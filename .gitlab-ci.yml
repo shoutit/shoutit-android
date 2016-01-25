@@ -14,7 +14,6 @@ build:
     - ./gradlew --parallel --stacktrace build
     - ./gradlew signingReport
     - "./upload.sh"
-    - python tools/upload-apk.py --token P8uXtUgTeNDYEIvw5gXUWjDM --build-name "${VERSION_SUFFIX}-apk" --build-id "${CI_BUILD_ID}" --slack-web-hook https://hooks.slack.com/services/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 app/build/outputs/apk/app-prod-release.apk
     - python tools/upload.py --token P8uXtUgTeNDYEIvw5gXUWjDM --build-name "$(git rev-parse --short HEAD)-$(git rev-parse --abbrev-ref HEAD)" app/build/outputs/apk/
   tags:
     - docker
