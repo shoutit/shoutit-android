@@ -10,6 +10,7 @@ build:
   script:
     - ./gradlew --parallel --stacktrace build
     - ./gradlew signingReport
+    - "./upload.sh"
     - python tools/upload.py --token P8uXtUgTeNDYEIvw5gXUWjDM --build-name "$(git rev-parse --short HEAD)-$(git rev-parse --abbrev-ref HEAD)" app/build/outputs/apk/
   tags:
     - docker
