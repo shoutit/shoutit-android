@@ -88,9 +88,6 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
-            ext.betaDistributionReleaseNotes="Changelog available here: https://review.appunite.com/gitweb?p=androidonemedical.git;a=log;h=${project.ext.commitId}"
-            ext.betaDistributionGroupAliases="testers"
-            ext.betaDistributionNotifications=false
             ext.enableCrashlytics = true
         }
     }
