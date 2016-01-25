@@ -7,9 +7,11 @@ import android.os.Looper;
 import android.util.Log;
 
 import com.google.common.base.Optional;
+import com.google.gson.Gson;
 import com.jakewharton.picasso.OkHttp3Downloader;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BuildConfig;
+import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.errors.NetworkOnMainThreadExceptionWithUrl;
 import com.squareup.picasso.Picasso;
 
@@ -26,6 +28,9 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.GsonConverterFactory;
+import retrofit2.Retrofit;
+import retrofit2.RxJavaCallAdapterFactory;
 
 @Module
 public final class AppModule {
@@ -76,7 +81,8 @@ public final class AppModule {
 
         final HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
 
-        loggingInterceptor.setLevel(BuildConfig.DEBUG ? HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE);
+        loggingInterceptor.setLevel(BuildConfig.DEBUG ?
+                HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE);
 
         okHttpClient.interceptors().add(new Interceptor() {
             @Override
@@ -92,6 +98,18 @@ public final class AppModule {
         okHttpClient.interceptors().add(loggingInterceptor);
 
         return okHttpClient.build();
+    }
+
+    @Provides
+    @Singleton
+    ApiService provideKingschatService(Gson gson, OkHttpClient client) {
+        return new Retrofit.Builder()
+                .baseUrl(BuildConfig.API_URL)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .client(client)
+                .build()
+                .create(ApiService.class);
     }
 
     private Optional<Cache> getCacheOrNull(@ForApplication Context context) {
