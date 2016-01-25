@@ -2,7 +2,6 @@ package com.shoutit.app.android;
 
 import android.app.Application;
 
-import com.appunite.app.BuildConfig;
 import com.crashlytics.android.Crashlytics;
 
 import io.fabric.sdk.android.Fabric;
