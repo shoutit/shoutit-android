@@ -2,7 +2,7 @@ package com.shoutit.app.android;
 
 import android.app.Application;
 
-import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.core.CrashlyticsCore;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -16,8 +16,10 @@ public class App extends Application {
     }
 
     private void initFabric() {
-        if (!BuildConfig.DEBUG) {
-            Fabric.with(this, new Crashlytics());
-        }
+        final CrashlyticsCore crashlytics = new CrashlyticsCore.Builder()
+                .disabled(BuildConfig.DEBUG)
+                .build();
+
+        Fabric.with(this, crashlytics);
     }
 }
