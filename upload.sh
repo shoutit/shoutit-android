@@ -5,5 +5,5 @@ then
 	--stacktrace \
 	--project-prop commitId="${CI_BUILD_REF}" \
 	--project-prop versionSuffix="$CI_BUILD_REF_NAME.$CI_BUILD_ID" \
-	crashlyticsUploadDistributionProdRelease
+	crashlyticsUploadDistributionProdRelease crashlyticsUploadDistributionProdStaging
 fi

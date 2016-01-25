@@ -67,11 +67,16 @@ android {
         debug {
             storeFile file("appunite-debug.keystore")
         }
+
+        staging {
+            storeFile file("appunite-debug.keystore")
+        }
+
         release {
-            storeFile file("${props.getProperty('onemedical.key.store', 'appunite-debug.keystore')}")
-            storePassword "${props.getProperty('onemedical.key.store.password', 'android')}"
-            keyAlias "${props.getProperty('onemedical.key.alias', 'androiddebugkey')}"
-            keyPassword "${props.getProperty('onemedical.key.alias.password', 'android')}"
+            storeFile file("${props.getProperty('shoutit.key.store', 'appunite-debug.keystore')}")
+            storePassword "${props.getProperty('shoutit.key.store.password', 'android')}"
+            keyAlias "${props.getProperty('shoutit.key.alias', 'androiddebugkey')}"
+            keyPassword "${props.getProperty('shoutit.key.alias.password', 'android')}"
         }
     }
 
@@ -82,16 +87,28 @@ android {
             ext.enableCrashlytics = false
             applicationIdSuffix '.debug'
             versionNameSuffix "-debug"
+            signingConfig signingConfigs.staging
+            buildConfigField "String", "API_URL", dev_runscope_api_url
         }
+
+        staging {
+            debuggable false
+            minifyEnabled false
+            ext.enableCrashlytics = true
+            applicationIdSuffix '.staging'
+            versionNameSuffix "-staging"
+            signingConfig signingConfigs.debug
+            ext.enableCrashlytics = true
+            buildConfigField "String", "API_URL", dev_runscope_api_url
+        }
+
         release {
             debuggable false
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
-            ext.betaDistributionReleaseNotes="Changelog available here: https://review.appunite.com/gitweb?p=androidonemedical.git;a=log;h=${project.ext.commitId}"
-            ext.betaDistributionGroupAliases="testers"
-            ext.betaDistributionNotifications=false
             ext.enableCrashlytics = true
+            buildConfigField "String", "API_URL", production_api_url
         }
     }
 
