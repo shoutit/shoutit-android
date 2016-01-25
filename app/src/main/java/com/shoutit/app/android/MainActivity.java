@@ -1,4 +1,4 @@
-package com.appunite.shoutit;
+package com.shoutit.app.android;
 
 import android.support.v7.app.AppCompatActivity;
 

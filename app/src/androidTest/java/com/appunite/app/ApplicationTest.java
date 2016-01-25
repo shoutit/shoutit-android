@@ -1,4 +1,4 @@
-package com.appunite.shoutit;
+package com.appunite.app;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
