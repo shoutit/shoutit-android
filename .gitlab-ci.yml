@@ -1,0 +1,17 @@
+before_script:
+  - export VERSION_SUFFIX="$(git rev-parse --short HEAD).$(git rev-list HEAD --count)$(echo "-${CI_BUILD_REF_NAME}" | sed 's/^-master$//‘)"
+  - printf "org.gradle.jvmargs=-XX:MaxPermSize=2g\ncommitId=${CI_BUILD_REF}\nversionSuffix=${VERSION_SUFFIX}\ndisablePreDex=true\n" > gradle.properties
+  - python tools/download.py --token P8uXtUgTeNDYEIvw5gXUWjDM --key-version agxzfmF1dG8tY2xvc2VyGAsSC1Byb2plY3RLZXlzGICAgMDuv6EKDA
+  - git submodule update --init --recursive
+  - git submodule foreach --recursive git clean -x -f -d
+  - /opt/tools/android-accept-licenses.sh "android update sdk --all --no-ui --filter extra-android-m2repository,extra-google-m2repository,build-tools-23.0.1,build-tools-23.0.2,android-23,extra-android-support,extra-android-m2repository,extra-google-google_play_services"
+
+build:
+  script:
+    - ./gradlew --parallel --stacktrace build
+    - ./gradlew signingReport
+    - python tools/upload.py --token P8uXtUgTeNDYEIvw5gXUWjDM --build-name "$(git rev-parse --short HEAD)-$(git rev-parse --abbrev-ref HEAD)" app/build/outputs/apk/
+  tags:
+    - docker
+  except:
+    - tags
