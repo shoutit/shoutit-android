@@ -1,5 +1,5 @@
 before_script:
-  - export VERSION_SUFFIX="$(git rev-parse --short HEAD).$(git rev-list HEAD --count)$(echo "-${CI_BUILD_REF_NAME}" | sed 's/^-master$//‘)"
+  - export VERSION_SUFFIX="$(git rev-parse --short HEAD).$(git rev-list HEAD --count)$(echo "-${CI_BUILD_REF_NAME}" | sed 's/^-master$//')"
   - printf "org.gradle.jvmargs=-XX:MaxPermSize=2g\ncommitId=${CI_BUILD_REF}\nversionSuffix=${VERSION_SUFFIX}\ndisablePreDex=true\n" > gradle.properties
   - python tools/download.py --token P8uXtUgTeNDYEIvw5gXUWjDM --key-version agxzfmF1dG8tY2xvc2VyGAsSC1Byb2plY3RLZXlzGICAgMDuv6EKDA
   - git submodule update --init --recursive
