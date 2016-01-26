@@ -28,4 +28,9 @@ public class IntroActivity extends AppCompatActivity {
     public void onHelpClick() {
         UserVoice.launchUserVoice(this);
     }
+
+    @OnClick(R.id.activity_intro_login_btn)
+    public void onLoginClick() {
+        startActivity(LoginActivity.newIntent(this));
+    }
 }

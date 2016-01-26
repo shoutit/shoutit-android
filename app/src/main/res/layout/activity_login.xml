@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?actionBarSize"
+        android:background="@color/pattern_background"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/activity_login_join"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="100dp"
+                android:text="@string/login_join"
+                android:textColor="@color/black_54"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/activity_login_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="84dp"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:lineSpacingExtra="4dp"
+                android:text="@string/login_text"
+                android:textColor="@color/black_54"
+                android:textSize="14sp" />
+
+            <RelativeLayout
+                android:id="@+id/activity_login_facebook_btn"
+                android:layout_width="280dp"
+                android:layout_height="40dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/shape_button_facebook"
+                android:foreground="?selectableItemBackground"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/activity_login_facebook_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginStart="20dp"
+                    android:src="@drawable/ic_facebook" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="@string/login_facebook"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/activity_login_gplus_btn"
+                android:layout_width="280dp"
+                android:layout_height="40dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/shape_button_google"
+                android:foreground="?selectableItemBackground"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/activity_login_google_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginStart="20dp"
+                    android:src="@drawable/ic_gplus" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="@string/login_facebook"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp" />
+
+            </RelativeLayout>
+
+            <TextView
+                android:layout_width="280dp"
+                android:layout_height="40dp"
+                android:background="@drawable/shape_button_signup"
+                android:foreground="?selectableItemBackground"
+                android:gravity="center"
+                android:text="@string/login_signup"
+                android:textColor="@android:color/white"
+                android:textSize="14sp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="10dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/login_bottom_buttons"
+                    android:text="@string/login_feedback" />
+
+                <TextView
+                    style="@style/login_bottom_buttons"
+                    android:text="@string/login_help" />
+
+                <TextView
+                    style="@style/login_bottom_buttons"
+                    android:text="@string/login_terms" />
+
+                <TextView
+                    style="@style/login_bottom_buttons"
+                    android:text="@string/login_about" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/activity_login_toolbar"
+        android:layout_centerHorizontal="true"
+        android:alpha="0.1"
+        android:scaleType="centerCrop"
+        android:src="@drawable/img_pattern" />
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/activity_login_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize"
+        android:navigationIcon="@drawable/ic_blue_arrow"
+        android:theme="@style/WhiteToolbar"
+        android:title="">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_shoutit_logo" />
+
+    </android.support.v7.widget.Toolbar>
+
+    <View
+        android:layout_below="@id/activity_login_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:background="@drawable/toolbar_drop_shadow" />
+
+</RelativeLayout>

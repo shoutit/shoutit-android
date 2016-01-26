@@ -17,6 +17,8 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".view.LoginActivity"/>
+
         <!-- Crashlytics -->
         <meta-data
             android:name="com.crashlytics.ApiKey"

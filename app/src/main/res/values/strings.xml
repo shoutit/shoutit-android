@@ -8,4 +8,14 @@
     <string name="intro_skip">Skip</string>
     <string name="intro_help">Help</string>
 
+    <!-- Login -->
+    <string name="login_join">Join Now!</string>
+    <string name="login_text">Login and discover what others are\n selling in your neighborhood or start\n selling in seconds</string>
+    <string name="login_facebook">Log in with Facebook</string>
+    <string name="login_signup">Sign up / Log in with E-mail</string>
+    <string name="login_feedback">Feedback</string>
+    <string name="login_help">Help</string>
+    <string name="login_terms">Terms</string>
+    <string name="login_about">About</string>
+
 </resources>
