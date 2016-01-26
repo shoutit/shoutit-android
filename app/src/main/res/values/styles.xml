@@ -6,4 +6,12 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="TranslucentStatusBar" parent="AppTheme" />
+
+    <!-- Needed for UserVoice library -->
+    <style name="UserVoiceTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+    </style>
+
 </resources>

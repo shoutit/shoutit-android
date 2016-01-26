@@ -87,6 +87,7 @@ android {
         }
 
         staging {
+            signingConfig signingConfigs.debug
             debuggable false
             minifyEnabled false
             ext.enableCrashlytics = true
@@ -187,4 +188,5 @@ dependencies {
         transitive = true;
     }
     compile 'com.google.guava:guava:18.0'
+    compile 'com.uservoice:uservoice-android-sdk:1.2.4'
 }

@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">ShoutIt</string>
+
+    <!-- Intro -->
+    <string name="intro_welcome">Welcome To Shoutit</string>
+    <string name="intro_buy">Buy and Sell while Chatting</string>
+    <string name="intro_login">Login</string>
+    <string name="intro_skip">Skip</string>
+    <string name="intro_help">Help</string>
+
 </resources>

@@ -3,4 +3,11 @@
     <color name="colorPrimary">#4CAF50</color>
     <color name="colorPrimaryDark">#3C8C40</color>
     <color name="colorAccent">#4CAF50</color>
+
+    <!-- Intro -->
+    <color name="intro_gradient_start">#80588F94</color>
+    <color name="intro_gradient_end">#80023842</color>
+    <color name="intro_buy">#b2ffffff</color>
+    <color name="intro_status_bar">#34000000</color>
+
 </resources>
