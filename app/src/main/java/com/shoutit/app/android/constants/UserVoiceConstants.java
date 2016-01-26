@@ -1,6 +1,6 @@
-package com.shoutit.app.android.data;
+package com.shoutit.app.android.constants;
 
-public class Constants {
+public class UserVoiceConstants {
 
     // User Voice library
     public static final int USER_VOICE_FORUM_ID = 290071;
