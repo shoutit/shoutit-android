@@ -4,8 +4,8 @@ buildscript {
         maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.5.0'
-        classpath 'io.fabric.tools:gradle:1.+'
+        classpath 'com.android.tools.build:gradle:2.0.0-alpha7'
+        classpath 'io.fabric.tools:gradle:1.21.2'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.7'
     }
 }
@@ -87,7 +87,7 @@ android {
             ext.enableCrashlytics = false
             applicationIdSuffix '.debug'
             versionNameSuffix "-debug"
-            signingConfig signingConfigs.staging
+            signingConfig signingConfigs.debug
             buildConfigField "String", "API_URL", dev_runscope_api_url
         }
 
@@ -97,7 +97,7 @@ android {
             ext.enableCrashlytics = true
             applicationIdSuffix '.staging'
             versionNameSuffix "-staging"
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.staging
             ext.enableCrashlytics = true
             buildConfigField "String", "API_URL", dev_runscope_api_url
         }
@@ -153,6 +153,7 @@ dependencies {
     apt 'com.google.dagger:dagger-compiler:2.0.1'
     compile 'com.google.dagger:dagger:2.0.1'
     compile 'com.google.code.gson:gson:2.5'
+    compile 'com.google.code.findbugs:jsr305:2.0.1'
 
     // Square
     compile 'com.jakewharton:butterknife:7.0.1'
