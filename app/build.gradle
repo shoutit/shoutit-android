@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
         maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
@@ -11,7 +11,7 @@ buildscript {
 }
 
 repositories {
-    mavenCentral()
+    jcenter()
     maven { url 'https://maven.fabric.io/public' }
 }
 
@@ -68,10 +68,6 @@ android {
             storeFile file("appunite-debug.keystore")
         }
 
-        staging {
-            storeFile file("appunite-debug.keystore")
-        }
-
         release {
             storeFile file("${props.getProperty('shoutit.key.store', 'appunite-debug.keystore')}")
             storePassword "${props.getProperty('shoutit.key.store.password', 'android')}"
@@ -87,7 +83,6 @@ android {
             ext.enableCrashlytics = false
             applicationIdSuffix '.debug'
             versionNameSuffix "-debug"
-            signingConfig signingConfigs.debug
             buildConfigField "String", "API_URL", dev_runscope_api_url
         }
 
@@ -97,7 +92,6 @@ android {
             ext.enableCrashlytics = true
             applicationIdSuffix '.staging'
             versionNameSuffix "-staging"
-            signingConfig signingConfigs.staging
             ext.enableCrashlytics = true
             buildConfigField "String", "API_URL", dev_runscope_api_url
         }
