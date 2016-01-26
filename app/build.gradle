@@ -1,17 +1,17 @@
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
         maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.5.0'
-        classpath 'io.fabric.tools:gradle:1.+'
+        classpath 'com.android.tools.build:gradle:2.0.0-alpha7'
+        classpath 'io.fabric.tools:gradle:1.21.2'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.7'
     }
 }
 
 repositories {
-    mavenCentral()
+    jcenter()
     maven { url 'https://maven.fabric.io/public' }
 }
 
@@ -67,11 +67,12 @@ android {
         debug {
             storeFile file("appunite-debug.keystore")
         }
+
         release {
-            storeFile file("${props.getProperty('onemedical.key.store', 'appunite-debug.keystore')}")
-            storePassword "${props.getProperty('onemedical.key.store.password', 'android')}"
-            keyAlias "${props.getProperty('onemedical.key.alias', 'androiddebugkey')}"
-            keyPassword "${props.getProperty('onemedical.key.alias.password', 'android')}"
+            storeFile file("${props.getProperty('shoutit.key.store', 'appunite-debug.keystore')}")
+            storePassword "${props.getProperty('shoutit.key.store.password', 'android')}"
+            keyAlias "${props.getProperty('shoutit.key.alias', 'androiddebugkey')}"
+            keyPassword "${props.getProperty('shoutit.key.alias.password', 'android')}"
         }
     }
 
@@ -82,13 +83,26 @@ android {
             ext.enableCrashlytics = false
             applicationIdSuffix '.debug'
             versionNameSuffix "-debug"
+            buildConfigField "String", "API_URL", dev_runscope_api_url
         }
+
+        staging {
+            debuggable false
+            minifyEnabled false
+            ext.enableCrashlytics = true
+            applicationIdSuffix '.staging'
+            versionNameSuffix "-staging"
+            ext.enableCrashlytics = true
+            buildConfigField "String", "API_URL", dev_runscope_api_url
+        }
+
         release {
             debuggable false
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
             ext.enableCrashlytics = true
+            buildConfigField "String", "API_URL", production_api_url
         }
     }
 
@@ -98,7 +112,7 @@ android {
         }
 
         prod {
-            minSdkVersion 15
+            minSdkVersion 16
         }
     }
 
@@ -133,13 +147,17 @@ dependencies {
     apt 'com.google.dagger:dagger-compiler:2.0.1'
     compile 'com.google.dagger:dagger:2.0.1'
     compile 'com.google.code.gson:gson:2.5'
+    compile 'com.google.code.findbugs:jsr305:2.0.1'
 
     // Square
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.squareup.retrofit2:retrofit:2.0.0-beta3'
-
-    compile 'com.squareup.okhttp:okhttp-urlconnection:2.2.0'
+    compile 'com.squareup.okhttp3:okhttp-urlconnection:3.0.1'
+    compile 'com.squareup.okhttp3:logging-interceptor:3.0.1'
+    compile 'com.jakewharton.picasso:picasso2-okhttp3-downloader:1.0.2'
+    compile 'com.squareup.retrofit2:converter-gson:2.0.0-beta3'
+    compile 'com.squareup.retrofit2:adapter-rxjava:2.0.0-beta3'
 
     // RX
     compile 'com.trello:rxlifecycle:0.4.0'
@@ -168,4 +186,5 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.5.1@aar') {
         transitive = true;
     }
+    compile 'com.google.guava:guava:18.0'
 }
