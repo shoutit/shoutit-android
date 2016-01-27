@@ -4,18 +4,12 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     android:fillViewport="true"
+    android:background="@drawable/gradient_intro"
     tools:context=".view.intro.IntroActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:foreground="@drawable/gradient_intro"
-            android:scaleType="centerCrop"
-            android:src="@drawable/img_intro" />
 
         <ImageView
             android:id="@+id/activity_intro_logo"
@@ -51,14 +45,13 @@
 
         <Button
             android:layout_width="200dp"
-            android:layout_height="58dp"
+            android:layout_height="47dp"
             android:layout_below="@+id/activity_intro_buy"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="100dp"
             android:fontFamily="sans-serif-regular"
             android:text="@string/intro_login"
-            android:background="@android:color/white"
-            android:foreground="?selectableItemBackground"
+            android:background="@drawable/selector_intro"
             android:textAllCaps="false"
             android:textColor="@color/colorPrimary"
             android:textSize="14sp" />
