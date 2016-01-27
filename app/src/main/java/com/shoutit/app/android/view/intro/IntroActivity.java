@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view;
+package com.shoutit.app.android.view.intro;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

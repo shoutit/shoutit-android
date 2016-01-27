@@ -7,7 +7,7 @@ import com.shoutit.app.android.dagger.AppComponent;
 import com.shoutit.app.android.dagger.AppModule;
 import com.shoutit.app.android.dagger.BaseModule;
 import com.shoutit.app.android.dagger.DaggerAppComponent;
-import com.shoutit.app.android.data.Constants;
+import com.shoutit.app.android.constants.UserVoiceConstants;
 import com.uservoice.uservoicesdk.Config;
 import com.uservoice.uservoicesdk.UserVoice;
 
@@ -28,10 +28,10 @@ public class App extends Application {
     }
 
     private void initUserVoice() {
-        final Config config = new Config(Constants.USER_VOICE_WEBSITE);
+        final Config config = new Config(UserVoiceConstants.USER_VOICE_WEBSITE);
         config.setShowForum(false);
-        config.setTopicId(Constants.USER_VOICE_TOPIC_ID);
-        config.setForumId(Constants.USER_VOICE_FORUM_ID);
+        config.setTopicId(UserVoiceConstants.USER_VOICE_TOPIC_ID);
+        config.setForumId(UserVoiceConstants.USER_VOICE_FORUM_ID);
         UserVoice.init(config, this);
     }
 

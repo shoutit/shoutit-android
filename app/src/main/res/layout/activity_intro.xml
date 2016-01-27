@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     android:fillViewport="true"
-    tools:context=".view.IntroActivity">
+    tools:context=".view.intro.IntroActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -58,6 +58,8 @@
             android:layout_marginTop="100dp"
             android:fontFamily="sans-serif-regular"
             android:text="@string/intro_login"
+            android:background="@android:color/white"
+            android:foreground="?selectableItemBackground"
             android:textAllCaps="false"
             android:textColor="@color/colorPrimary"
             android:textSize="14sp" />
