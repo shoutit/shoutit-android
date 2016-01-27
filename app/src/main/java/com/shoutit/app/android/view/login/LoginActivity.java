@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view;
+package com.shoutit.app.android.view.login;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,9 +9,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.view.about.AboutActivity;
+import com.shoutit.app.android.view.about.AboutFragment;
+import com.uservoice.uservoicesdk.UserVoice;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -46,5 +50,20 @@ public class LoginActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @OnClick(R.id.activity_login_feedback)
+    public void onFeedbackClick() {
+        UserVoice.launchContactUs(this);
+    }
+
+    @OnClick(R.id.activity_login_help)
+    public void onHelpClick() {
+        UserVoice.launchUserVoice(this);
+    }
+
+    @OnClick(R.id.activity_login_about)
+    public void onAboutClick() {
+        startActivity(new Intent(this, AboutActivity.class));
     }
 }
