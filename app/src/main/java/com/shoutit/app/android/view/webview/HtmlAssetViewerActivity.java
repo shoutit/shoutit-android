@@ -33,6 +33,7 @@ public class HtmlAssetViewerActivity extends AppCompatActivity {
     private String assetName;
     private String toolbarTitle;
 
+    @Nonnull
     public static Intent newIntent(@Nonnull Context context,
                                    @Nonnull String assetName,
                                    @Nullable String toolbarName) {

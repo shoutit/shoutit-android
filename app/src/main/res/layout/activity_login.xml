@@ -120,17 +120,17 @@
 
                 <TextView
                     android:id="@+id/activity_login_feedback"
-                    style="@style/login_bottom_buttons"
+                    style="@style/LoginBottomButtons"
                     android:text="@string/login_feedback" />
 
                 <TextView
                     android:id="@+id/activity_login_help"
-                    style="@style/login_bottom_buttons"
+                    style="@style/LoginBottomButtons"
                     android:text="@string/login_help" />
 
                 <TextView
                     android:id="@+id/activity_login_about"
-                    style="@style/login_bottom_buttons"
+                    style="@style/LoginBottomButtons"
                     android:text="@string/login_about" />
 
             </LinearLayout>

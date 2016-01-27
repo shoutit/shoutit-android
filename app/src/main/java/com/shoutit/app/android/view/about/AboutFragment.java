@@ -3,7 +3,7 @@ package com.shoutit.app.android.view.about;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.preference.PreferenceScreen;
+import android.support.annotation.StringRes;
 
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.data.AssetsConstants;
@@ -13,6 +13,7 @@ import javax.annotation.Nonnull;
 
 public class AboutFragment extends PreferenceFragment {
 
+    @Nonnull
     public static AboutFragment newInstance() {
         return new AboutFragment();
     }
@@ -23,39 +24,28 @@ public class AboutFragment extends PreferenceFragment {
 
         addPreferencesFromResource(R.xml.preferences_about);
 
-        final PreferenceScreen termsPref = (PreferenceScreen) findPreference(getString(R.string.pref_key_terms_of_service));
-        termsPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                startWebPage(AssetsConstants.ASSET_TERMS_OF_SERVICE,
-                        getString(R.string.terms_of_service));
-                return true;
-            }
-        });
+        setOnPreferenceClickListener(R.string.pref_key_terms_of_service,
+                AssetsConstants.ASSET_TERMS_OF_SERVICE,
+                R.string.terms_of_service);
 
-        final PreferenceScreen privacyPref = (PreferenceScreen) findPreference(getString(R.string.pref_key_privacy_policy));
-        privacyPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                startWebPage(AssetsConstants.ASSET_PRIVACY_POLICY,
-                        getString(R.string.about_privacy_policy_title));
-                return true;
-            }
-        });
+        setOnPreferenceClickListener(R.string.pref_key_privacy_policy,
+                AssetsConstants.ASSET_PRIVACY_POLICY,
+                R.string.about_privacy_policy_title);
 
-        final PreferenceScreen legalPref = (PreferenceScreen) findPreference(getString(R.string.pref_key_legal));
-        legalPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        setOnPreferenceClickListener(R.string.pref_key_legal,
+                AssetsConstants.ASSET_LEGAL,
+                R.string.about_legal_title);
+    }
+
+    private void setOnPreferenceClickListener(@StringRes int prefKey,
+                                              @Nonnull final String assetName,
+                                              @StringRes final int toolbarTitleId) {
+        findPreference(getString(prefKey)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                startWebPage(AssetsConstants.ASSET_LEGAL,
-                        getString(R.string.about_legal_title));
+                startActivity(HtmlAssetViewerActivity.newIntent(getActivity(), assetName, getString(toolbarTitleId)));
                 return true;
             }
         });
     }
-
-    private void startWebPage(@Nonnull String assetName, @Nonnull String toolbarTitle) {
-        startActivity(HtmlAssetViewerActivity.newIntent(getActivity(), assetName, toolbarTitle));
-    }
-
 }

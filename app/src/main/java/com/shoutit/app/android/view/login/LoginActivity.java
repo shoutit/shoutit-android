@@ -13,6 +13,8 @@ import com.shoutit.app.android.view.about.AboutActivity;
 import com.shoutit.app.android.view.about.AboutFragment;
 import com.uservoice.uservoicesdk.UserVoice;
 
+import javax.annotation.Nonnull;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -22,6 +24,7 @@ public class LoginActivity extends AppCompatActivity {
     @Bind(R.id.activity_login_toolbar)
     Toolbar toolbar;
 
+    @Nonnull
     public static Intent newIntent(Context from) {
         return new Intent(from, LoginActivity.class);
     }
