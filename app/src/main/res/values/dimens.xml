@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="status_bar_margin">0dp</dimen>
+
+    <!-- Home -->
+    <dimen name="home_discover_image_height">90dp</dimen>
+    <dimen name="home_feed_image_height">126dp</dimen>
+    <dimen name="home_discover_card_width">120dp</dimen>
+
 </resources>

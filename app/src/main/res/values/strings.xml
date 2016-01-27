@@ -8,4 +8,10 @@
     <string name="intro_skip">Skip</string>
     <string name="intro_help">Help</string>
 
+    <!-- Home -->
+    <string name="home_menu_chat">Chat</string>
+    <string name="home_menu_search">Search</string>
+    <string name="home_menu_cart">Cart</string>
+    <string name="home_see_all">See All</string>
+
 </resources>

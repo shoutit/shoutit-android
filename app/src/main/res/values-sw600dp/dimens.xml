@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Home -->
+    <dimen name="home_discover_image_height">120dp</dimen>
+    <dimen name="home_feed_image_height">156dp</dimen>
+    <dimen name="home_discover_card_width">150dp</dimen>
+</resources>

@@ -4,6 +4,10 @@
     <color name="colorPrimaryDark">#3C8C40</color>
     <color name="colorAccent">#4CAF50</color>
 
+    <!-- Global colors -->
+    <color name="default_bg_color">#f7f7f7</color>
+    <color name="black_54">#8a000000</color>
+
     <!-- Intro -->
     <color name="intro_gradient_start">#80588F94</color>
     <color name="intro_gradient_end">#80023842</color>
