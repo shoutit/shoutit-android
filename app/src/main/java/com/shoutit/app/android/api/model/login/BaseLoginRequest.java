@@ -16,4 +16,24 @@ public class BaseLoginRequest {
         this.grantType = grantType;
         this.user = user;
     }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public String getClientSecret() {
+        return clientSecret;
+    }
+
+    public String getMixpanelDistinctId() {
+        return mixpanelDistinctId;
+    }
+
+    public String getGrantType() {
+        return grantType;
+    }
+
+    public LoginUser getUser() {
+        return user;
+    }
 }

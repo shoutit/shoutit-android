@@ -8,7 +8,7 @@ public class LoginUser {
         this.location = new Location(latitude, longitude);
     }
 
-    private class Location {
+    public static class Location {
 
         private final double latitude;
         private final double longitude;
@@ -17,5 +17,17 @@ public class LoginUser {
             this.latitude = latitude;
             this.longitude = longitude;
         }
+
+        public double getLatitude() {
+            return latitude;
+        }
+
+        public double getLongitude() {
+            return longitude;
+        }
+    }
+
+    public Location getLocation() {
+        return location;
     }
 }

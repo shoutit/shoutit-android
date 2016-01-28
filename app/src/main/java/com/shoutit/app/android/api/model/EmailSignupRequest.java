@@ -26,4 +26,19 @@ public class EmailSignupRequest extends BaseLoginRequest {
         this.email = email;
         this.password = password;
     }
+
+    @NonNull
+    public String getPassword() {
+        return password;
+    }
+
+    @NonNull
+    public String getEmail() {
+        return email;
+    }
+
+    @NonNull
+    public String getName() {
+        return name;
+    }
 }
