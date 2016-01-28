@@ -8,7 +8,8 @@ public class ShoutsResponse extends PaginatedResponse {
     @Nonnull
     final List<Shout> results;
 
-    public ShoutsResponse(@Nonnull List<Shout> results) {
+    public ShoutsResponse(int count, String next, String previous, @Nonnull List<Shout> results) {
+        super(count, next, previous);
         this.results = results;
     }
 

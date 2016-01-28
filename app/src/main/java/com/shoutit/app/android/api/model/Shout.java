@@ -1,5 +1,7 @@
 package com.shoutit.app.android.api.model;
 
+import com.google.common.base.Objects;
+
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -41,5 +43,94 @@ public class Shout {
         this.category = category;
         this.tags = tags;
         this.tags2 = tags2;
+    }
+
+    @Nonnull
+    public String getId() {
+        return id;
+    }
+
+    public String getApiUrl() {
+        return apiUrl;
+    }
+
+    public String getWebUrl() {
+        return webUrl;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public float getNumber() {
+        return number;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public String getThumbnail() {
+        return thumbnail;
+    }
+
+    public String getVideoUrl() {
+        return videoUrl;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public String getTags2() {
+        return tags2;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Shout)) return false;
+        final Shout shout = (Shout) o;
+        return Float.compare(shout.number, number) == 0 &&
+                Objects.equal(id, shout.id) &&
+                Objects.equal(apiUrl, shout.apiUrl) &&
+                Objects.equal(webUrl, shout.webUrl) &&
+                Objects.equal(type, shout.type) &&
+                Objects.equal(location, shout.location) &&
+                Objects.equal(title, shout.title) &&
+                Objects.equal(text, shout.text) &&
+                Objects.equal(currency, shout.currency) &&
+                Objects.equal(thumbnail, shout.thumbnail) &&
+                Objects.equal(videoUrl, shout.videoUrl) &&
+                Objects.equal(user, shout.user) &&
+                Objects.equal(category, shout.category) &&
+                Objects.equal(tags, shout.tags) &&
+                Objects.equal(tags2, shout.tags2);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id, apiUrl, webUrl, type, location, title, text,
+                number, currency, thumbnail, videoUrl, user, category, tags, tags2);
     }
 }

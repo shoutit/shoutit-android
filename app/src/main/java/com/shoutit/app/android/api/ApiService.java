@@ -4,6 +4,7 @@ import com.shoutit.app.android.api.model.DiscoverResponse;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 
 import retrofit2.http.GET;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 import rx.Observable;
 
@@ -14,10 +15,13 @@ public interface ApiService {
                                            @Query("page") int page,
                                            @Query("page_size") int pageSize);
 
-    @GET("users/me/home")
-    Observable<ShoutsResponse> myHome(@Query("page") int page,
-                                      @Query("page_size") int pageSize);
+    @GET("users/{user_name}/home")
+    Observable<ShoutsResponse> home(@Path("user_name") String userName,
+                                    @Query("page") int page,
+                                    @Query("page_size") int pageSize);
 
     @GET("shouts")
-    Observable<ShoutsResponse> shoutsForCountry(@Query("city") String city);
+    Observable<ShoutsResponse> shoutsForCountry(@Query("city") String city,
+                                                @Query("page") int page,
+                                                @Query("page_size") int pageSize);
 }
