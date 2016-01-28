@@ -26,12 +26,12 @@
         <!-- Crashlytics -->
         <meta-data
             android:name="com.crashlytics.ApiKey"
-            android:value="df7a00236cfb54396bdf1cb5c0a37140f2edc1f4" />
+            android:value="b058b2dcbf8b8f864860fe9fe12789317aba9da1" />
 
         <!-- Fabric -->
         <meta-data
             android:name="io.fabric.ApiKey"
-            android:value="df7a00236cfb54396bdf1cb5c0a37140f2edc1f4" />
+            android:value="b058b2dcbf8b8f864860fe9fe12789317aba9da1" />
 
     </application>
 
