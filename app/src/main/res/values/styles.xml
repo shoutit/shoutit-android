@@ -4,9 +4,10 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:colorButtonNormal">@color/colorAccent</item>
     </style>
 
-    <style name="TranslucentStatusBar" parent="AppTheme" />
+    <style name="TranslucentStatusBar" parent="AppTheme"/>
 
     <!-- Needed for UserVoice library -->
     <style name="UserVoiceTheme" parent="Theme.AppCompat.Light.DarkActionBar">

@@ -149,6 +149,8 @@ dependencies {
     compile 'com.google.dagger:dagger:2.0.1'
     compile 'com.google.code.gson:gson:2.5'
     compile 'com.google.code.findbugs:jsr305:2.0.1'
+    compile 'com.google.android.gms:play-services-location:8.4.0'
+    compile 'com.google.guava:guava:18.0'
 
     // Square
     compile 'com.jakewharton:butterknife:7.0.1'
@@ -159,6 +161,7 @@ dependencies {
     compile 'com.jakewharton.picasso:picasso2-okhttp3-downloader:1.0.2'
     compile 'com.squareup.retrofit2:converter-gson:2.0.0-beta3'
     compile 'com.squareup.retrofit2:adapter-rxjava:2.0.0-beta3'
+
 
     // RX
     compile 'com.trello:rxlifecycle:0.4.0'
@@ -176,6 +179,9 @@ dependencies {
         exclude group: 'com.google.code.findbugs', module: 'annotations'
     }
 
+    // other
+    compile 'com.uservoice:uservoice-android-sdk:1.2.4'
+
     // Tests
     testCompile 'junit:junit:4.12'
     testCompile 'com.android.support:support-annotations:23.1.1'
@@ -187,6 +193,4 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.5.1@aar') {
         transitive = true;
     }
-    compile 'com.google.guava:guava:18.0'
-    compile 'com.uservoice:uservoice-android-sdk:1.2.4'
 }
