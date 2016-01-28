@@ -29,11 +29,8 @@ import rx.subjects.PublishSubject;
 public class HomePresenter {
 
     private final static int PAGE_SIZE = 20;
+    private final static int VISIBLE_DISCOVER_ITEMS_ON_START = 6;
 
-    @Nonnull
-    private final Observable<List<BaseAdapterItem>> allDiscoversObservable;
-    @Nonnull
-    private final Observable<List<BaseAdapterItem>> allShoutsObservable;
     @Nonnull
     private final PublishSubject<Object> loadMoreDiscovers = PublishSubject.create();
     @Nonnull
@@ -46,6 +43,8 @@ public class HomePresenter {
     private final Scheduler networkScheduler;
     @Nonnull
     private final Observable<Boolean> progressObservable;
+    @Nonnull
+    private final Observable<List<BaseAdapterItem>> allAdapterItemsObservable;
 
 
     @Inject
@@ -61,7 +60,7 @@ public class HomePresenter {
                         .compose(ResponseOrError.<ShoutsResponse>toResponseOrErrorObservable())
                         .compose(ObservableExtensions.<ResponseOrError<ShoutsResponse>>behaviorRefCount());
 
-        allShoutsObservable = myShoutsObservable
+        final Observable<List<BaseAdapterItem>> allShoutsObservable = myShoutsObservable
                 .compose(ResponseOrError.<ShoutsResponse>onlySuccess())
                 .filter(new Func1<ShoutsResponse, Boolean>() {
                     @Override
@@ -91,7 +90,7 @@ public class HomePresenter {
                         .compose(ResponseOrError.<DiscoverResponse>toResponseOrErrorObservable())
                         .compose(ObservableExtensions.<ResponseOrError<DiscoverResponse>>behaviorRefCount());
 
-        allDiscoversObservable = discoverObservable
+        final Observable<List<BaseAdapterItem>> allDiscoversObservable = discoverObservable
                 .compose(ResponseOrError.<DiscoverResponse>onlySuccess())
                 .filter(new Func1<DiscoverResponse, Boolean>() {
                     @Override
@@ -107,6 +106,10 @@ public class HomePresenter {
                             items.add(new DiscoverAdapterItem(discover));
                         }
 
+                        if (items.size() <= VISIBLE_DISCOVER_ITEMS_ON_START) {
+                            items.add(new DiscoverSeeMoteAdapterItem());
+                        }
+
                         return new ImmutableList.Builder<BaseAdapterItem>()
                                 .add(new DiscoverHeaderAdapterItem())
                                 .addAll(items)
@@ -114,11 +117,25 @@ public class HomePresenter {
                     }
                 });
 
+        allAdapterItemsObservable = Observable.combineLatest(
+                allDiscoversObservable,
+                allShoutsObservable,
+                new Func2<List<BaseAdapterItem>, List<BaseAdapterItem>, List<BaseAdapterItem>>() {
+                    @Override
+                    public List<BaseAdapterItem> call(List<BaseAdapterItem> discovers,
+                                                      List<BaseAdapterItem> shouts) {
+                        return ImmutableList.<BaseAdapterItem>builder()
+                                .add(new DiscoverContainerAdapterItem(discovers))
+                                .addAll(shouts)
+                                .build();
+                    }
+                });
 
-        /** Progress and Error **/
-        errorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
-                ResponseOrError.transform(myShoutsObservable),
-                ResponseOrError.transform(discoverObservable)));
+
+                /** Progress and Error **/
+                errorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
+                        ResponseOrError.transform(myShoutsObservable),
+                        ResponseOrError.transform(discoverObservable)));
 
         progressObservable = Observable.merge(errorObservable, allDiscoversObservable, allShoutsObservable)
                 .map(Functions1.returnFalse());
@@ -205,18 +222,39 @@ public class HomePresenter {
     }
 
     @Nonnull
-    public Observable<List<BaseAdapterItem>> getDiscoversObservable() {
-        return allDiscoversObservable;
-    }
-
-    @Nonnull
-    public Observable<List<BaseAdapterItem>> getAllShoutsObservable() {
-        return allShoutsObservable;
+    public Observable<List<BaseAdapterItem>> getAllAdapterItemsObservable() {
+        return allAdapterItemsObservable;
     }
 
     @Nonnull
     public Observable<Boolean> getProgressObservable() {
         return progressObservable;
+    }
+
+    @Nonnull
+    public Observable<Throwable> getErrorObservable() {
+        return errorObservable;
+    }
+
+    public class DiscoverSeeMoteAdapterItem implements BaseAdapterItem {
+
+        public DiscoverSeeMoteAdapterItem() {
+        }
+
+        @Override
+        public long adapterId() {
+            return BaseAdapterItem.NO_ID;
+        }
+
+        @Override
+        public boolean matches(@Nonnull BaseAdapterItem item) {
+            return item instanceof DiscoverSeeMoteAdapterItem;
+        }
+
+        @Override
+        public boolean same(@Nonnull BaseAdapterItem item) {
+            return item instanceof DiscoverSeeMoteAdapterItem;
+        }
     }
 
     public class ShoutAdapterItem implements BaseAdapterItem {
@@ -272,9 +310,13 @@ public class HomePresenter {
         public boolean same(@Nonnull BaseAdapterItem item) {
             return item instanceof ShoutHeaderAdapterItem;
         }
+
+        public boolean isUserLoggedIn() {
+            return isUserLoggedIn;
+        }
     }
 
-    private class DiscoverAdapterItem implements BaseAdapterItem {
+    public class DiscoverAdapterItem implements BaseAdapterItem {
 
         @Nonnull
         private final Discover discover;
@@ -305,7 +347,7 @@ public class HomePresenter {
         }
     }
 
-    private class DiscoverHeaderAdapterItem implements BaseAdapterItem {
+    public class DiscoverHeaderAdapterItem implements BaseAdapterItem {
 
         public DiscoverHeaderAdapterItem() {
         }
@@ -317,12 +359,42 @@ public class HomePresenter {
 
         @Override
         public boolean matches(@Nonnull BaseAdapterItem item) {
-            return item instanceof DiscoverAdapterItem;
+            return item instanceof DiscoverHeaderAdapterItem;
         }
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof DiscoverAdapterItem;
+            return item instanceof DiscoverHeaderAdapterItem;
+        }
+    }
+
+    public class DiscoverContainerAdapterItem implements BaseAdapterItem {
+
+        @Nonnull
+        private final List<BaseAdapterItem> adapterItems;
+
+        public DiscoverContainerAdapterItem(@Nonnull List<BaseAdapterItem> adapterItems) {
+            this.adapterItems = adapterItems;
+        }
+
+        @Override
+        public long adapterId() {
+            return BaseAdapterItem.NO_ID;
+        }
+
+        @Override
+        public boolean matches(@Nonnull BaseAdapterItem item) {
+            return item instanceof DiscoverContainerAdapterItem;
+        }
+
+        @Override
+        public boolean same(@Nonnull BaseAdapterItem item) {
+            return item instanceof DiscoverContainerAdapterItem;
+        }
+
+        @Nonnull
+        public List<BaseAdapterItem> getAdapterItems() {
+            return adapterItems;
         }
     }
 }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="status_bar_margin">0dp</dimen>
+    <dimen name="fab_size">56dp</dimen>
 
     <!-- Home -->
     <dimen name="home_discover_image_height">90dp</dimen>
