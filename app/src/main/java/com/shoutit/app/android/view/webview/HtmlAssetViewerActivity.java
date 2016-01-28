@@ -48,11 +48,13 @@ public class HtmlAssetViewerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_html_asset_viewer);
         ButterKnife.bind(this);
 
-        if (savedInstanceState == null) {
-            getData(getIntent().getExtras());
-        } else {
-            getData(savedInstanceState);
-        }
+        final Intent intent = getIntent();
+        checkNotNull(intent);
+        toolbarTitle = intent.getStringExtra(EXTRA_TITLE);
+        assetName = intent.getStringExtra(EXTRA_HTML_ASSET_NAME);
+        checkNotNull(assetName);
+
+        loadWebPage();
 
         setUpToolbar();
     }
@@ -75,15 +77,6 @@ public class HtmlAssetViewerActivity extends AppCompatActivity {
         }
     }
 
-    private void getData(Bundle extras) {
-        checkNotNull(extras);
-        toolbarTitle = extras.getString(EXTRA_TITLE);
-        assetName = extras.getString(EXTRA_HTML_ASSET_NAME);
-        checkNotNull(assetName);
-
-        loadWebPage();
-    }
-
     private void loadWebPage() {
         webView.getSettings().setJavaScriptEnabled(false);
         webView.loadUrl(ASSETS_FILE_PATH + assetName);
@@ -92,13 +85,4 @@ public class HtmlAssetViewerActivity extends AppCompatActivity {
         webView.getSettings().setUseWideViewPort(true);
         webView.getSettings().setLoadWithOverviewMode(true);
     }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString(EXTRA_HTML_ASSET_NAME, assetName);
-        outState.putString(EXTRA_TITLE, toolbarTitle);
-    }
-
-
 }
