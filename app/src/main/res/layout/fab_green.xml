@@ -7,7 +7,5 @@
     android:layout_gravity="bottom|end"
     android:layout_margin="16dp"
     android:src="@drawable/ic_add"
-    app:backgroundTint="@color/colorAccent"
-    app:elevation="4dp"
-    app:fab_colorPressed="@color/theme_primary_dark"
-    app:fab_elevationCompat="8dp" />
+    app:backgroundTint="@color/colorPrimary"
+    app:elevation="4dp" />
