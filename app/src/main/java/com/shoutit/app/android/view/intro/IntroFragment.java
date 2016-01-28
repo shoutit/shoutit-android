@@ -15,11 +15,8 @@ import com.shoutit.app.android.R;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 
-public class IntroFragment extends Fragment {
-
-    private static final String EXTRA_PAGE_NUMBER = "page_number";
+public abstract class IntroFragment extends Fragment {
 
     @Bind(R.id.activity_intro_logo)
     ImageView logoImageView;
@@ -27,14 +24,6 @@ public class IntroFragment extends Fragment {
     TextView firstTextView;
     @Bind(R.id.activity_intro_second_text)
     TextView secondTextView;
-
-    public static IntroFragment newInstance(int pageNumber) {
-        final Bundle bundle = new Bundle();
-        bundle.putInt(EXTRA_PAGE_NUMBER, pageNumber);
-        final IntroFragment fragment = new IntroFragment();
-        fragment.setArguments(bundle);
-        return fragment;
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -46,28 +35,20 @@ public class IntroFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
 
-        checkNotNull(getArguments());
-        final int pageNumber = getArguments().getInt(EXTRA_PAGE_NUMBER);
-
-        switch (pageNumber) {
-            case 0:
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-                bindData(R.drawable.ic_logo, R.string.intro_welcome, R.string.intro_buy);
-                break;
-            default:
-                throw new RuntimeException("Unknown page size");
-        }
+        bindData();
     }
 
-    private void bindData(@DrawableRes int logoResId,
-                          @StringRes int firstTextId,
-                          @StringRes int secondTextId) {
-        logoImageView.setImageDrawable(getResources().getDrawable(logoResId));
-        firstTextView.setText(firstTextId);
-        secondTextView.setText(secondTextId);
+    private void bindData() {
+        logoImageView.setImageDrawable(getResources().getDrawable(getLogoResId()));
+        firstTextView.setText(getFirstTextResId());
+        secondTextView.setText(getSecondTextResId());
     }
+
+    @DrawableRes
+    protected abstract int getLogoResId();
+    @StringRes
+    protected abstract int getFirstTextResId();
+    @StringRes
+    protected abstract int getSecondTextResId();
+
 }
