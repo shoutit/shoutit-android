@@ -11,6 +11,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.SystemUIUtils;
+import com.shoutit.app.android.view.login.LoginActivity;
 import com.uservoice.uservoicesdk.UserVoice;
 import com.viewpagerindicator.CirclePageIndicator;
 
@@ -52,6 +53,11 @@ public class IntroActivity extends BaseActivity {
     public void onSkipClick() {
         // TODO
         Toast.makeText(this, "Not implemented yet", Toast.LENGTH_LONG).show();
+    }
+
+    @OnClick(R.id.activity_intro_login_button)
+    public void onLoginClick() {
+        startActivity(LoginActivity.newIntent(this));
     }
 
     @Nonnull
