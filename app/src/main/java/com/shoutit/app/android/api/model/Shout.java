@@ -15,6 +15,7 @@ public class Shout {
     private final Location location;
     private final String title;
     private final String text;
+    private final float price;
     private final float number;
     private final String currency;
     private final String thumbnail;
@@ -25,7 +26,7 @@ public class Shout {
     private final String tags2;
 
     public Shout(@Nonnull String id, String apiUrl, String webUrl, String type,
-                 Location location, String title, String text, float number,
+                 Location location, String title, String text, float price, float number,
                  String currency, String thumbnail, String videoUrl, User user,
                  Category category, List<Tag> tags, String tags2) {
         this.id = id;
@@ -35,6 +36,7 @@ public class Shout {
         this.location = location;
         this.title = title;
         this.text = text;
+        this.price = price;
         this.number = number;
         this.currency = currency;
         this.thumbnail = thumbnail;
@@ -106,6 +108,10 @@ public class Shout {
         return tags2;
     }
 
+    public float getPrice() {
+        return price;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -125,12 +131,13 @@ public class Shout {
                 Objects.equal(user, shout.user) &&
                 Objects.equal(category, shout.category) &&
                 Objects.equal(tags, shout.tags) &&
+                Objects.equal(price, shout.price) &&
                 Objects.equal(tags2, shout.tags2);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id, apiUrl, webUrl, type, location, title, text,
+        return Objects.hashCode(id, apiUrl, webUrl, type, location, title, text, price,
                 number, currency, thumbnail, videoUrl, user, category, tags, tags2);
     }
 }

@@ -77,7 +77,7 @@ public class HomePresenter {
                         }
 
                         return new ImmutableList.Builder<BaseAdapterItem>()
-                                .add(new ShoutHeaderAdapterItem(isUserLoggedIn()))
+                                .add(new ShoutHeaderAdapterItem(isUserLoggedIn(), "Dubaj")) // TODO provide city here
                                 .addAll(items)
                                 .build();
                     }
@@ -111,7 +111,7 @@ public class HomePresenter {
                         }
 
                         return new ImmutableList.Builder<BaseAdapterItem>()
-                                .add(new DiscoverHeaderAdapterItem())
+                                .add(new DiscoverHeaderAdapterItem("Dubaj")) // TODO provide city
                                 .addAll(items)
                                 .build();
                     }
@@ -291,9 +291,12 @@ public class HomePresenter {
     public class ShoutHeaderAdapterItem implements BaseAdapterItem {
 
         private final boolean isUserLoggedIn;
+        // TODO need provide this city
+        private final String userCity;
 
-        public ShoutHeaderAdapterItem(boolean isUserLoggedIn) {
+        public ShoutHeaderAdapterItem(boolean isUserLoggedIn, String userCity) {
             this.isUserLoggedIn = isUserLoggedIn;
+            this.userCity = userCity;
         }
 
         @Override
@@ -313,6 +316,10 @@ public class HomePresenter {
 
         public boolean isUserLoggedIn() {
             return isUserLoggedIn;
+        }
+
+        public String getUserCity() {
+            return userCity;
         }
     }
 
@@ -349,7 +356,10 @@ public class HomePresenter {
 
     public class DiscoverHeaderAdapterItem implements BaseAdapterItem {
 
-        public DiscoverHeaderAdapterItem() {
+        private final String city;
+
+        public DiscoverHeaderAdapterItem(String city) {
+            this.city = city;
         }
 
         @Override
@@ -365,6 +375,10 @@ public class HomePresenter {
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
             return item instanceof DiscoverHeaderAdapterItem;
+        }
+
+        public String getCity() {
+            return city;
         }
     }
 

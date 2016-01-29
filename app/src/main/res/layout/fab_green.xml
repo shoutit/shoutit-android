@@ -9,6 +9,4 @@
     android:src="@drawable/ic_add"
     app:backgroundTint="@color/colorPrimary"
     app:elevation="4dp"
-    app:fab_colorPressed="@color/colorPrimaryDark"
-    app:fab_elevationCompat="4dp"
     app:layout_anchorGravity="bottom|right|end" />

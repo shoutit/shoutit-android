@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">ShoutIt</string>
 
+    <!-- Global strings -->
+    <string name="price_with_currency">%1$s %2$s</string>
+
     <!-- Intro -->
     <string name="intro_welcome">Welcome To Shoutit</string>
     <string name="intro_buy">Buy and Sell while Chatting</string>
@@ -13,5 +16,8 @@
     <string name="home_menu_search">Search</string>
     <string name="home_menu_cart">Cart</string>
     <string name="home_see_all">See All</string>
+    <string name="home_shouts_header_logged">MY FEED</string>
+    <string name="home_shouts_header_guest">SHOUTS IN %1$s</string>
+    <string name="home_discover_header">DISCOVER %1$s</string>
 
 </resources>

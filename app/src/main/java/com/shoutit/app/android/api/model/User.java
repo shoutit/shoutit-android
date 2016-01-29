@@ -30,4 +30,52 @@ public class User {
         this.cover = cover;
         this.isListening = isListening;
     }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getApiUrl() {
+        return apiUrl;
+    }
+
+    public String getWebUrl() {
+        return webUrl;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public boolean isActivated() {
+        return isActivated;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public String getCover() {
+        return cover;
+    }
+
+    public boolean isListening() {
+        return isListening;
+    }
 }
