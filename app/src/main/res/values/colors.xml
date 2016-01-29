@@ -1,14 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Base theme colors -->
     <color name="colorPrimary">#4CAF50</color>
     <color name="colorPrimaryDark">#3C8C40</color>
     <color name="colorAccent">#4CAF50</color>
 
+    <!-- Global values -->
+    <color name="pattern_background">#F4F4F4</color>
+    <color name="black_54">#8a000000</color>
+    <color name="white_toolbar_arrow">#40C4FF</color>
+
     <!-- Intro -->
-    <color name="intro_gradient_start">#80588F94</color>
-    <color name="intro_gradient_end">#80023842</color>
+    <color name="intro_gradient_start">#43cea2</color>
+    <color name="intro_gradient_end">#0072ff</color>
     <color name="intro_buy">#b2ffffff</color>
     <color name="intro_status_bar">#34000000</color>
+    <color name="intro_login_normal">#ffffff</color>
+    <color name="shape_intro_login_pressed">#bfbfbf</color>
+
+    <!-- Login -->
+    <color name="login_facebook_button">#3A589A</color>
+    <color name="login_google_button">#DF5238</color>
+    <color name="login_signup_button">#58585A</color>
 
     <!--Snackbar -->
     <color name="snackbar_success">#ff2195f3</color>

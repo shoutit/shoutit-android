@@ -1,7 +1,10 @@
+import retrofit2.http.HEAD
+
 buildscript {
     repositories {
         jcenter()
         maven { url 'https://maven.fabric.io/public' }
+        maven { url "https://jitpack.io" }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.0.0-alpha7'
@@ -25,8 +28,8 @@ if (keystoreProperties.exists()) {
     props.load(new FileInputStream(keystoreProperties))
 }
 
-project.ext.versionCode = 1
-def baseVersionName = "0.0.1"
+project.ext.versionCode = 100
+def baseVersionName = "0.10.0"
 if (project.hasProperty("versionSuffix")) {
     project.ext.versionSuffix = project.versionSuffix
 } else {
@@ -181,6 +184,7 @@ dependencies {
 
     // other
     compile 'com.uservoice:uservoice-android-sdk:1.2.4'
+    compile 'fr.avianey.com.viewpagerindicator:library:2.4.1@aar'
 
     // Tests
     testCompile 'junit:junit:4.12'
