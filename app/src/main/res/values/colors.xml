@@ -10,4 +10,8 @@
     <color name="intro_buy">#b2ffffff</color>
     <color name="intro_status_bar">#34000000</color>
 
+    <!--Snackbar -->
+    <color name="snackbar_success">#ff2195f3</color>
+    <color name="snackbar_error">#fff44336</color>
+
 </resources>

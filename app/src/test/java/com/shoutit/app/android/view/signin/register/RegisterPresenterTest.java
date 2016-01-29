@@ -84,8 +84,8 @@ public class RegisterPresenterTest {
         mRegisterPresenter.failObservable().subscribe(failObserver);
 
         mRegisterPresenter.getEmailObserver().onNext("test");
-        mRegisterPresenter.getPasswordObserver().onNext("test");
-        mRegisterPresenter.getNameObservable().onNext("test");
+        mRegisterPresenter.getPasswordObserver().onNext("testtest");
+        mRegisterPresenter.getNameObserver().onNext("test");
         mRegisterPresenter.getProceedObserver().onNext(new Object());
 
         assert_().that(successObserver.getOnErrorEvents()).isEmpty();
@@ -105,8 +105,8 @@ public class RegisterPresenterTest {
         mRegisterPresenter.failObservable().subscribe(failObserver);
 
         mRegisterPresenter.getEmailObserver().onNext("test");
-        mRegisterPresenter.getPasswordObserver().onNext("test");
-        mRegisterPresenter.getNameObservable().onNext("test");
+        mRegisterPresenter.getPasswordObserver().onNext("testtest");
+        mRegisterPresenter.getNameObserver().onNext("test");
         mRegisterPresenter.getProceedObserver().onNext(new Object());
 
         assert_().that(successObserver.getOnNextEvents()).isEmpty();
@@ -136,6 +136,27 @@ public class RegisterPresenterTest {
         assert_().that(failObserver.getOnNextEvents()).isEmpty();
 
         assert_().that(emptyPasswordObserver.getOnNextEvents()).hasSize(1);
+    }
+
+    @Test
+    public void testWhenEmptyPasswordAndButtonNotClicked_dontShowError() {
+        final TestObserver<Object> successObserver = new TestObserver<>();
+        final TestObserver<Object> failObserver = new TestObserver<>();
+        final TestObserver<Object> emptyPasswordObserver = new TestObserver<>();
+        mRegisterPresenter.successObservable().subscribe(successObserver);
+        mRegisterPresenter.failObservable().subscribe(failObserver);
+        mRegisterPresenter.getPasswordEmpty().subscribe(emptyPasswordObserver);
+
+        mRegisterPresenter.getEmailObserver().onNext("test");
+        mRegisterPresenter.getPasswordObserver().onNext("");
+
+        assert_().that(successObserver.getOnNextEvents()).isEmpty();
+        assert_().that(successObserver.getOnErrorEvents()).isEmpty();
+
+        assert_().that(failObserver.getOnErrorEvents()).isEmpty();
+        assert_().that(failObserver.getOnNextEvents()).isEmpty();
+
+        assert_().that(emptyPasswordObserver.getOnNextEvents()).hasSize(0);
     }
 
     @Test
@@ -171,7 +192,7 @@ public class RegisterPresenterTest {
 
         mRegisterPresenter.getEmailObserver().onNext("test");
         mRegisterPresenter.getPasswordObserver().onNext("test");
-        mRegisterPresenter.getNameObservable().onNext("");
+        mRegisterPresenter.getNameObserver().onNext("");
         mRegisterPresenter.getProceedObserver().onNext(new Object());
 
         assert_().that(successObserver.getOnNextEvents()).isEmpty();
@@ -194,8 +215,8 @@ public class RegisterPresenterTest {
         mRegisterPresenter.failObservable().subscribe(failObserver);
 
         mRegisterPresenter.getEmailObserver().onNext("test");
-        mRegisterPresenter.getPasswordObserver().onNext("test");
-        mRegisterPresenter.getNameObservable().onNext("test");
+        mRegisterPresenter.getPasswordObserver().onNext("testtest");
+        mRegisterPresenter.getNameObserver().onNext("test");
         mRegisterPresenter.getProceedObserver().onNext(new Object());
 
         assert_().that(successObserver.getOnErrorEvents()).isEmpty();

@@ -8,10 +8,13 @@ import com.shoutit.app.android.dagger.AppModule;
 import com.shoutit.app.android.dagger.BaseModule;
 import com.shoutit.app.android.dagger.DaggerAppComponent;
 import com.shoutit.app.android.constants.UserVoiceConstants;
+import com.shoutit.app.android.utils.LogHelper;
 import com.uservoice.uservoicesdk.Config;
 import com.uservoice.uservoicesdk.UserVoice;
 
 import io.fabric.sdk.android.Fabric;
+import rx.plugins.RxJavaErrorHandler;
+import rx.plugins.RxJavaPlugins;
 
 public class App extends Application {
 
@@ -23,6 +26,7 @@ public class App extends Application {
 
         initFabric();
         initUserVoice();
+        logRxJavaErrors();
 
         setupGraph();
     }
@@ -49,6 +53,19 @@ public class App extends Application {
                 .baseModule(new BaseModule())
                 .build();
         component.inject(this);
+    }
+
+
+    private void logRxJavaErrors() {
+        if (BuildConfig.DEBUG) {
+            RxJavaPlugins.getInstance().registerErrorHandler(new RxJavaErrorHandler() {
+                @Override
+                public void handleError(Throwable e) {
+                    LogHelper.logThrowable("rxjava error handler", "error", e);
+                    super.handleError(e);
+                }
+            });
+        }
     }
 
     public static AppComponent getAppComponent(Application app) {

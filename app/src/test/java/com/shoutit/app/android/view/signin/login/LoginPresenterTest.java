@@ -104,6 +104,27 @@ public class LoginPresenterTest {
     }
 
     @Test
+    public void testWhenEmptyPasswordAndNotClicked_errorNotShown() {
+        final TestObserver<Object> successObserver = new TestObserver<>();
+        final TestObserver<Object> failObserver = new TestObserver<>();
+        final TestObserver<Object> emptyPasswordObserver = new TestObserver<>();
+        mLoginPresenter.successObservable().subscribe(successObserver);
+        mLoginPresenter.failObservable().subscribe(failObserver);
+        mLoginPresenter.getPasswordEmpty().subscribe(emptyPasswordObserver);
+
+        mLoginPresenter.getEmailObserver().onNext("test");
+        mLoginPresenter.getPasswordObserver().onNext("");
+
+        assert_().that(successObserver.getOnNextEvents()).isEmpty();
+        assert_().that(successObserver.getOnErrorEvents()).isEmpty();
+
+        assert_().that(failObserver.getOnErrorEvents()).isEmpty();
+        assert_().that(failObserver.getOnNextEvents()).isEmpty();
+
+        assert_().that(emptyPasswordObserver.getOnNextEvents()).hasSize(0);
+    }
+
+    @Test
     public void testWhenEmptyPassword_showError() {
         final TestObserver<Object> successObserver = new TestObserver<>();
         final TestObserver<Object> failObserver = new TestObserver<>();

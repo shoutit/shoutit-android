@@ -19,4 +19,6 @@ public interface LoginActivityComponent extends BaseActivityComponent {
 
     void inject(LoginActivity loginActivity);
 
+    CoarseLocationObservableProvider coarseLocationObservableProvider();
+
 }

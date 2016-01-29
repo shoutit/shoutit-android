@@ -14,6 +14,7 @@ import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.login.LoginUser;
+import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.view.signin.CoarseLocationObservableProvider;
 
@@ -43,7 +44,7 @@ public class RegisterPresenter {
 
     @Inject
     public RegisterPresenter(@NonNull final ApiService apiService,
-                             @NonNull Context context,
+                             @NonNull @ForActivity Context context,
                              @NonNull CoarseLocationObservableProvider coarseLocationObservableProvider,
                              @NonNull final UserPreferences userPreferences,
                              @NonNull @NetworkScheduler final Scheduler networkScheduler,
@@ -61,7 +62,7 @@ public class RegisterPresenter {
                         return Observable.zip(
                                 mNameSubject.filter(getNotEmptyFunc1()),
                                 mEmailSubject.filter(getNotEmptyFunc1()),
-                                mPasswordSubject.filter(getNotEmptyFunc1()),
+                                mPasswordSubject.filter(Functions1.neg(getLessThan6CharsFunc1())),
                                 new Func3<String, String, String, EmailSignupRequest>() {
                                     @Override
                                     public EmailSignupRequest call(String name, String email, String password) {
@@ -70,21 +71,21 @@ public class RegisterPresenter {
                                 });
                     }
                 })
-                .flatMap(new Func1<EmailSignupRequest, Observable<SignResponse>>() {
+                .flatMap(new Func1<EmailSignupRequest, Observable<ResponseOrError<SignResponse>>>() {
                     @Override
-                    public Observable<SignResponse> call(EmailSignupRequest signupRequest) {
+                    public Observable<ResponseOrError<SignResponse>> call(EmailSignupRequest signupRequest) {
                         return apiService.signup(signupRequest)
                                 .subscribeOn(networkScheduler)
-                                .observeOn(uiScheduler);
+                                .observeOn(uiScheduler)
+                                .compose(ResponseOrError.<SignResponse>toResponseOrErrorObservable());
                     }
                 })
-                .compose(ResponseOrError.<SignResponse>toResponseOrErrorObservable())
                 .compose(ObservableExtensions.<ResponseOrError<SignResponse>>behaviorRefCount());
 
 
-        mPasswordEmpty = mPasswordSubject.filter(Functions1.isNullOrEmpty());
-        mEmailEmpty = mEmailSubject.filter(Functions1.isNullOrEmpty());
-        mNameEmpty = mNameSubject.filter(Functions1.isNullOrEmpty());
+        mPasswordEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservable(mPasswordSubject.first())).filter(getLessThan6CharsFunc1());
+        mEmailEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservable(mEmailSubject.first())).filter(Functions1.isNullOrEmpty());
+        mNameEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservable(mNameSubject.first())).filter(Functions1.isNullOrEmpty());
 
         mSuccessObservable = responseOrErrorObservable
                 .compose(ResponseOrError.<SignResponse>onlySuccess())
@@ -101,6 +102,16 @@ public class RegisterPresenter {
     @NonNull
     private Func1<? super CharSequence, Boolean> getNotEmptyFunc1() {
         return Functions1.neg(Functions1.isNullOrEmpty());
+    }
+
+    @NonNull
+    private Func1<? super CharSequence, Boolean> getLessThan6CharsFunc1() {
+        return new Func1<CharSequence, Boolean>() {
+            @Override
+            public Boolean call(CharSequence charSequence) {
+                return charSequence.length() < 6;
+            }
+        };
     }
 
     @NonNull
@@ -134,7 +145,7 @@ public class RegisterPresenter {
     }
 
     @NonNull
-    public Observer<String> getNameObservable() {
+    public Observer<String> getNameObserver() {
         return mNameSubject;
     }
 

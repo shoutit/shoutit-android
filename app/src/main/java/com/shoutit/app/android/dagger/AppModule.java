@@ -11,6 +11,7 @@ import com.jakewharton.picasso.OkHttp3Downloader;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BuildConfig;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.view.signin.CoarseLocationObservableProvider;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -99,6 +100,11 @@ public final class AppModule {
         final File httpCacheDir = new File(context.getCacheDir(), "cache");
         final long httpCacheSize = 100 * 1024 * 1024; // 100 MiB
         return Optional.of(new Cache(httpCacheDir, httpCacheSize));
+    }
+
+    @Provides
+    public CoarseLocationObservableProvider provideCoarseLocationObservableProvider() {
+        return CoarseLocationObservableProvider.DEFAULT;
     }
 
 }
