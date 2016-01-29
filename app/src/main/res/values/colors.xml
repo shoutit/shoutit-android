@@ -11,10 +11,12 @@
     <color name="white_toolbar_arrow">#40C4FF</color>
 
     <!-- Intro -->
-    <color name="intro_gradient_start">#80588F94</color>
-    <color name="intro_gradient_end">#80023842</color>
+    <color name="intro_gradient_start">#43cea2</color>
+    <color name="intro_gradient_end">#0072ff</color>
     <color name="intro_buy">#b2ffffff</color>
     <color name="intro_status_bar">#34000000</color>
+    <color name="intro_login_normal">#ffffff</color>
+    <color name="shape_intro_login_pressed">#bfbfbf</color>
 
     <!-- Login -->
     <color name="login_facebook_button">#3A589A</color>
