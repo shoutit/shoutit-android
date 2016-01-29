@@ -20,6 +20,7 @@
             android:id="@+id/home_feed_card_image_view"
             android:layout_width="match_parent"
             android:layout_height="@dimen/home_feed_image_height"
+            android:src="@drawable/pattern_placeholder"
             tools:background="@android:color/black" />
 
         <RelativeLayout

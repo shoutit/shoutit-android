@@ -17,7 +17,7 @@ public class DiscoverResponse extends PaginatedResponse {
         this.results = results;
     }
 
-    @Nonnull
+    @Nullable
     public List<Discover> getDiscovers() {
         return results;
     }

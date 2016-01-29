@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.home;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -19,10 +20,11 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class HomeDiscoversAdapter extends BaseAdapter {
-    private static final int VIEW_TYPE_HEADER = 1;
-    private static final int VIEW_TYPE_ITEM = 2;
+    private static final int VIEW_TYPE_DISCOVER_ITEM = 1;
+    private static final int VIEW_TYPE_SHOW_MORE = 2;
 
     @Nonnull
     private final Picasso picasso;
@@ -32,21 +34,6 @@ public class HomeDiscoversAdapter extends BaseAdapter {
                                 @Nonnull @ForActivity Context context) {
         super(context);
         this.picasso = picasso;
-    }
-
-    class DiscoverHeaderViewHolder extends ViewHolderManager.BaseViewHolder<HomePresenter.DiscoverHeaderAdapterItem> {
-        @Bind(R.id.home_discover_header_tv)
-        TextView headerTextView;
-
-        public DiscoverHeaderViewHolder(View itemView) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
-        }
-
-        @Override
-        public void bind(@Nonnull HomePresenter.DiscoverHeaderAdapterItem item) {
-            headerTextView.setText(context.getString(R.string.home_discover_header, item.getCity()));
-        }
     }
 
     class DiscoverItemViewHolder extends ViewHolderManager.BaseViewHolder<HomePresenter.DiscoverAdapterItem> {
@@ -65,19 +52,43 @@ public class HomeDiscoversAdapter extends BaseAdapter {
             final Discover discover = item.getDiscover();
             cardTitleTextView.setText(discover.getTitle());
 
-            picasso.load(discover.getImage())
-                    .fit()
-                    .centerCrop()
-                    .into(cardImageView);
+            if (!TextUtils.isEmpty(discover.getImage())) {
+                picasso.load(discover.getImage())
+                        .placeholder(R.drawable.pattern_placeholder)
+                        .fit()
+                        .centerCrop()
+                        .into(cardImageView);
+            }
+
+        }
+    }
+
+    class ShowAllItemsViewHolder extends ViewHolderManager.BaseViewHolder<HomePresenter.DiscoverShowAllAdapterItem> {
+
+        private HomePresenter.DiscoverShowAllAdapterItem item;
+
+        public ShowAllItemsViewHolder(@Nonnull View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        @Override
+        public void bind(@Nonnull HomePresenter.DiscoverShowAllAdapterItem item) {
+            this.item = item;
+        }
+
+        @OnClick(R.id.home_see_all_tv)
+        public void onSeeAllClick() {
+            item.getShowAllDiscoversObserver().onNext(true);
         }
     }
 
     @Override
     public ViewHolderManager.BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         switch (viewType) {
-            case VIEW_TYPE_HEADER:
-                return new DiscoverHeaderViewHolder(layoutInflater.inflate(R.layout.home_discover_header, parent, false));
-            case VIEW_TYPE_ITEM:
+            case VIEW_TYPE_SHOW_MORE:
+                return new ShowAllItemsViewHolder(layoutInflater.inflate(R.layout.home_see_all_item, parent, false));
+            case VIEW_TYPE_DISCOVER_ITEM:
                 return new DiscoverItemViewHolder(layoutInflater.inflate(R.layout.home_discover_item, parent, false));
             default:
                 throw new RuntimeException("Unknown adapter view type");
@@ -92,10 +103,10 @@ public class HomeDiscoversAdapter extends BaseAdapter {
     @Override
     public int getItemViewType(int position) {
         final BaseAdapterItem item = items.get(position);
-        if (item instanceof HomePresenter.DiscoverHeaderAdapterItem) {
-            return VIEW_TYPE_HEADER;
+        if (item instanceof HomePresenter.DiscoverShowAllAdapterItem) {
+            return VIEW_TYPE_SHOW_MORE;
         } else if (item instanceof HomePresenter.DiscoverAdapterItem) {
-            return VIEW_TYPE_ITEM;
+            return VIEW_TYPE_DISCOVER_ITEM;
         } else {
             throw new RuntimeException("Unknown adapter view type");
         }

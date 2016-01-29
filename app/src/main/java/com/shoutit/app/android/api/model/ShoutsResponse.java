@@ -1,5 +1,7 @@
 package com.shoutit.app.android.api.model;
 
+import android.support.annotation.Nullable;
+
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -13,7 +15,7 @@ public class ShoutsResponse extends PaginatedResponse {
         this.results = results;
     }
 
-    @Nonnull
+    @Nullable
     public List<Shout> getShouts() {
         return results;
     }

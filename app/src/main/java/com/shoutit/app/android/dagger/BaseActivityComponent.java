@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
+import com.shoutit.app.android.api.ApiService;
 import com.squareup.picasso.Picasso;
 
 import dagger.Component;
@@ -35,4 +36,6 @@ public interface BaseActivityComponent {
     Picasso getPicasso();
 
     LayoutInflater getLayoutInflater();
+
+    ApiService apiService();
 }

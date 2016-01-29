@@ -21,9 +21,11 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import rx.Observable;
+import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Func1;
 import rx.functions.Func2;
+import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
 public class HomePresenter {
@@ -35,6 +37,8 @@ public class HomePresenter {
     private final PublishSubject<Object> loadMoreDiscovers = PublishSubject.create();
     @Nonnull
     private final PublishSubject<Object> loadMoreShouts = PublishSubject.create();
+    @Nonnull
+    private final BehaviorSubject<Boolean> showAllDiscovers = BehaviorSubject.create();
     @Nonnull
     private final Observable<Throwable> errorObservable;
     @Nonnull
@@ -60,12 +64,13 @@ public class HomePresenter {
                         .compose(ResponseOrError.<ShoutsResponse>toResponseOrErrorObservable())
                         .compose(ObservableExtensions.<ResponseOrError<ShoutsResponse>>behaviorRefCount());
 
-        final Observable<List<BaseAdapterItem>> allShoutsObservable = myShoutsObservable
+        final Observable<List<BaseAdapterItem>> allShoutAdapterItems = myShoutsObservable
                 .compose(ResponseOrError.<ShoutsResponse>onlySuccess())
                 .filter(new Func1<ShoutsResponse, Boolean>() {
                     @Override
                     public Boolean call(ShoutsResponse shoutsResponse) {
-                        return shoutsResponse != null && !shoutsResponse.getShouts().isEmpty();
+                        return shoutsResponse != null && shoutsResponse.getShouts() != null &&
+                                !shoutsResponse.getShouts().isEmpty();
                     }
                 })
                 .map(new Func1<ShoutsResponse, List<BaseAdapterItem>>() {
@@ -90,54 +95,76 @@ public class HomePresenter {
                         .compose(ResponseOrError.<DiscoverResponse>toResponseOrErrorObservable())
                         .compose(ObservableExtensions.<ResponseOrError<DiscoverResponse>>behaviorRefCount());
 
-        final Observable<List<BaseAdapterItem>> allDiscoversObservable = discoverObservable
+        final Observable<List<Discover>> successDiscoverObservable = discoverObservable
                 .compose(ResponseOrError.<DiscoverResponse>onlySuccess())
                 .filter(new Func1<DiscoverResponse, Boolean>() {
                     @Override
                     public Boolean call(DiscoverResponse discoverResponse) {
-                        return discoverResponse != null && !discoverResponse.getDiscovers().isEmpty();
+                        return discoverResponse != null && discoverResponse.getDiscovers() != null &&
+                                !discoverResponse.getDiscovers().isEmpty();
                     }
                 })
-                .map(new Func1<DiscoverResponse, List<BaseAdapterItem>>() {
+                .map(new Func1<DiscoverResponse, List<Discover>>() {
                     @Override
-                    public List<BaseAdapterItem> call(DiscoverResponse response) {
+                    public List<Discover> call(DiscoverResponse response) {
+                        return response.getDiscovers();
+                    }
+                });
+
+        final Observable<List<BaseAdapterItem>> allDiscoverAdapterItems = Observable.combineLatest(
+                successDiscoverObservable,
+                showAllDiscovers.startWith(false),
+                new Func2<List<Discover>, Boolean, List<Discover>>() {
+                    @Override
+                    public List<Discover> call(List<Discover> discovers, Boolean showAllItems) {
+                            if (showAllItems || discovers.size() < VISIBLE_DISCOVER_ITEMS_ON_START) {
+                                return ImmutableList.copyOf(discovers);
+                            } else {
+                                return ImmutableList.copyOf(discovers.subList(0, VISIBLE_DISCOVER_ITEMS_ON_START));
+                            }
+                    }
+                })
+                .map(new Func1<List<Discover>, List<BaseAdapterItem>>() {
+                    @Override
+                    public List<BaseAdapterItem> call(List<Discover> discovers) {
                         final List<BaseAdapterItem> items = new ArrayList<>();
-                        for (Discover discover : response.getDiscovers()) {
+                        for (Discover discover : discovers) {
                             items.add(new DiscoverAdapterItem(discover));
                         }
 
-                        if (items.size() <= VISIBLE_DISCOVER_ITEMS_ON_START) {
-                            items.add(new DiscoverSeeMoteAdapterItem());
+                        if (items.size() == VISIBLE_DISCOVER_ITEMS_ON_START) {
+                            items.add(new DiscoverShowAllAdapterItem(showAllDiscovers));
                         }
 
                         return new ImmutableList.Builder<BaseAdapterItem>()
-                                .add(new DiscoverHeaderAdapterItem("Dubaj")) // TODO provide city
                                 .addAll(items)
                                 .build();
                     }
                 });
 
+        /** Results **/
         allAdapterItemsObservable = Observable.combineLatest(
-                allDiscoversObservable,
-                allShoutsObservable,
+                allDiscoverAdapterItems.startWith(ImmutableList.<List<BaseAdapterItem>>of()),
+                allShoutAdapterItems.startWith(ImmutableList.<List<BaseAdapterItem>>of()),
                 new Func2<List<BaseAdapterItem>, List<BaseAdapterItem>, List<BaseAdapterItem>>() {
                     @Override
                     public List<BaseAdapterItem> call(List<BaseAdapterItem> discovers,
                                                       List<BaseAdapterItem> shouts) {
                         return ImmutableList.<BaseAdapterItem>builder()
-                                .add(new DiscoverContainerAdapterItem(discovers))
+                                .add(new DiscoverHeaderAdapterItem("Dubaj")) // TODO provide city
+                                .add(new DiscoverContainerAdapterItem(discovers, loadMoreDiscovers))
                                 .addAll(shouts)
                                 .build();
                     }
                 });
 
+        /** Progress and Error **/
+        errorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
+                ResponseOrError.transform(myShoutsObservable),
+                ResponseOrError.transform(discoverObservable)))
+                .filter(Functions1.isNotNull());
 
-                /** Progress and Error **/
-                errorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
-                        ResponseOrError.transform(myShoutsObservable),
-                        ResponseOrError.transform(discoverObservable)));
-
-        progressObservable = Observable.merge(errorObservable, allDiscoversObservable, allShoutsObservable)
+        progressObservable = Observable.merge(errorObservable, allDiscoverAdapterItems, allShoutAdapterItems)
                 .map(Functions1.returnFalse());
 
     }
@@ -148,8 +175,8 @@ public class HomePresenter {
             private int pageNumber = 0;
 
             @Override
-            public Observable<ShoutsResponse> call(ShoutsResponse response) {
-                if (response == null || response.getNext() != null) {
+            public Observable<ShoutsResponse> call(ShoutsResponse previousResponse) {
+                if (previousResponse == null || previousResponse.getNext() != null) {
                     ++pageNumber;
                     final Observable<ShoutsResponse> apiRequest;
                     if (isUserLoggedIn) {
@@ -158,11 +185,15 @@ public class HomePresenter {
                                 .subscribeOn(networkScheduler);
                     } else {
                         apiRequest = apiService
-                                .shoutsForCountry("ADL", pageNumber, PAGE_SIZE)
+                                .shoutsForCountry("GE", pageNumber, PAGE_SIZE)
                                 .subscribeOn(networkScheduler);
                     }
 
-                    return Observable.just(response).zipWith(apiRequest, new MergeShoutsResponses());
+                    if (previousResponse == null) {
+                        return apiRequest;
+                    } else {
+                        return Observable.just(previousResponse).zipWith(apiRequest, new MergeShoutsResponses());
+                    }
                 } else {
                     return Observable.never();
                 }
@@ -176,14 +207,18 @@ public class HomePresenter {
             private int pageNumber = 0;
 
             @Override
-            public Observable<DiscoverResponse> call(DiscoverResponse response) {
-                if (response == null || response.getNext() != null) {
+            public Observable<DiscoverResponse> call(DiscoverResponse previousResponse) {
+                if (previousResponse == null || previousResponse.getNext() != null) {
                     ++pageNumber;
                     final Observable<DiscoverResponse> apiRequest = apiService
-                            .discovers("ADL", pageNumber, PAGE_SIZE)
+                            .discovers("GE", pageNumber, PAGE_SIZE)
                             .subscribeOn(networkScheduler);
 
-                    return Observable.just(response).zipWith(apiRequest, new MergeDiscoverResponses());
+                    if (previousResponse == null) {
+                        return apiRequest;
+                    } else {
+                        return Observable.just(previousResponse).zipWith(apiRequest, new MergeDiscoverResponses());
+                    }
                 } else {
                     return Observable.never();
                 }
@@ -218,7 +253,7 @@ public class HomePresenter {
     }
 
     private boolean isUserLoggedIn() {
-        return true;
+        return false;
     }
 
     @Nonnull
@@ -236,9 +271,19 @@ public class HomePresenter {
         return errorObservable;
     }
 
-    public class DiscoverSeeMoteAdapterItem implements BaseAdapterItem {
+    @Nonnull
+    public PublishSubject<Object> getLoadMoreShouts() {
+        return loadMoreShouts;
+    }
 
-        public DiscoverSeeMoteAdapterItem() {
+    /** ADAPTER ITEMS **/
+    public class DiscoverShowAllAdapterItem implements BaseAdapterItem {
+
+        @Nonnull
+        private final Observer<Boolean> showAllDiscoversObserver;
+
+        public DiscoverShowAllAdapterItem(@Nonnull Observer<Boolean> showAllDiscoversObserver) {
+            this.showAllDiscoversObserver = showAllDiscoversObserver;
         }
 
         @Override
@@ -248,12 +293,17 @@ public class HomePresenter {
 
         @Override
         public boolean matches(@Nonnull BaseAdapterItem item) {
-            return item instanceof DiscoverSeeMoteAdapterItem;
+            return item instanceof DiscoverShowAllAdapterItem;
         }
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof DiscoverSeeMoteAdapterItem;
+            return item instanceof DiscoverShowAllAdapterItem;
+        }
+
+        @Nonnull
+        public Observer<Boolean> getShowAllDiscoversObserver() {
+            return showAllDiscoversObserver;
         }
     }
 
@@ -386,9 +436,13 @@ public class HomePresenter {
 
         @Nonnull
         private final List<BaseAdapterItem> adapterItems;
+        @Nonnull
+        private final Observer<Object> loadMoreDiscoversObserver;
 
-        public DiscoverContainerAdapterItem(@Nonnull List<BaseAdapterItem> adapterItems) {
+        public DiscoverContainerAdapterItem(@Nonnull List<BaseAdapterItem> adapterItems,
+                                            @Nonnull Observer<Object> loadMoreDiscoversObserver) {
             this.adapterItems = adapterItems;
+            this.loadMoreDiscoversObserver = loadMoreDiscoversObserver;
         }
 
         @Override
@@ -410,5 +464,11 @@ public class HomePresenter {
         public List<BaseAdapterItem> getAdapterItems() {
             return adapterItems;
         }
+
+        @Nonnull
+        public Observer<Object> getLoadMoreDiscoversObserver() {
+            return loadMoreDiscoversObserver;
+        }
     }
+    /** END OF ADAPTER ITEMS **/
 }

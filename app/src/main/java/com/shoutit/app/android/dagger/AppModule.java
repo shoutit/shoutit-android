@@ -102,7 +102,7 @@ public final class AppModule {
 
     @Provides
     @Singleton
-    ApiService provideKingschatService(Gson gson, OkHttpClient client) {
+    ApiService provideApiService(Gson gson, OkHttpClient client) {
         return new Retrofit.Builder()
                 .baseUrl(BuildConfig.API_URL)
                 .addConverterFactory(GsonConverterFactory.create(gson))
