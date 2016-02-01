@@ -78,11 +78,11 @@ public class LoginFragment extends BaseFragment {
 
         loginPresenter.getEmailEmpty()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(Actions1.showError(emailEdittext));
+                .subscribe(Actions1.showError(emailEdittext, getString(R.string.login_empty_mail)));
 
         loginPresenter.getPasswordEmpty()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(Actions1.showError(passwordEdittext));
+                .subscribe(Actions1.showError(passwordEdittext, getString(R.string.login_empty_password)));
 
         loginPresenter.failObservable()
                 .compose(this.<Throwable>bindToLifecycle())

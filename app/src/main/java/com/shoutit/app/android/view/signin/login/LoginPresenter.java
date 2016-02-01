@@ -53,7 +53,12 @@ public class LoginPresenter {
                 .compose(ObservableExtensions.<Location>behaviorRefCount());
 
         final Observable<ResponseOrError<SignResponse>> responseOrErrorObservable = mProceedSubject
-                .switchMap(MoreFunctions1.returnObservable(mLocationObservable.first()))
+                .withLatestFrom(mLocationObservable, new Func2<Object, Location, Location>() {
+                    @Override
+                    public Location call(Object o, Location location) {
+                        return location;
+                    }
+                })
                 .flatMap(new Func1<Location, Observable<EmailLoginRequest>>() {
                     @Override
                     public Observable<EmailLoginRequest> call(final Location location) {

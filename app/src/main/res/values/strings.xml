@@ -17,6 +17,8 @@
     <string name="login_btn_text">Log in</string>
     <string name="login_sign_up_text">New to Shoutit? Sign up</string>
     <string name="login_error">Wrong data</string>
+    <string name="login_empty_mail">Mail cannot be empty.</string>
+    <string name="login_empty_password">Password must have at least 6 characters.</string>
 
     <!-- Register -->
     <string name="register_sign_up_btn_text">Sign up</string>
@@ -25,6 +27,9 @@
     <string name="register_password">Password</string>
     <string name="register_login_text">Have an account? Log in</string>
     <string name="register_error">Failed to register</string>
+    <string name="register_empty_mail">Mail cannot be empty.</string>
+    <string name="register_empty_password">Password must have at least 6 characters.</string>
+    <string name="register_empty_name">Name cannot be empty</string>
 
     <!-- Login Intro -->
     <string name="login_intro_join">Join Now!</string>
@@ -46,6 +51,5 @@
     <string name="about_privacy_policy_title">Privacy Policy</string>
     <string name="about_legal_title">Legal</string>
     <string name="about_title">About</string>
->>>>>>> origin/develop
 
 </resources>

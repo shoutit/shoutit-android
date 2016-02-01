@@ -9,11 +9,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.jakewharton.rxbinding.view.RxView;
 import com.jakewharton.rxbinding.widget.RxTextView;
-import com.jakewharton.rxbinding.widget.TextViewTextChangeEvent;
 import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.SignResponse;
@@ -21,6 +19,7 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.Actions1;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.view.signin.LoginActivityComponent;
 import com.shoutit.app.android.view.signin.login.LoginFragment;
 
@@ -30,12 +29,11 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import rx.functions.Action1;
-import rx.functions.Func1;
 
 public class RegisterFragment extends BaseFragment {
 
     @Bind(R.id.register_name_edittext)
-    EditText nameEdittExt;
+    EditText nameEditText;
 
     @Bind(R.id.register_email_edittext)
     EditText emailEdittext;
@@ -47,7 +45,7 @@ public class RegisterFragment extends BaseFragment {
     Button proceedBtn;
 
     @Bind(R.id.register_sign_up_text)
-    TextView signUp;
+    TextView signUpTextview;
 
     @Inject
     RegisterPresenter registerPresenter;
@@ -67,7 +65,7 @@ public class RegisterFragment extends BaseFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        signUp.setOnClickListener(new View.OnClickListener() {
+        signUpTextview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 getFragmentManager()
@@ -83,15 +81,15 @@ public class RegisterFragment extends BaseFragment {
 
         registerPresenter.getEmailEmpty()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(Actions1.showError(emailEdittext));
+                .subscribe(Actions1.showError(emailEdittext, getString(R.string.register_empty_mail)));
 
         registerPresenter.getPasswordEmpty()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(Actions1.showError(passwordEdittext));
+                .subscribe(Actions1.showError(passwordEdittext, getString(R.string.register_empty_password)));
 
         registerPresenter.getNameEmpty()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(Actions1.showError(nameEdittExt));
+                .subscribe(Actions1.showError(nameEditText, getString(R.string.register_empty_name)));
 
         registerPresenter.failObservable()
                 .compose(this.<Throwable>bindToLifecycle())
@@ -107,32 +105,17 @@ public class RegisterFragment extends BaseFragment {
                 });
 
         RxTextView.textChangeEvents(emailEdittext)
-                .map(new Func1<TextViewTextChangeEvent, String>() {
-                    @Override
-                    public String call(TextViewTextChangeEvent textViewTextChangeEvent) {
-                        return textViewTextChangeEvent.text().toString();
-                    }
-                })
+                .map(MoreFunctions1.mapTextChangeEventToString())
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(registerPresenter.getEmailObserver());
 
-        RxTextView.textChangeEvents(nameEdittExt)
-                .map(new Func1<TextViewTextChangeEvent, String>() {
-                    @Override
-                    public String call(TextViewTextChangeEvent textViewTextChangeEvent) {
-                        return textViewTextChangeEvent.text().toString();
-                    }
-                })
+        RxTextView.textChangeEvents(nameEditText)
+                .map(MoreFunctions1.mapTextChangeEventToString())
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(registerPresenter.getNameObserver());
 
         RxTextView.textChangeEvents(passwordEdittext)
-                .map(new Func1<TextViewTextChangeEvent, String>() {
-                    @Override
-                    public String call(TextViewTextChangeEvent textViewTextChangeEvent) {
-                        return textViewTextChangeEvent.text().toString();
-                    }
-                })
+                .map(MoreFunctions1.mapTextChangeEventToString())
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(registerPresenter.getPasswordObserver());
 

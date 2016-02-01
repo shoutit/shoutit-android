@@ -8,7 +8,7 @@ public class LogHelper {
 
     public static void logThrowable(String tag, String msg, Throwable t) {
         Log.e(tag, msg, t);
-        Throwable cause = t.getCause();
+        final Throwable cause = t.getCause();
         if (cause != null) {
             logThrowable(tag, msg, cause);
         }

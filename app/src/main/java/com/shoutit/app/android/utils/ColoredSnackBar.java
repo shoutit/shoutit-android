@@ -20,14 +20,14 @@ public class ColoredSnackBar {
 
     @Nonnull
     public static Snackbar colorSnackBar(@Nonnull View view, @Nonnull CharSequence text, int length, int color) {
-        Snackbar snackbar = Snackbar.make(view, text, length);
+        final Snackbar snackbar = Snackbar.make(view, text, length);
         getSnackBarLayout(snackbar).setBackgroundColor(color);
         return snackbar;
     }
 
     @Nonnull
     public static Snackbar colorSnackBar(@Nonnull View view, int text, int length, int color) {
-        Snackbar snackbar = Snackbar.make(view, text, length);
+        final Snackbar snackbar = Snackbar.make(view, text, length);
         getSnackBarLayout(snackbar).setBackgroundColor(color);
         return snackbar;
     }

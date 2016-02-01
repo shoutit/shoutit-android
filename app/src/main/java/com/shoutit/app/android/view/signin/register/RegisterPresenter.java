@@ -25,6 +25,7 @@ import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.functions.Func3;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
@@ -55,7 +56,12 @@ public class RegisterPresenter {
                 .compose(ObservableExtensions.<Location>behaviorRefCount());
 
         final Observable<ResponseOrError<SignResponse>> responseOrErrorObservable = mProceedSubject
-                .switchMap(MoreFunctions1.returnObservable(mLocationObservable.first()))
+                .withLatestFrom(mLocationObservable, new Func2<Object, Location, Location>() {
+                    @Override
+                    public Location call(Object o, Location location) {
+                        return location;
+                    }
+                })
                 .flatMap(new Func1<Location, Observable<EmailSignupRequest>>() {
                     @Override
                     public Observable<EmailSignupRequest> call(final Location location) {

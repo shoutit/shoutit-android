@@ -22,17 +22,17 @@ public class CoarseLocationObservable {
         return Observable.create(new Observable.OnSubscribe<Location>() {
             @Override
             public void call(final Subscriber<? super Location> subscriber) {
-                final GoogleApiClient build = new GoogleApiClient.Builder(context)
+                final GoogleApiClient apiClient = new GoogleApiClient.Builder(context)
                         .addApi(LocationServices.API)
                         .build();
 
-                build.registerConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                apiClient.registerConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
                     @Override
                     public void onConnected(@Nullable Bundle bundle) {
                         if (!subscriber.isUnsubscribed()) {
-                            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                                final Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                                        build);
+                            if (checkPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ||
+                                    checkPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                                final Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(apiClient);
                                 if (lastLocation != null) {
                                     subscriber.onNext(lastLocation);
                                 }
@@ -46,15 +46,19 @@ public class CoarseLocationObservable {
                     }
                 });
 
-                build.connect();
+                apiClient.connect();
 
                 subscriber.add(Subscriptions.create(new Action0() {
                     @Override
                     public void call() {
-                        build.disconnect();
+                        apiClient.disconnect();
                     }
                 }));
             }
         });
+    }
+
+    private static boolean checkPermission(Context context, String accessFineLocation) {
+        return ActivityCompat.checkSelfPermission(context, accessFineLocation) == PackageManager.PERMISSION_GRANTED;
     }
 }
