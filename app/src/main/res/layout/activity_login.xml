@@ -24,7 +24,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="100dp"
-                android:text="@string/login_join"
+                android:text="@string/login_intro_join"
                 android:textColor="@color/black_54"
                 android:textSize="24sp" />
 
@@ -36,7 +36,7 @@
                 android:layout_marginTop="16dp"
                 android:gravity="center"
                 android:lineSpacingExtra="4dp"
-                android:text="@string/login_text"
+                android:text="@string/login_intro_text"
                 android:textColor="@color/black_54"
                 android:textSize="14sp" />
 
@@ -62,7 +62,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
-                    android:text="@string/login_facebook"
+                    android:text="@string/login_intro_facebook"
                     android:textColor="@android:color/white"
                     android:textSize="14sp" />
 
@@ -90,7 +90,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
-                    android:text="@string/login_facebook"
+                    android:text="@string/login_intro_facebook"
                     android:textColor="@android:color/white"
                     android:textSize="14sp" />
 
@@ -102,7 +102,7 @@
                 android:background="@drawable/shape_button_signup"
                 android:foreground="?selectableItemBackground"
                 android:gravity="center"
-                android:text="@string/login_signup"
+                android:text="@string/login_intro_signup"
                 android:textColor="@android:color/white"
                 android:textSize="14sp" />
 
@@ -121,17 +121,17 @@
                 <TextView
                     android:id="@+id/activity_login_feedback"
                     style="@style/LoginBottomButtons"
-                    android:text="@string/login_feedback" />
+                    android:text="@string/login_intro_feedback" />
 
                 <TextView
                     android:id="@+id/activity_login_help"
                     style="@style/LoginBottomButtons"
-                    android:text="@string/login_help" />
+                    android:text="@string/login_intro_help" />
 
                 <TextView
                     android:id="@+id/activity_login_about"
                     style="@style/LoginBottomButtons"
-                    android:text="@string/login_about" />
+                    android:text="@string/login_intro_about" />
 
             </LinearLayout>
 

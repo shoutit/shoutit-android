@@ -4,9 +4,10 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorButtonNormal">@color/colorAccent</item>
     </style>
 
-    <style name="TranslucentStatusBar" parent="AppTheme" />
+    <style name="TranslucentStatusBar" parent="AppTheme"/>
 
     <style name="BaseToolbarStyle">
         <item name="android:background">?attr/colorPrimary</item>

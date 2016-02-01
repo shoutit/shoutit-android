@@ -23,4 +23,8 @@
     <color name="login_google_button">#DF5238</color>
     <color name="login_signup_button">#58585A</color>
 
+    <!--Snackbar -->
+    <color name="snackbar_success">#ff2195f3</color>
+    <color name="snackbar_error">#fff44336</color>
+
 </resources>

@@ -12,13 +12,33 @@
     <string name="intro_help">Help</string>
 
     <!-- Login -->
-    <string name="login_join">Join Now!</string>
-    <string name="login_text">Login and discover what others are\n selling in your neighborhood or start\n selling in seconds</string>
-    <string name="login_facebook">Log in with Facebook</string>
-    <string name="login_signup">Sign up / Log in with E-mail</string>
-    <string name="login_feedback">Feedback</string>
-    <string name="login_help">Help</string>
-    <string name="login_about">About</string>
+    <string name="login_email_hint">Email</string>
+    <string name="login_password_hint">Password</string>
+    <string name="login_btn_text">Log in</string>
+    <string name="login_sign_up_text">New to Shoutit? Sign up</string>
+    <string name="login_error">Wrong data</string>
+    <string name="login_empty_mail">Mail cannot be empty.</string>
+    <string name="login_empty_password">Password must have at least 6 characters.</string>
+
+    <!-- Register -->
+    <string name="register_sign_up_btn_text">Sign up</string>
+    <string name="register_name">Name</string>
+    <string name="register_email">Email</string>
+    <string name="register_password">Password</string>
+    <string name="register_login_text">Have an account? Log in</string>
+    <string name="register_error">Failed to register</string>
+    <string name="register_empty_mail">Mail cannot be empty.</string>
+    <string name="register_empty_password">Password must have at least 6 characters.</string>
+    <string name="register_empty_name">Name cannot be empty</string>
+
+    <!-- Login Intro -->
+    <string name="login_intro_join">Join Now!</string>
+    <string name="login_intro_text">Login and discover what others are\n selling in your neighborhood or start\n selling in seconds</string>
+    <string name="login_intro_facebook">Log in with Facebook</string>
+    <string name="login_intro_signup">Sign up / Log in with E-mail</string>
+    <string name="login_intro_feedback">Feedback</string>
+    <string name="login_intro_help">Help</string>
+    <string name="login_intro_about">About</string>
 
     <!-- About -->
     <string name="pref_key_terms_of_service" translatable="false">pref_key_terms_of_service</string>

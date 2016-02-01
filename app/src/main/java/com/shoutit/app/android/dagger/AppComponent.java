@@ -5,6 +5,8 @@ import android.content.Context;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.shoutit.app.android.App;
+import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.view.signin.CoarseLocationObservableProvider;
 import com.squareup.picasso.Picasso;
 
 import javax.inject.Singleton;
@@ -34,6 +36,10 @@ public interface AppComponent {
     Context getContext();
 
     Picasso getPicasso();
+
+    ApiService apiService();
+
+    CoarseLocationObservableProvider coarseLocationObservableProvider();
 
     OkHttpClient getOkHttpClient();
 }

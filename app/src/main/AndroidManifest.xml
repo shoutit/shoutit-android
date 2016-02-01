@@ -1,19 +1,27 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.shoutit.app.android">
+<manifest package="com.shoutit.app.android"
+          xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:name=".App"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".view.intro.IntroActivity"
+        <activity
+            android:name=".view.intro.IntroActivity"
+            android:theme="@style/TranslucentStatusBar">
+        </activity>
+
+        <activity
+            android:name=".view.signin.LoginActivity"
             android:theme="@style/TranslucentStatusBar">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
@@ -26,13 +34,12 @@
         <!-- Crashlytics -->
         <meta-data
             android:name="com.crashlytics.ApiKey"
-            android:value="b058b2dcbf8b8f864860fe9fe12789317aba9da1" />
+            android:value="b058b2dcbf8b8f864860fe9fe12789317aba9da1"/>
 
         <!-- Fabric -->
         <meta-data
             android:name="io.fabric.ApiKey"
-            android:value="b058b2dcbf8b8f864860fe9fe12789317aba9da1" />
+            android:value="b058b2dcbf8b8f864860fe9fe12789317aba9da1"/>
 
     </application>
-
 </manifest>
