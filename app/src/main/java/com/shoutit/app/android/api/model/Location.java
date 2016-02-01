@@ -21,4 +21,36 @@ public class Location {
         this.address = address;
         this.googleGeocodeResponse = googleGeocodeResponse;
     }
+
+    public float getLatitude() {
+        return latitude;
+    }
+
+    public float getLongitude() {
+        return longitude;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public String getPostalCode() {
+        return postalCode;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getGoogleGeocodeResponse() {
+        return googleGeocodeResponse;
+    }
 }

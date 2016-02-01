@@ -10,4 +10,16 @@ public class Category {
         this.slug = slug;
         this.mainTag = mainTag;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getSlug() {
+        return slug;
+    }
+
+    public Tag getMainTag() {
+        return mainTag;
+    }
 }

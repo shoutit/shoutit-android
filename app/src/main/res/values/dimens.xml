@@ -10,5 +10,7 @@
     <dimen name="home_discover_card_height">126dp</dimen>
     <dimen name="home_grid_side_spacing">5dp</dimen>
     <dimen name="home_discover_recycler_margin">8dp</dimen>
+    <dimen name="home_feed_image_size_linear">100dp</dimen>
+    <dimen name="home_country_icon">26dp</dimen>
 
 </resources>

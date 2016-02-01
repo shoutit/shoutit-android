@@ -1,12 +1,18 @@
 package com.shoutit.app.android.api.model;
 
+import android.support.annotation.StringRes;
+
 import com.google.common.base.Objects;
+import com.shoutit.app.android.R;
 
 import java.util.List;
 
 import javax.annotation.Nonnull;
 
 public class Shout {
+    private static final String TYPE_OFFER = "offer";
+    private static final String TYPE_REQUEST = "request";
+
     @Nonnull
     private final String id;
     private final String apiUrl;
@@ -23,11 +29,12 @@ public class Shout {
     private final User user;
     private final Category category;
     private final List<Tag> tags;
+    private final long datePublished;
 
     public Shout(@Nonnull String id, String apiUrl, String webUrl, String type,
                  Location location, String title, String text, float price, float number,
                  String currency, String thumbnail, String videoUrl, User user,
-                 Category category, List<Tag> tags) {
+                 Category category, List<Tag> tags, long datePublished) {
         this.id = id;
         this.apiUrl = apiUrl;
         this.webUrl = webUrl;
@@ -43,6 +50,7 @@ public class Shout {
         this.user = user;
         this.category = category;
         this.tags = tags;
+        this.datePublished = datePublished;
     }
 
     @Nonnull
@@ -60,6 +68,13 @@ public class Shout {
 
     public String getType() {
         return type;
+    }
+
+    @StringRes
+    public int getTypeResId() {
+        return TYPE_OFFER.equalsIgnoreCase(type) ?
+                R.string.shout_type_offer :
+                R.string.shout_type_request;
     }
 
     public Location getLocation() {
@@ -106,6 +121,10 @@ public class Shout {
         return price;
     }
 
+    public long getDatePublishedInMillis() {
+        return datePublished * 1000;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -125,12 +144,13 @@ public class Shout {
                 Objects.equal(user, shout.user) &&
                 Objects.equal(category, shout.category) &&
                 Objects.equal(tags, shout.tags) &&
+                Objects.equal(datePublished, shout.datePublished) &&
                 Objects.equal(price, shout.price);
     }
 
     @Override
     public int hashCode() {
         return Objects.hashCode(id, apiUrl, webUrl, type, location, title, text, price,
-                number, currency, thumbnail, videoUrl, user, category, tags);
+                number, currency, thumbnail, videoUrl, user, category, tags, datePublished);
     }
 }

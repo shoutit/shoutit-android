@@ -3,6 +3,8 @@
 
     <!-- Global strings -->
     <string name="price_with_currency">%1$s %2$s</string>
+    <string name="shout_type_offer">Offer</string>
+    <string name="shout_type_request">Request</string>
 
     <!-- Intro -->
     <string name="intro_welcome">Welcome To Shoutit</string>
@@ -19,5 +21,6 @@
     <string name="home_shouts_header_logged">MY FEED</string>
     <string name="home_shouts_header_guest">SHOUTS IN %1$s</string>
     <string name="home_discover_header">DISCOVER %1$s</string>
+    <string name="home_user_and_date">%1$s - %2$s</string>
 
 </resources>

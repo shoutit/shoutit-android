@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:layout_height="120dp"
+    android:background="@android:color/white"
+    android:foreground="?selectableItemBackground"
+    card_view:cardCornerRadius="2dp"
+    card_view:cardElevation="2dp"
+    card_view:cardUseCompatPadding="true">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="4dp"
+        android:paddingStart="4dp"
+        android:paddingRight="8dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp">
+
+        <ImageView
+            android:id="@+id/home_feed_card_image_view"
+            android:layout_width="@dimen/home_feed_image_size_linear"
+            android:layout_height="@dimen/home_feed_image_size_linear"
+            android:background="@android:color/black"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="8dp"
+            android:layout_marginEnd="8dp"/>
+
+        <TextView
+            android:id="@+id/home_feed_card_title_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/home_feed_card_image_view"
+            android:layout_toRightOf="@+id/home_feed_card_image_view"
+            android:maxLines="2"
+            android:textSize="14sp"
+            android:textColor="@color/black_54"
+            tools:text="Merino Wool Slouchy Hat, Winter
+Hat, Chunky Textured Knit Ht"
+            android:ellipsize="end"/>
+
+        <LinearLayout
+            android:id="@+id/home_feed_name_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/home_feed_card_title_tv"
+            android:layout_toEndOf="@+id/home_feed_card_image_view"
+            android:layout_toRightOf="@+id/home_feed_card_image_view"
+            android:gravity="center_vertical"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/home_feed_card_user_tv"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="@color/black_38"
+                android:maxLines="2"
+                android:layout_gravity="center_vertical"
+                android:ellipsize="end"
+                tools:text="John Smith - 2 hours ago dsfdsfdsfdsfdsfdsfdsfdsfdsf"/>
+
+            <TextView
+                android:id="@+id/home_feed_card_type_label_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Offer"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="4dp"
+                android:background="@drawable/shape_home_offer_label"/>
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/home_feed_card_country_iv"
+            android:layout_width="@dimen/home_country_icon"
+            android:layout_height="@dimen/home_country_icon"
+            android:layout_alignParentBottom="true"
+            android:layout_toEndOf="@+id/home_feed_card_image_view"
+            android:layout_toRightOf="@+id/home_feed_card_image_view"
+            android:layout_below="@+id/home_feed_name_container"
+            android:layout_marginEnd="20dp"
+            android:layout_marginRight="20dp"
+            android:paddingRight="4dp"
+            android:paddingEnd="4dp"
+            android:paddingTop="4dp"
+            tools:src="@drawable/ic_chat"
+            />
+
+        <ImageView
+            android:id="@+id/home_feed_card_item_icon_iv"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@+id/home_feed_card_country_iv"
+            android:layout_toEndOf="@+id/home_feed_card_country_iv"
+            android:layout_below="@+id/home_feed_name_container"
+            android:paddingRight="4dp"
+            android:paddingEnd="4dp"
+            android:paddingTop="4dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginRight="20dp"
+            tools:src="@drawable/ic_chat"
+            />
+
+        <ImageView
+            android:id="@+id/home_feed_card_chat_iv"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_alignParentBottom="true"
+            android:layout_below="@+id/home_feed_name_container"
+            android:paddingRight="4dp"
+            android:paddingEnd="4dp"
+            android:paddingTop="4dp"
+            android:layout_toEndOf="@+id/home_feed_card_item_icon_iv"
+            android:layout_toRightOf="@+id/home_feed_card_item_icon_iv"
+            android:src="@drawable/ic_chat"
+            />
+
+        <TextView
+            android:id="@+id/home_feed_card_price_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:gravity="end"
+            android:textSize="14sp"
+            android:maxLines="1"
+            android:paddingBottom="2dp"
+            android:layout_toEndOf="@+id/home_feed_card_chat_iv"
+            android:layout_toRightOf="@+id/home_feed_card_chat_iv"
+            android:textColor="@color/colorPrimary"
+            tools:text="$23333333334USD"/>
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

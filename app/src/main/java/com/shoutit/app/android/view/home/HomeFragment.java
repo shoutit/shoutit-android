@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.appunite.rx.android.MyAndroidSchedulers;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.UiScheduler;
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
@@ -24,6 +22,9 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.LoadMoreHelper;
+import com.shoutit.app.android.utils.MyGridLayoutManager;
+import com.shoutit.app.android.utils.MyLayoutManager;
+import com.shoutit.app.android.utils.MyLinearLayoutManager;
 
 import java.util.List;
 
@@ -59,6 +60,7 @@ public class HomeFragment extends BaseFragment {
     @UiScheduler
     Scheduler uiScheduler;
 
+    private HomeGridSpacingItemDecoration gridViewItemDecoration;
 
     @android.support.annotation.Nullable
     @Override
@@ -72,22 +74,28 @@ public class HomeFragment extends BaseFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        final GridLayoutManager layoutManager = new GridLayoutManager(context, 2);
-        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-            @Override
-            public int getSpanSize(int position) {
-                if (adapter.getItemViewType(position) == HomeAdapter.VIEW_TYPE_SHOUT_ITEM) {
-                    return 1;
-                } else {
-                    return 2;
-                }
-            }
-        });
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.addItemDecoration(new HomeGridSpacingItemDecoration(
-                getResources().getDimensionPixelSize(R.dimen.home_grid_side_spacing))
-        );
+        gridViewItemDecoration = new HomeGridSpacingItemDecoration(
+                getResources().getDimensionPixelSize(R.dimen.home_grid_side_spacing));
+        setGridLayoutManager();
         recyclerView.setAdapter(adapter);
+
+        presenter.getLinearLayoutManagerObservable()
+                .compose(this.<Boolean>bindToLifecycle())
+                .subscribe(new Action1<Boolean>() {
+                    @Override
+                    public void call(Boolean ignore) {
+                        setLinearLayoutManager();
+                    }
+                });
+
+        presenter.getGridLayoutManagerObservable()
+                .compose(this.<Boolean>bindToLifecycle())
+                .subscribe(new Action1<Boolean>() {
+                    @Override
+                    public void call(Boolean ignore) {
+                        setGridLayoutManager();
+                    }
+                });
 
         presenter.getAllAdapterItemsObservable()
                 .observeOn(uiScheduler)
@@ -97,7 +105,7 @@ public class HomeFragment extends BaseFragment {
         RxRecyclerView.scrollEvents(recyclerView)
                 .observeOn(uiScheduler)
                 .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
-                .filter(LoadMoreHelper.needLoadMore(layoutManager, adapter))
+                .filter(LoadMoreHelper.needLoadMore((MyLayoutManager) recyclerView.getLayoutManager(), adapter))
                 .subscribe(presenter.getLoadMoreShouts());
 
         presenter.getProgressObservable()
@@ -125,6 +133,29 @@ public class HomeFragment extends BaseFragment {
                         Toast.makeText(context, "Not impelmented yet", Toast.LENGTH_LONG).show();
                     }
                 });
+    }
+
+    private void setLinearLayoutManager() {
+        recyclerView.setLayoutManager(new MyLinearLayoutManager(context));
+        recyclerView.removeItemDecoration(gridViewItemDecoration);
+        adapter.switchLayoutManager();
+    }
+
+    private void setGridLayoutManager() {
+        final MyGridLayoutManager gridLayoutManager = new MyGridLayoutManager(context, 2);
+        gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                if (adapter.getItemViewType(position) == HomeAdapter.VIEW_TYPE_SHOUT_ITEM) {
+                    return 1;
+                } else {
+                    return 2;
+                }
+            }
+        });
+        recyclerView.setLayoutManager(gridLayoutManager);
+        recyclerView.addItemDecoration(gridViewItemDecoration);
+        adapter.switchLayoutManager();
     }
 
     @Override

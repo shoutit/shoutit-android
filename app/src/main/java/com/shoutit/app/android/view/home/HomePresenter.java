@@ -4,6 +4,7 @@ import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.NetworkScheduler;
+import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.appunite.rx.operators.OperatorMergeNextToken;
 import com.google.common.collect.ImmutableList;
@@ -40,22 +41,30 @@ public class HomePresenter {
     @Nonnull
     private final BehaviorSubject<Boolean> showAllDiscovers = BehaviorSubject.create();
     @Nonnull
+    private final PublishSubject<Object> layoutManagerSwitchObserver = PublishSubject.create();
+    @Nonnull
     private final Observable<Throwable> errorObservable;
     @Nonnull
     private final ApiService apiService;
     @Nonnull
     private final Scheduler networkScheduler;
     @Nonnull
+    private final Scheduler uiScheduler;
+    @Nonnull
     private final Observable<Boolean> progressObservable;
     @Nonnull
     private final Observable<List<BaseAdapterItem>> allAdapterItemsObservable;
+    @Nonnull
+    private final Observable<Boolean> linearLayoutManagerObservable;
 
 
     @Inject
     public HomePresenter(@Nonnull final ApiService apiService,
-                         @Nonnull @NetworkScheduler final Scheduler networkScheduler) {
+                         @Nonnull @NetworkScheduler final Scheduler networkScheduler,
+                         @Nonnull @UiScheduler final Scheduler uiScheduler) {
         this.apiService = apiService;
         this.networkScheduler = networkScheduler;
+        this.uiScheduler = uiScheduler;
 
         /** Shouts **/
         final Observable<ResponseOrError<ShoutsResponse>> myShoutsObservable =
@@ -82,7 +91,7 @@ public class HomePresenter {
                         }
 
                         return new ImmutableList.Builder<BaseAdapterItem>()
-                                .add(new ShoutHeaderAdapterItem(isUserLoggedIn(), "Dubaj")) // TODO provide city here
+                                .add(new ShoutHeaderAdapterItem(isUserLoggedIn(), "Dubaj", layoutManagerSwitchObserver)) // TODO provide city here
                                 .addAll(items)
                                 .build();
                     }
@@ -167,6 +176,21 @@ public class HomePresenter {
         progressObservable = Observable.merge(errorObservable, allDiscoverAdapterItems, allShoutAdapterItems)
                 .map(Functions1.returnFalse());
 
+        // Layout manager changes
+        linearLayoutManagerObservable = layoutManagerSwitchObserver
+                .scan(0, new Func2<Integer, Object, Integer>() {
+                    @Override
+                    public Integer call(Integer counter, Object o) {
+                        return ++counter;
+                    }
+                })
+                .skip(1)
+                .map(new Func1<Integer, Boolean>() {
+                    @Override
+                    public Boolean call(Integer count) {
+                        return count % 2 == 1;
+                    }
+                });
     }
 
     @Nonnull
@@ -276,6 +300,20 @@ public class HomePresenter {
         return loadMoreShouts;
     }
 
+    @Nonnull
+    public Observable<Boolean> getLinearLayoutManagerObservable() {
+        return linearLayoutManagerObservable
+                .observeOn(uiScheduler)
+                .filter(Functions1.isTrue());
+    }
+
+    @Nonnull
+    public Observable<Boolean> getGridLayoutManagerObservable() {
+        return linearLayoutManagerObservable
+                .observeOn(uiScheduler)
+                .filter(Functions1.isFalse());
+    }
+
     /** ADAPTER ITEMS **/
     public class DiscoverShowAllAdapterItem implements BaseAdapterItem {
 
@@ -343,10 +381,13 @@ public class HomePresenter {
         private final boolean isUserLoggedIn;
         // TODO need provide this city
         private final String userCity;
+        private final Observer<Object> layoutManagerSwitchObserver;
 
-        public ShoutHeaderAdapterItem(boolean isUserLoggedIn, String userCity) {
+        public ShoutHeaderAdapterItem(boolean isUserLoggedIn, String userCity,
+                                      Observer<Object> layoutManagerSwitchObserver) {
             this.isUserLoggedIn = isUserLoggedIn;
             this.userCity = userCity;
+            this.layoutManagerSwitchObserver = layoutManagerSwitchObserver;
         }
 
         @Override
@@ -370,6 +411,10 @@ public class HomePresenter {
 
         public String getUserCity() {
             return userCity;
+        }
+
+        public Observer<Object> getLayoutManagerSwitchObserver() {
+            return layoutManagerSwitchObserver;
         }
     }
 
