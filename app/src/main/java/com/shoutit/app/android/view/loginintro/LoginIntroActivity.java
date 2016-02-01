@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.login;
+package com.shoutit.app.android.view.loginintro;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,7 +10,6 @@ import android.view.MenuItem;
 
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.view.about.AboutActivity;
-import com.shoutit.app.android.view.about.AboutFragment;
 import com.uservoice.uservoicesdk.UserVoice;
 
 import javax.annotation.Nonnull;
@@ -19,14 +18,14 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginIntroActivity extends AppCompatActivity {
 
     @Bind(R.id.activity_login_toolbar)
     Toolbar toolbar;
 
     @Nonnull
     public static Intent newIntent(Context from) {
-        return new Intent(from, LoginActivity.class);
+        return new Intent(from, LoginIntroActivity.class);
     }
 
     @Override
@@ -40,7 +39,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void setUpActionBar() {
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(null);
+        toolbar.setTitle(null);
         toolbar.setNavigationIcon(R.drawable.ic_blue_arrow);
     }
 
@@ -53,6 +52,11 @@ public class LoginActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @OnClick(R.id.activity_login_signup)
+    public void singUpClick(){
+        com.shoutit.app.android.view.signin.LoginActivity.
     }
 
     @OnClick(R.id.activity_login_feedback)
