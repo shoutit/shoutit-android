@@ -2,11 +2,12 @@ buildscript {
     repositories {
         jcenter()
         maven { url 'https://maven.fabric.io/public' }
+        maven { url "https://jitpack.io" }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.0.0-alpha7'
         classpath 'io.fabric.tools:gradle:1.21.2'
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.7'
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
     }
 }
 
@@ -25,8 +26,8 @@ if (keystoreProperties.exists()) {
     props.load(new FileInputStream(keystoreProperties))
 }
 
-project.ext.versionCode = 1
-def baseVersionName = "0.0.1"
+project.ext.versionCode = 100
+def baseVersionName = "0.10.0"
 if (project.hasProperty("versionSuffix")) {
     project.ext.versionSuffix = project.versionSuffix
 } else {
@@ -149,6 +150,8 @@ dependencies {
     compile 'com.google.dagger:dagger:2.0.1'
     compile 'com.google.code.gson:gson:2.5'
     compile 'com.google.code.findbugs:jsr305:2.0.1'
+    compile 'com.google.android.gms:play-services-location:8.4.0'
+    compile 'com.google.guava:guava:18.0'
 
     // Square
     compile 'com.jakewharton:butterknife:7.0.1'
@@ -159,6 +162,7 @@ dependencies {
     compile 'com.jakewharton.picasso:picasso2-okhttp3-downloader:1.0.2'
     compile 'com.squareup.retrofit2:converter-gson:2.0.0-beta3'
     compile 'com.squareup.retrofit2:adapter-rxjava:2.0.0-beta3'
+
 
     // RX
     compile 'com.trello:rxlifecycle:0.4.0'
@@ -176,6 +180,10 @@ dependencies {
         exclude group: 'com.google.code.findbugs', module: 'annotations'
     }
 
+    // other
+    compile 'com.uservoice:uservoice-android-sdk:1.2.4'
+    compile 'fr.avianey.com.viewpagerindicator:library:2.4.1@aar'
+
     // Tests
     testCompile 'junit:junit:4.12'
     testCompile 'com.android.support:support-annotations:23.1.1'
@@ -187,6 +195,4 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.5.1@aar') {
         transitive = true;
     }
-    compile 'com.google.guava:guava:18.0'
-    compile 'com.uservoice:uservoice-android-sdk:1.2.4'
 }

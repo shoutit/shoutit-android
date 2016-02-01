@@ -33,6 +33,9 @@ public interface BaseActivityComponent {
     @ForActivity
     Context getActivityContext();
 
+    @ForApplication
+    Context getAppContext();
+
     Picasso getPicasso();
 
     LayoutInflater getLayoutInflater();

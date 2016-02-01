@@ -5,6 +5,7 @@
     <string name="price_with_currency">%1$s %2$s</string>
     <string name="shout_type_offer">Offer</string>
     <string name="shout_type_request">Request</string>
+    <string name="terms_of_service">Terms of Service</string>
 
     <!-- Intro -->
     <string name="intro_welcome">Welcome To Shoutit</string>
@@ -22,5 +23,46 @@
     <string name="home_shouts_header_guest">SHOUTS IN %1$s</string>
     <string name="home_discover_header">DISCOVER %1$s</string>
     <string name="home_user_and_date">%1$s - %2$s</string>
+
+    <!-- Login -->
+    <string name="login_email_hint">Email</string>
+    <string name="login_password_hint">Password</string>
+    <string name="login_btn_text">Log in</string>
+    <string name="login_sign_up_text">New to Shoutit? Sign up</string>
+    <string name="login_error">Wrong data</string>
+    <string name="login_empty_mail">Mail cannot be empty.</string>
+    <string name="login_empty_password">Password must have at least 6 characters.</string>
+
+    <!-- Register -->
+    <string name="register_sign_up_btn_text">Sign up</string>
+    <string name="register_name">Name</string>
+    <string name="register_email">Email</string>
+    <string name="register_password">Password</string>
+    <string name="register_login_text">Have an account? Log in</string>
+    <string name="register_error">Failed to register</string>
+    <string name="register_empty_mail">Mail cannot be empty.</string>
+    <string name="register_empty_password">Password must have at least 6 characters.</string>
+    <string name="register_empty_name">Name cannot be empty</string>
+
+    <!-- Login Intro -->
+    <string name="login_intro_join">Join Now!</string>
+    <string name="login_intro_text">Login and discover what others are\n selling in your neighborhood or start\n selling in seconds</string>
+    <string name="login_intro_facebook">Log in with Facebook</string>
+    <string name="login_intro_signup">Sign up / Log in with E-mail</string>
+    <string name="login_intro_feedback">Feedback</string>
+    <string name="login_intro_help">Help</string>
+    <string name="login_intro_about">About</string>
+
+    <!-- About -->
+    <string name="pref_key_terms_of_service" translatable="false">pref_key_terms_of_service</string>
+    <string name="pref_key_privacy_policy" translatable="false">pref_key_privacy_policy</string>
+    <string name="pref_key_legal" translatable="false">pref_key_legal</string>
+    <string name="pref_terms_of_service">Terms of Service</string>
+    <string name="pref_privacy_policy">Privacy Policy</string>
+    <string name="pref_legal">Legal</string>
+    <string name="about_terms_of_service_title">Terms of Service</string>
+    <string name="about_privacy_policy_title">Privacy Policy</string>
+    <string name="about_legal_title">Legal</string>
+    <string name="about_title">About</string>
 
 </resources>
