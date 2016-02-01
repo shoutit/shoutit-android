@@ -6,9 +6,9 @@ import com.crashlytics.android.Crashlytics;
 
 public class LogHelper {
 
-    public static void logThrowable(String tag, String msg, Throwable t) {
-        Log.e(tag, msg, t);
-        final Throwable cause = t.getCause();
+    public static void logThrowable(String tag, String msg, Throwable throwable) {
+        Log.e(tag, msg, throwable);
+        final Throwable cause = throwable.getCause();
         if (cause != null) {
             logThrowable(tag, msg, cause);
         }

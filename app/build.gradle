@@ -55,7 +55,6 @@ android {
         targetSdkVersion 23
         versionCode project.ext.versionCode
         versionName project.ext.versionName
-        testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
         renderscriptTargetApi 23
     }
 

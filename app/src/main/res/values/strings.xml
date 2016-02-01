@@ -35,6 +35,7 @@
     <string name="login_intro_join">Join Now!</string>
     <string name="login_intro_text">Login and discover what others are\n selling in your neighborhood or start\n selling in seconds</string>
     <string name="login_intro_facebook">Log in with Facebook</string>
+    <string name="login_intro_google">Log in with Google+</string>
     <string name="login_intro_signup">Sign up / Log in with E-mail</string>
     <string name="login_intro_feedback">Feedback</string>
     <string name="login_intro_help">Help</string>

@@ -11,7 +11,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.SystemUIUtils;
-import com.shoutit.app.android.view.login.LoginActivity;
+import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.uservoice.uservoicesdk.UserVoice;
 import com.viewpagerindicator.CirclePageIndicator;
 
@@ -57,7 +57,7 @@ public class IntroActivity extends BaseActivity {
 
     @OnClick(R.id.activity_intro_login_button)
     public void onLoginClick() {
-        startActivity(LoginActivity.newIntent(this));
+        startActivity(LoginIntroActivity.newIntent(this));
     }
 
     @Nonnull

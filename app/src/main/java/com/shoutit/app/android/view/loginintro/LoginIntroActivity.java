@@ -10,6 +10,7 @@ import android.view.MenuItem;
 
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.view.about.AboutActivity;
+import com.shoutit.app.android.view.signin.LoginActivity;
 import com.uservoice.uservoicesdk.UserVoice;
 
 import javax.annotation.Nonnull;
@@ -55,8 +56,8 @@ public class LoginIntroActivity extends AppCompatActivity {
     }
 
     @OnClick(R.id.activity_login_signup)
-    public void singUpClick(){
-        com.shoutit.app.android.view.signin.LoginActivity.
+    public void singUpClick() {
+        startActivity(LoginActivity.newIntent(this));
     }
 
     @OnClick(R.id.activity_login_feedback)
