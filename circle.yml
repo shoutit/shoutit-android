@@ -1,5 +1,5 @@
 machine:
-   environment:
+   pre:
      - printf "org.gradle.jvmargs=-XX:MaxPermSize=2g\ndisablePreDex=true\n" > gradle.properties
 
 dependencies:
