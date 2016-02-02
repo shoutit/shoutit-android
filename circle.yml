@@ -1,6 +1,6 @@
 machine:
-   pre:
-     - printf "org.gradle.jvmargs=-XX:MaxPermSize=2g\ndisablePreDex=true\n" > gradle.properties
+   environment:
+       JAVA_TOOL_OPTIONS: "-Xmx2g -XX:MaxPermSize=2g -Xms2g"
 
 dependencies:
     override:
