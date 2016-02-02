@@ -18,7 +18,8 @@ test:
         - python tools/download.py --token P8uXtUgTeNDYEIvw5gXUWjDM --key-version agxzfmF1dG8tY2xvc2VyGAsSC1Byb2plY3RLZXlzGICAgMDuv6EKDA
 
     override:
-        - ./gradlew --parallel --stacktrace --project-prop versionSuffix="$BRANCH_NAME" clean build
+        - (./gradlew --parallel --stacktrace --project-prop versionSuffix="$BRANCH_NAME" clean build):
+            timeout: 1800
 
     post:
         - ./gradlew :app:signingReport
