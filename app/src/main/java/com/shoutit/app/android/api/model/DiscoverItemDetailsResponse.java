@@ -15,22 +15,19 @@ public class DiscoverItemDetailsResponse {
         this.children = children;
     }
 
-    public class DiscoverChild {
-        private final String id;
-        private final String apiUrl;
-        private final String title;
-        private final String subtitle;
-        private final String image;
-        private final String icon;
-
-        public DiscoverChild(String id, String apiUrl, String title, String subtitle, String image, String icon) {
-            this.id = id;
-            this.apiUrl = apiUrl;
-            this.title = title;
-            this.subtitle = subtitle;
-            this.image = image;
-            this.icon = icon;
-        }
+    public String getId() {
+        return id;
     }
 
+    public boolean isShowChildren() {
+        return showChildren;
+    }
+
+    public boolean isShow_shouts() {
+        return show_shouts;
+    }
+
+    public List<DiscoverChild> getChildren() {
+        return children;
+    }
 }

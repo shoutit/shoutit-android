@@ -3,17 +3,18 @@ package com.shoutit.app.android.view.home;
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
-import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
-import com.appunite.rx.operators.OperatorMergeNextToken;
 import com.google.common.collect.ImmutableList;
-import com.shoutit.app.android.api.ApiService;
-import com.shoutit.app.android.api.model.Discover;
+import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.model.DiscoverChild;
+import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
-import com.shoutit.app.android.constants.RequestsConstants;
+import com.shoutit.app.android.dao.DiscoversDao;
+import com.shoutit.app.android.dao.ShoutsDao;
+import com.shoutit.app.android.utils.rx.RxMoreObservers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,30 +27,19 @@ import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Func1;
 import rx.functions.Func2;
-import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
 public class HomePresenter {
 
-    private final static int PAGE_SIZE = 20;
-    private final static int VISIBLE_DISCOVER_ITEMS_ON_START = 6;
+    private final static int MAX_VISIBLE_DISCOVER_ITEMS = 6;
 
     @Nonnull
-    private final PublishSubject<Object> loadMoreDiscovers = PublishSubject.create();
-    @Nonnull
-    private final PublishSubject<Object> loadMoreShouts = PublishSubject.create();
-    @Nonnull
-    private final BehaviorSubject<Boolean> showAllDiscovers = BehaviorSubject.create();
+    private final PublishSubject<Boolean> showAllDiscovers = PublishSubject.create();
     @Nonnull
     private final PublishSubject<Object> layoutManagerSwitchObserver = PublishSubject.create();
+
     @Nonnull
     private final Observable<Throwable> errorObservable;
-    @Nonnull
-    private final ApiService apiService;
-    @Nonnull
-    private final Scheduler networkScheduler;
-    @Nonnull
-    private final Scheduler uiScheduler;
     @Nonnull
     private final Observable<Boolean> progressObservable;
     @Nonnull
@@ -57,23 +47,26 @@ public class HomePresenter {
     @Nonnull
     private final Observable<Boolean> linearLayoutManagerObservable;
 
+    @Nonnull
+    private final ShoutsDao shoutsDao;
+    @Nonnull
+    private final Scheduler uiScheduler;
+    private final String userCity;
+
 
     @Inject
-    public HomePresenter(@Nonnull final ApiService apiService,
-                         @Nonnull @NetworkScheduler final Scheduler networkScheduler,
+    public HomePresenter(@Nonnull ShoutsDao shoutsDao,
+                         @Nonnull final DiscoversDao discoversDao,
+                         @Nonnull final UserPreferences userPreferences,
                          @Nonnull @UiScheduler final Scheduler uiScheduler) {
-        this.apiService = apiService;
-        this.networkScheduler = networkScheduler;
+        this.shoutsDao = shoutsDao;
         this.uiScheduler = uiScheduler;
 
-        /** Shouts **/
-        final Observable<ResponseOrError<ShoutsResponse>> myShoutsObservable =
-                loadMoreShouts.startWith((Object) null)
-                        .lift(getShoutsLoadMoreOperator(isUserLoggedIn()))
-                        .compose(ResponseOrError.<ShoutsResponse>toResponseOrErrorObservable())
-                        .compose(ObservableExtensions.<ResponseOrError<ShoutsResponse>>behaviorRefCount());
+        final boolean isUserLoggedIn = userPreferences.isUserLoggedIn();
+        userCity = userPreferences.getUserCity();
 
-        final Observable<List<BaseAdapterItem>> allShoutAdapterItems = myShoutsObservable
+        /** Shouts **/
+        final Observable<List<BaseAdapterItem>> allShoutAdapterItems = shoutsDao.getHomeShoutsObservable()
                 .compose(ResponseOrError.<ShoutsResponse>onlySuccess())
                 .filter(new Func1<ShoutsResponse, Boolean>() {
                     @Override
@@ -91,20 +84,14 @@ public class HomePresenter {
                         }
 
                         return new ImmutableList.Builder<BaseAdapterItem>()
-                                .add(new ShoutHeaderAdapterItem(isUserLoggedIn(), "Dubaj", layoutManagerSwitchObserver)) // TODO provide city here
+                                .add(new ShoutHeaderAdapterItem(isUserLoggedIn, userCity, layoutManagerSwitchObserver))
                                 .addAll(items)
                                 .build();
                     }
                 });
 
         /** Discovers **/
-        final Observable<ResponseOrError<DiscoverResponse>> discoverObservable =
-                loadMoreDiscovers.startWith((Object) null)
-                        .lift(getDiscoverLoadMoreOperator())
-                        .compose(ResponseOrError.<DiscoverResponse>toResponseOrErrorObservable())
-                        .compose(ObservableExtensions.<ResponseOrError<DiscoverResponse>>behaviorRefCount());
-
-        final Observable<List<Discover>> successDiscoverObservable = discoverObservable
+        final Observable<String> mainDiscoverIdObservable = discoversDao.getHomeDiscoverObservable()
                 .compose(ResponseOrError.<DiscoverResponse>onlySuccess())
                 .filter(new Func1<DiscoverResponse, Boolean>() {
                     @Override
@@ -113,37 +100,47 @@ public class HomePresenter {
                                 !discoverResponse.getDiscovers().isEmpty();
                     }
                 })
-                .map(new Func1<DiscoverResponse, List<Discover>>() {
+                .map(new Func1<DiscoverResponse, String>() {
                     @Override
-                    public List<Discover> call(DiscoverResponse response) {
-                        return response.getDiscovers();
+                    public String call(DiscoverResponse response) {
+                        return response.getDiscovers().get(0).getId();
                     }
                 });
 
-        final Observable<List<BaseAdapterItem>> allDiscoverAdapterItems = Observable.combineLatest(
-                successDiscoverObservable,
-                showAllDiscovers.startWith(false),
-                new Func2<List<Discover>, Boolean, List<Discover>>() {
+        final Observable<ResponseOrError<DiscoverItemDetailsResponse>> discoverItemDetailsObservable = mainDiscoverIdObservable
+                .switchMap(new Func1<String, Observable<ResponseOrError<DiscoverItemDetailsResponse>>>() {
                     @Override
-                    public List<Discover> call(List<Discover> discovers, Boolean showAllItems) {
-                            if (showAllItems || discovers.size() < VISIBLE_DISCOVER_ITEMS_ON_START) {
-                                return ImmutableList.copyOf(discovers);
-                            } else {
-                                return ImmutableList.copyOf(discovers.subList(0, VISIBLE_DISCOVER_ITEMS_ON_START));
-                            }
+                    public Observable<ResponseOrError<DiscoverItemDetailsResponse>> call(String discoverId) {
+                        return discoversDao.discoverItemDao(discoverId)
+                                .getDiscoverItemObservable();
                     }
                 })
-                .map(new Func1<List<Discover>, List<BaseAdapterItem>>() {
+                .compose(ObservableExtensions.<ResponseOrError<DiscoverItemDetailsResponse>>behaviorRefCount());
+
+        final Observable<List<DiscoverChild>> childDiscoversObservable =
+                discoverItemDetailsObservable
+                        .compose(ResponseOrError.<DiscoverItemDetailsResponse>onlySuccess())
+                        .filter(Functions1.isNotNull())
+                        .map(new Func1<DiscoverItemDetailsResponse, List<DiscoverChild>>() {
+                            @Override
+                            public List<DiscoverChild> call(DiscoverItemDetailsResponse discoverItemDetailsResponse) {
+                                return discoverItemDetailsResponse.getChildren();
+                            }
+                        });
+
+        final Observable<List<BaseAdapterItem>> allDiscoverAdapterItems =
+                childDiscoversObservable.map(new Func1<List<DiscoverChild>, List<BaseAdapterItem>>() {
                     @Override
-                    public List<BaseAdapterItem> call(List<Discover> discovers) {
+                    public List<BaseAdapterItem> call(List<DiscoverChild> discovers) {
                         final List<BaseAdapterItem> items = new ArrayList<>();
-                        for (Discover discover : discovers) {
-                            items.add(new DiscoverAdapterItem(discover));
+                        for (int i = 0; i < discovers.size(); i++) {
+                            if (i >= MAX_VISIBLE_DISCOVER_ITEMS) {
+                                break;
+                            }
+                            items.add(new DiscoverAdapterItem(discovers.get(i)));
                         }
 
-                        if (items.size() == VISIBLE_DISCOVER_ITEMS_ON_START) {
-                            items.add(new DiscoverShowAllAdapterItem(showAllDiscovers));
-                        }
+                        items.add(new DiscoverShowAllAdapterItem(showAllDiscovers));
 
                         return new ImmutableList.Builder<BaseAdapterItem>()
                                 .addAll(items)
@@ -151,7 +148,7 @@ public class HomePresenter {
                     }
                 });
 
-        /** Results **/
+        /** Combines adapter items **/
         allAdapterItemsObservable = Observable.combineLatest(
                 allDiscoverAdapterItems.startWith(ImmutableList.<List<BaseAdapterItem>>of()),
                 allShoutAdapterItems.startWith(ImmutableList.<List<BaseAdapterItem>>of()),
@@ -160,8 +157,8 @@ public class HomePresenter {
                     public List<BaseAdapterItem> call(List<BaseAdapterItem> discovers,
                                                       List<BaseAdapterItem> shouts) {
                         return ImmutableList.<BaseAdapterItem>builder()
-                                .add(new DiscoverHeaderAdapterItem("Dubaj")) // TODO provide city
-                                .add(new DiscoverContainerAdapterItem(discovers, loadMoreDiscovers))
+                                .add(new DiscoverHeaderAdapterItem(userCity))
+                                .add(new DiscoverContainerAdapterItem(discovers))
                                 .addAll(shouts)
                                 .build();
                     }
@@ -169,11 +166,12 @@ public class HomePresenter {
 
         /** Progress and Error **/
         errorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
-                ResponseOrError.transform(myShoutsObservable),
-                ResponseOrError.transform(discoverObservable)))
+                ResponseOrError.transform(shoutsDao.getHomeShoutsObservable()),
+                ResponseOrError.transform(discoversDao.getHomeDiscoverObservable()),
+                ResponseOrError.transform(discoverItemDetailsObservable)))
                 .filter(Functions1.isNotNull());
 
-        progressObservable = Observable.merge(errorObservable, allDiscoverAdapterItems, allShoutAdapterItems)
+        progressObservable = Observable.merge(errorObservable, allAdapterItemsObservable)
                 .map(Functions1.returnFalse());
 
         // Layout manager changes
@@ -194,93 +192,6 @@ public class HomePresenter {
     }
 
     @Nonnull
-    private OperatorMergeNextToken<ShoutsResponse, Object> getShoutsLoadMoreOperator(final boolean isUserLoggedIn) {
-        return OperatorMergeNextToken.create(new Func1<ShoutsResponse, Observable<ShoutsResponse>>() {
-            private int pageNumber = 0;
-
-            @Override
-            public Observable<ShoutsResponse> call(ShoutsResponse previousResponse) {
-                if (previousResponse == null || previousResponse.getNext() != null) {
-                    ++pageNumber;
-                    final Observable<ShoutsResponse> apiRequest;
-                    if (isUserLoggedIn) {
-                        apiRequest = apiService
-                                .home(RequestsConstants.USER_ME, pageNumber, PAGE_SIZE)
-                                .subscribeOn(networkScheduler);
-                    } else {
-                        apiRequest = apiService
-                                .shoutsForCountry("GE", pageNumber, PAGE_SIZE)
-                                .subscribeOn(networkScheduler);
-                    }
-
-                    if (previousResponse == null) {
-                        return apiRequest;
-                    } else {
-                        return Observable.just(previousResponse).zipWith(apiRequest, new MergeShoutsResponses());
-                    }
-                } else {
-                    return Observable.never();
-                }
-            }
-        });
-    }
-
-    @Nonnull
-    private OperatorMergeNextToken<DiscoverResponse, Object> getDiscoverLoadMoreOperator() {
-        return OperatorMergeNextToken.create(new Func1<DiscoverResponse, Observable<DiscoverResponse>>() {
-            private int pageNumber = 0;
-
-            @Override
-            public Observable<DiscoverResponse> call(DiscoverResponse previousResponse) {
-                if (previousResponse == null || previousResponse.getNext() != null) {
-                    ++pageNumber;
-                    final Observable<DiscoverResponse> apiRequest = apiService
-                            .discovers("GE", pageNumber, PAGE_SIZE)
-                            .subscribeOn(networkScheduler);
-
-                    if (previousResponse == null) {
-                        return apiRequest;
-                    } else {
-                        return Observable.just(previousResponse).zipWith(apiRequest, new MergeDiscoverResponses());
-                    }
-                } else {
-                    return Observable.never();
-                }
-            }
-        });
-    }
-
-    private class MergeShoutsResponses implements Func2<ShoutsResponse, ShoutsResponse, ShoutsResponse> {
-        @Override
-        public ShoutsResponse call(ShoutsResponse previousData, ShoutsResponse newData) {
-            final ImmutableList<Shout> allItems = ImmutableList.<Shout>builder()
-                    .addAll(previousData.getShouts())
-                    .addAll(newData.getShouts())
-                    .build();
-
-            final int count = previousData.getCount() + newData.getCount();
-            return new ShoutsResponse(count, newData.getNext(), newData.getPrevious(), allItems);
-        }
-    }
-
-    private class MergeDiscoverResponses implements Func2<DiscoverResponse, DiscoverResponse, DiscoverResponse> {
-        @Override
-        public DiscoverResponse call(DiscoverResponse previousData, DiscoverResponse newData) {
-            final ImmutableList<Discover> allItems = ImmutableList.<Discover>builder()
-                    .addAll(previousData.getDiscovers())
-                    .addAll(newData.getDiscovers())
-                    .build();
-
-            final int count = previousData.getCount() + newData.getCount();
-            return new DiscoverResponse(count, newData.getNext(), newData.getPrevious(), allItems);
-        }
-    }
-
-    private boolean isUserLoggedIn() {
-        return false;
-    }
-
-    @Nonnull
     public Observable<List<BaseAdapterItem>> getAllAdapterItemsObservable() {
         return allAdapterItemsObservable;
     }
@@ -296,8 +207,8 @@ public class HomePresenter {
     }
 
     @Nonnull
-    public PublishSubject<Object> getLoadMoreShouts() {
-        return loadMoreShouts;
+    public Observer<Object> getLoadMoreShouts() {
+        return RxMoreObservers.ignoreCompleted(shoutsDao.getLoadMoreShoutsObserver());
     }
 
     @Nonnull
@@ -314,7 +225,14 @@ public class HomePresenter {
                 .filter(Functions1.isFalse());
     }
 
-    /** ADAPTER ITEMS **/
+    @Nonnull
+    public Observable<Boolean> getShowAllDiscoversObservable() {
+        return showAllDiscovers;
+    }
+
+    /**
+     * ADAPTER ITEMS
+     **/
     public class DiscoverShowAllAdapterItem implements BaseAdapterItem {
 
         @Nonnull
@@ -379,7 +297,6 @@ public class HomePresenter {
     public class ShoutHeaderAdapterItem implements BaseAdapterItem {
 
         private final boolean isUserLoggedIn;
-        // TODO need provide this city
         private final String userCity;
         private final Observer<Object> layoutManagerSwitchObserver;
 
@@ -421,9 +338,9 @@ public class HomePresenter {
     public class DiscoverAdapterItem implements BaseAdapterItem {
 
         @Nonnull
-        private final Discover discover;
+        private final DiscoverChild discover;
 
-        public DiscoverAdapterItem(@Nonnull Discover discover) {
+        public DiscoverAdapterItem(@Nonnull DiscoverChild discover) {
             this.discover = discover;
         }
 
@@ -444,7 +361,7 @@ public class HomePresenter {
         }
 
         @Nonnull
-        public Discover getDiscover() {
+        public DiscoverChild getDiscover() {
             return discover;
         }
     }
@@ -481,13 +398,9 @@ public class HomePresenter {
 
         @Nonnull
         private final List<BaseAdapterItem> adapterItems;
-        @Nonnull
-        private final Observer<Object> loadMoreDiscoversObserver;
 
-        public DiscoverContainerAdapterItem(@Nonnull List<BaseAdapterItem> adapterItems,
-                                            @Nonnull Observer<Object> loadMoreDiscoversObserver) {
+        public DiscoverContainerAdapterItem(@Nonnull List<BaseAdapterItem> adapterItems) {
             this.adapterItems = adapterItems;
-            this.loadMoreDiscoversObserver = loadMoreDiscoversObserver;
         }
 
         @Override
@@ -508,11 +421,6 @@ public class HomePresenter {
         @Nonnull
         public List<BaseAdapterItem> getAdapterItems() {
             return adapterItems;
-        }
-
-        @Nonnull
-        public Observer<Object> getLoadMoreDiscoversObserver() {
-            return loadMoreDiscoversObserver;
         }
     }
     /** END OF ADAPTER ITEMS **/

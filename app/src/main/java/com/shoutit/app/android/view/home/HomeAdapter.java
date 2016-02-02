@@ -2,6 +2,8 @@ package com.shoutit.app.android.view.home;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -39,6 +41,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import rx.Observable;
 import rx.Scheduler;
+import rx.Subscription;
 import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
 
@@ -94,11 +97,22 @@ public class HomeAdapter extends BaseAdapter {
         @Bind(R.id.fragment_home_discover_recycler_view)
         RecyclerView recyclerView;
 
-        private CompositeSubscription subscription;
+        private Subscription subscription;
+        private final RecyclerView.ItemDecoration itemDecoration;
+        private final int itemSpacing;
 
         public DiscoverContainerViewHolder(@Nonnull View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+
+            itemSpacing = context.getResources().getDimensionPixelOffset(R.dimen.home_discover_item_spacing);
+            itemDecoration = new RecyclerView.ItemDecoration() {
+                @Override
+                public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+                    outRect.left = itemSpacing;
+                    outRect.right = itemSpacing;
+                }
+            };
         }
 
         @Override
@@ -107,19 +121,13 @@ public class HomeAdapter extends BaseAdapter {
 
             final MyLinearLayoutManager layoutManager = new MyLinearLayoutManager(
                     context, LinearLayoutManager.HORIZONTAL, false);
+            recyclerView.addItemDecoration(itemDecoration);
             recyclerView.setLayoutManager(layoutManager);
             recyclerView.setAdapter(homeDiscoversAdapter);
 
-            subscription = new CompositeSubscription(
-                    RxRecyclerView.scrollEvents(recyclerView)
+            subscription = Observable.just(item.getAdapterItems())
                             .observeOn(uiScheduler)
-                            .filter(LoadMoreHelper.needLoadMore(layoutManager, homeDiscoversAdapter))
-                            .subscribe(item.getLoadMoreDiscoversObserver()),
-
-                    Observable.just(item.getAdapterItems())
-                            .observeOn(uiScheduler)
-                            .subscribe(homeDiscoversAdapter)
-            );
+                            .subscribe(homeDiscoversAdapter);
         }
 
         @Override

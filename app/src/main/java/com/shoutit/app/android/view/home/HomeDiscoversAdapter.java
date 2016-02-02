@@ -12,6 +12,7 @@ import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.Discover;
+import com.shoutit.app.android.api.model.DiscoverChild;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.squareup.picasso.Picasso;
 
@@ -49,7 +50,7 @@ public class HomeDiscoversAdapter extends BaseAdapter {
 
         @Override
         public void bind(@Nonnull HomePresenter.DiscoverAdapterItem item) {
-            final Discover discover = item.getDiscover();
+            final DiscoverChild discover = item.getDiscover();
             cardTitleTextView.setText(discover.getTitle());
 
             if (!TextUtils.isEmpty(discover.getImage())) {

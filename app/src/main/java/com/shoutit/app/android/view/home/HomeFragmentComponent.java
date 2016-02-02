@@ -12,6 +12,7 @@ import dagger.Component;
         dependencies = BaseActivityComponent.class,
         modules = {
                 FragmentModule.class,
+                HomeFragmentModule.class
         }
 )
 public interface HomeFragmentComponent extends BaseFragmentComponent {

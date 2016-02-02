@@ -59,8 +59,10 @@ public class HomeFragment extends BaseFragment {
     @Inject
     @UiScheduler
     Scheduler uiScheduler;
-
-    private HomeGridSpacingItemDecoration gridViewItemDecoration;
+    @Inject
+    HomeGridSpacingItemDecoration gridViewItemDecoration;
+    @Inject
+    HomeLinearSpacingItemDecoration linearViewItemDecoration;
 
     @android.support.annotation.Nullable
     @Override
@@ -74,8 +76,6 @@ public class HomeFragment extends BaseFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        gridViewItemDecoration = new HomeGridSpacingItemDecoration(
-                getResources().getDimensionPixelSize(R.dimen.home_grid_side_spacing));
         setGridLayoutManager();
         recyclerView.setAdapter(adapter);
 
@@ -133,11 +133,23 @@ public class HomeFragment extends BaseFragment {
                         Toast.makeText(context, "Not impelmented yet", Toast.LENGTH_LONG).show();
                     }
                 });
+
+        presenter.getShowAllDiscoversObservable()
+                .observeOn(uiScheduler)
+                .compose(this.<Boolean>bindToLifecycle())
+                .subscribe(new Action1<Boolean>() {
+                    @Override
+                    public void call(Boolean aBoolean) {
+                        Toast.makeText(context, "Not impelmented yet", Toast.LENGTH_LONG).show();
+                    }
+                });
+
     }
 
     private void setLinearLayoutManager() {
         recyclerView.setLayoutManager(new MyLinearLayoutManager(context));
         recyclerView.removeItemDecoration(gridViewItemDecoration);
+        recyclerView.addItemDecoration(linearViewItemDecoration);
         adapter.switchLayoutManager();
     }
 
@@ -154,6 +166,7 @@ public class HomeFragment extends BaseFragment {
             }
         });
         recyclerView.setLayoutManager(gridLayoutManager);
+        recyclerView.removeItemDecoration(linearViewItemDecoration);
         recyclerView.addItemDecoration(gridViewItemDecoration);
         adapter.switchLayoutManager();
     }
@@ -166,6 +179,7 @@ public class HomeFragment extends BaseFragment {
         DaggerHomeFragmentComponent.builder()
                 .baseActivityComponent(baseActivityComponent)
                 .fragmentModule(fragmentModule)
+                .homeFragmentModule(new HomeFragmentModule(this))
                 .build()
                 .inject(this);
     }

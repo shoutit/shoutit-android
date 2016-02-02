@@ -1,5 +1,6 @@
 package com.shoutit.app.android.api;
 
+import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 
@@ -18,18 +19,21 @@ public interface ApiService {
 
     @GET("discover")
     Observable<DiscoverResponse> discovers(@Query("country") String country,
-                                           @Query("page") int page,
-                                           @Query("page_size") int pageSize);
+                                           @Query("page") Integer page,
+                                           @Query("page_size") Integer pageSize);
+
+    @GET("discover/{id}")
+    Observable<DiscoverItemDetailsResponse> discoverItem(@Path("id") String id);
 
     @GET("users/{user_name}/home")
     Observable<ShoutsResponse> home(@Path("user_name") String userName,
-                                    @Query("page") int page,
-                                    @Query("page_size") int pageSize);
+                                    @Query("page") Integer page,
+                                    @Query("page_size") Integer pageSize);
 
     @GET("shouts")
     Observable<ShoutsResponse> shoutsForCountry(@Query("city") String city,
-                                                @Query("page") int page,
-                                                @Query("page_size") int pageSize);
+                                                @Query("page") Integer page,
+                                                @Query("page_size") Integer pageSize);
     @POST("oauth2/access_token")
     Observable<SignResponse> login(@Body EmailLoginRequest request);
 

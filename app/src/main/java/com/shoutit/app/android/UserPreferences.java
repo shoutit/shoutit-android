@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.google.common.base.Optional;
 import com.shoutit.app.android.dagger.ForApplication;
@@ -33,5 +35,21 @@ public class UserPreferences {
 
     public Optional<String> getAuthToken() {
         return Optional.fromNullable(mPreferences.getString(AUTH_TOKEN, null));
+    }
+
+    public boolean isUserLoggedIn() {
+        return !TextUtils.isEmpty(mPreferences.getString(AUTH_TOKEN, null));
+    }
+
+    // TODO
+    @Nullable
+    public String getUserCountryCode() {
+        return "GE";
+    }
+
+    // TODO
+    @Nullable
+    public String getUserCity() {
+        return "Dubaj";
     }
 }
