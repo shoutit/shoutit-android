@@ -20,14 +20,14 @@ test:
         - ./gradlew :app:signingReport
 
 deployment:
-    master:
-        branch: master
-          commands:
-            - "./upload.sh"
-            - python tools/upload.py --token P8uXtUgTeNDYEIvw5gXUWjDM --build-name "$(git rev-parse --short HEAD)-$(git rev-parse --abbrev-ref HEAD)" app/build/outputs/apk/
+  master:
+    branch: master
+    commands:
+      - "./upload.sh"
+      - python tools/upload.py --token P8uXtUgTeNDYEIvw5gXUWjDM --build-name "$(git rev-parse --short HEAD)-$(git rev-parse --abbrev-ref HEAD)" app/build/outputs/apk/
 
-    develop:
-        branch: develop
-          commands:
-            - "./upload.sh"
-            - python tools/upload.py --token P8uXtUgTeNDYEIvw5gXUWjDM --build-name "$(git rev-parse --short HEAD)-$(git rev-parse --abbrev-ref HEAD)" app/build/outputs/apk/
+  develop:
+    branch: develop
+    commands:
+      - "./upload.sh"
+      - python tools/upload.py --token P8uXtUgTeNDYEIvw5gXUWjDM --build-name "$(git rev-parse --short HEAD)-$(git rev-parse --abbrev-ref HEAD)" app/build/outputs/apk/
