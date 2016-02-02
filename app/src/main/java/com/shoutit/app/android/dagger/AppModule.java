@@ -116,15 +116,14 @@ public final class AppModule {
     @Provides
     public ShoutsDao provideShoutsDao(ApiService apiService,
                                       @NetworkScheduler Scheduler networkScheduler,
-                                      @UiScheduler Scheduler uiScheduler,
                                       UserPreferences userPreferences) {
-        return new ShoutsDao(apiService, networkScheduler, uiScheduler, userPreferences);
+        return new ShoutsDao(apiService, networkScheduler, userPreferences);
     }
 
     @Provides
-    public DiscoversDao proivideDiscoversDao(ApiService apiService,
-                                             @NetworkScheduler Scheduler networkScheduler,
-                                             UserPreferences userPreferences) {
+    public DiscoversDao provideDiscoversDao(ApiService apiService,
+                                            @NetworkScheduler Scheduler networkScheduler,
+                                            UserPreferences userPreferences) {
         return new DiscoversDao(apiService, userPreferences, networkScheduler);
     }
 

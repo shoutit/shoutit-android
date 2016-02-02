@@ -1,9 +1,7 @@
 package com.shoutit.app.android.dao;
 
-import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
-import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.operators.MoreOperators;
 import com.appunite.rx.operators.OperatorMergeNextToken;
 import com.google.common.collect.ImmutableList;
@@ -17,7 +15,10 @@ import javax.annotation.Nonnull;
 import javax.inject.Singleton;
 
 import rx.Observable;
+import rx.Observer;
 import rx.Scheduler;
+import rx.functions.Action0;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.subjects.PublishSubject;
@@ -32,7 +33,6 @@ public class ShoutsDao {
 
     public ShoutsDao(@Nonnull final ApiService apiService,
                      @Nonnull @NetworkScheduler final Scheduler networkScheduler,
-                     @Nonnull @UiScheduler final Scheduler uiScheduler,
                      @Nonnull final UserPreferences userPreferences) {
 
         final OperatorMergeNextToken<ShoutsResponse, Object> homeShoutsLoadMoreOperator =
@@ -68,8 +68,7 @@ public class ShoutsDao {
         homeShoutsObservable = loadMoreShouts.startWith((Object) null)
                 .lift(homeShoutsLoadMoreOperator)
                 .compose(ResponseOrError.<ShoutsResponse>toResponseOrErrorObservable())
-                .observeOn(uiScheduler)
-                .compose(MoreOperators.<ResponseOrError<ShoutsResponse>>cacheWithTimeout(uiScheduler));
+                .compose(MoreOperators.<ResponseOrError<ShoutsResponse>>cacheWithTimeout(networkScheduler));
     }
 
     private class MergeShoutsResponses implements Func2<ShoutsResponse, ShoutsResponse, ShoutsResponse> {
@@ -86,7 +85,7 @@ public class ShoutsDao {
     }
 
     @Nonnull
-    public PublishSubject<Object> getLoadMoreShoutsObserver() {
+    public Observer<Object> getLoadMoreShoutsObserver() {
         return loadMoreShouts;
     }
 
