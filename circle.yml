@@ -1,6 +1,6 @@
 machine:
    environment:
-       JAVA_TOOL_OPTIONS: "-Xmx512m -XX:MaxPermSize=2g -Xms512m"
+       JAVA_TOOL_OPTIONS: "-Xmx1024m -XX:MaxPermSize=1024m -Xms512m"
 
 dependencies:
     override:
