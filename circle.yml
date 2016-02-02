@@ -1,7 +1,10 @@
+machine:
+   environment:
+     - printf "org.gradle.jvmargs=-XX:MaxPermSize=2g\ndisablePreDex=true\n" > gradle.properties
 
 dependencies:
     override:
-        - echo y | android update sdk --no-ui --all --filter tools,platform-tools,build-tools-23.0.2,android-23,extra-google-m2repository,extra-google-google_play_services,extra-android-support
+        - echo y | android update sdk --no-ui --all --filter tools,platform-tools,android-23,extra-google-m2repository,extra-google-google_play_services,extra-android-support
         - echo y | android update sdk --no-ui --all --filter build-tools-23.0.2,build-tools-23.0.1
 
 checkout:
