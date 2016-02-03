@@ -62,30 +62,35 @@
             android:id="@+id/menu_home"
             style="@style/SideMenuItem"
             android:drawableStart="@drawable/ic_menu_home"
+            android:drawableLeft="@drawable/ic_menu_home"
             android:text="@string/menu_item_home" />
 
         <CheckedTextView
             android:id="@+id/menu_discover"
             style="@style/SideMenuItem"
             android:drawableStart="@drawable/ic_menu_discover"
+            android:drawableLeft="@drawable/ic_menu_discover"
             android:text="@string/menu_item_discover" />
 
         <CheckedTextView
             android:id="@+id/menu_browse"
             style="@style/SideMenuItem"
             android:drawableStart="@drawable/ic_menu_browse"
+            android:drawableLeft="@drawable/ic_menu_browse"
             android:text="@string/menu_item_browse" />
 
         <CheckedTextView
             android:id="@+id/menu_chat"
             style="@style/SideMenuItem"
             android:drawableStart="@drawable/ic_menu_chat"
+            android:drawableLeft="@drawable/ic_menu_chat"
             android:text="@string/menu_item_home" />
 
         <CheckedTextView
             android:id="@+id/menu_orders"
             style="@style/SideMenuItem"
             android:drawableStart="@drawable/ic_menu_orders"
+            android:drawableLeft="@drawable/ic_menu_orders"
             android:text="@string/menu_item_orders" />
 
         <View
