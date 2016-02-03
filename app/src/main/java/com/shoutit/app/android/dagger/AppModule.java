@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
+import com.appunite.rx.dagger.NetworkScheduler;
 import com.google.common.base.Optional;
 import com.google.gson.Gson;
 import com.jakewharton.picasso.OkHttp3Downloader;
@@ -13,24 +14,24 @@ import com.shoutit.app.android.BuildConfig;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.AuthInterceptor;
+import com.shoutit.app.android.dao.DiscoversDao;
+import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.view.signin.CoarseLocationObservableProvider;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
-import java.io.IOException;
 
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
 import okhttp3.Cache;
-import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
-import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.GsonConverterFactory;
 import retrofit2.Retrofit;
 import retrofit2.RxJavaCallAdapterFactory;
+import rx.Scheduler;
 
 @Module
 public final class AppModule {
@@ -93,7 +94,7 @@ public final class AppModule {
 
     @Provides
     @Singleton
-    ApiService provideKingschatService(Gson gson, OkHttpClient client) {
+    ApiService provideApiService(Gson gson, OkHttpClient client) {
         return new Retrofit.Builder()
                 .baseUrl(BuildConfig.API_URL)
                 .addConverterFactory(GsonConverterFactory.create(gson))
@@ -118,6 +119,20 @@ public final class AppModule {
     @Provides
     AuthInterceptor prvideAuthInterceptor(UserPreferences userPreferences) {
         return new AuthInterceptor(userPreferences);
+    }
+
+    @Provides
+    public ShoutsDao provideShoutsDao(ApiService apiService,
+                                      @NetworkScheduler Scheduler networkScheduler,
+                                      UserPreferences userPreferences) {
+        return new ShoutsDao(apiService, networkScheduler, userPreferences);
+    }
+
+    @Provides
+    public DiscoversDao provideDiscoversDao(ApiService apiService,
+                                            @NetworkScheduler Scheduler networkScheduler,
+                                            UserPreferences userPreferences) {
+        return new DiscoversDao(apiService, userPreferences, networkScheduler);
     }
 
 }

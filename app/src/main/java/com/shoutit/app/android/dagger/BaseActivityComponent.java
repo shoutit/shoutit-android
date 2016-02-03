@@ -8,7 +8,8 @@ import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.google.gson.Gson;
 import com.shoutit.app.android.api.ApiService;
-import com.shoutit.app.android.view.signin.CoarseLocationObservableProvider;
+import com.shoutit.app.android.dao.DiscoversDao;
+import com.shoutit.app.android.dao.ShoutsDao;
 import com.squareup.picasso.Picasso;
 
 import dagger.Component;
@@ -40,9 +41,13 @@ public interface BaseActivityComponent {
 
     Picasso getPicasso();
 
-    ApiService apiService();
-
     LayoutInflater getLayoutInflater();
 
+    ApiService apiService();
+
     Gson gson();
+
+    ShoutsDao shoutsDao();
+
+    DiscoversDao discoversDao();
 }

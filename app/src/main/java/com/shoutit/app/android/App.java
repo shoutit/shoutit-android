@@ -6,11 +6,11 @@ import com.appunite.rx.dagger.NetworkScheduler;
 import com.crashlytics.android.core.CrashlyticsCore;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.constants.UserVoiceConstants;
 import com.shoutit.app.android.dagger.AppComponent;
 import com.shoutit.app.android.dagger.AppModule;
 import com.shoutit.app.android.dagger.BaseModule;
 import com.shoutit.app.android.dagger.DaggerAppComponent;
-import com.shoutit.app.android.constants.UserVoiceConstants;
 import com.shoutit.app.android.utils.LogHelper;
 import com.uservoice.uservoicesdk.Config;
 import com.uservoice.uservoicesdk.UserVoice;
@@ -95,7 +95,7 @@ public class App extends Application {
             return;
         }
 
-        apiService.getUser(User.ME)
+        apiService.getMyUser()
                 .subscribeOn(networkScheduler)
                 .subscribe(new Action1<User>() {
                     @Override

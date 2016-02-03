@@ -5,9 +5,11 @@
     <color name="colorPrimaryDark">#3C8C40</color>
     <color name="colorAccent">#4CAF50</color>
 
-    <!-- Global values -->
-    <color name="pattern_background">#F4F4F4</color>
+    <!-- Global colors -->
+    <color name="default_bg_color">#f7f7f7</color>
     <color name="black_54">#8a000000</color>
+    <color name="black_38">#61000000</color>
+    <color name="pattern_background">#F4F4F4</color>
     <color name="white_toolbar_arrow">#40C4FF</color>
 
     <!-- Intro -->

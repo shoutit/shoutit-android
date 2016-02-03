@@ -6,7 +6,7 @@
     android:orientation="vertical">
 
     <android.support.v7.widget.Toolbar
-        style="@style/BaseToolbarStyle"
+        style="@style/AppTheme.BaseToolbarStyle"
         android:id="@+id/activity_html_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?actionBarSize"/>

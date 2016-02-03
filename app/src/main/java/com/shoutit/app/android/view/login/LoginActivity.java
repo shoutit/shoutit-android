@@ -55,6 +55,11 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    @OnClick(R.id.activity_login_email)
+    public void loginWithEmail() {
+        startActivity(com.shoutit.app.android.view.signin.LoginActivity.newIntent(this));
+    }
+
     @OnClick(R.id.activity_login_feedback)
     public void onFeedbackClick() {
         UserVoice.launchContactUs(this);

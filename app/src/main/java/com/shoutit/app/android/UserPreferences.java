@@ -86,4 +86,16 @@ public class UserPreferences {
     private void refreshUser() {
         userRefreshSubject.onNext(null);
     }
+
+    // TODO
+    @Nullable
+    public String getUserCountryCode() {
+        return "GE";
+    }
+
+    // TODO
+    @Nullable
+    public String getUserCity() {
+        return "Dubaj";
+    }
 }

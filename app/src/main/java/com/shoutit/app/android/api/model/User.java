@@ -1,7 +1,6 @@
 package com.shoutit.app.android.api.model;
 
 public class User {
-    public static final String ME = "me";
 
     private final String id;
     private final String type;

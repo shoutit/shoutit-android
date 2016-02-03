@@ -1,7 +1,10 @@
 <resources>
     <string name="app_name">ShoutIt</string>
 
-    <!-- Global Strings -->
+    <!-- Global strings -->
+    <string name="price_with_currency">%1$s %2$s</string>
+    <string name="shout_type_offer">Offer</string>
+    <string name="shout_type_request">Request</string>
     <string name="terms_of_service">Terms of Service</string>
 
     <!-- Intro -->
@@ -10,6 +13,16 @@
     <string name="intro_login">Login</string>
     <string name="intro_skip">Skip</string>
     <string name="intro_help">Help</string>
+
+    <!-- Home -->
+    <string name="home_menu_chat">Chat</string>
+    <string name="home_menu_search">Search</string>
+    <string name="home_menu_cart">Cart</string>
+    <string name="home_see_all">See All</string>
+    <string name="home_shouts_header_logged">MY FEED</string>
+    <string name="home_shouts_header_guest">SHOUTS IN %1$s</string>
+    <string name="home_discover_header">DISCOVER %1$s</string>
+    <string name="home_user_and_date">%1$s - %2$s</string>
 
     <!-- Login -->
     <string name="login_email_hint">Email</string>

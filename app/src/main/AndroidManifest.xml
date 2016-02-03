@@ -1,5 +1,6 @@
-<manifest package="com.shoutit.app.android"
-          xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest
+    package="com.shoutit.app.android"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
@@ -14,15 +15,20 @@
         <activity
             android:name=".view.intro.IntroActivity"
             android:theme="@style/TranslucentStatusBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
         </activity>
 
         <activity
             android:name=".view.signin.LoginActivity"
             android:theme="@style/TranslucentStatusBar"/>
+
+        <activity android:name=".view.main.MainActivity">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+
+        </activity>
 
         <activity android:name=".view.login.LoginActivity"/>
 
