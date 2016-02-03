@@ -1,5 +1,7 @@
 package com.shoutit.app.android.view.signin;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.shoutit.app.android.App;
@@ -14,6 +16,9 @@ import javax.annotation.Nullable;
 
 public class LoginActivity extends BaseActivity {
 
+    public static Intent newIntent(Context context) {
+        return new Intent(context, LoginActivity.class);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

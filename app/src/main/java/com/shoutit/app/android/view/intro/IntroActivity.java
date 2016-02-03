@@ -1,5 +1,7 @@
 package com.shoutit.app.android.view.intro;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
@@ -31,6 +33,10 @@ public class IntroActivity extends BaseActivity {
 
     @Inject
     IntroPagerAdapter pagerAdapter;
+
+    public static Intent newIntent(Context context) {
+        return new Intent(context, IntroActivity.class);
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

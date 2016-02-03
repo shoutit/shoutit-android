@@ -11,11 +11,14 @@ import android.view.Menu;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.view.home.HomeFragment;
+import com.shoutit.app.android.view.intro.IntroActivity;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -29,11 +32,19 @@ public class MainActivity extends BaseActivity {
     @Bind(R.id.activity_main_toolbar)
     Toolbar toolbar;
 
+    @Inject
+    UserPreferences mUserPreferences;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        if (!mUserPreferences.isUserLoggedIn()) {
+            finish();
+            startActivity(IntroActivity.newIntent(this));
+        }
 
         setUpActionBar();
 

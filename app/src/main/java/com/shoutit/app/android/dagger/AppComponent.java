@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
+import com.google.gson.Gson;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.dao.DiscoversDao;
@@ -42,6 +43,8 @@ public interface AppComponent {
     CoarseLocationObservableProvider coarseLocationObservableProvider();
 
     OkHttpClient getOkHttpClient();
+
+    Gson gson();
 
     ApiService getApiService();
 

@@ -3,6 +3,8 @@ package com.shoutit.app.android.view.signin.login;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +22,7 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.Actions1;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.signin.LoginActivityComponent;
 import com.shoutit.app.android.view.signin.register.RegisterFragment;
 
@@ -93,7 +96,9 @@ public class LoginFragment extends BaseFragment {
                 .subscribe(new Action1<SignResponse>() {
                     @Override
                     public void call(SignResponse signResponse) {
-                        getActivity().finish();
+                        final FragmentActivity activity = getActivity();
+                        ActivityCompat.finishAffinity(activity);
+                        startActivity(MainActivity.newIntent(activity));
                     }
                 });
 

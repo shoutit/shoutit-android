@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
+import com.google.gson.Gson;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ShoutsDao;
@@ -43,6 +44,8 @@ public interface BaseActivityComponent {
     LayoutInflater getLayoutInflater();
 
     ApiService apiService();
+
+    Gson gson();
 
     ShoutsDao shoutsDao();
 

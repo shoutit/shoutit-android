@@ -1,6 +1,7 @@
 package com.shoutit.app.android.api.model;
 
 public class User {
+
     private final String id;
     private final String type;
     private final String apiUrl;
