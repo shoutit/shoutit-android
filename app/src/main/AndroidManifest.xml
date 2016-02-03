@@ -14,16 +14,15 @@
         <activity
             android:name=".view.intro.IntroActivity"
             android:theme="@style/TranslucentStatusBar">
-        </activity>
-
-        <activity
-            android:name=".view.signin.LoginActivity"
-            android:theme="@style/TranslucentStatusBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".view.signin.LoginActivity"
+            android:theme="@style/TranslucentStatusBar"/>
 
         <activity android:name=".view.login.LoginActivity"/>
 

@@ -10,18 +10,23 @@ import com.google.gson.Gson;
 import com.jakewharton.picasso.OkHttp3Downloader;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BuildConfig;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.AuthInterceptor;
 import com.shoutit.app.android.view.signin.CoarseLocationObservableProvider;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.io.IOException;
 
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
 import okhttp3.Cache;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.GsonConverterFactory;
 import retrofit2.Retrofit;
@@ -69,7 +74,8 @@ public final class AppModule {
 
     @Provides
     @Singleton
-    public OkHttpClient provideOkHttpClient(@ForApplication final Context context) {
+    public OkHttpClient provideOkHttpClient(@ForApplication final Context context,
+                                            AuthInterceptor authInterceptor) {
         final Optional<Cache> cache = getCacheOrNull(context);
         final OkHttpClient.Builder okHttpClient = new OkHttpClient.Builder();
         if (cache.isPresent()) {
@@ -78,6 +84,7 @@ public final class AppModule {
 
         final HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
         okHttpClient.interceptors().add(loggingInterceptor);
+        okHttpClient.interceptors().add(authInterceptor);
         loggingInterceptor.setLevel(BuildConfig.DEBUG ?
                 HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE);
 
@@ -105,6 +112,12 @@ public final class AppModule {
     @Provides
     public CoarseLocationObservableProvider provideCoarseLocationObservableProvider() {
         return CoarseLocationObservableProvider.DEFAULT;
+    }
+
+    @Singleton
+    @Provides
+    AuthInterceptor prvideAuthInterceptor(UserPreferences userPreferences) {
+        return new AuthInterceptor(userPreferences);
     }
 
 }

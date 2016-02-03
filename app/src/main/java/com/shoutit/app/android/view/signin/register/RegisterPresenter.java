@@ -99,6 +99,7 @@ public class RegisterPresenter {
                     @Override
                     public void call(SignResponse signResponse) {
                         userPreferences.setLoggedIn(signResponse.getAccessToken(), signResponse.getRefreshToken());
+                        userPreferences.saveUserAsJson(signResponse.getUser());
                     }
                 });
 

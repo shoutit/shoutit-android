@@ -47,7 +47,7 @@ public class LoginPresenterTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        mResponseSubject = BehaviorSubject.create(new SignResponse("a", "b", "c", true));
+        mResponseSubject = BehaviorSubject.create(new SignResponse("a", "b", "c", true, user));
         when(mApiService.login(any(EmailLoginRequest.class))).thenReturn(mResponseSubject);
         when(coarseLocationProvider.get(any(Context.class))).thenReturn(Observable.just((Location) null));
 
