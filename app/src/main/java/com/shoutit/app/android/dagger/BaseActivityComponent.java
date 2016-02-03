@@ -45,9 +45,9 @@ public interface BaseActivityComponent {
 
     ApiService apiService();
 
+    Gson gson();
+
     ShoutsDao shoutsDao();
 
     DiscoversDao discoversDao();
-
-    Gson gson();
 }

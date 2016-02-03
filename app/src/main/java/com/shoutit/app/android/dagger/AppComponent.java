@@ -44,11 +44,11 @@ public interface AppComponent {
 
     OkHttpClient getOkHttpClient();
 
+    Gson gson();
+
     ApiService getApiService();
 
     ShoutsDao shoutsDao();
 
     DiscoversDao discoversDao();
-
-    Gson gson();
 }

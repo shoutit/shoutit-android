@@ -6,6 +6,7 @@ import android.location.Location;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.SignResponse;
+import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.login.EmailLoginRequest;
 import com.shoutit.app.android.view.signin.CoarseLocationObservableProvider;
 
@@ -42,6 +43,9 @@ public class LoginPresenterTest {
 
     @Mock
     CoarseLocationObservableProvider coarseLocationProvider;
+
+    @Mock
+    User user;
 
     @Before
     public void setUp() {

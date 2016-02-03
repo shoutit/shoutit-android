@@ -28,12 +28,12 @@ public class AuthInterceptor implements Interceptor {
         final String token = userPreferences.getAuthToken().orNull();
         if (TextUtils.isEmpty(token)) {
             return chain.proceed(original);
+        } else {
+            final Request request = original.newBuilder()
+                    .header("Authorization", TOKEN_PREFIX + token)
+                    .build();
+
+            return chain.proceed(request);
         }
-
-        final Request request = original.newBuilder()
-                .header("Authorization", TOKEN_PREFIX + token)
-                .build();
-
-        return chain.proceed(request);
     }
 }

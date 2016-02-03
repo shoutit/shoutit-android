@@ -1,5 +1,6 @@
-<manifest package="com.shoutit.app.android"
-          xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest
+    package="com.shoutit.app.android"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
@@ -22,8 +23,7 @@
 
         <activity
             android:name=".view.signin.LoginActivity"
-            android:theme="@style/TranslucentStatusBar">
-        </activity>
+            android:theme="@style/TranslucentStatusBar"/>
 
         <activity android:name=".view.main.MainActivity"/>
 

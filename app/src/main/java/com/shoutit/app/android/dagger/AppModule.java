@@ -115,6 +115,12 @@ public final class AppModule {
         return CoarseLocationObservableProvider.DEFAULT;
     }
 
+    @Singleton
+    @Provides
+    AuthInterceptor prvideAuthInterceptor(UserPreferences userPreferences) {
+        return new AuthInterceptor(userPreferences);
+    }
+
     @Provides
     public ShoutsDao provideShoutsDao(ApiService apiService,
                                       @NetworkScheduler Scheduler networkScheduler,
@@ -127,12 +133,6 @@ public final class AppModule {
                                             @NetworkScheduler Scheduler networkScheduler,
                                             UserPreferences userPreferences) {
         return new DiscoversDao(apiService, userPreferences, networkScheduler);
-    }
-
-    @Singleton
-    @Provides
-    AuthInterceptor prvideAuthInterceptor(UserPreferences userPreferences) {
-        return new AuthInterceptor(userPreferences);
     }
 
 }

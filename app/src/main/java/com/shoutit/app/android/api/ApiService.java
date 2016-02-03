@@ -45,4 +45,7 @@ public interface ApiService {
 
     @GET("users/{user_name}")
     Observable<User> getUser(@Path("user_name") String userName);
+
+    @GET("users/me")
+    Observable<User> getMyUser();
 }
