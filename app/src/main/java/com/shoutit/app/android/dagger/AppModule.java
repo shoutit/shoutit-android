@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.appunite.rx.dagger.NetworkScheduler;
-import com.appunite.rx.dagger.UiScheduler;
 import com.google.common.base.Optional;
 import com.google.gson.Gson;
 import com.jakewharton.picasso.OkHttp3Downloader;
@@ -14,6 +13,7 @@ import com.shoutit.app.android.App;
 import com.shoutit.app.android.BuildConfig;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.AuthInterceptor;
 import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.view.signin.CoarseLocationObservableProvider;
@@ -75,7 +75,8 @@ public final class AppModule {
 
     @Provides
     @Singleton
-    public OkHttpClient provideOkHttpClient(@ForApplication final Context context) {
+    public OkHttpClient provideOkHttpClient(@ForApplication final Context context,
+                                            AuthInterceptor authInterceptor) {
         final Optional<Cache> cache = getCacheOrNull(context);
         final OkHttpClient.Builder okHttpClient = new OkHttpClient.Builder();
         if (cache.isPresent()) {
@@ -84,6 +85,7 @@ public final class AppModule {
 
         final HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
         okHttpClient.interceptors().add(loggingInterceptor);
+        okHttpClient.interceptors().add(authInterceptor);
         loggingInterceptor.setLevel(BuildConfig.DEBUG ?
                 HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE);
 
@@ -125,6 +127,12 @@ public final class AppModule {
                                             @NetworkScheduler Scheduler networkScheduler,
                                             UserPreferences userPreferences) {
         return new DiscoversDao(apiService, userPreferences, networkScheduler);
+    }
+
+    @Singleton
+    @Provides
+    AuthInterceptor prvideAuthInterceptor(UserPreferences userPreferences) {
+        return new AuthInterceptor(userPreferences);
     }
 
 }

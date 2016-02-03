@@ -1,5 +1,6 @@
 package com.shoutit.app.android.api.model;
 
+
 public class SignResponse {
 
     private final String accessToken;
