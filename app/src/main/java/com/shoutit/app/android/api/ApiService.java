@@ -3,6 +3,8 @@ package com.shoutit.app.android.api;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.login.EmailLoginRequest;
+import com.shoutit.app.android.api.model.login.FacebookLogin;
+import com.shoutit.app.android.api.model.login.GoogleLogin;
 
 import retrofit2.http.Body;
 import retrofit2.http.POST;
@@ -15,4 +17,10 @@ public interface ApiService {
 
     @POST("oauth2/access_token")
     Observable<SignResponse> signup(@Body EmailSignupRequest request);
+
+    @POST("oauth2/access_token")
+    Observable<SignResponse> facebookLogin(@Body FacebookLogin request);
+
+    @POST("oauth2/access_token")
+    Observable<SignResponse> googleLogin(@Body GoogleLogin request);
 }

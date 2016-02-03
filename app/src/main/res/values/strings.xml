@@ -3,6 +3,7 @@
 
     <!-- Global Strings -->
     <string name="terms_of_service">Terms of Service</string>
+    <string name="facebook_app_id">1148740908499849</string>
 
     <!-- Intro -->
     <string name="intro_welcome">Welcome To Shoutit</string>
