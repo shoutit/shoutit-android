@@ -11,14 +11,14 @@
         android:layout_height="@dimen/side_menu_cover_height">
 
         <ImageView
-            android:id="@+id/side_menu_cover_iv"
+            android:id="@+id/menu_cover_iv"
             android:layout_width="match_parent"
             android:layout_height="@dimen/side_menu_cover_height"
             android:scaleType="centerCrop"
             android:src="@drawable/pattern_bg" />
 
         <ImageView
-            android:id="@+id/side_menu_avatar_iv"
+            android:id="@+id/menu_avatar_iv"
             android:layout_width="@dimen/side_menu_avatar_size"
             android:layout_height="@dimen/side_menu_avatar_size"
             android:layout_marginTop="40dp"
@@ -26,9 +26,10 @@
             android:src="@drawable/ic_avatar_placeholder" />
 
         <TextView
+            android:id="@+id/menu_user_name_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/side_menu_avatar_iv"
+            android:layout_below="@+id/menu_avatar_iv"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="20dp"
             android:layout_marginTop="8dp"
@@ -40,13 +41,14 @@
     </RelativeLayout>
 
     <LinearLayout
+        android:id="@+id/menu_new_shout_btn"
         android:layout_width="166dp"
         android:layout_height="40dp"
         android:layout_below="@+id/side_menu_image_container"
         android:layout_centerHorizontal="true"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="-20dp"
-        android:background="@drawable/shape_create_shout"
+        android:background="@drawable/selector_menu_create_shout"
         android:gravity="center"
         android:orientation="horizontal">
 

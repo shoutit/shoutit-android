@@ -5,13 +5,14 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
@@ -21,11 +22,12 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.view.home.HomeFragment;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements OnMenuItemSelectedListener {
 
     public static Intent newIntent(@Nonnull Context context) {
         return new Intent(context, MainActivity.class);
@@ -35,6 +37,9 @@ public class MainActivity extends BaseActivity {
     Toolbar toolbar;
     @Bind(R.id.main_drawer_layout)
     DrawerLayout drawerLayout;
+
+    @Inject
+    MenuHandler menuHandler;
 
     private ActionBarDrawerToggle drawerToggle;
 
@@ -46,6 +51,7 @@ public class MainActivity extends BaseActivity {
 
         setUpActionBar();
         setUpDrawer();
+        menuHandler.initMenu(drawerLayout);
 
         if (savedInstanceState == null) {
             getSupportFragmentManager()
@@ -101,10 +107,27 @@ public class MainActivity extends BaseActivity {
         final MainActivityComponent component = DaggerMainActivityComponent
                 .builder()
                 .activityModule(new ActivityModule(this))
+                .mainActivityModule(new MainActivityModule(this))
                 .appComponent(App.getAppComponent(getApplication()))
                 .build();
         component.inject(this);
 
         return component;
+    }
+
+    @Override
+    public void onMenuItemSelected(@Nonnull String fragmentTag) {
+        final FragmentManager fragmentManager = getSupportFragmentManager();
+        Fragment fragment = fragmentManager.findFragmentByTag(fragmentTag);
+
+        if (fragment == null) {
+            fragment = MenuHandler.getFragmentForTag(fragmentTag);
+        }
+
+        fragmentManager.beginTransaction()
+                .replace(R.id.activity_main_fragment_container, fragment, fragmentTag)
+                .commit();
+
+        drawerLayout.closeDrawers();
     }
 }
