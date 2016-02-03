@@ -6,6 +6,8 @@ import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.dao.DiscoversDao;
+import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.view.signin.CoarseLocationObservableProvider;
 import com.squareup.picasso.Picasso;
 
@@ -37,9 +39,13 @@ public interface AppComponent {
 
     Picasso getPicasso();
 
-    ApiService apiService();
-
     CoarseLocationObservableProvider coarseLocationObservableProvider();
 
     OkHttpClient getOkHttpClient();
+
+    ApiService getApiService();
+
+    ShoutsDao shoutsDao();
+
+    DiscoversDao discoversDao();
 }
