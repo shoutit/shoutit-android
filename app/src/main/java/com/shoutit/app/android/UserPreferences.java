@@ -8,9 +8,15 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.google.common.base.Optional;
+import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForApplication;
 
+import java.util.concurrent.Callable;
+
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
+
+import rx.Observable;
 
 public class UserPreferences {
 
@@ -51,5 +57,19 @@ public class UserPreferences {
     @Nullable
     public String getUserCity() {
         return "Dubaj";
+    }
+
+    public User getUser() {
+
+    }
+
+    @Nonnull
+    public Observable<User> userObservable() {
+        return Observable.fromCallable(new Callable<User>() {
+            @Override
+            public User call() throws Exception {
+                return getUser();
+            }
+        });
     }
 }

@@ -7,8 +7,10 @@
 
     <!-- Global colors -->
     <color name="default_bg_color">#f7f7f7</color>
+    <color name="black_87">#000000</color>
     <color name="black_54">#8a000000</color>
     <color name="black_38">#61000000</color>
+    <color name="black_12">#1e000000</color>
     <color name="pattern_background">#F4F4F4</color>
     <color name="white_toolbar_arrow">#40C4FF</color>
 
@@ -28,5 +30,10 @@
     <!--Snackbar -->
     <color name="snackbar_success">#ff2195f3</color>
     <color name="snackbar_error">#fff44336</color>
+
+    <!-- Menu -->
+    <color name="menu_selected_stroke">#62000000</color>
+    <color name="menu_bg">#F4F4F4</color>
+    <color name="menu_change">#40C4FF</color>
 
 </resources>

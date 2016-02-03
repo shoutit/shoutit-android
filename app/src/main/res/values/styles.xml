@@ -45,5 +45,17 @@
         <item name="android:textColorPrimary">@color/white_toolbar_arrow</item>
     </style>
 
+    <style name="SideMenuItem">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:textColor">@color/black_54</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:drawablePadding">32dp</item>
+        <item name="android:background">@drawable/selector_menu_item</item>
+    </style>
+
 
 </resources>

@@ -5,13 +5,15 @@ public class SignResponse {
     private final String accessToken;
     private final String tokenType;
     private final String refreshToken;
-    private final boolean newSingup;
+    private final boolean newSignup;
+    private final User user;
 
-    public SignResponse(String accessToken, String tokenType, String refreshToken, boolean newSingup) {
+    public SignResponse(String accessToken, String tokenType, String refreshToken, boolean newSignup, User user) {
         this.accessToken = accessToken;
         this.tokenType = tokenType;
         this.refreshToken = refreshToken;
-        this.newSingup = newSingup;
+        this.newSignup = newSignup;
+        this.user = user;
     }
 
     public String getAccessToken() {
@@ -26,7 +28,11 @@ public class SignResponse {
         return refreshToken;
     }
 
-    public boolean isNewSingup() {
-        return newSingup;
+    public boolean isNewSignup() {
+        return newSignup;
+    }
+
+    public User getUser() {
+        return user;
     }
 }

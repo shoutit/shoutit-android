@@ -2,11 +2,16 @@ package com.shoutit.app.android.view.main;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
@@ -28,6 +33,10 @@ public class MainActivity extends BaseActivity {
 
     @Bind(R.id.activity_main_toolbar)
     Toolbar toolbar;
+    @Bind(R.id.main_drawer_layout)
+    DrawerLayout drawerLayout;
+
+    private ActionBarDrawerToggle drawerToggle;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -36,6 +45,7 @@ public class MainActivity extends BaseActivity {
         ButterKnife.bind(this);
 
         setUpActionBar();
+        setUpDrawer();
 
         if (savedInstanceState == null) {
             getSupportFragmentManager()
@@ -45,11 +55,38 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    private void setUpDrawer() {
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
+                R.string.drawer_open, R.string.drawer_close);
+        drawerLayout.setDrawerListener(drawerToggle);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        drawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (drawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void setUpActionBar() {
         setSupportActionBar(toolbar);
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(null);
         actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeButtonEnabled(true);
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        drawerToggle.syncState();
     }
 
     @Override
