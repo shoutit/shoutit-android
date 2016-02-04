@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.shoutit.app.android.views.ScrimInsetsScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+    android:layout_width="304dp"
     android:layout_height="match_parent"
     android:background="@color/menu_bg"
     android:layout_gravity="left|start"
     android:overScrollMode="never"
     android:fitsSystemWindows="true"
+    app:insetForeground="#4000"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <LinearLayout
@@ -36,11 +37,13 @@
                 tools:drawableLeft="@drawable/ad"
                 tools:drawableStart="@drawable/ad"
                 android:drawablePadding="32dp"
+                android:gravity="center_vertical"
                 android:textColor="@color/black_87"
                 android:textSize="16sp"
                 tools:text="Dubai" />
 
             <TextView
+                android:id="@+id/menu_location_change_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
@@ -84,7 +87,7 @@
             style="@style/SideMenuItem"
             android:drawableStart="@drawable/ic_menu_chat"
             android:drawableLeft="@drawable/ic_menu_chat"
-            android:text="@string/menu_item_home" />
+            android:text="@string/menu_item_chats" />
 
         <CheckedTextView
             android:id="@+id/menu_orders"
@@ -116,4 +119,4 @@
     </LinearLayout>
 
 
-</ScrollView>
+</com.shoutit.app.android.views.ScrimInsetsScrollView>

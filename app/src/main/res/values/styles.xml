@@ -57,5 +57,7 @@
         <!--<item name="android:background">@drawable/selector_menu_item</item>-->
     </style>
 
+    <style name="AppTheme.WithDrawer"/>
+
 
 </resources>

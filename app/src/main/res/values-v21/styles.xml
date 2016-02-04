@@ -6,4 +6,9 @@
         <item name="android:statusBarColor">@color/intro_status_bar</item>
     </style>
 
+    <style name="AppTheme.WithDrawer">
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
 </resources>

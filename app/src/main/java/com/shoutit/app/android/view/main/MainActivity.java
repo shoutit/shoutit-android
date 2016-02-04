@@ -21,7 +21,6 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.view.home.HomeFragment;
-import com.shoutit.app.android.view.intro.IntroActivity;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
