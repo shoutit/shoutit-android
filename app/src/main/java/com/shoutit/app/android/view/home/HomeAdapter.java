@@ -288,8 +288,8 @@ public class HomeAdapter extends BaseAdapter {
                 }
             }
 
-            if (shout.getLocation() != null && !TextUtils.isEmpty(shout.getLocation().getCountryCode())) {
-                final String countryCode = shout.getLocation().getCountryCode().toLowerCase();
+            if (shout.getLocation() != null && !TextUtils.isEmpty(shout.getLocation().getCountry())) {
+                final String countryCode = shout.getLocation().getCountry().toLowerCase();
                 final int flagResId = ResourcesHelper.getResourceIdForName(countryCode, context);
                 if (flagResId != 0) {
                     final Target target = PicassoHelper.getRoundedBitmapTarget(context, countryImageView);

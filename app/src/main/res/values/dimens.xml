@@ -22,4 +22,5 @@
     <dimen name="side_menu_header_height">192dp</dimen>
     <dimen name="side_menu_avatar_size">64dp</dimen>
     <dimen name="side_menu_avatar_stroke_size">1dp</dimen>
+    <dimen name="menu_flag_size">24dp</dimen>
 </resources>

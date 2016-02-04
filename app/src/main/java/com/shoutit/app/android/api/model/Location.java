@@ -5,8 +5,7 @@ import com.google.gson.annotations.SerializedName;
 public class Location {
     private final float latitude;
     private final float longitude;
-    @SerializedName("countryCode")
-    private final String countryCode;
+    private final String country;
     private final String postalCode;
     private final String state;
     private final String city;
@@ -17,7 +16,7 @@ public class Location {
                     String state, String city, String address, String googleGeocodeResponse) {
         this.latitude = latitude;
         this.longitude = longitude;
-        this.countryCode = countryCode;
+        this.country = countryCode;
         this.postalCode = postalCode;
         this.state = state;
         this.city = city;
@@ -33,8 +32,8 @@ public class Location {
         return longitude;
     }
 
-    public String getCountryCode() {
-        return countryCode;
+    public String getCountry() {
+        return country;
     }
 
     public String getPostalCode() {

@@ -2,7 +2,6 @@ package com.shoutit.app.android.view.main;
 
 import android.graphics.Bitmap;
 import android.support.annotation.DrawableRes;
-import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.View;
@@ -47,6 +46,8 @@ public class MenuHandler {
     ImageView coverImageView;
     @Bind(R.id.menu_location_tv)
     TextView locationTextView;
+    @Bind(R.id.menu_flag_iv)
+    ImageView flagImageView;
 
     @Inject
     MenuHandlerPresenter presenter;
@@ -95,12 +96,19 @@ public class MenuHandler {
 
         presenter.getCountryCodeObservable()
                 .compose(rxActivity.<Integer>bindToLifecycle())
-                .subscribe(new Action1<Integer>() {
-                    @Override
-                    public void call(@DrawableRes Integer flagId) {
-                        locationTextView.setCompoundDrawablesRelativeWithIntrinsicBounds(flagId, 0, 0, 0);
-                    }
-                });
+                .subscribe(loadFlag());
+    }
+
+    @NonNull
+    private Action1<Integer> loadFlag() {
+        final Target roundedBitmapTarget = PicassoHelper.getRoundedBitmapTarget(rxActivity, flagImageView);
+        return new Action1<Integer>() {
+            @Override
+            public void call(@DrawableRes Integer flagId) {
+                picasso.load(flagId)
+                        .into(roundedBitmapTarget);
+            }
+        };
     }
 
     @OnClick({R.id.menu_home, R.id.menu_discover, R.id.menu_browse, R.id.menu_chat,

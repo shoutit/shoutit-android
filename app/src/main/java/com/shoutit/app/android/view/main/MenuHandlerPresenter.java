@@ -87,14 +87,14 @@ public class MenuHandlerPresenter {
                 .map(new Func1<Location, String>() {
                     @Override
                     public String call(Location location) {
-                        return TextHelper.emptyToNull(location.getCountryCode());
+                        return TextHelper.emptyToNull(location.getCountry());
                     }
                 })
                 .filter(Functions1.isNotNull())
                 .map(new Func1<String, Integer>() {
                     @Override
                     public Integer call(String countryCode) {
-                        return ResourcesHelper.getResourceIdForName(countryCode, context);
+                        return ResourcesHelper.getResourceIdForName(countryCode.toLowerCase(), context);
                     }
                 })
                 .filter(new Func1<Integer, Boolean>() {
