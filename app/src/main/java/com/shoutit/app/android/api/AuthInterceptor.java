@@ -25,15 +25,16 @@ public class AuthInterceptor implements Interceptor {
     public Response intercept(Chain chain) throws IOException {
         final Request original = chain.request();
 
-        final String token = userPreferences.getAuthToken().orNull();
-        if (TextUtils.isEmpty(token)) {
-            return chain.proceed(original);
-        } else {
-            final Request request = original.newBuilder()
-                    .header("Authorization", TOKEN_PREFIX + token)
-                    .build();
+        final Request.Builder requestBuilder = original.newBuilder()
+                .header("Content-Type", "application/json");
 
-            return chain.proceed(request);
+        final String token = userPreferences.getAuthToken().orNull();
+
+        if (!TextUtils.isEmpty(token)) {
+            requestBuilder
+                    .header("Authorization", TOKEN_PREFIX + token);
         }
+
+        return chain.proceed(requestBuilder.build());
     }
 }

@@ -2,10 +2,14 @@ package com.shoutit.app.android.utils;
 
 import android.support.annotation.NonNull;
 
+import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.jakewharton.rxbinding.widget.TextViewTextChangeEvent;
+
+import java.util.List;
 
 import rx.Observable;
 import rx.functions.Func1;
+import rx.functions.Func2;
 
 public class MoreFunctions1 {
 
@@ -24,6 +28,15 @@ public class MoreFunctions1 {
             @Override
             public String call(TextViewTextChangeEvent textViewTextChangeEvent) {
                 return textViewTextChangeEvent.text().toString();
+            }
+        };
+    }
+
+    public static <T> Func1<List<T>, Boolean> listNotEmpty() {
+        return new Func1<List<T>, Boolean>() {
+            @Override
+            public Boolean call(List<T> list) {
+                return list != null && !list.isEmpty();
             }
         };
     }
