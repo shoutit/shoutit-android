@@ -1,0 +1,85 @@
+package com.shoutit.app.android.view.postlogininterest;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.Category;
+import com.shoutit.app.android.api.model.Tag;
+import com.shoutit.app.android.dao.CategoriesDao;
+
+import junit.framework.TestCase;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import java.util.List;
+
+import rx.observers.TestObserver;
+import rx.schedulers.Schedulers;
+import rx.subjects.BehaviorSubject;
+
+import static com.google.common.truth.Truth.assert_;
+import static org.mockito.Mockito.when;
+
+public class PostLoginPresenterTest extends TestCase {
+
+    private PostLoginPresenter mPostLoginPresenter;
+
+    private CategoriesDao mCategoriesDao;
+
+    @Mock
+    ApiService mApiService;
+    private BehaviorSubject<List<Category>> mSubject;
+
+    @Before
+    public void setUp() {
+        MockitoAnnotations.initMocks(this);
+
+        mSubject = BehaviorSubject.<List<Category>>create(ImmutableList.of(new Category("name", "slug", new Tag("id", "name", "apiUrl", "image"))));
+        when(mApiService.categories()).thenReturn(mSubject);
+
+        mCategoriesDao = new CategoriesDao(mApiService, Schedulers.immediate());
+        mPostLoginPresenter = new PostLoginPresenter(mCategoriesDao);
+    }
+
+    @Test
+    public void testSuccess() {
+        TestObserver<List<PostLoginPresenter.CategoryItem>> testObserver = new TestObserver<>();
+
+        mPostLoginPresenter.getCategoriesList().subscribe(testObserver);
+
+        assert_().that(testObserver.getOnErrorEvents()).isEmpty();
+        assert_().that(testObserver.getOnNextEvents()).hasSize(1);
+        assert_().that(Iterables.getLast(testObserver.getOnNextEvents())).isNotEmpty();
+    }
+
+    @Test
+    public void testFail() {
+        mSubject.onError(new RuntimeException());
+        TestObserver<Throwable> testObserver = new TestObserver<>();
+
+        mPostLoginPresenter.getErrorObservable().subscribe(testObserver);
+
+        assert_().that(testObserver.getOnNextEvents()).isNotEmpty();
+    }
+
+    @Test
+    public void testSelection() {
+        TestObserver<List<PostLoginPresenter.CategoryItem>> testObserver = new TestObserver<>();
+        TestObserver<Boolean> testSelectionObserver = new TestObserver<>();
+
+
+        mPostLoginPresenter.getCategoriesList().subscribe(testObserver);
+        final PostLoginPresenter.CategoryItem last = Iterables.getLast(Iterables.getLast(testObserver.getOnNextEvents()));
+
+
+        last.selection().subscribe(testSelectionObserver);
+        assert_().that(Iterables.getLast(testSelectionObserver.getOnNextEvents())).isFalse();
+
+        last.selectionObserver().onNext(true);
+        assert_().that(Iterables.getLast(testSelectionObserver.getOnNextEvents())).isTrue();
+    }
+
+}

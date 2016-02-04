@@ -1,5 +1,6 @@
 package com.shoutit.app.android.api;
 
+import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
@@ -9,6 +10,8 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.login.EmailLoginRequest;
 import com.shoutit.app.android.api.model.login.FacebookLogin;
 import com.shoutit.app.android.api.model.login.GoogleLogin;
+
+import java.util.List;
 
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -54,4 +57,7 @@ public interface ApiService {
 
     @GET("users/me")
     Observable<User> getMyUser();
+
+    @GET("misc/categories")
+    Observable<List<Category>> categories();
 }
