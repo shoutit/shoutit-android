@@ -2,7 +2,6 @@ package com.shoutit.app.android.view.main;
 
 import android.graphics.Bitmap;
 import android.support.annotation.DrawableRes;
-import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.View;
@@ -13,7 +12,6 @@ import android.widget.Toast;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
-import com.shoutit.app.android.utils.BlurTransform;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.view.home.HomeFragment;
 import com.squareup.picasso.Picasso;
@@ -171,18 +169,6 @@ public class MenuHandler {
 
     @NonNull
     private Action1<String> loadCoverAction() {
-        final Transformation blurTransformation = new Transformation() {
-            @Override
-            public Bitmap transform(Bitmap source) {
-                return new BlurTransform(rxActivity).transform(source, true);
-            }
-
-            @Override
-            public String key() {
-                return "menuCover";
-            }
-        };
-
         return new Action1<String>() {
             @Override
             public void call(String coverUrl) {
@@ -190,7 +176,6 @@ public class MenuHandler {
                         .error(R.drawable.pattern_bg)
                         .fit()
                         .centerCrop()
-                        .transform(blurTransformation)
                         .into(coverImageView);
             }
         };
