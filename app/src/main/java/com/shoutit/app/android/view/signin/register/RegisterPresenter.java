@@ -72,7 +72,7 @@ public class RegisterPresenter {
                                 new Func3<String, String, String, EmailSignupRequest>() {
                                     @Override
                                     public EmailSignupRequest call(String name, String email, String password) {
-                                        return new EmailSignupRequest(name, email, password, location != null ? new LoginUser(location.getLatitude(), location.getLongitude()) : null);
+                                        return new EmailSignupRequest(name, email, password, LoginUser.loginUser(location));
                                     }
                                 });
                     }

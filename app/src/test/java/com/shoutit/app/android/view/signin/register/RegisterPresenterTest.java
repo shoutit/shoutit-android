@@ -232,7 +232,7 @@ public class RegisterPresenterTest {
         final ArgumentCaptor<EmailSignupRequest> argumentCaptor = ArgumentCaptor.forClass(EmailSignupRequest.class);
         verify(mApiService).signup(argumentCaptor.capture());
 
-        final LoginUser.Location location = argumentCaptor.getValue().getUser().getLocation();
+        final LoginUser.UserLocation location = argumentCaptor.getValue().getUser().getLocation();
         assert_().that(location.getLatitude()).isEqualTo(1d);
         assert_().that(location.getLongitude()).isEqualTo(1d);
     }

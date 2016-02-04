@@ -65,7 +65,7 @@ public class LoginPresenter {
                         return Observable.zip(mEmailSubject.filter(getNotEmptyFunc1()), mPasswordSubject.filter(getNotEmptyFunc1()), new Func2<String, String, EmailLoginRequest>() {
                             @Override
                             public EmailLoginRequest call(String email, String password) {
-                                return new EmailLoginRequest(email, password, location != null ? new LoginUser(location.getLatitude(), location.getLongitude()) : null);
+                                return new EmailLoginRequest(email, password, LoginUser.loginUser(location));
                             }
                         });
                     }
