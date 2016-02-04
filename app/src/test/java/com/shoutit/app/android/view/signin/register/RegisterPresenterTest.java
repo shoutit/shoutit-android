@@ -7,6 +7,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.SignResponse;
+import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.login.LoginUser;
 import com.shoutit.app.android.view.signin.CoarseLocationObservableProvider;
 
@@ -49,6 +50,9 @@ public class RegisterPresenterTest {
     @Mock
     CoarseLocationObservableProvider coarseLocationProvider;
 
+    @Mock
+    User user;
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -56,7 +60,7 @@ public class RegisterPresenterTest {
         when(location.getLatitude()).thenReturn(1d);
         when(location.getLongitude()).thenReturn(1d);
 
-        mResponseSubject = BehaviorSubject.create(new SignResponse("a", "b", "c", true));
+        mResponseSubject = BehaviorSubject.create(new SignResponse("a", "b", "c", true, user));
         mLocationObservable = BehaviorSubject.create();
 
         when(mApiService.signup(any(EmailSignupRequest.class))).thenReturn(mResponseSubject);
@@ -228,7 +232,7 @@ public class RegisterPresenterTest {
         final ArgumentCaptor<EmailSignupRequest> argumentCaptor = ArgumentCaptor.forClass(EmailSignupRequest.class);
         verify(mApiService).signup(argumentCaptor.capture());
 
-        final LoginUser.Location location = argumentCaptor.getValue().getUser().getLocation();
+        final LoginUser.UserLocation location = argumentCaptor.getValue().getUser().getLocation();
         assert_().that(location.getLatitude()).isEqualTo(1d);
         assert_().that(location.getLongitude()).isEqualTo(1d);
     }

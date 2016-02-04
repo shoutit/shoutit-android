@@ -7,7 +7,9 @@
 
     <!-- Global values -->
     <color name="pattern_background">#FFF4F4F4</color>
+    <color name="default_bg_color">#f7f7f7</color>
     <color name="black_54">#8a000000</color>
+    <color name="black_38">#61000000</color>
     <color name="white_toolbar_arrow">#40C4FF</color>
 
     <!-- Intro -->

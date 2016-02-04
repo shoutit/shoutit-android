@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
@@ -29,6 +30,7 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.view.about.AboutActivity;
+import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.signin.CoarseLocationObservableProvider;
 import com.shoutit.app.android.view.signin.LoginActivity;
 import com.uservoice.uservoicesdk.UserVoice;
@@ -80,6 +82,7 @@ public class LoginIntroActivity extends BaseActivity {
 
         mObservable = mCoarseLocationObservable
                 .get(this)
+                .startWith((Location) null)
                 .compose(ObservableExtensions.<Location>behaviorRefCount());
 
         mObservable.compose(bindToLifecycle())
@@ -156,6 +159,8 @@ public class LoginIntroActivity extends BaseActivity {
             @Override
             public void call(SignResponse o) {
                 mUserPreferences.setLoggedIn(o.getAccessToken(), o.getRefreshToken());
+                ActivityCompat.finishAffinity(LoginIntroActivity.this);
+                startActivity(MainActivity.newIntent(LoginIntroActivity.this));
             }
         };
     }
@@ -165,7 +170,7 @@ public class LoginIntroActivity extends BaseActivity {
         return new Func1<BothParams<String, Location>, Observable<SignResponse>>() {
             @Override
             public Observable<SignResponse> call(BothParams<String, Location> bothParams) {
-                return mApiService.googleLogin(new GoogleLogin(bothParams.param1(), new LoginUser(bothParams.param2().getLatitude(), bothParams.param2().getLongitude())))
+                return mApiService.googleLogin(new GoogleLogin(bothParams.param1(), LoginUser.loginUser(bothParams.param2())))
                         .subscribeOn(Schedulers.io())
                         .observeOn(MyAndroidSchedulers.mainThread());
             }
@@ -177,7 +182,7 @@ public class LoginIntroActivity extends BaseActivity {
         return new Func1<BothParams<String, Location>, Observable<SignResponse>>() {
             @Override
             public Observable<SignResponse> call(BothParams<String, Location> bothParams) {
-                return mApiService.facebookLogin(new FacebookLogin(bothParams.param1(), new LoginUser(bothParams.param2().getLatitude(), bothParams.param2().getLongitude())))
+                return mApiService.facebookLogin(new FacebookLogin(bothParams.param1(), LoginUser.loginUser(bothParams.param2())))
                         .subscribeOn(Schedulers.io())
                         .observeOn(MyAndroidSchedulers.mainThread());
             }

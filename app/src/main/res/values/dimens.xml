@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="status_bar_margin">0dp</dimen>
+    <dimen name="fab_size">56dp</dimen>
+
+    <!-- Home -->
+    <dimen name="home_discover_image_height">90dp</dimen>
+    <dimen name="home_feed_image_height">126dp</dimen>
+    <dimen name="home_discover_card_width">120dp</dimen>
+    <dimen name="home_discover_card_height">126dp</dimen>
+    <dimen name="home_grid_side_spacing">5dp</dimen>
+    <dimen name="home_linear_side_spacing">4dp</dimen>
+    <dimen name="home_discover_item_spacing">2dp</dimen>
+    <dimen name="home_feed_image_size_linear">100dp</dimen>
+    <dimen name="home_country_icon">26dp</dimen>
 
     <!-- Intro -->
     <dimen name="activity_intro_pager_height">400dp</dimen>

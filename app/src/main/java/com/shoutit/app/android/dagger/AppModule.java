@@ -5,12 +5,17 @@ import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
+import com.appunite.rx.dagger.NetworkScheduler;
 import com.google.common.base.Optional;
 import com.google.gson.Gson;
 import com.jakewharton.picasso.OkHttp3Downloader;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BuildConfig;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.AuthInterceptor;
+import com.shoutit.app.android.dao.DiscoversDao;
+import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.view.signin.CoarseLocationObservableProvider;
 import com.squareup.picasso.Picasso;
 
@@ -26,6 +31,7 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.GsonConverterFactory;
 import retrofit2.Retrofit;
 import retrofit2.RxJavaCallAdapterFactory;
+import rx.Scheduler;
 
 @Module
 public final class AppModule {
@@ -69,7 +75,8 @@ public final class AppModule {
 
     @Provides
     @Singleton
-    public OkHttpClient provideOkHttpClient(@ForApplication final Context context) {
+    public OkHttpClient provideOkHttpClient(@ForApplication final Context context,
+                                            AuthInterceptor authInterceptor) {
         final Optional<Cache> cache = getCacheOrNull(context);
         final OkHttpClient.Builder okHttpClient = new OkHttpClient.Builder();
         if (cache.isPresent()) {
@@ -78,6 +85,7 @@ public final class AppModule {
 
         final HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
         okHttpClient.interceptors().add(loggingInterceptor);
+        okHttpClient.interceptors().add(authInterceptor);
         loggingInterceptor.setLevel(BuildConfig.DEBUG ?
                 HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE);
 
@@ -86,7 +94,7 @@ public final class AppModule {
 
     @Provides
     @Singleton
-    ApiService provideKingschatService(Gson gson, OkHttpClient client) {
+    ApiService provideApiService(Gson gson, OkHttpClient client) {
         return new Retrofit.Builder()
                 .baseUrl(BuildConfig.API_URL)
                 .addConverterFactory(GsonConverterFactory.create(gson))
@@ -105,6 +113,26 @@ public final class AppModule {
     @Provides
     public CoarseLocationObservableProvider provideCoarseLocationObservableProvider() {
         return CoarseLocationObservableProvider.DEFAULT;
+    }
+
+    @Singleton
+    @Provides
+    AuthInterceptor prvideAuthInterceptor(UserPreferences userPreferences) {
+        return new AuthInterceptor(userPreferences);
+    }
+
+    @Provides
+    public ShoutsDao provideShoutsDao(ApiService apiService,
+                                      @NetworkScheduler Scheduler networkScheduler,
+                                      UserPreferences userPreferences) {
+        return new ShoutsDao(apiService, networkScheduler, userPreferences);
+    }
+
+    @Provides
+    public DiscoversDao provideDiscoversDao(ApiService apiService,
+                                            @NetworkScheduler Scheduler networkScheduler,
+                                            UserPreferences userPreferences) {
+        return new DiscoversDao(apiService, userPreferences, networkScheduler);
     }
 
 }

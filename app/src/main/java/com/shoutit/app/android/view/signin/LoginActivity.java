@@ -17,6 +17,10 @@ import javax.annotation.Nullable;
 
 public class LoginActivity extends BaseActivity {
 
+    @Nonnull
+    public static Intent newIntent(@NonNull Context context) {
+        return new Intent(context, LoginActivity.class);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,10 +42,5 @@ public class LoginActivity extends BaseActivity {
                 .activityModule(new ActivityModule(this))
                 .appComponent(App.getAppComponent(getApplication()))
                 .build();
-    }
-
-    @Nonnull
-    public static Intent newIntent(@NonNull Context context) {
-        return new Intent(context, LoginActivity.class);
     }
 }

@@ -58,11 +58,17 @@ android {
         versionCode project.ext.versionCode
         versionName project.ext.versionName
         renderscriptTargetApi 23
+        multiDexEnabled true
+        testInstrumentationRunner "com.android.test.runner.MultiDexTestRunner"
     }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
+    }
+
+    dexOptions {
+        javaMaxHeapSize "2g"
     }
 
     signingConfigs {
@@ -79,6 +85,7 @@ android {
     }
 
     buildTypes {
+
         debug {
             debuggable true
             minifyEnabled false
@@ -95,14 +102,12 @@ android {
             ext.enableCrashlytics = true
             applicationIdSuffix '.staging'
             versionNameSuffix "-staging"
-            ext.enableCrashlytics = true
             buildConfigField "String", "API_URL", dev_runscope_api_url
         }
 
         release {
             debuggable false
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
             ext.enableCrashlytics = true
             buildConfigField "String", "API_URL", production_api_url
@@ -116,6 +121,18 @@ android {
 
         prod {
             minSdkVersion 16
+        }
+    }
+
+    android.variantFilter { variant ->
+        if (variant.buildType.name.equals('staging') && variant.getFlavors().get(0).name.equals('dev')) {
+            variant.setIgnore(true);
+        }
+        if (variant.buildType.name.equals('release') && variant.getFlavors().get(0).name.equals('dev')) {
+            variant.setIgnore(true);
+        }
+        if (variant.buildType.name.equals('release') && variant.getFlavors().get(0).name.equals('dev')) {
+            variant.setIgnore(true);
         }
     }
 
@@ -154,6 +171,7 @@ dependencies {
     compile 'com.android.support:cardview-v7:23.1.1'
     compile 'com.android.support:recyclerview-v7:23.1.1'
     compile 'com.android.support:support-annotations:23.1.1'
+    compile 'com.android.support:multidex:1.0.0'
 
     // Facebook
     compile 'com.facebook.android:facebook-android-sdk:4.6.0'
@@ -177,31 +195,26 @@ dependencies {
     compile 'com.squareup.retrofit2:converter-gson:2.0.0-beta3'
     compile 'com.squareup.retrofit2:adapter-rxjava:2.0.0-beta3'
 
-
     // RX
     compile 'com.trello:rxlifecycle:0.4.0'
-    compile ('com.trello:rxlifecycle-components:0.4.0'){
-        exclude group: 'com.android.support'
-    }
+    compile 'com.trello:rxlifecycle-components:0.4.0'
     compile 'com.jakewharton.rxbinding:rxbinding:0.3.0'
+    compile 'com.jakewharton.rxbinding:rxbinding-recyclerview-v7:0.3.0'
+
     compile(project(":rx-android-extensions")) {
         exclude group: 'com.google.code.findbugs', module: 'annotations'
     }
 
     // other
-    compile ('com.uservoice:uservoice-android-sdk:1.2.4'){
-        exclude group: 'com.android.support'
-    }
+    compile 'com.uservoice:uservoice-android-sdk:1.2.4'
     compile 'fr.avianey.com.viewpagerindicator:library:2.4.1@aar'
+    compile('com.crashlytics.sdk.android:crashlytics:2.5.1@aar') {
+        transitive = true;
+    }
 
     // Tests
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
     testApt 'com.google.dagger:dagger-compiler:2.0.1'
     testCompile 'com.google.truth:truth:0.26'
-
-    // Others
-    compile('com.crashlytics.sdk.android:crashlytics:2.5.1@aar') {
-        transitive = true;
-    }
 }

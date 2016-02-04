@@ -5,6 +5,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorButtonNormal">@color/colorAccent</item>
+        <item name="actionBarStyle">@style/AppTheme.BaseToolbarStyle</item>
     </style>
 
     <style name="FacebookButton" parent="AppTheme">
@@ -22,11 +23,12 @@
 
     <style name="TranslucentStatusBar" parent="AppTheme"/>
 
-    <style name="BaseToolbarStyle">
+    <style name="AppTheme.BaseToolbarStyle" parent="@style/ThemeOverlay.AppCompat.ActionBar">
         <item name="android:background">?attr/colorPrimary</item>
         <item name="android:theme">@style/AppTheme.AppBarOverlay</item>
         <item name="popupTheme">@style/AppTheme.PopupOverlay</item>
         <item name="elevation">4dp</item>
+        <item name="colorControlNormal">@android:color/white</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark"/>

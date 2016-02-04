@@ -6,6 +6,7 @@ import android.location.Location;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.SignResponse;
+import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.login.EmailLoginRequest;
 import com.shoutit.app.android.view.signin.CoarseLocationObservableProvider;
 
@@ -43,11 +44,14 @@ public class LoginPresenterTest {
     @Mock
     CoarseLocationObservableProvider coarseLocationProvider;
 
+    @Mock
+    User user;
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        mResponseSubject = BehaviorSubject.create(new SignResponse("a", "b", "c", true));
+        mResponseSubject = BehaviorSubject.create(new SignResponse("a", "b", "c", true, user));
         when(mApiService.login(any(EmailLoginRequest.class))).thenReturn(mResponseSubject);
         when(coarseLocationProvider.get(any(Context.class))).thenReturn(Observable.just((Location) null));
 

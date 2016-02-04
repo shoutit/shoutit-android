@@ -1,17 +1,20 @@
 package com.shoutit.app.android.view.intro;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
-import android.widget.Toast;
 
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.SystemUIUtils;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
+import com.shoutit.app.android.view.main.MainActivity;
 import com.uservoice.uservoicesdk.UserVoice;
 import com.viewpagerindicator.CirclePageIndicator;
 
@@ -32,6 +35,13 @@ public class IntroActivity extends BaseActivity {
     @Inject
     IntroPagerAdapter pagerAdapter;
 
+    @Inject
+    UserPreferences mUserPreferences;
+
+    public static Intent newIntent(Context context) {
+        return new Intent(context, IntroActivity.class);
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,8 +61,8 @@ public class IntroActivity extends BaseActivity {
 
     @OnClick(R.id.activity_intro_skip)
     public void onSkipClick() {
-        // TODO
-        Toast.makeText(this, "Not implemented yet", Toast.LENGTH_LONG).show();
+        mUserPreferences.setGuest(true);
+        startActivity(MainActivity.newIntent(this));
     }
 
     @OnClick(R.id.activity_intro_login_button)

@@ -47,7 +47,7 @@ public class FacebookHelper {
                     }
                 });
 
-                instance.logInWithReadPermissions(activity, Collections.singletonList("public_profile"));
+                instance.logInWithReadPermissions(activity, Collections.singletonList("email"));
             }
         });
     }
