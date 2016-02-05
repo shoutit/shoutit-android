@@ -1,7 +1,9 @@
 package com.shoutit.app.android.utils;
 
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
+import com.google.common.base.Strings;
 import com.jakewharton.rxbinding.widget.TextViewTextChangeEvent;
 
 import rx.Observable;
@@ -28,4 +30,12 @@ public class MoreFunctions1 {
         };
     }
 
+    public static Func1<String, Boolean> textNotEmpty() {
+        return new Func1<String, Boolean>() {
+            @Override
+            public Boolean call(String text) {
+                return !Strings.isNullOrEmpty(text);
+            }
+        };
+    }
 }
