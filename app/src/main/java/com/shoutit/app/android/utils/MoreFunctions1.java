@@ -2,14 +2,13 @@ package com.shoutit.app.android.utils;
 
 import android.support.annotation.NonNull;
 
-import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.google.common.base.Strings;
 import com.jakewharton.rxbinding.widget.TextViewTextChangeEvent;
 
 import java.util.List;
 
 import rx.Observable;
 import rx.functions.Func1;
-import rx.functions.Func2;
 
 public class MoreFunctions1 {
 
@@ -28,6 +27,15 @@ public class MoreFunctions1 {
             @Override
             public String call(TextViewTextChangeEvent textViewTextChangeEvent) {
                 return textViewTextChangeEvent.text().toString();
+            }
+        };
+    }
+
+    public static Func1<String, Boolean> textNotEmpty() {
+        return new Func1<String, Boolean>() {
+            @Override
+            public Boolean call(String text) {
+                return !Strings.isNullOrEmpty(text);
             }
         };
     }

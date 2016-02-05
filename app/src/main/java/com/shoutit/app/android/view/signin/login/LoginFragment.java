@@ -31,6 +31,8 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
+import okhttp3.ResponseBody;
+import retrofit2.Response;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
@@ -46,7 +48,13 @@ public class LoginFragment extends BaseFragment {
     Button proceedBtn;
 
     @Bind(R.id.login_sign_up_text)
-    TextView signUp;
+    View signUp;
+
+    @Bind(R.id.login_forgot_password_tv)
+    TextView forgotPassworTextView;
+
+    @Bind(R.id.fragment_login_progress)
+    View progressView;
 
     @Inject
     LoginPresenter loginPresenter;
@@ -89,7 +97,7 @@ public class LoginFragment extends BaseFragment {
 
         loginPresenter.failObservable()
                 .compose(this.<Throwable>bindToLifecycle())
-                .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(getActivity()), R.string.login_error));
+                .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(getActivity())));
 
         loginPresenter.successObservable()
                 .compose(this.<SignResponse>bindToLifecycle())
@@ -101,6 +109,16 @@ public class LoginFragment extends BaseFragment {
                         startActivity(MainActivity.newIntent(activity));
                     }
                 });
+
+        loginPresenter.successResetPassword()
+                .compose(this.<ResponseBody>bindToLifecycle())
+                .subscribe(ColoredSnackBar.successSnackBarAction(
+                        ColoredSnackBar.contentView(getActivity()), R.string.login_success_reset_password));
+
+        loginPresenter.resetPasswordEmptyEmail()
+                .compose(this.bindToLifecycle())
+                .subscribe(ColoredSnackBar.errorSnackBarAction(
+                        ColoredSnackBar.contentView(getActivity()), R.string.login_error_empty_email));
 
         RxTextView.textChangeEvents(emailEdittext)
                 .map(new Func1<TextViewTextChangeEvent, String>() {
@@ -125,6 +143,14 @@ public class LoginFragment extends BaseFragment {
         RxView.clicks(proceedBtn)
                 .compose(this.<Void>bindToLifecycle())
                 .subscribe(loginPresenter.getProceedObserver());
+
+        RxView.clicks(forgotPassworTextView)
+                .compose(this.<Void>bindToLifecycle())
+                .subscribe(loginPresenter.getResetPasswordClickObserver());
+
+        loginPresenter.getProgressObservable()
+                .compose(this.<Boolean>bindToLifecycle())
+                .subscribe(RxView.visibility(progressView));
     }
 
     @Override
