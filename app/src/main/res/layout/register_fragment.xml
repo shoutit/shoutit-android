@@ -9,6 +9,7 @@
     android:paddingTop="30dp">
 
     <android.support.design.widget.TextInputLayout
+        android:theme="@style/LoginInputStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -16,11 +17,13 @@
             android:id="@+id/register_name_edittext"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:nextFocusDown="@+id/register_email_edittext"
             android:hint="@string/register_name"/>
 
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
+        android:theme="@style/LoginInputStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp">
@@ -30,11 +33,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/register_email"
+            android:nextFocusDown="@+id/register_password_edittext"
             android:inputType="textEmailAddress"/>
 
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
+        android:theme="@style/LoginInputStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp">
@@ -44,6 +49,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/register_password"
+            android:imeOptions="actionDone"
             android:inputType="textPassword"/>
 
     </android.support.design.widget.TextInputLayout>

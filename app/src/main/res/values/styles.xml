@@ -58,5 +58,13 @@
         <item name="android:textColorPrimary">@color/white_toolbar_arrow</item>
     </style>
 
+    <style name="LoginInputStyle" parent="TextAppearance.AppCompat">
+        <item name="android:textColorHint">@color/black_38</item>
+        <item name="colorAccent">@color/accent_blue</item>
+        <item name="colorControlNormal">@color/black_20</item>
+        <item name="colorControlActivated">@color/accent_blue</item>
+        <item name="colorControlHighlight">@color/accent_blue</item>
+        <item name="android:textSize">16sp</item>
+    </style>
 
 </resources>
