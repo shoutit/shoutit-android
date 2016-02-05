@@ -3,6 +3,7 @@ package com.shoutit.app.android.view.signin;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
@@ -16,7 +17,8 @@ import javax.annotation.Nullable;
 
 public class LoginActivity extends BaseActivity {
 
-    public static Intent newIntent(Context context) {
+    @Nonnull
+    public static Intent newIntent(@NonNull Context context) {
         return new Intent(context, LoginActivity.class);
     }
 

@@ -54,6 +54,11 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        if (!mUserPreferences.isUserLoggedIn() && !mUserPreferences.isGuest()) {
+            finish();
+            startActivity(IntroActivity.newIntent(this));
+        }
+
         setUpActionBar();
         setUpDrawer();
         menuHandler.initMenu(drawerLayout);

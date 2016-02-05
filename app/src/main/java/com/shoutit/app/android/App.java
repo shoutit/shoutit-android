@@ -1,6 +1,8 @@
 package com.shoutit.app.android;
 
 import android.app.Application;
+import android.support.multidex.MultiDex;
+import android.support.multidex.MultiDexApplication;
 
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.crashlytics.android.core.CrashlyticsCore;
@@ -23,7 +25,7 @@ import rx.functions.Action1;
 import rx.plugins.RxJavaErrorHandler;
 import rx.plugins.RxJavaPlugins;
 
-public class App extends Application {
+public class App extends MultiDexApplication {
     private static final String TAG = App.class.getSimpleName();
 
     private AppComponent component;
@@ -39,6 +41,7 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        MultiDex.install(this);
 
         initFabric();
         initUserVoice();

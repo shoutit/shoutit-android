@@ -5,7 +5,7 @@
     <color name="colorPrimaryDark">#3C8C40</color>
     <color name="colorAccent">#4CAF50</color>
 
-    <!-- Global colors -->
+    <!-- Global values -->
     <color name="default_bg_color">#f7f7f7</color>
     <color name="black_87">#000000</color>
     <color name="black_54">#8a000000</color>

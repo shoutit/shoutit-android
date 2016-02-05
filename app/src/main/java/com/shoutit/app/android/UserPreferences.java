@@ -25,6 +25,7 @@ public class UserPreferences {
     private static final String AUTH_TOKEN = "token";
     private static final String REFRESH_TOKEN = "refresh_token";
     private static final String KEY_USER = "user";
+    private static final String IS_GUEST = "is_guest";
 
     private final PublishSubject<Object> userRefreshSubject = PublishSubject.create();
 
@@ -45,6 +46,17 @@ public class UserPreferences {
         editor.putString(AUTH_TOKEN, authToken);
         editor.putString(REFRESH_TOKEN, refreshToken);
         editor.commit();
+    }
+
+    @SuppressLint("CommitPrefEdits")
+    public void setGuest(boolean isGuest) {
+        final SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putBoolean(IS_GUEST, isGuest);
+        editor.commit();
+    }
+
+    public boolean isGuest() {
+        return mPreferences.getBoolean(IS_GUEST, false);
     }
 
     public Optional<String> getAuthToken() {
