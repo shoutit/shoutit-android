@@ -61,6 +61,8 @@
         <CheckedTextView
             android:id="@+id/menu_home"
             style="@style/SideMenuItem"
+            android:paddingLeft="16dp"
+            android:paddingStart="16dp"
             android:drawableStart="@drawable/ic_menu_home"
             android:drawableLeft="@drawable/ic_menu_home"
             android:text="@string/menu_item_home" />
@@ -68,6 +70,8 @@
         <CheckedTextView
             android:id="@+id/menu_discover"
             style="@style/SideMenuItem"
+            android:paddingLeft="16dp"
+            android:paddingStart="16dp"
             android:drawableStart="@drawable/ic_menu_discover"
             android:drawableLeft="@drawable/ic_menu_discover"
             android:text="@string/menu_item_discover" />
@@ -75,6 +79,8 @@
         <CheckedTextView
             android:id="@+id/menu_browse"
             style="@style/SideMenuItem"
+            android:paddingLeft="16dp"
+            android:paddingStart="16dp"
             android:drawableStart="@drawable/ic_menu_browse"
             android:drawableLeft="@drawable/ic_menu_browse"
             android:text="@string/menu_item_browse" />
@@ -82,6 +88,8 @@
         <CheckedTextView
             android:id="@+id/menu_chat"
             style="@style/SideMenuItem"
+            android:paddingLeft="16dp"
+            android:paddingStart="16dp"
             android:drawableStart="@drawable/ic_menu_chat"
             android:drawableLeft="@drawable/ic_menu_chat"
             android:text="@string/menu_item_home" />
@@ -89,6 +97,8 @@
         <CheckedTextView
             android:id="@+id/menu_orders"
             style="@style/SideMenuItem"
+            android:paddingLeft="16dp"
+            android:paddingStart="16dp"
             android:drawableStart="@drawable/ic_menu_orders"
             android:drawableLeft="@drawable/ic_menu_orders"
             android:text="@string/menu_item_orders" />
@@ -100,17 +110,24 @@
 
         <CheckedTextView
             android:id="@+id/menu_settings"
+            android:paddingLeft="16dp"
+            android:paddingStart="16dp"
             style="@style/SideMenuItem"
+
             android:text="@string/menu_item_settings" />
 
         <CheckedTextView
             android:id="@+id/menu_help"
             style="@style/SideMenuItem"
+            android:paddingLeft="16dp"
+            android:paddingStart="16dp"
             android:text="@string/menu_item_help" />
 
         <CheckedTextView
             android:id="@+id/menu_invite_frirends"
             style="@style/SideMenuItem"
+            android:paddingLeft="16dp"
+            android:paddingStart="16dp"
             android:text="@string/menu_item_invite_friends" />
 
     </LinearLayout>
