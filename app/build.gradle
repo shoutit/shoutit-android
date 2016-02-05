@@ -58,7 +58,6 @@ android {
         versionCode project.ext.versionCode
         versionName project.ext.versionName
         renderscriptTargetApi 20
-        renderscriptSupportModeEnabled true
         multiDexEnabled true
         testInstrumentationRunner "com.android.test.runner.MultiDexTestRunner"
     }
