@@ -8,10 +8,10 @@
     {
       "client_info": {
         "mobilesdk_app_id": "",
-        "client_id": "android:com.shoutit.android.app.debug",
+        "client_id": "android:com.shoutit.app.android.debug",
         "client_type": 1,
         "android_client_info": {
-          "package_name": "com.shoutit.android.app.debug"
+          "package_name": "com.shoutit.app.android.debug"
         }
       },
       "oauth_client": [
@@ -44,10 +44,10 @@
     {
       "client_info": {
         "mobilesdk_app_id": "",
-        "client_id": "android:com.shoutit.android.app.staging",
+        "client_id": "android:com.shoutit.app.android.staging",
         "client_type": 1,
         "android_client_info": {
-          "package_name": "com.shoutit.android.app.staging"
+          "package_name": "com.shoutit.app.android.staging"
         }
       },
       "oauth_client": [
@@ -80,10 +80,10 @@
     {
       "client_info": {
         "mobilesdk_app_id": "1:935842257865:android:49d4bd8ff5c58010",
-        "client_id": "android:com.shoutit.android.app",
+        "client_id": "android:com.shoutit.app.android",
         "client_type": 1,
         "android_client_info": {
-          "package_name": "com.shoutit.android.app"
+          "package_name": "com.shoutit.app.android"
         }
       },
       "oauth_client": [
@@ -91,7 +91,7 @@
           "client_id": "935842257865-1doue16dh8dc0nj8k5fara36un1usi7g.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.shoutit.android.app",
+            "package_name": "com.shoutit.app.android",
             "certificate_hash": "5B230F90B5F806B084D5D566F3E314472C7F4BEF"
           }
         },
