@@ -52,6 +52,8 @@
     <string name="register_empty_mail">Mail cannot be empty.</string>
     <string name="register_empty_password">Password must have at least 6 characters.</string>
     <string name="register_empty_name">Name cannot be empty</string>
+    <string name="register_have_an_account">Have an account?</string>
+    <string name="register_log_in">Log in</string>
 
     <!-- Login Intro -->
     <string name="login_intro_join">Join Now!</string>
@@ -76,5 +78,13 @@
     <string name="about_privacy_policy_title">Privacy Policy</string>
     <string name="about_legal_title">Legal</string>
     <string name="about_title">About</string>
+    <string name="register_bottom_text1">By Proceeding you also agree to Shoutit’s</string>
+    <string name="register_bottom_text2">Terms of Service</string>
+    <string name="register_bottom_text3">and</string>
+    <string name="register_bottom_text4">Privacy Policy</string>
+
+    <!-- Html Activity -->
+    <string name="html_activity_terms">Terms of Service</string>
+    <string name="html_activity_privacy">Privacy Policy</string>
 
 </resources>

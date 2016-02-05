@@ -31,4 +31,7 @@
     <color name="snackbar_success">#ff2195f3</color>
     <color name="snackbar_error">#fff44336</color>
 
+    <!-- Register -->
+    <color name="register_underline">#40C4FF</color>
+
 </resources>
