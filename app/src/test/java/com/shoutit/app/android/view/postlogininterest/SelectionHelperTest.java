@@ -28,7 +28,7 @@ public class SelectionHelperTest extends TestCase {
         final TestSubscriber<Set<Integer>> selectedItems = new TestSubscriber<>();
         mIntegerSelectionHelper.getSelectedItems().subscribe(selectedItems);
 
-        mIntegerSelectionHelper.getClickObserver().onNext(BothParams.of(1, true));
+        mIntegerSelectionHelper.getToggleObserver().onNext(BothParams.of(1, true));
 
         final Set<Integer> last = Iterables.getLast(selectedItems.getOnNextEvents());
         assert_().that(last).contains(1);
@@ -39,8 +39,8 @@ public class SelectionHelperTest extends TestCase {
         final TestSubscriber<Set<Integer>> selectedItems = new TestSubscriber<>();
         mIntegerSelectionHelper.getSelectedItems().subscribe(selectedItems);
 
-        mIntegerSelectionHelper.getClickObserver().onNext(BothParams.of(1, true));
-        mIntegerSelectionHelper.getClickObserver().onNext(BothParams.of(1, false));
+        mIntegerSelectionHelper.getToggleObserver().onNext(BothParams.of(1, true));
+        mIntegerSelectionHelper.getToggleObserver().onNext(BothParams.of(1, false));
 
         final Set<Integer> last = Iterables.getLast(selectedItems.getOnNextEvents());
         assert_().that(last).doesNotContain(1);
@@ -51,9 +51,9 @@ public class SelectionHelperTest extends TestCase {
         final TestSubscriber<Set<Integer>> selectedItems = new TestSubscriber<>();
         mIntegerSelectionHelper.getSelectedItems().subscribe(selectedItems);
 
-        mIntegerSelectionHelper.getClickObserver().onNext(BothParams.of(1, true));
-        mIntegerSelectionHelper.getClickObserver().onNext(BothParams.of(2, true));
-        mIntegerSelectionHelper.getClickObserver().onNext(BothParams.of(3, true));
+        mIntegerSelectionHelper.getToggleObserver().onNext(BothParams.of(1, true));
+        mIntegerSelectionHelper.getToggleObserver().onNext(BothParams.of(2, true));
+        mIntegerSelectionHelper.getToggleObserver().onNext(BothParams.of(3, true));
 
         final Set<Integer> last = Iterables.getLast(selectedItems.getOnNextEvents());
         assert_().that(last).hasSize(3);
@@ -64,10 +64,10 @@ public class SelectionHelperTest extends TestCase {
         final TestSubscriber<Set<Integer>> selectedItems = new TestSubscriber<>();
         mIntegerSelectionHelper.getSelectedItems().subscribe(selectedItems);
 
-        mIntegerSelectionHelper.getClickObserver().onNext(BothParams.of(1, true));
-        mIntegerSelectionHelper.getClickObserver().onNext(BothParams.of(2, true));
-        mIntegerSelectionHelper.getClickObserver().onNext(BothParams.of(3, true));
-        mIntegerSelectionHelper.getItemCleared().onNext(new Object());
+        mIntegerSelectionHelper.getToggleObserver().onNext(BothParams.of(1, true));
+        mIntegerSelectionHelper.getToggleObserver().onNext(BothParams.of(2, true));
+        mIntegerSelectionHelper.getToggleObserver().onNext(BothParams.of(3, true));
+        mIntegerSelectionHelper.getItemClearObserver().onNext(new Object());
 
         final Set<Integer> last = Iterables.getLast(selectedItems.getOnNextEvents());
         assert_().that(last).isEmpty();
@@ -78,10 +78,10 @@ public class SelectionHelperTest extends TestCase {
         final TestSubscriber<Boolean> selectedObserver = new TestSubscriber<>();
         mIntegerSelectionHelper.itemSelectionObservable(1).subscribe(selectedObserver);
 
-        mIntegerSelectionHelper.getClickObserver().onNext(BothParams.of(1, true));
+        mIntegerSelectionHelper.getToggleObserver().onNext(BothParams.of(1, true));
         assert_().that(Iterables.getLast(selectedObserver.getOnNextEvents())).isTrue();
 
-        mIntegerSelectionHelper.getClickObserver().onNext(BothParams.of(1, false));
+        mIntegerSelectionHelper.getToggleObserver().onNext(BothParams.of(1, false));
         assert_().that(Iterables.getLast(selectedObserver.getOnNextEvents())).isFalse();
     }
 }

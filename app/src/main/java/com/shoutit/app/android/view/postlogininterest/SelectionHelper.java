@@ -116,12 +116,12 @@ public class SelectionHelper<T> {
     }
 
     @Nonnull
-    public Observer<BothParams<T, Boolean>> getClickObserver() {
+    public Observer<BothParams<T, Boolean>> getToggleObserver() {
         return toggleSubject;
     }
 
     @Nonnull
-    public Observer<Object> getItemCleared() {
+    public Observer<Object> getItemClearObserver() {
         return itemCleared;
     }
 }

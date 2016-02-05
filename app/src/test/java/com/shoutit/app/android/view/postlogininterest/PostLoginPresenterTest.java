@@ -21,6 +21,8 @@ import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
 import static com.google.common.truth.Truth.assert_;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class PostLoginPresenterTest extends TestCase {
@@ -31,7 +33,9 @@ public class PostLoginPresenterTest extends TestCase {
 
     @Mock
     ApiService mApiService;
+
     private BehaviorSubject<List<Category>> mSubject;
+    private BehaviorSubject<Object> mPostSubject;
 
     @Before
     public void setUp() {
@@ -39,9 +43,11 @@ public class PostLoginPresenterTest extends TestCase {
 
         mSubject = BehaviorSubject.<List<Category>>create(ImmutableList.of(new Category("name", "slug", new Tag("id", "name", "apiUrl", "image"))));
         when(mApiService.categories()).thenReturn(mSubject);
+        mPostSubject = BehaviorSubject.create(new Object());
+        when(mApiService.postCategoryListen(anyString())).thenReturn(mPostSubject);
 
         mCategoriesDao = new CategoriesDao(mApiService, Schedulers.immediate());
-        mPostLoginPresenter = new PostLoginPresenter(mCategoriesDao);
+        mPostLoginPresenter = new PostLoginPresenter(mCategoriesDao, mApiService);
     }
 
     @Test
@@ -81,5 +87,46 @@ public class PostLoginPresenterTest extends TestCase {
         last.selectionObserver().onNext(true);
         assert_().that(Iterables.getLast(testSelectionObserver.getOnNextEvents())).isTrue();
     }
+
+    @Test
+    public void testWhenClickedNext_sendCategories() {
+        final TestObserver<List<PostLoginPresenter.CategoryItem>> testObserver = new TestObserver<>();
+        final TestObserver<Boolean> testSelectionObserver = new TestObserver<>();
+
+        mPostLoginPresenter.getCategoriesList().subscribe(testObserver);
+        final PostLoginPresenter.CategoryItem last = Iterables.getLast(Iterables.getLast(testObserver.getOnNextEvents()));
+
+        last.selection().subscribe(testSelectionObserver);
+        last.selectionObserver().onNext(true);
+
+        mPostLoginPresenter.getCategoriesSentObservable().subscribe();
+        mPostLoginPresenter.nextClickedObserver().onNext(new Object());
+
+        verify(mApiService).postCategoryListen(anyString());
+    }
+
+
+    @Test
+    public void testWhenClickedNextAndErrored_sendingAgainWorks() {
+        mPostSubject.onError(new RuntimeException());
+        final TestObserver<List<PostLoginPresenter.CategoryItem>> testObserver = new TestObserver<>();
+        final TestObserver<Boolean> testSelectionObserver = new TestObserver<>();
+
+        mPostLoginPresenter.getCategoriesList().subscribe(testObserver);
+        final PostLoginPresenter.CategoryItem last = Iterables.getLast(Iterables.getLast(testObserver.getOnNextEvents()));
+
+        last.selection().subscribe(testSelectionObserver);
+        last.selectionObserver().onNext(true);
+
+        mPostLoginPresenter.getCategoriesSentObservable().subscribe();
+        mPostLoginPresenter.nextClickedObserver().onNext(new Object());
+
+        verify(mApiService).postCategoryListen(anyString());
+
+        mPostLoginPresenter.nextClickedObserver().onNext(new Object());
+
+        verify(mApiService).postCategoryListen(anyString());
+    }
+
 
 }

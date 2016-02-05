@@ -1,5 +1,7 @@
 package com.shoutit.app.android.api;
 
+import android.support.annotation.NonNull;
+
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
@@ -52,6 +54,9 @@ public interface ApiService {
     @POST("oauth2/access_token")
     Observable<SignResponse> googleLogin(@Body GoogleLogin request);
 
+    @POST("/tags/{main_tag}/listen")
+    Observable<Object> postCategoryListen(@Path("main_tag") String tagSlug);
+
     @GET("users/{user_name}")
     Observable<User> getUser(@Path("user_name") String userName);
 
@@ -60,4 +65,5 @@ public interface ApiService {
 
     @GET("misc/categories")
     Observable<List<Category>> categories();
+
 }
