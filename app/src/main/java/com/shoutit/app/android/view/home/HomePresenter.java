@@ -14,6 +14,7 @@ import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ShoutsDao;
+import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
 
 import java.util.ArrayList;
@@ -150,19 +151,24 @@ public class HomePresenter {
 
         /** Combines adapter items **/
         allAdapterItemsObservable = Observable.combineLatest(
-                allDiscoverAdapterItems.startWith(ImmutableList.<List<BaseAdapterItem>>of()),
-                allShoutAdapterItems.startWith(ImmutableList.<List<BaseAdapterItem>>of()),
+                allDiscoverAdapterItems.startWith(new ArrayList<BaseAdapterItem>()),
+                allShoutAdapterItems.startWith(new ArrayList<BaseAdapterItem>()),
                 new Func2<List<BaseAdapterItem>, List<BaseAdapterItem>, List<BaseAdapterItem>>() {
                     @Override
                     public List<BaseAdapterItem> call(List<BaseAdapterItem> discovers,
                                                       List<BaseAdapterItem> shouts) {
-                        return ImmutableList.<BaseAdapterItem>builder()
-                                .add(new DiscoverHeaderAdapterItem(userCity))
-                                .add(new DiscoverContainerAdapterItem(discovers))
+                        final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
+                        if (!discovers.isEmpty()) {
+                            builder.add(new DiscoverHeaderAdapterItem(userCity))
+                                    .add(new DiscoverContainerAdapterItem(discovers));
+                        }
+
+                        return builder
                                 .addAll(shouts)
                                 .build();
                     }
-                });
+                })
+                .filter(MoreFunctions1.<BaseAdapterItem>listNotEmpty());
 
         /** Progress and Error **/
         errorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
@@ -171,7 +177,9 @@ public class HomePresenter {
                 ResponseOrError.transform(discoverItemDetailsObservable)))
                 .filter(Functions1.isNotNull());
 
-        progressObservable = Observable.merge(errorObservable, allAdapterItemsObservable)
+        progressObservable = Observable.merge(
+                errorObservable,
+                allAdapterItemsObservable.filter(MoreFunctions1.<BaseAdapterItem>listNotEmpty()))
                 .map(Functions1.returnFalse());
 
         // Layout manager changes

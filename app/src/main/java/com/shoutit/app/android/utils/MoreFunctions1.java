@@ -1,10 +1,11 @@
 package com.shoutit.app.android.utils;
 
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
 
 import com.google.common.base.Strings;
 import com.jakewharton.rxbinding.widget.TextViewTextChangeEvent;
+
+import java.util.List;
 
 import rx.Observable;
 import rx.functions.Func1;
@@ -38,4 +39,14 @@ public class MoreFunctions1 {
             }
         };
     }
+
+    public static <T> Func1<List<T>, Boolean> listNotEmpty() {
+        return new Func1<List<T>, Boolean>() {
+            @Override
+            public Boolean call(List<T> list) {
+                return list != null && !list.isEmpty();
+            }
+        };
+    }
+
 }
