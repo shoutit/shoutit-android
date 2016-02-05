@@ -1,13 +1,13 @@
 machine:
    environment:
-       JAVA_TOOL_OPTIONS: "-Xmx1024m -XX:MaxPermSize=2g"
+       JAVA_TOOL_OPTIONS: "-Xmx2048m -XX:MaxPermSize=4g"
    pre:
      - printf "org.gradle.jvmargs=-XX:MaxPermSize=2g\ndisablePreDex=true\n" > gradle.properties
 
 dependencies:
     override:
         - echo y | android update sdk --no-ui --all --filter tools,platform-tools,android-23,extra-google-m2repository,extra-google-google_play_services,extra-android-support
-        - echo y | android update sdk --no-ui --all --filter build-tools-23.0.2,build-tools-23.0.1
+        - echo y | android update sdk --no-ui --all --filter build-tools-23.0.2,build-tools-23.0.1,build-tools-22.0.1
 
 checkout:
     post:
@@ -20,7 +20,7 @@ test:
         - python tools/download.py --token P8uXtUgTeNDYEIvw5gXUWjDM --key-version agxzfmF1dG8tY2xvc2VyGAsSC1Byb2plY3RLZXlzGICAgMDuv6EKDA
 
     override:
-        - (./gradlew --parallel --stacktrace --project-prop versionSuffix="$BRANCH_NAME" clean build):
+        - (./gradlew --parallel --stacktrace --debug --project-prop versionSuffix="$BRANCH_NAME" clean build):
             timeout: 1800
 
     post:

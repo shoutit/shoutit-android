@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/side_menu_image_container"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/side_menu_cover_height">
+
+        <ImageView
+            android:id="@+id/menu_cover_iv"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/side_menu_cover_height"
+            android:scaleType="centerCrop"
+            android:src="@drawable/pattern_bg" />
+
+        <ImageView
+            android:id="@+id/menu_avatar_iv"
+            android:layout_width="@dimen/side_menu_avatar_size"
+            android:layout_height="@dimen/side_menu_avatar_size"
+            android:layout_marginTop="40dp"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/ic_avatar_placeholder" />
+
+        <TextView
+            android:id="@+id/menu_user_name_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/menu_avatar_iv"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="8dp"
+            android:maxLines="1"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            tools:text="Alvin Armstrong" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/menu_new_shout_btn"
+        android:layout_width="166dp"
+        android:layout_height="40dp"
+        android:layout_below="@+id/side_menu_image_container"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="-20dp"
+        android:background="@drawable/selector_menu_create_shout"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="3dp"
+            android:layout_marginRight="3dp"
+            android:src="@drawable/ic_create_shout_plus" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawablePadding="0dp"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="14sp"
+            android:text="@string/menu_create_shout"
+            android:textAllCaps="true"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
+
+</RelativeLayout>
