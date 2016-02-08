@@ -8,6 +8,12 @@
     <string name="terms_of_service">Terms of Service</string>
     <string name="facebook_app_id">1148740908499849</string>
 
+    <!-- Errors -->
+    <string name="error_default">Ooops, something went wrong</string>
+    <string name="error_connection">Ooops, probably there is no Internet connection</string>
+    <string name="error_email_not_found">The email or username you entered do not belong to any account.</string>
+    <string name="error_wrong_email_or_password">Wrong email or password</string>
+
     <!-- Intro -->
     <string name="intro_welcome">Welcome To Shoutit</string>
     <string name="intro_buy">Buy and Sell while Chatting</string>
@@ -26,13 +32,15 @@
     <string name="home_user_and_date">%1$s - %2$s</string>
 
     <!-- Login -->
-    <string name="login_email_hint">Email</string>
+    <string name="login_email_hint">Email or Username</string>
     <string name="login_password_hint">Password</string>
     <string name="login_btn_text">Log in</string>
-    <string name="login_sign_up_text">New to Shoutit? Sign up</string>
+    <string name="login_sign_up_text">Sign up</string>
     <string name="login_error">Wrong data</string>
     <string name="login_empty_mail">Mail cannot be empty.</string>
     <string name="login_empty_password">Password must have at least 6 characters.</string>
+    <string name="login_success_reset_password">Password reset email will be sent soon.</string>
+    <string name="login_error_empty_email">Email or username cannot be empty</string>
 
     <!-- Register -->
     <string name="register_sign_up_btn_text">Sign up</string>
@@ -44,6 +52,8 @@
     <string name="register_empty_mail">Mail cannot be empty.</string>
     <string name="register_empty_password">Password must have at least 6 characters.</string>
     <string name="register_empty_name">Name cannot be empty</string>
+    <string name="register_have_an_account">Have an account?</string>
+    <string name="register_log_in">Log in</string>
 
     <!-- Login Intro -->
     <string name="login_intro_join">Join Now!</string>
@@ -54,6 +64,8 @@
     <string name="login_intro_feedback">Feedback</string>
     <string name="login_intro_help">Help</string>
     <string name="login_intro_about">About</string>
+    <string name="register_forgot_password">Forgot your password?</string>
+    <string name="login_sign_up_new">New to Shoutit?</string>
 
     <!-- About -->
     <string name="pref_key_terms_of_service" translatable="false">pref_key_terms_of_service</string>
@@ -66,6 +78,14 @@
     <string name="about_privacy_policy_title">Privacy Policy</string>
     <string name="about_legal_title">Legal</string>
     <string name="about_title">About</string>
+    <string name="register_bottom_text1">By Proceeding you also agree to Shoutit’s</string>
+    <string name="register_bottom_text2">Terms of Service</string>
+    <string name="register_bottom_text3">and</string>
+    <string name="register_bottom_text4">Privacy Policy</string>
+
+    <!-- Html Activity -->
+    <string name="html_activity_terms">Terms of Service</string>
+    <string name="html_activity_privacy">Privacy Policy</string>
 
     <!-- Side Menu -->
     <string name="menu_create_shout">Create Shout</string>

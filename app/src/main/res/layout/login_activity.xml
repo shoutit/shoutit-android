@@ -1,26 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:background="@color/default_bg_color"
+    android:fillViewport="true">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/login_toolbar"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:src="@drawable/appbar_logo"/>
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/login_toolbar"
+            android:theme="@style/WhiteToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize"
+            android:navigationIcon="@drawable/ic_blue_arrow"
+            android:title="">
 
-    </android.support.v7.widget.Toolbar>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_shoutit_logo"/>
 
-    <FrameLayout
-        android:id="@+id/login_sign_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        </android.support.v7.widget.Toolbar>
 
-</LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:layout_below="@id/login_toolbar"
+            android:background="@drawable/toolbar_drop_shadow" />
+
+        <FrameLayout
+            android:id="@+id/login_sign_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/login_bottom_actions_container"
+            android:layout_below="@+id/login_toolbar"/>
+
+        <include layout="@layout/login_bottom_actions"
+            android:id="@+id/login_bottom_actions_container"/>
+
+    </RelativeLayout>
+
+</ScrollView>
