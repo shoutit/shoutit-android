@@ -1,5 +1,8 @@
 package com.shoutit.app.android.view.main;
 
+import android.graphics.Bitmap;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.View;
@@ -9,10 +12,13 @@ import android.widget.Toast;
 
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.utils.BlurTransform;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.view.home.HomeFragment;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+import com.squareup.picasso.Transformation;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
 import javax.annotation.Nonnull;
@@ -52,20 +58,17 @@ public class MenuHandler {
     @Nonnull
     private final Picasso picasso;
     @Nonnull
-    private final Target roundedTarget;
+    private final UserPreferences userPreferences;
 
     @Inject
-    public MenuHandler(@Nonnull RxAppCompatActivity rxActivity,
+    public MenuHandler(@Nonnull final RxAppCompatActivity rxActivity,
                        @Nonnull OnMenuItemSelectedListener onMenuItemSelectedListener,
-                       @Nonnull Picasso picasso) {
+                       @Nonnull Picasso picasso,
+                       @Nonnull UserPreferences userPreferences) {
         this.rxActivity = rxActivity;
         this.onMenuItemSelectedListener = onMenuItemSelectedListener;
         this.picasso = picasso;
-
-        roundedTarget = PicassoHelper.getRoundedBitmapWithStrokeTarget(
-                avatarImageView,
-                rxActivity.getResources().getDimensionPixelSize(R.dimen.side_menu_avatar_stroke_size)
-        );
+        this.userPreferences = userPreferences;
     }
 
     public void initMenu(@Nonnull View view) {
@@ -84,11 +87,20 @@ public class MenuHandler {
 
         presenter.getAvatarObservable()
                 .compose(rxActivity.<String>bindToLifecycle())
-                .subscribe(loadAvatarAction(roundedTarget));
+                .subscribe(loadAvatarAction());
 
         presenter.getCoverObservable()
                 .compose(rxActivity.<String>bindToLifecycle())
                 .subscribe(loadCoverAction());
+
+        presenter.getCountryCodeObservable()
+                .compose(rxActivity.<Integer>bindToLifecycle())
+                .subscribe(new Action1<Integer>() {
+                    @Override
+                    public void call(@DrawableRes Integer flagId) {
+                        locationTextView.setCompoundDrawablesRelativeWithIntrinsicBounds(flagId, 0, 0, 0);
+                    }
+                });
     }
 
     @OnClick({R.id.menu_home, R.id.menu_discover, R.id.menu_browse, R.id.menu_chat,
@@ -105,10 +117,20 @@ public class MenuHandler {
                 onMenuItemSelectedListener.onMenuItemSelected(FRAGMENT_BROWSE);
                 break;
             case R.id.menu_chat:
-                onMenuItemSelectedListener.onMenuItemSelected(FRAGMENT_CHATS);
+                if (userPreferences.isUserLoggedIn()) {
+                    onMenuItemSelectedListener.onMenuItemSelected(FRAGMENT_CHATS);
+                    Toast.makeText(rxActivity, "Not implemented yet", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(rxActivity, "Hello. Log in popup here", Toast.LENGTH_SHORT).show();
+                }
                 break;
             case R.id.menu_orders:
-                onMenuItemSelectedListener.onMenuItemSelected(FRAGMENT_ORDERS);
+                if (userPreferences.isUserLoggedIn()) {
+                    onMenuItemSelectedListener.onMenuItemSelected(FRAGMENT_ORDERS);
+                    Toast.makeText(rxActivity, "Not implemented yet", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(rxActivity, "Hello. Log in popup here", Toast.LENGTH_SHORT).show();
+                }
                 break;
             case R.id.menu_settings:
                 onMenuItemSelectedListener.onMenuItemSelected(FRAGMENT_SETTINGS);
@@ -126,16 +148,41 @@ public class MenuHandler {
 
     @OnClick({R.id.menu_avatar_iv, R.id.menu_user_name_tv})
     public void startUserProfile() {
-        Toast.makeText(rxActivity, "Not implemented yet", Toast.LENGTH_LONG).show();
+        if (userPreferences.isUserLoggedIn()) {
+            Toast.makeText(rxActivity, "Not implemented yet", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(rxActivity, "Hello. Log in popup here", Toast.LENGTH_SHORT).show();
+        }
     }
 
-    @OnClick(R.id.menu_location_tv)
+    @OnClick(R.id.menu_location_change_tv)
     public void showChangeLocationScreen() {
-        Toast.makeText(rxActivity, "Not implemented yet", Toast.LENGTH_LONG).show();
+        Toast.makeText(rxActivity, "Not implemented yet", Toast.LENGTH_SHORT).show();
+    }
+
+    @OnClick(R.id.menu_new_shout_btn)
+    public void newShoutClick() {
+        if (userPreferences.isUserLoggedIn()) {
+            Toast.makeText(rxActivity, "Not implemented yet", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(rxActivity, "Hello. Log in popup here", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @NonNull
     private Action1<String> loadCoverAction() {
+        final Transformation blurTransformation = new Transformation() {
+            @Override
+            public Bitmap transform(Bitmap source) {
+                return new BlurTransform(rxActivity).transform(source, true);
+            }
+
+            @Override
+            public String key() {
+                return "menuCover";
+            }
+        };
+
         return new Action1<String>() {
             @Override
             public void call(String coverUrl) {
@@ -143,14 +190,19 @@ public class MenuHandler {
                         .error(R.drawable.pattern_bg)
                         .fit()
                         .centerCrop()
+                        .transform(blurTransformation)
                         .into(coverImageView);
-
             }
         };
     }
 
     @NonNull
-    private Action1<String> loadAvatarAction(final Target roundedTarget) {
+    private Action1<String> loadAvatarAction() {
+        final Target roundedTarget = PicassoHelper.getRoundedBitmapWithStrokeTarget(
+                avatarImageView,
+                rxActivity.getResources().getDimensionPixelSize(R.dimen.side_menu_avatar_stroke_size)
+        );
+
         return new Action1<String>() {
             @Override
             public void call(String avatarUrl) {

@@ -1,20 +1,23 @@
 package com.shoutit.app.android.api.model;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Location {
     private final float latitude;
     private final float longitude;
-    private final String country;
+    @SerializedName("countryCode")
+    private final String countryCode;
     private final String postalCode;
     private final String state;
     private final String city;
     private final String address;
     private final String googleGeocodeResponse;
 
-    public Location(float latitude, float longitude, String country, String postalCode,
+    public Location(float latitude, float longitude, String countryCode, String postalCode,
                     String state, String city, String address, String googleGeocodeResponse) {
         this.latitude = latitude;
         this.longitude = longitude;
-        this.country = country;
+        this.countryCode = countryCode;
         this.postalCode = postalCode;
         this.state = state;
         this.city = city;
@@ -30,8 +33,8 @@ public class Location {
         return longitude;
     }
 
-    public String getCountry() {
-        return country;
+    public String getCountryCode() {
+        return countryCode;
     }
 
     public String getPostalCode() {
