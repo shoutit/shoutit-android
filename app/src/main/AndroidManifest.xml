@@ -14,30 +14,27 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity
-            android:name=".view.main.MainActivity"
+        <activity android:name=".view.main.MainActivity"
             android:theme="@style/AppTheme.WithDrawer">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
 
         <activity
             android:name=".view.intro.IntroActivity"
-            android:theme="@style/TranslucentStatusBar" />
+            android:theme="@style/TranslucentStatusBar"/>
+
+        <activity
+            android:name=".view.signin.LoginActivity"
+            android:theme="@style/TranslucentStatusBar"/>
 
         <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-
-        <activity
-            android:name=".view.signin.LoginActivity"
-            android:theme="@style/TranslucentStatusBar" />
 
         <activity android:name=".view.loginintro.LoginIntroActivity" />
 

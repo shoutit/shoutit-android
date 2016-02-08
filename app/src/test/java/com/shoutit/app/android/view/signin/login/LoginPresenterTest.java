@@ -5,6 +5,7 @@ import android.location.Location;
 
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.login.EmailLoginRequest;
@@ -15,8 +16,12 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import okhttp3.Headers;
+import okhttp3.ResponseBody;
+import okhttp3.internal.http.RealResponseBody;
 import rx.Observable;
 import rx.observers.TestObserver;
+import rx.observers.TestSubscriber;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
@@ -53,6 +58,8 @@ public class LoginPresenterTest {
 
         mResponseSubject = BehaviorSubject.create(new SignResponse("a", "b", "c", true, user));
         when(mApiService.login(any(EmailLoginRequest.class))).thenReturn(mResponseSubject);
+        when(mApiService.resetPassword(any(ResetPasswordRequest.class))).thenReturn(
+                Observable.just((ResponseBody) new RealResponseBody(new Headers.Builder().build(), null)));
         when(coarseLocationProvider.get(any(Context.class))).thenReturn(Observable.just((Location) null));
 
         mLoginPresenter = new LoginPresenter(mApiService, mContext, coarseLocationProvider, mUserPreferences, Schedulers.immediate(), Schedulers.immediate());
@@ -172,4 +179,65 @@ public class LoginPresenterTest {
         assert_().that(emptyEmailObserver.getOnNextEvents()).hasSize(1);
     }
 
+    @Test
+    public void testWhenForgotPasswordEmailEmpty_showError() throws Exception {
+        final TestSubscriber<Object> errorSubscriber = new TestSubscriber<>();
+        final TestSubscriber<Object> successSubscriber = new TestSubscriber<>();
+
+        mLoginPresenter.resetPasswordEmptyEmail().subscribe(errorSubscriber);
+        mLoginPresenter.successResetPassword().subscribe(successSubscriber);
+
+        mLoginPresenter.getEmailObserver().onNext("");
+        mLoginPresenter.getResetPasswordClickObserver().onNext(null);
+
+        errorSubscriber.assertValueCount(1);
+        successSubscriber.assertNoValues();
+    }
+
+    @Test
+    public void testWhenForgotPasswordEmailNotEmpty_showSuccess() throws Exception {
+        final TestSubscriber<Object> errorSubscriber = new TestSubscriber<>();
+        final TestSubscriber<Object> successSubscriber = new TestSubscriber<>();
+
+        mLoginPresenter.resetPasswordEmptyEmail().subscribe(errorSubscriber);
+        mLoginPresenter.successResetPassword().subscribe(successSubscriber);
+
+        mLoginPresenter.getEmailObserver().onNext("email");
+        mLoginPresenter.getResetPasswordClickObserver().onNext(null);
+
+        successSubscriber.assertValueCount(1);
+        errorSubscriber.assertNoErrors();
+    }
+
+    @Test
+    public void testWhenStart_noProgress() throws Exception {
+        final TestSubscriber<Object> subscriber = new TestSubscriber<>();
+
+        mLoginPresenter.getProgressObservable().subscribe(subscriber);
+
+        subscriber.assertNoValues();
+    }
+
+    @Test
+    public void testWhenLogin_showProgressThenHide() throws Exception {
+        final TestSubscriber<Object> subscriber = new TestSubscriber<>();
+        mLoginPresenter.getProgressObservable().subscribe(subscriber);
+
+        mLoginPresenter.getEmailObserver().onNext("email");
+        mLoginPresenter.getPasswordObserver().onNext("password123");
+        mLoginPresenter.getProceedObserver().onNext(null);
+
+        subscriber.assertValues(true, false);
+    }
+
+    @Test
+    public void testWhenResetPassword_showProgressThenHide() throws Exception {
+        final TestSubscriber<Object> subscriber = new TestSubscriber<>();
+        mLoginPresenter.getProgressObservable().subscribe(subscriber);
+
+        mLoginPresenter.getEmailObserver().onNext("email");
+        mLoginPresenter.getResetPasswordClickObserver().onNext(null);
+
+        subscriber.assertValues(true, false);
+    }
 }

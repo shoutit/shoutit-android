@@ -53,12 +53,11 @@ android {
 
     defaultConfig {
         applicationId "com.shoutit.android.app"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 23
         versionCode project.ext.versionCode
         versionName project.ext.versionName
-        renderscriptTargetApi 20
-        renderscriptSupportModeEnabled true
+        renderscriptTargetApi 23
         multiDexEnabled true
         testInstrumentationRunner "com.android.test.runner.MultiDexTestRunner"
     }
@@ -121,7 +120,7 @@ android {
         }
 
         prod {
-            minSdkVersion 16
+            minSdkVersion 21
         }
     }
 
