@@ -51,7 +51,8 @@ public class MenuHandlerPresenter {
                     public String call(User user) {
                         return Strings.emptyToNull(user.getCover());
                     }
-                });
+                })
+                .filter(Functions1.isNotNull());
 
         nameObservable = userObservable
                 .map(new Func1<User, String>() {

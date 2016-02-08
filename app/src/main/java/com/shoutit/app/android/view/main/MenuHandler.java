@@ -1,5 +1,6 @@
 package com.shoutit.app.android.view.main;
 
+import android.graphics.Bitmap;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -11,10 +12,12 @@ import android.widget.Toast;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.utils.BlurTransform;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.view.home.HomeFragment;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+import com.squareup.picasso.Transformation;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
 import javax.annotation.Nonnull;
@@ -176,13 +179,27 @@ public class MenuHandler {
 
     @NonNull
     private Action1<String> loadCoverAction() {
+        final Transformation blurTransformation = new Transformation() {
+            @Override
+            public Bitmap transform(Bitmap source) {
+                return new BlurTransform(rxActivity).transform(source, true);
+            }
+
+            @Override
+            public String key() {
+                return "menuCover";
+            }
+        };
+
         return new Action1<String>() {
             @Override
             public void call(String coverUrl) {
                 picasso.load(coverUrl)
                         .error(R.drawable.pattern_bg)
+                        .placeholder(R.drawable.pattern_bg)
                         .fit()
                         .centerCrop()
+                        .transform(blurTransformation)
                         .into(coverImageView);
             }
         };
@@ -200,6 +217,7 @@ public class MenuHandler {
             public void call(String avatarUrl) {
                 picasso.load(avatarUrl)
                         .error(R.drawable.ic_avatar_placeholder)
+                        .placeholder(R.drawable.ic_avatar_placeholder)
                         .resizeDimen(R.dimen.side_menu_avatar_size, R.dimen.side_menu_avatar_size)
                         .into(roundedTarget);
             }
