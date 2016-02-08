@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
 import com.appunite.rx.functions.Functions1;
 import com.appunite.rx.operators.MoreOperators;
 import com.google.common.base.Optional;
@@ -64,6 +63,18 @@ public class UserPreferences {
         return Optional.fromNullable(mPreferences.getString(AUTH_TOKEN, null));
     }
 
+    // TODO
+    @Nullable
+    public String getUserCountryCode() {
+        return "GE";
+    }
+
+    // TODO
+    @Nullable
+    public String getUserCity() {
+        return "Dubaj";
+    }
+
     @SuppressLint("CommitPrefEdits")
     public void saveUserAsJson(User user) {
         mPreferences.edit()
@@ -97,17 +108,5 @@ public class UserPreferences {
 
     private void refreshUser() {
         userRefreshSubject.onNext(null);
-    }
-
-    // TODO
-    @Nullable
-    public String getUserCountryCode() {
-        return "GE";
-    }
-
-    // TODO
-    @Nullable
-    public String getUserCity() {
-        return "Dubaj";
     }
 }

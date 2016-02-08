@@ -1,5 +1,7 @@
 package com.shoutit.app.android.api.model;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Location {
     private final float latitude;
     private final float longitude;
@@ -10,11 +12,11 @@ public class Location {
     private final String address;
     private final String googleGeocodeResponse;
 
-    public Location(float latitude, float longitude, String country, String postalCode,
+    public Location(float latitude, float longitude, String countryCode, String postalCode,
                     String state, String city, String address, String googleGeocodeResponse) {
         this.latitude = latitude;
         this.longitude = longitude;
-        this.country = country;
+        this.country = countryCode;
         this.postalCode = postalCode;
         this.state = state;
         this.city = city;

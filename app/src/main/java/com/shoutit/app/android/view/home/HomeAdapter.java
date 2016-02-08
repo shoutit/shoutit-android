@@ -1,10 +1,7 @@
 package com.shoutit.app.android.view.home;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -18,21 +15,18 @@ import android.widget.Toast;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.appunite.rx.dagger.UiScheduler;
-import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.DateTimeUtils;
-import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.PriceUtils;
+import com.shoutit.app.android.utils.ResourcesHelper;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
-
-import java.util.Locale;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -296,8 +290,7 @@ public class HomeAdapter extends BaseAdapter {
 
             if (shout.getLocation() != null && !TextUtils.isEmpty(shout.getLocation().getCountry())) {
                 final String countryCode = shout.getLocation().getCountry().toLowerCase();
-                final int flagResId = context.getResources().getIdentifier(countryCode,
-                        "drawable", context.getPackageName());
+                final int flagResId = ResourcesHelper.getResourceIdForName(countryCode, context);
                 if (flagResId != 0) {
                     final Target target = PicassoHelper.getRoundedBitmapTarget(context, countryImageView);
                     cardImageView.setTag(target);
