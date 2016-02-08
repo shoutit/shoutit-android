@@ -4,12 +4,12 @@ import android.content.Context;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.functions.Functions1;
+import com.google.common.base.Strings;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.Location;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.ResourcesHelper;
-import com.shoutit.app.android.utils.TextHelper;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -41,7 +41,7 @@ public class MenuHandlerPresenter {
                 .map(new Func1<User, String>() {
                     @Override
                     public String call(User user) {
-                        return TextHelper.emptyToNull(user.getImage());
+                        return Strings.emptyToNull(user.getImage());
                     }
                 });
 
@@ -49,7 +49,7 @@ public class MenuHandlerPresenter {
                 .map(new Func1<User, String>() {
                     @Override
                     public String call(User user) {
-                        return TextHelper.emptyToNull(user.getCover());
+                        return Strings.emptyToNull(user.getCover());
                     }
                 });
 
@@ -87,7 +87,7 @@ public class MenuHandlerPresenter {
                 .map(new Func1<Location, String>() {
                     @Override
                     public String call(Location location) {
-                        return TextHelper.emptyToNull(location.getCountry());
+                        return Strings.emptyToNull(location.getCountry());
                     }
                 })
                 .filter(Functions1.isNotNull())
