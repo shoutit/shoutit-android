@@ -19,6 +19,7 @@ public class CategoriesDao {
 
     private final Observable<ResponseOrError<List<Category>>> mListObservableResponseOrError;
 
+    @Inject
     public CategoriesDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
         mListObservableResponseOrError = apiService
                 .categories()

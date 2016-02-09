@@ -21,6 +21,7 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -57,7 +58,8 @@ public final class AppModule {
 
     @Provides
     @Singleton
-    Picasso providePicasso(@ForApplication Context context, OkHttpClient okHttpClient) {
+    Picasso providePicasso(@ForApplication Context context,
+                           @Named("picasso") OkHttpClient okHttpClient) {
         return new Picasso.Builder(context)
                 .indicatorsEnabled(BuildConfig.DEBUG)
                 .loggingEnabled(BuildConfig.DEBUG)
@@ -73,11 +75,22 @@ public final class AppModule {
                 .build();
     }
 
+    @Named("picasso")
     @Provides
     @Singleton
-    public OkHttpClient provideOkHttpClient(@ForApplication final Context context,
-                                            AuthInterceptor authInterceptor) {
-        final Optional<Cache> cache = getCacheOrNull(context);
+    public OkHttpClient providePicassoOkHttpClient(Optional<Cache> cache) {
+        final OkHttpClient.Builder okHttpClient = new OkHttpClient.Builder();
+        if (cache.isPresent()) {
+            okHttpClient.cache(cache.get());
+        }
+
+        return okHttpClient.build();
+    }
+
+    @Provides
+    @Singleton
+    public OkHttpClient provideOkHttpClient(AuthInterceptor authInterceptor,
+                                            Optional<Cache> cache) {
         final OkHttpClient.Builder okHttpClient = new OkHttpClient.Builder();
         if (cache.isPresent()) {
             okHttpClient.cache(cache.get());
@@ -104,7 +117,9 @@ public final class AppModule {
                 .create(ApiService.class);
     }
 
-    private Optional<Cache> getCacheOrNull(@ForApplication Context context) {
+    @Provides
+    @Singleton
+    Optional<Cache> provideCache(@ForApplication Context context) {
         final File httpCacheDir = new File(context.getCacheDir(), "cache");
         final long httpCacheSize = 100 * 1024 * 1024; // 100 MiB
         return Optional.of(new Cache(httpCacheDir, httpCacheSize));
