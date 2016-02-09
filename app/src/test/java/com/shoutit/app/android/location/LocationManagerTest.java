@@ -26,7 +26,6 @@ import rx.Observable;
 import rx.observers.TestSubscriber;
 import rx.schedulers.TestScheduler;
 import rx.subjects.BehaviorSubject;
-
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Matchers.anyString;
@@ -98,6 +97,7 @@ public class LocationManagerTest {
         testScheduler.triggerActions();
 
         subscriber.assertValueCount(1);
+        subscriber.assertValue(location);
     }
 
     @Test
@@ -115,12 +115,14 @@ public class LocationManagerTest {
         testScheduler.triggerActions();
 
         subscriber.assertValueCount(2);
+        subscriber.assertValues(location, location);
     }
 
     @Test
     public void testWhenSubscribed_locationFromIPFetched() throws Exception {
         final TestSubscriber<Location> subscriber = new TestSubscriber<>();
-        when(userPreferences.automaticLocationTrackingEnabled()).thenReturn(false);
+        when(userPreferences.automaticLocationTrackingEnabled()).thenReturn(true);
+        when(PermissionHelper.hasPermission(any(Context.class), anyString())).thenReturn(false);
         final Location location = getLocationWithLatLngCity(1, 2, "city");
 
         locationManager.updateUserLocationObservable().subscribe(subscriber);
@@ -135,7 +137,8 @@ public class LocationManagerTest {
     @Test
     public void testWhenRefreshedSubject_locationFromIpFetchedAgain() throws Exception {
         final TestSubscriber<Location> subscriber = new TestSubscriber<>();
-        when(userPreferences.automaticLocationTrackingEnabled()).thenReturn(false);
+        when(userPreferences.automaticLocationTrackingEnabled()).thenReturn(true);
+        when(PermissionHelper.hasPermission(any(Context.class), anyString())).thenReturn(false);
         final Location location = getLocationWithLatLngCity(1, 2, "city");
 
         locationManager.updateUserLocationObservable().subscribe(subscriber);
@@ -152,8 +155,9 @@ public class LocationManagerTest {
     @Test
     public void testWhenLocationChangedAndUserLoggedIn_userUpdated() throws Exception {
         final TestSubscriber<Location> subscriber = new TestSubscriber<>();
-        when(userPreferences.automaticLocationTrackingEnabled()).thenReturn(false);
+        when(userPreferences.automaticLocationTrackingEnabled()).thenReturn(true);
         when(userPreferences.isUserLoggedIn()).thenReturn(true);
+        when(PermissionHelper.hasPermission(any(Context.class), anyString())).thenReturn(false);
         final Location location = getLocationWithLatLngCity(1, 2, "city");
 
         locationManager.updateUserLocationObservable().subscribe(subscriber);
@@ -169,8 +173,9 @@ public class LocationManagerTest {
     @Test
     public void testWhenLocationChangedAndUserNotLoggedIn_userNotUpdated() throws Exception {
         final TestSubscriber<Location> subscriber = new TestSubscriber<>();
-        when(userPreferences.automaticLocationTrackingEnabled()).thenReturn(false);
+        when(userPreferences.automaticLocationTrackingEnabled()).thenReturn(true);
         when(userPreferences.isUserLoggedIn()).thenReturn(false);
+        when(PermissionHelper.hasPermission(any(Context.class), anyString())).thenReturn(false);
         final Location location = getLocationWithLatLngCity(1, 2, "city");
 
         locationManager.updateUserLocationObservable().subscribe(subscriber);

@@ -14,10 +14,11 @@ public class User {
     private final String image;
     private final String cover;
     private final boolean isListening;
+    private final Location location;
 
     public User(String id, String type, String apiUrl, String webUrl, String username,
                 String name, String firstName, String lastName, boolean isActivated, String image,
-                String cover, boolean isListening) {
+                String cover, boolean isListening, Location location) {
         this.id = id;
         this.type = type;
         this.apiUrl = apiUrl;
@@ -30,6 +31,7 @@ public class User {
         this.image = image;
         this.cover = cover;
         this.isListening = isListening;
+        this.location = location;
     }
 
     public String getId() {
@@ -78,5 +80,9 @@ public class User {
 
     public boolean isListening() {
         return isListening;
+    }
+
+    public Location getLocation() {
+        return location;
     }
 }

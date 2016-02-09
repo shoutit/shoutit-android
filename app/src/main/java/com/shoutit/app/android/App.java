@@ -53,7 +53,7 @@ public class App extends MultiDexApplication {
         setupGraph();
 
         fetchUser();
-        updateLocationIfNeeded();
+        fetchLocation();
     }
 
     private void initUserVoice() {
@@ -117,7 +117,7 @@ public class App extends MultiDexApplication {
                 });
     }
 
-    private void updateLocationIfNeeded() {
+    private void fetchLocation() {
         locationManager.updateUserLocationObservable()
                 .subscribe();
     }

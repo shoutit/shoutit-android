@@ -44,6 +44,7 @@ public class MainActivity extends BaseActivity {
         if (!mUserPreferences.isUserLoggedIn() && !mUserPreferences.isGuest()) {
             finish();
             startActivity(IntroActivity.newIntent(this));
+            return;
         }
 
         setUpActionBar();

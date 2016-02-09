@@ -134,7 +134,10 @@ public class UserPreferences {
                 .compose(MoreOperators.<Location>refresh(locationRefreshSubject));
     }
 
-    public void saveLocation(Location location) {
+    public void saveLocation(@Nullable Location location) {
+        if (location == null) {
+            return;
+        }
         mPreferences.edit()
                 .putString(KEY_LOCATION, gson.toJson(location))
                 .commit();
