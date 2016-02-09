@@ -26,6 +26,7 @@ public class UserPreferences {
     private static final String REFRESH_TOKEN = "refresh_token";
     private static final String KEY_USER = "user";
     private static final String IS_GUEST = "is_guest";
+    private static final String IS_FIRST_RUN = "is_first_run";
 
     private final PublishSubject<Object> userRefreshSubject = PublishSubject.create();
 
@@ -85,6 +86,16 @@ public class UserPreferences {
 
     public boolean isUserLoggedIn() {
         return getAuthToken().isPresent();
+    }
+
+    public boolean isFirstRun() {
+        return mPreferences.getBoolean(IS_FIRST_RUN, true);
+    }
+
+    public boolean isFirstRunAndSetToFalse() {
+        final boolean isFirstRun = mPreferences.getBoolean(IS_FIRST_RUN, true);
+        mPreferences.edit().putBoolean(IS_FIRST_RUN, false).apply();
+        return isFirstRun;
     }
 
     @Nullable

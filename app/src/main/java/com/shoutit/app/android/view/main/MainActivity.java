@@ -22,6 +22,7 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.view.home.HomeFragment;
 import com.shoutit.app.android.view.intro.IntroActivity;
+import com.shoutit.app.android.view.postlogininterest.PostLoginInterestActivity;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -57,6 +58,11 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
         if (!mUserPreferences.isUserLoggedIn() && !mUserPreferences.isGuest()) {
             finish();
             startActivity(IntroActivity.newIntent(this));
+            return;
+        }
+
+        if(mUserPreferences.isFirstRun()){
+            startActivity(PostLoginInterestActivity.newIntent(this));
         }
 
         setUpActionBar();

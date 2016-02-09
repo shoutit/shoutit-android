@@ -101,4 +101,10 @@
     <string name="drawer_open">Open</string>
     <string name="drawer_close">Close</string>
 
+    <!-- Post Login -->
+    <string name="post_login_error">Error fetching data</string>
+    <string name="post_login_send_error">Error sending interests</string>
+    <string name="post_login_next">next</string>
+    <string name="post_login_activity_title">Listen to your Interest!</string>
+
 </resources>
