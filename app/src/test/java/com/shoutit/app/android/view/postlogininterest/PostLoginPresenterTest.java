@@ -49,7 +49,7 @@ public class PostLoginPresenterTest extends TestCase {
         when(mApiService.postCategoryListen(anyString())).thenReturn(mPostSubject);
 
         mCategoriesDao = new CategoriesDao(mApiService, Schedulers.immediate());
-        mPostLoginPresenter = new PostLoginPresenter(mCategoriesDao, mApiService);
+        mPostLoginPresenter = new PostLoginPresenter(mCategoriesDao, mApiService, Schedulers.immediate(), Schedulers.immediate());
     }
 
     @Test
