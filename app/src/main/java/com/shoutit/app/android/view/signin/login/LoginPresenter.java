@@ -9,8 +9,12 @@ import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
+import com.appunite.rx.operators.MoreOperators;
+import com.google.android.gms.location.LocationRequest;
+import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.login.EmailLoginRequest;
 import com.shoutit.app.android.api.model.login.LoginUser;
@@ -18,8 +22,11 @@ import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.view.signin.CoarseLocationObservableProvider;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
+import okhttp3.ResponseBody;
+import retrofit2.Response;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
@@ -36,9 +43,15 @@ public class LoginPresenter {
     private final BehaviorSubject<String> mEmailSubject = BehaviorSubject.create();
     private final BehaviorSubject<String> mPasswordSubject = BehaviorSubject.create();
     private final PublishSubject<Object> mProceedSubject = PublishSubject.create();
+    private final PublishSubject<Object> resetPasswordClickObserver = PublishSubject.create();
+    private final PublishSubject<Boolean> progressSubject = PublishSubject.create();
+
     private final Observable<String> mPasswordEmpty;
     private final Observable<String> mEmailEmpty;
     private final Observable<Location> mLocationObservable;
+    private final Observable<ResponseBody> resetPasswordSuccess;
+    private final Observable<Object> resetPasswordEmptyEmail;
+    private final Observable<Boolean> progressObservable;
 
     @Inject
     public LoginPresenter(@NonNull final ApiService apiService,
@@ -52,7 +65,8 @@ public class LoginPresenter {
                 .startWith((Location) null)
                 .compose(ObservableExtensions.<Location>behaviorRefCount());
 
-        final Observable<ResponseOrError<SignResponse>> responseOrErrorObservable = mProceedSubject
+        // Login
+        final Observable<ResponseOrError<SignResponse>> loginRequestObservable = mProceedSubject
                 .withLatestFrom(mLocationObservable, new Func2<Object, Location, Location>() {
                     @Override
                     public Location call(Object o, Location location) {
@@ -70,6 +84,7 @@ public class LoginPresenter {
                         });
                     }
                 })
+                .doOnNext(showProgressAction())
                 .flatMap(new Func1<EmailLoginRequest, Observable<ResponseOrError<SignResponse>>>() {
                     @Override
                     public Observable<ResponseOrError<SignResponse>> call(EmailLoginRequest loginRequest) {
@@ -84,7 +99,7 @@ public class LoginPresenter {
         mPasswordEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservable(mPasswordSubject.first())).filter(Functions1.isNullOrEmpty());
         mEmailEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservable(mEmailSubject.first())).filter(Functions1.isNullOrEmpty());
 
-        mSuccessObservable = responseOrErrorObservable
+        mSuccessObservable = loginRequestObservable
                 .compose(ResponseOrError.<SignResponse>onlySuccess())
                 .doOnNext(new Action1<SignResponse>() {
                     @Override
@@ -94,7 +109,62 @@ public class LoginPresenter {
                     }
                 });
 
-        mErrorObservable = responseOrErrorObservable.compose(ResponseOrError.<SignResponse>onlyError());
+        // Reset password
+        final Observable<String> resetPasswordClickObservable = resetPasswordClickObserver
+                .withLatestFrom(mEmailSubject, new Func2<Object, String, String>() {
+                    @Override
+                    public String call(Object ignore, String email) {
+                        return email;
+                    }
+                });
+
+        final Observable<ResponseOrError<ResponseBody>> resetPasswordRequestObservable = resetPasswordClickObservable
+                .filter(MoreFunctions1.textNotEmpty())
+                .doOnNext(showProgressAction())
+                .switchMap(new Func1<String, Observable<ResponseOrError<ResponseBody>>>() {
+                    @Override
+                    public Observable<ResponseOrError<ResponseBody>> call(String email) {
+                        return apiService.resetPassword(new ResetPasswordRequest(email))
+                                .subscribeOn(networkScheduler)
+                                .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
+
+                    }
+                })
+                .compose(ObservableExtensions.<ResponseOrError<ResponseBody>>behaviorRefCount());
+
+        resetPasswordEmptyEmail = resetPasswordClickObservable
+                .filter(Functions1.neg(MoreFunctions1.textNotEmpty()))
+                .map(Functions1.toObject());
+
+        resetPasswordSuccess = resetPasswordRequestObservable
+                .compose(ResponseOrError.<ResponseBody>onlySuccess())
+                .observeOn(uiScheduler);
+
+
+        // Errors
+        mErrorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
+                ResponseOrError.transform(loginRequestObservable),
+                ResponseOrError.transform(resetPasswordRequestObservable)))
+                .filter(Functions1.isNotNull())
+                .observeOn(uiScheduler);
+
+        // Progress
+        progressObservable = Observable.merge(
+                progressSubject,
+                mErrorObservable.map(Functions1.returnFalse()),
+                loginRequestObservable.map(Functions1.returnFalse()),
+                resetPasswordRequestObservable.map(Functions1.returnFalse()))
+                .observeOn(uiScheduler);
+    }
+
+    @NonNull
+    private Action1<Object> showProgressAction() {
+        return new Action1<Object>() {
+            @Override
+            public void call(Object ignore) {
+                progressSubject.onNext(true);
+            }
+        };
     }
 
     @NonNull
@@ -140,5 +210,24 @@ public class LoginPresenter {
     @NonNull
     public Observable<Location> getLocationObservable() {
         return mLocationObservable;
+    }
+
+    @Nonnull
+    public Observer<Object> getResetPasswordClickObserver() {
+        return resetPasswordClickObserver;
+    }
+
+    @Nonnull
+    public Observable<ResponseBody> successResetPassword() {
+        return resetPasswordSuccess;
+    }
+
+    @Nonnull
+    public Observable<Object> resetPasswordEmptyEmail() {
+        return resetPasswordEmptyEmail;
+    }
+
+    public Observable<Boolean> getProgressObservable() {
+        return progressObservable;
     }
 }

@@ -52,7 +52,7 @@ android {
     buildToolsVersion "23.0.2"
 
     defaultConfig {
-        applicationId "com.shoutit.android.app"
+        applicationId "com.shoutit.app.android"
         minSdkVersion 16
         targetSdkVersion 23
         versionCode project.ext.versionCode

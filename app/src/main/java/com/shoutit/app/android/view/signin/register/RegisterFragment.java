@@ -5,6 +5,12 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.text.SpannableString;
+import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.UnderlineSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,12 +25,14 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
+import com.shoutit.app.android.data.AssetsConstants;
 import com.shoutit.app.android.utils.Actions1;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.signin.LoginActivityComponent;
 import com.shoutit.app.android.view.signin.login.LoginFragment;
+import com.shoutit.app.android.view.webview.HtmlAssetViewerActivity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -47,8 +55,11 @@ public class RegisterFragment extends BaseFragment {
     @Bind(R.id.register_proceed_btn)
     Button proceedBtn;
 
-    @Bind(R.id.register_sign_up_text)
-    TextView signUpTextview;
+    @Bind(R.id.register_login_up_text)
+    View signUpTextview;
+
+    @Bind(R.id.register_bottom_text)
+    TextView bottomTextView;
 
     @Inject
     RegisterPresenter registerPresenter;
@@ -67,6 +78,8 @@ public class RegisterFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        setUpSpans();
 
         signUpTextview.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,7 +109,7 @@ public class RegisterFragment extends BaseFragment {
 
         registerPresenter.failObservable()
                 .compose(this.<Throwable>bindToLifecycle())
-                .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(getActivity()), R.string.register_error));
+                .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(getActivity())));
 
         registerPresenter.successObservable()
                 .compose(this.<SignResponse>bindToLifecycle())
@@ -127,7 +140,45 @@ public class RegisterFragment extends BaseFragment {
         RxView.clicks(proceedBtn)
                 .compose(this.<Void>bindToLifecycle())
                 .subscribe(registerPresenter.getProceedObserver());
+
     }
+
+    private void setUpSpans() {
+        final String bottomText1 = getString(R.string.register_bottom_text1);
+        final String textTermsOfService = getString(R.string.register_bottom_text2);
+        final String bottomText3 = getString(R.string.register_bottom_text3);
+        final String textPrivacyPolicy = getString(R.string.register_bottom_text4);
+
+        final SpannableString spannableTermsOfService = new SpannableString(textTermsOfService);
+        spannableTermsOfService.setSpan(new ForegroundColorSpan(
+                getResources().getColor(R.color.register_underline)), 0, textTermsOfService.length(), 0);
+        spannableTermsOfService.setSpan(new UnderlineSpan(), 0, textTermsOfService.length(), 0);
+        spannableTermsOfService.setSpan(new ClickableSpan() {
+            @Override
+            public void onClick(View widget) {
+                startActivity(HtmlAssetViewerActivity.newIntent(
+                        getActivity(), AssetsConstants.ASSET_TERMS_OF_SERVICE,
+                        getString(R.string.html_activity_terms)));
+            }
+        }, 0, textTermsOfService.length(), 0);
+
+        final SpannableString spannablePrivacy = new SpannableString(textPrivacyPolicy);
+        spannablePrivacy.setSpan(new UnderlineSpan(), 0, textPrivacyPolicy.length(), 0);
+        spannablePrivacy.setSpan(new ForegroundColorSpan(
+                getResources().getColor(R.color.register_underline)), 0, textPrivacyPolicy.length(), 0);
+        spannablePrivacy.setSpan(new ClickableSpan() {
+            @Override
+            public void onClick(View widget) {
+                startActivity(HtmlAssetViewerActivity.newIntent(
+                        getActivity(), AssetsConstants.ASSET_PRIVACY_POLICY,
+                        getString(R.string.html_activity_privacy)));
+            }
+        }, 0, textPrivacyPolicy.length(), 0);
+
+        bottomTextView.setMovementMethod(LinkMovementMethod.getInstance());
+        bottomTextView.setText(TextUtils.concat(bottomText1, " ", spannableTermsOfService, " ", bottomText3, " ", spannablePrivacy));
+    }
+
 
     @Override
     protected void injectComponent(@Nonnull BaseActivityComponent baseActivityComponent, @Nonnull FragmentModule fragmentModule, @Nullable Bundle savedInstanceState) {

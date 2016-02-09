@@ -1,11 +1,10 @@
 package com.shoutit.app.android.api;
 
-import android.support.annotation.NonNull;
-
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
+import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.User;
@@ -15,6 +14,7 @@ import com.shoutit.app.android.api.model.login.GoogleLogin;
 
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
@@ -50,6 +50,9 @@ public interface ApiService {
 
     @POST("oauth2/access_token")
     Observable<SignResponse> facebookLogin(@Body FacebookLogin request);
+
+    @POST("auth/reset_password")
+    Observable<ResponseBody> resetPassword(@Body ResetPasswordRequest request);
 
     @POST("oauth2/access_token")
     Observable<SignResponse> googleLogin(@Body GoogleLogin request);

@@ -6,6 +6,7 @@ import android.support.design.widget.Snackbar;
 import android.view.View;
 
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.ErrorHandler;
 
 import javax.annotation.Nonnull;
 
@@ -62,7 +63,17 @@ public class ColoredSnackBar {
         return new Action1<Object>() {
             @Override
             public void call(Object o) {
-                ColoredSnackBar.error(contentView, resId, Snackbar.LENGTH_SHORT).show();
+                ColoredSnackBar.error(contentView, resId, Snackbar.LENGTH_LONG).show();
+            }
+        };
+    }
+
+    @NonNull
+    public static Action1<Throwable> errorSnackBarAction(final View contentView) {
+        return new Action1<Throwable>() {
+            @Override
+            public void call(Throwable throwable) {
+                ColoredSnackBar.error(contentView, ErrorHandler.getErrorMessageId(throwable), Snackbar.LENGTH_LONG).show();
             }
         };
     }
@@ -72,7 +83,7 @@ public class ColoredSnackBar {
         return new Action1<Object>() {
             @Override
             public void call(Object o) {
-                ColoredSnackBar.success(contentView, resId, Snackbar.LENGTH_SHORT).show();
+                ColoredSnackBar.success(contentView, resId, Snackbar.LENGTH_LONG).show();
             }
         };
     }

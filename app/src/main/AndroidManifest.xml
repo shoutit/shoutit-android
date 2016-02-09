@@ -1,11 +1,10 @@
-<manifest
-    package="com.shoutit.app.android"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.shoutit.app.android">
 
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".App"
@@ -15,13 +14,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".view.main.MainActivity">
-
+        <activity android:name=".view.main.MainActivity"
+            android:theme="@style/AppTheme.WithDrawer">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
 
         <activity
@@ -29,38 +27,37 @@
             android:theme="@style/TranslucentStatusBar"/>
 
         <activity
-            android:name="com.facebook.FacebookActivity"
-            android:configChanges=
-                "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-            android:label="@string/app_name"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
-
-        <activity
             android:name=".view.signin.LoginActivity"
             android:theme="@style/TranslucentStatusBar"/>
 
-        <activity android:name=".view.loginintro.LoginIntroActivity"/>
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
-        <activity android:name=".view.webview.HtmlAssetViewerActivity"/>
+        <activity android:name=".view.loginintro.LoginIntroActivity" />
 
-        <activity android:name=".view.about.AboutActivity"/>
+        <activity android:name=".view.webview.HtmlAssetViewerActivity" />
+
+        <activity android:name=".view.about.AboutActivity" />
 
         <activity android:name=".view.postlogininterest.PostLoginInterestActivity"/>
 
         <!-- Facebook -->
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_app_id"/>
+            android:value="@string/facebook_app_id" />
 
         <!-- Crashlytics -->
         <meta-data
             android:name="com.crashlytics.ApiKey"
-            android:value="b058b2dcbf8b8f864860fe9fe12789317aba9da1"/>
+            android:value="b058b2dcbf8b8f864860fe9fe12789317aba9da1" />
 
         <!-- Fabric -->
         <meta-data
             android:name="io.fabric.ApiKey"
-            android:value="b058b2dcbf8b8f864860fe9fe12789317aba9da1"/>
+            android:value="b058b2dcbf8b8f864860fe9fe12789317aba9da1" />
 
     </application>
 </manifest>

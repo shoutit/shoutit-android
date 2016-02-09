@@ -73,7 +73,7 @@ public class LoginIntroActivity extends BaseActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_login_intro);
         ButterKnife.bind(this);
 
         initFacebook();
@@ -95,9 +95,9 @@ public class LoginIntroActivity extends BaseActivity {
     }
 
     private void setUpActionBar() {
-        setSupportActionBar(toolbar);
-        toolbar.setTitle(null);
         toolbar.setNavigationIcon(R.drawable.ic_blue_arrow);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle(null);
     }
 
     @Override
