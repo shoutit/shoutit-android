@@ -3,9 +3,11 @@ package com.shoutit.app.android.api;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
+import com.shoutit.app.android.api.model.Location;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.SignResponse;
+import com.shoutit.app.android.api.model.UpdateLocationRequest;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.login.EmailLoginRequest;
 import com.shoutit.app.android.api.model.login.FacebookLogin;
@@ -15,6 +17,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Response;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
@@ -60,4 +63,13 @@ public interface ApiService {
 
     @GET("users/me")
     Observable<User> getMyUser();
+
+    @PATCH("users/me")
+    Observable<User> updateUserLocation(@Body UpdateLocationRequest updateLocationRequest);
+
+    @GET("misc/geocode")
+    Observable<Location> geocode(@Query("latlng") String latlng); // format like latlng=40.722100,-74.046900
+
+    @GET("misc/geocode?latlng=0,0")
+    Observable<Location> geocodeDefault();
 }

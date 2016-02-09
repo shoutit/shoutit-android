@@ -1,7 +1,6 @@
 package com.shoutit.app.android.view.signin.register;
 
 import android.content.Context;
-import android.location.Location;
 import android.support.annotation.NonNull;
 
 import com.appunite.rx.ObservableExtensions;
@@ -12,12 +11,15 @@ import com.appunite.rx.functions.Functions1;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
+import com.shoutit.app.android.api.model.Location;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.login.LoginUser;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.view.signin.CoarseLocationObservableProvider;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import rx.Observable;
@@ -49,9 +51,10 @@ public class RegisterPresenter {
                              @NonNull CoarseLocationObservableProvider coarseLocationObservableProvider,
                              @NonNull final UserPreferences userPreferences,
                              @NonNull @NetworkScheduler final Scheduler networkScheduler,
-                             @NonNull @UiScheduler final Scheduler uiScheduler) {
-        mLocationObservable = coarseLocationObservableProvider
-                .get(context)
+                             @NonNull @UiScheduler final Scheduler uiScheduler,
+                             @Nonnull LocationManager locationManager) {
+        mLocationObservable = locationManager
+                .updateUserLocationObservable()
                 .startWith((Location) null)
                 .compose(ObservableExtensions.<Location>behaviorRefCount());
 

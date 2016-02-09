@@ -9,7 +9,9 @@ import android.support.annotation.Nullable;
 import com.appunite.rx.functions.Functions1;
 import com.appunite.rx.operators.MoreOperators;
 import com.google.common.base.Optional;
+import com.google.common.base.Strings;
 import com.google.gson.Gson;
+import com.shoutit.app.android.api.model.Location;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForApplication;
 
@@ -26,9 +28,12 @@ public class UserPreferences {
     private static final String AUTH_TOKEN = "token";
     private static final String REFRESH_TOKEN = "refresh_token";
     private static final String KEY_USER = "user";
+    private static final String KEY_LOCATION = "location";
     private static final String IS_GUEST = "is_guest";
+    private static final String KEY_LOCATION_TRACKING = "location_tracking";
 
     private final PublishSubject<Object> userRefreshSubject = PublishSubject.create();
+    private PublishSubject<Object> locationRefreshSubject = PublishSubject.create();
 
     @SuppressLint("CommitPrefEdits")
     private final SharedPreferences mPreferences;
@@ -99,15 +104,48 @@ public class UserPreferences {
         userRefreshSubject.onNext(null);
     }
 
-    // TODO
     @Nullable
     public String getUserCountryCode() {
-        return "GE";
+        final Location location = getLocation();
+        return location != null ? location.getCountry() : null;
     }
 
-    // TODO
     @Nullable
     public String getUserCity() {
-        return "Dubaj";
+        final Location location = getLocation();
+        return location != null ? location.getCity() : null;
+    }
+
+    @Nullable
+    public Location getLocation() {
+        final String locationJson = mPreferences.getString(KEY_LOCATION, null);
+        return gson.fromJson(locationJson, Location.class);
+    }
+
+    public Observable<Location> getLocationObservable() {
+        return Observable
+                .fromCallable(new Callable<Location>() {
+                    @Override
+                    public Location call() throws Exception {
+                        return getLocation();
+                    }
+                })
+                .filter(Functions1.isNotNull())
+                .compose(MoreOperators.<Location>refresh(locationRefreshSubject));
+    }
+
+    public void saveLocation(Location location) {
+        mPreferences.edit()
+                .putString(KEY_LOCATION, gson.toJson(location))
+                .commit();
+        refreshLocation();
+    }
+
+    private void refreshLocation() {
+        locationRefreshSubject.onNext(null);
+    }
+
+    public boolean automaticLocationTrackingEnabled() {
+        return mPreferences.getBoolean(KEY_LOCATION_TRACKING, true);
     }
 }

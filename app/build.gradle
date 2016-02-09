@@ -217,4 +217,8 @@ dependencies {
     testCompile 'org.mockito:mockito-core:1.10.19'
     testApt 'com.google.dagger:dagger-compiler:2.0.1'
     testCompile 'com.google.truth:truth:0.26'
+    testCompile 'org.powermock:powermock-api-mockito:1.6.4'
+    testCompile 'org.powermock:powermock-module-junit4-rule-agent:1.6.4'
+    testCompile 'org.powermock:powermock-module-junit4-rule:1.6.4'
+    testCompile 'org.powermock:powermock-module-junit4:1.6.4'
 }

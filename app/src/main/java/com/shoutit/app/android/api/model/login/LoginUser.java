@@ -1,7 +1,8 @@
 package com.shoutit.app.android.api.model.login;
 
-import android.location.Location;
 import android.support.annotation.Nullable;
+
+import com.shoutit.app.android.api.model.Location;
 
 public class LoginUser {
 

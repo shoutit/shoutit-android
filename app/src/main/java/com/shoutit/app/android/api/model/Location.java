@@ -1,8 +1,8 @@
 package com.shoutit.app.android.api.model;
 
 public class Location {
-    private final float latitude;
-    private final float longitude;
+    private final double latitude;
+    private final double longitude;
     private final String country;
     private final String postalCode;
     private final String state;
@@ -10,7 +10,7 @@ public class Location {
     private final String address;
     private final String googleGeocodeResponse;
 
-    public Location(float latitude, float longitude, String country, String postalCode,
+    public Location(double latitude, double longitude, String country, String postalCode,
                     String state, String city, String address, String googleGeocodeResponse) {
         this.latitude = latitude;
         this.longitude = longitude;
@@ -22,11 +22,11 @@ public class Location {
         this.googleGeocodeResponse = googleGeocodeResponse;
     }
 
-    public float getLatitude() {
+    public double getLatitude() {
         return latitude;
     }
 
-    public float getLongitude() {
+    public double getLongitude() {
         return longitude;
     }
 

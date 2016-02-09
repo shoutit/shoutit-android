@@ -1,7 +1,6 @@
 package com.shoutit.app.android.view.signin.login;
 
 import android.content.Context;
-import android.location.Location;
 import android.support.annotation.NonNull;
 
 import com.appunite.rx.ObservableExtensions;
@@ -9,16 +8,16 @@ import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
-import com.appunite.rx.operators.MoreOperators;
-import com.google.android.gms.location.LocationRequest;
 import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.Location;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.login.EmailLoginRequest;
 import com.shoutit.app.android.api.model.login.LoginUser;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.view.signin.CoarseLocationObservableProvider;
 
@@ -26,7 +25,6 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import okhttp3.ResponseBody;
-import retrofit2.Response;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
@@ -59,9 +57,10 @@ public class LoginPresenter {
                           @NonNull CoarseLocationObservableProvider coarseLocationObservableProvider,
                           @NonNull final UserPreferences userPreferences,
                           @NonNull @NetworkScheduler final Scheduler networkScheduler,
-                          @NonNull @UiScheduler final Scheduler uiScheduler) {
-        mLocationObservable = coarseLocationObservableProvider
-                .get(context)
+                          @NonNull @UiScheduler final Scheduler uiScheduler,
+                          @Nonnull LocationManager locationManager) {
+
+        mLocationObservable = locationManager.updateUserLocationObservable()
                 .startWith((Location) null)
                 .compose(ObservableExtensions.<Location>behaviorRefCount());
 

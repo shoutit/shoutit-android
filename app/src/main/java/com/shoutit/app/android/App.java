@@ -13,6 +13,7 @@ import com.shoutit.app.android.dagger.AppComponent;
 import com.shoutit.app.android.dagger.AppModule;
 import com.shoutit.app.android.dagger.BaseModule;
 import com.shoutit.app.android.dagger.DaggerAppComponent;
+import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.utils.LogHelper;
 import com.uservoice.uservoicesdk.Config;
 import com.uservoice.uservoicesdk.UserVoice;
@@ -37,6 +38,8 @@ public class App extends MultiDexApplication {
     Scheduler networkScheduler;
     @Inject
     UserPreferences userPreferences;
+    @Inject
+    LocationManager locationManager;
 
     @Override
     public void onCreate() {
@@ -50,6 +53,7 @@ public class App extends MultiDexApplication {
         setupGraph();
 
         fetchUser();
+        updateLocationIfNeeded();
     }
 
     private void initUserVoice() {
@@ -111,5 +115,10 @@ public class App extends MultiDexApplication {
                         LogHelper.logThrowable(TAG, "Cannot fetch user", throwable);
                     }
                 });
+    }
+
+    private void updateLocationIfNeeded() {
+        locationManager.updateUserLocationObservable()
+                .subscribe();
     }
 }

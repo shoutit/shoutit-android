@@ -3,7 +3,6 @@ package com.shoutit.app.android.view.loginintro;
 import android.accounts.AccountManager;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -22,12 +21,14 @@ import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.Location;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.login.FacebookLogin;
 import com.shoutit.app.android.api.model.login.GoogleLogin;
 import com.shoutit.app.android.api.model.login.LoginUser;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.view.about.AboutActivity;
 import com.shoutit.app.android.view.main.MainActivity;
@@ -61,6 +62,8 @@ public class LoginIntroActivity extends BaseActivity {
     ApiService mApiService;
     @Inject
     UserPreferences mUserPreferences;
+    @Inject
+    LocationManager locationManager;
 
     private CallbackManager mCallbackManager;
     private Observable<Location> mObservable;
@@ -80,8 +83,9 @@ public class LoginIntroActivity extends BaseActivity {
 
         setUpActionBar();
 
-        mObservable = mCoarseLocationObservable
-                .get(this)
+        mObservable = locationManager
+                .updateUserLocationObservable()
+                .compose(this.<Location>bindToLifecycle())
                 .startWith((Location) null)
                 .compose(ObservableExtensions.<Location>behaviorRefCount());
 

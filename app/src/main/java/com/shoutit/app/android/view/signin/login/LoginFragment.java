@@ -1,6 +1,5 @@
 package com.shoutit.app.android.view.signin.login;
 
-import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -17,6 +16,7 @@ import com.jakewharton.rxbinding.widget.RxTextView;
 import com.jakewharton.rxbinding.widget.TextViewTextChangeEvent;
 import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.Location;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
