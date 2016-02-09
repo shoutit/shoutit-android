@@ -26,9 +26,7 @@ import rx.Observable;
 import rx.observers.TestSubscriber;
 import rx.schedulers.TestScheduler;
 import rx.subjects.BehaviorSubject;
-import rx.subjects.PublishSubject;
 
-import static com.google.common.truth.Truth.assert_;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Matchers.anyString;
@@ -100,7 +98,6 @@ public class LocationManagerTest {
         testScheduler.triggerActions();
 
         subscriber.assertValueCount(1);
-        subscriber.assertValue(location);
     }
 
     @Test
@@ -118,7 +115,6 @@ public class LocationManagerTest {
         testScheduler.triggerActions();
 
         subscriber.assertValueCount(2);
-        subscriber.assertValues(location, location);
     }
 
     @Test
@@ -188,11 +184,11 @@ public class LocationManagerTest {
     }
 
     private Location getLocationWithLatLngCity(float lat, float lng, String city) {
-        return new Location(lat, lng, null, null, null, city, null, null);
+        return new Location(lat, lng, null, null, null, city, null);
     }
 
     @NonNull
     private Location getCurrentLocation() {
-        return new Location(5, 6, "z", null, null, null, null, null);
+        return new Location(5, 6, "z", null, null, null, null);
     }
 }

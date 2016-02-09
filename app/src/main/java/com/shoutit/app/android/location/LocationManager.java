@@ -68,23 +68,20 @@ public class LocationManager implements GoogleApiClient.ConnectionCallbacks {
 
         googleApiClient.registerConnectionCallbacks(this);
 
-        final Observable<Location> locationFromCoordinates = lastGoogleLocationSubject
-                .filter(Functions1.isNotNull())
-                .filter(coordinatesChangedFilter())
-                .switchMap(new Func1<android.location.Location, Observable<Location>>() {
-                    @Override
-                    public Observable<Location> call(android.location.Location location) {
-                        return apiService.geocode(location.getLatitude() + "," + location.getLongitude())
-                                .subscribeOn(networkScheduler)
-                                .compose(ResponseOrError.<Location>toResponseOrErrorObservable())
-                                .compose(ResponseOrError.<Location>onlySuccess());
-                    }
-                });
-
-        final Observable<Location> locationFromIP = apiService.geocodeDefault()
+        final Observable<Location> locationFromIPObservable = apiService.geocodeDefault()
                 .subscribeOn(networkScheduler)
                 .compose(ResponseOrError.<Location>toResponseOrErrorObservable())
                 .compose(ResponseOrError.<Location>onlySuccess());
+
+        final Observable<Location> locationFromGpsObservable = lastGoogleLocationSubject
+                .filter(Functions1.isNotNull())
+                .filter(coordinatesChangedFilter())
+                .map(new Func1<android.location.Location, Location>() {
+                    @Override
+                    public Location call(android.location.Location location) {
+                        return Location.withCoordinates(location.getLatitude(), location.getLongitude());
+                    }
+                });
 
         final PublishSubject<Location> locationChangedSubject = PublishSubject.create();
         updateLocationObservable = Observable
@@ -93,9 +90,11 @@ public class LocationManager implements GoogleApiClient.ConnectionCallbacks {
                     public Observable<Location> call() {
                         if (userPreferences.automaticLocationTrackingEnabled() && hasLocationPermissions(context)) {
                             googleApiClient.connect();
-                            return locationFromCoordinates;
+                            return locationFromGpsObservable;
+                        } else if (!userPreferences.automaticLocationTrackingEnabled()){
+                            return locationFromIPObservable;
                         } else {
-                            return locationFromIP;
+                            return Observable.never();
                         }
                     }
                 })

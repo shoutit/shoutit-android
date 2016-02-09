@@ -8,10 +8,9 @@ public class Location {
     private final String state;
     private final String city;
     private final String address;
-    private final String googleGeocodeResponse;
 
     public Location(double latitude, double longitude, String country, String postalCode,
-                    String state, String city, String address, String googleGeocodeResponse) {
+                    String state, String city, String address) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.country = country;
@@ -19,7 +18,10 @@ public class Location {
         this.state = state;
         this.city = city;
         this.address = address;
-        this.googleGeocodeResponse = googleGeocodeResponse;
+    }
+
+    public static Location withCoordinates(double lat, double lng) {
+        return new Location(lat, lng, null, null, null, null, null);
     }
 
     public double getLatitude() {
@@ -50,7 +52,4 @@ public class Location {
         return address;
     }
 
-    public String getGoogleGeocodeResponse() {
-        return googleGeocodeResponse;
-    }
 }
