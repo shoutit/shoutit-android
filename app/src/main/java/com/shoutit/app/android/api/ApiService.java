@@ -54,7 +54,7 @@ public interface ApiService {
     @POST("oauth2/access_token")
     Observable<SignResponse> googleLogin(@Body GoogleLogin request);
 
-    @POST("/tags/{main_tag}/listen")
+    @POST("tags/{main_tag}/listen")
     Observable<Object> postCategoryListen(@Path("main_tag") String tagSlug);
 
     @GET("users/{user_name}")
