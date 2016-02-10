@@ -72,7 +72,7 @@ public class LoginPresenter {
                         return location;
                     }
                 })
-                .flatMap(new Func1<Location, Observable<EmailLoginRequest>>() {
+                .switchMap(new Func1<Location, Observable<EmailLoginRequest>>() {
                     @Override
                     public Observable<EmailLoginRequest> call(final Location location) {
                         return Observable

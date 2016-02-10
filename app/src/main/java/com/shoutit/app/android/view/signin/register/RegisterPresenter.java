@@ -65,7 +65,7 @@ public class RegisterPresenter {
                         return location;
                     }
                 })
-                .flatMap(new Func1<Location, Observable<EmailSignupRequest>>() {
+                .switchMap(new Func1<Location, Observable<EmailSignupRequest>>() {
                     @Override
                     public Observable<EmailSignupRequest> call(final Location location) {
                         return Observable.zip(

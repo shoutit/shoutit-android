@@ -35,6 +35,8 @@ import com.shoutit.app.android.view.signin.LoginActivityComponent;
 import com.shoutit.app.android.view.signin.login.LoginFragment;
 import com.shoutit.app.android.view.webview.HtmlAssetViewerActivity;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -145,16 +147,19 @@ public class RegisterFragment extends BaseFragment {
                 });
 
         RxTextView.textChangeEvents(emailEdittext)
+                .debounce(500, TimeUnit.MILLISECONDS) // TODO temp fix
                 .map(MoreFunctions1.mapTextChangeEventToString())
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(registerPresenter.getEmailObserver());
 
         RxTextView.textChangeEvents(nameEditText)
+                .debounce(500, TimeUnit.MILLISECONDS) // TODO temp fix
                 .map(MoreFunctions1.mapTextChangeEventToString())
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(registerPresenter.getNameObserver());
 
         RxTextView.textChangeEvents(passwordEdittext)
+                .debounce(500, TimeUnit.MILLISECONDS) // TODO temp fix
                 .map(MoreFunctions1.mapTextChangeEventToString())
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(registerPresenter.getPasswordObserver());
