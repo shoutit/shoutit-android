@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
-import com.shoutit.app.android.api.model.Location;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.User;
@@ -64,7 +64,7 @@ public class LoginPresenterTest {
         when(mApiService.login(any(EmailLoginRequest.class))).thenReturn(mResponseSubject);
         when(mApiService.resetPassword(any(ResetPasswordRequest.class))).thenReturn(
                 Observable.just((ResponseBody) new RealResponseBody(new Headers.Builder().build(), null)));
-        when(locationManager.updateUserLocationObservable()).thenReturn(Observable.just((Location) null));
+        when(locationManager.updateUserLocationObservable()).thenReturn(Observable.just((UserLocation) null));
 
         mLoginPresenter = new LoginPresenter(mApiService, mContext, coarseLocationProvider,
                 mUserPreferences, Schedulers.immediate(), Schedulers.immediate(), locationManager);

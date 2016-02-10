@@ -11,7 +11,7 @@ import com.appunite.rx.functions.Functions1;
 import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
-import com.shoutit.app.android.api.model.Location;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.login.EmailLoginRequest;
@@ -46,7 +46,7 @@ public class LoginPresenter {
 
     private final Observable<String> mPasswordEmpty;
     private final Observable<String> mEmailEmpty;
-    private final Observable<Location> mLocationObservable;
+    private final Observable<UserLocation> mLocationObservable;
     private final Observable<ResponseBody> resetPasswordSuccess;
     private final Observable<Object> resetPasswordEmptyEmail;
     private final Observable<Boolean> progressObservable;
@@ -61,20 +61,20 @@ public class LoginPresenter {
                           @Nonnull LocationManager locationManager) {
 
         mLocationObservable = locationManager.updateUserLocationObservable()
-                .startWith((Location) null)
-                .compose(ObservableExtensions.<Location>behaviorRefCount());
+                .startWith((UserLocation) null)
+                .compose(ObservableExtensions.<UserLocation>behaviorRefCount());
 
         // Login
         final Observable<ResponseOrError<SignResponse>> loginRequestObservable = mProceedSubject
-                .withLatestFrom(mLocationObservable, new Func2<Object, Location, Location>() {
+                .withLatestFrom(mLocationObservable, new Func2<Object, UserLocation, UserLocation>() {
                     @Override
-                    public Location call(Object o, Location location) {
+                    public UserLocation call(Object o, UserLocation location) {
                         return location;
                     }
                 })
-                .flatMap(new Func1<Location, Observable<EmailLoginRequest>>() {
+                .flatMap(new Func1<UserLocation, Observable<EmailLoginRequest>>() {
                     @Override
-                    public Observable<EmailLoginRequest> call(final Location location) {
+                    public Observable<EmailLoginRequest> call(final UserLocation location) {
                         return Observable.zip(mEmailSubject.filter(getNotEmptyFunc1()), mPasswordSubject.filter(getNotEmptyFunc1()), new Func2<String, String, EmailLoginRequest>() {
                             @Override
                             public EmailLoginRequest call(String email, String password) {
@@ -207,7 +207,7 @@ public class LoginPresenter {
     }
 
     @NonNull
-    public Observable<Location> getLocationObservable() {
+    public Observable<UserLocation> getLocationObservable() {
         return mLocationObservable;
     }
 

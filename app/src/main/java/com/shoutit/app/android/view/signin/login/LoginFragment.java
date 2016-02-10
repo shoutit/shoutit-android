@@ -16,7 +16,7 @@ import com.jakewharton.rxbinding.widget.RxTextView;
 import com.jakewharton.rxbinding.widget.TextViewTextChangeEvent;
 import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
-import com.shoutit.app.android.api.model.Location;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
@@ -32,7 +32,6 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import okhttp3.ResponseBody;
-import retrofit2.Response;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
@@ -84,7 +83,7 @@ public class LoginFragment extends BaseFragment {
         });
 
         loginPresenter.getLocationObservable()
-                .compose(this.<Location>bindToLifecycle())
+                .compose(this.<UserLocation>bindToLifecycle())
                 .subscribe();
 
         loginPresenter.getEmailEmpty()

@@ -9,9 +9,8 @@ import android.support.annotation.Nullable;
 import com.appunite.rx.functions.Functions1;
 import com.appunite.rx.operators.MoreOperators;
 import com.google.common.base.Optional;
-import com.google.common.base.Strings;
 import com.google.gson.Gson;
-import com.shoutit.app.android.api.model.Location;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForApplication;
 
@@ -106,35 +105,35 @@ public class UserPreferences {
 
     @Nullable
     public String getUserCountryCode() {
-        final Location location = getLocation();
+        final UserLocation location = getLocation();
         return location != null ? location.getCountry() : null;
     }
 
     @Nullable
     public String getUserCity() {
-        final Location location = getLocation();
+        final UserLocation location = getLocation();
         return location != null ? location.getCity() : null;
     }
 
     @Nullable
-    public Location getLocation() {
+    public UserLocation getLocation() {
         final String locationJson = mPreferences.getString(KEY_LOCATION, null);
-        return gson.fromJson(locationJson, Location.class);
+        return gson.fromJson(locationJson, UserLocation.class);
     }
 
-    public Observable<Location> getLocationObservable() {
+    public Observable<UserLocation> getLocationObservable() {
         return Observable
-                .fromCallable(new Callable<Location>() {
+                .fromCallable(new Callable<UserLocation>() {
                     @Override
-                    public Location call() throws Exception {
+                    public UserLocation call() throws Exception {
                         return getLocation();
                     }
                 })
                 .filter(Functions1.isNotNull())
-                .compose(MoreOperators.<Location>refresh(locationRefreshSubject));
+                .compose(MoreOperators.<UserLocation>refresh(locationRefreshSubject));
     }
 
-    public void saveLocation(@Nullable Location location) {
+    public void saveLocation(@Nullable UserLocation location) {
         if (location == null) {
             return;
         }

@@ -43,6 +43,8 @@
 
         <activity android:name=".view.about.AboutActivity"/>
 
+        <activity android:name=".view.location.LocationActivity"/>
+
         <!-- Facebook -->
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
@@ -57,6 +59,11 @@
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="b058b2dcbf8b8f864860fe9fe12789317aba9da1"/>
+
+        <!-- Maps, Places -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_api_key" />
 
     </application>
 </manifest>

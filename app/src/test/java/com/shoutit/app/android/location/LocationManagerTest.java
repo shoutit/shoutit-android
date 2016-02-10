@@ -7,7 +7,7 @@ import android.support.v4.content.ContextCompat;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
-import com.shoutit.app.android.api.model.Location;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.UpdateLocationRequest;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.utils.LocationUtils;
@@ -52,8 +52,8 @@ public class LocationManagerTest {
     @Mock
     android.location.Location gpsLocation;
 
-    private BehaviorSubject<Location> locationFromGpsSubject = BehaviorSubject.create();
-    private BehaviorSubject<Location> locationFromIPSubject = BehaviorSubject.create();
+    private BehaviorSubject<UserLocation> locationFromGpsSubject = BehaviorSubject.create();
+    private BehaviorSubject<UserLocation> locationFromIPSubject = BehaviorSubject.create();
 
     private TestScheduler testScheduler = new TestScheduler();
     private LocationManager locationManager;
@@ -86,9 +86,9 @@ public class LocationManagerTest {
 
     @Test
     public void testWhenSubscribed_locationFromGpsFetched() throws Exception {
-        final TestSubscriber<Location> subscriber = new TestSubscriber<>();
+        final TestSubscriber<UserLocation> subscriber = new TestSubscriber<>();
         when(userPreferences.automaticLocationTrackingEnabled()).thenReturn(true);
-        final Location location = getLocationWithLatLngCity(1, 2, "city");
+        final UserLocation location = getLocationWithLatLngCity(1, 2, "city");
 
         locationManager.updateUserLocationObservable().subscribe(subscriber);
 
@@ -102,9 +102,9 @@ public class LocationManagerTest {
 
     @Test
     public void testWhenRefreshedSubject_locationFromGpsFetchedAgain() throws Exception {
-        final TestSubscriber<Location> subscriber = new TestSubscriber<>();
+        final TestSubscriber<UserLocation> subscriber = new TestSubscriber<>();
         when(userPreferences.automaticLocationTrackingEnabled()).thenReturn(true);
-        final Location location = getLocationWithLatLngCity(1, 2, "city");
+        final UserLocation location = getLocationWithLatLngCity(1, 2, "city");
 
         locationManager.updateUserLocationObservable().subscribe(subscriber);
 
@@ -120,10 +120,10 @@ public class LocationManagerTest {
 
     @Test
     public void testWhenSubscribed_locationFromIPFetched() throws Exception {
-        final TestSubscriber<Location> subscriber = new TestSubscriber<>();
+        final TestSubscriber<UserLocation> subscriber = new TestSubscriber<>();
         when(userPreferences.automaticLocationTrackingEnabled()).thenReturn(true);
         when(PermissionHelper.hasPermission(any(Context.class), anyString())).thenReturn(false);
-        final Location location = getLocationWithLatLngCity(1, 2, "city");
+        final UserLocation location = getLocationWithLatLngCity(1, 2, "city");
 
         locationManager.updateUserLocationObservable().subscribe(subscriber);
 
@@ -136,10 +136,10 @@ public class LocationManagerTest {
 
     @Test
     public void testWhenRefreshedSubject_locationFromIpFetchedAgain() throws Exception {
-        final TestSubscriber<Location> subscriber = new TestSubscriber<>();
+        final TestSubscriber<UserLocation> subscriber = new TestSubscriber<>();
         when(userPreferences.automaticLocationTrackingEnabled()).thenReturn(true);
         when(PermissionHelper.hasPermission(any(Context.class), anyString())).thenReturn(false);
-        final Location location = getLocationWithLatLngCity(1, 2, "city");
+        final UserLocation location = getLocationWithLatLngCity(1, 2, "city");
 
         locationManager.updateUserLocationObservable().subscribe(subscriber);
 
@@ -154,11 +154,11 @@ public class LocationManagerTest {
 
     @Test
     public void testWhenLocationChangedAndUserLoggedIn_userUpdated() throws Exception {
-        final TestSubscriber<Location> subscriber = new TestSubscriber<>();
+        final TestSubscriber<UserLocation> subscriber = new TestSubscriber<>();
         when(userPreferences.automaticLocationTrackingEnabled()).thenReturn(true);
         when(userPreferences.isUserLoggedIn()).thenReturn(true);
         when(PermissionHelper.hasPermission(any(Context.class), anyString())).thenReturn(false);
-        final Location location = getLocationWithLatLngCity(1, 2, "city");
+        final UserLocation location = getLocationWithLatLngCity(1, 2, "city");
 
         locationManager.updateUserLocationObservable().subscribe(subscriber);
 
@@ -172,11 +172,11 @@ public class LocationManagerTest {
 
     @Test
     public void testWhenLocationChangedAndUserNotLoggedIn_userNotUpdated() throws Exception {
-        final TestSubscriber<Location> subscriber = new TestSubscriber<>();
+        final TestSubscriber<UserLocation> subscriber = new TestSubscriber<>();
         when(userPreferences.automaticLocationTrackingEnabled()).thenReturn(true);
         when(userPreferences.isUserLoggedIn()).thenReturn(false);
         when(PermissionHelper.hasPermission(any(Context.class), anyString())).thenReturn(false);
-        final Location location = getLocationWithLatLngCity(1, 2, "city");
+        final UserLocation location = getLocationWithLatLngCity(1, 2, "city");
 
         locationManager.updateUserLocationObservable().subscribe(subscriber);
 
@@ -188,12 +188,12 @@ public class LocationManagerTest {
         verify(userPreferences, times(0)).saveUserAsJson(any(User.class));
     }
 
-    private Location getLocationWithLatLngCity(float lat, float lng, String city) {
-        return new Location(lat, lng, null, null, null, city, null);
+    private UserLocation getLocationWithLatLngCity(float lat, float lng, String city) {
+        return new UserLocation(lat, lng, null, null, null, city, null);
     }
 
     @NonNull
-    private Location getCurrentLocation() {
-        return new Location(5, 6, "z", null, null, null, null);
+    private UserLocation getCurrentLocation() {
+        return new UserLocation(5, 6, "z", null, null, null, null);
     }
 }

@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.functions.Functions1;
@@ -17,7 +16,7 @@ import com.google.common.base.Strings;
 import com.shoutit.app.android.BuildConfig;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
-import com.shoutit.app.android.api.model.Location;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.UpdateLocationRequest;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForApplication;
@@ -45,8 +44,10 @@ public class LocationManager implements GoogleApiClient.ConnectionCallbacks {
     @Nonnull
     private final PublishSubject<Object> refreshGetLocationSubject = PublishSubject.create();
     @Nonnull
-    private final Observable<Location> updateLocationObservable;
+    private final Observable<UserLocation> updateLocationObservable;
 
+    @Nonnull
+    private final Context context;
     @Nonnull
     private final UserPreferences userPreferences;
     @Nonnull
@@ -56,11 +57,12 @@ public class LocationManager implements GoogleApiClient.ConnectionCallbacks {
     @Nonnull
     private final Scheduler networkScheduler;
 
-    public LocationManager(@ForApplication final Context context,
+    public LocationManager(@ForApplication @Nonnull final Context context,
                            @Nonnull final UserPreferences userPreferences,
                            @Nonnull final GoogleApiClient googleApiClient,
                            @Nonnull final ApiService apiService,
                            @Nonnull @NetworkScheduler final Scheduler networkScheduler) {
+        this.context = context;
         this.userPreferences = userPreferences;
         this.googleApiClient = googleApiClient;
         this.apiService = apiService;
@@ -68,29 +70,29 @@ public class LocationManager implements GoogleApiClient.ConnectionCallbacks {
 
         googleApiClient.registerConnectionCallbacks(this);
 
-        final Observable<Location> locationFromCoordinates = lastGoogleLocationSubject
+        final Observable<UserLocation> locationFromCoordinates = lastGoogleLocationSubject
                 .filter(Functions1.isNotNull())
                 .filter(coordinatesChangedFilter())
-                .switchMap(new Func1<android.location.Location, Observable<Location>>() {
+                .switchMap(new Func1<android.location.Location, Observable<UserLocation>>() {
                     @Override
-                    public Observable<Location> call(android.location.Location location) {
+                    public Observable<UserLocation> call(android.location.Location location) {
                         return apiService.geocode(location.getLatitude() + "," + location.getLongitude())
                                 .subscribeOn(networkScheduler)
-                                .compose(ResponseOrError.<Location>toResponseOrErrorObservable())
-                                .compose(ResponseOrError.<Location>onlySuccess());
+                                .compose(ResponseOrError.<UserLocation>toResponseOrErrorObservable())
+                                .compose(ResponseOrError.<UserLocation>onlySuccess());
                     }
                 });
 
-        final Observable<Location> locationFromIP = apiService.geocodeDefault()
+        final Observable<UserLocation> locationFromIP = apiService.geocodeDefault()
                 .subscribeOn(networkScheduler)
-                .compose(ResponseOrError.<Location>toResponseOrErrorObservable())
-                .compose(ResponseOrError.<Location>onlySuccess());
+                .compose(ResponseOrError.<UserLocation>toResponseOrErrorObservable())
+                .compose(ResponseOrError.<UserLocation>onlySuccess());
 
-        final PublishSubject<Location> locationChangedSubject = PublishSubject.create();
+        final PublishSubject<UserLocation> locationChangedSubject = PublishSubject.create();
         updateLocationObservable = Observable
-                .defer(new Func0<Observable<Location>>() {
+                .defer(new Func0<Observable<UserLocation>>() {
                     @Override
-                    public Observable<Location> call() {
+                    public Observable<UserLocation> call() {
                         if (userPreferences.automaticLocationTrackingEnabled() && hasLocationPermissions(context)) {
                             googleApiClient.connect();
                             return locationFromCoordinates;
@@ -101,16 +103,16 @@ public class LocationManager implements GoogleApiClient.ConnectionCallbacks {
                         }
                     }
                 })
-                .compose(MoreOperators.<Location>refresh(refreshGetLocationSubject))
+                .compose(MoreOperators.<UserLocation>refresh(refreshGetLocationSubject))
                 .filter(Functions1.isNotNull())
                 .filter(locationChangedFilter())
                 .lift(MoreOperators.callOnNext(locationChangedSubject))
                 .doOnNext(saveToPreferences());
 
         locationChangedSubject
-                .filter(new Func1<Location, Boolean>() {
+                .filter(new Func1<UserLocation, Boolean>() {
                     @Override
-                    public Boolean call(Location location) {
+                    public Boolean call(UserLocation location) {
                         return userPreferences.isUserLoggedIn();
                     }
                 })
@@ -119,10 +121,10 @@ public class LocationManager implements GoogleApiClient.ConnectionCallbacks {
     }
 
     @NonNull
-    private Func1<Location, Observable<User>> updateUserWithNewLocation() {
-        return new Func1<Location, Observable<User>>() {
+    private Func1<UserLocation, Observable<User>> updateUserWithNewLocation() {
+        return new Func1<UserLocation, Observable<User>>() {
             @Override
-            public Observable<User> call(Location location) {
+            public Observable<User> call(UserLocation location) {
                 return apiService.updateUserLocation(new UpdateLocationRequest(location))
                         .subscribeOn(networkScheduler)
                         .compose(ResponseOrError.<User>toResponseOrErrorObservable())
@@ -140,11 +142,11 @@ public class LocationManager implements GoogleApiClient.ConnectionCallbacks {
         };
     }
 
-    private Func1<Location, Boolean> locationChangedFilter() {
-        return new Func1<Location, Boolean>() {
+    private Func1<UserLocation, Boolean> locationChangedFilter() {
+        return new Func1<UserLocation, Boolean>() {
             @Override
-            public Boolean call(@Nonnull Location location) {
-                final Location currentLocation = userPreferences.getLocation();
+            public Boolean call(@Nonnull UserLocation location) {
+                final UserLocation currentLocation = userPreferences.getLocation();
                 return currentLocation == null ||
                         (currentLocation != null && !Strings.nullToEmpty(currentLocation.getCity()).equalsIgnoreCase(location.getCity()));
             }
@@ -155,19 +157,19 @@ public class LocationManager implements GoogleApiClient.ConnectionCallbacks {
         return new Func1<android.location.Location, Boolean>() {
             @Override
             public Boolean call(@Nonnull android.location.Location location) {
-                final Location currentLocation = userPreferences.getLocation();
+                final UserLocation currentLocation = userPreferences.getLocation();
 
-                return LocationUtils.isLocationDifferenceMoreThanDelta(currentLocation.getLatitude(), 
+                return LocationUtils.isLocationDifferenceMoreThanDelta(currentLocation.getLatitude(),
                         currentLocation.getLongitude(), location.getLatitude(), location.getLongitude(),
                         LOCATION_MAX_DELTA_METERS);
             }
         };
     }
 
-    private Action1<Location> saveToPreferences() {
-        return new Action1<Location>() {
+    private Action1<UserLocation> saveToPreferences() {
+        return new Action1<UserLocation>() {
             @Override
-            public void call(Location location) {
+            public void call(UserLocation location) {
                 userPreferences.saveLocation(location);
             }
         };
@@ -177,8 +179,13 @@ public class LocationManager implements GoogleApiClient.ConnectionCallbacks {
         return PermissionHelper.hasPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
     }
 
+    @SuppressWarnings("MissingPermission")
     @Override
     public void onConnected(Bundle bundle) {
+        if (!hasLocationPermissions(context)) {
+            return;
+        }
+
         android.location.Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
         lastGoogleLocationSubject.onNext(lastLocation);
         if (BuildConfig.DEBUG && lastLocation != null) {
@@ -198,7 +205,7 @@ public class LocationManager implements GoogleApiClient.ConnectionCallbacks {
     }
 
     @Nonnull
-    public Observable<Location> updateUserLocationObservable() {
+    public Observable<UserLocation> updateUserLocationObservable() {
         return updateLocationObservable;
     }
 

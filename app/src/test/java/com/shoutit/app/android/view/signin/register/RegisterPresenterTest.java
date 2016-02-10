@@ -5,7 +5,7 @@ import android.content.Context;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
-import com.shoutit.app.android.api.model.Location;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.login.LoginUser;
@@ -34,10 +34,10 @@ public class RegisterPresenterTest {
 
     private BehaviorSubject<SignResponse> mResponseSubject;
 
-    private BehaviorSubject<Location> mLocationObservable;
+    private BehaviorSubject<UserLocation> mLocationObservable;
 
     @Mock
-    Location location;
+    UserLocation location;
 
     @Mock
     ApiService mApiService;

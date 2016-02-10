@@ -4,9 +4,9 @@ import javax.annotation.Nonnull;
 
 public class UpdateLocationRequest {
     @Nonnull
-    private final Location location;
+    private final UserLocation location;
 
-    public UpdateLocationRequest(@Nonnull Location location) {
+    public UpdateLocationRequest(@Nonnull UserLocation location) {
         this.location = location;
     }
 }

@@ -8,6 +8,7 @@ import android.util.Log;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Places;
 import com.google.common.base.Optional;
 import com.google.gson.Gson;
 import com.jakewharton.picasso.OkHttp3Downloader;
@@ -24,6 +25,7 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -142,6 +144,8 @@ public final class AppModule {
     GoogleApiClient providesGoogleApiClient(@ForApplication Context context) {
         return new GoogleApiClient.Builder(context)
                 .addApi(LocationServices.API)
+                .addApi(Places.GEO_DATA_API)
+                .addApi(Places.PLACE_DETECTION_API)
                 .build();
     }
 

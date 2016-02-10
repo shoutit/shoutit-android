@@ -1,6 +1,6 @@
 package com.shoutit.app.android.api.model;
 
-public class Location {
+public class UserLocation {
     private final double latitude;
     private final double longitude;
     private final String country;
@@ -9,8 +9,8 @@ public class Location {
     private final String city;
     private final String address;
 
-    public Location(double latitude, double longitude, String country, String postalCode,
-                    String state, String city, String address) {
+    public UserLocation(double latitude, double longitude, String country, String postalCode,
+                        String state, String city, String address) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.country = country;
@@ -20,8 +20,8 @@ public class Location {
         this.address = address;
     }
 
-    public static Location withCoordinates(double lat, double lng) {
-        return new Location(lat, lng, null, null, null, null, null);
+    public static UserLocation withCoordinates(double lat, double lng) {
+        return new UserLocation(lat, lng, null, null, null, null, null);
     }
 
     public double getLatitude() {
