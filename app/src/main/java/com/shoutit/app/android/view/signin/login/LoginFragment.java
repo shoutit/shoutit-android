@@ -27,6 +27,8 @@ import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.signin.LoginActivityComponent;
 import com.shoutit.app.android.view.signin.register.RegisterFragment;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -135,6 +137,7 @@ public class LoginFragment extends BaseFragment {
                         ColoredSnackBar.contentView(getActivity()), R.string.login_error_empty_email));
 
         RxTextView.textChangeEvents(emailEdittext)
+                .debounce(500, TimeUnit.MILLISECONDS) // TODO temp fix
                 .map(new Func1<TextViewTextChangeEvent, String>() {
                     @Override
                     public String call(TextViewTextChangeEvent textViewTextChangeEvent) {
@@ -145,6 +148,7 @@ public class LoginFragment extends BaseFragment {
                 .subscribe(loginPresenter.getEmailObserver());
 
         RxTextView.textChangeEvents(passwordEdittext)
+                .debounce(500, TimeUnit.MILLISECONDS) // TODO temp fix
                 .map(new Func1<TextViewTextChangeEvent, String>() {
                     @Override
                     public String call(TextViewTextChangeEvent textViewTextChangeEvent) {
