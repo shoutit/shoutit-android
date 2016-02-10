@@ -1,6 +1,7 @@
 machine:
    environment:
        JAVA_TOOL_OPTIONS: "-Xmx2048m -XX:MaxPermSize=4g"
+       BRANCH_NAME: $(echo -${CIRCLE_SHA1} | cut -c -8)$(if [ ${CIRCLE_BRANCH} == "master" ] || [ ${CIRCLE_BRANCH} == "develop" ]; then echo ""; else echo -SNAPSHOT; fi)
    pre:
      - printf "org.gradle.jvmargs=-XX:MaxPermSize=4g\ndisablePreDex=true\n" > gradle.properties
 
@@ -16,7 +17,6 @@ checkout:
 
 test:
     pre:
-        - export BRANCH_NAME=$(echo "-${CIRCLE_SHA1}" | cut -c -8)$(if [ "${CIRCLE_BRANCH}" == "master" ] || [ "${CIRCLE_BRANCH}" == "develop" ]; then echo ""; else echo "-SNAPSHOT"; fi)
         - python tools/download.py --token P8uXtUgTeNDYEIvw5gXUWjDM --key-version agxzfmF1dG8tY2xvc2VyGAsSC1Byb2plY3RLZXlzGICAgMDuv6EKDA
 
     override:
