@@ -3,6 +3,7 @@ package com.shoutit.app.android.view.signin.login;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
@@ -32,7 +33,6 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import okhttp3.ResponseBody;
-import retrofit2.Response;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
@@ -55,6 +55,12 @@ public class LoginFragment extends BaseFragment {
 
     @Bind(R.id.fragment_login_progress)
     View progressView;
+
+    @Bind(R.id.register_email_edittext_layout)
+    TextInputLayout emailInputLayout;
+
+    @Bind(R.id.register_password_edittext_layout)
+    TextInputLayout passwordInputLayout;
 
     @Inject
     LoginPresenter loginPresenter;
@@ -89,11 +95,19 @@ public class LoginFragment extends BaseFragment {
 
         loginPresenter.getEmailEmpty()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(Actions1.showError(emailEdittext, getString(R.string.login_empty_mail)));
+                .subscribe(Actions1.showError(emailInputLayout, getString(R.string.login_empty_mail)));
 
         loginPresenter.getPasswordEmpty()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(Actions1.showError(passwordEdittext, getString(R.string.login_empty_password)));
+                .subscribe(Actions1.showError(passwordInputLayout, getString(R.string.login_empty_password)));
+
+        loginPresenter.getPasswordNotEmpty()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(Actions1.hideError(passwordInputLayout));
+
+        loginPresenter.getEmailNotEmpty()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(Actions1.hideError(emailInputLayout));
 
         loginPresenter.failObservable()
                 .compose(this.<Throwable>bindToLifecycle())

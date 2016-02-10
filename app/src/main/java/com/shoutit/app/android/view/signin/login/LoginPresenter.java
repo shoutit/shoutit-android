@@ -20,8 +20,6 @@ import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.view.signin.CoarseLocationObservableProvider;
 
-import java.util.concurrent.TimeUnit;
-
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
@@ -51,6 +49,8 @@ public class LoginPresenter {
     private final Observable<ResponseBody> resetPasswordSuccess;
     private final Observable<Object> resetPasswordEmptyEmail;
     private final Observable<Boolean> progressObservable;
+    private final Observable<String> mEmailNotEmpty;
+    private final Observable<String> mPasswordNotEmpty;
 
     @Inject
     public LoginPresenter(@NonNull final ApiService apiService,
@@ -64,9 +64,6 @@ public class LoginPresenter {
                 .startWith((Location) null)
                 .compose(ObservableExtensions.<Location>behaviorRefCount());
 
-        final Observable<String> password = mPasswordSubject.throttleLast(100, TimeUnit.MILLISECONDS);
-        final Observable<String> email = mEmailSubject.throttleLast(100, TimeUnit.MILLISECONDS);
-
         // Login
         final Observable<ResponseOrError<SignResponse>> loginRequestObservable = mProceedSubject
                 .withLatestFrom(mLocationObservable, new Func2<Object, Location, Location>() {
@@ -78,16 +75,18 @@ public class LoginPresenter {
                 .flatMap(new Func1<Location, Observable<EmailLoginRequest>>() {
                     @Override
                     public Observable<EmailLoginRequest> call(final Location location) {
-                        return Observable.zip(email.filter(getNotEmptyFunc1()), password.filter(getNotEmptyFunc1()), new Func2<String, String, EmailLoginRequest>() {
-                            @Override
-                            public EmailLoginRequest call(String email, String password) {
-                                return new EmailLoginRequest(email, password, LoginUser.loginUser(location));
-                            }
-                        });
+                        return Observable
+                                .zip(mEmailSubject.filter(getNotEmptyFunc1()), mPasswordSubject.filter(getNotEmptyFunc1()), new Func2<String, String, EmailLoginRequest>() {
+                                    @Override
+                                    public EmailLoginRequest call(String email, String password) {
+                                        return new EmailLoginRequest(email, password, LoginUser.loginUser(location));
+                                    }
+                                })
+                                .first();
                     }
                 })
                 .doOnNext(showProgressAction())
-                .flatMap(new Func1<EmailLoginRequest, Observable<ResponseOrError<SignResponse>>>() {
+                .switchMap(new Func1<EmailLoginRequest, Observable<ResponseOrError<SignResponse>>>() {
                     @Override
                     public Observable<ResponseOrError<SignResponse>> call(EmailLoginRequest loginRequest) {
                         return apiService.login(loginRequest)
@@ -98,8 +97,11 @@ public class LoginPresenter {
                 })
                 .compose(ObservableExtensions.<ResponseOrError<SignResponse>>behaviorRefCount());
 
-        mPasswordEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservable(password.first())).filter(Functions1.isNullOrEmpty());
-        mEmailEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservable(email.first())).filter(Functions1.isNullOrEmpty());
+        mPasswordEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservableFirst(mPasswordSubject)).filter(Functions1.isNullOrEmpty());
+        mEmailEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservableFirst(mEmailSubject)).filter(Functions1.isNullOrEmpty());
+
+        mPasswordNotEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservableFirst(mPasswordSubject)).filter(Functions1.neg(Functions1.isNullOrEmpty()));
+        mEmailNotEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservableFirst(mEmailSubject)).filter(Functions1.neg(Functions1.isNullOrEmpty()));
 
         mSuccessObservable = loginRequestObservable
                 .compose(ResponseOrError.<SignResponse>onlySuccess())
@@ -113,7 +115,7 @@ public class LoginPresenter {
 
         // Reset password
         final Observable<String> resetPasswordClickObservable = resetPasswordClickObserver
-                .withLatestFrom(email, new Func2<Object, String, String>() {
+                .withLatestFrom(mEmailSubject, new Func2<Object, String, String>() {
                     @Override
                     public String call(Object ignore, String email) {
                         return email;
@@ -128,7 +130,6 @@ public class LoginPresenter {
                     public Observable<ResponseOrError<ResponseBody>> call(String email) {
                         return apiService.resetPassword(new ResetPasswordRequest(email))
                                 .subscribeOn(networkScheduler)
-                                .observeOn(uiScheduler)
                                 .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
 
                     }
@@ -140,7 +141,9 @@ public class LoginPresenter {
                 .map(Functions1.toObject());
 
         resetPasswordSuccess = resetPasswordRequestObservable
-                .compose(ResponseOrError.<ResponseBody>onlySuccess());
+                .compose(ResponseOrError.<ResponseBody>onlySuccess())
+                .observeOn(uiScheduler);
+
 
         // Errors
         mErrorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
@@ -228,7 +231,18 @@ public class LoginPresenter {
         return resetPasswordEmptyEmail;
     }
 
+    @Nonnull
     public Observable<Boolean> getProgressObservable() {
         return progressObservable;
+    }
+
+    @Nonnull
+    public Observable<String> getPasswordNotEmpty() {
+        return mPasswordNotEmpty;
+    }
+
+    @Nonnull
+    public Observable<String> getEmailNotEmpty() {
+        return mEmailNotEmpty;
     }
 }
