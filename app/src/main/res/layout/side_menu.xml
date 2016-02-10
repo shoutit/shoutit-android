@@ -138,6 +138,32 @@
             android:paddingStart="16dp"
             android:text="@string/menu_item_invite_friends" />
 
+        <CheckedTextView
+            android:id="@+id/menu_logout"
+            style="@style/SideMenuItem"
+            android:paddingLeft="16dp"
+            android:paddingStart="16dp"
+            android:text="@string/menu_item_logout" />
+
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/black_12"/>
+
+        <TextView
+            android:id="@+id/menu_version_name"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:gravity="center"
+            android:textColor="@color/black_38"
+            android:textSize="14sp"
+            tools:text="Shoutit 2.0.1"/>
+
     </LinearLayout>
 
 

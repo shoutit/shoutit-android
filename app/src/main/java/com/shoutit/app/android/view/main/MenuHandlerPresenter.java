@@ -5,6 +5,8 @@ import android.content.Context;
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Strings;
+import com.shoutit.app.android.BuildConfig;
+import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.Location;
 import com.shoutit.app.android.api.model.User;
@@ -29,6 +31,10 @@ public class MenuHandlerPresenter {
     private final Observable<String> locationObservable;
     @Nonnull
     private final Observable<Integer> countryCodeObservable;
+    @Nonnull
+    private final Observable<String> versionNameObservable;
+    @Nonnull
+    private final Observable<Boolean> logoutItemVisibilityObservable;
 
     @Inject
     public MenuHandlerPresenter(@Nonnull UserPreferences userPreferences,
@@ -104,6 +110,12 @@ public class MenuHandlerPresenter {
                         return integer != 0;
                     }
                 });
+
+        versionNameObservable = Observable.just(
+                context.getString(R.string.menu_version_name, BuildConfig.VERSION_NAME)
+        );
+
+        logoutItemVisibilityObservable = Observable.just(userPreferences.isUserLoggedIn());
     }
 
     @Nonnull
@@ -129,5 +141,15 @@ public class MenuHandlerPresenter {
     @Nonnull
     public Observable<Integer> getCountryCodeObservable() {
         return countryCodeObservable;
+    }
+
+    @Nonnull
+    public Observable<String> getVersionNameObservable() {
+        return versionNameObservable;
+    }
+
+    @Nonnull
+    public Observable<Boolean> getLogoutItemVisibilityObservable() {
+        return logoutItemVisibilityObservable;
     }
 }

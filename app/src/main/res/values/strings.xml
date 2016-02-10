@@ -100,6 +100,9 @@
     <string name="menu_change_location">Change</string>
     <string name="drawer_open">Open</string>
     <string name="drawer_close">Close</string>
+    <string name="menu_guest">Guest</string>
+    <string name="menu_item_logout">Logout</string>
+    <string name="menu_version_name">Shoutit %1$s</string>
 
     <!-- Post Login -->
     <string name="post_login_error">Error fetching data</string>
