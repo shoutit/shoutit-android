@@ -9,8 +9,6 @@ import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
-import com.appunite.rx.operators.MoreOperators;
-import com.google.android.gms.location.LocationRequest;
 import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
@@ -26,7 +24,6 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import okhttp3.ResponseBody;
-import retrofit2.Response;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
@@ -52,6 +49,8 @@ public class LoginPresenter {
     private final Observable<ResponseBody> resetPasswordSuccess;
     private final Observable<Object> resetPasswordEmptyEmail;
     private final Observable<Boolean> progressObservable;
+    private final Observable<String> mEmailNotEmpty;
+    private final Observable<String> mPasswordNotEmpty;
 
     @Inject
     public LoginPresenter(@NonNull final ApiService apiService,
@@ -76,16 +75,18 @@ public class LoginPresenter {
                 .flatMap(new Func1<Location, Observable<EmailLoginRequest>>() {
                     @Override
                     public Observable<EmailLoginRequest> call(final Location location) {
-                        return Observable.zip(mEmailSubject.filter(getNotEmptyFunc1()), mPasswordSubject.filter(getNotEmptyFunc1()), new Func2<String, String, EmailLoginRequest>() {
-                            @Override
-                            public EmailLoginRequest call(String email, String password) {
-                                return new EmailLoginRequest(email, password, LoginUser.loginUser(location));
-                            }
-                        });
+                        return Observable
+                                .zip(mEmailSubject.filter(getNotEmptyFunc1()), mPasswordSubject.filter(getNotEmptyFunc1()), new Func2<String, String, EmailLoginRequest>() {
+                                    @Override
+                                    public EmailLoginRequest call(String email, String password) {
+                                        return new EmailLoginRequest(email, password, LoginUser.loginUser(location));
+                                    }
+                                })
+                                .first();
                     }
                 })
                 .doOnNext(showProgressAction())
-                .flatMap(new Func1<EmailLoginRequest, Observable<ResponseOrError<SignResponse>>>() {
+                .switchMap(new Func1<EmailLoginRequest, Observable<ResponseOrError<SignResponse>>>() {
                     @Override
                     public Observable<ResponseOrError<SignResponse>> call(EmailLoginRequest loginRequest) {
                         return apiService.login(loginRequest)
@@ -96,8 +97,11 @@ public class LoginPresenter {
                 })
                 .compose(ObservableExtensions.<ResponseOrError<SignResponse>>behaviorRefCount());
 
-        mPasswordEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservable(mPasswordSubject.first())).filter(Functions1.isNullOrEmpty());
-        mEmailEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservable(mEmailSubject.first())).filter(Functions1.isNullOrEmpty());
+        mPasswordEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservableFirst(mPasswordSubject)).filter(Functions1.isNullOrEmpty());
+        mEmailEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservableFirst(mEmailSubject)).filter(Functions1.isNullOrEmpty());
+
+        mPasswordNotEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservableFirst(mPasswordSubject)).filter(Functions1.neg(Functions1.isNullOrEmpty()));
+        mEmailNotEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservableFirst(mEmailSubject)).filter(Functions1.neg(Functions1.isNullOrEmpty()));
 
         mSuccessObservable = loginRequestObservable
                 .compose(ResponseOrError.<SignResponse>onlySuccess())
@@ -227,7 +231,18 @@ public class LoginPresenter {
         return resetPasswordEmptyEmail;
     }
 
+    @Nonnull
     public Observable<Boolean> getProgressObservable() {
         return progressObservable;
+    }
+
+    @Nonnull
+    public Observable<String> getPasswordNotEmpty() {
+        return mPasswordNotEmpty;
+    }
+
+    @Nonnull
+    public Observable<String> getEmailNotEmpty() {
+        return mEmailNotEmpty;
     }
 }
