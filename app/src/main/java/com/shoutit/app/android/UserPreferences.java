@@ -120,4 +120,9 @@ public class UserPreferences {
     private void refreshUser() {
         userRefreshSubject.onNext(null);
     }
+
+    @SuppressLint("CommitPrefEdits")
+    public void logout() {
+        mPreferences.edit().clear().commit();
+    }
 }

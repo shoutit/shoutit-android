@@ -1,14 +1,18 @@
 package com.shoutit.app.android.view.main;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jakewharton.rxbinding.view.RxView;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
@@ -19,6 +23,7 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.squareup.picasso.Transformation;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
+import com.uservoice.uservoicesdk.UserVoice;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -48,6 +53,10 @@ public class MenuHandler {
     TextView locationTextView;
     @Bind(R.id.menu_flag_iv)
     ImageView flagImageView;
+    @Bind(R.id.menu_version_name)
+    TextView versionNameTextView;
+    @Bind(R.id.menu_logout)
+    View logoutView;
 
     @Inject
     MenuHandlerPresenter presenter;
@@ -97,6 +106,14 @@ public class MenuHandler {
         presenter.getCountryCodeObservable()
                 .compose(rxActivity.<Integer>bindToLifecycle())
                 .subscribe(loadFlag());
+
+        presenter.getVersionNameObservable()
+                .compose(rxActivity.<String>bindToLifecycle())
+                .subscribe(RxTextView.text(versionNameTextView));
+
+        presenter.getLogoutItemVisibilityObservable()
+                .compose(rxActivity.<Boolean>bindToLifecycle())
+                .subscribe(RxView.visibility(logoutView));
     }
 
     @NonNull
@@ -111,8 +128,9 @@ public class MenuHandler {
         };
     }
 
+    @Nullable
     @OnClick({R.id.menu_home, R.id.menu_discover, R.id.menu_browse, R.id.menu_chat,
-            R.id.menu_orders, R.id.menu_settings, R.id.menu_help, R.id.menu_invite_frirends})
+            R.id.menu_orders, R.id.menu_settings, R.id.menu_help, R.id.menu_invite_frirends, R.id.menu_logout})
     public void onMenuItemSelected(View view) {
         switch (view.getId()) {
             case R.id.menu_home:
@@ -144,13 +162,17 @@ public class MenuHandler {
                 onMenuItemSelectedListener.onMenuItemSelected(FRAGMENT_SETTINGS);
                 break;
             case R.id.menu_help:
-                onMenuItemSelectedListener.onMenuItemSelected(FRAGMENT_HELP);
+                UserVoice.launchUserVoice(rxActivity);
                 break;
             case R.id.menu_invite_frirends:
                 onMenuItemSelectedListener.onMenuItemSelected(FRAGMENT_INVITE_FRIENDS);
                 break;
-            default:
-                throw new RuntimeException("Unknown menu item");
+            case R.id.menu_logout:
+                userPreferences.logout();
+                rxActivity.finish();
+                rxActivity.startActivity(MainActivity.newIntent(rxActivity)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                );
         }
     }
 

@@ -36,7 +36,7 @@
             android:maxLines="1"
             android:textColor="@android:color/white"
             android:textSize="16sp"
-            tools:text="Alvin Armstrong" />
+            android:text="@string/menu_guest" />
 
     </RelativeLayout>
 
