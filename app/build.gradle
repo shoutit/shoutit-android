@@ -96,6 +96,8 @@ android {
             debuggable false
             minifyEnabled false
             signingConfig signingConfigs.release
+            ext.betaDistributionGroupAliases = "android-internal-testers, internal-tests"
+            ext.betaDistributionNotifications = false
             ext.enableCrashlytics = true
             buildConfigField "String", "API_URL", production_api_url
         }
