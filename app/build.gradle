@@ -107,10 +107,6 @@ android {
         dev {
             minSdkVersion 21
         }
-
-        prod {
-            minSdkVersion 16
-        }
     }
 
     android.variantFilter { variant ->
