@@ -105,7 +105,7 @@ public class LocationPresenter implements GoogleApiClient.ConnectionCallbacks {
                     }
                 });
 
-        final Observable<List<BaseAdapterItem>> getPlacesAdapterItems = querySubject
+        final Observable<List<BaseAdapterItem>> placesForQueryObservable = querySubject
                 .filter(queryFilter())
                 .debounce(TYPING_THRESHOLD_MS, TimeUnit.MILLISECONDS)
                 .distinctUntilChanged()
@@ -176,7 +176,7 @@ public class LocationPresenter implements GoogleApiClient.ConnectionCallbacks {
         allAdapterItemsObservable = Observable.combineLatest(
                 selectedLocationObservable.startWith((BaseAdapterItem) null),
                 currentGpsLocationObservable.startWith((BaseAdapterItem) null),
-                getPlacesAdapterItems,
+                placesForQueryObservable,
                 new Func3<BaseAdapterItem, BaseAdapterItem, List<BaseAdapterItem>, List<BaseAdapterItem>>() {
                     @Override
                     public List<BaseAdapterItem> call(BaseAdapterItem selectedLocation,
@@ -291,6 +291,10 @@ public class LocationPresenter implements GoogleApiClient.ConnectionCallbacks {
     @Override
     public void onConnectionSuspended(int i) {
 
+    }
+
+    public void disconnectGoogleApi() {
+        googleApiClient.disconnect();
     }
 
     public static class PlaceAdapterItem implements BaseAdapterItem {

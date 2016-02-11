@@ -58,12 +58,10 @@ public class LocationActivity extends BaseActivity {
 
         setUpActionbar();
 
+        askForLocationPermissions();
+
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
-
-        PermissionHelper.checkPermissions(this, REQUEST_CODE_LOCATION,
-                findViewById(android.R.id.content), R.string.permission_location_explanation,
-                new String[] {Manifest.permission.ACCESS_FINE_LOCATION});
 
         RxTextView.textChangeEvents(searchEditText)
                 .map(MoreFunctions1.mapTextChangeEventToString())
@@ -78,6 +76,12 @@ public class LocationActivity extends BaseActivity {
                 .compose(this.<Boolean>bindToLifecycle())
                 .subscribe(RxView.visibility(progressBar));
 
+    }
+
+    private void askForLocationPermissions() {
+        PermissionHelper.checkPermissions(this, REQUEST_CODE_LOCATION,
+                findViewById(android.R.id.content), R.string.permission_location_explanation,
+                new String[] {Manifest.permission.ACCESS_FINE_LOCATION});
     }
 
     private void setUpActionbar() {
@@ -111,6 +115,12 @@ public class LocationActivity extends BaseActivity {
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        presenter.disconnectGoogleApi();
+        super.onDestroy();
     }
 
     @Nonnull
