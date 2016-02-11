@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ShoutIt</string>
+    <string name="app_name">Shoutit</string>
 
     <!-- Global strings -->
     <string name="price_with_currency">%1$s %2$s</string>
