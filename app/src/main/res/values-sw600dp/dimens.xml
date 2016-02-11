@@ -11,4 +11,9 @@
     <dimen name="home_discover_item_spacing">4dp</dimen>
     <dimen name="home_feed_image_size_linear">140dp</dimen>
 
+    <!-- Side menu -->
+    <dimen name="side_menu_cover_height">202dp</dimen>
+    <dimen name="side_menu_header_height">222dp</dimen>
+    <dimen name="side_menu_avatar_size">84dp</dimen>
+
 </resources>

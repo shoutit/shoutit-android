@@ -28,7 +28,7 @@ public abstract class BaseAdapter extends RecyclerView.Adapter<ViewHolderManager
     @Nonnull
     protected List<BaseAdapterItem> items = ImmutableList.of();
 
-    public BaseAdapter(@ForActivity Context context) {
+    public BaseAdapter(@ForActivity @Nonnull Context context) {
         this.context = context;
         changesDetector = new ChangesDetector<>(new SimpleDetector<BaseAdapterItem>());
         layoutInflater = LayoutInflater.from(context);

@@ -2,6 +2,7 @@ package com.shoutit.app.android.view.signin.login;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
@@ -25,6 +26,8 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.signin.LoginActivityComponent;
 import com.shoutit.app.android.view.signin.register.RegisterFragment;
+
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -54,6 +57,12 @@ public class LoginFragment extends BaseFragment {
 
     @Bind(R.id.fragment_login_progress)
     View progressView;
+
+    @Bind(R.id.register_email_edittext_layout)
+    TextInputLayout emailInputLayout;
+
+    @Bind(R.id.register_password_edittext_layout)
+    TextInputLayout passwordInputLayout;
 
     @Inject
     LoginPresenter loginPresenter;
@@ -88,11 +97,19 @@ public class LoginFragment extends BaseFragment {
 
         loginPresenter.getEmailEmpty()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(Actions1.showError(emailEdittext, getString(R.string.login_empty_mail)));
+                .subscribe(Actions1.showError(emailInputLayout, getString(R.string.login_empty_mail)));
 
         loginPresenter.getPasswordEmpty()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(Actions1.showError(passwordEdittext, getString(R.string.login_empty_password)));
+                .subscribe(Actions1.showError(passwordInputLayout, getString(R.string.login_empty_password)));
+
+        loginPresenter.getPasswordNotEmpty()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(Actions1.hideError(passwordInputLayout));
+
+        loginPresenter.getEmailNotEmpty()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(Actions1.hideError(emailInputLayout));
 
         loginPresenter.failObservable()
                 .compose(this.<Throwable>bindToLifecycle())
@@ -120,6 +137,7 @@ public class LoginFragment extends BaseFragment {
                         ColoredSnackBar.contentView(getActivity()), R.string.login_error_empty_email));
 
         RxTextView.textChangeEvents(emailEdittext)
+                .debounce(500, TimeUnit.MILLISECONDS) // TODO temp fix
                 .map(new Func1<TextViewTextChangeEvent, String>() {
                     @Override
                     public String call(TextViewTextChangeEvent textViewTextChangeEvent) {
@@ -130,6 +148,7 @@ public class LoginFragment extends BaseFragment {
                 .subscribe(loginPresenter.getEmailObserver());
 
         RxTextView.textChangeEvents(passwordEdittext)
+                .debounce(500, TimeUnit.MILLISECONDS) // TODO temp fix
                 .map(new Func1<TextViewTextChangeEvent, String>() {
                     @Override
                     public String call(TextViewTextChangeEvent textViewTextChangeEvent) {

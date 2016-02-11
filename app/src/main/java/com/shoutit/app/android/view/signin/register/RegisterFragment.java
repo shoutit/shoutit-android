@@ -2,6 +2,7 @@ package com.shoutit.app.android.view.signin.register;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.text.SpannableString;
@@ -34,6 +35,8 @@ import com.shoutit.app.android.view.signin.LoginActivityComponent;
 import com.shoutit.app.android.view.signin.login.LoginFragment;
 import com.shoutit.app.android.view.webview.HtmlAssetViewerActivity;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -51,6 +54,15 @@ public class RegisterFragment extends BaseFragment {
 
     @Bind(R.id.register_password_edittext)
     EditText passwordEdittext;
+
+    @Bind(R.id.register_password_layout)
+    TextInputLayout passwordInputLayout;
+
+    @Bind(R.id.register_email_layout)
+    TextInputLayout emailInputLayout;
+
+    @Bind(R.id.register_name_layout)
+    TextInputLayout nameInputLayout;
 
     @Bind(R.id.register_proceed_btn)
     Button proceedBtn;
@@ -97,15 +109,27 @@ public class RegisterFragment extends BaseFragment {
 
         registerPresenter.getEmailEmpty()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(Actions1.showError(emailEdittext, getString(R.string.register_empty_mail)));
+                .subscribe(Actions1.showError(emailInputLayout, getString(R.string.register_empty_mail)));
 
         registerPresenter.getPasswordEmpty()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(Actions1.showError(passwordEdittext, getString(R.string.register_empty_password)));
+                .subscribe(Actions1.showError(passwordInputLayout, getString(R.string.register_empty_password)));
 
         registerPresenter.getNameEmpty()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(Actions1.showError(nameEditText, getString(R.string.register_empty_name)));
+                .subscribe(Actions1.showError(nameInputLayout, getString(R.string.register_empty_name)));
+
+        registerPresenter.getPasswordNotEmpty()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(Actions1.hideError(passwordInputLayout));
+
+        registerPresenter.getEmailNotEmpty()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(Actions1.hideError(emailInputLayout));
+
+        registerPresenter.getNameNotEmpty()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(Actions1.hideError(nameInputLayout));
 
         registerPresenter.failObservable()
                 .compose(this.<Throwable>bindToLifecycle())
@@ -123,16 +147,19 @@ public class RegisterFragment extends BaseFragment {
                 });
 
         RxTextView.textChangeEvents(emailEdittext)
+                .debounce(500, TimeUnit.MILLISECONDS) // TODO temp fix
                 .map(MoreFunctions1.mapTextChangeEventToString())
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(registerPresenter.getEmailObserver());
 
         RxTextView.textChangeEvents(nameEditText)
+                .debounce(500, TimeUnit.MILLISECONDS) // TODO temp fix
                 .map(MoreFunctions1.mapTextChangeEventToString())
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(registerPresenter.getNameObserver());
 
         RxTextView.textChangeEvents(passwordEdittext)
+                .debounce(500, TimeUnit.MILLISECONDS) // TODO temp fix
                 .map(MoreFunctions1.mapTextChangeEventToString())
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(registerPresenter.getPasswordObserver());

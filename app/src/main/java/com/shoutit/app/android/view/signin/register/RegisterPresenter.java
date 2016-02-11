@@ -44,6 +44,9 @@ public class RegisterPresenter {
     private final Observable<UserLocation> mLocationObservable;
     private final Observable<String> mEmailEmpty;
     private final Observable<String> mNameEmpty;
+    private final Observable<String> mPasswordNotEmpty;
+    private final Observable<String> mEmailNotEmpty;
+    private final Observable<String> mNameNotEmpty;
 
     @Inject
     public RegisterPresenter(@NonNull final ApiService apiService,
@@ -65,7 +68,7 @@ public class RegisterPresenter {
                         return location;
                     }
                 })
-                .flatMap(new Func1<UserLocation, Observable<EmailSignupRequest>>() {
+                .switchMap(new Func1<UserLocation, Observable<EmailSignupRequest>>() {
                     @Override
                     public Observable<EmailSignupRequest> call(final UserLocation location) {
                         return Observable.zip(
@@ -77,10 +80,11 @@ public class RegisterPresenter {
                                     public EmailSignupRequest call(String name, String email, String password) {
                                         return new EmailSignupRequest(name, email, password, LoginUser.loginUser(location));
                                     }
-                                });
+                                })
+                                .first();
                     }
                 })
-                .flatMap(new Func1<EmailSignupRequest, Observable<ResponseOrError<SignResponse>>>() {
+                .switchMap(new Func1<EmailSignupRequest, Observable<ResponseOrError<SignResponse>>>() {
                     @Override
                     public Observable<ResponseOrError<SignResponse>> call(EmailSignupRequest signupRequest) {
                         return apiService.signup(signupRequest)
@@ -92,9 +96,13 @@ public class RegisterPresenter {
                 .compose(ObservableExtensions.<ResponseOrError<SignResponse>>behaviorRefCount());
 
 
-        mPasswordEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservable(mPasswordSubject.first())).filter(getLessThan6CharsFunc1());
-        mEmailEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservable(mEmailSubject.first())).filter(Functions1.isNullOrEmpty());
-        mNameEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservable(mNameSubject.first())).filter(Functions1.isNullOrEmpty());
+        mPasswordEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservableFirst(mPasswordSubject)).filter(getLessThan6CharsFunc1());
+        mEmailEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservableFirst(mEmailSubject)).filter(Functions1.isNullOrEmpty());
+        mNameEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservableFirst(mNameSubject)).filter(Functions1.isNullOrEmpty());
+
+        mPasswordNotEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservableFirst(mPasswordSubject)).filter(Functions1.neg(getLessThan6CharsFunc1()));
+        mEmailNotEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservableFirst(mEmailSubject)).filter(Functions1.neg(Functions1.isNullOrEmpty()));
+        mNameNotEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservableFirst(mNameSubject)).filter(Functions1.neg(Functions1.isNullOrEmpty()));
 
         mSuccessObservable = responseOrErrorObservable
                 .compose(ResponseOrError.<SignResponse>onlySuccess())
@@ -172,5 +180,20 @@ public class RegisterPresenter {
     @NonNull
     public Observable<String> getNameEmpty() {
         return mNameEmpty;
+    }
+
+    @NonNull
+    public Observable<String> getPasswordNotEmpty() {
+        return mPasswordNotEmpty;
+    }
+
+    @NonNull
+    public Observable<String> getEmailNotEmpty() {
+        return mEmailNotEmpty;
+    }
+
+    @NonNull
+    public Observable<String> getNameNotEmpty() {
+        return mNameNotEmpty;
     }
 }

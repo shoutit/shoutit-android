@@ -1,5 +1,6 @@
 package com.shoutit.app.android.api;
 
+import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
@@ -12,6 +13,8 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.login.EmailLoginRequest;
 import com.shoutit.app.android.api.model.login.FacebookLogin;
 import com.shoutit.app.android.api.model.login.GoogleLogin;
+
+import java.util.List;
 
 import okhttp3.ResponseBody;
 import retrofit2.http.Body;
@@ -57,6 +60,9 @@ public interface ApiService {
     @POST("oauth2/access_token")
     Observable<SignResponse> googleLogin(@Body GoogleLogin request);
 
+    @POST("tags/{main_tag}/listen")
+    Observable<Object> postCategoryListen(@Path("main_tag") String tagSlug);
+
     @GET("users/{user_name}")
     Observable<User> getUser(@Path("user_name") String userName);
 
@@ -71,5 +77,8 @@ public interface ApiService {
 
     @GET("misc/geocode?latlng=0,0")
     Observable<UserLocation> geocodeDefault();
+
+    @GET("misc/categories")
+    Observable<List<Category>> categories();
 
 }

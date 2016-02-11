@@ -50,6 +50,8 @@ public class LoginPresenter {
     private final Observable<ResponseBody> resetPasswordSuccess;
     private final Observable<Object> resetPasswordEmptyEmail;
     private final Observable<Boolean> progressObservable;
+    private final Observable<String> mEmailNotEmpty;
+    private final Observable<String> mPasswordNotEmpty;
 
     @Inject
     public LoginPresenter(@NonNull final ApiService apiService,
@@ -72,19 +74,21 @@ public class LoginPresenter {
                         return location;
                     }
                 })
-                .flatMap(new Func1<UserLocation, Observable<EmailLoginRequest>>() {
+                .switchMap(new Func1<UserLocation, Observable<EmailLoginRequest>>() {
                     @Override
                     public Observable<EmailLoginRequest> call(final UserLocation location) {
-                        return Observable.zip(mEmailSubject.filter(getNotEmptyFunc1()), mPasswordSubject.filter(getNotEmptyFunc1()), new Func2<String, String, EmailLoginRequest>() {
-                            @Override
-                            public EmailLoginRequest call(String email, String password) {
-                                return new EmailLoginRequest(email, password, LoginUser.loginUser(location));
-                            }
-                        });
+                        return Observable
+                                .zip(mEmailSubject.filter(getNotEmptyFunc1()), mPasswordSubject.filter(getNotEmptyFunc1()), new Func2<String, String, EmailLoginRequest>() {
+                                    @Override
+                                    public EmailLoginRequest call(String email, String password) {
+                                        return new EmailLoginRequest(email, password, LoginUser.loginUser(location));
+                                    }
+                                })
+                                .first();
                     }
                 })
                 .doOnNext(showProgressAction())
-                .flatMap(new Func1<EmailLoginRequest, Observable<ResponseOrError<SignResponse>>>() {
+                .switchMap(new Func1<EmailLoginRequest, Observable<ResponseOrError<SignResponse>>>() {
                     @Override
                     public Observable<ResponseOrError<SignResponse>> call(EmailLoginRequest loginRequest) {
                         return apiService.login(loginRequest)
@@ -95,8 +99,11 @@ public class LoginPresenter {
                 })
                 .compose(ObservableExtensions.<ResponseOrError<SignResponse>>behaviorRefCount());
 
-        mPasswordEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservable(mPasswordSubject.first())).filter(Functions1.isNullOrEmpty());
-        mEmailEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservable(mEmailSubject.first())).filter(Functions1.isNullOrEmpty());
+        mPasswordEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservableFirst(mPasswordSubject)).filter(Functions1.isNullOrEmpty());
+        mEmailEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservableFirst(mEmailSubject)).filter(Functions1.isNullOrEmpty());
+
+        mPasswordNotEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservableFirst(mPasswordSubject)).filter(Functions1.neg(Functions1.isNullOrEmpty()));
+        mEmailNotEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservableFirst(mEmailSubject)).filter(Functions1.neg(Functions1.isNullOrEmpty()));
 
         mSuccessObservable = loginRequestObservable
                 .compose(ResponseOrError.<SignResponse>onlySuccess())
@@ -226,7 +233,18 @@ public class LoginPresenter {
         return resetPasswordEmptyEmail;
     }
 
+    @Nonnull
     public Observable<Boolean> getProgressObservable() {
         return progressObservable;
+    }
+
+    @Nonnull
+    public Observable<String> getPasswordNotEmpty() {
+        return mPasswordNotEmpty;
+    }
+
+    @Nonnull
+    public Observable<String> getEmailNotEmpty() {
+        return mEmailNotEmpty;
     }
 }

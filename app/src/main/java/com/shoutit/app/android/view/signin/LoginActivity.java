@@ -13,7 +13,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.view.about.AboutActivity;
-import com.shoutit.app.android.view.signin.login.LoginFragment;
+import com.shoutit.app.android.view.signin.register.RegisterFragment;
 import com.uservoice.uservoicesdk.UserVoice;
 
 import javax.annotation.Nonnull;
@@ -44,7 +44,7 @@ public class LoginActivity extends BaseActivity {
         if (savedInstanceState == null) {
             getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.login_sign_layout, LoginFragment.newInstance())
+                    .replace(R.id.login_sign_layout, RegisterFragment.newInstance())
                     .commit();
         }
     }

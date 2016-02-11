@@ -1,6 +1,5 @@
 set -e -x
 ./gradlew --parallel \
 --stacktrace \
---project-prop commitId="${CI_BUILD_REF}" \
---project-prop versionSuffix="$CI_BUILD_REF_NAME.$CI_BUILD_ID" \
+--project-prop versionSuffix="$BRANCH_NAME" \
 crashlyticsUploadDistributionProdRelease crashlyticsUploadDistributionProdStaging

@@ -27,23 +27,14 @@ if (keystoreProperties.exists()) {
     props.load(new FileInputStream(keystoreProperties))
 }
 
-project.ext.versionCode = 100
 def baseVersionName = "0.10.0"
-if (project.hasProperty("versionSuffix")) {
-    project.ext.versionSuffix = project.versionSuffix
-} else {
-    project.ext.versionSuffix = "snapshot"
-}
-if (project.ext.versionSuffix) {
-    project.ext.versionName = "${baseVersionName}-${project.versionSuffix}"
-} else {
-    project.ext.versionName = "${baseVersionName}"
-}
 
-if (project.hasProperty("commitId")) {
-    project.ext.commitId = project.commitId
+project.ext.versionCode = 100
+
+if (project.hasProperty("versionSuffix")) {
+    project.ext.versionChangeSuffix = project.versionSuffix
 } else {
-    project.ext.commitId = "<unknown>"
+    project.ext.versionChangeSuffix = "-snapshot"
 }
 
 android {
@@ -55,7 +46,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 23
         versionCode project.ext.versionCode
-        versionName project.ext.versionName
+        versionName "${baseVersionName}${project.ext.versionChangeSuffix}"
         renderscriptTargetApi 23
         multiDexEnabled true
         testInstrumentationRunner "com.android.test.runner.MultiDexTestRunner"
@@ -64,10 +55,6 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
-    }
-
-    dexOptions {
-        javaMaxHeapSize "2g"
     }
 
     signingConfigs {
@@ -108,6 +95,8 @@ android {
             debuggable false
             minifyEnabled false
             signingConfig signingConfigs.release
+            ext.betaDistributionGroupAliases = "android-internal-testers, internal-tests"
+            ext.betaDistributionNotifications = false
             ext.enableCrashlytics = true
             buildConfigField "String", "API_URL", production_api_url
         }

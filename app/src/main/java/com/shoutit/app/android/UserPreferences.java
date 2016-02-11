@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
 import com.appunite.rx.functions.Functions1;
 import com.appunite.rx.operators.MoreOperators;
 import com.google.common.base.Optional;
@@ -30,6 +29,7 @@ public class UserPreferences {
     private static final String KEY_LOCATION = "location";
     private static final String IS_GUEST = "is_guest";
     private static final String KEY_LOCATION_TRACKING = "location_tracking";
+    private static final String IS_FIRST_RUN = "is_first_run";
 
     private final PublishSubject<Object> userRefreshSubject = PublishSubject.create();
     private PublishSubject<Object> locationRefreshSubject = PublishSubject.create();
@@ -78,6 +78,16 @@ public class UserPreferences {
 
     public boolean isUserLoggedIn() {
         return getAuthToken().isPresent();
+    }
+
+    public boolean isFirstRun() {
+        return mPreferences.getBoolean(IS_FIRST_RUN, true);
+    }
+
+    public boolean isFirstRunAndSetToFalse() {
+        final boolean isFirstRun = mPreferences.getBoolean(IS_FIRST_RUN, true);
+        mPreferences.edit().putBoolean(IS_FIRST_RUN, false).apply();
+        return isFirstRun;
     }
 
     @Nullable
@@ -149,5 +159,10 @@ public class UserPreferences {
 
     public boolean automaticLocationTrackingEnabled() {
         return mPreferences.getBoolean(KEY_LOCATION_TRACKING, true);
+    }
+
+    @SuppressLint("CommitPrefEdits")
+    public void logout() {
+        mPreferences.edit().clear().commit();
     }
 }
