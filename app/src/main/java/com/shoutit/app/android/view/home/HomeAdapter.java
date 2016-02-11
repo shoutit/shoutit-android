@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.appunite.rx.dagger.UiScheduler;
+import com.google.common.base.Strings;
 import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
@@ -45,7 +46,6 @@ public class HomeAdapter extends BaseAdapter {
     private static final int VIEW_TYPE_DISCOVER_ITEMS_CONTAINER = 2;
     private static final int VIEW_TYPE_SHOUT_HEADER = 3;
     public static final int VIEW_TYPE_SHOUT_ITEM = 4;
-    private static final int POSITION_WHERE_SHOUTS_ITEMS_STARTS = 3;
 
     @Nonnull
     private final HomeDiscoversAdapter homeDiscoversAdapter;
@@ -66,10 +66,9 @@ public class HomeAdapter extends BaseAdapter {
         this.uiScheduler = uiScheduler;
     }
 
-    public void switchLayoutManager() {
-        isLinearLayoutManager = !isLinearLayoutManager;
-        notifyItemRangeChanged(POSITION_WHERE_SHOUTS_ITEMS_STARTS,
-                getItemCount() - POSITION_WHERE_SHOUTS_ITEMS_STARTS + 1);
+    public void switchLayoutManager(boolean isLinearLayoutManager) {
+        this.isLinearLayoutManager = isLinearLayoutManager;
+        notifyDataSetChanged();
     }
 
     class DiscoverHeaderViewHolder extends ViewHolderManager.BaseViewHolder<HomePresenter.DiscoverHeaderAdapterItem> {
@@ -107,16 +106,16 @@ public class HomeAdapter extends BaseAdapter {
                     outRect.right = itemSpacing;
                 }
             };
+            final MyLinearLayoutManager layoutManager = new MyLinearLayoutManager(
+                    context, LinearLayoutManager.HORIZONTAL, false);
+            recyclerView.addItemDecoration(itemDecoration);
+            recyclerView.setLayoutManager(layoutManager);
         }
 
         @Override
         public void bind(@Nonnull HomePresenter.DiscoverContainerAdapterItem item) {
             recycle();
 
-            final MyLinearLayoutManager layoutManager = new MyLinearLayoutManager(
-                    context, LinearLayoutManager.HORIZONTAL, false);
-            recyclerView.addItemDecoration(itemDecoration);
-            recyclerView.setLayoutManager(layoutManager);
             recyclerView.setAdapter(homeDiscoversAdapter);
 
             subscription = Observable.just(item.getAdapterItems())
@@ -217,13 +216,11 @@ public class HomeAdapter extends BaseAdapter {
                     R.string.price_with_currency, price, shout.getCurrency())
             );
 
-            if (!TextUtils.isEmpty(shout.getThumbnail())) {
-                picasso.load(shout.getThumbnail())
-                        .placeholder(R.drawable.pattern_placeholder)
-                        .fit()
-                        .centerCrop()
-                        .into(cardImageView);
-            }
+            picasso.load(Strings.emptyToNull(shout.getThumbnail()))
+                    .placeholder(R.drawable.pattern_placeholder)
+                    .fit()
+                    .centerCrop()
+                    .into(cardImageView);
         }
     }
 
@@ -270,35 +267,22 @@ public class HomeAdapter extends BaseAdapter {
 
             typeLabelTextView.setText(shout.getTypeResId());
 
-            if (!TextUtils.isEmpty(shout.getThumbnail())) {
-                picasso.load(shout.getThumbnail())
-                        .placeholder(R.drawable.pattern_placeholder)
-                        .fit()
-                        .centerCrop()
-                        .into(cardImageView);
-            }
+            picasso.load(Strings.emptyToNull(shout.getThumbnail()))
+                    .placeholder(R.drawable.pattern_placeholder)
+                    .fit()
+                    .centerCrop()
+                    .into(cardImageView);
 
-            if (shout.getCategory() != null && shout.getCategory().getMainTag() != null) {
-                final String categoryImageUrl = shout.getCategory().getMainTag().getImage();
-                if (!TextUtils.isEmpty(categoryImageUrl)) {
-                    picasso.load(categoryImageUrl)
-                            .fit()
-                            .centerInside()
-                            .into(itemCategoryImageView);
-                }
-            }
+            picasso.load(item.getCategoryIconUrl())
+                    .fit()
+                    .centerInside()
+                    .into(itemCategoryImageView);
 
-            if (shout.getLocation() != null && !TextUtils.isEmpty(shout.getLocation().getCountry())) {
-                final String countryCode = shout.getLocation().getCountry().toLowerCase();
-                final int flagResId = ResourcesHelper.getResourceIdForName(countryCode, context);
-                if (flagResId != 0) {
-                    final Target target = PicassoHelper.getRoundedBitmapTarget(context, countryImageView);
-                    cardImageView.setTag(target);
-                    picasso.load(flagResId)
-                            .resizeDimen(R.dimen.home_country_icon, R.dimen.home_country_icon)
-                            .into(target);
-                }
-            }
+            final Target target = PicassoHelper.getRoundedBitmapTarget(context, countryImageView);
+            cardImageView.setTag(target);
+            picasso.load(item.getCountryResId())
+                    .resizeDimen(R.dimen.home_country_icon, R.dimen.home_country_icon)
+                    .into(target);
 
             subscription = new CompositeSubscription(
                     RxView.clicks(chatIcon)
