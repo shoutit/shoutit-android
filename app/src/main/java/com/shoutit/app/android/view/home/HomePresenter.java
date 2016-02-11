@@ -1,10 +1,16 @@
 package com.shoutit.app.android.view.home;
 
+import android.content.Context;
+import android.support.annotation.IdRes;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
+
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.DiscoverChild;
@@ -12,9 +18,11 @@ import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
+import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.utils.MoreFunctions1;
+import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
 
 import java.util.ArrayList;
@@ -52,6 +60,7 @@ public class HomePresenter {
     private final ShoutsDao shoutsDao;
     @Nonnull
     private final Scheduler uiScheduler;
+    private final Context context;
     private final String userCity;
 
 
@@ -59,9 +68,11 @@ public class HomePresenter {
     public HomePresenter(@Nonnull ShoutsDao shoutsDao,
                          @Nonnull final DiscoversDao discoversDao,
                          @Nonnull final UserPreferences userPreferences,
-                         @Nonnull @UiScheduler final Scheduler uiScheduler) {
+                         @Nonnull @UiScheduler final Scheduler uiScheduler,
+                         @ForActivity Context context) {
         this.shoutsDao = shoutsDao;
         this.uiScheduler = uiScheduler;
+        this.context = context;
 
         final boolean isUserLoggedIn = userPreferences.isUserLoggedIn();
         userCity = userPreferences.getUserCity();
@@ -299,6 +310,26 @@ public class HomePresenter {
         @Nonnull
         public Shout getShout() {
             return shout;
+        }
+
+        @Nullable
+        public String getCategoryIconUrl() {
+            if (shout.getCategory() != null && shout.getCategory().getMainTag() != null) {
+                return Strings.emptyToNull(shout.getCategory().getMainTag().getImage());
+            } else {
+                return null;
+            }
+        }
+
+        @IdRes
+        @Nullable
+        public Integer getCountryResId() {
+            if (shout.getLocation() != null && !TextUtils.isEmpty(shout.getLocation().getCountry())) {
+                final String countryCode = shout.getLocation().getCountry().toLowerCase();
+                return ResourcesHelper.getResourceIdForName(countryCode, context);
+            } else {
+                return null;
+            }
         }
     }
 

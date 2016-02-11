@@ -1,7 +1,6 @@
 package com.shoutit.app.android.view.home;
 
 import android.content.Context;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -9,9 +8,9 @@ import android.widget.TextView;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
+import com.google.common.base.Strings;
 import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
-import com.shoutit.app.android.api.model.Discover;
 import com.shoutit.app.android.api.model.DiscoverChild;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.squareup.picasso.Picasso;
@@ -53,14 +52,11 @@ public class HomeDiscoversAdapter extends BaseAdapter {
             final DiscoverChild discover = item.getDiscover();
             cardTitleTextView.setText(discover.getTitle());
 
-            if (!TextUtils.isEmpty(discover.getImage())) {
-                picasso.load(discover.getImage())
-                        .placeholder(R.drawable.pattern_placeholder)
-                        .fit()
-                        .centerCrop()
-                        .into(cardImageView);
-            }
-
+            picasso.load(Strings.emptyToNull(discover.getImage()))
+                    .placeholder(R.drawable.pattern_placeholder)
+                    .fit()
+                    .centerCrop()
+                    .into(cardImageView);
         }
     }
 
