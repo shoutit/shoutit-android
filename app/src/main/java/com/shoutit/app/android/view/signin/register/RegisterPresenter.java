@@ -71,7 +71,7 @@ public class RegisterPresenter {
                         return Observable.zip(
                                 mNameSubject.filter(getNotEmptyFunc1()),
                                 mEmailSubject.filter(getNotEmptyFunc1()),
-                                mPasswordSubject.filter(Functions1.neg(getLessThan6CharsFunc1())),
+                                mPasswordSubject.filter(Functions1.neg(getLessThan6AndMoreThan20CharsFunc1())),
                                 new Func3<String, String, String, EmailSignupRequest>() {
                                     @Override
                                     public EmailSignupRequest call(String name, String email, String password) {
@@ -93,11 +93,11 @@ public class RegisterPresenter {
                 .compose(ObservableExtensions.<ResponseOrError<SignResponse>>behaviorRefCount());
 
 
-        mPasswordEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservableFirst(mPasswordSubject)).filter(getLessThan6CharsFunc1());
+        mPasswordEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservableFirst(mPasswordSubject)).filter(getLessThan6AndMoreThan20CharsFunc1());
         mEmailEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservableFirst(mEmailSubject)).filter(Functions1.isNullOrEmpty());
         mNameEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservableFirst(mNameSubject)).filter(Functions1.isNullOrEmpty());
 
-        mPasswordNotEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservableFirst(mPasswordSubject)).filter(Functions1.neg(getLessThan6CharsFunc1()));
+        mPasswordNotEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservableFirst(mPasswordSubject)).filter(Functions1.neg(getLessThan6AndMoreThan20CharsFunc1()));
         mEmailNotEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservableFirst(mEmailSubject)).filter(Functions1.neg(Functions1.isNullOrEmpty()));
         mNameNotEmpty = mProceedSubject.flatMap(MoreFunctions1.returnObservableFirst(mNameSubject)).filter(Functions1.neg(Functions1.isNullOrEmpty()));
 
@@ -120,11 +120,12 @@ public class RegisterPresenter {
     }
 
     @NonNull
-    private Func1<? super CharSequence, Boolean> getLessThan6CharsFunc1() {
+    private Func1<? super CharSequence, Boolean> getLessThan6AndMoreThan20CharsFunc1() {
         return new Func1<CharSequence, Boolean>() {
             @Override
             public Boolean call(CharSequence charSequence) {
-                return charSequence.length() < 6;
+                final int length = charSequence.length();
+                return length < 6 || length > 20;
             }
         };
     }
