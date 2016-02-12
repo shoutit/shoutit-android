@@ -282,6 +282,8 @@ public class LocationPresenter implements GoogleApiClient.ConnectionCallbacks {
                 .switchMap(new Func1<UserLocation, Observable<ResponseOrError<User>>>() {
                     @Override
                     public Observable<ResponseOrError<User>> call(UserLocation userLocation) {
+                        userPreferences.setAutomaticLocationTrackingEnabled(userLocation.isFromGps());
+
                         if (!userPreferences.isUserLoggedIn()) { // TODO remove this if guest user will be handled by API
                             userPreferences.saveLocation(userLocation);
                             return Observable.just(ResponseOrError.fromData(User.guestUser(userLocation)));
@@ -553,7 +555,7 @@ public class LocationPresenter implements GoogleApiClient.ConnectionCallbacks {
 
         public void onLocationSelected() {
             if (isGpsLocation) {
-                selectedGpsUserLocation.onNext(userLocation);
+                selectedGpsUserLocation.onNext(UserLocation.fromGps(userLocation));
             }
         }
     }

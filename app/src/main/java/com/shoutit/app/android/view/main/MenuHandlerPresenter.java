@@ -3,6 +3,7 @@ package com.shoutit.app.android.view.main;
 import android.content.Context;
 
 import com.appunite.rx.ObservableExtensions;
+import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Strings;
 import com.shoutit.app.android.BuildConfig;
@@ -17,6 +18,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import rx.Observable;
+import rx.Scheduler;
 import rx.functions.Func1;
 
 public class MenuHandlerPresenter {
@@ -38,9 +40,11 @@ public class MenuHandlerPresenter {
 
     @Inject
     public MenuHandlerPresenter(@Nonnull UserPreferences userPreferences,
-                                @Nonnull @ForActivity final Context context) {
+                                @Nonnull @ForActivity final Context context,
+                                @Nonnull @UiScheduler Scheduler uiScheduler) {
 
         final Observable<User> userObservable = userPreferences.userObservable()
+                .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<User>behaviorRefCount());
 
         avatarObservable = userObservable
@@ -70,6 +74,7 @@ public class MenuHandlerPresenter {
 
 
         final Observable<UserLocation> locationObservable = userPreferences.getLocationObservable()
+                .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<UserLocation>behaviorRefCount());
 
         cityObservable = locationObservable

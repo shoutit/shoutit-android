@@ -9,6 +9,14 @@ public class UserLocation {
     private final String city;
     private final String address;
 
+    // Not from API
+    private boolean isFromGps;
+
+    public static UserLocation fromGps(UserLocation userLocation) {
+        return new UserLocation(userLocation.latitude, userLocation.longitude, userLocation.country,
+                userLocation.postalCode, userLocation.state, userLocation.city, userLocation.address, true);
+    }
+
     public UserLocation(double latitude, double longitude, String country, String postalCode,
                         String state, String city, String address) {
         this.latitude = latitude;
@@ -20,8 +28,16 @@ public class UserLocation {
         this.address = address;
     }
 
-    public static UserLocation withCoordinates(double lat, double lng) {
-        return new UserLocation(lat, lng, null, null, null, null, null);
+    public UserLocation(double latitude, double longitude, String country, String postalCode,
+                        String state, String city, String address, boolean isFromGps) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.country = country;
+        this.postalCode = postalCode;
+        this.state = state;
+        this.city = city;
+        this.address = address;
+        this.isFromGps = isFromGps;
     }
 
     public double getLatitude() {
@@ -52,4 +68,7 @@ public class UserLocation {
         return address;
     }
 
+    public boolean isFromGps() {
+        return isFromGps;
+    }
 }

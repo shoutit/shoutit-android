@@ -17,10 +17,14 @@ import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import rx.Observable;
+import rx.functions.Func0;
+import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
+@Singleton
 public class UserPreferences {
 
     private static final String AUTH_TOKEN = "token";
@@ -32,7 +36,9 @@ public class UserPreferences {
     private static final String IS_FIRST_RUN = "is_first_run";
 
     private final PublishSubject<Object> userRefreshSubject = PublishSubject.create();
-    private PublishSubject<Object> locationRefreshSubject = PublishSubject.create();
+    private final PublishSubject<Object> locationRefreshSubject = PublishSubject.create();
+    private final Observable<User> userObservable;
+    private final Observable<UserLocation> locationObservable;
 
     @SuppressLint("CommitPrefEdits")
     private final SharedPreferences mPreferences;
@@ -43,6 +49,26 @@ public class UserPreferences {
     public UserPreferences(@ForApplication Context context, @Nonnull Gson gson) {
         this.gson = gson;
         mPreferences = context.getSharedPreferences("prefs", 0);
+
+        locationObservable = Observable
+                .defer(new Func0<Observable<UserLocation>>() {
+                    @Override
+                    public Observable<UserLocation> call() {
+                        return Observable.just(getLocation());
+                    }
+                })
+                .compose(MoreOperators.<UserLocation>refresh(locationRefreshSubject))
+                .filter(Functions1.isNotNull());
+
+        userObservable = Observable
+                .defer(new Func0<Observable<User>>() {
+                    @Override
+                    public Observable<User> call() {
+                        return Observable.just(getUser());
+                    }
+                })
+                .compose(MoreOperators.<User>refresh(userRefreshSubject))
+                .filter(Functions1.isNotNull());
     }
 
     @SuppressLint("CommitPrefEdits")
@@ -98,15 +124,7 @@ public class UserPreferences {
 
     @Nonnull
     public Observable<User> userObservable() {
-        return Observable
-                .fromCallable(new Callable<User>() {
-                    @Override
-                    public User call() throws Exception {
-                        return getUser();
-                    }
-                })
-                .filter(Functions1.isNotNull())
-                .compose(MoreOperators.<User>refresh(userRefreshSubject));
+        return userObservable;
     }
 
     private void refreshUser() {
@@ -132,16 +150,7 @@ public class UserPreferences {
     }
 
     public Observable<UserLocation> getLocationObservable() {
-        return Observable
-                .fromCallable(new Callable<UserLocation>() {
-                    @Override
-                    public UserLocation call() throws Exception {
-                        return getLocation();
-                    }
-                })
-                .compose(MoreOperators.<UserLocation>refresh(locationRefreshSubject))
-                .filter(Functions1.isNotNull());
-
+        return locationObservable;
     }
 
     public void saveLocation(@Nullable UserLocation location) {
@@ -160,6 +169,13 @@ public class UserPreferences {
 
     public boolean automaticLocationTrackingEnabled() {
         return mPreferences.getBoolean(KEY_LOCATION_TRACKING, true);
+    }
+
+    @SuppressLint("CommitPrefEdits")
+    public void setAutomaticLocationTrackingEnabled(boolean enable) {
+        mPreferences.edit()
+                .putBoolean(KEY_LOCATION_TRACKING, enable)
+                .commit();
     }
 
     @SuppressLint("CommitPrefEdits")
