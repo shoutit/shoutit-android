@@ -56,10 +56,15 @@
     <string name="register_login_text">Have an account? Log in</string>
     <string name="register_error">Failed to register</string>
     <string name="register_empty_mail">Mail cannot be empty.</string>
-    <string name="register_empty_password">Password must have at least 6 characters.</string>
+    <string name="register_empty_password">Password must have at least 6 and no more than 20 characters.</string>
     <string name="register_empty_name">Name cannot be empty</string>
     <string name="register_have_an_account">Have an account?</string>
     <string name="register_log_in">Log in</string>
+    <string name="register_bottom_text1">By Proceeding you also agree to Shoutit’s</string>
+    <string name="register_bottom_text2">Terms of Service</string>
+    <string name="register_bottom_text3">and</string>
+    <string name="register_bottom_text4">Privacy Policy</string>
+    <string name="register_forgot_password">Forgot your password?</string>
 
     <!-- Login Intro -->
     <string name="login_intro_join">Join Now!</string>
@@ -70,7 +75,6 @@
     <string name="login_intro_feedback">Feedback</string>
     <string name="login_intro_help">Help</string>
     <string name="login_intro_about">About</string>
-    <string name="register_forgot_password">Forgot your password?</string>
     <string name="login_sign_up_new">New to Shoutit?</string>
 
     <!-- About -->
@@ -84,10 +88,6 @@
     <string name="about_privacy_policy_title">Privacy Policy</string>
     <string name="about_legal_title">Legal</string>
     <string name="about_title">About</string>
-    <string name="register_bottom_text1">By Proceeding you also agree to Shoutit’s</string>
-    <string name="register_bottom_text2">Terms of Service</string>
-    <string name="register_bottom_text3">and</string>
-    <string name="register_bottom_text4">Privacy Policy</string>
 
     <!-- Html Activity -->
     <string name="html_activity_terms">Terms of Service</string>

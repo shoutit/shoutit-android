@@ -129,9 +129,9 @@ public class LocationActivity extends BaseActivity {
 
     private void setUpActionbar() {
         setSupportActionBar(toolbar);
+        toolbar.setTitle(R.string.location_toolbar_title);
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle(R.string.location_toolbar_title);
     }
 
     @Override

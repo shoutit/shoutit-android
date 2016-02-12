@@ -17,7 +17,7 @@ import rx.schedulers.Schedulers;
 
 public class GoogleHelper {
 
-    private final static String SCOPE = "oauth2:https://www.googleapis.com/auth/userinfo.profile";
+    private final static String SCOPE = "oauth2:https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email";
 
     public static void pickUserAccount(Activity context, int requestCode) {
         final String[] accountTypes = new String[]{"com.google"};

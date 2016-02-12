@@ -86,6 +86,8 @@ android {
             debuggable false
             minifyEnabled false
             ext.enableCrashlytics = true
+            ext.betaDistributionGroupAliases = "android-internal-testers, internal-tests"
+            ext.betaDistributionNotifications = false
             applicationIdSuffix '.staging'
             versionNameSuffix "-staging"
             buildConfigField "String", "API_URL", dev_runscope_api_url

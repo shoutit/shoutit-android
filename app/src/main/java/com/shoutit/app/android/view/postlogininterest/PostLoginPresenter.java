@@ -13,6 +13,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.Category;
+import com.shoutit.app.android.api.model.TagsRequest;
 import com.shoutit.app.android.dao.CategoriesDao;
 
 import java.util.List;
@@ -74,17 +75,17 @@ public class PostLoginPresenter {
                         return mStringSelectionHelper
                                 .getSelectedItems()
                                 .first()
-                                .flatMap(new Func1<Set<String>, Observable<String>>() {
+                                .flatMap(new Func1<Set<String>, Observable<ResponseOrError<Object>>>() {
                                     @Override
-                                    public Observable<String> call(Set<String> strings) {
-                                        return Observable.from(strings);
-                                    }
-                                })
-                                .flatMap(new Func1<String, Observable<ResponseOrError<Object>>>() {
-                                    @Override
-                                    public Observable<ResponseOrError<Object>> call(String s) {
-                                        return apiService
-                                                .postCategoryListen(s)
+                                    public Observable<ResponseOrError<Object>> call(Set<String> strings) {
+                                        final ImmutableList<TagsRequest.TagToListen> tagToListens = ImmutableList.copyOf(Iterables.transform(strings, new Function<String, TagsRequest.TagToListen>() {
+                                            @Nullable
+                                            @Override
+                                            public TagsRequest.TagToListen apply(@Nullable String input) {
+                                                return new TagsRequest.TagToListen(input);
+                                            }
+                                        }));
+                                        return apiService.batchListen(new TagsRequest(tagToListens))
                                                 .subscribeOn(networkScheduler)
                                                 .observeOn(uiScheduler)
                                                 .compose(ResponseOrError.toResponseOrErrorObservable());

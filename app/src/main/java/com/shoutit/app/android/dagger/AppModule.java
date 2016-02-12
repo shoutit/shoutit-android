@@ -100,9 +100,11 @@ public final class AppModule {
             okHttpClient.cache(cache.get());
         }
 
+        okHttpClient.interceptors().add(authInterceptor);
+
         final HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
         okHttpClient.interceptors().add(loggingInterceptor);
-        okHttpClient.interceptors().add(authInterceptor);
+
         loggingInterceptor.setLevel(BuildConfig.DEBUG ?
                 HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE);
 

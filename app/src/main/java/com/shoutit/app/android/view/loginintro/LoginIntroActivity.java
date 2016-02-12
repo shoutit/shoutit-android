@@ -117,7 +117,7 @@ public class LoginIntroActivity extends BaseActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == GOOGLE_SIGN_IN) {
+        if (requestCode == GOOGLE_SIGN_IN && resultCode == RESULT_OK) {
             final String email = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
             GoogleHelper.getToken(this, email, GOOGLE_ACC_AUTH)
                     .withLatestFrom(mObservable, new Func2<String, UserLocation, BothParams<String, UserLocation>>() {
@@ -128,7 +128,7 @@ public class LoginIntroActivity extends BaseActivity {
                     })
                     .flatMap(getCallGoogleApi())
                     .subscribe(getSuccessAction(), getErrorAction());
-        } else if (requestCode == GOOGLE_ACC_AUTH) {
+        } else if (requestCode == GOOGLE_ACC_AUTH && resultCode == RESULT_OK) {
             final String authtoken = data.getExtras().getString("authtoken");
             mObservable
                     .map(new Func1<UserLocation, BothParams<String, UserLocation>>() {

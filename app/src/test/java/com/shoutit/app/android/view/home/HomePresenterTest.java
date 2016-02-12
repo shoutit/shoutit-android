@@ -1,5 +1,7 @@
 package com.shoutit.app.android.view.home;
 
+import android.content.Context;
+
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.collect.Lists;
@@ -48,6 +50,8 @@ public class HomePresenterTest {
     Tag tag;
     @Mock
     UserPreferences userPreferences;
+    @Mock
+    Context context;
 
     private HomePresenter presenter;
     private final TestScheduler scheduler = new TestScheduler();
@@ -71,7 +75,7 @@ public class HomePresenterTest {
         when(userPreferences.getUserCity()).thenReturn("city");
         when(userPreferences.getUserCountryCode()).thenReturn("PL");
 
-        presenter = new HomePresenter(shoutsDao, discoversDao, userPreferences, scheduler);
+        presenter = new HomePresenter(shoutsDao, discoversDao, userPreferences, scheduler, context);
     }
 
     @Test

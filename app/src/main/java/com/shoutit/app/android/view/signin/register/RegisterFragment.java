@@ -147,19 +147,19 @@ public class RegisterFragment extends BaseFragment {
                 });
 
         RxTextView.textChangeEvents(emailEdittext)
-                .debounce(500, TimeUnit.MILLISECONDS) // TODO temp fix
+                .debounce(500, TimeUnit.MILLISECONDS)
                 .map(MoreFunctions1.mapTextChangeEventToString())
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(registerPresenter.getEmailObserver());
 
         RxTextView.textChangeEvents(nameEditText)
-                .debounce(500, TimeUnit.MILLISECONDS) // TODO temp fix
+                .debounce(500, TimeUnit.MILLISECONDS)
                 .map(MoreFunctions1.mapTextChangeEventToString())
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(registerPresenter.getNameObserver());
 
         RxTextView.textChangeEvents(passwordEdittext)
-                .debounce(500, TimeUnit.MILLISECONDS) // TODO temp fix
+                .debounce(500, TimeUnit.MILLISECONDS)
                 .map(MoreFunctions1.mapTextChangeEventToString())
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(registerPresenter.getPasswordObserver());
@@ -167,7 +167,6 @@ public class RegisterFragment extends BaseFragment {
         RxView.clicks(proceedBtn)
                 .compose(this.<Void>bindToLifecycle())
                 .subscribe(registerPresenter.getProceedObserver());
-
     }
 
     private void setUpSpans() {

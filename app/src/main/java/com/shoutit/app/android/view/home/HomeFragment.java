@@ -150,7 +150,8 @@ public class HomeFragment extends BaseFragment {
         recyclerView.setLayoutManager(new MyLinearLayoutManager(context));
         recyclerView.removeItemDecoration(gridViewItemDecoration);
         recyclerView.addItemDecoration(linearViewItemDecoration);
-        adapter.switchLayoutManager();
+        recyclerView.setAdapter(adapter);
+        adapter.switchLayoutManager(true);
     }
 
     private void setGridLayoutManager() {
@@ -168,7 +169,8 @@ public class HomeFragment extends BaseFragment {
         recyclerView.setLayoutManager(gridLayoutManager);
         recyclerView.removeItemDecoration(linearViewItemDecoration);
         recyclerView.addItemDecoration(gridViewItemDecoration);
-        adapter.switchLayoutManager();
+        recyclerView.setAdapter(adapter);
+        adapter.switchLayoutManager(false);
     }
 
     @Override
