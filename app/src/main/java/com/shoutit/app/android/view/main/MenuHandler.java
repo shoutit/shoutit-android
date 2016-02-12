@@ -3,15 +3,17 @@ package com.shoutit.app.android.view.main;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.view.View;
+import android.widget.CheckedTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.common.collect.Lists;
 import com.jakewharton.rxbinding.view.RxView;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.R;
@@ -24,6 +26,9 @@ import com.squareup.picasso.Target;
 import com.squareup.picasso.Transformation;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 import com.uservoice.uservoicesdk.UserVoice;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -56,7 +61,18 @@ public class MenuHandler {
     @Bind(R.id.menu_version_name)
     TextView versionNameTextView;
     @Bind(R.id.menu_logout)
-    View logoutView;
+    CheckedTextView logoutView;
+
+    @Bind(R.id.menu_home)
+    CheckedTextView homeItem;
+    @Bind(R.id.menu_discover)
+    CheckedTextView discoverItem;
+    @Bind(R.id.menu_browse)
+    CheckedTextView browseItem;
+    @Bind(R.id.menu_chat)
+    CheckedTextView chatItem;
+    @Bind(R.id.menu_orders)
+    CheckedTextView orderItems;
 
     @Inject
     MenuHandlerPresenter presenter;
@@ -69,6 +85,8 @@ public class MenuHandler {
     private final Picasso picasso;
     @Nonnull
     private final UserPreferences userPreferences;
+
+    private List<CheckedTextView> selectableItems = new ArrayList<>();
 
     @Inject
     public MenuHandler(@Nonnull final RxAppCompatActivity rxActivity,
@@ -83,6 +101,7 @@ public class MenuHandler {
 
     public void initMenu(@Nonnull View view) {
         ButterKnife.bind(this, view);
+        selectableItems = Lists.newArrayList(homeItem, discoverItem, browseItem, chatItem, orderItems);
         setData();
     }
 
@@ -135,12 +154,15 @@ public class MenuHandler {
         switch (view.getId()) {
             case R.id.menu_home:
                 onMenuItemSelectedListener.onMenuItemSelected(FRAGMENT_HOME);
+                selectItem(view.getId());
                 break;
             case R.id.menu_discover:
                 onMenuItemSelectedListener.onMenuItemSelected(FRAGMENT_DISCOVER);
+                selectItem(view.getId());
                 break;
             case R.id.menu_browse:
                 onMenuItemSelectedListener.onMenuItemSelected(FRAGMENT_BROWSE);
+                selectItem(view.getId());
                 break;
             case R.id.menu_chat:
                 if (userPreferences.isUserLoggedIn()) {
@@ -149,6 +171,7 @@ public class MenuHandler {
                 } else {
                     Toast.makeText(rxActivity, "Hello. Log in popup here", Toast.LENGTH_SHORT).show();
                 }
+                selectItem(view.getId());
                 break;
             case R.id.menu_orders:
                 if (userPreferences.isUserLoggedIn()) {
@@ -157,6 +180,7 @@ public class MenuHandler {
                 } else {
                     Toast.makeText(rxActivity, "Hello. Log in popup here", Toast.LENGTH_SHORT).show();
                 }
+                selectItem(view.getId());
                 break;
             case R.id.menu_settings:
                 onMenuItemSelectedListener.onMenuItemSelected(FRAGMENT_SETTINGS);
@@ -173,6 +197,14 @@ public class MenuHandler {
                 rxActivity.startActivity(MainActivity.newIntent(rxActivity)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 );
+        }
+
+        selectItem(view.getId());
+    }
+
+    private void selectItem(@IdRes int id) {
+        for (CheckedTextView item : selectableItems) {
+            item.setChecked(item.getId() == id);
         }
     }
 
