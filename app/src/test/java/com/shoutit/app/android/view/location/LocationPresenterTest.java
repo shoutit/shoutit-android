@@ -83,7 +83,7 @@ public class LocationPresenterTest {
                 .thenReturn(Observable.just(UserLocation.withCoordinates(0, 0)));
         when(userPreferences.automaticLocationTrackingEnabled())
                 .thenReturn(true);
-        when(userPreferences.getLocationObservable()).thenReturn(Observable.just(new UserLocation(0, 1, "c", null, null, null, null)));
+        when(userPreferences.getCityObservable()).thenReturn(Observable.just(new UserLocation(0, 1, "c", null, null, null, null)));
         when(googleApiClient.isConnected()).thenReturn(true);
         when(PermissionHelper.hasPermission(any(Context.class), anyString())).thenReturn(true);
 

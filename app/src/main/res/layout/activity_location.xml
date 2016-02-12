@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <android.support.v7.widget.Toolbar
@@ -27,7 +27,7 @@
                 android:hint="@string/location_search_hint"/>
 
             <ProgressBar
-                android:id="@+id/location_progress_bar"
+                android:id="@+id/location_query_progress_bar"
                 android:theme="@style/WhiteProgressBar"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
@@ -42,7 +42,24 @@
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/location_recycler_view"
+        android:layout_below="@+id/location_toolbar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-</LinearLayout>
+    <FrameLayout
+        android:id="@+id/location_progress_bar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        android:clickable="true">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
+
+    </FrameLayout>
+
+
+</RelativeLayout>

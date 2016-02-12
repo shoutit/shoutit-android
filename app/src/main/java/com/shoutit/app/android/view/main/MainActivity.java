@@ -102,6 +102,9 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
+        if (drawerToggle == null) {
+            return;
+        }
         drawerToggle.syncState();
     }
 

@@ -1,5 +1,6 @@
 package com.shoutit.app.android.api.model;
 
+
 public class User {
 
     private final String id;
@@ -32,6 +33,11 @@ public class User {
         this.cover = cover;
         this.isListening = isListening;
         this.location = location;
+    }
+
+    // TODO remove it when user will be handler by API
+    public static User guestUser(UserLocation location) {
+        return new User(null, null, null, null ,null, null, null, null, false, null, null, false, location);
     }
 
     public String getId() {

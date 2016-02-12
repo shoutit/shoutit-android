@@ -28,11 +28,7 @@ public class LocationUtils {
 
     public static PendingResult<AutocompletePredictionBuffer> getPredictionsForQuery(
             @Nonnull GoogleApiClient googleApiClient, @Nonnull String query) {
-        final AutocompleteFilter autocompleteFilter = new AutocompleteFilter.Builder()
-                .setTypeFilter(AutocompleteFilter.TYPE_FILTER_ADDRESS)
-                .build();
-
         return Places.GeoDataApi.getAutocompletePredictions(googleApiClient, query,
-                BOUNDS_WORLDWIDE, autocompleteFilter);
+                BOUNDS_WORLDWIDE, null);
     }
 }

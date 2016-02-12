@@ -139,8 +139,9 @@ public class UserPreferences {
                         return getLocation();
                     }
                 })
-                .filter(Functions1.isNotNull())
-                .compose(MoreOperators.<UserLocation>refresh(locationRefreshSubject));
+                .compose(MoreOperators.<UserLocation>refresh(locationRefreshSubject))
+                .filter(Functions1.isNotNull());
+
     }
 
     public void saveLocation(@Nullable UserLocation location) {

@@ -91,7 +91,7 @@ public class MenuHandler {
                 .compose(rxActivity.<String>bindToLifecycle())
                 .subscribe(RxTextView.text(userNameTextView));
 
-        presenter.getLocationObservable()
+        presenter.getCityObservable()
                 .compose(rxActivity.<String>bindToLifecycle())
                 .subscribe(RxTextView.text(locationTextView));
 

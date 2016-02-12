@@ -28,7 +28,7 @@ public class MenuHandlerPresenter {
     @Nonnull
     private final Observable<String> nameObservable;
     @Nonnull
-    private final Observable<String> locationObservable;
+    private final Observable<String> cityObservable;
     @Nonnull
     private final Observable<Integer> countryCodeObservable;
     @Nonnull
@@ -68,14 +68,11 @@ public class MenuHandlerPresenter {
                     }
                 });
 
-        locationObservable = userObservable
-                .map(new Func1<User, UserLocation>() {
-                    @Override
-                    public UserLocation call(User user) {
-                        return user.getLocation();
-                    }
-                })
-                .filter(Functions1.isNotNull())
+
+        final Observable<UserLocation> locationObservable = userPreferences.getLocationObservable()
+                .compose(ObservableExtensions.<UserLocation>behaviorRefCount());
+
+        cityObservable = locationObservable
                 .map(new Func1<UserLocation, String>() {
                     @Override
                     public String call(UserLocation location) {
@@ -83,14 +80,7 @@ public class MenuHandlerPresenter {
                     }
                 });
 
-        countryCodeObservable = userObservable
-                .map(new Func1<User, UserLocation>() {
-                    @Override
-                    public UserLocation call(User user) {
-                        return user.getLocation();
-                    }
-                })
-                .filter(Functions1.isNotNull())
+        countryCodeObservable = locationObservable
                 .map(new Func1<UserLocation, String>() {
                     @Override
                     public String call(UserLocation location) {
@@ -134,8 +124,8 @@ public class MenuHandlerPresenter {
     }
 
     @Nonnull
-    public Observable<String> getLocationObservable() {
-        return locationObservable;
+    public Observable<String> getCityObservable() {
+        return cityObservable;
     }
 
     @Nonnull

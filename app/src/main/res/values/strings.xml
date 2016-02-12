@@ -122,5 +122,8 @@
     <string name="post_login_send_error">Error sending interests</string>
     <string name="post_login_next">next</string>
     <string name="post_login_activity_title">Listen to your Interest!</string>
+    <string name="location_fetching_error">Sorry, cannot get locations</string>
+    <string name="location_update_error">Sorry, cannot update your location. Please try again.</string>
+    <string name="location_update_success">Location successfully changed</string>
 
 </resources>

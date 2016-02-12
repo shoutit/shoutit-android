@@ -27,39 +27,59 @@ public class LocationAdapter extends BaseAdapter {
         super(context);
     }
 
-    class PlaceViewHolder extends ViewHolderManager.BaseViewHolder<LocationPresenter.PlaceAdapterItem> {
+    class PlaceViewHolder extends ViewHolderManager.BaseViewHolder<LocationPresenter.PlaceAdapterItem> implements View.OnClickListener {
 
         @Bind(R.id.location_suggestion_item_tv)
         TextView placeTextView;
 
+        @Nonnull
+        private LocationPresenter.PlaceAdapterItem item;
+
         public PlaceViewHolder(@Nonnull View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            itemView.setOnClickListener(this);
         }
 
         @Override
         public void bind(@Nonnull LocationPresenter.PlaceAdapterItem item) {
+            this.item = item;
             placeTextView.setText(item.getFullText());
+        }
+
+        @Override
+        public void onClick(View v) {
+            item.locationSelected();
         }
     }
 
-    class CurrentLocationViewHolder extends ViewHolderManager.BaseViewHolder<LocationPresenter.CurrentLocationAdapterItem> {
+    class CurrentLocationViewHolder extends ViewHolderManager.BaseViewHolder<LocationPresenter.CurrentLocationAdapterItem> implements View.OnClickListener {
 
         @Bind(R.id.location_current_item_header_tv)
         TextView headerTextView;
         @Bind(R.id.location_current_item_place_tv)
         TextView placeTextView;
 
+        @Nonnull
+        private LocationPresenter.CurrentLocationAdapterItem item;
+
         public CurrentLocationViewHolder(@Nonnull View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            itemView.setOnClickListener(this);
         }
 
         @Override
         public void bind(@Nonnull LocationPresenter.CurrentLocationAdapterItem item) {
+            this.item = item;
             headerTextView.setText(item.getHeaderName());
             placeTextView.setText(context.getString(R.string.location_location,
                     item.getUserLocation().getCountry(), item.getUserLocation().getCity()));
+        }
+
+        @Override
+        public void onClick(View v) {
+            item.onLocationSelected();
         }
     }
 

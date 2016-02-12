@@ -82,6 +82,8 @@ public class LocationPresenter implements GoogleApiClient.ConnectionCallbacks {
     @Nonnull
     private final Scheduler networkScheduler;
     @Nonnull
+    private final Scheduler uiScheduler;
+    @Nonnull
     private final Context context;
     @Nonnull
     private final ApiService apiService;
@@ -97,6 +99,7 @@ public class LocationPresenter implements GoogleApiClient.ConnectionCallbacks {
                              @Nonnull final UserPreferences userPreferences) {
         this.googleApiClient = googleApiClient;
         this.networkScheduler = networkScheduler;
+        this.uiScheduler = uiScheduler;
         this.context = context;
         this.apiService = apiService;
         this.userPreferences = userPreferences;
@@ -154,6 +157,7 @@ public class LocationPresenter implements GoogleApiClient.ConnectionCallbacks {
                 .filter(queryFilter())
                 .distinctUntilChanged()
                 .doOnNext(showQueryProgressAction(true))
+                .observeOn(networkScheduler)
                 .switchMap(new Func1<String, Observable<AutocompletePredictionBuffer>>() {
                     @Override
                     public Observable<AutocompletePredictionBuffer> call(String query) {
@@ -234,6 +238,7 @@ public class LocationPresenter implements GoogleApiClient.ConnectionCallbacks {
         final Observable<ResponseOrError<PlaceBuffer>> locationDetailsObservable = suggestedLocationSelectedSubject
                 .filter(Functions1.isNotNull())
                 .doOnNext(showProgressAction(true))
+                .observeOn(networkScheduler)
                 .switchMap(new Func1<String, Observable<PlaceBuffer>>() {
                     @Override
                     public Observable<PlaceBuffer> call(String placeId) {
@@ -279,12 +284,15 @@ public class LocationPresenter implements GoogleApiClient.ConnectionCallbacks {
                     public Observable<ResponseOrError<User>> call(UserLocation userLocation) {
                         if (!userPreferences.isUserLoggedIn()) { // TODO remove this if guest user will be handled by API
                             userPreferences.saveLocation(userLocation);
+                            return Observable.just(ResponseOrError.fromData(User.guestUser(userLocation)));
+                        } else {
+                            return apiService.updateUserLocation(new UpdateLocationRequest(userLocation))
+                                    .subscribeOn(networkScheduler)
+                                    .compose(ResponseOrError.<User>toResponseOrErrorObservable());
                         }
-                        return apiService.updateUserLocation(new UpdateLocationRequest(userLocation))
-                                .subscribeOn(networkScheduler)
-                                .compose(ResponseOrError.<User>toResponseOrErrorObservable());
                     }
-                });
+                })
+                .compose(ObservableExtensions.<ResponseOrError<User>>behaviorRefCount());
 
         userUpdateSuccessObservable = updateUserObservable
                 .compose(ResponseOrError.<User>onlySuccess())
@@ -307,6 +315,7 @@ public class LocationPresenter implements GoogleApiClient.ConnectionCallbacks {
 
         locationErrorObservable = ResponseOrError.combineErrorsObservable(
                 ImmutableList.of(ResponseOrError.transform(locationDetailsObservable)))
+                .filter(Functions1.isNotNull())
                 .observeOn(uiScheduler);
 
         updateLocationErrorObservable = ResponseOrError.combineErrorsObservable(
@@ -314,6 +323,7 @@ public class LocationPresenter implements GoogleApiClient.ConnectionCallbacks {
                         ResponseOrError.transform(selectedPlaceGeocodeResponse),
                         ResponseOrError.transform(updateUserObservable)
                 ))
+                .filter(Functions1.isNotNull())
                 .observeOn(uiScheduler);
     }
 
@@ -360,13 +370,13 @@ public class LocationPresenter implements GoogleApiClient.ConnectionCallbacks {
     }
 
     @Nonnull
-    public Observable<Boolean> getProgressObservable() {
-        return progressObservable;
+    public Observable<Boolean> getQueryProgressObservable() {
+        return queryProgressSubject.observeOn(uiScheduler);
     }
 
     @Nonnull
-    public Observer<Location> getLastGpsLocationObserver() {
-        return lastGpsLocationSubject;
+    public Observable<Boolean> getProgressObservable() {
+        return progressObservable;
     }
 
     @Nonnull
@@ -424,6 +434,9 @@ public class LocationPresenter implements GoogleApiClient.ConnectionCallbacks {
         googleApiClient.disconnect();
     }
 
+
+    // Adapter items
+
     public static class PlaceAdapterItem implements BaseAdapterItem {
         @Nonnull
         private final String placeId;
@@ -438,11 +451,6 @@ public class LocationPresenter implements GoogleApiClient.ConnectionCallbacks {
             this.placeId = placeId;
             this.fullText = fullText;
             this.locationSelectedObserver = locationSelectedObserver;
-        }
-
-        @Nonnull
-        public String getPlaceId() {
-            return placeId;
         }
 
         @Nonnull

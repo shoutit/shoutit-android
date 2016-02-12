@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
@@ -14,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
@@ -37,6 +37,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import rx.functions.Action1;
 
 public class LocationActivity extends BaseActivity {
 
@@ -49,8 +50,10 @@ public class LocationActivity extends BaseActivity {
     Toolbar toolbar;
     @Bind(R.id.location_search_et)
     EditText searchEditText;
+    @Bind(R.id.location_query_progress_bar)
+    ProgressBar queryProgressBar;
     @Bind(R.id.location_progress_bar)
-    ProgressBar progressBar;
+    FrameLayout progressBar;
 
     @Inject
     LocationAdapter adapter;
@@ -84,9 +87,37 @@ public class LocationActivity extends BaseActivity {
                 .compose(this.<List<BaseAdapterItem>>bindToLifecycle())
                 .subscribe(adapter);
 
+        presenter.getQueryProgressObservable()
+                .compose(this.<Boolean>bindToLifecycle())
+                .subscribe(RxView.visibility(queryProgressBar, View.INVISIBLE));
+
         presenter.getProgressObservable()
                 .compose(this.<Boolean>bindToLifecycle())
-                .subscribe(RxView.visibility(progressBar, View.INVISIBLE));
+                .subscribe(RxView.visibility(progressBar));
+
+        presenter.getLocationErrorObservable()
+                .compose(this.<Throwable>bindToLifecycle())
+                .subscribe(ColoredSnackBar.errorSnackBarAction(
+                        ColoredSnackBar.contentView(this),
+                        R.string.location_fetching_error));
+
+        presenter.getUpdateLocationErrorObservable()
+                .compose(this.<Throwable>bindToLifecycle())
+                .subscribe(ColoredSnackBar.errorSnackBarAction(
+                        ColoredSnackBar.contentView(this),
+                        R.string.location_update_error));
+
+        presenter.getUserUpdateSuccessObservable()
+                .compose(bindToLifecycle())
+                .subscribe(new Action1<Object>() {
+                    @Override
+                    public void call(Object o) {
+                        ColoredSnackBar.successSnackBarAction(
+                                ColoredSnackBar.contentView(LocationActivity.this),
+                                R.string.location_update_success);
+                        finish();
+                    }
+                });
 
     }
 
