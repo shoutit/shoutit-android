@@ -6,6 +6,7 @@ import com.google.common.collect.Iterables;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.Tag;
+import com.shoutit.app.android.api.model.TagsRequest;
 import com.shoutit.app.android.dao.CategoriesDao;
 
 import junit.framework.TestCase;
@@ -22,7 +23,7 @@ import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
 import static com.google.common.truth.Truth.assert_;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -46,7 +47,7 @@ public class PostLoginPresenterTest extends TestCase {
         mSubject = BehaviorSubject.<List<Category>>create(ImmutableList.of(new Category("name", "slug", new Tag("id", "name", "apiUrl", "image"))));
         when(mApiService.categories()).thenReturn(mSubject);
         mPostSubject = BehaviorSubject.create(new Object());
-        when(mApiService.postCategoryListen(anyString())).thenReturn(mPostSubject);
+        when(mApiService.batchListen(any(TagsRequest.class))).thenReturn(mPostSubject);
 
         mCategoriesDao = new CategoriesDao(mApiService, Schedulers.immediate());
         mPostLoginPresenter = new PostLoginPresenter(mCategoriesDao, mApiService, Schedulers.immediate(), Schedulers.immediate());
@@ -104,7 +105,7 @@ public class PostLoginPresenterTest extends TestCase {
         mPostLoginPresenter.getSuccessCategoriesObservable().subscribe();
         mPostLoginPresenter.nextClickedObserver().onNext(new Object());
 
-        verify(mApiService).postCategoryListen(anyString());
+        verify(mApiService).batchListen(any(TagsRequest.class));
     }
 
 
@@ -126,10 +127,10 @@ public class PostLoginPresenterTest extends TestCase {
         mPostLoginPresenter.nextClickedObserver().onNext(new Object());
 
         assert_().that(throwableTestObserver.getOnNextEvents()).isNotEmpty();
-        verify(mApiService).postCategoryListen(anyString());
+        verify(mApiService).batchListen(any(TagsRequest.class));
 
         mPostLoginPresenter.nextClickedObserver().onNext(new Object());
 
-        verify(mApiService, times(2)).postCategoryListen(anyString());
+        verify(mApiService, times(2)).batchListen(any(TagsRequest.class));
     }
 }

@@ -7,6 +7,7 @@ import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.SignResponse;
+import com.shoutit.app.android.api.model.TagsRequest;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.login.EmailLoginRequest;
 import com.shoutit.app.android.api.model.login.FacebookLogin;
@@ -57,8 +58,8 @@ public interface ApiService {
     @POST("oauth2/access_token")
     Observable<SignResponse> googleLogin(@Body GoogleLogin request);
 
-    @POST("tags/{main_tag}/listen")
-    Observable<Object> postCategoryListen(@Path("main_tag") String tagSlug);
+    @POST("tags/batch_listen")
+    Observable<Object> batchListen(@Body TagsRequest request);
 
     @GET("users/{user_name}")
     Observable<User> getUser(@Path("user_name") String userName);
