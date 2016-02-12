@@ -106,6 +106,8 @@ public class MenuHandler {
     }
 
     public void setData() {
+        selectItem(R.id.menu_home);
+
         presenter.getNameObservable()
                 .compose(rxActivity.<String>bindToLifecycle())
                 .subscribe(RxTextView.text(userNameTextView));
