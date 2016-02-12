@@ -306,7 +306,7 @@ public class HomeAdapter extends BaseAdapter {
                     .subscribe(new Action1<Void>() {
                         @Override
                         public void call(Void aVoid) {
-                            Toast.makeText(context, "Not impelmented yet", Toast.LENGTH_LONG).show();
+                            Toast.makeText(context, "Not implemented yet", Toast.LENGTH_LONG).show();
                         }
                     })
             );

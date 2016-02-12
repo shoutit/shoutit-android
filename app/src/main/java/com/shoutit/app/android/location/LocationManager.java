@@ -37,7 +37,7 @@ import rx.subjects.PublishSubject;
 @Singleton
 public class LocationManager implements GoogleApiClient.ConnectionCallbacks {
 
-    private static final double LOCATION_MAX_DELTA_METERS = 1000 * 20;
+    private static final double LOCATION_MAX_DELTA_METERS = 1000 * 5;
 
     @Nonnull
     private final BehaviorSubject<android.location.Location> lastGoogleLocationSubject = BehaviorSubject.create();
@@ -107,13 +107,13 @@ public class LocationManager implements GoogleApiClient.ConnectionCallbacks {
                 .filter(Functions1.isNotNull())
                 .filter(locationChangedFilter())
                 .lift(MoreOperators.callOnNext(locationChangedSubject))
-                .doOnNext(saveToPreferences());
+                .doOnNext(saveToPreferences()); // TODO remove this if guest user will be handled by API
 
         locationChangedSubject
                 .filter(new Func1<UserLocation, Boolean>() {
                     @Override
                     public Boolean call(UserLocation location) {
-                        return userPreferences.isUserLoggedIn();
+                        return userPreferences.isUserLoggedIn(); // TODO remove this if guest user will be handled by API
                     }
                 })
                 .switchMap(updateUserWithNewLocation())
@@ -158,6 +158,9 @@ public class LocationManager implements GoogleApiClient.ConnectionCallbacks {
             @Override
             public Boolean call(@Nonnull android.location.Location location) {
                 final UserLocation currentLocation = userPreferences.getLocation();
+                if (currentLocation == null) {
+                    return true;
+                }
 
                 return LocationUtils.isLocationDifferenceMoreThanDelta(currentLocation.getLatitude(),
                         currentLocation.getLongitude(), location.getLatitude(), location.getLongitude(),

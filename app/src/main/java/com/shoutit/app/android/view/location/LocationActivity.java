@@ -1,6 +1,8 @@
 package com.shoutit.app.android.view.location;
 
 import android.Manifest;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
@@ -10,6 +12,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 
@@ -26,16 +29,19 @@ import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.utils.PermissionHelper;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
+import butterknife.ButterKnife;
 
 public class LocationActivity extends BaseActivity {
 
     private static final int REQUEST_CODE_LOCATION = 2;
+    private static final long TYPING_THRESHOLD_MS = 500;
 
     @Bind(R.id.location_recycler_view)
     RecyclerView recyclerView;
@@ -51,10 +57,15 @@ public class LocationActivity extends BaseActivity {
     @Inject
     LocationPresenter presenter;
 
+    public static Intent newIntent(@Nonnull Context context) {
+        return new Intent(context, LocationActivity.class);
+    }
+
     @Override
-    public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
-        super.onCreate(savedInstanceState, persistentState);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location);
+        ButterKnife.bind(this);
 
         setUpActionbar();
 
@@ -64,6 +75,7 @@ public class LocationActivity extends BaseActivity {
         recyclerView.setAdapter(adapter);
 
         RxTextView.textChangeEvents(searchEditText)
+                .debounce(TYPING_THRESHOLD_MS, TimeUnit.MILLISECONDS)
                 .map(MoreFunctions1.mapTextChangeEventToString())
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(presenter.getQuerySubject());
@@ -74,7 +86,7 @@ public class LocationActivity extends BaseActivity {
 
         presenter.getProgressObservable()
                 .compose(this.<Boolean>bindToLifecycle())
-                .subscribe(RxView.visibility(progressBar));
+                .subscribe(RxView.visibility(progressBar, View.INVISIBLE));
 
     }
 

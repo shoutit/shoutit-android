@@ -7,7 +7,7 @@
     <string name="shout_type_request">Request</string>
     <string name="terms_of_service">Terms of Service</string>
     <string name="facebook_app_id">1148740908499849</string>
-    <string name="google_api_key" translatable="false">AIzaSyAWcgh_3Em7Jv2ur3olffwoJHYNZ_c9b60</string>
+    <string name="google_api_key" translatable="false">AIzaSyBWHadI_MPYQgDLqI4RXhymEs42YEtgTEE</string>
 
     <!-- Errors -->
     <string name="error_default">Ooops, something went wrong</string>

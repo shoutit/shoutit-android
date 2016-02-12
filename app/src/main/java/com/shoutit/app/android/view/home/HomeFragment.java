@@ -130,7 +130,7 @@ public class HomeFragment extends BaseFragment {
                 .subscribe(new Action1<Void>() {
                     @Override
                     public void call(Void aVoid) {
-                        Toast.makeText(context, "Not impelmented yet", Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, "Not implemented yet", Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -140,7 +140,7 @@ public class HomeFragment extends BaseFragment {
                 .subscribe(new Action1<Boolean>() {
                     @Override
                     public void call(Boolean aBoolean) {
-                        Toast.makeText(context, "Not impelmented yet", Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, "Not implemented yet", Toast.LENGTH_LONG).show();
                     }
                 });
 
