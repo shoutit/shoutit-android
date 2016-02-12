@@ -87,6 +87,8 @@ android {
             debuggable false
             minifyEnabled false
             ext.enableCrashlytics = true
+            ext.betaDistributionGroupAliases = "android-internal-testers, internal-tests"
+            ext.betaDistributionNotifications = false
             applicationIdSuffix '.staging'
             versionNameSuffix "-staging"
             buildConfigField "String", "API_URL", dev_runscope_api_url
@@ -173,6 +175,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-location:8.3.0'
     compile 'com.google.guava:guava:18.0'
     compile 'com.google.android.gms:play-services-auth:8.3.0'
+    compile 'com.google.android.gms:play-services-plus:8.3.0'
 
     // Square
     compile 'com.jakewharton:butterknife:7.0.1'
