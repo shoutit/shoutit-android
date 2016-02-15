@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.jakewharton.rxbinding.view.RxView;
 import com.jakewharton.rxbinding.widget.RxTextView;
@@ -86,7 +87,7 @@ public class MenuHandler {
     @Nonnull
     private final UserPreferences userPreferences;
 
-    private List<CheckedTextView> selectableItems = new ArrayList<>();
+    private List<CheckedTextView> selectableItems = ImmutableList.of();
 
     @Inject
     public MenuHandler(@Nonnull final RxAppCompatActivity rxActivity,
@@ -101,7 +102,7 @@ public class MenuHandler {
 
     public void initMenu(@Nonnull View view) {
         ButterKnife.bind(this, view);
-        selectableItems = Lists.newArrayList(homeItem, discoverItem, browseItem, chatItem, orderItems);
+        selectableItems = ImmutableList.of(homeItem, discoverItem, browseItem, chatItem, orderItems);
         setData();
     }
 
