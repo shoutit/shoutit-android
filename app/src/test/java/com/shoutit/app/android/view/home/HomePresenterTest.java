@@ -15,8 +15,10 @@ import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.Tag;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ShoutsDao;
+import com.shoutit.app.android.model.LocationPointer;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -26,11 +28,13 @@ import org.mockito.MockitoAnnotations;
 import java.util.List;
 import javax.annotation.Nonnull;
 
+import rx.Observable;
 import rx.observers.TestSubscriber;
 import rx.schedulers.TestScheduler;
 import rx.subjects.TestSubject;
 
 import static com.google.common.truth.Truth.assert_;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -64,16 +68,15 @@ public class HomePresenterTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        when(shoutsDao.getHomeShoutsObservable()).thenReturn(shoutsSubject);
-        when(shoutsDao.getLoadMoreShoutsObserver()).thenReturn(loadMoreShoutsSubject);
+        when(shoutsDao.getHomeShoutsObservable(any(LocationPointer.class))).thenReturn(shoutsSubject);
+        when(shoutsDao.getLoadMoreHomeShoutsObserver()).thenReturn(loadMoreShoutsSubject);
 
         when(discoversDao.discoverItemDao(anyString())).thenReturn(discoverItemDao);
         when(discoversDao.discoverItemDao(anyString()).getDiscoverItemObservable()).thenReturn(discoversDetailsSubject);
-        when(discoversDao.getHomeDiscoverObservable()).thenReturn(discoversSubject);
+        when(discoversDao.getDiscoverObservable(any(LocationPointer.class))).thenReturn(discoversSubject);
 
         when(userPreferences.isUserLoggedIn()).thenReturn(true);
-        when(userPreferences.getUserCity()).thenReturn("city");
-        when(userPreferences.getUserCountryCode()).thenReturn("PL");
+        when(userPreferences.getLocationObservable()).thenReturn(Observable.just(new UserLocation(0, 0, "zz", null, null, null, null)));
 
         presenter = new HomePresenter(shoutsDao, discoversDao, userPreferences, scheduler, context);
     }
@@ -145,6 +148,24 @@ public class HomePresenterTest {
         subscriber.assertNoValues();
     }
 
+    @Test
+    public void testWhenNoShouts_ThenEmptyItemIsVisible() throws Exception {
+        final TestSubscriber<List<BaseAdapterItem>> subscriber = new TestSubscriber<>();
+        presenter.getAllAdapterItemsObservable().subscribe(subscriber);
+
+        shoutsSubject.onNext(shoutsEmptyResponse());
+        discoversSubject.onNext(discoverResponse());
+        discoversDetailsSubject.onNext(discoverDetailsResponse());
+        scheduler.triggerActions();
+
+        assert_().that(subscriber.getOnNextEvents()).hasSize(2);
+        final List<BaseAdapterItem> baseAdapterItems = subscriber.getOnNextEvents().get(1);
+        assert_().that(baseAdapterItems.get(0)).isInstanceOf(HomePresenter.DiscoverHeaderAdapterItem.class);
+        assert_().that(baseAdapterItems.get(1)).isInstanceOf(HomePresenter.DiscoverContainerAdapterItem.class);
+        assert_().that(baseAdapterItems.get(2)).isInstanceOf(HomePresenter.ShoutHeaderAdapterItem.class);
+        assert_().that(baseAdapterItems.get(3)).isInstanceOf(HomePresenter.ShoutsEmptyAdapterItem.class);
+    }
+
     private void initData() {
         shoutsSubject.onNext(shoutsResponse());
         discoversSubject.onNext(discoverResponse());
@@ -169,5 +190,10 @@ public class HomePresenterTest {
         return ResponseOrError.fromData(new ShoutsResponse(1, "2", null, Lists.newArrayList(
                 new Shout("id", null, null, null, null, null, null, 1f, 2f, null, null, null,
                         user, category, Lists.newArrayList(tag), 2))));
+    }
+
+    @Nonnull
+    private ResponseOrError<ShoutsResponse> shoutsEmptyResponse() {
+        return ResponseOrError.fromData(new ShoutsResponse(1, "2", null, null));
     }
 }

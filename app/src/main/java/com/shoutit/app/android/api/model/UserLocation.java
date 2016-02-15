@@ -71,4 +71,6 @@ public class UserLocation {
     public boolean isFromGps() {
         return isFromGps;
     }
+
+
 }

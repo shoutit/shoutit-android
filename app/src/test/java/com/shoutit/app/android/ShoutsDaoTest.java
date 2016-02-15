@@ -6,6 +6,7 @@ import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.dao.ShoutsDao;
+import com.shoutit.app.android.model.LocationPointer;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -32,15 +33,17 @@ public class ShoutsDaoTest {
 
     private final TestScheduler scheduler = new TestScheduler();
     private ShoutsDao shoutsDao;
+    private LocationPointer locationPointer;
 
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
+        locationPointer = new LocationPointer("GE", "Berlin");
+
         when(userPreferences.isUserLoggedIn()).thenReturn(true);
-        when(userPreferences.getUserCountryCode()).thenReturn("GE");
-        when(apiService.shoutsForCountry(anyString(), anyInt(), anyInt()))
+        when(apiService.shoutsForCity(anyString(), anyString(), anyInt(), anyInt()))
                 .thenReturn(Observable.just(shoutsResponse()));
         when(apiService.home(anyString(), anyInt(), anyInt()))
                 .thenReturn(Observable.just(shoutsResponse()));
@@ -53,7 +56,7 @@ public class ShoutsDaoTest {
         final TestSubscriber<ResponseOrError<ShoutsResponse>> subscriber = new TestSubscriber<>();
         when(userPreferences.isUserLoggedIn()).thenReturn(true);
 
-        shoutsDao.getHomeShoutsObservable().subscribe(subscriber);
+        shoutsDao.getHomeShoutsObservable(locationPointer).subscribe(subscriber);
         scheduler.triggerActions();
 
         subscriber.assertNoErrors();
@@ -65,7 +68,7 @@ public class ShoutsDaoTest {
         final TestSubscriber<ResponseOrError<ShoutsResponse>> subscriber = new TestSubscriber<>();
         when(userPreferences.isUserLoggedIn()).thenReturn(false);
 
-        shoutsDao.getHomeShoutsObservable().subscribe(subscriber);
+        shoutsDao.getHomeShoutsObservable(locationPointer).subscribe(subscriber);
         scheduler.triggerActions();
 
         subscriber.assertNoErrors();
@@ -77,9 +80,9 @@ public class ShoutsDaoTest {
         final TestSubscriber<ResponseOrError<ShoutsResponse>> subscriber = new TestSubscriber<>();
         when(userPreferences.isUserLoggedIn()).thenReturn(true);
 
-        shoutsDao.getHomeShoutsObservable().subscribe(subscriber);
+        shoutsDao.getHomeShoutsObservable(locationPointer).subscribe(subscriber);
         scheduler.triggerActions();
-        shoutsDao.getLoadMoreShoutsObserver().onNext(null);
+        shoutsDao.getLoadMoreHomeShoutsObserver().onNext(null);
         scheduler.triggerActions();
 
         subscriber.assertNoErrors();
@@ -93,9 +96,9 @@ public class ShoutsDaoTest {
         final TestSubscriber<ResponseOrError<ShoutsResponse>> subscriber = new TestSubscriber<>();
         when(userPreferences.isUserLoggedIn()).thenReturn(false);
 
-        shoutsDao.getHomeShoutsObservable().subscribe(subscriber);
+        shoutsDao.getHomeShoutsObservable(locationPointer).subscribe(subscriber);
         scheduler.triggerActions();
-        shoutsDao.getLoadMoreShoutsObserver().onNext(null);
+        shoutsDao.getLoadMoreHomeShoutsObserver().onNext(null);
         scheduler.triggerActions();
 
         subscriber.assertNoErrors();

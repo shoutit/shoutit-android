@@ -125,5 +125,6 @@
     <string name="location_fetching_error">Sorry, cannot get locations</string>
     <string name="location_update_error">Sorry, cannot update your location. Please try again.</string>
     <string name="location_update_success">Location successfully changed</string>
+    <string name="home_no_shouts">No shouts to display</string>
 
 </resources>
