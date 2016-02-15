@@ -2,7 +2,6 @@ package com.shoutit.app.android.view.loginintro;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -21,10 +20,7 @@ import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.Scope;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
@@ -50,16 +46,14 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Observable;
-import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
-public class LoginIntroActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener {
+public class LoginIntroActivity extends BaseActivity {
 
     private static final int GOOGLE_SIGN_IN = 0;
-    private static final int GOOGLE_ACC_AUTH = 1;
 
     @Bind(R.id.activity_login_toolbar)
     Toolbar toolbar;
@@ -197,30 +191,11 @@ public class LoginIntroActivity extends BaseActivity implements GoogleApiClient.
                 .build();
 
         final GoogleApiClient googleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient);
+        final Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient);
         startActivityForResult(signInIntent, GOOGLE_SIGN_IN);
-
-//        Schedulers.io().createWorker().schedule(new Action0() {
-//            @Override
-//            public void call() {
-//                final ConnectionResult connectionResult = googleApiClient.blockingConnect();
-//                runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        try {
-//                            connectionResult.startResolutionForResult(LoginIntroActivity.this, GOOGLE_SIGN_IN);
-//                        } catch (IntentSender.SendIntentException e) {
-//                            getErrorAction().call(e);
-//                        }
-//                    }
-//                });
-//            }
-//        });
-
     }
 
     @OnClick(R.id.activity_login_gplus_btn)
@@ -270,10 +245,5 @@ public class LoginIntroActivity extends BaseActivity implements GoogleApiClient.
                 .build();
         component.inject(this);
         return component;
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-
     }
 }
