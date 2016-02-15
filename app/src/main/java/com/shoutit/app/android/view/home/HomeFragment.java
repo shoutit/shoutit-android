@@ -18,6 +18,7 @@ import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dagger.FragmentModule;
@@ -25,6 +26,8 @@ import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyGridLayoutManager;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
+import com.shoutit.app.android.view.main.MainActivity;
+import com.shoutit.app.android.view.signin.LoginActivity;
 
 import java.util.List;
 
@@ -63,6 +66,8 @@ public class HomeFragment extends BaseFragment {
     HomeGridSpacingItemDecoration gridViewItemDecoration;
     @Inject
     HomeLinearSpacingItemDecoration linearViewItemDecoration;
+    @Inject
+    UserPreferences mUserPreferences;
 
     @android.support.annotation.Nullable
     @Override
@@ -130,7 +135,11 @@ public class HomeFragment extends BaseFragment {
                 .subscribe(new Action1<Void>() {
                     @Override
                     public void call(Void aVoid) {
-                        Toast.makeText(context, "Not implemented yet", Toast.LENGTH_LONG).show();
+                        if (mUserPreferences.isGuest()) {
+                            LoginActivity.newIntent(getActivity(), MainActivity.class);
+                        } else {
+                            Toast.makeText(context, "Not implemented yet", Toast.LENGTH_LONG).show();
+                        }
                     }
                 });
 

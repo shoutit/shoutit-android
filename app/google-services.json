@@ -7,79 +7,7 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "",
-        "client_id": "android:com.shoutit.app.android.debug",
-        "client_type": 1,
-        "android_client_info": {
-          "package_name": "com.shoutit.app.android.debug"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "935842257865-s6069gqjq4bvpi4rcbjtdtn2kggrvi06.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [],
-      "services": {
-        "analytics_service": {
-          "status": 1
-        },
-        "cloud_messaging_service": {
-          "status": 1,
-          "apns_config": []
-        },
-        "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
-        },
-        "google_signin_service": {
-          "status": 1
-        },
-        "ads_service": {
-          "status": 1
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "",
-        "client_id": "android:com.shoutit.app.android.staging",
-        "client_type": 1,
-        "android_client_info": {
-          "package_name": "com.shoutit.app.android.staging"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "935842257865-s6069gqjq4bvpi4rcbjtdtn2kggrvi06.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [],
-      "services": {
-        "analytics_service": {
-          "status": 1
-        },
-        "cloud_messaging_service": {
-          "status": 1,
-          "apns_config": []
-        },
-        "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
-        },
-        "google_signin_service": {
-          "status": 1
-        },
-        "ads_service": {
-          "status": 1
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:935842257865:android:49d4bd8ff5c58010",
+        "mobilesdk_app_id": "1:935842257865:android:d20002b39f218033",
         "client_id": "android:com.shoutit.app.android",
         "client_type": 1,
         "android_client_info": {
@@ -88,10 +16,54 @@
       },
       "oauth_client": [
         {
-          "client_id": "935842257865-1doue16dh8dc0nj8k5fara36un1usi7g.apps.googleusercontent.com",
+          "client_id": "935842257865-k8liss1jp2qkh9bgr7e640lth7sgu2ds.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.shoutit.app.android",
+            "certificate_hash": "F907DF44EA6066A546193F50D8A9E57C680B8071"
+          }
+        },
+        {
+          "client_id": "935842257865-s6069gqjq4bvpi4rcbjtdtn2kggrvi06.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 2,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 2
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:935842257865:android:99255d74bd22cd44",
+        "client_id": "android:com.shoutit.app.android.staging",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "com.shoutit.app.android.staging"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "935842257865-51kapkp3csmirueslfk81ki575bfcktk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.shoutit.app.android.staging",
             "certificate_hash": "5B230F90B5F806B084D5D566F3E314472C7F4BEF"
           }
         },
@@ -106,7 +78,51 @@
           "status": 1
         },
         "cloud_messaging_service": {
+          "status": 2,
+          "apns_config": []
+        },
+        "appinvite_service": {
           "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 2
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:935842257865:android:99255d74bd22cd44",
+        "client_id": "android:com.shoutit.app.android.debug",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "com.shoutit.app.android.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "935842257865-51kapkp3csmirueslfk81ki575bfcktk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.shoutit.app.android.debug",
+            "certificate_hash": "5B230F90B5F806B084D5D566F3E314472C7F4BEF"
+          }
+        },
+        {
+          "client_id": "935842257865-s6069gqjq4bvpi4rcbjtdtn2kggrvi06.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 2,
           "apns_config": []
         },
         "appinvite_service": {

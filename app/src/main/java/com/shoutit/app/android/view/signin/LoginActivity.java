@@ -1,5 +1,6 @@
 package com.shoutit.app.android.view.signin;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,6 +8,12 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.Scopes;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Scope;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
@@ -25,12 +32,23 @@ import butterknife.OnClick;
 
 public class LoginActivity extends BaseActivity {
 
+    public static final String EXTRAS_CALLING_CLASS = "extras_calling_class";
+    public static final String EXTRAS_GUEST_LOGIN = "extras_guest_login";
+
     @Bind(R.id.login_toolbar)
     Toolbar toolbar;
 
     @Nonnull
     public static Intent newIntent(@NonNull Context context) {
         return new Intent(context, LoginActivity.class);
+    }
+
+    @Nonnull
+    public static Intent newIntent(@NonNull Context context, @NonNull Class<?> callingClass) {
+        return new Intent(context, LoginActivity.class)
+                .putExtra(EXTRAS_GUEST_LOGIN, true)
+                .putExtra(EXTRAS_CALLING_CLASS, callingClass)
+                .addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
     }
 
     @Override
