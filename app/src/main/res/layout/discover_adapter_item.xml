@@ -2,12 +2,12 @@
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="@dimen/home_discover_card_width"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     card_view:cardElevation="2dp"
     card_view:cardUseCompatPadding="true"
     card_view:cardCornerRadius="2dp"
-    tools:layout_width="120dp">
+    tools:layout_width="150dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,23 +15,23 @@
         android:orientation="vertical">
 
         <ImageView
-            android:id="@+id/home_discover_item_iv"
+            android:id="@+id/discover_item_iv"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/home_discover_image_height"
+            android:layout_height="@dimen/discover_image_height"
             android:scaleType="centerCrop"
             android:src="@drawable/pattern_placeholder"/>
 
         <TextView
-            android:id="@+id/home_discover_item_tv"
+            android:id="@+id/discover_item_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="12sp"
+            android:textSize="16sp"
             android:paddingLeft="8dp"
             android:paddingStart="8dp"
             android:paddingRight="2dp"
             android:paddingEnd="2dp"
             android:paddingTop="4dp"
-            android:paddingBottom="5dp"
+            android:paddingBottom="4dp"
             tools:text="Cars dsfadsfadsfdasfadsfdsafdsafds"
             android:ellipsize="end"
             android:textColor="@color/black_54"

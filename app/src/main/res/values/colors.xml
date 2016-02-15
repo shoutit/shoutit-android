@@ -42,4 +42,7 @@
     <!-- Register -->
     <color name="register_underline">#40C4FF</color>
 
+    <!-- Discover -->
+    <color name="discover_button">#1f000000</color>
+
 </resources>
