@@ -1,14 +1,15 @@
 package com.shoutit.app.android.view.signin.register;
 
 import android.content.Context;
-import android.location.Location;
 
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.login.LoginUser;
+import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.view.signin.CoarseLocationObservableProvider;
 
 import org.junit.Before;
@@ -33,10 +34,10 @@ public class RegisterPresenterTest {
 
     private BehaviorSubject<SignResponse> mResponseSubject;
 
-    private BehaviorSubject<Location> mLocationObservable;
+    private BehaviorSubject<UserLocation> mLocationObservable;
 
     @Mock
-    Location location;
+    UserLocation location;
 
     @Mock
     ApiService mApiService;
@@ -53,6 +54,9 @@ public class RegisterPresenterTest {
     @Mock
     User user;
 
+    @Mock
+    LocationManager locationManager;
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -64,9 +68,10 @@ public class RegisterPresenterTest {
         mLocationObservable = BehaviorSubject.create();
 
         when(mApiService.signup(any(EmailSignupRequest.class))).thenReturn(mResponseSubject);
-        when(coarseLocationProvider.get(any(Context.class))).thenReturn(mLocationObservable);
+        when(locationManager.updateUserLocationObservable()).thenReturn(mLocationObservable);
 
-        mRegisterPresenter = new RegisterPresenter(mApiService, mContext, coarseLocationProvider, mUserPreferences, Schedulers.immediate(), Schedulers.immediate());
+        mRegisterPresenter = new RegisterPresenter(mApiService, mContext, coarseLocationProvider,
+                mUserPreferences, Schedulers.immediate(), Schedulers.immediate(), locationManager);
     }
 
     @Test

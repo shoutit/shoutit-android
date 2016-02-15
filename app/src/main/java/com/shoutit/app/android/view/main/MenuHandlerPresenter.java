@@ -3,13 +3,14 @@ package com.shoutit.app.android.view.main;
 import android.content.Context;
 
 import com.appunite.rx.ObservableExtensions;
+import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Strings;
 import com.shoutit.app.android.BuildConfig;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
-import com.shoutit.app.android.api.model.Location;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.ResourcesHelper;
 
@@ -17,6 +18,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import rx.Observable;
+import rx.Scheduler;
 import rx.functions.Func1;
 
 public class MenuHandlerPresenter {
@@ -28,7 +30,7 @@ public class MenuHandlerPresenter {
     @Nonnull
     private final Observable<String> nameObservable;
     @Nonnull
-    private final Observable<String> locationObservable;
+    private final Observable<String> cityObservable;
     @Nonnull
     private final Observable<Integer> countryCodeObservable;
     @Nonnull
@@ -38,9 +40,11 @@ public class MenuHandlerPresenter {
 
     @Inject
     public MenuHandlerPresenter(@Nonnull UserPreferences userPreferences,
-                                @Nonnull @ForActivity final Context context) {
+                                @Nonnull @ForActivity final Context context,
+                                @Nonnull @UiScheduler Scheduler uiScheduler) {
 
         final Observable<User> userObservable = userPreferences.userObservable()
+                .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<User>behaviorRefCount());
 
         avatarObservable = userObservable
@@ -68,32 +72,23 @@ public class MenuHandlerPresenter {
                     }
                 });
 
-        locationObservable = userObservable
-                .map(new Func1<User, Location>() {
+
+        final Observable<UserLocation> locationObservable = userPreferences.getLocationObservable()
+                .observeOn(uiScheduler)
+                .compose(ObservableExtensions.<UserLocation>behaviorRefCount());
+
+        cityObservable = locationObservable
+                .map(new Func1<UserLocation, String>() {
                     @Override
-                    public Location call(User user) {
-                        return user.getLocation();
-                    }
-                })
-                .filter(Functions1.isNotNull())
-                .map(new Func1<Location, String>() {
-                    @Override
-                    public String call(Location location) {
+                    public String call(UserLocation location) {
                         return location.getCity();
                     }
                 });
 
-        countryCodeObservable = userObservable
-                .map(new Func1<User, Location>() {
+        countryCodeObservable = locationObservable
+                .map(new Func1<UserLocation, String>() {
                     @Override
-                    public Location call(User user) {
-                        return user.getLocation();
-                    }
-                })
-                .filter(Functions1.isNotNull())
-                .map(new Func1<Location, String>() {
-                    @Override
-                    public String call(Location location) {
+                    public String call(UserLocation location) {
                         return Strings.emptyToNull(location.getCountry());
                     }
                 })
@@ -134,8 +129,8 @@ public class MenuHandlerPresenter {
     }
 
     @Nonnull
-    public Observable<String> getLocationObservable() {
-        return locationObservable;
+    public Observable<String> getCityObservable() {
+        return cityObservable;
     }
 
     @Nonnull
