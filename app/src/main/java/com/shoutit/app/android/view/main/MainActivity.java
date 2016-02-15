@@ -61,9 +61,8 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
             return;
         }
 
-        if (true) {
+        if (mUserPreferences.isFirstRunAndSetToFalse()) {
             startActivity(PostLoginInterestActivity.newIntent(this));
-            return;
         }
 
         setUpActionBar();
