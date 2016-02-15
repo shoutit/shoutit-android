@@ -17,7 +17,7 @@ checkout:
 
 test:
     pre:
-        - python tools/download.py --token P8uXtUgTeNDYEIvw5gXUWjDM --key-version agxzfmF1dG8tY2xvc2VyGAsSC1Byb2plY3RLZXlzGICAgMDuv6EKDA
+        - python tools/download.py --token P8uXtUgTeNDYEIvw5gXUWjDM --key-version agxzfmF1dG8tY2xvc2VyGAsSC1Byb2plY3RLZXlzGICAgKDI0JMKDA
 
     override:
         - (./gradlew --parallel --stacktrace --project-prop versionSuffix="$BRANCH_NAME" clean build):
