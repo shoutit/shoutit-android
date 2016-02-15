@@ -3,9 +3,7 @@ package com.shoutit.app.android.view.location;
 import android.Manifest;
 import android.content.Context;
 import android.location.Location;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
@@ -13,6 +11,7 @@ import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
+import com.appunite.rx.operators.MoreOperators;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.location.LocationServices;
@@ -21,8 +20,10 @@ import com.google.android.gms.location.places.AutocompletePredictionBuffer;
 import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
@@ -33,31 +34,33 @@ import com.shoutit.app.android.dagger.ForApplication;
 import com.shoutit.app.android.utils.LocationUtils;
 import com.shoutit.app.android.utils.PermissionHelper;
 
-import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Action1;
+import rx.functions.Func0;
 import rx.functions.Func1;
 import rx.functions.Func3;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
 
-public class LocationPresenter implements GoogleApiClient.ConnectionCallbacks {
+public class LocationPresenter {
 
     private static final long MINIMUM_SEARCH_INPUT = 3;
 
     @Nonnull
     private BehaviorSubject<String> querySubject = BehaviorSubject.create();
     @Nonnull
-    private final BehaviorSubject<android.location.Location> lastGpsLocationSubject = BehaviorSubject.create();
+    private final PublishSubject<Object> gpsLocationRefreshSubject = PublishSubject.create();
     @Nonnull
     private PublishSubject<String> suggestedLocationSelectedSubject = PublishSubject.create();
     @Nonnull
@@ -84,8 +87,6 @@ public class LocationPresenter implements GoogleApiClient.ConnectionCallbacks {
     @Nonnull
     private final Scheduler uiScheduler;
     @Nonnull
-    private final Context context;
-    @Nonnull
     private final ApiService apiService;
     @Nonnull
     private final UserPreferences userPreferences;
@@ -100,11 +101,17 @@ public class LocationPresenter implements GoogleApiClient.ConnectionCallbacks {
         this.googleApiClient = googleApiClient;
         this.networkScheduler = networkScheduler;
         this.uiScheduler = uiScheduler;
-        this.context = context;
         this.apiService = apiService;
         this.userPreferences = userPreferences;
-        googleApiClient.registerConnectionCallbacks(this);
-        googleApiClient.connect();
+
+
+        // Fetch gps location
+
+        final Observable<Location> gpsLocationObservable = LocationUtils
+                .getLocationObservable(googleApiClient, context, networkScheduler)
+                .compose(MoreOperators.<Location>refresh(gpsLocationRefreshSubject))
+                .filter(Functions1.isNotNull());
+
 
         // Currently selected manual location
 
@@ -131,7 +138,7 @@ public class LocationPresenter implements GoogleApiClient.ConnectionCallbacks {
 
         // Current GPS location
 
-        final Observable<BaseAdapterItem> currentGpsLocationObservable = lastGpsLocationSubject
+        final Observable<BaseAdapterItem> currentGpsLocationObservable = gpsLocationObservable
                 .filter(Functions1.isNotNull())
                 .switchMap(new Func1<android.location.Location, Observable<UserLocation>>() {
                     @Override
@@ -184,17 +191,22 @@ public class LocationPresenter implements GoogleApiClient.ConnectionCallbacks {
                     @Override
                     public List<BaseAdapterItem> call(AutocompletePredictionBuffer predictions) {
 
-                        final Iterator<AutocompletePrediction> iterator = predictions.iterator();
                         final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
 
-                        while (iterator.hasNext()) {
-                            final AutocompletePrediction prediction = iterator.next();
-                            builder.add(new PlaceAdapterItem(
-                                    prediction.getPlaceId(),
-                                    prediction.getFullText(null).toString(),
-                                    suggestedLocationSelectedSubject)
-                            );
-                        }
+                        final Iterable<BaseAdapterItem> placesSuggestions = Iterables.transform(
+                                predictions,
+                                new Function<AutocompletePrediction, BaseAdapterItem>() {
+                                    @Nullable
+                                    @Override
+                                    public BaseAdapterItem apply(@Nullable AutocompletePrediction prediction) {
+                                        return new PlaceAdapterItem(
+                                                prediction.getPlaceId(),
+                                                prediction.getFullText(null).toString(),
+                                                suggestedLocationSelectedSubject);
+                                    }
+                                });
+
+                        builder.addAll(placesSuggestions);
 
                         // Release the buffer now that all data has been copied.
                         predictions.release();
@@ -341,7 +353,7 @@ public class LocationPresenter implements GoogleApiClient.ConnectionCallbacks {
     }
 
     private Observable<ResponseOrError<UserLocation>> getGeoCodeRequest(double latitude, double longitude) {
-        return apiService.geocode(latitude + "," + longitude)
+        return apiService.geocode(String.format(Locale.getDefault(), "%1$f,%2$f", latitude, longitude))
                 .subscribeOn(networkScheduler)
                 .compose(ResponseOrError.<UserLocation>toResponseOrErrorObservable());
     }
@@ -401,7 +413,11 @@ public class LocationPresenter implements GoogleApiClient.ConnectionCallbacks {
         return updateLocationErrorObservable;
     }
 
-    @NonNull
+    public void refreshGpsLocation() {
+        gpsLocationRefreshSubject.onNext(null);
+    }
+
+    @Nonnull
     private Func1<String, Boolean> queryFilter() {
         return new Func1<String, Boolean>() {
             @Override
@@ -413,29 +429,9 @@ public class LocationPresenter implements GoogleApiClient.ConnectionCallbacks {
         };
     }
 
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-        getCurrentLocation();
-    }
-
-    @SuppressWarnings("MissingPermission")
-    public void getCurrentLocation() {
-        if (!googleApiClient.isConnected() && !PermissionHelper.hasPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)) {
-            return;
-        }
-        android.location.Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-        lastGpsLocationSubject.onNext(lastLocation);
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
     public void disconnectGoogleApi() {
         googleApiClient.disconnect();
     }
-
 
     // Adapter items
 

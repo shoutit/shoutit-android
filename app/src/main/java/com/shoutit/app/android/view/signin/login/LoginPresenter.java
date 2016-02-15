@@ -55,14 +55,11 @@ public class LoginPresenter {
 
     @Inject
     public LoginPresenter(@NonNull final ApiService apiService,
-                          @NonNull @ForActivity Context context,
-                          @NonNull CoarseLocationObservableProvider coarseLocationObservableProvider,
                           @NonNull final UserPreferences userPreferences,
                           @NonNull @NetworkScheduler final Scheduler networkScheduler,
-                          @NonNull @UiScheduler final Scheduler uiScheduler,
-                          @Nonnull LocationManager locationManager) {
+                          @NonNull @UiScheduler final Scheduler uiScheduler) {
 
-        mLocationObservable = locationManager.updateUserLocationObservable()
+        mLocationObservable = userPreferences.getLocationObservable()
                 .startWith((UserLocation) null)
                 .compose(ObservableExtensions.<UserLocation>behaviorRefCount());
 
