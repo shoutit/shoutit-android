@@ -18,7 +18,7 @@ public class Shout {
     private final String apiUrl;
     private final String webUrl;
     private final String type;
-    private final Location location;
+    private final UserLocation location;
     private final String title;
     private final String text;
     private final float price;
@@ -32,7 +32,7 @@ public class Shout {
     private final long datePublished;
 
     public Shout(@Nonnull String id, String apiUrl, String webUrl, String type,
-                 Location location, String title, String text, float price, float number,
+                 UserLocation location, String title, String text, float price, float number,
                  String currency, String thumbnail, String videoUrl, User user,
                  Category category, List<Tag> tags, long datePublished) {
         this.id = id;
@@ -77,7 +77,7 @@ public class Shout {
                 R.string.shout_type_request;
     }
 
-    public Location getLocation() {
+    public UserLocation getLocation() {
         return location;
     }
 

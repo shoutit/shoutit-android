@@ -1,12 +1,16 @@
 package com.shoutit.app.android.api;
 
+import android.support.annotation.Nullable;
+
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.SignResponse;
+import com.shoutit.app.android.api.model.UpdateLocationRequest;
 import com.shoutit.app.android.api.model.TagsRequest;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.login.EmailLoginRequest;
@@ -18,6 +22,7 @@ import java.util.List;
 import okhttp3.ResponseBody;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
@@ -39,9 +44,10 @@ public interface ApiService {
                                     @Query("page_size") Integer pageSize);
 
     @GET("shouts")
-    Observable<ShoutsResponse> shoutsForCountry(@Query("city") String city,
-                                                @Query("page") Integer page,
-                                                @Query("page_size") Integer pageSize);
+    Observable<ShoutsResponse> shoutsForCity(@Query("country") String countryCode,
+                                             @Query("city") String city,
+                                             @Query("page") Integer page,
+                                             @Query("page_size") Integer pageSize);
 
     @POST("oauth2/access_token")
     Observable<SignResponse> login(@Body EmailLoginRequest request);
@@ -66,6 +72,15 @@ public interface ApiService {
 
     @GET("users/me")
     Observable<User> getMyUser();
+
+    @PATCH("users/me")
+    Observable<User> updateUserLocation(@Body UpdateLocationRequest updateLocationRequest);
+
+    @GET("misc/geocode")
+    Observable<UserLocation> geocode(@Query("latlng") String latlng); // format like latlng=40.722100,-74.046900
+
+    @GET("misc/geocode?latlng=0,0")
+    Observable<UserLocation> geocodeDefault();
 
     @GET("misc/categories")
     Observable<List<Category>> categories();

@@ -7,12 +7,18 @@
     <string name="shout_type_request">Request</string>
     <string name="terms_of_service">Terms of Service</string>
     <string name="facebook_app_id">1148740908499849</string>
+    <string name="google_api_key" translatable="false">AIzaSyBWHadI_MPYQgDLqI4RXhymEs42YEtgTEE</string>
 
     <!-- Errors -->
     <string name="error_default">Ooops, something went wrong</string>
     <string name="error_connection">Ooops, probably there is no Internet connection</string>
     <string name="error_email_not_found">The email or username you entered do not belong to any account.</string>
     <string name="error_wrong_email_or_password">Wrong email or password</string>
+
+    <!-- Permissions -->
+    <string name="permission_location_explanation">We need your location to prepare appropriate content</string>
+    <string name="permission_granted">Permissions have been granted</string>
+    <string name="permission_not_granted">Permissions not granted</string>
 
     <!-- Intro -->
     <string name="intro_welcome">Welcome To Shoutit</string>
@@ -87,6 +93,13 @@
     <string name="html_activity_terms">Terms of Service</string>
     <string name="html_activity_privacy">Privacy Policy</string>
 
+    <!-- Location -->
+    <string name="location_toolbar_title">Choose location</string>
+    <string name="location_search_hint">Enter a location</string>
+    <string name="location_header">My current location (automatic updates)</string>
+    <string name="location_header_selected_location">Current selection</string>
+    <string name="location_location">%1$s, %2$s</string>
+
     <!-- Side Menu -->
     <string name="menu_create_shout">Create Shout</string>
     <string name="menu_item_home">Home</string>
@@ -109,5 +122,9 @@
     <string name="post_login_send_error">Error sending interests</string>
     <string name="post_login_next">next</string>
     <string name="post_login_activity_title">Listen to your Interest!</string>
+    <string name="location_fetching_error">Sorry, cannot get locations</string>
+    <string name="location_update_error">Sorry, cannot update your location. Please try again.</string>
+    <string name="location_update_success">Location successfully changed</string>
+    <string name="home_no_shouts">No shouts to display</string>
 
 </resources>

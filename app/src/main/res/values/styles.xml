@@ -77,6 +77,16 @@
         <item name="android:textSize">16sp</item>
     </style>
 
+    <style name="SearchEditText" parent="ThemeOverlay.AppCompat">
+        <item name="colorControlNormal">@android:color/white</item>
+        <item name="colorControlActivated">@android:color/white</item>
+        <item name="colorControlHighlight">@android:color/white</item>
+    </style>
+
+    <style name="WhiteProgressBar" parent="ThemeOverlay.AppCompat">
+        <item name="colorAccent">@android:color/white</item>
+    </style>
+
     <style name="AppTheme.WithDrawer"/>
 
 </resources>
