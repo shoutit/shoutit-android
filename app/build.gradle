@@ -84,7 +84,7 @@ android {
 
         staging {
             signingConfig signingConfigs.debug
-            debuggable false
+            debuggable true
             minifyEnabled false
             ext.enableCrashlytics = true
             ext.betaDistributionGroupAliases = "android-internal-testers, internal-tests"

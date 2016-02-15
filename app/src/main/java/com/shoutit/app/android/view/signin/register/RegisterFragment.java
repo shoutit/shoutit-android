@@ -4,8 +4,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
@@ -30,8 +28,8 @@ import com.shoutit.app.android.data.AssetsConstants;
 import com.shoutit.app.android.utils.Actions1;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.MoreFunctions1;
-import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.signin.LoginActivityComponent;
+import com.shoutit.app.android.view.signin.StartNewActivityHelper;
 import com.shoutit.app.android.view.signin.login.LoginFragment;
 import com.shoutit.app.android.view.webview.HtmlAssetViewerActivity;
 
@@ -42,7 +40,6 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
-import rx.functions.Action1;
 
 public class RegisterFragment extends BaseFragment {
 
@@ -137,14 +134,7 @@ public class RegisterFragment extends BaseFragment {
 
         registerPresenter.successObservable()
                 .compose(this.<SignResponse>bindToLifecycle())
-                .subscribe(new Action1<SignResponse>() {
-                    @Override
-                    public void call(SignResponse signResponse) {
-                        final FragmentActivity activity = getActivity();
-                        ActivityCompat.finishAffinity(activity);
-                        startActivity(MainActivity.newIntent(activity));
-                    }
-                });
+                .subscribe(StartNewActivityHelper.startActivityAfterAuthAction(getActivity()));
 
         RxTextView.textChangeEvents(emailEdittext)
                 .debounce(500, TimeUnit.MILLISECONDS)

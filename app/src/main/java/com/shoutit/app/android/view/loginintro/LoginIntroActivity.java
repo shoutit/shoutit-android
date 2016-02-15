@@ -1,8 +1,8 @@
 package com.shoutit.app.android.view.loginintro;
 
-import android.accounts.AccountManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -17,6 +17,14 @@ import com.appunite.rx.android.MyAndroidSchedulers;
 import com.appunite.rx.functions.BothParams;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookSdk;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.Scopes;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Scope;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
@@ -42,12 +50,13 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Observable;
+import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
-public class LoginIntroActivity extends BaseActivity {
+public class LoginIntroActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener {
 
     private static final int GOOGLE_SIGN_IN = 0;
     private static final int GOOGLE_ACC_AUTH = 1;
@@ -114,23 +123,14 @@ public class LoginIntroActivity extends BaseActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == GOOGLE_SIGN_IN && resultCode == RESULT_OK) {
-            final String email = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-            GoogleHelper.getToken(this, email, GOOGLE_ACC_AUTH)
-                    .withLatestFrom(mObservable, new Func2<String, Location, BothParams<String, Location>>() {
-                        @Override
-                        public BothParams<String, Location> call(String s, Location location) {
-                            return new BothParams<>(s, location);
-                        }
-                    })
-                    .flatMap(getCallGoogleApi())
-                    .subscribe(getSuccessAction(), getErrorAction());
-        } else if (requestCode == GOOGLE_ACC_AUTH && resultCode == RESULT_OK) {
-            final String authtoken = data.getExtras().getString("authtoken");
+            final GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            final GoogleSignInAccount acct = result.getSignInAccount();
+            final String authCode = acct.getServerAuthCode();
             mObservable
                     .map(new Func1<Location, BothParams<String, Location>>() {
                         @Override
                         public BothParams<String, Location> call(Location location) {
-                            return BothParams.of(authtoken, location);
+                            return BothParams.of(authCode, location);
                         }
                     })
                     .flatMap(getCallGoogleApi())
@@ -189,10 +189,43 @@ public class LoginIntroActivity extends BaseActivity {
         };
     }
 
+    private void loginGoogle() {
+        final GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestProfile()
+                .requestServerAuthCode("935842257865-s6069gqjq4bvpi4rcbjtdtn2kggrvi06.apps.googleusercontent.com")
+                .build();
+
+        final GoogleApiClient googleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, this)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient);
+        startActivityForResult(signInIntent, GOOGLE_SIGN_IN);
+
+//        Schedulers.io().createWorker().schedule(new Action0() {
+//            @Override
+//            public void call() {
+//                final ConnectionResult connectionResult = googleApiClient.blockingConnect();
+//                runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        try {
+//                            connectionResult.startResolutionForResult(LoginIntroActivity.this, GOOGLE_SIGN_IN);
+//                        } catch (IntentSender.SendIntentException e) {
+//                            getErrorAction().call(e);
+//                        }
+//                    }
+//                });
+//            }
+//        });
+
+    }
 
     @OnClick(R.id.activity_login_gplus_btn)
     public void googleClick() {
-        GoogleHelper.pickUserAccount(this, GOOGLE_SIGN_IN);
+        loginGoogle();
     }
 
     @OnClick(R.id.activity_login_facebook_btn)
@@ -237,5 +270,10 @@ public class LoginIntroActivity extends BaseActivity {
                 .build();
         component.inject(this);
         return component;
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
     }
 }

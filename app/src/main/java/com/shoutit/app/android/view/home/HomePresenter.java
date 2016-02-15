@@ -8,10 +8,11 @@ import android.text.TextUtils;
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
-import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
+import com.google.common.base.Function;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.DiscoverChild;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
@@ -33,7 +34,6 @@ import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Observer;
-import rx.Scheduler;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.subjects.PublishSubject;
@@ -58,20 +58,15 @@ public class HomePresenter {
 
     @Nonnull
     private final ShoutsDao shoutsDao;
-    @Nonnull
-    private final Scheduler uiScheduler;
     private final Context context;
     private final String userCity;
-
 
     @Inject
     public HomePresenter(@Nonnull ShoutsDao shoutsDao,
                          @Nonnull final DiscoversDao discoversDao,
                          @Nonnull final UserPreferences userPreferences,
-                         @Nonnull @UiScheduler final Scheduler uiScheduler,
                          @ForActivity Context context) {
         this.shoutsDao = shoutsDao;
-        this.uiScheduler = uiScheduler;
         this.context = context;
 
         final boolean isUserLoggedIn = userPreferences.isUserLoggedIn();
@@ -90,10 +85,15 @@ public class HomePresenter {
                 .map(new Func1<ShoutsResponse, List<BaseAdapterItem>>() {
                     @Override
                     public List<BaseAdapterItem> call(ShoutsResponse shoutsResponse) {
-                        final List<BaseAdapterItem> items = new ArrayList<>();
-                        for (Shout shout : shoutsResponse.getShouts()) {
-                            items.add(new ShoutAdapterItem(shout));
-                        }
+                        assert shoutsResponse.getShouts() != null;
+                        final ImmutableList<ShoutAdapterItem> items = ImmutableList.copyOf(Iterables.transform(shoutsResponse.getShouts(), new Function<Shout, ShoutAdapterItem>() {
+                            @javax.annotation.Nullable
+                            @Override
+                            public ShoutAdapterItem apply(@Nullable Shout input) {
+                                assert input != null;
+                                return new ShoutAdapterItem(input);
+                            }
+                        }));
 
                         return new ImmutableList.Builder<BaseAdapterItem>()
                                 .add(new ShoutHeaderAdapterItem(isUserLoggedIn, userCity, layoutManagerSwitchObserver))
@@ -115,6 +115,7 @@ public class HomePresenter {
                 .map(new Func1<DiscoverResponse, String>() {
                     @Override
                     public String call(DiscoverResponse response) {
+                        assert response.getDiscovers() != null;
                         return response.getDiscovers().get(0).getId();
                     }
                 });
@@ -145,10 +146,7 @@ public class HomePresenter {
                     @Override
                     public List<BaseAdapterItem> call(List<DiscoverChild> discovers) {
                         final List<BaseAdapterItem> items = new ArrayList<>();
-                        for (int i = 0; i < discovers.size(); i++) {
-                            if (i >= MAX_VISIBLE_DISCOVER_ITEMS) {
-                                break;
-                            }
+                        for (int i = 0; i < discovers.size() && i < MAX_VISIBLE_DISCOVER_ITEMS; i++) {
                             items.add(new DiscoverAdapterItem(discovers.get(i)));
                         }
 
@@ -162,8 +160,8 @@ public class HomePresenter {
 
         /** Combines adapter items **/
         allAdapterItemsObservable = Observable.combineLatest(
-                allDiscoverAdapterItems.startWith(new ArrayList<BaseAdapterItem>()),
-                allShoutAdapterItems.startWith(new ArrayList<BaseAdapterItem>()),
+                allDiscoverAdapterItems.startWith(ImmutableList.<BaseAdapterItem>of()),
+                allShoutAdapterItems.startWith(ImmutableList.<BaseAdapterItem>of()),
                 new Func2<List<BaseAdapterItem>, List<BaseAdapterItem>, List<BaseAdapterItem>>() {
                     @Override
                     public List<BaseAdapterItem> call(List<BaseAdapterItem> discovers,
@@ -195,19 +193,14 @@ public class HomePresenter {
 
         // Layout manager changes
         linearLayoutManagerObservable = layoutManagerSwitchObserver
-                .scan(0, new Func2<Integer, Object, Integer>() {
+                .scan(true, new Func2<Boolean, Object, Boolean>() {
                     @Override
-                    public Integer call(Integer counter, Object o) {
-                        return ++counter;
+                    public Boolean call(Boolean prev, Object o) {
+                        return !prev;
                     }
                 })
                 .skip(1)
-                .map(new Func1<Integer, Boolean>() {
-                    @Override
-                    public Boolean call(Integer count) {
-                        return count % 2 == 1;
-                    }
-                });
+                .startWith(true);
     }
 
     @Nonnull
@@ -233,14 +226,12 @@ public class HomePresenter {
     @Nonnull
     public Observable<Boolean> getLinearLayoutManagerObservable() {
         return linearLayoutManagerObservable
-                .observeOn(uiScheduler)
                 .filter(Functions1.isTrue());
     }
 
     @Nonnull
     public Observable<Boolean> getGridLayoutManagerObservable() {
         return linearLayoutManagerObservable
-                .observeOn(uiScheduler)
                 .filter(Functions1.isFalse());
     }
 
@@ -304,7 +295,7 @@ public class HomePresenter {
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return shout.equals(item);
+            return this.equals(item);
         }
 
         @Nonnull
@@ -314,7 +305,7 @@ public class HomePresenter {
 
         @Nullable
         public String getCategoryIconUrl() {
-            if (shout.getCategory() != null && shout.getCategory().getMainTag() != null) {
+            if (shout.getCategory() != null) {
                 return Strings.emptyToNull(shout.getCategory().getMainTag().getImage());
             } else {
                 return null;
@@ -330,6 +321,22 @@ public class HomePresenter {
             } else {
                 return null;
             }
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            final ShoutAdapterItem that = (ShoutAdapterItem) o;
+
+            return shout.equals(that.shout);
+
+        }
+
+        @Override
+        public int hashCode() {
+            return shout.hashCode();
         }
     }
 
@@ -396,12 +403,28 @@ public class HomePresenter {
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return discover.equals(item);
+            return this.equals(item);
         }
 
         @Nonnull
         public DiscoverChild getDiscover() {
             return discover;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            final DiscoverAdapterItem that = (DiscoverAdapterItem) o;
+
+            return discover.equals(that.discover);
+
+        }
+
+        @Override
+        public int hashCode() {
+            return discover.hashCode();
         }
     }
 

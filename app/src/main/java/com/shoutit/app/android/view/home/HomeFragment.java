@@ -130,6 +130,7 @@ public class HomeFragment extends BaseFragment {
                 .subscribe(new Action1<Void>() {
                     @Override
                     public void call(Void aVoid) {
+
                         Toast.makeText(context, "Not impelmented yet", Toast.LENGTH_LONG).show();
                     }
                 });
