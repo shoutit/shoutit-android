@@ -71,8 +71,8 @@ public class HomePresenterTest {
         when(shoutsDao.getHomeShoutsObservable(any(LocationPointer.class))).thenReturn(shoutsSubject);
         when(shoutsDao.getLoadMoreHomeShoutsObserver()).thenReturn(loadMoreShoutsSubject);
 
-        when(discoversDao.discoverItemDao(anyString())).thenReturn(discoverItemDao);
-        when(discoversDao.discoverItemDao(anyString()).getDiscoverItemObservable()).thenReturn(discoversDetailsSubject);
+        when(discoversDao.getDiscoverItemDao(anyString())).thenReturn(discoverItemDao);
+        when(discoversDao.getDiscoverItemDao(anyString()).getDiscoverItemObservable()).thenReturn(discoversDetailsSubject);
         when(discoversDao.getDiscoverObservable(any(LocationPointer.class))).thenReturn(discoversSubject);
 
         when(userPreferences.isUserLoggedIn()).thenReturn(true);
@@ -182,7 +182,7 @@ public class HomePresenterTest {
     @Nonnull
     private ResponseOrError<DiscoverItemDetailsResponse> discoverDetailsResponse() {
         return ResponseOrError.fromData(new DiscoverItemDetailsResponse("2", true, false, Lists.<DiscoverChild>newArrayList(
-                new DiscoverChild("id", null, null, null, null, null))));
+                new DiscoverChild("id", null, null, null, null, null)), title, image));
     }
 
     @Nonnull

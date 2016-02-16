@@ -12,6 +12,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
+import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.model.LocationPointer;
 
 import javax.annotation.Nonnull;
@@ -81,23 +82,36 @@ public class DiscoversDao {
 
     public class DiscoverItemDao {
 
+        @Nonnull
         private final Observable<ResponseOrError<DiscoverItemDetailsResponse>> discoverItemObservable;
+        @Nonnull
+        private final Observable<ResponseOrError<ShoutsResponse>> discoverItemShoutsObservable;
 
         public DiscoverItemDao(@Nonnull String id) {
             discoverItemObservable = apiService.discoverItem(id)
                     .subscribeOn(networkScheduler)
                     .compose(ResponseOrError.<DiscoverItemDetailsResponse>toResponseOrErrorObservable())
                     .compose(MoreOperators.<ResponseOrError<DiscoverItemDetailsResponse>>cacheWithTimeout(networkScheduler));
+
+            discoverItemShoutsObservable = apiService.shoutsForDiscoverItem(id)
+                    .subscribeOn(networkScheduler)
+                    .compose(ResponseOrError.<ShoutsResponse>toResponseOrErrorObservable())
+                    .compose(MoreOperators.<ResponseOrError<ShoutsResponse>>cacheWithTimeout(networkScheduler));
         }
 
         @Nonnull
         public Observable<ResponseOrError<DiscoverItemDetailsResponse>> getDiscoverItemObservable() {
             return discoverItemObservable;
         }
+
+        @Nonnull
+        public Observable<ResponseOrError<ShoutsResponse>> getDiscoverItemShoutsObservable() {
+            return discoverItemShoutsObservable;
+        }
     }
 
     @Nonnull
-    public DiscoverItemDao discoverItemDao(@Nonnull final String id) {
+    public DiscoverItemDao getDiscoverItemDao(@Nonnull final String id) {
         return discoverItemCache.getUnchecked(id);
     }
 

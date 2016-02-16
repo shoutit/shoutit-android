@@ -69,7 +69,7 @@ public class DiscoversDaoTest {
     public void testDiscoverItemRequest() {
         final TestSubscriber<ResponseOrError<DiscoverItemDetailsResponse>> subscriber = new TestSubscriber<>();
 
-        discoversDao.discoverItemDao("z").getDiscoverItemObservable()
+        discoversDao.getDiscoverItemDao("z").getDiscoverItemObservable()
                 .subscribe(subscriber);
         scheduler.triggerActions();
 
@@ -84,6 +84,6 @@ public class DiscoversDaoTest {
 
     private DiscoverItemDetailsResponse discoverItemDetailsResponse() {
         return new DiscoverItemDetailsResponse("z", true, false,
-                Lists.newArrayList(new DiscoverChild("z", null, null, null, null, null)));
+                Lists.newArrayList(new DiscoverChild("z", null, null, null, null, null)), title, image);
     }
 }
