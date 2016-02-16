@@ -1,5 +1,7 @@
 package com.shoutit.app.android.api;
 
+import android.support.annotation.Nullable;
+
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
@@ -42,9 +44,10 @@ public interface ApiService {
                                     @Query("page_size") Integer pageSize);
 
     @GET("shouts")
-    Observable<ShoutsResponse> shoutsForCountry(@Query("city") String city,
-                                                @Query("page") Integer page,
-                                                @Query("page_size") Integer pageSize);
+    Observable<ShoutsResponse> shoutsForCity(@Query("country") String countryCode,
+                                             @Query("city") String city,
+                                             @Query("page") Integer page,
+                                             @Query("page_size") Integer pageSize);
 
     @POST("oauth2/access_token")
     Observable<SignResponse> login(@Body EmailLoginRequest request);

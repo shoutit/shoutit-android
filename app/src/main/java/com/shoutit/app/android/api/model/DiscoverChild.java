@@ -1,5 +1,7 @@
 package com.shoutit.app.android.api.model;
 
+import com.google.common.base.Objects;
+
 public class DiscoverChild {
     private final String id;
     private final String apiUrl;
@@ -39,5 +41,23 @@ public class DiscoverChild {
 
     public String getIcon() {
         return icon;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DiscoverChild)) return false;
+        final DiscoverChild that = (DiscoverChild) o;
+        return Objects.equal(id, that.id) &&
+                Objects.equal(apiUrl, that.apiUrl) &&
+                Objects.equal(title, that.title) &&
+                Objects.equal(subtitle, that.subtitle) &&
+                Objects.equal(image, that.image) &&
+                Objects.equal(icon, that.icon);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id, apiUrl, title, subtitle, image, icon);
     }
 }

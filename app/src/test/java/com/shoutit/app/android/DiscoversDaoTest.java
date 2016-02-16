@@ -9,6 +9,7 @@ import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.dao.DiscoversDao;
+import com.shoutit.app.android.model.LocationPointer;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -32,6 +33,8 @@ public class DiscoversDaoTest {
     @Mock
     Shout shout;
 
+    private LocationPointer locationPointer;
+
     private final TestScheduler scheduler = new TestScheduler();
     private DiscoversDao discoversDao;
 
@@ -39,20 +42,22 @@ public class DiscoversDaoTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
+        locationPointer = new LocationPointer("GE", "Berlin");
+
         when(userPreferences.getUserCountryCode()).thenReturn("GE");
         when(apiService.discovers(anyString(), anyInt(), anyInt()))
                 .thenReturn(Observable.just(discoversResponse()));
         when(apiService.discoverItem(anyString()))
                 .thenReturn(Observable.just(discoverItemDetailsResponse()));
 
-        discoversDao = new DiscoversDao(apiService, userPreferences, scheduler);
+        discoversDao = new DiscoversDao(apiService, scheduler);
     }
 
     @Test
     public void testDiscoverRequest() {
         final TestSubscriber<ResponseOrError<DiscoverResponse>> subscriber = new TestSubscriber<>();
 
-        discoversDao.getHomeDiscoverObservable()
+        discoversDao.getDiscoverObservable(locationPointer)
                 .subscribe(subscriber);
         scheduler.triggerActions();
 

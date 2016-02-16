@@ -46,6 +46,7 @@ public class HomeAdapter extends BaseAdapter {
     private static final int VIEW_TYPE_DISCOVER_ITEMS_CONTAINER = 2;
     private static final int VIEW_TYPE_SHOUT_HEADER = 3;
     public static final int VIEW_TYPE_SHOUT_ITEM = 4;
+    public static final int VIEW_TYPE_EMPTY_SHOUTS_ITEM = 5;
 
     @Nonnull
     private final HomeDiscoversAdapter homeDiscoversAdapter;
@@ -310,6 +311,16 @@ public class HomeAdapter extends BaseAdapter {
         }
     }
 
+    class ShoutEmptyViewHolder extends ViewHolderManager.BaseViewHolder<HomePresenter.ShoutsEmptyAdapterItem> {
+        public ShoutEmptyViewHolder(@Nonnull View itemView) {
+            super(itemView);
+        }
+
+        @Override
+        public void bind(@Nonnull HomePresenter.ShoutsEmptyAdapterItem item) {
+        }
+    }
+
     @Override
     public ViewHolderManager.BaseViewHolder<? extends BaseAdapterItem> onCreateViewHolder(ViewGroup parent, int viewType) {
         switch (viewType) {
@@ -323,6 +334,8 @@ public class HomeAdapter extends BaseAdapter {
                 return isLinearLayoutManager ?
                         new ShoutLinerViewHolder(layoutInflater.inflate(R.layout.home_feed_item_linear, parent, false)) :
                         new ShoutGridViewHolder(layoutInflater.inflate(R.layout.home_feed_item_grid, parent, false));
+            case VIEW_TYPE_EMPTY_SHOUTS_ITEM:
+                return new ShoutEmptyViewHolder(layoutInflater.inflate(R.layout.home_shouts_empty, parent, false));
             default:
                 throw new RuntimeException("Unknown adapter view type");
         }
@@ -344,6 +357,8 @@ public class HomeAdapter extends BaseAdapter {
             return VIEW_TYPE_SHOUT_HEADER;
         } else if (item instanceof HomePresenter.ShoutAdapterItem) {
             return VIEW_TYPE_SHOUT_ITEM;
+        } else if (item instanceof HomePresenter.ShoutsEmptyAdapterItem) {
+            return VIEW_TYPE_EMPTY_SHOUTS_ITEM;
         } else {
             throw new RuntimeException("Unknown adapter view type");
         }
