@@ -167,9 +167,8 @@ public final class AppModule {
 
     @Provides
     public DiscoversDao provideDiscoversDao(ApiService apiService,
-                                            @NetworkScheduler Scheduler networkScheduler,
-                                            UserPreferences userPreferences) {
-        return new DiscoversDao(apiService, userPreferences, networkScheduler);
+                                            @NetworkScheduler Scheduler networkScheduler) {
+        return new DiscoversDao(apiService, networkScheduler);
     }
 
     @Provides

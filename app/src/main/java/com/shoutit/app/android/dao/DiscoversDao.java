@@ -1,5 +1,7 @@
 package com.shoutit.app.android.dao;
 
+import android.support.annotation.NonNull;
+
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.operators.MoreOperators;
@@ -10,6 +12,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
+import com.shoutit.app.android.model.LocationPointer;
 
 import javax.annotation.Nonnull;
 import javax.inject.Singleton;
@@ -20,32 +23,60 @@ import rx.Scheduler;
 @Singleton
 public class DiscoversDao {
 
-    private final LoadingCache<String, DiscoverItemDao> cache;
+    @Nonnull
+    private final LoadingCache<String, DiscoverItemDao> discoverItemCache;
+    @Nonnull
+    private final LoadingCache<LocationPointer, DiscoverDao> discoverCache;
     @Nonnull
     private final ApiService apiService;
     @Nonnull
     private final Scheduler networkScheduler;
-    private final Observable<ResponseOrError<DiscoverResponse>> homeDiscoverObservable;
 
     public DiscoversDao(@Nonnull final ApiService apiService,
-                        @Nonnull UserPreferences userPreferences,
                         @Nonnull @NetworkScheduler Scheduler networkScheduler) {
         this.apiService = apiService;
         this.networkScheduler = networkScheduler;
 
-        homeDiscoverObservable = apiService
-                .discovers(userPreferences.getUserCountryCode(), null, null)
-                .subscribeOn(networkScheduler)
-                .compose(ResponseOrError.<DiscoverResponse>toResponseOrErrorObservable())
-                .compose(MoreOperators.<ResponseOrError<DiscoverResponse>>cacheWithTimeout(networkScheduler));
-
-        cache = CacheBuilder.newBuilder()
-                .build(new CacheLoader<String, DiscoverItemDao>() {
+        discoverCache = CacheBuilder.newBuilder()
+                .build(new CacheLoader<LocationPointer, DiscoverDao>() {
                     @Override
-                    public DiscoverItemDao load(@Nonnull final String id) throws Exception {
-                        return new DiscoverItemDao(id);
+                    public DiscoverDao load(@Nonnull final LocationPointer id) throws Exception {
+                        return new DiscoverDao(id);
                     }
                 });
+
+        discoverItemCache = CacheBuilder.newBuilder()
+                .build(new CacheLoader<String, DiscoverItemDao>() {
+                    @Override
+                    public DiscoverItemDao load(@NonNull String key) throws Exception {
+                        return new DiscoverItemDao(key);
+                    }
+                });
+    }
+
+    @Nonnull
+    public Observable<ResponseOrError<DiscoverResponse>> getDiscoverObservable(@Nonnull LocationPointer locationPointer) {
+        return discoverCache.getUnchecked(locationPointer).getDiscoverObservable();
+    }
+
+    public class DiscoverDao {
+
+        @Nonnull
+        private final Observable<ResponseOrError<DiscoverResponse>> discoverObservable;
+
+        public DiscoverDao(@Nonnull LocationPointer locationPointer) {
+
+            discoverObservable = apiService
+                    .discovers(locationPointer.getCountryCode(), null, null)
+                    .subscribeOn(networkScheduler)
+                    .compose(ResponseOrError.<DiscoverResponse>toResponseOrErrorObservable())
+                    .compose(MoreOperators.<ResponseOrError<DiscoverResponse>>cacheWithTimeout(networkScheduler));
+        }
+
+        @Nonnull
+        public Observable<ResponseOrError<DiscoverResponse>> getDiscoverObservable() {
+            return discoverObservable;
+        }
     }
 
     public class DiscoverItemDao {
@@ -59,6 +90,7 @@ public class DiscoversDao {
                     .compose(MoreOperators.<ResponseOrError<DiscoverItemDetailsResponse>>cacheWithTimeout(networkScheduler));
         }
 
+        @Nonnull
         public Observable<ResponseOrError<DiscoverItemDetailsResponse>> getDiscoverItemObservable() {
             return discoverItemObservable;
         }
@@ -66,10 +98,7 @@ public class DiscoversDao {
 
     @Nonnull
     public DiscoverItemDao discoverItemDao(@Nonnull final String id) {
-        return cache.getUnchecked(id);
+        return discoverItemCache.getUnchecked(id);
     }
 
-    public Observable<ResponseOrError<DiscoverResponse>> getHomeDiscoverObservable() {
-        return homeDiscoverObservable;
-    }
 }

@@ -9,6 +9,7 @@ import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.functions.Functions1;
+import com.google.common.base.Objects;
 import com.google.common.base.Function;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
@@ -19,9 +20,11 @@ import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ShoutsDao;
+import com.shoutit.app.android.model.LocationPointer;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
@@ -36,6 +39,7 @@ import rx.Observable;
 import rx.Observer;
 import rx.functions.Func1;
 import rx.functions.Func2;
+import rx.functions.Func3;
 import rx.subjects.PublishSubject;
 
 public class HomePresenter {
@@ -59,10 +63,9 @@ public class HomePresenter {
     @Nonnull
     private final ShoutsDao shoutsDao;
     private final Context context;
-    private final String userCity;
 
     @Inject
-    public HomePresenter(@Nonnull ShoutsDao shoutsDao,
+    public HomePresenter(@Nonnull final ShoutsDao shoutsDao,
                          @Nonnull final DiscoversDao discoversDao,
                          @Nonnull final UserPreferences userPreferences,
                          @ForActivity Context context) {
@@ -70,40 +73,68 @@ public class HomePresenter {
         this.context = context;
 
         final boolean isUserLoggedIn = userPreferences.isUserLoggedIn();
-        userCity = userPreferences.getUserCity();
 
-        /** Shouts **/
-        final Observable<List<BaseAdapterItem>> allShoutAdapterItems = shoutsDao.getHomeShoutsObservable()
-                .compose(ResponseOrError.<ShoutsResponse>onlySuccess())
-                .filter(new Func1<ShoutsResponse, Boolean>() {
+        final Observable<LocationPointer> locationObservable = userPreferences.getLocationObservable()
+                .map(new Func1<UserLocation, LocationPointer>() {
                     @Override
-                    public Boolean call(ShoutsResponse shoutsResponse) {
-                        return shoutsResponse != null && shoutsResponse.getShouts() != null &&
-                                !shoutsResponse.getShouts().isEmpty();
+                    public LocationPointer call(UserLocation userLocation) {
+                        return new LocationPointer(userLocation.getCountry(), userLocation.getCity());
                     }
                 })
+                .compose(ObservableExtensions.<LocationPointer>behaviorRefCount());
+
+        /** Shouts **/
+        final Observable<ResponseOrError<ShoutsResponse>> shoutsRequestObservable = locationObservable
+                .switchMap(new Func1<LocationPointer, Observable<ResponseOrError<ShoutsResponse>>>() {
+                    @Override
+                    public Observable<ResponseOrError<ShoutsResponse>> call(LocationPointer locationPointer) {
+                        return shoutsDao.getHomeShoutsObservable(locationPointer);
+                    }
+                })
+                .compose(ObservableExtensions.<ResponseOrError<ShoutsResponse>>behaviorRefCount());
+
+
+        final Observable<List<BaseAdapterItem>> allShoutAdapterItems = shoutsRequestObservable
+                .compose(ResponseOrError.<ShoutsResponse>onlySuccess())
+                .filter(Functions1.isNotNull())
                 .map(new Func1<ShoutsResponse, List<BaseAdapterItem>>() {
                     @Override
                     public List<BaseAdapterItem> call(ShoutsResponse shoutsResponse) {
-                        assert shoutsResponse.getShouts() != null;
-                        final ImmutableList<ShoutAdapterItem> items = ImmutableList.copyOf(Iterables.transform(shoutsResponse.getShouts(), new Function<Shout, ShoutAdapterItem>() {
-                            @javax.annotation.Nullable
-                            @Override
-                            public ShoutAdapterItem apply(@Nullable Shout input) {
-                                assert input != null;
-                                return new ShoutAdapterItem(input);
-                            }
-                        }));
+                        final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
+                        builder.add(new ShoutHeaderAdapterItem(isUserLoggedIn,
+                                userPreferences.getUserCity(), layoutManagerSwitchObserver));
 
-                        return new ImmutableList.Builder<BaseAdapterItem>()
-                                .add(new ShoutHeaderAdapterItem(isUserLoggedIn, userCity, layoutManagerSwitchObserver))
-                                .addAll(items)
-                                .build();
+                        if (shoutsResponse.getShouts() != null && !shoutsResponse.getShouts().isEmpty()) {
+                            final Iterable<BaseAdapterItem> items = Iterables
+                                    .transform(shoutsResponse.getShouts(), new Function<Shout, BaseAdapterItem>() {
+                                        @javax.annotation.Nullable
+                                        @Override
+                                        public BaseAdapterItem apply(@Nullable Shout input) {
+                                            assert input != null;
+                                            return new ShoutAdapterItem(input);
+                                        }
+                                    });
+
+                            builder.addAll(items);
+                        } else {
+                            builder.add(new ShoutsEmptyAdapterItem());
+                        }
+
+                        return builder.build();
                     }
                 });
 
         /** Discovers **/
-        final Observable<String> mainDiscoverIdObservable = discoversDao.getHomeDiscoverObservable()
+        final Observable<ResponseOrError<DiscoverResponse>> discoverRequestObservable = locationObservable
+                .switchMap(new Func1<LocationPointer, Observable<ResponseOrError<DiscoverResponse>>>() {
+                    @Override
+                    public Observable<ResponseOrError<DiscoverResponse>> call(LocationPointer locationPointer) {
+                        return discoversDao.getDiscoverObservable(locationPointer);
+                    }
+                })
+                .compose(ObservableExtensions.<ResponseOrError<DiscoverResponse>>behaviorRefCount());
+
+        final Observable<String> mainDiscoverIdObservable = discoverRequestObservable
                 .compose(ResponseOrError.<DiscoverResponse>onlySuccess())
                 .filter(new Func1<DiscoverResponse, Boolean>() {
                     @Override
@@ -160,16 +191,18 @@ public class HomePresenter {
 
         /** Combines adapter items **/
         allAdapterItemsObservable = Observable.combineLatest(
-                allDiscoverAdapterItems.startWith(ImmutableList.<BaseAdapterItem>of()),
-                allShoutAdapterItems.startWith(ImmutableList.<BaseAdapterItem>of()),
-                new Func2<List<BaseAdapterItem>, List<BaseAdapterItem>, List<BaseAdapterItem>>() {
+                locationObservable,
+                allDiscoverAdapterItems.startWith(new ArrayList<BaseAdapterItem>()),
+                allShoutAdapterItems.startWith(new ArrayList<BaseAdapterItem>()),
+                new Func3<LocationPointer, List<BaseAdapterItem>, List<BaseAdapterItem>, List<BaseAdapterItem>>() {
                     @Override
-                    public List<BaseAdapterItem> call(List<BaseAdapterItem> discovers,
+                    public List<BaseAdapterItem> call(LocationPointer locationPointer,
+                                                      List<BaseAdapterItem> discovers,
                                                       List<BaseAdapterItem> shouts) {
                         final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
                         if (!discovers.isEmpty()) {
-                            builder.add(new DiscoverHeaderAdapterItem(userCity))
-                                    .add(new DiscoverContainerAdapterItem(discovers));
+                            builder.add(new DiscoverHeaderAdapterItem(locationPointer.getCity()))
+                                    .add(new DiscoverContainerAdapterItem(discovers, locationPointer));
                         }
 
                         return builder
@@ -181,8 +214,8 @@ public class HomePresenter {
 
         /** Progress and Error **/
         errorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
-                ResponseOrError.transform(shoutsDao.getHomeShoutsObservable()),
-                ResponseOrError.transform(discoversDao.getHomeDiscoverObservable()),
+                ResponseOrError.transform(shoutsRequestObservable),
+                ResponseOrError.transform(discoverRequestObservable),
                 ResponseOrError.transform(discoverItemDetailsObservable)))
                 .filter(Functions1.isNotNull());
 
@@ -199,8 +232,7 @@ public class HomePresenter {
                         return !prev;
                     }
                 })
-                .skip(1)
-                .startWith(true);
+                .skip(1);
     }
 
     @Nonnull
@@ -220,7 +252,7 @@ public class HomePresenter {
 
     @Nonnull
     public Observer<Object> getLoadMoreShouts() {
-        return RxMoreObservers.ignoreCompleted(shoutsDao.getLoadMoreShoutsObserver());
+        return RxMoreObservers.ignoreCompleted(shoutsDao.getLoadMoreHomeShoutsObserver());
     }
 
     @Nonnull
@@ -365,7 +397,7 @@ public class HomePresenter {
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof ShoutHeaderAdapterItem;
+            return item instanceof ShoutHeaderAdapterItem && this.equals(item);
         }
 
         public boolean isUserLoggedIn() {
@@ -378,6 +410,20 @@ public class HomePresenter {
 
         public Observer<Object> getLayoutManagerSwitchObserver() {
             return layoutManagerSwitchObserver;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof ShoutHeaderAdapterItem)) return false;
+            final ShoutHeaderAdapterItem that = (ShoutHeaderAdapterItem) o;
+            return isUserLoggedIn == that.isUserLoggedIn &&
+                    Objects.equal(userCity, that.userCity);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(isUserLoggedIn, userCity);
         }
     }
 
@@ -414,17 +460,14 @@ public class HomePresenter {
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
+            if (!(o instanceof DiscoverAdapterItem)) return false;
             final DiscoverAdapterItem that = (DiscoverAdapterItem) o;
-
-            return discover.equals(that.discover);
-
+            return Objects.equal(discover, that.discover);
         }
 
         @Override
         public int hashCode() {
-            return discover.hashCode();
+            return Objects.hashCode(discover);
         }
     }
 
@@ -448,11 +491,24 @@ public class HomePresenter {
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof DiscoverHeaderAdapterItem;
+            return item instanceof DiscoverHeaderAdapterItem && this.equals(item);
         }
 
         public String getCity() {
             return city;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof DiscoverHeaderAdapterItem)) return false;
+            final DiscoverHeaderAdapterItem that = (DiscoverHeaderAdapterItem) o;
+            return Objects.equal(city, that.city);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(city);
         }
     }
 
@@ -460,9 +516,13 @@ public class HomePresenter {
 
         @Nonnull
         private final List<BaseAdapterItem> adapterItems;
+        @Nonnull
+        private final LocationPointer locationPointer;
 
-        public DiscoverContainerAdapterItem(@Nonnull List<BaseAdapterItem> adapterItems) {
+        public DiscoverContainerAdapterItem(@Nonnull List<BaseAdapterItem> adapterItems,
+                                            @Nonnull LocationPointer locationPointer) {
             this.adapterItems = adapterItems;
+            this.locationPointer = locationPointer;
         }
 
         @Override
@@ -477,12 +537,43 @@ public class HomePresenter {
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof DiscoverContainerAdapterItem;
+            return item instanceof DiscoverContainerAdapterItem && this.equals(item);
         }
 
         @Nonnull
         public List<BaseAdapterItem> getAdapterItems() {
             return adapterItems;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof DiscoverContainerAdapterItem)) return false;
+            final DiscoverContainerAdapterItem that = (DiscoverContainerAdapterItem) o;
+            return Objects.equal(locationPointer, that.locationPointer);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(locationPointer);
+        }
+    }
+
+    public class ShoutsEmptyAdapterItem implements BaseAdapterItem {
+
+        @Override
+        public long adapterId() {
+            return BaseAdapterItem.NO_ID;
+        }
+
+        @Override
+        public boolean matches(@Nonnull BaseAdapterItem item) {
+            return item instanceof ShoutsEmptyAdapterItem;
+        }
+
+        @Override
+        public boolean same(@Nonnull BaseAdapterItem item) {
+            return item instanceof ShoutsEmptyAdapterItem;
         }
     }
     /** END OF ADAPTER ITEMS **/
