@@ -44,8 +44,9 @@ public class PostLoginPresenter {
     public PostLoginPresenter(CategoriesDao dao,
                               final ApiService apiService,
                               @NetworkScheduler final Scheduler networkScheduler,
-                              @UiScheduler final Scheduler uiScheduler) {
-        mStringSelectionHelper = new SelectionHelper<>();
+                              @UiScheduler final Scheduler uiScheduler,
+                              SelectionHelper<String> selectionHelper) {
+        mStringSelectionHelper = selectionHelper;
 
         final Observable<ResponseOrError<List<Category>>> listObservableResponseOrError = dao
                 .getListObservableResponseOrError()
@@ -117,6 +118,11 @@ public class PostLoginPresenter {
     @NonNull
     public Observable<Object> getSuccessCategoriesObservable() {
         return mSuccessCategoriesObservable;
+    }
+
+    @NonNull
+    public SelectionHelper<String> getStringSelectionHelper() {
+        return mStringSelectionHelper;
     }
 
     @NonNull

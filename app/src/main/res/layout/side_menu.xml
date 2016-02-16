@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<com.shoutit.app.android.views.ScrimInsetsScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.shoutit.app.android.widget.ScrimInsetsScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="304dp"
@@ -167,4 +167,4 @@
     </LinearLayout>
 
 
-</com.shoutit.app.android.views.ScrimInsetsScrollView>
+</com.shoutit.app.android.widget.ScrimInsetsScrollView>
