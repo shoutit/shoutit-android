@@ -1,7 +1,7 @@
 machine:
    environment:
        JAVA_TOOL_OPTIONS: "-Xmx2048m -XX:MaxPermSize=4g"
-       BRANCH_NAME: $(echo -${CIRCLE_SHA1} | cut -c -8)$(if [ ${CIRCLE_BRANCH} == "master" ] || [ ${CIRCLE_BRANCH} == "develop" ]; then echo ""; else echo -SNAPSHOT; fi)
+       HASH: $(echo -${CIRCLE_SHA1} | cut -c -8)
    pre:
      - printf "org.gradle.jvmargs=-XX:MaxPermSize=4g\ndisablePreDex=true\n" > gradle.properties
 
@@ -20,7 +20,7 @@ test:
         - python tools/download.py --token P8uXtUgTeNDYEIvw5gXUWjDM --key-version agxzfmF1dG8tY2xvc2VyGAsSC1Byb2plY3RLZXlzGICAgKDI0JMKDA
 
     override:
-        - (./gradlew --parallel --stacktrace --project-prop versionSuffix="$BRANCH_NAME" clean build):
+        - (./gradlew --parallel --stacktrace --project-prop versionSuffix="$HASH" clean build):
             timeout: 1800
 
     post:
