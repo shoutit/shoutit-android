@@ -19,6 +19,11 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.shoutit.app.android.BuildConfig;
 import com.shoutit.app.android.dagger.ForApplication;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
+import java.util.Locale;
+
 import javax.annotation.Nonnull;
 
 import rx.Observable;
@@ -44,6 +49,11 @@ public class LocationUtils {
             @Nonnull GoogleApiClient googleApiClient, @Nonnull String query) {
         return Places.GeoDataApi.getAutocompletePredictions(googleApiClient, query,
                 BOUNDS_WORLDWIDE, null);
+    }
+
+    public static String convertCoordinatesForRequest(double latitude, double longitude) {
+        // This locale is required to have dots in double instead comma
+        return String.format(Locale.US,  "%1$f,%2$f", latitude, longitude);
     }
 
     @Nonnull

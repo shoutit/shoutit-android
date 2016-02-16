@@ -1,6 +1,5 @@
 package com.shoutit.app.android.view.location;
 
-import android.Manifest;
 import android.content.Context;
 import android.location.Location;
 import android.support.annotation.NonNull;
@@ -14,7 +13,6 @@ import com.appunite.rx.functions.Functions1;
 import com.appunite.rx.operators.MoreOperators;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.AutocompletePrediction;
 import com.google.android.gms.location.places.AutocompletePredictionBuffer;
 import com.google.android.gms.location.places.PlaceBuffer;
@@ -32,10 +30,8 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForApplication;
 import com.shoutit.app.android.utils.LocationUtils;
-import com.shoutit.app.android.utils.PermissionHelper;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -46,7 +42,6 @@ import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Action1;
-import rx.functions.Func0;
 import rx.functions.Func1;
 import rx.functions.Func3;
 import rx.subjects.BehaviorSubject;
@@ -353,7 +348,7 @@ public class LocationPresenter {
     }
 
     private Observable<ResponseOrError<UserLocation>> getGeoCodeRequest(double latitude, double longitude) {
-        return apiService.geocode(String.format(Locale.getDefault(), "%1$f,%2$f", latitude, longitude))
+        return apiService.geocode(LocationUtils.convertCoordinatesForRequest(latitude, longitude))
                 .subscribeOn(networkScheduler)
                 .compose(ResponseOrError.<UserLocation>toResponseOrErrorObservable());
     }

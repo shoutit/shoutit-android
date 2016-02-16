@@ -1,16 +1,14 @@
 package com.shoutit.app.android.location;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.UpdateLocationRequest;
 import com.shoutit.app.android.api.model.User;
-import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.utils.LocationUtils;
 import com.shoutit.app.android.utils.PermissionHelper;
 
@@ -22,6 +20,8 @@ import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import javax.annotation.Nonnull;
 
 import rx.Observable;
 import rx.Scheduler;
@@ -50,8 +50,6 @@ public class LocationManagerTest {
     @Mock
     User user;
     @Mock
-    ContextCompat contextCompat;
-    @Mock
     android.location.Location gpsLocation;
 
     private BehaviorSubject<UserLocation> locationFromGpsSubject = BehaviorSubject.create();
@@ -77,14 +75,14 @@ public class LocationManagerTest {
         when(gpsLocation.getLatitude()).thenReturn(1d);
         when(gpsLocation.getLongitude()).thenReturn(2d);
 
-        when(googleApiClient.blockingConnect()).thenReturn(new ConnectionResult(0));
-
-        when(LocationUtils.isLocationDifferenceMoreThanDelta(anyDouble(), anyDouble(), anyDouble(), anyDouble(), anyDouble()))
-                .thenReturn(true);
         when(LocationUtils.getLocationObservable(any(GoogleApiClient.class), any(Context.class), any(Scheduler.class)))
                 .thenReturn(Observable.just(gpsLocation));
-        when(PermissionHelper.hasPermission(any(Context.class), anyString())).thenReturn(true);
 
+        when(PermissionHelper.hasPermission(any(Context.class), anyString())).thenReturn(true);
+        when(LocationUtils.isLocationDifferenceMoreThanDelta(anyDouble(), anyDouble(), anyDouble(), anyDouble(), anyDouble()))
+                .thenReturn(true);
+
+        when(googleApiClient.blockingConnect()).thenReturn(new ConnectionResult(0));
 
         locationManager = new LocationManager(context, userPreferences, googleApiClient, apiService, testScheduler);
 
@@ -115,6 +113,7 @@ public class LocationManagerTest {
 
         locationFromGpsSubject.onNext(location);
         testScheduler.triggerActions();
+        subscriber.assertValueCount(1);
         locationManager.getRefreshGetLocationSubject().onNext(null);
         testScheduler.triggerActions();
 
@@ -124,9 +123,9 @@ public class LocationManagerTest {
 
     @Test
     public void testWhenSubscribed_locationFromIPFetched() throws Exception {
+        final TestSubscriber<UserLocation> subscriber = new TestSubscriber<>();
         when(userPreferences.automaticLocationTrackingEnabled()).thenReturn(true);
         when(PermissionHelper.hasPermission(any(Context.class), anyString())).thenReturn(false);
-        final TestSubscriber<UserLocation> subscriber = new TestSubscriber<>();
         final UserLocation location = getLocationWithLatLngCity(1, 2, "city");
 
         locationManager.updateUserLocationObservable().subscribe(subscriber);
@@ -196,7 +195,7 @@ public class LocationManagerTest {
         return new UserLocation(lat, lng, null, null, null, city, null);
     }
 
-    @NonNull
+    @Nonnull
     private UserLocation getCurrentLocation() {
         return new UserLocation(5, 6, "z", null, null, null, null);
     }

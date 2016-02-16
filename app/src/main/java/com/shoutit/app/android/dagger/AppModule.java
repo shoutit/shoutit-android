@@ -165,6 +165,7 @@ public final class AppModule {
                 .build();
     }
 
+    @Singleton
     @Provides
     public LocationManager provideLocationManager(@ForApplication Context context,
                                                   ApiService apiService,

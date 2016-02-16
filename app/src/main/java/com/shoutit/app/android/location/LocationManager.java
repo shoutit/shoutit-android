@@ -5,7 +5,6 @@ import android.content.Context;
 import android.location.Location;
 import android.support.annotation.NonNull;
 
-import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.functions.Functions1;
@@ -21,19 +20,17 @@ import com.shoutit.app.android.dagger.ForApplication;
 import com.shoutit.app.android.utils.LocationUtils;
 import com.shoutit.app.android.utils.PermissionHelper;
 
-import java.util.Locale;
 
 import javax.annotation.Nonnull;
-import javax.inject.Singleton;
 
 import rx.Observable;
+import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Action1;
 import rx.functions.Func0;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
-@Singleton
 public class LocationManager {
 
     private static final double LOCATION_MAX_DELTA_METERS = 1000 * 5;
@@ -59,7 +56,7 @@ public class LocationManager {
         this.apiService = apiService;
         this.networkScheduler = networkScheduler;
 
-        final Observable<UserLocation> locationFromCoordinates = LocationUtils
+        final Observable<UserLocation> locationFromCoordinatesObservable = LocationUtils
                 .getLocationObservable(googleApiClient, context, networkScheduler)
                 .doOnNext(new Action1<Location>() {
                     @Override
@@ -72,27 +69,28 @@ public class LocationManager {
                 .switchMap(new Func1<android.location.Location, Observable<UserLocation>>() {
                     @Override
                     public Observable<UserLocation> call(android.location.Location location) {
-                        return apiService.geocode(String.format(Locale.getDefault(),
-                                "%1$f,%2$f", location.getLatitude(), location.getLongitude()))
+                        return apiService.geocode(LocationUtils.convertCoordinatesForRequest(
+                                location.getLatitude(), location.getLongitude()))
                                 .subscribeOn(networkScheduler)
                                 .compose(ResponseOrError.<UserLocation>toResponseOrErrorObservable())
                                 .compose(ResponseOrError.<UserLocation>onlySuccess());
                     }
                 });
 
-        final Observable<UserLocation> locationFromIP = apiService.geocodeDefault()
+        final Observable<UserLocation> locationFromIPObservable = apiService.geocodeDefault()
                 .subscribeOn(networkScheduler)
                 .compose(ResponseOrError.<UserLocation>toResponseOrErrorObservable())
                 .compose(ResponseOrError.<UserLocation>onlySuccess());
 
+        final PublishSubject<UserLocation> updateUserSubject = PublishSubject.create();
         updateLocationObservable = Observable
                 .defer(new Func0<Observable<UserLocation>>() {
                     @Override
                     public Observable<UserLocation> call() {
                         if (userPreferences.automaticLocationTrackingEnabled() && hasLocationPermissions(context)) {
-                            return locationFromCoordinates;
+                            return locationFromCoordinatesObservable;
                         } else if (userPreferences.automaticLocationTrackingEnabled()) {
-                            return locationFromIP;
+                            return locationFromIPObservable;
                         } else {
                             return Observable.never();
                         }
@@ -101,11 +99,10 @@ public class LocationManager {
                 .compose(MoreOperators.<UserLocation>refresh(refreshGetLocationSubject))
                 .filter(Functions1.isNotNull())
                 .filter(locationChangedFilter())
-                .doOnNext(saveToPreferences()) // TODO remove this if guest user will be handled by API
-                .compose(ObservableExtensions.<UserLocation>behaviorRefCount());
+                .lift(MoreOperators.callOnNext(updateUserSubject))
+                .doOnNext(saveToPreferences()); // TODO remove this if guest user will be handled by API*/
 
-
-        updateLocationObservable
+        updateUserSubject
                 .filter(new Func1<UserLocation, Boolean>() {
                     @Override
                     public Boolean call(UserLocation location) {
@@ -177,7 +174,7 @@ public class LocationManager {
     }
 
     @Nonnull
-    public PublishSubject<Object> getRefreshGetLocationSubject() {
+    public Observer<Object> getRefreshGetLocationSubject() {
         return refreshGetLocationSubject;
     }
 
