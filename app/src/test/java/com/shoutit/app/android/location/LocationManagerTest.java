@@ -1,9 +1,8 @@
 package com.shoutit.app.android.location;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
@@ -22,7 +21,10 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import javax.annotation.Nonnull;
+
 import rx.Observable;
+import rx.Scheduler;
 import rx.observers.TestSubscriber;
 import rx.schedulers.TestScheduler;
 import rx.subjects.BehaviorSubject;
@@ -47,8 +49,6 @@ public class LocationManagerTest {
     GoogleApiClient googleApiClient;
     @Mock
     User user;
-    @Mock
-    ContextCompat contextCompat;
     @Mock
     android.location.Location gpsLocation;
 
@@ -75,10 +75,14 @@ public class LocationManagerTest {
         when(gpsLocation.getLatitude()).thenReturn(1d);
         when(gpsLocation.getLongitude()).thenReturn(2d);
 
+        when(LocationUtils.getLocationObservable(any(GoogleApiClient.class), any(Context.class), any(Scheduler.class)))
+                .thenReturn(Observable.just(gpsLocation));
+
         when(PermissionHelper.hasPermission(any(Context.class), anyString())).thenReturn(true);
         when(LocationUtils.isLocationDifferenceMoreThanDelta(anyDouble(), anyDouble(), anyDouble(), anyDouble(), anyDouble()))
                 .thenReturn(true);
 
+        when(googleApiClient.blockingConnect()).thenReturn(new ConnectionResult(0));
 
         locationManager = new LocationManager(context, userPreferences, googleApiClient, apiService, testScheduler);
 
@@ -93,7 +97,6 @@ public class LocationManagerTest {
         locationManager.updateUserLocationObservable().subscribe(subscriber);
 
         locationFromGpsSubject.onNext(location);
-        locationManager.getLastGoogleLocationSubject().onNext(gpsLocation);
         testScheduler.triggerActions();
 
         subscriber.assertValueCount(1);
@@ -109,8 +112,8 @@ public class LocationManagerTest {
         locationManager.updateUserLocationObservable().subscribe(subscriber);
 
         locationFromGpsSubject.onNext(location);
-        locationManager.getLastGoogleLocationSubject().onNext(gpsLocation);
         testScheduler.triggerActions();
+        subscriber.assertValueCount(1);
         locationManager.getRefreshGetLocationSubject().onNext(null);
         testScheduler.triggerActions();
 
@@ -192,7 +195,7 @@ public class LocationManagerTest {
         return new UserLocation(lat, lng, null, null, null, city, null);
     }
 
-    @NonNull
+    @Nonnull
     private UserLocation getCurrentLocation() {
         return new UserLocation(5, 6, "z", null, null, null, null);
     }

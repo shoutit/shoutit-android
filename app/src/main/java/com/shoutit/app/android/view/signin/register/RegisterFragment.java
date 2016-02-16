@@ -1,10 +1,10 @@
 package com.shoutit.app.android.view.signin.register;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
@@ -91,6 +91,8 @@ public class RegisterFragment extends BaseFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        passwordEdittext.setTypeface(null, Typeface.NORMAL);
+
         setUpSpans();
 
         signUpTextview.setOnClickListener(new View.OnClickListener() {
@@ -133,16 +135,15 @@ public class RegisterFragment extends BaseFragment {
 
         registerPresenter.failObservable()
                 .compose(this.<Throwable>bindToLifecycle())
-                .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(getActivity())));
+                .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(getActivity()), R.string.register_error));
 
         registerPresenter.successObservable()
                 .compose(this.<SignResponse>bindToLifecycle())
                 .subscribe(new Action1<SignResponse>() {
                     @Override
                     public void call(SignResponse signResponse) {
-                        final FragmentActivity activity = getActivity();
-                        ActivityCompat.finishAffinity(activity);
-                        startActivity(MainActivity.newIntent(activity));
+                        ActivityCompat.finishAffinity(getActivity());
+                        startActivity(MainActivity.newIntent(getActivity()));
                     }
                 });
 

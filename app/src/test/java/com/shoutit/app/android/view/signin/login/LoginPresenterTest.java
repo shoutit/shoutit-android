@@ -66,8 +66,11 @@ public class LoginPresenterTest {
                 Observable.just((ResponseBody) new RealResponseBody(new Headers.Builder().build(), null)));
         when(locationManager.updateUserLocationObservable()).thenReturn(Observable.just((UserLocation) null));
 
-        mLoginPresenter = new LoginPresenter(mApiService, mContext, coarseLocationProvider,
-                mUserPreferences, Schedulers.immediate(), Schedulers.immediate(), locationManager);
+        when(mUserPreferences.getLocationObservable())
+                .thenReturn(Observable.just(new UserLocation(1, 2, "z", null, null, null, null)));
+
+        mLoginPresenter = new LoginPresenter(mApiService, mUserPreferences,
+                Schedulers.immediate(), Schedulers.immediate());
     }
 
     @Test

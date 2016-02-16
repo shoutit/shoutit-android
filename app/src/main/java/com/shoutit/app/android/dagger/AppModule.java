@@ -20,10 +20,13 @@ import com.shoutit.app.android.api.AuthInterceptor;
 import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.location.LocationManager;
+import com.shoutit.app.android.utils.BadRequestThrowable;
+import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.view.signin.CoarseLocationObservableProvider;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.io.IOException;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -31,7 +34,9 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import okhttp3.Cache;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.GsonConverterFactory;
 import retrofit2.Retrofit;
@@ -104,9 +109,20 @@ public final class AppModule {
 
         final HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
         okHttpClient.interceptors().add(loggingInterceptor);
-
         loggingInterceptor.setLevel(BuildConfig.DEBUG ?
                 HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE);
+
+        okHttpClient.interceptors().add(new Interceptor() {
+            @Override
+            public Response intercept(Chain chain) throws IOException {
+                final Response response = chain.proceed(chain.request());
+                final int code = response.code();
+                if (code == 400) {
+                    LogHelper.logThrowableAndCrashlytics("http error", "status 400", new BadRequestThrowable(response));
+                }
+                return response;
+            }
+        });
 
         return okHttpClient.build();
     }
@@ -164,6 +180,7 @@ public final class AppModule {
                 .build();
     }
 
+    @Singleton
     @Provides
     public LocationManager provideLocationManager(@ForApplication Context context,
                                                   ApiService apiService,

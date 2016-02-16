@@ -41,7 +41,7 @@ import rx.functions.Action1;
 
 public class LocationActivity extends BaseActivity {
 
-    private static final int REQUEST_CODE_LOCATION = 2;
+    private static final int REQUEST_CODE_LOCATION = 0;
     private static final long TYPING_THRESHOLD_MS = 500;
 
     @Bind(R.id.location_recycler_view)
@@ -151,7 +151,7 @@ public class LocationActivity extends BaseActivity {
             final boolean permissionsGranted = PermissionHelper.arePermissionsGranted(grantResults);
             if (permissionsGranted) {
                 ColoredSnackBar.success(findViewById(android.R.id.content), R.string.permission_granted, Snackbar.LENGTH_SHORT).show();
-                presenter.getCurrentLocation();
+                presenter.refreshGpsLocation();
             } else {
                 ColoredSnackBar.error(findViewById(android.R.id.content), R.string.permission_not_granted, Snackbar.LENGTH_SHORT);
             }

@@ -1,10 +1,10 @@
 package com.shoutit.app.android.view.signin.login;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,6 +81,9 @@ public class LoginFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        passwordEdittext.setTypeface(null, Typeface.NORMAL);
+
         signUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -120,9 +123,8 @@ public class LoginFragment extends BaseFragment {
                 .subscribe(new Action1<SignResponse>() {
                     @Override
                     public void call(SignResponse signResponse) {
-                        final FragmentActivity activity = getActivity();
-                        ActivityCompat.finishAffinity(activity);
-                        startActivity(MainActivity.newIntent(activity));
+                        ActivityCompat.finishAffinity(getActivity());
+                        startActivity(MainActivity.newIntent(getActivity()));
                     }
                 });
 
@@ -137,7 +139,7 @@ public class LoginFragment extends BaseFragment {
                         ColoredSnackBar.contentView(getActivity()), R.string.login_error_empty_email));
 
         RxTextView.textChangeEvents(emailEdittext)
-                .debounce(500, TimeUnit.MILLISECONDS) 
+                .debounce(500, TimeUnit.MILLISECONDS)
                 .map(new Func1<TextViewTextChangeEvent, String>() {
                     @Override
                     public String call(TextViewTextChangeEvent textViewTextChangeEvent) {

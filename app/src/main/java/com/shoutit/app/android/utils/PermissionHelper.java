@@ -10,6 +10,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 
+import javax.annotation.Nonnull;
+
 public class PermissionHelper {
 
     public static boolean checkPermissions(final Activity activity, final int requestCode,
@@ -71,7 +73,7 @@ public class PermissionHelper {
         ActivityCompat.requestPermissions(activity, permissions, requestCode);
     }
 
-    public static boolean hasPermission(@NonNull Context context, @NonNull String permission) {
+    public static boolean hasPermission(@Nonnull Context context, @Nonnull String permission) {
         return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
     }
 }
