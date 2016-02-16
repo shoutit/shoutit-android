@@ -151,8 +151,9 @@ public class LoginIntroActivity extends BaseActivity {
     private Action1<? super SignResponse> getSuccessAction() {
         return new Action1<SignResponse>() {
             @Override
-            public void call(SignResponse o) {
-                mUserPreferences.setLoggedIn(o.getAccessToken(), o.getRefreshToken());
+            public void call(SignResponse signResponse) {
+                mUserPreferences.setLoggedIn(signResponse.getAccessToken(), signResponse.getRefreshToken());
+                mUserPreferences.saveUserAsJson(signResponse.getUser());
                 ActivityCompat.finishAffinity(LoginIntroActivity.this);
                 startActivity(MainActivity.newIntent(LoginIntroActivity.this));
             }
