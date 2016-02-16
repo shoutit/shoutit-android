@@ -6,8 +6,8 @@
     <string name="shout_type_offer">Offer</string>
     <string name="shout_type_request">Request</string>
     <string name="terms_of_service">Terms of Service</string>
-    <string name="facebook_app_id">1148740908499849</string>
     <string name="google_api_key" translatable="false">AIzaSyBWHadI_MPYQgDLqI4RXhymEs42YEtgTEE</string>
+    <string name="facebook_app_id">353625811317277</string>
 
     <!-- Errors -->
     <string name="error_default">Ooops, something went wrong</string>
@@ -44,7 +44,7 @@
     <string name="login_sign_up_text">Sign up</string>
     <string name="login_error">Wrong data</string>
     <string name="login_empty_mail">Mail cannot be empty.</string>
-    <string name="login_empty_password">Password must have at least 6 characters.</string>
+    <string name="login_empty_password">Password cannot be empty.</string>
     <string name="login_success_reset_password">Password reset email will be sent soon.</string>
     <string name="login_error_empty_email">Email or username cannot be empty</string>
 

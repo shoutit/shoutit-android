@@ -3,8 +3,6 @@ package com.shoutit.app.android.view.signin.login;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,8 +21,8 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.Actions1;
 import com.shoutit.app.android.utils.ColoredSnackBar;
-import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.signin.LoginActivityComponent;
+import com.shoutit.app.android.view.signin.StartNewActivityHelper;
 import com.shoutit.app.android.view.signin.register.RegisterFragment;
 
 import java.util.concurrent.TimeUnit;
@@ -35,7 +33,6 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import okhttp3.ResponseBody;
-import rx.functions.Action1;
 import rx.functions.Func1;
 
 public class LoginFragment extends BaseFragment {
@@ -117,14 +114,7 @@ public class LoginFragment extends BaseFragment {
 
         loginPresenter.successObservable()
                 .compose(this.<SignResponse>bindToLifecycle())
-                .subscribe(new Action1<SignResponse>() {
-                    @Override
-                    public void call(SignResponse signResponse) {
-                        final FragmentActivity activity = getActivity();
-                        ActivityCompat.finishAffinity(activity);
-                        startActivity(MainActivity.newIntent(activity));
-                    }
-                });
+                .subscribe(StartNewActivityHelper.startActivityAfterAuthAction(getActivity()));
 
         loginPresenter.successResetPassword()
                 .compose(this.<ResponseBody>bindToLifecycle())
@@ -137,7 +127,7 @@ public class LoginFragment extends BaseFragment {
                         ColoredSnackBar.contentView(getActivity()), R.string.login_error_empty_email));
 
         RxTextView.textChangeEvents(emailEdittext)
-                .debounce(500, TimeUnit.MILLISECONDS) 
+                .debounce(500, TimeUnit.MILLISECONDS)
                 .map(new Func1<TextViewTextChangeEvent, String>() {
                     @Override
                     public String call(TextViewTextChangeEvent textViewTextChangeEvent) {

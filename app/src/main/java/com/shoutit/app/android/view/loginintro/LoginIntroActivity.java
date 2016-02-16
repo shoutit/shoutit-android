@@ -1,6 +1,5 @@
 package com.shoutit.app.android.view.loginintro;
 
-import android.accounts.AccountManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,6 +15,11 @@ import com.appunite.rx.android.MyAndroidSchedulers;
 import com.appunite.rx.functions.BothParams;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookSdk;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
@@ -50,7 +54,6 @@ import rx.schedulers.Schedulers;
 public class LoginIntroActivity extends BaseActivity {
 
     private static final int GOOGLE_SIGN_IN = 0;
-    private static final int GOOGLE_ACC_AUTH = 1;
 
     @Bind(R.id.activity_login_toolbar)
     Toolbar toolbar;
@@ -114,23 +117,14 @@ public class LoginIntroActivity extends BaseActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == GOOGLE_SIGN_IN && resultCode == RESULT_OK) {
-            final String email = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-            GoogleHelper.getToken(this, email, GOOGLE_ACC_AUTH)
-                    .withLatestFrom(mObservable, new Func2<String, UserLocation, BothParams<String, UserLocation>>() {
-                        @Override
-                        public BothParams<String, UserLocation> call(String s, UserLocation location) {
-                            return new BothParams<>(s, location);
-                        }
-                    })
-                    .flatMap(getCallGoogleApi())
-                    .subscribe(getSuccessAction(), getErrorAction());
-        } else if (requestCode == GOOGLE_ACC_AUTH && resultCode == RESULT_OK) {
-            final String authtoken = data.getExtras().getString("authtoken");
+            final GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            final GoogleSignInAccount acct = result.getSignInAccount();
+            final String authCode = acct.getServerAuthCode();
             mObservable
                     .map(new Func1<UserLocation, BothParams<String, UserLocation>>() {
                         @Override
                         public BothParams<String, UserLocation> call(UserLocation location) {
-                            return BothParams.of(authtoken, location);
+                            return BothParams.of(authCode, location);
                         }
                     })
                     .flatMap(getCallGoogleApi())
@@ -157,8 +151,9 @@ public class LoginIntroActivity extends BaseActivity {
     private Action1<? super SignResponse> getSuccessAction() {
         return new Action1<SignResponse>() {
             @Override
-            public void call(SignResponse o) {
-                mUserPreferences.setLoggedIn(o.getAccessToken(), o.getRefreshToken());
+            public void call(SignResponse signResponse) {
+                mUserPreferences.setLoggedIn(signResponse.getAccessToken(), signResponse.getRefreshToken());
+                mUserPreferences.saveUserAsJson(signResponse.getUser());
                 ActivityCompat.finishAffinity(LoginIntroActivity.this);
                 startActivity(MainActivity.newIntent(LoginIntroActivity.this));
             }
@@ -189,10 +184,24 @@ public class LoginIntroActivity extends BaseActivity {
         };
     }
 
+    private void loginGoogle() {
+        final GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestProfile()
+                .requestServerAuthCode("935842257865-s6069gqjq4bvpi4rcbjtdtn2kggrvi06.apps.googleusercontent.com")
+                .build();
+
+        final GoogleApiClient googleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+
+        final Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient);
+        startActivityForResult(signInIntent, GOOGLE_SIGN_IN);
+    }
 
     @OnClick(R.id.activity_login_gplus_btn)
     public void googleClick() {
-        GoogleHelper.pickUserAccount(this, GOOGLE_SIGN_IN);
+        loginGoogle();
     }
 
     @OnClick(R.id.activity_login_facebook_btn)
