@@ -26,8 +26,7 @@ import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyGridLayoutManager;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
-import com.shoutit.app.android.view.main.MainActivity;
-import com.shoutit.app.android.view.signin.LoginActivity;
+import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 
 import java.util.List;
 
@@ -136,7 +135,7 @@ public class HomeFragment extends BaseFragment {
                     @Override
                     public void call(Void aVoid) {
                         if (mUserPreferences.isGuest()) {
-                            LoginActivity.newIntent(getActivity(), MainActivity.class);
+                            startActivity(LoginIntroActivity.newIntent(getActivity()));
                         } else {
                             Toast.makeText(context, "Not implemented yet", Toast.LENGTH_LONG).show();
                         }

@@ -1,8 +1,10 @@
 package com.shoutit.app.android.view.signin.login;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.ActivityCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,8 +23,8 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.Actions1;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.signin.LoginActivityComponent;
-import com.shoutit.app.android.view.signin.StartNewActivityHelper;
 import com.shoutit.app.android.view.signin.register.RegisterFragment;
 
 import java.util.concurrent.TimeUnit;
@@ -33,6 +35,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import okhttp3.ResponseBody;
+import rx.functions.Action1;
 import rx.functions.Func1;
 
 public class LoginFragment extends BaseFragment {
@@ -78,6 +81,9 @@ public class LoginFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        passwordEdittext.setTypeface(null, Typeface.NORMAL);
+
         signUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -114,7 +120,13 @@ public class LoginFragment extends BaseFragment {
 
         loginPresenter.successObservable()
                 .compose(this.<SignResponse>bindToLifecycle())
-                .subscribe(StartNewActivityHelper.startActivityAfterAuthAction(getActivity()));
+                .subscribe(new Action1<SignResponse>() {
+                    @Override
+                    public void call(SignResponse signResponse) {
+                        ActivityCompat.finishAffinity(getActivity());
+                        startActivity(MainActivity.newIntent(getActivity()));
+                    }
+                });
 
         loginPresenter.successResetPassword()
                 .compose(this.<ResponseBody>bindToLifecycle())
