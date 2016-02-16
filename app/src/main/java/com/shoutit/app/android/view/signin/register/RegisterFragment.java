@@ -1,5 +1,6 @@
 package com.shoutit.app.android.view.signin.register;
 
+import android.graphics.Typeface;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -87,6 +88,8 @@ public class RegisterFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        passwordEdittext.setTypeface(null, Typeface.NORMAL);
 
         setUpSpans();
 
