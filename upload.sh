@@ -1,5 +1,5 @@
 set -e -x
 ./gradlew --parallel \
 --stacktrace \
---project-prop versionSuffix="$BRANCH_NAME" \
+--project-prop versionSuffix="$HASH" \
 crashlyticsUploadDistributionProdRelease crashlyticsUploadDistributionProdStaging
