@@ -1,6 +1,5 @@
 package com.shoutit.app.android.api.model.login;
 
-import android.location.Location;
 import android.support.annotation.Nullable;
 
 public class LoginUser {
@@ -12,7 +11,7 @@ public class LoginUser {
     }
 
     @Nullable
-    public static LoginUser loginUser(@Nullable Location location) {
+    public static LoginUser loginUser(@Nullable com.shoutit.app.android.api.model.UserLocation location) {
         if (location == null) {
             return null;
         } else {

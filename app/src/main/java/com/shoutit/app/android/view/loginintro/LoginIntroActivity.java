@@ -2,7 +2,6 @@ package com.shoutit.app.android.view.loginintro;
 
 import android.content.Context;
 import android.content.Intent;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -27,6 +26,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.SignResponse;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.login.FacebookLogin;
 import com.shoutit.app.android.api.model.login.GoogleLogin;
 import com.shoutit.app.android.api.model.login.LoginUser;
@@ -66,7 +66,7 @@ public class LoginIntroActivity extends BaseActivity {
     UserPreferences mUserPreferences;
 
     private CallbackManager mCallbackManager;
-    private Observable<Location> mObservable;
+    private Observable<UserLocation> mObservable;
 
     @Nonnull
     public static Intent newIntent(Context from) {
@@ -83,10 +83,10 @@ public class LoginIntroActivity extends BaseActivity {
 
         setUpActionBar();
 
-        mObservable = mCoarseLocationObservable
-                .get(this)
-                .startWith((Location) null)
-                .compose(ObservableExtensions.<Location>behaviorRefCount());
+        mObservable = mUserPreferences.getLocationObservable()
+                .compose(this.<UserLocation>bindToLifecycle())
+                .startWith((UserLocation) null)
+                .compose(ObservableExtensions.<UserLocation>behaviorRefCount());
 
         mObservable.compose(bindToLifecycle())
                 .subscribe();
@@ -121,9 +121,9 @@ public class LoginIntroActivity extends BaseActivity {
             final GoogleSignInAccount acct = result.getSignInAccount();
             final String authCode = acct.getServerAuthCode();
             mObservable
-                    .map(new Func1<Location, BothParams<String, Location>>() {
+                    .map(new Func1<UserLocation, BothParams<String, UserLocation>>() {
                         @Override
-                        public BothParams<String, Location> call(Location location) {
+                        public BothParams<String, UserLocation> call(UserLocation location) {
                             return BothParams.of(authCode, location);
                         }
                     })
@@ -161,10 +161,10 @@ public class LoginIntroActivity extends BaseActivity {
     }
 
     @NonNull
-    private Func1<BothParams<String, Location>, Observable<SignResponse>> getCallGoogleApi() {
-        return new Func1<BothParams<String, Location>, Observable<SignResponse>>() {
+    private Func1<BothParams<String, UserLocation>, Observable<SignResponse>> getCallGoogleApi() {
+        return new Func1<BothParams<String, UserLocation>, Observable<SignResponse>>() {
             @Override
-            public Observable<SignResponse> call(BothParams<String, Location> bothParams) {
+            public Observable<SignResponse> call(BothParams<String, UserLocation> bothParams) {
                 return mApiService.googleLogin(new GoogleLogin(bothParams.param1(), LoginUser.loginUser(bothParams.param2())))
                         .subscribeOn(Schedulers.io())
                         .observeOn(MyAndroidSchedulers.mainThread());
@@ -173,10 +173,10 @@ public class LoginIntroActivity extends BaseActivity {
     }
 
     @NonNull
-    private Func1<BothParams<String, Location>, Observable<SignResponse>> getCallFacebookApi() {
-        return new Func1<BothParams<String, Location>, Observable<SignResponse>>() {
+    private Func1<BothParams<String, UserLocation>, Observable<SignResponse>> getCallFacebookApi() {
+        return new Func1<BothParams<String, UserLocation>, Observable<SignResponse>>() {
             @Override
-            public Observable<SignResponse> call(BothParams<String, Location> bothParams) {
+            public Observable<SignResponse> call(BothParams<String, UserLocation> bothParams) {
                 return mApiService.facebookLogin(new FacebookLogin(bothParams.param1(), LoginUser.loginUser(bothParams.param2())))
                         .subscribeOn(Schedulers.io())
                         .observeOn(MyAndroidSchedulers.mainThread());
@@ -207,9 +207,9 @@ public class LoginIntroActivity extends BaseActivity {
     @OnClick(R.id.activity_login_facebook_btn)
     public void facebookClick() {
         FacebookHelper.getToken(this, mCallbackManager)
-                .withLatestFrom(mObservable, new Func2<String, Location, BothParams<String, Location>>() {
+                .withLatestFrom(mObservable, new Func2<String, UserLocation, BothParams<String, UserLocation>>() {
                     @Override
-                    public BothParams<String, Location> call(String s, Location location) {
+                    public BothParams<String, UserLocation> call(String s, UserLocation location) {
                         return BothParams.of(s, location);
                     }
                 })

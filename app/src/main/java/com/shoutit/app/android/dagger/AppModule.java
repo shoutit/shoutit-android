@@ -6,6 +6,9 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.appunite.rx.dagger.NetworkScheduler;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Places;
 import com.google.common.base.Optional;
 import com.google.gson.Gson;
 import com.jakewharton.picasso.OkHttp3Downloader;
@@ -16,6 +19,7 @@ import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.AuthInterceptor;
 import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ShoutsDao;
+import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.utils.BadRequestThrowable;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.view.signin.CoarseLocationObservableProvider;
@@ -166,6 +170,25 @@ public final class AppModule {
                                             @NetworkScheduler Scheduler networkScheduler,
                                             UserPreferences userPreferences) {
         return new DiscoversDao(apiService, userPreferences, networkScheduler);
+    }
+
+    @Provides
+    GoogleApiClient providesGoogleApiClient(@ForApplication Context context) {
+        return new GoogleApiClient.Builder(context)
+                .addApi(LocationServices.API)
+                .addApi(Places.GEO_DATA_API)
+                .addApi(Places.PLACE_DETECTION_API)
+                .build();
+    }
+
+    @Singleton
+    @Provides
+    public LocationManager provideLocationManager(@ForApplication Context context,
+                                                  ApiService apiService,
+                                                  UserPreferences userPreferences,
+                                                  GoogleApiClient googleApiClient,
+                                                  @NetworkScheduler Scheduler networkScheduler) {
+        return new LocationManager(context, userPreferences, googleApiClient, apiService, networkScheduler);
     }
 
 }

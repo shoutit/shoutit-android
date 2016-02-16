@@ -1,7 +1,6 @@
 package com.shoutit.app.android.view.signin.login;
 
 import android.content.Context;
-import android.location.Location;
 import android.support.annotation.NonNull;
 
 import com.appunite.rx.ObservableExtensions;
@@ -12,11 +11,13 @@ import com.appunite.rx.functions.Functions1;
 import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.login.EmailLoginRequest;
 import com.shoutit.app.android.api.model.login.LoginUser;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.view.signin.CoarseLocationObservableProvider;
 
@@ -45,7 +46,7 @@ public class LoginPresenter {
 
     private final Observable<String> mPasswordEmpty;
     private final Observable<String> mEmailEmpty;
-    private final Observable<Location> mLocationObservable;
+    private final Observable<UserLocation> mLocationObservable;
     private final Observable<ResponseBody> resetPasswordSuccess;
     private final Observable<Object> resetPasswordEmptyEmail;
     private final Observable<Boolean> progressObservable;
@@ -54,27 +55,25 @@ public class LoginPresenter {
 
     @Inject
     public LoginPresenter(@NonNull final ApiService apiService,
-                          @NonNull @ForActivity Context context,
-                          @NonNull CoarseLocationObservableProvider coarseLocationObservableProvider,
                           @NonNull final UserPreferences userPreferences,
                           @NonNull @NetworkScheduler final Scheduler networkScheduler,
                           @NonNull @UiScheduler final Scheduler uiScheduler) {
-        mLocationObservable = coarseLocationObservableProvider
-                .get(context)
-                .startWith((Location) null)
-                .compose(ObservableExtensions.<Location>behaviorRefCount());
+
+        mLocationObservable = userPreferences.getLocationObservable()
+                .startWith((UserLocation) null)
+                .compose(ObservableExtensions.<UserLocation>behaviorRefCount());
 
         // Login
         final Observable<ResponseOrError<SignResponse>> loginRequestObservable = mProceedSubject
-                .withLatestFrom(mLocationObservable, new Func2<Object, Location, Location>() {
+                .withLatestFrom(mLocationObservable, new Func2<Object, UserLocation, UserLocation>() {
                     @Override
-                    public Location call(Object o, Location location) {
+                    public UserLocation call(Object o, UserLocation location) {
                         return location;
                     }
                 })
-                .switchMap(new Func1<Location, Observable<EmailLoginRequest>>() {
+                .switchMap(new Func1<UserLocation, Observable<EmailLoginRequest>>() {
                     @Override
-                    public Observable<EmailLoginRequest> call(final Location location) {
+                    public Observable<EmailLoginRequest> call(final UserLocation location) {
                         return Observable
                                 .zip(mEmailSubject.filter(getNotEmptyFunc1()), mPasswordSubject.filter(getNotEmptyFunc1()), new Func2<String, String, EmailLoginRequest>() {
                                     @Override
@@ -212,7 +211,7 @@ public class LoginPresenter {
     }
 
     @NonNull
-    public Observable<Location> getLocationObservable() {
+    public Observable<UserLocation> getLocationObservable() {
         return mLocationObservable;
     }
 

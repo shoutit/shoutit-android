@@ -9,6 +9,7 @@ import com.appunite.rx.functions.Functions1;
 import com.appunite.rx.operators.MoreOperators;
 import com.google.common.base.Optional;
 import com.google.gson.Gson;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForApplication;
 
@@ -16,19 +17,28 @@ import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import rx.Observable;
+import rx.functions.Func0;
+import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
+@Singleton
 public class UserPreferences {
 
     private static final String AUTH_TOKEN = "token";
     private static final String REFRESH_TOKEN = "refresh_token";
     private static final String KEY_USER = "user";
+    private static final String KEY_LOCATION = "location";
     private static final String IS_GUEST = "is_guest";
+    private static final String KEY_LOCATION_TRACKING = "location_tracking";
     private static final String IS_FIRST_RUN = "is_first_run";
 
     private final PublishSubject<Object> userRefreshSubject = PublishSubject.create();
+    private final PublishSubject<Object> locationRefreshSubject = PublishSubject.create();
+    private final Observable<User> userObservable;
+    private final Observable<UserLocation> locationObservable;
 
     @SuppressLint("CommitPrefEdits")
     private final SharedPreferences mPreferences;
@@ -39,6 +49,26 @@ public class UserPreferences {
     public UserPreferences(@ForApplication Context context, @Nonnull Gson gson) {
         this.gson = gson;
         mPreferences = context.getSharedPreferences("prefs", 0);
+
+        locationObservable = Observable
+                .defer(new Func0<Observable<UserLocation>>() {
+                    @Override
+                    public Observable<UserLocation> call() {
+                        return Observable.just(getLocation());
+                    }
+                })
+                .compose(MoreOperators.<UserLocation>refresh(locationRefreshSubject))
+                .filter(Functions1.isNotNull());
+
+        userObservable = Observable
+                .defer(new Func0<Observable<User>>() {
+                    @Override
+                    public Observable<User> call() {
+                        return Observable.just(getUser());
+                    }
+                })
+                .compose(MoreOperators.<User>refresh(userRefreshSubject))
+                .filter(Functions1.isNotNull());
     }
 
     @SuppressLint("CommitPrefEdits")
@@ -62,18 +92,6 @@ public class UserPreferences {
 
     public Optional<String> getAuthToken() {
         return Optional.fromNullable(mPreferences.getString(AUTH_TOKEN, null));
-    }
-
-    // TODO
-    @Nullable
-    public String getUserCountryCode() {
-        return "GE";
-    }
-
-    // TODO
-    @Nullable
-    public String getUserCity() {
-        return "Dubaj";
     }
 
     @SuppressLint("CommitPrefEdits")
@@ -106,19 +124,58 @@ public class UserPreferences {
 
     @Nonnull
     public Observable<User> userObservable() {
-        return Observable
-                .fromCallable(new Callable<User>() {
-                    @Override
-                    public User call() throws Exception {
-                        return getUser();
-                    }
-                })
-                .filter(Functions1.isNotNull())
-                .compose(MoreOperators.<User>refresh(userRefreshSubject));
+        return userObservable;
     }
 
     private void refreshUser() {
         userRefreshSubject.onNext(null);
+    }
+
+    @Nullable
+    public String getUserCountryCode() {
+        final UserLocation location = getLocation();
+        return location != null ? location.getCountry() : null;
+    }
+
+    @Nullable
+    public String getUserCity() {
+        final UserLocation location = getLocation();
+        return location != null ? location.getCity() : null;
+    }
+
+    @Nullable
+    public UserLocation getLocation() {
+        final String locationJson = mPreferences.getString(KEY_LOCATION, null);
+        return gson.fromJson(locationJson, UserLocation.class);
+    }
+
+    public Observable<UserLocation> getLocationObservable() {
+        return locationObservable;
+    }
+
+    public void saveLocation(@Nullable UserLocation location) {
+        if (location == null) {
+            return;
+        }
+        mPreferences.edit()
+                .putString(KEY_LOCATION, gson.toJson(location))
+                .commit();
+        refreshLocation();
+    }
+
+    private void refreshLocation() {
+        locationRefreshSubject.onNext(null);
+    }
+
+    public boolean automaticLocationTrackingEnabled() {
+        return mPreferences.getBoolean(KEY_LOCATION_TRACKING, true);
+    }
+
+    @SuppressLint("CommitPrefEdits")
+    public void setAutomaticLocationTrackingEnabled(boolean enable) {
+        mPreferences.edit()
+                .putBoolean(KEY_LOCATION_TRACKING, enable)
+                .commit();
     }
 
     @SuppressLint("CommitPrefEdits")

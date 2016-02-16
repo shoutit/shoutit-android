@@ -1,7 +1,6 @@
 package com.shoutit.app.android.view.signin.login;
 
 import android.graphics.Typeface;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
@@ -18,6 +17,7 @@ import com.jakewharton.rxbinding.widget.RxTextView;
 import com.jakewharton.rxbinding.widget.TextViewTextChangeEvent;
 import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
@@ -95,7 +95,7 @@ public class LoginFragment extends BaseFragment {
         });
 
         loginPresenter.getLocationObservable()
-                .compose(this.<Location>bindToLifecycle())
+                .compose(this.<UserLocation>bindToLifecycle())
                 .subscribe();
 
         loginPresenter.getEmailEmpty()

@@ -22,6 +22,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.utils.BlurTransform;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.view.home.HomeFragment;
+import com.shoutit.app.android.view.location.LocationActivity;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.squareup.picasso.Transformation;
@@ -113,7 +114,7 @@ public class MenuHandler {
                 .compose(rxActivity.<String>bindToLifecycle())
                 .subscribe(RxTextView.text(userNameTextView));
 
-        presenter.getLocationObservable()
+        presenter.getCityObservable()
                 .compose(rxActivity.<String>bindToLifecycle())
                 .subscribe(RxTextView.text(locationTextView));
 
@@ -200,6 +201,7 @@ public class MenuHandler {
                 rxActivity.startActivity(MainActivity.newIntent(rxActivity)
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 );
+                break;
         }
 
         selectItem(view.getId());
@@ -222,7 +224,7 @@ public class MenuHandler {
 
     @OnClick(R.id.menu_location_change_tv)
     public void showChangeLocationScreen() {
-        Toast.makeText(rxActivity, "Not implemented yet", Toast.LENGTH_SHORT).show();
+        rxActivity.startActivity(LocationActivity.newIntent(rxActivity));
     }
 
     @OnClick(R.id.menu_new_shout_btn)

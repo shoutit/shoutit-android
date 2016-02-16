@@ -1,7 +1,5 @@
 package com.shoutit.app.android.view.signin.register;
 
-import android.content.Context;
-import android.location.Location;
 import android.support.annotation.NonNull;
 
 import com.appunite.rx.ObservableExtensions;
@@ -13,10 +11,9 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.SignResponse;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.login.LoginUser;
-import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.MoreFunctions1;
-import com.shoutit.app.android.view.signin.CoarseLocationObservableProvider;
 
 import javax.inject.Inject;
 
@@ -39,7 +36,7 @@ public class RegisterPresenter {
     private final BehaviorSubject<String> mNameSubject = BehaviorSubject.create();
     private final PublishSubject<Object> mProceedSubject = PublishSubject.create();
     private final Observable<String> mPasswordEmpty;
-    private final Observable<Location> mLocationObservable;
+    private final Observable<UserLocation> mLocationObservable;
     private final Observable<String> mEmailEmpty;
     private final Observable<String> mNameEmpty;
     private final Observable<String> mPasswordNotEmpty;
@@ -48,26 +45,25 @@ public class RegisterPresenter {
 
     @Inject
     public RegisterPresenter(@NonNull final ApiService apiService,
-                             @NonNull @ForActivity Context context,
-                             @NonNull CoarseLocationObservableProvider coarseLocationObservableProvider,
                              @NonNull final UserPreferences userPreferences,
                              @NonNull @NetworkScheduler final Scheduler networkScheduler,
                              @NonNull @UiScheduler final Scheduler uiScheduler) {
-        mLocationObservable = coarseLocationObservableProvider
-                .get(context)
-                .startWith((Location) null)
-                .compose(ObservableExtensions.<Location>behaviorRefCount());
+
+        mLocationObservable = userPreferences
+                .getLocationObservable()
+                .startWith((UserLocation) null)
+                .compose(ObservableExtensions.<UserLocation>behaviorRefCount());
 
         final Observable<ResponseOrError<SignResponse>> responseOrErrorObservable = mProceedSubject
-                .withLatestFrom(mLocationObservable, new Func2<Object, Location, Location>() {
+                .withLatestFrom(mLocationObservable, new Func2<Object, UserLocation, UserLocation>() {
                     @Override
-                    public Location call(Object o, Location location) {
+                    public UserLocation call(Object o, UserLocation location) {
                         return location;
                     }
                 })
-                .switchMap(new Func1<Location, Observable<EmailSignupRequest>>() {
+                .switchMap(new Func1<UserLocation, Observable<EmailSignupRequest>>() {
                     @Override
-                    public Observable<EmailSignupRequest> call(final Location location) {
+                    public Observable<EmailSignupRequest> call(final UserLocation location) {
                         return Observable.zip(
                                 mNameSubject.filter(getNotEmptyFunc1()),
                                 mEmailSubject.filter(getNotEmptyFunc1()),
@@ -171,7 +167,7 @@ public class RegisterPresenter {
     }
 
     @NonNull
-    public Observable<Location> getLocationObservable() {
+    public Observable<UserLocation> getLocationObservable() {
         return mLocationObservable;
     }
 

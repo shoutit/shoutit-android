@@ -18,6 +18,7 @@ import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.view.home.HomeFragment;
@@ -29,6 +30,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import rx.functions.Action1;
 
 public class MainActivity extends BaseActivity implements OnMenuItemSelectedListener {
 
@@ -63,6 +65,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
         if (mUserPreferences.isFirstRunAndSetToFalse()) {
             startActivity(PostLoginInterestActivity.newIntent(this));
+            return;
         }
 
         setUpActionBar();
@@ -108,6 +111,9 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
+        if (drawerToggle == null) {
+            return;
+        }
         drawerToggle.syncState();
     }
 

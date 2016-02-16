@@ -1,14 +1,15 @@
 package com.shoutit.app.android.view.signin.login;
 
 import android.content.Context;
-import android.location.Location;
 
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.login.EmailLoginRequest;
+import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.view.signin.CoarseLocationObservableProvider;
 
 import org.junit.Before;
@@ -50,6 +51,9 @@ public class LoginPresenterTest {
     CoarseLocationObservableProvider coarseLocationProvider;
 
     @Mock
+    LocationManager locationManager;
+
+    @Mock
     User user;
 
     @Before
@@ -60,9 +64,13 @@ public class LoginPresenterTest {
         when(mApiService.login(any(EmailLoginRequest.class))).thenReturn(mResponseSubject);
         when(mApiService.resetPassword(any(ResetPasswordRequest.class))).thenReturn(
                 Observable.just((ResponseBody) new RealResponseBody(new Headers.Builder().build(), null)));
-        when(coarseLocationProvider.get(any(Context.class))).thenReturn(Observable.just((Location) null));
+        when(locationManager.updateUserLocationObservable()).thenReturn(Observable.just((UserLocation) null));
 
-        mLoginPresenter = new LoginPresenter(mApiService, mContext, coarseLocationProvider, mUserPreferences, Schedulers.immediate(), Schedulers.immediate());
+        when(mUserPreferences.getLocationObservable())
+                .thenReturn(Observable.just(new UserLocation(1, 2, "z", null, null, null, null)));
+
+        mLoginPresenter = new LoginPresenter(mApiService, mUserPreferences,
+                Schedulers.immediate(), Schedulers.immediate());
     }
 
     @Test
