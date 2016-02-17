@@ -17,6 +17,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.view.main.MainActivityComponent;
 import com.shoutit.app.android.view.main.OnNewDiscoverSelectedListener;
 
 import java.util.List;
@@ -111,9 +112,9 @@ public class DiscoverFragment extends BaseFragment {
                 final int viewType = adapter.getItemViewType(position);
                 if (viewType == DiscoverAdapter.VIEW_TYPE_DISCOVER ||
                         viewType == DiscoverAdapter.VIEW_TYPE_SHOUT) {
-                    return 2;
-                } else {
                     return 1;
+                } else {
+                    return 2;
                 }
             }
         });
@@ -125,12 +126,15 @@ public class DiscoverFragment extends BaseFragment {
     protected void injectComponent(@Nonnull BaseActivityComponent baseActivityComponent,
                                    @Nonnull FragmentModule fragmentModule,
                                    @Nullable Bundle savedInstanceState) {
-        final String discoverId = getArguments().getString(KEY_DISCOVER_ID, null);
+        String discoverId = null;
+        if (getArguments() != null) {
+             discoverId = getArguments().getString(KEY_DISCOVER_ID, null);
+        }
 
         DaggerDiscoverFragmentComponent.builder()
-                .baseActivityComponent(baseActivityComponent)
+                .mainActivityComponent((MainActivityComponent) baseActivityComponent)
                 .fragmentModule(fragmentModule)
-                .discoverFragmentModule(new DiscoverFragmentModule(discoverId))
+                .discoverFragmentModule(new DiscoverFragmentModule(this, discoverId))
                 .build()
                 .inject(this);
     }

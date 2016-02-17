@@ -3,6 +3,7 @@ package com.shoutit.app.android.view.discover;
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
@@ -18,7 +19,6 @@ import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.dao.DiscoversDao;
-import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.model.LocationPointer;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.view.home.HomePresenter;
@@ -28,11 +28,10 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Observer;
-import rx.functions.Func0;
+import rx.Scheduler;
 import rx.functions.Func1;
 import rx.functions.Func3;
 import rx.subjects.PublishSubject;
@@ -56,7 +55,8 @@ public class DiscoverPresenter {
     public DiscoverPresenter(@Nonnull UserPreferences userPreferences,
                              @Nonnull final DiscoversDao discoversDao,
                              @Nonnull final DiscoverShoutsDao discoverShoutsDao,
-                             @Nonnull Optional<String> discoverParentId) {
+                             @Nonnull Optional<String> discoverParentId,
+                             @Nonnull @UiScheduler Scheduler uiScheduler) {
 
 
         final Observable<LocationPointer> locationObservable = userPreferences.getLocationObservable()
@@ -87,8 +87,7 @@ public class DiscoverPresenter {
                             public Observable<ResponseOrError<DiscoverResponse>> call(LocationPointer locationPointer) {
                                 return discoversDao.getDiscoverObservable(locationPointer);
                             }
-                        })
-                        .compose(ObservableExtensions.<ResponseOrError<DiscoverResponse>>behaviorRefCount());
+                        });
 
         final Observable<String> mainDiscoverIdObservable = mainDiscoverObservable
                 .compose(ResponseOrError.<DiscoverResponse>onlySuccess())
@@ -118,7 +117,8 @@ public class DiscoverPresenter {
                         .switchMap(new Func1<String, Observable<ResponseOrError<DiscoverItemDetailsResponse>>>() {
                             @Override
                             public Observable<ResponseOrError<DiscoverItemDetailsResponse>> call(String itemId) {
-                                return discoversDao.getDiscoverItemDao(itemId).getDiscoverItemObservable();
+                                return discoversDao.getDiscoverItemDao(itemId)
+                                        .getDiscoverItemObservable();
                             }
                         })
                         .compose(ObservableExtensions.<ResponseOrError<DiscoverItemDetailsResponse>>behaviorRefCount());
@@ -190,9 +190,9 @@ public class DiscoverPresenter {
                     public List<BaseAdapterItem> call(ShoutsResponse shoutsResponse) {
                         final List<BaseAdapterItem> items = new ArrayList<>();
 
-                        for (int i = 0; i < MAX_DISPLAYED_SHOUTS; i++) {
-                            final Shout shout = shoutsResponse.getShouts().get(i);
-                            items.add(new ShoutAdapterItem(shout));
+                        final List<Shout> shouts = shoutsResponse.getShouts();
+                        for (int i = 0; i < Math.min(shouts.size(), MAX_DISPLAYED_SHOUTS); i++) {
+                            items.add(new ShoutAdapterItem(shouts.get(i)));
                         }
 
                         return ImmutableList.copyOf(items);
@@ -200,7 +200,7 @@ public class DiscoverPresenter {
                 });
 
         allAdapterItemsObservable = Observable.combineLatest(
-                headerAdapterItemObservable,
+                headerAdapterItemObservable.startWith((BaseAdapterItem) null),
                 discoverAdapterItemsObservable.startWith(ImmutableList.<BaseAdapterItem>of()),
                 shoutAdapterItemObservable.startWith(ImmutableList.<BaseAdapterItem>of()),
                 new Func3<BaseAdapterItem, List<BaseAdapterItem>, List<BaseAdapterItem>, List<BaseAdapterItem>>() {
@@ -210,7 +210,9 @@ public class DiscoverPresenter {
                                                       List<BaseAdapterItem> shouts) {
                         final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
 
-                        builder.add(headerItem);
+                        if (headerItem != null) {
+                            builder.add(headerItem);
+                        }
 
                         if (!discovers.isEmpty()) {
                             builder.addAll(discovers);
@@ -224,24 +226,24 @@ public class DiscoverPresenter {
 
                         return builder.build();
                     }
-                }
-        );
+                })
+                .observeOn(uiScheduler);
 
 
         /** Errors and Progress **/
         errorsObservable = ResponseOrError.combineErrorsObservable(
-            ImmutableList.of(
-                    ResponseOrError.transform(mainDiscoverObservable),
-                    ResponseOrError.transform(discoverItemObservable),
-                    ResponseOrError.transform(shoutsItemsObservable)
-            )
-        );
+                ImmutableList.of(
+                        ResponseOrError.transform(mainDiscoverObservable),
+                        ResponseOrError.transform(discoverItemObservable),
+                        ResponseOrError.transform(shoutsItemsObservable)
+                ))
+                .filter(Functions1.isNotNull())
+                .observeOn(uiScheduler);
 
         progressObservable = Observable.merge(
-                mainDiscoverObservable.map(Functions1.returnFalse()),
                 discoverItemObservable.map(Functions1.returnFalse()),
-                shoutsItemsObservable.map(Functions1.returnFalse())
-        );
+                shoutsItemsObservable.map(Functions1.returnFalse()))
+                .observeOn(uiScheduler);
     }
 
     @Nonnull

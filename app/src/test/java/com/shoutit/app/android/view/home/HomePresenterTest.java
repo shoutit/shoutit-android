@@ -182,7 +182,7 @@ public class HomePresenterTest {
     @Nonnull
     private ResponseOrError<DiscoverItemDetailsResponse> discoverDetailsResponse() {
         return ResponseOrError.fromData(new DiscoverItemDetailsResponse("2", true, false, Lists.<DiscoverChild>newArrayList(
-                new DiscoverChild("id", null, null, null, null, null)), title, image));
+                new DiscoverChild("id", null, null, null, null, null)), null, null));
     }
 
     @Nonnull

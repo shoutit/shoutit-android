@@ -59,7 +59,8 @@ public class DiscoverShoutsDao {
                                 ++pageNumber;
 
                                 final Observable<ShoutsResponse> apiRequest = apiService
-                                        .shoutsForDiscoverItem(discoverId, pageNumber, PAGE_SIZE);
+                                        .shoutsForDiscoverItem(discoverId, pageNumber, PAGE_SIZE)
+                                        .subscribeOn(networkScheduler);
 
                                 if (previousResponse == null) {
                                     return apiRequest;

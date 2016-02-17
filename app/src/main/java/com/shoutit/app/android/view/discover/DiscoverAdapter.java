@@ -48,17 +48,17 @@ public class DiscoverAdapter extends BaseAdapter {
 
         public HeaderViewHolder(@Nonnull View itemView) {
             super(itemView);
-            ButterKnife.bind(itemView);
+            ButterKnife.bind(this, itemView);
         }
 
         @Override
         public void bind(@Nonnull DiscoverPresenter.HeaderAdapterItem item) {
-            picasso.load(item.getImage())
+     /*       picasso.load(Strings.emptyToNull(item.getImage()))
                     .placeholder(R.drawable.pattern_bg)
                     .error(R.drawable.pattern_bg)
                     .fit()
                     .centerCrop()
-                    .into(cardImageView);
+                    .into(cardImageView);*/
 
             titleTextView.setText(item.getTitle());
         }
@@ -74,7 +74,7 @@ public class DiscoverAdapter extends BaseAdapter {
 
         public DiscoverViewHolder(@Nonnull View itemView) {
             super(itemView);
-            ButterKnife.bind(itemView);
+            ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
         }
 
@@ -83,12 +83,12 @@ public class DiscoverAdapter extends BaseAdapter {
             this.item = item;
             final DiscoverChild discover =  item.getDiscoverChild();
 
-            picasso.load(discover.getImage())
+      /*      picasso.load(Strings.emptyToNull(discover.getImage()))
                     .placeholder(R.drawable.pattern_placeholder)
                     .error(R.drawable.pattern_placeholder)
                     .fit()
                     .centerCrop()
-                    .into(imageView);
+                    .into(imageView);*/
 
             titleTextView.setText(discover.getTitle());
         }
@@ -103,7 +103,7 @@ public class DiscoverAdapter extends BaseAdapter {
 
         public ShoutHeaderViewHolder(@Nonnull View itemView) {
             super(itemView);
-            ButterKnife.bind(itemView);
+            ButterKnife.bind(this, itemView);
         }
 
         @Override
@@ -124,19 +124,19 @@ public class DiscoverAdapter extends BaseAdapter {
 
         public ShoutViewHolder(@Nonnull View itemView) {
             super(itemView);
-            ButterKnife.bind(itemView);
+            ButterKnife.bind(this, itemView);
         }
 
         @Override
         public void bind(@Nonnull DiscoverPresenter.ShoutAdapterItem item) {
             final Shout shout = item.getShout();
 
-            picasso.load(shout.getThumbnail())
+   /*         picasso.load(Strings.emptyToNull(shout.getThumbnail()))
                     .placeholder(R.drawable.pattern_placeholder)
                     .error(R.drawable.pattern_placeholder)
                     .fit()
                     .centerCrop()
-                    .into(cardImageView);
+                    .into(cardImageView);*/
 
             titleTextView.setText(shout.getTitle());
             shoutNameTextView.setText(shout.getText());
@@ -154,7 +154,7 @@ public class DiscoverAdapter extends BaseAdapter {
 
         public ButtonViewHolder(@Nonnull View itemView) {
             super(itemView);
-            ButterKnife.bind(itemView);
+            ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
         }
 

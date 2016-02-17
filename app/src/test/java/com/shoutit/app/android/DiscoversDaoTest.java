@@ -84,6 +84,6 @@ public class DiscoversDaoTest {
 
     private DiscoverItemDetailsResponse discoverItemDetailsResponse() {
         return new DiscoverItemDetailsResponse("z", true, false,
-                Lists.newArrayList(new DiscoverChild("z", null, null, null, null, null)), title, image);
+                Lists.newArrayList(new DiscoverChild("z", null, null, null, null, null)), null, null);
     }
 }

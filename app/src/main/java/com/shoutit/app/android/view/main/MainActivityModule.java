@@ -31,8 +31,7 @@ public class MainActivityModule {
     }
 
     @Provides
-    @Singleton
-    OnNewDiscoverSelectedListener provideonNewDiscoverSelectedListener() {
+    OnNewDiscoverSelectedListener provideOnNewDiscoverSelectedListener() {
         return activity;
     }
 }

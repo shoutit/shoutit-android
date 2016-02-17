@@ -17,6 +17,7 @@ import com.shoutit.app.android.BuildConfig;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.AuthInterceptor;
+import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.location.LocationManager;
@@ -142,6 +143,7 @@ public final class AppModule {
         return new AuthInterceptor(userPreferences);
     }
 
+    @Singleton
     @Provides
     public ShoutsDao provideShoutsDao(ApiService apiService,
                                       @NetworkScheduler Scheduler networkScheduler,
@@ -149,6 +151,7 @@ public final class AppModule {
         return new ShoutsDao(apiService, networkScheduler, userPreferences);
     }
 
+    @Singleton
     @Provides
     public DiscoversDao provideDiscoversDao(ApiService apiService,
                                             @NetworkScheduler Scheduler networkScheduler) {
@@ -171,6 +174,13 @@ public final class AppModule {
                                                   GoogleApiClient googleApiClient,
                                                   @NetworkScheduler Scheduler networkScheduler) {
         return new LocationManager(context, userPreferences, googleApiClient, apiService, networkScheduler);
+    }
+
+    @Singleton
+    @Provides
+    public DiscoverShoutsDao provideDiscoverShoutsDao(@NetworkScheduler Scheduler networkScheduler,
+                                                      ApiService apiService) {
+        return new DiscoverShoutsDao(networkScheduler, apiService);
     }
 
 }

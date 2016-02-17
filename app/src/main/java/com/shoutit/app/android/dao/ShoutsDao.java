@@ -26,7 +26,6 @@ import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.subjects.PublishSubject;
 
-@Singleton
 public class ShoutsDao {
     private final static int PAGE_SIZE = 20;
 

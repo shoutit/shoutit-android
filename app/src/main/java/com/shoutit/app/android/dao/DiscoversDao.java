@@ -3,14 +3,17 @@ package com.shoutit.app.android.dao;
 import android.support.annotation.NonNull;
 
 import com.appunite.rx.ResponseOrError;
+import com.appunite.rx.android.util.LogTransformer;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.operators.MoreOperators;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
+import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.model.LocationPointer;
 
 import javax.annotation.Nonnull;
@@ -19,7 +22,6 @@ import javax.inject.Singleton;
 import rx.Observable;
 import rx.Scheduler;
 
-@Singleton
 public class DiscoversDao {
 
     @Nonnull
@@ -67,6 +69,7 @@ public class DiscoversDao {
 
             discoverObservable = apiService
                     .discovers(locationPointer.getCountryCode(), null, null)
+                    .compose(LogTransformer.<DiscoverResponse>transformer("dupa", "dupa1"))
                     .subscribeOn(networkScheduler)
                     .compose(ResponseOrError.<DiscoverResponse>toResponseOrErrorObservable())
                     .compose(MoreOperators.<ResponseOrError<DiscoverResponse>>cacheWithTimeout(networkScheduler));
