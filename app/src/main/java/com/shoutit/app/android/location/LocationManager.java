@@ -5,6 +5,7 @@ import android.content.Context;
 import android.location.Location;
 import android.support.annotation.NonNull;
 
+import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.functions.Functions1;
@@ -56,14 +57,23 @@ public class LocationManager {
         this.apiService = apiService;
         this.networkScheduler = networkScheduler;
 
-        final Observable<UserLocation> locationFromCoordinatesObservable = LocationUtils
+        final Observable<UserLocation> locationFromIPObservable = apiService.geocodeDefault()
+                .subscribeOn(networkScheduler)
+                .compose(ResponseOrError.<UserLocation>toResponseOrErrorObservable())
+                .compose(MoreOperators.<UserLocation>repeatOnError(networkScheduler))
+                .compose(ResponseOrError.<UserLocation>onlySuccess());
+
+        final Observable<Location> gpsLocationObservable = LocationUtils
                 .getLocationObservable(googleApiClient, context, networkScheduler)
+                .compose(ObservableExtensions.<Location>behaviorRefCount())
                 .doOnNext(new Action1<Location>() {
                     @Override
                     public void call(Location location) {
                         googleApiClient.disconnect();
                     }
-                })
+                });
+
+        final Observable<UserLocation> successGpsLocationObservable = gpsLocationObservable
                 .filter(Functions1.isNotNull())
                 .filter(coordinatesChangedFilter())
                 .switchMap(new Func1<android.location.Location, Observable<UserLocation>>() {
@@ -77,10 +87,14 @@ public class LocationManager {
                     }
                 });
 
-        final Observable<UserLocation> locationFromIPObservable = apiService.geocodeDefault()
-                .subscribeOn(networkScheduler)
-                .compose(ResponseOrError.<UserLocation>toResponseOrErrorObservable())
-                .compose(ResponseOrError.<UserLocation>onlySuccess());
+        final Observable<UserLocation> locationFromIpOnGpsFailObservable = gpsLocationObservable
+                .filter(Functions1.isNull())
+                .switchMap(new Func1<Location, Observable<UserLocation>>() {
+                    @Override
+                    public Observable<UserLocation> call(Location location) {
+                        return locationFromIPObservable;
+                    }
+                });
 
         final PublishSubject<UserLocation> updateUserSubject = PublishSubject.create();
         updateLocationObservable = Observable
@@ -88,7 +102,7 @@ public class LocationManager {
                     @Override
                     public Observable<UserLocation> call() {
                         if (userPreferences.automaticLocationTrackingEnabled() && hasLocationPermissions(context)) {
-                            return locationFromCoordinatesObservable;
+                            return Observable.merge(successGpsLocationObservable, locationFromIpOnGpsFailObservable);
                         } else if (userPreferences.automaticLocationTrackingEnabled()) {
                             return locationFromIPObservable;
                         } else {
