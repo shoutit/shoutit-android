@@ -12,6 +12,7 @@ import dagger.Component;
         dependencies = BaseActivityComponent.class,
         modules = {
                 FragmentModule.class,
+                DiscoverFragment.class
         }
 )
 public interface DiscoverFragmentComponent extends BaseFragmentComponent {

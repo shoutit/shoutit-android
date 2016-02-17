@@ -4,10 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="130dp"
     xmlns:tools="http://schemas.android.com/tools"
-    card_view:cardBackgroundColor="@drawable/pattern_bg"
     card_view:cardCornerRadius="2dp"
     card_view:cardElevation="2dp"
     card_view:cardUseCompatPadding="true">
+
+    <ImageView
+        android:id="@+id/discover_header_iv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/pattern_bg"/>
 
     <TextView
         android:id="@+id/discover_header_title"

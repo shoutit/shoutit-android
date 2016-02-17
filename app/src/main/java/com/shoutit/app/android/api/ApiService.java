@@ -49,7 +49,9 @@ public interface ApiService {
                                              @Query("page_size") Integer pageSize);
 
     @GET("shouts")
-    Observable<ShoutsResponse> shoutsForDiscoverItem(@Query("discover") String discoverId);
+    Observable<ShoutsResponse> shoutsForDiscoverItem(@Query("discover") String discoverId,
+                                                     @Query("page") Integer page,
+                                                     @Query("page_size") Integer pageSize);
 
 
     /** OAuth **/

@@ -17,6 +17,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.utils.BlurTransform;
 import com.shoutit.app.android.utils.PicassoHelper;
+import com.shoutit.app.android.view.discover.DiscoverFragment;
 import com.shoutit.app.android.view.home.HomeFragment;
 import com.shoutit.app.android.view.location.LocationActivity;
 import com.squareup.picasso.Picasso;
@@ -252,6 +253,7 @@ public class MenuHandler {
             case FRAGMENT_HOME:
                 return HomeFragment.newInstance();
             case FRAGMENT_DISCOVER:
+                return DiscoverFragment.newInstance();
             case FRAGMENT_BROWSE:
             case FRAGMENT_CHATS:
             case FRAGMENT_ORDERS:

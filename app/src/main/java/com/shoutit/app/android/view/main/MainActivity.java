@@ -18,9 +18,9 @@ import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
-import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.view.discover.DiscoverFragment;
 import com.shoutit.app.android.view.home.HomeFragment;
 import com.shoutit.app.android.view.intro.IntroActivity;
 import com.shoutit.app.android.view.postlogininterest.PostLoginInterestActivity;
@@ -30,9 +30,8 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import rx.functions.Action1;
 
-public class MainActivity extends BaseActivity implements OnMenuItemSelectedListener {
+public class MainActivity extends BaseActivity implements OnMenuItemSelectedListener, OnNewDiscoverSelectedListener {
 
     public static Intent newIntent(@Nonnull Context context) {
         return new Intent(context, MainActivity.class);
@@ -45,11 +44,10 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
     @Inject
     MenuHandler menuHandler;
-
-    private ActionBarDrawerToggle drawerToggle;
-
     @Inject
     UserPreferences mUserPreferences;
+
+    private ActionBarDrawerToggle drawerToggle;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -146,10 +144,21 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
             fragment = MenuHandler.getFragmentForTag(fragmentTag);
         }
 
+        fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
         fragmentManager.beginTransaction()
                 .replace(R.id.activity_main_fragment_container, fragment, fragmentTag)
                 .commit();
 
         drawerLayout.closeDrawers();
+    }
+
+    @Override
+    public void onNewDiscoverSelected(@Nonnull String discoverId) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .addToBackStack(null)
+                .add(R.id.activity_main_fragment_container, DiscoverFragment.newInstance(discoverId))
+                .commit();
     }
 }

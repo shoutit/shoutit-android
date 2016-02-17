@@ -5,6 +5,7 @@ import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
+import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -15,10 +16,14 @@ import com.shoutit.app.android.api.model.DiscoverResponse;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.UserLocation;
+import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.dao.DiscoversDao;
+import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.model.LocationPointer;
 import com.shoutit.app.android.utils.MoreFunctions1;
+import com.shoutit.app.android.view.home.HomePresenter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -34,6 +39,8 @@ import rx.subjects.PublishSubject;
 
 public class DiscoverPresenter {
 
+    private static final int MAX_DISPLAYED_SHOUTS = 4;
+
     @Nonnull
     private final Observable<List<BaseAdapterItem>> allAdapterItemsObservable;
     @Nonnull
@@ -46,9 +53,9 @@ public class DiscoverPresenter {
     @Nonnull
     private final PublishSubject<String> discoverSelectedObserver = PublishSubject.create();
 
-    @Inject
     public DiscoverPresenter(@Nonnull UserPreferences userPreferences,
-                             @Nonnull final DiscoversDao dao,
+                             @Nonnull final DiscoversDao discoversDao,
+                             @Nonnull final DiscoverShoutsDao discoverShoutsDao,
                              @Nonnull Optional<String> discoverParentId) {
 
 
@@ -78,7 +85,7 @@ public class DiscoverPresenter {
                         .switchMap(new Func1<LocationPointer, Observable<ResponseOrError<DiscoverResponse>>>() {
                             @Override
                             public Observable<ResponseOrError<DiscoverResponse>> call(LocationPointer locationPointer) {
-                                return dao.getDiscoverObservable(locationPointer);
+                                return discoversDao.getDiscoverObservable(locationPointer);
                             }
                         })
                         .compose(ObservableExtensions.<ResponseOrError<DiscoverResponse>>behaviorRefCount());
@@ -111,7 +118,7 @@ public class DiscoverPresenter {
                         .switchMap(new Func1<String, Observable<ResponseOrError<DiscoverItemDetailsResponse>>>() {
                             @Override
                             public Observable<ResponseOrError<DiscoverItemDetailsResponse>> call(String itemId) {
-                                return dao.getDiscoverItemDao(itemId).getDiscoverItemObservable();
+                                return discoversDao.getDiscoverItemDao(itemId).getDiscoverItemObservable();
                             }
                         })
                         .compose(ObservableExtensions.<ResponseOrError<DiscoverItemDetailsResponse>>behaviorRefCount());
@@ -128,7 +135,7 @@ public class DiscoverPresenter {
                 .switchMap(new Func1<DiscoverItemDetailsResponse, Observable<ResponseOrError<ShoutsResponse>>>() {
                     @Override
                     public Observable<ResponseOrError<ShoutsResponse>> call(DiscoverItemDetailsResponse response) {
-                        return dao.getDiscoverItemDao(response.getId()).getDiscoverItemShoutsObservable();
+                        return discoverShoutsDao.getShoutsObservable(response.getId());
                     }
                 })
                 .compose(ObservableExtensions.<ResponseOrError<ShoutsResponse>>behaviorRefCount());
@@ -161,7 +168,7 @@ public class DiscoverPresenter {
                                     @Nullable
                                     @Override
                                     public BaseAdapterItem apply(@Nullable DiscoverChild input) {
-                                        return new DiscoverAdapterItem(input);
+                                        return new DiscoverAdapterItem(input, discoverSelectedObserver);
                                     }
                                 });
 
@@ -181,15 +188,12 @@ public class DiscoverPresenter {
                 .map(new Func1<ShoutsResponse, List<BaseAdapterItem>>() {
                     @Override
                     public List<BaseAdapterItem> call(ShoutsResponse shoutsResponse) {
+                        final List<BaseAdapterItem> items = new ArrayList<>();
 
-                        final List<BaseAdapterItem> items = Lists
-                                .transform(shoutsResponse.getShouts(), new Function<Shout, BaseAdapterItem>() {
-                                    @Nullable
-                                    @Override
-                                    public BaseAdapterItem apply(@Nullable Shout input) {
-                                        return new ShoutAdapterItem(input);
-                                    }
-                                });
+                        for (int i = 0; i < MAX_DISPLAYED_SHOUTS; i++) {
+                            final Shout shout = shoutsResponse.getShouts().get(i);
+                            items.add(new ShoutAdapterItem(shout));
+                        }
 
                         return ImmutableList.copyOf(items);
                     }
@@ -255,6 +259,16 @@ public class DiscoverPresenter {
         return progressObservable;
     }
 
+    @Nonnull
+    public Observable<Object> getShowMoreObservable() {
+        return showMoreObserver;
+    }
+
+    @Nonnull
+    public Observable<String> getDiscoverSelectedObservable() {
+        return discoverSelectedObserver;
+    }
+
     /**
      * Adapter Items
      **/
@@ -298,9 +312,13 @@ public class DiscoverPresenter {
 
         @Nonnull
         private final DiscoverChild discoverChild;
+        @Nonnull
+        private final Observer<String> discoverSelectedObserver;
 
-        public DiscoverAdapterItem(@Nonnull DiscoverChild discoverChild) {
+        public DiscoverAdapterItem(@Nonnull DiscoverChild discoverChild,
+                                   @Nonnull Observer<String> discoverSelectedObserver) {
             this.discoverChild = discoverChild;
+            this.discoverSelectedObserver = discoverSelectedObserver;
         }
 
         @Nonnull
@@ -315,12 +333,30 @@ public class DiscoverPresenter {
 
         @Override
         public boolean matches(@Nonnull BaseAdapterItem item) {
-            return false;
+            return item instanceof HomePresenter.DiscoverAdapterItem &&
+                    discoverChild.getId().equals(((HomePresenter.DiscoverAdapterItem) item).getDiscover().getId());
         }
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return false;
+            return item instanceof HomePresenter.DiscoverAdapterItem && this.equals(item);
+        }
+
+        public void onDiscoverSelected() {
+            discoverSelectedObserver.onNext(discoverChild.getId());
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof DiscoverAdapterItem)) return false;
+            final DiscoverAdapterItem that = (DiscoverAdapterItem) o;
+            return Objects.equal(discoverChild, that.discoverChild);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(discoverChild);
         }
     }
 
@@ -333,12 +369,12 @@ public class DiscoverPresenter {
 
         @Override
         public boolean matches(@Nonnull BaseAdapterItem item) {
-            return false;
+            return item instanceof ShoutHeaderAdapterItem;
         }
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return false;
+            return item instanceof ShoutHeaderAdapterItem;
         }
     }
 
@@ -358,17 +394,32 @@ public class DiscoverPresenter {
 
         @Override
         public boolean matches(@Nonnull BaseAdapterItem item) {
-            return false;
+            return item instanceof ShoutAdapterItem &&
+                    shout.getId().equals(((ShoutAdapterItem) item).getShout().getId());
         }
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return false;
+            return item instanceof ShoutAdapterItem &&
+                    this.equals(item);
         }
 
         @Nonnull
         public Shout getShout() {
             return shout;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof ShoutAdapterItem)) return false;
+            final ShoutAdapterItem that = (ShoutAdapterItem) o;
+            return Objects.equal(shout, that.shout);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(shout);
         }
     }
 

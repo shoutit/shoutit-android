@@ -3,9 +3,12 @@ package com.shoutit.app.android.view.main;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
 import javax.annotation.Nonnull;
+import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import rx.Observer;
+import rx.subjects.PublishSubject;
 
 @Module
 public class MainActivityModule {
@@ -24,6 +27,12 @@ public class MainActivityModule {
 
     @Provides
     OnMenuItemSelectedListener provideOnMenuItemSelectedListener() {
+        return activity;
+    }
+
+    @Provides
+    @Singleton
+    OnNewDiscoverSelectedListener provideonNewDiscoverSelectedListener() {
         return activity;
     }
 }
