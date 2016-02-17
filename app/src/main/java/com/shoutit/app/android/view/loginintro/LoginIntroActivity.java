@@ -9,6 +9,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.android.MyAndroidSchedulers;
@@ -46,6 +47,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Observable;
+import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
@@ -57,6 +59,9 @@ public class LoginIntroActivity extends BaseActivity {
 
     @Bind(R.id.activity_login_toolbar)
     Toolbar toolbar;
+
+    @Bind(R.id.activity_login_progress_layout)
+    View progress;
 
     @Inject
     CoarseLocationObservableProvider mCoarseLocationObservable;
@@ -119,6 +124,7 @@ public class LoginIntroActivity extends BaseActivity {
         if (requestCode == GOOGLE_SIGN_IN && resultCode == RESULT_OK) {
             final GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             final GoogleSignInAccount acct = result.getSignInAccount();
+            assert acct != null;
             final String authCode = acct.getServerAuthCode();
             mObservable
                     .map(new Func1<UserLocation, BothParams<String, UserLocation>>() {
@@ -142,7 +148,10 @@ public class LoginIntroActivity extends BaseActivity {
         return new Action1<Throwable>() {
             @Override
             public void call(Throwable throwable) {
-                ColoredSnackBar.error(ColoredSnackBar.contentView(LoginIntroActivity.this), "error", Snackbar.LENGTH_SHORT);
+                ColoredSnackBar.error(ColoredSnackBar.contentView(LoginIntroActivity.this),
+                        getString(R.string.login_intro_fail),
+                        Snackbar.LENGTH_SHORT)
+                        .show();
             }
         };
     }
@@ -214,6 +223,18 @@ public class LoginIntroActivity extends BaseActivity {
                     }
                 })
                 .flatMap(getCallFacebookApi())
+                .doOnSubscribe(new Action0() {
+                    @Override
+                    public void call() {
+                        progress.setVisibility(View.VISIBLE);
+                    }
+                })
+                .finallyDo(new Action0() {
+                    @Override
+                    public void call() {
+                        progress.setVisibility(View.GONE);
+                    }
+                })
                 .subscribe(getSuccessAction(), getErrorAction());
     }
 

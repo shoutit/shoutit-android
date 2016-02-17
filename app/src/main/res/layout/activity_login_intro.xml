@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout android:id="@+id/activity_login_root_view"
-                xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+<RelativeLayout
+    android:id="@+id/activity_login_root_view"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -74,8 +75,8 @@
                 android:id="@+id/activity_login_signup"
                 android:layout_width="280dp"
                 android:layout_height="50dp"
-                android:textAllCaps="false"
                 android:text="@string/login_intro_signup"
+                android:textAllCaps="false"
                 android:textColor="@android:color/white"
                 android:textSize="14sp"
                 android:theme="@style/LoginButton"/>
@@ -121,5 +122,19 @@
         android:layout_height="4dp"
         android:layout_below="@id/activity_login_toolbar"
         android:background="@drawable/toolbar_drop_shadow"/>
+
+    <FrameLayout
+        android:id="@+id/activity_login_progress_layout"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black_54">
+
+        <ProgressBar
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </FrameLayout>
 
 </RelativeLayout>

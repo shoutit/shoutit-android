@@ -76,6 +76,7 @@
     <string name="login_intro_help">Help</string>
     <string name="login_intro_about">About</string>
     <string name="login_sign_up_new">New to Shoutit?</string>
+    <string name="login_intro_fail">Failed to login</string>
 
     <!-- About -->
     <string name="pref_key_terms_of_service" translatable="false">pref_key_terms_of_service</string>
