@@ -5,12 +5,13 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
 import com.appunite.rx.functions.Functions1;
 import com.appunite.rx.operators.MoreOperators;
 import com.google.common.base.Optional;
 import com.google.gson.Gson;
-import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForApplication;
 
 import javax.annotation.Nonnull;
@@ -177,6 +178,10 @@ public class UserPreferences {
 
     @SuppressLint("CommitPrefEdits")
     public void logout() {
-        mPreferences.edit().clear().commit();
+        final String locationJson = mPreferences.getString(KEY_LOCATION, null);
+        mPreferences.edit()
+                .clear()
+                .putString(KEY_LOCATION, locationJson)
+                .commit();
     }
 }
