@@ -13,15 +13,12 @@ import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForApplication;
 
-import java.util.concurrent.Callable;
-
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import rx.Observable;
 import rx.functions.Func0;
-import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
 @Singleton
@@ -33,7 +30,7 @@ public class UserPreferences {
     private static final String KEY_LOCATION = "location";
     private static final String IS_GUEST = "is_guest";
     private static final String KEY_LOCATION_TRACKING = "location_tracking";
-    private static final String IS_FIRST_RUN = "is_first_run";
+    private static final String SHOULD_ASK_FOR_INTEREST = "is_first_run";
 
     private final PublishSubject<Object> userRefreshSubject = PublishSubject.create();
     private final PublishSubject<Object> locationRefreshSubject = PublishSubject.create();
@@ -106,13 +103,13 @@ public class UserPreferences {
         return getAuthToken().isPresent();
     }
 
-    public boolean isFirstRun() {
-        return mPreferences.getBoolean(IS_FIRST_RUN, true);
+    public void setShouldAskForInterestTrue() {
+        mPreferences.edit().putBoolean(SHOULD_ASK_FOR_INTEREST, true).apply();
     }
 
-    public boolean isFirstRunAndSetToFalse() {
-        final boolean isFirstRun = mPreferences.getBoolean(IS_FIRST_RUN, true);
-        mPreferences.edit().putBoolean(IS_FIRST_RUN, false).apply();
+    public boolean shouldAskForInterestAndSetToFalse() {
+        final boolean isFirstRun = mPreferences.getBoolean(SHOULD_ASK_FOR_INTEREST, true);
+        mPreferences.edit().putBoolean(SHOULD_ASK_FOR_INTEREST, false).apply();
         return isFirstRun;
     }
 

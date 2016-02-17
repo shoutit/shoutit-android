@@ -1,6 +1,6 @@
 package com.shoutit.app.android.view.signin.register;
 
-import android.graphics.Typeface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
@@ -23,18 +23,20 @@ import com.jakewharton.rxbinding.view.RxView;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
-import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.SignResponse;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.data.AssetsConstants;
 import com.shoutit.app.android.utils.Actions1;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.MoreFunctions1;
+import com.shoutit.app.android.view.about.AboutActivity;
 import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.signin.LoginActivityComponent;
 import com.shoutit.app.android.view.signin.login.LoginFragment;
 import com.shoutit.app.android.view.webview.HtmlAssetViewerActivity;
+import com.uservoice.uservoicesdk.UserVoice;
 
 import java.util.concurrent.TimeUnit;
 
@@ -43,6 +45,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
+import butterknife.OnClick;
 import rx.functions.Action1;
 
 public class RegisterFragment extends BaseFragment {
@@ -216,5 +219,20 @@ public class RegisterFragment extends BaseFragment {
                 .fragmentModule(fragmentModule)
                 .build()
                 .inject(this);
+    }
+
+    @OnClick(R.id.activity_login_feedback)
+    public void onFeedbackClick() {
+        UserVoice.launchContactUs(getActivity());
+    }
+
+    @OnClick(R.id.activity_login_help)
+    public void onHelpClick() {
+        UserVoice.launchUserVoice(getActivity());
+    }
+
+    @OnClick(R.id.activity_login_about)
+    public void onAboutClick() {
+        startActivity(new Intent(getActivity(), AboutActivity.class));
     }
 }

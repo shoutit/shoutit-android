@@ -90,7 +90,7 @@ public class SelectionHelper<T> {
                                 @Override
                                 public boolean apply(@Nullable T input) {
                                     Preconditions.checkNotNull(input);
-                                    return input != itemSelected.localId;
+                                    return !input.equals(itemSelected.localId);
                                 }
                             }));
                         }

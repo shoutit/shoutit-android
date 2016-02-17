@@ -1,6 +1,5 @@
 package com.shoutit.app.android.view.signin.login;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.appunite.rx.ObservableExtensions;
@@ -11,15 +10,12 @@ import com.appunite.rx.functions.Functions1;
 import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
-import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.api.model.SignResponse;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.login.EmailLoginRequest;
 import com.shoutit.app.android.api.model.login.LoginUser;
-import com.shoutit.app.android.dagger.ForActivity;
-import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.utils.MoreFunctions1;
-import com.shoutit.app.android.view.signin.CoarseLocationObservableProvider;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
