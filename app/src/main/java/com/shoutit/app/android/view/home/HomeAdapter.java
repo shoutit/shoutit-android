@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -25,7 +24,7 @@ import com.shoutit.app.android.utils.DateTimeUtils;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.PriceUtils;
-import com.shoutit.app.android.utils.ResourcesHelper;
+import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -120,8 +119,8 @@ public class HomeAdapter extends BaseAdapter {
             recyclerView.setAdapter(homeDiscoversAdapter);
 
             subscription = Observable.just(item.getAdapterItems())
-                            .observeOn(uiScheduler)
-                            .subscribe(homeDiscoversAdapter);
+                    .observeOn(uiScheduler)
+                    .subscribe(homeDiscoversAdapter);
         }
 
         @Override
@@ -192,7 +191,7 @@ public class HomeAdapter extends BaseAdapter {
         }
     }
 
-    class ShoutGridViewHolder extends ViewHolderManager.BaseViewHolder<HomePresenter.ShoutAdapterItem> {
+    class ShoutGridViewHolder extends ViewHolderManager.BaseViewHolder<ShoutAdapterItem> {
         @Bind(R.id.home_feed_card_image_view)
         ImageView cardImageView;
         @Bind(R.id.home_feed_card_title_tv)
@@ -208,13 +207,13 @@ public class HomeAdapter extends BaseAdapter {
         }
 
         @Override
-        public void bind(@Nonnull HomePresenter.ShoutAdapterItem item) {
+        public void bind(@Nonnull ShoutAdapterItem item) {
             final Shout shout = item.getShout();
             titleTextView.setText(shout.getTitle());
             nameTextView.setText(shout.getUser().getName());
             final String price = PriceUtils.formatPrice(shout.getPrice());
             cardPriceTextView.setText(context.getString(
-                    R.string.price_with_currency, price, shout.getCurrency())
+                            R.string.price_with_currency, price, shout.getCurrency())
             );
 
             picasso.load(Strings.emptyToNull(shout.getThumbnail()))
@@ -225,7 +224,7 @@ public class HomeAdapter extends BaseAdapter {
         }
     }
 
-    class ShoutLinerViewHolder extends ViewHolderManager.BaseViewHolder<HomePresenter.ShoutAdapterItem> {
+    class ShoutLinerViewHolder extends ViewHolderManager.BaseViewHolder<ShoutAdapterItem> {
         @Bind(R.id.home_feed_card_image_view)
         ImageView cardImageView;
         @Bind(R.id.home_feed_card_title_tv)
@@ -251,7 +250,7 @@ public class HomeAdapter extends BaseAdapter {
         }
 
         @Override
-        public void bind(@Nonnull HomePresenter.ShoutAdapterItem item) {
+        public void bind(@Nonnull ShoutAdapterItem item) {
             recycle();
 
             final Shout shout = item.getShout();
@@ -263,7 +262,7 @@ public class HomeAdapter extends BaseAdapter {
 
             final String price = PriceUtils.formatPrice(shout.getPrice());
             cardPriceTextView.setText(context.getString(
-                    R.string.price_with_currency, price, shout.getCurrency())
+                            R.string.price_with_currency, price, shout.getCurrency())
             );
 
             typeLabelTextView.setText(shout.getTypeResId());
@@ -287,13 +286,13 @@ public class HomeAdapter extends BaseAdapter {
 
             subscription = new CompositeSubscription(
                     RxView.clicks(chatIcon)
-                    .observeOn(uiScheduler)
-                    .subscribe(new Action1<Void>() {
-                        @Override
-                        public void call(Void aVoid) {
-                            Toast.makeText(context, "Not implemented yet", Toast.LENGTH_LONG).show();
-                        }
-                    })
+                            .observeOn(uiScheduler)
+                            .subscribe(new Action1<Void>() {
+                                @Override
+                                public void call(Void aVoid) {
+                                    Toast.makeText(context, "Not implemented yet", Toast.LENGTH_LONG).show();
+                                }
+                            })
             );
         }
 
@@ -355,7 +354,7 @@ public class HomeAdapter extends BaseAdapter {
             return VIEW_TYPE_DISCOVER_ITEMS_CONTAINER;
         } else if (item instanceof HomePresenter.ShoutHeaderAdapterItem) {
             return VIEW_TYPE_SHOUT_HEADER;
-        } else if (item instanceof HomePresenter.ShoutAdapterItem) {
+        } else if (item instanceof ShoutAdapterItem) {
             return VIEW_TYPE_SHOUT_ITEM;
         } else if (item instanceof HomePresenter.ShoutsEmptyAdapterItem) {
             return VIEW_TYPE_EMPTY_SHOUTS_ITEM;
