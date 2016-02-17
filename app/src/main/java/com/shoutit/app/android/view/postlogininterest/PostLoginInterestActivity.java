@@ -17,6 +17,7 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.BaseActivityComponentProvider;
 import com.shoutit.app.android.retainfragment.RetainFragmentHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.view.main.MainActivity;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
 import java.util.List;
@@ -95,6 +96,7 @@ public class PostLoginInterestActivity extends RxAppCompatActivity implements Ba
             @Override
             public void call(Object view) {
                 finish();
+                startActivity(MainActivity.newIntent(PostLoginInterestActivity.this));
             }
         };
     }
