@@ -8,6 +8,7 @@ import android.support.v4.app.ActivityCompat;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.UnderlineSpan;
@@ -91,7 +92,7 @@ public class RegisterFragment extends BaseFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        passwordEdittext.setTypeface(null, Typeface.NORMAL);
+        passwordEdittext.setTransformationMethod(new PasswordTransformationMethod());
 
         setUpSpans();
 
