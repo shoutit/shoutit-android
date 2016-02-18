@@ -152,19 +152,19 @@ public class RegisterFragment extends BaseFragment {
                 });
 
         RxTextView.textChangeEvents(emailEdittext)
-                .debounce(500, TimeUnit.MILLISECONDS)
+                .debounce(100, TimeUnit.MILLISECONDS)
                 .map(MoreFunctions1.mapTextChangeEventToString())
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(registerPresenter.getEmailObserver());
 
         RxTextView.textChangeEvents(nameEditText)
-                .debounce(500, TimeUnit.MILLISECONDS)
+                .debounce(100, TimeUnit.MILLISECONDS)
                 .map(MoreFunctions1.mapTextChangeEventToString())
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(registerPresenter.getNameObserver());
 
         RxTextView.textChangeEvents(passwordEdittext)
-                .debounce(500, TimeUnit.MILLISECONDS)
+                .debounce(100, TimeUnit.MILLISECONDS)
                 .map(MoreFunctions1.mapTextChangeEventToString())
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(registerPresenter.getPasswordObserver());
