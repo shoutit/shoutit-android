@@ -98,8 +98,8 @@ public class HomePresenterTest {
 
         initData();
 
-        assert_().that(subscriber.getOnNextEvents()).hasSize(2);
-        final List<BaseAdapterItem> baseAdapterItems = subscriber.getOnNextEvents().get(1);
+        assert_().that(subscriber.getOnNextEvents()).hasSize(1);
+        final List<BaseAdapterItem> baseAdapterItems = subscriber.getOnNextEvents().get(0);
         assert_().that(baseAdapterItems.get(0)).isInstanceOf(HomePresenter.DiscoverHeaderAdapterItem.class);
         assert_().that(baseAdapterItems.get(1)).isInstanceOf(HomePresenter.DiscoverContainerAdapterItem.class);
         assert_().that(baseAdapterItems.get(2)).isInstanceOf(HomePresenter.ShoutHeaderAdapterItem.class);
@@ -113,7 +113,7 @@ public class HomePresenterTest {
 
         initData();
         final HomePresenter.DiscoverContainerAdapterItem discoverContainerAdapterItem =
-                (HomePresenter.DiscoverContainerAdapterItem) subscriber.getOnNextEvents().get(1).get(1);
+                (HomePresenter.DiscoverContainerAdapterItem) subscriber.getOnNextEvents().get(0).get(1);
 
         assert_().that(discoverContainerAdapterItem.getAdapterItems()).isNotEmpty();
     }
@@ -125,8 +125,8 @@ public class HomePresenterTest {
 
         initData();
 
-        subscriber.assertValueCount(2);
-        subscriber.assertValues(false, false);
+        subscriber.assertValueCount(1);
+        subscriber.assertValues(false);
     }
 
     @Test
@@ -159,8 +159,8 @@ public class HomePresenterTest {
         discoversDetailsSubject.onNext(discoverDetailsResponse());
         scheduler.triggerActions();
 
-        assert_().that(subscriber.getOnNextEvents()).hasSize(2);
-        final List<BaseAdapterItem> baseAdapterItems = subscriber.getOnNextEvents().get(1);
+        assert_().that(subscriber.getOnNextEvents()).hasSize(1);
+        final List<BaseAdapterItem> baseAdapterItems = subscriber.getOnNextEvents().get(0);
         assert_().that(baseAdapterItems.get(0)).isInstanceOf(HomePresenter.DiscoverHeaderAdapterItem.class);
         assert_().that(baseAdapterItems.get(1)).isInstanceOf(HomePresenter.DiscoverContainerAdapterItem.class);
         assert_().that(baseAdapterItems.get(2)).isInstanceOf(HomePresenter.ShoutHeaderAdapterItem.class);
