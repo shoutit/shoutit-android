@@ -2,6 +2,7 @@ package com.shoutit.app.android.view.discover;
 
 import android.support.annotation.Nullable;
 
+import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.google.common.base.Optional;
 import com.shoutit.app.android.UserPreferences;
@@ -27,7 +28,8 @@ public class DiscoverFragmentModule extends FragmentModule {
     @Provides
     public DiscoverPresenter provideDiscoverPresenter(UserPreferences userPreferences,
                                                       DiscoversDao dao, DiscoverShoutsDao discoverShoutsDao,
-                                                      @UiScheduler Scheduler uiScheduler) {
-        return new DiscoverPresenter(userPreferences, dao, discoverShoutsDao, Optional.fromNullable(discoverId), uiScheduler);
+                                                      @UiScheduler Scheduler uiScheduler,
+                                                      @NetworkScheduler Scheduler networkScheduler) {
+        return new DiscoverPresenter(userPreferences, dao, discoverShoutsDao, Optional.fromNullable(discoverId), uiScheduler, networkScheduler);
     }
 }

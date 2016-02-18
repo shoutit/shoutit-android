@@ -76,7 +76,7 @@ public class DiscoverPresenterTest {
                 .thenReturn(Observable.just(ResponseOrError.fromData(getShoutsResponse())));
 
         presenter = new DiscoverPresenter(userPreferences, discoversDao,
-                discoverShoutsDao, Optional.<String>absent(), Schedulers.immediate());
+                discoverShoutsDao, Optional.<String>absent(), Schedulers.immediate(), Schedulers.immediate());
     }
 
     @Test

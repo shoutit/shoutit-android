@@ -1,18 +1,19 @@
 package com.shoutit.app.android.api;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
-import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.SignResponse;
-import com.shoutit.app.android.api.model.UpdateLocationRequest;
 import com.shoutit.app.android.api.model.TagsRequest;
+import com.shoutit.app.android.api.model.UpdateLocationRequest;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.login.EmailLoginRequest;
 import com.shoutit.app.android.api.model.login.FacebookLogin;
 import com.shoutit.app.android.api.model.login.GoogleLogin;
@@ -49,9 +50,9 @@ public interface ApiService {
                                              @Query("page_size") Integer pageSize);
 
     @GET("shouts")
-    Observable<ShoutsResponse> shoutsForDiscoverItem(@Query("discover") String discoverId,
-                                                     @Query("page") Integer page,
-                                                     @Query("page_size") Integer pageSize);
+    Observable<ShoutsResponse> shoutsForDiscoverItem(@Query("discover") @NonNull String discoverId,
+                                                     @Query("page") @Nullable Integer page,
+                                                     @Query("page_size") @Nullable Integer pageSize);
 
 
     /** OAuth **/
