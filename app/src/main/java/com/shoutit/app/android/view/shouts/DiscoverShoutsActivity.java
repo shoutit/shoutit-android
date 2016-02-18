@@ -120,9 +120,9 @@ public class DiscoverShoutsActivity extends BaseActivity {
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
         final String discoverId = getIntent().getStringExtra(DISCOVER_ID);
-        final DiscoverShoutsActivityComponent activityComponent = DaggerShoutsActivityComponent.builder()
+        final DiscoverShoutsActivityComponent activityComponent = DaggerDiscoverShoutsActivityComponent.builder()
                 .activityModule(new ActivityModule(this))
-                .shoutsActivityModule(new DiscoverShoutsActivityModule(discoverId))
+                .discoverShoutsActivityModule(new DiscoverShoutsActivityModule(discoverId))
                 .appComponent(App.getAppComponent(getApplication()))
                 .build();
         activityComponent.inject(this);
