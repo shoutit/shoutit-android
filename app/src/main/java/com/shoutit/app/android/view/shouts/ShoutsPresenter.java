@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.appunite.rx.ResponseOrError;
+import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
@@ -18,6 +19,7 @@ import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import java.util.List;
 
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Observer;
@@ -26,11 +28,12 @@ import rx.functions.Func1;
 
 public class ShoutsPresenter {
 
-    private final Observable<List<ShoutAdapterItem>> mListObservable;
+    private final Observable<List<BaseAdapterItem>> mListObservable;
     private final Observable<Throwable> mThrowableObservable;
     private final Observable<Boolean> mProgressObservable;
     private final DiscoverShoutsDao mDiscoverShoutsDao;
 
+    @Inject
     public ShoutsPresenter(@NetworkScheduler Scheduler networkScheduler,
                            @UiScheduler Scheduler uiScheduler,
                            DiscoverShoutsDao discoverShoutsDao,
@@ -42,13 +45,13 @@ public class ShoutsPresenter {
                 .observeOn(uiScheduler);
 
         mListObservable = observable.compose(ResponseOrError.<ShoutsResponse>onlySuccess())
-                .map(new Func1<ShoutsResponse, List<ShoutAdapterItem>>() {
+                .map(new Func1<ShoutsResponse, List<BaseAdapterItem>>() {
                     @Override
-                    public List<ShoutAdapterItem> call(ShoutsResponse shoutsResponse) {
-                        return ImmutableList.copyOf(Iterables.transform(shoutsResponse.getShouts(), new Function<Shout, ShoutAdapterItem>() {
+                    public List<BaseAdapterItem> call(ShoutsResponse shoutsResponse) {
+                        return ImmutableList.copyOf(Iterables.transform(shoutsResponse.getShouts(), new Function<Shout, BaseAdapterItem>() {
                             @Nullable
                             @Override
-                            public ShoutAdapterItem apply(Shout input) {
+                            public BaseAdapterItem apply(Shout input) {
                                 return new ShoutAdapterItem(input, context);
                             }
                         }));
@@ -60,7 +63,7 @@ public class ShoutsPresenter {
     }
 
     @NonNull
-    public Observable<List<ShoutAdapterItem>> getSuccessObservable() {
+    public Observable<List<BaseAdapterItem>> getSuccessObservable() {
         return mListObservable;
     }
 

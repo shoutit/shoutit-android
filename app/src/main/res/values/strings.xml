@@ -128,4 +128,12 @@
     <string name="location_update_success">Location successfully changed</string>
     <string name="home_no_shouts">No shouts to display</string>
 
+    <!-- Discover -->
+    <string name="discover_shouts_header">Discover shouts</string>
+    <string name="discover_see_all_button">See all shouts</string>
+
+    <!-- Discover Shouts -->
+    <string name="discover_shouts_error">Failed to load shouts</string>
+    <string name="discover_shouts_share">Share</string>
+
 </resources>

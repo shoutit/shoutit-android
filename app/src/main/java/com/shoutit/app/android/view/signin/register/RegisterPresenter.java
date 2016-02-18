@@ -14,6 +14,7 @@ import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.login.LoginUser;
 import com.shoutit.app.android.utils.MoreFunctions1;
+import com.shoutit.app.android.utils.rx.RxMoreObservers;
 
 import javax.inject.Inject;
 
@@ -104,6 +105,7 @@ public class RegisterPresenter {
                     public void call(SignResponse signResponse) {
                         userPreferences.setLoggedIn(signResponse.getAccessToken(), signResponse.getRefreshToken());
                         userPreferences.saveUserAsJson(signResponse.getUser());
+                        userPreferences.setShouldAskForInterestTrue();
                     }
                 });
 
@@ -128,12 +130,12 @@ public class RegisterPresenter {
 
     @NonNull
     public Observer<String> getEmailObserver() {
-        return mEmailSubject;
+        return RxMoreObservers.ignoreCompleted(mEmailSubject);
     }
 
     @NonNull
     public Observer<String> getPasswordObserver() {
-        return mPasswordSubject;
+        return RxMoreObservers.ignoreCompleted(mPasswordSubject);
     }
 
     @NonNull
@@ -158,7 +160,7 @@ public class RegisterPresenter {
 
     @NonNull
     public Observer<String> getNameObserver() {
-        return mNameSubject;
+        return RxMoreObservers.ignoreCompleted(mNameSubject);
     }
 
     @NonNull

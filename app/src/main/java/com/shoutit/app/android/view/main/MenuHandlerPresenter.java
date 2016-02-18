@@ -39,7 +39,7 @@ public class MenuHandlerPresenter {
     private final Observable<Boolean> logoutItemVisibilityObservable;
 
     @Inject
-    public MenuHandlerPresenter(@Nonnull UserPreferences userPreferences,
+    public MenuHandlerPresenter(@Nonnull final UserPreferences userPreferences,
                                 @Nonnull @ForActivity final Context context,
                                 @Nonnull @UiScheduler Scheduler uiScheduler) {
 
@@ -68,7 +68,11 @@ public class MenuHandlerPresenter {
                 .map(new Func1<User, String>() {
                     @Override
                     public String call(User user) {
-                        return user.getName();
+                        if (userPreferences.isGuest()) {
+                            return context.getString(R.string.menu_guest);
+                        } else {
+                            return user.getName();
+                        }
                     }
                 });
 

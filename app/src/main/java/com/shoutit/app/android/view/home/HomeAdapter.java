@@ -7,26 +7,21 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.appunite.rx.dagger.UiScheduler;
-import com.google.common.base.Strings;
 import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
-import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.dagger.ForActivity;
-import com.shoutit.app.android.utils.DateTimeUtils;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
-import com.shoutit.app.android.utils.PicassoHelper;
-import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
+import com.shoutit.app.android.view.shouts.ShoutGridViewHolder;
+import com.shoutit.app.android.view.shouts.ShoutLinerViewHolder;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -191,125 +186,6 @@ public class HomeAdapter extends BaseAdapter {
         }
     }
 
-    class ShoutGridViewHolder extends ViewHolderManager.BaseViewHolder<ShoutAdapterItem> {
-        @Bind(R.id.home_feed_card_image_view)
-        ImageView cardImageView;
-        @Bind(R.id.home_feed_card_title_tv)
-        TextView titleTextView;
-        @Bind(R.id.home_feed_card_name_tv)
-        TextView nameTextView;
-        @Bind(R.id.home_feed_card_price_tv)
-        TextView cardPriceTextView;
-
-        public ShoutGridViewHolder(@Nonnull View itemView) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
-        }
-
-        @Override
-        public void bind(@Nonnull ShoutAdapterItem item) {
-            final Shout shout = item.getShout();
-            titleTextView.setText(shout.getTitle());
-            nameTextView.setText(shout.getUser().getName());
-            final String price = PriceUtils.formatPrice(shout.getPrice());
-            cardPriceTextView.setText(context.getString(
-                            R.string.price_with_currency, price, shout.getCurrency())
-            );
-
-            picasso.load(Strings.emptyToNull(shout.getThumbnail()))
-                    .placeholder(R.drawable.pattern_placeholder)
-                    .fit()
-                    .centerCrop()
-                    .into(cardImageView);
-        }
-    }
-
-    class ShoutLinerViewHolder extends ViewHolderManager.BaseViewHolder<ShoutAdapterItem> {
-        @Bind(R.id.home_feed_card_image_view)
-        ImageView cardImageView;
-        @Bind(R.id.home_feed_card_title_tv)
-        TextView titleTextView;
-        @Bind(R.id.home_feed_card_user_tv)
-        TextView nameTextView;
-        @Bind(R.id.home_feed_card_price_tv)
-        TextView cardPriceTextView;
-        @Bind(R.id.home_feed_card_chat_iv)
-        View chatIcon;
-        @Bind(R.id.home_feed_card_item_icon_iv)
-        ImageView itemCategoryImageView;
-        @Bind(R.id.home_feed_card_type_label_tv)
-        TextView typeLabelTextView;
-        @Bind(R.id.home_feed_card_country_iv)
-        ImageView countryImageView;
-
-        private CompositeSubscription subscription;
-
-        public ShoutLinerViewHolder(@Nonnull View itemView) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
-        }
-
-        @Override
-        public void bind(@Nonnull ShoutAdapterItem item) {
-            recycle();
-
-            final Shout shout = item.getShout();
-
-            titleTextView.setText(shout.getTitle());
-
-            final String timeAgo = DateTimeUtils.timeAgoFromSecondsToWeek(context, shout.getDatePublishedInMillis());
-            nameTextView.setText(context.getString(R.string.home_user_and_date, shout.getUser().getName(), timeAgo));
-
-            final String price = PriceUtils.formatPrice(shout.getPrice());
-            cardPriceTextView.setText(context.getString(
-                            R.string.price_with_currency, price, shout.getCurrency())
-            );
-
-            typeLabelTextView.setText(shout.getTypeResId());
-
-            picasso.load(Strings.emptyToNull(shout.getThumbnail()))
-                    .placeholder(R.drawable.pattern_placeholder)
-                    .fit()
-                    .centerCrop()
-                    .into(cardImageView);
-
-            picasso.load(item.getCategoryIconUrl())
-                    .fit()
-                    .centerInside()
-                    .into(itemCategoryImageView);
-
-            final Target target = PicassoHelper.getRoundedBitmapTarget(context, countryImageView);
-            cardImageView.setTag(target);
-            picasso.load(item.getCountryResId())
-                    .resizeDimen(R.dimen.home_country_icon, R.dimen.home_country_icon)
-                    .into(target);
-
-            subscription = new CompositeSubscription(
-                    RxView.clicks(chatIcon)
-                            .observeOn(uiScheduler)
-                            .subscribe(new Action1<Void>() {
-                                @Override
-                                public void call(Void aVoid) {
-                                    Toast.makeText(context, "Not implemented yet", Toast.LENGTH_LONG).show();
-                                }
-                            })
-            );
-        }
-
-        @Override
-        public void onViewRecycled() {
-            recycle();
-            super.onViewRecycled();
-        }
-
-        private void recycle() {
-            if (subscription != null) {
-                subscription.unsubscribe();
-                subscription = null;
-            }
-        }
-    }
-
     class ShoutEmptyViewHolder extends ViewHolderManager.BaseViewHolder<HomePresenter.ShoutsEmptyAdapterItem> {
         public ShoutEmptyViewHolder(@Nonnull View itemView) {
             super(itemView);
@@ -331,8 +207,8 @@ public class HomeAdapter extends BaseAdapter {
                 return new ShoutHeaderViewHolder(layoutInflater.inflate(R.layout.home_feed_header_item, parent, false));
             case VIEW_TYPE_SHOUT_ITEM:
                 return isLinearLayoutManager ?
-                        new ShoutLinerViewHolder(layoutInflater.inflate(R.layout.home_feed_item_linear, parent, false)) :
-                        new ShoutGridViewHolder(layoutInflater.inflate(R.layout.home_feed_item_grid, parent, false));
+                        new ShoutLinerViewHolder(layoutInflater.inflate(R.layout.home_feed_item_linear, parent, false), context, picasso) :
+                        new ShoutGridViewHolder(layoutInflater.inflate(R.layout.home_feed_item_grid, parent, false), picasso, context);
             case VIEW_TYPE_EMPTY_SHOUTS_ITEM:
                 return new ShoutEmptyViewHolder(layoutInflater.inflate(R.layout.home_shouts_empty, parent, false));
             default:
@@ -342,6 +218,7 @@ public class HomeAdapter extends BaseAdapter {
 
     @Override
     public void onBindViewHolder(ViewHolderManager.BaseViewHolder holder, int position) {
+        //noinspection unchecked
         holder.bind(items.get(position));
     }
 

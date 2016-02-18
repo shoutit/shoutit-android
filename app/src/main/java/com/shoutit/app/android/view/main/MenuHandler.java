@@ -14,13 +14,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.jakewharton.rxbinding.view.RxView;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.utils.BlurTransform;
 import com.shoutit.app.android.utils.PicassoHelper;
+import com.shoutit.app.android.view.discover.DiscoverFragment;
 import com.shoutit.app.android.view.home.HomeFragment;
 import com.shoutit.app.android.view.location.LocationActivity;
 import com.squareup.picasso.Picasso;
@@ -29,7 +29,6 @@ import com.squareup.picasso.Transformation;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 import com.uservoice.uservoicesdk.UserVoice;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -102,13 +101,17 @@ public class MenuHandler {
     }
 
     public void initMenu(@Nonnull View view) {
-        ButterKnife.bind(this, view);
-        selectableItems = ImmutableList.of(homeItem, discoverItem, browseItem, chatItem, orderItems);
-        setData();
+        initMenu(view, R.id.menu_home);
     }
 
-    public void setData() {
-        selectItem(R.id.menu_home);
+    public void initMenu(@Nonnull View view, @IdRes int id) {
+        ButterKnife.bind(this, view);
+        selectableItems = ImmutableList.of(homeItem, discoverItem, browseItem, chatItem, orderItems);
+        setData(id);
+    }
+
+    public void setData(@IdRes int id) {
+        selectItem(id);
 
         presenter.getNameObservable()
                 .compose(rxActivity.<String>bindToLifecycle())
@@ -199,7 +202,7 @@ public class MenuHandler {
                 userPreferences.logout();
                 rxActivity.finish();
                 rxActivity.startActivity(MainActivity.newIntent(rxActivity)
-                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 );
                 break;
         }
@@ -211,6 +214,14 @@ public class MenuHandler {
         for (CheckedTextView item : selectableItems) {
             item.setChecked(item.getId() == id);
         }
+    }
+
+    @IdRes
+    public int getSelectedItem() {
+        for (CheckedTextView item : selectableItems) {
+            if (item.isChecked()) return item.getId();
+        }
+        return -1;
     }
 
     @OnClick({R.id.menu_avatar_iv, R.id.menu_user_name_tv})
@@ -288,6 +299,7 @@ public class MenuHandler {
             case FRAGMENT_HOME:
                 return HomeFragment.newInstance();
             case FRAGMENT_DISCOVER:
+                return DiscoverFragment.newInstance();
             case FRAGMENT_BROWSE:
             case FRAGMENT_CHATS:
             case FRAGMENT_ORDERS:

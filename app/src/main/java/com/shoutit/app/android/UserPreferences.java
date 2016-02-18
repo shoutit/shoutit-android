@@ -5,15 +5,14 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
 import com.appunite.rx.functions.Functions1;
 import com.appunite.rx.operators.MoreOperators;
 import com.google.common.base.Optional;
 import com.google.gson.Gson;
-import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForApplication;
-
-import java.util.concurrent.Callable;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -21,7 +20,6 @@ import javax.inject.Singleton;
 
 import rx.Observable;
 import rx.functions.Func0;
-import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
 @Singleton
@@ -33,7 +31,7 @@ public class UserPreferences {
     private static final String KEY_LOCATION = "location";
     private static final String IS_GUEST = "is_guest";
     private static final String KEY_LOCATION_TRACKING = "location_tracking";
-    private static final String IS_FIRST_RUN = "is_first_run";
+    private static final String SHOULD_ASK_FOR_INTEREST = "is_first_run";
 
     private final PublishSubject<Object> userRefreshSubject = PublishSubject.create();
     private final PublishSubject<Object> locationRefreshSubject = PublishSubject.create();
@@ -74,8 +72,10 @@ public class UserPreferences {
     @SuppressLint("CommitPrefEdits")
     public void setLoggedIn(@NonNull String authToken, @NonNull String refreshToken) {
         final SharedPreferences.Editor editor = mPreferences.edit();
-        editor.putString(AUTH_TOKEN, authToken);
-        editor.putString(REFRESH_TOKEN, refreshToken);
+        editor
+                .putString(AUTH_TOKEN, authToken)
+                .putString(REFRESH_TOKEN, refreshToken)
+                .putBoolean(IS_GUEST, false);
         editor.commit();
     }
 
@@ -106,13 +106,13 @@ public class UserPreferences {
         return getAuthToken().isPresent();
     }
 
-    public boolean isFirstRun() {
-        return mPreferences.getBoolean(IS_FIRST_RUN, true);
+    public void setShouldAskForInterestTrue() {
+        mPreferences.edit().putBoolean(SHOULD_ASK_FOR_INTEREST, true).apply();
     }
 
-    public boolean isFirstRunAndSetToFalse() {
-        final boolean isFirstRun = mPreferences.getBoolean(IS_FIRST_RUN, true);
-        mPreferences.edit().putBoolean(IS_FIRST_RUN, false).apply();
+    public boolean shouldAskForInterestAndSetToFalse() {
+        final boolean isFirstRun = mPreferences.getBoolean(SHOULD_ASK_FOR_INTEREST, false);
+        mPreferences.edit().putBoolean(SHOULD_ASK_FOR_INTEREST, false).apply();
         return isFirstRun;
     }
 
@@ -180,6 +180,10 @@ public class UserPreferences {
 
     @SuppressLint("CommitPrefEdits")
     public void logout() {
-        mPreferences.edit().clear().commit();
+        final String locationJson = mPreferences.getString(KEY_LOCATION, null);
+        mPreferences.edit()
+                .clear()
+                .putString(KEY_LOCATION, locationJson)
+                .commit();
     }
 }

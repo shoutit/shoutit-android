@@ -19,8 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/home_discover_image_height"
             android:scaleType="centerCrop"
-            android:src="@drawable/pattern_placeholder"
-            tools:src="@android:color/black" />
+            android:src="@drawable/pattern_placeholder"/>
 
         <TextView
             android:id="@+id/home_discover_item_tv"

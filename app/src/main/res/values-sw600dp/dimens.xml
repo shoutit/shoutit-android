@@ -16,4 +16,9 @@
     <dimen name="side_menu_header_height">222dp</dimen>
     <dimen name="side_menu_avatar_size">84dp</dimen>
 
+    <!-- Discover -->
+    <dimen name="discover_image_height">156dp</dimen>
+    <dimen name="discover_grid_spacing">2dp</dimen>
+    <dimen name="discover_header_height">160dp</dimen>
+
 </resources>

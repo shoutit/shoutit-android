@@ -2,10 +2,12 @@ package com.shoutit.app.android.view.shouts;
 
 import android.content.Context;
 import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.utils.ResourcesHelper;
@@ -55,13 +57,13 @@ public class ShoutAdapterItem implements BaseAdapterItem {
     }
 
     @IdRes
-    @Nullable
-    public Integer getCountryResId() {
+    @NonNull
+    public Optional<Integer> getCountryResId() {
         if (shout.getLocation() != null && !TextUtils.isEmpty(shout.getLocation().getCountry())) {
             final String countryCode = shout.getLocation().getCountry().toLowerCase();
-            return ResourcesHelper.getResourceIdForName(countryCode, context);
+            return Optional.of(ResourcesHelper.getResourceIdForName(countryCode, context));
         } else {
-            return null;
+            return Optional.absent();
         }
     }
 

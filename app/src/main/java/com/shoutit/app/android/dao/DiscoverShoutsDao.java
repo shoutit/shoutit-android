@@ -61,7 +61,6 @@ public class DiscoverShoutsDao {
 
                                 final Observable<ShoutsResponse> apiRequest = apiService
                                         .shoutsForDiscoverItem(discoverId, pageNumber, PAGE_SIZE);
-
                                 if (previousResponse == null) {
                                     return apiRequest;
                                 } else {
@@ -74,6 +73,7 @@ public class DiscoverShoutsDao {
                     });
 
             shoutsObservable = loadMoreShoutsSubject.startWith((Object) null)
+                    .mergeWith(Observable.never())
                     .lift(loadMoreOperator)
                     .compose(ResponseOrError.<ShoutsResponse>toResponseOrErrorObservable())
                     .compose(MoreOperators.<ResponseOrError<ShoutsResponse>>cacheWithTimeout(networkScheduler));

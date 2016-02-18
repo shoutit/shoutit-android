@@ -15,7 +15,6 @@ import com.shoutit.app.android.constants.RequestsConstants;
 import com.shoutit.app.android.model.LocationPointer;
 
 import javax.annotation.Nonnull;
-import javax.inject.Singleton;
 
 import rx.Observable;
 import rx.Observer;
@@ -23,7 +22,6 @@ import rx.Scheduler;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
-@Singleton
 public class ShoutsDao {
 
     private final static int PAGE_SIZE = 20;
@@ -106,6 +104,7 @@ public class ShoutsDao {
             homeShoutsObservable = loadMoreHomeShoutsSubject.startWith((Object) null)
                     .lift(loadMoreOperator)
                     .compose(ResponseOrError.<ShoutsResponse>toResponseOrErrorObservable())
+                    .compose(MoreOperators.<ShoutsResponse>repeatOnError(networkScheduler))
                     .compose(MoreOperators.<ResponseOrError<ShoutsResponse>>cacheWithTimeout(networkScheduler));
         }
 

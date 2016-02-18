@@ -66,21 +66,6 @@ public class LoginActivity extends BaseActivity {
         }
     }
 
-    @OnClick(R.id.activity_login_feedback)
-    public void onFeedbackClick() {
-        UserVoice.launchContactUs(this);
-    }
-
-    @OnClick(R.id.activity_login_help)
-    public void onHelpClick() {
-        UserVoice.launchUserVoice(this);
-    }
-
-    @OnClick(R.id.activity_login_about)
-    public void onAboutClick() {
-        startActivity(new Intent(this, AboutActivity.class));
-    }
-
     @Nonnull
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
