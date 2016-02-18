@@ -72,8 +72,10 @@ public class UserPreferences {
     @SuppressLint("CommitPrefEdits")
     public void setLoggedIn(@NonNull String authToken, @NonNull String refreshToken) {
         final SharedPreferences.Editor editor = mPreferences.edit();
-        editor.putString(AUTH_TOKEN, authToken);
-        editor.putString(REFRESH_TOKEN, refreshToken);
+        editor
+                .putString(AUTH_TOKEN, authToken)
+                .putString(REFRESH_TOKEN, refreshToken)
+                .putBoolean(IS_GUEST, false);
         editor.commit();
     }
 
