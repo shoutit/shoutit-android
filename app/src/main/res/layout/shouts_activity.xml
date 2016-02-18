@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:orientation="vertical">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/shouts_toolbar"
+            style="@style/AppTheme.BaseToolbarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize"/>
+
+        <RelativeLayout
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <CheckBox
+                android:id="@+id/shouts_layout_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_margin="4dp"
+                android:button="@drawable/selector_home_layout_switcher"
+                tools:src="@drawable/ic_grid_switch"/>
+
+            <ImageButton
+                android:id="@+id/shouts_filter_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_margin="4dp"
+                android:background="?selectableItemBackground"
+                android:layout_toStartOf="@+id/shouts_layout_btn"
+                android:layout_toLeftOf="@+id/shouts_layout_btn"
+                android:src="@drawable/ic_filter"/>
+
+        </RelativeLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/shouts_activity_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+    <include
+        android:id="@+id/fragment_home_fab"
+        layout="@layout/fab_green" />
+
+    <ProgressBar
+        android:id="@+id/shouts_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"/>
+
+</android.support.design.widget.CoordinatorLayout>

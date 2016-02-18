@@ -23,6 +23,7 @@ import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
 public class ShoutsDao {
+
     private final static int PAGE_SIZE = 20;
 
     @Nonnull
@@ -109,7 +110,7 @@ public class ShoutsDao {
 
         @Nonnull
         public Observable<ResponseOrError<ShoutsResponse>> getShoutsObservable() {
-           return homeShoutsObservable;
+            return homeShoutsObservable;
         }
     }
 }

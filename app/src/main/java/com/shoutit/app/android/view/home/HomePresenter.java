@@ -1,9 +1,7 @@
 package com.shoutit.app.android.view.home;
 
 import android.content.Context;
-import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
@@ -13,7 +11,6 @@ import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.UserPreferences;
@@ -28,8 +25,8 @@ import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.model.LocationPointer;
 import com.shoutit.app.android.utils.MoreFunctions1;
-import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
+import com.shoutit.app.android.view.shouts.DiscoverShoutAdapterItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +63,6 @@ public class HomePresenter {
 
     @Nonnull
     private final ShoutsDao shoutsDao;
-    private final Context context;
     @Nonnull
     private final Scheduler uiScheduler;
 
@@ -74,10 +70,9 @@ public class HomePresenter {
     public HomePresenter(@Nonnull final ShoutsDao shoutsDao,
                          @Nonnull final DiscoversDao discoversDao,
                          @Nonnull final UserPreferences userPreferences,
-                         @ForActivity Context context,
+                         @ForActivity final Context context,
                          @Nonnull @UiScheduler Scheduler uiScheduler) {
         this.shoutsDao = shoutsDao;
-        this.context = context;
         this.uiScheduler = uiScheduler;
 
         final boolean isUserLoggedIn = userPreferences.isUserLoggedIn();
@@ -112,14 +107,14 @@ public class HomePresenter {
 
                         if (shoutsResponse.isData()) {
                             final ShoutsResponse data = shoutsResponse.data();
-                            if (data.getShouts() != null && !data.getShouts().isEmpty()) {
+                            if (!data.getShouts().isEmpty()) {
                                 final Iterable<BaseAdapterItem> items = Iterables
                                         .transform(data.getShouts(), new Function<Shout, BaseAdapterItem>() {
                                             @javax.annotation.Nullable
                                             @Override
                                             public BaseAdapterItem apply(@Nullable Shout input) {
                                                 assert input != null;
-                                                return new ShoutAdapterItem(input);
+                                                return new DiscoverShoutAdapterItem(input, context);
                                             }
                                         });
 
@@ -330,73 +325,6 @@ public class HomePresenter {
 
         public void onShowAllClicked() {
             showAllDiscoversObserver.onNext(null);
-        }
-    }
-
-    public class ShoutAdapterItem implements BaseAdapterItem {
-
-        @Nonnull
-        private final Shout shout;
-
-        public ShoutAdapterItem(@Nonnull Shout shout) {
-            this.shout = shout;
-        }
-
-        @Override
-        public long adapterId() {
-            return BaseAdapterItem.NO_ID;
-        }
-
-        @Override
-        public boolean matches(@Nonnull BaseAdapterItem item) {
-            return item instanceof ShoutAdapterItem &&
-                    shout.getId().equals(((ShoutAdapterItem) item).shout.getId());
-        }
-
-        @Override
-        public boolean same(@Nonnull BaseAdapterItem item) {
-            return this.equals(item);
-        }
-
-        @Nonnull
-        public Shout getShout() {
-            return shout;
-        }
-
-        @Nullable
-        public String getCategoryIconUrl() {
-            if (shout.getCategory() != null) {
-                return Strings.emptyToNull(shout.getCategory().getMainTag().getImage());
-            } else {
-                return null;
-            }
-        }
-
-        @IdRes
-        @Nullable
-        public Integer getCountryResId() {
-            if (shout.getLocation() != null && !TextUtils.isEmpty(shout.getLocation().getCountry())) {
-                final String countryCode = shout.getLocation().getCountry().toLowerCase();
-                return ResourcesHelper.getResourceIdForName(countryCode, context);
-            } else {
-                return null;
-            }
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            final ShoutAdapterItem that = (ShoutAdapterItem) o;
-
-            return shout.equals(that.shout);
-
-        }
-
-        @Override
-        public int hashCode() {
-            return shout.hashCode();
         }
     }
 

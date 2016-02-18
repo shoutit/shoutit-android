@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.UserPreferences;
@@ -20,6 +21,7 @@ import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.model.LocationPointer;
+import com.shoutit.app.android.view.shouts.DiscoverShoutAdapterItem;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -104,7 +106,7 @@ public class HomePresenterTest {
         assert_().that(baseAdapterItems.get(0)).isInstanceOf(HomePresenter.DiscoverHeaderAdapterItem.class);
         assert_().that(baseAdapterItems.get(1)).isInstanceOf(HomePresenter.DiscoverContainerAdapterItem.class);
         assert_().that(baseAdapterItems.get(2)).isInstanceOf(HomePresenter.ShoutHeaderAdapterItem.class);
-        assert_().that(baseAdapterItems.get(3)).isInstanceOf(HomePresenter.ShoutAdapterItem.class);
+        assert_().that(baseAdapterItems.get(3)).isInstanceOf(DiscoverShoutAdapterItem.class);
     }
 
     @Test
@@ -216,6 +218,6 @@ public class HomePresenterTest {
 
     @Nonnull
     private ResponseOrError<ShoutsResponse> shoutsEmptyResponse() {
-        return ResponseOrError.fromData(new ShoutsResponse(1, "2", null, null));
+        return ResponseOrError.fromData(new ShoutsResponse(1, "2", null, ImmutableList.<Shout>of()));
     }
 }

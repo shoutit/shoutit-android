@@ -48,6 +48,8 @@
 
         <activity android:name=".view.discover.DiscoverActivity"/>
 
+        <activity android:name=".view.shouts.DiscoverShoutsActivity"/>
+
         <!-- Facebook -->
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
