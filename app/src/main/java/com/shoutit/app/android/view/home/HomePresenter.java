@@ -25,7 +25,7 @@ import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.model.LocationPointer;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
-import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
+import com.shoutit.app.android.view.shouts.DiscoverShoutAdapterItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -106,7 +106,7 @@ public class HomePresenter {
                                             @Override
                                             public BaseAdapterItem apply(@Nullable Shout input) {
                                                 assert input != null;
-                                                return new ShoutAdapterItem(input, context);
+                                                return new DiscoverShoutAdapterItem(input, context);
                                             }
                                         });
 

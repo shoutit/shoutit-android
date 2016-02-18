@@ -37,7 +37,7 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class ShoutsActivity extends BaseActivity {
+public class DiscoverShoutsActivity extends BaseActivity {
 
     private static final String DISCOVER_ID = "discover_id";
 
@@ -54,10 +54,10 @@ public class ShoutsActivity extends BaseActivity {
     Toolbar mToolbar;
 
     @Inject
-    ShoutsAdapter mShoutsAdapter;
+    DiscoverShoutsAdapter mShoutsAdapter;
 
     @Inject
-    ShoutsPresenter mShoutsPresenter;
+    DiscoverShoutsPresenter mShoutsPresenter;
 
     private HomeGridSpacingItemDecoration gridViewItemDecoration;
     private HomeLinearSpacingItemDecoration linearViewItemDecoration;
@@ -120,9 +120,9 @@ public class ShoutsActivity extends BaseActivity {
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
         final String discoverId = getIntent().getStringExtra(DISCOVER_ID);
-        final ShoutsActivityComponent activityComponent = DaggerShoutsActivityComponent.builder()
+        final DiscoverShoutsActivityComponent activityComponent = DaggerShoutsActivityComponent.builder()
                 .activityModule(new ActivityModule(this))
-                .shoutsActivityModule(new ShoutsActivityModule(discoverId))
+                .shoutsActivityModule(new DiscoverShoutsActivityModule(discoverId))
                 .appComponent(App.getAppComponent(getApplication()))
                 .build();
         activityComponent.inject(this);
@@ -149,6 +149,6 @@ public class ShoutsActivity extends BaseActivity {
 
     @NonNull
     public static Intent newIntent(Context context, String discoverId) {
-        return new Intent(context, ShoutsActivity.class).putExtra(DISCOVER_ID, discoverId);
+        return new Intent(context, DiscoverShoutsActivity.class).putExtra(DISCOVER_ID, discoverId);
     }
 }

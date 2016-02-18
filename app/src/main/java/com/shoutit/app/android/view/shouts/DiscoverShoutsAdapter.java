@@ -11,13 +11,13 @@ import com.squareup.picasso.Picasso;
 
 import javax.inject.Inject;
 
-public class ShoutsAdapter extends BaseAdapter {
+public class DiscoverShoutsAdapter extends BaseAdapter {
 
     private final Picasso mPicasso;
     private boolean isLinearLayoutManager = false;
 
     @Inject
-    public ShoutsAdapter(@ForActivity Context context, Picasso picasso) {
+    public DiscoverShoutsAdapter(@ForActivity Context context, Picasso picasso) {
         super(context);
         mPicasso = picasso;
     }

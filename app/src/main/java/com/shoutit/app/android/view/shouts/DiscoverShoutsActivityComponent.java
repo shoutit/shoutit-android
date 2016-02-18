@@ -12,11 +12,11 @@ import dagger.Component;
         dependencies = AppComponent.class,
         modules = {
                 ActivityModule.class,
-                ShoutsActivityModule.class
+                DiscoverShoutsActivityModule.class
         }
 )
-public interface ShoutsActivityComponent extends BaseActivityComponent {
+public interface DiscoverShoutsActivityComponent extends BaseActivityComponent {
 
-    void inject(ShoutsActivity shoutsActivity);
+    void inject(DiscoverShoutsActivity shoutsActivity);
 
 }

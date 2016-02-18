@@ -17,7 +17,7 @@ import javax.annotation.Nonnull;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class ShoutGridViewHolder extends ViewHolderManager.BaseViewHolder<ShoutAdapterItem> {
+public class ShoutGridViewHolder extends ViewHolderManager.BaseViewHolder<DiscoverShoutAdapterItem> {
 
     @Bind(R.id.home_feed_card_image_view)
     ImageView cardImageView;
@@ -39,7 +39,7 @@ public class ShoutGridViewHolder extends ViewHolderManager.BaseViewHolder<ShoutA
     }
 
     @Override
-    public void bind(@Nonnull ShoutAdapterItem item) {
+    public void bind(@Nonnull DiscoverShoutAdapterItem item) {
         final Shout shout = item.getShout();
         titleTextView.setText(shout.getTitle());
         nameTextView.setText(shout.getUser().getName());

@@ -1,6 +1,7 @@
 package com.shoutit.app.android.api;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
@@ -50,8 +51,8 @@ public interface ApiService {
 
     @GET("shouts")
     Observable<ShoutsResponse> shoutsForDiscoverItem(@Query("discover") @NonNull String discoverId,
-                                                     @Query("page") @NonNull Integer page,
-                                                     @Query("page_size") @NonNull Integer pageSize);
+                                                     @Query("page") @Nullable Integer page,
+                                                     @Query("page_size") @Nullable Integer pageSize);
 
 
     /** OAuth **/

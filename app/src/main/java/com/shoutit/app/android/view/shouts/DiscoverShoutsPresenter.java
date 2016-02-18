@@ -15,6 +15,7 @@ import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
+import com.shoutit.app.android.utils.rx.RxMoreObservers;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Func1;
 
-public class ShoutsPresenter {
+public class DiscoverShoutsPresenter {
 
     private final Observable<List<BaseAdapterItem>> mListObservable;
     private final Observable<Throwable> mThrowableObservable;
@@ -34,11 +35,11 @@ public class ShoutsPresenter {
     private final DiscoverShoutsDao mDiscoverShoutsDao;
 
     @Inject
-    public ShoutsPresenter(@NetworkScheduler Scheduler networkScheduler,
-                           @UiScheduler Scheduler uiScheduler,
-                           DiscoverShoutsDao discoverShoutsDao,
-                           String discoverId,
-                           @ForActivity final Context context) {
+    public DiscoverShoutsPresenter(@NetworkScheduler Scheduler networkScheduler,
+                                   @UiScheduler Scheduler uiScheduler,
+                                   DiscoverShoutsDao discoverShoutsDao,
+                                   String discoverId,
+                                   @ForActivity final Context context) {
         mDiscoverShoutsDao = discoverShoutsDao;
         final Observable<ResponseOrError<ShoutsResponse>> observable = discoverShoutsDao.getShoutsObservable(discoverId)
                 .subscribeOn(networkScheduler)
@@ -52,7 +53,7 @@ public class ShoutsPresenter {
                             @Nullable
                             @Override
                             public BaseAdapterItem apply(Shout input) {
-                                return new ShoutAdapterItem(input, context);
+                                return new DiscoverShoutAdapterItem(input, context);
                             }
                         }));
                     }
@@ -79,6 +80,6 @@ public class ShoutsPresenter {
 
     @NonNull
     public Observer<Object> getLoadMoreObserver() {
-        return mDiscoverShoutsDao.getLoadMoreShoutsSubject();
+        return RxMoreObservers.ignoreCompleted(mDiscoverShoutsDao.getLoadMoreShoutsSubject());
     }
 }

@@ -4,11 +4,11 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class ShoutsActivityModule {
+public class DiscoverShoutsActivityModule {
 
     private final String discoveryId;
 
-    public ShoutsActivityModule(String discoveryId) {
+    public DiscoverShoutsActivityModule(String discoveryId) {
         this.discoveryId = discoveryId;
     }
 

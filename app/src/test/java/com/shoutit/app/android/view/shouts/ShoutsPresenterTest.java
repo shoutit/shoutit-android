@@ -16,10 +16,6 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 
-import rx.Observable;
-import rx.Subscriber;
-import rx.functions.Action0;
-import rx.functions.Action1;
 import rx.observers.TestSubscriber;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
@@ -30,7 +26,7 @@ import static org.mockito.Mockito.when;
 
 public class ShoutsPresenterTest {
 
-    private ShoutsPresenter mShoutsPresenter;
+    private DiscoverShoutsPresenter mShoutsPresenter;
 
     @Mock
     DiscoverShoutsDao mDiscoverShoutsDao;
@@ -47,7 +43,7 @@ public class ShoutsPresenterTest {
         mBehaviorSubject = BehaviorSubject.create(ResponseOrError.fromData(new ShoutsResponse(0, "", "", ImmutableList.of(new Shout("", "", "", "", new UserLocation(0, 0, "", "", "", "", ""), "", "", 0, 0, "", "", "", null, null, null, 0)))));
         when(mDiscoverShoutsDao.getShoutsObservable(anyString())).thenReturn(mBehaviorSubject);
 
-        mShoutsPresenter = new ShoutsPresenter(Schedulers.immediate(), Schedulers.immediate(), mDiscoverShoutsDao, "", mContext);
+        mShoutsPresenter = new DiscoverShoutsPresenter(Schedulers.immediate(), Schedulers.immediate(), mDiscoverShoutsDao, "", mContext);
     }
 
     @Test
@@ -65,7 +61,7 @@ public class ShoutsPresenterTest {
         TestSubscriber<Boolean> testSubscriber = new TestSubscriber<>();
         mShoutsPresenter.getProgressVisible().subscribe(testSubscriber);
 
-        final TestSubscriber<List<ShoutAdapterItem>> subscriber = new TestSubscriber<>();
+        final TestSubscriber<List<DiscoverShoutAdapterItem>> subscriber = new TestSubscriber<>();
         mShoutsPresenter.getSuccessObservable().subscribe(subscriber);
 
         assert_().that(testSubscriber.getOnNextEvents()).hasSize(2);
@@ -75,7 +71,7 @@ public class ShoutsPresenterTest {
 
     @Test
     public void testSuccess() {
-        final TestSubscriber<List<ShoutAdapterItem>> subscriber = new TestSubscriber<>();
+        final TestSubscriber<List<DiscoverShoutAdapterItem>> subscriber = new TestSubscriber<>();
         mShoutsPresenter.getSuccessObservable().subscribe(subscriber);
 
         subscriber.assertNoErrors();

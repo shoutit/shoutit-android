@@ -14,14 +14,14 @@ import com.shoutit.app.android.utils.ResourcesHelper;
 
 import javax.annotation.Nonnull;
 
-public class ShoutAdapterItem implements BaseAdapterItem {
+public class DiscoverShoutAdapterItem implements BaseAdapterItem {
 
     @Nonnull
     private final Shout shout;
     @Nonnull
     private final Context context;
 
-    public ShoutAdapterItem(@Nonnull Shout shout, @Nonnull Context context) {
+    public DiscoverShoutAdapterItem(@Nonnull Shout shout, @Nonnull Context context) {
         this.shout = shout;
         this.context = context;
     }
@@ -33,8 +33,8 @@ public class ShoutAdapterItem implements BaseAdapterItem {
 
     @Override
     public boolean matches(@Nonnull BaseAdapterItem item) {
-        return item instanceof ShoutAdapterItem &&
-                shout.getId().equals(((ShoutAdapterItem) item).shout.getId());
+        return item instanceof DiscoverShoutAdapterItem &&
+                shout.getId().equals(((DiscoverShoutAdapterItem) item).shout.getId());
     }
 
     @Override
@@ -72,7 +72,7 @@ public class ShoutAdapterItem implements BaseAdapterItem {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        final ShoutAdapterItem that = (ShoutAdapterItem) o;
+        final DiscoverShoutAdapterItem that = (DiscoverShoutAdapterItem) o;
 
         return shout.equals(that.shout);
 

@@ -19,7 +19,7 @@ import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.view.main.MainActivityComponent;
 import com.shoutit.app.android.view.main.OnNewDiscoverSelectedListener;
-import com.shoutit.app.android.view.shouts.ShoutsActivity;
+import com.shoutit.app.android.view.shouts.DiscoverShoutsActivity;
 
 import java.util.List;
 
@@ -99,7 +99,7 @@ public class DiscoverFragment extends BaseFragment {
                 .subscribe(new Action1<String>() {
                     @Override
                     public void call(String discoverId) {
-                        startActivity(ShoutsActivity.newIntent(getActivity(), discoverId));
+                        startActivity(DiscoverShoutsActivity.newIntent(getActivity(), discoverId));
                     }
                 });
     }

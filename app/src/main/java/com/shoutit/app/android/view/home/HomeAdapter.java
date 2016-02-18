@@ -18,7 +18,7 @@ import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
-import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
+import com.shoutit.app.android.view.shouts.DiscoverShoutAdapterItem;
 import com.shoutit.app.android.view.shouts.ShoutGridViewHolder;
 import com.shoutit.app.android.view.shouts.ShoutLinerViewHolder;
 import com.squareup.picasso.Picasso;
@@ -231,7 +231,7 @@ public class HomeAdapter extends BaseAdapter {
             return VIEW_TYPE_DISCOVER_ITEMS_CONTAINER;
         } else if (item instanceof HomePresenter.ShoutHeaderAdapterItem) {
             return VIEW_TYPE_SHOUT_HEADER;
-        } else if (item instanceof ShoutAdapterItem) {
+        } else if (item instanceof DiscoverShoutAdapterItem) {
             return VIEW_TYPE_SHOUT_ITEM;
         } else if (item instanceof HomePresenter.ShoutsEmptyAdapterItem) {
             return VIEW_TYPE_EMPTY_SHOUTS_ITEM;

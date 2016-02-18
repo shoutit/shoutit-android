@@ -24,7 +24,7 @@ import butterknife.ButterKnife;
 import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
 
-public class ShoutLinerViewHolder extends ViewHolderManager.BaseViewHolder<ShoutAdapterItem> {
+public class ShoutLinerViewHolder extends ViewHolderManager.BaseViewHolder<DiscoverShoutAdapterItem> {
     @Bind(R.id.home_feed_card_image_view)
     ImageView cardImageView;
     @Bind(R.id.home_feed_card_title_tv)
@@ -54,7 +54,7 @@ public class ShoutLinerViewHolder extends ViewHolderManager.BaseViewHolder<Shout
     }
 
     @Override
-    public void bind(@Nonnull ShoutAdapterItem item) {
+    public void bind(@Nonnull DiscoverShoutAdapterItem item) {
         recycle();
 
         final Shout shout = item.getShout();

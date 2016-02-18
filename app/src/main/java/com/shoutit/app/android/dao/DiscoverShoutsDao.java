@@ -73,7 +73,6 @@ public class DiscoverShoutsDao {
                     });
 
             shoutsObservable = loadMoreShoutsSubject.startWith((Object) null)
-                    .mergeWith(Observable.never())
                     .lift(loadMoreOperator)
                     .compose(ResponseOrError.<ShoutsResponse>toResponseOrErrorObservable())
                     .compose(MoreOperators.<ResponseOrError<ShoutsResponse>>cacheWithTimeout(networkScheduler));
