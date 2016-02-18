@@ -41,6 +41,7 @@
                 android:layout_margin="4dp"
                 android:background="?selectableItemBackground"
                 android:layout_toStartOf="@+id/shouts_layout_btn"
+                android:layout_toLeftOf="@+id/shouts_layout_btn"
                 android:src="@drawable/ic_filter"/>
 
         </RelativeLayout>
