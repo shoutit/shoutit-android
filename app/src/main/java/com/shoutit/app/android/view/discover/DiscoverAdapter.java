@@ -55,8 +55,8 @@ public class DiscoverAdapter extends BaseAdapter {
         @Override
         public void bind(@Nonnull DiscoverPresenter.HeaderAdapterItem item) {
             picasso.load(Strings.emptyToNull(item.getImage()))
-                    .placeholder(R.drawable.pattern_bg)
-                    .error(R.drawable.pattern_bg)
+                    .placeholder(R.drawable.discover_header_bg)
+                    .error(R.drawable.discover_header_bg)
                     .fit()
                     .centerCrop()
                     .into(cardImageView);

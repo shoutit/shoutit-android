@@ -4,7 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
@@ -13,6 +15,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
@@ -30,6 +33,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import rx.Observable;
 
 public class MainActivity extends BaseActivity implements OnMenuItemSelectedListener, OnNewDiscoverSelectedListener {
 
@@ -50,6 +54,14 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
     UserPreferences mUserPreferences;
 
     private ActionBarDrawerToggle drawerToggle;
+    private boolean doubleBackToExitPressedOnce;
+    private final Handler backButtonHandler = new Handler();
+    private final Runnable backButtonRunnable = new Runnable() {
+        @Override
+        public void run() {
+            doubleBackToExitPressedOnce = false;
+        }
+    };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -172,5 +184,24 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(MENU_SELECT_ITEM, menuHandler.getSelectedItem());
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        backButtonHandler.removeCallbacks(backButtonRunnable);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce || getSupportFragmentManager().getBackStackEntryCount() != 0) {
+            super.onBackPressed();
+            return;
+        }
+
+        doubleBackToExitPressedOnce = true;
+        Snackbar.make(findViewById(android.R.id.content), R.string.exit_text, Snackbar.LENGTH_SHORT).show();
+
+        backButtonHandler.postDelayed(backButtonRunnable, 2000);
     }
 }

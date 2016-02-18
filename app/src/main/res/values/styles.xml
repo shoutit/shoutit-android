@@ -89,8 +89,4 @@
 
     <style name="AppTheme.WithDrawer"/>
 
-    <style name="GrayButton" parent="AppTheme">
-        <item name="colorButtonNormal">@color/discover_button</item>
-    </style>
-
 </resources>
