@@ -8,6 +8,7 @@
     <string name="terms_of_service">Terms of Service</string>
     <string name="google_api_key" translatable="false">AIzaSyBWHadI_MPYQgDLqI4RXhymEs42YEtgTEE</string>
     <string name="facebook_app_id">353625811317277</string>
+    <string name="exit_text">Press BACK again to exit</string>
 
     <!-- Errors -->
     <string name="error_default">Ooops, something went wrong</string>

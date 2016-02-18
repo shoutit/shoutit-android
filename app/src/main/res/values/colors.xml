@@ -44,5 +44,6 @@
 
     <!-- Discover -->
     <color name="discover_button">#1f000000</color>
+    <color name="discover_button_pressed">#5e000000</color>
 
 </resources>

@@ -5,5 +5,9 @@
     android:textSize="14sp"
     android:fontFamily="sans-serif-medium"
     android:textColor="@color/black_54"
-    android:theme="@style/GrayButton"
+    android:layout_marginLeft="2dp"
+    android:layout_marginRight="2dp"
+    android:layout_marginTop="6dp"
+    android:layout_marginBottom="6dp"
+    android:background="@drawable/selector_discover_button"
     android:text="@string/discover_see_all_button"/>
