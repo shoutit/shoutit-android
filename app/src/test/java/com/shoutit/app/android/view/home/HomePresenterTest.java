@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.UserPreferences;
@@ -216,6 +217,6 @@ public class HomePresenterTest {
 
     @Nonnull
     private ResponseOrError<ShoutsResponse> shoutsEmptyResponse() {
-        return ResponseOrError.fromData(new ShoutsResponse(1, "2", null, null));
+        return ResponseOrError.fromData(new ShoutsResponse(1, "2", null, ImmutableList.<Shout>of()));
     }
 }

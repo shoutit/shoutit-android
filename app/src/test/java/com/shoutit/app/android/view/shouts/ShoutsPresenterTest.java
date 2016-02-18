@@ -3,6 +3,7 @@ package com.shoutit.app.android.view.shouts;
 import android.content.Context;
 
 import com.appunite.rx.ResponseOrError;
+import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
@@ -61,7 +62,7 @@ public class ShoutsPresenterTest {
         TestSubscriber<Boolean> testSubscriber = new TestSubscriber<>();
         mShoutsPresenter.getProgressVisible().subscribe(testSubscriber);
 
-        final TestSubscriber<List<DiscoverShoutAdapterItem>> subscriber = new TestSubscriber<>();
+        final TestSubscriber<List<BaseAdapterItem>> subscriber = new TestSubscriber<>();
         mShoutsPresenter.getSuccessObservable().subscribe(subscriber);
 
         assert_().that(testSubscriber.getOnNextEvents()).hasSize(2);
@@ -71,7 +72,7 @@ public class ShoutsPresenterTest {
 
     @Test
     public void testSuccess() {
-        final TestSubscriber<List<DiscoverShoutAdapterItem>> subscriber = new TestSubscriber<>();
+        final TestSubscriber<List<BaseAdapterItem>> subscriber = new TestSubscriber<>();
         mShoutsPresenter.getSuccessObservable().subscribe(subscriber);
 
         subscriber.assertNoErrors();
