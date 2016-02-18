@@ -6,8 +6,8 @@
     <string name="shout_type_offer">Offer</string>
     <string name="shout_type_request">Request</string>
     <string name="terms_of_service">Terms of Service</string>
-    <string name="facebook_app_id">1148740908499849</string>
     <string name="google_api_key" translatable="false">AIzaSyBWHadI_MPYQgDLqI4RXhymEs42YEtgTEE</string>
+    <string name="facebook_app_id">353625811317277</string>
 
     <!-- Errors -->
     <string name="error_default">Ooops, something went wrong</string>
@@ -76,6 +76,7 @@
     <string name="login_intro_help">Help</string>
     <string name="login_intro_about">About</string>
     <string name="login_sign_up_new">New to Shoutit?</string>
+    <string name="login_intro_fail">Failed to login</string>
 
     <!-- About -->
     <string name="pref_key_terms_of_service" translatable="false">pref_key_terms_of_service</string>

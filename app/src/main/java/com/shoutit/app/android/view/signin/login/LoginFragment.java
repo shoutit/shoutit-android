@@ -1,10 +1,12 @@
 package com.shoutit.app.android.view.signin.login;
 
+import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
+import android.text.method.PasswordTransformationMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,9 +25,11 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.Actions1;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.view.about.AboutActivity;
 import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.signin.LoginActivityComponent;
 import com.shoutit.app.android.view.signin.register.RegisterFragment;
+import com.uservoice.uservoicesdk.UserVoice;
 
 import java.util.concurrent.TimeUnit;
 
@@ -34,6 +38,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
+import butterknife.OnClick;
 import okhttp3.ResponseBody;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -81,6 +86,9 @@ public class LoginFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        passwordEdittext.setTransformationMethod(new PasswordTransformationMethod());
+
         signUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -120,9 +128,8 @@ public class LoginFragment extends BaseFragment {
                 .subscribe(new Action1<SignResponse>() {
                     @Override
                     public void call(SignResponse signResponse) {
-                        final FragmentActivity activity = getActivity();
-                        ActivityCompat.finishAffinity(activity);
-                        startActivity(MainActivity.newIntent(activity));
+                        ActivityCompat.finishAffinity(getActivity());
+                        startActivity(MainActivity.newIntent(getActivity()));
                     }
                 });
 
@@ -137,7 +144,7 @@ public class LoginFragment extends BaseFragment {
                         ColoredSnackBar.contentView(getActivity()), R.string.login_error_empty_email));
 
         RxTextView.textChangeEvents(emailEdittext)
-                .debounce(500, TimeUnit.MILLISECONDS) 
+                .debounce(500, TimeUnit.MILLISECONDS)
                 .map(new Func1<TextViewTextChangeEvent, String>() {
                     @Override
                     public String call(TextViewTextChangeEvent textViewTextChangeEvent) {
@@ -179,5 +186,20 @@ public class LoginFragment extends BaseFragment {
                 .fragmentModule(fragmentModule)
                 .build()
                 .inject(this);
+    }
+
+    @OnClick(R.id.activity_login_feedback)
+    public void onFeedbackClick() {
+        UserVoice.launchContactUs(getActivity());
+    }
+
+    @OnClick(R.id.activity_login_help)
+    public void onHelpClick() {
+        UserVoice.launchUserVoice(getActivity());
+    }
+
+    @OnClick(R.id.activity_login_about)
+    public void onAboutClick() {
+        startActivity(new Intent(getActivity(), AboutActivity.class));
     }
 }

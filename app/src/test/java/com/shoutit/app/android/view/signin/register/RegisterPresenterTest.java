@@ -18,6 +18,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import rx.Observable;
 import rx.observers.TestObserver;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
@@ -70,8 +71,11 @@ public class RegisterPresenterTest {
         when(mApiService.signup(any(EmailSignupRequest.class))).thenReturn(mResponseSubject);
         when(locationManager.updateUserLocationObservable()).thenReturn(mLocationObservable);
 
-        mRegisterPresenter = new RegisterPresenter(mApiService, mContext, coarseLocationProvider,
-                mUserPreferences, Schedulers.immediate(), Schedulers.immediate(), locationManager);
+        when(mUserPreferences.getLocationObservable())
+                .thenReturn(Observable.just(location));
+
+        mRegisterPresenter = new RegisterPresenter(mApiService,
+                mUserPreferences, Schedulers.immediate(), Schedulers.immediate());
     }
 
     @Test

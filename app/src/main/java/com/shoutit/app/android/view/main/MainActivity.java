@@ -33,6 +33,8 @@ import butterknife.ButterKnife;
 
 public class MainActivity extends BaseActivity implements OnMenuItemSelectedListener, OnNewDiscoverSelectedListener {
 
+    private static final String MENU_SELECT_ITEM = "args_menu_item";
+
     public static Intent newIntent(@Nonnull Context context) {
         return new Intent(context, MainActivity.class);
     }
@@ -61,20 +63,25 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
             return;
         }
 
-        if (mUserPreferences.isFirstRunAndSetToFalse()) {
+        if (mUserPreferences.shouldAskForInterestAndSetToFalse()) {
+            finish();
             startActivity(PostLoginInterestActivity.newIntent(this));
             return;
         }
 
         setUpActionBar();
         setUpDrawer();
-        menuHandler.initMenu(drawerLayout);
+
 
         if (savedInstanceState == null) {
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.activity_main_fragment_container, HomeFragment.newInstance())
                     .commit();
+            menuHandler.initMenu(drawerLayout);
+        } else {
+            final int selectedItem = savedInstanceState.getInt(MENU_SELECT_ITEM);
+            menuHandler.initMenu(drawerLayout, selectedItem);
         }
     }
 
@@ -160,5 +167,10 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
                 .addToBackStack(null)
                 .add(R.id.activity_main_fragment_container, DiscoverFragment.newInstance(discoverId))
                 .commit();
+    }
+
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(MENU_SELECT_ITEM, menuHandler.getSelectedItem());
     }
 }

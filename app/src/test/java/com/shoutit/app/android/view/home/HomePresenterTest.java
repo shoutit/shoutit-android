@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.Category;
@@ -78,7 +79,7 @@ public class HomePresenterTest {
         when(userPreferences.isUserLoggedIn()).thenReturn(true);
         when(userPreferences.getLocationObservable()).thenReturn(Observable.just(new UserLocation(0, 0, "zz", null, null, null, null)));
 
-        presenter = new HomePresenter(shoutsDao, discoversDao, userPreferences, scheduler, context);
+        presenter = new HomePresenter(shoutsDao, discoversDao, userPreferences, context);
     }
 
     @Test
@@ -164,6 +165,26 @@ public class HomePresenterTest {
         assert_().that(baseAdapterItems.get(1)).isInstanceOf(HomePresenter.DiscoverContainerAdapterItem.class);
         assert_().that(baseAdapterItems.get(2)).isInstanceOf(HomePresenter.ShoutHeaderAdapterItem.class);
         assert_().that(baseAdapterItems.get(3)).isInstanceOf(HomePresenter.ShoutsEmptyAdapterItem.class);
+    }
+
+    @Test
+    public void testAfterClick_GridLayoutManagerUsed() throws Exception {
+        final TestSubscriber<Boolean> linearSubscriber = new TestSubscriber<>();
+        final TestSubscriber<Boolean> gridSubscriber = new TestSubscriber<>();
+        final TestSubscriber<List<BaseAdapterItem>> subscriber = new TestSubscriber<>();
+
+        presenter.getAllAdapterItemsObservable().subscribe(subscriber);
+        initData();
+        final List<BaseAdapterItem> last = Iterables.getLast(subscriber.getOnNextEvents());
+        final HomePresenter.ShoutHeaderAdapterItem baseAdapterItem = (HomePresenter.ShoutHeaderAdapterItem) last.get(last.size() - 2);
+
+        presenter.getLinearLayoutManagerObservable().subscribe(linearSubscriber);
+        presenter.getGridLayoutManagerObservable().subscribe(gridSubscriber);
+
+        baseAdapterItem.getLayoutManagerSwitchObserver().onNext(new Object());
+
+        linearSubscriber.assertValueCount(0);
+        gridSubscriber.assertValueCount(1);
     }
 
     private void initData() {

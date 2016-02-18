@@ -11,11 +11,14 @@ import android.support.v7.widget.Toolbar;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.widget.RxToolbarMore;
 import com.shoutit.app.android.App;
-import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.dagger.BaseActivityComponentProvider;
+import com.shoutit.app.android.retainfragment.RetainFragmentHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.view.main.MainActivity;
+import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
 import java.util.List;
 
@@ -27,7 +30,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import rx.functions.Action1;
 
-public class PostLoginInterestActivity extends BaseActivity {
+public class PostLoginInterestActivity extends RxAppCompatActivity implements BaseActivityComponentProvider {
 
     @Bind(R.id.post_login_list)
     RecyclerView mRecyclerView;
@@ -49,6 +52,7 @@ public class PostLoginInterestActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        createActivityComponent(savedInstanceState);
         setContentView(R.layout.post_login_activity);
 
         ButterKnife.bind(this);
@@ -92,18 +96,46 @@ public class PostLoginInterestActivity extends BaseActivity {
             @Override
             public void call(Object view) {
                 finish();
+                startActivity(MainActivity.newIntent(PostLoginInterestActivity.this));
             }
         };
+    }
+
+    @NonNull
+    private SelectionHelper<String> getOrCreateSelectionHelper(Bundle savedInstanceState) {
+        SelectionHelper<String> selectionHelper;
+
+        if (savedInstanceState == null) {
+            // first run, create and set observable
+            selectionHelper = new SelectionHelper<>();
+        } else {
+            // following runs, get observable from retained fragment
+            selectionHelper = RetainFragmentHelper.getObjectOrNull(this, getSupportFragmentManager());
+            // fragment may be removed during memory clean up, if so, create and set observable again
+            if (selectionHelper == null) {
+                selectionHelper = new SelectionHelper<>();
+            }
+        }
+
+        return selectionHelper;
     }
 
     @Nonnull
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
+        final SelectionHelper<String> selectionHelper = getOrCreateSelectionHelper(savedInstanceState);
         final PostLoginActivityComponent postLoginActivityComponent = DaggerPostLoginActivityComponent.builder()
                 .appComponent(App.getAppComponent(getApplication()))
                 .activityModule(new ActivityModule(this))
+                .postLoginActivityModule(new PostLoginActivityModule(selectionHelper))
                 .build();
         postLoginActivityComponent.inject(this);
         return postLoginActivityComponent;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        RetainFragmentHelper.setObject(this, getSupportFragmentManager(), mPostLoginPresenter.getStringSelectionHelper());
+        super.onSaveInstanceState(outState);
     }
 }

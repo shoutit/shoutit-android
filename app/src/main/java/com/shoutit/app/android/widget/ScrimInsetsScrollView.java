@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.shoutit.app.android.views;
+package com.shoutit.app.android.widget;
 
 import android.content.Context;
 import android.content.res.TypedArray;

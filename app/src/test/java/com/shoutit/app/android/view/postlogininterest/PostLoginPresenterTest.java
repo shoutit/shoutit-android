@@ -50,7 +50,7 @@ public class PostLoginPresenterTest extends TestCase {
         when(mApiService.batchListen(any(TagsRequest.class))).thenReturn(mPostSubject);
 
         mCategoriesDao = new CategoriesDao(mApiService, Schedulers.immediate());
-        mPostLoginPresenter = new PostLoginPresenter(mCategoriesDao, mApiService, Schedulers.immediate(), Schedulers.immediate());
+        mPostLoginPresenter = new PostLoginPresenter(mCategoriesDao, mApiService, Schedulers.immediate(), Schedulers.immediate(), new SelectionHelper<String>());
     }
 
     @Test

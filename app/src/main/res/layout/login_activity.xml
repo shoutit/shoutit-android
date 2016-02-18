@@ -35,8 +35,4 @@
         android:layout_above="@+id/login_bottom_actions_container"
         android:layout_below="@+id/login_toolbar"/>
 
-    <include
-        android:id="@+id/login_bottom_actions_container"
-        layout="@layout/login_bottom_actions"/>
-
 </RelativeLayout>
