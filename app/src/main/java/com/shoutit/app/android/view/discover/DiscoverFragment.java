@@ -1,5 +1,6 @@
 package com.shoutit.app.android.view.discover;
 
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -116,6 +117,30 @@ public class DiscoverFragment extends BaseFragment {
                 } else {
                     return 2;
                 }
+            }
+        });
+
+        final int spacing = getResources().getDimensionPixelSize(R.dimen.discover_grid_spacing);
+        recyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+                int position = parent.getChildAdapterPosition(view);
+
+                if (position == RecyclerView.NO_POSITION) {
+                    return;
+                }
+
+                final int viewType = parent.getAdapter().getItemViewType(position);
+                if (viewType != DiscoverAdapter.VIEW_TYPE_SHOUT && viewType != DiscoverAdapter.VIEW_TYPE_DISCOVER) {
+                    return;
+                }
+
+                if (position % 2 == 0) {
+                    outRect.left = spacing;
+                } else {
+                    outRect.right = spacing;
+                }
+                outRect.bottom = spacing;
             }
         });
         recyclerView.setLayoutManager(layoutManager);

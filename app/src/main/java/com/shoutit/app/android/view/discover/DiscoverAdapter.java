@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
+import com.google.common.base.Strings;
 import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.DiscoverChild;
@@ -53,12 +54,12 @@ public class DiscoverAdapter extends BaseAdapter {
 
         @Override
         public void bind(@Nonnull DiscoverPresenter.HeaderAdapterItem item) {
-     /*       picasso.load(Strings.emptyToNull(item.getImage()))
+            picasso.load(Strings.emptyToNull(item.getImage()))
                     .placeholder(R.drawable.pattern_bg)
                     .error(R.drawable.pattern_bg)
                     .fit()
                     .centerCrop()
-                    .into(cardImageView);*/
+                    .into(cardImageView);
 
             titleTextView.setText(item.getTitle());
         }
@@ -83,12 +84,12 @@ public class DiscoverAdapter extends BaseAdapter {
             this.item = item;
             final DiscoverChild discover =  item.getDiscoverChild();
 
-      /*      picasso.load(Strings.emptyToNull(discover.getImage()))
+            picasso.load(Strings.emptyToNull(discover.getImage()))
                     .placeholder(R.drawable.pattern_placeholder)
                     .error(R.drawable.pattern_placeholder)
                     .fit()
                     .centerCrop()
-                    .into(imageView);*/
+                    .into(imageView);
 
             titleTextView.setText(discover.getTitle());
         }
@@ -131,12 +132,12 @@ public class DiscoverAdapter extends BaseAdapter {
         public void bind(@Nonnull DiscoverPresenter.ShoutAdapterItem item) {
             final Shout shout = item.getShout();
 
-   /*         picasso.load(Strings.emptyToNull(shout.getThumbnail()))
+            picasso.load(Strings.emptyToNull(shout.getThumbnail()))
                     .placeholder(R.drawable.pattern_placeholder)
                     .error(R.drawable.pattern_placeholder)
                     .fit()
                     .centerCrop()
-                    .into(cardImageView);*/
+                    .into(cardImageView);
 
             titleTextView.setText(shout.getTitle());
             shoutNameTextView.setText(shout.getText());

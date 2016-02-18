@@ -2,9 +2,11 @@ package com.shoutit.app.android.dao;
 
 import android.support.annotation.NonNull;
 
+import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.util.LogTransformer;
 import com.appunite.rx.dagger.NetworkScheduler;
+import com.appunite.rx.functions.Functions1;
 import com.appunite.rx.operators.MoreOperators;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -15,6 +17,8 @@ import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.model.LocationPointer;
+
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.inject.Singleton;
@@ -67,11 +71,16 @@ public class DiscoversDao {
 
         public DiscoverDao(@Nonnull LocationPointer locationPointer) {
 
+            final Observable<Object> refreshWithCache = Observable
+                    .interval(5, TimeUnit.MINUTES, networkScheduler)
+                    .map(Functions1.toObject());
+
             discoverObservable = apiService
                     .discovers(locationPointer.getCountryCode(), null, null)
-                    .compose(LogTransformer.<DiscoverResponse>transformer("dupa", "dupa1"))
                     .subscribeOn(networkScheduler)
+                    .compose(MoreOperators.<DiscoverResponse>refresh(refreshWithCache))
                     .compose(ResponseOrError.<DiscoverResponse>toResponseOrErrorObservable())
+                    .compose(MoreOperators.<DiscoverResponse>repeatOnError(networkScheduler))
                     .compose(MoreOperators.<ResponseOrError<DiscoverResponse>>cacheWithTimeout(networkScheduler));
         }
 
@@ -87,9 +96,16 @@ public class DiscoversDao {
         private final Observable<ResponseOrError<DiscoverItemDetailsResponse>> discoverItemObservable;
 
         public DiscoverItemDao(@Nonnull String id) {
+
+            final Observable<Object> refreshWithCache = Observable
+                    .interval(5, TimeUnit.MINUTES, networkScheduler)
+                    .map(Functions1.toObject());
+
             discoverItemObservable = apiService.discoverItem(id)
                     .subscribeOn(networkScheduler)
+                    .compose(MoreOperators.<DiscoverItemDetailsResponse>refresh(refreshWithCache))
                     .compose(ResponseOrError.<DiscoverItemDetailsResponse>toResponseOrErrorObservable())
+                    .compose(MoreOperators.<DiscoverItemDetailsResponse>repeatOnError(networkScheduler))
                     .compose(MoreOperators.<ResponseOrError<DiscoverItemDetailsResponse>>cacheWithTimeout(networkScheduler));
         }
 

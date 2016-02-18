@@ -3,6 +3,7 @@ package com.shoutit.app.android.view.discover;
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.appunite.rx.android.util.LogTransformer;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
@@ -25,6 +26,7 @@ import com.shoutit.app.android.view.home.HomePresenter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -238,6 +240,7 @@ public class DiscoverPresenter {
                         ResponseOrError.transform(shoutsItemsObservable)
                 ))
                 .filter(Functions1.isNotNull())
+                .throttleFirst(5, TimeUnit.SECONDS)
                 .observeOn(uiScheduler);
 
         progressObservable = Observable.merge(
