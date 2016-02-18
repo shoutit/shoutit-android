@@ -18,8 +18,6 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.ColoredSnackBar;
-import com.shoutit.app.android.view.main.MainActivityComponent;
-import com.shoutit.app.android.view.main.OnNewDiscoverSelectedListener;
 
 import java.util.List;
 
@@ -157,7 +155,7 @@ public class DiscoverFragment extends BaseFragment {
         }
 
         DaggerDiscoverFragmentComponent.builder()
-                .mainActivityComponent((MainActivityComponent) baseActivityComponent)
+                .baseActivityComponent(baseActivityComponent)
                 .fragmentModule(fragmentModule)
                 .discoverFragmentModule(new DiscoverFragmentModule(this, discoverId))
                 .build()

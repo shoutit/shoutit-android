@@ -16,11 +16,13 @@ import rx.Scheduler;
 @Module
 public class DiscoverFragmentModule extends FragmentModule {
 
+    private final DiscoverFragment discoverFragment;
     @Nullable
     private final String discoverId;
 
     public DiscoverFragmentModule(DiscoverFragment discoverFragment, @Nullable String discoverId) {
         super(discoverFragment);
+        this.discoverFragment = discoverFragment;
         this.discoverId = discoverId;
     }
 
@@ -30,4 +32,11 @@ public class DiscoverFragmentModule extends FragmentModule {
                                                       @UiScheduler Scheduler uiScheduler) {
         return new DiscoverPresenter(userPreferences, dao, discoverShoutsDao, Optional.fromNullable(discoverId), uiScheduler);
     }
+
+
+    @Provides
+    OnNewDiscoverSelectedListener provideOnNewDiscoverSelectedListener() {
+        return (OnNewDiscoverSelectedListener) discoverFragment.getActivity();
+    }
+
 }

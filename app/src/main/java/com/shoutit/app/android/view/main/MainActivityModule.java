@@ -30,8 +30,4 @@ public class MainActivityModule {
         return activity;
     }
 
-    @Provides
-    OnNewDiscoverSelectedListener provideOnNewDiscoverSelectedListener() {
-        return activity;
-    }
 }

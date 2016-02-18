@@ -312,4 +312,8 @@ public class MenuHandler {
 
         }
     }
+
+    public void setDiscoverMenuItem() {
+        onMenuItemSelected(discoverItem);
+    }
 }

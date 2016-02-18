@@ -36,19 +36,22 @@ public class HomeDiscoversAdapter extends BaseAdapter {
         this.picasso = picasso;
     }
 
-    class DiscoverItemViewHolder extends ViewHolderManager.BaseViewHolder<HomePresenter.DiscoverAdapterItem> {
+    class DiscoverItemViewHolder extends ViewHolderManager.BaseViewHolder<HomePresenter.DiscoverAdapterItem> implements View.OnClickListener {
         @Bind(R.id.home_discover_item_iv)
         ImageView cardImageView;
         @Bind(R.id.home_discover_item_tv)
         TextView cardTitleTextView;
+        private HomePresenter.DiscoverAdapterItem item;
 
         public DiscoverItemViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            itemView.setOnClickListener(this);
         }
 
         @Override
         public void bind(@Nonnull HomePresenter.DiscoverAdapterItem item) {
+            this.item = item;
             final DiscoverChild discover = item.getDiscover();
             cardTitleTextView.setText(discover.getTitle());
 
@@ -57,6 +60,11 @@ public class HomeDiscoversAdapter extends BaseAdapter {
                     .fit()
                     .centerCrop()
                     .into(cardImageView);
+        }
+
+        @Override
+        public void onClick(View v) {
+            item.onDiscoverSelected();
         }
     }
 
@@ -76,7 +84,7 @@ public class HomeDiscoversAdapter extends BaseAdapter {
 
         @OnClick(R.id.home_see_all_tv)
         public void onSeeAllClick() {
-            item.getShowAllDiscoversObserver().onNext(true);
+            item.onShowAllClicked();
         }
     }
 
