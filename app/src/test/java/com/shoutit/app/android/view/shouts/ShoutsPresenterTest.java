@@ -16,6 +16,10 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 
+import rx.Observable;
+import rx.Subscriber;
+import rx.functions.Action0;
+import rx.functions.Action1;
 import rx.observers.TestSubscriber;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
