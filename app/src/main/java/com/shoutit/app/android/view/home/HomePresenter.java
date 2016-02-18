@@ -8,9 +8,10 @@ import android.text.TextUtils;
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.functions.Functions1;
-import com.google.common.base.Objects;
 import com.google.common.base.Function;
+import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -39,7 +40,6 @@ import rx.Observable;
 import rx.Observer;
 import rx.functions.Func1;
 import rx.functions.Func2;
-import rx.functions.Func3;
 import rx.subjects.PublishSubject;
 
 public class HomePresenter {
@@ -95,32 +95,35 @@ public class HomePresenter {
 
 
         final Observable<List<BaseAdapterItem>> allShoutAdapterItems = shoutsRequestObservable
-                .compose(ResponseOrError.<ShoutsResponse>onlySuccess())
-                .filter(Functions1.isNotNull())
-                .map(new Func1<ShoutsResponse, List<BaseAdapterItem>>() {
+                .map(new Func1<ResponseOrError<ShoutsResponse>, List<BaseAdapterItem>>() {
                     @Override
-                    public List<BaseAdapterItem> call(ShoutsResponse shoutsResponse) {
+                    public List<BaseAdapterItem> call(ResponseOrError<ShoutsResponse> shoutsResponse) {
                         final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
                         builder.add(new ShoutHeaderAdapterItem(isUserLoggedIn,
                                 userPreferences.getUserCity(), layoutManagerSwitchObserver));
 
-                        if (shoutsResponse.getShouts() != null && !shoutsResponse.getShouts().isEmpty()) {
-                            final Iterable<BaseAdapterItem> items = Iterables
-                                    .transform(shoutsResponse.getShouts(), new Function<Shout, BaseAdapterItem>() {
-                                        @javax.annotation.Nullable
-                                        @Override
-                                        public BaseAdapterItem apply(@Nullable Shout input) {
-                                            assert input != null;
-                                            return new ShoutAdapterItem(input);
-                                        }
-                                    });
+                        if (shoutsResponse.isData()) {
+                            final ShoutsResponse data = shoutsResponse.data();
+                            if (data.getShouts() != null && !data.getShouts().isEmpty()) {
+                                final Iterable<BaseAdapterItem> items = Iterables
+                                        .transform(data.getShouts(), new Function<Shout, BaseAdapterItem>() {
+                                            @javax.annotation.Nullable
+                                            @Override
+                                            public BaseAdapterItem apply(@Nullable Shout input) {
+                                                assert input != null;
+                                                return new ShoutAdapterItem(input);
+                                            }
+                                        });
 
-                            builder.addAll(items);
+                                builder.addAll(items);
+                            } else {
+                                builder.add(new ShoutsEmptyAdapterItem());
+                            }
+
+                            return builder.build();
                         } else {
-                            builder.add(new ShoutsEmptyAdapterItem());
+                            return ImmutableList.of();
                         }
-
-                        return builder.build();
                     }
                 });
 
@@ -163,12 +166,14 @@ public class HomePresenter {
 
         final Observable<List<DiscoverChild>> childDiscoversObservable =
                 discoverItemDetailsObservable
-                        .compose(ResponseOrError.<DiscoverItemDetailsResponse>onlySuccess())
-                        .filter(Functions1.isNotNull())
-                        .map(new Func1<DiscoverItemDetailsResponse, List<DiscoverChild>>() {
+                        .map(new Func1<ResponseOrError<DiscoverItemDetailsResponse>, List<DiscoverChild>>() {
                             @Override
-                            public List<DiscoverChild> call(DiscoverItemDetailsResponse discoverItemDetailsResponse) {
-                                return discoverItemDetailsResponse.getChildren();
+                            public List<DiscoverChild> call(ResponseOrError<DiscoverItemDetailsResponse> discoverItemDetailsResponse) {
+                                if (discoverItemDetailsResponse.isData()) {
+                                    return discoverItemDetailsResponse.data().getChildren();
+                                } else {
+                                    return ImmutableList.of();
+                                }
                             }
                         });
 
@@ -189,16 +194,22 @@ public class HomePresenter {
                     }
                 });
 
+
         /** Combines adapter items **/
         allAdapterItemsObservable = Observable.combineLatest(
                 locationObservable,
-                allDiscoverAdapterItems.startWith(new ArrayList<BaseAdapterItem>()),
-                allShoutAdapterItems.startWith(new ArrayList<BaseAdapterItem>()),
-                new Func3<LocationPointer, List<BaseAdapterItem>, List<BaseAdapterItem>, List<BaseAdapterItem>>() {
+                Observable.zip(allDiscoverAdapterItems.startWith(new ArrayList<BaseAdapterItem>()), allShoutAdapterItems.startWith(new ArrayList<BaseAdapterItem>()), new Func2<List<BaseAdapterItem>, List<BaseAdapterItem>, BothParams<List<BaseAdapterItem>, List<BaseAdapterItem>>>() {
                     @Override
-                    public List<BaseAdapterItem> call(LocationPointer locationPointer,
-                                                      List<BaseAdapterItem> discovers,
-                                                      List<BaseAdapterItem> shouts) {
+                    public BothParams<List<BaseAdapterItem>, List<BaseAdapterItem>> call(List<BaseAdapterItem> discover, List<BaseAdapterItem> shout) {
+                        return BothParams.of(discover, shout);
+                    }
+                }),
+                new Func2<LocationPointer, BothParams<List<BaseAdapterItem>, List<BaseAdapterItem>>, List<BaseAdapterItem>>() {
+                    @Override
+                    public List<BaseAdapterItem> call(LocationPointer locationPointer, BothParams<List<BaseAdapterItem>, List<BaseAdapterItem>> listListBothParams) {
+                        final List<BaseAdapterItem> discovers = listListBothParams.param1();
+                        final List<BaseAdapterItem> shouts = listListBothParams.param2();
+
                         final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
                         if (!discovers.isEmpty()) {
                             builder.add(new DiscoverHeaderAdapterItem(locationPointer.getCity()))
