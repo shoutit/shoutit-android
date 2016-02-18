@@ -132,4 +132,7 @@
     <string name="discover_shouts_header">Discover shouts</string>
     <string name="discover_see_all_button">See all shouts</string>
 
+    <!-- Shout -->
+    <string name="shout_add_to_cart">Add to cart</string>
+
 </resources>

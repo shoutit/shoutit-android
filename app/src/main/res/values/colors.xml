@@ -45,4 +45,7 @@
     <!-- Discover -->
     <color name="discover_button">#1f000000</color>
 
+    <!-- Shout -->
+    <color name="shout_name">#de000000</color>
+
 </resources>
