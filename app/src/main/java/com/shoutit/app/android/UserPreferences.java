@@ -109,7 +109,7 @@ public class UserPreferences {
     }
 
     public boolean shouldAskForInterestAndSetToFalse() {
-        final boolean isFirstRun = mPreferences.getBoolean(SHOULD_ASK_FOR_INTEREST, true);
+        final boolean isFirstRun = mPreferences.getBoolean(SHOULD_ASK_FOR_INTEREST, false);
         mPreferences.edit().putBoolean(SHOULD_ASK_FOR_INTEREST, false).apply();
         return isFirstRun;
     }
