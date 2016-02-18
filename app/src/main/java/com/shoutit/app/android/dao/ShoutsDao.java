@@ -8,25 +8,20 @@ import com.appunite.rx.operators.OperatorMergeNextToken;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
-import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.constants.RequestsConstants;
 import com.shoutit.app.android.model.LocationPointer;
 
 import javax.annotation.Nonnull;
-import javax.inject.Singleton;
 
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Func1;
-import rx.functions.Func2;
 import rx.subjects.PublishSubject;
 
-@Singleton
 public class ShoutsDao {
     private final static int PAGE_SIZE = 20;
 
@@ -108,25 +103,13 @@ public class ShoutsDao {
             homeShoutsObservable = loadMoreHomeShoutsSubject.startWith((Object) null)
                     .lift(loadMoreOperator)
                     .compose(ResponseOrError.<ShoutsResponse>toResponseOrErrorObservable())
+                    .compose(MoreOperators.<ShoutsResponse>repeatOnError(networkScheduler))
                     .compose(MoreOperators.<ResponseOrError<ShoutsResponse>>cacheWithTimeout(networkScheduler));
         }
 
         @Nonnull
         public Observable<ResponseOrError<ShoutsResponse>> getShoutsObservable() {
            return homeShoutsObservable;
-        }
-    }
-
-    private class MergeShoutsResponses implements Func2<ShoutsResponse, ShoutsResponse, ShoutsResponse> {
-        @Override
-        public ShoutsResponse call(ShoutsResponse previousData, ShoutsResponse newData) {
-            final ImmutableList<Shout> allItems = ImmutableList.<Shout>builder()
-                    .addAll(previousData.getShouts())
-                    .addAll(newData.getShouts())
-                    .build();
-
-            final int count = previousData.getCount() + newData.getCount();
-            return new ShoutsResponse(count, newData.getNext(), newData.getPrevious(), allItems);
         }
     }
 }

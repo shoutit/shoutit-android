@@ -23,6 +23,7 @@
             android:layout_height="@dimen/side_menu_avatar_size"
             android:layout_marginTop="40dp"
             android:layout_centerHorizontal="true"
+            android:scaleType="centerCrop"
             android:src="@drawable/ic_avatar_placeholder" />
 
         <TextView

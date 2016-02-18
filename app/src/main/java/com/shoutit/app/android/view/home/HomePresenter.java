@@ -155,8 +155,7 @@ public class HomePresenter {
                 .switchMap(new Func1<String, Observable<ResponseOrError<DiscoverItemDetailsResponse>>>() {
                     @Override
                     public Observable<ResponseOrError<DiscoverItemDetailsResponse>> call(String discoverId) {
-                        return discoversDao.discoverItemDao(discoverId)
-                                .getDiscoverItemObservable();
+                        return discoversDao.getDiscoverItemDao(discoverId).getDiscoverItemObservable();
                     }
                 })
                 .compose(ObservableExtensions.<ResponseOrError<DiscoverItemDetailsResponse>>behaviorRefCount());
