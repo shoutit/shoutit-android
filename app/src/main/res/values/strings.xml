@@ -144,6 +144,7 @@
     <string name="settings_about">About</string>
 
     <!-- Account -->
+    <string name="account_title">Account</string>
     <string name="account_email">Email</string>
     <string name="account_password">Password</string>
     <string name="settings_new_email">New email</string>
@@ -153,6 +154,9 @@
     <string name="settings_new_email_verify">Verify New Password</string>
     <string name="settings_change_password">Change Password</string>
     <string name="settings_passwords_not_match">Passwords do not match</string>
+    <string name="account_title_change_email">Change email</string>
+    <string name="account_title_change_password">Change password</string>
+    <string name="account_error_old_password">Please provide old password</string>
 
 
 </resources>

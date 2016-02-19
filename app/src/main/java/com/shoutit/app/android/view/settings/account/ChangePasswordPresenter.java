@@ -86,7 +86,7 @@ public class ChangePasswordPresenter {
                 new Func2<String, Boolean, Boolean>() {
                     @Override
                     public Boolean call(String oldPass, Boolean hadPasswordSet) {
-                        return hadPasswordSet &&  Strings.isNullOrEmpty(oldPass);
+                        return hadPasswordSet && Strings.isNullOrEmpty(oldPass);
                     }
                 })
                 .startWith(false)

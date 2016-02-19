@@ -104,7 +104,7 @@ public interface ApiService {
 
 
     /** Auth **/
-    @GET("auth/change_password")
-    Observable<ResponseBody> changePassword(ChangePasswordRequest changePasswordRequest);
+    @POST("auth/change_password")
+    Observable<ResponseBody> changePassword(@Body ChangePasswordRequest changePasswordRequest);
 
 }

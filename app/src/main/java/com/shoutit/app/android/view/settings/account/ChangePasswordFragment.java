@@ -3,6 +3,7 @@ package com.shoutit.app.android.view.settings.account;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.text.method.PasswordTransformationMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,6 +62,10 @@ public class ChangePasswordFragment extends BaseFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        oldPasswordEditText.setTransformationMethod(new PasswordTransformationMethod());
+        passwordEditText.setTransformationMethod(new PasswordTransformationMethod());
+        passwordConfirmEditText.setTransformationMethod(new PasswordTransformationMethod());
+
         presenter.getRequestSuccessObservable()
                 .compose(bindToLifecycle())
                 .subscribe(new Action1<Object>() {
@@ -84,7 +89,7 @@ public class ChangePasswordFragment extends BaseFragment {
 
         presenter.getOldPasswordEmptyError()
                 .compose(this.<Boolean>bindToLifecycle())
-                .subscribe(Actions1.showOrHideError(passwordConfirmInput, getString(R.string.register_empty_password)));
+                .subscribe(Actions1.showOrHideError(currentPasswordInput, getString(R.string.account_error_old_password)));
 
         presenter.getPasswordsDoNotMatchError()
                 .compose(this.<Boolean>bindToLifecycle())
