@@ -205,8 +205,8 @@ public class HomePresenterTest {
 
     @Nonnull
     private ResponseOrError<DiscoverItemDetailsResponse> discoverDetailsResponse() {
-        return ResponseOrError.fromData(new DiscoverItemDetailsResponse("2", true, false, Lists.<DiscoverChild>newArrayList(
-                new DiscoverChild("id", null, null, null, null, null)), null, null));
+        return ResponseOrError.fromData(new DiscoverItemDetailsResponse("2", true, false, Lists.newArrayList(
+                new DiscoverChild("id", null, null, null, null, null)), null, null, null));
     }
 
     @Nonnull

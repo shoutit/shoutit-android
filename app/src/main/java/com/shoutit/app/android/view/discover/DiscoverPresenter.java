@@ -156,7 +156,7 @@ public class DiscoverPresenter {
                 .map(new Func1<DiscoverItemDetailsResponse, BaseAdapterItem>() {
                     @Override
                     public BaseAdapterItem call(DiscoverItemDetailsResponse response) {
-                        return new HeaderAdapterItem(response.getTitle(), response.getImage());
+                        return new HeaderAdapterItem(response.getTitle(), response.getCover());
                     }
                 });
 
