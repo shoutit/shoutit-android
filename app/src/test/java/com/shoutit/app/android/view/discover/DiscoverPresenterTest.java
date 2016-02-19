@@ -1,9 +1,7 @@
 package com.shoutit.app.android.view.discover;
 
-import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
-import com.appunite.rx.operators.MoreOperators;
 import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -26,13 +24,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.List;
-import java.util.Random;
-import java.util.concurrent.Callable;
 
 import rx.Observable;
 import rx.Scheduler;
-import rx.Single;
-import rx.functions.Action0;
 import rx.observers.TestSubscriber;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
@@ -177,6 +171,6 @@ public class DiscoverPresenterTest {
 
     public ResponseOrError<DiscoverItemDetailsResponse> getDiscoverItemResponse(boolean showChildren, boolean showShouts) {
         return ResponseOrError.fromData(new DiscoverItemDetailsResponse("id", showChildren, showShouts,
-                Lists.newArrayList(new DiscoverChild("id", null, null, null, null, null)), null, null));
+                Lists.newArrayList(new DiscoverChild("id", null, null, null, null, null)), null, null, null));
     }
 }

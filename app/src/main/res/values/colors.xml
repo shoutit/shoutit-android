@@ -45,5 +45,6 @@
     <!-- Discover -->
     <color name="discover_button">#1f000000</color>
     <color name="discover_button_pressed">#5e000000</color>
+    <color name="discover_header_white_dim">#17ffffff</color>
 
 </resources>
