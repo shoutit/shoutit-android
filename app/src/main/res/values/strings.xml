@@ -134,5 +134,10 @@
 
     <!-- Shout -->
     <string name="shout_add_to_cart">Add to cart</string>
+    <string name="shout_date">Date</string>
+    <string name="shout_category">Category</string>
+    <string name="shout_location">Location</string>
+    <string name="shout_model">Model</string>
+    <string name="shout_color">Color</string>
 
 </resources>

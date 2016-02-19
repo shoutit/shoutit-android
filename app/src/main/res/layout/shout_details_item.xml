@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    card_view:cardCornerRadius="2dp"
+    card_view:cardElevation="2dp"
+    card_view:cardUseCompatPadding="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout style="@style/ShoutCardItemLight">
+
+            <TextView
+                style="@style/ShoutCardSection"
+                android:text="@string/shout_date"
+                tools:text="lalallaldfgdfgdfgdfgfdgdfgdfgadsfdsfsdfdsfl" />
+
+            <TextView
+                style="@style/ShoutCardSectionText"
+                android:id="@+id/shout_date_tv"
+                android:layout_weight="2"
+                tools:text="30 - 10 - 2015" />
+
+        </LinearLayout>
+
+        <LinearLayout style="@style/ShoutCardItemDark">
+
+            <TextView
+                style="@style/ShoutCardSection"
+                android:text="@string/shout_category" />
+
+            <TextView
+                style="@style/ShoutCardSectionText"
+                android:id="@+id/shout_category_tv"
+                android:layout_weight="2"
+                tools:text="Clothes" />
+
+        </LinearLayout>
+
+        <LinearLayout style="@style/ShoutCardItemLight">
+
+            <TextView
+                style="@style/ShoutCardSection"
+                android:text="@string/shout_model" />
+
+            <TextView
+                style="@style/ShoutCardSectionText"
+                android:id="@+id/shout_model_tv"
+                android:layout_weight="2"
+                tools:text="2015" />
+
+        </LinearLayout>
+
+        <LinearLayout style="@style/ShoutCardItemDark">
+
+            <TextView
+                style="@style/ShoutCardSection"
+                android:text="@string/shout_color"
+                />
+
+            <TextView
+                style="@style/ShoutCardSectionText"
+                android:id="@+id/shout_color_tv"
+                android:layout_weight="2"
+                tools:text="Black" />
+
+        </LinearLayout>
+
+        <LinearLayout style="@style/ShoutCardItemLight">
+
+            <TextView
+                style="@style/ShoutCardSection"
+                android:text="@string/shout_location" />
+
+            <TextView
+                style="@style/ShoutCardSectionText"
+                android:id="@+id/shout_location_tv"
+                android:layout_weight="2"
+                tools:text="Dubai" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>
