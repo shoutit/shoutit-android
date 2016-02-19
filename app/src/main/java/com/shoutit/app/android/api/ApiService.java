@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.shoutit.app.android.api.model.Category;
+import com.shoutit.app.android.api.model.ChangePasswordRequest;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
@@ -100,5 +101,10 @@ public interface ApiService {
 
     @GET("misc/categories")
     Observable<List<Category>> categories();
+
+
+    /** Auth **/
+    @GET("auth/change_password")
+    Observable<ResponseBody> changePassword(ChangePasswordRequest changePasswordRequest);
 
 }

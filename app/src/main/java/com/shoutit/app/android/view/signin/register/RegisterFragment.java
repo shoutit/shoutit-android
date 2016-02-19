@@ -233,6 +233,6 @@ public class RegisterFragment extends BaseFragment {
 
     @OnClick(R.id.activity_login_about)
     public void onAboutClick() {
-        startActivity(new Intent(getActivity(), AboutActivity.class));
+        startActivity(AboutActivity.newIntent(getActivity()));
     }
 }

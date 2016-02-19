@@ -255,7 +255,7 @@ public class LoginIntroActivity extends BaseActivity {
 
     @OnClick(R.id.activity_login_about)
     public void onAboutClick() {
-        startActivity(new Intent(this, AboutActivity.class));
+        startActivity(AboutActivity.newIntent(this));
     }
 
     @Nonnull
