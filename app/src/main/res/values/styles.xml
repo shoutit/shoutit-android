@@ -6,6 +6,7 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorButtonNormal">@color/colorAccent</item>
         <item name="actionBarStyle">@style/AppTheme.BaseToolbarStyle</item>
+        <item name="android:windowBackground">@drawable/window</item>
     </style>
 
     <style name="FacebookButton" parent="AppTheme">
@@ -20,8 +21,11 @@
         <item name="colorButtonNormal">@color/login_signup_button</item>
     </style>
 
-
     <style name="TranslucentStatusBar" parent="AppTheme"/>
+
+    <style name="IntroActivityTheme" parent="TranslucentStatusBar">
+        <item name="android:windowBackground">@drawable/gradient_intro</item>
+    </style>
 
     <style name="AppTheme.BaseToolbarStyle" parent="@style/ThemeOverlay.AppCompat.ActionBar">
         <item name="android:background">?attr/colorPrimary</item>
