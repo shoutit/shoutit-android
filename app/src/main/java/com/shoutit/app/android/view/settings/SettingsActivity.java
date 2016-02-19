@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -53,6 +54,17 @@ public class SettingsActivity extends BaseActivity {
 
         accountTextView.setVisibility(userPreferences.isGuest() ? View.GONE : View.VISIBLE);
         versionTextView.setText(getString(R.string.menu_version_name, BuildConfig.VERSION_NAME));
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void setUpToolbar() {
