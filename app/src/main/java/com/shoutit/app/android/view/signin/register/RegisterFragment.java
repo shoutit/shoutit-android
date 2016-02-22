@@ -152,19 +152,19 @@ public class RegisterFragment extends BaseFragment {
                 });
 
         RxTextView.textChangeEvents(emailEdittext)
-                .debounce(500, TimeUnit.MILLISECONDS)
+                .debounce(100, TimeUnit.MILLISECONDS)
                 .map(MoreFunctions1.mapTextChangeEventToString())
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(registerPresenter.getEmailObserver());
 
         RxTextView.textChangeEvents(nameEditText)
-                .debounce(500, TimeUnit.MILLISECONDS)
+                .debounce(100, TimeUnit.MILLISECONDS)
                 .map(MoreFunctions1.mapTextChangeEventToString())
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(registerPresenter.getNameObserver());
 
         RxTextView.textChangeEvents(passwordEdittext)
-                .debounce(500, TimeUnit.MILLISECONDS)
+                .debounce(100, TimeUnit.MILLISECONDS)
                 .map(MoreFunctions1.mapTextChangeEventToString())
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(registerPresenter.getPasswordObserver());
@@ -233,6 +233,6 @@ public class RegisterFragment extends BaseFragment {
 
     @OnClick(R.id.activity_login_about)
     public void onAboutClick() {
-        startActivity(new Intent(getActivity(), AboutActivity.class));
+        startActivity(AboutActivity.newIntent(getActivity()));
     }
 }

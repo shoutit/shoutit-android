@@ -8,6 +8,7 @@
     <string name="terms_of_service">Terms of Service</string>
     <string name="google_api_key" translatable="false">AIzaSyBWHadI_MPYQgDLqI4RXhymEs42YEtgTEE</string>
     <string name="facebook_app_id">353625811317277</string>
+    <string name="exit_text">Press BACK again to exit</string>
 
     <!-- Errors -->
     <string name="error_default">Ooops, something went wrong</string>
@@ -139,5 +140,30 @@
     <string name="shout_location">Location</string>
     <string name="shout_model">Model</string>
     <string name="shout_color">Color</string>
+
+    <!-- Discover Shouts -->
+    <string name="discover_shouts_error">Failed to load shouts</string>
+    <string name="discover_shouts_share">Share</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_account">Account</string>
+    <string name="settings_notifications">Notifications</string>
+    <string name="settings_about">About</string>
+
+    <!-- Account -->
+    <string name="account_title">Account</string>
+    <string name="account_email">Email</string>
+    <string name="account_password">Password</string>
+    <string name="settings_new_email">New email</string>
+    <string name="settings_change_email">Change email</string>
+    <string name="settings_current_password">Current Password</string>
+    <string name="settings_new_password">New Password</string>
+    <string name="settings_new_email_verify">Verify New Password</string>
+    <string name="settings_change_password">Change Password</string>
+    <string name="settings_passwords_not_match">Passwords do not match</string>
+    <string name="account_title_change_email">Change email</string>
+    <string name="account_title_change_password">Change password</string>
+    <string name="account_error_old_password">Please provide old password</string>
 
 </resources>

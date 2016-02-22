@@ -3,9 +3,10 @@ package com.shoutit.app.android.view.discover;
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
-import com.appunite.rx.android.util.LogTransformer;
+import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
+import com.appunite.rx.operators.MoreOperators;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
@@ -36,6 +37,7 @@ import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Func1;
 import rx.functions.Func3;
+import rx.functions.Func4;
 import rx.subjects.PublishSubject;
 
 public class DiscoverPresenter {
@@ -50,7 +52,7 @@ public class DiscoverPresenter {
     private final Observable<Boolean> progressObservable;
 
     @Nonnull
-    private final PublishSubject<Object> showMoreObserver = PublishSubject.create();
+    private final PublishSubject<String> showMoreObserver = PublishSubject.create();
     @Nonnull
     private final PublishSubject<String> discoverSelectedObserver = PublishSubject.create();
 
@@ -58,7 +60,8 @@ public class DiscoverPresenter {
                              @Nonnull final DiscoversDao discoversDao,
                              @Nonnull final DiscoverShoutsDao discoverShoutsDao,
                              @Nonnull Optional<String> discoverParentId,
-                             @Nonnull @UiScheduler Scheduler uiScheduler) {
+                             @Nonnull @UiScheduler final Scheduler uiScheduler,
+                             @Nonnull @NetworkScheduler final Scheduler networkScheduler) {
 
 
         final Observable<LocationPointer> locationObservable = userPreferences.getLocationObservable()
@@ -111,10 +114,13 @@ public class DiscoverPresenter {
                     }
                 });
 
+        final Observable<String> idObservable = Observable.merge(
+                mainDiscoverIdObservable, parentDiscoverIdObservable)
+                .compose(ObservableExtensions.<String>behaviorRefCount());
 
         /** DiscoverItemDetails **/
         final Observable<ResponseOrError<DiscoverItemDetailsResponse>> discoverItemObservable =
-                Observable.merge(mainDiscoverIdObservable, parentDiscoverIdObservable)
+                idObservable
                         .filter(Functions1.isNotNull())
                         .switchMap(new Func1<String, Observable<ResponseOrError<DiscoverItemDetailsResponse>>>() {
                             @Override
@@ -137,7 +143,9 @@ public class DiscoverPresenter {
                 .switchMap(new Func1<DiscoverItemDetailsResponse, Observable<ResponseOrError<ShoutsResponse>>>() {
                     @Override
                     public Observable<ResponseOrError<ShoutsResponse>> call(DiscoverItemDetailsResponse response) {
-                        return discoverShoutsDao.getShoutsObservable(response.getId());
+                        return discoverShoutsDao.getShoutsObservable(response.getId())
+                                .subscribeOn(networkScheduler)
+                                .observeOn(uiScheduler);
                     }
                 })
                 .compose(ObservableExtensions.<ResponseOrError<ShoutsResponse>>behaviorRefCount());
@@ -148,7 +156,7 @@ public class DiscoverPresenter {
                 .map(new Func1<DiscoverItemDetailsResponse, BaseAdapterItem>() {
                     @Override
                     public BaseAdapterItem call(DiscoverItemDetailsResponse response) {
-                        return new HeaderAdapterItem(response.getTitle(), response.getImage());
+                        return new HeaderAdapterItem(response.getTitle(), response.getCover());
                     }
                 });
 
@@ -170,6 +178,7 @@ public class DiscoverPresenter {
                                     @Nullable
                                     @Override
                                     public BaseAdapterItem apply(@Nullable DiscoverChild input) {
+                                        assert input != null;
                                         return new DiscoverAdapterItem(input, discoverSelectedObserver);
                                     }
                                 });
@@ -184,7 +193,7 @@ public class DiscoverPresenter {
                 .filter(new Func1<ShoutsResponse, Boolean>() {
                     @Override
                     public Boolean call(ShoutsResponse shoutsResponse) {
-                        return shoutsResponse.getShouts() != null && !shoutsResponse.getShouts().isEmpty();
+                        return !shoutsResponse.getShouts().isEmpty();
                     }
                 })
                 .map(new Func1<ShoutsResponse, List<BaseAdapterItem>>() {
@@ -202,12 +211,14 @@ public class DiscoverPresenter {
                 });
 
         allAdapterItemsObservable = Observable.combineLatest(
+                idObservable,
                 headerAdapterItemObservable.startWith((BaseAdapterItem) null),
                 discoverAdapterItemsObservable.startWith(ImmutableList.<BaseAdapterItem>of()),
                 shoutAdapterItemObservable.startWith(ImmutableList.<BaseAdapterItem>of()),
-                new Func3<BaseAdapterItem, List<BaseAdapterItem>, List<BaseAdapterItem>, List<BaseAdapterItem>>() {
+                new Func4<String, BaseAdapterItem, List<BaseAdapterItem>, List<BaseAdapterItem>, List<BaseAdapterItem>>() {
                     @Override
-                    public List<BaseAdapterItem> call(BaseAdapterItem headerItem,
+                    public List<BaseAdapterItem> call(String discoverId,
+                                                      BaseAdapterItem headerItem,
                                                       List<BaseAdapterItem> discovers,
                                                       List<BaseAdapterItem> shouts) {
                         final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
@@ -223,7 +234,7 @@ public class DiscoverPresenter {
                         if (!shouts.isEmpty()) {
                             builder.add(new ShoutHeaderAdapterItem());
                             builder.addAll(shouts);
-                            builder.add(new ShowMoreButtonAdapterItem(showMoreObserver));
+                            builder.add(new ShowMoreButtonAdapterItem(discoverId, showMoreObserver));
                         }
 
                         return builder.build();
@@ -265,7 +276,7 @@ public class DiscoverPresenter {
     }
 
     @Nonnull
-    public Observable<Object> getShowMoreObservable() {
+    public Observable<String> getShowMoreObservable() {
         return showMoreObserver;
     }
 
@@ -431,9 +442,13 @@ public class DiscoverPresenter {
     public class ShowMoreButtonAdapterItem implements BaseAdapterItem {
 
         @Nonnull
-        private final Observer<Object> showMoreObserver;
+        private final String discoverId;
+        @Nonnull
+        private final Observer<String> showMoreObserver;
 
-        public ShowMoreButtonAdapterItem(@Nonnull Observer<Object> showMoreObserver) {
+        public ShowMoreButtonAdapterItem(@Nonnull String discoverId,
+                                         @Nonnull Observer<String> showMoreObserver) {
+            this.discoverId = discoverId;
             this.showMoreObserver = showMoreObserver;
         }
 
@@ -453,7 +468,7 @@ public class DiscoverPresenter {
         }
 
         public void showMoreClicked() {
-            showMoreObserver.onNext(null);
+            showMoreObserver.onNext(discoverId);
         }
     }
 }

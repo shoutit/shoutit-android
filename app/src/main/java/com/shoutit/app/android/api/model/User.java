@@ -15,11 +15,12 @@ public class User {
     private final String image;
     private final String cover;
     private final boolean isListening;
+    private final boolean isPasswordSet;
     private final UserLocation location;
 
     public User(String id, String type, String apiUrl, String webUrl, String username,
                 String name, String firstName, String lastName, boolean isActivated, String image,
-                String cover, boolean isListening, UserLocation location) {
+                String cover, boolean isListening, boolean isPasswordSet, UserLocation location) {
         this.id = id;
         this.type = type;
         this.apiUrl = apiUrl;
@@ -32,12 +33,13 @@ public class User {
         this.image = image;
         this.cover = cover;
         this.isListening = isListening;
+        this.isPasswordSet = isPasswordSet;
         this.location = location;
     }
 
     // TODO remove it when user will be handler by API
     public static User guestUser(UserLocation location) {
-        return new User(null, null, null, null ,null, null, null, null, false, null, null, false, location);
+        return new User(null, null, null, null ,null, null, null, null, false, null, null, false, false, location);
     }
 
     public String getId() {
@@ -90,5 +92,9 @@ public class User {
 
     public UserLocation getLocation() {
         return location;
+    }
+
+    public boolean isPasswordSet() {
+        return isPasswordSet;
     }
 }

@@ -19,5 +19,4 @@ public interface MainActivityComponent extends BaseActivityComponent {
 
     void inject(MainActivity activity);
 
-    OnNewDiscoverSelectedListener onNewDiscoverSelectedListener();
 }

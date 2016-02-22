@@ -18,6 +18,7 @@ import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
 public class DiscoverShoutsDao {
+
     private final static int PAGE_SIZE = 20;
 
     @Nonnull
@@ -59,9 +60,7 @@ public class DiscoverShoutsDao {
                                 ++pageNumber;
 
                                 final Observable<ShoutsResponse> apiRequest = apiService
-                                        .shoutsForDiscoverItem(discoverId, pageNumber, PAGE_SIZE)
-                                        .subscribeOn(networkScheduler);
-
+                                        .shoutsForDiscoverItem(discoverId, pageNumber, PAGE_SIZE);
                                 if (previousResponse == null) {
                                     return apiRequest;
                                 } else {

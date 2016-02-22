@@ -21,6 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/home_feed_image_height"
             android:src="@drawable/pattern_placeholder"
+            android:scaleType="centerCrop"
             tools:background="@android:color/black" />
 
         <RelativeLayout

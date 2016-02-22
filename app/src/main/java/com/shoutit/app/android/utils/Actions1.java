@@ -27,4 +27,18 @@ public class Actions1 {
         };
     }
 
+    @NonNull
+    public static Action1<Boolean> showOrHideError(@NonNull final TextInputLayout textInputLayout, @NonNull final String message) {
+        return new Action1<Boolean>() {
+            @Override
+            public void call(Boolean show) {
+                if (show) {
+                    textInputLayout.setError(message);
+                } else {
+                    textInputLayout.setErrorEnabled(false);
+                }
+            }
+        };
+    }
+
 }

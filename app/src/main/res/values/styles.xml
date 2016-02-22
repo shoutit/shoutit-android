@@ -6,6 +6,7 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorButtonNormal">@color/colorAccent</item>
         <item name="actionBarStyle">@style/AppTheme.BaseToolbarStyle</item>
+        <item name="android:windowBackground">@drawable/window</item>
     </style>
 
     <style name="FacebookButton" parent="AppTheme">
@@ -20,8 +21,11 @@
         <item name="colorButtonNormal">@color/login_signup_button</item>
     </style>
 
-
     <style name="TranslucentStatusBar" parent="AppTheme"/>
+
+    <style name="IntroActivityTheme" parent="TranslucentStatusBar">
+        <item name="android:windowBackground">@drawable/gradient_intro</item>
+    </style>
 
     <style name="AppTheme.BaseToolbarStyle" parent="@style/ThemeOverlay.AppCompat.ActionBar">
         <item name="android:background">?attr/colorPrimary</item>
@@ -89,8 +93,15 @@
 
     <style name="AppTheme.WithDrawer"/>
 
-    <style name="GrayButton" parent="AppTheme">
-        <item name="colorButtonNormal">@color/discover_button</item>
+    <style name="SettingsItem">
+        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingStart" tools:ignore="NewApi">16dp</item>
+        <item name="android:textColor">@color/black_54</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:background">?selectableItemBackground</item>
     </style>
 
     <style name="ShoutCardSection">

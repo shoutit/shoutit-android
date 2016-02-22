@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.main;
+package com.shoutit.app.android.view.discover;
 
 import javax.annotation.Nonnull;
 

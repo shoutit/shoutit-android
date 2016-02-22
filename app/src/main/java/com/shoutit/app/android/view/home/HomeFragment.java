@@ -26,7 +26,9 @@ import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyGridLayoutManager;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
+import com.shoutit.app.android.view.discover.DiscoverActivity;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
+import com.shoutit.app.android.view.main.OnSeeAllDiscoversListener;
 
 import java.util.List;
 
@@ -59,14 +61,13 @@ public class HomeFragment extends BaseFragment {
     @Inject
     HomeAdapter adapter;
     @Inject
-    @UiScheduler
-    Scheduler uiScheduler;
-    @Inject
     HomeGridSpacingItemDecoration gridViewItemDecoration;
     @Inject
     HomeLinearSpacingItemDecoration linearViewItemDecoration;
     @Inject
     UserPreferences mUserPreferences;
+    @Inject
+    OnSeeAllDiscoversListener onSeeAllDiscoversListener;
 
     @android.support.annotation.Nullable
     @Override
@@ -102,23 +103,19 @@ public class HomeFragment extends BaseFragment {
                 });
 
         presenter.getAllAdapterItemsObservable()
-                .observeOn(uiScheduler)
                 .compose(this.<List<BaseAdapterItem>>bindToLifecycle())
                 .subscribe(adapter);
 
         RxRecyclerView.scrollEvents(recyclerView)
-                .observeOn(uiScheduler)
                 .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
                 .filter(LoadMoreHelper.needLoadMore((MyLayoutManager) recyclerView.getLayoutManager(), adapter))
                 .subscribe(presenter.getLoadMoreShouts());
 
         presenter.getProgressObservable()
-                .observeOn(uiScheduler)
                 .compose(this.<Boolean>bindToLifecycle())
                 .subscribe(RxView.visibility(progressBar));
 
         presenter.getErrorObservable()
-                .observeOn(uiScheduler)
                 .compose(this.<Throwable>bindToLifecycle())
                 .subscribe(new Action1<Throwable>() {
                     @Override
@@ -129,7 +126,6 @@ public class HomeFragment extends BaseFragment {
                 });
 
         RxView.clicks(fab)
-                .observeOn(uiScheduler)
                 .compose(this.<Void>bindToLifecycle())
                 .subscribe(new Action1<Void>() {
                     @Override
@@ -143,12 +139,20 @@ public class HomeFragment extends BaseFragment {
                 });
 
         presenter.getShowAllDiscoversObservable()
-                .observeOn(uiScheduler)
-                .compose(this.<Boolean>bindToLifecycle())
-                .subscribe(new Action1<Boolean>() {
+                .compose(this.bindToLifecycle())
+                .subscribe(new Action1<Object>() {
                     @Override
-                    public void call(Boolean aBoolean) {
-                        Toast.makeText(context, "Not implemented yet", Toast.LENGTH_LONG).show();
+                    public void call(Object ignore) {
+                        onSeeAllDiscoversListener.onSeeAllDiscovers();
+                    }
+                });
+
+        presenter.getOnDiscoverSelectedObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(@Nonnull String discoverId) {
+                        startActivity(DiscoverActivity.newIntent(context, discoverId));
                     }
                 });
 

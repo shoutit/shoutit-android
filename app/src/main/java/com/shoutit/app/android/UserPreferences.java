@@ -123,7 +123,7 @@ public class UserPreferences {
     }
 
     @Nonnull
-    public Observable<User> userObservable() {
+    public Observable<User> getUserObservable() {
         return userObservable;
     }
 

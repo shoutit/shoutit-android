@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.jakewharton.rxbinding.view.RxView;
@@ -18,8 +17,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.ColoredSnackBar;
-import com.shoutit.app.android.view.main.MainActivityComponent;
-import com.shoutit.app.android.view.main.OnNewDiscoverSelectedListener;
+import com.shoutit.app.android.view.shouts.DiscoverShoutsActivity;
 
 import java.util.List;
 
@@ -95,12 +93,11 @@ public class DiscoverFragment extends BaseFragment {
                 });
 
         presenter.getShowMoreObservable()
-                .compose(bindToLifecycle())
-                .subscribe(new Action1<Object>() {
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(new Action1<String>() {
                     @Override
-                    public void call(Object o) {
-                        // TODO
-                        Toast.makeText(getContext(), "Not implemented yet", Toast.LENGTH_SHORT).show();
+                    public void call(String discoverId) {
+                        startActivity(DiscoverShoutsActivity.newIntent(getActivity(), discoverId));
                     }
                 });
     }
@@ -157,7 +154,7 @@ public class DiscoverFragment extends BaseFragment {
         }
 
         DaggerDiscoverFragmentComponent.builder()
-                .mainActivityComponent((MainActivityComponent) baseActivityComponent)
+                .baseActivityComponent(baseActivityComponent)
                 .fragmentModule(fragmentModule)
                 .discoverFragmentModule(new DiscoverFragmentModule(this, discoverId))
                 .build()
