@@ -1,5 +1,7 @@
 package com.shoutit.app.android.view.about;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -8,6 +10,8 @@ import android.view.MenuItem;
 
 import com.shoutit.app.android.R;
 
+import javax.annotation.Nonnull;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
@@ -15,6 +19,10 @@ public class AboutActivity extends AppCompatActivity {
 
     @Bind(R.id.activity_about_toolbar)
     Toolbar toolbar;
+
+    public static Intent newIntent(@Nonnull Context context) {
+        return new Intent(context, AboutActivity.class);
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

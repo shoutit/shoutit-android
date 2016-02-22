@@ -23,6 +23,7 @@ import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.view.discover.DiscoverFragment;
 import com.shoutit.app.android.view.home.HomeFragment;
 import com.shoutit.app.android.view.location.LocationActivity;
+import com.shoutit.app.android.view.settings.SettingsActivity;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.squareup.picasso.Transformation;
@@ -45,7 +46,6 @@ public class MenuHandler {
     public static final String FRAGMENT_BROWSE = "fragment_browse";
     public static final String FRAGMENT_CHATS = "fragment_chats";
     public static final String FRAGMENT_ORDERS = "fragment_orders";
-    public static final String FRAGMENT_SETTINGS = "fragment_settings";
     public static final String FRAGMENT_HELP = "fragment_help";
     public static final String FRAGMENT_INVITE_FRIENDS = "fragment_invite_friends";
 
@@ -190,7 +190,7 @@ public class MenuHandler {
                 selectItem(view.getId());
                 break;
             case R.id.menu_settings:
-                onMenuItemSelectedListener.onMenuItemSelected(FRAGMENT_SETTINGS);
+                rxActivity.startActivity(SettingsActivity.newIntent(rxActivity));
                 break;
             case R.id.menu_help:
                 UserVoice.launchUserVoice(rxActivity);
@@ -303,7 +303,6 @@ public class MenuHandler {
             case FRAGMENT_BROWSE:
             case FRAGMENT_CHATS:
             case FRAGMENT_ORDERS:
-            case FRAGMENT_SETTINGS:
             case FRAGMENT_HELP:
             case FRAGMENT_INVITE_FRIENDS:
                 return new Fragment();
