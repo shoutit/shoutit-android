@@ -136,6 +136,7 @@
     <!-- Discover Shouts -->
     <string name="discover_shouts_error">Failed to load shouts</string>
     <string name="discover_shouts_share">Share</string>
+    <string name="discover_shouts_title">%s Shouts</string>
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>
