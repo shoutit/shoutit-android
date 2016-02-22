@@ -13,6 +13,7 @@ import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.TagsRequest;
 import com.shoutit.app.android.api.model.UpdateLocationRequest;
+import com.shoutit.app.android.api.model.UpdateUserRequest;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.login.EmailLoginRequest;
@@ -90,6 +91,10 @@ public interface ApiService {
     Observable<ShoutsResponse> home(@Path("user_name") String userName,
                                     @Query("page") Integer page,
                                     @Query("page_size") Integer pageSize);
+
+    @PATCH("users/me")
+    Observable<User> updateUser(@Body UpdateUserRequest updateUserRequest);
+
 
 
     /** Misc **/
