@@ -9,16 +9,18 @@ public class DiscoverItemDetailsResponse {
     private final List<DiscoverChild> children;
     private final String title;
     private final String image;
+    private final String cover;
 
     public DiscoverItemDetailsResponse(String id, boolean showChildren,
                                        boolean showShouts, List<DiscoverChild> children,
-                                       String title, String image) {
+                                       String title, String image, String cover) {
         this.id = id;
         this.showChildren = showChildren;
         this.showShouts = showShouts;
         this.children = children;
         this.title = title;
         this.image = image;
+        this.cover = cover;
     }
 
     public String getId() {
@@ -43,5 +45,9 @@ public class DiscoverItemDetailsResponse {
 
     public String getImage() {
         return image;
+    }
+
+    public String getCover() {
+        return cover;
     }
 }
