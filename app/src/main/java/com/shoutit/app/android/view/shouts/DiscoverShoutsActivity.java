@@ -74,7 +74,7 @@ public class DiscoverShoutsActivity extends BaseActivity {
         final Bundle bundle = Preconditions.checkNotNull(getIntent().getExtras());
         final String name = bundle.getString(DISCOVER_NAME);
 
-        mToolbar.setTitle(name);
+        mToolbar.setTitle(getString(R.string.discover_shouts_title, name));
         mToolbar.inflateMenu(R.menu.shouts_menu);
         mToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
