@@ -24,7 +24,7 @@ import butterknife.ButterKnife;
 import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
 
-public class ShoutLinerViewHolder extends ViewHolderManager.BaseViewHolder<ShoutAdapterItem> {
+public class ShoutLinerViewHolder extends ViewHolderManager.BaseViewHolder<ShoutAdapterItem> implements View.OnClickListener {
     @Bind(R.id.shout_grid_image_view)
     ImageView cardImageView;
     @Bind(R.id.shout_grid_title_tv)
@@ -45,16 +45,19 @@ public class ShoutLinerViewHolder extends ViewHolderManager.BaseViewHolder<Shout
     private CompositeSubscription subscription;
     private final Context context;
     private final Picasso picasso;
+    private ShoutAdapterItem item;
 
     public ShoutLinerViewHolder(@Nonnull View itemView, Context context, Picasso picasso) {
         super(itemView);
         this.context = context;
         this.picasso = picasso;
         ButterKnife.bind(this, itemView);
+        itemView.setOnClickListener(this);
     }
 
     @Override
     public void bind(@Nonnull ShoutAdapterItem item) {
+        this.item = item;
         recycle();
 
         final Shout shout = item.getShout();
@@ -113,5 +116,10 @@ public class ShoutLinerViewHolder extends ViewHolderManager.BaseViewHolder<Shout
             subscription.unsubscribe();
             subscription = null;
         }
+    }
+
+    @Override
+    public void onClick(View v) {
+        item.onShoutSelected();
     }
 }

@@ -17,7 +17,7 @@ import javax.annotation.Nonnull;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class ShoutGridViewHolder extends ViewHolderManager.BaseViewHolder<ShoutAdapterItem> {
+public class ShoutGridViewHolder extends ViewHolderManager.BaseViewHolder<ShoutAdapterItem> implements View.OnClickListener {
 
     @Bind(R.id.shout_grid_image_view)
     ImageView cardImageView;
@@ -30,16 +30,19 @@ public class ShoutGridViewHolder extends ViewHolderManager.BaseViewHolder<ShoutA
 
     private final Picasso picasso;
     private final Context context;
+    private ShoutAdapterItem item;
 
     public ShoutGridViewHolder(@Nonnull View itemView, Picasso picasso, Context context) {
         super(itemView);
         this.picasso = picasso;
         this.context = context;
         ButterKnife.bind(this, itemView);
+        itemView.setOnClickListener(this);
     }
 
     @Override
     public void bind(@Nonnull ShoutAdapterItem item) {
+        this.item = item;
         final Shout shout = item.getShout();
         titleTextView.setText(shout.getTitle());
         nameTextView.setText(shout.getUser().getName());
@@ -53,5 +56,10 @@ public class ShoutGridViewHolder extends ViewHolderManager.BaseViewHolder<ShoutA
                 .fit()
                 .centerCrop()
                 .into(cardImageView);
+    }
+
+    @Override
+    public void onClick(View v) {
+        item.onShoutSelected();
     }
 }

@@ -7,6 +7,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -23,7 +24,6 @@ import com.shoutit.app.android.utils.DateTimeUtils;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.ResourcesHelper;
-import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.viewpagerindicator.CirclePageIndicator;
@@ -39,9 +39,9 @@ import rx.Subscription;
 public class ShoutAdapter extends BaseAdapter {
 
     private static final int VIEW_TYPE_SHOUT = 1;
-    private static final int VIEW_TYPE_USER_SHOUTS = 2;
+    public static final int VIEW_TYPE_USER_SHOUTS = 2;
     private static final int VIEW_TYPE_VISIT_PROFILE = 3;
-    private static final int VIEW_TYPE_RELATED_SHOUTS_CONTAINER = 4;
+    public static final int VIEW_TYPE_RELATED_SHOUTS_CONTAINER = 4;
     private static final int VIEW_TYPE_HEADER = 5;
 
     @Nonnull
@@ -117,28 +117,30 @@ public class ShoutAdapter extends BaseAdapter {
                     .into(avatarImageView);
 
             nameTextView.setText(user.getName());
-            userLocationTextView.setText(context.getString(R.string.shout_user_location,
-                    user.getLocation().getCity(), user.getLocation().getCountry()));
+            if (user.getLocation() != null) {
+                userLocationTextView.setText(context.getString(R.string.shout_user_location,
+                        user.getLocation().getCity(), user.getLocation().getCountry()));
+                locationTextView.setText(user.getLocation().getCity());
+            }
+
             labelTextView.setText(shout.getTypeResId());
 
             titleTextView.setText(shout.getTitle());
             priceTextView.setText(context.getString(R.string.price_with_currency, shout.getPrice(), shout.getCurrency()));
-            availableTextView.setText(context.getString(R.string.shout_available, shout.getNumber()));
+            availableTextView.setText(context.getString(R.string.shout_available, (int) shout.getNumber()));
 
-            imagesPagerAdapter.setData(shout.getImages());
             shoutViewPager.setAdapter(imagesPagerAdapter);
             pageIndicator.setViewPager(shoutViewPager);
+            imagesPagerAdapter.setData(shout.getImages());
 
             descriptionTextView.setText(shout.getText());
 
             dateTextView.setText(DateTimeUtils.getShoutDetailDate(context, shout.getDatePublishedInMillis()));
             categoryTextView.setText(shout.getCategory().getName());
-            locationTextView.setText(user.getLocation().getCity());
+
             final Optional<Integer> flagResId = ResourcesHelper.getCountryResId(context, shout);
             if (flagResId.isPresent()) {
                 picasso.load(flagResId.get())
-                        .fit()
-                        .centerCrop()
                         .into(flagTarget);
             }
         }
@@ -159,7 +161,7 @@ public class ShoutAdapter extends BaseAdapter {
         }
     }
 
-    public class UserShoutViewHolder extends ViewHolderManager.BaseViewHolder<ShoutAdapterItems.UserShoutAdapterItem> {
+    public class UserShoutViewHolder extends ViewHolderManager.BaseViewHolder<ShoutAdapterItems.UserShoutAdapterItem> implements View.OnClickListener {
         @Bind(R.id.shout_grid_image_view)
         ImageView cardImageView;
         @Bind(R.id.shout_grid_title_tv)
@@ -168,15 +170,18 @@ public class ShoutAdapter extends BaseAdapter {
         TextView nameTextView;
         @Bind(R.id.shout_grid_price_tv)
         TextView cardPriceTextView;
+        private ShoutAdapterItems.UserShoutAdapterItem item;
 
 
         public UserShoutViewHolder(@Nonnull View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            itemView.setOnClickListener(this);
         }
 
         @Override
         public void bind(@Nonnull ShoutAdapterItems.UserShoutAdapterItem item) {
+            this.item = item;
             final Shout shout = item.getShout();
             titleTextView.setText(shout.getTitle());
             nameTextView.setText(shout.getUser().getName());
@@ -190,9 +195,16 @@ public class ShoutAdapter extends BaseAdapter {
                     .centerCrop()
                     .into(cardImageView);
         }
+
+        @Override
+        public void onClick(View v) {
+            item.onShoutSelected();
+        }
     }
 
-    public class VisitProfileViewHolder extends ViewHolderManager.BaseViewHolder<ShoutAdapterItems.VisitProfileAdapterItem> implements View.OnClickListener{
+    public class VisitProfileViewHolder extends ViewHolderManager.BaseViewHolder<ShoutAdapterItems.VisitProfileAdapterItem> implements View.OnClickListener {
+        @Bind(R.id.button_gray_tv)
+        Button button;
 
         private ShoutAdapterItems.VisitProfileAdapterItem item;
 
@@ -205,6 +217,7 @@ public class ShoutAdapter extends BaseAdapter {
         @Override
         public void bind(@Nonnull ShoutAdapterItems.VisitProfileAdapterItem item) {
             this.item = item;
+            button.setText(item.getName());
         }
 
         @Override
@@ -236,13 +249,12 @@ public class ShoutAdapter extends BaseAdapter {
                     context, LinearLayoutManager.HORIZONTAL, false);
             recyclerView.addItemDecoration(itemDecoration);
             recyclerView.setLayoutManager(layoutManager);
+            recyclerView.setAdapter(relatedShoutsAdapter);
         }
 
         @Override
         public void bind(@Nonnull ShoutAdapterItems.RelatedContainerAdapterItem item) {
             recycle();
-
-            recyclerView.setAdapter(relatedShoutsAdapter);
 
             subscription = Observable.just(item.getItems())
                     .subscribe(relatedShoutsAdapter);
@@ -296,10 +308,10 @@ public class ShoutAdapter extends BaseAdapter {
             return VIEW_TYPE_RELATED_SHOUTS_CONTAINER;
         } else if (item instanceof ShoutAdapterItems.VisitProfileAdapterItem) {
             return VIEW_TYPE_VISIT_PROFILE;
-        } else if (item instanceof ShoutAdapterItem) {
+        } else if (item instanceof ShoutAdapterItems.UserShoutAdapterItem) {
             return VIEW_TYPE_USER_SHOUTS;
         } else {
-            throw new RuntimeException("Unknown view type");
+            throw new RuntimeException("Unknown view type: " + item.getClass().getSimpleName());
         }
     }
 }

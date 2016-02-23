@@ -54,6 +54,8 @@
 
         <activity android:name=".view.settings.account.AccountActivity"/>
 
+        <activity android:name=".view.shout.ShoutActivity"/>
+
         <!-- Facebook -->
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"

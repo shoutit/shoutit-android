@@ -3,6 +3,7 @@ package com.shoutit.app.android.view.shout;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.base.Objects;
 import com.shoutit.app.android.api.model.Shout;
+import com.shoutit.app.android.api.model.User;
 
 import java.util.List;
 
@@ -77,7 +78,7 @@ public class ShoutAdapterItems {
         }
 
         public void onShoutSelected() {
-            shoutSelectedObserver.onNext(shout.getUser().getName());
+            shoutSelectedObserver.onNext(shout.getId());
         }
 
         @Nonnull
@@ -119,15 +120,20 @@ public class ShoutAdapterItems {
         @Nonnull
         private final Observer<String> visitProfileObserver;
         @Nonnull
-        private final String userName;
+        private final User user;
 
-        public VisitProfileAdapterItem(@Nonnull Observer<String> visitProfileObserver, @Nonnull String userName) {
+        public VisitProfileAdapterItem(@Nonnull Observer<String> visitProfileObserver, @Nonnull User user) {
             this.visitProfileObserver = visitProfileObserver;
-            this.userName = userName;
+            this.user = user;
         }
 
         public void onViewUserProfileClicked() {
-            visitProfileObserver.onNext(userName);
+            visitProfileObserver.onNext(user.getUsername());
+        }
+
+        @Nonnull
+        public String getName() {
+            return user.getName();
         }
 
         @Override

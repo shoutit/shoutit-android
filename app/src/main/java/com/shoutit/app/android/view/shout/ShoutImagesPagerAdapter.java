@@ -41,12 +41,14 @@ public class ShoutImagesPagerAdapter extends PagerAdapter {
     public Object instantiateItem(ViewGroup container, int position) {
         final ImageView imageView = (ImageView) inflater.inflate(R.layout.shout_pager_image, container, false);
 
-        picasso.load(images.get(position))
-                .placeholder(R.drawable.pattern_placeholder)
-                .error(R.drawable.pattern_placeholder)
-                .fit()
-                .centerCrop()
-                .into(imageView);
+        if (!images.isEmpty()) {
+            picasso.load(images.get(position))
+                    .placeholder(R.drawable.pattern_placeholder)
+                    .error(R.drawable.pattern_placeholder)
+                    .fit()
+                    .centerCrop()
+                    .into(imageView);
+        }
 
         container.addView(imageView);
 
@@ -55,7 +57,11 @@ public class ShoutImagesPagerAdapter extends PagerAdapter {
 
     @Override
     public int getCount() {
-        return images.size();
+        if (images.size() == 0) {
+            return 1;
+        } else {
+            return images.size();
+        }
     }
 
     @Override

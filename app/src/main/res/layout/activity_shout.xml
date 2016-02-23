@@ -10,8 +10,10 @@
         android:layout_height="?actionBarSize"/>
 
     <android.support.v7.widget.RecyclerView
+        android:layout_above="@+id/shout_bottom_bar"
         android:layout_below="@+id/shout_toolbar"
         android:id="@+id/shout_recycler_view"
+        android:layout_marginTop="4dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
@@ -20,5 +22,42 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"/>
+
+    <LinearLayout
+        android:id="@+id/shout_bottom_bar"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/black_87"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/ShoutBottomBarItem"
+            android:drawableLeft="@drawable/ic_call"
+            android:drawableStart="@drawable/ic_call"
+            android:text="@string/shout_bottom_bar_call"/>
+
+        <TextView
+            style="@style/ShoutBottomBarItem"
+            android:drawableLeft="@drawable/ic_video_chat"
+            android:drawableStart="@drawable/ic_video_chat"
+            android:text="@string/shout_bottom_bar_video_call"/>
+
+        <TextView
+            style="@style/ShoutBottomBarItem"
+            android:drawableLeft="@drawable/ic_chat_white"
+            android:drawableStart="@drawable/ic_chat_white"
+            android:text="@string/shout_bottom_bar_chat"/>
+
+        <TextView
+            style="@style/ShoutBottomBarItem"
+            android:layout_weight="0.1"
+            android:drawableLeft="@drawable/ic_more"
+            android:drawableStart="@drawable/ic_more" />
+
+    </LinearLayout>
 
 </RelativeLayout>

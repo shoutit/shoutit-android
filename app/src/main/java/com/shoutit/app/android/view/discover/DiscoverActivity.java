@@ -60,7 +60,7 @@ public class DiscoverActivity extends BaseActivity implements OnNewDiscoverSelec
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_main_menu, menu);
+        getMenuInflater().inflate(R.menu.base_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
 

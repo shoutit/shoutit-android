@@ -70,7 +70,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:background="@drawable/shape_home_offer_label"
-                android:gravity="center_vertical"
+                android:gravity="top|center_horizontal"
                 android:paddingBottom="4dp"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
@@ -94,11 +94,11 @@
 
             <com.viewpagerindicator.CirclePageIndicator
                 android:id="@+id/activity_intro_page_indicators"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 tools:background="@android:color/black"
                 android:layout_gravity="center_horizontal|bottom"
-                android:layout_marginBottom="26dp"
+                android:layout_marginBottom="20dp"
                 app:fillColor="@android:color/white"
                 app:pageColor="@color/shout_page_indicator"/>
 

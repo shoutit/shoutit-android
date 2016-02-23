@@ -12,7 +12,8 @@ import dagger.Component;
 @Component(
         dependencies = AppComponent.class,
         modules = {
-                ActivityModule.class
+                ActivityModule.class,
+                ShoutActivityModule.class
         }
 )
 public interface ShoutActivityComponent extends BaseActivityComponent {

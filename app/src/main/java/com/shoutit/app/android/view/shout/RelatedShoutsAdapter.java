@@ -13,7 +13,6 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.PriceUtils;
-import com.shoutit.app.android.view.home.HomePresenter;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 import com.squareup.picasso.Picasso;
 
@@ -38,9 +37,9 @@ public class RelatedShoutsAdapter extends BaseAdapter {
         this.picasso = picasso;
     }
 
-    class ShowAllItemsViewHolder extends ViewHolderManager.BaseViewHolder<HomePresenter.DiscoverShowAllAdapterItem> {
+    class ShowAllItemsViewHolder extends ViewHolderManager.BaseViewHolder<ShoutAdapterItems.SeeAllRelatesAdapterItem> {
 
-        private HomePresenter.DiscoverShowAllAdapterItem item;
+        private ShoutAdapterItems.SeeAllRelatesAdapterItem item;
 
         public ShowAllItemsViewHolder(@Nonnull View itemView) {
             super(itemView);
@@ -48,13 +47,13 @@ public class RelatedShoutsAdapter extends BaseAdapter {
         }
 
         @Override
-        public void bind(@Nonnull HomePresenter.DiscoverShowAllAdapterItem item) {
+        public void bind(@Nonnull ShoutAdapterItems.SeeAllRelatesAdapterItem item) {
             this.item = item;
         }
 
-        @OnClick(R.id.home_see_all_tv)
+        @OnClick(R.id.shout_see_all_tv)
         public void onSeeAllClick() {
-            item.onShowAllClicked();
+            item.onSeeAllClicked();
         }
     }
 

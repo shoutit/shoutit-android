@@ -298,6 +298,11 @@ public class HomePresenter {
         return onDiscoverSelectedSubject.observeOn(uiScheduler);
     }
 
+    @Nonnull
+    public Observable<String> getShoutSelectedObservable() {
+        return shoutSelectedObserver;
+    }
+
     /**
      * ADAPTER ITEMS
      **/

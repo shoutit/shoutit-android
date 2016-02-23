@@ -5,5 +5,4 @@
     android:paddingStart="@dimen/home_discover_item_spacing"
     android:overScrollMode="never"
     android:layout_width="match_parent"
-    android:layout_height="0dp"
-    android:layout_weight="1"/>
+    android:layout_height="@dimen/shout_related_container_height" />

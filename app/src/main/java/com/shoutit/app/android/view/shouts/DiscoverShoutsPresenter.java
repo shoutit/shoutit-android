@@ -87,4 +87,9 @@ public class DiscoverShoutsPresenter {
     public Observer<Object> getLoadMoreObserver() {
         return RxMoreObservers.ignoreCompleted(mDiscoverShoutsDao.getLoadMoreShoutsSubject());
     }
+
+    @Nonnull
+    public Observable<String> getShoutSelectedObservable() {
+        return shoutSelectedObserver;
+    }
 }

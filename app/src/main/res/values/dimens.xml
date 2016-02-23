@@ -32,7 +32,9 @@
     <!-- Shout detail -->
     <dimen name="shout_related_width">120dp</dimen>
     <dimen name="shout_related_image_height">90dp</dimen>
+    <dimen name="shout_related_container_height">150dp</dimen>
     <dimen name="shout_avatar_size">40dp</dimen>
     <dimen name="shout_related_card_height">40dp</dimen>
+    <dimen name="shout_item_padding">6dp</dimen>
 
 </resources>

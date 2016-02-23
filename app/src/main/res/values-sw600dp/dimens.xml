@@ -24,5 +24,6 @@
     <!-- Shout detail -->
     <dimen name="shout_related_width">150dp</dimen>
     <dimen name="shout_related_image_height">110dp</dimen>
+    <dimen name="shout_related_container_height">180dp</dimen>
 
 </resources>

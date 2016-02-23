@@ -4,6 +4,7 @@ import android.content.Context;
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
@@ -11,6 +12,7 @@ import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
+import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.model.RelatedShoutsPointer;
@@ -24,6 +26,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import rx.Observable;
+import rx.Scheduler;
 import rx.functions.Func1;
 import rx.functions.Func3;
 import rx.subjects.PublishSubject;
@@ -32,10 +35,12 @@ public class ShoutPresenter {
 
     private static final int USER_SHOUTS_PAGE_SIZE = 4;
     private static final int RELATED_SHOUTS_PAGE_SIZE = 6;
+    private static final int MAX_RELATED_ITEMS = 6;
 
     private final Observable<List<BaseAdapterItem>> allAdapterItemsObservable;
     private final Observable<Throwable> errorObservable;
     private final Observable<Boolean> progressObservable;
+    private final Observable<String> titleObservable;
 
     private PublishSubject<String> addToCartSubject = PublishSubject.create();
     private PublishSubject<String> userShoutSelectedSubject = PublishSubject.create();
@@ -43,10 +48,15 @@ public class ShoutPresenter {
     private PublishSubject<String> seeAllRelatedShoutSubject = PublishSubject.create();
     private PublishSubject<String> visitProfileSubject = PublishSubject.create();
 
+    @Nonnull
+    private final Scheduler uiScheduler;
+
     @Inject
     public ShoutPresenter(@Nonnull final ShoutsDao shoutsDao,
                           @Nonnull final String shoutId,
-                          @Nonnull @ForActivity final Context context) {
+                          @Nonnull @ForActivity final Context context,
+                          @Nonnull @UiScheduler Scheduler uiScheduler) {
+        this.uiScheduler = uiScheduler;
 
         /** Requests **/
         final Observable<Shout> shoutResponse = shoutsDao.getShoutObservable(shoutId)
@@ -56,10 +66,18 @@ public class ShoutPresenter {
                 .map(new Func1<Shout, String>() {
                     @Override
                     public String call(Shout shout) {
-                        return shout.getUser().getName();
+                        return shout.getUser().getUsername();
                     }
                 })
                 .compose(ObservableExtensions.<String>behaviorRefCount());
+
+        titleObservable = shoutResponse
+                .map(new Func1<Shout, String>() {
+                    @Override
+                    public String call(Shout shout) {
+                        return shout.getTitle();
+                    }
+                });
 
         final Observable<ResponseOrError<ShoutsResponse>> userShoutsObservable = userNameObservable
                 .switchMap(new Func1<String, Observable<ResponseOrError<ShoutsResponse>>>() {
@@ -131,7 +149,13 @@ public class ShoutPresenter {
                                     }
                                 });
 
-                        return ImmutableList.copyOf(items);
+                        final ImmutableList.Builder<BaseAdapterItem> builder = new ImmutableList.Builder<>();
+                        builder.addAll(items);
+                        if (items.size() >= MAX_RELATED_ITEMS) {
+                            builder.add(new ShoutAdapterItems.SeeAllRelatesAdapterItem(shoutId, seeAllRelatedShoutSubject));
+                        }
+
+                        return builder.build();
                     }
                 });
 
@@ -148,17 +172,13 @@ public class ShoutPresenter {
 
                         builder.add(shout);
 
-                        final String userName = shout.getShout().getUser().getName();
+                        final User user = shout.getShout().getUser();
                         if (!userShouts.isEmpty()) {
-                            builder.add(new ShoutAdapterItems.HeaderAdapterItem(context.getString(R.string.shout_user_shouts_header, userName)))
+                            builder.add(new ShoutAdapterItems.HeaderAdapterItem(context.getString(R.string.shout_user_shouts_header, user.getName())))
                                     .addAll(userShouts);
                         }
 
-                        builder.add(new ShoutAdapterItems.VisitProfileAdapterItem(visitProfileSubject, userName));
-
-                        if (!relatedShouts.isEmpty()) {
-                            builder.add(new ShoutAdapterItems.SeeAllRelatesAdapterItem(shoutId, seeAllRelatedShoutSubject));
-                        }
+                        builder.add(new ShoutAdapterItems.VisitProfileAdapterItem(visitProfileSubject, user));
 
                         if (!relatedShouts.isEmpty()) {
                             builder.add(new ShoutAdapterItems.HeaderAdapterItem(context.getString(R.string.shout_related_shouts_header)))
@@ -167,32 +187,64 @@ public class ShoutPresenter {
 
                         return builder.build();
                     }
-                });
+                })
+                .observeOn(uiScheduler);
 
         /** Errors **/
         errorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
                 ResponseOrError.transform(userShoutsObservable),
                 ResponseOrError.transform(shoutsDao.getShoutObservable(shoutId)),
                 ResponseOrError.transform(shoutsDao.getRelatedShoutsObservable(new RelatedShoutsPointer(shoutId, RELATED_SHOUTS_PAGE_SIZE)))))
-                .filter(Functions1.isNotNull());
+                .filter(Functions1.isNotNull())
+                .observeOn(uiScheduler);
 
         /** Progress **/
         progressObservable = Observable.merge(
                 errorObservable.map(Functions1.returnFalse()),
                 allAdapterItemsObservable.map(Functions1.returnFalse()))
-                .startWith(true);
+                .startWith(true)
+                .observeOn(uiScheduler);
     }
 
+    @Nonnull
     public Observable<List<BaseAdapterItem>> getAllAdapterItemsObservable() {
         return allAdapterItemsObservable;
     }
 
+    @Nonnull
     public Observable<Throwable> getErrorObservable() {
         return errorObservable;
     }
 
+    @Nonnull
     public Observable<Boolean> getProgressObservable() {
         return progressObservable;
+    }
+
+    @Nonnull
+    public Observable<String> getTitleObservable() {
+        return titleObservable
+                .observeOn(uiScheduler);
+    }
+
+    @Nonnull
+    public Observable<String> getUserShoutSelectedObservable() {
+        return userShoutSelectedSubject;
+    }
+
+    @Nonnull
+    public Observable<String> getRelatedShoutSelectedObservable() {
+        return relatedShoutSelectedSubject;
+    }
+
+    @Nonnull
+    public Observable<String> getSeeAllRelatedShoutObservable() {
+        return seeAllRelatedShoutSubject;
+    }
+
+    @Nonnull
+    public Observable<String> getVisitProfileObservable() {
+        return visitProfileSubject;
     }
 }
 
