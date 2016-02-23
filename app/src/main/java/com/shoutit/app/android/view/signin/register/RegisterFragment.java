@@ -1,6 +1,5 @@
 package com.shoutit.app.android.view.signin.register;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
@@ -208,6 +207,16 @@ public class RegisterFragment extends BaseFragment {
 
         bottomTextView.setMovementMethod(LinkMovementMethod.getInstance());
         bottomTextView.setText(TextUtils.concat(bottomText1, " ", spannableTermsOfService, " ", bottomText3, " ", spannablePrivacy));
+    }
+
+    @OnClick(R.id.register_lock_password)
+    public void lock() {
+        if (passwordEdittext.getTransformationMethod() instanceof PasswordTransformationMethod) {
+            passwordEdittext.setTransformationMethod(null);
+        } else {
+            passwordEdittext.setTransformationMethod(new PasswordTransformationMethod());
+        }
+        passwordEdittext.setSelection(passwordEdittext.length());
     }
 
 

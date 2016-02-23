@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
+    android:focusableInTouchMode="true"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ScrollView
         android:fillViewport="true"
@@ -20,6 +22,7 @@
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/register_email_edittext_layout"
                 style="@style/LoginInputStyle"
+                app:hintTextAppearance="@style/LoginInputStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -27,6 +30,7 @@
                     android:id="@+id/register_email_edittext"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:imeActionLabel="@string/login_next_label"
                     android:hint="@string/login_email_hint"
                     android:inputType="textEmailAddress"
                     android:nextFocusDown="@+id/register_password_edittext"/>
@@ -36,6 +40,7 @@
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/register_password_edittext_layout"
                 style="@style/LoginInputStyle"
+                app:hintTextAppearance="@style/LoginInputStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp">
@@ -44,6 +49,8 @@
                     android:id="@+id/register_password_edittext"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:imeActionLabel="@string/login_done_label"
+                    android:singleLine="true"
                     android:hint="@string/login_password_hint"
                     android:imeOptions="actionDone"/>
 
