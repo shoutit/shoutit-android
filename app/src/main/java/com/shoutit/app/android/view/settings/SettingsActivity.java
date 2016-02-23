@@ -34,6 +34,8 @@ public class SettingsActivity extends BaseActivity {
     Toolbar toolbar;
     @Bind(R.id.settings_account)
     TextView accountTextView;
+    @Bind(R.id.settings_account_divider)
+    View accountDivider;
 
     @Inject
     UserPreferences userPreferences;
@@ -51,6 +53,7 @@ public class SettingsActivity extends BaseActivity {
         setUpToolbar();
 
         accountTextView.setVisibility(userPreferences.isGuest() ? View.GONE : View.VISIBLE);
+        accountDivider.setVisibility(userPreferences.isGuest() ? View.GONE : View.VISIBLE);
     }
 
     @Override

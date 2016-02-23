@@ -6,6 +6,7 @@
     android:background="@color/default_bg_color">
 
     <android.support.design.widget.TextInputLayout
+        style="@style/LoginInputStyle"
         android:id="@+id/account_change_email_til"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
