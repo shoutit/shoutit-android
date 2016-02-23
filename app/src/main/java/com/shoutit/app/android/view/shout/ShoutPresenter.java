@@ -27,6 +27,7 @@ import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Scheduler;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func3;
 import rx.subjects.PublishSubject;
@@ -59,10 +60,13 @@ public class ShoutPresenter {
         this.uiScheduler = uiScheduler;
 
         /** Requests **/
-        final Observable<Shout> shoutResponse = shoutsDao.getShoutObservable(shoutId)
+        final Observable<ResponseOrError<Shout>> shoutResponse = shoutsDao.getShoutObservable(shoutId)
+                .compose(ObservableExtensions.<ResponseOrError<Shout>>behaviorRefCount());
+
+        final Observable<Shout> successShoutResponse = shoutResponse
                 .compose(ResponseOrError.<Shout>onlySuccess());
 
-        final Observable<String> userNameObservable = shoutResponse
+        final Observable<String> userNameObservable = successShoutResponse
                 .map(new Func1<Shout, String>() {
                     @Override
                     public String call(Shout shout) {
@@ -71,7 +75,7 @@ public class ShoutPresenter {
                 })
                 .compose(ObservableExtensions.<String>behaviorRefCount());
 
-        titleObservable = shoutResponse
+        titleObservable = successShoutResponse
                 .map(new Func1<Shout, String>() {
                     @Override
                     public String call(Shout shout) {
@@ -98,7 +102,11 @@ public class ShoutPresenter {
                 })
                 .filter(Functions1.isNotNull());
 
-        final Observable<List<Shout>> relatedShoutsObservable = shoutsDao
+        final Observable<ResponseOrError<ShoutsResponse>> relatedShoutsObservable = shoutsDao
+                .getRelatedShoutsObservable(new RelatedShoutsPointer(shoutId, RELATED_SHOUTS_PAGE_SIZE))
+                .compose(ObservableExtensions.<ResponseOrError<ShoutsResponse>>behaviorRefCount());
+
+        final Observable<List<Shout>> successRelatedShoutsObservable = shoutsDao
                 .getRelatedShoutsObservable(new RelatedShoutsPointer(shoutId, RELATED_SHOUTS_PAGE_SIZE))
                 .compose(ResponseOrError.<ShoutsResponse>onlySuccess())
                 .map(new Func1<ShoutsResponse, List<Shout>>() {
@@ -112,7 +120,7 @@ public class ShoutPresenter {
 
         /** Adapter Items **/
         final Observable<ShoutAdapterItems.MainShoutAdapterItem> shoutItemObservable =
-                shoutResponse.map(new Func1<Shout, ShoutAdapterItems.MainShoutAdapterItem>() {
+                successShoutResponse.map(new Func1<Shout, ShoutAdapterItems.MainShoutAdapterItem>() {
                     @Override
                     public ShoutAdapterItems.MainShoutAdapterItem call(Shout shout) {
                         return new ShoutAdapterItems.MainShoutAdapterItem(addToCartSubject, shout);
@@ -136,7 +144,7 @@ public class ShoutPresenter {
                     }
                 });
 
-        final Observable<List<BaseAdapterItem>> relatedShoutsItems = relatedShoutsObservable
+        final Observable<List<BaseAdapterItem>> relatedShoutsItems = successRelatedShoutsObservable
                 .map(new Func1<List<Shout>, List<BaseAdapterItem>>() {
                     @Override
                     public List<BaseAdapterItem> call(List<Shout> shouts) {
@@ -193,9 +201,14 @@ public class ShoutPresenter {
         /** Errors **/
         errorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
                 ResponseOrError.transform(userShoutsObservable),
-                ResponseOrError.transform(shoutsDao.getShoutObservable(shoutId)),
-                ResponseOrError.transform(shoutsDao.getRelatedShoutsObservable(new RelatedShoutsPointer(shoutId, RELATED_SHOUTS_PAGE_SIZE)))))
-                .filter(Functions1.isNotNull())
+                ResponseOrError.transform(shoutResponse),
+                ResponseOrError.transform(relatedShoutsObservable)))
+                .filter(Functions1.isNotNull()).doOnNext(new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+
+                    }
+                })
                 .observeOn(uiScheduler);
 
         /** Progress **/

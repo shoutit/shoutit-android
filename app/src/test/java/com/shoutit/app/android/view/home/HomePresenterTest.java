@@ -213,7 +213,7 @@ public class HomePresenterTest {
     private ResponseOrError<ShoutsResponse> shoutsResponse() {
         return ResponseOrError.fromData(new ShoutsResponse(1, "2", null, Lists.newArrayList(
                 new Shout("id", null, null, null, null, null, null, 1f, 2f, null, null, null,
-                        user, category, Lists.newArrayList(tag), 2, images))));
+                        user, category, Lists.newArrayList(tag), 2, null))));
     }
 
     @Nonnull
