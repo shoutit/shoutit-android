@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:focusableInTouchMode="true">
 
     <ScrollView
-        android:fillViewport="true"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -22,14 +24,17 @@
                 android:id="@+id/register_name_layout"
                 style="@style/LoginInputStyle"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:hintTextAppearance="@style/LoginInputStyle">
 
                 <EditText
                     android:id="@+id/register_name_edittext"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/register_name"
-                    android:nextFocusDown="@+id/register_email_edittext"/>
+                    android:imeActionLabel="@string/register_next_label"
+                    android:nextFocusDown="@+id/register_email_edittext"
+                    android:singleLine="true"/>
 
             </android.support.design.widget.TextInputLayout>
 
@@ -39,38 +44,59 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:nextFocusDown="@+id/register_password_layout">
+                android:nextFocusDown="@+id/register_password_layout"
+                app:hintTextAppearance="@style/LoginInputStyle">
 
                 <EditText
                     android:id="@+id/register_email_edittext"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/register_email"
+                    android:imeActionLabel="@string/register_next_label"
                     android:inputType="textEmailAddress"
-                    android:nextFocusDown="@+id/register_password_edittext"/>
+                    android:nextFocusDown="@+id/register_password_edittext"
+                    android:singleLine="true"/>
 
             </android.support.design.widget.TextInputLayout>
 
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/register_password_layout"
-                style="@style/LoginInputStyle"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp">
+                android:layout_height="wrap_content">
 
-                <EditText
-                    android:id="@+id/register_password_edittext"
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/register_password_layout"
+                    style="@style/LoginInputStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/register_password"
-                    android:imeOptions="actionDone"/>
+                    android:layout_marginTop="10dp"
+                    app:hintTextAppearance="@style/LoginInputStyle">
 
-            </android.support.design.widget.TextInputLayout>
+                    <EditText
+                        android:id="@+id/register_password_edittext"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/register_password"
+                        android:imeActionLabel="@string/register_done_label"
+                        android:imeOptions="actionDone"
+                        android:singleLine="true"/>
+
+                </android.support.design.widget.TextInputLayout>
+
+                <ImageButton
+                    android:id="@+id/register_lock_password"
+                    android:background="?selectableItemBackground"
+                    android:src="@drawable/lock"
+                    android:layout_marginTop="4dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+            </FrameLayout>
 
             <Button
                 android:id="@+id/register_proceed_btn"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="60dp"
                 android:layout_marginTop="14dp"
                 android:text="@string/register_sign_up_btn_text"
                 android:textColor="@android:color/white"/>

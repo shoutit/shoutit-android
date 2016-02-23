@@ -66,6 +66,8 @@
     <string name="register_bottom_text3">and</string>
     <string name="register_bottom_text4">Privacy Policy</string>
     <string name="register_forgot_password">Forgot your password?</string>
+    <string name="register_next_label">Next</string>
+    <string name="register_done_label">Done</string>
 
     <!-- Login Intro -->
     <string name="login_intro_join">Join Now!</string>
@@ -78,6 +80,8 @@
     <string name="login_intro_about">About</string>
     <string name="login_sign_up_new">New to Shoutit?</string>
     <string name="login_intro_fail">Failed to login</string>
+    <string name="login_next_label">Next</string>
+    <string name="login_done_label">Done</string>
 
     <!-- About -->
     <string name="pref_key_terms_of_service" translatable="false">pref_key_terms_of_service</string>
@@ -158,6 +162,5 @@
     <string name="account_title_change_email">Change email</string>
     <string name="account_title_change_password">Change password</string>
     <string name="account_error_old_password">Please provide old password</string>
-
 
 </resources>
