@@ -8,11 +8,19 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
+import android.view.View;
 
+import com.appunite.rx.ObservableExtensions;
+import com.appunite.rx.android.MyAndroidSchedulers;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.GuestSignupRequest;
+import com.shoutit.app.android.api.model.SignResponse;
+import com.shoutit.app.android.api.model.UserLocation;
+import com.shoutit.app.android.api.model.login.LoginUser;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.location.LocationManager;
@@ -30,6 +38,11 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Observable;
+import rx.functions.Action0;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 public class IntroActivity extends BaseActivity {
 
@@ -40,6 +53,9 @@ public class IntroActivity extends BaseActivity {
     @Bind(R.id.activity_intro_page_indicators)
     CirclePageIndicator circlePageIndicator;
 
+    @Bind(R.id.intro_progress)
+    View progress;
+
     @Inject
     IntroPagerAdapter pagerAdapter;
 
@@ -47,6 +63,9 @@ public class IntroActivity extends BaseActivity {
     UserPreferences mUserPreferences;
     @Inject
     LocationManager locationManager;
+    @Inject
+    ApiService mApiService;
+    private Observable<UserLocation> mLocationObservable;
 
     public static Intent newIntent(Context context) {
         return new Intent(context, IntroActivity.class);
@@ -64,12 +83,19 @@ public class IntroActivity extends BaseActivity {
         circlePageIndicator.setViewPager(viewPager);
 
         askForLocationPermissionIfNeeded();
+
+        mLocationObservable = mUserPreferences.getLocationObservable()
+                .startWith((UserLocation) null)
+                .compose(ObservableExtensions.<UserLocation>behaviorRefCount());
+        mLocationObservable
+                .compose(bindToLifecycle())
+                .subscribe();
     }
 
     private void askForLocationPermissionIfNeeded() {
         PermissionHelper.checkPermissions(this, REQUEST_CODE_LOCATION,
                 findViewById(android.R.id.content), R.string.permission_location_explanation,
-                new String[] {Manifest.permission.ACCESS_FINE_LOCATION});
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION});
     }
 
     @OnClick(R.id.activity_intro_help)
@@ -80,7 +106,35 @@ public class IntroActivity extends BaseActivity {
     @OnClick(R.id.activity_intro_skip)
     public void onSkipClick() {
         mUserPreferences.setGuest(true);
-        startActivity(MainActivity.newIntent(this));
+
+        progress.setVisibility(View.VISIBLE);
+        mLocationObservable.first()
+                .flatMap(new Func1<UserLocation, Observable<SignResponse>>() {
+                    @Override
+                    public Observable<SignResponse> call(UserLocation location) {
+                        return mApiService.loginGuest(new GuestSignupRequest(LoginUser.loginUser(location)))
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(MyAndroidSchedulers.mainThread());
+                    }
+                })
+                .doOnTerminate(new Action0() {
+                    @Override
+                    public void call() {
+                        progress.setVisibility(View.GONE);
+                    }
+                })
+                .subscribe(new Action1<SignResponse>() {
+                    @Override
+                    public void call(SignResponse signResponse) {
+                        mUserPreferences.setGuestLoggedIn(signResponse.getAccessToken(), signResponse.getRefreshToken());
+                        startActivity(MainActivity.newIntent(IntroActivity.this));
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        ColoredSnackBar.error(ColoredSnackBar.contentView(IntroActivity.this), R.string.intro_fail_login, Snackbar.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     @OnClick(R.id.activity_intro_login_button)
