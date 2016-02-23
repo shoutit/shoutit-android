@@ -32,8 +32,6 @@ public class SettingsActivity extends BaseActivity {
 
     @Bind(R.id.activity_settings_toolbar)
     Toolbar toolbar;
-    @Bind(R.id.settings_version_name)
-    TextView versionTextView;
     @Bind(R.id.settings_account)
     TextView accountTextView;
 
@@ -53,7 +51,6 @@ public class SettingsActivity extends BaseActivity {
         setUpToolbar();
 
         accountTextView.setVisibility(userPreferences.isGuest() ? View.GONE : View.VISIBLE);
-        versionTextView.setText(getString(R.string.menu_version_name, BuildConfig.VERSION_NAME));
     }
 
     @Override
