@@ -26,7 +26,7 @@ public class DiscoverShoutsAdapter extends BaseAdapter {
     public ViewHolderManager.BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return isLinearLayoutManager ?
                 new ShoutLinerViewHolder(layoutInflater.inflate(R.layout.home_feed_item_linear, parent, false), context, mPicasso) :
-                new ShoutGridViewHolder(layoutInflater.inflate(R.layout.home_feed_item_grid, parent, false), mPicasso, context);
+                new ShoutGridViewHolder(layoutInflater.inflate(R.layout.shout_item_grid, parent, false), mPicasso, context);
     }
 
     @Override

@@ -4,20 +4,22 @@ import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.base.Objects;
 import com.shoutit.app.android.api.model.Shout;
 
+import java.util.List;
+
 import javax.annotation.Nonnull;
 
 import rx.Observer;
 
 public class ShoutAdapterItems {
 
-    public static class ShoutAdapterItem implements BaseAdapterItem {
+    public static class MainShoutAdapterItem implements BaseAdapterItem {
 
         @Nonnull
         private final Observer<String> addToCartObserver;
         @Nonnull
         private final Shout shout;
 
-        public ShoutAdapterItem(@Nonnull Observer<String> addToCartObserver, @Nonnull Shout shout) {
+        public MainShoutAdapterItem(@Nonnull Observer<String> addToCartObserver, @Nonnull Shout shout) {
             this.addToCartObserver = addToCartObserver;
             this.shout = shout;
         }
@@ -38,7 +40,7 @@ public class ShoutAdapterItems {
 
         @Override
         public boolean matches(@Nonnull BaseAdapterItem item) {
-            return item instanceof ShoutAdapterItem;
+            return item instanceof MainShoutAdapterItem;
         }
 
         @Override
@@ -49,8 +51,8 @@ public class ShoutAdapterItems {
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
-            if (!(o instanceof ShoutAdapterItem)) return false;
-            final ShoutAdapterItem that = (ShoutAdapterItem) o;
+            if (!(o instanceof MainShoutAdapterItem)) return false;
+            final MainShoutAdapterItem that = (MainShoutAdapterItem) o;
             return Objects.equal(shout, that.shout);
         }
 
@@ -113,13 +115,13 @@ public class ShoutAdapterItems {
         }
     }
 
-    public static class ViewProfileAdapterItem implements BaseAdapterItem {
+    public static class VisitProfileAdapterItem implements BaseAdapterItem {
         @Nonnull
         private final Observer<String> visitProfileObserver;
         @Nonnull
         private final String userName;
 
-        public ViewProfileAdapterItem(@Nonnull Observer<String> visitProfileObserver, @Nonnull String userName) {
+        public VisitProfileAdapterItem(@Nonnull Observer<String> visitProfileObserver, @Nonnull String userName) {
             this.visitProfileObserver = visitProfileObserver;
             this.userName = userName;
         }
@@ -135,12 +137,12 @@ public class ShoutAdapterItems {
 
         @Override
         public boolean matches(@Nonnull BaseAdapterItem item) {
-            return item instanceof ViewProfileAdapterItem;
+            return item instanceof VisitProfileAdapterItem;
         }
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof ViewProfileAdapterItem;
+            return item instanceof VisitProfileAdapterItem;
         }
     }
 
@@ -206,6 +208,34 @@ public class ShoutAdapterItems {
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
             return item instanceof HeaderAdapterItem && title.equals(((HeaderAdapterItem) item).getTitle());
+        }
+    }
+
+    public static class RelatedContainerAdapterItem implements BaseAdapterItem {
+
+        private final List<BaseAdapterItem> items;
+
+        public RelatedContainerAdapterItem(List<BaseAdapterItem> items) {
+            this.items = items;
+        }
+
+        public List<BaseAdapterItem> getItems() {
+            return items;
+        }
+
+        @Override
+        public long adapterId() {
+            return BaseAdapterItem.NO_ID;
+        }
+
+        @Override
+        public boolean matches(@Nonnull BaseAdapterItem item) {
+            return false;
+        }
+
+        @Override
+        public boolean same(@Nonnull BaseAdapterItem item) {
+            return false;
         }
     }
 }

@@ -10,6 +10,7 @@
     card_view:cardUseCompatPadding="true">
 
     <TextView
+        android:id="@+id/shout_description_tv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="8dp"

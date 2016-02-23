@@ -19,13 +19,13 @@ import butterknife.ButterKnife;
 
 public class ShoutGridViewHolder extends ViewHolderManager.BaseViewHolder<ShoutAdapterItem> {
 
-    @Bind(R.id.home_feed_card_image_view)
+    @Bind(R.id.shout_grid_image_view)
     ImageView cardImageView;
-    @Bind(R.id.home_feed_card_title_tv)
+    @Bind(R.id.shout_grid_title_tv)
     TextView titleTextView;
     @Bind(R.id.home_feed_card_name_tv)
     TextView nameTextView;
-    @Bind(R.id.home_feed_card_price_tv)
+    @Bind(R.id.shout_grid_price_tv)
     TextView cardPriceTextView;
 
     private final Picasso picasso;

@@ -172,5 +172,7 @@
     <string name="shout_header_description">DESCRIPTION</string>
     <string name="shout_header_details">Details</string>
     <string name="shout_user_shouts_header">OTHER SHOUTS FROM %1$s</string>
+    <string name="shout_user_location">%1$s %2$s</string>
+    <string name="shout_available">Only %1$f available</string>
 
 </resources>

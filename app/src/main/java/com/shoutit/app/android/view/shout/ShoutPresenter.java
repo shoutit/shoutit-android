@@ -40,11 +40,12 @@ public class ShoutPresenter {
     private PublishSubject<String> addToCartSubject = PublishSubject.create();
     private PublishSubject<String> userShoutSelectedSubject = PublishSubject.create();
     private PublishSubject<String> relatedShoutSelectedSubject = PublishSubject.create();
+    private PublishSubject<String> seeAllRelatedShoutSubject = PublishSubject.create();
     private PublishSubject<String> visitProfileSubject = PublishSubject.create();
 
     @Inject
     public ShoutPresenter(@Nonnull final ShoutsDao shoutsDao,
-                          @Nonnull String shoutId,
+                          @Nonnull final String shoutId,
                           @Nonnull @ForActivity final Context context) {
 
         /** Requests **/
@@ -92,11 +93,11 @@ public class ShoutPresenter {
 
 
         /** Adapter Items **/
-        final Observable<ShoutAdapterItems.ShoutAdapterItem> shoutItemObservable =
-                shoutResponse.map(new Func1<Shout, ShoutAdapterItems.ShoutAdapterItem>() {
+        final Observable<ShoutAdapterItems.MainShoutAdapterItem> shoutItemObservable =
+                shoutResponse.map(new Func1<Shout, ShoutAdapterItems.MainShoutAdapterItem>() {
                     @Override
-                    public ShoutAdapterItems.ShoutAdapterItem call(Shout shout) {
-                        return new ShoutAdapterItems.ShoutAdapterItem(addToCartSubject, shout);
+                    public ShoutAdapterItems.MainShoutAdapterItem call(Shout shout) {
+                        return new ShoutAdapterItems.MainShoutAdapterItem(addToCartSubject, shout);
                     }
                 });
 
@@ -125,7 +126,7 @@ public class ShoutPresenter {
                                 Lists.transform(shouts, new Function<Shout, BaseAdapterItem>() {
                                     @Nullable
                                     @Override
-                                    public BaseAdapterItem apply(@Nullable Shout input) {
+                                    public ShoutAdapterItem apply(@Nullable Shout input) {
                                         return new ShoutAdapterItem(input, context, relatedShoutSelectedSubject);
                                     }
                                 });
@@ -138,9 +139,9 @@ public class ShoutPresenter {
                 shoutItemObservable,
                 userShoutItemsObservable.startWith(ImmutableList.<BaseAdapterItem>of()),
                 relatedShoutsItems.startWith(ImmutableList.<BaseAdapterItem>of()),
-                new Func3<ShoutAdapterItems.ShoutAdapterItem, List<BaseAdapterItem>, List<BaseAdapterItem>, List<BaseAdapterItem>>() {
+                new Func3<ShoutAdapterItems.MainShoutAdapterItem, List<BaseAdapterItem>, List<BaseAdapterItem>, List<BaseAdapterItem>>() {
                     @Override
-                    public List<BaseAdapterItem> call(ShoutAdapterItems.ShoutAdapterItem shout,
+                    public List<BaseAdapterItem> call(ShoutAdapterItems.MainShoutAdapterItem shout,
                                                       List<BaseAdapterItem> userShouts,
                                                       List<BaseAdapterItem> relatedShouts) {
                         final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
@@ -153,11 +154,15 @@ public class ShoutPresenter {
                                     .addAll(userShouts);
                         }
 
-                        builder.add(new ShoutAdapterItems.ViewProfileAdapterItem(visitProfileSubject, userName));
+                        builder.add(new ShoutAdapterItems.VisitProfileAdapterItem(visitProfileSubject, userName));
+
+                        if (!relatedShouts.isEmpty()) {
+                            builder.add(new ShoutAdapterItems.SeeAllRelatesAdapterItem(shoutId, seeAllRelatedShoutSubject));
+                        }
 
                         if (!relatedShouts.isEmpty()) {
                             builder.add(new ShoutAdapterItems.HeaderAdapterItem(context.getString(R.string.shout_related_shouts_header)))
-                                    .addAll(relatedShouts);
+                                    .add(new ShoutAdapterItems.RelatedContainerAdapterItem(relatedShouts));
                         }
 
                         return builder.build();

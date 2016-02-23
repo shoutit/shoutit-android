@@ -81,6 +81,14 @@
                 android:id="@+id/shout_location_tv"
                 tools:text="Dubai" />
 
+            <ImageView
+                android:id="@+id/shout_location_flag_iv"
+                android:layout_width="35dp"
+                android:layout_height="20dp"
+                android:paddingRight="15dp"
+                android:paddingEnd="15dp"
+                android:src="@drawable/pl"/>
+
         </LinearLayout>
 
     </LinearLayout>

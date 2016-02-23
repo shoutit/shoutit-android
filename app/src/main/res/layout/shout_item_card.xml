@@ -28,8 +28,8 @@
 
             <ImageView
                 android:id="@+id/shout_avatar_iv"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="@dimen/shout_avatar_size"
+                android:layout_height="@dimen/shout_avatar_size"
                 android:layout_marginEnd="8dp"
                 android:layout_marginRight="8dp"
                 android:scaleType="centerCrop"
@@ -54,6 +54,7 @@
                     tools:text="John Smith" />
 
                 <TextView
+                    android:id="@+id/shout_user_location_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
@@ -104,7 +105,7 @@
         </FrameLayout>
 
         <TextView
-            android:id="@+id/shouts_description_tv"
+            android:id="@+id/shouts_title_tv"
             android:layout_below="@+id/shout_pager_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -118,7 +119,7 @@
 
         <TextView
             android:id="@+id/shouts_price_tv"
-            android:layout_below="@+id/shouts_description_tv"
+            android:layout_below="@+id/shouts_title_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
@@ -127,7 +128,8 @@
             tools:text="$44 USD"/>
 
         <TextView
-            android:layout_below="@+id/shouts_description_tv"
+            android:id="@+id/shout_available_tv"
+            android:layout_below="@+id/shouts_title_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
