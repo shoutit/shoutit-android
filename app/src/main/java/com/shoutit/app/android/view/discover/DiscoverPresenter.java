@@ -6,7 +6,6 @@ import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
-import com.appunite.rx.operators.MoreOperators;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
@@ -36,7 +35,7 @@ import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Func1;
-import rx.functions.Func3;
+import rx.functions.Func2;
 import rx.functions.Func4;
 import rx.subjects.PublishSubject;
 
@@ -55,6 +54,7 @@ public class DiscoverPresenter {
     private final PublishSubject<String> showMoreObserver = PublishSubject.create();
     @Nonnull
     private final PublishSubject<String> discoverSelectedObserver = PublishSubject.create();
+    private final Observable<DiscoveryInfo> mDiscoveryInfoObservable;
 
     public DiscoverPresenter(@Nonnull UserPreferences userPreferences,
                              @Nonnull final DiscoversDao discoversDao,
@@ -130,10 +130,18 @@ public class DiscoverPresenter {
                             }
                         })
                         .compose(ObservableExtensions.<ResponseOrError<DiscoverItemDetailsResponse>>behaviorRefCount());
+        final Observable<DiscoverItemDetailsResponse> itemDetailsResponseObservable = discoverItemObservable
+                .compose(ResponseOrError.<DiscoverItemDetailsResponse>onlySuccess());
+
+        final Observable<String> discoveryTitle = itemDetailsResponseObservable.map(new Func1<DiscoverItemDetailsResponse, String>() {
+            @Override
+            public String call(DiscoverItemDetailsResponse discoverItemDetailsResponse) {
+                return discoverItemDetailsResponse.getTitle();
+            }
+        });
 
         /** Shouts **/
-        final Observable<ResponseOrError<ShoutsResponse>> shoutsItemsObservable = discoverItemObservable
-                .compose(ResponseOrError.<DiscoverItemDetailsResponse>onlySuccess())
+        final Observable<ResponseOrError<ShoutsResponse>> shoutsItemsObservable = itemDetailsResponseObservable
                 .filter(new Func1<DiscoverItemDetailsResponse, Boolean>() {
                     @Override
                     public Boolean call(DiscoverItemDetailsResponse response) {
@@ -151,8 +159,7 @@ public class DiscoverPresenter {
                 .compose(ObservableExtensions.<ResponseOrError<ShoutsResponse>>behaviorRefCount());
 
         /** Adapter Items **/
-        final Observable<BaseAdapterItem> headerAdapterItemObservable = discoverItemObservable
-                .compose(ResponseOrError.<DiscoverItemDetailsResponse>onlySuccess())
+        final Observable<BaseAdapterItem> headerAdapterItemObservable = itemDetailsResponseObservable
                 .map(new Func1<DiscoverItemDetailsResponse, BaseAdapterItem>() {
                     @Override
                     public BaseAdapterItem call(DiscoverItemDetailsResponse response) {
@@ -160,8 +167,7 @@ public class DiscoverPresenter {
                     }
                 });
 
-        final Observable<List<BaseAdapterItem>> discoverAdapterItemsObservable = discoverItemObservable
-                .compose(ResponseOrError.<DiscoverItemDetailsResponse>onlySuccess())
+        final Observable<List<BaseAdapterItem>> discoverAdapterItemsObservable = itemDetailsResponseObservable
                 .filter(new Func1<DiscoverItemDetailsResponse, Boolean>() {
                     @Override
                     public Boolean call(DiscoverItemDetailsResponse response) {
@@ -258,6 +264,13 @@ public class DiscoverPresenter {
                 discoverItemObservable.map(Functions1.returnFalse()),
                 shoutsItemsObservable.map(Functions1.returnFalse()))
                 .observeOn(uiScheduler);
+
+        mDiscoveryInfoObservable = showMoreObserver.withLatestFrom(discoveryTitle, new Func2<String, String, DiscoveryInfo>() {
+            @Override
+            public DiscoveryInfo call(String id, String title) {
+                return new DiscoveryInfo(id, title);
+            }
+        });
     }
 
     @Nonnull
@@ -276,8 +289,8 @@ public class DiscoverPresenter {
     }
 
     @Nonnull
-    public Observable<String> getShowMoreObservable() {
-        return showMoreObserver;
+    public Observable<DiscoveryInfo> getShowMoreObservable() {
+        return mDiscoveryInfoObservable;
     }
 
     @Nonnull
@@ -469,6 +482,24 @@ public class DiscoverPresenter {
 
         public void showMoreClicked() {
             showMoreObserver.onNext(discoverId);
+        }
+    }
+
+    public class DiscoveryInfo {
+        private final String mId;
+        private final String mTitle;
+
+        public DiscoveryInfo(String id, String title) {
+            mId = id;
+            mTitle = title;
+        }
+
+        public String getId() {
+            return mId;
+        }
+
+        public String getTitle() {
+            return mTitle;
         }
     }
 }

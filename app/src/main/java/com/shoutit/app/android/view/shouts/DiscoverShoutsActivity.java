@@ -12,6 +12,7 @@ import android.widget.CompoundButton;
 import android.widget.ProgressBar;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.google.common.base.Preconditions;
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
 import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.jakewharton.rxbinding.view.RxView;
@@ -40,6 +41,7 @@ import butterknife.ButterKnife;
 public class DiscoverShoutsActivity extends BaseActivity {
 
     private static final String DISCOVER_ID = "discover_id";
+    private static final String DISCOVER_NAME = "discover_name";
 
     @Bind(R.id.shouts_activity_list)
     RecyclerView mRecyclerView;
@@ -69,6 +71,10 @@ public class DiscoverShoutsActivity extends BaseActivity {
 
         ButterKnife.bind(this);
 
+        final Bundle bundle = Preconditions.checkNotNull(getIntent().getExtras());
+        final String name = bundle.getString(DISCOVER_NAME);
+
+        mToolbar.setTitle(getString(R.string.discover_shouts_title, name));
         mToolbar.inflateMenu(R.menu.shouts_menu);
         mToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -148,7 +154,9 @@ public class DiscoverShoutsActivity extends BaseActivity {
     }
 
     @NonNull
-    public static Intent newIntent(Context context, String discoverId) {
-        return new Intent(context, DiscoverShoutsActivity.class).putExtra(DISCOVER_ID, discoverId);
+    public static Intent newIntent(Context context, String discoverId, String title) {
+        return new Intent(context, DiscoverShoutsActivity.class)
+                .putExtra(DISCOVER_ID, discoverId)
+                .putExtra(DISCOVER_NAME, title);
     }
 }

@@ -8,6 +8,7 @@ import com.shoutit.app.android.api.model.ChangePasswordRequest;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
+import com.shoutit.app.android.api.model.GuestSignupRequest;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.SignResponse;
@@ -32,7 +33,9 @@ import rx.Observable;
 
 public interface ApiService {
 
-    /** Discover **/
+    /**
+     * Discover
+     **/
     @GET("discover")
     Observable<DiscoverResponse> discovers(@Query("country") String country,
                                            @Query("page") Integer page,
@@ -42,8 +45,9 @@ public interface ApiService {
     Observable<DiscoverItemDetailsResponse> discoverItem(@Path("id") String id);
 
 
-
-    /** Shouts **/
+    /**
+     * Shouts
+     **/
     @GET("shouts")
     Observable<ShoutsResponse> shoutsForCity(@Query("country") String countryCode,
                                              @Query("city") String city,
@@ -56,9 +60,14 @@ public interface ApiService {
                                                      @Query("page_size") @Nullable Integer pageSize);
 
 
-    /** OAuth **/
+    /**
+     * OAuth
+     **/
     @POST("oauth2/access_token")
     Observable<SignResponse> login(@Body EmailLoginRequest request);
+
+    @POST("/v3/oauth2/access_token")
+    Observable<SignResponse> loginGuest(@Body GuestSignupRequest request);
 
     @POST("oauth2/access_token")
     Observable<SignResponse> signup(@Body EmailSignupRequest request);
@@ -76,7 +85,9 @@ public interface ApiService {
     Observable<Object> batchListen(@Body TagsRequest request);
 
 
-    /** User **/
+    /**
+     * User
+     **/
     @GET("users/{user_name}")
     Observable<User> getUser(@Path("user_name") String userName);
 
@@ -92,7 +103,9 @@ public interface ApiService {
                                     @Query("page_size") Integer pageSize);
 
 
-    /** Misc **/
+    /**
+     * Misc
+     **/
     @GET("misc/geocode")
     Observable<UserLocation> geocode(@Query("latlng") String latlng); // format like latlng=40.722100,-74.046900
 
@@ -103,7 +116,9 @@ public interface ApiService {
     Observable<List<Category>> categories();
 
 
-    /** Auth **/
+    /**
+     * Auth
+     **/
     @POST("auth/change_password")
     Observable<ResponseBody> changePassword(@Body ChangePasswordRequest changePasswordRequest);
 

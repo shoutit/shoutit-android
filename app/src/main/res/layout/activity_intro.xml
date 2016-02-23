@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -24,14 +24,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/activity_intro_pager_height"
                 android:layout_gravity="center_horizontal"
-                tools:layout_height="200dp" />
+                tools:layout_height="200dp"/>
 
             <com.viewpagerindicator.CirclePageIndicator
                 android:id="@+id/activity_intro_page_indicators"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                app:fillColor="@android:color/white" />
+                app:fillColor="@android:color/white"/>
 
             <Button
                 android:id="@+id/activity_intro_login_button"
@@ -43,7 +43,7 @@
                 android:text="@string/intro_login"
                 android:textAllCaps="false"
                 android:textColor="@color/colorPrimary"
-                android:textSize="14sp" />
+                android:textSize="14sp"/>
 
             <TextView
                 android:id="@+id/activity_intro_help"
@@ -53,7 +53,7 @@
                 android:padding="16dp"
                 android:text="@string/intro_help"
                 android:textColor="@android:color/white"
-                android:textSize="16sp" />
+                android:textSize="16sp"/>
 
         </LinearLayout>
 
@@ -70,6 +70,21 @@
         android:padding="16dp"
         android:text="@string/intro_skip"
         android:textColor="@android:color/white"
-        android:textSize="16sp" />
+        android:textSize="16sp"/>
+
+    <FrameLayout
+        android:id="@+id/intro_progress"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black_20"
+        android:clickable="true"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
+
+    </FrameLayout>
 
 </RelativeLayout>
