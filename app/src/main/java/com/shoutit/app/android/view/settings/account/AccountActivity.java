@@ -16,6 +16,8 @@ import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.view.settings.account.email.ChangeEmailFragment;
+import com.shoutit.app.android.view.settings.account.password.ChangePasswordFragment;
 
 import javax.annotation.Nonnull;
 

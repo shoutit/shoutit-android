@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.settings.account;
+package com.shoutit.app.android.view.settings.account.password;
 
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.BaseFragmentComponent;
@@ -15,8 +15,8 @@ import dagger.Component;
                 FragmentModule.class,
         }
 )
-public interface ChangeEmailFragmentComponent extends BaseFragmentComponent {
+public interface ChangePasswordFragmentComponent extends BaseFragmentComponent {
 
-    void inject(ChangeEmailFragment fragment);
+    void inject(ChangePasswordFragment fragment);
 }
 

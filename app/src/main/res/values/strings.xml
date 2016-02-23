@@ -163,5 +163,7 @@
     <string name="account_title_change_email">Change email</string>
     <string name="account_title_change_password">Change password</string>
     <string name="account_error_old_password">Please provide old password</string>
+    <string name="account_email_changed">Email successfully changed</string>
+    <string name="account_wrong_email">Wrong email address</string>
 
 </resources>
