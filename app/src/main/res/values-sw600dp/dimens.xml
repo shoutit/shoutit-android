@@ -21,4 +21,8 @@
     <dimen name="discover_grid_spacing">2dp</dimen>
     <dimen name="discover_header_height">160dp</dimen>
 
+    <!-- Shout detail -->
+    <dimen name="shout_related_width">150dp</dimen>
+    <dimen name="shout_related_image_height">110dp</dimen>
+
 </resources>

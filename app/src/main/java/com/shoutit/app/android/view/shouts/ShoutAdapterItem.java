@@ -14,16 +14,24 @@ import com.shoutit.app.android.utils.ResourcesHelper;
 
 import javax.annotation.Nonnull;
 
-public class DiscoverShoutAdapterItem implements BaseAdapterItem {
+import rx.Observer;
+import rx.subjects.PublishSubject;
+
+public class ShoutAdapterItem implements BaseAdapterItem {
 
     @Nonnull
     private final Shout shout;
     @Nonnull
     private final Context context;
+    @Nonnull
+    private final Observer<String> shoutSelectedObserver;
 
-    public DiscoverShoutAdapterItem(@Nonnull Shout shout, @Nonnull Context context) {
+    public ShoutAdapterItem(@Nonnull Shout shout,
+                            @Nonnull Context context,
+                            @Nonnull Observer<String> shoutSelectedObserver) {
         this.shout = shout;
         this.context = context;
+        this.shoutSelectedObserver = shoutSelectedObserver;
     }
 
     @Override
@@ -33,8 +41,8 @@ public class DiscoverShoutAdapterItem implements BaseAdapterItem {
 
     @Override
     public boolean matches(@Nonnull BaseAdapterItem item) {
-        return item instanceof DiscoverShoutAdapterItem &&
-                shout.getId().equals(((DiscoverShoutAdapterItem) item).shout.getId());
+        return item instanceof ShoutAdapterItem &&
+                shout.getId().equals(((ShoutAdapterItem) item).shout.getId());
     }
 
     @Override
@@ -67,12 +75,16 @@ public class DiscoverShoutAdapterItem implements BaseAdapterItem {
         }
     }
 
+    public void onShoutSelected() {
+        shoutSelectedObserver.onNext(shout.getId());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        final DiscoverShoutAdapterItem that = (DiscoverShoutAdapterItem) o;
+        final ShoutAdapterItem that = (ShoutAdapterItem) o;
 
         return shout.equals(that.shout);
 

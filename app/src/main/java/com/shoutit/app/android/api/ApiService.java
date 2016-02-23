@@ -9,6 +9,7 @@ import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
+import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.TagsRequest;
@@ -54,6 +55,20 @@ public interface ApiService {
     Observable<ShoutsResponse> shoutsForDiscoverItem(@Query("discover") @NonNull String discoverId,
                                                      @Query("page") @Nullable Integer page,
                                                      @Query("page_size") @Nullable Integer pageSize);
+
+    @GET("shouts/{id}")
+    Observable<Shout> shout(@Path("id") String shoutId);
+
+    @GET("shouts")
+    Observable<ShoutsResponse> shoutsForUser(@Query("user") String userName,
+                                             @Query("page") Integer page,
+                                             @Query("page_size") Integer pageSize);
+
+    @GET("shouts/{id}/related")
+    Observable<ShoutsResponse> shoutsRelated(@Path("id") String shoutId,
+                                             @Query("page") Integer page,
+                                             @Query("page_size") Integer pageSize);
+
 
 
     /** OAuth **/

@@ -166,4 +166,11 @@
     <string name="account_title_change_password">Change password</string>
     <string name="account_error_old_password">Please provide old password</string>
 
+    <!-- Shout -->
+    <string name="shout_related_shouts_header">RELATED SHOUTS</string>
+    <string name="shout_related_more">More</string>
+    <string name="shout_header_description">DESCRIPTION</string>
+    <string name="shout_header_details">Details</string>
+    <string name="shout_user_shouts_header">OTHER SHOUTS FROM %1$s</string>
+
 </resources>

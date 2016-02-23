@@ -2,6 +2,7 @@
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@android:color/white"
     card_view:cardElevation="2dp"
     card_view:cardUseCompatPadding="true"
@@ -78,16 +79,33 @@
                 tools:text="Offer" />
 
         </LinearLayout>
-        
-        <android.support.v4.view.ViewPager
-            android:id="@+id/shout_view_pager"
+
+        <FrameLayout
+            android:id="@+id/shout_pager_container"
             android:layout_below="@+id/shout_user_header"
-            android:layout_width="match_parent"
-            android:layout_height="258dp"/>
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/shout_view_pager"
+                android:layout_width="match_parent"
+                android:layout_height="258dp"/>
+
+            <com.viewpagerindicator.CirclePageIndicator
+                android:id="@+id/activity_intro_page_indicators"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:background="@android:color/black"
+                android:layout_gravity="center_horizontal|bottom"
+                android:layout_marginBottom="26dp"
+                app:fillColor="@android:color/white"
+                app:pageColor="@color/shout_page_indicator"/>
+
+        </FrameLayout>
 
         <TextView
             android:id="@+id/shouts_description_tv"
-            android:layout_below="@+id/shout_view_pager"
+            android:layout_below="@+id/shout_pager_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="16sp"
@@ -149,7 +167,6 @@
                 />
 
         </LinearLayout>
-
 
     </RelativeLayout>
 

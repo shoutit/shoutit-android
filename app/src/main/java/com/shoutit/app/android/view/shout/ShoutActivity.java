@@ -13,6 +13,7 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -25,6 +26,9 @@ public class ShoutActivity extends BaseActivity {
     RecyclerView recyclerView;
     @Bind(R.id.shout_progress_bar)
     ProgressBar progressBar;
+
+    @Inject
+    ShoutPresenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
