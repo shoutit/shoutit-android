@@ -13,8 +13,6 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
-import com.shoutit.app.android.view.discover.DaggerDiscoverFragmentComponent;
-import com.shoutit.app.android.view.discover.DiscoverFragmentModule;
 import com.shoutit.app.android.view.main.MainActivity;
 
 import javax.annotation.Nonnull;

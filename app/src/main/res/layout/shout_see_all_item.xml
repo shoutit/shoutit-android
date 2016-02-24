@@ -2,7 +2,7 @@
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/shout_see_all_tv"
     android:layout_width="90dp"
-    android:layout_height="@dimen/home_discover_image_height"
+    android:layout_height="@dimen/home_discover_card_height"
     android:gravity="center"
     android:text="@string/home_see_all"
     android:background="?selectableItemBackground"
