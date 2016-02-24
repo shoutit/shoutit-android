@@ -22,6 +22,7 @@ public class Actions1 {
         return new Action1<Object>() {
             @Override
             public void call(Object s) {
+                textInputLayout.setError(null);
                 textInputLayout.setErrorEnabled(false);
             }
         };
@@ -35,6 +36,7 @@ public class Actions1 {
                 if (show) {
                     textInputLayout.setError(message);
                 } else {
+                    textInputLayout.setError(null);
                     textInputLayout.setErrorEnabled(false);
                 }
             }

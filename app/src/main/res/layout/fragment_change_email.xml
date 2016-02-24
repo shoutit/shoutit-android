@@ -7,6 +7,7 @@
     android:background="@color/default_bg_color">
 
     <android.support.design.widget.TextInputLayout
+        android:theme="@style/BlueEditText"
         app:hintTextAppearance="@style/BlueInputStyle"
         android:id="@+id/account_change_email_til"
         android:layout_marginLeft="16dp"
@@ -16,12 +17,12 @@
         android:layout_height="wrap_content">
 
         <EditText
-            android:theme="@style/BlueEditText"
             android:id="@+id/account_change_email_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:imeOptions="actionDone"
             android:textSize="16sp"
+            android:maxLines="1"
             android:inputType="textEmailAddress"
             android:hint="@string/settings_new_email"/>
 
@@ -38,6 +39,19 @@
         android:layout_below="@+id/account_change_email_til"
         android:textColor="@android:color/white"/>
 
-    <include layout="@layout/base_progress" />
+    <FrameLayout
+        android:id="@+id/base_progress"
+        android:clickable="true"
+        android:layout_centerInParent="true"
+        android:background="@android:color/transparent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+
+    </FrameLayout>
 
 </RelativeLayout>
