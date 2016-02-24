@@ -259,6 +259,11 @@ public class ShoutPresenter {
     public Observable<String> getVisitProfileObservable() {
         return visitProfileSubject;
     }
+
+    @Nonnull
+    public Observable<String> getAddToCartSubject() {
+        return addToCartSubject;
+    }
 }
 
 

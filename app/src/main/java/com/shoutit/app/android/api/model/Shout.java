@@ -1,6 +1,5 @@
 package com.shoutit.app.android.api.model;
 
-import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 
 import com.google.common.base.Objects;

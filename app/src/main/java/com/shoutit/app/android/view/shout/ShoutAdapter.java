@@ -2,6 +2,7 @@ package com.shoutit.app.android.view.shout;
 
 import android.content.Context;
 import android.graphics.Rect;
+import android.location.Location;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,6 +21,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.Filter;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.DateTimeUtils;
 import com.shoutit.app.android.utils.PicassoHelper;
@@ -34,6 +36,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import rx.Observable;
 import rx.Subscription;
 
@@ -97,6 +100,7 @@ public class ShoutAdapter extends BaseAdapter {
         View locationContainer;
 
         private final Target flagTarget;
+        private ShoutAdapterItems.MainShoutAdapterItem item;
 
         public ShoutViewHolder(@Nonnull View itemView) {
             super(itemView);
@@ -104,8 +108,14 @@ public class ShoutAdapter extends BaseAdapter {
             flagTarget = PicassoHelper.getRoundedBitmapTarget(context, flagImageView);
         }
 
+        @OnClick(R.id.shout_add_to_cart_btn)
+        public void onAddToCartClicked() {
+            item.addToCartClicked();
+        }
+
         @Override
         public void bind(@Nonnull ShoutAdapterItems.MainShoutAdapterItem item) {
+            this.item = item;
             final Shout shout = item.getShout();
             final User user = shout.getUser();
 
@@ -117,10 +127,11 @@ public class ShoutAdapter extends BaseAdapter {
                     .into(avatarImageView);
 
             nameTextView.setText(user.getName());
-            if (user.getLocation() != null) {
+            final UserLocation location = shout.getLocation();
+            if (location != null) {
                 userLocationTextView.setText(context.getString(R.string.shout_user_location,
-                        user.getLocation().getCity(), user.getLocation().getCountry()));
-                locationTextView.setText(user.getLocation().getCity());
+                        location.getCity(), location.getCountry()));
+                locationTextView.setText(location.getCity());
             }
 
             labelTextView.setText(shout.getTypeResId());
@@ -161,7 +172,7 @@ public class ShoutAdapter extends BaseAdapter {
                 ((TextView) view.getChildAt(1)).setText(filter.getValue().getName());
 
                 assert detailsContainer.getChildCount() >= 2;
-                detailsContainer.addView(view, detailsContainer.getChildCount() - 2);
+                detailsContainer.addView(view, detailsContainer.getChildCount() - 1);
             }
 
             final boolean isLastElementLight = detailsContainer.getChildCount() % 2 != 0;

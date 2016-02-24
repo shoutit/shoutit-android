@@ -42,28 +42,35 @@
 
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/shout_detail_location_row"
-            style="@style/ShoutCardItemLight">
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-            <TextView
-                style="@style/ShoutCardSection"
-                android:text="@string/shout_location" />
+            <LinearLayout
+                android:id="@+id/shout_detail_location_row"
+                style="@style/ShoutCardItemLight">
 
-            <TextView
-                style="@style/ShoutCardSectionText"
-                android:id="@+id/shout_location_tv"
-                tools:text="Dubai" />
+                <TextView
+                    style="@style/ShoutCardSection"
+                    android:text="@string/shout_location" />
+
+                <TextView
+                    android:id="@+id/shout_location_tv"
+                    style="@style/ShoutCardSectionText"
+                    tools:text="Dubai" />
+
+            </LinearLayout>
 
             <ImageView
                 android:id="@+id/shout_location_flag_iv"
-                android:layout_width="35dp"
-                android:layout_height="20dp"
-                android:paddingRight="15dp"
-                android:paddingEnd="15dp"
-                android:src="@drawable/pl"/>
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="end|center_vertical"
+                android:layout_marginEnd="12dp"
+                android:layout_marginRight="12dp"
+                android:src="@drawable/pl" />
 
-        </LinearLayout>
+        </FrameLayout>
 
     </LinearLayout>
 

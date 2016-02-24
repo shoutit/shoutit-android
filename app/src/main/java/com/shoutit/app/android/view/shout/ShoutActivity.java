@@ -121,6 +121,15 @@ public class ShoutActivity extends BaseActivity {
                         Toast.makeText(ShoutActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
                     }
                 });
+
+        presenter.getAddToCartSubject()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        Toast.makeText(ShoutActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void setUpAdapter() {
