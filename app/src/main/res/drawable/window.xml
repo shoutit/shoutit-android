@@ -15,7 +15,7 @@
         android:bottom="0dp"
         android:left="0dp"
         android:right="0dp"
-        android:top="?actionBarSize">
+        android:top="80dp">
         <shape android:shape="rectangle">
             <solid android:color="@color/default_bg_color"/>
         </shape>
