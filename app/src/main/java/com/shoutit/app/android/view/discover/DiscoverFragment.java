@@ -94,11 +94,11 @@ public class DiscoverFragment extends BaseFragment {
                 });
 
         presenter.getShowMoreObservable()
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
+                .compose(this.<DiscoverPresenter.DiscoveryInfo>bindToLifecycle())
+                .subscribe(new Action1<DiscoverPresenter.DiscoveryInfo>() {
                     @Override
-                    public void call(String discoverId) {
-                        startActivity(DiscoverShoutsActivity.newIntent(getActivity(), discoverId));
+                    public void call(DiscoverPresenter.DiscoveryInfo discoveryInfo) {
+                        startActivity(DiscoverShoutsActivity.newIntent(getActivity(), discoveryInfo.getId(), discoveryInfo.getTitle()));
                     }
                 });
 
@@ -160,7 +160,7 @@ public class DiscoverFragment extends BaseFragment {
                                    @Nullable Bundle savedInstanceState) {
         String discoverId = null;
         if (getArguments() != null) {
-             discoverId = getArguments().getString(KEY_DISCOVER_ID, null);
+            discoverId = getArguments().getString(KEY_DISCOVER_ID, null);
         }
 
         DaggerDiscoverFragmentComponent.builder()

@@ -1,18 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:background="@color/default_bg_color"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp"
-    android:paddingTop="16dp">
+    android:background="@color/default_bg_color">
 
     <android.support.design.widget.TextInputLayout
+        app:hintTextAppearance="@style/BlueInputStyle"
+        android:id="@+id/account_change_email_til"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <EditText
+            android:theme="@style/BlueEditText"
+            android:id="@+id/account_change_email_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:imeOptions="actionDone"
@@ -23,10 +28,16 @@
     </android.support.design.widget.TextInputLayout>
 
     <Button
+        android:id="@+id/account_change_email_confirm_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/settings_change_email"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
         android:layout_marginTop="12dp"
+        android:text="@string/settings_change_email"
+        android:layout_below="@+id/account_change_email_til"
         android:textColor="@android:color/white"/>
 
-</LinearLayout>
+    <include layout="@layout/base_progress" />
+
+</RelativeLayout>

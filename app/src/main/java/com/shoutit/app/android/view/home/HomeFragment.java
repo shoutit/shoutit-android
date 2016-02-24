@@ -12,7 +12,6 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
-import com.appunite.rx.dagger.UiScheduler;
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
 import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.jakewharton.rxbinding.view.RxView;
@@ -38,7 +37,6 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
-import rx.Scheduler;
 import rx.functions.Action1;
 
 public class HomeFragment extends BaseFragment {

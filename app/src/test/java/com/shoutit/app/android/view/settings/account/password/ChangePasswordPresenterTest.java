@@ -1,9 +1,10 @@
-package com.shoutit.app.android.view.settings.account;
+package com.shoutit.app.android.view.settings.account.password;
 
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.ChangePasswordRequest;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.view.settings.account.password.ChangePasswordPresenter;
 
 import org.junit.Before;
 import org.junit.Test;

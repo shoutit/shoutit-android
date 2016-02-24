@@ -14,7 +14,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.common.collect.ImmutableList;
-import com.jakewharton.rxbinding.view.RxView;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
@@ -61,8 +60,6 @@ public class MenuHandler {
     ImageView flagImageView;
     @Bind(R.id.menu_version_name)
     TextView versionNameTextView;
-    @Bind(R.id.menu_logout)
-    CheckedTextView logoutView;
 
     @Bind(R.id.menu_home)
     CheckedTextView homeItem;
@@ -136,10 +133,6 @@ public class MenuHandler {
         presenter.getVersionNameObservable()
                 .compose(rxActivity.<String>bindToLifecycle())
                 .subscribe(RxTextView.text(versionNameTextView));
-
-        presenter.getLogoutItemVisibilityObservable()
-                .compose(rxActivity.<Boolean>bindToLifecycle())
-                .subscribe(RxView.visibility(logoutView));
     }
 
     @NonNull
@@ -156,7 +149,7 @@ public class MenuHandler {
 
     @Nullable
     @OnClick({R.id.menu_home, R.id.menu_discover, R.id.menu_browse, R.id.menu_chat,
-            R.id.menu_orders, R.id.menu_settings, R.id.menu_help, R.id.menu_invite_frirends, R.id.menu_logout})
+            R.id.menu_orders, R.id.menu_settings, R.id.menu_help, R.id.menu_invite_frirends})
     public void onMenuItemSelected(View view) {
         switch (view.getId()) {
             case R.id.menu_home:
@@ -197,13 +190,6 @@ public class MenuHandler {
                 break;
             case R.id.menu_invite_frirends:
                 onMenuItemSelectedListener.onMenuItemSelected(FRAGMENT_INVITE_FRIENDS);
-                break;
-            case R.id.menu_logout:
-                userPreferences.logout();
-                rxActivity.finish();
-                rxActivity.startActivity(MainActivity.newIntent(rxActivity)
-                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                );
                 break;
         }
 

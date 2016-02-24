@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.settings.account;
+package com.shoutit.app.android.view.settings.account.password;
 
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;

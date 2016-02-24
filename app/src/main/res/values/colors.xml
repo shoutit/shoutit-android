@@ -16,6 +16,7 @@
     <color name="pattern_background">#F4F4F4</color>
     <color name="white_toolbar_arrow">#40C4FF</color>
     <color name="accent_blue">#40C4FF</color>
+    <color name="progress_dim">#17000000</color>
 
     <!-- Intro -->
     <color name="intro_gradient_start">#43cea2</color>

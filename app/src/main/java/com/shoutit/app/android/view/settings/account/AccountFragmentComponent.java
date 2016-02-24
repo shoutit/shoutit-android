@@ -7,7 +7,6 @@ import com.shoutit.app.android.dagger.FragmentScope;
 
 import dagger.Component;
 
-
 @FragmentScope
 @Component(
         dependencies = BaseActivityComponent.class,
@@ -15,8 +14,8 @@ import dagger.Component;
                 FragmentModule.class,
         }
 )
-public interface ChangeEmailFragmentComponent extends BaseFragmentComponent {
+public interface AccountFragmentComponent extends BaseFragmentComponent {
 
-    void inject(ChangeEmailFragment fragment);
+    void inject(AccountFragment fragment);
 }
 

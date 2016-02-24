@@ -80,6 +80,16 @@ public class UserPreferences {
     }
 
     @SuppressLint("CommitPrefEdits")
+    public void setGuestLoggedIn(@NonNull String authToken, @NonNull String refreshToken) {
+        final SharedPreferences.Editor editor = mPreferences.edit();
+        editor
+                .putString(AUTH_TOKEN, authToken)
+                .putString(REFRESH_TOKEN, refreshToken)
+                .putBoolean(IS_GUEST, true);
+        editor.commit();
+    }
+
+    @SuppressLint("CommitPrefEdits")
     public void setGuest(boolean isGuest) {
         final SharedPreferences.Editor editor = mPreferences.edit();
         editor.putBoolean(IS_GUEST, isGuest);

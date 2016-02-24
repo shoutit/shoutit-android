@@ -138,13 +138,6 @@
             android:paddingStart="16dp"
             android:text="@string/menu_item_invite_friends" />
 
-        <CheckedTextView
-            android:id="@+id/menu_logout"
-            style="@style/SideMenuItem"
-            android:paddingLeft="16dp"
-            android:paddingStart="16dp"
-            android:text="@string/menu_item_logout" />
-
         <View
             android:layout_width="wrap_content"
             android:layout_height="0dp"

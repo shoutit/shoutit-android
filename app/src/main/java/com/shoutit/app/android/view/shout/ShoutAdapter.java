@@ -272,7 +272,7 @@ public class ShoutAdapter extends BaseAdapter {
             super(itemView);
             ButterKnife.bind(this, itemView);
 
-            final int itemSpacing = context.getResources().getDimensionPixelOffset(R.dimen.home_discover_item_spacing);
+            final int itemSpacing = context.getResources().getDimensionPixelOffset(R.dimen.shout_related_item_spacing);
             final RecyclerView.ItemDecoration itemDecoration = new RecyclerView.ItemDecoration() {
                 @Override
                 public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
