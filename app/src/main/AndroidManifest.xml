@@ -52,7 +52,8 @@
 
         <activity android:name=".view.settings.SettingsActivity"/>
 
-        <activity android:name=".view.settings.account.AccountActivity"/>
+        <activity android:name=".view.settings.account.AccountActivity"
+            android:windowSoftInputMode="adjustResize"/>
 
         <activity android:name=".view.shout.ShoutActivity"/>
 

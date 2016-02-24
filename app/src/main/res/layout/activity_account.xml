@@ -17,9 +17,16 @@
         android:layout_height="3dp"
         android:background="@drawable/toolbar_drop_shadow"/>
 
-    <FrameLayout
-        android:id="@+id/account_fragment_container"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:background="@color/default_bg_color">
+
+        <FrameLayout
+            android:id="@+id/account_fragment_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </ScrollView>
 
 </LinearLayout>

@@ -7,6 +7,7 @@
     android:background="@color/default_bg_color">
 
     <android.support.design.widget.TextInputLayout
+        android:theme="@style/BlueEditText"
         app:hintTextAppearance="@style/BlueInputStyle"
         android:id="@+id/account_change_email_til"
         android:layout_marginLeft="16dp"
@@ -16,12 +17,12 @@
         android:layout_height="wrap_content">
 
         <EditText
-            android:theme="@style/BlueEditText"
             android:id="@+id/account_change_email_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:imeOptions="actionDone"
             android:textSize="16sp"
+            android:maxLines="1"
             android:inputType="textEmailAddress"
             android:hint="@string/settings_new_email"/>
 
