@@ -165,5 +165,6 @@
     <string name="account_error_old_password">Please provide old password</string>
     <string name="account_email_changed">Email successfully changed</string>
     <string name="account_wrong_email">Wrong email address</string>
+    <string name="account_logout">Log out</string>
 
 </resources>

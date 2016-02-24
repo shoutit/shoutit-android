@@ -1,5 +1,6 @@
 package com.shoutit.app.android.view.settings.account;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -7,12 +8,25 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.dagger.FragmentModule;
+import com.shoutit.app.android.view.discover.DaggerDiscoverFragmentComponent;
+import com.shoutit.app.android.view.discover.DiscoverFragmentModule;
+import com.shoutit.app.android.view.main.MainActivity;
+
+import javax.annotation.Nonnull;
+import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class AccountFragment extends Fragment {
+public class AccountFragment extends BaseFragment {
+
+    @Inject
+    UserPreferences userPreferences;
 
     public static Fragment newInstance() {
         return new AccountFragment();
@@ -38,6 +52,25 @@ public class AccountFragment extends Fragment {
     @OnClick(R.id.account_password_tv)
     public void onPasswordClick() {
         ((AccountActivity) getActivity()).onFragmentSelected(AccountActivity.FRAGMENT_CHANGE_PASSWORD);
+    }
+
+    @OnClick(R.id.account_logout_tv)
+    public void onLogoutClick() {
+        userPreferences.logout();
+        getActivity().finish();
+        startActivity(MainActivity.newIntent(getActivity())
+                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+    }
+
+    @Override
+    protected void injectComponent(@Nonnull BaseActivityComponent baseActivityComponent,
+                                   @Nonnull FragmentModule fragmentModule,
+                                   @javax.annotation.Nullable Bundle savedInstanceState) {
+        DaggerAccountFragmentComponent.builder()
+                .baseActivityComponent(baseActivityComponent)
+                .fragmentModule(fragmentModule)
+                .build()
+                .inject(this);
     }
 
 }

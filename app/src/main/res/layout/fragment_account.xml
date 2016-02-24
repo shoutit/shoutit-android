@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/default_bg_color"
     android:orientation="vertical">
 
     <TextView
@@ -21,12 +22,17 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="4dp"
-        android:background="@drawable/toolbar_drop_shadow" />
+        android:layout_height="0.5dp"
+        android:background="@color/black_12" />
+
+    <TextView
+        android:id="@+id/account_logout_tv"
+        style="@style/SettingsItem"
+        android:text="@string/account_logout" />
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/default_bg_color"/>
+        android:layout_height="0.5dp"
+        android:background="@color/black_12" />
 
 </LinearLayout>
