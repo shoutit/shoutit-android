@@ -17,6 +17,7 @@ import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.google.common.base.Optional;
 import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.Filter;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
@@ -92,6 +93,8 @@ public class ShoutAdapter extends BaseAdapter {
         ImageView flagImageView;
         @Bind(R.id.shout_details_container)
         LinearLayout detailsContainer;
+        @Bind(R.id.shout_detail_location_row)
+        View locationContainer;
 
         private final Target flagTarget;
 
@@ -99,9 +102,6 @@ public class ShoutAdapter extends BaseAdapter {
             super(itemView);
             ButterKnife.bind(this, itemView);
             flagTarget = PicassoHelper.getRoundedBitmapTarget(context, flagImageView);
-
-            final View lightRow = layoutInflater.inflate(R.layout.shout_detail_row_light, detailsContainer, false);
-            final View darkRow = layoutInflater.inflate(R.layout.shout_detail_row_dark, detailsContainer, false);
         }
 
         @Override
@@ -143,6 +143,30 @@ public class ShoutAdapter extends BaseAdapter {
                 picasso.load(flagResId.get())
                         .into(flagTarget);
             }
+
+            setUpFilters(shout);
+        }
+
+        private void setUpFilters(Shout shout) {
+            for (int i = 0; i < shout.getFilters().size(); i++) {
+                final Filter filter = shout.getFilters().get(i);
+                final LinearLayout view;
+                if (i % 2 == 0) {
+                    view = (LinearLayout) layoutInflater.inflate(R.layout.shout_detail_row_light, detailsContainer, false);
+                } else {
+                    view = (LinearLayout) layoutInflater.inflate(R.layout.shout_detail_row_dark, detailsContainer, false);
+                }
+
+                ((TextView) view.getChildAt(0)).setText(filter.getName());
+                ((TextView) view.getChildAt(1)).setText(filter.getValue().getName());
+
+                assert detailsContainer.getChildCount() >= 2;
+                detailsContainer.addView(view, detailsContainer.getChildCount() - 2);
+            }
+
+            final boolean isLastElementLight = detailsContainer.getChildCount() % 2 != 0;
+            locationContainer.setBackgroundColor(context.getResources().getColor(
+                    isLastElementLight ? android.R.color.white : R.color.black_12));
         }
     }
 

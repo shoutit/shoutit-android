@@ -42,35 +42,9 @@
 
         </LinearLayout>
 
-        <LinearLayout style="@style/ShoutCardItemLight">
-
-            <TextView
-                style="@style/ShoutCardSection"
-                android:text="@string/shout_model" />
-
-            <TextView
-                style="@style/ShoutCardSectionText"
-                android:id="@+id/shout_model_tv"
-                tools:text="2015" />
-
-        </LinearLayout>
-
-        <LinearLayout style="@style/ShoutCardItemDark">
-
-            <TextView
-                style="@style/ShoutCardSection"
-                android:text="@string/shout_color"
-                />
-
-            <TextView
-                style="@style/ShoutCardSectionText"
-                android:id="@+id/shout_color_tv"
-                android:layout_weight="2"
-                tools:text="Black" />
-
-        </LinearLayout>
-
-        <LinearLayout style="@style/ShoutCardItemLight">
+        <LinearLayout
+            android:id="@+id/shout_detail_location_row"
+            style="@style/ShoutCardItemLight">
 
             <TextView
                 style="@style/ShoutCardSection"
