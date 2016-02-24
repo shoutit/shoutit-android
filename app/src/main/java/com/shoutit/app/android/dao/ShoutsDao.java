@@ -130,7 +130,7 @@ public class ShoutsDao {
                             if (previousResponse == null || previousResponse.getNext() != null) {
                                 ++pageNumber;
                                 final Observable<ShoutsResponse> apiRequest;
-                                if (userPreferences.isUserLoggedIn()) {
+                                if (userPreferences.isNormalUser()) {
                                     apiRequest = apiService
                                             .home(RequestsConstants.USER_ME, pageNumber, PAGE_SIZE)
                                             .subscribeOn(networkScheduler);

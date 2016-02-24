@@ -98,7 +98,7 @@ public class App extends MultiDexApplication {
     }
 
     private void fetchUser() {
-        if (!userPreferences.isUserLoggedIn()) {
+        if (!userPreferences.isNormalUser()) {
             return;
         }
 

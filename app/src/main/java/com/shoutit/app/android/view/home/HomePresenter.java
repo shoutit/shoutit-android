@@ -77,7 +77,7 @@ public class HomePresenter {
         this.shoutsDao = shoutsDao;
         this.uiScheduler = uiScheduler;
 
-        final boolean isUserLoggedIn = userPreferences.isUserLoggedIn();
+        final boolean isNormalUser = userPreferences.isNormalUser();
 
         final Observable<LocationPointer> locationObservable = userPreferences.getLocationObservable()
                 .map(new Func1<UserLocation, LocationPointer>() {
@@ -104,7 +104,7 @@ public class HomePresenter {
                     @Override
                     public List<BaseAdapterItem> call(ResponseOrError<ShoutsResponse> shoutsResponse) {
                         final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
-                        builder.add(new ShoutHeaderAdapterItem(isUserLoggedIn,
+                        builder.add(new ShoutHeaderAdapterItem(isNormalUser,
                                 userPreferences.getUserCity(), layoutManagerSwitchObserver));
 
                         if (shoutsResponse.isData()) {
