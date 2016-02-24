@@ -141,6 +141,7 @@
             tools:text="Only 3 available"/>
 
         <LinearLayout
+            android:id="@+id/shout_add_to_cart_btn"
             android:layout_below="@+id/shouts_price_tv"
             android:layout_width="match_parent"
             android:layout_height="40dp"

@@ -10,5 +10,6 @@
     android:textSize="14sp"
     android:paddingLeft="8dp"
     android:paddingStart="8dp"
+    android:paddingTop="4dp"
     android:gravity="center_vertical"
     tools:text="DESCRIPTION" />

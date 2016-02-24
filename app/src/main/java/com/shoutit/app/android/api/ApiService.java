@@ -56,7 +56,7 @@ public interface ApiService {
                                                      @Query("page") @Nullable Integer page,
                                                      @Query("page_size") @Nullable Integer pageSize);
 
-    @GET("shouts/{id}")
+    @GET("/v3/shouts/{id}")
     Observable<Shout> shout(@Path("id") String shoutId);
 
     @GET("shouts")

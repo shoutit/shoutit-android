@@ -42,54 +42,35 @@
 
         </LinearLayout>
 
-        <LinearLayout style="@style/ShoutCardItemLight">
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-            <TextView
-                style="@style/ShoutCardSection"
-                android:text="@string/shout_model" />
+            <LinearLayout
+                android:id="@+id/shout_detail_location_row"
+                style="@style/ShoutCardItemLight">
 
-            <TextView
-                style="@style/ShoutCardSectionText"
-                android:id="@+id/shout_model_tv"
-                tools:text="2015" />
+                <TextView
+                    style="@style/ShoutCardSection"
+                    android:text="@string/shout_location" />
 
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/shout_location_tv"
+                    style="@style/ShoutCardSectionText"
+                    tools:text="Dubai" />
 
-        <LinearLayout style="@style/ShoutCardItemDark">
-
-            <TextView
-                style="@style/ShoutCardSection"
-                android:text="@string/shout_color"
-                />
-
-            <TextView
-                style="@style/ShoutCardSectionText"
-                android:id="@+id/shout_color_tv"
-                android:layout_weight="2"
-                tools:text="Black" />
-
-        </LinearLayout>
-
-        <LinearLayout style="@style/ShoutCardItemLight">
-
-            <TextView
-                style="@style/ShoutCardSection"
-                android:text="@string/shout_location" />
-
-            <TextView
-                style="@style/ShoutCardSectionText"
-                android:id="@+id/shout_location_tv"
-                tools:text="Dubai" />
+            </LinearLayout>
 
             <ImageView
                 android:id="@+id/shout_location_flag_iv"
-                android:layout_width="35dp"
-                android:layout_height="20dp"
-                android:paddingRight="15dp"
-                android:paddingEnd="15dp"
-                android:src="@drawable/pl"/>
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="end|center_vertical"
+                android:layout_marginEnd="12dp"
+                android:layout_marginRight="12dp"
+                android:src="@drawable/pl" />
 
-        </LinearLayout>
+        </FrameLayout>
 
     </LinearLayout>
 

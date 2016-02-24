@@ -2,6 +2,7 @@ package com.shoutit.app.android.view.shout;
 
 import android.content.Context;
 import android.graphics.Rect;
+import android.location.Location;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,8 +18,10 @@ import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.google.common.base.Optional;
 import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.Filter;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.DateTimeUtils;
 import com.shoutit.app.android.utils.PicassoHelper;
@@ -33,6 +36,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import rx.Observable;
 import rx.Subscription;
 
@@ -92,20 +96,26 @@ public class ShoutAdapter extends BaseAdapter {
         ImageView flagImageView;
         @Bind(R.id.shout_details_container)
         LinearLayout detailsContainer;
+        @Bind(R.id.shout_detail_location_row)
+        View locationContainer;
 
         private final Target flagTarget;
+        private ShoutAdapterItems.MainShoutAdapterItem item;
 
         public ShoutViewHolder(@Nonnull View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
             flagTarget = PicassoHelper.getRoundedBitmapTarget(context, flagImageView);
+        }
 
-            final View lightRow = layoutInflater.inflate(R.layout.shout_detail_row_light, detailsContainer, false);
-            final View darkRow = layoutInflater.inflate(R.layout.shout_detail_row_dark, detailsContainer, false);
+        @OnClick(R.id.shout_add_to_cart_btn)
+        public void onAddToCartClicked() {
+            item.addToCartClicked();
         }
 
         @Override
         public void bind(@Nonnull ShoutAdapterItems.MainShoutAdapterItem item) {
+            this.item = item;
             final Shout shout = item.getShout();
             final User user = shout.getUser();
 
@@ -117,10 +127,11 @@ public class ShoutAdapter extends BaseAdapter {
                     .into(avatarImageView);
 
             nameTextView.setText(user.getName());
-            if (user.getLocation() != null) {
+            final UserLocation location = shout.getLocation();
+            if (location != null) {
                 userLocationTextView.setText(context.getString(R.string.shout_user_location,
-                        user.getLocation().getCity(), user.getLocation().getCountry()));
-                locationTextView.setText(user.getLocation().getCity());
+                        location.getCity(), location.getCountry()));
+                locationTextView.setText(location.getCity());
             }
 
             labelTextView.setText(shout.getTypeResId());
@@ -143,6 +154,30 @@ public class ShoutAdapter extends BaseAdapter {
                 picasso.load(flagResId.get())
                         .into(flagTarget);
             }
+
+            setUpFilters(shout);
+        }
+
+        private void setUpFilters(Shout shout) {
+            for (int i = 0; i < shout.getFilters().size(); i++) {
+                final Filter filter = shout.getFilters().get(i);
+                final LinearLayout view;
+                if (i % 2 == 0) {
+                    view = (LinearLayout) layoutInflater.inflate(R.layout.shout_detail_row_light, detailsContainer, false);
+                } else {
+                    view = (LinearLayout) layoutInflater.inflate(R.layout.shout_detail_row_dark, detailsContainer, false);
+                }
+
+                ((TextView) view.getChildAt(0)).setText(filter.getName());
+                ((TextView) view.getChildAt(1)).setText(filter.getValue().getName());
+
+                assert detailsContainer.getChildCount() >= 2;
+                detailsContainer.addView(view, detailsContainer.getChildCount() - 1);
+            }
+
+            final boolean isLastElementLight = detailsContainer.getChildCount() % 2 != 0;
+            locationContainer.setBackgroundColor(context.getResources().getColor(
+                    isLastElementLight ? android.R.color.white : R.color.black_12));
         }
     }
 

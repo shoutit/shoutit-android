@@ -31,11 +31,12 @@ public class Shout {
     private final List<Tag> tags;
     private final long datePublished;
     private final List<String> images;
+    private final List<Filter> filters;
 
     public Shout(@Nonnull String id, String apiUrl, String webUrl, String type,
                  UserLocation location, String title, String text, float price, float number,
                  String currency, String thumbnail, String videoUrl, User user,
-                 Category category, List<Tag> tags, long datePublished, List<String> images) {
+                 Category category, List<Tag> tags, long datePublished, List<String> images, List<Filter> filters) {
         this.id = id;
         this.apiUrl = apiUrl;
         this.webUrl = webUrl;
@@ -53,6 +54,7 @@ public class Shout {
         this.tags = tags;
         this.datePublished = datePublished;
         this.images = images;
+        this.filters = filters;
     }
 
     @Nonnull
@@ -129,6 +131,10 @@ public class Shout {
 
     public List<String> getImages() {
         return images;
+    }
+
+    public List<Filter> getFilters() {
+        return filters;
     }
 
     @Override
