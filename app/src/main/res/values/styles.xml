@@ -60,6 +60,7 @@
         <item name="colorPrimary">@android:color/white</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="android:textColorPrimary">@color/white_toolbar_arrow</item>
+        <item name="android:background">@android:color/white</item>
     </style>
 
     <style name="SideMenuItem">
