@@ -17,7 +17,7 @@
         tools:layout_width="200dp">
 
         <ImageView
-            android:id="@+id/home_feed_card_image_view"
+            android:id="@+id/shout_grid_image_view"
             android:layout_width="match_parent"
             android:layout_height="@dimen/home_feed_image_height"
             android:src="@drawable/pattern_placeholder"
@@ -35,7 +35,7 @@
             android:paddingTop="5dp">
 
             <TextView
-                android:id="@+id/home_feed_card_title_tv"
+                android:id="@+id/shout_grid_title_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"
@@ -51,11 +51,11 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:layout_below="@+id/home_feed_card_title_tv"
+                android:layout_below="@+id/shout_grid_title_tv"
                 android:layout_marginEnd="1dp"
                 android:layout_marginRight="1dp"
-                android:layout_toLeftOf="@+id/home_feed_card_price_tv"
-                android:layout_toStartOf="@+id/home_feed_card_price_tv"
+                android:layout_toLeftOf="@+id/shout_grid_price_tv"
+                android:layout_toStartOf="@+id/shout_grid_price_tv"
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:textColor="#61000000"
@@ -63,12 +63,12 @@
                 tools:text="John Smith dfdsfsadfadsfdsafdsafsdafdasfadsfdas" />
 
             <TextView
-                android:id="@+id/home_feed_card_price_tv"
+                android:id="@+id/shout_grid_price_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
-                android:layout_below="@+id/home_feed_card_title_tv"
+                android:layout_below="@+id/shout_grid_title_tv"
                 android:maxLines="1"
                 android:textColor="#4caf50"
                 android:textSize="12sp"

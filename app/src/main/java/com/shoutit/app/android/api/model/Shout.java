@@ -30,11 +30,13 @@ public class Shout {
     private final Category category;
     private final List<Tag> tags;
     private final long datePublished;
+    private final List<String> images;
+    private final List<Filter> filters;
 
     public Shout(@Nonnull String id, String apiUrl, String webUrl, String type,
                  UserLocation location, String title, String text, float price, float number,
                  String currency, String thumbnail, String videoUrl, User user,
-                 Category category, List<Tag> tags, long datePublished) {
+                 Category category, List<Tag> tags, long datePublished, List<String> images, List<Filter> filters) {
         this.id = id;
         this.apiUrl = apiUrl;
         this.webUrl = webUrl;
@@ -51,6 +53,8 @@ public class Shout {
         this.category = category;
         this.tags = tags;
         this.datePublished = datePublished;
+        this.images = images;
+        this.filters = filters;
     }
 
     @Nonnull
@@ -125,6 +129,14 @@ public class Shout {
         return datePublished * 1000;
     }
 
+    public List<String> getImages() {
+        return images;
+    }
+
+    public List<Filter> getFilters() {
+        return filters;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -145,12 +157,13 @@ public class Shout {
                 Objects.equal(category, shout.category) &&
                 Objects.equal(tags, shout.tags) &&
                 Objects.equal(datePublished, shout.datePublished) &&
-                Objects.equal(price, shout.price);
+                Objects.equal(price, shout.price) &&
+                Objects.equal(images, shout.images);
     }
 
     @Override
     public int hashCode() {
         return Objects.hashCode(id, apiUrl, webUrl, type, location, title, text, price,
-                number, currency, thumbnail, videoUrl, user, category, tags, datePublished);
+                number, currency, thumbnail, videoUrl, user, category, tags, datePublished, images);
     }
 }

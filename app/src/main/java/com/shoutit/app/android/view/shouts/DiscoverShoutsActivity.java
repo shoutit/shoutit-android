@@ -28,6 +28,7 @@ import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.home.HomeGridSpacingItemDecoration;
 import com.shoutit.app.android.view.home.HomeLinearSpacingItemDecoration;
+import com.shoutit.app.android.view.shout.ShoutActivity;
 
 import java.util.List;
 
@@ -37,6 +38,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import rx.functions.Action1;
 
 public class DiscoverShoutsActivity extends BaseActivity {
 
@@ -120,6 +122,15 @@ public class DiscoverShoutsActivity extends BaseActivity {
                 }
             }
         });
+
+        mShoutsPresenter.getShoutSelectedObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String shoutId) {
+                        startActivity(ShoutActivity.newIntent(DiscoverShoutsActivity.this, shoutId));
+                    }
+                });
     }
 
     @Nonnull

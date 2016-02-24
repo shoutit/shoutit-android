@@ -54,6 +54,9 @@ public class DiscoverPresenter {
     private final PublishSubject<String> showMoreObserver = PublishSubject.create();
     @Nonnull
     private final PublishSubject<String> discoverSelectedObserver = PublishSubject.create();
+    @Nonnull
+    private final PublishSubject<String> shoutSelectedObserver = PublishSubject.create();
+    @Nonnull
     private final Observable<DiscoveryInfo> mDiscoveryInfoObservable;
 
     public DiscoverPresenter(@Nonnull UserPreferences userPreferences,
@@ -209,7 +212,7 @@ public class DiscoverPresenter {
 
                         final List<Shout> shouts = shoutsResponse.getShouts();
                         for (int i = 0; i < Math.min(shouts.size(), MAX_DISPLAYED_SHOUTS); i++) {
-                            items.add(new ShoutAdapterItem(shouts.get(i)));
+                            items.add(new ShoutAdapterItem(shouts.get(i), shoutSelectedObserver));
                         }
 
                         return ImmutableList.copyOf(items);
@@ -296,6 +299,11 @@ public class DiscoverPresenter {
     @Nonnull
     public Observable<String> getDiscoverSelectedObservable() {
         return discoverSelectedObserver;
+    }
+
+    @Nonnull
+    public Observable<String> getShoutSelectedObservable() {
+        return shoutSelectedObserver;
     }
 
     /**
@@ -411,9 +419,12 @@ public class DiscoverPresenter {
 
         @Nonnull
         private final Shout shout;
+        @Nonnull
+        private final Observer<String> shoutSelectedObserver;
 
-        public ShoutAdapterItem(@Nonnull Shout shout) {
+        public ShoutAdapterItem(@Nonnull Shout shout, @Nonnull Observer<String> shoutSelectedObserver) {
             this.shout = shout;
+            this.shoutSelectedObserver = shoutSelectedObserver;
         }
 
         @Override
@@ -436,6 +447,10 @@ public class DiscoverPresenter {
         @Nonnull
         public Shout getShout() {
             return shout;
+        }
+
+        public void onShoutSelected() {
+            shoutSelectedObserver.onNext(shout.getId());
         }
 
         @Override

@@ -48,4 +48,8 @@
     <color name="discover_button_pressed">#5e000000</color>
     <color name="discover_header_white_dim">#17ffffff</color>
 
+    <!-- Shout -->
+    <color name="shout_name">#de000000</color>
+    <color name="shout_page_indicator">#99FFFFFF</color>
+
 </resources>

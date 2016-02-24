@@ -26,7 +26,7 @@ import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.model.LocationPointer;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
-import com.shoutit.app.android.view.shouts.DiscoverShoutAdapterItem;
+import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +51,8 @@ public class HomePresenter {
     private final PublishSubject<Object> layoutManagerSwitchObserver = PublishSubject.create();
     @Nonnull
     private final PublishSubject<String> onDiscoverSelectedSubject = PublishSubject.create();
+    @Nonnull
+    private final PublishSubject<String> shoutSelectedObserver = PublishSubject.create();
 
     @Nonnull
     private final Observable<Throwable> errorObservable;
@@ -114,7 +116,7 @@ public class HomePresenter {
                                             @Override
                                             public BaseAdapterItem apply(@Nullable Shout input) {
                                                 assert input != null;
-                                                return new DiscoverShoutAdapterItem(input, context);
+                                                return new ShoutAdapterItem(input, context, shoutSelectedObserver);
                                             }
                                         });
 
@@ -294,6 +296,11 @@ public class HomePresenter {
     @Nonnull
     public Observable<String> getOnDiscoverSelectedObservable() {
         return onDiscoverSelectedSubject.observeOn(uiScheduler);
+    }
+
+    @Nonnull
+    public Observable<String> getShoutSelectedObservable() {
+        return shoutSelectedObserver;
     }
 
     /**

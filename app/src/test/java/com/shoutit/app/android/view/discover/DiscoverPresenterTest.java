@@ -161,7 +161,7 @@ public class DiscoverPresenterTest {
 
     private ShoutsResponse getShoutsResponse() {
         return new ShoutsResponse(0, "a", null,
-                Lists.newArrayList(new Shout("z", null, null, null, null, null, null, 0, 0, null, null, null, null, null, null, 1L)));
+                Lists.newArrayList(new Shout("z", null, null, null, null, null, null, 0, 0, null, null, null, null, null, null, 1L, null, null)));
     }
 
     private DiscoverResponse getDiscoverResponse() {

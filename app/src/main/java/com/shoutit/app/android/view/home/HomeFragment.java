@@ -28,6 +28,7 @@ import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.discover.DiscoverActivity;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.main.OnSeeAllDiscoversListener;
+import com.shoutit.app.android.view.shout.ShoutActivity;
 
 import java.util.List;
 
@@ -151,6 +152,15 @@ public class HomeFragment extends BaseFragment {
                     @Override
                     public void call(@Nonnull String discoverId) {
                         startActivity(DiscoverActivity.newIntent(context, discoverId));
+                    }
+                });
+
+        presenter.getShoutSelectedObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String shoutId) {
+                        startActivity(ShoutActivity.newIntent(context, shoutId));
                     }
                 });
 

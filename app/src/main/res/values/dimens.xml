@@ -10,7 +10,7 @@
     <dimen name="home_discover_card_height">126dp</dimen>
     <dimen name="home_grid_side_spacing">5dp</dimen>
     <dimen name="home_linear_side_spacing">4dp</dimen>
-    <dimen name="home_discover_item_spacing">2dp</dimen>
+    <dimen name="home_discover_item_spacing">4dp</dimen>
     <dimen name="home_feed_image_size_linear">100dp</dimen>
     <dimen name="home_country_icon">26dp</dimen>
 
@@ -28,5 +28,14 @@
     <dimen name="discover_image_height">126dp</dimen>
     <dimen name="discover_grid_spacing">1dp</dimen>
     <dimen name="discover_header_height">130dp</dimen>
+
+    <!-- Shout detail -->
+    <dimen name="shout_related_width">120dp</dimen>
+    <dimen name="shout_related_image_height">90dp</dimen>
+    <dimen name="shout_related_container_height">150dp</dimen>
+    <dimen name="shout_avatar_size">40dp</dimen>
+    <dimen name="shout_related_card_height">40dp</dimen>
+    <dimen name="shout_item_padding">6dp</dimen>
+    <dimen name="shout_related_item_spacing">1dp</dimen>
 
 </resources>

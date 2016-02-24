@@ -19,6 +19,7 @@ import com.shoutit.app.android.utils.rx.RxMoreObservers;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
@@ -26,6 +27,7 @@ import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Func1;
+import rx.subjects.PublishSubject;
 
 public class DiscoverShoutsPresenter {
 
@@ -33,6 +35,9 @@ public class DiscoverShoutsPresenter {
     private final Observable<Throwable> mThrowableObservable;
     private final Observable<Boolean> mProgressObservable;
     private final DiscoverShoutsDao mDiscoverShoutsDao;
+
+    @Nonnull
+    private final PublishSubject<String> shoutSelectedObserver = PublishSubject.create();
 
     @Inject
     public DiscoverShoutsPresenter(@NetworkScheduler Scheduler networkScheduler,
@@ -53,7 +58,7 @@ public class DiscoverShoutsPresenter {
                             @Nullable
                             @Override
                             public BaseAdapterItem apply(Shout input) {
-                                return new DiscoverShoutAdapterItem(input, context);
+                                return new ShoutAdapterItem(input, context, shoutSelectedObserver);
                             }
                         }));
                     }
@@ -81,5 +86,10 @@ public class DiscoverShoutsPresenter {
     @NonNull
     public Observer<Object> getLoadMoreObserver() {
         return RxMoreObservers.ignoreCompleted(mDiscoverShoutsDao.getLoadMoreShoutsSubject());
+    }
+
+    @Nonnull
+    public Observable<String> getShoutSelectedObservable() {
+        return shoutSelectedObserver;
     }
 }

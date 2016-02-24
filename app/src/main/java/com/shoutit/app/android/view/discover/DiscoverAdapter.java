@@ -113,7 +113,7 @@ public class DiscoverAdapter extends BaseAdapter {
         }
     }
 
-    class ShoutViewHolder extends ViewHolderManager.BaseViewHolder<DiscoverPresenter.ShoutAdapterItem> {
+    class ShoutViewHolder extends ViewHolderManager.BaseViewHolder<DiscoverPresenter.ShoutAdapterItem> implements View.OnClickListener {
         @Bind(R.id.discover_shout_card_image_view)
         ImageView cardImageView;
         @Bind(R.id.discover_shout_card_title_tv)
@@ -122,14 +122,17 @@ public class DiscoverAdapter extends BaseAdapter {
         TextView shoutNameTextView;
         @Bind(R.id.discover_shout_card_price_tv)
         TextView shoutPriceTextView;
+        private DiscoverPresenter.ShoutAdapterItem item;
 
         public ShoutViewHolder(@Nonnull View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            itemView.setOnClickListener(this);
         }
 
         @Override
         public void bind(@Nonnull DiscoverPresenter.ShoutAdapterItem item) {
+            this.item = item;
             final Shout shout = item.getShout();
 
             picasso.load(Strings.emptyToNull(shout.getThumbnail()))
@@ -144,6 +147,11 @@ public class DiscoverAdapter extends BaseAdapter {
             final String price = PriceUtils.formatPrice(shout.getPrice());
             shoutPriceTextView.setText(context.getString(
                     R.string.price_with_currency, price, shout.getCurrency()));
+        }
+
+        @Override
+        public void onClick(View v) {
+            item.onShoutSelected();
         }
     }
 

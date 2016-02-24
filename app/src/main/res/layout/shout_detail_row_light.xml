@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout style="@style/ShoutCardItemLight"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <TextView
+        android:id="@+id/shout_detail_row_key"
+        style="@style/ShoutCardSection"
+        tools:text="@string/shout_location" />
+
+    <TextView
+        android:id="@+id/shout_detail_row_value"
+        style="@style/ShoutCardSectionText"
+        tools:text="Dubai" />
+
+</LinearLayout>

@@ -3,19 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/home_menu_chat"
+        android:id="@+id/base_menu_chat"
         android:icon="@drawable/ic_ab_chat"
         android:title="@string/home_menu_chat"
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/home_menu_search"
+        android:id="@+id/base_menu_search"
         android:icon="@drawable/ic_ab_search"
         android:title="@string/home_menu_search"
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/home_menu_cart"
+        android:id="@+id/base_menu_cart"
         android:icon="@drawable/ic_ab_cart"
         android:title="@string/home_menu_cart"
         app:showAsAction="ifRoom" />

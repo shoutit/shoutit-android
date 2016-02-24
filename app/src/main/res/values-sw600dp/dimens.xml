@@ -8,7 +8,7 @@
     <dimen name="home_discover_card_height">156dp</dimen>
     <dimen name="home_grid_side_spacing">8dp</dimen>
     <dimen name="home_linear_side_spacing">8dp</dimen>
-    <dimen name="home_discover_item_spacing">4dp</dimen>
+    <dimen name="home_discover_item_spacing">6dp</dimen>
     <dimen name="home_feed_image_size_linear">140dp</dimen>
 
     <!-- Side menu -->
@@ -20,5 +20,10 @@
     <dimen name="discover_image_height">156dp</dimen>
     <dimen name="discover_grid_spacing">2dp</dimen>
     <dimen name="discover_header_height">160dp</dimen>
+
+    <!-- Shout detail -->
+    <dimen name="shout_related_width">150dp</dimen>
+    <dimen name="shout_related_image_height">110dp</dimen>
+    <dimen name="shout_related_container_height">180dp</dimen>
 
 </resources>

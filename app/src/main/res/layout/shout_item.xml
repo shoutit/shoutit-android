@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/shout_item_card" />
+
+    <TextView
+        style="@style/ShoutItemHeader"
+        android:text="@string/shout_header_description" />
+
+    <include layout="@layout/shout_description_item"/>
+
+    <TextView
+        style="@style/ShoutItemHeader"
+        android:text="@string/shout_header_details" />
+
+    <include layout="@layout/shout_details_item"/>
+
+</LinearLayout>

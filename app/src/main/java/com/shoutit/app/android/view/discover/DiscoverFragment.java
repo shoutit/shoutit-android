@@ -17,6 +17,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.shoutit.app.android.view.shouts.DiscoverShoutsActivity;
 
 import java.util.List;
@@ -100,6 +101,15 @@ public class DiscoverFragment extends BaseFragment {
                         startActivity(DiscoverShoutsActivity.newIntent(getActivity(), discoveryInfo.getId(), discoveryInfo.getTitle()));
                     }
                 });
+
+        presenter.getShoutSelectedObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String shoutId) {
+                        startActivity(ShoutActivity.newIntent(getActivity(), shoutId));
+                    }
+                });
     }
 
     private void setUpAdapter() {
@@ -133,9 +143,9 @@ public class DiscoverFragment extends BaseFragment {
                 }
 
                 if (position % 2 == 0) {
-                    outRect.left = spacing;
-                } else {
                     outRect.right = spacing;
+                } else {
+                    outRect.left = spacing;
                 }
                 outRect.bottom = spacing;
             }

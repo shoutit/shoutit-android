@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    card_view:cardCornerRadius="2dp"
+    card_view:cardElevation="2dp"
+    card_view:cardUseCompatPadding="true">
+
+    <LinearLayout
+        android:id="@+id/shout_details_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout style="@style/ShoutCardItemLight">
+
+            <TextView
+                style="@style/ShoutCardSection"
+                android:text="@string/shout_date"
+                tools:text="lalallaldfgdfgdfgdfgfdgdfgdfgadsfdsfsdfdsfl" />
+
+            <TextView
+                style="@style/ShoutCardSectionText"
+                android:id="@+id/shout_date_tv"
+                tools:text="30 - 10 - 2015" />
+
+        </LinearLayout>
+
+        <LinearLayout style="@style/ShoutCardItemDark">
+
+            <TextView
+                style="@style/ShoutCardSection"
+                android:text="@string/shout_category" />
+
+            <TextView
+                style="@style/ShoutCardSectionText"
+                android:id="@+id/shout_category_tv"
+                tools:text="Clothes" />
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/shout_detail_location_row"
+                style="@style/ShoutCardItemLight">
+
+                <TextView
+                    style="@style/ShoutCardSection"
+                    android:text="@string/shout_location" />
+
+                <TextView
+                    android:id="@+id/shout_location_tv"
+                    style="@style/ShoutCardSectionText"
+                    tools:text="Dubai" />
+
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/shout_location_flag_iv"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="end|center_vertical"
+                android:layout_marginEnd="12dp"
+                android:layout_marginRight="12dp"
+                android:src="@drawable/pl" />
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

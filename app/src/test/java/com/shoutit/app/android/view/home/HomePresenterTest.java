@@ -21,7 +21,7 @@ import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.model.LocationPointer;
-import com.shoutit.app.android.view.shouts.DiscoverShoutAdapterItem;
+import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -106,7 +106,7 @@ public class HomePresenterTest {
         assert_().that(baseAdapterItems.get(0)).isInstanceOf(HomePresenter.DiscoverHeaderAdapterItem.class);
         assert_().that(baseAdapterItems.get(1)).isInstanceOf(HomePresenter.DiscoverContainerAdapterItem.class);
         assert_().that(baseAdapterItems.get(2)).isInstanceOf(HomePresenter.ShoutHeaderAdapterItem.class);
-        assert_().that(baseAdapterItems.get(3)).isInstanceOf(DiscoverShoutAdapterItem.class);
+        assert_().that(baseAdapterItems.get(3)).isInstanceOf(ShoutAdapterItem.class);
     }
 
     @Test
@@ -213,7 +213,7 @@ public class HomePresenterTest {
     private ResponseOrError<ShoutsResponse> shoutsResponse() {
         return ResponseOrError.fromData(new ShoutsResponse(1, "2", null, Lists.newArrayList(
                 new Shout("id", null, null, null, null, null, null, 1f, 2f, null, null, null,
-                        user, category, Lists.newArrayList(tag), 2))));
+                        user, category, Lists.newArrayList(tag), 2, null, null))));
     }
 
     @Nonnull
