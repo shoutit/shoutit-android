@@ -2,11 +2,12 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:background="@color/default_bg_color">
 
     <android.support.design.widget.TextInputLayout
-        style="@style/LoginInputStyle"
+        app:hintTextAppearance="@style/BlueInputStyle"
         android:id="@+id/account_change_email_til"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
@@ -15,6 +16,7 @@
         android:layout_height="wrap_content">
 
         <EditText
+            android:theme="@style/BlueEditText"
             android:id="@+id/account_change_email_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
