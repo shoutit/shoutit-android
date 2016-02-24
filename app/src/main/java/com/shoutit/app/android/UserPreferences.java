@@ -100,6 +100,10 @@ public class UserPreferences {
         return mPreferences.getBoolean(IS_GUEST, false);
     }
 
+    public boolean isNormalUser() {
+        return !isGuest() && isUserLoggedIn();
+    }
+
     public Optional<String> getAuthToken() {
         return Optional.fromNullable(mPreferences.getString(AUTH_TOKEN, null));
     }
