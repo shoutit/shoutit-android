@@ -30,6 +30,7 @@
                     android:id="@+id/register_email_edittext"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:theme="@style/BlueEditText"
                     android:imeActionLabel="@string/login_next_label"
                     android:hint="@string/login_email_hint"
                     android:inputType="textEmailAddress"
@@ -47,8 +48,10 @@
 
                 <EditText
                     android:id="@+id/register_password_edittext"
+                    android:inputType="textFilter"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:theme="@style/BlueEditText"
                     android:imeActionLabel="@string/login_done_label"
                     android:singleLine="true"
                     android:hint="@string/login_password_hint"
@@ -59,7 +62,7 @@
             <Button
                 android:id="@+id/register_proceed_btn"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="56dp"
                 android:layout_marginTop="14dp"
                 android:text="@string/login_btn_text"
                 android:textColor="@android:color/white"/>

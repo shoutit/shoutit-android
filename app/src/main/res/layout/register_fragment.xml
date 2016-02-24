@@ -31,6 +31,7 @@
                     android:id="@+id/register_name_edittext"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:theme="@style/BlueEditText"
                     android:hint="@string/register_name"
                     android:imeActionLabel="@string/register_next_label"
                     android:nextFocusDown="@+id/register_email_edittext"
@@ -51,6 +52,7 @@
                     android:id="@+id/register_email_edittext"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:theme="@style/BlueEditText"
                     android:hint="@string/register_email"
                     android:imeActionLabel="@string/register_next_label"
                     android:inputType="textEmailAddress"
@@ -73,8 +75,10 @@
 
                     <EditText
                         android:id="@+id/register_password_edittext"
+                        android:inputType="textFilter"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:theme="@style/BlueEditText"
                         android:hint="@string/register_password"
                         android:imeActionLabel="@string/register_done_label"
                         android:imeOptions="actionDone"
@@ -96,7 +100,7 @@
             <Button
                 android:id="@+id/register_proceed_btn"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="56dp"
                 android:layout_marginTop="14dp"
                 android:text="@string/register_sign_up_btn_text"
                 android:textColor="@android:color/white"/>
