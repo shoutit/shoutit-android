@@ -66,6 +66,7 @@ public class ShoutAdapter extends BaseAdapter {
     }
 
     class ShoutViewHolder extends ViewHolderManager.BaseViewHolder<ShoutAdapterItems.MainShoutAdapterItem> {
+        private final int initDetailsContainerChildsCount;
         @Bind(R.id.shout_avatar_iv)
         ImageView avatarImageView;
         @Bind(R.id.shout_name_tv)
@@ -106,6 +107,7 @@ public class ShoutAdapter extends BaseAdapter {
             super(itemView);
             ButterKnife.bind(this, itemView);
             flagTarget = PicassoHelper.getRoundedBitmapTarget(context, flagImageView);
+            initDetailsContainerChildsCount = detailsContainer.getChildCount();
         }
 
         @OnClick(R.id.shout_add_to_cart_btn)
@@ -159,6 +161,10 @@ public class ShoutAdapter extends BaseAdapter {
         }
 
         private void setUpFilters(Shout shout) {
+            if (detailsContainer.getChildCount() > initDetailsContainerChildsCount) {
+                return;
+            }
+
             for (int i = 0; i < shout.getFilters().size(); i++) {
                 final Filter filter = shout.getFilters().get(i);
                 final LinearLayout view;
