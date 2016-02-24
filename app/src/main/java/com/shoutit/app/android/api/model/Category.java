@@ -11,11 +11,15 @@ public class Category {
     private final String slug;
 
     @NonNull
+    private final String icon;
+
+    @NonNull
     private final Tag mainTag;
 
-    public Category(@NonNull String name, @NonNull String slug, @NonNull Tag mainTag) {
+    public Category(@NonNull String name, @NonNull String slug, @NonNull String icon, @NonNull Tag mainTag) {
         this.name = name;
         this.slug = slug;
+        this.icon = icon;
         this.mainTag = mainTag;
     }
 
@@ -32,5 +36,10 @@ public class Category {
     @NonNull
     public Tag getMainTag() {
         return mainTag;
+    }
+
+    @NonNull
+    public String getIcon() {
+        return icon;
     }
 }

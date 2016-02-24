@@ -171,7 +171,7 @@ public class HomePresenterTest {
     }
 
     @Test
-    public void testAfterClick_GridLayoutManagerUsed() throws Exception {
+    public void testAfterClick_LinearLayoutManagerUsed() throws Exception {
         final TestSubscriber<Boolean> linearSubscriber = new TestSubscriber<>();
         final TestSubscriber<Boolean> gridSubscriber = new TestSubscriber<>();
         final TestSubscriber<List<BaseAdapterItem>> subscriber = new TestSubscriber<>();
@@ -186,8 +186,8 @@ public class HomePresenterTest {
 
         baseAdapterItem.getLayoutManagerSwitchObserver().onNext(new Object());
 
-        linearSubscriber.assertValueCount(0);
-        gridSubscriber.assertValueCount(1);
+        linearSubscriber.assertValueCount(1);
+        gridSubscriber.assertValueCount(0);
     }
 
     private void initData() {

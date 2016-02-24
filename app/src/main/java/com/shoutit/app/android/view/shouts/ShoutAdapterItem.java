@@ -58,7 +58,7 @@ public class ShoutAdapterItem implements BaseAdapterItem {
     @Nullable
     public String getCategoryIconUrl() {
         if (shout.getCategory() != null) {
-            return Strings.emptyToNull(shout.getCategory().getMainTag().getImage());
+            return Strings.emptyToNull(shout.getCategory().getIcon());
         } else {
             return null;
         }

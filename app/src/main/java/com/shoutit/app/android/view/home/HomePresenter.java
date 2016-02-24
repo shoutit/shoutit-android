@@ -244,7 +244,7 @@ public class HomePresenter {
 
         // Layout manager changes
         linearLayoutManagerObservable = layoutManagerSwitchObserver
-                .scan(true, new Func2<Boolean, Object, Boolean>() {
+                .scan(false, new Func2<Boolean, Object, Boolean>() {
                     @Override
                     public Boolean call(Boolean prev, Object o) {
                         return !prev;
