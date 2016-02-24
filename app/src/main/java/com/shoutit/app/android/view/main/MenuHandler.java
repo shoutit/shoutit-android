@@ -22,6 +22,7 @@ import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.view.discover.DiscoverFragment;
 import com.shoutit.app.android.view.home.HomeFragment;
 import com.shoutit.app.android.view.location.LocationActivity;
+import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.settings.SettingsActivity;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -165,22 +166,22 @@ public class MenuHandler {
                 selectItem(view.getId());
                 break;
             case R.id.menu_chat:
-                if (userPreferences.isUserLoggedIn()) {
+                if (userPreferences.isNormalUser()) {
                     onMenuItemSelectedListener.onMenuItemSelected(FRAGMENT_CHATS);
+                    selectItem(view.getId());
                     Toast.makeText(rxActivity, "Not implemented yet", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(rxActivity, "Hello. Log in popup here", Toast.LENGTH_SHORT).show();
+                    showLoginActivity();
                 }
-                selectItem(view.getId());
                 break;
             case R.id.menu_orders:
-                if (userPreferences.isUserLoggedIn()) {
+                if (userPreferences.isNormalUser()) {
                     onMenuItemSelectedListener.onMenuItemSelected(FRAGMENT_ORDERS);
+                    selectItem(view.getId());
                     Toast.makeText(rxActivity, "Not implemented yet", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(rxActivity, "Hello. Log in popup here", Toast.LENGTH_SHORT).show();
+                    showLoginActivity();
                 }
-                selectItem(view.getId());
                 break;
             case R.id.menu_settings:
                 rxActivity.startActivity(SettingsActivity.newIntent(rxActivity));
@@ -194,6 +195,10 @@ public class MenuHandler {
         }
 
         selectItem(view.getId());
+    }
+
+    private void showLoginActivity() {
+        rxActivity.startActivity(LoginIntroActivity.newIntent(rxActivity));
     }
 
     private void selectItem(@IdRes int id) {
@@ -212,10 +217,10 @@ public class MenuHandler {
 
     @OnClick({R.id.menu_avatar_iv, R.id.menu_user_name_tv})
     public void startUserProfile() {
-        if (userPreferences.isUserLoggedIn()) {
+        if (userPreferences.isNormalUser()) {
             Toast.makeText(rxActivity, "Not implemented yet", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(rxActivity, "Hello. Log in popup here", Toast.LENGTH_SHORT).show();
+            showLoginActivity();
         }
     }
 
@@ -226,10 +231,10 @@ public class MenuHandler {
 
     @OnClick(R.id.menu_new_shout_btn)
     public void newShoutClick() {
-        if (userPreferences.isUserLoggedIn()) {
+        if (userPreferences.isNormalUser()) {
             Toast.makeText(rxActivity, "Not implemented yet", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(rxActivity, "Hello. Log in popup here", Toast.LENGTH_SHORT).show();
+            showLoginActivity();
         }
     }
 
