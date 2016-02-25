@@ -6,6 +6,7 @@ import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
@@ -35,6 +36,8 @@ public class ShoutPresenterTest {
     ShoutsDao shoutsDao;
     @Mock
     Context context;
+    @Mock
+    UserPreferences userPreferences;
 
     private ShoutPresenter presenter;
 
@@ -48,8 +51,12 @@ public class ShoutPresenterTest {
                 .thenReturn(Observable.just(ResponseOrError.fromData(new ShoutsResponse(1, "z", "z", Lists.newArrayList(getShout())))));
         when(shoutsDao.getRelatedShoutsObservable(any(RelatedShoutsPointer.class)))
                 .thenReturn(Observable.just(ResponseOrError.fromData(new ShoutsResponse(1, "z", "z", Lists.newArrayList(getShout())))));
+        when(userPreferences.getUserObservable())
+                .thenReturn(Observable.just(new User("z", null, null, null, null, null, null, null, false, null, null, false, false, null)));
+        when(userPreferences.isNormalUser())
+                .thenReturn(true);
 
-        presenter = new ShoutPresenter(shoutsDao, "zz", context, Schedulers.immediate());
+        presenter = new ShoutPresenter(shoutsDao, "zz", context, Schedulers.immediate(), userPreferences);
     }
 
     @Test
