@@ -10,6 +10,7 @@ import com.shoutit.app.android.api.model.ShoutsResponse;
 import javax.annotation.Nonnull;
 
 import rx.Observable;
+import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
@@ -20,6 +21,8 @@ public abstract class BaseShoutsDao {
     private Observable<ResponseOrError<ShoutsResponse>> shoutsObservable;
     @Nonnull
     protected final PublishSubject<Object> loadMoreShoutsSubject = PublishSubject.create();
+    @Nonnull
+    protected final PublishSubject<Object> refreshShoutsSubject = PublishSubject.create();
 
     public BaseShoutsDao(final @Nonnull @NetworkScheduler Scheduler networkScheduler) {
         final OperatorMergeNextToken<ShoutsResponse, Object> loadMoreOperator =
@@ -46,6 +49,7 @@ public abstract class BaseShoutsDao {
                 });
 
         shoutsObservable = loadMoreShoutsSubject.startWith((Object) null)
+                .compose(MoreOperators.refresh(refreshShoutsSubject))
                 .lift(loadMoreOperator)
                 .compose(ResponseOrError.<ShoutsResponse>toResponseOrErrorObservable())
                 .compose(MoreOperators.<ResponseOrError<ShoutsResponse>>cacheWithTimeout(networkScheduler));
@@ -57,5 +61,11 @@ public abstract class BaseShoutsDao {
         return shoutsObservable;
     }
 
+    @Nonnull
+    public Observer<Object> getRefreshObserver() {
+        return refreshShoutsSubject;
+    }
+
+    @Nonnull
     abstract Observable<ShoutsResponse> getShoutsRequest(int pageNumber);
 }

@@ -150,7 +150,7 @@ public class ShoutPresenterTest {
     }
 
     private User getUser() {
-        return new User("id", null, null, null, null, null, null, null, false, null, null, false, false, null);
+        return new User("id", null, null, null, null, null, null, null, false, null, null, false, false, null, 1, null);
     }
 
 

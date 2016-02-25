@@ -28,7 +28,7 @@ public class UserShoutsPointer {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof UserShoutsPointer)) return false;
-        UserShoutsPointer that = (UserShoutsPointer) o;
+        final UserShoutsPointer that = (UserShoutsPointer) o;
         return pageSize == that.pageSize &&
                 Objects.equal(userName, that.userName);
     }

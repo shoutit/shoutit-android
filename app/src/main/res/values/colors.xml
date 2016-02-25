@@ -52,4 +52,7 @@
     <color name="shout_name">#de000000</color>
     <color name="shout_page_indicator">#99FFFFFF</color>
 
+    <!-- Profile -->
+    <color name="profile_name">#de000000</color>
+
 </resources>

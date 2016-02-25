@@ -189,4 +189,15 @@
     <string name="account_wrong_email">Wrong email address</string>
     <string name="account_logout">Log out</string>
 
+    <!-- Profile -->
+    <string name="profile_shuts_button">See all shouts</string>
+    <string name="profile_my_shouts_header">My shouts</string>
+    <string name="profile_listening">Listening</string>
+    <string name="profile_interests">Interests</string>
+    <string name="profile_subtitle">%1$d Listeners</string>
+    <string name="profile_empty_field">---</string>
+    <string name="profile_share_profile_title">Share profile</string>
+    <string name="profile_joined_date">Joined %1$s</string>
+    <string name="error_main_message">Ooops something went wrong</string>
+
 </resources>

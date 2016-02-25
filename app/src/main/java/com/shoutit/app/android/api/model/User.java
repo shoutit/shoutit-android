@@ -1,7 +1,10 @@
 package com.shoutit.app.android.api.model;
 
 
+import java.util.List;
+
 public class User {
+    public static final String USERNAME_ME = "me";
 
     private final String id;
     private final String type;
@@ -17,10 +20,12 @@ public class User {
     private final boolean isListening;
     private final boolean isPasswordSet;
     private final UserLocation location;
+    private final int listenersCount;
+    private final List<Page> pages;
 
     public User(String id, String type, String apiUrl, String webUrl, String username,
                 String name, String firstName, String lastName, boolean isActivated, String image,
-                String cover, boolean isListening, boolean isPasswordSet, UserLocation location) {
+                String cover, boolean isListening, boolean isPasswordSet, UserLocation location, int listenersCount, List<Page> pages) {
         this.id = id;
         this.type = type;
         this.apiUrl = apiUrl;
@@ -35,11 +40,13 @@ public class User {
         this.isListening = isListening;
         this.isPasswordSet = isPasswordSet;
         this.location = location;
+        this.listenersCount = listenersCount;
+        this.pages = pages;
     }
 
     // TODO remove it when user will be handler by API
     public static User guestUser(UserLocation location) {
-        return new User(null, null, null, null ,null, null, null, null, false, null, null, false, false, location);
+        return new User(null, null, null, null ,null, null, null, null, false, null, null, false, false, location, 1, null);
     }
 
     public String getId() {
@@ -96,5 +103,13 @@ public class User {
 
     public boolean isPasswordSet() {
         return isPasswordSet;
+    }
+
+    public int getListenersCount() {
+        return listenersCount;
+    }
+
+    public List<Page> getPages() {
+        return pages;
     }
 }
