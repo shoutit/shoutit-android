@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <android.support.v7.widget.Toolbar
         style="@style/AppTheme.BaseToolbarStyle"
@@ -10,7 +12,6 @@
         android:layout_height="?actionBarSize"/>
 
     <android.support.v7.widget.RecyclerView
-        android:layout_above="@+id/shout_bottom_bar"
         android:layout_below="@+id/shout_toolbar"
         android:id="@+id/shout_recycler_view"
         android:layout_marginTop="4dp"
@@ -24,40 +25,85 @@
         android:layout_centerInParent="true"/>
 
     <LinearLayout
+        android:theme="@style/ShoutBottomBar"
         android:id="@+id/shout_bottom_bar"
-        android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:background="@color/black_87"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
+        android:layout_height="@dimen/shout_bottom_bar"
+        android:layout_alignParentBottom="true"
+        android:background="@color/shout_bottom_bar"
         android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp">
 
         <TextView
+            android:id="@+id/shout_bottom_bar_call_or_delete"
             style="@style/ShoutBottomBarItem"
-            android:drawableLeft="@drawable/ic_call"
-            android:drawableStart="@drawable/ic_call"
-            android:text="@string/shout_bottom_bar_call"/>
+            android:background="?selectableItemBackground"
+            android:drawableLeft="@drawable/ic_call_green"
+            android:drawableStart="@drawable/ic_call_green"
+            android:text="@string/shout_bottom_bar_call" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
 
         <TextView
+            android:id="@+id/shout_bottom_bar_video_call_or_edit"
             style="@style/ShoutBottomBarItem"
-            android:drawableLeft="@drawable/ic_video_chat"
-            android:drawableStart="@drawable/ic_video_chat"
-            android:text="@string/shout_bottom_bar_video_call"/>
+            android:background="?selectableItemBackground"
+            android:drawableLeft="@drawable/ic_video_chat_red"
+            android:drawableStart="@drawable/ic_video_chat_red"
+            android:text="@string/shout_bottom_bar_video_call" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
 
         <TextView
+            android:id="@+id/shout_bottom_bar_chat_or_chats"
             style="@style/ShoutBottomBarItem"
-            android:drawableLeft="@drawable/ic_chat_white"
-            android:drawableStart="@drawable/ic_chat_white"
-            android:text="@string/shout_bottom_bar_chat"/>
+            android:background="?selectableItemBackground"
+            android:drawableLeft="@drawable/ic_chat"
+            android:drawableStart="@drawable/ic_chat"
+            android:text="@string/shout_bottom_bar_chat" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
 
         <TextView
+            android:id="@+id/shout_bottom_bar_more"
             style="@style/ShoutBottomBarItem"
-            android:layout_weight="0.1"
+            android:background="?selectableItemBackground"
             android:drawableLeft="@drawable/ic_more"
             android:drawableStart="@drawable/ic_more" />
 
     </LinearLayout>
+
+    <TextView
+        android:theme="@style/ShoutBottomBar"
+        android:id="@+id/shout_bottom_bar_report_tv"
+        android:layout_above="@+id/shout_bottom_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="120dp"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:gravity="center_vertical|start"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:textColor="@android:color/white"
+        android:background="@color/shout_bottom_bar"
+        android:text="@string/shout_bottom_bar_report"/>
 
 </RelativeLayout>

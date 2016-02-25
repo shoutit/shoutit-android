@@ -183,6 +183,8 @@
     <string name="shout_bottom_bar_call">Call</string>
     <string name="shout_bottom_bar_video_call">Video call</string>
     <string name="shout_bottom_bar_chat">Chat</string>
+    <string name="shout_bottom_bar_chats">Chats</string>
+    <string name="shout_bottom_bar_report">Report</string>
 
     <!-- Account -->
     <string name="account_email_changed">Email successfully changed</string>
