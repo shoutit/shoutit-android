@@ -46,7 +46,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 23
         versionCode project.ext.versionCode
-        versionName "${baseVersionName}-${project.ext.versionChangeSuffix} (${project.ext.versionCode})"
+        versionName "${baseVersionName}-${project.ext.versionChangeSuffix}"
         renderscriptTargetApi 23
         multiDexEnabled true
         testInstrumentationRunner "com.android.test.runner.MultiDexTestRunner"
