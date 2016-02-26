@@ -2,7 +2,6 @@ package com.shoutit.app.android.view.shout;
 
 import android.content.Context;
 import android.graphics.Rect;
-import android.location.Location;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +17,7 @@ import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.google.common.base.Optional;
 import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
 import com.shoutit.app.android.api.model.Filter;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.User;
@@ -27,6 +27,7 @@ import com.shoutit.app.android.utils.DateTimeUtils;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.ResourcesHelper;
+import com.shoutit.app.android.viewholders.HeaderViewHolder;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.viewpagerindicator.CirclePageIndicator;
@@ -151,7 +152,7 @@ public class ShoutAdapter extends BaseAdapter {
             dateTextView.setText(DateTimeUtils.getShoutDetailDate(context, shout.getDatePublishedInMillis()));
             categoryTextView.setText(shout.getCategory().getName());
 
-            final Optional<Integer> flagResId = ResourcesHelper.getCountryResId(context, shout);
+            final Optional<Integer> flagResId = ResourcesHelper.getCountryResId(context, shout.getLocation());
             if (flagResId.isPresent()) {
                 picasso.load(flagResId.get())
                         .into(flagTarget);
@@ -184,21 +185,6 @@ public class ShoutAdapter extends BaseAdapter {
             final boolean isLastElementLight = detailsContainer.getChildCount() % 2 != 0;
             locationContainer.setBackgroundColor(context.getResources().getColor(
                     isLastElementLight ? android.R.color.white : R.color.black_12));
-        }
-    }
-
-    public class HeaderViewHolder extends ViewHolderManager.BaseViewHolder<ShoutAdapterItems.HeaderAdapterItem> {
-        @Bind(R.id.shout_item_header_tv)
-        TextView titleTextView;
-
-        public HeaderViewHolder(@Nonnull View itemView) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
-        }
-
-        @Override
-        public void bind(@Nonnull ShoutAdapterItems.HeaderAdapterItem item) {
-            titleTextView.setText(item.getTitle());
         }
     }
 
@@ -321,7 +307,7 @@ public class ShoutAdapter extends BaseAdapter {
             case VIEW_TYPE_SHOUT:
                 return new ShoutViewHolder(layoutInflater.inflate(R.layout.shout_item, parent, false));
             case VIEW_TYPE_HEADER:
-                return new HeaderViewHolder(layoutInflater.inflate(R.layout.shout_header_item, parent, false));
+                return new HeaderViewHolder(layoutInflater.inflate(R.layout.base_header_item, parent, false));
             case VIEW_TYPE_USER_SHOUTS:
                 return new UserShoutViewHolder(layoutInflater.inflate(R.layout.shout_item_grid, parent, false));
             case VIEW_TYPE_VISIT_PROFILE:
@@ -343,7 +329,7 @@ public class ShoutAdapter extends BaseAdapter {
         final BaseAdapterItem item = items.get(position);
         if (item instanceof ShoutAdapterItems.MainShoutAdapterItem) {
             return VIEW_TYPE_SHOUT;
-        } else if (item instanceof ShoutAdapterItems.HeaderAdapterItem) {
+        } else if (item instanceof HeaderAdapterItem) {
             return VIEW_TYPE_HEADER;
         } else if (item instanceof ShoutAdapterItems.RelatedContainerAdapterItem) {
             return VIEW_TYPE_RELATED_SHOUTS_CONTAINER;

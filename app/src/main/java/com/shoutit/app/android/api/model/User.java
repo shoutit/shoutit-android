@@ -22,10 +22,12 @@ public class User {
     private final UserLocation location;
     private final int listenersCount;
     private final List<Page> pages;
+    private final String bio;
+    private final int dateJoined;
 
     public User(String id, String type, String apiUrl, String webUrl, String username,
                 String name, String firstName, String lastName, boolean isActivated, String image,
-                String cover, boolean isListening, boolean isPasswordSet, UserLocation location, int listenersCount, List<Page> pages) {
+                String cover, boolean isListening, boolean isPasswordSet, UserLocation location, int listenersCount, List<Page> pages, String bio, int dateJoined) {
         this.id = id;
         this.type = type;
         this.apiUrl = apiUrl;
@@ -42,11 +44,13 @@ public class User {
         this.location = location;
         this.listenersCount = listenersCount;
         this.pages = pages;
+        this.bio = bio;
+        this.dateJoined = dateJoined;
     }
 
     // TODO remove it when user will be handler by API
     public static User guestUser(UserLocation location) {
-        return new User(null, null, null, null ,null, null, null, null, false, null, null, false, false, location, 1, null);
+        return new User(null, null, null, null ,null, null, null, null, false, null, null, false, false, location, 1, null, null, 0);
     }
 
     public String getId() {
@@ -111,5 +115,13 @@ public class User {
 
     public List<Page> getPages() {
         return pages;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public long getDateJoinedInMillis() {
+        return dateJoined * 1000;
     }
 }

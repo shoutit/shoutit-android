@@ -198,6 +198,6 @@
     <string name="profile_empty_field">---</string>
     <string name="profile_share_profile_title">Share profile</string>
     <string name="profile_joined_date">Joined %1$s</string>
-    <string name="error_main_message">Ooops something went wrong</string>
+    <string name="profile_listening_to_you">listening to you</string>
 
 </resources>

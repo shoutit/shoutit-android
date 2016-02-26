@@ -32,12 +32,44 @@ public class PicassoHelper {
 
             @Override
             public void onBitmapFailed(Drawable errorDrawable) {
-
+                if (errorDrawable != null) {
+                    imageView.setImageDrawable(errorDrawable);
+                }
             }
 
             @Override
             public void onPrepareLoad(Drawable placeHolderDrawable) {
+                if (placeHolderDrawable != null) {
+                    imageView.setImageDrawable(placeHolderDrawable);
+                }
+            }
+        };
+    }
 
+    public static Target getRoundedBitmapTarget(@Nonnull final Context context,
+                                                @Nonnull final ImageView imageView,
+                                                final float cornerRadius) {
+        return new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                final RoundedBitmapDrawable roundedBitmap = RoundedBitmapDrawableFactory
+                        .create(context.getResources(), bitmap);
+                roundedBitmap.setCornerRadius(cornerRadius);
+                imageView.setImageDrawable(roundedBitmap);
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+                if (errorDrawable != null) {
+                    imageView.setImageDrawable(errorDrawable);
+                }
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+                if (placeHolderDrawable != null) {
+                    imageView.setImageDrawable(placeHolderDrawable);
+                }
             }
         };
     }

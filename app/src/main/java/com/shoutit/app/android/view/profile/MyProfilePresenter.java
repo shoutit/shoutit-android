@@ -6,45 +6,39 @@ import android.support.annotation.NonNull;
 
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.appunite.rx.dagger.UiScheduler;
 import com.google.common.collect.ImmutableList;
+import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ShoutsDao;
+import com.shoutit.app.android.view.shout.ShoutAdapterItems;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 
 import rx.Observable;
+import rx.Scheduler;
 import rx.functions.Func2;
 
 public class MyProfilePresenter extends ProfilePresenter {
 
-    @Nonnull
-    private final UserPreferences userPreferences;
-
     public MyProfilePresenter(@Nonnull String userName,
                               @Nonnull ShoutsDao shoutsDao,
                               @Nonnull @ForActivity Context context,
-                              @Nonnull Resources resources,
-                              @Nonnull UserPreferences userPreferences) {
-        super(userName, shoutsDao, context, resources);
-        this.userPreferences = userPreferences;
+                              @Nonnull UserPreferences userPreferences,
+                              @Nonnull @UiScheduler Scheduler scheduler) {
+        super(userName, shoutsDao, context, userPreferences, scheduler);
     }
 
-    @NonNull
     @Override
-    protected Func2<User, List<BaseAdapterItem>, List<BaseAdapterItem>> combineAdapterItems() {
-        return new Func2<User, List<BaseAdapterItem>, List<BaseAdapterItem>>() {
-            @Override
-            public List<BaseAdapterItem> call(User user, List<BaseAdapterItem> shouts) {
-                final ImmutableList.Builder<Object> builder = ImmutableList.builder();
-
-                builder.add(new MyUserAdapterItem(user));
-                builder.add()
-            }
-        };
+    protected ProfileAdpaterItems.UserNameAdapterItem getUserNameAdapterItem(@Nonnull User user) {
+        return new MyUserNameAdapterItem(user);
     }
 
     @Nonnull
@@ -54,28 +48,30 @@ public class MyProfilePresenter extends ProfilePresenter {
                 .compose(ResponseOrError.<User>toResponseOrErrorObservable());
     }
 
-    public class MyUserAdapterItem implements BaseAdapterItem {
+    @Override
+    protected String getSectionHeaderTitle(String profileType, User user) {
+        return
+    }
 
-        @Nonnull
-        private final User user;
+    @Override
+    protected String getShoutsHeaderTitle(User user) {
+        return context.getString(R.string.) ?
+    }
 
-        public MyUserAdapterItem(@Nonnull User user) {
-            this.user = user;
-        }
+    public class MyUserNameAdapterItem extends ProfileAdpaterItems.UserNameAdapterItem {
 
-        @Override
-        public long adapterId() {
-            return BaseAdapterItem.NO_ID;
+        public MyUserNameAdapterItem(@Nonnull User user) {
+            super(user);
         }
 
         @Override
         public boolean matches(@Nonnull BaseAdapterItem item) {
-            return item instanceof UserAdapterItem && !user.equals(item);
+            return item instanceof ProfileAdpaterItems.UserNameAdapterItem && !user.equals(item);
         }
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof UserAdapterItem && user.equals(item);
+            return item instanceof ProfileAdpaterItems.UserNameAdapterItem && user.equals(item);
         }
 
         @Nonnull

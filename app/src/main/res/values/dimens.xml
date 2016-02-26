@@ -38,4 +38,12 @@
     <dimen name="shout_item_padding">6dp</dimen>
     <dimen name="shout_related_item_spacing">1dp</dimen>
 
+    <!-- Profile fragment -->
+    <dimen name="profile_shout_grid_side_spacing">4dp</dimen>
+    <dimen name="profile_avatar_radius">2dp</dimen>
+    <dimen name="profile_avatar_stroke">0.5dp</dimen>
+    <dimen name="profile_cover_height">203dp</dimen>
+    <dimen name="profile_shout_height">126dp</dimen>
+    <dimen name="profile_section_avatar_corners">3dp</dimen>
+
 </resources>

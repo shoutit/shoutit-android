@@ -17,12 +17,15 @@ import com.google.common.collect.ImmutableList;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.model.ProfileKind;
+import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.utils.BlurTransform;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.view.discover.DiscoverFragment;
 import com.shoutit.app.android.view.home.HomeFragment;
 import com.shoutit.app.android.view.location.LocationActivity;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
+import com.shoutit.app.android.view.profile.ProfileActivity;
 import com.shoutit.app.android.view.settings.SettingsActivity;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -195,6 +198,13 @@ public class MenuHandler {
         }
 
         selectItem(view.getId());
+    }
+
+    @OnClick(R.id.menu_avatar_iv)
+    public void onAvatarClicked() {
+        if (userPreferences.isNormalUser()) {
+            rxActivity.startActivity(ProfileActivity.newIntent(rxActivity, userPreferences.getUser().getUsername(), ProfileKind.PROFILE));
+        }
     }
 
     private void showLoginActivity() {

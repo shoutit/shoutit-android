@@ -11,7 +11,8 @@ import dagger.Component;
 @Component(
         dependencies = AppComponent.class,
         modules = {
-                ActivityModule.class
+                ActivityModule.class,
+                ProfileActivityModule.class
         }
 )
 public interface ProfileActivityComponent extends BaseActivityComponent {

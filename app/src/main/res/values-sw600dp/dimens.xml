@@ -26,4 +26,8 @@
     <dimen name="shout_related_image_height">110dp</dimen>
     <dimen name="shout_related_container_height">180dp</dimen>
 
+    <!-- Profile -->
+    <dimen name="profile_cover_height">240dp</dimen>
+    <dimen name="profile_shout_height">220dp</dimen>
+
 </resources>

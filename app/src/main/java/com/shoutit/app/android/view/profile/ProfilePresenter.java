@@ -1,46 +1,40 @@
 package com.shoutit.app.android.view.profile;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.support.annotation.NonNull;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.appunite.rx.android.util.LogTransformer;
+import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
-import com.shoutit.app.android.api.model.Page;
+import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
+import com.shoutit.app.android.api.model.ProfileKind;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ShoutsDao;
-import com.shoutit.app.android.data.UserController;
-import com.shoutit.app.android.data.api.ShoutitService;
-import com.shoutit.app.android.data.api.image.ShoutitImageType;
-import com.shoutit.app.android.data.api.model.Shout;
-import com.shoutit.app.android.data.api.model.User;
-import com.shoutit.app.android.data.api.model.response.shouts.ShoutStreamResponse;
-import com.shoutit.app.android.data.event.users.UserProfileReadyEvent;
 import com.shoutit.app.android.model.UserShoutsPointer;
-import com.shoutit.app.android.rx.RxMoreObservers;
-import com.shoutit.app.android.utils.rx.RxMoreObservers;
+import com.shoutit.app.android.view.shout.ShoutAdapterItems;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
 
 import rx.Observable;
-import rx.Observer;
+import rx.Scheduler;
 import rx.functions.Func1;
 import rx.functions.Func2;
-import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
 public abstract class ProfilePresenter {
@@ -64,30 +58,36 @@ public abstract class ProfilePresenter {
     private final Observable<String> shareObservable;
 
     @Nonnull
-    private final PublishSubject<Boolean> showMoreShoutsSubject = PublishSubject.create();
-    @Nonnull
-    private final PublishSubject<Object> loadMoreShoutsSubject = PublishSubject.create();
+    private final PublishSubject<String> showAllShoutsSubject = PublishSubject.create();
     @Nonnull
     private final PublishSubject<Object> refreshProfileSubject = PublishSubject.create();
-    @Nonnull
-    private final PublishSubject<Shout> newShoutSubject = PublishSubject.create();
     @Nonnull
     private final PublishSubject<Object> shareInitSubject = PublishSubject.create();
     @Nonnull
     private final PublishSubject<String> shoutSelectedSubject = PublishSubject.create();
     @Nonnull
-    private final PublishSubject<String> listenProfileSubject = PublishSubject.create();
+    protected final PublishSubject<String> pageSelectedSubject = PublishSubject.create();
     @Nonnull
-    private final PublishSubject<String> openChatSubject = PublishSubject.create();
+    protected final PublishSubject<String> pageListenSubject = PublishSubject.create();
 
-    @Inject
+    @Nonnull
+    protected final Context context;
+    @Nonnull
+    protected final UserPreferences userPreferences;
+    protected boolean isMyProfile;
+
     public ProfilePresenter(@Nonnull final String userName,
                             @Nonnull final ShoutsDao shoutsDao,
                             @Nonnull @ForActivity final Context context,
-                            @Nonnull final Resources resources) {
+                            @Nonnull UserPreferences userPreferences,
+                            @Nonnull @UiScheduler Scheduler uiScheduler) {
+        this.context = context;
+        this.userPreferences = userPreferences;
+        isMyProfile = userName.equals(userPreferences.getUser().getUsername());
 
         /** User **/
         final Observable<ResponseOrError<User>> userObservable = getUserObservable()
+                .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<User>>behaviorRefCount());
 
         final Observable<User> successUserObservable = userObservable
@@ -122,7 +122,7 @@ public abstract class ProfilePresenter {
                 .map(new Func1<User, String>() {
                     @Override
                     public String call(User user) {
-                        return resources.getString(R.string.profile_subtitle, user.getListenersCount());
+                        return context.getResources().getString(R.string.profile_subtitle, user.getListenersCount());
                     }
                 });
 
@@ -130,7 +130,8 @@ public abstract class ProfilePresenter {
         /** Shouts **/
         final Observable<ResponseOrError<ShoutsResponse>> shoutsObservable =
                 shoutsDao.getUserShoutObservable(new UserShoutsPointer(SHOUTS_PAGE_SIZE, userName))
-                .compose(ObservableExtensions.<ResponseOrError<ShoutsResponse>>behaviorRefCount());
+                        .observeOn(uiScheduler)
+                        .compose(ObservableExtensions.<ResponseOrError<ShoutsResponse>>behaviorRefCount());
 
         final Observable<List<BaseAdapterItem>> shoutsSuccessResponse = shoutsObservable
                 .compose(ResponseOrError.<ShoutsResponse>onlySuccess())
@@ -160,14 +161,16 @@ public abstract class ProfilePresenter {
         allAdapterItemsObservable = Observable.combineLatest(
                 successUserObservable,
                 shoutsSuccessResponse.startWith(ImmutableList.<List<BaseAdapterItem>>of()),
-                combineAdapterItems());
+                combineAdapterItems())
+                .compose(LogTransformer.<List<BaseAdapterItem>>transformer("lol", "allAdapterItemsObservable"));
 
 
         /** Errors **/
         shoutsErrorsResponse = ResponseOrError.combineErrorsObservable(ImmutableList.of(
                 ResponseOrError.transform(shoutsObservable),
                 ResponseOrError.transform(userObservable)))
-                .filter(Functions1.isNotNull());
+                .filter(Functions1.isNotNull())
+                .compose(LogTransformer.<Throwable>transformer("lol", "shoutsErrorsResponse"));
 
         /** Progress **/
         progressObservable = Observable.merge(userObservable, shoutsErrorsResponse)
@@ -185,10 +188,55 @@ public abstract class ProfilePresenter {
     }
 
     @NonNull
-    protected abstract Func2<User, List<BaseAdapterItem>, List<BaseAdapterItem>> combineAdapterItems();
+    protected Func2<User, List<BaseAdapterItem>, List<BaseAdapterItem>> combineAdapterItems() {
+        return new Func2<User, List<BaseAdapterItem>, List<BaseAdapterItem>>() {
+            @Override
+            public List<BaseAdapterItem> call(User user, List<BaseAdapterItem> shouts) {
+                final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
+
+                builder.add(getUserNameAdapterItem(user))
+                        .add(new ProfileAdpaterItems.UserInfoAdapterItem(user));
+
+                final List<BaseAdapterItem> items = new ArrayList<>();
+                if (!user.getPages().isEmpty()) {
+                    builder.add(new HeaderAdapterItem("Pages"));
+
+                    for (int i = 0; i < user.getPages().size(); i++) {
+                        items.add(getPageAdapterItemForPosition(i, user.getPages()));
+                    }
+                    builder.addAll(items);
+                }
+
+                if (!shouts.isEmpty()) {
+                    builder.add(new HeaderAdapterItem("Shouts"))
+                            .addAll(shouts)
+                            .add(new ProfileAdpaterItems.SeeAllUserShoutsAdapterItem(
+                                    showAllShoutsSubject, user.getUsername()));
+                }
+
+                return builder.build();
+            }
+        };
+    }
+
+    private <T extends ProfileKind> ProfileAdpaterItems.ProfileSectionAdapterItem getPageAdapterItemForPosition(int position, List<T> items) {
+        if (position == 0) {
+            return new ProfileAdpaterItems.ProfileSectionAdapterItem<>(true, false, items.get(position), pageSelectedSubject, pageListenSubject);
+        } else if (position == items.size() - 1) {
+            return new ProfileAdpaterItems.ProfileSectionAdapterItem<>(false, true, items.get(position), pageSelectedSubject, pageListenSubject);
+        } else {
+            return new ProfileAdpaterItems.ProfileSectionAdapterItem<>(false, false, items.get(position), pageSelectedSubject, pageListenSubject);
+        }
+    }
+
+    protected abstract ProfileAdpaterItems.UserNameAdapterItem getUserNameAdapterItem(@Nonnull User user);
 
     @Nonnull
     protected abstract Observable<ResponseOrError<User>> getUserObservable();
+
+    protected abstract String getSectionHeaderTitle(String profileType, User user);
+
+    protected abstract String getShoutsHeaderTitle(User user);
 
     @Nonnull
     public Observable<Boolean> getProgressObservable() {
@@ -196,18 +244,8 @@ public abstract class ProfilePresenter {
     }
 
     @Nonnull
-    public Observer<Object> getLoadMoreShoutsSubject() {
-        return RxMoreObservers.ignoreCompleted(loadMoreShoutsSubject);
-    }
-
-    @Nonnull
     public Observable<List<BaseAdapterItem>> getAllAdapterItemsObservable() {
         return allAdapterItemsObservable;
-    }
-
-    @Nonnull
-    private Observer<Boolean> getShowAllShoutsObserver() {
-        return RxMoreObservers.ignoreCompleted(showMoreShoutsSubject);
     }
 
     @Nonnull
@@ -236,122 +274,9 @@ public abstract class ProfilePresenter {
     }
 
     @Nonnull
-    public Observer<Object> refreshProfileObserver() {
-        return refreshProfileSubject;
-    }
-
-    @Nonnull
-    public Observer<Shout> getNewShoutSubject() {
-        return newShoutSubject;
-    }
-
-    @Nonnull
-    public Observer<Object> shareProfileInitObserver() {
-        return shareInitSubject;
-    }
-
-    @Nonnull
     public Observable<String> getShareObservable() {
         return shareObservable;
     }
 
-    public class UserAdapterItem implements BaseAdapterItem {
 
-        @Nonnull
-        private final User user;
-
-        public UserAdapterItem(@Nonnull User user) {
-            this.user = user;
-        }
-
-        @Override
-        public long adapterId() {
-            return BaseAdapterItem.NO_ID;
-        }
-
-        @Override
-        public boolean matches(@Nonnull BaseAdapterItem item) {
-            return item instanceof UserAdapterItem && !user.equals(item);
-        }
-
-        @Override
-        public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof UserAdapterItem && user.equals(item);
-        }
-
-        @Nonnull
-        public User getUser() {
-            return user;
-        }
-    }
-
-    public class ProfilePageAdapterItem {
-
-        private final boolean isFirstItem;
-        private final boolean isLastItem;
-        @Nonnull
-        private final Page page;
-        @Nonnull
-        private final Observer<String> pageSelectedObserver;
-        @Nonnull
-        private final Observer<String> listenPageObserver;
-        @Nonnull
-        private final String pageName;
-
-        public ProfilePageAdapterItem(boolean isFirstItem, boolean isLastItem,
-                                      @Nonnull Page page,
-                                      @Nonnull Observer<String> pageSelectedObserver,
-                                      @Nonnull Observer<String> listenPageObserver,
-                                      @Nonnull String pageName) {
-            this.isFirstItem = isFirstItem;
-            this.isLastItem = isLastItem;
-            this.page = page;
-            this.pageSelectedObserver = pageSelectedObserver;
-            this.listenPageObserver = listenPageObserver;
-            this.pageName = pageName;
-        }
-
-        public void onPageSelected() {
-            pageSelectedObserver.onNext(pageName);
-        }
-
-        public void onListenPage() {
-            if (!page.isListening()) {
-                listenPageObserver.onNext(pageName);
-            }
-        }
-    }
-
-    public class ShowMoreShoutsAdapterItem implements BaseAdapterItem {
-
-        @Nonnull
-        private final Observer<String> showMoreShoutsObserver;
-        @Nonnull
-        private final String userName;
-
-        public ShowMoreShoutsAdapterItem(@Nonnull Observer<String> showMoreShoutsObserver,
-                                         @Nonnull String userName) {
-            this.showMoreShoutsObserver = showMoreShoutsObserver;
-            this.userName = userName;
-        }
-
-        @Override
-        public boolean matches(@Nonnull BaseAdapterItem item) {
-            return item instanceof ShowMoreShoutsAdapterItem;
-        }
-
-        @Override
-        public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof ShowMoreShoutsAdapterItem;
-        }
-
-        @Override
-        public long adapterId() {
-            return BaseAdapterItem.NO_ID;
-        }
-
-        public void onShowMoreShouts() {
-            showMoreShoutsObserver.onNext(userName);
-        }
-    }
 }

@@ -2,6 +2,7 @@
 
 <android.support.design.widget.FloatingActionButton xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/base_fab"
     android:layout_width="@dimen/fab_size"
     android:layout_height="@dimen/fab_size"
     android:layout_gravity="bottom|end"

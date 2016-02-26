@@ -68,11 +68,11 @@ public class HomeFragment extends BaseFragment {
     @Inject
     OnSeeAllDiscoversListener onSeeAllDiscoversListener;
 
-    @android.support.annotation.Nullable
+    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater,
-                             @android.support.annotation.Nullable ViewGroup container,
-                             @android.support.annotation.Nullable Bundle savedInstanceState) {
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
 

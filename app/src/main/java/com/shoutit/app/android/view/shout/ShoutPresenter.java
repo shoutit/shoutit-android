@@ -10,6 +10,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
@@ -182,14 +183,14 @@ public class ShoutPresenter {
 
                         final User user = shout.getShout().getUser();
                         if (!userShouts.isEmpty()) {
-                            builder.add(new ShoutAdapterItems.HeaderAdapterItem(context.getString(R.string.shout_user_shouts_header, user.getName())))
+                            builder.add(new HeaderAdapterItem(context.getString(R.string.shout_user_shouts_header, user.getName())))
                                     .addAll(userShouts);
                         }
 
                         builder.add(new ShoutAdapterItems.VisitProfileAdapterItem(visitProfileSubject, user));
 
                         if (!relatedShouts.isEmpty()) {
-                            builder.add(new ShoutAdapterItems.HeaderAdapterItem(context.getString(R.string.shout_related_shouts_header)))
+                            builder.add(new HeaderAdapterItem(context.getString(R.string.shout_related_shouts_header)))
                                     .add(new ShoutAdapterItems.RelatedContainerAdapterItem(relatedShouts));
                         }
 

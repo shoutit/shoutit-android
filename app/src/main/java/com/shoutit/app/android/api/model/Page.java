@@ -1,6 +1,6 @@
 package com.shoutit.app.android.api.model;
 
-public class Page {
+public class Page implements ProfileKind {
     private final String id;
     private final String type;
     private final String userName;
@@ -32,10 +32,12 @@ public class Page {
         return id;
     }
 
+    @Override
     public String getType() {
         return type;
     }
 
+    @Override
     public String getUserName() {
         return userName;
     }
@@ -64,6 +66,7 @@ public class Page {
         return cover;
     }
 
+    @Override
     public boolean isListening() {
         return isListening;
     }
