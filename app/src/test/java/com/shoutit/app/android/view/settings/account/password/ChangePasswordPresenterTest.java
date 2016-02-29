@@ -35,7 +35,7 @@ public class ChangePasswordPresenterTest {
                 .thenReturn(Observable.just(ResponseBody.create(null, "z")));
 
         when(userPreferences.getUserObservable())
-                .thenReturn(Observable.just(new User("", null, null, null, null, null, null, null, false, null, null, true, false, null, 1, null, null, 0)));
+                .thenReturn(Observable.just(new User("", null, null, null, null, null, null, null, false, null, null, true, false, null, 1, null, null, 0, null)));
 
         presenter = new ChangePasswordPresenter(apiService, userPreferences, Schedulers.immediate(), Schedulers.immediate());
     }
@@ -151,6 +151,6 @@ public class ChangePasswordPresenterTest {
     }
 
     private User userWithPasswordSet() {
-        return new User("", null, null, null, null, null, null, null, false, null, null, false, false, null, 1, null, null, 0);
+        return new User("", null, null, null, null, null, null, null, false, null, null, false, false, null, 1, null, null, 0, null);
     }
 }

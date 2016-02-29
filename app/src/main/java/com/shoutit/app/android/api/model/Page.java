@@ -1,6 +1,8 @@
 package com.shoutit.app.android.api.model;
 
-public class Page implements ProfileKind {
+import com.google.common.base.Objects;
+
+public class Page implements ProfileType {
     private final String id;
     private final String type;
     private final String userName;
@@ -73,5 +75,28 @@ public class Page implements ProfileKind {
 
     public int getListenersCount() {
         return listenersCount;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Page)) return false;
+        final Page page = (Page) o;
+        return isActivated == page.isActivated &&
+                isListening == page.isListening &&
+                listenersCount == page.listenersCount &&
+                Objects.equal(id, page.id) &&
+                Objects.equal(type, page.type) &&
+                Objects.equal(userName, page.userName) &&
+                Objects.equal(name, page.name) &&
+                Objects.equal(firstName, page.firstName) &&
+                Objects.equal(lastName, page.lastName) &&
+                Objects.equal(image, page.image) &&
+                Objects.equal(cover, page.cover);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id, type, userName, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount);
     }
 }

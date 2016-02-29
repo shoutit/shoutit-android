@@ -2,19 +2,24 @@ package com.shoutit.app.android.view.profile;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.appunite.rx.android.MyAndroidSchedulers;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.jakewharton.rxbinding.view.RxView;
 import com.jakewharton.rxbinding.widget.RxTextView;
@@ -61,6 +66,8 @@ public class ProfileActivity extends BaseActivity {
     ImageView coverImageView;
     @Bind(R.id.base_fab)
     FloatingActionButton fab;
+    @Bind(R.id.profile_fragment_toolbar)
+    Toolbar toolbar;
 
     @Inject
     MyProfilePresenter presenter;
@@ -84,6 +91,7 @@ public class ProfileActivity extends BaseActivity {
         ButterKnife.bind(this);
 
         handleAppBarScrollAnimation();
+        setUpToolbar();
         setUpAdapter();
 
         presenter
@@ -129,10 +137,41 @@ public class ProfileActivity extends BaseActivity {
                     }
                 });
 
+        presenter.getSectionItemListenSubject()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        Toast.makeText(ProfileActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
         presenter.getShareObservable()
-                .observeOn(MyAndroidSchedulers.mainThread())
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(shareProfileUrl());
+    }
+
+    private void setUpToolbar() {
+        setSupportActionBar(toolbar);
+        final ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.base_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void setUpAdapter() {
@@ -149,8 +188,50 @@ public class ProfileActivity extends BaseActivity {
             }
         });
         recyclerView.setLayoutManager(gridLayoutManager);
-        final int gridSideSpacing = getResources().getDimensionPixelSize(R.dimen.profile_shout_grid_side_spacing);
-        //recyclerView.addItemDecoration(new ProfileGridSpacingItemDecoration(gridSideSpacing));
+        recyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
+            int firstShoutPosition = 0;
+
+            final int sideSpacing = getResources().getDimensionPixelSize(R.dimen.profile_side_spacing);
+
+            @Override
+            public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+                int position = parent.getChildAdapterPosition(view);
+
+                if (position == RecyclerView.NO_POSITION) {
+                    return;
+                }
+
+                final int viewType = parent.getAdapter().getItemViewType(position);
+                if (viewType == ProfileAdapter.VIEW_TYPE_USER_NAME ||
+                        viewType == ProfileAdapter.VIEW_TYPE_USER_INFO ||
+                        viewType == ProfileAdapter.VIEW_TYPE_THREE_ICONS) {
+                    return;
+                } else if (viewType == ProfileAdapter.VIEW_TYPE_SHOUT) {
+                    if (adapter.getItemViewType(position - 1) != ProfileAdapter.VIEW_TYPE_SHOUT) {
+                        firstShoutPosition = position - 1;
+                    }
+
+                    boolean isFirstPositionEven = firstShoutPosition % 2 == 0;
+                    boolean isCurrentPositionEven = position % 2 == 0;
+                    if (isFirstPositionEven) {
+                        if (isCurrentPositionEven) {
+                            outRect.right = sideSpacing;
+                        } else {
+                            outRect.left = sideSpacing;
+                        }
+                    } else {
+                        if (isCurrentPositionEven) {
+                            outRect.left = sideSpacing;
+                        } else {
+                            outRect.right = sideSpacing;
+                        }
+                    }
+                } else {
+                    outRect.right = sideSpacing;
+                    outRect.left = sideSpacing;
+                }
+            }
+        });
         recyclerView.setAdapter(adapter);
     }
 
@@ -171,9 +252,11 @@ public class ProfileActivity extends BaseActivity {
         return new Action1<String>() {
             @Override
             public void call(String coverUrl) {
-                picasso.load("http://lorempixel.com/800/600/animals/")
+                picasso.load(coverUrl)
                         .fit()
                         .centerCrop()
+                        .placeholder(R.drawable.pattern_placeholder)
+                        .error(R.drawable.pattern_placeholder)
                         .into(coverImageView);
             }
         };
@@ -181,7 +264,8 @@ public class ProfileActivity extends BaseActivity {
 
     private Action1<String> loadAvatarAction() {
         final Target target = PicassoHelper.getRoundedBitmapWithStrokeTarget(
-                avatarImageView, getResources().getDimensionPixelSize(R.dimen.profile_avatar_stroke));
+                avatarImageView, getResources().getDimensionPixelSize(R.dimen.profile_avatar_stroke),
+                false, getResources().getDimensionPixelSize(R.dimen.profile_avatar_radius));
 
         return new Action1<String>() {
             @Override

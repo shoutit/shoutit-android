@@ -8,19 +8,18 @@ import android.widget.TextView;
 
 import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.shoutit.app.android.R;
-import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
-import com.shoutit.app.android.utils.PicassoHelper;
+import com.shoutit.app.android.utils.ImageHelper;
+import com.shoutit.app.android.utils.TextHelper;
+import com.shoutit.app.android.viewholders.ProfilePageSectionViewHolder;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 public class MyProfileAdapter extends ProfileAdapter {
 
@@ -34,8 +33,13 @@ public class MyProfileAdapter extends ProfileAdapter {
     }
 
     @Override
-    protected ViewHolderManager.BaseViewHolder getProfileSectionViewHolder(ViewGroup parent) {
-        return new PageProfileSectionViewHolder(layoutInflater.inflate(R.layout.profile_section_item, parent, false));
+    protected ViewHolderManager.BaseViewHolder getThreeIconsViewHolder(ViewGroup parent) {
+        return new MyProfileThreeIconsViewHolder(layoutInflater.inflate(R.layout.profile_three_icons_item, parent, false));
+    }
+
+    @Override
+    protected ViewHolderManager.BaseViewHolder getSectionViewHolder(ViewGroup parent) {
+        return new ProfilePageSectionViewHolder(layoutInflater.inflate(R.layout.profile_section_item, parent, false), context, picasso);
     }
 
     @Override
@@ -67,50 +71,36 @@ public class MyProfileAdapter extends ProfileAdapter {
         }
     }
 
-    class PageProfileSectionViewHolder extends ViewHolderManager.BaseViewHolder<ProfileAdpaterItems.ProfileSectionAdapterItem<Page>> {
-        @Bind(R.id.profile_section_iv)
-        ImageView avatarImageView;
-        @Bind(R.id.profile_section_name_tv)
-        TextView nameTextView;
-        @Bind(R.id.profile_section_listeners_tv)
-        TextView listenerTextView;
-        @Bind(R.id.profile_section_listening_iv)
-        ImageView listeningImageView;
+    class MyProfileThreeIconsViewHolder extends ViewHolderManager.BaseViewHolder<ProfileAdapterItems.ThreeIconsAdapterItem> {
+        @Bind(R.id.profile_first_icon_value_tv)
+        TextView firstIconValue;
+        @Bind(R.id.profile_second_icon_value_tv)
+        TextView secondIconValue;
+        @Bind(R.id.profile_second_icon_text_tv)
+        TextView secondIconText;
+        @Bind(R.id.profile_third_icon_value_tv)
+        TextView thirdIconValue;
+        @Bind(R.id.profile_third_icon_text_tv)
+        TextView thirdIconText;
 
-        private ProfileAdpaterItems.ProfileSectionAdapterItem<Page> item;
-        private final Target target;
-
-        public PageProfileSectionViewHolder(View itemView) {
+        public MyProfileThreeIconsViewHolder(@Nonnull View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-
-            target = PicassoHelper.getRoundedBitmapTarget(context, avatarImageView,
-                    context.getResources().getDimensionPixelSize(R.dimen.profile_section_avatar_corners));
         }
 
         @Override
-        public void bind(@Nonnull ProfileAdpaterItems.ProfileSectionAdapterItem<Page> item) {
-            this.item = item;
-            final Page page = item.getSectionItem();
+        public void bind(@Nonnull ProfileAdapterItems.ThreeIconsAdapterItem item) {
+            final User user = item.getUser();
 
-            picasso.load(page.getImage())
-                    .placeholder(R.drawable.ic_avatar_placeholder)
-                    .into(target);
-
-            nameTextView.setText(page.getName());
-            listenerTextView.setText(String.valueOf(page.getListenersCount()));
-            listeningImageView.setImageDrawable(context.getResources().getDrawable(
-                    page.isListening() ? R.drawable.ic_listening_on : R.drawable.ic_listening_off));
-        }
-
-        @OnClick(R.id.profile_section_iv)
-        public void onProfileSelected() {
-            item.onItemSelected();
-        }
-
-        @OnClick(R.id.profile_section_listening_iv)
-        public void onListenClicked() {
-            item.onListenPage();
+            firstIconValue.setText(TextHelper.formatListenersNumber(user.getListenersCount()));
+            secondIconValue.setText(TextHelper.formatListenersNumber(user.getListeningCount().getProfileListening()));
+            ImageHelper.setStartCompoundRelativeDrawable(secondIconValue, R.drawable.ic_listeners);
+            secondIconText.setText(context.getString(R.string.profile_listening_label));
+            thirdIconValue.setText(TextHelper.formatListenersNumber(user.getListeningCount().getTags()));
+            ImageHelper.setStartCompoundRelativeDrawable(thirdIconValue, R.drawable.ic_tags);
+            thirdIconText.setText(context.getString(R.string.profile_interests_label));
         }
     }
+
+
 }

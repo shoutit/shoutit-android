@@ -15,14 +15,13 @@ import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
-import com.shoutit.app.android.api.model.ProfileKind;
+import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.model.UserShoutsPointer;
-import com.shoutit.app.android.view.shout.ShoutAdapterItems;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
 import java.util.ArrayList;
@@ -66,9 +65,9 @@ public abstract class ProfilePresenter {
     @Nonnull
     private final PublishSubject<String> shoutSelectedSubject = PublishSubject.create();
     @Nonnull
-    protected final PublishSubject<String> pageSelectedSubject = PublishSubject.create();
+    protected final PublishSubject<String> sectionItemSelectedSubject = PublishSubject.create();
     @Nonnull
-    protected final PublishSubject<String> pageListenSubject = PublishSubject.create();
+    protected final PublishSubject<String> sectionItemListenSubject = PublishSubject.create();
 
     @Nonnull
     protected final Context context;
@@ -195,22 +194,23 @@ public abstract class ProfilePresenter {
                 final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
 
                 builder.add(getUserNameAdapterItem(user))
-                        .add(new ProfileAdpaterItems.UserInfoAdapterItem(user));
+                        .add(getThreeIconsAdapterItem(user))
+                        .add(new ProfileAdapterItems.UserInfoAdapterItem(user));
 
                 final List<BaseAdapterItem> items = new ArrayList<>();
                 if (!user.getPages().isEmpty()) {
-                    builder.add(new HeaderAdapterItem("Pages"));
+                    builder.add(new HeaderAdapterItem(getSectionHeaderTitle(user)));
 
                     for (int i = 0; i < user.getPages().size(); i++) {
-                        items.add(getPageAdapterItemForPosition(i, user.getPages()));
+                        items.add(getSectionAdapterItemForPosition(i, user.getPages(), isMyProfile));
                     }
                     builder.addAll(items);
                 }
 
                 if (!shouts.isEmpty()) {
-                    builder.add(new HeaderAdapterItem("Shouts"))
+                    builder.add(new HeaderAdapterItem(getShoutsHeaderTitle(user)))
                             .addAll(shouts)
-                            .add(new ProfileAdpaterItems.SeeAllUserShoutsAdapterItem(
+                            .add(new ProfileAdapterItems.SeeAllUserShoutsAdapterItem(
                                     showAllShoutsSubject, user.getUsername()));
                 }
 
@@ -219,22 +219,34 @@ public abstract class ProfilePresenter {
         };
     }
 
-    private <T extends ProfileKind> ProfileAdpaterItems.ProfileSectionAdapterItem getPageAdapterItemForPosition(int position, List<T> items) {
+    private <T extends ProfileType> ProfileAdapterItems.ProfileSectionAdapterItem getSectionAdapterItemForPosition(int position, List<T> items, boolean isMyProfile) {
         if (position == 0) {
-            return new ProfileAdpaterItems.ProfileSectionAdapterItem<>(true, false, items.get(position), pageSelectedSubject, pageListenSubject);
+            return new ProfileAdapterItems.ProfileSectionAdapterItem<>(true, false, items.get(position), sectionItemSelectedSubject, sectionItemListenSubject, isMyProfile);
         } else if (position == items.size() - 1) {
-            return new ProfileAdpaterItems.ProfileSectionAdapterItem<>(false, true, items.get(position), pageSelectedSubject, pageListenSubject);
+            return new ProfileAdapterItems.ProfileSectionAdapterItem<>(false, true, items.get(position), sectionItemSelectedSubject, sectionItemListenSubject, isMyProfile);
         } else {
-            return new ProfileAdpaterItems.ProfileSectionAdapterItem<>(false, false, items.get(position), pageSelectedSubject, pageListenSubject);
+            return new ProfileAdapterItems.ProfileSectionAdapterItem<>(false, false, items.get(position), sectionItemSelectedSubject, sectionItemListenSubject, isMyProfile);
         }
     }
 
-    protected abstract ProfileAdpaterItems.UserNameAdapterItem getUserNameAdapterItem(@Nonnull User user);
+    protected abstract ProfileAdapterItems.UserNameAdapterItem getUserNameAdapterItem(@Nonnull User user);
+
+    protected abstract BaseAdapterItem getThreeIconsAdapterItem(@Nonnull User user);
 
     @Nonnull
     protected abstract Observable<ResponseOrError<User>> getUserObservable();
 
-    protected abstract String getSectionHeaderTitle(String profileType, User user);
+    public String getSectionHeaderTitle(User user) {
+        switch (user.getType()) {
+            case ProfileType.PROFILE:
+                return isMyProfile ? context.getString(R.string.profile_my_pages) :
+                        context.getString(R.string.profile_user_pages, user.getName()).toUpperCase();
+            case ProfileType.PAGE:
+                return context.getString(R.string.profile_page_admins, user.getName()).toUpperCase();
+            default:
+                throw new RuntimeException("Unknown profile type");
+        }
+    }
 
     protected abstract String getShoutsHeaderTitle(User user);
 
@@ -278,5 +290,13 @@ public abstract class ProfilePresenter {
         return shareObservable;
     }
 
+    @Nonnull
+    public PublishSubject<String> getSectionItemSelectedSubject() {
+        return sectionItemSelectedSubject;
+    }
 
+    @Nonnull
+    public PublishSubject<String> getSectionItemListenSubject() {
+        return sectionItemListenSubject;
+    }
 }

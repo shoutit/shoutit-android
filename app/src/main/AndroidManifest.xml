@@ -57,7 +57,8 @@
 
         <activity android:name=".view.shout.ShoutActivity"/>
 
-        <activity android:name=".view.profile.ProfileActivity"/>
+        <activity android:name=".view.profile.ProfileActivity"
+            android:theme="@style/TranslucentStatusBar"/>
 
         <!-- Facebook -->
         <meta-data

@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
@@ -74,12 +75,16 @@ public class PicassoHelper {
         };
     }
 
+    public static Target getCircularBitmapWithStrokeTarget(@Nonnull final ImageView imageView, final int strokeSize) {
+        return getRoundedBitmapWithStrokeTarget(imageView, strokeSize, true, 0);
+    }
+
     public static Target getRoundedBitmapWithStrokeTarget(@Nonnull final ImageView imageView,
-                                                          final int strokeSize) {
+                                                          final int strokeSize, final boolean isCircular, final int radius) {
         return new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                imageView.setImageBitmap(getRoundedBitmapWithStroke(bitmap, strokeSize));
+                imageView.setImageBitmap(getRoundedBitmapWithStroke(bitmap, strokeSize, isCircular, radius));
             }
 
             @Override
@@ -98,12 +103,15 @@ public class PicassoHelper {
         };
     }
 
-    public static Bitmap getRoundedBitmapWithStroke(Bitmap bitmap, int strokeSize) {
+    public static Bitmap getRoundedBitmapWithStroke(Bitmap bitmap, int strokeSize, boolean isCircular, int radius) {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
 
-        int radius = Math.min(height / 2, width / 2);
-        final Bitmap output = Bitmap.createBitmap(width + 8, height + 8, Bitmap.Config.ARGB_8888);
+        if (isCircular) {
+            radius = Math.min(height / 2, width / 2);
+        }
+
+        final Bitmap output = Bitmap.createBitmap(width + strokeSize, height + strokeSize, Bitmap.Config.ARGB_8888);
 
         final Paint paint = new Paint();
         paint.setAntiAlias(true);
@@ -112,7 +120,8 @@ public class PicassoHelper {
         canvas.drawARGB(0, 0, 0, 0);
         paint.setStyle(Paint.Style.FILL);
 
-        canvas.drawCircle((width / 2) + strokeSize, (height / 2) + strokeSize, radius, paint);
+        final RectF bounds = new RectF(strokeSize, strokeSize, width, height);
+        canvas.drawRoundRect(bounds, radius, radius, paint);
 
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
 
@@ -120,8 +129,9 @@ public class PicassoHelper {
         paint.setXfermode(null);
         paint.setStyle(Paint.Style.STROKE);
         paint.setColor(Color.WHITE);
-        paint.setStrokeWidth(3);
-        canvas.drawCircle((width / 2) + strokeSize, (height / 2) + strokeSize, radius, paint);
+        paint.setStrokeWidth(strokeSize);
+        final RectF strokeBounds = new RectF(0, 0, width + strokeSize, height + strokeSize);
+        canvas.drawRoundRect(strokeBounds, radius, radius, paint);
 
         return output;
     }

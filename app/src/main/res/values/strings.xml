@@ -192,12 +192,19 @@
     <!-- Profile -->
     <string name="profile_shuts_button">See all shouts</string>
     <string name="profile_my_shouts_header">My shouts</string>
-    <string name="profile_listening">Listening</string>
-    <string name="profile_interests">Interests</string>
+    <string name="profile_listening_label">Listening</string>
+    <string name="profile_interests_label">Interests</string>
     <string name="profile_subtitle">%1$d Listeners</string>
     <string name="profile_empty_field">---</string>
     <string name="profile_share_profile_title">Share profile</string>
     <string name="profile_joined_date">Joined %1$s</string>
     <string name="profile_listening_to_you">listening to you</string>
+    <string name="profile_my_pages">MY PAGES</string>
+    <string name="profile_my_shouts">MY SHOUTS</string>
+    <string name="profile_user_pages">%1$s pages</string>
+    <string name="profile_page_admins">%1$s admins</string>
+    <string name="profile_listeners">%1$s Listeners</string>
+    <string name="profile_listeners_label">Listeners</string>
+    <string name="profile_see_all_shouts">See all shouts</string>
 
 </resources>

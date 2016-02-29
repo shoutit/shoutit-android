@@ -1,6 +1,5 @@
 package com.shoutit.app.android.view.main;
 
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IdRes;
@@ -17,8 +16,7 @@ import com.google.common.collect.ImmutableList;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
-import com.shoutit.app.android.api.model.ProfileKind;
-import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.utils.BlurTransform;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.view.discover.DiscoverFragment;
@@ -200,13 +198,6 @@ public class MenuHandler {
         selectItem(view.getId());
     }
 
-    @OnClick(R.id.menu_avatar_iv)
-    public void onAvatarClicked() {
-        if (userPreferences.isNormalUser()) {
-            rxActivity.startActivity(ProfileActivity.newIntent(rxActivity, userPreferences.getUser().getUsername(), ProfileKind.PROFILE));
-        }
-    }
-
     private void showLoginActivity() {
         rxActivity.startActivity(LoginIntroActivity.newIntent(rxActivity));
     }
@@ -228,7 +219,7 @@ public class MenuHandler {
     @OnClick({R.id.menu_avatar_iv, R.id.menu_user_name_tv})
     public void startUserProfile() {
         if (userPreferences.isNormalUser()) {
-            Toast.makeText(rxActivity, "Not implemented yet", Toast.LENGTH_SHORT).show();
+            rxActivity.startActivity(ProfileActivity.newIntent(rxActivity, userPreferences.getUser().getUsername(), ProfileType.PROFILE));
         } else {
             showLoginActivity();
         }
@@ -278,7 +269,7 @@ public class MenuHandler {
 
     @NonNull
     private Action1<String> loadAvatarAction() {
-        final Target roundedTarget = PicassoHelper.getRoundedBitmapWithStrokeTarget(
+        final Target roundedTarget = PicassoHelper.getCircularBitmapWithStrokeTarget(
                 avatarImageView,
                 rxActivity.getResources().getDimensionPixelSize(R.dimen.side_menu_avatar_stroke_size)
         );

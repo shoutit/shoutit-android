@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.appunite.rx.dagger.UiScheduler;
 import com.shoutit.app.android.UserPreferences;
-import com.shoutit.app.android.api.model.ProfileKind;
+import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ShoutsDao;
 
@@ -30,7 +30,7 @@ public class ProfileActivityModule {
     @Provides
     public MyProfilePresenter provideProfilePresenter(ShoutsDao shoutsDao, @ForActivity Context context,
                                                       UserPreferences preferences, @UiScheduler Scheduler uiScheduler) {
-        if (profileType.equals(ProfileKind.PROFILE)) {
+        if (profileType.equals(ProfileType.PROFILE)) {
             return new MyProfilePresenter(userName, shoutsDao, context, preferences, uiScheduler);
         } else {
             // TODO

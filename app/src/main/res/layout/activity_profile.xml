@@ -27,11 +27,13 @@
 
             <ImageView
                 android:id="@+id/profile_fragment_cover_image_view"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="@dimen/profile_cover_height"
                 android:background="@color/colorPrimary"
                 android:fitsSystemWindows="true"
                 android:scaleType="centerCrop"
+                android:elevation="20dp"
+                android:src="@drawable/pattern_placeholder"
                 app:layout_collapseMode="parallax"
                 app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed" />
 

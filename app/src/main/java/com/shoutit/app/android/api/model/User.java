@@ -1,11 +1,11 @@
 package com.shoutit.app.android.api.model;
 
 
+import com.google.common.base.Objects;
+
 import java.util.List;
 
 public class User {
-    public static final String USERNAME_ME = "me";
-
     private final String id;
     private final String type;
     private final String apiUrl;
@@ -24,10 +24,11 @@ public class User {
     private final List<Page> pages;
     private final String bio;
     private final int dateJoined;
+    private final Listening listeningCount;
 
     public User(String id, String type, String apiUrl, String webUrl, String username,
                 String name, String firstName, String lastName, boolean isActivated, String image,
-                String cover, boolean isListening, boolean isPasswordSet, UserLocation location, int listenersCount, List<Page> pages, String bio, int dateJoined) {
+                String cover, boolean isListening, boolean isPasswordSet, UserLocation location, int listenersCount, List<Page> pages, String bio, int dateJoined, Listening listeningCount) {
         this.id = id;
         this.type = type;
         this.apiUrl = apiUrl;
@@ -46,11 +47,12 @@ public class User {
         this.pages = pages;
         this.bio = bio;
         this.dateJoined = dateJoined;
+        this.listeningCount = listeningCount;
     }
 
     // TODO remove it when user will be handler by API
     public static User guestUser(UserLocation location) {
-        return new User(null, null, null, null ,null, null, null, null, false, null, null, false, false, location, 1, null, null, 0);
+        return new User(null, null, null, null ,null, null, null, null, false, null, null, false, false, location, 1, null, null, 0, null);
     }
 
     public String getId() {
@@ -123,5 +125,42 @@ public class User {
 
     public long getDateJoinedInMillis() {
         return dateJoined * 1000;
+    }
+
+    public Listening getListeningCount() {
+        return listeningCount;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+        final User user = (User) o;
+        return isActivated == user.isActivated &&
+                isListening == user.isListening &&
+                isPasswordSet == user.isPasswordSet &&
+                listenersCount == user.listenersCount &&
+                dateJoined == user.dateJoined &&
+                Objects.equal(id, user.id) &&
+                Objects.equal(type, user.type) &&
+                Objects.equal(apiUrl, user.apiUrl) &&
+                Objects.equal(webUrl, user.webUrl) &&
+                Objects.equal(username, user.username) &&
+                Objects.equal(name, user.name) &&
+                Objects.equal(firstName, user.firstName) &&
+                Objects.equal(lastName, user.lastName) &&
+                Objects.equal(image, user.image) &&
+                Objects.equal(cover, user.cover) &&
+                Objects.equal(location, user.location) &&
+                Objects.equal(pages, user.pages) &&
+                Objects.equal(bio, user.bio) &&
+                Objects.equal(listeningCount, user.listeningCount);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id, type, apiUrl, webUrl, username, name, firstName, lastName,
+                isActivated, image, cover, isListening, isPasswordSet, location, listenersCount,
+                pages, bio, dateJoined, listeningCount);
     }
 }

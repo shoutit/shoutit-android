@@ -3,6 +3,7 @@ package com.shoutit.app.android.view.profile;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -16,7 +17,6 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.ResourcesHelper;
-import com.shoutit.app.android.view.shout.ShoutAdapterItems;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 import com.shoutit.app.android.view.shouts.ShoutGridViewHolder;
 import com.shoutit.app.android.viewholders.HeaderViewHolder;
@@ -34,11 +34,12 @@ import butterknife.ButterKnife;
 public abstract class ProfileAdapter extends BaseAdapter {
 
     public static final int VIEW_TYPE_USER_NAME = 1;
-    public static final int VIEW_TYPE_USER_INFO = 2;
-    public static final int VIEW_TYPE_USER_PAGES_OR_ADMINS = 3;
-    public static final int VIEW_TYPE_SHOUT = 4;
-    public static final int VIEW_TYPE_SHOW_MORE = 5;
-    public static final int VIEW_TYPE_HEADER = 6;
+    public static final int VIEW_TYPE_THREE_ICONS = 3;
+    public static final int VIEW_TYPE_USER_INFO = 4;
+    public static final int VIEW_TYPE_USER_PAGES_OR_ADMINS = 5;
+    public static final int VIEW_TYPE_SHOUT = 6;
+    public static final int VIEW_TYPE_SEE_ALL_SHOUTS = 7;
+    public static final int VIEW_TYPE_HEADER = 8;
 
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
@@ -50,7 +51,7 @@ public abstract class ProfileAdapter extends BaseAdapter {
         this.picasso = picasso;
     }
 
-    class UserInfoViewHolder extends ViewHolderManager.BaseViewHolder<ProfileAdpaterItems.UserInfoAdapterItem> {
+    class UserInfoViewHolder extends ViewHolderManager.BaseViewHolder<ProfileAdapterItems.UserInfoAdapterItem> {
         @Bind(R.id.profile_bio_tv)
         TextView bioTextView;
         @Bind(R.id.profile_website_tv)
@@ -71,7 +72,7 @@ public abstract class ProfileAdapter extends BaseAdapter {
         }
 
         @Override
-        public void bind(@Nonnull ProfileAdpaterItems.UserInfoAdapterItem item) {
+        public void bind(@Nonnull ProfileAdapterItems.UserInfoAdapterItem item) {
             final User user = item.getUser();
             bioTextView.setText(user.getBio());
             websiteTextView.setText(user.getWebUrl());
@@ -93,9 +94,12 @@ public abstract class ProfileAdapter extends BaseAdapter {
         }
     }
 
-    class SeeAllButtonViewHolder extends ViewHolderManager.BaseViewHolder<ProfileAdpaterItems.SeeAllUserShoutsAdapterItem> implements View.OnClickListener {
+    class SeeAllButtonViewHolder extends ViewHolderManager.BaseViewHolder<ProfileAdapterItems.SeeAllUserShoutsAdapterItem> implements View.OnClickListener {
 
-        private ProfileAdpaterItems.SeeAllUserShoutsAdapterItem item;
+        @Bind(R.id.button_gray_btn)
+        Button seeAllButton;
+
+        private ProfileAdapterItems.SeeAllUserShoutsAdapterItem item;
 
         public SeeAllButtonViewHolder(@Nonnull View itemView) {
             super(itemView);
@@ -104,8 +108,9 @@ public abstract class ProfileAdapter extends BaseAdapter {
         }
 
         @Override
-        public void bind(@Nonnull ProfileAdpaterItems.SeeAllUserShoutsAdapterItem item) {
+        public void bind(@Nonnull ProfileAdapterItems.SeeAllUserShoutsAdapterItem item) {
             this.item = item;
+            seeAllButton.setText(context.getString(R.string.profile_see_all_shouts));
         }
 
         @Override
@@ -118,13 +123,15 @@ public abstract class ProfileAdapter extends BaseAdapter {
         switch (viewType) {
             case VIEW_TYPE_USER_NAME:
                 return getUserNameViewHolder(parent);
+            case  VIEW_TYPE_THREE_ICONS:
+                return getThreeIconsViewHolder(parent);
             case VIEW_TYPE_USER_INFO:
                 return new UserInfoViewHolder(layoutInflater.inflate(R.layout.profile_info_item, parent, false));
             case VIEW_TYPE_USER_PAGES_OR_ADMINS:
-                return getProfileSectionViewHolder(parent);
+                return getSectionViewHolder(parent);
             case VIEW_TYPE_SHOUT:
                 return new ShoutGridViewHolder(layoutInflater.inflate(R.layout.shout_item_grid, parent, false), picasso, context);
-            case VIEW_TYPE_SHOW_MORE:
+            case VIEW_TYPE_SEE_ALL_SHOUTS:
                 return new SeeAllButtonViewHolder(layoutInflater.inflate(R.layout.button_gray_with_stroke, parent, false));
             case VIEW_TYPE_HEADER:
                 return new HeaderViewHolder(layoutInflater.inflate(R.layout.base_header_item, parent, false));
@@ -133,23 +140,27 @@ public abstract class ProfileAdapter extends BaseAdapter {
         }
     }
 
-    protected abstract ViewHolderManager.BaseViewHolder getProfileSectionViewHolder(ViewGroup parent);
+    protected abstract ViewHolderManager.BaseViewHolder getThreeIconsViewHolder(ViewGroup parent);
+
+    protected abstract ViewHolderManager.BaseViewHolder getSectionViewHolder(ViewGroup parent);
 
     protected abstract ViewHolderManager.BaseViewHolder getUserNameViewHolder(ViewGroup parent);
 
     @Override
     public int getItemViewType(int position) {
         final BaseAdapterItem item = items.get(position);
-        if (item instanceof ProfileAdpaterItems.UserNameAdapterItem) {
+        if (item instanceof ProfileAdapterItems.UserNameAdapterItem) {
             return VIEW_TYPE_USER_NAME;
-        } else if (item instanceof ProfileAdpaterItems.UserInfoAdapterItem) {
+        } else if (item instanceof ProfileAdapterItems.UserInfoAdapterItem) {
             return VIEW_TYPE_USER_INFO;
+        } else if (item instanceof ProfileAdapterItems.ThreeIconsAdapterItem) {
+            return VIEW_TYPE_THREE_ICONS;
         } else if (item instanceof ShoutAdapterItem) {
             return VIEW_TYPE_SHOUT;
-        } else if (item instanceof ProfileAdpaterItems.ProfileSectionAdapterItem) {
+        } else if (item instanceof ProfileAdapterItems.ProfileSectionAdapterItem) {
             return VIEW_TYPE_USER_PAGES_OR_ADMINS;
-        } else if (item instanceof ProfileAdpaterItems.SeeAllUserShoutsAdapterItem) {
-            return VIEW_TYPE_SHOW_MORE;
+        } else if (item instanceof ProfileAdapterItems.SeeAllUserShoutsAdapterItem) {
+            return VIEW_TYPE_SEE_ALL_SHOUTS;
         } else if (item instanceof HeaderAdapterItem) {
             return VIEW_TYPE_HEADER;
         } else {

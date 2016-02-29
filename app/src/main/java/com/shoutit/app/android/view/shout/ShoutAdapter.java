@@ -230,7 +230,7 @@ public class ShoutAdapter extends BaseAdapter {
     }
 
     public class VisitProfileViewHolder extends ViewHolderManager.BaseViewHolder<ShoutAdapterItems.VisitProfileAdapterItem> implements View.OnClickListener {
-        @Bind(R.id.button_gray_tv)
+        @Bind(R.id.button_gray_btn)
         Button button;
 
         private ShoutAdapterItems.VisitProfileAdapterItem item;

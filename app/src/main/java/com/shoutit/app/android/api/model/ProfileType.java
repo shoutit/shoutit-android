@@ -1,6 +1,6 @@
 package com.shoutit.app.android.api.model;
 
-public interface ProfileKind {
+public interface ProfileType {
     public static final String PAGE = "Page";
     public static final String PROFILE = "Profile";
 
