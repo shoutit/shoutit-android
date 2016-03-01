@@ -24,6 +24,7 @@ import com.shoutit.app.android.view.home.HomeFragment;
 import com.shoutit.app.android.view.location.LocationActivity;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.profile.ProfileActivity;
+import com.shoutit.app.android.view.profile.myprofile.MyProfileActivity;
 import com.shoutit.app.android.view.settings.SettingsActivity;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -219,7 +220,11 @@ public class MenuHandler {
     @OnClick({R.id.menu_avatar_iv, R.id.menu_user_name_tv})
     public void startUserProfile() {
         if (userPreferences.isNormalUser()) {
-            rxActivity.startActivity(ProfileActivity.newIntent(rxActivity, userPreferences.getUser().getUsername(), ProfileType.PROFILE));
+            rxActivity.startActivity(ProfileActivity.newIntent(
+                    rxActivity,
+                    userPreferences.getUser().getUsername(),
+                    ProfileType.PROFILE,
+                    MyProfileActivity.class));
         } else {
             showLoginActivity();
         }

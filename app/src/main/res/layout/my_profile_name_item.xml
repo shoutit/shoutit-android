@@ -31,19 +31,19 @@
         tools:text="Doris90" />
 
     <ImageView
-        android:id="@+id/profile_fragment_notification"
+        android:id="@+id/profile_notification_iv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="12dp"
         android:layout_marginRight="12dp"
-        android:layout_toLeftOf="@+id/profile_fragment_edit_profile"
-        android:layout_toStartOf="@+id/profile_fragment_edit_profile"
+        android:layout_toLeftOf="@+id/profile_edit_profile_iv"
+        android:layout_toStartOf="@+id/profile_edit_profile_iv"
         android:background="?selectableItemBackground"
         android:padding="6dp"
         android:src="@drawable/ic_notifications" />
 
     <ImageView
-        android:id="@+id/profile_fragment_edit_profile"
+        android:id="@+id/profile_edit_profile_iv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"

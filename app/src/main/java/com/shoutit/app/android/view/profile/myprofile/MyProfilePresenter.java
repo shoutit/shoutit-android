@@ -1,6 +1,7 @@
-package com.shoutit.app.android.view.profile;
+package com.shoutit.app.android.view.profile.myprofile;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
@@ -10,13 +11,22 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ShoutsDao;
+import com.shoutit.app.android.view.profile.ProfileAdapterItems;
+import com.shoutit.app.android.view.profile.ProfilePresenter;
 
 import javax.annotation.Nonnull;
 
 import rx.Observable;
+import rx.Observer;
 import rx.Scheduler;
+import rx.subjects.PublishSubject;
 
 public class MyProfilePresenter extends ProfilePresenter {
+
+    @Nonnull
+    private PublishSubject<Object> editProfileClickObserver = PublishSubject.create();
+    @Nonnull
+    private PublishSubject<Object> notificationsClickObserver = PublishSubject.create();
 
     public MyProfilePresenter(@Nonnull String userName,
                               @Nonnull ShoutsDao shoutsDao,
@@ -28,7 +38,7 @@ public class MyProfilePresenter extends ProfilePresenter {
 
     @Override
     protected ProfileAdapterItems.UserNameAdapterItem getUserNameAdapterItem(@Nonnull User user) {
-        return new MyUserNameAdapterItem(user);
+        return new MyUserNameAdapterItem(user, editProfileClickObserver, notificationsClickObserver);
     }
 
     @Override
@@ -48,10 +58,28 @@ public class MyProfilePresenter extends ProfilePresenter {
         return context.getString(R.string.profile_my_shouts);
     }
 
+    @Nonnull
+    public Observable<Object> getEditProfileClickObservable() {
+        return editProfileClickObserver;
+    }
+
+    @Nonnull
+    public Observable<Object> getNotificationsClickObservable() {
+        return notificationsClickObserver;
+    }
+
     public class MyUserNameAdapterItem extends ProfileAdapterItems.UserNameAdapterItem {
 
-        public MyUserNameAdapterItem(@Nonnull User user) {
+        @NonNull
+        private final Observer<Object> editProfileClickObserver;
+        @Nonnull
+        private final Observer<Object> notificationsClickObserver;
+
+        public MyUserNameAdapterItem(@Nonnull User user, @NonNull Observer<Object> editProfileClickObserver,
+                                     @Nonnull Observer<Object> notificationsClickObserver) {
             super(user);
+            this.editProfileClickObserver = editProfileClickObserver;
+            this.notificationsClickObserver = notificationsClickObserver;
         }
 
         @Override
@@ -67,6 +95,14 @@ public class MyProfilePresenter extends ProfilePresenter {
         @Nonnull
         public User getUser() {
             return user;
+        }
+
+        public void onEditProfileClicked() {
+            editProfileClickObserver.onNext(null);
+        }
+
+        public void onShowNotificationClicked() {
+            notificationsClickObserver.onNext(null);
         }
     }
 

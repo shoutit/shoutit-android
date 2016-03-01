@@ -51,7 +51,7 @@
         tools:text="@string/profile_listening_to_you" />
 
     <ImageView
-        android:id="@+id/profile_fragment_edit_profile"
+        android:id="@+id/profile_edit_profile_iv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"

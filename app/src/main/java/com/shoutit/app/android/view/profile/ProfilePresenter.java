@@ -59,8 +59,6 @@ public abstract class ProfilePresenter {
     @Nonnull
     private final PublishSubject<String> showAllShoutsSubject = PublishSubject.create();
     @Nonnull
-    private final PublishSubject<Object> refreshProfileSubject = PublishSubject.create();
-    @Nonnull
     private final PublishSubject<Object> shareInitSubject = PublishSubject.create();
     @Nonnull
     private final PublishSubject<String> shoutSelectedSubject = PublishSubject.create();
@@ -291,12 +289,17 @@ public abstract class ProfilePresenter {
     }
 
     @Nonnull
-    public PublishSubject<String> getSectionItemSelectedSubject() {
+    public Observable<String> getSectionItemSelectedObservable() {
         return sectionItemSelectedSubject;
     }
 
     @Nonnull
-    public PublishSubject<String> getSectionItemListenSubject() {
+    public Observable<String> getSectionItemListenObservable() {
         return sectionItemListenSubject;
+    }
+
+    @Nonnull
+    public Observable<String> getShoutSelectedObservable() {
+        return shoutSelectedSubject;
     }
 }

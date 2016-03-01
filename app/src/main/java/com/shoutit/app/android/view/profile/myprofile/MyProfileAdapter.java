@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.profile;
+package com.shoutit.app.android.view.profile.myprofile;
 
 import android.content.Context;
 import android.view.View;
@@ -12,21 +12,22 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.ImageHelper;
 import com.shoutit.app.android.utils.TextHelper;
+import com.shoutit.app.android.view.profile.ProfileAdapter;
+import com.shoutit.app.android.view.profile.ProfileAdapterItems;
 import com.shoutit.app.android.viewholders.ProfilePageSectionViewHolder;
 import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class MyProfileAdapter extends ProfileAdapter {
 
     @Nonnull
     private final Picasso picasso;
 
-    @Inject
     public MyProfileAdapter(@Nonnull @ForActivity Context context, @Nonnull Picasso picasso) {
         super(context, picasso);
         this.picasso = picasso;
@@ -53,10 +54,11 @@ public class MyProfileAdapter extends ProfileAdapter {
         TextView userName;
         @Bind(R.id.profile_user_nick)
         TextView userNick;
-        @Bind(R.id.profile_fragment_notification)
+        @Bind(R.id.profile_notification_iv)
         ImageView notificationIcon;
-        @Bind(R.id.profile_fragment_edit_profile)
+        @Bind(R.id.profile_edit_profile_iv)
         ImageView editProfileIcon;
+        private MyProfilePresenter.MyUserNameAdapterItem item;
 
         public MyProfileUserNameViewHolder(@Nonnull View itemView) {
             super(itemView);
@@ -65,9 +67,20 @@ public class MyProfileAdapter extends ProfileAdapter {
 
         @Override
         public void bind(@Nonnull MyProfilePresenter.MyUserNameAdapterItem item) {
+            this.item = item;
             final User user = item.getUser();
             userName.setText(user.getName());
             userNick.setText(user.getUsername());
+        }
+
+        @OnClick(R.id.profile_notification_iv)
+        public void onNotificationClick() {
+            item.onShowNotificationClicked();
+        }
+
+        @OnClick(R.id.profile_edit_profile_iv)
+        public void onEditProfileClick() {
+            item.onEditProfileClicked();
         }
     }
 
@@ -94,7 +107,7 @@ public class MyProfileAdapter extends ProfileAdapter {
 
             firstIconValue.setText(TextHelper.formatListenersNumber(user.getListenersCount()));
             secondIconValue.setText(TextHelper.formatListenersNumber(user.getListeningCount().getProfileListening()));
-            ImageHelper.setStartCompoundRelativeDrawable(secondIconValue, R.drawable.ic_listeners);
+            ImageHelper.setStartCompoundRelativeDrawable(secondIconValue, R.drawable.ic_listening);
             secondIconText.setText(context.getString(R.string.profile_listening_label));
             thirdIconValue.setText(TextHelper.formatListenersNumber(user.getListeningCount().getTags()));
             ImageHelper.setStartCompoundRelativeDrawable(thirdIconValue, R.drawable.ic_tags);

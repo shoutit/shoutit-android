@@ -6,7 +6,6 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,6 +29,7 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PicassoHelper;
+import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -64,22 +64,21 @@ public class ProfileActivity extends BaseActivity {
     RecyclerView recyclerView;
     @Bind(R.id.profile_fragment_cover_image_view)
     ImageView coverImageView;
-    @Bind(R.id.base_fab)
-    FloatingActionButton fab;
     @Bind(R.id.profile_fragment_toolbar)
     Toolbar toolbar;
 
     @Inject
-    MyProfilePresenter presenter;
+    ProfilePresenter presenter;
     @Inject
-    MyProfileAdapter adapter;
+    ProfileAdapter adapter;
     @Inject
     Picasso picasso;
 
     private final AccelerateInterpolator toolbarInterpolator = new AccelerateInterpolator();
 
-    public static Intent newIntent(@Nonnull Context context, @Nonnull String userName, @Nonnull String profileType) {
-        return new Intent(context, ProfileActivity.class)
+    public static <T extends ProfileActivity> Intent newIntent(@Nonnull Context context, @Nonnull String userName,
+                                   @Nonnull String profileType, Class<T> profileClass) {
+        return new Intent(context, profileClass)
                 .putExtra(KEY_USER_NAME, userName)
                 .putExtra(KEY_PROFILE_TYPE, profileType);
     }
@@ -128,16 +127,7 @@ public class ProfileActivity extends BaseActivity {
                 .compose(this.<Throwable>bindToLifecycle())
                 .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(this)));
 
-        RxView.clicks(fab)
-                .compose(this.<Void>bindToLifecycle())
-                .subscribe(new Action1<Void>() {
-                    @Override
-                    public void call(Void aVoid) {
-                        Toast.makeText(ProfileActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-        presenter.getSectionItemListenSubject()
+        presenter.getSectionItemSelectedObservable()
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(new Action1<String>() {
                     @Override
@@ -149,6 +139,15 @@ public class ProfileActivity extends BaseActivity {
         presenter.getShareObservable()
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(shareProfileUrl());
+
+        presenter.getShoutSelectedObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String shoutId) {
+                        startActivity(ShoutActivity.newIntent(ProfileActivity.this, shoutId));
+                    }
+                });
     }
 
     private void setUpToolbar() {
