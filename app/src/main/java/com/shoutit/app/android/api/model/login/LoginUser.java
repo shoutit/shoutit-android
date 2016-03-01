@@ -2,12 +2,14 @@ package com.shoutit.app.android.api.model.login;
 
 import android.support.annotation.Nullable;
 
+import com.shoutit.app.android.api.model.UserLocationSimple;
+
 public class LoginUser {
 
-    private final UserLocation location;
+    private final UserLocationSimple location;
 
     public LoginUser(double latitude, double longitude) {
-        this.location = new UserLocation(latitude, longitude);
+        this.location = new UserLocationSimple(latitude, longitude);
     }
 
     @Nullable
@@ -19,26 +21,7 @@ public class LoginUser {
         }
     }
 
-    public static class UserLocation {
-
-        private final double latitude;
-        private final double longitude;
-
-        public UserLocation(double latitude, double longitude) {
-            this.latitude = latitude;
-            this.longitude = longitude;
-        }
-
-        public double getLatitude() {
-            return latitude;
-        }
-
-        public double getLongitude() {
-            return longitude;
-        }
-    }
-
-    public UserLocation getLocation() {
+    public UserLocationSimple getLocation() {
         return location;
     }
 }

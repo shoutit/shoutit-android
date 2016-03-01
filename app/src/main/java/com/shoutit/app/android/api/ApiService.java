@@ -5,6 +5,8 @@ import android.support.annotation.Nullable;
 
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.ChangePasswordRequest;
+import com.shoutit.app.android.api.model.CreateRequestShoutRequest;
+import com.shoutit.app.android.api.model.Currency;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
@@ -75,7 +77,6 @@ public interface ApiService {
                                              @Query("page_size") Integer pageSize);
 
 
-
     /**
      * OAuth
      **/
@@ -122,7 +123,6 @@ public interface ApiService {
     Observable<User> updateUser(@Body UpdateUserRequest updateUserRequest);
 
 
-
     /**
      * Misc
      **/
@@ -142,4 +142,13 @@ public interface ApiService {
     @POST("auth/change_password")
     Observable<ResponseBody> changePassword(@Body ChangePasswordRequest changePasswordRequest);
 
+
+    /**
+     * create shout
+     */
+    @POST("/v3/shouts")
+    Observable<ResponseBody> createShoutRequest(@Body CreateRequestShoutRequest request);
+
+    @GET("misc/currencies")
+    Observable<List<Currency>> getCurrencies();
 }

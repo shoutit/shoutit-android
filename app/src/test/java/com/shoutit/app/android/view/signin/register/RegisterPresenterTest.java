@@ -10,7 +10,6 @@ import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.login.LoginUser;
 import com.shoutit.app.android.location.LocationManager;
-import com.shoutit.app.android.view.signin.CoarseLocationObservableProvider;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -48,9 +47,6 @@ public class RegisterPresenterTest {
 
     @Mock
     UserPreferences mUserPreferences;
-
-    @Mock
-    CoarseLocationObservableProvider coarseLocationProvider;
 
     @Mock
     User user;

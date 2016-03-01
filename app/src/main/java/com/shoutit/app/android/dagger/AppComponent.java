@@ -13,7 +13,6 @@ import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.location.LocationManager;
-import com.shoutit.app.android.view.signin.CoarseLocationObservableProvider;
 import com.squareup.picasso.Picasso;
 
 import javax.inject.Singleton;
@@ -43,8 +42,6 @@ public interface AppComponent {
     Context getContext();
 
     Picasso getPicasso();
-
-    CoarseLocationObservableProvider coarseLocationObservableProvider();
 
     OkHttpClient getOkHttpClient();
 
