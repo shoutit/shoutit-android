@@ -14,7 +14,7 @@ import com.shoutit.app.android.utils.ImageHelper;
 import com.shoutit.app.android.utils.TextHelper;
 import com.shoutit.app.android.view.profile.ProfileAdapter;
 import com.shoutit.app.android.view.profile.ProfileAdapterItems;
-import com.shoutit.app.android.viewholders.ProfilePageSectionViewHolder;
+import com.shoutit.app.android.viewholders.ProfileSectionViewHolder;
 import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;
@@ -35,12 +35,12 @@ public class MyProfileAdapter extends ProfileAdapter {
 
     @Override
     protected ViewHolderManager.BaseViewHolder getThreeIconsViewHolder(ViewGroup parent) {
-        return new MyProfileThreeIconsViewHolder(layoutInflater.inflate(R.layout.profile_three_icons_item, parent, false));
+        return new MyProfileThreeIconsViewHolder(layoutInflater.inflate(R.layout.profile_mine_three_icons_item, parent, false));
     }
 
     @Override
     protected ViewHolderManager.BaseViewHolder getSectionViewHolder(ViewGroup parent) {
-        return new ProfilePageSectionViewHolder(layoutInflater.inflate(R.layout.profile_section_item, parent, false), context, picasso);
+        return new ProfileSectionViewHolder(layoutInflater.inflate(R.layout.profile_section_item, parent, false), context, picasso);
     }
 
     @Override

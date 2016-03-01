@@ -2,14 +2,18 @@ package com.shoutit.app.android.view.profile;
 
 import android.content.Context;
 
+import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.dagger.ActivityScope;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.view.profile.myprofile.MyProfileAdapter;
 import com.shoutit.app.android.view.profile.myprofile.MyProfilePresenter;
+import com.shoutit.app.android.view.profile.userprofile.UserProfileAdapter;
+import com.shoutit.app.android.view.profile.userprofile.UserProfilePresenter;
 import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;
@@ -35,13 +39,13 @@ public class ProfileActivityModule {
     @Provides
     @ActivityScope
     public ProfilePresenter provideProfilePresenter(ShoutsDao shoutsDao, @ForActivity Context context,
-                                                      UserPreferences preferences, @UiScheduler Scheduler uiScheduler) {
+                                                    UserPreferences preferences, @UiScheduler Scheduler uiScheduler,
+                                                    @NetworkScheduler Scheduler networkScheduler, ApiService apiService) {
         final boolean isMyProfile = userName.equals(preferences.getUser().getUsername());
         if (isMyProfile && profileType.equalsIgnoreCase(ProfileType.PROFILE)) {
-            return new MyProfilePresenter(userName, shoutsDao, context, preferences, uiScheduler);
+            return new MyProfilePresenter(userName, shoutsDao, context, preferences, uiScheduler, networkScheduler, apiService);
         } else {
-            // TODO
-            return new MyProfilePresenter(userName, shoutsDao, context, preferences, uiScheduler);
+            return new UserProfilePresenter(userName, shoutsDao, context, preferences, uiScheduler, networkScheduler, apiService);
         }
     }
 
@@ -52,8 +56,7 @@ public class ProfileActivityModule {
         if (isMyProfile && profileType.equalsIgnoreCase(ProfileType.PROFILE)) {
             return new MyProfileAdapter(context, picasso);
         } else {
-            // TODO
-            return new MyProfileAdapter(context, picasso);
+            return new UserProfileAdapter(context, picasso);
         }
     }
 }

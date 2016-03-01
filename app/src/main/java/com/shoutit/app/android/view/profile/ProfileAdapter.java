@@ -44,7 +44,7 @@ public abstract class ProfileAdapter extends BaseAdapter {
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
     @Nonnull
-    private final Picasso picasso;
+    protected final Picasso picasso;
 
     public ProfileAdapter(@Nonnull @ForActivity Context context, @Nonnull Picasso picasso) {
         super(context);
@@ -149,7 +149,7 @@ public abstract class ProfileAdapter extends BaseAdapter {
     @Override
     public int getItemViewType(int position) {
         final BaseAdapterItem item = items.get(position);
-        if (item instanceof ProfileAdapterItems.UserNameAdapterItem) {
+        if (item instanceof ProfileAdapterItems.NameAdapterItem) {
             return VIEW_TYPE_USER_NAME;
         } else if (item instanceof ProfileAdapterItems.UserInfoAdapterItem) {
             return VIEW_TYPE_USER_INFO;

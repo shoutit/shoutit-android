@@ -2,9 +2,10 @@
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@android:color/white"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:orientation="horizontal">
 
     <TextView
         android:id="@+id/profile_user_name"
@@ -16,19 +17,6 @@
         android:textColor="@color/profile_name"
         android:textSize="16sp"
         tools:text="Doris Schultz" />
-
-    <TextView
-        android:id="@+id/profile_user_nick"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/profile_user_name"
-        android:layout_alignStart="@+id/profile_user_name"
-        android:layout_below="@+id/profile_user_name"
-        android:layout_marginTop="3dp"
-        android:textColor="@color/black_54"
-        android:paddingBottom="2dp"
-        android:textSize="12sp"
-        tools:text="Doris90" />
 
     <TextView
         android:id="@+id/profile_user_listening_to_you"
@@ -48,10 +36,22 @@
         android:background="@drawable/shape_profile_listening"
         android:layout_toRightOf="@+id/profile_user_nick"
         android:layout_toEndOf="@+id/profile_user_nick"
-        tools:text="@string/profile_listening_to_you" />
+        android:text="@string/profile_listening_to_you" />
+
+    <TextView
+        android:id="@+id/profile_user_nick"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/profile_user_name"
+        android:layout_alignStart="@+id/profile_user_name"
+        android:layout_below="@+id/profile_user_name"
+        android:layout_marginTop="3dp"
+        android:textColor="@color/black_54"
+        android:textSize="12sp"
+        tools:text="Doris90" />
 
     <ImageView
-        android:id="@+id/profile_edit_profile_iv"
+        android:id="@+id/profile_menu_more_iv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"

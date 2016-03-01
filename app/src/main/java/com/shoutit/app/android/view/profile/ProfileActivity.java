@@ -17,7 +17,6 @@ import android.view.animation.AccelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.jakewharton.rxbinding.view.RxView;
@@ -89,8 +88,8 @@ public class ProfileActivity extends BaseActivity {
         setContentView(R.layout.activity_profile);
         ButterKnife.bind(this);
 
-        handleAppBarScrollAnimation();
         setUpToolbar();
+        handleAppBarScrollAnimation();
         setUpAdapter();
 
         presenter
@@ -123,18 +122,9 @@ public class ProfileActivity extends BaseActivity {
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(RxTextView.text(toolbarSubtitle));
 
-        presenter.getShoutsErrorsResponse()
+        presenter.getErrorObservable()
                 .compose(this.<Throwable>bindToLifecycle())
                 .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(this)));
-
-        presenter.getSectionItemSelectedObservable()
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String s) {
-                        Toast.makeText(ProfileActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
-                    }
-                });
 
         presenter.getShareObservable()
                 .compose(this.<String>bindToLifecycle())
@@ -154,11 +144,12 @@ public class ProfileActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle(null);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.base_menu, menu);
+        getMenuInflater().inflate(R.menu.menu_profile, menu);
         return super.onCreateOptionsMenu(menu);
     }
 

@@ -206,5 +206,9 @@
     <string name="profile_listeners">%1$s Listeners</string>
     <string name="profile_listeners_label">Listeners</string>
     <string name="profile_see_all_shouts">See all shouts</string>
+    <string name="profile_user_shouts_header">%1$s shouts</string>
+    <string name="profile_chat_label">Chat</string>
+    <string name="profile_listen_label">Listen</string>
+    <string name="profile_stop_listening_label">Stop Listening</string>
 
 </resources>

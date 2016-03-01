@@ -48,7 +48,7 @@ public class ShoutPresenter {
     private PublishSubject<String> userShoutSelectedSubject = PublishSubject.create();
     private PublishSubject<String> relatedShoutSelectedSubject = PublishSubject.create();
     private PublishSubject<String> seeAllRelatedShoutSubject = PublishSubject.create();
-    private PublishSubject<String> visitProfileSubject = PublishSubject.create();
+    private PublishSubject<User> visitProfileSubject = PublishSubject.create();
 
     @Nonnull
     private final Scheduler uiScheduler;
@@ -257,7 +257,7 @@ public class ShoutPresenter {
     }
 
     @Nonnull
-    public Observable<String> getVisitProfileObservable() {
+    public Observable<User> getVisitProfileObservable() {
         return visitProfileSubject;
     }
 

@@ -12,23 +12,23 @@ import rx.Observer;
 
 public class ProfileAdapterItems {
 
-    public static class UserNameAdapterItem extends BaseNoIDAdapterItem {
+    public static class NameAdapterItem extends BaseNoIDAdapterItem {
 
         @Nonnull
         protected final User user;
 
-        public UserNameAdapterItem(@Nonnull User user) {
+        public NameAdapterItem(@Nonnull User user) {
             this.user = user;
         }
 
         @Override
         public boolean matches(@Nonnull BaseAdapterItem item) {
-            return item instanceof UserNameAdapterItem;
+            return item instanceof NameAdapterItem;
         }
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof UserNameAdapterItem && user.equals(((UserNameAdapterItem) item).getUser());
+            return item instanceof NameAdapterItem && user.equals(((NameAdapterItem) item).getUser());
         }
 
         @Nonnull
@@ -48,12 +48,12 @@ public class ProfileAdapterItems {
 
         @Override
         public boolean matches(@Nonnull BaseAdapterItem item) {
-            return item instanceof UserNameAdapterItem;
+            return item instanceof NameAdapterItem;
         }
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof UserNameAdapterItem && user.equals(((UserNameAdapterItem) item).getUser());
+            return item instanceof NameAdapterItem && user.equals(((NameAdapterItem) item).getUser());
         }
 
         @Nonnull
@@ -67,33 +67,29 @@ public class ProfileAdapterItems {
         private final boolean isFirstItem;
         private final boolean isLastItem;
         @Nonnull
+        private final User user;
+        @Nonnull
         private final T sectionItem;
         @Nonnull
-        private final Observer<String> itemSelectedObserver;
-        @Nonnull
-        private final Observer<String> listenItemObserver;
+        private final Observer<ProfilePresenter.UserWithItemToListen> listenItemObserver;
         private final boolean isMyProfile;
 
-        public ProfileSectionAdapterItem(boolean isFirstItem, boolean isLastItem,
+        public ProfileSectionAdapterItem(boolean isFirstItem,
+                                         boolean isLastItem,
+                                         @Nonnull User user,
                                          @Nonnull T sectionItem,
-                                         @Nonnull Observer<String> itemSelectedObserver,
-                                         @Nonnull Observer<String> listenItemObserver, boolean isMyProfile) {
+                                         @Nonnull Observer<ProfilePresenter.UserWithItemToListen> listenItemObserver,
+                                         boolean isMyProfile) {
             this.isFirstItem = isFirstItem;
             this.isLastItem = isLastItem;
+            this.user = user;
             this.sectionItem = sectionItem;
-            this.itemSelectedObserver = itemSelectedObserver;
             this.listenItemObserver = listenItemObserver;
             this.isMyProfile = isMyProfile;
         }
 
-        public void onItemSelected() {
-            itemSelectedObserver.onNext(sectionItem.getUserName());
-        }
-
         public void onItemListen() {
-            if (!sectionItem.isListening()) {
-                listenItemObserver.onNext(sectionItem.getUserName());
-            }
+            listenItemObserver.onNext(new ProfilePresenter.UserWithItemToListen(user, sectionItem));
         }
 
         public boolean isMyProfile() {
@@ -120,7 +116,8 @@ public class ProfileAdapterItems {
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof ProfileSectionAdapterItem && this.equals(item);
+            // Done intentionally
+            return false;
         }
 
         @Override
@@ -184,7 +181,7 @@ public class ProfileAdapterItems {
     public static abstract class ThreeIconsAdapterItem extends BaseNoIDAdapterItem {
 
         @Nonnull
-        private final User user;
+        protected final User user;
 
         public ThreeIconsAdapterItem(@Nonnull User user) {
             this.user = user;
@@ -197,7 +194,8 @@ public class ProfileAdapterItems {
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof ThreeIconsAdapterItem && this.equals(item);
+            // Done intentionally, cuz the same User object is returned if listen profile fail
+            return false;
         }
 
         @Nonnull
@@ -205,17 +203,5 @@ public class ProfileAdapterItems {
             return user;
         }
 
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof ThreeIconsAdapterItem)) return false;
-            final ThreeIconsAdapterItem that = (ThreeIconsAdapterItem) o;
-            return Objects.equal(user, that.user);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hashCode(user);
-        }
     }
 }
