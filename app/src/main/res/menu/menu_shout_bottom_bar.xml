@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_report"
+        android:title="@string/shout_bottom_bar_report"
+        app:showAsAction="always"/>
+
+</menu>

@@ -179,12 +179,16 @@
     <string name="shout_header_details">Details</string>
     <string name="shout_user_shouts_header">OTHER SHOUTS FROM %1$s</string>
     <string name="shout_user_location">%1$s, %2$s</string>
-    <string name="shout_available">Only %1$d available</string>
+    <string name="shout_only_available">Only %1$d available</string>
+    <string name="shout_available">%1$d available</string>
     <string name="shout_bottom_bar_call">Call</string>
     <string name="shout_bottom_bar_video_call">Video call</string>
     <string name="shout_bottom_bar_chat">Chat</string>
     <string name="shout_bottom_bar_chats">Chats</string>
     <string name="shout_bottom_bar_report">Report</string>
+    <string name="shout_visit_profile">VISIT %1$s\'s PROFILE</string>
+    <string name="shout_bottom_bar_delete">Delete</string>
+    <string name="shout_bottom_bar_edit">Edit</string>
 
     <!-- Account -->
     <string name="account_email_changed">Email successfully changed</string>

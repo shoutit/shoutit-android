@@ -65,8 +65,7 @@ public class UserPreferences {
                         return Observable.just(getUser());
                     }
                 })
-                .compose(MoreOperators.<User>refresh(userRefreshSubject))
-                .filter(Functions1.isNotNull());
+                .compose(MoreOperators.<User>refresh(userRefreshSubject));
     }
 
     @SuppressLint("CommitPrefEdits")

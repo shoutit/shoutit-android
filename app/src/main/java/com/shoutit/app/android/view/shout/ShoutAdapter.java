@@ -2,7 +2,6 @@ package com.shoutit.app.android.view.shout;
 
 import android.content.Context;
 import android.graphics.Rect;
-import android.location.Location;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -140,7 +139,11 @@ public class ShoutAdapter extends BaseAdapter {
 
             titleTextView.setText(shout.getTitle());
             priceTextView.setText(context.getString(R.string.price_with_currency, shout.getPrice(), shout.getCurrency()));
-            availableTextView.setText(context.getString(R.string.shout_available, (int) shout.getNumber()));
+            if (shout.getNumber() == 0) {
+                availableTextView.setText(context.getString(R.string.shout_available, (int) shout.getNumber()));
+            } else {
+                availableTextView.setText(context.getString(R.string.shout_only_available, (int) shout.getNumber()));
+            }
 
             shoutViewPager.setAdapter(imagesPagerAdapter);
             pageIndicator.setViewPager(shoutViewPager);
@@ -258,7 +261,7 @@ public class ShoutAdapter extends BaseAdapter {
         @Override
         public void bind(@Nonnull ShoutAdapterItems.VisitProfileAdapterItem item) {
             this.item = item;
-            button.setText(item.getName());
+            button.setText(context.getString(R.string.shout_visit_profile, item.getName()));
         }
 
         @Override

@@ -108,7 +108,7 @@
     </style>
 
     <style name="ShoutCardSection">
-        <item name="android:textColor">@color/black_38</item>
+        <item name="android:textColor">@color/black_54</item>
         <item name="android:textSize">14sp</item>
         <item name="android:paddingLeft">8dp</item>
         <item name="android:paddingStart" tools:ignore="NewApi">8dp</item>
@@ -140,7 +140,7 @@
     </style>
 
     <style name="ShoutCardItemDark" parent="ShoutCardItemLight">
-        <item name="android:background">@color/black_12</item>
+        <item name="android:background">@color/shout_item_dark</item>
     </style>
 
     <style name="ShoutItemHeader">
@@ -168,7 +168,5 @@
         <item name="android:drawablePadding">8dp</item>
         <item name="android:padding">4dp</item>
     </style>
-
-    <style name="ShoutBottomBar" parent="ThemeOverlay.AppCompat.Dark"/>
 
 </resources>

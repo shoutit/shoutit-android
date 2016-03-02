@@ -24,86 +24,80 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"/>
 
-    <LinearLayout
-        android:theme="@style/ShoutBottomBar"
-        android:id="@+id/shout_bottom_bar"
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/shout_bottom_toolbar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/shout_bottom_bar"
         android:layout_alignParentBottom="true"
         android:background="@color/shout_bottom_bar"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"
+        app:contentInsetLeft="0dp"
+        app:contentInsetStart="0dp"
+        app:contentInsetEnd="0dp"
+        app:contentInsetRight="0dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
         android:visibility="gone"
-        tools:visibility="visible"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp">
+        tools:visibility="visible">
 
-        <TextView
-            android:id="@+id/shout_bottom_bar_call_or_delete"
-            style="@style/ShoutBottomBarItem"
-            android:background="?selectableItemBackground"
-            android:drawableLeft="@drawable/ic_call_green"
-            android:drawableStart="@drawable/ic_call_green"
-            android:text="@string/shout_bottom_bar_call" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-        <View
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            <TextView
+                android:id="@+id/shout_bottom_bar_call_or_delete"
+                style="@style/ShoutBottomBarItem"
+                android:background="?selectableItemBackground"
+                android:drawableLeft="@drawable/ic_call_green"
+                android:drawableStart="@drawable/ic_call_green"
+                android:text="@string/shout_bottom_bar_call" />
 
-        <TextView
-            android:id="@+id/shout_bottom_bar_video_call_or_edit"
-            style="@style/ShoutBottomBarItem"
-            android:background="?selectableItemBackground"
-            android:drawableLeft="@drawable/ic_video_chat_red"
-            android:drawableStart="@drawable/ic_video_chat_red"
-            android:text="@string/shout_bottom_bar_video_call" />
+            <View
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
 
-        <View
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            <TextView
+                android:id="@+id/shout_bottom_bar_video_call_or_edit"
+                style="@style/ShoutBottomBarItem"
+                android:background="?selectableItemBackground"
+                android:drawableLeft="@drawable/ic_video_chat_red"
+                android:drawableStart="@drawable/ic_video_chat_red"
+                android:text="@string/shout_bottom_bar_video_call" />
 
-        <TextView
-            android:id="@+id/shout_bottom_bar_chat_or_chats"
-            style="@style/ShoutBottomBarItem"
-            android:background="?selectableItemBackground"
-            android:drawableLeft="@drawable/ic_chat"
-            android:drawableStart="@drawable/ic_chat"
-            android:text="@string/shout_bottom_bar_chat" />
+            <View
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
 
-        <View
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            <TextView
+                android:id="@+id/shout_bottom_bar_chat_or_chats"
+                style="@style/ShoutBottomBarItem"
+                android:background="?selectableItemBackground"
+                android:drawableLeft="@drawable/ic_chat"
+                android:drawableStart="@drawable/ic_chat"
+                android:text="@string/shout_bottom_bar_chat" />
 
-        <TextView
-            android:id="@+id/shout_bottom_bar_more"
-            style="@style/ShoutBottomBarItem"
-            android:background="?selectableItemBackground"
-            android:drawableLeft="@drawable/ic_more"
-            android:drawableStart="@drawable/ic_more" />
+            <View
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
 
-    </LinearLayout>
+            <TextView
+                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:id="@+id/shout_bottom_bar_more"
+                android:background="?selectableItemBackground"
+                android:drawableLeft="@drawable/ic_more"
+                android:drawableStart="@drawable/ic_more"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp" />
 
-    <TextView
-        android:theme="@style/ShoutBottomBar"
-        android:id="@+id/shout_bottom_bar_report_tv"
-        android:layout_above="@+id/shout_bottom_bar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:minWidth="120dp"
-        android:paddingLeft="12dp"
-        android:paddingRight="12dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:visibility="gone"
-        tools:visibility="visible"
-        android:gravity="center_vertical|start"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:textColor="@android:color/white"
-        android:background="@color/shout_bottom_bar"
-        android:text="@string/shout_bottom_bar_report"/>
+        </LinearLayout>
+
+    </android.support.v7.widget.Toolbar>
 
 </RelativeLayout>

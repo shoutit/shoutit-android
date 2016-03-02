@@ -1,23 +1,23 @@
 <?xml version="1.0"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/shouts_chat"
+        android:id="@+id/base_menu_chat"
         android:icon="@drawable/ic_share"
-        android:title="@string/discover_shouts_share"
-        app:showAsAction="ifRoom"/>
+        android:title="@string/home_menu_chat"
+        app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/shouts_search"
+        android:id="@+id/base_menu_search"
         android:icon="@drawable/ic_ab_search"
         android:title="@string/home_menu_search"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/shouts_cart"
+        android:id="@+id/base_menu_cart"
         android:icon="@drawable/ic_ab_cart"
         android:title="@string/home_menu_cart"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="ifRoom" />
 
 </menu>
