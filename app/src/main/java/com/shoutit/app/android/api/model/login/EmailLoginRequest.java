@@ -6,13 +6,13 @@ import android.support.annotation.Nullable;
 @SuppressWarnings("unused")
 public class EmailLoginRequest extends BaseLoginRequest {
 
-    private static final String SHOUTIT_SIGNIN = "shoutit_signin";
+    private static final String SHOUTIT_LOGIN = "shoutit_login";
 
     private final String email;
     private final String password;
 
     public EmailLoginRequest(@NonNull String email, @NonNull String password, @Nullable LoginUser loginUser) {
-        super(SHOUTIT_SIGNIN, loginUser);
+        super(SHOUTIT_LOGIN, loginUser);
         this.email = email;
         this.password = password;
     }

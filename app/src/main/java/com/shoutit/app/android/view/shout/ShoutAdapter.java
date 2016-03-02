@@ -2,7 +2,6 @@ package com.shoutit.app.android.view.shout;
 
 import android.content.Context;
 import android.graphics.Rect;
-import android.location.Location;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -119,7 +118,7 @@ public class ShoutAdapter extends BaseAdapter {
         public void bind(@Nonnull ShoutAdapterItems.MainShoutAdapterItem item) {
             this.item = item;
             final Shout shout = item.getShout();
-            final User user = shout.getUser();
+            final User user = shout.getProfile();
 
             picasso.load(user.getImage())
                     .resizeDimen(R.dimen.shout_avatar_size, R.dimen.shout_avatar_size)
@@ -139,7 +138,7 @@ public class ShoutAdapter extends BaseAdapter {
             labelTextView.setText(shout.getTypeResId());
 
             titleTextView.setText(shout.getTitle());
-            priceTextView.setText(context.getString(R.string.price_with_currency, shout.getPrice(), shout.getCurrency()));
+            priceTextView.setText(context.getString(R.string.price_with_currency, PriceUtils.formatPrice(shout.getPrice()), shout.getCurrency()));
             availableTextView.setText(context.getString(R.string.shout_available, (int) shout.getNumber()));
 
             shoutViewPager.setAdapter(imagesPagerAdapter);
@@ -225,7 +224,7 @@ public class ShoutAdapter extends BaseAdapter {
             this.item = item;
             final Shout shout = item.getShout();
             titleTextView.setText(shout.getTitle());
-            nameTextView.setText(shout.getUser().getName());
+            nameTextView.setText(shout.getProfile().getName());
             final String price = PriceUtils.formatPrice(shout.getPrice());
             cardPriceTextView.setText(context.getString(
                     R.string.price_with_currency, price, shout.getCurrency()));

@@ -61,7 +61,7 @@ public interface ApiService {
                                                      @Query("page") @Nullable Integer page,
                                                      @Query("page_size") @Nullable Integer pageSize);
 
-    @GET("/v3/shouts/{id}")
+    @GET("shouts/{id}")
     Observable<Shout> shout(@Path("id") String shoutId);
 
     @GET("shouts")
@@ -74,6 +74,9 @@ public interface ApiService {
                                              @Query("page") Integer page,
                                              @Query("page_size") Integer pageSize);
 
+    @GET("shouts/categories")
+    Observable<List<Category>> categories();
+
 
 
     /**
@@ -82,7 +85,7 @@ public interface ApiService {
     @POST("oauth2/access_token")
     Observable<SignResponse> login(@Body EmailLoginRequest request);
 
-    @POST("/v3/oauth2/access_token")
+    @POST("oauth2/access_token")
     Observable<SignResponse> loginGuest(@Body GuestSignupRequest request);
 
     @POST("oauth2/access_token")
@@ -131,9 +134,6 @@ public interface ApiService {
 
     @GET("misc/geocode?latlng=0,0")
     Observable<UserLocation> geocodeDefault();
-
-    @GET("misc/categories")
-    Observable<List<Category>> categories();
 
 
     /**
