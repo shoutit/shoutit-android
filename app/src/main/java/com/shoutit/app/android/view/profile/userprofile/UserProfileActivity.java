@@ -52,6 +52,12 @@ public class UserProfileActivity extends ProfileActivity {
                         popupMenu.show();
                     }
                 });
+
+        userProfilePresenter.getActionOnlyForLoggedInUserObservable()
+                .compose(bindToLifecycle())
+                .subscribe(ColoredSnackBar.errorSnackBarAction(
+                        ColoredSnackBar.contentView(UserProfileActivity.this),
+                        R.string.error_action_only_for_logged_in_user));
     }
 
     private void setUpPopupMenu() {

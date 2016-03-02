@@ -72,24 +72,38 @@ public class ProfileAdapterItems {
         private final T sectionItem;
         @Nonnull
         private final Observer<ProfilePresenter.UserWithItemToListen> listenItemObserver;
+        @Nonnull
+        private final Observer<Object> actionOnlyForLoggedInUserObserver;
         private final boolean isMyProfile;
+        private final boolean isUserLoggedIn;
+        private final boolean isOnlyItemInSection;
 
         public ProfileSectionAdapterItem(boolean isFirstItem,
                                          boolean isLastItem,
                                          @Nonnull User user,
                                          @Nonnull T sectionItem,
                                          @Nonnull Observer<ProfilePresenter.UserWithItemToListen> listenItemObserver,
-                                         boolean isMyProfile) {
+                                         @Nonnull Observer<Object> actionOnlyForLoggedInUserObserver,
+                                         boolean isMyProfile,
+                                         boolean isUserLoggedIn,
+                                         boolean isOnlyItemInSection) {
             this.isFirstItem = isFirstItem;
             this.isLastItem = isLastItem;
             this.user = user;
             this.sectionItem = sectionItem;
             this.listenItemObserver = listenItemObserver;
+            this.actionOnlyForLoggedInUserObserver = actionOnlyForLoggedInUserObserver;
             this.isMyProfile = isMyProfile;
+            this.isUserLoggedIn = isUserLoggedIn;
+            this.isOnlyItemInSection = isOnlyItemInSection;
         }
 
         public void onItemListen() {
             listenItemObserver.onNext(new ProfilePresenter.UserWithItemToListen(user, sectionItem));
+        }
+
+        public void onActionOnlyForLoggedInUser() {
+            actionOnlyForLoggedInUserObserver.onNext(null);
         }
 
         public boolean isMyProfile() {
@@ -104,9 +118,17 @@ public class ProfileAdapterItems {
             return isLastItem;
         }
 
+        public boolean isOnlyItemInSection() {
+            return isOnlyItemInSection;
+        }
+
         @Nonnull
         public T getSectionItem() {
             return sectionItem;
+        }
+
+        public boolean isUserLoggedIn() {
+            return isUserLoggedIn;
         }
 
         @Override

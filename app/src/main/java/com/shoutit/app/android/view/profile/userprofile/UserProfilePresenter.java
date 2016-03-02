@@ -36,6 +36,8 @@ public class UserProfilePresenter extends ProfilePresenter {
     private final PublishSubject<Object> onChatIconClickedSubject = PublishSubject.create();
     @Nonnull
     private final PublishSubject<User> onListenActionClickedSubject = PublishSubject.create();
+    @Nonnull
+    private final PublishSubject<Object> actionOnlyForLoggedInUserSubject = PublishSubject.create();
 
     @Nonnull
     private final Observable<ResponseOrError<User>> userObservable;
@@ -99,7 +101,7 @@ public class UserProfilePresenter extends ProfilePresenter {
 
     @Override
     protected BaseAdapterItem getThreeIconsAdapterItem(@Nonnull User user) {
-        return new OtherUserThreeIconsAdapterItem(user);
+        return new OtherUserThreeIconsAdapterItem(user, isUserLoggedIn, actionOnlyForLoggedInUserSubject);
     }
 
     @Nonnull
@@ -116,6 +118,11 @@ public class UserProfilePresenter extends ProfilePresenter {
     @Nonnull
     public PublishSubject<Object> getMoreMenuOptionClickedSubject() {
         return moreMenuOptionClickedSubject;
+    }
+
+    @Nonnull
+    public Observable<Object> getActionOnlyForLoggedInUserObservable() {
+        return actionOnlyForLoggedInUserSubject;
     }
 
     @Nonnull
@@ -155,8 +162,19 @@ public class UserProfilePresenter extends ProfilePresenter {
 
     public class OtherUserThreeIconsAdapterItem extends ProfileAdapterItems.ThreeIconsAdapterItem {
 
-        public OtherUserThreeIconsAdapterItem(@Nonnull User user) {
+        private final boolean isUserLoggedIn;
+        @Nonnull
+        private final Observer<Object> actionOnlyForLoggedInUserObserver;
+
+        public OtherUserThreeIconsAdapterItem(@Nonnull User user, boolean isUserLoggedIn,
+                                              @Nonnull Observer<Object> actionOnlyForLoggedInUserObserver) {
             super(user);
+            this.isUserLoggedIn = isUserLoggedIn;
+            this.actionOnlyForLoggedInUserObserver = actionOnlyForLoggedInUserObserver;
+        }
+
+        public boolean isUserLoggedIn() {
+            return isUserLoggedIn;
         }
 
         public void onChatActionClicked() {
@@ -165,6 +183,10 @@ public class UserProfilePresenter extends ProfilePresenter {
 
         public void onListenActionClicked() {
             onListenActionClickedSubject.onNext(user);
+        }
+
+        public void onActionOnlyForLoggedInUser() {
+            actionOnlyForLoggedInUserObserver.onNext(null);
         }
     }
 }

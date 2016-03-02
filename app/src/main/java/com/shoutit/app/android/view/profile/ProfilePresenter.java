@@ -70,6 +70,8 @@ public abstract class ProfilePresenter {
     protected final PublishSubject<UserWithItemToListen> sectionItemListenSubject = PublishSubject.create();
     @Nonnull
     protected final PublishSubject<Throwable> errorsSubject = PublishSubject.create();
+    @Nonnull
+    private final PublishSubject<Object> actionOnlyForLoggedInUserSubject = PublishSubject.create();
 
     @Nonnull
     protected final String userName;
@@ -86,6 +88,7 @@ public abstract class ProfilePresenter {
     @Nonnull
     protected final ApiService apiService;
     protected boolean isMyProfile;
+    protected boolean isUserLoggedIn;
 
     public ProfilePresenter(@Nonnull final String userName,
                             @Nonnull final ShoutsDao shoutsDao,
@@ -103,6 +106,7 @@ public abstract class ProfilePresenter {
         this.networkScheduler = networkScheduler;
         this.apiService = apiService;
         this.isMyProfile = isMyProfile;
+        this.isUserLoggedIn = userPreferences.isNormalUser();
     }
 
     /** Must be called after child constructor is finished **/
@@ -304,11 +308,14 @@ public abstract class ProfilePresenter {
 
     private <T extends ProfileType> ProfileAdapterItems.ProfileSectionAdapterItem getSectionAdapterItemForPosition(int position, User user, List<T> items, boolean isMyProfile) {
         if (position == 0) {
-            return new ProfileAdapterItems.ProfileSectionAdapterItem<>(true, false, user, items.get(position), sectionItemListenSubject, isMyProfile);
+            return new ProfileAdapterItems.ProfileSectionAdapterItem<>(true, false, user, items.get(position),
+                    sectionItemListenSubject, actionOnlyForLoggedInUserSubject, isMyProfile, isUserLoggedIn, items.size() == 1);
         } else if (position == items.size() - 1) {
-            return new ProfileAdapterItems.ProfileSectionAdapterItem<>(false, true, user, items.get(position), sectionItemListenSubject, isMyProfile);
+            return new ProfileAdapterItems.ProfileSectionAdapterItem<>(false, true, user, items.get(position),
+                    sectionItemListenSubject, actionOnlyForLoggedInUserSubject, isMyProfile, isUserLoggedIn, false);
         } else {
-            return new ProfileAdapterItems.ProfileSectionAdapterItem<>(false, false, user, items.get(position), sectionItemListenSubject, isMyProfile);
+            return new ProfileAdapterItems.ProfileSectionAdapterItem<>(false, false, user, items.get(position),
+                    sectionItemListenSubject, actionOnlyForLoggedInUserSubject, isMyProfile, isUserLoggedIn, false);
         }
     }
 
@@ -342,6 +349,11 @@ public abstract class ProfilePresenter {
     @Nonnull
     public Observable<List<BaseAdapterItem>> getAllAdapterItemsObservable() {
         return allAdapterItemsObservable;
+    }
+
+    @Nonnull
+    public Observable<Object> getActionOnlyForLoggedInUserObservable() {
+        return actionOnlyForLoggedInUserSubject;
     }
 
     @Nonnull

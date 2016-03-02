@@ -138,6 +138,12 @@ public class ProfileActivity extends BaseActivity {
                         startActivity(ShoutActivity.newIntent(ProfileActivity.this, shoutId));
                     }
                 });
+
+        presenter.getActionOnlyForLoggedInUserObservable()
+                .compose(bindToLifecycle())
+                .subscribe(ColoredSnackBar.errorSnackBarAction(
+                        ColoredSnackBar.contentView(ProfileActivity.this),
+                        R.string.error_action_only_for_logged_in_user));
     }
 
     private void setUpToolbar() {

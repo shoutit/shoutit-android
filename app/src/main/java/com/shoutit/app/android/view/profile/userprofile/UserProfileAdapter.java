@@ -106,8 +106,12 @@ public class UserProfileAdapter extends ProfileAdapter {
 
         @OnClick(R.id.profile_listen_action_container)
         public void onListenActionClicked() {
-            setListeningIcon(!item.getUser().isListening());
-            item.onListenActionClicked();
+            if (item.isUserLoggedIn()) {
+                setListeningIcon(!item.getUser().isListening());
+                item.onListenActionClicked();
+            } else {
+                item.onActionOnlyForLoggedInUser();
+            }
         }
 
         @OnClick(R.id.profile_second_icon_text_tv)
