@@ -153,7 +153,6 @@
             android:gravity="center"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
-            android:visibility="visible"
             android:background="@drawable/selector_cart_button">
 
             <ImageView
