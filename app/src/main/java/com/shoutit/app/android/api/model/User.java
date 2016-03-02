@@ -31,7 +31,8 @@ public class User {
 
     public User(String id, String type, String apiUrl, String webUrl, String username,
                 String name, String firstName, String lastName, boolean isActivated, String image,
-                String cover, boolean isListening, boolean isListener, boolean isPasswordSet, UserLocation location, int listenersCount, List<Page> pages, String bio, int dateJoined, Listening listeningCount) {
+                String cover, boolean isListening, boolean isListener, boolean isPasswordSet, UserLocation location,
+                int listenersCount, List<Page> pages, String bio, int dateJoined, Listening listeningCount) {
         this.id = id;
         this.type = type;
         this.apiUrl = apiUrl;
