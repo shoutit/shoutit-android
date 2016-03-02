@@ -44,6 +44,7 @@ public class MenuHandlerPresenter {
                                 @Nonnull @UiScheduler Scheduler uiScheduler) {
 
         final Observable<User> userObservable = userPreferences.getUserObservable()
+                .filter(Functions1.isNotNull())
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<User>behaviorRefCount());
 
