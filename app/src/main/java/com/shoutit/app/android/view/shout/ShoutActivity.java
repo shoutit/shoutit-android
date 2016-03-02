@@ -1,16 +1,22 @@
 package com.shoutit.app.android.view.shout;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
@@ -21,7 +27,6 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -31,6 +36,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import rx.functions.Action1;
 
 import static com.appunite.rx.internal.Preconditions.checkNotNull;
@@ -45,6 +51,16 @@ public class ShoutActivity extends BaseActivity {
     RecyclerView recyclerView;
     @Bind(R.id.shout_progress_bar)
     ProgressBar progressBar;
+    @Bind(R.id.shout_bottom_bar)
+    View bottomBar;
+    @Bind(R.id.shout_bottom_bar_call_or_delete)
+    TextView callOrDeleteTextView;
+    @Bind(R.id.shout_bottom_bar_video_call_or_edit)
+    TextView videoCallOrEditTextView;
+    @Bind(R.id.shout_bottom_bar_report_tv)
+    TextView reportTextView;
+    @Bind(R.id.shout_bottom_bar_chat_or_chats)
+    TextView chatOrChatsTextView;
 
     @Inject
     ShoutPresenter presenter;
@@ -63,7 +79,12 @@ public class ShoutActivity extends BaseActivity {
         ButterKnife.bind(this);
 
         setUpActionBar();
+        setUpBottomBar();
         setUpAdapter();
+
+        presenter.getIsUserShoutOwnerObservable()
+                .compose(this.<Boolean>bindToLifecycle())
+                .subscribe(setUpBottomBar());
 
         presenter.getAllAdapterItemsObservable()
                 .compose(this.<List<BaseAdapterItem>>bindToLifecycle())
@@ -132,6 +153,60 @@ public class ShoutActivity extends BaseActivity {
                 });
     }
 
+    @NonNull
+    private Action1<Boolean> setUpBottomBar() {
+        return new Action1<Boolean>() {
+            @Override
+            public void call(Boolean isUserShoutOwner) {
+                callOrDeleteTextView.setCompoundDrawablesWithIntrinsicBounds(
+                        isUserShoutOwner ? R.drawable.ic_delete_red : R.drawable.ic_call_green, 0, 0, 0);
+                videoCallOrEditTextView.setCompoundDrawablesWithIntrinsicBounds(
+                        isUserShoutOwner ? R.drawable.ic_edit_red : R.drawable.ic_video_chat_red, 0, 0, 0);
+                chatOrChatsTextView.setText(isUserShoutOwner ?
+                        R.string.shout_bottom_bar_chats : R.string.shout_bottom_bar_chat);
+
+                final int bottomBarHeight = getResources().getDimensionPixelSize(R.dimen.shout_bottom_bar);
+                final ObjectAnimator animator = ObjectAnimator.ofFloat(bottomBar, "translationY", bottomBarHeight, 0);
+                animator.setDuration(500)
+                        .setStartDelay(1000);
+                animator.setInterpolator(new DecelerateInterpolator());
+                animator.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+                        bottomBar.setVisibility(View.VISIBLE);
+                    }
+                });
+                animator.start();
+            }
+        };
+    }
+
+    @OnClick(R.id.shout_bottom_bar_call_or_delete)
+    public void onCallOrDeleteClicked() {
+        Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
+    }
+
+    @OnClick(R.id.shout_bottom_bar_video_call_or_edit)
+    public void onVideoCallOrEditClicked() {
+        Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
+    }
+
+    @OnClick(R.id.shout_bottom_bar_chat_or_chats)
+    public void onChatClicked() {
+        Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
+    }
+
+    @OnClick(R.id.shout_bottom_bar_more)
+    public void onMoreClicked() {
+        reportTextView.setVisibility(reportTextView.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
+    }
+
+    @OnClick(R.id.shout_bottom_bar_report_tv)
+    public void onReportClicked() {
+        reportTextView.setVisibility(View.GONE);
+        Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
+    }
+
     private void setUpAdapter() {
         final GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
         layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
@@ -146,6 +221,7 @@ public class ShoutActivity extends BaseActivity {
         });
 
         final int spacing = getResources().getDimensionPixelSize(R.dimen.shout_item_padding);
+        final int bottomSpacing = getResources().getDimensionPixelSize(R.dimen.shout_bottom_bar);
         recyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
@@ -153,6 +229,10 @@ public class ShoutActivity extends BaseActivity {
 
                 if (position == RecyclerView.NO_POSITION) {
                     return;
+                }
+
+                if (position == adapter.getItemCount() - 1) {
+                    outRect.bottom = bottomSpacing;
                 }
 
                 final int viewType = parent.getAdapter().getItemViewType(position);
