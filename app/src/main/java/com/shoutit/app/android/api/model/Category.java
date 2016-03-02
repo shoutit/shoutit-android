@@ -2,6 +2,8 @@ package com.shoutit.app.android.api.model;
 
 import android.support.annotation.NonNull;
 
+import java.util.List;
+
 public class Category {
 
     @NonNull
@@ -16,11 +18,19 @@ public class Category {
     @NonNull
     private final Tag mainTag;
 
-    public Category(@NonNull String name, @NonNull String slug, @NonNull String icon, @NonNull Tag mainTag) {
+    @NonNull
+    private final List<CategoryFilter> filters;
+
+    public Category(@NonNull String name,
+                    @NonNull String slug,
+                    @NonNull String icon,
+                    @NonNull Tag mainTag,
+                    @NonNull List<CategoryFilter> filters) {
         this.name = name;
         this.slug = slug;
         this.icon = icon;
         this.mainTag = mainTag;
+        this.filters = filters;
     }
 
     @NonNull
@@ -41,5 +51,10 @@ public class Category {
     @NonNull
     public String getIcon() {
         return icon;
+    }
+
+    @NonNull
+    public List<CategoryFilter> getFilters() {
+        return filters;
     }
 }
