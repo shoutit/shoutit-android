@@ -31,6 +31,7 @@
         android:layout_height="@dimen/shout_bottom_bar"
         android:layout_alignParentBottom="true"
         android:background="@color/shout_bottom_bar"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"
         app:contentInsetLeft="0dp"
         app:contentInsetStart="0dp"
