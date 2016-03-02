@@ -36,7 +36,6 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.view.about.AboutActivity;
 import com.shoutit.app.android.view.main.MainActivity;
-import com.shoutit.app.android.view.signin.CoarseLocationObservableProvider;
 import com.shoutit.app.android.view.signin.LoginActivity;
 import com.uservoice.uservoicesdk.UserVoice;
 
@@ -63,8 +62,6 @@ public class LoginIntroActivity extends BaseActivity {
     @Bind(R.id.activity_login_progress_layout)
     View progress;
 
-    @Inject
-    CoarseLocationObservableProvider mCoarseLocationObservable;
     @Inject
     ApiService mApiService;
     @Inject

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:background="@android:color/white">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/request_activity_toolbar"
+            style="@style/AppTheme.BaseToolbarStyle"
+            android:layout_marginBottom="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize"/>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/request_activity_description_layout"
+            style="@style/BlueInputStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp">
+
+            <EditText
+                android:id="@+id/create_request_descirption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/request_activity_what_are_you_looking_for"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:orientation="horizontal">
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/request_activity_budget_layout"
+                android:layout_width="0dp"
+                android:layout_height="54dp"
+                android:layout_weight="0.65">
+
+                <EditText
+                    android:id="@+id/create_request_budget"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/request_activity_budget"
+                    android:inputType="numberDecimal"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <Spinner
+                android:id="@+id/create_request_spinner"
+                style="?android:attr/editTextStyle"
+                android:layout_width="0dp"
+                android:layout_height="54dp"
+                android:layout_weight="0.35"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="@string/request_activity_when"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="now"
+                android:textAllCaps="true"
+                android:textColor="@android:color/black"/>
+
+            <SeekBar
+                android:id="@+id/create_request_time"
+                android:theme="@style/BlueSeekBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+
+        <View
+            android:background="@android:color/darker_gray"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="1px"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="@string/request_activity_where"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="6dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/create_request_location"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.75"
+                android:drawablePadding="10dp"
+                android:gravity="center_vertical"
+                android:paddingLeft="6dp"
+                android:textColor="@android:color/black"
+                tools:drawableLeft="@drawable/ec"
+                tools:text="Dubai, United Arab Emirates"/>
+
+            <Button
+                android:id="@+id/create_request_location_btn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.25"
+                android:background="?selectableItemBackground"
+                android:text="@string/request_activity_change_location"
+                android:textColor="@color/accent_blue"/>
+
+        </LinearLayout>
+
+        <View
+            android:background="@android:color/darker_gray"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="1px"/>
+
+        <Button
+            android:id="@+id/create_request_confirm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="6dp"
+            android:text="@string/request_activity_btn"
+            android:textColor="@android:color/white"/>
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/create_request_progress"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black_20"
+        android:clickable="true"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
+
+    </FrameLayout>
+
+</FrameLayout>

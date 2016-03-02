@@ -8,9 +8,9 @@ import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.api.model.UserLocationSimple;
 import com.shoutit.app.android.api.model.login.LoginUser;
 import com.shoutit.app.android.location.LocationManager;
-import com.shoutit.app.android.view.signin.CoarseLocationObservableProvider;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -48,9 +48,6 @@ public class RegisterPresenterTest {
 
     @Mock
     UserPreferences mUserPreferences;
-
-    @Mock
-    CoarseLocationObservableProvider coarseLocationProvider;
 
     @Mock
     User user;
@@ -263,8 +260,8 @@ public class RegisterPresenterTest {
         final ArgumentCaptor<EmailSignupRequest> argumentCaptor = ArgumentCaptor.forClass(EmailSignupRequest.class);
         verify(mApiService).signup(argumentCaptor.capture());
 
-        final LoginUser.UserLocation location = argumentCaptor.getValue().getUser().getLocation();
-        assert_().that(location.getLatitude()).isEqualTo(1d);
-        assert_().that(location.getLongitude()).isEqualTo(1d);
+        final UserLocationSimple location = argumentCaptor.getValue().getUser().getLocation();
+        assert_().that(this.location.getLatitude()).isEqualTo(1d);
+        assert_().that(this.location.getLongitude()).isEqualTo(1d);
     }
 }

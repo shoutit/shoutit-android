@@ -191,4 +191,18 @@
     <string name="account_wrong_email">Wrong email address</string>
     <string name="account_logout">Log out</string>
 
+    <!-- Request Shout -->
+    <string name="request_activity_title">Create Request</string>
+    <string name="request_activity_what_are_you_looking_for">What are you looking for?</string>
+    <string name="request_activity_budget">What is your budget?</string>
+    <string name="request_activity_when">When do you want it</string>
+    <string name="request_activity_where">Where?</string>
+    <string name="request_activity_change_location">Change</string>
+    <string name="request_activity_btn">Let us help!</string>
+    <string name="request_activity_currency">Currency</string>
+    <string name="request_acitvity_currency_error">Failed to load currencies</string>
+    <string name="request_acitvity_post_error">Failed to post request</string>
+    <string name="create_request_activity_title_too_short">Title must be at least 6 characters long</string>
+    <string name="create_request_activity_price_empty">Price cannot be empty</string>
+
 </resources>
