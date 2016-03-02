@@ -15,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/side_menu_cover_height"
             android:scaleType="centerCrop"
-            android:src="@drawable/pattern_bg" />
+            android:background="@drawable/pattern_bg" />
 
         <ImageView
             android:id="@+id/menu_avatar_iv"
