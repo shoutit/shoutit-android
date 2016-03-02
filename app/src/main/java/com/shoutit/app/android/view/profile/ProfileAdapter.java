@@ -110,7 +110,7 @@ public abstract class ProfileAdapter extends BaseAdapter {
         @Override
         public void bind(@Nonnull ProfileAdapterItems.SeeAllUserShoutsAdapterItem item) {
             this.item = item;
-            seeAllButton.setText(context.getString(R.string.profile_see_all_shouts));
+            seeAllButton.setText(context.getString(R.string.profile_see_all_shouts).toUpperCase());
         }
 
         @Override

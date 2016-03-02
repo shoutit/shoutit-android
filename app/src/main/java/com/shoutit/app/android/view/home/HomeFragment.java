@@ -2,7 +2,6 @@ package com.shoutit.app.android.view.home;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,6 +11,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.github.clans.fab.FloatingActionMenu;
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
 import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.jakewharton.rxbinding.view.RxView;
@@ -25,6 +25,7 @@ import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyGridLayoutManager;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
+import com.shoutit.app.android.view.createshout.request.CreateRequestActivity;
 import com.shoutit.app.android.view.discover.DiscoverActivity;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.main.OnSeeAllDiscoversListener;
@@ -37,6 +38,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
+import butterknife.OnClick;
 import rx.functions.Action1;
 
 public class HomeFragment extends BaseFragment {
@@ -48,7 +50,7 @@ public class HomeFragment extends BaseFragment {
     @Bind(R.id.fragment_home_recycler_view)
     RecyclerView recyclerView;
     @Bind(R.id.fragment_home_fab)
-    FloatingActionButton fab;
+    FloatingActionMenu fab;
     @Bind(R.id.fragment_home_progress_bar)
     ProgressBar progressBar;
 
@@ -124,19 +126,6 @@ public class HomeFragment extends BaseFragment {
                     }
                 });
 
-        RxView.clicks(fab)
-                .compose(this.<Void>bindToLifecycle())
-                .subscribe(new Action1<Void>() {
-                    @Override
-                    public void call(Void aVoid) {
-                        if (mUserPreferences.isGuest()) {
-                            startActivity(LoginIntroActivity.newIntent(getActivity()));
-                        } else {
-                            Toast.makeText(context, "Not implemented yet", Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
-
         presenter.getShowAllDiscoversObservable()
                 .compose(this.bindToLifecycle())
                 .subscribe(new Action1<Object>() {
@@ -191,6 +180,26 @@ public class HomeFragment extends BaseFragment {
         recyclerView.addItemDecoration(gridViewItemDecoration);
         recyclerView.setAdapter(adapter);
         adapter.switchLayoutManager(false);
+    }
+
+    @OnClick(R.id.fab_create_shout)
+    void onAddShoutClicked() {
+        if (mUserPreferences.isGuest()) {
+            startActivity(LoginIntroActivity.newIntent(getActivity()));
+            fab.close(false);
+        } else {
+            Toast.makeText(context, "Not implemented yet", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @OnClick(R.id.fab_request_shout)
+    void onRequestShoutClicked() {
+        if (mUserPreferences.isGuest()) {
+            startActivity(LoginIntroActivity.newIntent(getActivity()));
+            fab.close(false);
+        } else {
+            startActivity(CreateRequestActivity.newIntent(getActivity()));
+        }
     }
 
     @Override

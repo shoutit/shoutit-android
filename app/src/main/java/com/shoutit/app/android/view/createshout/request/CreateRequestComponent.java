@@ -1,10 +1,9 @@
-package com.shoutit.app.android.view.signin;
+package com.shoutit.app.android.view.createshout.request;
 
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.ActivityScope;
 import com.shoutit.app.android.dagger.AppComponent;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
-import com.shoutit.app.android.view.signin.LoginActivity;
 
 import dagger.Component;
 
@@ -15,8 +14,8 @@ import dagger.Component;
                 ActivityModule.class,
         }
 )
-public interface LoginActivityComponent extends BaseActivityComponent {
+public interface CreateRequestComponent extends BaseActivityComponent {
 
-    void inject(LoginActivity loginActivity);
+    void inject(CreateRequestActivity activity);
 
 }

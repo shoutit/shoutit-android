@@ -52,6 +52,7 @@
     <color name="shout_name">#de000000</color>
     <color name="shout_page_indicator">#99FFFFFF</color>
     <color name="shout_bottom_bar">#de000000</color>
+    <color name="shout_item_dark">#1f000000</color>
 
     <!-- Profile -->
     <color name="profile_name">#de000000</color>

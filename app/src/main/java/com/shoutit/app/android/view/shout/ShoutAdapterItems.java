@@ -133,7 +133,7 @@ public class ShoutAdapterItems {
 
         @Nonnull
         public String getName() {
-            return user.getName();
+            return user.getName().toUpperCase();
         }
 
         @Override

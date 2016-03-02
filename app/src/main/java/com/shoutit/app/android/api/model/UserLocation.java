@@ -2,7 +2,9 @@ package com.shoutit.app.android.api.model;
 
 import com.google.common.base.Objects;
 
-public class UserLocation {
+import java.io.Serializable;
+
+public class UserLocation implements Serializable {
     private final double latitude;
     private final double longitude;
     private final String country;

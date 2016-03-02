@@ -140,8 +140,19 @@ public class ShoutAdapter extends BaseAdapter {
             labelTextView.setText(shout.getTypeResId());
 
             titleTextView.setText(shout.getTitle());
-            priceTextView.setText(context.getString(R.string.price_with_currency, PriceUtils.formatPrice(shout.getPrice()), shout.getCurrency()));
-            availableTextView.setText(context.getString(R.string.shout_available, (int) shout.getNumber()));
+
+            final String formattedPrice =  PriceUtils.formatPrice(shout.getPrice());
+            if (shout.getCurrency() != null) {
+                priceTextView.setText(context.getString(R.string.price_with_currency, formattedPrice, shout.getCurrency()));
+            } else {
+                priceTextView.setText(formattedPrice);
+            }
+
+            if (shout.getNumber() == 0) {
+                availableTextView.setText(context.getString(R.string.shout_available, (int) shout.getNumber()));
+            } else {
+                availableTextView.setText(context.getString(R.string.shout_only_available, (int) shout.getNumber()));
+            }
 
             shoutViewPager.setAdapter(imagesPagerAdapter);
             pageIndicator.setViewPager(shoutViewPager);
@@ -244,7 +255,7 @@ public class ShoutAdapter extends BaseAdapter {
         @Override
         public void bind(@Nonnull ShoutAdapterItems.VisitProfileAdapterItem item) {
             this.item = item;
-            button.setText(item.getName());
+            button.setText(context.getString(R.string.shout_visit_profile, item.getName()));
         }
 
         @Override

@@ -9,6 +9,7 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -57,16 +58,16 @@ public class ShoutActivity extends BaseActivity {
     RecyclerView recyclerView;
     @Bind(R.id.shout_progress_bar)
     ProgressBar progressBar;
-    @Bind(R.id.shout_bottom_bar)
+    @Bind(R.id.shout_bottom_toolbar)
     View bottomBar;
     @Bind(R.id.shout_bottom_bar_call_or_delete)
     TextView callOrDeleteTextView;
     @Bind(R.id.shout_bottom_bar_video_call_or_edit)
     TextView videoCallOrEditTextView;
-    @Bind(R.id.shout_bottom_bar_report_tv)
-    TextView reportTextView;
     @Bind(R.id.shout_bottom_bar_chat_or_chats)
     TextView chatOrChatsTextView;
+    @Bind(R.id.shout_bottom_bar_more)
+    View showMoreIcon;
 
     @Inject
     ShoutPresenter presenter;
@@ -167,13 +168,36 @@ public class ShoutActivity extends BaseActivity {
 
     @NonNull
     private Action1<Boolean> setUpBottomBar() {
+        final PopupMenu popupMenu = new PopupMenu(toolbar.getContext(), showMoreIcon);
+        popupMenu.inflate(R.menu.menu_shout_bottom_bar);
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Toast.makeText(ShoutActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
+
+        showMoreIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popupMenu.show();
+            }
+        });
+
         return new Action1<Boolean>() {
             @Override
             public void call(Boolean isUserShoutOwner) {
                 callOrDeleteTextView.setCompoundDrawablesWithIntrinsicBounds(
                         isUserShoutOwner ? R.drawable.ic_delete_red : R.drawable.ic_call_green, 0, 0, 0);
+                callOrDeleteTextView.setText(isUserShoutOwner ?
+                        R.string.shout_bottom_bar_delete : R.string.shout_bottom_bar_call);
+
                 videoCallOrEditTextView.setCompoundDrawablesWithIntrinsicBounds(
                         isUserShoutOwner ? R.drawable.ic_edit_red : R.drawable.ic_video_chat_red, 0, 0, 0);
+                videoCallOrEditTextView.setText(isUserShoutOwner ?
+                        R.string.shout_bottom_bar_edit : R.string.shout_bottom_bar_video_call);
+
                 chatOrChatsTextView.setText(isUserShoutOwner ?
                         R.string.shout_bottom_bar_chats : R.string.shout_bottom_bar_chat);
 
@@ -205,17 +229,6 @@ public class ShoutActivity extends BaseActivity {
 
     @OnClick(R.id.shout_bottom_bar_chat_or_chats)
     public void onChatClicked() {
-        Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
-    }
-
-    @OnClick(R.id.shout_bottom_bar_more)
-    public void onMoreClicked() {
-        reportTextView.setVisibility(reportTextView.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
-    }
-
-    @OnClick(R.id.shout_bottom_bar_report_tv)
-    public void onReportClicked() {
-        reportTextView.setVisibility(View.GONE);
         Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
     }
 

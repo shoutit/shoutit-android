@@ -70,7 +70,7 @@ public class ShoutPresenter {
         final Observable<Shout> successShoutResponse = shoutResponse
                 .compose(ResponseOrError.<Shout>onlySuccess());
 
-        final Observable<String> userNameObservable =  successShoutResponse
+        final Observable<String> userNameObservable = successShoutResponse
                 .map(new Func1<Shout, String>() {
                     @Override
                     public String call(Shout shout) {
@@ -227,10 +227,11 @@ public class ShoutPresenter {
                 userNameObservable, userPreferences.getUserObservable(), Observable.just(userPreferences.isNormalUser()),
                 new Func3<String, User, Boolean, Boolean>() {
                     @Override
-                    public Boolean call(String shoutUser, User user, Boolean isNormalUser) {
-                        return isNormalUser && user.getUsername().equals(shoutUser);
+                    public Boolean call(String shoutUser, @Nullable User user, Boolean isNormalUser) {
+                        return isNormalUser && user != null && user.getUsername().equals(shoutUser);
                     }
                 })
+                .compose(ObservableExtensions.<Boolean>behaviorRefCount())
                 .first();
     }
 

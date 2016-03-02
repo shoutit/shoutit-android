@@ -181,12 +181,16 @@
     <string name="shout_header_details">Details</string>
     <string name="shout_user_shouts_header">OTHER SHOUTS FROM %1$s</string>
     <string name="shout_user_location">%1$s, %2$s</string>
-    <string name="shout_available">Only %1$d available</string>
+    <string name="shout_only_available">Only %1$d available</string>
+    <string name="shout_available">%1$d available</string>
     <string name="shout_bottom_bar_call">Call</string>
     <string name="shout_bottom_bar_video_call">Video call</string>
     <string name="shout_bottom_bar_chat">Chat</string>
     <string name="shout_bottom_bar_chats">Chats</string>
     <string name="shout_bottom_bar_report">Report</string>
+    <string name="shout_visit_profile">VISIT %1$s\'s PROFILE</string>
+    <string name="shout_bottom_bar_delete">Delete</string>
+    <string name="shout_bottom_bar_edit">Edit</string>
 
     <!-- Account -->
     <string name="account_email_changed">Email successfully changed</string>
@@ -215,4 +219,19 @@
     <string name="profile_listen_label">Listen</string>
     <string name="profile_stop_listening_label">Stop Listening</string>
     <string name="profile_report">Report</string>
+
+    <!-- Request Shout -->
+    <string name="request_activity_title">Create Request</string>
+    <string name="request_activity_what_are_you_looking_for">What are you looking for?</string>
+    <string name="request_activity_budget">What is your budget?</string>
+    <string name="request_activity_when">When do you want it</string>
+    <string name="request_activity_where">Where?</string>
+    <string name="request_activity_change_location">Change</string>
+    <string name="request_activity_btn">Let us help!</string>
+    <string name="request_activity_currency">Currency</string>
+    <string name="request_acitvity_currency_error">Failed to load currencies</string>
+    <string name="request_acitvity_post_error">Failed to post request</string>
+    <string name="create_request_activity_title_too_short">Title must be at least 6 characters long</string>
+    <string name="create_request_activity_price_empty">Price cannot be empty</string>
+
 </resources>

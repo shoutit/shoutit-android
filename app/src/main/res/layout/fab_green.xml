@@ -1,13 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<android.support.design.widget.FloatingActionButton xmlns:android="http://schemas.android.com/apk/res/android"
+<com.github.clans.fab.FloatingActionMenu
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/base_fab"
-    android:layout_width="@dimen/fab_size"
-    android:layout_height="@dimen/fab_size"
-    android:layout_gravity="bottom|end"
-    android:layout_margin="16dp"
-    android:src="@drawable/ic_add"
-    app:backgroundTint="@color/colorPrimary"
-    app:elevation="4dp"
-    app:layout_anchorGravity="bottom|right|end" />
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="28dp"
+    android:paddingEnd="16dp"
+    android:paddingRight="16dp"
+    app:menu_colorNormal="@color/colorPrimary"
+    app:menu_colorPressed="@color/colorPrimary"
+    app:menu_colorRipple="@color/colorPrimary"
+    app:menu_labels_colorNormal="@android:color/white"
+    app:menu_labels_colorPressed="@android:color/white"
+    app:menu_labels_singleLine="true"
+    app:menu_labels_textColor="@android:color/black"
+    app:menu_labels_textSize="14sp">
+
+    <com.github.clans.fab.FloatingActionButton
+        android:id="@+id/fab_create_shout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/fab_add"
+        app:fab_colorNormal="@color/colorPrimary"
+        app:fab_colorPressed="@color/colorPrimary"
+        app:fab_label="Offer"
+        app:fab_size="mini"/>
+
+    <com.github.clans.fab.FloatingActionButton
+        android:id="@+id/fab_request_shout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/fab_add"
+        app:fab_colorNormal="@color/colorPrimary"
+        app:fab_colorPressed="@color/colorPrimary"
+        app:fab_label="Request"
+        app:fab_size="mini"/>
+
+</com.github.clans.fab.FloatingActionMenu>

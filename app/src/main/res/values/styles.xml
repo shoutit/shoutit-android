@@ -84,6 +84,12 @@
         <item name="colorControlHighlight">@color/accent_blue</item>
     </style>
 
+    <style name="BlueSeekBar" parent="ThemeOverlay.AppCompat">
+        <item name="colorControlNormal">@color/accent_blue</item>
+        <item name="colorControlActivated">@color/accent_blue</item>
+        <item name="colorControlHighlight">@color/accent_blue</item>
+    </style>
+
     <style name="SearchEditText" parent="ThemeOverlay.AppCompat">
         <item name="colorControlNormal">@android:color/white</item>
         <item name="colorControlActivated">@android:color/white</item>
@@ -108,7 +114,7 @@
     </style>
 
     <style name="ShoutCardSection">
-        <item name="android:textColor">@color/black_38</item>
+        <item name="android:textColor">@color/black_54</item>
         <item name="android:textSize">14sp</item>
         <item name="android:paddingLeft">8dp</item>
         <item name="android:paddingStart" tools:ignore="NewApi">8dp</item>
@@ -140,7 +146,7 @@
     </style>
 
     <style name="ShoutCardItemDark" parent="ShoutCardItemLight">
-        <item name="android:background">@color/black_12</item>
+        <item name="android:background">@color/shout_item_dark</item>
     </style>
 
     <style name="ShoutItemHeader">
