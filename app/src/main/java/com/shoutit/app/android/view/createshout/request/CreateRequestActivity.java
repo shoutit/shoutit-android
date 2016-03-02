@@ -1,5 +1,6 @@
 package com.shoutit.app.android.view.createshout.request;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.util.Pair;
@@ -75,6 +77,7 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
             return list.get(position).first.hashCode();
         }
 
+        @SuppressLint("ViewHolder")
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             final TextView view = (TextView) getLayoutInflater().inflate(android.R.layout.simple_list_item_1, parent, false);
@@ -109,6 +112,10 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
     FrameLayout mCreateRequestProgress;
     @Bind(R.id.request_activity_toolbar)
     Toolbar mRequestActivityToolbar;
+    @Bind(R.id.request_activity_description_layout)
+    TextInputLayout mRequestActivityDescriptionLayout;
+    @Bind(R.id.request_activity_budget_layout)
+    TextInputLayout mRequestActivityBudgetLayout;
 
     @Inject
     CreateRequestPresenter mCreateRequestPresenter;
@@ -171,6 +178,7 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public CreateRequestPresenter.RequestData getRequestData() {
         return new CreateRequestPresenter.RequestData(
@@ -236,13 +244,23 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
     }
 
     @Override
-    public void showTitleTooShortError() {
-        mCreateRequestDescirption.setError(getString(R.string.create_request_activity_title_too_short));
+    public void showTitleTooShortError(boolean show) {
+        if(show) {
+            mRequestActivityDescriptionLayout.setErrorEnabled(true);
+            mRequestActivityDescriptionLayout.setError(getString(R.string.create_request_activity_title_too_short));
+        } else {
+            mRequestActivityDescriptionLayout.setErrorEnabled(false);
+        }
     }
 
     @Override
-    public void showEmptyPriceError() {
-        mCreateRequestBudget.setError(getString(R.string.create_request_activity_price_empty));
+    public void showEmptyPriceError(boolean show) {
+        if(show) {
+            mRequestActivityBudgetLayout.setErrorEnabled(true);
+            mRequestActivityBudgetLayout.setError(getString(R.string.create_request_activity_price_empty));
+        } else {
+            mRequestActivityBudgetLayout.setErrorEnabled(false);
+        }
     }
 
     @Override

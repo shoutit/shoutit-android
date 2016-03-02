@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,26 +18,41 @@
             android:layout_width="match_parent"
             android:layout_height="?actionBarSize"/>
 
-        <EditText
-            android:layout_margin="6dp"
-            android:id="@+id/create_request_descirption"
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/request_activity_description_layout"
+            style="@style/BlueInputStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/request_activity_what_are_you_looking_for"/>
-
-        <LinearLayout
-            android:layout_margin="6dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_margin="6dp">
 
             <EditText
-                android:id="@+id/create_request_budget"
+                android:id="@+id/create_request_descirption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/request_activity_what_are_you_looking_for"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="6dp"
+            android:orientation="horizontal">
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/request_activity_budget_layout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.65"
-                android:inputType="numberDecimal"
-                android:hint="@string/request_activity_budget"/>
+                android:layout_weight="0.65">
+
+                <EditText
+                    android:id="@+id/create_request_budget"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/request_activity_budget"
+                    android:inputType="numberDecimal"/>
+
+            </android.support.design.widget.TextInputLayout>
 
             <Spinner
                 android:id="@+id/create_request_spinner"
@@ -47,24 +63,24 @@
         </LinearLayout>
 
         <TextView
-            android:layout_margin="6dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="6dp"
             android:text="@string/request_activity_when"/>
 
         <LinearLayout
-            android:layout_margin="6dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="6dp"
             android:orientation="horizontal">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:textColor="@android:color/black"
                 android:text="now"
-                android:textAllCaps="true"/>
+                android:textAllCaps="true"
+                android:textColor="@android:color/black"/>
 
             <SeekBar
                 android:id="@+id/create_request_time"
@@ -74,15 +90,15 @@
         </LinearLayout>
 
         <TextView
-            android:layout_margin="6dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_margin="6dp"
             android:text="@string/request_activity_where"/>
 
         <LinearLayout
-            android:layout_margin="6dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="6dp"
             android:orientation="horizontal">
 
             <TextView
@@ -90,29 +106,29 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.75"
-                android:gravity="center_vertical"
-                android:textColor="@android:color/black"
-                android:paddingLeft="10dp"
                 android:drawablePadding="10dp"
+                android:gravity="center_vertical"
+                android:paddingLeft="10dp"
+                android:textColor="@android:color/black"
                 tools:drawableLeft="@drawable/ec"
                 tools:text="Dubai, United Arab Emirates"/>
 
             <Button
                 android:id="@+id/create_request_location_btn"
-                android:background="?selectableItemBackground"
-                android:textColor="@color/accent_blue"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.25"
-                android:text="@string/request_activity_change_location"/>
+                android:background="?selectableItemBackground"
+                android:text="@string/request_activity_change_location"
+                android:textColor="@color/accent_blue"/>
 
         </LinearLayout>
 
         <Button
-            android:layout_margin="6dp"
             android:id="@+id/create_request_confirm"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="6dp"
             android:text="@string/request_activity_btn"
             android:textColor="@android:color/white"/>
     </LinearLayout>

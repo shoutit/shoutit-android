@@ -102,10 +102,10 @@ public class CreateRequestPresenter {
                                                        @Nullable
                                                        @Override
                                                        public Pair<String, String> apply(Currency input) {
-                                                           return Pair.create(input.getCode(), input.getName());
+                                                           return Pair.create(input.getCode(),
+                                                                   String.format("%s (%s)", input.getName(), input.getCountry()));
                                                        }
                                                    }));
-
 
                                    mListener.setCurrenciesEnabled(true);
                                    mListener.setCurrencies(list);
@@ -154,19 +154,16 @@ public class CreateRequestPresenter {
                         mListener.showError();
                     }
                 }));
-
     }
 
     private boolean checkValidity(RequestData requestData) {
-        if (requestData.mDescription.length() < 6) {
-            mListener.showTitleTooShortError();
-            return false;
-        }
-        if(Strings.isNullOrEmpty(requestData.mBudget)){
-            mListener.showEmptyPriceError();
-            return false;
-        }
-        return true;
+        final boolean erroredTitle = requestData.mDescription.length() < 6;
+        mListener.showTitleTooShortError(erroredTitle);
+
+        final boolean erroredBudget = Strings.isNullOrEmpty(requestData.mBudget);
+        mListener.showEmptyPriceError(erroredBudget);
+
+        return !erroredTitle || !erroredBudget;
     }
 
     public void updateLocation(@NonNull UserLocation userLocation) {
@@ -205,9 +202,9 @@ public class CreateRequestPresenter {
 
         void removeRetryCurrenciesListener();
 
-        void showTitleTooShortError();
+        void showTitleTooShortError(boolean show);
 
-        void showEmptyPriceError();
+        void showEmptyPriceError(boolean show);
 
         void finishActivity();
     }
