@@ -4,7 +4,6 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.ChangePasswordRequest;
 import com.shoutit.app.android.api.model.User;
-import com.shoutit.app.android.view.settings.account.password.ChangePasswordPresenter;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +35,7 @@ public class ChangePasswordPresenterTest {
                 .thenReturn(Observable.just(ResponseBody.create(null, "z")));
 
         when(userPreferences.getUserObservable())
-                .thenReturn(Observable.just(new User("", null, null, null, null, null, null, null, false, null, null, true, false, null)));
+                .thenReturn(Observable.just(new User("", null, null, null, null, null, null, null, false, null, null, true, false, false, null, 1, null, null, 0, null)));
 
         presenter = new ChangePasswordPresenter(apiService, userPreferences, Schedulers.immediate(), Schedulers.immediate());
     }
@@ -152,6 +151,6 @@ public class ChangePasswordPresenterTest {
     }
 
     private User userWithPasswordSet() {
-        return new User("", null, null, null, null, null, null, null, false, null, null, false, false, null);
+        return new User("", null, null, null, null, null, null, null, false, null, null, false, false, false, null, 1, null, null, 0, null);
     }
 }

@@ -175,4 +175,18 @@
         <item name="android:padding">4dp</item>
     </style>
 
+    <style name="ProfileInfo">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingEnd" tools:ignore="NewApi">16dp</item>
+        <item name="android:paddingRight">16dp</item>
+        <item name="android:paddingStart" tools:ignore="NewApi">16dp</item>
+        <item name="android:paddingLeft">16dp</item>
+    </style>
+
+    <style name="ShoutBottomBar" parent="ThemeOverlay.AppCompat.Dark"/>
+
 </resources>

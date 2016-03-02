@@ -7,6 +7,7 @@ import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
@@ -52,7 +53,7 @@ public class ShoutPresenterTest {
         when(shoutsDao.getRelatedShoutsObservable(any(RelatedShoutsPointer.class)))
                 .thenReturn(Observable.just(ResponseOrError.fromData(new ShoutsResponse(1, "z", "z", Lists.newArrayList(getShout())))));
         when(userPreferences.getUserObservable())
-                .thenReturn(Observable.just(new User("z", null, null, null, null, null, null, null, false, null, null, false, false, null)));
+                .thenReturn(Observable.just(new User("z", null, null, null, null, null, null, null, false, null, null, false, false, false, null, 1, null, null, 1, null)));
         when(userPreferences.isNormalUser())
                 .thenReturn(true);
 
@@ -67,10 +68,10 @@ public class ShoutPresenterTest {
         subscriber.assertNoErrors();
         final List<BaseAdapterItem> items = Iterables.getLast(subscriber.getOnNextEvents());
         assert_().that(items.get(0)).isInstanceOf(ShoutAdapterItems.MainShoutAdapterItem.class);
-        assert_().that(items.get(1)).isInstanceOf(ShoutAdapterItems.HeaderAdapterItem.class);
+        assert_().that(items.get(1)).isInstanceOf(HeaderAdapterItem.class);
         assert_().that(items.get(2)).isInstanceOf(ShoutAdapterItems.UserShoutAdapterItem.class);
         assert_().that(items.get(3)).isInstanceOf(ShoutAdapterItems.VisitProfileAdapterItem.class);
-        assert_().that(items.get(4)).isInstanceOf(ShoutAdapterItems.HeaderAdapterItem.class);
+        assert_().that(items.get(4)).isInstanceOf(HeaderAdapterItem.class);
         assert_().that(items.get(5)).isInstanceOf(ShoutAdapterItems.RelatedContainerAdapterItem.class);
     }
 
@@ -85,7 +86,7 @@ public class ShoutPresenterTest {
         final List<BaseAdapterItem> items = Iterables.getLast(subscriber.getOnNextEvents());
         assert_().that(items.get(0)).isInstanceOf(ShoutAdapterItems.MainShoutAdapterItem.class);
         assert_().that(items.get(1)).isInstanceOf(ShoutAdapterItems.VisitProfileAdapterItem.class);
-        assert_().that(items.get(2)).isInstanceOf(ShoutAdapterItems.HeaderAdapterItem.class);
+        assert_().that(items.get(2)).isInstanceOf(HeaderAdapterItem.class);
         assert_().that(items.get(3)).isInstanceOf(ShoutAdapterItems.RelatedContainerAdapterItem.class);
     }
 
@@ -99,10 +100,10 @@ public class ShoutPresenterTest {
         subscriber.assertNoErrors();
         final List<BaseAdapterItem> items = Iterables.getLast(subscriber.getOnNextEvents());
         assert_().that(items.get(0)).isInstanceOf(ShoutAdapterItems.MainShoutAdapterItem.class);
-        assert_().that(items.get(1)).isInstanceOf(ShoutAdapterItems.HeaderAdapterItem.class);
+        assert_().that(items.get(1)).isInstanceOf(HeaderAdapterItem.class);
         assert_().that(items.get(2)).isInstanceOf(ShoutAdapterItems.UserShoutAdapterItem.class);
         assert_().that(items.get(3)).isInstanceOf(ShoutAdapterItems.VisitProfileAdapterItem.class);
-        assert_().that(items.get(4)).isInstanceOf(ShoutAdapterItems.HeaderAdapterItem.class);
+        assert_().that(items.get(4)).isInstanceOf(HeaderAdapterItem.class);
     }
 
     @Test
@@ -157,7 +158,7 @@ public class ShoutPresenterTest {
     }
 
     private User getUser() {
-        return new User("id", null, null, null, null, null, null, null, false, null, null, false, false, null);
+        return new User("id", null, null, null, null, null, null, null, false, null, null, false, false, false, null, 1, null, null, 0, null);
     }
 
 

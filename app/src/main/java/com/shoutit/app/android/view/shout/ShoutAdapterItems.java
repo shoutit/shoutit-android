@@ -118,17 +118,17 @@ public class ShoutAdapterItems {
 
     public static class VisitProfileAdapterItem implements BaseAdapterItem {
         @Nonnull
-        private final Observer<String> visitProfileObserver;
+        private final Observer<User> visitProfileObserver;
         @Nonnull
         private final User user;
 
-        public VisitProfileAdapterItem(@Nonnull Observer<String> visitProfileObserver, @Nonnull User user) {
+        public VisitProfileAdapterItem(@Nonnull Observer<User> visitProfileObserver, @Nonnull User user) {
             this.visitProfileObserver = visitProfileObserver;
             this.user = user;
         }
 
         public void onViewUserProfileClicked() {
-            visitProfileObserver.onNext(user.getUsername());
+            visitProfileObserver.onNext(user);
         }
 
         @Nonnull
@@ -183,37 +183,6 @@ public class ShoutAdapterItems {
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
             return item instanceof SeeAllRelatesAdapterItem;
-        }
-    }
-
-    public static class HeaderAdapterItem implements BaseAdapterItem {
-
-        @Nonnull
-        private final String title;
-
-        public HeaderAdapterItem(@Nonnull String title) {
-            this.title = title;
-        }
-
-        @Nonnull
-        public String getTitle() {
-            return title;
-        }
-
-
-        @Override
-        public long adapterId() {
-            return BaseAdapterItem.NO_ID;
-        }
-
-        @Override
-        public boolean matches(@Nonnull BaseAdapterItem item) {
-            return item instanceof HeaderAdapterItem;
-        }
-
-        @Override
-        public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof HeaderAdapterItem && title.equals(((HeaderAdapterItem) item).getTitle());
         }
     }
 

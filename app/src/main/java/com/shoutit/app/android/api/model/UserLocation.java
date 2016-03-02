@@ -1,5 +1,7 @@
 package com.shoutit.app.android.api.model;
 
+import com.google.common.base.Objects;
+
 import java.io.Serializable;
 
 public class UserLocation implements Serializable {
@@ -75,5 +77,22 @@ public class UserLocation implements Serializable {
         return isFromGps;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UserLocation)) return false;
+        final UserLocation that = (UserLocation) o;
+        return Double.compare(that.latitude, latitude) == 0 &&
+                Double.compare(that.longitude, longitude) == 0 &&
+                Objects.equal(country, that.country) &&
+                Objects.equal(postalCode, that.postalCode) &&
+                Objects.equal(state, that.state) &&
+                Objects.equal(city, that.city) &&
+                Objects.equal(address, that.address);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(latitude, longitude, country, postalCode, state, city, address);
+    }
 }

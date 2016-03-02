@@ -15,6 +15,8 @@
     <string name="error_connection">Ooops, probably there is no Internet connection</string>
     <string name="error_email_not_found">The email or username you entered do not belong to any account.</string>
     <string name="error_wrong_email_or_password">Wrong email or password</string>
+    <string name="error_action_only_for_logged_in_user">Only for logged in users</string>
+
 
     <!-- Permissions -->
     <string name="permission_location_explanation">We need your location to prepare appropriate content</string>
@@ -194,6 +196,29 @@
     <string name="account_email_changed">Email successfully changed</string>
     <string name="account_wrong_email">Wrong email address</string>
     <string name="account_logout">Log out</string>
+
+    <!-- Profile -->
+    <string name="profile_shuts_button">See all shouts</string>
+    <string name="profile_my_shouts_header">My shouts</string>
+    <string name="profile_listening_label">Listening</string>
+    <string name="profile_interests_label">Interests</string>
+    <string name="profile_subtitle">%1$d Listeners</string>
+    <string name="profile_empty_field">---</string>
+    <string name="profile_share_profile_title">Share profile</string>
+    <string name="profile_joined_date">Joined %1$s</string>
+    <string name="profile_listening_to_you">listening to you</string>
+    <string name="profile_my_pages">MY PAGES</string>
+    <string name="profile_my_shouts">MY SHOUTS</string>
+    <string name="profile_user_pages">%1$s pages</string>
+    <string name="profile_page_admins">%1$s admins</string>
+    <string name="profile_listeners">%1$s Listeners</string>
+    <string name="profile_listeners_label">Listeners</string>
+    <string name="profile_see_all_shouts">See all shouts</string>
+    <string name="profile_user_shouts_header">%1$s shouts</string>
+    <string name="profile_chat_label">Chat</string>
+    <string name="profile_listen_label">Listen</string>
+    <string name="profile_stop_listening_label">Stop Listening</string>
+    <string name="profile_report">Report</string>
 
     <!-- Request Shout -->
     <string name="request_activity_title">Create Request</string>

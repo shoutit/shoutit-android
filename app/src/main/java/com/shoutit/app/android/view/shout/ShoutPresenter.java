@@ -10,6 +10,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
@@ -49,7 +50,7 @@ public class ShoutPresenter {
     private PublishSubject<String> userShoutSelectedSubject = PublishSubject.create();
     private PublishSubject<String> relatedShoutSelectedSubject = PublishSubject.create();
     private PublishSubject<String> seeAllRelatedShoutSubject = PublishSubject.create();
-    private PublishSubject<String> visitProfileSubject = PublishSubject.create();
+    private PublishSubject<User> visitProfileSubject = PublishSubject.create();
 
     @Nonnull
     private final Scheduler uiScheduler;
@@ -185,14 +186,14 @@ public class ShoutPresenter {
 
                         final User user = shout.getShout().getProfile();
                         if (!userShouts.isEmpty()) {
-                            builder.add(new ShoutAdapterItems.HeaderAdapterItem(context.getString(R.string.shout_user_shouts_header, user.getName())))
+                            builder.add(new HeaderAdapterItem(context.getString(R.string.shout_user_shouts_header, user.getName())))
                                     .addAll(userShouts);
                         }
 
                         builder.add(new ShoutAdapterItems.VisitProfileAdapterItem(visitProfileSubject, user));
 
                         if (!relatedShouts.isEmpty()) {
-                            builder.add(new ShoutAdapterItems.HeaderAdapterItem(context.getString(R.string.shout_related_shouts_header)))
+                            builder.add(new HeaderAdapterItem(context.getString(R.string.shout_related_shouts_header)))
                                     .add(new ShoutAdapterItems.RelatedContainerAdapterItem(relatedShouts));
                         }
 
@@ -271,7 +272,7 @@ public class ShoutPresenter {
     }
 
     @Nonnull
-    public Observable<String> getVisitProfileObservable() {
+    public Observable<User> getVisitProfileObservable() {
         return visitProfileSubject;
     }
 

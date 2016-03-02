@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@android:color/white"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/profile_fragment_listening"
+        android:layout_toStartOf="@+id/profile_fragment_listening"
+        android:gravity="center"
+        android:paddingTop="16dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/profile_first_icon_value_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/ic_listeners"
+            android:drawablePadding="6dp"
+            android:drawableStart="@drawable/ic_listeners"
+            android:gravity="center"
+            android:textColor="@color/black_54"
+            android:textSize="14sp"
+            tools:text="3K" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:gravity="center"
+            android:text="@string/profile_listeners_label"
+            android:textColor="@color/black_54"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/profile_fragment_listening"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginLeft="60dp"
+        android:layout_marginRight="60dp"
+        android:paddingTop="16dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/profile_second_icon_value_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/ic_listeners"
+            android:drawableStart="@drawable/ic_listeners"
+            android:drawablePadding="6dp"
+            android:gravity="center"
+            android:textColor="@color/black_54"
+            android:textSize="14sp"
+            tools:text="3K" />
+
+        <TextView
+            android:id="@+id/profile_second_icon_text_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:gravity="center"
+            android:text="@string/profile_listening_label"
+            android:textColor="@color/black_54"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/profile_fragment_listening"
+        android:layout_toRightOf="@+id/profile_fragment_listening"
+        android:paddingTop="16dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/profile_third_icon_value_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/ic_tags"
+            android:drawablePadding="6dp"
+            android:drawableStart="@drawable/ic_tags"
+            android:gravity="center"
+            android:textColor="@color/black_54"
+            android:textSize="14sp"
+            tools:text="3K" />
+
+        <TextView
+            android:id="@+id/profile_third_icon_text_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:gravity="center"
+            android:text="@string/profile_interests_label"
+            android:textColor="@color/black_54"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+</RelativeLayout>

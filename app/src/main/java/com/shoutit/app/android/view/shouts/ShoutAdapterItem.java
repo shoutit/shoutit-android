@@ -67,7 +67,7 @@ public class ShoutAdapterItem implements BaseAdapterItem {
     @IdRes
     @NonNull
     public Optional<Integer> getCountryResId() {
-        return ResourcesHelper.getCountryResId(context, shout);
+        return ResourcesHelper.getCountryResId(context, shout.getLocation());
     }
 
     public void onShoutSelected() {

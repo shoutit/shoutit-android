@@ -1,6 +1,5 @@
 package com.shoutit.app.android.view.main;
 
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IdRes;
@@ -17,12 +16,15 @@ import com.google.common.collect.ImmutableList;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.utils.BlurTransform;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.view.discover.DiscoverFragment;
 import com.shoutit.app.android.view.home.HomeFragment;
 import com.shoutit.app.android.view.location.LocationActivity;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
+import com.shoutit.app.android.view.profile.ProfileActivity;
+import com.shoutit.app.android.view.profile.myprofile.MyProfileActivity;
 import com.shoutit.app.android.view.settings.SettingsActivity;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -148,7 +150,6 @@ public class MenuHandler {
         };
     }
 
-    @Nullable
     @OnClick({R.id.menu_home, R.id.menu_discover, R.id.menu_browse, R.id.menu_chat,
             R.id.menu_orders, R.id.menu_settings, R.id.menu_help, R.id.menu_invite_frirends})
     public void onMenuItemSelected(View view) {
@@ -218,7 +219,11 @@ public class MenuHandler {
     @OnClick({R.id.menu_avatar_iv, R.id.menu_user_name_tv})
     public void startUserProfile() {
         if (userPreferences.isNormalUser()) {
-            Toast.makeText(rxActivity, "Not implemented yet", Toast.LENGTH_SHORT).show();
+            rxActivity.startActivity(ProfileActivity.newIntent(
+                    rxActivity,
+                    userPreferences.getUser().getUsername(),
+                    ProfileType.USER,
+                    MyProfileActivity.class));
         } else {
             showLoginActivity();
         }
@@ -268,7 +273,7 @@ public class MenuHandler {
 
     @NonNull
     private Action1<String> loadAvatarAction() {
-        final Target roundedTarget = PicassoHelper.getRoundedBitmapWithStrokeTarget(
+        final Target roundedTarget = PicassoHelper.getCircularBitmapWithStrokeTarget(
                 avatarImageView,
                 rxActivity.getResources().getDimensionPixelSize(R.dimen.side_menu_avatar_stroke_size)
         );

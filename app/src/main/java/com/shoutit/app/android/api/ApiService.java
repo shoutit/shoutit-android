@@ -28,6 +28,7 @@ import java.util.List;
 
 import okhttp3.ResponseBody;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
@@ -124,6 +125,17 @@ public interface ApiService {
 
     @PATCH("users/me")
     Observable<User> updateUser(@Body UpdateUserRequest updateUserRequest);
+
+
+    /** Profile **/
+    @POST("profiles/{username}/listen")
+    Observable<ResponseBody> listenProfile(@Path("username") String username);
+
+    @DELETE("profiles/{username}/listen")
+    Observable<ResponseBody> unlistenProfile(@Path("username") String username);
+
+    @GET("profiles/{user_name}")
+    Observable<User> getProfile(@Path("user_name") String userName);
 
 
     /**
