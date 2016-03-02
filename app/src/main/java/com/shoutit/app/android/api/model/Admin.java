@@ -2,10 +2,10 @@ package com.shoutit.app.android.api.model;
 
 import com.google.common.base.Objects;
 
-public class Page implements ProfileType {
+public class Admin implements ProfileType {
     private final String id;
     private final String type;
-    private final String username;
+    private final String userName;
     private final String name;
     private final String firstName;
     private final String lastName;
@@ -15,11 +15,11 @@ public class Page implements ProfileType {
     private final boolean isListening;
     private final int listenersCount;
 
-    public Page(String id, String type, String username, String name, String firstName,
+    public Admin(String id, String type, String userName, String name, String firstName,
                 String lastName, boolean isActivated, String image, String cover, boolean isListening, int listenersCount) {
         this.id = id;
         this.type = type;
-        this.username = username;
+        this.userName = userName;
         this.name = name;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -40,7 +40,7 @@ public class Page implements ProfileType {
     }
 
     public String getUsername() {
-        return username;
+        return userName;
     }
 
     public String getName() {
@@ -79,29 +79,24 @@ public class Page implements ProfileType {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Page)) return false;
-        final Page page = (Page) o;
-        return isActivated == page.isActivated &&
-                isListening == page.isListening &&
-                listenersCount == page.listenersCount &&
-                Objects.equal(id, page.id) &&
-                Objects.equal(type, page.type) &&
-                Objects.equal(username, page.username) &&
-                Objects.equal(name, page.name) &&
-                Objects.equal(firstName, page.firstName) &&
-                Objects.equal(lastName, page.lastName) &&
-                Objects.equal(image, page.image) &&
-                Objects.equal(cover, page.cover);
+        if (!(o instanceof Admin)) return false;
+        final Admin admin = (Admin) o;
+        return isActivated == admin.isActivated &&
+                isListening == admin.isListening &&
+                listenersCount == admin.listenersCount &&
+                Objects.equal(id, admin.id) &&
+                Objects.equal(type, admin.type) &&
+                Objects.equal(userName, admin.userName) &&
+                Objects.equal(name, admin.name) &&
+                Objects.equal(firstName, admin.firstName) &&
+                Objects.equal(lastName, admin.lastName) &&
+                Objects.equal(image, admin.image) &&
+                Objects.equal(cover, admin.cover);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount);
-    }
-
-    public static Page withIsListening(Page page, boolean isListening) {
-        int listenersCount = isListening ? page.listenersCount + 1 : page.listenersCount - 1;
-        return new Page(page.id, page.type, page.username, page.name, page.firstName,
-                page.lastName, page.isActivated, page.image, page.cover, isListening, listenersCount);
+        return Objects.hashCode(id, type, userName, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount);
     }
 }
+

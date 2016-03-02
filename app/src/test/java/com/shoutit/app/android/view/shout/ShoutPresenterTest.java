@@ -53,7 +53,7 @@ public class ShoutPresenterTest {
         when(shoutsDao.getRelatedShoutsObservable(any(RelatedShoutsPointer.class)))
                 .thenReturn(Observable.just(ResponseOrError.fromData(new ShoutsResponse(1, "z", "z", Lists.newArrayList(getShout())))));
         when(userPreferences.getUserObservable())
-                .thenReturn(Observable.just(new User("z", null, null, null, null, null, null, null, false, null, null, false, false, null, 2, null, null, 1, null)));
+                .thenReturn(Observable.just(new User("z", null, null, null, null, null, null, null, false, null, null, false, false, false, null, 1, null, null, 1, null)));
         when(userPreferences.isNormalUser())
                 .thenReturn(true);
 
@@ -154,11 +154,11 @@ public class ShoutPresenterTest {
     }
 
     private Shout getShout() {
-        return new Shout("id", null, null, null, null, null, null, 1, 2, null, null, null, getUser(), null, null, 1, null, null);
+        return new Shout("id", null, null, null, null, null, null, 1, 2, null, null, null, getUser(), null, null, 1, null);
     }
 
     private User getUser() {
-        return new User("id", null, null, null, null, null, null, null, false, null, null, false, false, null, 1, null, null, 0, null);
+        return new User("id", null, null, null, null, null, null, null, false, null, null, false, false, false, null, 1, null, null, 0, null);
     }
 
 

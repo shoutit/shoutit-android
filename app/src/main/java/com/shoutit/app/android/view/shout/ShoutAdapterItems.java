@@ -118,17 +118,17 @@ public class ShoutAdapterItems {
 
     public static class VisitProfileAdapterItem implements BaseAdapterItem {
         @Nonnull
-        private final Observer<String> visitProfileObserver;
+        private final Observer<User> visitProfileObserver;
         @Nonnull
         private final User user;
 
-        public VisitProfileAdapterItem(@Nonnull Observer<String> visitProfileObserver, @Nonnull User user) {
+        public VisitProfileAdapterItem(@Nonnull Observer<User> visitProfileObserver, @Nonnull User user) {
             this.visitProfileObserver = visitProfileObserver;
             this.user = user;
         }
 
         public void onViewUserProfileClicked() {
-            visitProfileObserver.onNext(user.getUsername());
+            visitProfileObserver.onNext(user);
         }
 
         @Nonnull

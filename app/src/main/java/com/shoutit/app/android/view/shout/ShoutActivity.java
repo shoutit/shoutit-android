@@ -24,9 +24,15 @@ import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.model.ProfileType;
+import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.view.profile.myprofile.MyProfileActivity;
+import com.shoutit.app.android.view.profile.userprofile.UserProfileActivity;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -66,6 +72,8 @@ public class ShoutActivity extends BaseActivity {
     ShoutPresenter presenter;
     @Inject
     ShoutAdapter adapter;
+    @Inject
+    UserPreferences userPreferences;
 
     public static Intent newIntent(@Nonnull Context context, @Nonnull String shoutId) {
         return new Intent(context, ShoutActivity.class)
@@ -135,11 +143,15 @@ public class ShoutActivity extends BaseActivity {
                 });
 
         presenter.getVisitProfileObservable()
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
+                .compose(this.<User>bindToLifecycle())
+                .subscribe(new Action1<User>() {
                     @Override
-                    public void call(String userName) {
-                        Toast.makeText(ShoutActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
+                    public void call(User user) {
+                        final User currentUser = userPreferences.getUser();
+                        final boolean isMyProfile = currentUser != null && user.getUsername().equals(currentUser.getUsername());
+                        startActivity(UserProfileActivity.newIntent(ShoutActivity.this,
+                                user.getUsername(), user.getType(),
+                                isMyProfile ? MyProfileActivity.class : UserProfileActivity.class));
                     }
                 });
 

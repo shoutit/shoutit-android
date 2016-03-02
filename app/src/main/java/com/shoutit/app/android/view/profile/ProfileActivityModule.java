@@ -2,18 +2,22 @@ package com.shoutit.app.android.view.profile;
 
 import android.content.Context;
 
+import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.dagger.ActivityScope;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ShoutsDao;
+import com.shoutit.app.android.utils.PreferencesHelper;
 import com.shoutit.app.android.view.profile.myprofile.MyProfileAdapter;
 import com.shoutit.app.android.view.profile.myprofile.MyProfilePresenter;
+import com.shoutit.app.android.view.profile.userprofile.UserProfileAdapter;
+import com.shoutit.app.android.view.profile.userprofile.UserProfilePresenter;
 import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;
-import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
@@ -35,25 +39,23 @@ public class ProfileActivityModule {
     @Provides
     @ActivityScope
     public ProfilePresenter provideProfilePresenter(ShoutsDao shoutsDao, @ForActivity Context context,
-                                                      UserPreferences preferences, @UiScheduler Scheduler uiScheduler) {
-        final boolean isMyProfile = userName.equals(preferences.getUser().getUsername());
-        if (isMyProfile && profileType.equalsIgnoreCase(ProfileType.PROFILE)) {
-            return new MyProfilePresenter(userName, shoutsDao, context, preferences, uiScheduler);
+                                                    UserPreferences preferences, @UiScheduler Scheduler uiScheduler,
+                                                    @NetworkScheduler Scheduler networkScheduler, ApiService apiService,
+                                                    PreferencesHelper preferencesHelper) {
+        if (preferencesHelper.isMyProfile(userName) && profileType.equalsIgnoreCase(ProfileType.USER)) {
+            return new MyProfilePresenter(userName, shoutsDao, context, preferences, uiScheduler, networkScheduler, apiService);
         } else {
-            // TODO
-            return new MyProfilePresenter(userName, shoutsDao, context, preferences, uiScheduler);
+            return new UserProfilePresenter(userName, shoutsDao, context, preferences, uiScheduler, networkScheduler, apiService);
         }
     }
 
     @Provides
     @ActivityScope
-    public ProfileAdapter provideProfileAdapter(@ForActivity Context context, UserPreferences preferences, Picasso picasso) {
-        final boolean isMyProfile = userName.equals(preferences.getUser().getUsername());
-        if (isMyProfile && profileType.equalsIgnoreCase(ProfileType.PROFILE)) {
+    public ProfileAdapter provideProfileAdapter(@ForActivity Context context, Picasso picasso, PreferencesHelper preferencesHelper) {
+        if (preferencesHelper.isMyProfile(userName) && profileType.equalsIgnoreCase(ProfileType.USER)) {
             return new MyProfileAdapter(context, picasso);
         } else {
-            // TODO
-            return new MyProfileAdapter(context, picasso);
+            return new UserProfileAdapter(context, picasso);
         }
     }
 }

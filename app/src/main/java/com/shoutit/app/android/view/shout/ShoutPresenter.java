@@ -50,7 +50,7 @@ public class ShoutPresenter {
     private PublishSubject<String> userShoutSelectedSubject = PublishSubject.create();
     private PublishSubject<String> relatedShoutSelectedSubject = PublishSubject.create();
     private PublishSubject<String> seeAllRelatedShoutSubject = PublishSubject.create();
-    private PublishSubject<String> visitProfileSubject = PublishSubject.create();
+    private PublishSubject<User> visitProfileSubject = PublishSubject.create();
 
     @Nonnull
     private final Scheduler uiScheduler;
@@ -74,7 +74,7 @@ public class ShoutPresenter {
                 .map(new Func1<Shout, String>() {
                     @Override
                     public String call(Shout shout) {
-                        return shout.getUser().getUsername();
+                        return shout.getProfile().getUsername();
                     }
                 })
                 .compose(ObservableExtensions.<String>behaviorRefCount());
@@ -184,7 +184,7 @@ public class ShoutPresenter {
 
                         builder.add(shout);
 
-                        final User user = shout.getShout().getUser();
+                        final User user = shout.getShout().getProfile();
                         if (!userShouts.isEmpty()) {
                             builder.add(new HeaderAdapterItem(context.getString(R.string.shout_user_shouts_header, user.getName())))
                                     .addAll(userShouts);
@@ -271,7 +271,7 @@ public class ShoutPresenter {
     }
 
     @Nonnull
-    public Observable<String> getVisitProfileObservable() {
+    public Observable<User> getVisitProfileObservable() {
         return visitProfileSubject;
     }
 

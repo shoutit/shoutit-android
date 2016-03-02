@@ -80,7 +80,7 @@ public class RelatedShoutsAdapter extends BaseAdapter {
             this.item = item;
             final Shout shout = item.getShout();
             titleTextView.setText(shout.getTitle());
-            nameTextView.setText(shout.getUser().getName());
+            nameTextView.setText(shout.getProfile().getName());
             final String price = PriceUtils.formatPrice(shout.getPrice());
             priceTextView.setText(context.getString(
                     R.string.price_with_currency, price, shout.getCurrency())

@@ -17,7 +17,6 @@ import android.view.animation.AccelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.jakewharton.rxbinding.view.RxView;
@@ -54,8 +53,8 @@ public class ProfileActivity extends BaseActivity {
     ProgressBar progressBar;
     @Bind(R.id.profile_fragment_avatar)
     ImageView avatarImageView;
-    @Bind(R.id.app_bar)
-    AppBarLayout appBarLayout;
+    @Bind(R.id.profile_app_bar)
+    protected AppBarLayout appBarLayout;
     @Bind(R.id.profile_fragment_toolbar_title)
     TextView toolbarTitle;
     @Bind(R.id.profile_fragment_toolbar_subtitle)
@@ -89,8 +88,8 @@ public class ProfileActivity extends BaseActivity {
         setContentView(R.layout.activity_profile);
         ButterKnife.bind(this);
 
-        handleAppBarScrollAnimation();
         setUpToolbar();
+        handleAppBarScrollAnimation();
         setUpAdapter();
 
         presenter
@@ -123,18 +122,9 @@ public class ProfileActivity extends BaseActivity {
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(RxTextView.text(toolbarSubtitle));
 
-        presenter.getShoutsErrorsResponse()
+        presenter.getErrorObservable()
                 .compose(this.<Throwable>bindToLifecycle())
                 .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(this)));
-
-        presenter.getSectionItemSelectedObservable()
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String s) {
-                        Toast.makeText(ProfileActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
-                    }
-                });
 
         presenter.getShareObservable()
                 .compose(this.<String>bindToLifecycle())
@@ -148,17 +138,24 @@ public class ProfileActivity extends BaseActivity {
                         startActivity(ShoutActivity.newIntent(ProfileActivity.this, shoutId));
                     }
                 });
+
+        presenter.getActionOnlyForLoggedInUserObservable()
+                .compose(bindToLifecycle())
+                .subscribe(ColoredSnackBar.errorSnackBarAction(
+                        ColoredSnackBar.contentView(ProfileActivity.this),
+                        R.string.error_action_only_for_logged_in_user));
     }
 
     private void setUpToolbar() {
         setSupportActionBar(toolbar);
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle(null);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.base_menu, menu);
+        getMenuInflater().inflate(R.menu.menu_profile, menu);
         return super.onCreateOptionsMenu(menu);
     }
 

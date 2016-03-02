@@ -15,6 +15,8 @@
     <string name="error_connection">Ooops, probably there is no Internet connection</string>
     <string name="error_email_not_found">The email or username you entered do not belong to any account.</string>
     <string name="error_wrong_email_or_password">Wrong email or password</string>
+    <string name="error_action_only_for_logged_in_user">Only for logged in users</string>
+
 
     <!-- Permissions -->
     <string name="permission_location_explanation">We need your location to prepare appropriate content</string>
@@ -208,5 +210,9 @@
     <string name="profile_listeners">%1$s Listeners</string>
     <string name="profile_listeners_label">Listeners</string>
     <string name="profile_see_all_shouts">See all shouts</string>
-
+    <string name="profile_user_shouts_header">%1$s shouts</string>
+    <string name="profile_chat_label">Chat</string>
+    <string name="profile_listen_label">Listen</string>
+    <string name="profile_stop_listening_label">Stop Listening</string>
+    <string name="profile_report">Report</string>
 </resources>

@@ -22,6 +22,14 @@ public class Listening {
         return tags;
     }
 
+    public int getPages() {
+        return pages;
+    }
+
+    public int getUsers() {
+        return users;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
