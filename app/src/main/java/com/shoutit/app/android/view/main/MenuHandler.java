@@ -256,8 +256,6 @@ public class MenuHandler {
             @Override
             public void call(String coverUrl) {
                 picasso.load(coverUrl)
-                        .error(R.drawable.pattern_bg)
-                        .placeholder(R.drawable.pattern_bg)
                         .fit()
                         .centerCrop()
                         .transform(blurTransformation)
