@@ -5,7 +5,7 @@ import java.text.DecimalFormat;
 public class PriceUtils {
 
     public static String formatPrice(long price) {
-        final float formattedPrice = price / 100;
+        final float formattedPrice = (float) price / 100;
         return new DecimalFormat("#.##").format(formattedPrice);
     }
 }
