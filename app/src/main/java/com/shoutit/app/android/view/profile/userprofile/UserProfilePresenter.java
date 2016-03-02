@@ -26,7 +26,6 @@ import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Func1;
-import rx.functions.Func2;
 import rx.subjects.PublishSubject;
 
 public class UserProfilePresenter extends ProfilePresenter {
@@ -48,7 +47,7 @@ public class UserProfilePresenter extends ProfilePresenter {
                                 @Nonnull final ApiService apiService) {
         super(userName, shoutsDao, context, userPreferences, uiScheduler, networkScheduler, apiService);
 
-        final Observable<ResponseOrError<User>> userRequestObservable = apiService.getUser(userName)
+        final Observable<ResponseOrError<User>> userRequestObservable = apiService.getProfile(userName)
                 .subscribeOn(networkScheduler)
                 .compose(ResponseOrError.<User>toResponseOrErrorObservable())
                 .compose(ObservableExtensions.<ResponseOrError<User>>behaviorRefCount());
@@ -60,12 +59,12 @@ public class UserProfilePresenter extends ProfilePresenter {
                     public Observable<ResponseOrError<User>> call(final User user) {
                         final Observable<ResponseOrError<ResponseBody>> request;
                         if (user.isListening()) {
-                             request = apiService.unlisten(user.getUsername())
+                             request = apiService.unlistenProfile(user.getUsername())
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
                                     .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
                         } else {
-                            request = apiService.listen(user.getUsername())
+                            request = apiService.listenProfile(user.getUsername())
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
                                     .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
@@ -78,7 +77,7 @@ public class UserProfilePresenter extends ProfilePresenter {
                                     return ResponseOrError.fromData(User.listenedUser(user, !user.isListening()));
                                 } else {
                                     errorsSubject.onNext(new Throwable());
-                                    // On error return current user in order to select/deselect already deselected/selected 'listen' icon
+                                    // On error return current user in order to select/deselect already deselected/selected 'listenProfile' icon
                                     return ResponseOrError.fromData(user);
                                 }
                             }

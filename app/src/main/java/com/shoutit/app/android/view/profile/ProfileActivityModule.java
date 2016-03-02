@@ -17,7 +17,6 @@ import com.shoutit.app.android.view.profile.userprofile.UserProfilePresenter;
 import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;
-import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
@@ -42,7 +41,7 @@ public class ProfileActivityModule {
                                                     UserPreferences preferences, @UiScheduler Scheduler uiScheduler,
                                                     @NetworkScheduler Scheduler networkScheduler, ApiService apiService) {
         final boolean isMyProfile = userName.equals(preferences.getUser().getUsername());
-        if (isMyProfile && profileType.equalsIgnoreCase(ProfileType.PROFILE)) {
+        if (isMyProfile && profileType.equalsIgnoreCase(ProfileType.USER)) {
             return new MyProfilePresenter(userName, shoutsDao, context, preferences, uiScheduler, networkScheduler, apiService);
         } else {
             return new UserProfilePresenter(userName, shoutsDao, context, preferences, uiScheduler, networkScheduler, apiService);
@@ -53,7 +52,7 @@ public class ProfileActivityModule {
     @ActivityScope
     public ProfileAdapter provideProfileAdapter(@ForActivity Context context, UserPreferences preferences, Picasso picasso) {
         final boolean isMyProfile = userName.equals(preferences.getUser().getUsername());
-        if (isMyProfile && profileType.equalsIgnoreCase(ProfileType.PROFILE)) {
+        if (isMyProfile && profileType.equalsIgnoreCase(ProfileType.USER)) {
             return new MyProfileAdapter(context, picasso);
         } else {
             return new UserProfileAdapter(context, picasso);

@@ -125,12 +125,12 @@ public abstract class ProfilePresenter {
 
                         Observable<ResponseOrError<ResponseBody>> listenRequestObservable;
                         if (isListeningToProfile) {
-                            listenRequestObservable = apiService.unlisten(userName)
+                            listenRequestObservable = apiService.unlistenProfile(userName)
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
                                     .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
                         } else {
-                            listenRequestObservable = apiService.listen(userName)
+                            listenRequestObservable = apiService.listenProfile(userName)
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
                                     .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
@@ -144,7 +144,7 @@ public abstract class ProfilePresenter {
                                             return updateUserWithChangedPageItems(userWithItemToListen);
                                         } else {
                                             errorsSubject.onNext(new Throwable());
-                                            // On error return current user in order to select/deselect already deselected/selected item to listen
+                                            // On error return current user in order to select/deselect already deselected/selected item to listenProfile
                                             return userWithItemToListen.getCurrentProfileUser();
                                         }
                                     }
@@ -320,13 +320,13 @@ public abstract class ProfilePresenter {
 
     public String getSectionHeaderTitle(User user) {
         switch (user.getType()) {
-            case ProfileType.PROFILE:
+            case ProfileType.USER:
                 return isMyProfile ? context.getString(R.string.profile_my_pages) :
                         context.getString(R.string.profile_user_pages, user.getName()).toUpperCase();
             case ProfileType.PAGE:
                 return context.getString(R.string.profile_page_admins, user.getName()).toUpperCase();
             default:
-                throw new RuntimeException("Unknown profile type");
+                throw new RuntimeException("Unknown profile type: " + user.getType());
         }
     }
 

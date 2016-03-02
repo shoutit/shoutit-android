@@ -150,7 +150,6 @@ public class MenuHandler {
         };
     }
 
-    @Nullable
     @OnClick({R.id.menu_home, R.id.menu_discover, R.id.menu_browse, R.id.menu_chat,
             R.id.menu_orders, R.id.menu_settings, R.id.menu_help, R.id.menu_invite_frirends})
     public void onMenuItemSelected(View view) {
@@ -223,7 +222,7 @@ public class MenuHandler {
             rxActivity.startActivity(ProfileActivity.newIntent(
                     rxActivity,
                     userPreferences.getUser().getUsername(),
-                    ProfileType.PROFILE,
+                    ProfileType.USER,
                     MyProfileActivity.class));
         } else {
             showLoginActivity();

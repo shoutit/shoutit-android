@@ -194,7 +194,7 @@ public class ProfileAdapterItems {
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            // Done intentionally, cuz the same User object is returned if listen profile fail
+            // Done intentionally, cuz the same User object is returned if listenProfile profile fail
             return false;
         }
 

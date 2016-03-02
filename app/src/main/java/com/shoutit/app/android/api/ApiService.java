@@ -62,7 +62,7 @@ public interface ApiService {
                                                      @Query("page") @Nullable Integer page,
                                                      @Query("page_size") @Nullable Integer pageSize);
 
-    @GET("/v3/shouts/{id}")
+    @GET("shouts/{id}")
     Observable<Shout> shout(@Path("id") String shoutId);
 
     @GET("shouts")
@@ -83,7 +83,7 @@ public interface ApiService {
     @POST("oauth2/access_token")
     Observable<SignResponse> login(@Body EmailLoginRequest request);
 
-    @POST("/v3/oauth2/access_token")
+    @POST("oauth2/access_token")
     Observable<SignResponse> loginGuest(@Body GuestSignupRequest request);
 
     @POST("oauth2/access_token")
@@ -122,11 +122,17 @@ public interface ApiService {
     @PATCH("users/me")
     Observable<User> updateUser(@Body UpdateUserRequest updateUserRequest);
 
-    @POST("/v3/users/{username}/listen")
-    Observable<ResponseBody> listen(@Path("username") String username);
 
-    @DELETE("/v3/users/{username}/listen")
-    Observable<ResponseBody> unlisten(@Path("username") String username);
+
+    /** Profile **/
+    @POST("profiles/{username}/listenProfile")
+    Observable<ResponseBody> listenProfile(@Path("username") String username);
+
+    @DELETE("profiles/{username}/listenProfile")
+    Observable<ResponseBody> unlistenProfile(@Path("username") String username);
+
+    @GET("profiles/{user_name}")
+    Observable<User> getProfile(@Path("user_name") String userName);
 
 
     /**

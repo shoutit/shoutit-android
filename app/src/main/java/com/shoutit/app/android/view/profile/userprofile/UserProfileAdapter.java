@@ -110,7 +110,7 @@ public class UserProfileAdapter extends ProfileAdapter {
             item.onListenActionClicked();
         }
 
-        @OnClick(R.id.profile_chat_ll)
+        @OnClick(R.id.profile_second_icon_text_tv)
         public void onChatActionClicked() {
             item.onChatActionClicked();
         }

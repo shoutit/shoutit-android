@@ -1,17 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:background="@android:color/white"
     android:orientation="horizontal"
-    android:paddingTop="16dp"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp"
+    android:paddingTop="16dp">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="120dp"
         android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/profile_second_icon_text_tv"
+        android:layout_toStartOf="@+id/profile_second_icon_text_tv"
+        android:background="?selectableItemBackground"
         android:gravity="center"
-        android:layout_weight="1"
         android:orientation="vertical">
 
         <TextView
@@ -30,43 +34,39 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
+            android:ellipsize="end"
             android:gravity="center"
             android:maxLines="1"
-            android:ellipsize="end"
             android:text="@string/profile_listeners_label"
             android:textColor="@color/black_54"
             android:textSize="14sp" />
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/profile_chat_ll"
-        android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/profile_second_icon_text_tv"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginTop="2dp"
+        android:drawableTop="@drawable/ic_chat_gray"
+        android:background="?selectableItemBackground"
+        android:ellipsize="end"
         android:gravity="center"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/profile_second_icon_text_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:maxLines="1"
-            android:drawableTop="@drawable/ic_chat_gray"
-            android:ellipsize="end"
-            android:gravity="center"
-            android:text="@string/profile_chat_label"
-            android:textColor="@color/black_54"
-            android:textSize="14sp" />
-
-    </LinearLayout>
+        android:maxLines="1"
+        android:text="@string/profile_chat_label"
+        android:textColor="@color/black_54"
+        android:textSize="14sp" />
 
     <LinearLayout
         android:id="@+id/profile_listen_action_container"
-        android:layout_width="wrap_content"
+        android:layout_width="120dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
+        android:layout_toEndOf="@+id/profile_second_icon_text_tv"
+        android:layout_toRightOf="@+id/profile_second_icon_text_tv"
+        android:background="?selectableItemBackground"
         android:gravity="center"
         android:orientation="vertical">
 
@@ -74,8 +74,8 @@
             android:id="@+id/profile_listen_icon_iv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_listening_off"
             android:gravity="center"
+            android:src="@drawable/ic_listening_off"
             android:textColor="@color/black_54"
             android:textSize="14sp" />
 
@@ -85,12 +85,12 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:gravity="center"
-            android:text="@string/profile_listen_label"
             android:maxLines="1"
-            android:ellipsize="end"
+            android:text="@string/profile_listen_label"
             android:textColor="@color/black_54"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            tools:text="Stio Listening lol" />
 
     </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout>
