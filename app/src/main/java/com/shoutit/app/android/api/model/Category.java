@@ -14,13 +14,14 @@ public class Category {
     private final String icon;
 
     @NonNull
-    private final Tag mainTag;
+    private final String image;
 
-    public Category(@NonNull String name, @NonNull String slug, @NonNull String icon, @NonNull Tag mainTag) {
+
+    public Category(@NonNull String name, @NonNull String slug, @NonNull String icon, @NonNull String image) {
         this.name = name;
         this.slug = slug;
         this.icon = icon;
-        this.mainTag = mainTag;
+        this.image = image;
     }
 
     @NonNull
@@ -34,12 +35,12 @@ public class Category {
     }
 
     @NonNull
-    public Tag getMainTag() {
-        return mainTag;
+    public String getIcon() {
+        return icon;
     }
 
     @NonNull
-    public String getIcon() {
-        return icon;
+    public String getImage() {
+        return image;
     }
 }

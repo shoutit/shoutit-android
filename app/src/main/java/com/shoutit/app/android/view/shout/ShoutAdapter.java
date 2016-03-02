@@ -118,7 +118,7 @@ public class ShoutAdapter extends BaseAdapter {
         public void bind(@Nonnull ShoutAdapterItems.MainShoutAdapterItem item) {
             this.item = item;
             final Shout shout = item.getShout();
-            final User user = shout.getUser();
+            final User user = shout.getProfile();
 
             picasso.load(user.getImage())
                     .resizeDimen(R.dimen.shout_avatar_size, R.dimen.shout_avatar_size)
@@ -138,7 +138,14 @@ public class ShoutAdapter extends BaseAdapter {
             labelTextView.setText(shout.getTypeResId());
 
             titleTextView.setText(shout.getTitle());
-            priceTextView.setText(context.getString(R.string.price_with_currency, shout.getPrice(), shout.getCurrency()));
+
+            final String formattedPrice =  PriceUtils.formatPrice(shout.getPrice());
+            if (shout.getCurrency() != null) {
+                priceTextView.setText(context.getString(R.string.price_with_currency, formattedPrice, shout.getCurrency()));
+            } else {
+                priceTextView.setText(formattedPrice);
+            }
+
             if (shout.getNumber() == 0) {
                 availableTextView.setText(context.getString(R.string.shout_available, (int) shout.getNumber()));
             } else {
@@ -228,7 +235,7 @@ public class ShoutAdapter extends BaseAdapter {
             this.item = item;
             final Shout shout = item.getShout();
             titleTextView.setText(shout.getTitle());
-            nameTextView.setText(shout.getUser().getName());
+            nameTextView.setText(shout.getProfile().getName());
             final String price = PriceUtils.formatPrice(shout.getPrice());
             cardPriceTextView.setText(context.getString(
                     R.string.price_with_currency, price, shout.getCurrency()));

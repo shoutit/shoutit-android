@@ -5,6 +5,8 @@ import android.support.annotation.Nullable;
 
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.ChangePasswordRequest;
+import com.shoutit.app.android.api.model.CreateRequestShoutRequest;
+import com.shoutit.app.android.api.model.Currency;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
@@ -61,7 +63,7 @@ public interface ApiService {
                                                      @Query("page") @Nullable Integer page,
                                                      @Query("page_size") @Nullable Integer pageSize);
 
-    @GET("/v3/shouts/{id}")
+    @GET("shouts/{id}")
     Observable<Shout> shout(@Path("id") String shoutId);
 
     @GET("shouts")
@@ -74,6 +76,8 @@ public interface ApiService {
                                              @Query("page") Integer page,
                                              @Query("page_size") Integer pageSize);
 
+    @GET("shouts/categories")
+    Observable<List<Category>> categories();
 
 
     /**
@@ -82,7 +86,7 @@ public interface ApiService {
     @POST("oauth2/access_token")
     Observable<SignResponse> login(@Body EmailLoginRequest request);
 
-    @POST("/v3/oauth2/access_token")
+    @POST("oauth2/access_token")
     Observable<SignResponse> loginGuest(@Body GuestSignupRequest request);
 
     @POST("oauth2/access_token")
@@ -122,7 +126,6 @@ public interface ApiService {
     Observable<User> updateUser(@Body UpdateUserRequest updateUserRequest);
 
 
-
     /**
      * Misc
      **/
@@ -132,9 +135,6 @@ public interface ApiService {
     @GET("misc/geocode?latlng=0,0")
     Observable<UserLocation> geocodeDefault();
 
-    @GET("misc/categories")
-    Observable<List<Category>> categories();
-
 
     /**
      * Auth
@@ -142,4 +142,13 @@ public interface ApiService {
     @POST("auth/change_password")
     Observable<ResponseBody> changePassword(@Body ChangePasswordRequest changePasswordRequest);
 
+
+    /**
+     * create shout
+     */
+    @POST("/v3/shouts")
+    Observable<ResponseBody> createShoutRequest(@Body CreateRequestShoutRequest request);
+
+    @GET("misc/currencies")
+    Observable<List<Currency>> getCurrencies();
 }

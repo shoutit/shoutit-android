@@ -4,6 +4,7 @@ import android.support.annotation.StringRes;
 
 import com.google.common.base.Objects;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.utils.PriceUtils;
 
 import java.util.List;
 
@@ -21,22 +22,21 @@ public class Shout {
     private final UserLocation location;
     private final String title;
     private final String text;
-    private final float price;
+    private final long price;
     private final float number;
     private final String currency;
     private final String thumbnail;
     private final String videoUrl;
-    private final User user;
+    private final User profile;
     private final Category category;
-    private final List<Tag> tags;
     private final long datePublished;
     private final List<String> images;
     private final List<Filter> filters;
 
     public Shout(@Nonnull String id, String apiUrl, String webUrl, String type,
-                 UserLocation location, String title, String text, float price, float number,
-                 String currency, String thumbnail, String videoUrl, User user,
-                 Category category, List<Tag> tags, long datePublished, List<String> images, List<Filter> filters) {
+                 UserLocation location, String title, String text, long price, float number,
+                 String currency, String thumbnail, String videoUrl, User profile,
+                 Category category, List<Filter> filters, long datePublished, List<String> images) {
         this.id = id;
         this.apiUrl = apiUrl;
         this.webUrl = webUrl;
@@ -49,9 +49,8 @@ public class Shout {
         this.currency = currency;
         this.thumbnail = thumbnail;
         this.videoUrl = videoUrl;
-        this.user = user;
+        this.profile = profile;
         this.category = category;
-        this.tags = tags;
         this.datePublished = datePublished;
         this.images = images;
         this.filters = filters;
@@ -109,19 +108,15 @@ public class Shout {
         return videoUrl;
     }
 
-    public User getUser() {
-        return user;
+    public User getProfile() {
+        return profile;
     }
 
     public Category getCategory() {
         return category;
     }
 
-    public List<Tag> getTags() {
-        return tags;
-    }
-
-    public float getPrice() {
+    public long getPrice() {
         return price;
     }
 
@@ -153,9 +148,8 @@ public class Shout {
                 Objects.equal(currency, shout.currency) &&
                 Objects.equal(thumbnail, shout.thumbnail) &&
                 Objects.equal(videoUrl, shout.videoUrl) &&
-                Objects.equal(user, shout.user) &&
+                Objects.equal(profile, shout.profile) &&
                 Objects.equal(category, shout.category) &&
-                Objects.equal(tags, shout.tags) &&
                 Objects.equal(datePublished, shout.datePublished) &&
                 Objects.equal(price, shout.price) &&
                 Objects.equal(images, shout.images);
@@ -164,6 +158,6 @@ public class Shout {
     @Override
     public int hashCode() {
         return Objects.hashCode(id, apiUrl, webUrl, type, location, title, text, price,
-                number, currency, thumbnail, videoUrl, user, category, tags, datePublished, images);
+                number, currency, thumbnail, videoUrl, profile, category, datePublished, images);
     }
 }

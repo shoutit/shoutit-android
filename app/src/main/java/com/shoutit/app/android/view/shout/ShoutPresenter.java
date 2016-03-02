@@ -73,7 +73,7 @@ public class ShoutPresenter {
                 .map(new Func1<Shout, String>() {
                     @Override
                     public String call(Shout shout) {
-                        return shout.getUser().getUsername();
+                        return shout.getProfile().getUsername();
                     }
                 })
                 .compose(ObservableExtensions.<String>behaviorRefCount());
@@ -183,7 +183,7 @@ public class ShoutPresenter {
 
                         builder.add(shout);
 
-                        final User user = shout.getShout().getUser();
+                        final User user = shout.getShout().getProfile();
                         if (!userShouts.isEmpty()) {
                             builder.add(new ShoutAdapterItems.HeaderAdapterItem(context.getString(R.string.shout_user_shouts_header, user.getName())))
                                     .addAll(userShouts);

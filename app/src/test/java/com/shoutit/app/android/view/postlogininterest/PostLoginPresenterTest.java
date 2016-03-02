@@ -44,7 +44,7 @@ public class PostLoginPresenterTest extends TestCase {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        mSubject = BehaviorSubject.<List<Category>>create(ImmutableList.of(new Category("name", "slug", "icon", new Tag("id", "name", "apiUrl", "image"))));
+        mSubject = BehaviorSubject.<List<Category>>create(ImmutableList.of(new Category("name", "slug", "icon", null)));
         when(mApiService.categories()).thenReturn(mSubject);
         mPostSubject = BehaviorSubject.create(new Object());
         when(mApiService.batchListen(any(TagsRequest.class))).thenReturn(mPostSubject);
