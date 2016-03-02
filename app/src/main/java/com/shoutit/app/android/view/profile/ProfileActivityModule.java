@@ -10,6 +10,7 @@ import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.dagger.ActivityScope;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ShoutsDao;
+import com.shoutit.app.android.utils.PreferencesHelper;
 import com.shoutit.app.android.view.profile.myprofile.MyProfileAdapter;
 import com.shoutit.app.android.view.profile.myprofile.MyProfilePresenter;
 import com.shoutit.app.android.view.profile.userprofile.UserProfileAdapter;
@@ -39,9 +40,9 @@ public class ProfileActivityModule {
     @ActivityScope
     public ProfilePresenter provideProfilePresenter(ShoutsDao shoutsDao, @ForActivity Context context,
                                                     UserPreferences preferences, @UiScheduler Scheduler uiScheduler,
-                                                    @NetworkScheduler Scheduler networkScheduler, ApiService apiService) {
-        final boolean isMyProfile = userName.equals(preferences.getUser().getUsername());
-        if (isMyProfile && profileType.equalsIgnoreCase(ProfileType.USER)) {
+                                                    @NetworkScheduler Scheduler networkScheduler, ApiService apiService,
+                                                    PreferencesHelper preferencesHelper) {
+        if (preferencesHelper.isMyProfile(userName) && profileType.equalsIgnoreCase(ProfileType.USER)) {
             return new MyProfilePresenter(userName, shoutsDao, context, preferences, uiScheduler, networkScheduler, apiService);
         } else {
             return new UserProfilePresenter(userName, shoutsDao, context, preferences, uiScheduler, networkScheduler, apiService);
@@ -50,9 +51,8 @@ public class ProfileActivityModule {
 
     @Provides
     @ActivityScope
-    public ProfileAdapter provideProfileAdapter(@ForActivity Context context, UserPreferences preferences, Picasso picasso) {
-        final boolean isMyProfile = userName.equals(preferences.getUser().getUsername());
-        if (isMyProfile && profileType.equalsIgnoreCase(ProfileType.USER)) {
+    public ProfileAdapter provideProfileAdapter(@ForActivity Context context, Picasso picasso, PreferencesHelper preferencesHelper) {
+        if (preferencesHelper.isMyProfile(userName) && profileType.equalsIgnoreCase(ProfileType.USER)) {
             return new MyProfileAdapter(context, picasso);
         } else {
             return new UserProfileAdapter(context, picasso);

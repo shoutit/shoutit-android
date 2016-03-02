@@ -37,7 +37,7 @@ public class MyProfilePresenter extends ProfilePresenter {
                               @Nonnull @UiScheduler Scheduler scheduler,
                               @Nonnull @NetworkScheduler Scheduler networkScheduler,
                               @Nonnull ApiService apiService) {
-        super(userName, shoutsDao, context, userPreferences, scheduler, networkScheduler, apiService);
+        super(userName, shoutsDao, context, userPreferences, true, scheduler, networkScheduler, apiService);
         initPresenter();
     }
 

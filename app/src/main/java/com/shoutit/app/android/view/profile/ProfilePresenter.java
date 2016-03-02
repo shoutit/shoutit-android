@@ -91,6 +91,7 @@ public abstract class ProfilePresenter {
                             @Nonnull final ShoutsDao shoutsDao,
                             @Nonnull @ForActivity final Context context,
                             @Nonnull UserPreferences userPreferences,
+                            boolean isMyProfile,
                             @Nonnull @UiScheduler Scheduler uiScheduler,
                             @Nonnull @NetworkScheduler Scheduler networkScheduler,
                             @Nonnull ApiService apiService) {
@@ -101,7 +102,7 @@ public abstract class ProfilePresenter {
         this.uiScheduler = uiScheduler;
         this.networkScheduler = networkScheduler;
         this.apiService = apiService;
-        isMyProfile = userName.equals(userPreferences.getUser().getUsername());
+        this.isMyProfile = isMyProfile;
     }
 
     /** Must be called after child constructor is finished **/
@@ -116,7 +117,7 @@ public abstract class ProfilePresenter {
                 .compose(ResponseOrError.<User>onlySuccess());
 
         final Observable<User> userWithUpdatedSectionItems = sectionItemListenSubject
-                .throttleFirst(2, TimeUnit.SECONDS)
+                .throttleFirst(1, TimeUnit.SECONDS)
                 .switchMap(new Func1<UserWithItemToListen, Observable<User>>() {
                     @Override
                     public Observable<User> call(final UserWithItemToListen userWithItemToListen) {
@@ -318,6 +319,7 @@ public abstract class ProfilePresenter {
     @Nonnull
     protected abstract Observable<ResponseOrError<User>> getUserObservable();
 
+    @Nonnull
     public String getSectionHeaderTitle(User user) {
         switch (user.getType()) {
             case ProfileType.USER:

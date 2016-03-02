@@ -87,6 +87,13 @@
 
             </android.support.v7.widget.Toolbar>
 
+            <View
+                android:id="@+id/profile_popup_menu_anchor_view"
+                android:layout_width="1dp"
+                android:layout_height="1dp"
+                android:background="@android:color/transparent"
+                android:layout_gravity="bottom|end|right"/>
+
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 

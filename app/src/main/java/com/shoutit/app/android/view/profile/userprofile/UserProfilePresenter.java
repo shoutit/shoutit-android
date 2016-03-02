@@ -45,7 +45,7 @@ public class UserProfilePresenter extends ProfilePresenter {
                                 @Nonnull @UiScheduler final Scheduler uiScheduler,
                                 @Nonnull @NetworkScheduler final Scheduler networkScheduler,
                                 @Nonnull final ApiService apiService) {
-        super(userName, shoutsDao, context, userPreferences, uiScheduler, networkScheduler, apiService);
+        super(userName, shoutsDao, context, userPreferences, false, uiScheduler, networkScheduler, apiService);
 
         final Observable<ResponseOrError<User>> userRequestObservable = apiService.getProfile(userName)
                 .subscribeOn(networkScheduler)
@@ -53,7 +53,7 @@ public class UserProfilePresenter extends ProfilePresenter {
                 .compose(ObservableExtensions.<ResponseOrError<User>>behaviorRefCount());
 
         final Observable<ResponseOrError<User>> updatedUserWithListening = onListenActionClickedSubject
-                .throttleFirst(2, TimeUnit.SECONDS)
+                .throttleFirst(1, TimeUnit.SECONDS)
                 .switchMap(new Func1<User, Observable<ResponseOrError<User>>>() {
                     @Override
                     public Observable<ResponseOrError<User>> call(final User user) {

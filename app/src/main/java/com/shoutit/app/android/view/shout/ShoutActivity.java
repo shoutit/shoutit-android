@@ -147,7 +147,8 @@ public class ShoutActivity extends BaseActivity {
                 .subscribe(new Action1<User>() {
                     @Override
                     public void call(User user) {
-                        final boolean isMyProfile = user.getUsername().equals(userPreferences.getUser().getUsername());
+                        final User currentUser = userPreferences.getUser();
+                        final boolean isMyProfile = currentUser != null && user.getUsername().equals(currentUser.getUsername());
                         startActivity(UserProfileActivity.newIntent(ShoutActivity.this,
                                 user.getUsername(), user.getType(),
                                 isMyProfile ? MyProfileActivity.class : UserProfileActivity.class));

@@ -128,10 +128,10 @@ public interface ApiService {
 
 
     /** Profile **/
-    @POST("profiles/{username}/listenProfile")
+    @POST("profiles/{username}/listen")
     Observable<ResponseBody> listenProfile(@Path("username") String username);
 
-    @DELETE("profiles/{username}/listenProfile")
+    @DELETE("profiles/{username}/listen")
     Observable<ResponseBody> unlistenProfile(@Path("username") String username);
 
     @GET("profiles/{user_name}")
