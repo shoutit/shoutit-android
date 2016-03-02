@@ -158,15 +158,15 @@
     </style>
 
     <style name="ShoutBottomBarItem">
-        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textAllCaps">true</item>
         <item name="android:maxLines">2</item>
-        <item name="android:gravity">center_vertical</item>
+        <item name="android:gravity">center</item>
         <item name="android:drawablePadding">8dp</item>
-        <item name="android:layout_weight">1</item>
+        <item name="android:padding">4dp</item>
     </style>
 
     <style name="ProfileInfo">
@@ -180,5 +180,7 @@
         <item name="android:paddingStart" tools:ignore="NewApi">16dp</item>
         <item name="android:paddingLeft">16dp</item>
     </style>
+
+    <style name="ShoutBottomBar" parent="ThemeOverlay.AppCompat.Dark"/>
 
 </resources>

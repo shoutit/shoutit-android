@@ -11,6 +11,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
@@ -43,6 +44,7 @@ public class ShoutPresenter {
     private final Observable<Throwable> errorObservable;
     private final Observable<Boolean> progressObservable;
     private final Observable<String> titleObservable;
+    private final Observable<Boolean> isUserShoutOwnerObservable;
 
     private PublishSubject<String> addToCartSubject = PublishSubject.create();
     private PublishSubject<String> userShoutSelectedSubject = PublishSubject.create();
@@ -57,7 +59,8 @@ public class ShoutPresenter {
     public ShoutPresenter(@Nonnull final ShoutsDao shoutsDao,
                           @Nonnull final String shoutId,
                           @Nonnull @ForActivity final Context context,
-                          @Nonnull @UiScheduler Scheduler uiScheduler) {
+                          @Nonnull @UiScheduler Scheduler uiScheduler,
+                          @Nonnull UserPreferences userPreferences) {
         this.uiScheduler = uiScheduler;
 
         /** Requests **/
@@ -67,7 +70,7 @@ public class ShoutPresenter {
         final Observable<Shout> successShoutResponse = shoutResponse
                 .compose(ResponseOrError.<Shout>onlySuccess());
 
-        final Observable<String> userNameObservable = successShoutResponse
+        final Observable<String> userNameObservable =  successShoutResponse
                 .map(new Func1<Shout, String>() {
                     @Override
                     public String call(Shout shout) {
@@ -218,6 +221,17 @@ public class ShoutPresenter {
                 allAdapterItemsObservable.map(Functions1.returnFalse()))
                 .startWith(true)
                 .observeOn(uiScheduler);
+
+        /** Others **/
+        isUserShoutOwnerObservable = Observable.zip(
+                userNameObservable, userPreferences.getUserObservable(), Observable.just(userPreferences.isNormalUser()),
+                new Func3<String, User, Boolean, Boolean>() {
+                    @Override
+                    public Boolean call(String shoutUser, User user, Boolean isNormalUser) {
+                        return isNormalUser && user.getUsername().equals(shoutUser);
+                    }
+                })
+                .first();
     }
 
     @Nonnull
@@ -264,6 +278,19 @@ public class ShoutPresenter {
     @Nonnull
     public Observable<String> getAddToCartSubject() {
         return addToCartSubject;
+    }
+
+    @Nonnull
+    public Observable<Boolean> getIsUserShoutOwnerObservable() {
+        return allAdapterItemsObservable
+                .first()
+                .flatMap(new Func1<List<BaseAdapterItem>, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> call(List<BaseAdapterItem> baseAdapterItems) {
+                        return isUserShoutOwnerObservable;
+                    }
+                })
+                .observeOn(uiScheduler);
     }
 }
 
