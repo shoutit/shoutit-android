@@ -138,6 +138,24 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
             }
         });
 
+        mCreateRequestTime.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
         mCreateRequestPresenter.registerListener(this);
     }
 

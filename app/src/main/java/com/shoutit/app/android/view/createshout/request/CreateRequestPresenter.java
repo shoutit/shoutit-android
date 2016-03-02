@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
+import android.support.v7.widget.PopupMenu;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.dagger.NetworkScheduler;
