@@ -234,4 +234,14 @@
     <string name="create_request_activity_title_too_short">Title must be at least 6 characters long</string>
     <string name="create_request_activity_price_empty">Price cannot be empty</string>
 
+    <!-- Edit Profile -->
+    <string name="edit_profile_hint_name">Name</string>
+    <string name="edit_profile_hint_username">Username</string>
+    <string name="edit_profile_hint_bio">Bio</string>
+    <string name="edit_profile_header_location">Location</string>
+    <string name="edit_profile_location_change">Change</string>
+    <string name="edit_profile_hint_website">Website</string>
+    <string name="edit_profile_menu_save">Save</string>
+    <string name="edit_profile_toolbar_title">Edit Profile</string>
+
 </resources>

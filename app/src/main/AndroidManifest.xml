@@ -72,6 +72,8 @@
         <activity android:name=".view.profile.userprofile.UserProfileActivity"
             android:theme="@style/TranslucentStatusBar"/>
 
+        <activity android:name=".view.editprofile.EditProfileActivity"/>
+
         <!-- Facebook -->
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"

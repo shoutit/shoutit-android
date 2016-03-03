@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/edit_profile_toolbar"
+                style="@style/AppTheme.BaseToolbarStyle"
+                android:layout_width="match_parent"
+                android:layout_height="?actionBarSize"
+                android:elevation="0dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:layout_below="@+id/edit_profile_toolbar"
+                android:background="@drawable/toolbar_drop_shadow" />
+
+            <FrameLayout
+                android:id="@+id/edit_profile_cover_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/edit_profile_toolbar">
+
+                <ImageView
+                    android:id="@+id/edit_profile_cover_iv"
+                    android:layout_width="match_parent"
+                    android:layout_height="202dp"
+                    android:background="@drawable/pattern_placeholder" />
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="202dp"
+                    android:background="@color/edit_profile_cover_dim"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_camera_large" />
+
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/edit_profile_cover_container"
+                android:orientation="vertical"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:paddingTop="50dp">
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/edit_profile_name_til"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:theme="@style/BlueEditText"
+                    app:hintTextAppearance="@style/BlueInputStyle">
+
+                    <EditText
+                        android:id="@+id/edit_profile_name_et"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/edit_profile_hint_name"
+                        android:imeOptions="actionNext"
+                        android:maxLines="1"
+                        android:nextFocusDown="@+id/edit_profile_username_et"
+                        android:textSize="16sp" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/edit_profile_username_til"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:theme="@style/BlueEditText"
+                    app:hintTextAppearance="@style/BlueInputStyle">
+
+                    <EditText
+                        android:id="@+id/edit_profile_username_et"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/edit_profile_hint_username"
+                        android:imeOptions="actionNext"
+                        android:maxLines="1"
+                        android:nextFocusDown="@+id/edit_profile_bio_et"
+                        android:textSize="16sp" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/edit_profile_bio_til"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:theme="@style/BlueEditText"
+                    app:counterEnabled="true"
+                    app:counterMaxLength="50"
+                    app:hintTextAppearance="@style/BlueInputStyle">
+
+                    <EditText
+                        android:id="@+id/edit_profile_bio_et"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/edit_profile_hint_bio"
+                        android:nextFocusDown="@+id/edit_profile_website_et"
+                        android:imeOptions="actionNext"
+                        android:maxLines="1"
+                        android:textSize="16sp" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="4dp"
+                    android:paddingStart="4dp"
+                    android:text="@string/edit_profile_header_location"
+                    android:textColor="@color/black_54"
+                    android:textSize="14sp" />
+
+                <RelativeLayout
+                    style="@style/Base.Widget.AppCompat.EditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/edit_profile_flag_iv"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_marginBottom="4dp"
+                        tools:src="@drawable/pl" />
+
+                    <TextView
+                        android:id="@+id/edit_profile_location_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="36dp"
+                        android:layout_marginStart="36dp"
+                        android:layout_toEndOf="@+id/edit_profile_flag_iv"
+                        android:layout_toRightOf="@+id/edit_profile_flag_iv"
+                        android:textColor="@color/black_87"
+                        android:textSize="14sp"
+                        tools:text="Dubai, United Arab Emirates" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBaseline="@+id/edit_profile_location_tv"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:fontFamily="sans-serif-medium"
+                        android:padding="4dp"
+                        android:text="@string/edit_profile_location_change"
+                        android:textAllCaps="true"
+                        android:textColor="@color/accent_blue"
+                        android:textSize="12dp" />
+
+                </RelativeLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/edit_profile_website_til"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:theme="@style/BlueEditText"
+                    app:hintTextAppearance="@style/BlueInputStyle">
+
+                    <EditText
+                        android:id="@+id/edit_profile_website_et"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/edit_profile_hint_website"
+                        android:imeOptions="actionDone"
+                        android:maxLines="1"
+                        android:textSize="16sp" />
+
+                </android.support.design.widget.TextInputLayout>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/edit_profile_avatar_iv"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:src="@drawable/ic_avatar_placeholder"
+            app:layout_anchor="@id/edit_profile_cover_iv"
+            app:layout_anchorGravity="bottom|start" />
+
+        <ImageView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/shape_avatar_dim"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_camera"
+            app:layout_anchor="@id/edit_profile_cover_iv"
+            app:layout_anchorGravity="bottom|start" />
+
+    </android.support.design.widget.CoordinatorLayout>
+
+</ScrollView>

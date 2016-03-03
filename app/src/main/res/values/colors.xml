@@ -7,7 +7,7 @@
 
     <!-- Global values -->
     <color name="default_bg_color">#f7f7f7</color>
-    <color name="black_87">#000000</color>
+    <color name="black_87">#de000000</color>
     <color name="black_54">#8a000000</color>
     <color name="black_38">#61000000</color>
     <color name="black_20">#34000000</color>
@@ -63,5 +63,8 @@
     <color name="profile_toolbar_subtitle">#b2ffffff</color>
     <color name="profile_cover_dim">#32000000</color>
     <color name="profile_section_name">#1D1D1D</color>
+
+    <!-- Edit Profile -->
+    <color name="edit_profile_cover_dim">#56000000</color>
 
 </resources>
