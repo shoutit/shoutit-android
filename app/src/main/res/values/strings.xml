@@ -243,5 +243,6 @@
     <string name="edit_profile_hint_website">Website</string>
     <string name="edit_profile_menu_save">Save</string>
     <string name="edit_profile_toolbar_title">Edit Profile</string>
+    <string name="edit_profile_country">%1$s, %2$s</string>
 
 </resources>
