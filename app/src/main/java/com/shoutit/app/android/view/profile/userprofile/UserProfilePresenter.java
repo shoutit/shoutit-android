@@ -112,7 +112,7 @@ public class UserProfilePresenter extends ProfilePresenter {
 
     @Override
     protected String getShoutsHeaderTitle(User user) {
-        return context.getString(R.string.shout_user_shouts_header, user.getName()).toUpperCase();
+        return context.getString(R.string.profile_user_shouts, user.getName()).toUpperCase();
     }
 
     @Nonnull

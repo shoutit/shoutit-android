@@ -219,6 +219,7 @@
     <string name="profile_listen_label">Listen</string>
     <string name="profile_stop_listening_label">Stop Listening</string>
     <string name="profile_report">Report</string>
+    <string name="profile_user_shouts">%1$s SHOUTS</string>
 
     <!-- Request Shout -->
     <string name="request_activity_title">Create Request</string>

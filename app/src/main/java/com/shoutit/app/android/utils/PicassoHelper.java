@@ -15,6 +15,7 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+import com.squareup.picasso.Transformation;
 
 import javax.annotation.Nonnull;
 
@@ -99,6 +100,30 @@ public class PicassoHelper {
                 if (placeHolderDrawable != null) {
                     imageView.setImageDrawable(placeHolderDrawable);
                 }
+            }
+        };
+    }
+
+    public static Transformation getCircularBitmapWithStrokeTarget(final int strokeSize,
+                                                                   final String transformationKey) {
+        return roundedWithStrokeTransformation(strokeSize, true, 0, transformationKey);
+    }
+
+    public static Transformation roundedWithStrokeTransformation(final int strokeSize,
+                                                                 final boolean isCircular,
+                                                                 final int radius,
+                                                                 final String transformationKey) {
+        return new Transformation() {
+            @Override
+            public Bitmap transform(Bitmap source) {
+                final Bitmap output = getRoundedBitmapWithStroke(source, strokeSize, isCircular, radius);
+                source.recycle();
+                return output;
+            }
+
+            @Override
+            public String key() {
+                return transformationKey;
             }
         };
     }
