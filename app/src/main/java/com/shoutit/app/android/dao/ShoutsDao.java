@@ -122,12 +122,15 @@ public class ShoutsDao {
         public HomeShoutsDao(@Nonnull final LocationPointer locationPointer) {
 
             final OperatorMergeNextToken<ShoutsResponse, Object> loadMoreOperator =
-                    OperatorMergeNextToken.create(new Func1<ShoutsResponse, Observable<ShoutsResponse>>() {
+                     OperatorMergeNextToken.create(new Func1<ShoutsResponse, Observable<ShoutsResponse>>() {
                         private int pageNumber = 0;
 
                         @Override
                         public Observable<ShoutsResponse> call(ShoutsResponse previousResponse) {
                             if (previousResponse == null || previousResponse.getNext() != null) {
+                                if (previousResponse == null) {
+                                    pageNumber = 0;
+                                }
                                 ++pageNumber;
                                 final Observable<ShoutsResponse> apiRequest;
                                 if (userPreferences.isNormalUser()) {

@@ -8,6 +8,8 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 public class User {
+    public static final String ME = "me";
+
     private final String id;
     private final String type;
     private final String apiUrl;
@@ -144,7 +146,7 @@ public class User {
     }
 
     public long getDateJoinedInMillis() {
-        return dateJoined * 1000;
+        return dateJoined * 1000L;
     }
 
     public Listening getListeningCount() {

@@ -17,6 +17,7 @@ import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.ProfileType;
+import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.utils.BlurTransform;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.view.discover.DiscoverFragment;
@@ -221,7 +222,7 @@ public class MenuHandler {
         if (userPreferences.isNormalUser()) {
             rxActivity.startActivity(ProfileActivity.newIntent(
                     rxActivity,
-                    userPreferences.getUser().getUsername(),
+                    User.ME,
                     ProfileType.USER,
                     MyProfileActivity.class));
         } else {
@@ -271,10 +272,7 @@ public class MenuHandler {
 
     @NonNull
     private Action1<String> loadAvatarAction() {
-        final Target roundedTarget = PicassoHelper.getCircularBitmapWithStrokeTarget(
-                avatarImageView,
-                rxActivity.getResources().getDimensionPixelSize(R.dimen.side_menu_avatar_stroke_size)
-        );
+        final int strokeSize = rxActivity.getResources().getDimensionPixelSize(R.dimen.side_menu_avatar_stroke_size);
 
         return new Action1<String>() {
             @Override
@@ -283,7 +281,9 @@ public class MenuHandler {
                         .error(R.drawable.ic_avatar_placeholder)
                         .placeholder(R.drawable.ic_avatar_placeholder)
                         .resizeDimen(R.dimen.side_menu_avatar_size, R.dimen.side_menu_avatar_size)
-                        .into(roundedTarget);
+                        .centerCrop()
+                        .transform(PicassoHelper.getCircularBitmapWithStrokeTarget(strokeSize, "MenuAvatar"))
+                        .into(avatarImageView);
             }
         };
     }
