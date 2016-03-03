@@ -5,6 +5,10 @@ import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -17,6 +21,7 @@ import com.shoutit.app.android.BuildConfig;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.AuthInterceptor;
+import com.shoutit.app.android.constants.AmazonConstants;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ShoutsDao;
@@ -194,4 +199,13 @@ public final class AppModule {
         return new DiscoverShoutsDao(networkScheduler, apiService);
     }
 
+    @Singleton
+    @Provides
+    public TransferUtility providesTransferUtility(@ForApplication Context context) {
+        final BasicAWSCredentials awsCredentials = new BasicAWSCredentials(
+                AmazonConstants.AMAZON_S3_ID, AmazonConstants.AMAZON_S3_SECRET);
+
+        final AmazonS3 s3Client = new AmazonS3Client(awsCredentials);
+        return new TransferUtility(s3Client, context);
+    }
 }
