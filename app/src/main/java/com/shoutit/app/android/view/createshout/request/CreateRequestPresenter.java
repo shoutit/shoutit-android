@@ -15,6 +15,7 @@ import com.google.common.collect.Iterables;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.CreateRequestShoutRequest;
+import com.shoutit.app.android.api.model.CreateShoutResponse;
 import com.shoutit.app.android.api.model.Currency;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.UserLocationSimple;
@@ -141,9 +142,9 @@ public class CreateRequestPresenter {
                         Double.parseDouble(requestData.mBudget), requestData.mCurrencyId))
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
-                .subscribe(new Action1<ResponseBody>() {
+                .subscribe(new Action1<CreateShoutResponse>() {
                     @Override
-                    public void call(ResponseBody responseBody) {
+                    public void call(CreateShoutResponse responseBody) {
                         mListener.hideProgress();
                         mListener.finishActivity();
                     }

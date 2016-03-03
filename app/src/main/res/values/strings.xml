@@ -203,4 +203,8 @@
     <string name="create_request_activity_title_too_short">Title must be at least 6 characters long</string>
     <string name="create_request_activity_price_empty">Price cannot be empty</string>
 
+    <!-- Edit Shout -->
+    <string name="edit_shout_option">Option</string>
+    <string name="edit_shout_category">Category</string>
+
 </resources>

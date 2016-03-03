@@ -8,6 +8,7 @@ import android.support.v4.util.Pair;
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
+import com.appunite.rx.functions.BothParams;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
@@ -35,6 +36,8 @@ import rx.Observable;
 import rx.Scheduler;
 import rx.Subscription;
 import rx.functions.Action1;
+import rx.functions.Func2;
+import rx.functions.Func3;
 import rx.subscriptions.CompositeSubscription;
 
 public class EditShoutPresenter {
@@ -52,6 +55,21 @@ public class EditShoutPresenter {
             mDescription = description;
             mBudget = budget;
             mCurrencyId = currencyId;
+        }
+    }
+
+    private static class ResponseData {
+
+        private final ShoutResponse mShoutResponse;
+        private final List<Category> mCategories;
+        private final List<Currency> mCurrencies;
+
+        public ResponseData(@Nullable ShoutResponse shoutResponse,
+                            @Nullable List<Category> categories,
+                            @Nullable List<Currency> currencies) {
+            mShoutResponse = shoutResponse;
+            mCategories = categories;
+            mCurrencies = currencies;
         }
     }
 
@@ -92,86 +110,128 @@ public class EditShoutPresenter {
             }
         });
 
-        getCurrencies();
-
-        mApiService.categories()
-                .subscribeOn(mNetworkScheduler)
-                .observeOn(mUiScheduler)
-                .subscribe(new Action1<List<Category>>() {
-
-                    @Override
-                    public void call(List<Category> categories) {
-                        final ImmutableList<Pair<String, String>> list = ImmutableList.copyOf(Iterables.transform(categories, new Function<Category, Pair<String, String>>() {
-                            @Nullable
-                            @Override
-                            public Pair<String, String> apply(@Nullable Category input) {
-                                assert input != null;
-                                return Pair.create(input.getSlug(), input.getName());
-                            }
-                        }));
-                        mListener.setCategories(list);
-                        mCategories = categories;
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        // TODO
-                    }
-                });
+        mListener.setCurrenciesEnabled(false);
+        mListener.showProgress();
 
         if (mShoutId != null) {
-            mApiService.getShout(mShoutId)
-                    .subscribeOn(mNetworkScheduler)
-                    .observeOn(mUiScheduler)
-                    .subscribe(new Action1<ShoutResponse>() {
-                        @Override
-                        public void call(ShoutResponse shoutResponse) {
-                            // TODO
-                        }
-                    }, new Action1<Throwable>() {
-                        @Override
-                        public void call(Throwable throwable) {
-                            // TODO
-                        }
-                    });
+            subscribeEditRequestShout();
+        } else {
+            subscribeEditCreateShout();
         }
     }
 
-    private void getCurrencies() {
-        mListener.setCurrenciesEnabled(false);
-        mListener.showProgress();
-        pendingSubscriptions.add(mApiService.getCurrencies()
-                .subscribeOn(mNetworkScheduler)
-                .observeOn(mUiScheduler)
-                .subscribe(new Action1<List<Currency>>() {
-                               @Override
-                               public void call(@NonNull List<Currency> responseBody) {
-                                   final ImmutableList<Pair<String, String>> list = ImmutableList.copyOf(
-                                           Iterables.transform(responseBody,
-                                                   new Function<Currency, Pair<String, String>>() {
-                                                       @Nullable
-                                                       @Override
-                                                       public Pair<String, String> apply(Currency input) {
-                                                           return Pair.create(input.getCode(),
-                                                                   String.format("%s (%s)", input.getName(), input.getCountry()));
-                                                       }
-                                                   }));
+    private void subscribeEditRequestShout() {
+        pendingSubscriptions.add(Observable.zip(
+                mApiService.getShout(mShoutId)
+                        .onErrorResumeNext(Observable.<ShoutResponse>just(null)),
+                mApiService.categories()
+                        .onErrorResumeNext(Observable.<List<Category>>just(null)),
+                mApiService.getCurrencies()
+                        .onErrorResumeNext(Observable.<List<Currency>>just(null)),
+                new Func3<ShoutResponse, List<Category>, List<Currency>, ResponseData>() {
+                    @Override
+                    public ResponseData call(ShoutResponse shoutResponse, List<Category> categories, List<Currency> currencies) {
+                        return new ResponseData(shoutResponse, categories, currencies);
+                    }
+                })
+                .subscribe(new Action1<ResponseData>() {
+                    @Override
+                    public void call(ResponseData responseData) {
+                        mListener.hideProgress();
 
-                                   mListener.setCurrenciesEnabled(true);
-                                   mListener.setCurrencies(list);
-                                   mListener.hideProgress();
-                                   mListener.removeRetryCurrenciesListener();
-                               }
-                           }, new Action1<Throwable>() {
-                               @Override
-                               public void call(Throwable throwable) {
-                                   mListener.setCurrenciesEnabled(true);
-                                   mListener.hideProgress();
-                                   mListener.showCurrenciesError();
-                                   mListener.setRetryCurrenciesListener();
-                               }
-                           }
-                ));
+                        if (responseData.mCategories != null) {
+                            categorySuccess(responseData.mCategories);
+                        } else {
+                            // TODO category error
+                        }
+
+                        if (responseData.mCurrencies != null) {
+                            currencySuccess(responseData.mCurrencies);
+                            if (responseData.mShoutResponse != null) {
+                                for (int i = 0; i < responseData.mCurrencies.size(); i++) {
+                                    final Currency currency = responseData.mCurrencies.get(i);
+                                    if (currency.getCode().equals(responseData.mShoutResponse.getCurrency())) {
+                                        mListener.setSelectedCurrency(i);
+                                    }
+                                }
+                            }
+                        } else {
+                            // TODO currency error
+                        }
+
+                        if (responseData.mShoutResponse != null) {
+                            mListener.setTitle(responseData.mShoutResponse.getTitle());
+                            mListener.setPrice(String.valueOf(responseData.mShoutResponse.getPrice()));
+                            mListener.setLocation(ResourcesHelper.getResourceIdForName(
+                                            responseData.mShoutResponse.getLocation().getCountry(), mContext),
+                                    responseData.mShoutResponse.getLocation().getCity());
+                        } else {
+                            // TODO body error
+                        }
+                    }
+                }));
+    }
+
+    private void subscribeEditCreateShout() {
+        pendingSubscriptions.add(Observable.zip(
+                mApiService.categories()
+                        .onErrorResumeNext(Observable.<List<Category>>just(null)),
+                mApiService.getCurrencies()
+                        .onErrorResumeNext(Observable.<List<Currency>>just(null)),
+                new Func2<List<Category>, List<Currency>, BothParams<List<Category>, List<Currency>>>() {
+                    @Override
+                    public BothParams<List<Category>, List<Currency>> call(List<Category> categories, List<Currency> currencies) {
+                        return BothParams.of(categories, currencies);
+                    }
+                })
+                .subscribe(new Action1<BothParams<List<Category>, List<Currency>>>() {
+                    @Override
+                    public void call(BothParams<List<Category>, List<Currency>> responseData) {
+                        mListener.hideProgress();
+
+                        if (responseData.param1() != null) {
+                            categorySuccess(responseData.param1());
+                        } else {
+                            // TODO category error
+                        }
+
+                        if (responseData.param2() != null) {
+                            currencySuccess(responseData.param2());
+                        } else {
+                            // TODO currency error
+                        }
+                    }
+                }));
+    }
+
+    private void categorySuccess(@NonNull List<Category> responseData) {
+        final List<Pair<String, String>> list = ImmutableList.copyOf(Iterables.transform(responseData,
+                new Function<Category, Pair<String, String>>() {
+                    @Nullable
+                    @Override
+                    public Pair<String, String> apply(@Nullable Category input) {
+                        assert input != null;
+                        return Pair.create(input.getSlug(), input.getName());
+                    }
+                }));
+        mListener.setCategories(list);
+        mCategories = responseData;
+    }
+
+    private void currencySuccess(@NonNull List<Currency> responseData) {
+        final List<Pair<String, String>> list = ImmutableList.copyOf(
+                Iterables.transform(responseData,
+                        new Function<Currency, Pair<String, String>>() {
+                            @Nullable
+                            @Override
+                            public Pair<String, String> apply(Currency input) {
+                                return Pair.create(input.getCode(),
+                                        String.format("%s (%s)", input.getName(), input.getCountry()));
+                            }
+                        }));
+
+        mListener.setCurrenciesEnabled(true);
+        mListener.setCurrencies(list);
     }
 
     private void setNewUserLocation(@NonNull UserLocation userLocation) {
@@ -226,11 +286,11 @@ public class EditShoutPresenter {
         pendingSubscriptions.unsubscribe();
     }
 
-    public void retryCurrencies() {
-        getCurrencies();
+    public void categorySelected(@NonNull final String id) {
+        changeCategory(id);
     }
 
-    public void categorySelected(@NonNull final String id) {
+    private void changeCategory(@NonNull final String id) {
         final Iterable<Category> filters = Iterables.filter(mCategories, new Predicate<Category>() {
             @Override
             public boolean apply(@Nullable Category input) {
@@ -239,7 +299,8 @@ public class EditShoutPresenter {
             }
         });
         final Category category = filters.iterator().next();
-        final ImmutableList<Iterable<Pair<String, List<CategoryFilter.FilterValue>>>> iterables = ImmutableList.of(Iterables.transform(category.getFilters(), new Function<CategoryFilter, Pair<String, List<CategoryFilter.FilterValue>>>() {
+
+        final List<Pair<String, List<CategoryFilter.FilterValue>>> options = ImmutableList.copyOf(Iterables.transform(category.getFilters(), new Function<CategoryFilter, Pair<String, List<CategoryFilter.FilterValue>>>() {
             @Nullable
             @Override
             public Pair<String, List<CategoryFilter.FilterValue>> apply(@Nullable CategoryFilter input) {
@@ -248,7 +309,7 @@ public class EditShoutPresenter {
             }
         }));
 
-
+        mListener.setOptions(options);
     }
 
     public interface Listener {
@@ -265,13 +326,7 @@ public class EditShoutPresenter {
 
         void setCurrencies(@NonNull List<Pair<String, String>> list);
 
-        void showCurrenciesError();
-
         void setCurrenciesEnabled(boolean enabled);
-
-        void setRetryCurrenciesListener();
-
-        void removeRetryCurrenciesListener();
 
         void showTitleTooShortError(boolean show);
 
@@ -282,6 +337,14 @@ public class EditShoutPresenter {
         void setDescription(@Nullable String description);
 
         void setCategories(@NonNull List<Pair<String, String>> list);
+
+        void setOptions(@NonNull List<Pair<String, List<CategoryFilter.FilterValue>>> options);
+
+        void setSelectedCurrency(int currencyPostion);
+
+        void setTitle(@NonNull String title);
+
+        void setPrice(@NonNull String price);
     }
 
 }

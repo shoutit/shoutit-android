@@ -55,7 +55,7 @@
             </android.support.design.widget.TextInputLayout>
 
             <Spinner
-                android:id="@+id/edit_spinner"
+                android:id="@+id/edit_currency_spinner"
                 style="?android:attr/editTextStyle"
                 android:layout_width="0dp"
                 android:layout_height="54dp"
@@ -69,11 +69,12 @@
             android:layout_height="wrap_content">
 
             <ImageView
-                android:id="@+id/edit_request"
+                android:id="@+id/edit_request_category_icon"
                 android:layout_width="54dp"
                 android:layout_height="54dp"/>
 
             <Spinner
+                android:id="@+id/edit_request_category_spinner"
                 style="?android:attr/editTextStyle"
                 android:layout_width="match_parent"
                 android:layout_height="54dp"/>
