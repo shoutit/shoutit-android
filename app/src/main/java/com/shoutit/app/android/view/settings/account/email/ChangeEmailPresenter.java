@@ -72,7 +72,7 @@ public class ChangeEmailPresenter {
                 .switchMap(new Func1<Boolean, Observable<ResponseOrError<User>>>() {
                     @Override
                     public Observable<ResponseOrError<User>> call(Boolean ignore) {
-                        return apiService.updateUser(new UpdateUserRequest(emailSubject.getValue()))
+                        return apiService.updateUser(UpdateUserRequest.updateWithEmail(emailSubject.getValue()))
                                 .subscribeOn(networkScheduler)
                                 .observeOn(uiScheduler)
                                 .compose(ResponseOrError.<User>toResponseOrErrorObservable());

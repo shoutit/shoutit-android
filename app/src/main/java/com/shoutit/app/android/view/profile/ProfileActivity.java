@@ -30,7 +30,6 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import java.util.List;
 
@@ -48,6 +47,7 @@ public class ProfileActivity extends BaseActivity {
 
     private static final String KEY_USER_NAME = "user_name";
     private static final String KEY_PROFILE_TYPE = "profile_type";
+    private static final String KEY_OFFSET = "key_offset";
 
     @Bind(R.id.profile_progress_bar)
     ProgressBar progressBar;
@@ -74,6 +74,7 @@ public class ProfileActivity extends BaseActivity {
     Picasso picasso;
 
     private final AccelerateInterpolator toolbarInterpolator = new AccelerateInterpolator();
+    private int lastVerticalOffset;
 
     public static <T extends ProfileActivity> Intent newIntent(@Nonnull Context context, @Nonnull String userName,
                                    @Nonnull String profileType, Class<T> profileClass) {
@@ -90,6 +91,10 @@ public class ProfileActivity extends BaseActivity {
 
         setUpToolbar();
         handleAppBarScrollAnimation();
+        if (savedInstanceState != null) {
+            // To scroll appbar after rotation
+            recyclerView.scrollTo(0, recyclerView.getScrollY());
+        }
         setUpAdapter();
 
         presenter
@@ -259,9 +264,8 @@ public class ProfileActivity extends BaseActivity {
     }
 
     private Action1<String> loadAvatarAction() {
-        final Target target = PicassoHelper.getRoundedBitmapWithStrokeTarget(
-                avatarImageView, getResources().getDimensionPixelSize(R.dimen.profile_avatar_stroke),
-                false, getResources().getDimensionPixelSize(R.dimen.profile_avatar_radius));
+        final int strokeSize = getResources().getDimensionPixelSize(R.dimen.profile_avatar_stroke);
+        final int corners = getResources().getDimensionPixelSize(R.dimen.profile_avatar_radius);
 
         return new Action1<String>() {
             @Override
@@ -269,7 +273,10 @@ public class ProfileActivity extends BaseActivity {
                 picasso.load(url)
                         .placeholder(R.drawable.ic_avatar_placeholder)
                         .error(R.drawable.ic_avatar_placeholder)
-                        .into(target);
+                        .fit()
+                        .centerCrop()
+                        .transform(PicassoHelper.roundedWithStrokeTransformation(strokeSize, false, corners, "ProfileAvatar"))
+                        .into(avatarImageView);
             }
         };
     }
@@ -278,6 +285,7 @@ public class ProfileActivity extends BaseActivity {
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                lastVerticalOffset = verticalOffset;
                 float maxScroll = appBarLayout.getTotalScrollRange();
                 float progressPercentage = ((float) (Math.abs(verticalOffset)) / maxScroll);
 
@@ -296,6 +304,12 @@ public class ProfileActivity extends BaseActivity {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt(KEY_OFFSET, lastVerticalOffset);
+        super.onSaveInstanceState(outState);
     }
 
     @Nonnull

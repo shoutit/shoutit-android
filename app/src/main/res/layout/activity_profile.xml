@@ -3,6 +3,7 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/profile_coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
@@ -27,7 +28,7 @@
 
             <ImageView
                 android:id="@+id/profile_fragment_cover_image_view"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="@dimen/profile_cover_height"
                 android:fitsSystemWindows="true"
                 android:scaleType="centerCrop"
@@ -36,7 +37,7 @@
                 app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed" />
 
             <View
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="@dimen/profile_cover_height"
                 android:alpha="0.2"
                 android:background="@drawable/profile_cover_gradient"
@@ -119,6 +120,7 @@
             android:layout_height="64dp"
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
+            android:scaleType="centerCrop"
             android:elevation="1dp"
             android:src="@drawable/ic_avatar_placeholder"
             tools:background="@android:color/black" />

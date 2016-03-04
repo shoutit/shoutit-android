@@ -286,7 +286,7 @@ public class ShoutActivity extends BaseActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.base_menu, menu);
+        getMenuInflater().inflate(R.menu.shouts_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
 

@@ -3,6 +3,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:fillViewport="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -45,6 +46,12 @@
                     android:background="@color/edit_profile_cover_dim"
                     android:scaleType="centerInside"
                     android:src="@drawable/ic_camera_large" />
+
+                <View
+                    android:id="@+id/edit_profile_cover_selector"
+                    android:layout_width="match_parent"
+                    android:layout_height="202dp"
+                    />
 
             </FrameLayout>
 
@@ -145,18 +152,25 @@
                         android:layout_marginStart="36dp"
                         android:layout_toEndOf="@+id/edit_profile_flag_iv"
                         android:layout_toRightOf="@+id/edit_profile_flag_iv"
+                        android:ellipsize="end"
+                        android:maxLines="1"
                         android:textColor="@color/black_87"
                         android:textSize="14sp"
+                        android:layout_marginEnd="1dp"
+                        android:layout_marginRight="1dp"
                         tools:text="Dubai, United Arab Emirates" />
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_alignBaseline="@+id/edit_profile_location_tv"
                         android:layout_alignParentEnd="true"
                         android:layout_alignParentRight="true"
                         android:fontFamily="sans-serif-medium"
                         android:padding="4dp"
+                        android:maxLines="1"
+                        android:gravity="right|end"
+                        android:layout_toRightOf="@+id/edit_profile_location_tv"
                         android:text="@string/edit_profile_location_change"
                         android:textAllCaps="true"
                         android:textColor="@color/accent_blue"
@@ -206,6 +220,18 @@
             android:src="@drawable/ic_camera"
             app:layout_anchor="@id/edit_profile_cover_iv"
             app:layout_anchorGravity="bottom|start" />
+
+        <View
+            android:id="@+id/edit_profile_selector_view"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:background="?selectableItemBackground"
+            app:layout_anchor="@id/edit_profile_cover_iv"
+            app:layout_anchorGravity="bottom|start" />
+
+        <include layout="@layout/base_progress" />
 
     </android.support.design.widget.CoordinatorLayout>
 

@@ -17,11 +17,16 @@
     <string name="error_wrong_email_or_password">Wrong email or password</string>
     <string name="error_action_only_for_logged_in_user">Only for logged in users</string>
 
-
     <!-- Permissions -->
     <string name="permission_location_explanation">We need your location to prepare appropriate content</string>
+    <string name="permission_camera_explanation">Permissions needed to get your photos</string>
     <string name="permission_granted">Permissions have been granted</string>
     <string name="permission_not_granted">Permissions not granted</string>
+
+    <!-- Image capture helper -->
+    <string name="image_video_capture_helper_select_image_source">Select image source</string>
+    <string name="image_video_capture_helper_sd_unmounted">No external storage</string>
+    <string name="image_video_capture_helper_sd_unmounted_title">Error</string>
 
     <!-- Intro -->
     <string name="intro_welcome">Welcome To Shoutit</string>
@@ -219,6 +224,7 @@
     <string name="profile_listen_label">Listen</string>
     <string name="profile_stop_listening_label">Stop Listening</string>
     <string name="profile_report">Report</string>
+    <string name="profile_user_shouts">%1$s SHOUTS</string>
 
     <!-- Request Shout -->
     <string name="request_activity_title">Create Request</string>

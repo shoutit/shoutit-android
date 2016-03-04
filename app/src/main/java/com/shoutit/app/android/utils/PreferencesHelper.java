@@ -19,6 +19,7 @@ public class PreferencesHelper {
 
     public boolean isMyProfile(@Nonnull String userNameToCompare) {
         final User currentUser = preferences.getUser();
-        return currentUser != null && userNameToCompare.equals(currentUser.getUsername());
+        return currentUser != null &&
+                (userNameToCompare.equals(currentUser.getUsername()) || userNameToCompare.equals(User.ME));
     }
 }

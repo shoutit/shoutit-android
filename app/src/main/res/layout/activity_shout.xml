@@ -92,8 +92,8 @@
                 android:layout_width="wrap_content"
                 android:id="@+id/shout_bottom_bar_more"
                 android:background="?selectableItemBackground"
-                android:drawableLeft="@drawable/ic_more"
-                android:drawableStart="@drawable/ic_more"
+                android:drawableLeft="@drawable/ic_more_white"
+                android:drawableStart="@drawable/ic_more_white"
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp" />
 

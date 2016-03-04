@@ -1,8 +1,9 @@
-package com.shoutit.app.android.utils;
+package com.shoutit.app.android.utils.rx;
 
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 
+import rx.Observer;
 import rx.functions.Action1;
 
 public class Actions1 {
@@ -39,6 +40,16 @@ public class Actions1 {
                     textInputLayout.setError(null);
                     textInputLayout.setErrorEnabled(false);
                 }
+            }
+        };
+    }
+
+    public static <T> Action1<T> progressOnNext(@NonNull final Observer<Boolean> progressObserver,
+                                                final boolean showProgress) {
+        return new Action1<T>() {
+            @Override
+            public void call(T ignore) {
+                progressObserver.onNext(showProgress);
             }
         };
     }

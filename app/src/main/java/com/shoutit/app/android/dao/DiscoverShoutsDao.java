@@ -57,6 +57,9 @@ public class DiscoverShoutsDao {
                         @Override
                         public Observable<ShoutsResponse> call(ShoutsResponse previousResponse) {
                             if (previousResponse == null || previousResponse.getNext() != null) {
+                                if (previousResponse == null) {
+                                    pageNumber = 0;
+                                }
                                 ++pageNumber;
 
                                 final Observable<ShoutsResponse> apiRequest = apiService

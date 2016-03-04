@@ -7,8 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
+import android.widget.CheckedTextView;
 import android.widget.ProgressBar;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
@@ -52,7 +51,7 @@ public class DiscoverShoutsActivity extends BaseActivity {
     ProgressBar mProgress;
 
     @Bind(R.id.shouts_layout_btn)
-    CheckBox mShoutsCheckBox;
+    CheckedTextView mShoutsCheckedTextView;
 
     @Bind(R.id.shouts_toolbar)
     Toolbar mToolbar;
@@ -112,12 +111,15 @@ public class DiscoverShoutsActivity extends BaseActivity {
                 .filter(LoadMoreHelper.needLoadMore((MyLayoutManager) mRecyclerView.getLayoutManager(), mShoutsAdapter))
                 .subscribe(mShoutsPresenter.getLoadMoreObserver());
 
-        mShoutsCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        mShoutsCheckedTextView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
-                if (checked) {
+            public void onClick(View v) {
+                mShoutsCheckedTextView.setChecked(!mShoutsCheckedTextView.isChecked());
+                if (mShoutsCheckedTextView.isChecked()) {
+                    mShoutsCheckedTextView.setBackground(getResources().getDrawable(R.drawable.ic_grid_switch));
                     setLinearLayoutManager();
                 } else {
+                    mShoutsCheckedTextView.setBackground(getResources().getDrawable(R.drawable.ic_list_switch));
                     setGridLayoutManager();
                 }
             }
