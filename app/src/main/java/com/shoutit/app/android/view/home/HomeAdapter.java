@@ -6,7 +6,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -137,8 +137,8 @@ public class HomeAdapter extends BaseAdapter {
         TextView headerTextView;
         @Bind(R.id.home_filter_iv)
         View filterIcon;
-        @Bind(R.id.home_switch_cb)
-        CheckBox layoutManagerSwitchView;
+        @Bind(R.id.home_switch_iv)
+        ImageView layoutManagerSwitchView;
 
         private CompositeSubscription subscription;
 
@@ -155,7 +155,8 @@ public class HomeAdapter extends BaseAdapter {
                     context.getString(R.string.home_shouts_header_logged) :
                     context.getString(R.string.home_shouts_header_guest, item.getUserCity()));
 
-            layoutManagerSwitchView.setChecked(isLinearLayoutManager);
+            layoutManagerSwitchView.setImageDrawable(context.getResources().getDrawable(
+                    isLinearLayoutManager ? R.drawable.ic_grid_switch : R.drawable.ic_list_switch));
 
             subscription = new CompositeSubscription(
                     RxView.clicks(layoutManagerSwitchView)
