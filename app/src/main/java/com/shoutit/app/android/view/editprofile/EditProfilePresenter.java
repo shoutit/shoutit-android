@@ -2,10 +2,8 @@ package com.shoutit.app.android.view.editprofile;
 
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
@@ -13,6 +11,7 @@ import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.UpdateUserRequest;
@@ -52,9 +51,6 @@ public class EditProfilePresenter {
 
     private final PublishSubject<Object> saveClickSubject = PublishSubject.create();
     private final PublishSubject<Boolean> progressSubject = PublishSubject.create();
-    private final PublishSubject<Boolean> avatarProgressSubject = PublishSubject.create();
-    private final PublishSubject<Boolean> coverProgressSubject = PublishSubject.create();
-    private final PublishSubject<Object> uploadCoverSubject = PublishSubject.create();
 
     @Nonnull
     private final Observable<User> userObservable;
@@ -65,16 +61,39 @@ public class EditProfilePresenter {
     @Nonnull
     private final Observable<User> successObservable;
     @Nonnull
+    private final Observable<Object> imageUploadToApiSuccessObservable;
+
+    @Nonnull
+    private final ApiService apiService;
+    @Nonnull
+    private final FileHelper fileHelper;
+    @Nonnull
+    private final AmazonHelper amazonHelper;
+    @Nonnull
+    private final Scheduler networkScheduler;
+    @Nonnull
     private final Scheduler uiScheduler;
+    @Nonnull
+    private final Observable<Boolean> avatarProgressObservable;
+    @Nonnull
+    private final Observable<Boolean> coverProgressObservable;
+    @Nonnull
+    private final Observable<Throwable> imageUploadError;
+    @Nonnull
+    private final Observable<Throwable> updateProfileError;
 
     @Inject
-    public EditProfilePresenter(@Nonnull UserPreferences userPreferences,
+    public EditProfilePresenter(@Nonnull final UserPreferences userPreferences,
                                 @Nonnull final ApiService apiService,
                                 @Nonnull final TransferUtility transferUtility,
                                 @Nonnull final FileHelper fileHelper,
                                 @Nonnull final AmazonHelper amazonHelper,
-                                @Nonnull@NetworkScheduler final Scheduler networkScheduler,
+                                @Nonnull @NetworkScheduler final Scheduler networkScheduler,
                                 @Nonnull @UiScheduler final Scheduler uiScheduler) {
+        this.apiService = apiService;
+        this.fileHelper = fileHelper;
+        this.amazonHelper = amazonHelper;
+        this.networkScheduler = networkScheduler;
         this.uiScheduler = uiScheduler;
 
         /** User Data **/
@@ -83,25 +102,43 @@ public class EditProfilePresenter {
                 .filter(Functions1.isNotNull())
                 .compose(ObservableExtensions.<User>behaviorRefCount());
 
-        avatarObservable = Observable.concat(
-                userObservable
-                        .map(new Func1<User, String>() {
-                            @Override
-                            public String call(User user) {
-                                return user.getImage();
-                            }
-                        }).first(),
-                lastSelectedAvatarUri);
+        final BehaviorSubject<String> coverFileName = BehaviorSubject.create();
+        userObservable
+                .first()
+                .map(new Func1<User, String>() {
+                    @Override
+                    public String call(User user) {
+                        return amazonHelper.getCoverFileName(user.getUsername());
+                    }
+                })
+                .subscribe(coverFileName);
 
-        coverObservable = Observable.concat(
-                userObservable
-                        .map(new Func1<User, String>() {
-                            @Override
-                            public String call(User user) {
-                                return user.getCover();
-                            }
-                        }).first(),
-                lastSelectedCoverUri);
+        final BehaviorSubject<String> avatarFileName = BehaviorSubject.create();
+        userObservable
+                .first()
+                .map(new Func1<User, String>() {
+                    @Override
+                    public String call(User user) {
+                        return amazonHelper.getAvatarFileName(user.getUsername());
+                    }
+                })
+                .subscribe(avatarFileName);
+
+        avatarObservable = userObservable
+                .map(new Func1<User, String>() {
+                    @Override
+                    public String call(User user) {
+                        return user.getImage();
+                    }
+                });
+
+        coverObservable = userObservable
+                .map(new Func1<User, String>() {
+                    @Override
+                    public String call(User user) {
+                        return user.getCover();
+                    }
+                });
 
         /** Errors **/
         final Observable<Boolean> nameErrorObservable = nameSubject
@@ -142,7 +179,7 @@ public class EditProfilePresenter {
                     }
                 });
 
-        /** Update request **/
+        /** Update profile data **/
         final Observable<ResponseOrError<User>> updateRequest = saveClickSubject
                 .withLatestFrom(hasAnyErrorObservable, new Func2<Object, Boolean, Boolean>() {
                     @Override
@@ -158,64 +195,157 @@ public class EditProfilePresenter {
                         return combinedData.first();
                     }
                 })
-                .switchMap(new Func1<UpdateUserRequest, Observable<ResponseOrError<User>>>() {
-                    @Override
-                    public Observable<ResponseOrError<User>> call(UpdateUserRequest updateUserRequest) {
-                        return apiService.updateUser(updateUserRequest)
-                                .subscribeOn(networkScheduler)
-                                .observeOn(uiScheduler)
-                                .compose(ResponseOrError.<User>toResponseOrErrorObservable());
-                    }
-                })
+                .switchMap(updateUserInApi())
                 .doOnNext(Actions1.progressOnNext(progressSubject, false))
                 .compose(ObservableExtensions.<ResponseOrError<User>>behaviorRefCount());
 
         successObservable = updateRequest
                 .compose(ResponseOrError.<User>onlySuccess());
 
-        /** Upload images **/
+        /** Upload cover **/
         final Observable<ResponseOrError<File>> coverFileToUploadObservable = lastSelectedCoverUri
-                .doOnNext(Actions1.progressOnNext(coverProgressSubject, true))
                 .subscribeOn(networkScheduler)
-                .observeOn(networkScheduler)
-                .switchMap(new Func1<Uri, Observable<File>>() {
-                    @Override
-                    public Observable<File> call(Uri imageUri) {
-                        try {
-                            final String tempFile = fileHelper.createTempFileAndStoreUri(imageUri);
-                            final Bitmap bitmapToUpload = ImageHelper.prepareImageToUpload(tempFile, ImageHelper.MAX_COVER_SIZE);
-                            return Observable.just(fileHelper.saveBitmapToTempFile(bitmapToUpload, "name"));
-                        } catch (IOException e) {
-                            // TODO
-                            e.printStackTrace();
-                            return Observable.error(new Throwable());
-                        }
-                    }
-                })
-                .compose(ResponseOrError.<File>toResponseOrErrorObservable())
+                .switchMap(transformImage(ImageHelper.MAX_COVER_SIZE, coverFileName.getValue()))
                 .compose(ObservableExtensions.<ResponseOrError<File>>behaviorRefCount());
 
         final Observable<ResponseOrError<String>> uploadCoverToAmazonObservable = coverFileToUploadObservable
                 .compose(ResponseOrError.<File>onlySuccess())
                 .filter(Functions1.isNotNull())
-                .switchMap(new Func1<File, Observable<ResponseOrError<String>>>() {
-                    @Override
-                    public Observable<ResponseOrError<String>> call(File fileToUpload) {
-                        return amazonHelper.uploadImageObservable(AmazonConstants.BUCKET_USER_URL, fileToUpload);
-                    }
-                })
+                .switchMap(uploadToAmazon())
                 .compose(ObservableExtensions.<ResponseOrError<String>>behaviorRefCount());
 
-        uploadCoverToAmazonObservable
+        final Observable<ResponseOrError<User>> uploadCoverToApiObservable = uploadCoverToAmazonObservable
                 .compose(ResponseOrError.<String>onlySuccess())
-                .switchMap(new Func1<String, Observable<ResponseOrError<User>>>() {
+                .map(new Func1<String, UpdateUserRequest>() {
                     @Override
-                    public Observable<ResponseOrError<User>> call(String coverUrlToUpload) {
-                        return apiService.updateUser(UpdateUserRequest.updateWithCoverUrl(coverUrlToUpload))
-                                .compose(ResponseOrError.<User>toResponseOrErrorObservable());
+                    public UpdateUserRequest call(String imageUrl) {
+                        return UpdateUserRequest.updateWithCoverUrl(imageUrl);
                     }
                 })
+                .switchMap(updateUserInApi())
                 .compose(ObservableExtensions.<ResponseOrError<User>>behaviorRefCount());
+
+        /** Upload avatar **/
+        final Observable<ResponseOrError<File>> avatarFileToUploadObservable = lastSelectedAvatarUri
+                .subscribeOn(networkScheduler)
+                .switchMap(transformImage(ImageHelper.MAX_AVATAR_SIZE, avatarFileName.getValue()))
+                .compose(ObservableExtensions.<ResponseOrError<File>>behaviorRefCount());
+
+        final Observable<ResponseOrError<String>> uploadAvatarToAmazonObservable = avatarFileToUploadObservable
+                .compose(ResponseOrError.<File>onlySuccess())
+                .filter(Functions1.isNotNull())
+                .switchMap(uploadToAmazon())
+                .compose(ObservableExtensions.<ResponseOrError<String>>behaviorRefCount());
+
+        final Observable<ResponseOrError<User>> uploadAvatarToApiObservable = uploadAvatarToAmazonObservable
+                .compose(ResponseOrError.<String>onlySuccess())
+                .map(new Func1<String, UpdateUserRequest>() {
+                    @Override
+                    public UpdateUserRequest call(String imageUrl) {
+                        return UpdateUserRequest.updateWithAvatarUrl(imageUrl);
+                    }
+                })
+                .switchMap(updateUserInApi())
+                .compose(ObservableExtensions.<ResponseOrError<User>>behaviorRefCount());
+
+        /** Success API user update **/
+        imageUploadToApiSuccessObservable = Observable.merge(
+                uploadCoverToApiObservable.compose(ResponseOrError.<User>onlySuccess()),
+                uploadAvatarToApiObservable.compose(ResponseOrError.<User>onlySuccess()),
+                successObservable)
+                .map(new Func1<User, Object>() {
+                    @Override
+                    public Object call(User user) {
+                        userPreferences.saveUserAsJson(user);
+                        return null;
+                    }
+                })
+                .observeOn(uiScheduler);
+
+        /** Progress **/
+        avatarProgressObservable = Observable.merge(
+                lastSelectedAvatarUri.map(Functions1.returnTrue()),
+                avatarFileToUploadObservable.compose(ResponseOrError.<File>onlyError()).map(Functions1.returnFalse()),
+                uploadAvatarToAmazonObservable.compose(ResponseOrError.<String>onlyError()).map(Functions1.returnFalse()),
+                uploadAvatarToApiObservable.compose(ResponseOrError.<User>onlyError()).map(Functions1.returnFalse()),
+                uploadAvatarToApiObservable.compose(ResponseOrError.<User>onlySuccess()).map(Functions1.returnFalse()))
+                .observeOn(uiScheduler);
+
+        coverProgressObservable = Observable.merge(
+                lastSelectedCoverUri.map(Functions1.returnTrue()),
+                coverFileToUploadObservable.compose(ResponseOrError.<File>onlyError()).map(Functions1.returnFalse()),
+                uploadCoverToAmazonObservable.compose(ResponseOrError.<String>onlyError()).map(Functions1.returnFalse()),
+                uploadCoverToApiObservable.compose(ResponseOrError.<User>onlyError()).map(Functions1.returnFalse()),
+                uploadCoverToApiObservable.compose(ResponseOrError.<User>onlySuccess()).map(Functions1.returnFalse()))
+                .observeOn(uiScheduler);
+
+        /** Errors **/
+        imageUploadError = ResponseOrError.combineErrorsObservable(ImmutableList.of(
+                ResponseOrError.transform(avatarFileToUploadObservable),
+                ResponseOrError.transform(uploadAvatarToAmazonObservable),
+                ResponseOrError.transform(uploadAvatarToApiObservable),
+                ResponseOrError.transform(coverFileToUploadObservable),
+                ResponseOrError.transform(uploadCoverToAmazonObservable),
+                ResponseOrError.transform(uploadCoverToApiObservable)))
+                .observeOn(uiScheduler);
+
+        updateProfileError = updateRequest.compose(ResponseOrError.<User>onlyError())
+                .observeOn(uiScheduler);
+    }
+
+    @NonNull
+    private Func1<UpdateUserRequest, Observable<ResponseOrError<User>>> updateUserInApi() {
+        return new Func1<UpdateUserRequest, Observable<ResponseOrError<User>>>() {
+            @Override
+            public Observable<ResponseOrError<User>> call(UpdateUserRequest updateUserRequest) {
+                return apiService.updateUser(updateUserRequest)
+                        .subscribeOn(networkScheduler)
+                        .observeOn(uiScheduler)
+                        .compose(ResponseOrError.<User>toResponseOrErrorObservable());
+            }
+        };
+    }
+
+    @NonNull
+    private Func1<File, Observable<ResponseOrError<String>>> uploadToAmazon() {
+        return new Func1<File, Observable<ResponseOrError<String>>>() {
+            @Override
+            public Observable<ResponseOrError<String>> call(File fileToUpload) {
+                return amazonHelper.uploadImageObservable(AmazonConstants.BUCKET_USER_URL, fileToUpload);
+            }
+        };
+    }
+
+    @NonNull
+    private Func1<Uri, Observable<ResponseOrError<File>>> transformImage(final int maxImageSize,
+                                                                         final String fileName) {
+        return new Func1<Uri, Observable<ResponseOrError<File>>>() {
+            @Override
+            public Observable<ResponseOrError<File>> call(Uri imageUri) {
+                try {
+                    final String tempFile = fileHelper.createTempFileAndStoreUri(imageUri);
+                    final Bitmap bitmapToUpload = ImageHelper.prepareImageToUpload(tempFile, maxImageSize);
+                    return Observable.just(ResponseOrError.fromData(fileHelper.saveBitmapToTempFile(bitmapToUpload, fileName)));
+                } catch (IOException e) {
+                    return Observable.just(ResponseOrError.<File>fromError(new Throwable()));
+                }
+            }
+        };
+    }
+
+    @Nonnull
+    public Observable<Boolean> getAvatarProgressObservable() {
+        return avatarProgressObservable;
+    }
+
+    @Nonnull
+    public Observable<Boolean> getCoverProgressObservable() {
+        return coverProgressObservable;
+    }
+
+    @Nonnull
+    public Observable<Object> getImageUploadToApiSuccessObservable() {
+        return imageUploadToApiSuccessObservable;
     }
 
     @Nonnull
