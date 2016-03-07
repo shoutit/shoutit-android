@@ -18,8 +18,8 @@ import java.io.IOException;
 import javax.annotation.Nonnull;
 
 public class ImageHelper {
-    public static final int MAX_AVATAR_SIZE = 600;
-    public static final int MAX_COVER_SIZE = 1024;
+    public static final int MAX_AVATAR_SIZE = 720 * 720;
+    public static final int MAX_COVER_SIZE = 1024 * 768;
 
     public static void setStartCompoundRelativeDrawable(@Nonnull TextView textView, @DrawableRes int drawableId) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
@@ -77,12 +77,12 @@ public class ImageHelper {
                 case ExifInterface.ORIENTATION_ROTATE_90:
                     matrix.postRotate(90);
                     break;
+                default:
+                    return sourceBitmap;
             }
 
-            final Bitmap output = Bitmap.createBitmap(sourceBitmap, 0, 0, sourceBitmap.getWidth(),
+            return Bitmap.createBitmap(sourceBitmap, 0, 0, sourceBitmap.getWidth(),
                     sourceBitmap.getHeight(), matrix, true);
-            sourceBitmap.recycle();
-            return output;
         } catch (Exception e) {
             return null;
         }

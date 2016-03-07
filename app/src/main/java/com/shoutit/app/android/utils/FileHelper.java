@@ -64,8 +64,8 @@ public class FileHelper {
     }
 
     @Nullable
-    public File saveBitmapToTempFile(@Nonnull Bitmap bitmap, @Nonnull String name) {
-        final File tmpFile = new File(context.getExternalCacheDir(), String.format("tmpFile-%s", name));
+    public File saveBitmapToTempFile(@Nonnull Bitmap bitmap) {
+        final File tmpFile = new File(context.getExternalCacheDir(), String.format("tmpFile-%s", bitmap.toString()));
 
         OutputStream os;
         try {

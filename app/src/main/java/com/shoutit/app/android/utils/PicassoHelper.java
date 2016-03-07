@@ -136,7 +136,7 @@ public class PicassoHelper {
             radius = Math.min(height / 2, width / 2);
         }
 
-        final Bitmap output = Bitmap.createBitmap(width + strokeSize, height + strokeSize, Bitmap.Config.ARGB_8888);
+        final Bitmap output = Bitmap.createBitmap(width + 2 * strokeSize, height + 2 * strokeSize, Bitmap.Config.ARGB_8888);
 
         final Paint paint = new Paint();
         paint.setAntiAlias(true);
@@ -145,8 +145,8 @@ public class PicassoHelper {
         canvas.drawARGB(0, 0, 0, 0);
         paint.setStyle(Paint.Style.FILL);
 
-        final RectF bounds = new RectF(strokeSize, strokeSize, width, height);
-        canvas.drawRoundRect(bounds, radius, radius, paint);
+        final RectF imageBounds = new RectF(strokeSize, strokeSize, width + strokeSize, height + strokeSize);
+        canvas.drawRoundRect(imageBounds, radius, radius, paint);
 
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
 
@@ -155,7 +155,7 @@ public class PicassoHelper {
         paint.setStyle(Paint.Style.STROKE);
         paint.setColor(Color.WHITE);
         paint.setStrokeWidth(strokeSize);
-        final RectF strokeBounds = new RectF(0, 0, width + strokeSize, height + strokeSize);
+        final RectF strokeBounds = new RectF(0, 0, width + 2 * strokeSize, height + 2 * strokeSize);
         canvas.drawRoundRect(strokeBounds, radius, radius, paint);
 
         return output;

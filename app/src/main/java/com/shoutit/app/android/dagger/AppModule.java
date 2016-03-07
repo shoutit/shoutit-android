@@ -1,12 +1,15 @@
 package com.shoutit.app.android.dagger;
 
 import android.app.Application;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.appunite.rx.dagger.NetworkScheduler;
@@ -206,6 +209,12 @@ public final class AppModule {
                 AmazonConstants.AMAZON_S3_ID, AmazonConstants.AMAZON_S3_SECRET);
 
         final AmazonS3 s3Client = new AmazonS3Client(awsCredentials);
+        s3Client.setRegion(Region.getRegion(Regions.EU_WEST_1));
         return new TransferUtility(s3Client, context);
+    }
+
+    @Provides
+    ContentResolver provideContentResolver(@ForApplication Context context) {
+        return context.getContentResolver();
     }
 }

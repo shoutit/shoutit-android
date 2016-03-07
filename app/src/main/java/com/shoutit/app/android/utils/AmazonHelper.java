@@ -5,6 +5,8 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.appunite.rx.ResponseOrError;
+import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.constants.AmazonConstants;
 
 import java.io.File;
 
@@ -19,25 +21,50 @@ public class AmazonHelper {
     private static final String AVATAR_INFIX = "_avatar_";
 
     private final TransferUtility transferUtility;
+    private final UserPreferences userPreferences;
+    private final String userId;
 
-    @Inject
-    public AmazonHelper(TransferUtility transferUtility) {
-        this.transferUtility = transferUtility;
+    public enum AmazonBucket {
+        SHOUT(AmazonConstants.BUCKET_SHOUT_NAME,
+                AmazonConstants.BUCKET_SHOUT_URL),
+        USER(AmazonConstants.BUCKET_USER_NAME,
+                AmazonConstants.BUCKET_USER_URL),
+        TAG(AmazonConstants.BUCKET_TAG_NAME,
+                AmazonConstants.BUCKET_TAG_URL);
+
+        public final String bucketName;
+        public final String bucketUrl;
+
+        AmazonBucket(String bucketName, String bucketUrl) {
+            this.bucketName = bucketName;
+            this.bucketUrl = bucketUrl;
+        }
     }
 
-    public Observable<ResponseOrError<String>> uploadImageObservable(@Nonnull final String bucketUrl,
+    @Inject
+    public AmazonHelper(@Nonnull TransferUtility transferUtility, @Nonnull UserPreferences userPreferences) {
+        this.transferUtility = transferUtility;
+        this.userPreferences = userPreferences;
+        userId = userPreferences.getUser().getId();
+    }
+
+    public Observable<ResponseOrError<String>> uploadImageObservable(@Nonnull final AmazonBucket bucket,
                                                                      @Nonnull final File fileToUpload) {
+        final String fileName = getFileName();
+
         return Observable.create(new Observable.OnSubscribe<ResponseOrError<String>>() {
             @Override
             public void call(final Subscriber<? super ResponseOrError<String>> subscriber) {
                 final TransferObserver upload = transferUtility
-                        .upload(bucketUrl, fileToUpload.getName(), fileToUpload);
+                        .upload(bucket.bucketName, fileName, fileToUpload);
 
                 upload.setTransferListener(new TransferListener() {
                     @Override
                     public void onStateChanged(int id, TransferState state) {
                         if (state == TransferState.COMPLETED && !subscriber.isUnsubscribed()) {
-                            subscriber.onNext(ResponseOrError.fromData(String.format("%1%s/%2$s", bucketUrl, fileToUpload.getName())));
+                            subscriber.onNext(ResponseOrError.fromData(
+                                    String.format("%1$s/%2$s", bucket.bucketUrl, fileName))
+                            );
                             subscriber.onCompleted();
                         }
                     }
@@ -58,11 +85,8 @@ public class AmazonHelper {
         });
     }
 
-    public String getCoverFileName(@Nonnull String username) {
-        return username + COVER_INFIX + System.currentTimeMillis();
-    }
-
-    public String getAvatarFileName(@Nonnull String username) {
-        return username + AVATAR_INFIX + System.currentTimeMillis();
+    @Nonnull
+    private String getFileName() {
+        return String.format("%1$d_%2$s", System.currentTimeMillis(), userId);
     }
 }

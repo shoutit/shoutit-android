@@ -113,6 +113,9 @@ public class UserPreferences {
                 .putString(KEY_USER, gson.toJson(user))
                 .commit();
         refreshUser();
+        if (user.getLocation() != null) {
+            saveLocation(user.getLocation());
+        }
     }
 
     public boolean isUserLoggedIn() {

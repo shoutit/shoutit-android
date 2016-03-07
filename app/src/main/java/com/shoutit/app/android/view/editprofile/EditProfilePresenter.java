@@ -3,8 +3,8 @@ package com.shoutit.app.android.view.editprofile;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
@@ -17,10 +17,10 @@ import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.UpdateUserRequest;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
-import com.shoutit.app.android.constants.AmazonConstants;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.FileHelper;
 import com.shoutit.app.android.utils.ImageHelper;
+import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.utils.rx.Actions1;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
 
@@ -46,14 +46,13 @@ public class EditProfilePresenter {
     private final BehaviorSubject<String> bioSubject = BehaviorSubject.create();
     private final BehaviorSubject<String> websiteSubject = BehaviorSubject.create();
     private final BehaviorSubject<UserLocation> locationSubject = BehaviorSubject.create();
+    private final BehaviorSubject<UpdateUserRequest> lastCombinesData = BehaviorSubject.create();
     private final BehaviorSubject<Uri> lastSelectedAvatarUri = BehaviorSubject.create();
     private final BehaviorSubject<Uri> lastSelectedCoverUri = BehaviorSubject.create();
 
     private final PublishSubject<Object> saveClickSubject = PublishSubject.create();
     private final PublishSubject<Boolean> progressSubject = PublishSubject.create();
 
-    @Nonnull
-    private final Observable<User> userObservable;
     @Nonnull
     private final Observable<String> avatarObservable;
     @Nonnull
@@ -81,48 +80,55 @@ public class EditProfilePresenter {
     private final Observable<Throwable> imageUploadError;
     @Nonnull
     private final Observable<Throwable> updateProfileError;
+    @Nonnull
+    private final Observable<Boolean> nameErrorObservable;
+    @Nonnull
+    private final Observable<Boolean> usernameErrorObservable;
+    @Nonnull
+    private final Observable<UserLocation> locationObservable;
+    @Nonnull
+    private final Observable<User> userInputsObservable;
 
-    @Inject
     public EditProfilePresenter(@Nonnull final UserPreferences userPreferences,
                                 @Nonnull final ApiService apiService,
-                                @Nonnull final TransferUtility transferUtility,
                                 @Nonnull final FileHelper fileHelper,
                                 @Nonnull final AmazonHelper amazonHelper,
                                 @Nonnull @NetworkScheduler final Scheduler networkScheduler,
-                                @Nonnull @UiScheduler final Scheduler uiScheduler) {
+                                @Nonnull @UiScheduler final Scheduler uiScheduler,
+                                @Nullable final State state) {
         this.apiService = apiService;
         this.fileHelper = fileHelper;
         this.amazonHelper = amazonHelper;
         this.networkScheduler = networkScheduler;
         this.uiScheduler = uiScheduler;
 
+        if (state != null) {
+            locationSubject.onNext(state.getUserLocation());
+        }
+
         /** User Data **/
-        userObservable = userPreferences
+        final Observable<User> userObservable = userPreferences
                 .getUserObservable()
                 .filter(Functions1.isNotNull())
                 .compose(ObservableExtensions.<User>behaviorRefCount());
 
-        final BehaviorSubject<String> coverFileName = BehaviorSubject.create();
-        userObservable
+        userInputsObservable = userObservable
                 .first()
-                .map(new Func1<User, String>() {
+                .filter(new Func1<User, Boolean>() {
                     @Override
-                    public String call(User user) {
-                        return amazonHelper.getCoverFileName(user.getUsername());
+                    public Boolean call(User user) {
+                        return state == null;
                     }
-                })
-                .subscribe(coverFileName);
+                });
 
-        final BehaviorSubject<String> avatarFileName = BehaviorSubject.create();
-        userObservable
-                .first()
-                .map(new Func1<User, String>() {
+        locationObservable = Observable.merge(
+                userInputsObservable.map(new Func1<User, UserLocation>() {
                     @Override
-                    public String call(User user) {
-                        return amazonHelper.getAvatarFileName(user.getUsername());
+                    public UserLocation call(User user) {
+                        return user.getLocation();
                     }
-                })
-                .subscribe(avatarFileName);
+                }),
+                locationSubject);
 
         avatarObservable = userObservable
                 .map(new Func1<User, String>() {
@@ -141,7 +147,7 @@ public class EditProfilePresenter {
                 });
 
         /** Errors **/
-        final Observable<Boolean> nameErrorObservable = nameSubject
+        nameErrorObservable = nameSubject
                 .map(new Func1<String, Boolean>() {
                     @Override
                     public Boolean call(String s) {
@@ -149,7 +155,7 @@ public class EditProfilePresenter {
                     }
                 });
 
-        final Observable<Boolean> usernameErrorObservable = usernameSubject
+        usernameErrorObservable = usernameSubject
                 .map(new Func1<String, Boolean>() {
                     @Override
                     public Boolean call(String s) {
@@ -166,7 +172,7 @@ public class EditProfilePresenter {
                 });
 
         /** Last Data from inputs **/
-        final Observable<UpdateUserRequest> combinedData = Observable.combineLatest(
+        Observable.combineLatest(
                 usernameSubject.startWith((String) null),
                 nameSubject.startWith((String) null),
                 bioSubject.startWith((String) null),
@@ -177,7 +183,8 @@ public class EditProfilePresenter {
                     public UpdateUserRequest call(String username, String name, String bio, String website, UserLocation userLocation) {
                         return UpdateUserRequest.updateProfile(username, name, bio, website, userLocation);
                     }
-                });
+                })
+                .subscribe(lastCombinesData);
 
         /** Update profile data **/
         final Observable<ResponseOrError<User>> updateRequest = saveClickSubject
@@ -188,13 +195,13 @@ public class EditProfilePresenter {
                     }
                 })
                 .filter(Functions1.isFalse())
-                .doOnNext(Actions1.progressOnNext(progressSubject, true))
                 .switchMap(new Func1<Boolean, Observable<UpdateUserRequest>>() {
                     @Override
                     public Observable<UpdateUserRequest> call(Boolean ignore) {
-                        return combinedData.first();
+                        return lastCombinesData.first();
                     }
                 })
+                .doOnNext(Actions1.progressOnNext(progressSubject, true))
                 .switchMap(updateUserInApi())
                 .doOnNext(Actions1.progressOnNext(progressSubject, false))
                 .compose(ObservableExtensions.<ResponseOrError<User>>behaviorRefCount());
@@ -205,7 +212,8 @@ public class EditProfilePresenter {
         /** Upload cover **/
         final Observable<ResponseOrError<File>> coverFileToUploadObservable = lastSelectedCoverUri
                 .subscribeOn(networkScheduler)
-                .switchMap(transformImage(ImageHelper.MAX_COVER_SIZE, coverFileName.getValue()))
+                .switchMap(transformImage(ImageHelper.MAX_COVER_SIZE))
+                .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<File>>behaviorRefCount());
 
         final Observable<ResponseOrError<String>> uploadCoverToAmazonObservable = coverFileToUploadObservable
@@ -228,7 +236,8 @@ public class EditProfilePresenter {
         /** Upload avatar **/
         final Observable<ResponseOrError<File>> avatarFileToUploadObservable = lastSelectedAvatarUri
                 .subscribeOn(networkScheduler)
-                .switchMap(transformImage(ImageHelper.MAX_AVATAR_SIZE, avatarFileName.getValue()))
+                .switchMap(transformImage(ImageHelper.MAX_AVATAR_SIZE))
+                .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<File>>behaviorRefCount());
 
         final Observable<ResponseOrError<String>> uploadAvatarToAmazonObservable = avatarFileToUploadObservable
@@ -287,6 +296,7 @@ public class EditProfilePresenter {
                 ResponseOrError.transform(coverFileToUploadObservable),
                 ResponseOrError.transform(uploadCoverToAmazonObservable),
                 ResponseOrError.transform(uploadCoverToApiObservable)))
+                .filter(Functions1.isNotNull())
                 .observeOn(uiScheduler);
 
         updateProfileError = updateRequest.compose(ResponseOrError.<User>onlyError())
@@ -311,26 +321,47 @@ public class EditProfilePresenter {
         return new Func1<File, Observable<ResponseOrError<String>>>() {
             @Override
             public Observable<ResponseOrError<String>> call(File fileToUpload) {
-                return amazonHelper.uploadImageObservable(AmazonConstants.BUCKET_USER_URL, fileToUpload);
+                return amazonHelper.uploadImageObservable(AmazonHelper.AmazonBucket.USER, fileToUpload)
+                        .subscribeOn(networkScheduler)
+                        .observeOn(uiScheduler);
             }
         };
     }
 
     @NonNull
-    private Func1<Uri, Observable<ResponseOrError<File>>> transformImage(final int maxImageSize,
-                                                                         final String fileName) {
+    private Func1<Uri, Observable<ResponseOrError<File>>> transformImage(final int maxImageSize) {
         return new Func1<Uri, Observable<ResponseOrError<File>>>() {
             @Override
             public Observable<ResponseOrError<File>> call(Uri imageUri) {
                 try {
                     final String tempFile = fileHelper.createTempFileAndStoreUri(imageUri);
                     final Bitmap bitmapToUpload = ImageHelper.prepareImageToUpload(tempFile, maxImageSize);
-                    return Observable.just(ResponseOrError.fromData(fileHelper.saveBitmapToTempFile(bitmapToUpload, fileName)));
+                    return Observable.just(ResponseOrError.fromData(fileHelper.saveBitmapToTempFile(bitmapToUpload)));
                 } catch (IOException e) {
                     return Observable.just(ResponseOrError.<File>fromError(new Throwable()));
                 }
             }
         };
+    }
+
+    @Nonnull
+    public Observable<Boolean> getNameErrorObservable() {
+        return saveClickSubject.flatMap(MoreFunctions1.returnObservableFirst(nameErrorObservable));
+    }
+
+    @Nonnull
+    public Observable<Boolean> getUsernameErrorObservable() {
+        return saveClickSubject.flatMap(MoreFunctions1.returnObservableFirst(usernameErrorObservable));
+    }
+
+    @Nonnull
+    public Observable<Throwable> getImageUploadError() {
+        return imageUploadError;
+    }
+
+    @Nonnull
+    public Observable<Throwable> getUpdateProfileError() {
+        return updateProfileError;
     }
 
     @Nonnull
@@ -360,7 +391,12 @@ public class EditProfilePresenter {
 
     @Nonnull
     public Observable<User> getUserObservable() {
-        return userObservable;
+        return userInputsObservable;
+    }
+
+    @Nonnull
+    public Observable<UserLocation> getLocationObservable() {
+        return locationObservable.observeOn(uiScheduler);
     }
 
     @Nonnull
@@ -406,5 +442,21 @@ public class EditProfilePresenter {
 
     public void onSaveClicked() {
         saveClickSubject.onNext(null);
+    }
+
+    public void onLocationChanged(UserLocation userLocation) {
+        locationSubject.onNext(userLocation);
+    }
+
+    public static class State {
+        private UserLocation userLocation;
+
+        public State(UserLocation userLocation) {
+            this.userLocation = userLocation;
+        }
+
+        public UserLocation getUserLocation() {
+            return userLocation;
+        }
     }
 }

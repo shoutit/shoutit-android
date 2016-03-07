@@ -1,15 +1,13 @@
 package com.shoutit.app.android.view.editprofile;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -17,7 +15,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
@@ -32,17 +32,15 @@ import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
-import com.shoutit.app.android.utils.FileHelper;
 import com.shoutit.app.android.utils.ImageCaptureHelper;
-import com.shoutit.app.android.utils.ImageHelper;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.ResourcesHelper;
+import com.shoutit.app.android.utils.rx.Actions1;
+import com.shoutit.app.android.view.createshout.location.LocationActivity;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
-
-import java.io.IOException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -54,11 +52,11 @@ import rx.functions.Action1;
 
 public class EditProfileActivity extends BaseActivity {
 
-    private static final int PERMISSION_REQUEST_CODE = 1;
-    private static final int CAPTURE_IMAGE_FOR_AVATAR = 1;
-    private static final int CAPTURE_IMAGE_FOR_COVER = 2;
-    private static final String KEY_CAPTURE_IMAGE_FOR_AVATAR = "avatar";
-    private static final String KEY_CAPTURE_IMAGE_FOR_COVER = "cover";
+    private static final int REQUEST_CODE_PERMISSION = 1;
+    private static final int REQUEST_CODE_LOCATION = 2;
+    private static final int REQUEST_CODE_CAPTURE_IMAGE_FOR_AVATAR = 3;
+    private static final int REQUEST_CODE_CAPTURE_IMAGE_FOR_COVER = 4;
+    private static final String KEY_LOCATION = "key_location";
 
     @Bind(R.id.edit_profile_toolbar)
     Toolbar toolbar;
@@ -71,7 +69,7 @@ public class EditProfileActivity extends BaseActivity {
     @Bind(R.id.edit_profile_username_et)
     EditText usernameEt;
     @Bind(R.id.edit_profile_username_til)
-    TextInputLayout usernameTil;
+    TextInputLayout usernameInput;
     @Bind(R.id.edit_profile_bio_et)
     EditText bioEt;
     @Bind(R.id.edit_profile_bio_til)
@@ -92,6 +90,17 @@ public class EditProfileActivity extends BaseActivity {
     View avatarSelectorView;
     @Bind(R.id.base_progress)
     View progressView;
+    @Bind(R.id.edit_profile_change_location_tv)
+    TextView changeLocationTv;
+    @Bind(R.id.edit_profile_cover_photo_icon_iv)
+    ImageView coverPhotoIconIv;
+    @Bind(R.id.edit_profile_cover_progressbar)
+    ProgressBar coverProgressbar;
+    @Bind(R.id.edit_profile_avatar_photo_icon_iv)
+    ImageView avatarPhotoIconIv;
+    @Bind(R.id.edit_profile_avatar_progressbar)
+    ProgressBar avatarProgressbar;
+
 
     @Inject
     EditProfilePresenter presenter;
@@ -101,11 +110,13 @@ public class EditProfileActivity extends BaseActivity {
     ImageCaptureHelper coverCaptureHelper;
     @Inject
     ImageCaptureHelper avatarCaptureHelper;
-    @Inject
-    FileHelper fileHelper;
 
-    private String lastSelectedAvatarPath;
-    private String lastSelectedCoverPath;
+    private UserLocation lastLocation;
+
+
+    public static Intent newIntent(Context context) {
+        return new Intent(context, EditProfileActivity.class);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,16 +126,13 @@ public class EditProfileActivity extends BaseActivity {
 
         setUpToolbar();
 
-        if (savedInstanceState == null) {
-            lastSelectedAvatarPath = savedInstanceState.getString(KEY_CAPTURE_IMAGE_FOR_AVATAR);
-            presenter.getLastSelectedAvatarUriObserver().onNext(lastSelectedAvatarPath);
-            lastSelectedCoverPath = savedInstanceState.getString(KEY_CAPTURE_IMAGE_FOR_COVER);
-            presenter.getLastSelectedCoverUriObserver().onNext(lastSelectedCoverPath);
-        }
-
         presenter.getUserObservable()
                 .compose(this.<User>bindToLifecycle())
                 .subscribe(setUserData());
+
+        presenter.getLocationObservable()
+                .compose(this.<UserLocation>bindToLifecycle())
+                .subscribe(setLocation());
 
         presenter.getAvatarObservable()
                 .compose(this.<String>bindToLifecycle())
@@ -156,11 +164,22 @@ public class EditProfileActivity extends BaseActivity {
 
         RxView.clicks(avatarSelectorView)
                 .compose(bindToLifecycle())
-                .subscribe(new CaptureImageAction(CAPTURE_IMAGE_FOR_AVATAR));
+                .subscribe(new CaptureImageAction(REQUEST_CODE_CAPTURE_IMAGE_FOR_AVATAR));
 
         RxView.clicks(coverSelectorView)
                 .compose(this.<Void>bindToLifecycle())
-                .subscribe(new CaptureImageAction(CAPTURE_IMAGE_FOR_COVER));
+                .subscribe(new CaptureImageAction(REQUEST_CODE_CAPTURE_IMAGE_FOR_COVER));
+
+        RxView.clicks(changeLocationTv)
+                .compose(this.<Void>bindToLifecycle())
+                .subscribe(new Action1<Void>() {
+                    @Override
+                    public void call(Void aVoid) {
+                        startActivityForResult(LocationActivity.newIntent(
+                                EditProfileActivity.this),
+                                REQUEST_CODE_LOCATION);
+                    }
+                });
 
         presenter.getSuccessObservable()
                 .compose(this.<User>bindToLifecycle())
@@ -174,6 +193,73 @@ public class EditProfileActivity extends BaseActivity {
         presenter.getProgressObservable()
                 .compose(this.<Boolean>bindToLifecycle())
                 .subscribe(RxView.visibility(progressView));
+
+        presenter.getAvatarProgressObservable()
+                .compose(this.<Boolean>bindToLifecycle())
+                .subscribe(new Action1<Boolean>() {
+                    @Override
+                    public void call(Boolean showProgress) {
+                        avatarProgressbar.setVisibility(showProgress ? View.VISIBLE : View.GONE);
+                        avatarPhotoIconIv.setVisibility(showProgress ? View.GONE : View.VISIBLE);
+                    }
+                });
+
+        presenter.getCoverProgressObservable()
+                .compose(this.<Boolean>bindToLifecycle())
+                .subscribe(new Action1<Boolean>() {
+                    @Override
+                    public void call(Boolean showProgress) {
+                        coverProgressbar.setVisibility(showProgress ? View.VISIBLE : View.GONE);
+                        coverPhotoIconIv.setVisibility(showProgress ? View.GONE : View.VISIBLE);
+                    }
+                });
+
+        presenter.getImageUploadToApiSuccessObservable()
+                .compose(bindToLifecycle())
+                .subscribe(new Action1<Object>() {
+                    @Override
+                    public void call(Object o) {
+                        Toast.makeText(EditProfileActivity.this, R.string.edit_profile_success, Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+        presenter.getImageUploadError()
+                .compose(this.<Throwable>bindToLifecycle())
+                .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(this), R.string.error_image_upload));
+
+        presenter.getUpdateProfileError()
+                .compose(this.<Throwable>bindToLifecycle())
+                .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(this)));
+
+        presenter.getNameErrorObservable()
+                .compose(this.<Boolean>bindToLifecycle())
+                .subscribe(Actions1.setOrEraseError(nameInput, getString(R.string.error_field_empty)));
+
+        presenter.getUsernameErrorObservable()
+                .compose(this.<Boolean>bindToLifecycle())
+                .subscribe(Actions1.setOrEraseError(usernameInput, getString(R.string.error_field_empty)));
+    }
+
+    @NonNull
+    private Action1<UserLocation> setLocation() {
+        return new Action1<UserLocation>() {
+            @Override
+            public void call(UserLocation userLocation) {
+                lastLocation = userLocation;
+                locationTv.setText(getString(R.string.edit_profile_country,
+                        Strings.nullToEmpty(userLocation.getCity()),
+                        Strings.nullToEmpty(userLocation.getCountry())));
+
+                final Optional<Integer> countryResId = ResourcesHelper
+                        .getCountryResId(EditProfileActivity.this, userLocation);
+                final Target flagTarget = PicassoHelper
+                        .getRoundedBitmapTarget(EditProfileActivity.this, flagIv);
+                if (countryResId.isPresent()) {
+                    picasso.load(countryResId.get())
+                            .into(flagTarget);
+                }
+            }
+        };
     }
 
     @Override
@@ -205,22 +291,6 @@ public class EditProfileActivity extends BaseActivity {
                 usernameEt.setText(user.getUsername());
                 bioEt.setText(user.getBio());
                 websiteEt.setText(user.getWebUrl());
-
-                final UserLocation userLocation = user.getLocation();
-                if (userLocation != null) {
-                    locationTv.setText(getString(R.string.edit_profile_country,
-                            Strings.nullToEmpty(userLocation.getCity()),
-                            Strings.nullToEmpty(userLocation.getCountry())));
-
-                    final Optional<Integer> countryResId = ResourcesHelper
-                            .getCountryResId(EditProfileActivity.this, userLocation);
-                    final Target flagTarget = PicassoHelper
-                            .getRoundedBitmapTarget(EditProfileActivity.this, flagIv);
-                    if (countryResId.isPresent()) {
-                        picasso.load(countryResId.get())
-                                .into(flagTarget);
-                    }
-                }
             }
         };
     }
@@ -230,26 +300,31 @@ public class EditProfileActivity extends BaseActivity {
         return new Action1<String>() {
             @Override
             public void call(String coverUrl) {
-                final Target avatarTarget = PicassoHelper.getRoundedBitmapWithStrokeTarget(
-                        avatarIv, getResources().getDimensionPixelSize(R.dimen.profile_avatar_stroke),
-                        false, getResources().getDimensionPixelSize(R.dimen.profile_avatar_radius));
                 picasso.load(coverUrl)
                         .fit()
                         .centerCrop()
-                        .into(avatarTarget);
+                        .placeholder(R.drawable.pattern_placeholder)
+                        .error(R.drawable.pattern_placeholder)
+                        .into(coverIv);
             }
         };
     }
 
     @NonNull
     private Action1<String> loadAvatar() {
+        final int strokeSize = getResources().getDimensionPixelSize(R.dimen.profile_avatar_stroke);
+        final int corners = getResources().getDimensionPixelSize(R.dimen.profile_avatar_radius);
+
         return new Action1<String>() {
             @Override
-            public void call(String avatarUri) {
-                picasso.load(avatarUri)
+            public void call(String url) {
+                picasso.load(url)
+                        .placeholder(R.drawable.ic_rect_avatar_placeholder)
+                        .error(R.drawable.ic_rect_avatar_placeholder)
                         .fit()
                         .centerCrop()
-                        .into(coverIv);
+                        .transform(PicassoHelper.roundedWithStrokeTransformation(strokeSize, false, corners, "ProfileAvatar"))
+                        .into(avatarIv);
             }
         };
     }
@@ -262,15 +337,15 @@ public class EditProfileActivity extends BaseActivity {
     }
 
     private void captureImage(int requestCode) {
-        if (!PermissionHelper.checkPermissions(this, PERMISSION_REQUEST_CODE, ColoredSnackBar.contentView(this),
+        if (!PermissionHelper.checkPermissions(this, REQUEST_CODE_PERMISSION, ColoredSnackBar.contentView(this),
                 R.string.permission_location_explanation, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE})) {
             return;
         }
 
         final Optional<Intent> captureIntent;
-        if (requestCode == CAPTURE_IMAGE_FOR_AVATAR) {
+        if (requestCode == REQUEST_CODE_CAPTURE_IMAGE_FOR_AVATAR) {
             captureIntent = avatarCaptureHelper.createSelectOrCaptureImageIntent();
-        } else if (requestCode == CAPTURE_IMAGE_FOR_COVER) {
+        } else if (requestCode == REQUEST_CODE_CAPTURE_IMAGE_FOR_COVER) {
             captureIntent = coverCaptureHelper.createSelectOrCaptureImageIntent();
         } else {
             throw new RuntimeException("Unkonwn request code: " + requestCode);
@@ -285,26 +360,27 @@ public class EditProfileActivity extends BaseActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         final Optional<Uri> uri;
 
+        if (resultCode != RESULT_OK) {
+            super.onActivityResult(requestCode, resultCode, data);
+            return;
+        }
+
         switch (requestCode) {
-            case CAPTURE_IMAGE_FOR_AVATAR:
+            case REQUEST_CODE_CAPTURE_IMAGE_FOR_AVATAR:
                 uri = avatarCaptureHelper.onResult(resultCode, data);
                 if (uri.isPresent()) {
-                    try {
-                        presenter.getLastSelectedAvatarUriObserver().onNext(uri.get());
-                    } catch (IOException e) {
-                        presenter.imageChooseErrorObserver().onNext(null);
-                    }
+                    presenter.getLastSelectedAvatarUriObserver().onNext(uri.get());
                 }
                 break;
-            case CAPTURE_IMAGE_FOR_COVER:
+            case REQUEST_CODE_CAPTURE_IMAGE_FOR_COVER:
                 uri = coverCaptureHelper.onResult(resultCode, data);
                 if (uri.isPresent()) {
-                    try {
-                        presenter.getLastSelectedAvatarUriObserver().onNext(uri.get());
-                    } catch (IOException e) {
-                        presenter.imageChooseErrorObserver().onNext(null);
-                    }
+                    presenter.getLastSelectedCoverUriObserver().onNext(uri.get());
                 }
+                break;
+            case REQUEST_CODE_LOCATION:
+                final UserLocation userLocation = (UserLocation) data.getSerializableExtra(LocationActivity.EXTRAS_USER_LOCATION);
+                presenter.onLocationChanged(userLocation);
                 break;
             default:
                 super.onActivityResult(requestCode, resultCode, data);
@@ -326,14 +402,14 @@ public class EditProfileActivity extends BaseActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == PERMISSION_REQUEST_CODE) {
+        if (requestCode == REQUEST_CODE_PERMISSION) {
             final boolean permissionsGranted = PermissionHelper.arePermissionsGranted(grantResults);
             if (permissionsGranted) {
                 ColoredSnackBar.success(ColoredSnackBar.contentView(this),
-                        R.string.permission_granted, Snackbar.LENGTH_SHORT);
+                        R.string.permission_granted, Snackbar.LENGTH_SHORT).show();
             } else {
-                ColoredSnackBar.success(ColoredSnackBar.contentView(this),
-                        R.string.permission_not_granted, Snackbar.LENGTH_SHORT);
+                ColoredSnackBar.error(ColoredSnackBar.contentView(this),
+                        R.string.permission_not_granted, Snackbar.LENGTH_SHORT).show();
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -342,17 +418,22 @@ public class EditProfileActivity extends BaseActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        outState.putSerializable(KEY_LOCATION, lastLocation);
         super.onSaveInstanceState(outState);
-        avatarCaptureHelper.onSaveInstanceState(outState, KEY_CAPTURE_IMAGE_FOR_AVATAR);
-        coverCaptureHelper.onSaveInstanceState(outState, KEY_CAPTURE_IMAGE_FOR_COVER);
     }
 
     @Nonnull
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            lastLocation = (UserLocation) savedInstanceState.getSerializable(KEY_LOCATION);
+        }
+
         final EditProfileActivityComponent component = DaggerEditProfileActivityComponent
                 .builder()
                 .activityModule(new ActivityModule(this))
+                .editProfileActivityModule(new EditProfileActivityModule(savedInstanceState == null ?
+                        null : new EditProfilePresenter.State(lastLocation)))
                 .appComponent(App.getAppComponent(getApplication()))
                 .build();
         component.inject(this);

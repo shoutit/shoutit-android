@@ -57,13 +57,13 @@ public class LocationPresenter {
     @Nonnull
     private final PublishSubject<Object> gpsLocationRefreshSubject = PublishSubject.create();
     @Nonnull
-    private PublishSubject<String> suggestedLocationSelectedSubject = PublishSubject.create();
+    private final PublishSubject<String> suggestedLocationSelectedSubject = PublishSubject.create();
     @Nonnull
-    private PublishSubject<Boolean> queryProgressSubject = PublishSubject.create();
+    private final PublishSubject<Boolean> queryProgressSubject = PublishSubject.create();
     @Nonnull
-    private PublishSubject<Boolean> progressSubject = PublishSubject.create();
+    private final PublishSubject<Boolean> progressSubject = PublishSubject.create();
     @Nonnull
-    private PublishSubject<UserLocation> selectedGpsUserLocation = PublishSubject.create();
+    private final PublishSubject<UserLocation> selectedGpsUserLocation = PublishSubject.create();
     @Nonnull
     private final Observable<List<BaseAdapterItem>> allAdapterItemsObservable;
     @Nonnull

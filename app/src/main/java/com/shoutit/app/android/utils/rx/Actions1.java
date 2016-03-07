@@ -44,6 +44,20 @@ public class Actions1 {
         };
     }
 
+    @NonNull
+    public static Action1<Boolean> setOrEraseError(@NonNull final TextInputLayout textInputLayout, @NonNull final String message) {
+        return new Action1<Boolean>() {
+            @Override
+            public void call(Boolean setError) {
+                if (setError) {
+                    textInputLayout.setError(message);
+                } else {
+                    textInputLayout.setError(null);
+                }
+            }
+        };
+    }
+
     public static <T> Action1<T> progressOnNext(@NonNull final Observer<Boolean> progressObserver,
                                                 final boolean showProgress) {
         return new Action1<T>() {
