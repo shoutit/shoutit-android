@@ -34,16 +34,19 @@ import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Func1;
 import rx.functions.Func2;
-import rx.functions.Func5;
+import rx.functions.Func3;
+import rx.functions.Func7;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
 public class EditProfilePresenter {
 
-    private final BehaviorSubject<String> nameSubject = BehaviorSubject.create();
+    private final BehaviorSubject<String> firstNameSubject = BehaviorSubject.create();
+    private final BehaviorSubject<String> lastNameSubject = BehaviorSubject.create();
     private final BehaviorSubject<String> usernameSubject = BehaviorSubject.create();
     private final BehaviorSubject<String> bioSubject = BehaviorSubject.create();
     private final BehaviorSubject<String> websiteSubject = BehaviorSubject.create();
+    private final BehaviorSubject<String> mobileSubject = BehaviorSubject.create();
     private final BehaviorSubject<UserLocation> locationSubject = BehaviorSubject.create();
     private final BehaviorSubject<UpdateUserRequest> lastCombinedData = BehaviorSubject.create();
     private final BehaviorSubject<Uri> lastSelectedAvatarUri = BehaviorSubject.create();
@@ -80,7 +83,9 @@ public class EditProfilePresenter {
     @Nonnull
     private final Observable<Throwable> updateProfileError;
     @Nonnull
-    private final Observable<Boolean> nameErrorObservable;
+    private final Observable<Boolean> firstNameErrorObservable;
+    @Nonnull
+    private final Observable<Boolean> lastNameErrorObservable;
     @Nonnull
     private final Observable<Boolean> usernameErrorObservable;
     @Nonnull
@@ -146,7 +151,15 @@ public class EditProfilePresenter {
                 });
 
         /** Errors **/
-        nameErrorObservable = nameSubject
+        firstNameErrorObservable = firstNameSubject
+                .map(new Func1<String, Boolean>() {
+                    @Override
+                    public Boolean call(String s) {
+                        return Strings.isNullOrEmpty(s);
+                    }
+                });
+
+        lastNameErrorObservable = lastNameSubject
                 .map(new Func1<String, Boolean>() {
                     @Override
                     public Boolean call(String s) {
@@ -163,24 +176,26 @@ public class EditProfilePresenter {
                 });
 
         final Observable<Boolean> hasAnyErrorObservable = Observable.combineLatest(
-                nameErrorObservable, usernameErrorObservable, new Func2<Boolean, Boolean, Boolean>() {
+                firstNameErrorObservable, lastNameErrorObservable, usernameErrorObservable, new Func3<Boolean, Boolean, Boolean, Boolean>() {
                     @Override
-                    public Boolean call(Boolean error1, Boolean error2) {
-                        return error1 || error2;
+                    public Boolean call(Boolean error1, Boolean error2, Boolean error3) {
+                        return error1 || error2 || error3;
                     }
                 });
 
         /** Last Data from inputs **/
         Observable.combineLatest(
                 usernameSubject.startWith((String) null),
-                nameSubject.startWith((String) null),
+                firstNameSubject.startWith((String) null),
+                lastNameSubject.startWith((String) null),
                 bioSubject.startWith((String) null),
                 websiteSubject.startWith((String) null),
+                mobileSubject.startWith((String) null),
                 locationSubject.startWith((UserLocation) null),
-                new Func5<String, String, String, String, UserLocation, UpdateUserRequest>() {
+                new Func7<String, String, String, String, String, String, UserLocation, UpdateUserRequest>() {
                     @Override
-                    public UpdateUserRequest call(String username, String name, String bio, String website, UserLocation userLocation) {
-                        return UpdateUserRequest.updateProfile(username, name, bio, website, userLocation);
+                    public UpdateUserRequest call(String username, String firstName, String lastName, String bio, String website, String mobile, UserLocation userLocation) {
+                        return UpdateUserRequest.updateProfile(username, firstName, lastName, bio, website, mobile, userLocation);
                     }
                 })
                 .subscribe(lastCombinedData);
@@ -344,8 +359,13 @@ public class EditProfilePresenter {
     }
 
     @Nonnull
-    public Observable<Boolean> getNameErrorObservable() {
-        return saveClickSubject.flatMap(MoreFunctions1.returnObservableFirst(nameErrorObservable));
+    public Observable<Boolean> getFirstNameErrorObservable() {
+        return saveClickSubject.flatMap(MoreFunctions1.returnObservableFirst(firstNameErrorObservable));
+    }
+
+    @Nonnull
+    public Observable<Boolean> getLastNameErrorObservable() {
+        return saveClickSubject.flatMap(MoreFunctions1.returnObservableFirst(lastNameErrorObservable));
     }
 
     @Nonnull
@@ -409,8 +429,13 @@ public class EditProfilePresenter {
     }
 
     @Nonnull
-    public Observer<String> getNameObserver() {
-        return RxMoreObservers.ignoreCompleted(nameSubject);
+    public Observer<String> getFirstNameObserver() {
+        return RxMoreObservers.ignoreCompleted(firstNameSubject);
+    }
+
+    @Nonnull
+    public Observer<String> getLastNameObserver() {
+        return RxMoreObservers.ignoreCompleted(lastNameSubject);
     }
 
     @Nonnull
@@ -426,6 +451,10 @@ public class EditProfilePresenter {
     @Nonnull
     public Observer<String> getWebsiteObserver() {
         return RxMoreObservers.ignoreCompleted(websiteSubject);
+    }
+
+    public Observer<String> getMobileObserver() {
+        return RxMoreObservers.ignoreCompleted(mobileSubject);
     }
 
     @Nonnull

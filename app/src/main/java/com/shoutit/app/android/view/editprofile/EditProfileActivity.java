@@ -23,7 +23,6 @@ import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import com.jakewharton.rxbinding.view.RxView;
 import com.jakewharton.rxbinding.widget.RxTextView;
-import com.jakewharton.rxbinding.widget.TextViewTextChangeEvent;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
@@ -62,10 +61,14 @@ public class EditProfileActivity extends BaseActivity {
     Toolbar toolbar;
     @Bind(R.id.edit_profile_cover_iv)
     ImageView coverIv;
-    @Bind(R.id.edit_profile_name_et)
-    EditText nameEt;
-    @Bind(R.id.edit_profile_name_til)
-    TextInputLayout nameInput;
+    @Bind(R.id.edit_profile_first_name_et)
+    EditText firstNameEt;
+    @Bind(R.id.edit_profile_first_name_til)
+    TextInputLayout firstNameInput;
+    @Bind(R.id.edit_profile_last_name_til)
+    TextInputLayout lastNameInput;
+    @Bind(R.id.edit_profile_last_name_et)
+    EditText lastNameEt;
     @Bind(R.id.edit_profile_username_et)
     EditText usernameEt;
     @Bind(R.id.edit_profile_username_til)
@@ -82,6 +85,8 @@ public class EditProfileActivity extends BaseActivity {
     EditText websiteEt;
     @Bind(R.id.edit_profile_website_til)
     TextInputLayout websiteInput;
+    @Bind(R.id.edit_profile_mobile_et)
+    EditText mobileEt;
     @Bind(R.id.edit_profile_avatar_iv)
     ImageView avatarIv;
     @Bind(R.id.edit_profile_cover_selector)
@@ -142,10 +147,15 @@ public class EditProfileActivity extends BaseActivity {
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(loadCover());
 
-        RxTextView.textChangeEvents(nameEt)
+        RxTextView.textChangeEvents(firstNameEt)
                 .map(MoreFunctions1.mapTextChangeEventToString())
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(presenter.getNameObserver());
+                .subscribe(presenter.getFirstNameObserver());
+
+        RxTextView.textChangeEvents(lastNameEt)
+                .map(MoreFunctions1.mapTextChangeEventToString())
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(presenter.getLastNameObserver());
 
         RxTextView.textChangeEvents(usernameEt)
                 .map(MoreFunctions1.mapTextChangeEventToString())
@@ -161,6 +171,11 @@ public class EditProfileActivity extends BaseActivity {
                 .map(MoreFunctions1.mapTextChangeEventToString())
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(presenter.getWebsiteObserver());
+
+        RxTextView.textChangeEvents(mobileEt)
+                .map(MoreFunctions1.mapTextChangeEventToString())
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(presenter.getMobileObserver());
 
         RxView.clicks(avatarSelectorView)
                 .compose(bindToLifecycle())
@@ -231,9 +246,13 @@ public class EditProfileActivity extends BaseActivity {
                 .compose(this.<Throwable>bindToLifecycle())
                 .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(this)));
 
-        presenter.getNameErrorObservable()
+        presenter.getFirstNameErrorObservable()
                 .compose(this.<Boolean>bindToLifecycle())
-                .subscribe(Actions1.setOrEraseError(nameInput, getString(R.string.error_field_empty)));
+                .subscribe(Actions1.setOrEraseError(firstNameInput, getString(R.string.error_field_empty)));
+
+        presenter.getLastNameErrorObservable()
+                .compose(this.<Boolean>bindToLifecycle())
+                .subscribe(Actions1.setOrEraseError(lastNameInput, getString(R.string.error_field_empty)));
 
         presenter.getUsernameErrorObservable()
                 .compose(this.<Boolean>bindToLifecycle())
@@ -287,10 +306,12 @@ public class EditProfileActivity extends BaseActivity {
         return new Action1<User>() {
             @Override
             public void call(User user) {
-                nameEt.setText(user.getName());
+                firstNameEt.setText(user.getFirstName());
+                lastNameEt.setText(user.getLastName());
                 usernameEt.setText(user.getUsername());
                 bioEt.setText(user.getBio());
-                websiteEt.setText(user.getWebUrl());
+                websiteEt.setText(user.getWebsite());
+                mobileEt.setText(user.getMobile());
             }
         };
     }

@@ -253,5 +253,8 @@
     <string name="edit_profile_toolbar_title">Edit Profile</string>
     <string name="edit_profile_country">%1$s, %2$s</string>
     <string name="edit_profile_success">Profile successfully updated</string>
+    <string name="edit_profile_hint_first_name">First Name</string>
+    <string name="edit_profile_hint_last_name">Last Name</string>
+    <string name="edit_profile_hint_mobile">Mobile</string>
 
 </resources>

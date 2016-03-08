@@ -73,6 +73,12 @@
         <item name="android:background">@drawable/selector_menu_item</item>
     </style>
 
+    <style name="ProfileInputStyle" parent="@style/TextAppearance.AppCompat">
+        <item name="android:textColorHint">@color/black_38</item>
+        <item name="android:textColor">@color/accent_blue</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
     <style name="BlueInputStyle" parent="@style/TextAppearance.AppCompat">
         <item name="android:textColorHint">@color/black_38</item>
         <item name="android:textColor">@color/accent_blue</item>

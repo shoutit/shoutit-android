@@ -7,7 +7,9 @@ public class UpdateUserRequest {
     @Nullable
     private final String username;
     @Nullable
-    private final String name;
+    private final String firstName;
+    @Nullable
+    private final String lastName;
     @Nullable
     private final String bio;
     @Nullable
@@ -18,42 +20,47 @@ public class UpdateUserRequest {
     private final String cover;
     @Nullable
     private final String image;
-
+    @Nullable
+    private final String mobile;
     @Nullable
     private final String email;
 
     public static UpdateUserRequest updateWithEmail(String email) {
-        return new UpdateUserRequest(email, null, null, null, null, null, null, null);
+        return new UpdateUserRequest(null, null, null, email, null, null, null, null, null, null);
     }
 
     public static UpdateUserRequest updateWithCoverUrl(String coverUrl) {
-        return new UpdateUserRequest(null, null, null, null, null, null, coverUrl, null);
+        return new UpdateUserRequest(null, null, null, null, null, null, null, coverUrl, null, null);
     }
 
     public static UpdateUserRequest updateWithAvatarUrl(String avatarUrl) {
-        return new UpdateUserRequest(null, null, null, null, null, null, null, avatarUrl);
+        return new UpdateUserRequest(null, null, null, null, null, null, null, null, avatarUrl, null);
     }
 
     public static UpdateUserRequest updateProfile(@Nullable String username,
-                                                  @Nullable String name,
+                                                  @Nullable String firstName,
+                                                  @Nullable String lastName,
                                                   @Nullable String bio,
                                                   @Nullable String website,
+                                                  @Nullable String mobile,
                                                   @Nullable UserLocation location) {
-        return new UpdateUserRequest(null, username, name, bio, website, location, null, null);
+        return new UpdateUserRequest(firstName, lastName, username, null, bio, website, location, null, null, mobile);
     }
 
-    public UpdateUserRequest(@Nullable String email, @Nullable String username,
-                             @Nullable String name,
+    public UpdateUserRequest(@Nullable String firstName, @Nullable String lastName,
+                             @Nullable String username, @Nullable String email,
                              @Nullable String bio, @Nullable String website,
                              @Nullable UserLocation location, @Nullable String cover,
-                             @Nullable String image) {
-        this.email = email;
+                             @Nullable String image, @Nullable String mobile) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.username = username;
-        this.name = name;
+        this.email = email;
         this.bio = bio;
         this.website = website;
         this.location = location;
         this.cover = cover;
         this.image = image;
+        this.mobile = mobile;
     }
 }

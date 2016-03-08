@@ -67,18 +67,38 @@
                     android:paddingTop="50dp">
 
                     <android.support.design.widget.TextInputLayout
-                        android:id="@+id/edit_profile_name_til"
+                        android:id="@+id/edit_profile_first_name_til"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:theme="@style/BlueEditText"
                         app:errorEnabled="true"
-                        app:hintTextAppearance="@style/BlueInputStyle">
+                        app:hintTextAppearance="@style/ProfileInputStyle">
 
                         <EditText
-                            android:id="@+id/edit_profile_name_et"
+                            android:id="@+id/edit_profile_first_name_et"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="@string/edit_profile_hint_name"
+                            android:hint="@string/edit_profile_hint_first_name"
+                            android:imeOptions="actionNext"
+                            android:singleLine="true"
+                            android:nextFocusDown="@+id/edit_profile_last_name_et"
+                            android:textSize="16sp" />
+
+                    </android.support.design.widget.TextInputLayout>
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/edit_profile_last_name_til"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:theme="@style/BlueEditText"
+                        app:errorEnabled="true"
+                        app:hintTextAppearance="@style/ProfileInputStyle">
+
+                        <EditText
+                            android:id="@+id/edit_profile_last_name_et"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/edit_profile_hint_last_name"
                             android:imeOptions="actionNext"
                             android:singleLine="true"
                             android:nextFocusDown="@+id/edit_profile_username_et"
@@ -92,7 +112,7 @@
                         android:layout_height="wrap_content"
                         android:theme="@style/BlueEditText"
                         app:errorEnabled="true"
-                        app:hintTextAppearance="@style/BlueInputStyle">
+                        app:hintTextAppearance="@style/ProfileInputStyle">
 
                         <EditText
                             android:id="@+id/edit_profile_username_et"
@@ -114,7 +134,7 @@
                         app:counterEnabled="true"
                         app:counterMaxLength="50"
                         app:errorEnabled="true"
-                        app:hintTextAppearance="@style/BlueInputStyle">
+                        app:hintTextAppearance="@style/ProfileInputStyle">
 
                         <EditText
                             android:id="@+id/edit_profile_bio_et"
@@ -190,15 +210,36 @@
                         android:layout_height="wrap_content"
                         android:theme="@style/BlueEditText"
                         app:errorEnabled="true"
-                        app:hintTextAppearance="@style/BlueInputStyle">
+                        app:hintTextAppearance="@style/ProfileInputStyle">
 
                         <EditText
                             android:id="@+id/edit_profile_website_et"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="@string/edit_profile_hint_website"
-                            android:imeOptions="actionDone"
+                            android:imeOptions="actionNext"
+                            android:nextFocusDown="@+id/edit_profile_mobile_et"
                             android:inputType="textUri"
+                            android:singleLine="true"
+                            android:textSize="16sp" />
+
+                    </android.support.design.widget.TextInputLayout>
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/edit_profile_mobile_til"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:theme="@style/BlueEditText"
+                        app:errorEnabled="true"
+                        app:hintTextAppearance="@style/ProfileInputStyle">
+
+                        <EditText
+                            android:id="@+id/edit_profile_mobile_et"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/edit_profile_hint_mobile"
+                            android:imeOptions="actionDone"
+                            android:inputType="phone"
                             android:singleLine="true"
                             android:textSize="16sp" />
 

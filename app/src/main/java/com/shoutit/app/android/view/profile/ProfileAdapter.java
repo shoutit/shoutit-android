@@ -75,7 +75,7 @@ public abstract class ProfileAdapter extends BaseAdapter {
         public void bind(@Nonnull ProfileAdapterItems.UserInfoAdapterItem item) {
             final User user = item.getUser();
             bioTextView.setText(user.getBio());
-            websiteTextView.setText(user.getWebUrl());
+            websiteTextView.setText(user.getWebsite());
 
             if (user.getDateJoinedInMillis() > 0) {
                 dateJoinedTextView.setText(context.getString(

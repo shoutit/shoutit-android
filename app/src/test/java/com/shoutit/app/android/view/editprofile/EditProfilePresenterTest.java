@@ -64,7 +64,7 @@ public class EditProfilePresenterTest {
     public void testName() throws Exception {
         TestSubscriber subscriber = new TestSubscriber();
 
-        presenter.getNameObserver().onNext("name");
+        presenter.getFirstNameObserver().onNext("name");
         presenter.getBioObserver().onNext("bio");
 
 
@@ -73,6 +73,6 @@ public class EditProfilePresenterTest {
 
     private User getUser() {
         return new User("z", null, null, null, null, null, null, null, false, null,
-                null, false, false, false, null, 1, null, null, 1, null);
+                null, false, false, false, null, 1, null, null, 1, null, null, null);
     }
 }
