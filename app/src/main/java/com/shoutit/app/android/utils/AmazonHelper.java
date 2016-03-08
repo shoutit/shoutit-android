@@ -17,10 +17,12 @@ import rx.Observable;
 import rx.Subscriber;
 
 public class AmazonHelper {
-    private static final String COVER_INFIX = "_cover_";
-    private static final String AVATAR_INFIX = "_avatar_";
 
+    public static final String JPEG = ".jpg";
+
+    @Nonnull
     private final TransferUtility transferUtility;
+    @Nonnull
     private final UserPreferences userPreferences;
     private final String userId;
 
@@ -50,7 +52,7 @@ public class AmazonHelper {
 
     public Observable<ResponseOrError<String>> uploadImageObservable(@Nonnull final AmazonBucket bucket,
                                                                      @Nonnull final File fileToUpload) {
-        final String fileName = getFileName();
+        final String fileName = getImageFileName();
 
         return Observable.create(new Observable.OnSubscribe<ResponseOrError<String>>() {
             @Override
@@ -86,7 +88,7 @@ public class AmazonHelper {
     }
 
     @Nonnull
-    private String getFileName() {
-        return String.format("%1$d_%2$s", System.currentTimeMillis(), userId);
+    private String getImageFileName() {
+        return String.format("%1$d_%2$s%3$s", System.currentTimeMillis(), userId, JPEG);
     }
 }
