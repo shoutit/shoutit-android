@@ -73,7 +73,7 @@ public class EditProfileActivity extends BaseActivity {
     @Bind(R.id.edit_profile_bio_et)
     EditText bioEt;
     @Bind(R.id.edit_profile_bio_til)
-    TextInputLayout bioTil;
+    TextInputLayout bioInput;
     @Bind(R.id.edit_profile_flag_iv)
     ImageView flagIv;
     @Bind(R.id.edit_profile_location_tv)
@@ -81,7 +81,7 @@ public class EditProfileActivity extends BaseActivity {
     @Bind(R.id.edit_profile_website_et)
     EditText websiteEt;
     @Bind(R.id.edit_profile_website_til)
-    TextInputLayout websiteTil;
+    TextInputLayout websiteInput;
     @Bind(R.id.edit_profile_avatar_iv)
     ImageView avatarIv;
     @Bind(R.id.edit_profile_cover_selector)
@@ -143,23 +143,23 @@ public class EditProfileActivity extends BaseActivity {
                 .subscribe(loadCover());
 
         RxTextView.textChangeEvents(nameEt)
-                .compose(this.<TextViewTextChangeEvent>bindToLifecycle())
                 .map(MoreFunctions1.mapTextChangeEventToString())
+                .compose(this.<String>bindToLifecycle())
                 .subscribe(presenter.getNameObserver());
 
         RxTextView.textChangeEvents(usernameEt)
-                .compose(this.<TextViewTextChangeEvent>bindToLifecycle())
                 .map(MoreFunctions1.mapTextChangeEventToString())
+                .compose(this.<String>bindToLifecycle())
                 .subscribe(presenter.getUserNameObserver());
 
         RxTextView.textChangeEvents(bioEt)
-                .compose(this.<TextViewTextChangeEvent>bindToLifecycle())
                 .map(MoreFunctions1.mapTextChangeEventToString())
+                .compose(this.<String>bindToLifecycle())
                 .subscribe(presenter.getBioObserver());
 
         RxTextView.textChangeEvents(websiteEt)
-                .compose(this.<TextViewTextChangeEvent>bindToLifecycle())
                 .map(MoreFunctions1.mapTextChangeEventToString())
+                .compose(this.<String>bindToLifecycle())
                 .subscribe(presenter.getWebsiteObserver());
 
         RxView.clicks(avatarSelectorView)

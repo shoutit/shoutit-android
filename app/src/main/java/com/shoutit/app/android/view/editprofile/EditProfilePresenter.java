@@ -28,7 +28,6 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Observer;
@@ -336,9 +335,9 @@ public class EditProfilePresenter {
                 try {
                     final String tempFile = fileHelper.createTempFileAndStoreUri(imageUri);
                     final Bitmap bitmapToUpload = ImageHelper.prepareImageToUpload(tempFile, maxImageSize);
-                    return Observable.just(ResponseOrError.fromData(fileHelper.saveBitmapToTempFile(bitmapToUpload)));
+                    return fileHelper.saveBitmapToTempFileObservable(bitmapToUpload);
                 } catch (IOException e) {
-                    return Observable.just(ResponseOrError.<File>fromError(new Throwable()));
+                    return Observable.just(ResponseOrError.<File>fromError(e));
                 }
             }
         };

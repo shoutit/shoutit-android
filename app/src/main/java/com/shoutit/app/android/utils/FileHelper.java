@@ -1,15 +1,14 @@
 package com.shoutit.app.android.utils;
 
-import android.content.ContentResolver;
 import android.content.Context;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.provider.MediaStore;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.google.common.base.Optional;
+import com.appunite.rx.ResponseOrError;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Files;
+import com.google.common.io.Resources;
 import com.shoutit.app.android.dagger.ForActivity;
 
 import java.io.File;
@@ -22,61 +21,58 @@ import java.io.OutputStream;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import rx.Observable;
+import rx.Subscriber;
 
 public class FileHelper {
 
-    private final ContentResolver mContentResolver;
     private final Context context;
 
     @Inject
-    public FileHelper(ContentResolver mContentResolver, @ForActivity Context context) {
-        this.mContentResolver = mContentResolver;
+    public FileHelper(@ForActivity Context context) {
         this.context = context;
     }
 
-    public Optional<File> getLocalFile(Uri uri) {
-        checkNotNull(uri);
-
-        if ("file".equals(uri.getScheme())) {
-            return Optional.of(new File(uri.getPath()));
-
-        } else if ("content".equals(uri.getScheme())) {
-            return getFileFromContentResolver(uri);
-        }
-
-        return Optional.absent();
+    @Nonnull
+    public Observable<ResponseOrError<File>> saveBitmapToTempFileObservable(@Nonnull final Bitmap bitmap) {
+        return Observable.create(new Observable.OnSubscribe<ResponseOrError<File>>() {
+            @Override
+            public void call(Subscriber<? super ResponseOrError<File>> subscriber) {
+                if (!subscriber.isUnsubscribed()) {
+                    try {
+                        subscriber.onNext(ResponseOrError.fromData(saveBitmapToTempFile(bitmap)));
+                    } catch (Exception e) {
+                        subscriber.onNext(ResponseOrError.<File>fromError(e));
+                    } finally {
+                        subscriber.onCompleted();
+                    }
+                }
+            }
+        });
     }
 
-    public Optional<File> getFileFromContentResolver(Uri uri) {
-        final String[] projection = {MediaStore.MediaColumns.DATA};
-        final Cursor cursor = mContentResolver.query(uri, projection, null, null, null);
-        if (cursor == null || cursor.getCount() == 0) {
-            return Optional.absent();
-        }
-        cursor.moveToFirst();
-        final String filePath = cursor.getString(0);
-        if (filePath != null) {
-            return Optional.of(new File(filePath));
-        } else {
-            return Optional.absent();
-        }
-    }
-
-    @Nullable
-    public File saveBitmapToTempFile(@Nonnull Bitmap bitmap) {
+    @Nonnull
+    private File saveBitmapToTempFile(@Nonnull Bitmap bitmap) throws Exception {
         final File tmpFile = new File(context.getExternalCacheDir(), String.format("tmpFile-%s", bitmap.toString()));
 
-        OutputStream os;
+        OutputStream os = null;
         try {
             os = new FileOutputStream(tmpFile);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 60, os);
             os.flush();
-            os.close();
             return tmpFile;
         } catch (Exception e) {
             Log.e(getClass().getSimpleName(), "Error writing bitmap", e);
-            return null;
+            throw e;
+        } finally {
+            if (os != null) {
+                try {
+                    os.close();
+                } catch (IOException e) {
+                    Log.e(getClass().getSimpleName(), "Error writing bitmap", e);
+                    throw e;
+                }
+            }
         }
     }
 
@@ -100,6 +96,7 @@ public class FileHelper {
         if (uri == null) {
             return null;
         }
+
         try {
             final InputStream inputStream = context.getContentResolver().openInputStream(uri);
             if (inputStream == null) {
@@ -108,15 +105,7 @@ public class FileHelper {
             try {
                 final File cacheFile = new File(context.getCacheDir(), "tmpFile");
                 final FileOutputStream output = new FileOutputStream(destFile);
-                try {
-                    byte[] buffer = new byte[1024];
-                    int length;
-                    while ((length = inputStream.read(buffer)) > 0) {
-                        output.write(buffer, 0, length);
-                    }
-                } finally {
-                    output.close();
-                }
+                ByteStreams.copy(inputStream, output);
                 return cacheFile;
             } finally {
                 inputStream.close();
@@ -124,6 +113,7 @@ public class FileHelper {
         } catch (IOException e) {
             throw new WrongFileException(e, uri);
         }
+
     }
 
     public static class WrongFileException extends IOException {
