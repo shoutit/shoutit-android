@@ -73,7 +73,7 @@ public class ProfileSectionViewHolder extends ViewHolderManager.BaseViewHolder<P
     }
 
     private void setListeningIcon(boolean isListening) {
-        if (item.isMyProfile()) {
+        if (item.isProfileOwner()) {
             listeningImageView.setVisibility(View.GONE);
         } else {
             listeningImageView.setImageDrawable(context.getResources().getDrawable(
@@ -89,5 +89,10 @@ public class ProfileSectionViewHolder extends ViewHolderManager.BaseViewHolder<P
         } else {
             item.onActionOnlyForLoggedInUser();
         }
+    }
+
+    @OnClick(R.id.profile_section_container)
+    public void onSectionItemSelected() {
+        item.onSectionItemSelected();
     }
 }

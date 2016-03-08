@@ -5,7 +5,7 @@ import com.google.common.base.Objects;
 public class Admin implements ProfileType {
     private final String id;
     private final String type;
-    private final String userName;
+    private final String username;
     private final String name;
     private final String firstName;
     private final String lastName;
@@ -15,11 +15,11 @@ public class Admin implements ProfileType {
     private final boolean isListening;
     private final int listenersCount;
 
-    public Admin(String id, String type, String userName, String name, String firstName,
-                String lastName, boolean isActivated, String image, String cover, boolean isListening, int listenersCount) {
+    public Admin(String id, String type, String username, String name, String firstName,
+                 String lastName, boolean isActivated, String image, String cover, boolean isListening, int listenersCount) {
         this.id = id;
         this.type = type;
-        this.userName = userName;
+        this.username = username;
         this.name = name;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -40,7 +40,7 @@ public class Admin implements ProfileType {
     }
 
     public String getUsername() {
-        return userName;
+        return username;
     }
 
     public String getName() {
@@ -86,7 +86,7 @@ public class Admin implements ProfileType {
                 listenersCount == admin.listenersCount &&
                 Objects.equal(id, admin.id) &&
                 Objects.equal(type, admin.type) &&
-                Objects.equal(userName, admin.userName) &&
+                Objects.equal(username, admin.username) &&
                 Objects.equal(name, admin.name) &&
                 Objects.equal(firstName, admin.firstName) &&
                 Objects.equal(lastName, admin.lastName) &&
@@ -96,7 +96,13 @@ public class Admin implements ProfileType {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id, type, userName, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount);
+        return Objects.hashCode(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount);
+    }
+
+    public static Admin withIsListening(Admin admin, boolean isListening) {
+        int listenersCount = isListening ? admin.listenersCount + 1 : admin.listenersCount - 1;
+        return new Admin(admin.id, admin.type, admin.username, admin.name, admin.firstName,
+                admin.lastName, admin.isActivated, admin.image, admin.cover, isListening, listenersCount);
     }
 }
 

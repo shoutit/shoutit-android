@@ -41,7 +41,7 @@ public class ChangeEmailPresenterTest {
         PowerMockito.mockStatic(Validators.class);
 
         when(apiService.updateUser(any(UpdateUserRequest.class)))
-                .thenReturn(Observable.just(new User("1", null, null, null, null, null, null, null, false, null, null, false, false, false, null, 1, null, null, 0, null)));
+                .thenReturn(Observable.just(new User("1", null, null, null, null, null, null, null, false, null, null, false, false, false, null, 1, null, null, null, 0, null, false, null)));
         when(Validators.isEmailValid(anyString())).thenReturn(true);
 
         presenter = new ChangeEmailPresenter(apiService, scheduler, scheduler, userPreferences);
