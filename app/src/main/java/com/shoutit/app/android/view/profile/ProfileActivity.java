@@ -271,8 +271,8 @@ public class ProfileActivity extends BaseActivity {
             @Override
             public void call(String url) {
                 picasso.load(url)
-                        .placeholder(R.drawable.ic_avatar_placeholder)
-                        .error(R.drawable.ic_avatar_placeholder)
+                        .placeholder(R.drawable.ic_rect_avatar_placeholder)
+                        .error(R.drawable.ic_rect_avatar_placeholder)
                         .fit()
                         .centerCrop()
                         .transform(PicassoHelper.roundedWithStrokeTransformation(strokeSize, false, corners, "ProfileAvatar"))

@@ -3,6 +3,7 @@ package com.shoutit.app.android.view.profile.myprofile;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import com.shoutit.app.android.view.editprofile.EditProfileActivity;
 import com.shoutit.app.android.view.profile.ProfileActivity;
 import com.shoutit.app.android.view.profile.ProfileActivityComponent;
 
@@ -22,7 +23,7 @@ public class MyProfileActivity extends ProfileActivity {
                 .subscribe(new Action1<Object>() {
                     @Override
                     public void call(Object ignore) {
-                        Toast.makeText(MyProfileActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
+                        startActivity(EditProfileActivity.newIntent(MyProfileActivity.this));
                     }
                 });
 

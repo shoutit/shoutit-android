@@ -30,11 +30,13 @@ public class User {
     private final String bio;
     private final int dateJoined;
     private final Listening listeningCount;
+    private final String mobile;
+    private final String website;
 
     public User(String id, String type, String apiUrl, String webUrl, String username,
                 String name, String firstName, String lastName, boolean isActivated, String image,
                 String cover, boolean isListening, boolean isListener, boolean isPasswordSet, UserLocation location,
-                int listenersCount, List<Page> pages, String bio, int dateJoined, Listening listeningCount) {
+                int listenersCount, List<Page> pages, String bio, int dateJoined, Listening listeningCount, String mobile, String website) {
         this.id = id;
         this.type = type;
         this.apiUrl = apiUrl;
@@ -55,11 +57,13 @@ public class User {
         this.bio = bio;
         this.dateJoined = dateJoined;
         this.listeningCount = listeningCount;
+        this.mobile = mobile;
+        this.website = website;
     }
 
     // TODO remove it when user will be handler by API
     public static User guestUser(UserLocation location) {
-        return new User(null, null, null, null ,null, null, null, null, false, null, null, false, false, false, location, 1, null, null, 0, null);
+        return new User(null, null, null, null ,null, null, null, null, false, null, null, false, false, false, location, 1, null, null, 0, null, null, null);
     }
 
     public static User listenedUser(@Nonnull User user, boolean isListening) {
@@ -67,14 +71,14 @@ public class User {
         return new User(user.id, user.type, user.apiUrl, user.webUrl, user.username, user.name,
                 user.firstName, user.lastName, user.isActivated, user.image, user.cover,
                 isListening, user.isListener, user.isPasswordSet, user.location,
-                listenersCount, user.pages, user.bio, user.dateJoined, user.listeningCount);
+                listenersCount, user.pages, user.bio, user.dateJoined, user.listeningCount, null, null);
     }
 
     public static User userWithUpdatedPages(@Nonnull User user, List<Page> pages) {
         return new User(user.id, user.type, user.apiUrl, user.webUrl, user.username, user.name,
                 user.firstName, user.lastName, user.isActivated, user.image, user.cover,
                 user.isListening, user.isListener, user.isPasswordSet, user.location,
-                user.listenersCount, pages, user.bio, user.dateJoined, user.listeningCount);
+                user.listenersCount, pages, user.bio, user.dateJoined, user.listeningCount, null, null);
     }
 
     public String getId() {
@@ -117,6 +121,10 @@ public class User {
         return image;
     }
 
+    public String getMobile() {
+        return mobile;
+    }
+
     public String getCover() {
         return cover;
     }
@@ -157,6 +165,10 @@ public class User {
         return isListener;
     }
 
+    public String getWebsite() {
+        return website;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -171,6 +183,7 @@ public class User {
                 Objects.equal(type, user.type) &&
                 Objects.equal(apiUrl, user.apiUrl) &&
                 Objects.equal(webUrl, user.webUrl) &&
+                Objects.equal(website, user.website) &&
                 Objects.equal(username, user.username) &&
                 Objects.equal(name, user.name) &&
                 Objects.equal(firstName, user.firstName) &&
@@ -188,6 +201,6 @@ public class User {
     public int hashCode() {
         return Objects.hashCode(id, type, apiUrl, webUrl, username, name, firstName, lastName,
                 isActivated, image, cover, isListening, isPasswordSet, location, listenersCount,
-                pages, bio, dateJoined, listeningCount, isListener);
+                pages, bio, dateJoined, listeningCount, isListener, website);
     }
 }

@@ -27,6 +27,7 @@ import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.utils.PermissionHelper;
 
@@ -115,6 +116,7 @@ public class LocationActivity extends BaseActivity {
                 .subscribe(new Action1<UserLocation>() {
                     @Override
                     public void call(UserLocation userLocation) {
+                        KeyboardHelper.hideSoftKeyboard(LocationActivity.this);
                         setResult(Activity.RESULT_OK, new Intent().putExtra(EXTRAS_USER_LOCATION, userLocation));
                         finish();
                     }

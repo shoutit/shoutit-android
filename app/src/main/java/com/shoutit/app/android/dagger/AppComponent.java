@@ -1,7 +1,9 @@
 package com.shoutit.app.android.dagger;
 
+import android.content.ContentResolver;
 import android.content.Context;
 
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -60,4 +62,8 @@ public interface AppComponent {
     UserPreferences userPreferences();
 
     LocationManager locationManager();
+
+    TransferUtility transferUtility();
+
+    ContentResolver contentResolver();
 }

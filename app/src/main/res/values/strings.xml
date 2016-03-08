@@ -14,14 +14,21 @@
     <string name="error_default">Ooops, something went wrong</string>
     <string name="error_connection">Ooops, probably there is no Internet connection</string>
     <string name="error_email_not_found">The email or username you entered do not belong to any account.</string>
+    <string name="error_field_empty">Field cannot be empty</string>
     <string name="error_wrong_email_or_password">Wrong email or password</string>
     <string name="error_action_only_for_logged_in_user">Only for logged in users</string>
-
+    <string name="error_image_upload">Sorry, cannot upload image. Please try again</string>
 
     <!-- Permissions -->
     <string name="permission_location_explanation">We need your location to prepare appropriate content</string>
+    <string name="permission_camera_explanation">Permissions needed to get your photos</string>
     <string name="permission_granted">Permissions have been granted</string>
     <string name="permission_not_granted">Permissions not granted</string>
+
+    <!-- Image capture helper -->
+    <string name="image_video_capture_helper_select_image_source">Select image source</string>
+    <string name="image_video_capture_helper_sd_unmounted">No external storage</string>
+    <string name="image_video_capture_helper_sd_unmounted_title">Error</string>
 
     <!-- Intro -->
     <string name="intro_welcome">Welcome To Shoutit</string>
@@ -234,5 +241,20 @@
     <string name="request_acitvity_post_error">Failed to post request</string>
     <string name="create_request_activity_title_too_short">Title must be at least 6 characters long</string>
     <string name="create_request_activity_price_empty">Price cannot be empty</string>
+
+    <!-- Edit Profile -->
+    <string name="edit_profile_hint_name">Name</string>
+    <string name="edit_profile_hint_username">Username</string>
+    <string name="edit_profile_hint_bio">Bio</string>
+    <string name="edit_profile_header_location">Location</string>
+    <string name="edit_profile_location_change">Change</string>
+    <string name="edit_profile_hint_website">Website</string>
+    <string name="edit_profile_menu_save">Save</string>
+    <string name="edit_profile_toolbar_title">Edit Profile</string>
+    <string name="edit_profile_country">%1$s, %2$s</string>
+    <string name="edit_profile_success">Profile successfully updated</string>
+    <string name="edit_profile_hint_first_name">First Name</string>
+    <string name="edit_profile_hint_last_name">Last Name</string>
+    <string name="edit_profile_hint_mobile">Mobile</string>
 
 </resources>
