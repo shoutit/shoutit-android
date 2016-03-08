@@ -40,6 +40,7 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.view.createshout.location.LocationActivity;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -59,8 +60,8 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
 
     @Bind(R.id.edit_toolbar)
     Toolbar mEditToolbar;
-    @Bind(R.id.edit_descirption)
-    EditText mEditDescirption;
+    @Bind(R.id.edit_shout_title)
+    EditText mTitle;
     @Bind(R.id.edit_description_layout)
     TextInputLayout mEditLayout;
     @Bind(R.id.edit_budget)
@@ -74,13 +75,18 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     Spinner mEditCategorySpinner;
 
     @Bind(R.id.edit_request_category_icon)
-    ImageView mEditRequest;
+    ImageView mEditCategoryIcon;
     @Bind(R.id.edit_shout_container)
     LinearLayout mEditShoutContainer;
     @Bind(R.id.edit_location)
     TextView mEditLocation;
     @Bind(R.id.edit_progress)
     FrameLayout mEditProgress;
+
+    @Inject
+    EditShoutPresenter mEditShoutPresenter;
+    @Inject
+    Picasso mPicasso;
 
     private SpinnerAdapter mCurrencyAdapter;
     private SpinnerAdapter mCategoryAdapter;
@@ -135,9 +141,6 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     }
 
 
-    @Inject
-    EditShoutPresenter mEditShoutPresenter;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -149,12 +152,18 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
 
         mCategoryAdapter = new SpinnerAdapter(R.string.edit_shout_category);
         mEditCategorySpinner.setAdapter(mCategoryAdapter);
-        mEditCategorySpinner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mEditCategorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
             @SuppressWarnings("unchecked")
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 final Pair<String, String> item = (Pair<String, String>) mEditCategorySpinner.getItemAtPosition(position);
                 mEditShoutPresenter.categorySelected(item.first);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
             }
         });
 
@@ -190,12 +199,12 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
         return component;
     }
 
-    @OnClick(R.id.create_request_confirm)
+    @OnClick(R.id.edit_confirm)
     public void onClick() {
         mEditShoutPresenter.confirmClicked();
     }
 
-    @OnClick(R.id.create_request_location_btn)
+    @OnClick(R.id.edit_location_btn)
     public void onLocationClick() {
         startActivityForResult(LocationActivity.newIntent(this), LOCATION_REQUEST);
     }
@@ -214,7 +223,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     @Override
     public EditShoutPresenter.RequestData getRequestData() {
         return new EditShoutPresenter.RequestData(
-                mEditDescirption.getText().toString(),
+                mTitle.getText().toString(),
                 mEditBudget.getText().toString(),
                 ((Pair<String, String>) mEditCurrencySpinner.getSelectedItem()).first);
     }
@@ -291,13 +300,13 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
 
     @Override
     public void setOptions(@NonNull List<Pair<String, List<CategoryFilter.FilterValue>>> options) {
+        mEditShoutContainer.removeAllViews();
         final LayoutInflater layoutInflater = getLayoutInflater();
-
         for (Pair<String, List<CategoryFilter.FilterValue>> option : options) {
             final String name = option.first;
             final List<CategoryFilter.FilterValue> optionsList = option.second;
 
-            final View view = layoutInflater.inflate(R.layout.options_layout, mEditShoutContainer, true);
+            final View view = layoutInflater.inflate(R.layout.options_layout, mEditShoutContainer, false);
             final TextView title = (TextView) view.findViewById(R.id.option_title);
             final Spinner spinner = (Spinner) view.findViewById(R.id.option_spinner);
 
@@ -316,6 +325,8 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
             adapter.setData(optionsPairs);
 
             title.setText(name);
+
+            mEditShoutContainer.addView(view, mEditShoutContainer.getChildCount());
         }
     }
 
@@ -326,11 +337,18 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
 
     @Override
     public void setTitle(@NonNull String title) {
-        // TODO
+        mTitle.setText(title);
     }
 
     @Override
     public void setPrice(@NonNull String price) {
         mEditBudget.setText(price);
+    }
+
+    @Override
+    public void setCategoryImage(@Nullable String image) {
+        mPicasso.load(image)
+                .fit()
+                .into(mEditCategoryIcon);
     }
 }

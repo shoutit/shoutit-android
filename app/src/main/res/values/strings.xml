@@ -207,4 +207,11 @@
     <string name="edit_shout_option">Option</string>
     <string name="edit_shout_category">Category</string>
 
+    <!-- Publish -->
+    <string name="publish_menu_share">Share Shout</string>
+    <string name="edit_shout_description_hint">Description</string>
+    <string name="edit_shout_location">Location</string>
+    <string name="edit_shout_price_hint">Price</string>
+    <string name="edit_shout_title_hint">Title</string>
+
 </resources>

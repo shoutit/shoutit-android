@@ -151,7 +151,7 @@ public interface ApiService {
     @POST("/v3/shouts")
     Observable<CreateShoutResponse> createShoutRequest(@Body CreateRequestShoutRequest request);
 
-    @GET("v3/shouts/{id}")
+    @GET("/v3/shouts/{id}")
     Observable<ShoutResponse> getShout(@Path("id") String id);
 
     @GET("misc/currencies")

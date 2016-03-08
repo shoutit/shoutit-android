@@ -34,6 +34,7 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.view.createshout.location.LocationActivity;
+import com.shoutit.app.android.view.createshout.publish.PublishShoutActivity;
 
 import java.util.List;
 
@@ -282,7 +283,8 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
     }
 
     @Override
-    public void finishActivity() {
+    public void finishActivity(String id) {
         finish();
+        startActivity(PublishShoutActivity.newIntent(this, id, true));
     }
 }

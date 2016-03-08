@@ -9,4 +9,9 @@ public class CreateShoutResponse {
     public CreateShoutResponse(@NonNull String id) {
         this.id = id;
     }
+
+    @NonNull
+    public String getId() {
+        return id;
+    }
 }

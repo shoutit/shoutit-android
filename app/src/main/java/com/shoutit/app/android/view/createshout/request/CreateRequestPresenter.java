@@ -146,7 +146,7 @@ public class CreateRequestPresenter {
                     @Override
                     public void call(CreateShoutResponse responseBody) {
                         mListener.hideProgress();
-                        mListener.finishActivity();
+                        mListener.finishActivity(responseBody.getId());
                     }
                 }, new Action1<Throwable>() {
                     @Override
@@ -164,7 +164,7 @@ public class CreateRequestPresenter {
         final boolean erroredBudget = Strings.isNullOrEmpty(requestData.mBudget);
         mListener.showEmptyPriceError(erroredBudget);
 
-        return !erroredTitle || !erroredBudget;
+        return !erroredTitle && !erroredBudget;
     }
 
     public void updateLocation(@NonNull UserLocation userLocation) {
@@ -207,7 +207,7 @@ public class CreateRequestPresenter {
 
         void showEmptyPriceError(boolean show);
 
-        void finishActivity();
+        void finishActivity(String id);
     }
 
 }

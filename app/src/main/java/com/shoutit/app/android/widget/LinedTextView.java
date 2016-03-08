@@ -38,6 +38,8 @@ public class LinedTextView extends TextView {
     private void init() {
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaint.setColor(Color.BLACK);
+        mPaint.setStrokeWidth(2f);
+
         internalPadding = getContext().getResources().getDimensionPixelSize(R.dimen.textview_padding);
     }
 
@@ -52,7 +54,7 @@ public class LinedTextView extends TextView {
 
         super.onDraw(canvas);
 
-        canvas.drawLine(0, heightMiddle - 1, widthMiddle - halfText - internalPadding, heightMiddle + 1, mPaint);
-        canvas.drawLine(widthMiddle + halfText + internalPadding, heightMiddle - 1, getWidth(), heightMiddle + 1, mPaint);
+        canvas.drawLine(0, heightMiddle, widthMiddle - halfText - internalPadding, heightMiddle, mPaint);
+        canvas.drawLine(widthMiddle + halfText + internalPadding, heightMiddle, getWidth(), heightMiddle, mPaint);
     }
 }

@@ -134,6 +134,8 @@ public class EditShoutPresenter {
                         return new ResponseData(shoutResponse, categories, currencies);
                     }
                 })
+                .subscribeOn(mNetworkScheduler)
+                .observeOn(mUiScheduler)
                 .subscribe(new Action1<ResponseData>() {
                     @Override
                     public void call(ResponseData responseData) {
@@ -184,6 +186,8 @@ public class EditShoutPresenter {
                         return BothParams.of(categories, currencies);
                     }
                 })
+                .subscribeOn(mNetworkScheduler)
+                .observeOn(mUiScheduler)
                 .subscribe(new Action1<BothParams<List<Category>, List<Currency>>>() {
                     @Override
                     public void call(BothParams<List<Category>, List<Currency>> responseData) {
@@ -273,7 +277,7 @@ public class EditShoutPresenter {
         final boolean erroredBudget = Strings.isNullOrEmpty(requestData.mBudget);
         mListener.showEmptyPriceError(erroredBudget);
 
-        return !erroredTitle || !erroredBudget;
+        return !erroredTitle && !erroredBudget;
     }
 
     public void updateLocation(@NonNull UserLocation userLocation) {
@@ -291,25 +295,28 @@ public class EditShoutPresenter {
     }
 
     private void changeCategory(@NonNull final String id) {
-        final Iterable<Category> filters = Iterables.filter(mCategories, new Predicate<Category>() {
-            @Override
-            public boolean apply(@Nullable Category input) {
-                assert input != null;
-                return input.getSlug().equals(id);
-            }
-        });
-        final Category category = filters.iterator().next();
+        if (mCategories != null) {
+            final Iterable<Category> filters = Iterables.filter(mCategories, new Predicate<Category>() {
+                @Override
+                public boolean apply(@Nullable Category input) {
+                    assert input != null;
+                    return input.getSlug().equals(id);
+                }
+            });
+            final Category category = filters.iterator().next();
 
-        final List<Pair<String, List<CategoryFilter.FilterValue>>> options = ImmutableList.copyOf(Iterables.transform(category.getFilters(), new Function<CategoryFilter, Pair<String, List<CategoryFilter.FilterValue>>>() {
-            @Nullable
-            @Override
-            public Pair<String, List<CategoryFilter.FilterValue>> apply(@Nullable CategoryFilter input) {
-                assert input != null;
-                return Pair.create(input.getName(), input.getValues());
-            }
-        }));
+            final List<Pair<String, List<CategoryFilter.FilterValue>>> options = ImmutableList.copyOf(Iterables.transform(category.getFilters(), new Function<CategoryFilter, Pair<String, List<CategoryFilter.FilterValue>>>() {
+                @Nullable
+                @Override
+                public Pair<String, List<CategoryFilter.FilterValue>> apply(@Nullable CategoryFilter input) {
+                    assert input != null;
+                    return Pair.create(input.getName(), input.getValues());
+                }
+            }));
 
-        mListener.setOptions(options);
+            mListener.setOptions(options);
+            mListener.setCategoryImage(category.getIcon());
+        }
     }
 
     public interface Listener {
@@ -345,6 +352,8 @@ public class EditShoutPresenter {
         void setTitle(@NonNull String title);
 
         void setPrice(@NonNull String price);
+
+        void setCategoryImage(@Nullable String image);
     }
 
 }
