@@ -49,8 +49,8 @@ public class EditProfilePresenterTest {
 
         when(fileHelper.createTempFileAndStoreUri(any(Uri.class)))
                 .thenReturn("file");
-        when(fileHelper.saveBitmapToTempFile(any(Bitmap.class)))
-                .thenReturn(new File("path"));
+        when(fileHelper.saveBitmapToTempFileObservable(any(Bitmap.class)))
+                .thenReturn(Observable.just(ResponseOrError.fromData(new File("path"))));
 
         when(amazonHelper.uploadImageObservable(any(AmazonHelper.AmazonBucket.class), any(File.class)))
                 .thenReturn(Observable.just(ResponseOrError.fromData("fileUrl")));

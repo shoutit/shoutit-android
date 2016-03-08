@@ -45,7 +45,7 @@ public class EditProfilePresenter {
     private final BehaviorSubject<String> bioSubject = BehaviorSubject.create();
     private final BehaviorSubject<String> websiteSubject = BehaviorSubject.create();
     private final BehaviorSubject<UserLocation> locationSubject = BehaviorSubject.create();
-    private final BehaviorSubject<UpdateUserRequest> lastCombinesData = BehaviorSubject.create();
+    private final BehaviorSubject<UpdateUserRequest> lastCombinedData = BehaviorSubject.create();
     private final BehaviorSubject<Uri> lastSelectedAvatarUri = BehaviorSubject.create();
     private final BehaviorSubject<Uri> lastSelectedCoverUri = BehaviorSubject.create();
 
@@ -183,7 +183,7 @@ public class EditProfilePresenter {
                         return UpdateUserRequest.updateProfile(username, name, bio, website, userLocation);
                     }
                 })
-                .subscribe(lastCombinesData);
+                .subscribe(lastCombinedData);
 
         /** Update profile data **/
         final Observable<ResponseOrError<User>> updateRequest = saveClickSubject
@@ -197,7 +197,7 @@ public class EditProfilePresenter {
                 .switchMap(new Func1<Boolean, Observable<UpdateUserRequest>>() {
                     @Override
                     public Observable<UpdateUserRequest> call(Boolean ignore) {
-                        return lastCombinesData.first();
+                        return lastCombinedData.first();
                     }
                 })
                 .doOnNext(Actions1.progressOnNext(progressSubject, true))

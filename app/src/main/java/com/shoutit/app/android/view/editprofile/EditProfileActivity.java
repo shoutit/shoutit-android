@@ -361,7 +361,6 @@ public class EditProfileActivity extends BaseActivity {
         final Optional<Uri> uri;
 
         if (resultCode != RESULT_OK) {
-            super.onActivityResult(requestCode, resultCode, data);
             return;
         }
 
