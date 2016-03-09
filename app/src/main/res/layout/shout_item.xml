@@ -7,6 +7,7 @@
     <include layout="@layout/shout_item_card" />
 
     <TextView
+        android:id="@+id/shout_item_description_header"
         style="@style/ShoutItemHeader"
         android:text="@string/shout_header_description" />
 

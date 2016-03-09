@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
-import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
@@ -300,9 +299,9 @@ public class ProfilePresenter {
         switch (user.getType()) {
             case ProfileType.USER:
                 return preferencesHelper.isMyProfile(user.getUsername()) ? context.getString(R.string.profile_my_pages) :
-                        context.getString(R.string.profile_user_pages, user.getName()).toUpperCase();
+                        context.getString(R.string.profile_user_pages, user.getFirstName()).toUpperCase();
             case ProfileType.PAGE:
-                return context.getString(R.string.profile_page_admins, user.getName()).toUpperCase();
+                return context.getString(R.string.profile_page_admins, user.getFirstName()).toUpperCase();
             default:
                 throw new RuntimeException("Unknown profile type: " + user.getType());
         }
