@@ -6,6 +6,8 @@ import android.support.annotation.NonNull;
 import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.CreateRequestShoutRequest;
+import com.shoutit.app.android.api.model.CreateShoutResponse;
 import com.shoutit.app.android.api.model.Currency;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.utils.ResourcesHelper;
@@ -79,6 +81,10 @@ public class CreateRequestPresenterTest {
         return ResponseBody.create(MediaType.parse("text/plain"), "");
     }
 
+    private CreateShoutResponse emptyCreateShoutResponse(){
+        return new CreateShoutResponse("");
+    }
+
     @NonNull
     private List<Currency> currencyList() {
         return ImmutableList.of(new Currency("a", "b", "c"));
@@ -86,7 +92,8 @@ public class CreateRequestPresenterTest {
 
     @Test
     public void testWhenButtonClicked_requestDataFromView() {
-        when(mApiService.createShoutRequest()).thenReturn(Observable.just(emptyResponse()));
+        when(mListener.getRequestData()).thenReturn(new CreateRequestPresenter.RequestData("", "", ""));
+        when(mApiService.createShoutRequest(any(CreateRequestShoutRequest.class))).thenReturn(Observable.just(emptyCreateShoutResponse()));
         mCreateRequestPresenter.registerListener(mListener);
 
         mCreateRequestPresenter.confirmClicked();
@@ -96,19 +103,19 @@ public class CreateRequestPresenterTest {
 
     @Test
     public void testWhenButtonClicked_DataSentToApi() {
-        when(mListener.getRequestData()).thenReturn(new CreateRequestPresenter.RequestData());
-        when(mApiService.createShoutRequest()).thenReturn(Observable.just(emptyResponse()));
+        when(mListener.getRequestData()).thenReturn(new CreateRequestPresenter.RequestData("123456", "5", ""));
+        when(mApiService.createShoutRequest(any(CreateRequestShoutRequest.class))).thenReturn(Observable.just(emptyCreateShoutResponse()));
         mCreateRequestPresenter.registerListener(mListener);
 
         mCreateRequestPresenter.confirmClicked();
 
-        verify(mApiService).createShoutRequest();
+        verify(mApiService).createShoutRequest(any(CreateRequestShoutRequest.class));
     }
 
     @Test
     public void testWhenButtonClickedAndRequestSuccessful_progressShownAndHidden() {
-        when(mListener.getRequestData()).thenReturn(new CreateRequestPresenter.RequestData());
-        when(mApiService.createShoutRequest()).thenReturn(Observable.just(emptyResponse()));
+        when(mListener.getRequestData()).thenReturn(new CreateRequestPresenter.RequestData("123456", "5", ""));
+        when(mApiService.createShoutRequest(any(CreateRequestShoutRequest.class))).thenReturn(Observable.just(emptyCreateShoutResponse()));
         mCreateRequestPresenter.registerListener(mListener);
 
         mCreateRequestPresenter.confirmClicked();
@@ -119,8 +126,8 @@ public class CreateRequestPresenterTest {
 
     @Test
     public void testWhenButtonClickedAndRequestFailed_progressShownAndHiddenAndErrorShown() {
-        when(mListener.getRequestData()).thenReturn(new CreateRequestPresenter.RequestData());
-        when(mApiService.createShoutRequest()).thenReturn(Observable.<ResponseBody>error(new RuntimeException("")));
+        when(mListener.getRequestData()).thenReturn(new CreateRequestPresenter.RequestData("123456", "5", ""));;
+        when(mApiService.createShoutRequest(any(CreateRequestShoutRequest.class))).thenReturn(Observable.<CreateShoutResponse>error(new RuntimeException("")));
         mCreateRequestPresenter.registerListener(mListener);
 
         mCreateRequestPresenter.confirmClicked();
