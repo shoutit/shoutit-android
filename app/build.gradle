@@ -5,7 +5,7 @@ buildscript {
         maven { url "https://jitpack.io" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.5.0'
+        classpath 'com.android.tools.build:gradle:2.0.0-alpha7'
         classpath 'io.fabric.tools:gradle:1.21.2'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
         classpath 'com.google.gms:google-services:2.0.0-alpha9'
@@ -212,8 +212,6 @@ dependencies {
     testCompile 'org.powermock:powermock-module-junit4-rule-agent:1.6.4'
     testCompile 'org.powermock:powermock-module-junit4-rule:1.6.4'
     testCompile 'org.powermock:powermock-module-junit4:1.6.4'
-
-    compile 'com.google.android.gms:play-services-appindexing:8.4.0'
 }
 
 apply plugin: 'com.google.gms.google-services'
