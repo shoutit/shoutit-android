@@ -5,6 +5,7 @@ import android.graphics.Rect;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -100,6 +101,10 @@ public class ShoutAdapter extends BaseAdapter {
         LinearLayout detailsContainer;
         @Bind(R.id.shout_detail_location_row)
         View locationContainer;
+        @Bind(R.id.shout_item_description_container)
+        View descriptionContainer;
+        @Bind(R.id.shout_item_description_header)
+        View descriptionHeader;
 
         private final Target flagTarget;
         private ShoutAdapterItems.MainShoutAdapterItem item;
@@ -159,6 +164,9 @@ public class ShoutAdapter extends BaseAdapter {
             imagesPagerAdapter.setData(shout.getImages());
 
             descriptionTextView.setText(shout.getText());
+            final boolean isDescription = !TextUtils.isEmpty(shout.getText());
+            descriptionHeader.setVisibility(isDescription ? View.VISIBLE : View.GONE);
+            descriptionContainer.setVisibility(isDescription ? View.VISIBLE : View.GONE);
 
             dateTextView.setText(DateTimeUtils.getShoutDetailDate(context, shout.getDatePublishedInMillis()));
             categoryTextView.setText(shout.getCategory().getName());

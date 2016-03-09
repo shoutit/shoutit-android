@@ -186,7 +186,7 @@ public class ShoutPresenter {
 
                         final User user = shout.getShout().getProfile();
                         if (!userShouts.isEmpty()) {
-                            builder.add(new HeaderAdapterItem(context.getString(R.string.shout_user_shouts_header, user.getName())))
+                            builder.add(new HeaderAdapterItem(context.getString(R.string.shout_user_shouts_header, user.getFirstName()).toUpperCase()))
                                     .addAll(userShouts);
                         }
 
