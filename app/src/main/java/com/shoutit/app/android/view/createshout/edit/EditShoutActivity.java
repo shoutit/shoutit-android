@@ -357,7 +357,9 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
             final Spinner spinner = (Spinner) view.findViewById(R.id.option_spinner);
 
             final Pair<String, String> selectedItem = (Pair<String, String>) spinner.getSelectedItem();
-            list.add(Pair.create((String) view.getTag(), selectedItem.first));
+            if (selectedItem != null) {
+                list.add(Pair.create((String) view.getTag(), selectedItem.first));
+            }
         }
         return ImmutableList.copyOf(list);
     }
