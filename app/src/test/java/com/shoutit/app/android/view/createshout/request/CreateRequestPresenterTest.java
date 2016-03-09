@@ -76,11 +76,6 @@ public class CreateRequestPresenterTest {
         return new UserLocation(1, 1, "", "", "", "", "");
     }
 
-    @NonNull
-    private ResponseBody emptyResponse() {
-        return ResponseBody.create(MediaType.parse("text/plain"), "");
-    }
-
     private CreateShoutResponse emptyCreateShoutResponse(){
         return new CreateShoutResponse("");
     }
