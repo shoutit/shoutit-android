@@ -52,7 +52,6 @@ public class App extends MultiDexApplication {
 
         setupGraph();
 
-        fetchUser();
         fetchLocation();
     }
 
@@ -95,26 +94,6 @@ public class App extends MultiDexApplication {
 
     public static AppComponent getAppComponent(Application app) {
         return ((App) app).component;
-    }
-
-    private void fetchUser() {
-        if (!userPreferences.isNormalUser()) {
-            return;
-        }
-
-        apiService.getMyUser()
-                .subscribeOn(networkScheduler)
-                .subscribe(new Action1<User>() {
-                    @Override
-                    public void call(User user) {
-                        userPreferences.saveUserAsJson(user);
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        LogHelper.logThrowable(TAG, "Cannot fetch user", throwable);
-                    }
-                });
     }
 
     private void fetchLocation() {

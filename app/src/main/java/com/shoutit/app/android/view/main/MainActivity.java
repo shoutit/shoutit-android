@@ -20,8 +20,11 @@ import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.dao.ProfilesDao;
+import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.view.discover.DiscoverActivity;
 import com.shoutit.app.android.view.discover.OnNewDiscoverSelectedListener;
 import com.shoutit.app.android.view.home.HomeFragment;
@@ -33,6 +36,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import rx.functions.Action1;
 
 public class MainActivity extends BaseActivity implements OnMenuItemSelectedListener,
         OnNewDiscoverSelectedListener, OnSeeAllDiscoversListener {
@@ -52,6 +56,8 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
     MenuHandler menuHandler;
     @Inject
     UserPreferences mUserPreferences;
+    @Inject
+    ProfilesDao profilesDao;
 
     private ActionBarDrawerToggle drawerToggle;
     private boolean doubleBackToExitPressedOnce;
@@ -83,7 +89,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
         setUpActionBar();
         setUpDrawer();
-
+        updateUser();
 
         if (savedInstanceState == null) {
             getSupportFragmentManager()
@@ -115,6 +121,21 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void updateUser() {
+        if (!mUserPreferences.isNormalUser()) {
+            return;
+        }
+
+        profilesDao.updateUser()
+                .compose(this.<User>bindToLifecycle())
+                .subscribe(new Action1<User>() {
+                    @Override
+                    public void call(User user) {
+                        mUserPreferences.saveUserAsJson(user);
+                    }
+                });
     }
 
     private void setUpActionBar() {

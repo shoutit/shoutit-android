@@ -8,12 +8,14 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.utils.LogHelper;
 
 import javax.annotation.Nonnull;
 
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
+import rx.functions.Action1;
 import rx.subjects.PublishSubject;
 
 public class ProfilesDao {
@@ -83,5 +85,13 @@ public class ProfilesDao {
         public Observer<ResponseOrError<User>> updatedProfileLocallyObserver() {
             return updatedProfileLocallySubject;
         }
+    }
+
+    @Nonnull
+    public Observable<User> updateUser() {
+        return apiService.getMyUser()
+                .subscribeOn(networkScheduler)
+                .compose(ResponseOrError.<User>toResponseOrErrorObservable())
+                .compose(ResponseOrError.<User>onlySuccess());
     }
 }
