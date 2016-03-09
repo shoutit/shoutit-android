@@ -2,6 +2,7 @@ package com.shoutit.app.android.view.profile;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -80,7 +81,7 @@ public class ProfileViewHolders {
                         dateFormat.format(new Date(user.getDateJoinedInMillis()))));
             }
 
-            if (user.getLocation() != null && user.getLocation().getCountry() != null) {
+            if (user.getLocation() != null && !TextUtils.isEmpty(user.getLocation().getCountry())) {
                 locationContainer.setVisibility(View.VISIBLE);
                 countryTextView.setText(user.getLocation().getCity());
                 final Optional<Integer> countryResId = ResourcesHelper.getCountryResId(context, user.getLocation());
