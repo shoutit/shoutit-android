@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.CheckedTextView;
@@ -16,7 +15,6 @@ import com.google.common.collect.ImmutableList;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
-import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.utils.BlurTransform;
 import com.shoutit.app.android.utils.PicassoHelper;
@@ -25,7 +23,6 @@ import com.shoutit.app.android.view.home.HomeFragment;
 import com.shoutit.app.android.view.location.LocationActivity;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.profile.ProfileActivity;
-import com.shoutit.app.android.view.profile.myprofile.MyProfileActivity;
 import com.shoutit.app.android.view.settings.SettingsActivity;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -220,11 +217,7 @@ public class MenuHandler {
     @OnClick({R.id.menu_avatar_iv, R.id.menu_user_name_tv})
     public void startUserProfile() {
         if (userPreferences.isNormalUser()) {
-            rxActivity.startActivity(ProfileActivity.newIntent(
-                    rxActivity,
-                    User.ME,
-                    ProfileType.USER,
-                    MyProfileActivity.class));
+            rxActivity.startActivity(ProfileActivity.newIntent(rxActivity, User.ME));
         } else {
             showLoginActivity();
         }

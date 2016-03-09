@@ -14,6 +14,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.dao.DiscoversDao;
+import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.location.LocationManager;
 import com.squareup.picasso.Picasso;
@@ -56,6 +57,8 @@ public interface BaseActivityComponent {
     ShoutsDao shoutsDao();
 
     DiscoversDao discoversDao();
+
+    ProfilesDao profilesDao();
 
     GoogleApiClient googleApiClient();
 

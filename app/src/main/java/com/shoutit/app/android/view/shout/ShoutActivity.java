@@ -26,14 +26,11 @@ import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
-import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
-import com.shoutit.app.android.view.profile.myprofile.MyProfileActivity;
-import com.shoutit.app.android.view.profile.userprofile.UserProfileActivity;
-import com.squareup.picasso.Picasso;
+import com.shoutit.app.android.view.profile.ProfileActivity;
 
 import java.util.List;
 
@@ -148,11 +145,7 @@ public class ShoutActivity extends BaseActivity {
                 .subscribe(new Action1<User>() {
                     @Override
                     public void call(User user) {
-                        final User currentUser = userPreferences.getUser();
-                        final boolean isMyProfile = currentUser != null && user.getUsername().equals(currentUser.getUsername());
-                        startActivity(UserProfileActivity.newIntent(ShoutActivity.this,
-                                user.getUsername(), user.getType(),
-                                isMyProfile ? MyProfileActivity.class : UserProfileActivity.class));
+                        startActivity(ProfileActivity.newIntent(ShoutActivity.this, user.getUsername()));
                     }
                 });
 
