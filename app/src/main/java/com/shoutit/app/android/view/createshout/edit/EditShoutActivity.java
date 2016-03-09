@@ -249,8 +249,23 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     }
 
     @Override
-    public void showError() {
+    public void showPostError() {
         ColoredSnackBar.error(ColoredSnackBar.contentView(this), getString(R.string.request_acitvity_post_error), Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showCategoriesError() {
+        ColoredSnackBar.error(ColoredSnackBar.contentView(this), getString(R.string.edit_shout_categories_error), Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showCurrenciesError() {
+        ColoredSnackBar.error(ColoredSnackBar.contentView(this), getString(R.string.edit_shout_currencies_error), Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showBodyError() {
+        ColoredSnackBar.error(ColoredSnackBar.contentView(this), getString(R.string.edit_shout_body_error), Snackbar.LENGTH_SHORT).show();
     }
 
     @Override

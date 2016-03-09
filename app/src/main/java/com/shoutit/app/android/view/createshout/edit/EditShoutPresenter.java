@@ -5,7 +5,6 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
 
-import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.BothParams;
@@ -14,7 +13,6 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.CategoryFilter;
@@ -34,7 +32,6 @@ import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Scheduler;
-import rx.Subscription;
 import rx.functions.Action1;
 import rx.functions.Func2;
 import rx.functions.Func3;
@@ -73,7 +70,6 @@ public class EditShoutPresenter {
         }
     }
 
-    private final Observable<UserLocation> mLocationObservable;
     private final Context mContext;
     private final ApiService mApiService;
     private final Scheduler mNetworkScheduler;
@@ -82,12 +78,10 @@ public class EditShoutPresenter {
     private List<Category> mCategories;
     private Listener mListener;
     private UserLocation mUserLocation;
-    private Subscription locationSubscription;
     private final CompositeSubscription pendingSubscriptions = new CompositeSubscription();
 
     @Inject
-    public EditShoutPresenter(UserPreferences userPreferences,
-                              @ForActivity Context context,
+    public EditShoutPresenter(@ForActivity Context context,
                               ApiService apiService,
                               @NetworkScheduler Scheduler networkScheduler,
                               @UiScheduler Scheduler uiScheduler,
@@ -97,18 +91,10 @@ public class EditShoutPresenter {
         mNetworkScheduler = networkScheduler;
         mUiScheduler = uiScheduler;
         mShoutId = shoutId;
-        mLocationObservable = userPreferences.getLocationObservable()
-                .compose(ObservableExtensions.<UserLocation>behaviorRefCount());
     }
 
     public void registerListener(@NonNull Listener listener) {
         mListener = listener;
-        locationSubscription = mLocationObservable.subscribe(new Action1<UserLocation>() {
-            @Override
-            public void call(@NonNull UserLocation userLocation) {
-                setNewUserLocation(userLocation);
-            }
-        });
 
         mListener.setCurrenciesEnabled(false);
         mListener.showProgress();
@@ -144,7 +130,7 @@ public class EditShoutPresenter {
                         if (responseData.mCategories != null) {
                             categorySuccess(responseData.mCategories);
                         } else {
-                            // TODO category error
+                            mListener.showCategoriesError();
                         }
 
                         if (responseData.mCurrencies != null) {
@@ -158,7 +144,7 @@ public class EditShoutPresenter {
                                 }
                             }
                         } else {
-                            // TODO currency error
+                            mListener.showCurrenciesError();
                         }
 
                         if (responseData.mShoutResponse != null) {
@@ -168,7 +154,7 @@ public class EditShoutPresenter {
                                             responseData.mShoutResponse.getLocation().getCountry(), mContext),
                                     responseData.mShoutResponse.getLocation().getCity());
                         } else {
-                            // TODO body error
+                            mListener.showBodyError();
                         }
                     }
                 }));
@@ -196,13 +182,13 @@ public class EditShoutPresenter {
                         if (responseData.param1() != null) {
                             categorySuccess(responseData.param1());
                         } else {
-                            // TODO category error
+                            mListener.showCategoriesError();
                         }
 
                         if (responseData.param2() != null) {
                             currencySuccess(responseData.param2());
                         } else {
-                            // TODO currency error
+                            mListener.showCurrenciesError();
                         }
                     }
                 }));
@@ -265,7 +251,7 @@ public class EditShoutPresenter {
                     @Override
                     public void call(Throwable throwable) {
                         mListener.hideProgress();
-                        mListener.showError();
+                        mListener.showPostError();
                     }
                 }));
     }
@@ -281,7 +267,6 @@ public class EditShoutPresenter {
     }
 
     public void updateLocation(@NonNull UserLocation userLocation) {
-        locationSubscription.unsubscribe();
         setNewUserLocation(userLocation);
     }
 
@@ -329,7 +314,13 @@ public class EditShoutPresenter {
 
         void hideProgress();
 
-        void showError();
+        void showPostError();
+
+        void showCategoriesError();
+
+        void showCurrenciesError();
+
+        void showBodyError();
 
         void setCurrencies(@NonNull List<Pair<String, String>> list);
 

@@ -245,6 +245,9 @@
     <!-- Edit Shout -->
     <string name="edit_shout_option">Option</string>
     <string name="edit_shout_category">Category</string>
+    <string name="edit_shout_categories_error">Failed to load categories</string>
+    <string name="edit_shout_currencies_error">Failed to load currency</string>
+    <string name="edit_shout_body_error">Failed to load shout</string>
 
     <!-- Publish -->
     <string name="publish_menu_share">Share Shout</string>
