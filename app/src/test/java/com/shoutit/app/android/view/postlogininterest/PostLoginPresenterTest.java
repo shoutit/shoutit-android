@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.Category;
+import com.shoutit.app.android.api.model.CategoryFilter;
 import com.shoutit.app.android.api.model.Tag;
 import com.shoutit.app.android.api.model.TagsRequest;
 import com.shoutit.app.android.dao.CategoriesDao;
@@ -18,6 +19,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 
+import retrofit2.http.HEAD;
 import rx.observers.TestObserver;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
@@ -44,7 +46,7 @@ public class PostLoginPresenterTest extends TestCase {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        mSubject = BehaviorSubject.<List<Category>>create(ImmutableList.of(new Category("name", "slug", "icon", null)));
+        mSubject = BehaviorSubject.<List<Category>>create(ImmutableList.of(new Category("name", "slug", "icon", "image", ImmutableList.<CategoryFilter>of())));
         when(mApiService.categories()).thenReturn(mSubject);
         mPostSubject = BehaviorSubject.create(new Object());
         when(mApiService.batchListen(any(TagsRequest.class))).thenReturn(mPostSubject);

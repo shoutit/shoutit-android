@@ -242,6 +242,20 @@
     <string name="create_request_activity_title_too_short">Title must be at least 6 characters long</string>
     <string name="create_request_activity_price_empty">Price cannot be empty</string>
 
+    <!-- Edit Shout -->
+    <string name="edit_shout_option">Option</string>
+    <string name="edit_shout_category">Category</string>
+    <string name="edit_shout_categories_error">Failed to load categories</string>
+    <string name="edit_shout_currencies_error">Failed to load currency</string>
+    <string name="edit_shout_body_error">Failed to load shout</string>
+
+    <!-- Publish -->
+    <string name="publish_menu_share">Share Shout</string>
+    <string name="edit_shout_description_hint">Description</string>
+    <string name="edit_shout_location">Location</string>
+    <string name="edit_shout_price_hint">Price</string>
+    <string name="edit_shout_title_hint">Title</string>
+
     <!-- Edit Profile -->
     <string name="edit_profile_hint_name">Name</string>
     <string name="edit_profile_hint_username">Username</string>

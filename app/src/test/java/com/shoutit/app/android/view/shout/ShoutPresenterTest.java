@@ -28,6 +28,7 @@ import rx.schedulers.Schedulers;
 
 import static com.google.common.truth.Truth.assert_;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -57,6 +58,9 @@ public class ShoutPresenterTest {
                 null, false, false, false, null, 1, null, null, null, 1, null, false, null, null, null)));
         when(userPreferences.isNormalUser())
                 .thenReturn(true);
+
+        when(context.getString(anyInt(), anyString()))
+                .thenReturn("text");
 
         presenter = new ShoutPresenter(shoutsDao, "zz", context, Schedulers.immediate(), userPreferences);
     }

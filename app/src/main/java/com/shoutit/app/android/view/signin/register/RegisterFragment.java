@@ -27,9 +27,9 @@ import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.data.AssetsConstants;
-import com.shoutit.app.android.utils.rx.Actions1;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.MoreFunctions1;
+import com.shoutit.app.android.utils.rx.Actions1;
 import com.shoutit.app.android.view.about.AboutActivity;
 import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.signin.LoginActivityComponent;
@@ -44,6 +44,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
+import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import rx.functions.Action1;
 
@@ -180,8 +181,6 @@ public class RegisterFragment extends BaseFragment {
         final String textPrivacyPolicy = getString(R.string.register_bottom_text4);
 
         final SpannableString spannableTermsOfService = new SpannableString(textTermsOfService);
-        spannableTermsOfService.setSpan(new ForegroundColorSpan(
-                getResources().getColor(R.color.register_underline)), 0, textTermsOfService.length(), 0);
         spannableTermsOfService.setSpan(new UnderlineSpan(), 0, textTermsOfService.length(), 0);
         spannableTermsOfService.setSpan(new ClickableSpan() {
             @Override
@@ -191,11 +190,11 @@ public class RegisterFragment extends BaseFragment {
                         getString(R.string.html_activity_terms)));
             }
         }, 0, textTermsOfService.length(), 0);
+        spannableTermsOfService.setSpan(new ForegroundColorSpan(
+                getResources().getColor(R.color.register_underline)), 0, textTermsOfService.length(), 0);
 
         final SpannableString spannablePrivacy = new SpannableString(textPrivacyPolicy);
         spannablePrivacy.setSpan(new UnderlineSpan(), 0, textPrivacyPolicy.length(), 0);
-        spannablePrivacy.setSpan(new ForegroundColorSpan(
-                getResources().getColor(R.color.register_underline)), 0, textPrivacyPolicy.length(), 0);
         spannablePrivacy.setSpan(new ClickableSpan() {
             @Override
             public void onClick(View widget) {
@@ -204,21 +203,23 @@ public class RegisterFragment extends BaseFragment {
                         getString(R.string.html_activity_privacy)));
             }
         }, 0, textPrivacyPolicy.length(), 0);
+        spannablePrivacy.setSpan(new ForegroundColorSpan(
+                getResources().getColor(R.color.register_underline)), 0, textPrivacyPolicy.length(), 0);
 
         bottomTextView.setMovementMethod(LinkMovementMethod.getInstance());
         bottomTextView.setText(TextUtils.concat(bottomText1, " ", spannableTermsOfService, " ", bottomText3, " ", spannablePrivacy));
     }
 
-    @OnClick(R.id.register_lock_password)
-    public void lock() {
-        if (passwordEdittext.getTransformationMethod() instanceof PasswordTransformationMethod) {
-            passwordEdittext.setTransformationMethod(null);
-        } else {
+    @OnCheckedChanged(R.id.register_lock_password)
+    public void lock(boolean checked) {
+        if (checked) {
             passwordEdittext.setTransformationMethod(new PasswordTransformationMethod());
+        } else {
+            passwordEdittext.setTransformationMethod(null);
+
         }
         passwordEdittext.setSelection(passwordEdittext.length());
     }
-
 
     @Override
     protected void injectComponent(@Nonnull BaseActivityComponent baseActivityComponent, @Nonnull FragmentModule fragmentModule, @Nullable Bundle savedInstanceState) {
