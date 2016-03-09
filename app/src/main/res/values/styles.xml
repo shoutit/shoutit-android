@@ -73,6 +73,12 @@
         <item name="android:background">@drawable/selector_menu_item</item>
     </style>
 
+    <style name="ProfileInputStyle" parent="@style/TextAppearance.AppCompat">
+        <item name="android:textColorHint">@color/black_38</item>
+        <item name="android:textColor">@color/accent_blue</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
     <style name="BlueInputStyle" parent="@style/TextAppearance.AppCompat">
         <item name="android:textColorHint">@color/black_38</item>
         <item name="android:textColor">@color/accent_blue</item>
@@ -114,7 +120,7 @@
     </style>
 
     <style name="ShoutCardSection">
-        <item name="android:textColor">@color/black_38</item>
+        <item name="android:textColor">@color/black_54</item>
         <item name="android:textSize">14sp</item>
         <item name="android:paddingLeft">8dp</item>
         <item name="android:paddingStart" tools:ignore="NewApi">8dp</item>
@@ -146,7 +152,7 @@
     </style>
 
     <style name="ShoutCardItemDark" parent="ShoutCardItemLight">
-        <item name="android:background">@color/black_12</item>
+        <item name="android:background">@color/shout_item_dark</item>
     </style>
 
     <style name="ShoutItemHeader">
@@ -164,15 +170,29 @@
     </style>
 
     <style name="ShoutBottomBarItem">
-        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textAllCaps">true</item>
         <item name="android:maxLines">2</item>
-        <item name="android:gravity">center_vertical</item>
+        <item name="android:gravity">center</item>
         <item name="android:drawablePadding">8dp</item>
-        <item name="android:layout_weight">1</item>
+        <item name="android:padding">4dp</item>
     </style>
+
+    <style name="ProfileInfo">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingEnd" tools:ignore="NewApi">16dp</item>
+        <item name="android:paddingRight">16dp</item>
+        <item name="android:paddingStart" tools:ignore="NewApi">16dp</item>
+        <item name="android:paddingLeft">16dp</item>
+    </style>
+
+    <style name="ShoutBottomBar" parent="ThemeOverlay.AppCompat.Dark"/>
 
 </resources>

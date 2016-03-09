@@ -175,6 +175,7 @@ public class CreateRequestPresenter {
     public void unregister() {
         mListener = null;
         pendingSubscriptions.unsubscribe();
+        locationSubscription.unsubscribe();
     }
 
     public void retryCurrencies() {

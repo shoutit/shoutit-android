@@ -23,8 +23,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.List;
 
-import okhttp3.MediaType;
-import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
@@ -67,6 +65,7 @@ public class CreateRequestPresenterTest {
         when(mApiService.getCurrencies()).thenReturn(Observable.just(currencyList()));
         when(ResourcesHelper.getResourceIdForName(anyString(), any(Context.class))).thenReturn(1);
         when(mUserPreferences.getLocationObservable()).thenReturn(Observable.just(getUserLocation()));
+        when(mListener.getRequestData()).thenReturn(new CreateRequestPresenter.RequestData("123456", "5", "a"));
 
         mCreateRequestPresenter = new CreateRequestPresenter(mUserPreferences, mContext, mApiService, Schedulers.immediate(), Schedulers.immediate());
     }
@@ -76,7 +75,7 @@ public class CreateRequestPresenterTest {
         return new UserLocation(1, 1, "", "", "", "", "");
     }
 
-    private CreateShoutResponse emptyCreateShoutResponse(){
+    private CreateShoutResponse emptyCreateShoutResponse() {
         return new CreateShoutResponse("");
     }
 
@@ -121,7 +120,8 @@ public class CreateRequestPresenterTest {
 
     @Test
     public void testWhenButtonClickedAndRequestFailed_progressShownAndHiddenAndErrorShown() {
-        when(mListener.getRequestData()).thenReturn(new CreateRequestPresenter.RequestData("123456", "5", ""));;
+        when(mListener.getRequestData()).thenReturn(new CreateRequestPresenter.RequestData("123456", "5", ""));
+        ;
         when(mApiService.createShoutRequest(any(CreateRequestShoutRequest.class))).thenReturn(Observable.<CreateShoutResponse>error(new RuntimeException("")));
         mCreateRequestPresenter.registerListener(mListener);
 

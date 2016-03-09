@@ -2,7 +2,6 @@ package com.shoutit.app.android.view.shout;
 
 import android.content.Context;
 import android.graphics.Rect;
-import android.location.Location;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +17,7 @@ import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.google.common.base.Optional;
 import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
 import com.shoutit.app.android.api.model.Filter;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.User;
@@ -27,6 +27,7 @@ import com.shoutit.app.android.utils.DateTimeUtils;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.ResourcesHelper;
+import com.shoutit.app.android.viewholders.HeaderViewHolder;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.viewpagerindicator.CirclePageIndicator;
@@ -119,7 +120,7 @@ public class ShoutAdapter extends BaseAdapter {
         public void bind(@Nonnull ShoutAdapterItems.MainShoutAdapterItem item) {
             this.item = item;
             final Shout shout = item.getShout();
-            final User user = shout.getUser();
+            final User user = shout.getProfile();
 
             picasso.load(user.getImage())
                     .resizeDimen(R.dimen.shout_avatar_size, R.dimen.shout_avatar_size)
@@ -139,8 +140,19 @@ public class ShoutAdapter extends BaseAdapter {
             labelTextView.setText(shout.getTypeResId());
 
             titleTextView.setText(shout.getTitle());
-            priceTextView.setText(context.getString(R.string.price_with_currency, shout.getPrice(), shout.getCurrency()));
-            availableTextView.setText(context.getString(R.string.shout_available, (int) shout.getNumber()));
+
+            final String formattedPrice =  PriceUtils.formatPrice(shout.getPrice());
+            if (shout.getCurrency() != null) {
+                priceTextView.setText(context.getString(R.string.price_with_currency, formattedPrice, shout.getCurrency()));
+            } else {
+                priceTextView.setText(formattedPrice);
+            }
+
+            if (shout.getNumber() == 0) {
+                availableTextView.setText(context.getString(R.string.shout_available, (int) shout.getNumber()));
+            } else {
+                availableTextView.setText(context.getString(R.string.shout_only_available, (int) shout.getNumber()));
+            }
 
             shoutViewPager.setAdapter(imagesPagerAdapter);
             pageIndicator.setViewPager(shoutViewPager);
@@ -151,7 +163,7 @@ public class ShoutAdapter extends BaseAdapter {
             dateTextView.setText(DateTimeUtils.getShoutDetailDate(context, shout.getDatePublishedInMillis()));
             categoryTextView.setText(shout.getCategory().getName());
 
-            final Optional<Integer> flagResId = ResourcesHelper.getCountryResId(context, shout);
+            final Optional<Integer> flagResId = ResourcesHelper.getCountryResId(context, shout.getLocation());
             if (flagResId.isPresent()) {
                 picasso.load(flagResId.get())
                         .into(flagTarget);
@@ -187,21 +199,6 @@ public class ShoutAdapter extends BaseAdapter {
         }
     }
 
-    public class HeaderViewHolder extends ViewHolderManager.BaseViewHolder<ShoutAdapterItems.HeaderAdapterItem> {
-        @Bind(R.id.shout_item_header_tv)
-        TextView titleTextView;
-
-        public HeaderViewHolder(@Nonnull View itemView) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
-        }
-
-        @Override
-        public void bind(@Nonnull ShoutAdapterItems.HeaderAdapterItem item) {
-            titleTextView.setText(item.getTitle());
-        }
-    }
-
     public class UserShoutViewHolder extends ViewHolderManager.BaseViewHolder<ShoutAdapterItems.UserShoutAdapterItem> implements View.OnClickListener {
         @Bind(R.id.shout_grid_image_view)
         ImageView cardImageView;
@@ -225,7 +222,7 @@ public class ShoutAdapter extends BaseAdapter {
             this.item = item;
             final Shout shout = item.getShout();
             titleTextView.setText(shout.getTitle());
-            nameTextView.setText(shout.getUser().getName());
+            nameTextView.setText(shout.getProfile().getName());
             final String price = PriceUtils.formatPrice(shout.getPrice());
             cardPriceTextView.setText(context.getString(
                     R.string.price_with_currency, price, shout.getCurrency()));
@@ -244,7 +241,7 @@ public class ShoutAdapter extends BaseAdapter {
     }
 
     public class VisitProfileViewHolder extends ViewHolderManager.BaseViewHolder<ShoutAdapterItems.VisitProfileAdapterItem> implements View.OnClickListener {
-        @Bind(R.id.button_gray_tv)
+        @Bind(R.id.button_gray_btn)
         Button button;
 
         private ShoutAdapterItems.VisitProfileAdapterItem item;
@@ -258,7 +255,7 @@ public class ShoutAdapter extends BaseAdapter {
         @Override
         public void bind(@Nonnull ShoutAdapterItems.VisitProfileAdapterItem item) {
             this.item = item;
-            button.setText(item.getName());
+            button.setText(context.getString(R.string.shout_visit_profile, item.getName()));
         }
 
         @Override
@@ -321,7 +318,7 @@ public class ShoutAdapter extends BaseAdapter {
             case VIEW_TYPE_SHOUT:
                 return new ShoutViewHolder(layoutInflater.inflate(R.layout.shout_item, parent, false));
             case VIEW_TYPE_HEADER:
-                return new HeaderViewHolder(layoutInflater.inflate(R.layout.shout_header_item, parent, false));
+                return new HeaderViewHolder(layoutInflater.inflate(R.layout.base_header_item, parent, false));
             case VIEW_TYPE_USER_SHOUTS:
                 return new UserShoutViewHolder(layoutInflater.inflate(R.layout.shout_item_grid, parent, false));
             case VIEW_TYPE_VISIT_PROFILE:
@@ -343,7 +340,7 @@ public class ShoutAdapter extends BaseAdapter {
         final BaseAdapterItem item = items.get(position);
         if (item instanceof ShoutAdapterItems.MainShoutAdapterItem) {
             return VIEW_TYPE_SHOUT;
-        } else if (item instanceof ShoutAdapterItems.HeaderAdapterItem) {
+        } else if (item instanceof HeaderAdapterItem) {
             return VIEW_TYPE_HEADER;
         } else if (item instanceof ShoutAdapterItems.RelatedContainerAdapterItem) {
             return VIEW_TYPE_RELATED_SHOUTS_CONTAINER;

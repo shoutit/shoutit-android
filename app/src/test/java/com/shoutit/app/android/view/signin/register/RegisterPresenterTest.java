@@ -5,9 +5,9 @@ import android.content.Context;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
-import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.UserLocationSimple;
 import com.shoutit.app.android.location.LocationManager;
 
@@ -126,7 +126,7 @@ public class RegisterPresenterTest {
     }
 
     @Test
-         public void testWhenEmptyPassword_showError() {
+    public void testWhenEmptyPassword_showError() {
         final TestObserver<Object> successObserver = new TestObserver<>();
         final TestObserver<Object> failObserver = new TestObserver<>();
         final TestObserver<Object> emptyPasswordObserver = new TestObserver<>();

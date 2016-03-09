@@ -30,6 +30,7 @@ import java.util.List;
 
 import okhttp3.ResponseBody;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
@@ -65,7 +66,7 @@ public interface ApiService {
                                                      @Query("page") @Nullable Integer page,
                                                      @Query("page_size") @Nullable Integer pageSize);
 
-    @GET("/v3/shouts/{id}")
+    @GET("shouts/{id}")
     Observable<Shout> shout(@Path("id") String shoutId);
 
     @GET("shouts")
@@ -78,14 +79,13 @@ public interface ApiService {
                                              @Query("page") Integer page,
                                              @Query("page_size") Integer pageSize);
 
-
     /**
      * OAuth
      **/
     @POST("oauth2/access_token")
     Observable<SignResponse> login(@Body EmailLoginRequest request);
 
-    @POST("/v3/oauth2/access_token")
+    @POST("oauth2/access_token")
     Observable<SignResponse> loginGuest(@Body GuestSignupRequest request);
 
     @POST("oauth2/access_token")
@@ -125,6 +125,17 @@ public interface ApiService {
     Observable<User> updateUser(@Body UpdateUserRequest updateUserRequest);
 
 
+    /** Profile **/
+    @POST("profiles/{username}/listen")
+    Observable<ResponseBody> listenProfile(@Path("username") String username);
+
+    @DELETE("profiles/{username}/listen")
+    Observable<ResponseBody> unlistenProfile(@Path("username") String username);
+
+    @GET("profiles/{user_name}")
+    Observable<User> getProfile(@Path("user_name") String userName);
+
+
     /**
      * Misc
      **/
@@ -136,7 +147,6 @@ public interface ApiService {
 
     @GET("/v3/misc/categories")
     Observable<List<Category>> categories();
-
 
     /**
      * Auth

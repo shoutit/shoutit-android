@@ -16,7 +16,7 @@ public class Category {
     private final String icon;
 
     @NonNull
-    private final Tag mainTag;
+    private final String image;
 
     @NonNull
     private final List<CategoryFilter> filters;
@@ -24,12 +24,12 @@ public class Category {
     public Category(@NonNull String name,
                     @NonNull String slug,
                     @NonNull String icon,
-                    @NonNull Tag mainTag,
+                    @NonNull String image,
                     @NonNull List<CategoryFilter> filters) {
         this.name = name;
         this.slug = slug;
         this.icon = icon;
-        this.mainTag = mainTag;
+        this.image = image;
         this.filters = filters;
     }
 
@@ -44,13 +44,13 @@ public class Category {
     }
 
     @NonNull
-    public Tag getMainTag() {
-        return mainTag;
+    public String getIcon() {
+        return icon;
     }
 
     @NonNull
-    public String getIcon() {
-        return icon;
+    public String getImage() {
+        return image;
     }
 
     @NonNull

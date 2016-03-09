@@ -46,7 +46,7 @@ public class PublishShoutActivity extends RxAppCompatActivity {
         mToolbar.inflateMenu(R.menu.publish_shout_menu);
         mToolbar.setNavigationIcon(R.drawable.close);
 
-        final Drawable drawable = getResources().getDrawable(R.drawable.share);
+        final Drawable drawable = getResources().getDrawable(R.drawable.ic_share);
         assert drawable != null;
         drawable.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
         mToolbar.getMenu().findItem(R.id.publish_share).setIcon(drawable);

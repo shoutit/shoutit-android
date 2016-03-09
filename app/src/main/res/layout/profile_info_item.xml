@@ -1,0 +1,120 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:orientation="vertical">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="9dp"
+        android:layout_marginTop="5dp"
+        android:background="#1f000000" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="26dp"
+        android:orientation="horizontal"
+        android:paddingEnd="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingStart="16dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:src="@drawable/ic_bio" />
+
+        <TextView
+            android:id="@+id/profile_bio_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:lineSpacingExtra="1dp"
+            android:text="@string/profile_empty_field"
+            android:textColor="@color/profile_text_color_light"
+            android:textSize="12sp"
+            tools:text="I have hinted that I would often jerk poor Queequeg from between the whale and the ship—where he would occasionally fall, from the incessant rolling and swaying of both. " />
+
+    </LinearLayout>
+
+    <LinearLayout
+        style="@style/ProfileInfo"
+        android:layout_marginBottom="18dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:src="@drawable/ic_website" />
+
+        <TextView
+            android:id="@+id/profile_website_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/profile_empty_field"
+            android:textColor="@color/profile_text_color_light"
+            android:textSize="12sp"
+            tools:text="www.shoutit.com" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        style="@style/ProfileInfo"
+        android:layout_marginBottom="18dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:src="@drawable/ic_joined" />
+
+        <TextView
+            android:id="@+id/profile_date_joined_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/profile_empty_field"
+            android:textColor="@color/profile_text_color_light"
+            android:textSize="12sp"
+            tools:text="Joind 10/13/2014" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        style="@style/ProfileInfo"
+        android:layout_marginBottom="10dp">
+
+        <ImageView
+            android:id="@+id/profile_country_iv"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:padding="2dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:scaleType="centerInside"
+            tools:src="@drawable/pl" />
+
+        <TextView
+            android:id="@+id/profile_country_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/profile_empty_field"
+            tools:text="lalalalallalal"
+            android:paddingLeft="1dp"
+            android:paddingStart="1dp"
+            android:textColor="@color/profile_text_color_light"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@drawable/shadow_line"/>
+
+</LinearLayout>

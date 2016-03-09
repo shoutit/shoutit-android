@@ -27,7 +27,7 @@ import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.data.AssetsConstants;
-import com.shoutit.app.android.utils.Actions1;
+import com.shoutit.app.android.utils.rx.Actions1;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.view.about.AboutActivity;

@@ -2,14 +2,13 @@
 
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                  android:layout_width="match_parent"
-                  android:layout_height="match_parent"
-                  android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/shouts_toolbar"
@@ -25,15 +24,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <CheckBox
+            <CheckedTextView
                 android:id="@+id/shouts_layout_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:button="@drawable/selector_home_layout_switcher"
-                tools:src="@drawable/ic_grid_switch"/>
+                android:background="@drawable/ic_list_switch"/>
 
             <ImageButton
                 android:id="@+id/shouts_filter_btn"

@@ -44,4 +44,9 @@ public abstract class BaseAdapter extends RecyclerView.Adapter<ViewHolderManager
     public int getItemCount() {
         return items.size();
     }
+
+    @Override
+    public void onBindViewHolder(ViewHolderManager.BaseViewHolder holder, int position) {
+        holder.bind(items.get(position));
+    }
 }

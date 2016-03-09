@@ -4,8 +4,6 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.UpdateUserRequest;
 import com.shoutit.app.android.api.model.User;
-import com.shoutit.app.android.utils.LocationUtils;
-import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.Validators;
 
 import org.junit.Before;
@@ -19,7 +17,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import rx.Observable;
 import rx.observers.TestSubscriber;
-import rx.schedulers.Schedulers;
 import rx.schedulers.TestScheduler;
 
 import static org.mockito.Matchers.any;
@@ -44,7 +41,7 @@ public class ChangeEmailPresenterTest {
         PowerMockito.mockStatic(Validators.class);
 
         when(apiService.updateUser(any(UpdateUserRequest.class)))
-                .thenReturn(Observable.just(new User("1", null, null, null, null, null, null, null, false, null, null, false, false, null)));
+                .thenReturn(Observable.just(new User("1", null, null, null, null, null, null, null, false, null, null, false, false, false, null, 1, null, null, 0, null, null, null)));
         when(Validators.isEmailValid(anyString())).thenReturn(true);
 
         presenter = new ChangeEmailPresenter(apiService, scheduler, scheduler, userPreferences);

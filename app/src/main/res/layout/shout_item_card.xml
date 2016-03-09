@@ -12,7 +12,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp">
 
         <LinearLayout
             android:id="@+id/shout_user_header"
@@ -113,7 +114,7 @@
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginTop="4dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="18dp"
             android:textColor="@color/black_87"
             tools:text="Merino Wool Slouchy Hat, Winter Hat, Chunky Textured Knit Hat, Oxblood Chunky Hat"/>
 
@@ -136,6 +137,8 @@
             android:layout_alignParentRight="true"
             android:maxLines="1"
             android:ellipsize="end"
+            android:textSize="12sp"
+            android:textColor="@color/black_54"
             android:layout_marginRight="8dp"
             android:layout_marginEnd="8dp"
             tools:text="Only 3 available"/>
@@ -150,7 +153,6 @@
             android:gravity="center"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
-            android:layout_marginBottom="8dp"
             android:background="@drawable/selector_cart_button">
 
             <ImageView
@@ -165,6 +167,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/shout_add_to_cart"
                 android:textSize="14sp"
+                android:textAllCaps="true"
                 android:textColor="@android:color/white"
                 android:fontFamily="sans-serif-medium"
                 />

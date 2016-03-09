@@ -212,6 +212,12 @@ dependencies {
     testCompile 'org.powermock:powermock-module-junit4-rule-agent:1.6.4'
     testCompile 'org.powermock:powermock-module-junit4-rule:1.6.4'
     testCompile 'org.powermock:powermock-module-junit4:1.6.4'
+
+    // Amazon
+    compile 'com.amazonaws:aws-android-sdk-core:2.2.13'
+    compile 'com.amazonaws:aws-android-sdk-cognito:2.2.13'
+    compile 'com.amazonaws:aws-android-sdk-s3:2.2.13'
+    compile 'com.amazonaws:aws-android-sdk-ddb:2.2.13'
 }
 
 apply plugin: 'com.google.gms.google-services'

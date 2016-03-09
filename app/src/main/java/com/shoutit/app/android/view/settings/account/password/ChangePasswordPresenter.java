@@ -70,6 +70,7 @@ public class ChangePasswordPresenter {
         newPasswordVerifySubject.onNext(null);
 
         hadUserPasswordSetObservable = userPreferences.getUserObservable()
+                .filter(Functions1.isNotNull())
                 .first()
                 .map(new Func1<User, Boolean>() {
                     @Override

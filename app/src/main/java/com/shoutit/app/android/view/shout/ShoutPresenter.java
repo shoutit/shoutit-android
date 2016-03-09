@@ -10,6 +10,8 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
@@ -42,12 +44,13 @@ public class ShoutPresenter {
     private final Observable<Throwable> errorObservable;
     private final Observable<Boolean> progressObservable;
     private final Observable<String> titleObservable;
+    private final Observable<Boolean> isUserShoutOwnerObservable;
 
     private PublishSubject<String> addToCartSubject = PublishSubject.create();
     private PublishSubject<String> userShoutSelectedSubject = PublishSubject.create();
     private PublishSubject<String> relatedShoutSelectedSubject = PublishSubject.create();
     private PublishSubject<String> seeAllRelatedShoutSubject = PublishSubject.create();
-    private PublishSubject<String> visitProfileSubject = PublishSubject.create();
+    private PublishSubject<User> visitProfileSubject = PublishSubject.create();
 
     @Nonnull
     private final Scheduler uiScheduler;
@@ -56,7 +59,8 @@ public class ShoutPresenter {
     public ShoutPresenter(@Nonnull final ShoutsDao shoutsDao,
                           @Nonnull final String shoutId,
                           @Nonnull @ForActivity final Context context,
-                          @Nonnull @UiScheduler Scheduler uiScheduler) {
+                          @Nonnull @UiScheduler Scheduler uiScheduler,
+                          @Nonnull UserPreferences userPreferences) {
         this.uiScheduler = uiScheduler;
 
         /** Requests **/
@@ -70,7 +74,7 @@ public class ShoutPresenter {
                 .map(new Func1<Shout, String>() {
                     @Override
                     public String call(Shout shout) {
-                        return shout.getUser().getUsername();
+                        return shout.getProfile().getUsername();
                     }
                 })
                 .compose(ObservableExtensions.<String>behaviorRefCount());
@@ -180,16 +184,16 @@ public class ShoutPresenter {
 
                         builder.add(shout);
 
-                        final User user = shout.getShout().getUser();
+                        final User user = shout.getShout().getProfile();
                         if (!userShouts.isEmpty()) {
-                            builder.add(new ShoutAdapterItems.HeaderAdapterItem(context.getString(R.string.shout_user_shouts_header, user.getName())))
+                            builder.add(new HeaderAdapterItem(context.getString(R.string.shout_user_shouts_header, user.getName())))
                                     .addAll(userShouts);
                         }
 
                         builder.add(new ShoutAdapterItems.VisitProfileAdapterItem(visitProfileSubject, user));
 
                         if (!relatedShouts.isEmpty()) {
-                            builder.add(new ShoutAdapterItems.HeaderAdapterItem(context.getString(R.string.shout_related_shouts_header)))
+                            builder.add(new HeaderAdapterItem(context.getString(R.string.shout_related_shouts_header)))
                                     .add(new ShoutAdapterItems.RelatedContainerAdapterItem(relatedShouts));
                         }
 
@@ -217,6 +221,18 @@ public class ShoutPresenter {
                 allAdapterItemsObservable.map(Functions1.returnFalse()))
                 .startWith(true)
                 .observeOn(uiScheduler);
+
+        /** Others **/
+        isUserShoutOwnerObservable = Observable.zip(
+                userNameObservable, userPreferences.getUserObservable(), Observable.just(userPreferences.isNormalUser()),
+                new Func3<String, User, Boolean, Boolean>() {
+                    @Override
+                    public Boolean call(String shoutUser, @Nullable User user, Boolean isNormalUser) {
+                        return isNormalUser && user != null && user.getUsername().equals(shoutUser);
+                    }
+                })
+                .compose(ObservableExtensions.<Boolean>behaviorRefCount())
+                .first();
     }
 
     @Nonnull
@@ -256,13 +272,26 @@ public class ShoutPresenter {
     }
 
     @Nonnull
-    public Observable<String> getVisitProfileObservable() {
+    public Observable<User> getVisitProfileObservable() {
         return visitProfileSubject;
     }
 
     @Nonnull
     public Observable<String> getAddToCartSubject() {
         return addToCartSubject;
+    }
+
+    @Nonnull
+    public Observable<Boolean> getIsUserShoutOwnerObservable() {
+        return allAdapterItemsObservable
+                .first()
+                .flatMap(new Func1<List<BaseAdapterItem>, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> call(List<BaseAdapterItem> baseAdapterItems) {
+                        return isUserShoutOwnerObservable;
+                    }
+                })
+                .observeOn(uiScheduler);
     }
 }
 

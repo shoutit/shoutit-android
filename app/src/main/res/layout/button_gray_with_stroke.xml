@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Button xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/button_gray_tv"
+    android:id="@+id/button_gray_btn"
     android:layout_width="match_parent"
     android:layout_height="40dp"
     xmlns:tools="http://schemas.android.com/tools"
@@ -12,4 +12,7 @@
     android:layout_marginTop="6dp"
     android:layout_marginBottom="6dp"
     android:background="@drawable/selector_discover_button"
-    tools:text="Some text" />
+    android:maxLines="1"
+    android:ellipsize="middle"
+    android:textAllCaps="false"
+    tools:text="Visit USerLongNamlalalalallalalalalala Profile" />
