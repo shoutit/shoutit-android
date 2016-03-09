@@ -10,6 +10,7 @@ import com.shoutit.app.android.api.model.CreateShoutResponse;
 import com.shoutit.app.android.api.model.Currency;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
+import com.shoutit.app.android.api.model.EditShoutRequest;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.GuestSignupRequest;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
@@ -160,6 +161,9 @@ public interface ApiService {
      */
     @POST("/v3/shouts")
     Observable<CreateShoutResponse> createShoutRequest(@Body CreateRequestShoutRequest request);
+
+    @PATCH("/v3/shouts/{id}")
+    Observable<CreateShoutResponse> editShout(@Path("id") String id, @Body EditShoutRequest request);
 
     @GET("/v3/shouts/{id}")
     Observable<ShoutResponse> getShout(@Path("id") String id);

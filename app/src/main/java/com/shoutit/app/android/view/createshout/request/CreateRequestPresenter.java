@@ -20,6 +20,7 @@ import com.shoutit.app.android.api.model.Currency;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.UserLocationSimple;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.ResourcesHelper;
 
 import java.util.List;
@@ -27,7 +28,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
-import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Scheduler;
 import rx.Subscription;
@@ -139,7 +139,7 @@ public class CreateRequestPresenter {
                 new CreateRequestShoutRequest(
                         requestData.mDescription,
                         new UserLocationSimple(mUserLocation.getLatitude(), mUserLocation.getLongitude()),
-                        Double.parseDouble(requestData.mBudget), requestData.mCurrencyId))
+                        PriceUtils.getPriceInCents(requestData.mBudget), requestData.mCurrencyId))
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
                 .subscribe(new Action1<CreateShoutResponse>() {

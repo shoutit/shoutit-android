@@ -72,10 +72,12 @@ public class PublishShoutActivity extends RxAppCompatActivity {
         } else {
             // TODO start create shout
         }
+        finish();
     }
 
     @OnClick(R.id.publish_activity_add_more_details)
     public void moreDetails() {
         startActivity(EditShoutActivity.newIntent(mId, this));
+        finish();
     }
 }

@@ -31,6 +31,7 @@ import android.widget.TextView;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
@@ -225,7 +226,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
         return new EditShoutPresenter.RequestData(
                 mTitle.getText().toString(),
                 mEditBudget.getText().toString(),
-                ((Pair<String, String>) mEditCurrencySpinner.getSelectedItem()).first);
+                ((Pair<String, String>) mEditCurrencySpinner.getSelectedItem()).first, ((Pair<String, String>) mEditCategorySpinner.getSelectedItem()).first, getSelectedOptions());
     }
 
     @Override
@@ -314,12 +315,13 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     }
 
     @Override
-    public void setOptions(@NonNull List<Pair<String, List<CategoryFilter.FilterValue>>> options) {
+    public void setOptions(@NonNull List<CategoryFilter> options) {
         mEditShoutContainer.removeAllViews();
         final LayoutInflater layoutInflater = getLayoutInflater();
-        for (Pair<String, List<CategoryFilter.FilterValue>> option : options) {
-            final String name = option.first;
-            final List<CategoryFilter.FilterValue> optionsList = option.second;
+
+        for (CategoryFilter categoryFilter : options) {
+            final String name = categoryFilter.getName();
+            final List<CategoryFilter.FilterValue> optionsList = categoryFilter.getValues();
 
             final View view = layoutInflater.inflate(R.layout.options_layout, mEditShoutContainer, false);
             final TextView title = (TextView) view.findViewById(R.id.option_title);
@@ -340,9 +342,24 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
             adapter.setData(optionsPairs);
 
             title.setText(name);
+            view.setTag(categoryFilter.getSlug());
 
             mEditShoutContainer.addView(view, mEditShoutContainer.getChildCount());
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<Pair<String, String>> getSelectedOptions() {
+        final int childCount = mEditShoutContainer.getChildCount();
+        List<Pair<String, String>> list = Lists.newArrayList();
+        for (int i = 0; i < childCount; i++) {
+            final View view = mEditShoutContainer.getChildAt(i);
+            final Spinner spinner = (Spinner) view.findViewById(R.id.option_spinner);
+
+            final Pair<String, String> selectedItem = (Pair<String, String>) spinner.getSelectedItem();
+            list.add(Pair.create((String) view.getTag(), selectedItem.first));
+        }
+        return ImmutableList.copyOf(list);
     }
 
     @Override

@@ -7,7 +7,6 @@ import android.support.v4.util.Pair;
 
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
-import com.appunite.rx.functions.BothParams;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
@@ -16,13 +15,14 @@ import com.google.common.collect.Iterables;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.CategoryFilter;
-import com.shoutit.app.android.api.model.CreateRequestShoutRequest;
 import com.shoutit.app.android.api.model.CreateShoutResponse;
 import com.shoutit.app.android.api.model.Currency;
+import com.shoutit.app.android.api.model.EditShoutRequest;
 import com.shoutit.app.android.api.model.ShoutResponse;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.UserLocationSimple;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.ResourcesHelper;
 
 import java.util.List;
@@ -33,7 +33,6 @@ import javax.inject.Inject;
 import rx.Observable;
 import rx.Scheduler;
 import rx.functions.Action1;
-import rx.functions.Func2;
 import rx.functions.Func3;
 import rx.subscriptions.CompositeSubscription;
 
@@ -47,11 +46,21 @@ public class EditShoutPresenter {
         private final String mBudget;
         @NonNull
         private final String mCurrencyId;
+        @Nullable
+        private final String mCategoryId;
+        @Nullable
+        private final List<Pair<String, String>> mOptionsIdValue;
 
-        public RequestData(@NonNull String description, @NonNull String budget, @NonNull String currencyId) {
+        public RequestData(@NonNull String description,
+                           @NonNull String budget,
+                           @NonNull String currencyId,
+                           @Nullable String categoryId,
+                           @Nullable List<Pair<String, String>> optionsIdValue) {
             mDescription = description;
             mBudget = budget;
             mCurrencyId = currencyId;
+            mCategoryId = categoryId;
+            mOptionsIdValue = optionsIdValue;
         }
     }
 
@@ -85,7 +94,7 @@ public class EditShoutPresenter {
                               ApiService apiService,
                               @NetworkScheduler Scheduler networkScheduler,
                               @UiScheduler Scheduler uiScheduler,
-                              @Nullable String shoutId) {
+                              @NonNull String shoutId) {
         mContext = context;
         mApiService = apiService;
         mNetworkScheduler = networkScheduler;
@@ -99,11 +108,7 @@ public class EditShoutPresenter {
         mListener.setCurrenciesEnabled(false);
         mListener.showProgress();
 
-        if (mShoutId != null) {
-            subscribeEditRequestShout();
-        } else {
-            subscribeEditCreateShout();
-        }
+        subscribeEditRequestShout();
     }
 
     private void subscribeEditRequestShout() {
@@ -149,46 +154,13 @@ public class EditShoutPresenter {
 
                         if (responseData.mShoutResponse != null) {
                             mListener.setTitle(responseData.mShoutResponse.getTitle());
-                            mListener.setPrice(String.valueOf(responseData.mShoutResponse.getPrice()));
+                            mListener.setPrice(PriceUtils.formatPrice(responseData.mShoutResponse.getPrice()));
+                            mUserLocation = responseData.mShoutResponse.getLocation();
                             mListener.setLocation(ResourcesHelper.getResourceIdForName(
-                                            responseData.mShoutResponse.getLocation().getCountry(), mContext),
-                                    responseData.mShoutResponse.getLocation().getCity());
+                                            mUserLocation.getCountry(), mContext),
+                                    mUserLocation.getCity());
                         } else {
                             mListener.showBodyError();
-                        }
-                    }
-                }));
-    }
-
-    private void subscribeEditCreateShout() {
-        pendingSubscriptions.add(Observable.zip(
-                mApiService.categories()
-                        .onErrorResumeNext(Observable.<List<Category>>just(null)),
-                mApiService.getCurrencies()
-                        .onErrorResumeNext(Observable.<List<Currency>>just(null)),
-                new Func2<List<Category>, List<Currency>, BothParams<List<Category>, List<Currency>>>() {
-                    @Override
-                    public BothParams<List<Category>, List<Currency>> call(List<Category> categories, List<Currency> currencies) {
-                        return BothParams.of(categories, currencies);
-                    }
-                })
-                .subscribeOn(mNetworkScheduler)
-                .observeOn(mUiScheduler)
-                .subscribe(new Action1<BothParams<List<Category>, List<Currency>>>() {
-                    @Override
-                    public void call(BothParams<List<Category>, List<Currency>> responseData) {
-                        mListener.hideProgress();
-
-                        if (responseData.param1() != null) {
-                            categorySuccess(responseData.param1());
-                        } else {
-                            mListener.showCategoriesError();
-                        }
-
-                        if (responseData.param2() != null) {
-                            currencySuccess(responseData.param2());
-                        } else {
-                            mListener.showCurrenciesError();
                         }
                     }
                 }));
@@ -234,11 +206,15 @@ public class EditShoutPresenter {
         if (!checkValidity(requestData)) return;
 
         mListener.showProgress();
-        pendingSubscriptions.add(mApiService.createShoutRequest(
-                new CreateRequestShoutRequest(
+        pendingSubscriptions.add(mApiService.editShout(
+                mShoutId,
+                new EditShoutRequest(
                         requestData.mDescription,
                         new UserLocationSimple(mUserLocation.getLatitude(), mUserLocation.getLongitude()),
-                        Double.parseDouble(requestData.mBudget), requestData.mCurrencyId))
+                        PriceUtils.getPriceInCents(requestData.mBudget),
+                        requestData.mCurrencyId,
+                        requestData.mCategoryId,
+                        getFilters(requestData.mOptionsIdValue)))
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
                 .subscribe(new Action1<CreateShoutResponse>() {
@@ -254,6 +230,17 @@ public class EditShoutPresenter {
                         mListener.showPostError();
                     }
                 }));
+    }
+
+    private List<EditShoutRequest.FilterValue> getFilters(List<Pair<String, String>> optionsIdValue) {
+        return ImmutableList.copyOf(Iterables.transform(optionsIdValue, new Function<Pair<String, String>, EditShoutRequest.FilterValue>() {
+            @Nullable
+            @Override
+            public EditShoutRequest.FilterValue apply(@Nullable Pair<String, String> input) {
+                assert input != null;
+                return new EditShoutRequest.FilterValue(input.first, new EditShoutRequest.FilterValue.Value(input.second));
+            }
+        }));
     }
 
     private boolean checkValidity(@NonNull RequestData requestData) {
@@ -290,16 +277,8 @@ public class EditShoutPresenter {
             });
             final Category category = filters.iterator().next();
 
-            final List<Pair<String, List<CategoryFilter.FilterValue>>> options = ImmutableList.copyOf(Iterables.transform(category.getFilters(), new Function<CategoryFilter, Pair<String, List<CategoryFilter.FilterValue>>>() {
-                @Nullable
-                @Override
-                public Pair<String, List<CategoryFilter.FilterValue>> apply(@Nullable CategoryFilter input) {
-                    assert input != null;
-                    return Pair.create(input.getName(), input.getValues());
-                }
-            }));
 
-            mListener.setOptions(options);
+            mListener.setOptions(category.getFilters());
             mListener.setCategoryImage(category.getIcon());
         }
     }
@@ -336,7 +315,7 @@ public class EditShoutPresenter {
 
         void setCategories(@NonNull List<Pair<String, String>> list);
 
-        void setOptions(@NonNull List<Pair<String, List<CategoryFilter.FilterValue>>> options);
+        void setOptions(@NonNull List<CategoryFilter> options);
 
         void setSelectedCurrency(int currencyPostion);
 

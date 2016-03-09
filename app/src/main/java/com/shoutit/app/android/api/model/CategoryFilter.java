@@ -50,4 +50,9 @@ public class CategoryFilter {
     public List<FilterValue> getValues() {
         return values;
     }
+
+    @Nonnull
+    public String getSlug() {
+        return slug;
+    }
 }
