@@ -36,6 +36,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
+import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import okhttp3.ResponseBody;
 import rx.functions.Action1;
@@ -174,6 +175,17 @@ public class LoginFragment extends BaseFragment {
         loginPresenter.getProgressObservable()
                 .compose(this.<Boolean>bindToLifecycle())
                 .subscribe(RxView.visibility(progressView));
+    }
+
+    @OnCheckedChanged(R.id.login_lock_password)
+    public void lock(boolean checked) {
+        if (checked) {
+            passwordEdittext.setTransformationMethod(new PasswordTransformationMethod());
+        } else {
+            passwordEdittext.setTransformationMethod(null);
+
+        }
+        passwordEdittext.setSelection(passwordEdittext.length());
     }
 
     @Override
