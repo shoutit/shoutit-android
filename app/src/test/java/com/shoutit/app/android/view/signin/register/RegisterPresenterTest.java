@@ -5,11 +5,10 @@ import android.content.Context;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
-import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.UserLocationSimple;
-import com.shoutit.app.android.api.model.login.LoginUser;
 import com.shoutit.app.android.location.LocationManager;
 
 import org.junit.Before;
@@ -127,7 +126,7 @@ public class RegisterPresenterTest {
     }
 
     @Test
-         public void testWhenEmptyPassword_showError() {
+    public void testWhenEmptyPassword_showError() {
         final TestObserver<Object> successObserver = new TestObserver<>();
         final TestObserver<Object> failObserver = new TestObserver<>();
         final TestObserver<Object> emptyPasswordObserver = new TestObserver<>();
@@ -261,7 +260,7 @@ public class RegisterPresenterTest {
         verify(mApiService).signup(argumentCaptor.capture());
 
         final UserLocationSimple location = argumentCaptor.getValue().getUser().getLocation();
-        assert_().that(this.location.getLatitude()).isEqualTo(1d);
-        assert_().that(this.location.getLongitude()).isEqualTo(1d);
+        assert_().that(location.getLatitude()).isEqualTo(1d);
+        assert_().that(location.getLongitude()).isEqualTo(1d);
     }
 }

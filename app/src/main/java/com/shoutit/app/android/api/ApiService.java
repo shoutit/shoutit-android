@@ -6,13 +6,16 @@ import android.support.annotation.Nullable;
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.ChangePasswordRequest;
 import com.shoutit.app.android.api.model.CreateRequestShoutRequest;
+import com.shoutit.app.android.api.model.CreateShoutResponse;
 import com.shoutit.app.android.api.model.Currency;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
+import com.shoutit.app.android.api.model.EditShoutRequest;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.GuestSignupRequest;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.api.model.Shout;
+import com.shoutit.app.android.api.model.ShoutResponse;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.TagsRequest;
@@ -76,10 +79,6 @@ public interface ApiService {
     Observable<ShoutsResponse> shoutsRelated(@Path("id") String shoutId,
                                              @Query("page") Integer page,
                                              @Query("page_size") Integer pageSize);
-
-    @GET("shouts/categories")
-    Observable<List<Category>> categories();
-
 
     /**
      * OAuth
@@ -147,6 +146,8 @@ public interface ApiService {
     @GET("misc/geocode?latlng=0,0")
     Observable<UserLocation> geocodeDefault();
 
+    @GET("/v3/misc/categories")
+    Observable<List<Category>> categories();
 
     /**
      * Auth
@@ -159,7 +160,13 @@ public interface ApiService {
      * create shout
      */
     @POST("/v3/shouts")
-    Observable<ResponseBody> createShoutRequest(@Body CreateRequestShoutRequest request);
+    Observable<CreateShoutResponse> createShoutRequest(@Body CreateRequestShoutRequest request);
+
+    @PATCH("/v3/shouts/{id}")
+    Observable<CreateShoutResponse> editShout(@Path("id") String id, @Body EditShoutRequest request);
+
+    @GET("/v3/shouts/{id}")
+    Observable<ShoutResponse> getShout(@Path("id") String id);
 
     @GET("misc/currencies")
     Observable<List<Currency>> getCurrencies();

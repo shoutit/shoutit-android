@@ -15,10 +15,12 @@ import com.google.common.collect.Iterables;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.CreateRequestShoutRequest;
+import com.shoutit.app.android.api.model.CreateShoutResponse;
 import com.shoutit.app.android.api.model.Currency;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.UserLocationSimple;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.ResourcesHelper;
 
 import java.util.List;
@@ -26,7 +28,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
-import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Scheduler;
 import rx.Subscription;
@@ -138,14 +139,14 @@ public class CreateRequestPresenter {
                 new CreateRequestShoutRequest(
                         requestData.mDescription,
                         new UserLocationSimple(mUserLocation.getLatitude(), mUserLocation.getLongitude()),
-                        Double.parseDouble(requestData.mBudget), requestData.mCurrencyId))
+                        PriceUtils.getPriceInCents(requestData.mBudget), requestData.mCurrencyId))
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
-                .subscribe(new Action1<ResponseBody>() {
+                .subscribe(new Action1<CreateShoutResponse>() {
                     @Override
-                    public void call(ResponseBody responseBody) {
+                    public void call(CreateShoutResponse responseBody) {
                         mListener.hideProgress();
-                        mListener.finishActivity();
+                        mListener.finishActivity(responseBody.getId());
                     }
                 }, new Action1<Throwable>() {
                     @Override
@@ -163,7 +164,7 @@ public class CreateRequestPresenter {
         final boolean erroredBudget = Strings.isNullOrEmpty(requestData.mBudget);
         mListener.showEmptyPriceError(erroredBudget);
 
-        return !erroredTitle || !erroredBudget;
+        return !erroredTitle && !erroredBudget;
     }
 
     public void updateLocation(@NonNull UserLocation userLocation) {
@@ -207,7 +208,7 @@ public class CreateRequestPresenter {
 
         void showEmptyPriceError(boolean show);
 
-        void finishActivity();
+        void finishActivity(String id);
     }
 
 }
