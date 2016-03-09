@@ -66,6 +66,8 @@
                 android:layout_height="wrap_content">
 
                 <android.support.design.widget.TextInputLayout
+                    android:layout_marginRight="24dp"
+                    android:layout_marginEnd="24dp"
                     android:id="@+id/register_password_layout"
                     style="@style/BlueInputStyle"
                     android:layout_width="match_parent"
@@ -86,10 +88,11 @@
 
                 </android.support.design.widget.TextInputLayout>
 
-                <ImageButton
+                <CheckBox
                     android:id="@+id/register_lock_password"
+                    android:checked="true"
                     android:background="?selectableItemBackground"
-                    android:src="@drawable/lock"
+                    android:button="@drawable/selector_password_lock"
                     android:layout_marginTop="4dp"
                     android:layout_gravity="end|center_vertical"
                     android:layout_width="wrap_content"
