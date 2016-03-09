@@ -12,6 +12,7 @@ import com.shoutit.app.android.api.model.Admin;
 import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.view.profile.ProfileAdapterItems;
 import com.shoutit.app.android.view.profile.ProfilePresenter;
 

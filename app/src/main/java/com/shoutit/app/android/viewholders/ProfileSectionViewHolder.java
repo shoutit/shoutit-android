@@ -73,9 +73,10 @@ public class ProfileSectionViewHolder extends ViewHolderManager.BaseViewHolder<P
     }
 
     private void setListeningIcon(boolean isListening) {
-        if (item.isProfileOwner()) {
+        if (item.isSectionItemProfileMyProfile()) {
             listeningImageView.setVisibility(View.GONE);
         } else {
+            listeningImageView.setVisibility(View.VISIBLE);
             listeningImageView.setImageDrawable(context.getResources().getDrawable(
                     isListening ? R.drawable.ic_listening_on : R.drawable.ic_listening_off));
         }

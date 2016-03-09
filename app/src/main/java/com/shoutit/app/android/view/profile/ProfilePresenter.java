@@ -90,7 +90,9 @@ public class ProfilePresenter {
     private final UserProfileHalfPresenter userProfilePresenter;
     @Nonnull
     private final PreferencesHelper preferencesHelper;
-    protected boolean isUserLoggedIn;
+    @Nullable
+    private String loggedInUserName;
+    private boolean isUserLoggedIn;
 
     public ProfilePresenter(@Nonnull final String userName,
                             @Nonnull final ShoutsDao shoutsDao,
@@ -112,17 +114,20 @@ public class ProfilePresenter {
         this.preferencesHelper = preferencesHelper;
         this.isUserLoggedIn = userPreferences.isNormalUser();
 
+        final User loggedInUser = userPreferences.getUser();
+        if (loggedInUser != null) {
+            loggedInUserName = loggedInUser.getUsername();
+        }
+
         /** User **/
         final Observable<ResponseOrError<User>> userRequestObservable = profilesDao.getProfileObservable(userName)
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<User>>behaviorRefCount());
 
-        final Observable<ResponseOrError<User>> userObservable = Observable.merge(
-                userRequestObservable,
-                userProfilePresenter.getUserUpdatesObservable())
-                .compose(ObservableExtensions.<ResponseOrError<User>>behaviorRefCount());
+        userProfilePresenter.getUserUpdatesObservable()
+                .subscribe(profilesDao.getProfileDao(userName).updatedProfileLocallyObserver());
 
-        final Observable<User> userSuccessObservable = userObservable.compose(ResponseOrError.<User>onlySuccess());
+        final Observable<User> userSuccessObservable = userRequestObservable.compose(ResponseOrError.<User>onlySuccess());
 
         /** Header Data **/
         avatarObservable = userSuccessObservable
@@ -145,7 +150,7 @@ public class ProfilePresenter {
                 .map(new Func1<User, String>() {
                     @Override
                     public String call(User user) {
-                        return String.format("%1$s %2$s", user.getFirstName(), user.getLastName());
+                        return user.getName();
                     }
                 });
 
@@ -198,8 +203,7 @@ public class ProfilePresenter {
         /** Errors **/
         errorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
                 ResponseOrError.transform(shoutsObservable),
-                ResponseOrError.transform(userRequestObservable),
-                ResponseOrError.transform(userObservable)))
+                ResponseOrError.transform(userRequestObservable)))
                 .mergeWith(errorsSubject)
                 .mergeWith(userProfilePresenter.getErrorObservable())
                 .filter(Functions1.isNotNull())
@@ -244,7 +248,7 @@ public class ProfilePresenter {
                     builder.add(new HeaderAdapterItem(getSectionHeaderTitle(user)));
 
                     for (int i = 0; i < user.getPages().size(); i++) {
-                        items.add(getSectionAdapterItemForPosition(i, user, user.getPages()));
+                        items.add(getSectionAdapterItemForPosition(i, user, user.getPages(), loggedInUserName));
                     }
                     builder.addAll(items);
                 }
@@ -253,7 +257,7 @@ public class ProfilePresenter {
                     builder.add(new HeaderAdapterItem(getSectionHeaderTitle(user)));
 
                     for (int i = 0; i < user.getAdmins().size(); i++) {
-                        items.add(getSectionAdapterItemForPosition(i, user, user.getAdmins()));
+                        items.add(getSectionAdapterItemForPosition(i, user, user.getAdmins(), loggedInUserName));
                     }
                     builder.addAll(items);
                 }
@@ -271,16 +275,16 @@ public class ProfilePresenter {
         };
     }
 
-    private <T extends ProfileType> ProfileAdapterItems.ProfileSectionAdapterItem getSectionAdapterItemForPosition(int position, User user, List<T> items) {
+    private <T extends ProfileType> ProfileAdapterItems.ProfileSectionAdapterItem getSectionAdapterItemForPosition(int position, User user, List<T> items, @Nullable String loggedInUserName) {
         if (position == 0) {
             return new ProfileAdapterItems.ProfileSectionAdapterItem<>(true, false, user, items.get(position),
-                    userProfilePresenter.getSectionItemListenObserver(), profileToOpenSubject, actionOnlyForLoggedInUserSubject, isUserLoggedIn, items.size() == 1);
+                    userProfilePresenter.getSectionItemListenObserver(), profileToOpenSubject, actionOnlyForLoggedInUserSubject, loggedInUserName, isUserLoggedIn, items.size() == 1);
         } else if (position == items.size() - 1) {
             return new ProfileAdapterItems.ProfileSectionAdapterItem<>(false, true, user, items.get(position),
-                    userProfilePresenter.getSectionItemListenObserver(), profileToOpenSubject, actionOnlyForLoggedInUserSubject, isUserLoggedIn, false);
+                    userProfilePresenter.getSectionItemListenObserver(), profileToOpenSubject, actionOnlyForLoggedInUserSubject, loggedInUserName, isUserLoggedIn, false);
         } else {
             return new ProfileAdapterItems.ProfileSectionAdapterItem<>(false, false, user, items.get(position),
-                    userProfilePresenter.getSectionItemListenObserver(), profileToOpenSubject, actionOnlyForLoggedInUserSubject, isUserLoggedIn, false);
+                    userProfilePresenter.getSectionItemListenObserver(), profileToOpenSubject, actionOnlyForLoggedInUserSubject, loggedInUserName, isUserLoggedIn, false);
         }
     }
 

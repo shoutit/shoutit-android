@@ -57,7 +57,7 @@ public class ProfileActivity extends BaseActivity {
     @Bind(R.id.profile_fragment_avatar)
     ImageView avatarImageView;
     @Bind(R.id.profile_app_bar)
-    protected AppBarLayout appBarLayout;
+    AppBarLayout appBarLayout;
     @Bind(R.id.profile_fragment_toolbar_title)
     TextView toolbarTitle;
     @Bind(R.id.profile_fragment_toolbar_subtitle)

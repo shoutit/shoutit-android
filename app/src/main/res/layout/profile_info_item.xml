@@ -13,6 +13,7 @@
         android:background="#1f000000" />
 
     <LinearLayout
+        android:id="@+id/profile_bio_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="26dp"
@@ -43,6 +44,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/profile_website_container"
         style="@style/ProfileInfo"
         android:layout_marginBottom="18dp">
 
@@ -65,6 +67,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/profile_joined_container"
         style="@style/ProfileInfo"
         android:layout_marginBottom="18dp">
 
