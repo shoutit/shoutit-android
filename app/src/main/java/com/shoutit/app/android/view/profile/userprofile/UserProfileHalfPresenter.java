@@ -12,6 +12,7 @@ import com.shoutit.app.android.api.model.Admin;
 import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.view.profile.ProfileAdapterItems;
 import com.shoutit.app.android.view.profile.ProfilePresenter;
 
@@ -176,7 +177,7 @@ public class UserProfileHalfPresenter {
     }
 
     public String getShoutsHeaderTitle(User user) {
-        return context.getString(R.string.profile_user_shouts, user.getName()).toUpperCase();
+        return context.getString(R.string.profile_user_shouts, user.getFirstName()).toUpperCase();
     }
 
     @Nonnull

@@ -1,9 +1,13 @@
 package com.shoutit.app.android.view.profile;
 
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.base.Objects;
+import com.shoutit.app.android.R;
 import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
 import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.api.model.User;
@@ -62,6 +66,23 @@ public class ProfileAdapterItems {
         public User getUser() {
             return user;
         }
+
+        public String getBioText() {
+            if (ProfileType.USER.equals(user.getType())) {
+                return user.getBio();
+            } else {
+                return user.getAbout();
+            }
+        }
+
+        @DrawableRes
+        public int getBioResId() {
+            if (ProfileType.USER.equals(user.getType())) {
+                return R.drawable.ic_bio;
+            } else {
+                return R.drawable.ic_about;
+            }
+        }
     }
 
     public static class ProfileSectionAdapterItem<T extends ProfileType> extends BaseNoIDAdapterItem {
@@ -78,6 +99,8 @@ public class ProfileAdapterItems {
         private final Observer<String> profileToOpenObserver;
         @Nonnull
         private final Observer<Object> actionOnlyForLoggedInUserObserver;
+        @Nullable
+        private final String loggedInUserName;
         private final boolean isUserLoggedIn;
         private final boolean isOnlyItemInSection;
 
@@ -88,6 +111,7 @@ public class ProfileAdapterItems {
                                          @Nonnull Observer<ProfilePresenter.UserWithItemToListen> listenItemObserver,
                                          @Nonnull Observer<String> profileToOpenObserver,
                                          @Nonnull Observer<Object> actionOnlyForLoggedInUserObserver,
+                                         @Nullable String loggedInUserName,
                                          boolean isUserLoggedIn,
                                          boolean isOnlyItemInSection) {
             this.isFirstItem = isFirstItem;
@@ -97,6 +121,7 @@ public class ProfileAdapterItems {
             this.listenItemObserver = listenItemObserver;
             this.profileToOpenObserver = profileToOpenObserver;
             this.actionOnlyForLoggedInUserObserver = actionOnlyForLoggedInUserObserver;
+            this.loggedInUserName = loggedInUserName;
             this.isUserLoggedIn = isUserLoggedIn;
             this.isOnlyItemInSection = isOnlyItemInSection;
         }
@@ -113,8 +138,8 @@ public class ProfileAdapterItems {
             actionOnlyForLoggedInUserObserver.onNext(null);
         }
 
-        public boolean isProfileOwner() {
-            return user.isOwner();
+        public boolean isSectionItemProfileMyProfile() {
+            return sectionItem.getUsername().equals(loggedInUserName);
         }
 
         public boolean isFirstItem() {

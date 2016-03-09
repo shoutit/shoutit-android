@@ -49,6 +49,12 @@ public class ProfileViewHolders {
         TextView countryTextView;
         @Bind(R.id.profile_country_iv)
         ImageView countryFlagImageView;
+        @Bind(R.id.profile_bio_container)
+        View bioContainer;
+        @Bind(R.id.profile_joined_container)
+        View joinedContainer;
+        @Bind(R.id.profile_website_container)
+        View webContainer;
 
         private final Target flagTarget;
         private final Context context;
@@ -66,19 +72,21 @@ public class ProfileViewHolders {
         public void bind(@Nonnull ProfileAdapterItems.UserInfoAdapterItem item) {
             final User user = item.getUser();
 
-            if (ProfileType.USER.equals(user.getType())) {
-                bioTextView.setText(user.getBio());
-                bioImageView.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_bio));
-            } else {
-                bioTextView.setText(user.getAbout());
-                bioImageView.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_about));
-            }
-            websiteTextView.setText(user.getWebUrl());
+            bioTextView.setText(item.getBioText());
+            bioImageView.setImageDrawable(context.getResources().getDrawable(item.getBioResId()));
+            bioContainer.setVisibility(TextUtils.isEmpty(item.getBioText()) ? View.GONE : View.VISIBLE);
+
+            final String website = user.getWebsite();
+            websiteTextView.setText(website);
+            webContainer.setVisibility(TextUtils.isEmpty(website) ? View.GONE : View.VISIBLE);
 
             if (user.getDateJoinedInMillis() > 0) {
+                joinedContainer.setVisibility(View.VISIBLE);
                 dateJoinedTextView.setText(context.getString(
                         R.string.profile_joined_date,
                         dateFormat.format(new Date(user.getDateJoinedInMillis()))));
+            } else {
+                joinedContainer.setVisibility(View.GONE);
             }
 
             if (user.getLocation() != null && !TextUtils.isEmpty(user.getLocation().getCountry())) {

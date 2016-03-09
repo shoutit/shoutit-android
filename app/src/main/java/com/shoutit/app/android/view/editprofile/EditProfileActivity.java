@@ -322,9 +322,9 @@ public class EditProfileActivity extends BaseActivity {
             @Override
             public void call(String coverUrl) {
                 picasso.load(coverUrl)
+                        .noPlaceholder()
                         .fit()
                         .centerCrop()
-                        .placeholder(R.drawable.pattern_placeholder)
                         .error(R.drawable.pattern_placeholder)
                         .into(coverIv);
             }
@@ -340,7 +340,7 @@ public class EditProfileActivity extends BaseActivity {
             @Override
             public void call(String url) {
                 picasso.load(url)
-                        .placeholder(R.drawable.ic_rect_avatar_placeholder)
+                        .noPlaceholder()
                         .error(R.drawable.ic_rect_avatar_placeholder)
                         .fit()
                         .centerCrop()
@@ -440,6 +440,12 @@ public class EditProfileActivity extends BaseActivity {
     protected void onSaveInstanceState(Bundle outState) {
         outState.putSerializable(KEY_LOCATION, lastLocation);
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void finish() {
+        setResult(RESULT_OK, null);
+        super.finish();
     }
 
     @Nonnull

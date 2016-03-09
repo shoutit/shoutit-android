@@ -51,13 +51,14 @@ public class ProfileActivity extends BaseActivity {
     private static final String KEY_USER_NAME = "user_name";
     private static final String KEY_OFFSET = "key_offset";
     private static final int REQUEST_PROFILE_OPENED_FROM_PROFILE = 1;
+    private static final int REQUEST_CODE_FROM_EDIT_PROFILE = 2;
 
     @Bind(R.id.profile_progress_bar)
     ProgressBar progressBar;
     @Bind(R.id.profile_fragment_avatar)
     ImageView avatarImageView;
     @Bind(R.id.profile_app_bar)
-    protected AppBarLayout appBarLayout;
+    AppBarLayout appBarLayout;
     @Bind(R.id.profile_fragment_toolbar_title)
     TextView toolbarTitle;
     @Bind(R.id.profile_fragment_toolbar_subtitle)
@@ -197,7 +198,9 @@ public class ProfileActivity extends BaseActivity {
                 .subscribe(new Action1<Object>() {
                     @Override
                     public void call(Object ignore) {
-                        startActivity(EditProfileActivity.newIntent(ProfileActivity.this));
+                        startActivityForResult(
+                                EditProfileActivity.newIntent(ProfileActivity.this),
+                                REQUEST_CODE_FROM_EDIT_PROFILE);
                     }
                 });
 
@@ -329,9 +332,9 @@ public class ProfileActivity extends BaseActivity {
             @Override
             public void call(String coverUrl) {
                 picasso.load(coverUrl)
+                        .noPlaceholder()
                         .fit()
                         .centerCrop()
-                        .placeholder(R.drawable.pattern_placeholder)
                         .error(R.drawable.pattern_placeholder)
                         .into(coverImageView);
             }
@@ -389,9 +392,12 @@ public class ProfileActivity extends BaseActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK && requestCode == REQUEST_PROFILE_OPENED_FROM_PROFILE) {
-            // Need to refresh profile if returned from other profile to refresh related data
+        if (resultCode == RESULT_OK && (requestCode == REQUEST_PROFILE_OPENED_FROM_PROFILE || requestCode == REQUEST_CODE_FROM_EDIT_PROFILE)) {
+            // Need to refresh profile if returned from other profile to refresh related data.
+            // And need to refresh profile if one was just edited
             presenter.refreshProfile();
+        } else if (requestCode == RESULT_OK) {
+            super.onActivityResult(requestCode, requestCode, data);
         }
     }
 
