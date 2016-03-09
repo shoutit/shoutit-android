@@ -30,6 +30,7 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PicassoHelper;
+import com.shoutit.app.android.view.editprofile.EditProfileActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.squareup.picasso.Picasso;
 
@@ -196,7 +197,7 @@ public class ProfileActivity extends BaseActivity {
                 .subscribe(new Action1<Object>() {
                     @Override
                     public void call(Object ignore) {
-                        Toast.makeText(ProfileActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
+                        startActivity(EditProfileActivity.newIntent(ProfileActivity.this));
                     }
                 });
 
@@ -345,8 +346,8 @@ public class ProfileActivity extends BaseActivity {
             @Override
             public void call(String url) {
                 picasso.load(url)
-                        .placeholder(R.drawable.ic_avatar_placeholder)
-                        .error(R.drawable.ic_avatar_placeholder)
+                        .placeholder(R.drawable.ic_rect_avatar_placeholder)
+                        .error(R.drawable.ic_rect_avatar_placeholder)
                         .fit()
                         .centerCrop()
                         .transform(PicassoHelper.roundedWithStrokeTransformation(strokeSize, false, corners, "ProfileAvatar"))

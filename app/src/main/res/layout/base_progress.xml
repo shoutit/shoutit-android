@@ -5,6 +5,7 @@
     android:layout_gravity="center"
     android:layout_centerInParent="true"
     android:background="@color/progress_dim"
+    android:visibility="gone"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 

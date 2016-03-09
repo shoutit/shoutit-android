@@ -2,6 +2,7 @@ package com.shoutit.app.android.utils;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 
@@ -27,14 +28,14 @@ public class ColoredSnackBar {
     }
 
     @Nonnull
-    public static Snackbar colorSnackBar(@Nonnull View view, int text, int length, int color) {
+    public static Snackbar colorSnackBar(@Nonnull View view, @StringRes int text, int length, int color) {
         final Snackbar snackbar = Snackbar.make(view, text, length);
         getSnackBarLayout(snackbar).setBackgroundColor(color);
         return snackbar;
     }
 
     @Nonnull
-    public static Snackbar success(@Nonnull View view, int text, int length) {
+    public static Snackbar success(@Nonnull View view, @StringRes int text, int length) {
         return colorSnackBar(view, text, length, view.getResources().getColor(R.color.snackbar_success));
     }
 
@@ -44,7 +45,7 @@ public class ColoredSnackBar {
     }
 
     @Nonnull
-    public static Snackbar error(@Nonnull View view, int text, int length) {
+    public static Snackbar error(@Nonnull View view, @StringRes int text, int length) {
         return colorSnackBar(view, text, length, view.getResources().getColor(R.color.snackbar_error));
     }
 
@@ -59,7 +60,7 @@ public class ColoredSnackBar {
     }
 
     @NonNull
-    public static Action1<Object> errorSnackBarAction(final View contentView, final int resId) {
+    public static Action1<Object> errorSnackBarAction(final View contentView, @StringRes final int resId) {
         return new Action1<Object>() {
             @Override
             public void call(Object o) {
@@ -79,7 +80,7 @@ public class ColoredSnackBar {
     }
 
     @NonNull
-    public static Action1<Object> successSnackBarAction(final View contentView, final int resId) {
+    public static Action1<Object> successSnackBarAction(final View contentView, @StringRes final int resId) {
         return new Action1<Object>() {
             @Override
             public void call(Object o) {
