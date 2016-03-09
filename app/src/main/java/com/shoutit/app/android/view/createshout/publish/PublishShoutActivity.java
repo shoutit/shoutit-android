@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.Xfermode;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -47,7 +46,7 @@ public class PublishShoutActivity extends RxAppCompatActivity {
         mToolbar.inflateMenu(R.menu.publish_shout_menu);
         mToolbar.setNavigationIcon(R.drawable.close);
 
-        final Drawable drawable = getDrawable(R.drawable.share);
+        final Drawable drawable = getResources().getDrawable(R.drawable.share);
         assert drawable != null;
         drawable.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
         mToolbar.getMenu().findItem(R.id.publish_share).setIcon(drawable);
