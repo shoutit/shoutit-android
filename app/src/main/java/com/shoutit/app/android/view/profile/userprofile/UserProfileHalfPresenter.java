@@ -176,7 +176,7 @@ public class UserProfileHalfPresenter {
     }
 
     public String getShoutsHeaderTitle(User user) {
-        return context.getString(R.string.profile_user_shouts, user.getName()).toUpperCase();
+        return context.getString(R.string.profile_user_shouts, user.getFirstName()).toUpperCase();
     }
 
     @Nonnull

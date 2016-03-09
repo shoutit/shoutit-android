@@ -1,57 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@android:color/white"
-    android:orientation="horizontal">
+    android:paddingLeft="80dp"
+    android:paddingStart="80dp"
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/profile_user_name"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="80dp"
-        android:layout_marginStart="80dp"
-        android:paddingTop="6dp"
-        android:textColor="@color/profile_name"
-        android:textSize="16sp"
-        tools:text="Doris Schultz" />
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/profile_user_name"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:paddingTop="6dp"
+            android:ellipsize="end"
+            android:layout_gravity="center_vertical"
+            android:maxLines="2"
+            android:textColor="@color/profile_name"
+            android:textSize="16sp"
+            tools:text="Doris lalalalalalallalalalaldfaasdfadsfadsfdasfdasf" />
+
+        <ImageView
+            android:id="@+id/profile_notification_iv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:layout_marginRight="12dp"
+            android:background="?selectableItemBackground"
+            android:paddingLeft="6dp"
+            android:paddingRight="6dp"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:layout_marginTop="6dp"
+            android:src="@drawable/ic_notifications" />
+
+        <ImageView
+            android:id="@+id/profile_edit_profile_iv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="11dp"
+            android:paddingLeft="6dp"
+            android:paddingRight="6dp"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:layout_marginTop="6dp"
+            android:background="?selectableItemBackground"
+            android:src="@drawable/ic_edit" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/profile_user_nick"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/profile_user_name"
-        android:layout_alignStart="@+id/profile_user_name"
-        android:layout_below="@+id/profile_user_name"
-        android:layout_marginTop="3dp"
         android:textColor="@color/black_54"
         android:textSize="12sp"
         tools:text="Doris90" />
 
-    <ImageView
-        android:id="@+id/profile_notification_iv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="12dp"
-        android:layout_marginRight="12dp"
-        android:layout_toLeftOf="@+id/profile_edit_profile_iv"
-        android:layout_toStartOf="@+id/profile_edit_profile_iv"
-        android:background="?selectableItemBackground"
-        android:padding="6dp"
-        android:src="@drawable/ic_notifications" />
-
-    <ImageView
-        android:id="@+id/profile_edit_profile_iv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginEnd="11dp"
-        android:layout_marginRight="11dp"
-        android:background="?selectableItemBackground"
-        android:padding="6dp"
-        android:src="@drawable/ic_edit" />
-
-</RelativeLayout>
+</LinearLayout>
