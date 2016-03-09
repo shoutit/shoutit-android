@@ -26,7 +26,6 @@ import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
@@ -50,6 +49,7 @@ public class ProfileActivity extends BaseActivity {
 
     private static final String KEY_USER_NAME = "user_name";
     private static final String KEY_OFFSET = "key_offset";
+    private static final int REQUEST_PROFILE_OPENED_FROM_PROFILE = 1;
 
     @Bind(R.id.profile_progress_bar)
     ProgressBar progressBar;
@@ -159,7 +159,9 @@ public class ProfileActivity extends BaseActivity {
                 .subscribe(new Action1<String>() {
                     @Override
                     public void call(String userName) {
-                        startActivity(ProfileActivity.newIntent(ProfileActivity.this, userName));
+                        startActivityForResult(
+                                ProfileActivity.newIntent(ProfileActivity.this, userName),
+                                REQUEST_PROFILE_OPENED_FROM_PROFILE);
                     }
                 });
 
@@ -238,6 +240,9 @@ public class ProfileActivity extends BaseActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
+                return true;
+            case R.id.profile_menu_share:
+                presenter.getShareInitObserver().onNext(null);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -373,6 +378,20 @@ public class ProfileActivity extends BaseActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public void finish() {
+        setResult(RESULT_OK, null);
+        super.finish();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK && requestCode == REQUEST_PROFILE_OPENED_FROM_PROFILE) {
+            // Need to refresh profile if returned from other profile to refresh related data
+            presenter.refreshProfile();
+        }
     }
 
     @Override

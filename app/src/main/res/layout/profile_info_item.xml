@@ -87,6 +87,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/profile_country_container"
         style="@style/ProfileInfo"
         android:layout_marginBottom="10dp">
 

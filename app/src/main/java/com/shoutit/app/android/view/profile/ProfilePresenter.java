@@ -21,6 +21,7 @@ import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.model.UserShoutsPointer;
 import com.shoutit.app.android.utils.PreferencesHelper;
@@ -35,6 +36,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import rx.Observable;
+import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Func1;
 import rx.functions.Func2;
@@ -82,6 +84,8 @@ public class ProfilePresenter {
     @Nonnull
     protected final ApiService apiService;
     @Nonnull
+    private final ProfilesDao profilesDao;
+    @Nonnull
     private final MyProfileHalfPresenter myProfilePresenter;
     @Nonnull
     private final UserProfileHalfPresenter userProfilePresenter;
@@ -94,8 +98,8 @@ public class ProfilePresenter {
                             @Nonnull @ForActivity final Context context,
                             @Nonnull UserPreferences userPreferences,
                             @Nonnull @UiScheduler Scheduler uiScheduler,
-                            @Nonnull @NetworkScheduler Scheduler networkScheduler,
                             @Nonnull ApiService apiService,
+                            @Nonnull ProfilesDao profilesDao,
                             @Nonnull MyProfileHalfPresenter myProfilePresenter,
                             @Nonnull UserProfileHalfPresenter userProfilePresenter,
                             @Nonnull PreferencesHelper preferencesHelper) {
@@ -103,16 +107,15 @@ public class ProfilePresenter {
         this.context = context;
         this.userPreferences = userPreferences;
         this.apiService = apiService;
+        this.profilesDao = profilesDao;
         this.myProfilePresenter = myProfilePresenter;
         this.userProfilePresenter = userProfilePresenter;
         this.preferencesHelper = preferencesHelper;
         this.isUserLoggedIn = userPreferences.isNormalUser();
 
         /** User **/
-        final Observable<ResponseOrError<User>> userRequestObservable = apiService.getProfile(userName)
-                .subscribeOn(networkScheduler)
+        final Observable<ResponseOrError<User>> userRequestObservable = profilesDao.getProfileObservable(userName)
                 .observeOn(uiScheduler)
-                .compose(ResponseOrError.<User>toResponseOrErrorObservable())
                 .compose(ObservableExtensions.<ResponseOrError<User>>behaviorRefCount());
 
         final Observable<ResponseOrError<User>> userObservable = Observable.merge(
@@ -358,6 +361,15 @@ public class ProfilePresenter {
     @Nonnull
     public Observable<String> getProfileToOpenObservable() {
         return profileToOpenSubject;
+    }
+
+    @Nonnull
+    public Observer<Object> getShareInitObserver() {
+        return shareInitSubject;
+    }
+
+    public void refreshProfile() {
+        profilesDao.getRefreshProfileObserver(userName).onNext(null);
     }
 
     public static class UserWithItemToListen {

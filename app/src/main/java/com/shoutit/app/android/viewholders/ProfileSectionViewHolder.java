@@ -53,7 +53,7 @@ public class ProfileSectionViewHolder extends ViewHolderManager.BaseViewHolder<P
         final ProfileType sectionItem = item.getSectionItem();
 
         if (item.isOnlyItemInSection()) {
-            container.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.shape_page_top));
+            container.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.shape_page_only_item));
         } else if (item.isFirstItem()) {
             container.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.shape_page_top));
         } else if (item.isLastItem()) {
@@ -91,7 +91,7 @@ public class ProfileSectionViewHolder extends ViewHolderManager.BaseViewHolder<P
         }
     }
 
-    @OnClick(R.id.profile_section_container)
+    @OnClick(R.id.profile_section_selector)
     public void onSectionItemSelected() {
         item.onSectionItemSelected();
     }

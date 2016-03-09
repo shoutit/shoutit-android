@@ -2,12 +2,12 @@ package com.shoutit.app.android.view.profile;
 
 import android.content.Context;
 
-import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.dagger.ActivityScope;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.utils.PreferencesHelper;
 import com.shoutit.app.android.view.profile.myprofile.MyProfileHalfPresenter;
@@ -31,12 +31,11 @@ public class ProfileActivityModule {
 
     @Provides
     @ActivityScope
-    public ProfilePresenter provideProfilePresenter(ShoutsDao shoutsDao, @ForActivity Context context,
-                                                    UserPreferences preferences, @UiScheduler Scheduler uiScheduler,
-                                                    @NetworkScheduler Scheduler networkScheduler, ApiService apiService,
+    public ProfilePresenter provideProfilePresenter(ShoutsDao shoutsDao, ProfilesDao profilesDao, @ForActivity Context context,
+                                                    UserPreferences preferences, @UiScheduler Scheduler uiScheduler, ApiService apiService,
                                                     PreferencesHelper preferencesHelper, UserProfileHalfPresenter userProfilePresenter,
                                                     MyProfileHalfPresenter myProfilePresenter) {
         return new ProfilePresenter(userName, shoutsDao, context, preferences, uiScheduler,
-                networkScheduler, apiService, myProfilePresenter, userProfilePresenter, preferencesHelper);
+                apiService, profilesDao, myProfilePresenter, userProfilePresenter, preferencesHelper);
     }
 }

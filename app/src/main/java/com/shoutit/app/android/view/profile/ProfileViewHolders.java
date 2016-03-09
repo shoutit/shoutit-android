@@ -42,6 +42,8 @@ public class ProfileViewHolders {
         TextView websiteTextView;
         @Bind(R.id.profile_date_joined_tv)
         TextView dateJoinedTextView;
+        @Bind(R.id.profile_country_container)
+        View locationContainer;
         @Bind(R.id.profile_country_tv)
         TextView countryTextView;
         @Bind(R.id.profile_country_iv)
@@ -78,13 +80,16 @@ public class ProfileViewHolders {
                         dateFormat.format(new Date(user.getDateJoinedInMillis()))));
             }
 
-            if (user.getLocation() != null) {
+            if (user.getLocation() != null && user.getLocation().getCountry() != null) {
+                locationContainer.setVisibility(View.VISIBLE);
                 countryTextView.setText(user.getLocation().getCity());
                 final Optional<Integer> countryResId = ResourcesHelper.getCountryResId(context, user.getLocation());
                 if (countryResId.isPresent()) {
                     picasso.load(countryResId.get())
                             .into(flagTarget);
                 }
+            } else {
+                locationContainer.setVisibility(View.GONE);
             }
         }
     }

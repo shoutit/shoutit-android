@@ -19,6 +19,7 @@ import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.AuthInterceptor;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.dao.DiscoversDao;
+import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.utils.BadRequestThrowable;
@@ -192,6 +193,12 @@ public final class AppModule {
     public DiscoverShoutsDao provideDiscoverShoutsDao(@NetworkScheduler Scheduler networkScheduler,
                                                       ApiService apiService) {
         return new DiscoverShoutsDao(networkScheduler, apiService);
+    }
+
+    @Singleton
+    @Provides
+    public ProfilesDao provideProfilesDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
+        return new ProfilesDao(apiService, networkScheduler);
     }
 
 }

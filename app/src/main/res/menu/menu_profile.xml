@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/profile_menu_chat"
+        android:id="@+id/profile_menu_share"
         android:icon="@drawable/ic_share"
         android:title="@string/home_menu_chat"
         app:showAsAction="ifRoom" />
