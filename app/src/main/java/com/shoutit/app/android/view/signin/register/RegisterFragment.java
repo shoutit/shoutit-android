@@ -181,8 +181,6 @@ public class RegisterFragment extends BaseFragment {
         final String textPrivacyPolicy = getString(R.string.register_bottom_text4);
 
         final SpannableString spannableTermsOfService = new SpannableString(textTermsOfService);
-        spannableTermsOfService.setSpan(new ForegroundColorSpan(
-                getResources().getColor(R.color.register_underline)), 0, textTermsOfService.length(), 0);
         spannableTermsOfService.setSpan(new UnderlineSpan(), 0, textTermsOfService.length(), 0);
         spannableTermsOfService.setSpan(new ClickableSpan() {
             @Override
@@ -192,11 +190,11 @@ public class RegisterFragment extends BaseFragment {
                         getString(R.string.html_activity_terms)));
             }
         }, 0, textTermsOfService.length(), 0);
+        spannableTermsOfService.setSpan(new ForegroundColorSpan(
+                getResources().getColor(R.color.register_underline)), 0, textTermsOfService.length(), 0);
 
         final SpannableString spannablePrivacy = new SpannableString(textPrivacyPolicy);
         spannablePrivacy.setSpan(new UnderlineSpan(), 0, textPrivacyPolicy.length(), 0);
-        spannablePrivacy.setSpan(new ForegroundColorSpan(
-                getResources().getColor(R.color.register_underline)), 0, textPrivacyPolicy.length(), 0);
         spannablePrivacy.setSpan(new ClickableSpan() {
             @Override
             public void onClick(View widget) {
@@ -205,6 +203,8 @@ public class RegisterFragment extends BaseFragment {
                         getString(R.string.html_activity_privacy)));
             }
         }, 0, textPrivacyPolicy.length(), 0);
+        spannablePrivacy.setSpan(new ForegroundColorSpan(
+                getResources().getColor(R.color.register_underline)), 0, textPrivacyPolicy.length(), 0);
 
         bottomTextView.setMovementMethod(LinkMovementMethod.getInstance());
         bottomTextView.setText(TextUtils.concat(bottomText1, " ", spannableTermsOfService, " ", bottomText3, " ", spannablePrivacy));
