@@ -23,6 +23,7 @@
         android:paddingStart="16dp">
 
         <ImageView
+            android:id="@+id/profile_bio_iv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
@@ -86,6 +87,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/profile_country_container"
         style="@style/ProfileInfo"
         android:layout_marginBottom="10dp">
 

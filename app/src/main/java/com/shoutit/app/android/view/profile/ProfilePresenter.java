@@ -16,31 +16,33 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
 import com.shoutit.app.android.api.ApiService;
-import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.model.UserShoutsPointer;
+import com.shoutit.app.android.utils.PreferencesHelper;
+import com.shoutit.app.android.view.profile.myprofile.MyProfileHalfPresenter;
+import com.shoutit.app.android.view.profile.userprofile.UserProfileHalfPresenter;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import okhttp3.ResponseBody;
 import rx.Observable;
+import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.subjects.PublishSubject;
 
-public abstract class ProfilePresenter {
+public class ProfilePresenter {
     private static final int SHOUTS_PAGE_SIZE = 4;
 
     @Nonnull
@@ -67,7 +69,7 @@ public abstract class ProfilePresenter {
     @Nonnull
     private final PublishSubject<String> shoutSelectedSubject = PublishSubject.create();
     @Nonnull
-    protected final PublishSubject<UserWithItemToListen> sectionItemListenSubject = PublishSubject.create();
+    protected final PublishSubject<String> profileToOpenSubject = PublishSubject.create();
     @Nonnull
     protected final PublishSubject<Throwable> errorsSubject = PublishSubject.create();
     @Nonnull
@@ -76,95 +78,55 @@ public abstract class ProfilePresenter {
     @Nonnull
     protected final String userName;
     @Nonnull
-    private final ShoutsDao shoutsDao;
-    @Nonnull
     protected final Context context;
     @Nonnull
     protected final UserPreferences userPreferences;
     @Nonnull
-    private final Scheduler uiScheduler;
-    @Nonnull
-    private final Scheduler networkScheduler;
-    @Nonnull
     protected final ApiService apiService;
-    protected boolean isMyProfile;
+    @Nonnull
+    private final ProfilesDao profilesDao;
+    @Nonnull
+    private final MyProfileHalfPresenter myProfilePresenter;
+    @Nonnull
+    private final UserProfileHalfPresenter userProfilePresenter;
+    @Nonnull
+    private final PreferencesHelper preferencesHelper;
     protected boolean isUserLoggedIn;
 
     public ProfilePresenter(@Nonnull final String userName,
                             @Nonnull final ShoutsDao shoutsDao,
                             @Nonnull @ForActivity final Context context,
                             @Nonnull UserPreferences userPreferences,
-                            boolean isMyProfile,
                             @Nonnull @UiScheduler Scheduler uiScheduler,
-                            @Nonnull @NetworkScheduler Scheduler networkScheduler,
-                            @Nonnull ApiService apiService) {
+                            @Nonnull ApiService apiService,
+                            @Nonnull ProfilesDao profilesDao,
+                            @Nonnull MyProfileHalfPresenter myProfilePresenter,
+                            @Nonnull UserProfileHalfPresenter userProfilePresenter,
+                            @Nonnull PreferencesHelper preferencesHelper) {
         this.userName = userName;
-        this.shoutsDao = shoutsDao;
         this.context = context;
         this.userPreferences = userPreferences;
-        this.uiScheduler = uiScheduler;
-        this.networkScheduler = networkScheduler;
         this.apiService = apiService;
-        this.isMyProfile = isMyProfile;
+        this.profilesDao = profilesDao;
+        this.myProfilePresenter = myProfilePresenter;
+        this.userProfilePresenter = userProfilePresenter;
+        this.preferencesHelper = preferencesHelper;
         this.isUserLoggedIn = userPreferences.isNormalUser();
-    }
-
-    /** Must be called after child constructor is finished **/
-    protected void initPresenter() {
 
         /** User **/
-        final Observable<ResponseOrError<User>> userRequestObservable = getUserObservable()
+        final Observable<ResponseOrError<User>> userRequestObservable = profilesDao.getProfileObservable(userName)
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<User>>behaviorRefCount());
 
-        final Observable<User> successUserRequestObservable = userRequestObservable
-                .compose(ResponseOrError.<User>onlySuccess());
+        final Observable<ResponseOrError<User>> userObservable = Observable.merge(
+                userRequestObservable,
+                userProfilePresenter.getUserUpdatesObservable())
+                .compose(ObservableExtensions.<ResponseOrError<User>>behaviorRefCount());
 
-        final Observable<User> userWithUpdatedSectionItems = sectionItemListenSubject
-                .throttleFirst(1, TimeUnit.SECONDS)
-                .switchMap(new Func1<UserWithItemToListen, Observable<User>>() {
-                    @Override
-                    public Observable<User> call(final UserWithItemToListen userWithItemToListen) {
-                        final String userName = userWithItemToListen.getProfileToListen().getUsername();
-                        final boolean isListeningToProfile = userWithItemToListen.profileToListen.isListening();
-
-                        Observable<ResponseOrError<ResponseBody>> listenRequestObservable;
-                        if (isListeningToProfile) {
-                            listenRequestObservable = apiService.unlistenProfile(userName)
-                                    .subscribeOn(networkScheduler)
-                                    .observeOn(uiScheduler)
-                                    .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
-                        } else {
-                            listenRequestObservable = apiService.listenProfile(userName)
-                                    .subscribeOn(networkScheduler)
-                                    .observeOn(uiScheduler)
-                                    .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
-                        }
-
-                        return listenRequestObservable
-                                .map(new Func1<ResponseOrError<ResponseBody>, User>() {
-                                    @Override
-                                    public User call(ResponseOrError<ResponseBody> response) {
-                                        if (response.isData()) {
-                                            return updateUserWithChangedPageItems(userWithItemToListen);
-                                        } else {
-                                            errorsSubject.onNext(new Throwable());
-                                            // On error return current user in order to select/deselect already deselected/selected item to listenProfile
-                                            return userWithItemToListen.getCurrentProfileUser();
-                                        }
-                                    }
-                                });
-                    }
-                })
-                .compose(ObservableExtensions.<User>behaviorRefCount());
-
-        final Observable<User> userObservable = Observable.merge(
-                successUserRequestObservable,
-                userWithUpdatedSectionItems)
-                .compose(ObservableExtensions.<User>behaviorRefCount());
+        final Observable<User> userSuccessObservable = userObservable.compose(ResponseOrError.<User>onlySuccess());
 
         /** Header Data **/
-        avatarObservable = userObservable
+        avatarObservable = userSuccessObservable
                 .map(new Func1<User, String>() {
                     @Override
                     public String call(User user) {
@@ -172,7 +134,7 @@ public abstract class ProfilePresenter {
                     }
                 });
 
-        coverUrlObservable = userObservable
+        coverUrlObservable = userSuccessObservable
                 .map(new Func1<User, String>() {
                     @Override
                     public String call(User user) {
@@ -180,7 +142,7 @@ public abstract class ProfilePresenter {
                     }
                 });
 
-        toolbarTitleObservable = userObservable
+        toolbarTitleObservable = userSuccessObservable
                 .map(new Func1<User, String>() {
                     @Override
                     public String call(User user) {
@@ -188,7 +150,7 @@ public abstract class ProfilePresenter {
                     }
                 });
 
-        toolbarSubtitleObservable = userObservable
+        toolbarSubtitleObservable = userSuccessObservable
                 .map(new Func1<User, String>() {
                     @Override
                     public String call(User user) {
@@ -229,7 +191,7 @@ public abstract class ProfilePresenter {
 
         /** All adapter items **/
         allAdapterItemsObservable = Observable.combineLatest(
-                userObservable,
+                userSuccessObservable,
                 shoutsSuccessResponse.startWith(ImmutableList.<List<BaseAdapterItem>>of()),
                 combineAdapterItems());
 
@@ -237,40 +199,27 @@ public abstract class ProfilePresenter {
         /** Errors **/
         errorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
                 ResponseOrError.transform(shoutsObservable),
-                ResponseOrError.transform(userRequestObservable)))
+                ResponseOrError.transform(userRequestObservable),
+                ResponseOrError.transform(userObservable)))
                 .mergeWith(errorsSubject)
-                .filter(Functions1.isNotNull());
+                .mergeWith(userProfilePresenter.getErrorObservable())
+                .filter(Functions1.isNotNull())
+                .observeOn(uiScheduler);
 
         /** Progress **/
         progressObservable = Observable.merge(userRequestObservable, errorObservable)
                 .map(Functions1.returnFalse())
-                .startWith(true);
+                .startWith(true)
+                .observeOn(uiScheduler);
 
         /** Share **/
         shareObservable = shareInitSubject
-                .withLatestFrom(userObservable, new Func2<Object, User, String>() {
+                .withLatestFrom(userSuccessObservable, new Func2<Object, User, String>() {
                     @Override
                     public String call(Object o, User user) {
                         return user.getWebUrl();
                     }
                 });
-    }
-
-    @Nonnull
-    private User updateUserWithChangedPageItems(@Nonnull UserWithItemToListen userWithItemToListen) {
-        final List<Page> pages = userWithItemToListen.getCurrentProfileUser().getPages();
-        for (int i = 0; i < pages.size(); i++) {
-            if (pages.get(i).getUsername().equals(userWithItemToListen.profileToListen.getUsername())) {
-                final Page pageToUpdate = pages.get(i);
-                final Page updatedPage = Page.withIsListening(pageToUpdate, !pageToUpdate.isListening());
-                final List<Page> updatedPages = new ArrayList<>(pages);
-                updatedPages.set(i, updatedPage);
-
-                return User.userWithUpdatedPages(userWithItemToListen.currentProfileUser, updatedPages);
-            }
-        }
-
-        return userWithItemToListen.getCurrentProfileUser();
     }
 
     @NonNull
@@ -280,22 +229,39 @@ public abstract class ProfilePresenter {
             public List<BaseAdapterItem> call(User user, List<BaseAdapterItem> shouts) {
                 final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
 
-                builder.add(getUserNameAdapterItem(user))
-                        .add(getThreeIconsAdapterItem(user))
-                        .add(new ProfileAdapterItems.UserInfoAdapterItem(user));
+                if (user.isOwner()) {
+                    builder.add(myProfilePresenter.getUserNameAdapterItem(user))
+                            .add(myProfilePresenter.getThreeIconsAdapterItem(user));
+                } else {
+                    builder.add(userProfilePresenter.getUserNameAdapterItem(user))
+                            .add(userProfilePresenter.getThreeIconsAdapterItem(user, isUserLoggedIn));
+                }
+
+                builder.add(new ProfileAdapterItems.UserInfoAdapterItem(user));
 
                 final List<BaseAdapterItem> items = new ArrayList<>();
-                if (!user.getPages().isEmpty()) {
+
+                if (user.getPages() != null && !user.getPages().isEmpty()) {
                     builder.add(new HeaderAdapterItem(getSectionHeaderTitle(user)));
 
                     for (int i = 0; i < user.getPages().size(); i++) {
-                        items.add(getSectionAdapterItemForPosition(i, user, user.getPages(), isMyProfile));
+                        items.add(getSectionAdapterItemForPosition(i, user, user.getPages()));
+                    }
+                    builder.addAll(items);
+                }
+
+                if (user.getAdmins() != null && !user.getAdmins().isEmpty()) {
+                    builder.add(new HeaderAdapterItem(getSectionHeaderTitle(user)));
+
+                    for (int i = 0; i < user.getAdmins().size(); i++) {
+                        items.add(getSectionAdapterItemForPosition(i, user, user.getAdmins()));
                     }
                     builder.addAll(items);
                 }
 
                 if (!shouts.isEmpty()) {
-                    builder.add(new HeaderAdapterItem(getShoutsHeaderTitle(user)))
+                    builder.add(new HeaderAdapterItem(user.isOwner() ?
+                            myProfilePresenter.getShoutsHeaderTitle() : userProfilePresenter.getShoutsHeaderTitle(user)))
                             .addAll(shouts)
                             .add(new ProfileAdapterItems.SeeAllUserShoutsAdapterItem(
                                     showAllShoutsSubject, user.getUsername()));
@@ -306,31 +272,34 @@ public abstract class ProfilePresenter {
         };
     }
 
-    private <T extends ProfileType> ProfileAdapterItems.ProfileSectionAdapterItem getSectionAdapterItemForPosition(int position, User user, List<T> items, boolean isMyProfile) {
+    private <T extends ProfileType> ProfileAdapterItems.ProfileSectionAdapterItem getSectionAdapterItemForPosition(int position, User user, List<T> items) {
         if (position == 0) {
             return new ProfileAdapterItems.ProfileSectionAdapterItem<>(true, false, user, items.get(position),
-                    sectionItemListenSubject, actionOnlyForLoggedInUserSubject, isMyProfile, isUserLoggedIn, items.size() == 1);
+                    userProfilePresenter.getSectionItemListenObserver(), profileToOpenSubject, actionOnlyForLoggedInUserSubject, isUserLoggedIn, items.size() == 1);
         } else if (position == items.size() - 1) {
             return new ProfileAdapterItems.ProfileSectionAdapterItem<>(false, true, user, items.get(position),
-                    sectionItemListenSubject, actionOnlyForLoggedInUserSubject, isMyProfile, isUserLoggedIn, false);
+                    userProfilePresenter.getSectionItemListenObserver(), profileToOpenSubject, actionOnlyForLoggedInUserSubject, isUserLoggedIn, false);
         } else {
             return new ProfileAdapterItems.ProfileSectionAdapterItem<>(false, false, user, items.get(position),
-                    sectionItemListenSubject, actionOnlyForLoggedInUserSubject, isMyProfile, isUserLoggedIn, false);
+                    userProfilePresenter.getSectionItemListenObserver(), profileToOpenSubject, actionOnlyForLoggedInUserSubject, isUserLoggedIn, false);
         }
     }
 
-    protected abstract ProfileAdapterItems.NameAdapterItem getUserNameAdapterItem(@Nonnull User user);
-
-    protected abstract BaseAdapterItem getThreeIconsAdapterItem(@Nonnull User user);
+    @Nonnull
+    public MyProfileHalfPresenter getMyProfilePresenter() {
+        return myProfilePresenter;
+    }
 
     @Nonnull
-    protected abstract Observable<ResponseOrError<User>> getUserObservable();
+    public UserProfileHalfPresenter getUserProfilePresenter() {
+        return userProfilePresenter;
+    }
 
     @Nonnull
     public String getSectionHeaderTitle(User user) {
         switch (user.getType()) {
             case ProfileType.USER:
-                return isMyProfile ? context.getString(R.string.profile_my_pages) :
+                return preferencesHelper.isMyProfile(user.getUsername()) ? context.getString(R.string.profile_my_pages) :
                         context.getString(R.string.profile_user_pages, user.getName()).toUpperCase();
             case ProfileType.PAGE:
                 return context.getString(R.string.profile_page_admins, user.getName()).toUpperCase();
@@ -338,8 +307,6 @@ public abstract class ProfilePresenter {
                 throw new RuntimeException("Unknown profile type: " + user.getType());
         }
     }
-
-    protected abstract String getShoutsHeaderTitle(User user);
 
     @Nonnull
     public Observable<Boolean> getProgressObservable() {
@@ -389,6 +356,20 @@ public abstract class ProfilePresenter {
     @Nonnull
     public Observable<String> getShoutSelectedObservable() {
         return shoutSelectedSubject;
+    }
+
+    @Nonnull
+    public Observable<String> getProfileToOpenObservable() {
+        return profileToOpenSubject;
+    }
+
+    @Nonnull
+    public Observer<Object> getShareInitObserver() {
+        return shareInitSubject;
+    }
+
+    public void refreshProfile() {
+        profilesDao.getRefreshProfileObserver(userName).onNext(null);
     }
 
     public static class UserWithItemToListen {

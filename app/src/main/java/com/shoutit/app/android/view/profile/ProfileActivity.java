@@ -15,8 +15,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.jakewharton.rxbinding.view.RxView;
@@ -28,6 +30,7 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PicassoHelper;
+import com.shoutit.app.android.view.editprofile.EditProfileActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.squareup.picasso.Picasso;
 
@@ -46,8 +49,8 @@ import static com.appunite.rx.internal.Preconditions.checkNotNull;
 public class ProfileActivity extends BaseActivity {
 
     private static final String KEY_USER_NAME = "user_name";
-    private static final String KEY_PROFILE_TYPE = "profile_type";
     private static final String KEY_OFFSET = "key_offset";
+    private static final int REQUEST_PROFILE_OPENED_FROM_PROFILE = 1;
 
     @Bind(R.id.profile_progress_bar)
     ProgressBar progressBar;
@@ -65,6 +68,8 @@ public class ProfileActivity extends BaseActivity {
     ImageView coverImageView;
     @Bind(R.id.profile_fragment_toolbar)
     Toolbar toolbar;
+    @Bind(R.id.profile_popup_menu_anchor_view)
+    View popupAnchorView;
 
     @Inject
     ProfilePresenter presenter;
@@ -75,12 +80,11 @@ public class ProfileActivity extends BaseActivity {
 
     private final AccelerateInterpolator toolbarInterpolator = new AccelerateInterpolator();
     private int lastVerticalOffset;
+    private PopupMenu popupMenu;
 
-    public static <T extends ProfileActivity> Intent newIntent(@Nonnull Context context, @Nonnull String userName,
-                                   @Nonnull String profileType, Class<T> profileClass) {
-        return new Intent(context, profileClass)
-                .putExtra(KEY_USER_NAME, userName)
-                .putExtra(KEY_PROFILE_TYPE, profileType);
+    public static Intent newIntent(@Nonnull Context context, @Nonnull String userName) {
+        return new Intent(context, ProfileActivity.class)
+                .putExtra(KEY_USER_NAME, userName);
     }
 
     @Override
@@ -90,6 +94,7 @@ public class ProfileActivity extends BaseActivity {
         ButterKnife.bind(this);
 
         setUpToolbar();
+        setUpPopupMenu();
         handleAppBarScrollAnimation();
         if (savedInstanceState != null) {
             // To scroll appbar after rotation
@@ -149,6 +154,61 @@ public class ProfileActivity extends BaseActivity {
                 .subscribe(ColoredSnackBar.errorSnackBarAction(
                         ColoredSnackBar.contentView(ProfileActivity.this),
                         R.string.error_action_only_for_logged_in_user));
+
+        presenter.getProfileToOpenObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String userName) {
+                        startActivityForResult(
+                                ProfileActivity.newIntent(ProfileActivity.this, userName),
+                                REQUEST_PROFILE_OPENED_FROM_PROFILE);
+                    }
+                });
+
+        // User Profile specific subscriptions
+        presenter.getUserProfilePresenter().getOnChatIconClickedSubject()
+                .compose(bindToLifecycle())
+                .subscribe(new Action1<Object>() {
+                    @Override
+                    public void call(Object ignore) {
+                        Toast.makeText(ProfileActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+        presenter.getUserProfilePresenter().getMoreMenuOptionClickedSubject()
+                .compose(bindToLifecycle())
+                .subscribe(new Action1<Object>() {
+                    @Override
+                    public void call(Object ignore) {
+                        popupMenu.show();
+                    }
+                });
+
+        presenter.getUserProfilePresenter().getActionOnlyForLoggedInUserObservable()
+                .compose(bindToLifecycle())
+                .subscribe(ColoredSnackBar.errorSnackBarAction(
+                        ColoredSnackBar.contentView(ProfileActivity.this),
+                        R.string.error_action_only_for_logged_in_user));
+
+        // My Profile specific subscriptions
+        presenter.getMyProfilePresenter().getEditProfileClickObservable()
+                .compose(bindToLifecycle())
+                .subscribe(new Action1<Object>() {
+                    @Override
+                    public void call(Object ignore) {
+                        startActivity(EditProfileActivity.newIntent(ProfileActivity.this));
+                    }
+                });
+
+        presenter.getMyProfilePresenter().getNotificationsClickObservable()
+                .compose(bindToLifecycle())
+                .subscribe(new Action1<Object>() {
+                    @Override
+                    public void call(Object ignore) {
+                        Toast.makeText(ProfileActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void setUpToolbar() {
@@ -156,6 +216,18 @@ public class ProfileActivity extends BaseActivity {
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(null);
+    }
+
+    private void setUpPopupMenu() {
+        popupMenu = new PopupMenu(this, popupAnchorView);
+        popupMenu.inflate(R.menu.menu_profile_popup);
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Toast.makeText(ProfileActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
     }
 
     @Override
@@ -169,6 +241,9 @@ public class ProfileActivity extends BaseActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
+                return true;
+            case R.id.profile_menu_share:
+                presenter.getShareInitObserver().onNext(null);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -307,6 +382,20 @@ public class ProfileActivity extends BaseActivity {
     }
 
     @Override
+    public void finish() {
+        setResult(RESULT_OK, null);
+        super.finish();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK && requestCode == REQUEST_PROFILE_OPENED_FROM_PROFILE) {
+            // Need to refresh profile if returned from other profile to refresh related data
+            presenter.refreshProfile();
+        }
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putInt(KEY_OFFSET, lastVerticalOffset);
         super.onSaveInstanceState(outState);
@@ -317,12 +406,11 @@ public class ProfileActivity extends BaseActivity {
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
         final Intent intent = checkNotNull(getIntent());
         final String userName = checkNotNull(intent.getStringExtra(KEY_USER_NAME));
-        final String profileType = checkNotNull(intent.getStringExtra(KEY_PROFILE_TYPE));
 
         final ProfileActivityComponent component = DaggerProfileActivityComponent
                 .builder()
                 .activityModule(new ActivityModule(this))
-                .profileActivityModule(new ProfileActivityModule(userName, profileType))
+                .profileActivityModule(new ProfileActivityModule(userName))
                 .appComponent(App.getAppComponent(getApplication()))
                 .build();
         component.inject(this);

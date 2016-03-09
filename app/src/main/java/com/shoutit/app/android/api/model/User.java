@@ -27,16 +27,20 @@ public class User {
     private final UserLocation location;
     private final int listenersCount;
     private final List<Page> pages;
+    private final List<Admin> admins;
     private final String bio;
     private final int dateJoined;
     private final Listening listeningCount;
+    private final boolean isOwner;
+    private final String about;
     private final String mobile;
     private final String website;
 
     public User(String id, String type, String apiUrl, String webUrl, String username,
                 String name, String firstName, String lastName, boolean isActivated, String image,
                 String cover, boolean isListening, boolean isListener, boolean isPasswordSet, UserLocation location,
-                int listenersCount, List<Page> pages, String bio, int dateJoined, Listening listeningCount, String mobile, String website) {
+                int listenersCount, List<Page> pages, List<Admin> admins, String bio, int dateJoined,
+                Listening listeningCount, boolean isOwner, String about, String mobile, String website) {
         this.id = id;
         this.type = type;
         this.apiUrl = apiUrl;
@@ -54,16 +58,19 @@ public class User {
         this.location = location;
         this.listenersCount = listenersCount;
         this.pages = pages;
+        this.admins = admins;
         this.bio = bio;
         this.dateJoined = dateJoined;
         this.listeningCount = listeningCount;
+        this.isOwner = isOwner;
+        this.about = about;
         this.mobile = mobile;
         this.website = website;
     }
 
     // TODO remove it when user will be handler by API
     public static User guestUser(UserLocation location) {
-        return new User(null, null, null, null ,null, null, null, null, false, null, null, false, false, false, location, 1, null, null, 0, null, null, null);
+        return new User(null, null, null, null ,null, null, null, null, false, null, null, false, false, false, location, 1, null, null, null, 0, null, false, null, null, null);
     }
 
     public static User listenedUser(@Nonnull User user, boolean isListening) {
@@ -71,14 +78,24 @@ public class User {
         return new User(user.id, user.type, user.apiUrl, user.webUrl, user.username, user.name,
                 user.firstName, user.lastName, user.isActivated, user.image, user.cover,
                 isListening, user.isListener, user.isPasswordSet, user.location,
-                listenersCount, user.pages, user.bio, user.dateJoined, user.listeningCount, null, null);
+                listenersCount, user.pages, user.admins, user.bio, user.dateJoined, user.listeningCount,
+                false, user.about, user.mobile, user.website);
     }
 
     public static User userWithUpdatedPages(@Nonnull User user, List<Page> pages) {
         return new User(user.id, user.type, user.apiUrl, user.webUrl, user.username, user.name,
                 user.firstName, user.lastName, user.isActivated, user.image, user.cover,
                 user.isListening, user.isListener, user.isPasswordSet, user.location,
-                user.listenersCount, pages, user.bio, user.dateJoined, user.listeningCount, null, null);
+                user.listenersCount, pages, user.admins, user.bio, user.dateJoined, user.listeningCount,
+                false, user.about, user.mobile, user.website);
+    }
+
+    public static User userWithUpdatedAdmins(@Nonnull User user, List<Admin> updatedAdmins) {
+        return new User(user.id, user.type, user.apiUrl, user.webUrl, user.username, user.name,
+                user.firstName, user.lastName, user.isActivated, user.image, user.cover,
+                user.isListening, user.isListener, user.isPasswordSet, user.location,
+                user.listenersCount, user.pages, updatedAdmins, user.bio, user.dateJoined, user.listeningCount,
+                false, user.about, user.mobile, user.website);
     }
 
     public String getId() {
@@ -165,6 +182,18 @@ public class User {
         return isListener;
     }
 
+    public List<Admin> getAdmins() {
+        return admins;
+    }
+
+    public boolean isOwner() {
+        return isOwner;
+    }
+
+    public String getAbout() {
+        return about;
+    }
+
     public String getWebsite() {
         return website;
     }
@@ -179,6 +208,7 @@ public class User {
                 isPasswordSet == user.isPasswordSet &&
                 listenersCount == user.listenersCount &&
                 dateJoined == user.dateJoined &&
+                isOwner == user.isOwner &&
                 Objects.equal(id, user.id) &&
                 Objects.equal(type, user.type) &&
                 Objects.equal(apiUrl, user.apiUrl) &&
@@ -192,6 +222,7 @@ public class User {
                 Objects.equal(cover, user.cover) &&
                 Objects.equal(location, user.location) &&
                 Objects.equal(pages, user.pages) &&
+                Objects.equal(admins, user.admins) &&
                 Objects.equal(bio, user.bio) &&
                 Objects.equal(isListener, user.isListener) &&
                 Objects.equal(listeningCount, user.listeningCount);
@@ -201,6 +232,6 @@ public class User {
     public int hashCode() {
         return Objects.hashCode(id, type, apiUrl, webUrl, username, name, firstName, lastName,
                 isActivated, image, cover, isListening, isPasswordSet, location, listenersCount,
-                pages, bio, dateJoined, listeningCount, isListener, website);
+                pages, bio, dateJoined, listeningCount, isListener, admins, isOwner, website);
     }
 }

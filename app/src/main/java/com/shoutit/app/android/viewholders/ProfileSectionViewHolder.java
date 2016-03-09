@@ -53,7 +53,7 @@ public class ProfileSectionViewHolder extends ViewHolderManager.BaseViewHolder<P
         final ProfileType sectionItem = item.getSectionItem();
 
         if (item.isOnlyItemInSection()) {
-            container.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.shape_page_top));
+            container.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.shape_page_only_item));
         } else if (item.isFirstItem()) {
             container.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.shape_page_top));
         } else if (item.isLastItem()) {
@@ -73,7 +73,7 @@ public class ProfileSectionViewHolder extends ViewHolderManager.BaseViewHolder<P
     }
 
     private void setListeningIcon(boolean isListening) {
-        if (item.isMyProfile()) {
+        if (item.isProfileOwner()) {
             listeningImageView.setVisibility(View.GONE);
         } else {
             listeningImageView.setImageDrawable(context.getResources().getDrawable(
@@ -89,5 +89,10 @@ public class ProfileSectionViewHolder extends ViewHolderManager.BaseViewHolder<P
         } else {
             item.onActionOnlyForLoggedInUser();
         }
+    }
+
+    @OnClick(R.id.profile_section_selector)
+    public void onSectionItemSelected() {
+        item.onSectionItemSelected();
     }
 }
