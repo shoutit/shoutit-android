@@ -271,4 +271,10 @@
     <string name="edit_profile_hint_last_name">Last Name</string>
     <string name="edit_profile_hint_mobile">Mobile</string>
 
+    <!-- Post Signup Second -->
+    <string name="post_signup_next">Next</string>
+    <string name="post_signup_skip">Skip</string>
+    <string name="post_signup_suggested_users">Suggested users</string>
+    <string name="post_signup_done">Done</string>
+
 </resources>
