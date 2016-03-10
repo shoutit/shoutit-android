@@ -69,10 +69,8 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     EditText mEditBudget;
     @Bind(R.id.edit_currency_spinner)
     Spinner mEditCurrencySpinner;
-
     @Bind(R.id.edit_request_category_spinner)
     Spinner mEditCategorySpinner;
-
     @Bind(R.id.edit_request_category_icon)
     ImageView mEditCategoryIcon;
     @Bind(R.id.edit_shout_container)
@@ -81,6 +79,8 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     TextView mEditLocation;
     @Bind(R.id.edit_progress)
     FrameLayout mEditProgress;
+    @Bind(R.id.edit_shout_description)
+    EditText mEditShoutDescription;
 
     @Inject
     EditShoutPresenter mEditShoutPresenter;
@@ -223,8 +223,11 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     public EditShoutPresenter.RequestData getRequestData() {
         return new EditShoutPresenter.RequestData(
                 mTitle.getText().toString(),
+                mEditShoutDescription.getText().toString(),
                 mEditBudget.getText().toString(),
-                ((Pair<String, String>) mEditCurrencySpinner.getSelectedItem()).first, ((Pair<String, String>) mEditCategorySpinner.getSelectedItem()).first, getSelectedOptions());
+                ((Pair<String, String>) mEditCurrencySpinner.getSelectedItem()).first,
+                ((Pair<String, String>) mEditCategorySpinner.getSelectedItem()).first,
+                getSelectedOptions());
     }
 
     @Override

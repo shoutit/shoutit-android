@@ -7,12 +7,14 @@ import java.util.List;
 public class EditShoutRequest {
 
     private final String title;
+    private final String description;
     private final UserLocationSimple location;
     private final String category;
     private final List<FilterValue> filters;
 
-    public EditShoutRequest(String title, UserLocationSimple location, String category, List<FilterValue> filters) {
+    public EditShoutRequest(String title, String description, UserLocationSimple location, String category, List<FilterValue> filters) {
         this.title = title;
+        this.description = description;
         this.location = location;
         this.category = category;
         this.filters = filters;
