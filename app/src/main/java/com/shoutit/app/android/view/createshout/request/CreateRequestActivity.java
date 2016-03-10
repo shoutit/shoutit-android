@@ -115,8 +115,6 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
     Toolbar mRequestActivityToolbar;
     @Bind(R.id.request_activity_description_layout)
     TextInputLayout mRequestActivityDescriptionLayout;
-    @Bind(R.id.request_activity_budget_layout)
-    TextInputLayout mRequestActivityBudgetLayout;
 
     @Inject
     CreateRequestPresenter mCreateRequestPresenter;
@@ -269,16 +267,6 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
             mRequestActivityDescriptionLayout.setError(getString(R.string.create_request_activity_title_too_short));
         } else {
             mRequestActivityDescriptionLayout.setErrorEnabled(false);
-        }
-    }
-
-    @Override
-    public void showEmptyPriceError(boolean show) {
-        if(show) {
-            mRequestActivityBudgetLayout.setErrorEnabled(true);
-            mRequestActivityBudgetLayout.setError(getString(R.string.create_request_activity_price_empty));
-        } else {
-            mRequestActivityBudgetLayout.setErrorEnabled(false);
         }
     }
 
