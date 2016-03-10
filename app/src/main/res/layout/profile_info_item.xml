@@ -8,7 +8,6 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginBottom="9dp"
         android:layout_marginTop="5dp"
         android:background="#1f000000" />
 
@@ -16,8 +15,9 @@
         android:id="@+id/profile_bio_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="26dp"
         android:orientation="horizontal"
+        android:paddingBottom="26dp"
+        android:paddingTop="9dp"
         android:paddingEnd="16dp"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
@@ -46,7 +46,9 @@
     <LinearLayout
         android:id="@+id/profile_website_container"
         style="@style/ProfileInfo"
-        android:layout_marginBottom="18dp">
+        android:background="?selectableItemBackground"
+        android:paddingTop="9dp"
+        android:paddingBottom="9dp">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -69,7 +71,8 @@
     <LinearLayout
         android:id="@+id/profile_joined_container"
         style="@style/ProfileInfo"
-        android:layout_marginBottom="18dp">
+        android:paddingTop="9dp"
+        android:paddingBottom="9dp">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -92,7 +95,8 @@
     <LinearLayout
         android:id="@+id/profile_country_container"
         style="@style/ProfileInfo"
-        android:layout_marginBottom="10dp">
+        android:paddingTop="9dp"
+        android:paddingBottom="10dp">
 
         <ImageView
             android:id="@+id/profile_country_iv"

@@ -68,20 +68,18 @@ public class ProfilePresenter {
     @Nonnull
     private final PublishSubject<String> shoutSelectedSubject = PublishSubject.create();
     @Nonnull
-    protected final PublishSubject<String> profileToOpenSubject = PublishSubject.create();
+    private final PublishSubject<String> profileToOpenSubject = PublishSubject.create();
     @Nonnull
-    protected final PublishSubject<Throwable> errorsSubject = PublishSubject.create();
+    private final PublishSubject<Throwable> errorsSubject = PublishSubject.create();
     @Nonnull
     private final PublishSubject<Object> actionOnlyForLoggedInUserSubject = PublishSubject.create();
+    @Nonnull
+    private final PublishSubject<String> webUrlClickedSubject = PublishSubject.create();
 
     @Nonnull
-    protected final String userName;
+    private final String userName;
     @Nonnull
-    protected final Context context;
-    @Nonnull
-    protected final UserPreferences userPreferences;
-    @Nonnull
-    protected final ApiService apiService;
+    private final Context context;
     @Nonnull
     private final ProfilesDao profilesDao;
     @Nonnull
@@ -99,15 +97,12 @@ public class ProfilePresenter {
                             @Nonnull @ForActivity final Context context,
                             @Nonnull UserPreferences userPreferences,
                             @Nonnull @UiScheduler Scheduler uiScheduler,
-                            @Nonnull ApiService apiService,
                             @Nonnull ProfilesDao profilesDao,
                             @Nonnull MyProfileHalfPresenter myProfilePresenter,
                             @Nonnull UserProfileHalfPresenter userProfilePresenter,
                             @Nonnull PreferencesHelper preferencesHelper) {
         this.userName = userName;
         this.context = context;
-        this.userPreferences = userPreferences;
-        this.apiService = apiService;
         this.profilesDao = profilesDao;
         this.myProfilePresenter = myProfilePresenter;
         this.userProfilePresenter = userProfilePresenter;
@@ -240,7 +235,7 @@ public class ProfilePresenter {
                             .add(userProfilePresenter.getThreeIconsAdapterItem(user, isUserLoggedIn));
                 }
 
-                builder.add(new ProfileAdapterItems.UserInfoAdapterItem(user));
+                builder.add(new ProfileAdapterItems.UserInfoAdapterItem(user, webUrlClickedSubject));
 
                 final List<BaseAdapterItem> items = new ArrayList<>();
 
@@ -369,6 +364,11 @@ public class ProfilePresenter {
     @Nonnull
     public Observer<Object> getShareInitObserver() {
         return shareInitSubject;
+    }
+
+    @Nonnull
+    public Observable<String> getWebUrlClickedObservable() {
+        return webUrlClickedSubject.filter(Functions1.isNotNull());
     }
 
     public void refreshProfile() {

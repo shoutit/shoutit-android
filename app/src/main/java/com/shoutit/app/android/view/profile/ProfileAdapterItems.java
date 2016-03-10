@@ -47,9 +47,12 @@ public class ProfileAdapterItems {
 
         @Nonnull
         protected final User user;
+        @Nonnull
+        private final Observer<String> webUrlClickedObserver;
 
-        public UserInfoAdapterItem(@Nonnull User user) {
+        public UserInfoAdapterItem(@Nonnull User user, @Nonnull Observer<String> webUrlClickedObserver) {
             this.user = user;
+            this.webUrlClickedObserver = webUrlClickedObserver;
         }
 
         @Override
@@ -82,6 +85,10 @@ public class ProfileAdapterItems {
             } else {
                 return R.drawable.ic_about;
             }
+        }
+
+        public void onWebsiteClicked() {
+            webUrlClickedObserver.onNext(user.getWebsite());
         }
     }
 
