@@ -3,6 +3,7 @@ package com.shoutit.app.android.view.profile;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
@@ -29,6 +30,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.view.editprofile.EditProfileActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
@@ -164,6 +166,15 @@ public class ProfileActivity extends BaseActivity {
                         startActivityForResult(
                                 ProfileActivity.newIntent(ProfileActivity.this, userName),
                                 REQUEST_PROFILE_OPENED_FROM_PROFILE);
+                    }
+                });
+
+        presenter.getWebUrlClickedObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String webUrl) {
+                        startActivity(IntentHelper.websiteIntent(webUrl));
                     }
                 });
 

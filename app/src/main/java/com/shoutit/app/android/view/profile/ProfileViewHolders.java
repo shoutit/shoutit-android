@@ -11,7 +11,6 @@ import android.widget.TextView;
 import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.google.common.base.Optional;
 import com.shoutit.app.android.R;
-import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.utils.ImageHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
@@ -59,6 +58,7 @@ public class ProfileViewHolders {
         private final Target flagTarget;
         private final Context context;
         private final Picasso picasso;
+        private ProfileAdapterItems.UserInfoAdapterItem item;
 
         public UserInfoViewHolder(@Nonnull View itemView, Context context, Picasso picasso) {
             super(itemView);
@@ -70,6 +70,7 @@ public class ProfileViewHolders {
 
         @Override
         public void bind(@Nonnull ProfileAdapterItems.UserInfoAdapterItem item) {
+            this.item = item;
             final User user = item.getUser();
 
             bioTextView.setText(item.getBioText());
@@ -100,6 +101,11 @@ public class ProfileViewHolders {
             } else {
                 locationContainer.setVisibility(View.GONE);
             }
+        }
+
+        @OnClick(R.id.profile_website_container)
+        public void onWebClicked() {
+            item.onWebsiteClicked();
         }
     }
 

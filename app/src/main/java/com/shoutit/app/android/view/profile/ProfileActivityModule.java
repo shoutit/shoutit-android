@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.appunite.rx.dagger.UiScheduler;
 import com.shoutit.app.android.UserPreferences;
-import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.dagger.ActivityScope;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ProfilesDao;
@@ -32,10 +31,10 @@ public class ProfileActivityModule {
     @Provides
     @ActivityScope
     public ProfilePresenter provideProfilePresenter(ShoutsDao shoutsDao, ProfilesDao profilesDao, @ForActivity Context context,
-                                                    UserPreferences preferences, @UiScheduler Scheduler uiScheduler, ApiService apiService,
+                                                    UserPreferences preferences, @UiScheduler Scheduler uiScheduler,
                                                     PreferencesHelper preferencesHelper, UserProfileHalfPresenter userProfilePresenter,
                                                     MyProfileHalfPresenter myProfilePresenter) {
         return new ProfilePresenter(userName, shoutsDao, context, preferences, uiScheduler,
-                apiService, profilesDao, myProfilePresenter, userProfilePresenter, preferencesHelper);
+                profilesDao, myProfilePresenter, userProfilePresenter, preferencesHelper);
     }
 }
