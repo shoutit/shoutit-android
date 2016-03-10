@@ -1,9 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:background="@android:color/white"
-              android:orientation="vertical">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:background="@android:color/white"
+             android:orientation="vertical">
+
+    <ScrollView
+        android:overScrollMode="never"
+        android:clipToPadding="true"
+        android:paddingTop="?actionBarSize"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:src="@drawable/cool"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:text="@string/published_congratulations"
+                android:textColor="@color/colorPrimary"/>
+
+            <TextView
+                android:textSize="16sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:text="@string/published_extra_info"/>
+
+            <Button
+                android:fontFamily="@string/font_roboto_regular"
+                android:id="@+id/publish_activity_add_more_details"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="30dp"
+                android:background="@drawable/green_border_button"
+                android:text="@string/published_add_details"
+                android:textAllCaps="false"
+                android:textColor="@color/colorAccent"/>
+
+            <com.shoutit.app.android.widget.LinedTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="50dp"
+                android:layout_marginRight="50dp"
+                android:layout_marginTop="20dp"
+                android:gravity="center"
+                android:text="@string/or_label"
+                android:textAllCaps="true"
+                android:textColor="@color/colorAccent"/>
+
+            <Button
+                android:fontFamily="@string/font_roboto_regular"
+                android:id="@+id/publish_activity_create_another_shout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="18dp"
+                android:layout_marginRight="18dp"
+                android:layout_marginTop="30dp"
+                android:text="@string/published_create_another_shout"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"/>
+
+        </LinearLayout>
+
+    </ScrollView>
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/publish_activity_toolbar"
@@ -11,61 +87,4 @@
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"/>
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="10dp"
-        android:src="@drawable/cool"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="10dp"
-        android:text="Congratulations!"
-        android:textColor="@color/colorPrimary"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="10dp"
-        android:text="Your offer will appear on ShoutIt soon."/>
-
-    <Button
-        android:id="@+id/publish_activity_add_more_details"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginTop="30dp"
-        android:background="@drawable/green_border_button"
-        android:text="Add more details"
-        android:textAllCaps="false"
-        android:textColor="@color/colorAccent"/>
-
-    <com.shoutit.app.android.widget.LinedTextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginLeft="50dp"
-        android:layout_marginRight="50dp"
-        android:layout_marginTop="20dp"
-        android:gravity="center"
-        android:text="or"
-        android:textAllCaps="true"
-        android:textColor="@color/colorAccent"/>
-
-    <Button
-        android:id="@+id/publish_activity_create_another_shout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="18dp"
-        android:layout_marginRight="18dp"
-        android:layout_marginTop="30dp"
-        android:text="Create another Shout"
-        android:textAllCaps="false"
-        android:textColor="@android:color/white"/>
-
-</LinearLayout>
+</FrameLayout>

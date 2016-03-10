@@ -270,5 +270,11 @@
     <string name="edit_profile_hint_first_name">First Name</string>
     <string name="edit_profile_hint_last_name">Last Name</string>
     <string name="edit_profile_hint_mobile">Mobile</string>
+    <string name="published_congratulations">Congratulations!</string>
+    <string name="published_extra_info">Your offer will appear on Shoutit soon.</string>
+    <string name="published_add_details">Add more details</string>
+    <string name="or_label">or</string>
+    <string name="published_create_another_shout">Create another Shout</string>
+    <string name="font_roboto_regular">sans-serif</string>
 
 </resources>
