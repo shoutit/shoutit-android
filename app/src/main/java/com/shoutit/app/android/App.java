@@ -7,7 +7,6 @@ import android.support.multidex.MultiDexApplication;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.crashlytics.android.core.CrashlyticsCore;
 import com.shoutit.app.android.api.ApiService;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.constants.UserVoiceConstants;
 import com.shoutit.app.android.dagger.AppComponent;
 import com.shoutit.app.android.dagger.AppModule;
@@ -22,7 +21,6 @@ import javax.inject.Inject;
 
 import io.fabric.sdk.android.Fabric;
 import rx.Scheduler;
-import rx.functions.Action1;
 import rx.plugins.RxJavaErrorHandler;
 import rx.plugins.RxJavaPlugins;
 

@@ -275,6 +275,7 @@
     <string name="post_signup_next">Next</string>
     <string name="post_signup_skip">Skip</string>
     <string name="post_signup_suggested_users">Suggested users</string>
+    <string name="post_signup_suggested_pages">Suggested pages</string>
     <string name="post_signup_done">Done</string>
 
 </resources>

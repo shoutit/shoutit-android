@@ -9,52 +9,6 @@ public class Page extends BaseProfile {
         super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount);
     }
 
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public String getType() {
-        return type;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public boolean isActivated() {
-        return isActivated;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public String getCover() {
-        return cover;
-    }
-
-    @Override
-    public boolean isListening() {
-        return isListening;
-    }
-
-    public int getListenersCount() {
-        return listenersCount;
-    }
-
     @Override
     public BaseProfile getListenedProfile() {
         boolean newIsListening = !isListening;

@@ -46,6 +46,9 @@
         <activity android:name=".view.about.AboutActivity"/>
 
         <activity android:name=".view.postlogininterest.PostLoginInterestActivity"/>
+        
+        <activity android:name=".view.postlogininterest.postsignupsecond.PostSignupSecondActivity"
+            android:theme="@style/TranslucentStatusBar"/>
 
         <activity android:name=".view.location.LocationActivity"/>
 

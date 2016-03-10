@@ -20,6 +20,7 @@ import com.shoutit.app.android.dao.SuggestionsDao;
 import com.shoutit.app.android.location.LocationManager;
 import com.squareup.picasso.Picasso;
 
+
 import dagger.Component;
 import rx.Scheduler;
 

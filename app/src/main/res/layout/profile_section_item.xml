@@ -4,7 +4,7 @@
     android:id="@+id/profile_section_container"
     android:layout_width="match_parent"
     android:layout_height="60dp"
-    android:background="@drawable/shape_page_bottom"
+    android:background="@android:color/white"
     android:gravity="center_vertical">
 
     <ImageView

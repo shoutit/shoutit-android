@@ -34,4 +34,54 @@ public abstract class BaseProfile implements ProfileType {
         return USER.equals(type);
     }
 
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public String getType() {
+        return type;
+    }
+
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public boolean isActivated() {
+        return isActivated;
+    }
+
+    @Override
+    public String getImage() {
+        return image;
+    }
+
+    public String getCover() {
+        return cover;
+    }
+
+    @Override
+    public boolean isListening() {
+        return isListening;
+    }
+
+    @Override
+    public int getListenersCount() {
+        return listenersCount;
+    }
 }

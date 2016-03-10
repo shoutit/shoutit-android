@@ -8,6 +8,7 @@ import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.BothParams;
+import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -38,9 +39,11 @@ public class PostSignupSecondPresenter {
 
     private final Observable<List<BaseAdapterItem>> suggestedPagesObservable;
     private final Observable<List<BaseAdapterItem>> suggestedUsersObservable;
+    private final Observable<Throwable> errorObservable;
 
     private final PublishSubject<Throwable> errorSubject = PublishSubject.create();
     private final PublishSubject<BaseProfile> itemListenedSubject = PublishSubject.create();
+    private final Observable<Boolean> progressObservable;
 
     public PostSignupSecondPresenter(@Nonnull SuggestionsDao suggestionsDao,
                                      @Nonnull final ApiService apiService,
@@ -126,6 +129,13 @@ public class PostSignupSecondPresenter {
                 })
                 .subscribe(suggestionsDao.getSuggestionUpdateObserver(suggestionsPointer));
 
+        errorObservable = Observable.merge(
+                suggestionsRequestObservable.compose(ResponseOrError.<SuggestionsResponse>onlyError()),
+                errorSubject);
+
+        progressObservable = suggestionsRequestObservable.map(Functions1.returnFalse())
+                .startWith(true);
+
     }
 
     @NonNull
@@ -137,7 +147,7 @@ public class PostSignupSecondPresenter {
                     @Nullable
                     @Override
                     public BaseAdapterItem apply(@Nullable BaseProfile input) {
-                        return new PostSignupListenItem(input, itemListenedSubject);
+                        return new SuggestionAdapterItem(input, itemListenedSubject);
                     }
                 });
 
@@ -154,38 +164,46 @@ public class PostSignupSecondPresenter {
         return suggestedUsersObservable;
     }
 
-    public static class PostSignupListenItem extends BaseNoIDAdapterItem {
+    public Observable<Throwable> getErrorObservable() {
+        return errorObservable;
+    }
+
+    public Observable<Boolean> getProgressObservable() {
+        return progressObservable;
+    }
+
+    public static class SuggestionAdapterItem extends BaseNoIDAdapterItem {
 
         @Nonnull
         private final BaseProfile baseprofile;
         @Nonnull
         private final Observer<BaseProfile> itemListenedSubject;
 
-        public PostSignupListenItem(@Nonnull BaseProfile baseprofile,
-                                    @Nonnull Observer<BaseProfile> itemListenedSubject) {
+        public SuggestionAdapterItem(@Nonnull BaseProfile baseprofile,
+                                     @Nonnull Observer<BaseProfile> itemListenedSubject) {
             this.baseprofile = baseprofile;
             this.itemListenedSubject = itemListenedSubject;
-        }
-
-        @Nonnull
-        public Observer<BaseProfile> getItemListenedSubject() {
-            return itemListenedSubject;
         }
 
         public void onItemClicked() {
             itemListenedSubject.onNext(baseprofile);
         }
 
+        @Nonnull
+        public BaseProfile getBaseprofile() {
+            return baseprofile;
+        }
+
         @Override
         public boolean matches(@Nonnull BaseAdapterItem item) {
-            return item instanceof  PostSignupListenItem &&
-                    baseprofile.getId().equals(((PostSignupListenItem) item).baseprofile.getId());
+            return item instanceof SuggestionAdapterItem &&
+                    baseprofile.getId().equals(((SuggestionAdapterItem) item).baseprofile.getId());
         }
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof  PostSignupListenItem &&
-                    baseprofile.equals(((PostSignupListenItem) item).baseprofile);
+            return item instanceof SuggestionAdapterItem &&
+                    baseprofile.equals(((SuggestionAdapterItem) item).baseprofile);
         }
     }
 }

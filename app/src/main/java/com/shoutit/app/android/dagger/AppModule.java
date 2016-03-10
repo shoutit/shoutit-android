@@ -227,6 +227,7 @@ public final class AppModule {
     }
 
     @Provides
+    @Singleton
     SuggestionsDao prpvideSuggestionsDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
         return new SuggestionsDao(apiService, networkScheduler);
     }
