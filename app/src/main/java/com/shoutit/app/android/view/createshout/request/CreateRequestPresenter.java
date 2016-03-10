@@ -15,6 +15,7 @@ import com.google.common.collect.Iterables;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.CreateRequestShoutRequest;
+import com.shoutit.app.android.api.model.CreateRequestShoutWithPriceRequest;
 import com.shoutit.app.android.api.model.CreateShoutResponse;
 import com.shoutit.app.android.api.model.Currency;
 import com.shoutit.app.android.api.model.UserLocation;
@@ -135,11 +136,17 @@ public class CreateRequestPresenter {
         if (!checkValidity(requestData)) return;
 
         mListener.showProgress();
-        pendingSubscriptions.add(mApiService.createShoutRequest(
+
+        CreateRequestShoutRequest request = Strings.isNullOrEmpty(requestData.mBudget) ?
                 new CreateRequestShoutRequest(
                         requestData.mDescription,
+                        new UserLocationSimple(mUserLocation.getLatitude(), mUserLocation.getLongitude())) :
+                new CreateRequestShoutWithPriceRequest(
+                        requestData.mDescription,
                         new UserLocationSimple(mUserLocation.getLatitude(), mUserLocation.getLongitude()),
-                        PriceUtils.getPriceInCents(requestData.mBudget), requestData.mCurrencyId))
+                        PriceUtils.getPriceInCents(requestData.mBudget), requestData.mCurrencyId);
+
+        pendingSubscriptions.add(mApiService.createShoutRequest(request)
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
                 .subscribe(new Action1<CreateShoutResponse>() {
@@ -161,10 +168,7 @@ public class CreateRequestPresenter {
         final boolean erroredTitle = requestData.mDescription.length() < 6;
         mListener.showTitleTooShortError(erroredTitle);
 
-        final boolean erroredBudget = Strings.isNullOrEmpty(requestData.mBudget);
-        mListener.showEmptyPriceError(erroredBudget);
-
-        return !erroredTitle && !erroredBudget;
+        return !erroredTitle;
     }
 
     public void updateLocation(@NonNull UserLocation userLocation) {
@@ -205,8 +209,6 @@ public class CreateRequestPresenter {
         void removeRetryCurrenciesListener();
 
         void showTitleTooShortError(boolean show);
-
-        void showEmptyPriceError(boolean show);
 
         void finishActivity(String id);
     }

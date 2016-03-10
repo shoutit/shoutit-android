@@ -67,8 +67,6 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     TextInputLayout mEditLayout;
     @Bind(R.id.edit_budget)
     EditText mEditBudget;
-    @Bind(R.id.edit_budget_layout)
-    TextInputLayout mEditBudgetLayout;
     @Bind(R.id.edit_currency_spinner)
     Spinner mEditCurrencySpinner;
     @Bind(R.id.edit_request_category_spinner)
@@ -289,16 +287,6 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
             mEditLayout.setError(getString(R.string.create_request_activity_title_too_short));
         } else {
             mEditLayout.setErrorEnabled(false);
-        }
-    }
-
-    @Override
-    public void showEmptyPriceError(boolean show) {
-        if (show) {
-            mEditBudgetLayout.setErrorEnabled(true);
-            mEditBudgetLayout.setError(getString(R.string.create_request_activity_price_empty));
-        } else {
-            mEditBudgetLayout.setErrorEnabled(false);
         }
     }
 
