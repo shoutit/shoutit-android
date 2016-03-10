@@ -2,32 +2,11 @@ package com.shoutit.app.android.api.model;
 
 import com.google.common.base.Objects;
 
-public class Page implements ProfileType {
-    private final String id;
-    private final String type;
-    private final String username;
-    private final String name;
-    private final String firstName;
-    private final String lastName;
-    private final boolean isActivated;
-    private final String image;
-    private final String cover;
-    private final boolean isListening;
-    private final int listenersCount;
+public class Page extends BaseProfile {
 
     public Page(String id, String type, String username, String name, String firstName,
                 String lastName, boolean isActivated, String image, String cover, boolean isListening, int listenersCount) {
-        this.id = id;
-        this.type = type;
-        this.username = username;
-        this.name = name;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.isActivated = isActivated;
-        this.image = image;
-        this.cover = cover;
-        this.isListening = isListening;
-        this.listenersCount = listenersCount;
+        super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount);
     }
 
     public String getId() {
@@ -74,6 +53,14 @@ public class Page implements ProfileType {
 
     public int getListenersCount() {
         return listenersCount;
+    }
+
+    @Override
+    public BaseProfile getListenedProfile() {
+        boolean newIsListening = !isListening;
+        int newListenersCount = newIsListening ? listenersCount + 1 : listenersCount - 1;
+
+        return new Page(id, type, username, name, firstName, lastName, isActivated, image, cover, newIsListening, newListenersCount);
     }
 
     @Override

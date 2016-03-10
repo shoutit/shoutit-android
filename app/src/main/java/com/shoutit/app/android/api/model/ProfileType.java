@@ -4,6 +4,8 @@ public interface ProfileType {
     String PAGE = "page";
     String USER = "user";
 
+    String getId();
+
     String getUsername();
 
     String getName();
@@ -15,4 +17,6 @@ public interface ProfileType {
     boolean isListening();
 
     int getListenersCount();
+
+    BaseProfile getListenedProfile();
 }
