@@ -18,6 +18,7 @@ import com.shoutit.app.android.api.model.CategoryFilter;
 import com.shoutit.app.android.api.model.CreateShoutResponse;
 import com.shoutit.app.android.api.model.Currency;
 import com.shoutit.app.android.api.model.EditShoutRequest;
+import com.shoutit.app.android.api.model.EditShoutRequestWithPrice;
 import com.shoutit.app.android.api.model.ShoutResponse;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.UserLocationSimple;
@@ -206,15 +207,22 @@ public class EditShoutPresenter {
         if (!checkValidity(requestData)) return;
 
         mListener.showProgress();
-        pendingSubscriptions.add(mApiService.editShout(
-                mShoutId,
+
+        final EditShoutRequest request = Strings.isNullOrEmpty(requestData.mBudget) ?
                 new EditShoutRequest(
+                        requestData.mDescription,
+                        new UserLocationSimple(mUserLocation.getLatitude(), mUserLocation.getLongitude()),
+                        requestData.mCategoryId,
+                        getFilters(requestData.mOptionsIdValue)) :
+                new EditShoutRequestWithPrice(
                         requestData.mDescription,
                         new UserLocationSimple(mUserLocation.getLatitude(), mUserLocation.getLongitude()),
                         PriceUtils.getPriceInCents(requestData.mBudget),
                         requestData.mCurrencyId,
                         requestData.mCategoryId,
-                        getFilters(requestData.mOptionsIdValue)))
+                        getFilters(requestData.mOptionsIdValue));
+
+        pendingSubscriptions.add(mApiService.editShout(mShoutId, request)
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
                 .subscribe(new Action1<CreateShoutResponse>() {
@@ -232,13 +240,13 @@ public class EditShoutPresenter {
                 }));
     }
 
-    private List<EditShoutRequest.FilterValue> getFilters(List<Pair<String, String>> optionsIdValue) {
-        return ImmutableList.copyOf(Iterables.transform(optionsIdValue, new Function<Pair<String, String>, EditShoutRequest.FilterValue>() {
+    private List<EditShoutRequestWithPrice.FilterValue> getFilters(List<Pair<String, String>> optionsIdValue) {
+        return ImmutableList.copyOf(Iterables.transform(optionsIdValue, new Function<Pair<String, String>, EditShoutRequestWithPrice.FilterValue>() {
             @Nullable
             @Override
-            public EditShoutRequest.FilterValue apply(@Nullable Pair<String, String> input) {
+            public EditShoutRequestWithPrice.FilterValue apply(@Nullable Pair<String, String> input) {
                 assert input != null;
-                return new EditShoutRequest.FilterValue(input.first, new EditShoutRequest.FilterValue.Value(input.second));
+                return new EditShoutRequestWithPrice.FilterValue(input.first, new EditShoutRequestWithPrice.FilterValue.Value(input.second));
             }
         }));
     }
@@ -247,10 +255,7 @@ public class EditShoutPresenter {
         final boolean erroredTitle = requestData.mDescription.length() < 6;
         mListener.showTitleTooShortError(erroredTitle);
 
-        final boolean erroredBudget = Strings.isNullOrEmpty(requestData.mBudget);
-        mListener.showEmptyPriceError(erroredBudget);
-
-        return !erroredTitle && !erroredBudget;
+        return !erroredTitle;
     }
 
     public void updateLocation(@NonNull UserLocation userLocation) {
@@ -306,8 +311,6 @@ public class EditShoutPresenter {
         void setCurrenciesEnabled(boolean enabled);
 
         void showTitleTooShortError(boolean show);
-
-        void showEmptyPriceError(boolean show);
 
         void finishActivity();
 

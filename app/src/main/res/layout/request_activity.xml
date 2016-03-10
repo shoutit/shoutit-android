@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,9 +15,9 @@
         <android.support.v7.widget.Toolbar
             android:id="@+id/request_activity_toolbar"
             style="@style/AppTheme.BaseToolbarStyle"
-            android:layout_marginBottom="10dp"
             android:layout_width="match_parent"
-            android:layout_height="?actionBarSize"/>
+            android:layout_height="?actionBarSize"
+            android:layout_marginBottom="10dp"/>
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/request_activity_description_layout"
@@ -45,25 +45,19 @@
                 android:layout_height="54dp"
                 android:layout_weight="0.5">
 
-                <android.support.design.widget.TextInputLayout
-                    android:id="@+id/request_activity_budget_layout"
+                <EditText
+                    android:id="@+id/create_request_budget"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <EditText
-                        android:id="@+id/create_request_budget"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/request_activity_budget"
-                        android:inputType="numberDecimal"/>
-
-                </android.support.design.widget.TextInputLayout>
+                    android:layout_height="wrap_content"
+                    android:hint="@string/request_activity_budget"
+                    android:inputType="numberDecimal"/>
 
                 <ImageView
-                    android:layout_gravity="end|center_vertical"
-                    android:src="@drawable/info"
                     android:layout_width="24dp"
-                    android:layout_height="24dp"/>
+                    android:layout_height="24dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginBottom="8dp"
+                    android:src="@drawable/info"/>
 
             </FrameLayout>
 
@@ -71,7 +65,7 @@
                 android:id="@+id/create_request_spinner"
                 style="?android:attr/editTextStyle"
                 android:layout_width="0dp"
-                android:layout_height="54dp"
+                android:layout_height="43dp"
                 android:layout_weight="0.35"/>
 
         </LinearLayout>
@@ -98,18 +92,18 @@
 
             <SeekBar
                 android:id="@+id/create_request_time"
-                android:theme="@style/BlueSeekBar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:theme="@style/BlueSeekBar"/>
 
         </LinearLayout>
 
         <View
-            android:background="@android:color/darker_gray"
+            android:layout_width="match_parent"
+            android:layout_height="1px"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:layout_width="match_parent"
-            android:layout_height="1px"/>
+            android:background="@android:color/darker_gray"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -147,11 +141,11 @@
         </LinearLayout>
 
         <View
-            android:background="@android:color/darker_gray"
+            android:layout_width="match_parent"
+            android:layout_height="1px"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:layout_width="match_parent"
-            android:layout_height="1px"/>
+            android:background="@android:color/darker_gray"/>
 
         <Button
             android:id="@+id/create_request_confirm"

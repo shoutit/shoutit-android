@@ -1,21 +1,19 @@
 package com.shoutit.app.android.api.model;
 
+import android.support.annotation.Nullable;
+
 import java.util.List;
 
 public class EditShoutRequest {
 
     private final String title;
     private final UserLocationSimple location;
-    private final long price;
-    private final String currency;
     private final String category;
     private final List<FilterValue> filters;
 
-    public EditShoutRequest(String title, UserLocationSimple location, long price, String currency, String category, List<FilterValue> filters) {
+    public EditShoutRequest(String title, UserLocationSimple location, String category, List<FilterValue> filters) {
         this.title = title;
         this.location = location;
-        this.price = price;
-        this.currency = currency;
         this.category = category;
         this.filters = filters;
     }

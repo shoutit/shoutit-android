@@ -126,7 +126,9 @@ public interface ApiService {
     Observable<User> updateUser(@Body UpdateUserRequest updateUserRequest);
 
 
-    /** Profile **/
+    /**
+     * Profile
+     **/
     @POST("profiles/{username}/listen")
     Observable<ResponseBody> listenProfile(@Path("username") String username);
 
