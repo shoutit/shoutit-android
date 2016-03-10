@@ -225,7 +225,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     public EditShoutPresenter.RequestData getRequestData() {
         return new EditShoutPresenter.RequestData(
                 mTitle.getText().toString(),
-                mEditBudget.getText().toString(),
+                description, mEditBudget.getText().toString(),
                 ((Pair<String, String>) mEditCurrencySpinner.getSelectedItem()).first, ((Pair<String, String>) mEditCategorySpinner.getSelectedItem()).first, getSelectedOptions());
     }
 

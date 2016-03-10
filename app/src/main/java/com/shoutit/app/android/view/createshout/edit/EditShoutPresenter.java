@@ -41,6 +41,8 @@ public class EditShoutPresenter {
     public static class RequestData {
 
         @NonNull
+        private final String mTitle;
+        @NonNull
         private final String mDescription;
         @NonNull
         private final String mBudget;
@@ -51,11 +53,13 @@ public class EditShoutPresenter {
         @Nullable
         private final List<Pair<String, String>> mOptionsIdValue;
 
-        public RequestData(@NonNull String description,
+        public RequestData(@NonNull String title,
+                           @NonNull String description,
                            @NonNull String budget,
                            @NonNull String currencyId,
                            @Nullable String categoryId,
                            @Nullable List<Pair<String, String>> optionsIdValue) {
+            mTitle = title;
             mDescription = description;
             mBudget = budget;
             mCurrencyId = currencyId;
@@ -155,9 +159,10 @@ public class EditShoutPresenter {
                         if (responseData.mShoutResponse != null) {
                             mListener.setTitle(responseData.mShoutResponse.getTitle());
                             mListener.setPrice(PriceUtils.formatPrice(responseData.mShoutResponse.getPrice()));
+                            mListener.setDescription(responseData.mShoutResponse.getDescription());
                             mUserLocation = responseData.mShoutResponse.getLocation();
-                            mListener.setLocation(ResourcesHelper.getResourceIdForName(
-                                            mUserLocation.getCountry(), mContext),
+                            mListener.setLocation(
+                                    ResourcesHelper.getResourceIdForName(mUserLocation.getCountry(), mContext),
                                     mUserLocation.getCity());
                         } else {
                             mListener.showBodyError();
@@ -209,6 +214,7 @@ public class EditShoutPresenter {
         pendingSubscriptions.add(mApiService.editShout(
                 mShoutId,
                 new EditShoutRequest(
+                        requestData.mTitle,
                         requestData.mDescription,
                         new UserLocationSimple(mUserLocation.getLatitude(), mUserLocation.getLongitude()),
                         PriceUtils.getPriceInCents(requestData.mBudget),
@@ -244,7 +250,7 @@ public class EditShoutPresenter {
     }
 
     private boolean checkValidity(@NonNull RequestData requestData) {
-        final boolean erroredTitle = requestData.mDescription.length() < 6;
+        final boolean erroredTitle = requestData.mTitle.length() < 6;
         mListener.showTitleTooShortError(erroredTitle);
 
         final boolean erroredBudget = Strings.isNullOrEmpty(requestData.mBudget);
