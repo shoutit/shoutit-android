@@ -209,7 +209,7 @@ public class HomeAdapter extends BaseAdapter {
             case VIEW_TYPE_SHOUT_ITEM:
                 return isLinearLayoutManager ?
                         new ShoutLinerViewHolder(layoutInflater.inflate(R.layout.home_feed_item_linear, parent, false), context, picasso) :
-                        new ShoutGridViewHolder(layoutInflater.inflate(R.layout.shout_item_grid, parent, false), picasso, context);
+                        new ShoutGridViewHolder(layoutInflater.inflate(R.layout.shout_item_grid, parent, false), picasso);
             case VIEW_TYPE_EMPTY_SHOUTS_ITEM:
                 return new ShoutEmptyViewHolder(layoutInflater.inflate(R.layout.home_shouts_empty, parent, false));
             default:

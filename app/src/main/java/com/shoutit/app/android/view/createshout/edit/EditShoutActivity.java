@@ -166,7 +166,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
             }
         });
 
-        mEditToolbar.setTitle(getString(R.string.request_activity_title));
+        mEditToolbar.setTitle(getString(R.string.edit_shout_title));
         mEditToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
         mEditToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override

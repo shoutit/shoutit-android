@@ -127,7 +127,7 @@ public class ShoutPresenter {
                 successShoutResponse.map(new Func1<Shout, ShoutAdapterItems.MainShoutAdapterItem>() {
                     @Override
                     public ShoutAdapterItems.MainShoutAdapterItem call(Shout shout) {
-                        return new ShoutAdapterItems.MainShoutAdapterItem(addToCartSubject, shout);
+                        return new ShoutAdapterItems.MainShoutAdapterItem(addToCartSubject, shout, context.getResources());
                     }
                 });
 
@@ -140,7 +140,7 @@ public class ShoutPresenter {
                                     @Nullable
                                     @Override
                                     public ShoutAdapterItems.UserShoutAdapterItem apply(@Nullable Shout input) {
-                                        return new ShoutAdapterItems.UserShoutAdapterItem(input, userShoutSelectedSubject);
+                                        return new ShoutAdapterItems.UserShoutAdapterItem(input, userShoutSelectedSubject, context.getResources());
                                     }
                                 });
 

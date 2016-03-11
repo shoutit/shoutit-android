@@ -14,7 +14,6 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.DiscoverChild;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.dagger.ForActivity;
-import com.shoutit.app.android.utils.PriceUtils;
 import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;
@@ -82,7 +81,7 @@ public class DiscoverAdapter extends BaseAdapter {
         @Override
         public void bind(@Nonnull DiscoverPresenter.DiscoverAdapterItem item) {
             this.item = item;
-            final DiscoverChild discover =  item.getDiscoverChild();
+            final DiscoverChild discover = item.getDiscoverChild();
 
             picasso.load(Strings.emptyToNull(discover.getImage()))
                     .placeholder(R.drawable.pattern_placeholder)
@@ -143,10 +142,9 @@ public class DiscoverAdapter extends BaseAdapter {
                     .into(cardImageView);
 
             titleTextView.setText(shout.getTitle());
-            shoutNameTextView.setText(shout.getText());
-            final String price = PriceUtils.formatPrice(shout.getPrice());
-            shoutPriceTextView.setText(context.getString(
-                    R.string.price_with_currency, price, shout.getCurrency()));
+            shoutNameTextView.setText(shout.getProfile().getName());
+
+            shoutPriceTextView.setText(item.getShoutPrice());
         }
 
         @Override
@@ -154,7 +152,6 @@ public class DiscoverAdapter extends BaseAdapter {
             item.onShoutSelected();
         }
     }
-
 
 
     class ButtonViewHolder extends ViewHolderManager.BaseViewHolder<DiscoverPresenter.ShowMoreButtonAdapterItem> implements View.OnClickListener {

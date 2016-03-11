@@ -9,7 +9,9 @@ import android.text.TextUtils;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
+import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.Shout;
+import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.ResourcesHelper;
 
 import javax.annotation.Nonnull;
@@ -61,6 +63,18 @@ public class ShoutAdapterItem implements BaseAdapterItem {
             return Strings.emptyToNull(shout.getCategory().getIcon());
         } else {
             return null;
+        }
+    }
+
+    @Nullable
+    public String getShoutPrice() {
+        final Long price = shout.getPrice();
+        if (price == null) {
+            return null;
+        } else {
+            final String priceString = PriceUtils.formatPrice(shout.getPrice());
+            return context.getString(
+                    R.string.price_with_currency, priceString, shout.getCurrency());
         }
     }
 
