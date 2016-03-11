@@ -104,10 +104,6 @@ android {
         }
     }
 
-    dexOptions {
-        javaMaxHeapSize "4g"
-    }
-
     productFlavors {
         dev {
             minSdkVersion 21
