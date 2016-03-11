@@ -22,7 +22,7 @@ public class Shout {
     private final UserLocation location;
     private final String title;
     private final String text;
-    private final long price;
+    private final Long price;
     private final float number;
     private final String currency;
     private final String thumbnail;
@@ -36,7 +36,7 @@ public class Shout {
     private final int availableCount;
 
     public Shout(@Nonnull String id, String apiUrl, String webUrl, String type,
-                 UserLocation location, String title, String text, long price, float number,
+                 UserLocation location, String title, String text, Long price, float number,
                  String currency, String thumbnail, String videoUrl, User profile,
                  Category category, List<Filter> filters, long datePublished, List<String> images, List<String> videos, int availableCount) {
         this.id = id;
@@ -120,7 +120,7 @@ public class Shout {
         return category;
     }
 
-    public long getPrice() {
+    public Long getPrice() {
         return price;
     }
 

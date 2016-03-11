@@ -63,6 +63,8 @@
 
         <activity android:name=".view.createshout.publish.PublishShoutActivity"/>
 
+        <activity android:name=".view.signin.forgotpassword.ForgotPasswordActivity"/>
+
         <activity
             android:name=".view.settings.account.AccountActivity"
             android:windowSoftInputMode="adjustResize"/>

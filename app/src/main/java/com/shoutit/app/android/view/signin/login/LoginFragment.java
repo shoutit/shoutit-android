@@ -21,11 +21,12 @@ import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
-import com.shoutit.app.android.utils.rx.Actions1;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.rx.Actions1;
 import com.shoutit.app.android.view.about.AboutActivity;
 import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.signin.LoginActivityComponent;
+import com.shoutit.app.android.view.signin.forgotpassword.ForgotPasswordActivity;
 import com.shoutit.app.android.view.signin.register.RegisterFragment;
 import com.uservoice.uservoicesdk.UserVoice;
 
@@ -38,7 +39,6 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
-import okhttp3.ResponseBody;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
@@ -132,16 +132,6 @@ public class LoginFragment extends BaseFragment {
                     }
                 });
 
-        loginPresenter.successResetPassword()
-                .compose(this.<ResponseBody>bindToLifecycle())
-                .subscribe(ColoredSnackBar.successSnackBarAction(
-                        ColoredSnackBar.contentView(getActivity()), R.string.login_success_reset_password));
-
-        loginPresenter.resetPasswordEmptyEmail()
-                .compose(this.bindToLifecycle())
-                .subscribe(ColoredSnackBar.errorSnackBarAction(
-                        ColoredSnackBar.contentView(getActivity()), R.string.login_error_empty_email));
-
         RxTextView.textChangeEvents(emailEdittext)
                 .debounce(100, TimeUnit.MILLISECONDS)
                 .map(new Func1<TextViewTextChangeEvent, String>() {
@@ -170,7 +160,12 @@ public class LoginFragment extends BaseFragment {
 
         RxView.clicks(forgotPassworTextView)
                 .compose(this.<Void>bindToLifecycle())
-                .subscribe(loginPresenter.getResetPasswordClickObserver());
+                .subscribe(new Action1<Void>() {
+                    @Override
+                    public void call(Void aVoid) {
+                        startActivity(ForgotPasswordActivity.newIntent(getActivity()));
+                    }
+                });
 
         loginPresenter.getProgressObservable()
                 .compose(this.<Boolean>bindToLifecycle())

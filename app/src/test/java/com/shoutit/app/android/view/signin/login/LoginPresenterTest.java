@@ -184,36 +184,6 @@ public class LoginPresenterTest {
     }
 
     @Test
-    public void testWhenForgotPasswordEmailEmpty_showError() throws Exception {
-        final TestSubscriber<Object> errorSubscriber = new TestSubscriber<>();
-        final TestSubscriber<Object> successSubscriber = new TestSubscriber<>();
-
-        mLoginPresenter.resetPasswordEmptyEmail().subscribe(errorSubscriber);
-        mLoginPresenter.successResetPassword().subscribe(successSubscriber);
-
-        mLoginPresenter.getEmailObserver().onNext("");
-        mLoginPresenter.getResetPasswordClickObserver().onNext(null);
-
-        errorSubscriber.assertValueCount(1);
-        successSubscriber.assertNoValues();
-    }
-
-    @Test
-    public void testWhenForgotPasswordEmailNotEmpty_showSuccess() throws Exception {
-        final TestSubscriber<Object> errorSubscriber = new TestSubscriber<>();
-        final TestSubscriber<Object> successSubscriber = new TestSubscriber<>();
-
-        mLoginPresenter.resetPasswordEmptyEmail().subscribe(errorSubscriber);
-        mLoginPresenter.successResetPassword().subscribe(successSubscriber);
-
-        mLoginPresenter.getEmailObserver().onNext("email");
-        mLoginPresenter.getResetPasswordClickObserver().onNext(null);
-
-        successSubscriber.assertValueCount(1);
-        errorSubscriber.assertNoErrors();
-    }
-
-    @Test
     public void testWhenStart_noProgress() throws Exception {
         final TestSubscriber<Object> subscriber = new TestSubscriber<>();
 
@@ -230,17 +200,6 @@ public class LoginPresenterTest {
         mLoginPresenter.getEmailObserver().onNext("email");
         mLoginPresenter.getPasswordObserver().onNext("password123");
         mLoginPresenter.getProceedObserver().onNext(null);
-
-        subscriber.assertValues(true, false);
-    }
-
-    @Test
-    public void testWhenResetPassword_showProgressThenHide() throws Exception {
-        final TestSubscriber<Object> subscriber = new TestSubscriber<>();
-        mLoginPresenter.getProgressObservable().subscribe(subscriber);
-
-        mLoginPresenter.getEmailObserver().onNext("email");
-        mLoginPresenter.getResetPasswordClickObserver().onNext(null);
 
         subscriber.assertValues(true, false);
     }

@@ -248,13 +248,14 @@
     <string name="edit_shout_categories_error">Failed to load categories</string>
     <string name="edit_shout_currencies_error">Failed to load currency</string>
     <string name="edit_shout_body_error">Failed to load shout</string>
-
-    <!-- Publish -->
-    <string name="publish_menu_share">Share Shout</string>
     <string name="edit_shout_description_hint">Description</string>
     <string name="edit_shout_location">Location</string>
     <string name="edit_shout_price_hint">Price</string>
     <string name="edit_shout_title_hint">Title</string>
+    <string name="edit_shout_title">Edit Shout</string>
+
+    <!-- Publish -->
+    <string name="publish_menu_share">Share Shout</string>
 
     <!-- Edit Profile -->
     <string name="edit_profile_hint_name">Name</string>
@@ -276,5 +277,7 @@
     <string name="or_label">or</string>
     <string name="published_create_another_shout">Create another Shout</string>
     <string name="font_roboto_regular">sans-serif</string>
+    <string name="forgot_password_send">Remind me</string>
+    <string name="forgot_password_fail">Failed to remind password</string>
 
 </resources>

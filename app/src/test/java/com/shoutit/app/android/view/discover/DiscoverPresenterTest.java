@@ -1,5 +1,7 @@
 package com.shoutit.app.android.view.discover;
 
+import android.content.res.Resources;
+
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.base.Optional;
@@ -50,10 +52,11 @@ public class DiscoverPresenterTest {
     Scheduler networkScheduler;
     @Mock
     DiscoversDao.DiscoverItemDao discoverItemDao;
+    @Mock
+    Resources mResources;
 
     private final PublishSubject<ResponseOrError<DiscoverItemDetailsResponse>> discoverItemSubject = PublishSubject.create();
     private DiscoverPresenter presenter;
-
 
     @Before
     public void setUp() throws Exception {
@@ -70,7 +73,7 @@ public class DiscoverPresenterTest {
                 .thenReturn(Observable.just(ResponseOrError.fromData(getShoutsResponse())));
 
         presenter = new DiscoverPresenter(userPreferences, discoversDao,
-                discoverShoutsDao, Optional.<String>absent(), Schedulers.immediate(), Schedulers.immediate());
+                discoverShoutsDao, Optional.<String>absent(), Schedulers.immediate(), Schedulers.immediate(), mResources);
     }
 
     @Test
@@ -161,7 +164,7 @@ public class DiscoverPresenterTest {
 
     private ShoutsResponse getShoutsResponse() {
         return new ShoutsResponse(0, "a", null,
-                Lists.newArrayList(new Shout("z", null, null, null, null, null, null, 0, 0, null, null, null, null, null, null, 1L, null, null, 0)));
+                Lists.newArrayList(new Shout("z", null, null, null, null, null, null, 0L, 0, null, null, null, null, null, null, 1L, null, null, 0)));
     }
 
     private DiscoverResponse getDiscoverResponse() {

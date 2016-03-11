@@ -1,5 +1,8 @@
 package com.shoutit.app.android.view.discover;
 
+import android.content.res.Resources;
+import android.support.annotation.NonNull;
+
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
@@ -11,6 +14,7 @@ import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.DiscoverChild;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
@@ -18,10 +22,12 @@ import com.shoutit.app.android.api.model.DiscoverResponse;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.UserLocation;
+import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.model.LocationPointer;
 import com.shoutit.app.android.utils.MoreFunctions1;
+import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.view.home.HomePresenter;
 
 import java.util.ArrayList;
@@ -58,13 +64,17 @@ public class DiscoverPresenter {
     private final PublishSubject<String> shoutSelectedObserver = PublishSubject.create();
     @Nonnull
     private final Observable<DiscoveryInfo> mDiscoveryInfoObservable;
+    @NonNull
+    private final Resources mResources;
 
     public DiscoverPresenter(@Nonnull UserPreferences userPreferences,
                              @Nonnull final DiscoversDao discoversDao,
                              @Nonnull final DiscoverShoutsDao discoverShoutsDao,
                              @Nonnull Optional<String> discoverParentId,
                              @Nonnull @UiScheduler final Scheduler uiScheduler,
-                             @Nonnull @NetworkScheduler final Scheduler networkScheduler) {
+                             @Nonnull @NetworkScheduler final Scheduler networkScheduler,
+                             @NonNull @ForActivity Resources resources) {
+        mResources = resources;
 
 
         final Observable<LocationPointer> locationObservable = userPreferences.getLocationObservable()
@@ -447,6 +457,18 @@ public class DiscoverPresenter {
         @Nonnull
         public Shout getShout() {
             return shout;
+        }
+
+        @Nullable
+        public String getShoutPrice() {
+            final Long price = shout.getPrice();
+            if (price == null) {
+                return null;
+            } else {
+                final String priceString = PriceUtils.formatPrice(shout.getPrice());
+                return mResources.getString(
+                        R.string.price_with_currency, priceString, shout.getCurrency());
+            }
         }
 
         public void onShoutSelected() {
