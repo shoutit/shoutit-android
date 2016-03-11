@@ -71,7 +71,7 @@ public class PostSignupSecondAdapter extends BaseAdapter {
             final BaseProfile baseProfile = item.getBaseprofile();
 
             picasso.load(baseProfile.getImage())
-                    .placeholder(R.drawable.ic_avatar_placeholder)
+                    .placeholder(R.drawable.ic_rect_avatar_placeholder)
                     .into(target);
 
             nameTextView.setText(baseProfile.getName());

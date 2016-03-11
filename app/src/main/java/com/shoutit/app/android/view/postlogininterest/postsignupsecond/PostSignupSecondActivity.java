@@ -1,6 +1,9 @@
 package com.shoutit.app.android.view.postlogininterest.postsignupsecond;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.widget.Button;
@@ -44,6 +47,10 @@ public class PostSignupSecondActivity extends BaseActivity {
     @Bind(R.id.post_signup_next_btn)
     Button nextButton;
 
+    public static Intent newIntent(Context context) {
+        return new Intent(context, PostSignupSecondActivity.class);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,8 +63,10 @@ public class PostSignupSecondActivity extends BaseActivity {
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                doneButton.setVisibility(View.VISIBLE);
-                nextButton.setVisibility(View.GONE);
+                if (position == 1) {
+                    doneButton.setVisibility(View.VISIBLE);
+                    nextButton.setVisibility(View.GONE);
+                }
             }
 
             @Override
@@ -88,7 +97,7 @@ public class PostSignupSecondActivity extends BaseActivity {
 
     @OnClick({R.id.post_signup_done_btn, R.id.post_signup_skip_btn})
     public void onDoneOrSkipClicked() {
-        finish();
+        ActivityCompat.finishAffinity(this);
         startActivity(MainActivity.newIntent(this));
     }
 

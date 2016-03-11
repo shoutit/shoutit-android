@@ -56,6 +56,7 @@ public class PostSignupSecondPresenter {
 
         final Observable<ResponseOrError<SuggestionsResponse>> suggestionsRequestObservable = suggestionsDao
                 .getSuggestionsObservable(suggestionsPointer)
+                .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<SuggestionsResponse>>behaviorRefCount());
 
         final Observable<SuggestionsResponse> successSuggestionsObservable = suggestionsRequestObservable
@@ -114,9 +115,9 @@ public class PostSignupSecondPresenter {
                                     public ResponseOrError<SuggestionsResponse> call(ResponseOrError<ResponseBody> response) {
                                         if (response.isData()) {
                                             if (ProfileType.USER.equals(baseProfile.getType())) {
-                                                return ResponseOrError.fromData(suggestionsResponse.withUpdatedUser(baseProfile));
+                                                return ResponseOrError.fromData(suggestionsResponse.withUpdatedUser(baseProfile.getListenedProfile()));
                                             } else {
-                                                return ResponseOrError.fromData(suggestionsResponse.withUpdatedPage(baseProfile));
+                                                return ResponseOrError.fromData(suggestionsResponse.withUpdatedPage(baseProfile.getListenedProfile()));
                                             }
                                         } else {
                                             errorSubject.onNext(new Throwable());

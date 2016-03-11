@@ -1,7 +1,7 @@
 package com.shoutit.app.android.api.model;
 
 
-public abstract class BaseProfile implements ProfileType {
+public class BaseProfile implements ProfileType {
     protected final String id;
     protected final String type;
     protected final String username;
@@ -14,7 +14,7 @@ public abstract class BaseProfile implements ProfileType {
     protected final boolean isListening;
     protected final int listenersCount;
 
-    protected BaseProfile(String id, String type, String username, String name,
+    public BaseProfile(String id, String type, String username, String name,
                           String firstName, String lastName, boolean isActivated, String image,
                           String cover, boolean isListening, int listenersCount) {
         this.id = id;
@@ -83,5 +83,12 @@ public abstract class BaseProfile implements ProfileType {
     @Override
     public int getListenersCount() {
         return listenersCount;
+    }
+
+    public BaseProfile getListenedProfile() {
+        boolean newIsListening = !isListening;
+        int newListenersCount = newIsListening ? listenersCount + 1 : listenersCount - 1;
+        return new BaseProfile(id, type, username, name, firstName, lastName, isActivated,
+                image, cover, newIsListening, newListenersCount);
     }
 }

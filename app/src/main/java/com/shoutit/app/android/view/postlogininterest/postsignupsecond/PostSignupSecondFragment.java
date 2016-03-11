@@ -1,5 +1,6 @@
 package com.shoutit.app.android.view.postlogininterest.postsignupsecond;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -26,7 +27,7 @@ import rx.Observable;
 public abstract class PostSignupSecondFragment extends BaseFragment {
 
     @Inject
-    protected PostSignupSecondPresenter presenter;
+    PostSignupSecondPresenter presenter;
     @Inject
     PostSignupSecondAdapter adapter;
 
@@ -56,7 +57,7 @@ public abstract class PostSignupSecondFragment extends BaseFragment {
     }
 
     private void setupAdapter() {
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setLayoutManager(new NoScrollLayoutManager(getActivity()));
         recyclerView.setAdapter(adapter);
     }
 
@@ -74,5 +75,17 @@ public abstract class PostSignupSecondFragment extends BaseFragment {
                 .fragmentModule(fragmentModule)
                 .build()
                 .inject(this);
+    }
+
+    public class NoScrollLayoutManager extends LinearLayoutManager {
+
+        public NoScrollLayoutManager(Context context) {
+            super(context);
+        }
+
+        @Override
+        public boolean canScrollVertically() {
+            return false;
+        }
     }
 }

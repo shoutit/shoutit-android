@@ -8,7 +8,7 @@ import dagger.Component;
 
 @FragmentScope
 @Component(
-        dependencies = PostSignupSecondActivityModule.class,
+        dependencies = PostSignupSecondActivityComponent.class,
         modules = {
                 FragmentModule.class,
         }

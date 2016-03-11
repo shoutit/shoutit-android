@@ -53,26 +53,25 @@ public class SuggestionsDao {
 
     public class SuggestionDao {
         @Nonnull
-        private final Observable<ResponseOrError<SuggestionsResponse>> suggestionsObservable;
+        private Observable<ResponseOrError<SuggestionsResponse>> suggestionsObservable;
         @Nonnull
         private final PublishSubject<ResponseOrError<SuggestionsResponse>> updatedSuggestionLocally = PublishSubject.create();
 
         public SuggestionDao(@Nullable SuggestionsPointer suggestionsPointer) {
             final UserLocation userLocation = suggestionsPointer.getUserLocation();
 
+            final Observable<SuggestionsResponse> request;
             if (userLocation != null) {
-                suggestionsObservable = apiService
-                        .suggestions(userLocation.getCountry(), userLocation.getState(), userLocation.getCity(), 1, suggestionsPointer.getPageSize())
-                        .compose(ResponseOrError.<SuggestionsResponse>toResponseOrErrorObservable())
-                        .mergeWith(updatedSuggestionLocally)
-                        .compose(MoreOperators.<ResponseOrError<SuggestionsResponse>>cacheWithTimeout(networkScheduler));
+                request = apiService.suggestions(userLocation.getCountry(), userLocation.getState(), userLocation.getCity(), 1, suggestionsPointer.getPageSize());
             } else {
-                suggestionsObservable = apiService
-                        .suggestions(null, null, null, 1, suggestionsPointer.getPageSize())
-                        .compose(ResponseOrError.<SuggestionsResponse>toResponseOrErrorObservable())
-                        .mergeWith(updatedSuggestionLocally)
-                        .compose(MoreOperators.<ResponseOrError<SuggestionsResponse>>cacheWithTimeout(networkScheduler));
+                request = apiService.suggestions(null, null, null, 1, suggestionsPointer.getPageSize());
             }
+
+            suggestionsObservable = request
+                    .subscribeOn(networkScheduler)
+                    .compose(ResponseOrError.<SuggestionsResponse>toResponseOrErrorObservable())
+                    .mergeWith(updatedSuggestionLocally)
+                    .compose(MoreOperators.<ResponseOrError<SuggestionsResponse>>cacheWithTimeout(networkScheduler));
         }
 
         @Nonnull

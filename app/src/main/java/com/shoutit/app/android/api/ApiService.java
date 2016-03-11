@@ -150,7 +150,7 @@ public interface ApiService {
     @GET("misc/categories")
     Observable<List<Category>> categories();
 
-    @GET("misc/suggestions?type=users/pages")
+    @GET("misc/suggestions?type=users,pages")
     Observable<SuggestionsResponse> suggestions(@Query("country") String country,
                                                 @Query("state") String state,
                                                 @Query("city") String city,

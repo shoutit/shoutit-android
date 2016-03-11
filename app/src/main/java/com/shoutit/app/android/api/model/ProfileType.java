@@ -17,6 +17,4 @@ public interface ProfileType {
     boolean isListening();
 
     int getListenersCount();
-
-    BaseProfile getListenedProfile();
 }
