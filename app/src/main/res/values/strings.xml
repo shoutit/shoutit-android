@@ -277,8 +277,10 @@
     <string name="or_label">or</string>
     <string name="published_create_another_shout">Create another Shout</string>
     <string name="font_roboto_regular">sans-serif</string>
-    <string name="forgot_password_send">Remind me</string>
-    <string name="forgot_password_fail">Failed to remind password</string>
+
+    <!-- Forgot Password -->
+    <string name="forgot_password_send">Reset password</string>
+    <string name="forgot_password_fail">Failed to reset password</string>
 
     <!-- Post Signup Second -->
     <string name="post_signup_next">Next</string>
