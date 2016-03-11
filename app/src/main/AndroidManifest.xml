@@ -43,7 +43,9 @@
 
         <activity android:name=".view.webview.HtmlAssetViewerActivity"/>
 
-        <activity android:name=".view.about.AboutActivity"/>
+        <activity
+            android:name=".view.about.AboutActivity"
+            android:theme="@style/PreferenceStyle"/>
 
         <activity android:name=".view.postlogininterest.PostLoginInterestActivity"/>
 
@@ -71,10 +73,12 @@
 
         <activity android:name=".view.shout.ShoutActivity"/>
 
-        <activity android:name=".view.profile.ProfileActivity"
+        <activity
+            android:name=".view.profile.ProfileActivity"
             android:theme="@style/TranslucentStatusBar"/>
 
-        <activity android:name=".view.editprofile.EditProfileActivity"
+        <activity
+            android:name=".view.editprofile.EditProfileActivity"
             android:windowSoftInputMode="stateHidden"/>
 
         <!-- Facebook -->
@@ -99,7 +103,7 @@
 
         <service
             android:name="com.amazonaws.mobileconnectors.s3.transferutility.TransferService"
-            android:enabled="true" />
+            android:enabled="true"/>
 
     </application>
 </manifest>

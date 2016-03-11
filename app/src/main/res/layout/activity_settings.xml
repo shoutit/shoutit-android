@@ -8,14 +8,8 @@
     <android.support.v7.widget.Toolbar
         style="@style/AppTheme.BaseToolbarStyle"
         android:id="@+id/activity_settings_toolbar"
-        android:elevation="0dp"
         android:layout_width="match_parent"
         android:layout_height="?actionBarSize"/>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="3dp"
-        android:background="@drawable/toolbar_drop_shadow"/>
     
     <TextView
         android:id="@+id/settings_account"

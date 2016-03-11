@@ -32,6 +32,7 @@
         <item name="android:theme">@style/AppTheme.AppBarOverlay</item>
         <item name="popupTheme">@style/AppTheme.PopupOverlay</item>
         <item name="elevation">4dp</item>
+        <item name="android:elevation">4dp</item>
         <item name="colorControlNormal">@android:color/white</item>
     </style>
 
@@ -194,5 +195,10 @@
     </style>
 
     <style name="ShoutBottomBar" parent="ThemeOverlay.AppCompat.Dark"/>
+
+    <style name="PreferenceStyle" parent="AppTheme">
+        <item name="android:textColor">@color/black_54</item>
+        <item name="android:textColorSecondary">@color/black_54</item>
+    </style>
 
 </resources>
