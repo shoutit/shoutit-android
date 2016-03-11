@@ -29,6 +29,7 @@ import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
+import com.shoutit.app.android.dao.SuggestionsDao;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.utils.BadRequestThrowable;
 import com.shoutit.app.android.utils.LogHelper;
@@ -224,5 +225,11 @@ public final class AppModule {
     @Provides
     ContentResolver provideContentResolver(@ForApplication Context context) {
         return context.getContentResolver();
+    }
+
+    @Provides
+    @Singleton
+    SuggestionsDao prpvideSuggestionsDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
+        return new SuggestionsDao(apiService, networkScheduler);
     }
 }

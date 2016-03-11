@@ -7,25 +7,14 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-public class User {
+public class User extends BaseProfile {
     public static final String ME = "me";
 
-    private final String id;
-    private final String type;
     private final String apiUrl;
     private final String webUrl;
-    private final String username;
-    private final String name;
-    private final String firstName;
-    private final String lastName;
-    private final boolean isActivated;
-    private final String image;
-    private final String cover;
-    private final boolean isListening;
     private final boolean isListener;
     private final boolean isPasswordSet;
     private final UserLocation location;
-    private final int listenersCount;
     private final List<Page> pages;
     private final List<Admin> admins;
     private final String bio;
@@ -41,22 +30,12 @@ public class User {
                 String cover, boolean isListening, boolean isListener, boolean isPasswordSet, UserLocation location,
                 int listenersCount, List<Page> pages, List<Admin> admins, String bio, int dateJoined,
                 Listening listeningCount, boolean isOwner, String about, String mobile, String website) {
-        this.id = id;
-        this.type = type;
+        super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount);
         this.apiUrl = apiUrl;
         this.webUrl = webUrl;
-        this.username = username;
-        this.name = name;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.isActivated = isActivated;
-        this.image = image;
-        this.cover = cover;
-        this.isListening = isListening;
         this.isListener = isListener;
         this.isPasswordSet = isPasswordSet;
         this.location = location;
-        this.listenersCount = listenersCount;
         this.pages = pages;
         this.admins = admins;
         this.bio = bio;
@@ -73,13 +52,14 @@ public class User {
         return new User(null, null, null, null ,null, null, null, null, false, null, null, false, false, false, location, 1, null, null, null, 0, null, false, null, null, null);
     }
 
-    public static User listenedUser(@Nonnull User user, boolean isListening) {
-        int listenersCount = isListening ? user.listenersCount + 1 : user.listenersCount - 1;
-        return new User(user.id, user.type, user.apiUrl, user.webUrl, user.username, user.name,
-                user.firstName, user.lastName, user.isActivated, user.image, user.cover,
-                isListening, user.isListener, user.isPasswordSet, user.location,
-                listenersCount, user.pages, user.admins, user.bio, user.dateJoined, user.listeningCount,
-                false, user.about, user.mobile, user.website);
+    public User getListenedProfile() {
+        boolean newIsListening = !isListening;
+        int newListenersCount = newIsListening ? listenersCount + 1 : listenersCount - 1;
+        return new User(id, type, apiUrl, webUrl, username, name,
+                firstName, lastName, isActivated, image, cover,
+                newIsListening, isListener, isPasswordSet, location,
+                newListenersCount, pages, admins, bio, dateJoined, listeningCount,
+                false, about, mobile, website);
     }
 
     public static User userWithUpdatedPages(@Nonnull User user, List<Page> pages) {

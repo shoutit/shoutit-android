@@ -2,78 +2,19 @@ package com.shoutit.app.android.api.model;
 
 import com.google.common.base.Objects;
 
-public class Page implements ProfileType {
-    private final String id;
-    private final String type;
-    private final String username;
-    private final String name;
-    private final String firstName;
-    private final String lastName;
-    private final boolean isActivated;
-    private final String image;
-    private final String cover;
-    private final boolean isListening;
-    private final int listenersCount;
+public class Page extends BaseProfile {
 
     public Page(String id, String type, String username, String name, String firstName,
                 String lastName, boolean isActivated, String image, String cover, boolean isListening, int listenersCount) {
-        this.id = id;
-        this.type = type;
-        this.username = username;
-        this.name = name;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.isActivated = isActivated;
-        this.image = image;
-        this.cover = cover;
-        this.isListening = isListening;
-        this.listenersCount = listenersCount;
-    }
-
-    public String getId() {
-        return id;
+        super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount);
     }
 
     @Override
-    public String getType() {
-        return type;
-    }
+    public BaseProfile getListenedProfile() {
+        boolean newIsListening = !isListening;
+        int newListenersCount = newIsListening ? listenersCount + 1 : listenersCount - 1;
 
-    public String getUsername() {
-        return username;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public boolean isActivated() {
-        return isActivated;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public String getCover() {
-        return cover;
-    }
-
-    @Override
-    public boolean isListening() {
-        return isListening;
-    }
-
-    public int getListenersCount() {
-        return listenersCount;
+        return new Page(id, type, username, name, firstName, lastName, isActivated, image, cover, newIsListening, newListenersCount);
     }
 
     @Override

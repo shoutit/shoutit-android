@@ -63,7 +63,7 @@ public class ProfileSectionViewHolder extends ViewHolderManager.BaseViewHolder<P
         }
 
         picasso.load(sectionItem.getImage())
-                .placeholder(R.drawable.ic_avatar_placeholder)
+                .placeholder(R.drawable.ic_rect_avatar_placeholder)
                 .into(target);
 
         nameTextView.setText(sectionItem.getName());

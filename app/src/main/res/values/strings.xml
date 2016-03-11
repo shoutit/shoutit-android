@@ -280,4 +280,11 @@
     <string name="forgot_password_send">Remind me</string>
     <string name="forgot_password_fail">Failed to remind password</string>
 
+    <!-- Post Signup Second -->
+    <string name="post_signup_next">Next</string>
+    <string name="post_signup_skip">Skip</string>
+    <string name="post_signup_suggested_users">Suggested users</string>
+    <string name="post_signup_suggested_pages">Suggested pages</string>
+    <string name="post_signup_done">Done</string>
+
 </resources>
