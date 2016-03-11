@@ -18,6 +18,7 @@ import com.shoutit.app.android.dagger.BaseActivityComponentProvider;
 import com.shoutit.app.android.retainfragment.RetainFragmentHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.view.main.MainActivity;
+import com.shoutit.app.android.view.postlogininterest.postsignupsecond.PostSignupSecondActivity;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
 import java.util.List;
@@ -74,7 +75,12 @@ public class PostLoginInterestActivity extends RxAppCompatActivity implements Ba
 
         mPostLoginPresenter.getSuccessCategoriesObservable()
                 .compose(bindToLifecycle())
-                .subscribe(getFinishActivity());
+                .subscribe(new Action1<Object>() {
+                    @Override
+                    public void call(Object o) {
+                        startActivity(PostSignupSecondActivity.newIntent(PostLoginInterestActivity.this));
+                    }
+                });
 
         mPostLoginPresenter.getPostCategoriesError()
                 .compose(bindToLifecycle())

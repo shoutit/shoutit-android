@@ -104,6 +104,8 @@ public class ShoutAdapter extends BaseAdapter {
         View descriptionContainer;
         @Bind(R.id.shout_item_description_header)
         View descriptionHeader;
+        @Bind(R.id.shout_pager_container)
+        View viewPagerContainer;
 
         private final Target flagTarget;
         private ShoutAdapterItems.MainShoutAdapterItem item;
@@ -129,8 +131,8 @@ public class ShoutAdapter extends BaseAdapter {
             picasso.load(user.getImage())
                     .resizeDimen(R.dimen.shout_avatar_size, R.dimen.shout_avatar_size)
                     .centerCrop()
-                    .placeholder(R.drawable.ic_avatar_placeholder)
-                    .error(R.drawable.ic_avatar_placeholder)
+                    .placeholder(R.drawable.ic_rect_avatar_placeholder)
+                    .error(R.drawable.ic_rect_avatar_placeholder)
                     .into(avatarImageView);
 
             nameTextView.setText(user.getName());
@@ -148,14 +150,16 @@ public class ShoutAdapter extends BaseAdapter {
             priceTextView.setText(item.getShoutPrice());
 
             if (shout.getNumber() == 0) {
-                availableTextView.setText(context.getString(R.string.shout_available, (int) shout.getNumber()));
+                availableTextView.setText(context.getString(R.string.shout_available, shout.getAvailableCount()));
             } else {
-                availableTextView.setText(context.getString(R.string.shout_only_available, (int) shout.getNumber()));
+                availableTextView.setText(context.getString(R.string.shout_only_available, shout.getAvailableCount()));
             }
 
             shoutViewPager.setAdapter(imagesPagerAdapter);
             pageIndicator.setViewPager(shoutViewPager);
             imagesPagerAdapter.setData(shout.getImages());
+            boolean hasAnyMedia = !shout.getImages().isEmpty() || !shout.getVideos().isEmpty();
+            viewPagerContainer.setVisibility(hasAnyMedia ? View.VISIBLE : View.GONE);
 
             descriptionTextView.setText(shout.getText());
             final boolean isDescription = !TextUtils.isEmpty(shout.getText());

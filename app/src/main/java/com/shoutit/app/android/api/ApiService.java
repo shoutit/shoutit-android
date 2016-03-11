@@ -18,6 +18,7 @@ import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutResponse;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.SignResponse;
+import com.shoutit.app.android.api.model.SuggestionsResponse;
 import com.shoutit.app.android.api.model.TagsRequest;
 import com.shoutit.app.android.api.model.UpdateLocationRequest;
 import com.shoutit.app.android.api.model.UpdateUserRequest;
@@ -148,8 +149,15 @@ public interface ApiService {
     @GET("misc/geocode?latlng=0,0")
     Observable<UserLocation> geocodeDefault();
 
-    @GET("/v3/misc/categories")
+    @GET("misc/categories")
     Observable<List<Category>> categories();
+
+    @GET("misc/suggestions?type=users,pages")
+    Observable<SuggestionsResponse> suggestions(@Query("country") String country,
+                                                @Query("state") String state,
+                                                @Query("city") String city,
+                                                @Query("page") Integer page,
+                                                @Query("page_size") Integer pageSize);
 
     /**
      * Auth
@@ -161,13 +169,13 @@ public interface ApiService {
     /**
      * create shout
      */
-    @POST("/v3/shouts")
+    @POST("shouts")
     Observable<CreateShoutResponse> createShoutRequest(@Body CreateRequestShoutRequest request);
 
-    @PATCH("/v3/shouts/{id}")
+    @PATCH("shouts/{id}")
     Observable<CreateShoutResponse> editShout(@Path("id") String id, @Body EditShoutRequest request);
 
-    @GET("/v3/shouts/{id}")
+    @GET("shouts/{id}")
     Observable<ShoutResponse> getShout(@Path("id") String id);
 
     @GET("misc/currencies")

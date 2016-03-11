@@ -4,7 +4,7 @@
     android:id="@+id/profile_section_container"
     android:layout_width="match_parent"
     android:layout_height="60dp"
-    android:background="@drawable/shape_page_bottom"
+    android:background="@android:color/white"
     android:gravity="center_vertical">
 
     <ImageView
@@ -14,7 +14,7 @@
         android:scaleType="centerCrop"
         android:layout_marginLeft="12dp"
         android:layout_marginStart="12dp"
-        android:src="@drawable/ic_avatar_placeholder"
+        android:src="@drawable/ic_rect_avatar_placeholder"
         android:layout_centerVertical="true"
         android:layout_marginRight="20dp"
         android:layout_marginEnd="20dp"

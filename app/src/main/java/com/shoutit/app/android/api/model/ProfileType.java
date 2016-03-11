@@ -4,6 +4,8 @@ public interface ProfileType {
     String PAGE = "page";
     String USER = "user";
 
+    String getId();
+
     String getUsername();
 
     String getName();

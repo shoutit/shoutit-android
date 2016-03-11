@@ -70,6 +70,7 @@ public class ChangePasswordPresenter {
         newPasswordVerifySubject.onNext(null);
 
         hadUserPasswordSetObservable = userPreferences.getUserObservable()
+                .observeOn(uiScheduler)
                 .filter(Functions1.isNotNull())
                 .first()
                 .map(new Func1<User, Boolean>() {

@@ -8,14 +8,12 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.User;
-import com.shoutit.app.android.utils.LogHelper;
 
 import javax.annotation.Nonnull;
 
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
-import rx.functions.Action1;
 import rx.subjects.PublishSubject;
 
 public class ProfilesDao {
@@ -26,7 +24,8 @@ public class ProfilesDao {
     private final ApiService apiService;
     private final Scheduler networkScheduler;
 
-    public ProfilesDao(@Nonnull ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
+    public ProfilesDao(@Nonnull ApiService apiService,
+                       @NetworkScheduler Scheduler networkScheduler) {
         this.apiService = apiService;
         this.networkScheduler = networkScheduler;
 
@@ -62,7 +61,7 @@ public class ProfilesDao {
         @Nonnull
         private PublishSubject<ResponseOrError<User>> updatedProfileLocallySubject = PublishSubject.create();
 
-        public ProfileDao(@Nonnull String userName) {
+        public ProfileDao(@Nonnull final String userName) {
             profileObservable = apiService.getProfile(userName)
                     .subscribeOn(networkScheduler)
                     .compose(MoreOperators.<User>refresh(refreshSubject))

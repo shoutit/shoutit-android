@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.appunite.rx.operators.MoreOperators;
 import com.google.common.base.Optional;
@@ -19,6 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import rx.Observable;
+import rx.Scheduler;
 import rx.functions.Func0;
 import rx.subjects.PublishSubject;
 
@@ -44,7 +46,7 @@ public class UserPreferences {
     private final Gson gson;
 
     @Inject
-    public UserPreferences(@ForApplication Context context, @Nonnull Gson gson) {
+    public UserPreferences(@ForApplication Context context, @Nonnull Gson gson, @UiScheduler Scheduler uiScheduler) {
         this.gson = gson;
         mPreferences = context.getSharedPreferences("prefs", 0);
 
@@ -56,7 +58,8 @@ public class UserPreferences {
                     }
                 })
                 .compose(MoreOperators.<UserLocation>refresh(locationRefreshSubject))
-                .filter(Functions1.isNotNull());
+                .filter(Functions1.isNotNull())
+                .observeOn(uiScheduler);
 
         userObservable = Observable
                 .defer(new Func0<Observable<User>>() {
@@ -65,7 +68,8 @@ public class UserPreferences {
                         return Observable.just(getUser());
                     }
                 })
-                .compose(MoreOperators.<User>refresh(userRefreshSubject));
+                .compose(MoreOperators.<User>refresh(userRefreshSubject))
+                .observeOn(uiScheduler);
     }
 
     @SuppressLint("CommitPrefEdits")

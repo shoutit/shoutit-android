@@ -14,7 +14,6 @@ import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
-import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
@@ -37,6 +36,7 @@ import javax.annotation.Nullable;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.subjects.PublishSubject;
@@ -95,7 +95,7 @@ public class ProfilePresenter {
     public ProfilePresenter(@Nonnull final String userName,
                             @Nonnull final ShoutsDao shoutsDao,
                             @Nonnull @ForActivity final Context context,
-                            @Nonnull UserPreferences userPreferences,
+                            @Nonnull final UserPreferences userPreferences,
                             @Nonnull @UiScheduler Scheduler uiScheduler,
                             @Nonnull ProfilesDao profilesDao,
                             @Nonnull MyProfileHalfPresenter myProfilePresenter,
@@ -122,7 +122,15 @@ public class ProfilePresenter {
         userProfilePresenter.getUserUpdatesObservable()
                 .subscribe(profilesDao.getProfileDao(userName).updatedProfileLocallyObserver());
 
-        final Observable<User> userSuccessObservable = userRequestObservable.compose(ResponseOrError.<User>onlySuccess());
+        final Observable<User> userSuccessObservable = userRequestObservable.compose(ResponseOrError.<User>onlySuccess())
+                .doOnNext(new Action1<User>() {
+                    @Override
+                    public void call(User user) {
+                        if (User.ME.equals(userName)) {
+                            userPreferences.saveUserAsJson(user);
+                        }
+                    }
+                });
 
         /** Header Data **/
         avatarObservable = userSuccessObservable
