@@ -82,6 +82,11 @@ public interface ApiService {
                                              @Query("page") Integer page,
                                              @Query("page_size") Integer pageSize);
 
+    @GET("shouts")
+    Observable<ShoutsResponse> tagShouts(@Query("tags") String tagName,
+                                         @Query("page") Integer page,
+                                         @Query("page_size") Integer pageSize);
+
     /**
      * OAuth
      **/

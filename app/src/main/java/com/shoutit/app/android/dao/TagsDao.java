@@ -39,13 +39,13 @@ public class TagsDao {
     }
 
     @Nonnull
-    public Observable<ResponseOrError<TagDetail>> getTagObservable(@Nonnull String userName) {
-        return tagsCache.getUnchecked(userName).getTagObservable();
+    public Observable<ResponseOrError<TagDetail>> getTagObservable(@Nonnull String tagName) {
+        return tagsCache.getUnchecked(tagName).getTagObservable();
     }
 
     @Nonnull
-    public TagDao getProfileDao(@Nonnull String userName) {
-        return tagsCache.getUnchecked(userName);
+    public Observer<ResponseOrError<TagDetail>> getUpdatedTagObserver(@Nonnull String tagName) {
+        return tagsCache.getUnchecked(tagName).updatedTagObserver();
     }
 
     public class TagDao {

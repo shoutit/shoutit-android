@@ -1,6 +1,8 @@
 package com.shoutit.app.android.dao;
 
 
+import android.support.annotation.NonNull;
+
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.functions.Functions1;
@@ -16,6 +18,7 @@ import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.constants.RequestsConstants;
 import com.shoutit.app.android.model.LocationPointer;
 import com.shoutit.app.android.model.RelatedShoutsPointer;
+import com.shoutit.app.android.model.TagShoutsPointer;
 import com.shoutit.app.android.model.UserShoutsPointer;
 
 import java.util.concurrent.TimeUnit;
@@ -48,6 +51,8 @@ public class ShoutsDao {
     private final LoadingCache<UserShoutsPointer, UserShoutsDao> userShoutsCache;
     @Nonnull
     private final LoadingCache<RelatedShoutsPointer, RelatedShoutsDao> relatedShoutsCache;
+    @Nonnull
+    private final LoadingCache<TagShoutsPointer, TagShoutsDao> tagsShoutsCache;
 
     public ShoutsDao(@Nonnull final ApiService apiService,
                      @Nonnull @NetworkScheduler final Scheduler networkScheduler,
@@ -87,6 +92,14 @@ public class ShoutsDao {
                         return new RelatedShoutsDao(pointer);
                     }
                 });
+
+        tagsShoutsCache = CacheBuilder.newBuilder()
+                .build(new CacheLoader<TagShoutsPointer, TagShoutsDao>() {
+                    @Override
+                    public TagShoutsDao load(@Nonnull TagShoutsPointer key) throws Exception {
+                        return new TagShoutsDao(key);
+                    }
+                });
     }
 
     @Nonnull
@@ -107,6 +120,11 @@ public class ShoutsDao {
     @Nonnull
     public Observable<ResponseOrError<ShoutsResponse>> getRelatedShoutsObservable(@Nonnull RelatedShoutsPointer pointer) {
         return relatedShoutsCache.getUnchecked(pointer).getShoutsObservable();
+    }
+
+    @Nonnull
+    public Observable<ResponseOrError<ShoutsResponse>> getTagsShoutsObservable(@Nonnull TagShoutsPointer pointer) {
+        return tagsShoutsCache.getUnchecked(pointer).getShoutsObservable();
     }
 
     @Nonnull
@@ -201,6 +219,7 @@ public class ShoutsDao {
             this.pointer = pointer;
         }
 
+        @NonNull
         @Override
         Observable<ShoutsResponse> getShoutsRequest(int pageNumber) {
             return apiService
@@ -222,6 +241,23 @@ public class ShoutsDao {
         Observable<ShoutsResponse> getShoutsRequest(int pageNumber) {
             return apiService
                     .shoutsRelated(pointer.getShoutId(), pageNumber, pointer.getPageSize());
+        }
+    }
+
+    public class TagShoutsDao extends BaseShoutsDao {
+        @Nonnull
+        private final TagShoutsPointer pointer;
+
+        public TagShoutsDao(@Nonnull final TagShoutsPointer pointer) {
+            super(networkScheduler);
+            this.pointer = pointer;
+        }
+
+        @NonNull
+        @Override
+        Observable<ShoutsResponse> getShoutsRequest(int pageNumber) {
+            return apiService
+                    .tagShouts(pointer.getTagName(), pageNumber, pointer.getPageSize());
         }
     }
 }

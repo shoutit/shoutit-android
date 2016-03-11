@@ -1,5 +1,7 @@
 package com.shoutit.app.android.dao;
 
+import android.support.annotation.NonNull;
+
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.operators.MoreOperators;
@@ -69,6 +71,7 @@ public abstract class BaseShoutsDao {
         return refreshShoutsSubject;
     }
 
+    @NonNull
     @Nonnull
     abstract Observable<ShoutsResponse> getShoutsRequest(int pageNumber);
 }
