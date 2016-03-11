@@ -1,10 +1,18 @@
 package com.shoutit.app.android.utils;
 
+import android.support.annotation.Nullable;
+
 import java.text.DecimalFormat;
+
+import javax.annotation.Nonnull;
 
 public class PriceUtils {
 
-    public static String formatPrice(long price) {
+    @Nonnull
+    public static String formatPrice(@Nullable Long price) {
+        if (price == null) {
+            return "";
+        }
         final float formattedPrice = (float) price / 100;
         return new DecimalFormat("#.##").format(formattedPrice);
     }

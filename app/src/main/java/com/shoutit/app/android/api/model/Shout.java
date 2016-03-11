@@ -4,7 +4,6 @@ import android.support.annotation.StringRes;
 
 import com.google.common.base.Objects;
 import com.shoutit.app.android.R;
-import com.shoutit.app.android.utils.PriceUtils;
 
 import java.util.List;
 
@@ -31,14 +30,14 @@ public class Shout {
     private final Category category;
     private final long datePublished;
     private final List<String> images;
-    private final List<String> videos;
+    private final List<Video> videos;
     private final List<Filter> filters;
     private final int availableCount;
 
     public Shout(@Nonnull String id, String apiUrl, String webUrl, String type,
                  UserLocation location, String title, String text, Long price, float number,
                  String currency, String thumbnail, String videoUrl, User profile,
-                 Category category, List<Filter> filters, long datePublished, List<String> images, List<String> videos, int availableCount) {
+                 Category category, List<Filter> filters, long datePublished, List<String> images, List<Video> videos, int availableCount) {
         this.id = id;
         this.apiUrl = apiUrl;
         this.webUrl = webUrl;
@@ -132,7 +131,7 @@ public class Shout {
         return images;
     }
 
-    public List<String> getVideos() {
+    public List<Video> getVideos() {
         return videos;
     }
 
