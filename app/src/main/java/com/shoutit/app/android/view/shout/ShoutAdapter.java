@@ -26,7 +26,6 @@ import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.DateTimeUtils;
 import com.shoutit.app.android.utils.PicassoHelper;
-import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.viewholders.HeaderViewHolder;
 import com.squareup.picasso.Picasso;
@@ -146,12 +145,7 @@ public class ShoutAdapter extends BaseAdapter {
 
             titleTextView.setText(shout.getTitle());
 
-            final String formattedPrice =  PriceUtils.formatPrice(shout.getPrice());
-            if (shout.getCurrency() != null) {
-                priceTextView.setText(context.getString(R.string.price_with_currency, formattedPrice, shout.getCurrency()));
-            } else {
-                priceTextView.setText(formattedPrice);
-            }
+            priceTextView.setText(item.getShoutPrice());
 
             if (shout.getNumber() == 0) {
                 availableTextView.setText(context.getString(R.string.shout_available, (int) shout.getNumber()));
@@ -231,9 +225,9 @@ public class ShoutAdapter extends BaseAdapter {
             final Shout shout = item.getShout();
             titleTextView.setText(shout.getTitle());
             nameTextView.setText(shout.getProfile().getName());
-            final String price = PriceUtils.formatPrice(shout.getPrice());
-            cardPriceTextView.setText(context.getString(
-                    R.string.price_with_currency, price, shout.getCurrency()));
+
+            final String shoutPrice = item.getShoutPrice();
+            cardPriceTextView.setText(shoutPrice);
 
             picasso.load(shout.getThumbnail())
                     .placeholder(R.drawable.pattern_placeholder)

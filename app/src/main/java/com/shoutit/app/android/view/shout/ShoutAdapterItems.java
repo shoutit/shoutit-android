@@ -1,9 +1,14 @@
 package com.shoutit.app.android.view.shout;
 
+import android.content.res.Resources;
+import android.support.annotation.Nullable;
+
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.base.Objects;
+import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.utils.PriceUtils;
 
 import java.util.List;
 
@@ -19,10 +24,15 @@ public class ShoutAdapterItems {
         private final Observer<String> addToCartObserver;
         @Nonnull
         private final Shout shout;
+        @Nonnull
+        private final Resources mResources;
 
-        public MainShoutAdapterItem(@Nonnull Observer<String> addToCartObserver, @Nonnull Shout shout) {
+        public MainShoutAdapterItem(@Nonnull Observer<String> addToCartObserver,
+                                    @Nonnull Shout shout,
+                                    @Nonnull Resources resources) {
             this.addToCartObserver = addToCartObserver;
             this.shout = shout;
+            mResources = resources;
         }
 
         @Nonnull
@@ -32,6 +42,18 @@ public class ShoutAdapterItems {
 
         public void addToCartClicked() {
             addToCartObserver.onNext(null);
+        }
+
+        @Nullable
+        public String getShoutPrice() {
+            final Long price = shout.getPrice();
+            if (price == null) {
+                return null;
+            } else {
+                final String priceString = PriceUtils.formatPrice(shout.getPrice());
+                return mResources.getString(
+                        R.string.price_with_currency, priceString, shout.getCurrency());
+            }
         }
 
         @Override
@@ -70,22 +92,37 @@ public class ShoutAdapterItems {
 
         @Nonnull
         private final Observer<String> shoutSelectedObserver;
+        @Nonnull
+        private final Resources mResources;
 
         public UserShoutAdapterItem(@Nonnull Shout shout,
-                                    @Nonnull Observer<String> shoutSelectedObserver) {
+                                    @Nonnull Observer<String> shoutSelectedObserver,
+                                    @Nonnull Resources resources) {
             this.shout = shout;
             this.shoutSelectedObserver = shoutSelectedObserver;
+            mResources = resources;
         }
 
         public void onShoutSelected() {
             shoutSelectedObserver.onNext(shout.getId());
         }
 
+        @Nullable
+        public String getShoutPrice() {
+            final Long price = shout.getPrice();
+            if (price == null) {
+                return null;
+            } else {
+                final String priceString = PriceUtils.formatPrice(shout.getPrice());
+                return mResources.getString(
+                        R.string.price_with_currency, priceString, shout.getCurrency());
+            }
+        }
+
         @Nonnull
         public Shout getShout() {
             return shout;
         }
-
 
         @Override
         public long adapterId() {
