@@ -21,6 +21,8 @@ import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.view.about.AboutActivity;
+import com.uservoice.uservoicesdk.UserVoice;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -28,6 +30,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import okhttp3.ResponseBody;
 import rx.Subscription;
 import rx.functions.Action0;
@@ -107,7 +110,9 @@ public class ForgotPasswordActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mSubscription.unsubscribe();
+        if (mSubscription != null) {
+            mSubscription.unsubscribe();
+        }
     }
 
     @Nonnull
@@ -124,5 +129,20 @@ public class ForgotPasswordActivity extends BaseActivity {
     @Nonnull
     public static Intent newIntent(Context context) {
         return new Intent(context, ForgotPasswordActivity.class);
+    }
+
+    @OnClick(R.id.activity_login_feedback)
+    public void onFeedbackClick() {
+        UserVoice.launchContactUs(this);
+    }
+
+    @OnClick(R.id.activity_login_help)
+    public void onHelpClick() {
+        UserVoice.launchUserVoice(this);
+    }
+
+    @OnClick(R.id.activity_login_about)
+    public void onAboutClick() {
+        startActivity(AboutActivity.newIntent(this));
     }
 }
