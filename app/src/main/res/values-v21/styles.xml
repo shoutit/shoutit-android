@@ -11,4 +11,12 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
+
+    <style name="AppTheme.BaseToolbarStyle" parent="@style/ThemeOverlay.AppCompat.ActionBar">
+        <item name="android:background">?attr/colorPrimary</item>
+        <item name="android:theme">@style/AppTheme.AppBarOverlay</item>
+        <item name="popupTheme">@style/AppTheme.PopupOverlay</item>
+        <item name="android:elevation">4dp</item>
+        <item name="colorControlNormal">@android:color/white</item>
+    </style>
 </resources>
