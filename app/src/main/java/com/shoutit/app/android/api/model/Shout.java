@@ -31,12 +31,14 @@ public class Shout {
     private final Category category;
     private final long datePublished;
     private final List<String> images;
+    private final List<String> videos;
     private final List<Filter> filters;
+    private final int availableCount;
 
     public Shout(@Nonnull String id, String apiUrl, String webUrl, String type,
                  UserLocation location, String title, String text, long price, float number,
                  String currency, String thumbnail, String videoUrl, User profile,
-                 Category category, List<Filter> filters, long datePublished, List<String> images) {
+                 Category category, List<Filter> filters, long datePublished, List<String> images, List<String> videos, int availableCount) {
         this.id = id;
         this.apiUrl = apiUrl;
         this.webUrl = webUrl;
@@ -54,6 +56,8 @@ public class Shout {
         this.datePublished = datePublished;
         this.images = images;
         this.filters = filters;
+        this.videos = videos;
+        this.availableCount = availableCount;
     }
 
     @Nonnull
@@ -128,6 +132,14 @@ public class Shout {
         return images;
     }
 
+    public List<String> getVideos() {
+        return videos;
+    }
+
+    public int getAvailableCount() {
+        return availableCount;
+    }
+
     public List<Filter> getFilters() {
         return filters;
     }
@@ -152,12 +164,14 @@ public class Shout {
                 Objects.equal(category, shout.category) &&
                 Objects.equal(datePublished, shout.datePublished) &&
                 Objects.equal(price, shout.price) &&
+                Objects.equal(availableCount, shout.availableCount) &&
+                Objects.equal(videos, shout.videos) &&
                 Objects.equal(images, shout.images);
     }
 
     @Override
     public int hashCode() {
         return Objects.hashCode(id, apiUrl, webUrl, type, location, title, text, price,
-                number, currency, thumbnail, videoUrl, profile, category, datePublished, images);
+                number, currency, thumbnail, videoUrl, profile, category, datePublished, images, availableCount, videos);
     }
 }
