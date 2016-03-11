@@ -113,6 +113,7 @@ public class EditProfilePresenter {
         /** User Data **/
         final Observable<User> userObservable = userPreferences
                 .getUserObservable()
+                .observeOn(uiScheduler)
                 .filter(Functions1.isNotNull())
                 .compose(ObservableExtensions.<User>behaviorRefCount());
 
