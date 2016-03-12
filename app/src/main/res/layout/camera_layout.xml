@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context=".view.media.NativeCameraActivity">
+
+    <FrameLayout
+        android:id="@+id/camera_preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/camera_controlls_layout"/>
+
+    <RelativeLayout
+        android:id="@+id/camera_controlls_layout"
+        android:layout_width="match_parent"
+        android:layout_height="145dp"
+        android:layout_alignParentBottom="true"
+        android:background="@android:color/black">
+
+        <TextView
+            android:id="@+id/camera_text_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="16dp"
+            android:text="What are you offering?"
+            android:textColor="@android:color/white"/>
+
+        <TextView
+            android:textSize="12sp"
+            android:layout_below="@+id/camera_text_header"
+            android:id="@+id/camera_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="6dp"
+            android:text="This is your featured photo. Make sure it's a good one!"
+            android:textColor="@android:color/white"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true">
+
+            <ImageButton
+                android:id="@+id/button_capture"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_gravity="bottom"
+                android:layout_margin="10dp"
+                android:background="?selectableItemBackground"
+                android:src="@drawable/camera"/>
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_gravity="bottom"
+                android:layout_marginEnd="40dp"
+                android:layout_toStartOf="@+id/button_capture"
+                android:background="?selectableItemBackground"
+                android:src="@drawable/gallery"/>
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_gravity="bottom"
+                android:layout_marginStart="40dp"
+                android:layout_toEndOf="@+id/button_capture"
+                android:background="?selectableItemBackground"
+                android:src="@drawable/video"/>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <ImageButton
+        android:layout_margin="8dp"
+        android:id="@+id/camera_close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/status_bar_margin"
+        android:background="?selectableItemBackground"
+        android:src="@drawable/close"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="@dimen/status_bar_margin">
+
+        <CheckBox
+            android:id="@+id/camera_rotate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="24dp"
+            android:button="@drawable/camera_switch_button"
+            android:checked="false"/>
+
+        <com.shoutit.app.android.widget.FlashlightButton
+            android:id="@+id/camera_flashlight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="24dp"
+            android:background="?selectableItemBackground"
+            tools:src="@drawable/flash"/>
+
+    </LinearLayout>
+
+</RelativeLayout>
