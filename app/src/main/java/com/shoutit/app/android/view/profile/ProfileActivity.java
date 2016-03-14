@@ -1,9 +1,7 @@
 package com.shoutit.app.android.view.profile;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
@@ -30,9 +28,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
-import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
-import com.shoutit.app.android.view.editprofile.EditProfileActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.squareup.picasso.Picasso;
 
@@ -48,12 +44,12 @@ import rx.functions.Action1;
 
 import static com.appunite.rx.internal.Preconditions.checkNotNull;
 
-public class ProfileActivity extends BaseActivity {
+public abstract class ProfileActivity extends BaseActivity {
 
-    private static final String KEY_USER_NAME = "user_name";
+    protected static final String KEY_PROFILE_ID = "profile_id";
     private static final String KEY_OFFSET = "key_offset";
-    private static final int REQUEST_PROFILE_OPENED_FROM_PROFILE = 1;
-    private static final int REQUEST_CODE_FROM_EDIT_PROFILE = 2;
+    protected static final int REQUEST_PROFILE_OPENED_FROM_PROFILE = 1;
+    protected static final int REQUEST_CODE_FROM_EDIT_PROFILE = 2;
 
     @Bind(R.id.profile_progress_bar)
     ProgressBar progressBar;
@@ -75,26 +71,23 @@ public class ProfileActivity extends BaseActivity {
     View popupAnchorView;
 
     @Inject
-    ProfilePresenter presenter;
-    @Inject
     ProfileAdapter adapter;
     @Inject
     Picasso picasso;
 
+    private ProfilePresenter presenter;
+
     private final AccelerateInterpolator toolbarInterpolator = new AccelerateInterpolator();
     private int lastVerticalOffset;
     private PopupMenu popupMenu;
-
-    public static Intent newIntent(@Nonnull Context context, @Nonnull String userName) {
-        return new Intent(context, ProfileActivity.class)
-                .putExtra(KEY_USER_NAME, userName);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         ButterKnife.bind(this);
+
+        presenter = ((ProfileActivityComponent) getActivityComponent()).getPresenter();
 
         setUpToolbar();
         setUpPopupMenu();
@@ -158,37 +151,7 @@ public class ProfileActivity extends BaseActivity {
                         ColoredSnackBar.contentView(ProfileActivity.this),
                         R.string.error_action_only_for_logged_in_user));
 
-        presenter.getProfileToOpenObservable()
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String userName) {
-                        startActivityForResult(
-                                ProfileActivity.newIntent(ProfileActivity.this, userName),
-                                REQUEST_PROFILE_OPENED_FROM_PROFILE);
-                    }
-                });
-
-        presenter.getWebUrlClickedObservable()
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String webUrl) {
-                        startActivity(IntentHelper.websiteIntent(webUrl));
-                    }
-                });
-
-        // User Profile specific subscriptions
-        presenter.getUserProfilePresenter().getOnChatIconClickedSubject()
-                .compose(bindToLifecycle())
-                .subscribe(new Action1<Object>() {
-                    @Override
-                    public void call(Object ignore) {
-                        Toast.makeText(ProfileActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-        presenter.getUserProfilePresenter().getMoreMenuOptionClickedSubject()
+        presenter.getMoreMenuOptionClickedSubject()
                 .compose(bindToLifecycle())
                 .subscribe(new Action1<Object>() {
                     @Override
@@ -197,32 +160,11 @@ public class ProfileActivity extends BaseActivity {
                     }
                 });
 
-        presenter.getUserProfilePresenter().getActionOnlyForLoggedInUserObservable()
+        presenter.getActionOnlyForLoggedInUserObservable()
                 .compose(bindToLifecycle())
                 .subscribe(ColoredSnackBar.errorSnackBarAction(
                         ColoredSnackBar.contentView(ProfileActivity.this),
                         R.string.error_action_only_for_logged_in_user));
-
-        // My Profile specific subscriptions
-        presenter.getMyProfilePresenter().getEditProfileClickObservable()
-                .compose(bindToLifecycle())
-                .subscribe(new Action1<Object>() {
-                    @Override
-                    public void call(Object ignore) {
-                        startActivityForResult(
-                                EditProfileActivity.newIntent(ProfileActivity.this),
-                                REQUEST_CODE_FROM_EDIT_PROFILE);
-                    }
-                });
-
-        presenter.getMyProfilePresenter().getNotificationsClickObservable()
-                .compose(bindToLifecycle())
-                .subscribe(new Action1<Object>() {
-                    @Override
-                    public void call(Object ignore) {
-                        Toast.makeText(ProfileActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
-                    }
-                });
     }
 
     private void setUpToolbar() {
@@ -416,22 +358,5 @@ public class ProfileActivity extends BaseActivity {
     protected void onSaveInstanceState(Bundle outState) {
         outState.putInt(KEY_OFFSET, lastVerticalOffset);
         super.onSaveInstanceState(outState);
-    }
-
-    @Nonnull
-    @Override
-    public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
-        final Intent intent = checkNotNull(getIntent());
-        final String userName = checkNotNull(intent.getStringExtra(KEY_USER_NAME));
-
-        final ProfileActivityComponent component = DaggerProfileActivityComponent
-                .builder()
-                .activityModule(new ActivityModule(this))
-                .profileActivityModule(new ProfileActivityModule(userName))
-                .appComponent(App.getAppComponent(getApplication()))
-                .build();
-        component.inject(this);
-
-        return component;
     }
 }

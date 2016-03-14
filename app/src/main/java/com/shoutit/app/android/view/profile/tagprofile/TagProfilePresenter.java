@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.profile.tagprofile;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
@@ -25,6 +26,7 @@ import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.TagsDao;
 import com.shoutit.app.android.model.TagShoutsPointer;
 import com.shoutit.app.android.view.profile.ProfileAdapterItems;
+import com.shoutit.app.android.view.profile.ProfilePresenter;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
 import java.util.ArrayList;
@@ -36,12 +38,14 @@ import javax.annotation.Nullable;
 
 import okhttp3.ResponseBody;
 import rx.Observable;
+import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.functions.Func3;
 import rx.subjects.PublishSubject;
 
-public class TagProfilePresenter {
+public class TagProfilePresenter implements ProfilePresenter {
     private static final int SHOUTS_PAGE_SIZE = 4;
 
     private final PublishSubject<TagDetail> onListenActionClickedSubject = PublishSubject.create();
@@ -52,7 +56,9 @@ public class TagProfilePresenter {
     private final PublishSubject<Object> actionOnlyForLoggedInUserSubject = PublishSubject.create();
     private final PublishSubject<String> profileToOpenSubject = PublishSubject.create();
     private final PublishSubject<String> showAllShoutsSubject = PublishSubject.create();
+    private final PublishSubject<Object> shareInitSubject = PublishSubject.create();
 
+    private final Observable<String> shareObservable;
     private final Observable<String> avatarObservable;
     private final Observable<String> coverUrlObservable;
     private final Observable<String> toolbarTitleObservable;
@@ -62,12 +68,17 @@ public class TagProfilePresenter {
     private final Observable<Throwable> errorObservable;
 
     private final boolean isLoggedInAsNormalUser;
+    private final TagsDao tagsDao;
+    @Nonnull
+    private final String tagName;
 
 
     public TagProfilePresenter(TagsDao tagsDao, final ShoutsDao shoutsDao, @Nonnull final String tagName,
                                @UiScheduler final Scheduler uiScheduler, @NetworkScheduler final Scheduler networkScheduler,
                                final ApiService apiService, @ForActivity final Context context,
                                UserPreferences userPreferences) {
+        this.tagsDao = tagsDao;
+        this.tagName = tagName;
         isLoggedInAsNormalUser = userPreferences.isNormalUser();
 
         /** Base Tag **/
@@ -299,6 +310,15 @@ public class TagProfilePresenter {
                 .startWith(true)
                 .observeOn(uiScheduler);
 
+        /** Share **/
+        shareObservable = shareInitSubject
+                .withLatestFrom(successTagRequestObservable, new Func2<Object, TagDetail, String>() {
+                    @Override
+                    public String call(Object o, TagDetail tagDetail) {
+                        return tagDetail.getWebUrl();
+                    }
+                });
+
     }
 
     private ProfileAdapterItems.RelatedTagAdapterItem getRelatedTagdapterItemForPosition(int position, TagDetail tag,
@@ -333,16 +353,87 @@ public class TagProfilePresenter {
         return new RelatedTagsResponse(tags);
     }
 
+    @Nonnull
+    @Override
     public Observable<Boolean> getProgressObservable() {
         return progressObservable;
     }
 
+    @Nonnull
+    @Override
     public Observable<Throwable> getErrorObservable() {
         return errorObservable;
     }
 
+    @Nonnull
+    @Override
+    public Observable<String> getAvatarObservable() {
+        return avatarObservable;
+    }
+
+    @Nonnull
+    @Override
+    public Observable<String> getCoverUrlObservable() {
+        return coverUrlObservable;
+    }
+
+    @Nonnull
+    @Override
+    public Observable<String> getToolbarTitleObservable() {
+        return toolbarTitleObservable;
+    }
+
+    @Nonnull
+    @Override
+    public Observable<String> getToolbarSubtitleObservable() {
+        return toolbarSubtitleObservable;
+    }
+
+    @Nonnull
+    @Override
+    public Observable<String> getShareObservable() {
+        return shareObservable;
+    }
+
+    @Nonnull
+    @Override
+    public Observable<String> getShoutSelectedObservable() {
+        return shoutSelectedSubject;
+    }
+
+    @Nonnull
+    @Override
+    public Observable<String> getProfileToOpenObservable() {
+        return profileToOpenSubject;
+    }
+
+    @Nonnull
+    @Override
+    public Observer<Object> getShareInitObserver() {
+        return shareInitSubject;
+    }
+
+    @Nonnull
+    @Override
+    public Observable<Object> getMoreMenuOptionClickedSubject() {
+        return moreMenuOptionClickedSubject;
+    }
+
+    @Override
+    public void refreshProfile() {
+        tagsDao.refreshRelatedTags(tagName);
+    }
+
+    @NonNull
+    @Override
     public Observable<List<BaseAdapterItem>> getAllAdapterItemsObservable() {
         return allAdapterItemsObservable;
+    }
+
+    @Nonnull
+    @Override
+    public Observable<Object> getActionOnlyForLoggedInUserObservable() {
+        return null;
     }
 
     public static class ListenedTagWithRelatedTags {

@@ -9,6 +9,7 @@ import com.google.common.cache.LoadingCache;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.RelatedTagsResponse;
 import com.shoutit.app.android.api.model.TagDetail;
+import com.shoutit.app.android.api.model.User;
 
 import javax.annotation.Nonnull;
 
@@ -69,6 +70,10 @@ public class TagsDao {
         return relatedTagsCache.getUnchecked(tagName).updatedTagObserver();
     }
 
+    public void refreshRelatedTags(@Nonnull String tagName) {
+        relatedTagsCache.getUnchecked(tagName).getRefreshObserver().onNext(null);
+    }
+
     public class TagDao {
         @Nonnull
         private Observable<ResponseOrError<TagDetail>> tagObservable;
@@ -99,10 +104,13 @@ public class TagsDao {
         private Observable<ResponseOrError<RelatedTagsResponse>> tagsObservable;
         @Nonnull
         private PublishSubject<ResponseOrError<RelatedTagsResponse>> updatedTagsSubject = PublishSubject.create();
+        @Nonnull
+        private PublishSubject<Object> refreshSubject = PublishSubject.create();
 
         public RelatedTagsDao(@Nonnull final String tagName) {
             tagsObservable = apiService.relatedTags(tagName)
                     .subscribeOn(networkScheduler)
+                    .compose(MoreOperators.<RelatedTagsResponse>refresh(refreshSubject))
                     .compose(ResponseOrError.<RelatedTagsResponse>toResponseOrErrorObservable())
                     .mergeWith(updatedTagsSubject)
                     .compose(MoreOperators.<ResponseOrError<RelatedTagsResponse>>cacheWithTimeout(networkScheduler));
@@ -116,6 +124,11 @@ public class TagsDao {
         @Nonnull
         public Observer<ResponseOrError<RelatedTagsResponse>> updatedTagObserver() {
             return updatedTagsSubject;
+        }
+
+        @Nonnull
+        public Observer<Object> getRefreshObserver() {
+            return refreshSubject;
         }
     }
 

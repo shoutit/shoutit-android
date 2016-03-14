@@ -40,6 +40,11 @@ public class Filter {
     }
 
     @Nonnull
+    public String getSlug() {
+        return slug;
+    }
+
+    @Nonnull
     public String getName() {
         return name;
     }

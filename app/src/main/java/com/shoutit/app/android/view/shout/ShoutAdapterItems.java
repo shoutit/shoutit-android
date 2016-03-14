@@ -23,14 +23,18 @@ public class ShoutAdapterItems {
         @Nonnull
         private final Observer<String> addToCartObserver;
         @Nonnull
+        private final Observer<String> onCategoryClickedObserver;
+        @Nonnull
         private final Shout shout;
         @Nonnull
         private final Resources mResources;
 
         public MainShoutAdapterItem(@Nonnull Observer<String> addToCartObserver,
+                                    @Nonnull Observer<String> onCategoryClickedObserver,
                                     @Nonnull Shout shout,
                                     @Nonnull Resources resources) {
             this.addToCartObserver = addToCartObserver;
+            this.onCategoryClickedObserver = onCategoryClickedObserver;
             this.shout = shout;
             mResources = resources;
         }
@@ -82,6 +86,10 @@ public class ShoutAdapterItems {
         @Override
         public int hashCode() {
             return Objects.hashCode(shout);
+        }
+
+        public void onCategoryClick(String slug) {
+            onCategoryClickedObserver.onNext(slug);
         }
     }
 

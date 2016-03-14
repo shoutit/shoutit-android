@@ -22,7 +22,7 @@ import com.shoutit.app.android.view.discover.DiscoverFragment;
 import com.shoutit.app.android.view.home.HomeFragment;
 import com.shoutit.app.android.view.location.LocationActivity;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
-import com.shoutit.app.android.view.profile.ProfileActivity;
+import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.settings.SettingsActivity;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -217,7 +217,7 @@ public class MenuHandler {
     @OnClick({R.id.menu_avatar_iv, R.id.menu_user_name_tv})
     public void startUserProfile() {
         if (userPreferences.isNormalUser()) {
-            rxActivity.startActivity(ProfileActivity.newIntent(rxActivity, User.ME));
+            rxActivity.startActivity(UserOrPageProfileActivity.newIntent(rxActivity, User.ME));
         } else {
             showLoginActivity();
         }

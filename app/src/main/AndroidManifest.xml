@@ -74,7 +74,10 @@
 
         <activity android:name=".view.shout.ShoutActivity"/>
 
-        <activity android:name=".view.profile.ProfileActivity"
+        <activity android:name=".view.profile.UserOrPageProfileActivity"
+            android:theme="@style/TranslucentStatusBar"/>
+
+        <activity android:name=".view.profile.tagprofile.TagProfileActivity"
             android:theme="@style/TranslucentStatusBar"/>
 
         <activity android:name=".view.editprofile.EditProfileActivity"

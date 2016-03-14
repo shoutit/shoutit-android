@@ -1,7 +1,7 @@
 package com.shoutit.app.android.api.model;
 
 
-public class TagDetail {
+public class TagDetail implements ProfileType {
     private final String id;
     private final String name;
     private final String apiUrl;
@@ -26,6 +26,11 @@ public class TagDetail {
         return id;
     }
 
+    @Override
+    public String getUsername() {
+        return name;
+    }
+
     public String getName() {
         return name;
     }
@@ -36,6 +41,11 @@ public class TagDetail {
 
     public String getImage() {
         return image;
+    }
+
+    @Override
+    public String getType() {
+        return ProfileType.TAG;
     }
 
     public String getWebUrl() {

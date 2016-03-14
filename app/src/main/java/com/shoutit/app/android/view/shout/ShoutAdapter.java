@@ -197,6 +197,12 @@ public class ShoutAdapter extends BaseAdapter {
 
                 assert detailsContainer.getChildCount() >= 2;
                 detailsContainer.addView(view, detailsContainer.getChildCount() - 1);
+                view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        item.onCategoryClick(filter.getSlug());
+                    }
+                });
             }
 
             final boolean isLastElementLight = detailsContainer.getChildCount() % 2 != 0;

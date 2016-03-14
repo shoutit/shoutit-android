@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.google.common.base.Optional;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.TagDetail;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.utils.ImageHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
@@ -279,6 +280,61 @@ public class ProfileViewHolders {
         @OnClick(R.id.profile_second_icon_text_tv)
         public void onChatActionClicked() {
             item.onChatActionClicked();
+        }
+    }
+
+    public static class TagViewHolder extends ViewHolderManager.BaseViewHolder<ProfileAdapterItems.TagInfoAdapterItem> {
+
+        @Bind(R.id.profile_user_name)
+        TextView tagName;
+        @Bind(R.id.profile_first_icon_value_tv)
+        TextView firstIconValue;
+        @Bind(R.id.profile_listen_icon_iv)
+        ImageView listenImageView;
+        @Bind(R.id.profile_listen_tv)
+        TextView listenTextView;
+        @Bind(R.id.profile_tag_icon_tv)
+        TextView tagIconTv;
+
+        private ProfileAdapterItems.TagInfoAdapterItem item;
+        private final Context context;
+
+        public TagViewHolder(View view, Context context) {
+            super(view);
+            this.context = context;
+            ButterKnife.bind(this, view);
+        }
+
+        @Override
+        public void bind(@Nonnull ProfileAdapterItems.TagInfoAdapterItem item) {
+            this.item = item;
+            final TagDetail tag = item.getTagDetail();
+            tagName.setText(tag.getName());
+
+            firstIconValue.setText(TextHelper.formatListenersNumber(tag.getListenersCount()));
+            setListeningIcon(tag.isListening());
+        }
+
+        private void setListeningIcon(boolean isListening) {
+            listenTextView.setText(isListening ?
+                    R.string.profile_stop_listening_label : R.string.profile_listen_label);
+            listenImageView.setImageDrawable(context.getResources().getDrawable(isListening ?
+                    R.drawable.ic_listening_on : R.drawable.ic_listening_off));
+        }
+
+        @OnClick(R.id.profile_listen_action_container)
+        public void onListenActionClicked() {
+            if (item.isUserLoggedIn()) {
+                setListeningIcon(!item.getTagDetail().isListening());
+                item.onListenActionClicked();
+            } else {
+                item.onActionOnlyForLoggedInUser();
+            }
+        }
+
+        @OnClick(R.id.profile_menu_more_iv)
+        public void onMenuMoreIconClick() {
+            item.onMoreMenuOptionClicked();
         }
     }
 }

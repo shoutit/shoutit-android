@@ -94,49 +94,30 @@ public class ProfileAdapterItems {
         }
     }
 
-    public static class ProfileSectionAdapterItem<T extends ProfileType> extends BaseNoIDAdapterItem {
+    public abstract static class BaseProfileSectionItem<T extends ProfileType> extends BaseNoIDAdapterItem {
 
-        private final boolean isFirstItem;
-        private final boolean isLastItem;
-        @Nonnull
-        private final User user;
-        @Nonnull
-        private final T sectionItem;
-        @Nonnull
-        private final Observer<ProfilePresenter.UserWithItemToListen> listenItemObserver;
         @Nonnull
         private final Observer<String> profileToOpenObserver;
         @Nonnull
         private final Observer<Object> actionOnlyForLoggedInUserObserver;
-        @Nullable
-        private final String loggedInUserName;
-        private final boolean isUserLoggedIn;
+        private final boolean isFirstItem;
+        private final boolean isLastItem;
         private final boolean isOnlyItemInSection;
+        @Nonnull
+        private final T sectionItem;
+        private final boolean isUserLoggedIn;
 
-        public ProfileSectionAdapterItem(boolean isFirstItem,
-                                         boolean isLastItem,
-                                         @Nonnull User user,
-                                         @Nonnull T sectionItem,
-                                         @Nonnull Observer<ProfilePresenter.UserWithItemToListen> listenItemObserver,
-                                         @Nonnull Observer<String> profileToOpenObserver,
+        protected BaseProfileSectionItem(@Nonnull Observer<String> profileToOpenObserver,
                                          @Nonnull Observer<Object> actionOnlyForLoggedInUserObserver,
-                                         @Nullable String loggedInUserName,
-                                         boolean isUserLoggedIn,
-                                         boolean isOnlyItemInSection) {
-            this.isFirstItem = isFirstItem;
-            this.isLastItem = isLastItem;
-            this.user = user;
-            this.sectionItem = sectionItem;
-            this.listenItemObserver = listenItemObserver;
+                                         boolean isFirstItem, boolean isLastItem, boolean isOnlyItemInSection,
+                                         @Nonnull T sectionItem, boolean isUserLoggedIn) {
             this.profileToOpenObserver = profileToOpenObserver;
             this.actionOnlyForLoggedInUserObserver = actionOnlyForLoggedInUserObserver;
-            this.loggedInUserName = loggedInUserName;
-            this.isUserLoggedIn = isUserLoggedIn;
+            this.isFirstItem = isFirstItem;
+            this.isLastItem = isLastItem;
             this.isOnlyItemInSection = isOnlyItemInSection;
-        }
-
-        public void onItemListen() {
-            listenItemObserver.onNext(new ProfilePresenter.UserWithItemToListen(user, sectionItem));
+            this.sectionItem = sectionItem;
+            this.isUserLoggedIn = isUserLoggedIn;
         }
 
         public void onSectionItemSelected() {
@@ -145,10 +126,6 @@ public class ProfileAdapterItems {
 
         public void onActionOnlyForLoggedInUser() {
             actionOnlyForLoggedInUserObserver.onNext(null);
-        }
-
-        public boolean isSectionItemProfileMyProfile() {
-            return sectionItem.getUsername().equals(loggedInUserName);
         }
 
         public boolean isFirstItem() {
@@ -172,9 +149,13 @@ public class ProfileAdapterItems {
             return isUserLoggedIn;
         }
 
+        public abstract boolean isSectionItemProfileMyProfile();
+
+        public abstract void onItemListen();
+
         @Override
         public boolean matches(@Nonnull BaseAdapterItem item) {
-            return item instanceof ProfileSectionAdapterItem;
+            return item instanceof BaseProfileSectionItem;
         }
 
         @Override
@@ -187,7 +168,7 @@ public class ProfileAdapterItems {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (!(o instanceof ProfileSectionAdapterItem)) return false;
-            final ProfileSectionAdapterItem<?> that = (ProfileSectionAdapterItem<?>) o;
+            final BaseProfileSectionItem<?> that = (BaseProfileSectionItem<?>) o;
             return isFirstItem == that.isFirstItem &&
                     isLastItem == that.isLastItem &&
                     Objects.equal(sectionItem, that.sectionItem);
@@ -196,6 +177,43 @@ public class ProfileAdapterItems {
         @Override
         public int hashCode() {
             return Objects.hashCode(isFirstItem, isLastItem, sectionItem);
+        }
+    }
+
+    public static class ProfileSectionAdapterItem<T extends ProfileType> extends BaseProfileSectionItem {
+        @Nonnull
+        private final User user;
+        @Nonnull
+        private final Observer<UserOrPageProfilePresenter.UserWithItemToListen> listenItemObserver;
+        @Nullable
+        private final String loggedInUserName;
+        private final T sectionItem;
+
+        public ProfileSectionAdapterItem(boolean isFirstItem,
+                                         boolean isLastItem,
+                                         @Nonnull User user,
+                                         @Nonnull T sectionItem,
+                                         @Nonnull Observer<UserOrPageProfilePresenter.UserWithItemToListen> listenItemObserver,
+                                         @Nonnull Observer<String> profileToOpenObserver,
+                                         @Nonnull Observer<Object> actionOnlyForLoggedInUserObserver,
+                                         @Nullable String loggedInUserName,
+                                         boolean isUserLoggedIn,
+                                         boolean isOnlyItemInSection) {
+            super(profileToOpenObserver, actionOnlyForLoggedInUserObserver, isFirstItem, isLastItem, isOnlyItemInSection, sectionItem, isUserLoggedIn);
+            this.user = user;
+            this.sectionItem = sectionItem;
+            this.listenItemObserver = listenItemObserver;
+            this.loggedInUserName = loggedInUserName;
+        }
+
+        @Override
+        public void onItemListen() {
+            listenItemObserver.onNext(new UserOrPageProfilePresenter.UserWithItemToListen(user, sectionItem));
+        }
+
+        @Override
+        public boolean isSectionItemProfileMyProfile() {
+            return sectionItem.getUsername().equals(loggedInUserName);
         }
     }
 
@@ -437,22 +455,14 @@ public class ProfileAdapterItems {
         }
     }
 
-    public static class RelatedTagAdapterItem extends BaseNoIDAdapterItem {
+    public static class RelatedTagAdapterItem extends BaseProfileSectionItem {
 
-        private final boolean isFirstItem;
-        private final boolean isLastItem;
         @Nonnull
         private final TagDetail relatedTag;
         @Nonnull
         private final RelatedTagsResponse lastResponse;
         @Nonnull
         private final Observer<TagProfilePresenter.ListenedTagWithRelatedTags> listenItemObserver;
-        @Nonnull
-        private final Observer<String> tagProfileToOpenObserver;
-        @Nonnull
-        private final Observer<Object> actionOnlyForLoggedInUserObserver;
-        private final boolean isUserLoggedIn;
-        private final boolean isOnlyItemInSection;
 
         public RelatedTagAdapterItem(boolean isFirstItem,
                                      boolean isLastItem,
@@ -463,75 +473,24 @@ public class ProfileAdapterItems {
                                      @Nonnull Observer<Object> actionOnlyForLoggedInUserObserver,
                                      boolean isUserLoggedIn,
                                      boolean isOnlyItemInSection) {
-            this.isFirstItem = isFirstItem;
-            this.isLastItem = isLastItem;
+            super(tagProfileToOpenObserver, actionOnlyForLoggedInUserObserver, isFirstItem, isLastItem, isOnlyItemInSection, relatedTag, isUserLoggedIn);
             this.relatedTag = relatedTag;
             this.lastResponse = lastResponse;
             this.listenItemObserver = listenItemObserver;
-            this.tagProfileToOpenObserver = tagProfileToOpenObserver;
-            this.actionOnlyForLoggedInUserObserver = actionOnlyForLoggedInUserObserver;
-            this.isUserLoggedIn = isUserLoggedIn;
-            this.isOnlyItemInSection = isOnlyItemInSection;
         }
 
         public void onItemListen() {
             listenItemObserver.onNext(new TagProfilePresenter.ListenedTagWithRelatedTags(lastResponse, relatedTag));
         }
 
-        public void onSectionItemSelected() {
-            tagProfileToOpenObserver.onNext(relatedTag.getName());
-        }
-
-        public void onActionOnlyForLoggedInUser() {
-            actionOnlyForLoggedInUserObserver.onNext(null);
-        }
-
-        public boolean isFirstItem() {
-            return isFirstItem;
-        }
-
-        public boolean isLastItem() {
-            return isLastItem;
-        }
-
-        public boolean isOnlyItemInSection() {
-            return isOnlyItemInSection;
-        }
-
         @Nonnull
-        public TagDetail getSectionItem() {
+        public TagDetail getTag() {
             return relatedTag;
         }
 
-        public boolean isUserLoggedIn() {
-            return isUserLoggedIn;
-        }
-
         @Override
-        public boolean matches(@Nonnull BaseAdapterItem item) {
-            return item instanceof RelatedTagAdapterItem;
-        }
-
-        @Override
-        public boolean same(@Nonnull BaseAdapterItem item) {
-            // Done intentionally
+        public boolean isSectionItemProfileMyProfile() {
             return false;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof RelatedTagAdapterItem)) return false;
-            final RelatedTagAdapterItem that = (RelatedTagAdapterItem) o;
-            return isFirstItem == that.isFirstItem &&
-                    isLastItem == that.isLastItem &&
-                    isOnlyItemInSection == that.isOnlyItemInSection &&
-                    Objects.equal(relatedTag, that.relatedTag);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hashCode(isFirstItem, isLastItem, isOnlyItemInSection, relatedTag);
         }
     }
 
