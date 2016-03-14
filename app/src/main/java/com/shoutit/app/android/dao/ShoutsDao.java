@@ -237,6 +237,7 @@ public class ShoutsDao {
             this.pointer = pointer;
         }
 
+        @NonNull
         @Override
         Observable<ShoutsResponse> getShoutsRequest(int pageNumber) {
             return apiService

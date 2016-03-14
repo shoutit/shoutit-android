@@ -287,4 +287,8 @@
     <string name="post_signup_suggested_pages">Suggested pages</string>
     <string name="post_signup_done">Done</string>
 
+    <!-- Tag Profile -->
+    <string name="tag_profile_related_interests">Related interests</string>
+    <string name="tag_profile_shouts">%1$s shouts</string>
+
 </resources>

@@ -7,6 +7,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.RelatedTagsResponse;
 import com.shoutit.app.android.api.model.TagDetail;
 
 import javax.annotation.Nonnull;
@@ -20,6 +21,8 @@ public class TagsDao {
 
     @Nonnull
     private final LoadingCache<String, TagDao> tagsCache;
+    @Nonnull
+    private final LoadingCache<String, RelatedTagsDao> relatedTagsCache;
     @Nonnull
     private final ApiService apiService;
     private final Scheduler networkScheduler;
@@ -36,6 +39,14 @@ public class TagsDao {
                         return new TagDao(tagName);
                     }
                 });
+
+        relatedTagsCache = CacheBuilder.newBuilder()
+                .build(new CacheLoader<String, RelatedTagsDao>() {
+                    @Override
+                    public RelatedTagsDao load(@Nonnull String tagName) throws Exception {
+                        return new RelatedTagsDao(tagName);
+                    }
+                });
     }
 
     @Nonnull
@@ -46,6 +57,16 @@ public class TagsDao {
     @Nonnull
     public Observer<ResponseOrError<TagDetail>> getUpdatedTagObserver(@Nonnull String tagName) {
         return tagsCache.getUnchecked(tagName).updatedTagObserver();
+    }
+
+    @Nonnull
+    public Observable<ResponseOrError<RelatedTagsResponse>> getRelatedTagsObservable(@Nonnull String tagName) {
+        return relatedTagsCache.getUnchecked(tagName).getRelatedTagsObservable();
+    }
+
+    @Nonnull
+    public Observer<ResponseOrError<RelatedTagsResponse>> getUpdatedRelatedTagsObserver(@Nonnull String tagName) {
+        return relatedTagsCache.getUnchecked(tagName).updatedTagObserver();
     }
 
     public class TagDao {
@@ -72,5 +93,31 @@ public class TagsDao {
             return updatedTagSubject;
         }
     }
+
+    public class RelatedTagsDao {
+        @Nonnull
+        private Observable<ResponseOrError<RelatedTagsResponse>> tagsObservable;
+        @Nonnull
+        private PublishSubject<ResponseOrError<RelatedTagsResponse>> updatedTagsSubject = PublishSubject.create();
+
+        public RelatedTagsDao(@Nonnull final String tagName) {
+            tagsObservable = apiService.relatedTags(tagName)
+                    .subscribeOn(networkScheduler)
+                    .compose(ResponseOrError.<RelatedTagsResponse>toResponseOrErrorObservable())
+                    .mergeWith(updatedTagsSubject)
+                    .compose(MoreOperators.<ResponseOrError<RelatedTagsResponse>>cacheWithTimeout(networkScheduler));
+        }
+
+        @Nonnull
+        public Observable<ResponseOrError<RelatedTagsResponse>> getRelatedTagsObservable() {
+            return tagsObservable;
+        }
+
+        @Nonnull
+        public Observer<ResponseOrError<RelatedTagsResponse>> updatedTagObserver() {
+            return updatedTagsSubject;
+        }
+    }
+
 }
 

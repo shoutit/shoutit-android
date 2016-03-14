@@ -13,20 +13,21 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.RelatedTagsResponse;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
-import com.shoutit.app.android.api.model.TagDetail;
 import com.shoutit.app.android.api.model.TagDetail;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.TagsDao;
-import com.shoutit.app.android.model.LocationPointer;
 import com.shoutit.app.android.model.TagShoutsPointer;
-import com.shoutit.app.android.model.UserShoutsPointer;
+import com.shoutit.app.android.view.profile.ProfileAdapterItems;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -35,29 +36,41 @@ import javax.annotation.Nullable;
 
 import okhttp3.ResponseBody;
 import rx.Observable;
-import rx.Observer;
 import rx.Scheduler;
-import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.functions.Func3;
 import rx.subjects.PublishSubject;
 
 public class TagProfilePresenter {
     private static final int SHOUTS_PAGE_SIZE = 4;
 
     private final PublishSubject<TagDetail> onListenActionClickedSubject = PublishSubject.create();
-    private PublishSubject<String> shoutSelectedSubject = PublishSubject.create();
+    private final PublishSubject<ListenedTagWithRelatedTags> onListenRelatedTagClickedSubject = PublishSubject.create();
+    private final PublishSubject<String> shoutSelectedSubject = PublishSubject.create();
     private final PublishSubject<Throwable> errorSubject = PublishSubject.create();
+    private final PublishSubject<Object> moreMenuOptionClickedSubject = PublishSubject.create();
+    private final PublishSubject<Object> actionOnlyForLoggedInUserSubject = PublishSubject.create();
+    private final PublishSubject<String> profileToOpenSubject = PublishSubject.create();
+    private final PublishSubject<String> showAllShoutsSubject = PublishSubject.create();
 
     private final Observable<String> avatarObservable;
     private final Observable<String> coverUrlObservable;
     private final Observable<String> toolbarTitleObservable;
     private final Observable<String> toolbarSubtitleObservable;
+    private final Observable<List<BaseAdapterItem>> allAdapterItemsObservable;
+    private final Observable<Boolean> progressObservable;
+    private final Observable<Throwable> errorObservable;
+
+    private final boolean isLoggedInAsNormalUser;
+
 
     public TagProfilePresenter(TagsDao tagsDao, final ShoutsDao shoutsDao, @Nonnull final String tagName,
                                @UiScheduler final Scheduler uiScheduler, @NetworkScheduler final Scheduler networkScheduler,
                                final ApiService apiService, @ForActivity final Context context,
                                UserPreferences userPreferences) {
+        isLoggedInAsNormalUser = userPreferences.isNormalUser();
 
+        /** Base Tag **/
         final Observable<ResponseOrError<TagDetail>> tagRequestObservable = tagsDao.getTagObservable(tagName)
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<TagDetail>>behaviorRefCount());
@@ -99,6 +112,15 @@ public class TagProfilePresenter {
         final Observable<TagDetail> successTagRequestObservable = tagRequestObservable
                 .compose(ResponseOrError.<TagDetail>onlySuccess());
 
+        final Observable<ProfileAdapterItems.TagInfoAdapterItem> tagAdapterItem = successTagRequestObservable
+                .map(new Func1<TagDetail, ProfileAdapterItems.TagInfoAdapterItem>() {
+                    @Override
+                    public ProfileAdapterItems.TagInfoAdapterItem call(TagDetail tagDetail) {
+                        return new ProfileAdapterItems.TagInfoAdapterItem(tagDetail, isLoggedInAsNormalUser,
+                                actionOnlyForLoggedInUserSubject, onListenActionClickedSubject, moreMenuOptionClickedSubject);
+                    }
+                });
+
         /** Header Data **/
         avatarObservable = successTagRequestObservable
                 .map(new Func1<TagDetail, String>() {
@@ -133,8 +155,10 @@ public class TagProfilePresenter {
                 });
 
         /** Shouts **/
-        final Observable<ResponseOrError<ShoutsResponse>> shoutsObservable = userPreferences
-                .getLocationObservable().first()
+        final Observable<ResponseOrError<ShoutsResponse>> shoutsRequestObservable = userPreferences
+                .getLocationObservable()
+                .first()
+                .filter(Functions1.isNotNull())
                 .switchMap(new Func1<UserLocation, Observable<ResponseOrError<ShoutsResponse>>>() {
                     @Override
                     public Observable<ResponseOrError<ShoutsResponse>> call(UserLocation userLocation) {
@@ -144,7 +168,7 @@ public class TagProfilePresenter {
                 })
                 .compose(ObservableExtensions.<ResponseOrError<ShoutsResponse>>behaviorRefCount());
 
-        final Observable<List<BaseAdapterItem>> shoutsSuccessResponse = shoutsObservable
+        final Observable<List<BaseAdapterItem>> shoutsSuccessResponse = shoutsRequestObservable
                 .compose(ResponseOrError.<ShoutsResponse>onlySuccess())
                 .map(new Func1<ShoutsResponse, List<Shout>>() {
                     @Override
@@ -168,5 +192,180 @@ public class TagProfilePresenter {
                     }
                 });
 
+        /** Related Tags **/
+        final Observable<ResponseOrError<RelatedTagsResponse>> relatedTagsRequest = tagsDao
+                .getRelatedTagsObservable(tagName)
+                .observeOn(uiScheduler)
+                .compose(ObservableExtensions.<ResponseOrError<RelatedTagsResponse>>behaviorRefCount());
+
+        final Observable<List<BaseAdapterItem>> successRelatedTags = relatedTagsRequest
+                .compose(ResponseOrError.<RelatedTagsResponse>onlySuccess())
+                .map(new Func1<RelatedTagsResponse, List<BaseAdapterItem>>() {
+                    @Override
+                    public List<BaseAdapterItem> call(RelatedTagsResponse relatedTagsResponse) {
+                        final List<TagDetail> tags = relatedTagsResponse.getResults();
+                        final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
+
+                        if (tags != null) {
+                            for (int i = 0; i < tags.size(); i++) {
+                                builder.add(getRelatedTagdapterItemForPosition(i, tags.get(i), relatedTagsResponse));
+                            }
+                        }
+
+                        return builder.build();
+                    }
+                });
+
+        onListenRelatedTagClickedSubject
+                .throttleFirst(1, TimeUnit.SECONDS)
+                .switchMap(new Func1<ListenedTagWithRelatedTags, Observable<ResponseOrError<RelatedTagsResponse>>>() {
+                    @Override
+                    public Observable<ResponseOrError<RelatedTagsResponse>> call(final ListenedTagWithRelatedTags listenedTagWithRelatedTags) {
+                        final TagDetail tagDetail = listenedTagWithRelatedTags.getTagInSection();
+
+                        final Observable<ResponseOrError<ResponseBody>> request;
+                        if (tagDetail.isListening()) {
+                            request = apiService.unlistenTag(tagDetail.getName())
+                                    .subscribeOn(networkScheduler)
+                                    .observeOn(uiScheduler)
+                                    .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
+                        } else {
+                            request = apiService.listenTag(tagDetail.getName())
+                                    .subscribeOn(networkScheduler)
+                                    .observeOn(uiScheduler)
+                                    .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
+                        }
+
+                        return request.map(new Func1<ResponseOrError<ResponseBody>, ResponseOrError<RelatedTagsResponse>>() {
+                            @Override
+                            public ResponseOrError<RelatedTagsResponse> call(ResponseOrError<ResponseBody> response) {
+                                if (response.isData()) {
+                                    return ResponseOrError.fromData(updateRelatedTagsWithListenings(listenedTagWithRelatedTags));
+                                } else {
+                                    errorSubject.onNext(new Throwable());
+                                    // On error return current tag in order to select/deselect already deselected/selected 'listenTagProfile' icon
+                                    return ResponseOrError.fromData(listenedTagWithRelatedTags.getRelatedTagsResponse());
+                                }
+                            }
+                        });
+                    }
+                })
+                .subscribe(tagsDao.getUpdatedRelatedTagsObserver(tagName));
+
+
+        /** All adapter items **/
+        allAdapterItemsObservable = Observable.combineLatest(
+                tagAdapterItem,
+                successRelatedTags,
+                shoutsSuccessResponse.startWith(ImmutableList.<List<BaseAdapterItem>>of()),
+                new Func3<ProfileAdapterItems.TagInfoAdapterItem, List<BaseAdapterItem>, List<BaseAdapterItem>, List<BaseAdapterItem>>() {
+                    @Override
+                    public List<BaseAdapterItem> call(ProfileAdapterItems.TagInfoAdapterItem tagItem,
+                                                      List<BaseAdapterItem> relatedTags,
+                                                      List<BaseAdapterItem> shouts) {
+                        final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
+
+                        builder.add(tagItem);
+
+                        if (!relatedTags.isEmpty()) {
+                            builder.add(new HeaderAdapterItem(context.getString(R.string.tag_profile_related_interests).toUpperCase()));
+                            builder.addAll(relatedTags);
+                        }
+
+                        if (!shouts.isEmpty()) {
+                            builder.add(new HeaderAdapterItem(
+                                    context.getString(R.string.tag_profile_shouts, tagItem.getTagDetail().getName().toUpperCase())))
+                            .addAll(shouts)
+                            .add(new ProfileAdapterItems.SeeAllTagShoutsAdapterItem(
+                                    showAllShoutsSubject, tagName));
+                        }
+
+                        return builder.build();
+                    }
+                });
+
+        /** Errors **/
+        errorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
+                ResponseOrError.transform(shoutsRequestObservable),
+                ResponseOrError.transform(relatedTagsRequest),
+                ResponseOrError.transform(tagRequestObservable)))
+                .mergeWith(errorSubject)
+                .filter(Functions1.isNotNull())
+                .observeOn(uiScheduler);
+
+        /** Progress **/
+        progressObservable = Observable.merge(tagRequestObservable, errorObservable)
+                .map(Functions1.returnFalse())
+                .startWith(true)
+                .observeOn(uiScheduler);
+
+    }
+
+    private ProfileAdapterItems.RelatedTagAdapterItem getRelatedTagdapterItemForPosition(int position, TagDetail tag,
+                                                                                         RelatedTagsResponse relatedTagsResponse) {
+        final List<TagDetail> tags = relatedTagsResponse.getResults();
+        if (position == 0) {
+            return new ProfileAdapterItems.RelatedTagAdapterItem(true, false, tag, relatedTagsResponse,
+                    onListenRelatedTagClickedSubject, profileToOpenSubject, actionOnlyForLoggedInUserSubject, isLoggedInAsNormalUser, tags.size() == 1);
+        } else if (position == tags.size() - 1) {
+            return new ProfileAdapterItems.RelatedTagAdapterItem(false, true, tag, relatedTagsResponse,
+                    onListenRelatedTagClickedSubject, profileToOpenSubject, actionOnlyForLoggedInUserSubject, isLoggedInAsNormalUser, false);
+        } else {
+            return new ProfileAdapterItems.RelatedTagAdapterItem(false, false, tag, relatedTagsResponse,
+                    onListenRelatedTagClickedSubject, profileToOpenSubject, actionOnlyForLoggedInUserSubject, isLoggedInAsNormalUser, false);
+        }
+    }
+
+    @Nonnull
+    private RelatedTagsResponse updateRelatedTagsWithListenings(@Nonnull ListenedTagWithRelatedTags listenedTagWithRelatedTags) {
+        final List<TagDetail> tags = listenedTagWithRelatedTags.getRelatedTagsResponse().getResults();
+        final TagDetail tagToUpdate = listenedTagWithRelatedTags.getTagInSection();
+
+        for (int i = 0; i < tags.size(); i++) {
+            if (tags.get(i).getName().equals(tagToUpdate.getName())) {
+                final List<TagDetail> updatedTags = new ArrayList<>(tags);
+                updatedTags.set(i, tagToUpdate.toListenedTag());
+
+                return new RelatedTagsResponse(updatedTags);
+            }
+        }
+
+        return new RelatedTagsResponse(tags);
+    }
+
+    public Observable<Boolean> getProgressObservable() {
+        return progressObservable;
+    }
+
+    public Observable<Throwable> getErrorObservable() {
+        return errorObservable;
+    }
+
+    public Observable<List<BaseAdapterItem>> getAllAdapterItemsObservable() {
+        return allAdapterItemsObservable;
+    }
+
+    public static class ListenedTagWithRelatedTags {
+
+        @Nonnull
+        private final RelatedTagsResponse relatedTagsResponse;
+        @Nonnull
+        private final TagDetail tagInSection;
+
+        public ListenedTagWithRelatedTags(@Nonnull RelatedTagsResponse relatedTagsResponse,
+                                          @Nonnull TagDetail tagInSection) {
+            this.relatedTagsResponse = relatedTagsResponse;
+            this.tagInSection = tagInSection;
+        }
+
+        @Nonnull
+        public RelatedTagsResponse getRelatedTagsResponse() {
+            return relatedTagsResponse;
+        }
+
+        @Nonnull
+        public TagDetail getTagInSection() {
+            return tagInSection;
+        }
     }
 }

@@ -13,6 +13,7 @@ import com.shoutit.app.android.api.model.DiscoverResponse;
 import com.shoutit.app.android.api.model.EditShoutRequest;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.GuestSignupRequest;
+import com.shoutit.app.android.api.model.RelatedTagsResponse;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutResponse;
@@ -196,7 +197,10 @@ public interface ApiService {
     @POST("tags/{name}/listen")
     Observable<ResponseBody> listenTag(@Path("name") String tagName);
 
-    @DELETE("profiles/{name}/listen")
+    @DELETE("tags/{name}/listen")
     Observable<ResponseBody> unlistenTag(@Path("name") String tagName);
+
+    @GET("tags/{name}/related")
+    Observable<RelatedTagsResponse> relatedTags(@Path("name") String tagName);
 
 }
