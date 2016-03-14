@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.shoutit.app.android.App;
+import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.view.profile.ProfileActivity;
@@ -39,6 +40,11 @@ public class TagProfileActivity extends ProfileActivity {
                                 REQUEST_PROFILE_OPENED_FROM_PROFILE);
                     }
                 });
+    }
+
+    @Override
+    protected int getAvatarPlaceholder() {
+        return R.drawable.ic_tag_avatar;
     }
 
     @Nonnull

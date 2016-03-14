@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import com.shoutit.app.android.App;
+import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.IntentHelper;
@@ -81,6 +82,11 @@ public class UserOrPageProfileActivity extends ProfileActivity {
                         Toast.makeText(UserOrPageProfileActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    @Override
+    protected int getAvatarPlaceholder() {
+        return R.drawable.ic_rect_avatar_placeholder;
     }
 
     @Nonnull

@@ -87,7 +87,7 @@ public class TagProfilePresenter implements ProfilePresenter {
                 .compose(ObservableExtensions.<ResponseOrError<TagDetail>>behaviorRefCount());
 
         onListenActionClickedSubject
-                .throttleFirst(1, TimeUnit.SECONDS)
+                .throttleFirst(500, TimeUnit.MILLISECONDS)
                 .switchMap(new Func1<TagDetail, Observable<ResponseOrError<TagDetail>>>() {
                     @Override
                     public Observable<ResponseOrError<TagDetail>> call(final TagDetail tagDetail) {
@@ -285,9 +285,9 @@ public class TagProfilePresenter implements ProfilePresenter {
 
                         if (!shouts.isEmpty()) {
                             builder.add(new HeaderAdapterItem(
-                                    context.getString(R.string.tag_profile_shouts, tagItem.getTagDetail().getName().toUpperCase())))
+                                    context.getString(R.string.tag_profile_shouts, tagItem.getTagDetail().getName()).toUpperCase()))
                             .addAll(shouts)
-                            .add(new ProfileAdapterItems.SeeAllTagShoutsAdapterItem(
+                            .add(new ProfileAdapterItems.SeeAllUserShoutsAdapterItem(
                                     showAllShoutsSubject, tagName));
                         }
 
@@ -422,6 +422,7 @@ public class TagProfilePresenter implements ProfilePresenter {
     @Override
     public void refreshProfile() {
         tagsDao.refreshRelatedTags(tagName);
+        tagsDao.refreshTag(tagName);
     }
 
     @NonNull
@@ -433,7 +434,7 @@ public class TagProfilePresenter implements ProfilePresenter {
     @Nonnull
     @Override
     public Observable<Object> getActionOnlyForLoggedInUserObservable() {
-        return null;
+        return actionOnlyForLoggedInUserSubject;
     }
 
     public static class ListenedTagWithRelatedTags {

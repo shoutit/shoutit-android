@@ -29,7 +29,7 @@ public class ProfileAdapter extends BaseAdapter {
     public static final int VIEW_TYPE_SHOUT = 7;
     public static final int VIEW_TYPE_SEE_ALL_SHOUTS = 8;
     public static final int VIEW_TYPE_HEADER = 9;
-    private static final int VIEW_TYPE_TAG_INFO = 10;
+    public static final int VIEW_TYPE_TAG_INFO = 10;
 
     @Nonnull
     protected final Picasso picasso;
@@ -61,7 +61,7 @@ public class ProfileAdapter extends BaseAdapter {
             case VIEW_TYPE_HEADER:
                 return new HeaderViewHolder(layoutInflater.inflate(R.layout.base_header_item, parent, false));
             case VIEW_TYPE_TAG_INFO:
-                return new ProfileViewHolders.TagViewHolder(layoutInflater.inflate(R.layout.profile_info_item, parent, false), context);
+                return new ProfileViewHolders.TagViewHolder(layoutInflater.inflate(R.layout.profile_tag_info_item, parent, false), context);
             default:
                 throw new RuntimeException("Unknown adapter view type");
         }
@@ -82,7 +82,7 @@ public class ProfileAdapter extends BaseAdapter {
             return VIEW_TYPE_MY_PROFILE_THREE_ICONS;
         } else if (item instanceof ShoutAdapterItem) {
             return VIEW_TYPE_SHOUT;
-        } else if (item instanceof ProfileAdapterItems.ProfileSectionAdapterItem) {
+        } else if (item instanceof ProfileAdapterItems.BaseProfileSectionItem) {
             return VIEW_TYPE_USER_PAGES_OR_ADMINS;
         } else if (item instanceof ProfileAdapterItems.SeeAllUserShoutsAdapterItem) {
             return VIEW_TYPE_SEE_ALL_SHOUTS;

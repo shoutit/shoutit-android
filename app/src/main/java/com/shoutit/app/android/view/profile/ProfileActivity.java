@@ -3,6 +3,7 @@ package com.shoutit.app.android.view.profile;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.ActionBar;
@@ -22,11 +23,8 @@ import android.widget.Toast;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.jakewharton.rxbinding.view.RxView;
 import com.jakewharton.rxbinding.widget.RxTextView;
-import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
-import com.shoutit.app.android.dagger.ActivityModule;
-import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.view.shout.ShoutActivity;
@@ -34,15 +32,11 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import rx.functions.Action1;
-
-import static com.appunite.rx.internal.Preconditions.checkNotNull;
 
 public abstract class ProfileActivity extends BaseActivity {
 
@@ -74,8 +68,8 @@ public abstract class ProfileActivity extends BaseActivity {
     ProfileAdapter adapter;
     @Inject
     Picasso picasso;
-
-    private ProfilePresenter presenter;
+    @Inject
+    ProfilePresenter presenter;
 
     private final AccelerateInterpolator toolbarInterpolator = new AccelerateInterpolator();
     private int lastVerticalOffset;
@@ -86,8 +80,6 @@ public abstract class ProfileActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         ButterKnife.bind(this);
-
-        presenter = ((ProfileActivityComponent) getActivityComponent()).getPresenter();
 
         setUpToolbar();
         setUpPopupMenu();
@@ -167,6 +159,9 @@ public abstract class ProfileActivity extends BaseActivity {
                         R.string.error_action_only_for_logged_in_user));
     }
 
+    @DrawableRes
+    protected abstract int getAvatarPlaceholder();
+
     private void setUpToolbar() {
         setSupportActionBar(toolbar);
         final ActionBar actionBar = getSupportActionBar();
@@ -236,6 +231,7 @@ public abstract class ProfileActivity extends BaseActivity {
                 final int viewType = parent.getAdapter().getItemViewType(position);
                 if (viewType == ProfileAdapter.VIEW_TYPE_USER_NAME ||
                         viewType == ProfileAdapter.VIEW_TYPE_USER_INFO ||
+                        viewType == ProfileAdapter.VIEW_TYPE_TAG_INFO ||
                         viewType == ProfileAdapter.VIEW_TYPE_THREE_ICONS) {
                     return;
                 } else if (viewType == ProfileAdapter.VIEW_TYPE_SHOUT) {
@@ -302,8 +298,8 @@ public abstract class ProfileActivity extends BaseActivity {
             @Override
             public void call(String url) {
                 picasso.load(url)
-                        .placeholder(R.drawable.ic_rect_avatar_placeholder)
-                        .error(R.drawable.ic_rect_avatar_placeholder)
+                        .placeholder(getAvatarPlaceholder())
+                        .error(getAvatarPlaceholder())
                         .fit()
                         .centerCrop()
                         .transform(PicassoHelper.roundedWithStrokeTransformation(strokeSize, false, corners, "ProfileAvatar"))

@@ -493,45 +493,4 @@ public class ProfileAdapterItems {
             return false;
         }
     }
-
-    public static class SeeAllTagShoutsAdapterItem extends BaseNoIDAdapterItem {
-
-        @Nonnull
-        private final Observer<String> showMoreShoutsObserver;
-        @Nonnull
-        private final String tagName;
-
-        public SeeAllTagShoutsAdapterItem(@Nonnull Observer<String> showMoreShoutsObserver,
-                                           @Nonnull String tagName) {
-            this.showMoreShoutsObserver = showMoreShoutsObserver;
-            this.tagName = tagName;
-        }
-
-        @Override
-        public boolean matches(@Nonnull BaseAdapterItem item) {
-            return item instanceof SeeAllTagShoutsAdapterItem;
-        }
-
-        @Override
-        public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof SeeAllTagShoutsAdapterItem && this.equals(item);
-        }
-
-        public void onSeeAllShouts() {
-            showMoreShoutsObserver.onNext(tagName);
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof SeeAllTagShoutsAdapterItem)) return false;
-            final SeeAllTagShoutsAdapterItem that = (SeeAllTagShoutsAdapterItem) o;
-            return Objects.equal(tagName, that.tagName);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hashCode(tagName);
-        }
-    }
 }

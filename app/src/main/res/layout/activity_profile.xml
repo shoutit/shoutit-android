@@ -125,8 +125,7 @@
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:scaleType="centerCrop"
-            android:elevation="1dp"
-            android:src="@drawable/ic_rect_avatar_placeholder" />
+            tools:src="@drawable/ic_rect_avatar_placeholder" />
 
     </FrameLayout>
 

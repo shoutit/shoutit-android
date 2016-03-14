@@ -74,15 +74,22 @@ public class TagsDao {
         relatedTagsCache.getUnchecked(tagName).getRefreshObserver().onNext(null);
     }
 
+    public void refreshTag(@Nonnull String tagName) {
+        tagsCache.getUnchecked(tagName).getRefreshObserver().onNext(null);
+    }
+
     public class TagDao {
         @Nonnull
         private Observable<ResponseOrError<TagDetail>> tagObservable;
         @Nonnull
         private PublishSubject<ResponseOrError<TagDetail>> updatedTagSubject = PublishSubject.create();
+        @Nonnull
+        private PublishSubject<Object> refreshSubject = PublishSubject.create();
 
         public TagDao(@Nonnull final String tagName) {
             tagObservable = apiService.tagDetail(tagName)
                     .subscribeOn(networkScheduler)
+                    .compose(MoreOperators.<TagDetail>refresh(refreshSubject))
                     .compose(ResponseOrError.<TagDetail>toResponseOrErrorObservable())
                     .mergeWith(updatedTagSubject)
                     .compose(MoreOperators.<ResponseOrError<TagDetail>>cacheWithTimeout(networkScheduler));
@@ -96,6 +103,11 @@ public class TagsDao {
         @Nonnull
         public Observer<ResponseOrError<TagDetail>> updatedTagObserver() {
             return updatedTagSubject;
+        }
+
+        @Nonnull
+        public Observer<Object> getRefreshObserver() {
+            return refreshSubject;
         }
     }
 

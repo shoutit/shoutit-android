@@ -200,7 +200,7 @@ public class ShoutAdapter extends BaseAdapter {
                 view.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        item.onCategoryClick(filter.getSlug());
+                        item.onCategoryClick(filter.getValue().getSlug());
                     }
                 });
             }
