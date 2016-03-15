@@ -293,5 +293,9 @@
     <string name="search_base_title">Search</string>
     <string name="search_base_hint">Search</string>
     <string name="search_category_header">Categories</string>
+    <string name="search_shouts_tab">SHOUTS</string>
+    <string name="search_users_tab">USERS</string>
+    <string name="search_recent_searches">Recent searches</string>
+    <string name="search_clear_all">Clear all</string>
 
 </resources>

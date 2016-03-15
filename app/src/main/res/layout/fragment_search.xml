@@ -2,24 +2,23 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/default_bg_color"
     android:orientation="vertical">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/search_toolbar"
-        style="@style/WhiteToolbar"
+    <android.support.design.widget.TabLayout
+        android:id="@+id/search_tab_layout"
         android:layout_width="match_parent"
-        android:layout_height="?actionBarSize"/>
-    
+        android:layout_height="48dp"
+        android:background="@color/search_tab_background"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
     <View
-        android:id="@+id/search_toolbar_shadow_view"
         android:layout_width="match_parent"
         android:layout_height="3dp"
         android:background="@drawable/toolbar_drop_shadow"/>
-    
-    <FrameLayout
-        android:id="@+id/search_categories_fragment_container"
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/search_view_pager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 
 </LinearLayout>

@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.search;
+package com.shoutit.app.android.view.search.categories;
 
 import android.content.Context;
 import android.view.View;

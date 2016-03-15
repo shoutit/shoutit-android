@@ -3,6 +3,7 @@ package com.shoutit.app.android.dagger;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.Resources;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
@@ -78,4 +79,6 @@ public interface BaseActivityComponent {
     TransferUtility transferUtility();
 
     ContentResolver contentResolver();
+
+    FragmentManager fragmentManager();
 }

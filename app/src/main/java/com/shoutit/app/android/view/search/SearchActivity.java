@@ -14,6 +14,7 @@ import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.view.search.categories.SearchCategoriesFragment;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -26,6 +27,8 @@ public class SearchActivity extends BaseActivity implements SearchView.OnQueryTe
 
     @Bind(R.id.search_toolbar)
     Toolbar toolbar;
+    @Bind(R.id.search_toolbar_shadow_view)
+    View toolbarShadow;
 
     public static Intent newIntent(Context context) {
         return new Intent(context, SearchActivity.class);
@@ -73,8 +76,22 @@ public class SearchActivity extends BaseActivity implements SearchView.OnQueryTe
         searchView.setIconifiedByDefault(false);
         searchView.setQueryHint(getString(R.string.search_base_hint));
         searchView.setMaxWidth(Integer.MAX_VALUE);
+        searchView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showSearchFragment();
+            }
+        });
 
         return true;
+    }
+
+    private void showSearchFragment() {
+        toolbarShadow.setVisibility(View.GONE);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.search_categories_fragment_container, SearchFragment.newInstance())
+                .commit();
     }
 
     @Override

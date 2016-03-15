@@ -71,4 +71,7 @@
     <!-- Location -->
     <color name="location_input_hint">#4dffffff</color>
 
+    <!-- Search -->
+    <color name="search_tab_background">#ededed</color>
+
 </resources>

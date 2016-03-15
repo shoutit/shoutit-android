@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.search;
+package com.shoutit.app.android.view.search.categories;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -16,6 +16,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.view.search.DaggerSearchCategoriesFragmentComponent;
 
 import java.util.List;
 

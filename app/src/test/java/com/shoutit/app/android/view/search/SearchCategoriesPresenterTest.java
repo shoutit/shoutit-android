@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.dao.CategoriesDao;
+import com.shoutit.app.android.view.search.categories.SearchCategoriesPresenter;
 
 import org.junit.Before;
 import org.junit.Test;
