@@ -289,4 +289,9 @@
     <string name="post_signup_suggested_pages">Suggested pages</string>
     <string name="post_signup_done">Done</string>
 
+    <!-- Search -->
+    <string name="search_base_title">Search</string>
+    <string name="search_base_hint">Search</string>
+    <string name="search_category_header">Categories</string>
+
 </resources>
