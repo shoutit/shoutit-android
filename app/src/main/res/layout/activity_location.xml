@@ -4,45 +4,58 @@
     android:layout_height="match_parent">
 
     <android.support.v7.widget.Toolbar
-        style="@style/AppTheme.BaseToolbarStyle"
+        style="@style/BaseToolbarNoElevation"
         android:id="@+id/location_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:background="@color/colorPrimary"
+        android:layout_height="?actionBarSize"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
+    <LinearLayout
+        android:id="@+id/location_search_container"
+        android:layout_below="@+id/location_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:paddingEnd="20dp"
+        android:paddingRight="20dp"
+        android:paddingLeft="58dp"
+        android:paddingStart="58dp"
+        android:gravity="bottom"
+        android:paddingBottom="2dp"
+        android:background="@color/colorPrimary"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/location_search_et"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:paddingTop="60dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginRight="20dp"
-            android:orientation="horizontal">
+            android:textColor="@android:color/white"
+            android:theme="@style/SearchEditText"
+            android:paddingBottom="14dp"
+            android:textColorHint="@color/location_input_hint"
+            android:hint="@string/location_search_hint"/>
 
-            <EditText
-                android:id="@+id/location_search_et"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:textColor="@android:color/white"
-                android:theme="@style/SearchEditText"
-                android:hint="@string/location_search_hint"/>
+        <ProgressBar
+            android:id="@+id/location_query_progress_bar"
+            android:theme="@style/WhiteProgressBar"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:visibility="invisible"
+            android:layout_marginLeft="4dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="10dp"/>
 
-            <ProgressBar
-                android:id="@+id/location_query_progress_bar"
-                android:theme="@style/WhiteProgressBar"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:visibility="invisible"
-                android:layout_marginLeft="4dp"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="10dp"/>
+    </LinearLayout>
 
-        </LinearLayout>
-
-    </android.support.v7.widget.Toolbar>
+    <View
+        android:layout_below="@+id/location_search_container"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@drawable/toolbar_drop_shadow"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/location_recycler_view"
-        android:layout_below="@+id/location_toolbar"
+        android:layout_below="@+id/location_search_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

@@ -110,10 +110,10 @@
     <string name="html_activity_privacy">Privacy Policy</string>
 
     <!-- Location -->
-    <string name="location_toolbar_title">Choose location</string>
-    <string name="location_search_hint">Enter a location</string>
+    <string name="location_toolbar_title">Change your location</string>
+    <string name="location_search_hint">Type an address</string>
     <string name="location_header">My current location (automatic updates)</string>
-    <string name="location_header_selected_location">Current selection</string>
+    <string name="location_header_selected_location">Current location</string>
     <string name="location_location">%1$s, %2$s</string>
 
     <!-- Side Menu -->

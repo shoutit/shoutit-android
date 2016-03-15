@@ -1,17 +1,16 @@
 package com.shoutit.app.android.view.createshout.location;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -130,22 +129,16 @@ public class LocationActivity extends BaseActivity {
                 new String[]{Manifest.permission.ACCESS_FINE_LOCATION});
     }
 
+    @SuppressLint("PrivateResource")
     private void setUpActionbar() {
-        setSupportActionBar(toolbar);
         toolbar.setTitle(R.string.location_toolbar_title);
-        final ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
+        toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+            }
+        });
     }
 
     @Override

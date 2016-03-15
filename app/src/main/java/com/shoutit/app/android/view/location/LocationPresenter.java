@@ -114,12 +114,6 @@ public class LocationPresenter {
                 .getLocationObservable()
                 .first()
                 .filter(Functions1.isNotNull())
-                .filter(new Func1<UserLocation, Boolean>() {
-                    @Override
-                    public Boolean call(UserLocation userLocation) {
-                        return !userPreferences.automaticLocationTrackingEnabled();
-                    }
-                })
                 .map(new Func1<UserLocation, BaseAdapterItem>() {
                     @Override
                     public BaseAdapterItem call(UserLocation userLocation) {
