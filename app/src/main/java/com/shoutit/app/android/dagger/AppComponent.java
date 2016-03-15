@@ -11,6 +11,7 @@ import com.google.gson.Gson;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.dao.CategoriesDao;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ProfilesDao;
@@ -62,6 +63,8 @@ public interface AppComponent {
     SuggestionsDao suggestionsDao();
 
     DiscoverShoutsDao discoverShoutsDao();
+
+    CategoriesDao categoriesDao();
 
     GoogleApiClient googleApiClient();
 

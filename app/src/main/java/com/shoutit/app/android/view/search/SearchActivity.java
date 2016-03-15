@@ -2,9 +2,13 @@ package com.shoutit.app.android.view.search;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.View;
+
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
@@ -14,13 +18,26 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 
 public class SearchActivity extends BaseActivity implements SearchView.OnQueryTextListener {
+
+    @Bind(R.id.search_toolbar)
+    Toolbar toolbar;
+
+    public static Intent newIntent(Context context) {
+        return new Intent(context, SearchActivity.class);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
+        ButterKnife.bind(this);
+
+        setUpToolbar();
 
         if (savedInstanceState == null) {
             getSupportFragmentManager()
@@ -28,6 +45,18 @@ public class SearchActivity extends BaseActivity implements SearchView.OnQueryTe
                     .replace(R.id.search_categories_fragment_container, SearchCategoriesFragment.newInstance())
                     .commit();
         }
+    }
+
+    private void setUpToolbar() {
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        toolbar.setNavigationIcon(R.drawable.ic_blue_arrow);
+        toolbar.setTitle(null);
+        setSupportActionBar(toolbar);
     }
 
     @Override
@@ -43,6 +72,7 @@ public class SearchActivity extends BaseActivity implements SearchView.OnQueryTe
         searchView.setOnQueryTextListener(this);
         searchView.setIconifiedByDefault(false);
         searchView.setQueryHint(getString(R.string.search_base_hint));
+        searchView.setMaxWidth(Integer.MAX_VALUE);
 
         return true;
     }

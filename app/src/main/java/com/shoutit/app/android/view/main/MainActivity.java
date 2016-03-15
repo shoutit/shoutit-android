@@ -30,6 +30,7 @@ import com.shoutit.app.android.view.discover.OnNewDiscoverSelectedListener;
 import com.shoutit.app.android.view.home.HomeFragment;
 import com.shoutit.app.android.view.intro.IntroActivity;
 import com.shoutit.app.android.view.postlogininterest.PostLoginInterestActivity;
+import com.shoutit.app.android.view.search.SearchActivity;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -120,7 +121,14 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
         if (drawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
-        return super.onOptionsItemSelected(item);
+
+        switch (item.getItemId()) {
+            case R.id.base_menu_search:
+                startActivity(SearchActivity.newIntent(this));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void updateUser() {

@@ -23,6 +23,7 @@ public class CategoriesDao {
     public CategoriesDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
         mListObservableResponseOrError = apiService
                 .categories()
+                .subscribeOn(networkScheduler)
                 .compose(ResponseOrError.<List<Category>>toResponseOrErrorObservable())
                 .compose(MoreOperators.<ResponseOrError<List<Category>>>cacheWithTimeout(networkScheduler));
     }

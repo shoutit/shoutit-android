@@ -25,6 +25,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.AuthInterceptor;
 import com.shoutit.app.android.constants.AmazonConstants;
+import com.shoutit.app.android.dao.CategoriesDao;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ProfilesDao;
@@ -231,5 +232,11 @@ public final class AppModule {
     @Singleton
     SuggestionsDao prpvideSuggestionsDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
         return new SuggestionsDao(apiService, networkScheduler);
+    }
+
+    @Provides
+    @Singleton
+    CategoriesDao categoriesDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
+        return new CategoriesDao(apiService, networkScheduler);
     }
 }
