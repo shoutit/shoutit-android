@@ -32,7 +32,6 @@ public class LocationAdapter extends BaseAdapter {
         @Bind(R.id.location_suggestion_item_tv)
         TextView placeTextView;
 
-        @Nonnull
         private LocationPresenter.PlaceAdapterItem item;
 
         public PlaceViewHolder(@Nonnull View itemView) {
@@ -60,7 +59,6 @@ public class LocationAdapter extends BaseAdapter {
         @Bind(R.id.location_current_item_place_tv)
         TextView placeTextView;
 
-        @Nonnull
         private LocationPresenter.CurrentLocationAdapterItem item;
 
         public CurrentLocationViewHolder(@Nonnull View itemView) {

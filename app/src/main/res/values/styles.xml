@@ -27,9 +27,14 @@
         <item name="android:windowBackground">@drawable/gradient_intro</item>
     </style>
 
+    <style name="BaseToolbarNoElevation" parent="AppTheme.BaseToolbarStyle">
+        <item name="elevation">0dp</item>
+    </style>
+
     <style name="AppTheme.BaseToolbarStyle" parent="@style/ThemeOverlay.AppCompat.ActionBar">
         <item name="android:background">?attr/colorPrimary</item>
         <item name="android:theme">@style/AppTheme.AppBarOverlay</item>
+        <item name="android:minHeight">?attr/actionBarSize</item>
         <item name="popupTheme">@style/AppTheme.PopupOverlay</item>
         <item name="elevation">4dp</item>
         <item name="colorControlNormal">@android:color/white</item>
