@@ -1,6 +1,5 @@
 package com.shoutit.app.android.view.createshout.edit;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -9,7 +8,6 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
@@ -18,9 +16,7 @@ import android.support.v4.util.Pair;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -41,6 +37,7 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.view.createshout.location.LocationActivity;
+import com.shoutit.app.android.widget.SpinnerAdapter;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -95,61 +92,16 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
                 .putExtra(ARGS_ID, id);
     }
 
-    private class SpinnerAdapter extends BaseAdapter {
-
-        private List<Pair<String, String>> list;
-
-        public SpinnerAdapter(@StringRes int startingText) {
-            list = ImmutableList.of(new Pair<>("", EditShoutActivity.this.getString(startingText)));
-        }
-
-        @Override
-        public int getCount() {
-            return list.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return list.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return list.get(position).first.hashCode();
-        }
-
-        @SuppressLint("ViewHolder")
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            final TextView view = (TextView) getLayoutInflater().inflate(android.R.layout.simple_list_item_1, parent, false);
-            view.setText(list.get(position).second);
-            return view;
-        }
-
-        @Override
-        public View getDropDownView(int position, View convertView, ViewGroup parent) {
-            final TextView view = (TextView) getLayoutInflater().inflate(android.R.layout.simple_list_item_1, parent, false);
-            view.setText(list.get(position).second);
-            return view;
-        }
-
-        public void setData(@NonNull List<Pair<String, String>> list) {
-            this.list = list;
-            notifyDataSetChanged();
-        }
-    }
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.edit_shout_activity);
         ButterKnife.bind(this);
 
-        mCurrencyAdapter = new SpinnerAdapter(R.string.request_activity_currency);
+        mCurrencyAdapter = new SpinnerAdapter(R.string.request_activity_currency, this);
         mEditCurrencySpinner.setAdapter(mCurrencyAdapter);
 
-        mCategoryAdapter = new SpinnerAdapter(R.string.edit_shout_category);
+        mCategoryAdapter = new SpinnerAdapter(R.string.edit_shout_category, this);
         mEditCategorySpinner.setAdapter(mCategoryAdapter);
         mEditCategorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
@@ -328,7 +280,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
                         }
                     }));
 
-            final SpinnerAdapter adapter = new SpinnerAdapter(R.string.edit_shout_option);
+            final SpinnerAdapter adapter = new SpinnerAdapter(R.string.edit_shout_option, this);
             spinner.setAdapter(adapter);
             adapter.setData(optionsPairs);
 

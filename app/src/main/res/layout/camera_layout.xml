@@ -10,14 +10,58 @@
         android:id="@+id/camera_preview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/camera_controlls_layout"/>
+        android:layout_above="@+id/camera_capture_controlls"/>
 
-    <RelativeLayout
-        android:id="@+id/camera_controlls_layout"
+    <ImageView
+        android:id="@+id/camera_preview_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/camera_capture_controlls"
+        android:scaleType="centerCrop"
+        android:visibility="gone"/>
+
+    <LinearLayout
+        android:id="@+id/camera_preview_controlls"
         android:layout_width="match_parent"
         android:layout_height="145dp"
         android:layout_alignParentBottom="true"
-        android:background="@android:color/black">
+        android:background="@android:color/black"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <Button
+            android:id="@+id/camera_preview_controlls_retake"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="40dp"
+            android:background="?selectableItemBackground"
+            android:fontFamily="sans-serif"
+            android:text="Retake"
+            android:textAllCaps="true"
+            android:textColor="@android:color/darker_gray"/>
+
+        <Button
+            android:id="@+id/camera_preview_controlls_publish"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="40dp"
+            android:background="?selectableItemBackground"
+            android:fontFamily="sans-serif"
+            android:text="Publish"
+            android:textAllCaps="true"
+            android:textColor="@android:color/white"/>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/camera_capture_controlls"
+        android:layout_width="match_parent"
+        android:layout_height="145dp"
+        android:layout_alignParentBottom="true"
+        android:background="@android:color/black"
+        tools:visibility="gone">
 
         <TextView
             android:id="@+id/camera_text_header"
@@ -29,15 +73,15 @@
             android:textColor="@android:color/white"/>
 
         <TextView
-            android:textSize="12sp"
-            android:layout_below="@+id/camera_text_header"
             android:id="@+id/camera_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/camera_text_header"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="6dp"
             android:text="This is your featured photo. Make sure it's a good one!"
-            android:textColor="@android:color/white"/>
+            android:textColor="@android:color/white"
+            android:textSize="12sp"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -78,16 +122,8 @@
 
     </RelativeLayout>
 
-    <ImageButton
-        android:layout_margin="8dp"
-        android:id="@+id/camera_close"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/status_bar_margin"
-        android:background="?selectableItemBackground"
-        android:src="@drawable/close"/>
-
     <LinearLayout
+        android:id="@+id/camera_camera_controlls"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
@@ -110,5 +146,82 @@
             tools:src="@drawable/flash"/>
 
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/camera_published_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black_20"
+        android:clickable="true"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingTop="40dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/cool"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Shout published. Congrats!"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Want to add price?"
+            android:textAllCaps="true"/>
+
+        <LinearLayout android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/camera_published_price"
+                android:layout_width="120dp"
+                android:layout_height="60dp"
+                android:hint="Negotiable"/>
+
+            <Spinner
+                android:id="@+id/camera_published_currency"
+                android:layout_width="80dp"
+                android:layout_height="60dp"/>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/camera_published_done"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Done"/>
+
+
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/camera_close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:layout_marginTop="@dimen/status_bar_margin"
+        android:background="?selectableItemBackground"
+        android:src="@drawable/close"/>
+
+    <FrameLayout
+        android:id="@+id/camera_progress"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black_20"
+        android:clickable="true"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
+
+    </FrameLayout>
 
 </RelativeLayout>

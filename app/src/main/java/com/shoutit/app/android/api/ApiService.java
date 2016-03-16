@@ -5,11 +5,13 @@ import android.support.annotation.Nullable;
 
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.ChangePasswordRequest;
+import com.shoutit.app.android.api.model.CreateOfferShoutWithImageRequest;
 import com.shoutit.app.android.api.model.CreateRequestShoutRequest;
 import com.shoutit.app.android.api.model.CreateShoutResponse;
 import com.shoutit.app.android.api.model.Currency;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
+import com.shoutit.app.android.api.model.EditShoutPriceRequest;
 import com.shoutit.app.android.api.model.EditShoutRequest;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.GuestSignupRequest;
@@ -170,10 +172,16 @@ public interface ApiService {
      * create shout
      */
     @POST("shouts")
-    Observable<CreateShoutResponse> createShoutRequest(@Body CreateRequestShoutRequest request);
+    Observable<CreateShoutResponse> createShoutRequest(@Body CreateRequestShoutRequest offer);
+
+    @POST("shouts")
+    Observable<CreateShoutResponse> createShoutOffer(@Body CreateOfferShoutWithImageRequest request);
 
     @PATCH("shouts/{id}")
     Observable<CreateShoutResponse> editShout(@Path("id") String id, @Body EditShoutRequest request);
+
+    @PATCH("shouts/{id}")
+    Observable<CreateShoutResponse> editShoutPrice(@Path("id") String id, @Body EditShoutPriceRequest request);
 
     @GET("shouts/{id}")
     Observable<ShoutResponse> getShout(@Path("id") String id);

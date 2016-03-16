@@ -52,8 +52,8 @@ public class EditProfilePresenterTest {
         when(fileHelper.saveBitmapToTempFileObservable(any(Bitmap.class)))
                 .thenReturn(Observable.just(ResponseOrError.fromData(new File("path"))));
 
-        when(amazonHelper.uploadImageObservable(any(AmazonHelper.AmazonBucket.class), any(File.class)))
-                .thenReturn(Observable.just(ResponseOrError.fromData("fileUrl")));
+        when(amazonHelper.uploadUserImageObservable(any(File.class)))
+                .thenReturn(Observable.just("fileUrl"));
 
         presenter = new EditProfilePresenter(userPreferences, apiService,
                 fileHelper, amazonHelper, Schedulers.immediate(), Schedulers.immediate(), null);
