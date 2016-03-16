@@ -1,11 +1,10 @@
-package com.shoutit.app.android.view.profile;
+package com.shoutit.app.android.view.profile.tagprofile;
 
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.ActivityScope;
 import com.shoutit.app.android.dagger.AppComponent;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
-import com.shoutit.app.android.view.profile.tagprofile.TagProfileActivity;
-import com.shoutit.app.android.view.profile.tagprofile.TagProfilePresenter;
+import com.shoutit.app.android.view.profile.ProfilePresenter;
 
 import dagger.Component;
 
@@ -14,13 +13,12 @@ import dagger.Component;
         dependencies = AppComponent.class,
         modules = {
                 ActivityModule.class,
-                ProfileActivityModule.class
+                TagProfileActivityModule.class
         }
 )
-public interface ProfileActivityComponent extends BaseActivityComponent {
+public interface TagProfileActivityComponent extends BaseActivityComponent {
 
-    void inject(ProfileActivity activity);
+    void inject(TagProfileActivity activity);
 
     ProfilePresenter getPresenter();
 }
-

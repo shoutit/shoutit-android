@@ -31,6 +31,7 @@ import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.SuggestionsDao;
+import com.shoutit.app.android.dao.TagsDao;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.utils.BadRequestThrowable;
 import com.shoutit.app.android.utils.LogHelper;
@@ -210,6 +211,13 @@ public final class AppModule {
     public ProfilesDao provideProfilesDao(ApiService apiService,
                                           @NetworkScheduler Scheduler networkScheduler) {
         return new ProfilesDao(apiService, networkScheduler);
+    }
+
+    @Singleton
+    @Provides
+    public TagsDao provideTagsDao(ApiService apiService,
+                                  @NetworkScheduler Scheduler networkScheduler) {
+        return new TagsDao(apiService, networkScheduler);
     }
 
     @Singleton

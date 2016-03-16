@@ -3,6 +3,7 @@ package com.shoutit.app.android.api.model;
 public interface ProfileType {
     String PAGE = "page";
     String USER = "user";
+    String TAG = "tag";
 
     String getId();
 
