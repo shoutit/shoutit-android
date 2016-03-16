@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.shoutit.app.android.App;
@@ -48,12 +49,6 @@ public class SearchActivity extends BaseActivity implements SearchView.OnQueryTe
     }
 
     private void setUpToolbar() {
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
         toolbar.setNavigationIcon(R.drawable.ic_blue_arrow);
         toolbar.setTitle(null);
         setSupportActionBar(toolbar);
@@ -75,6 +70,17 @@ public class SearchActivity extends BaseActivity implements SearchView.OnQueryTe
         searchView.setMaxWidth(Integer.MAX_VALUE);
 
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
