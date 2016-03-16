@@ -8,7 +8,7 @@ public class NoDataAdapterItem extends BaseNoIDAdapterItem {
 
     @Override
     public boolean matches(@Nonnull BaseAdapterItem item) {
-        return false;
+        return item instanceof NoDataAdapterItem;
     }
 
     @Override

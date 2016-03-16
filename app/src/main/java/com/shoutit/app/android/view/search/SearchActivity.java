@@ -79,11 +79,13 @@ public class SearchActivity extends BaseActivity implements SearchView.OnQueryTe
 
     @Override
     public boolean onQueryTextSubmit(String query) {
+        // TODO
         return false;
     }
 
     @Override
     public boolean onQueryTextChange(String newText) {
+        // TODO
         return false;
     }
 
