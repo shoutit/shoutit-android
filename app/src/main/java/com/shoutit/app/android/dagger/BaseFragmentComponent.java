@@ -1,5 +1,7 @@
 package com.shoutit.app.android.dagger;
 
+import com.shoutit.app.android.db.DbHelper;
+
 import dagger.Component;
 
 @FragmentScope
@@ -11,4 +13,5 @@ import dagger.Component;
 )
 public interface BaseFragmentComponent {
 
+        DbHelper dbHelper();
 }

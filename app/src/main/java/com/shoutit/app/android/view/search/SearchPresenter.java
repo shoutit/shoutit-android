@@ -14,11 +14,13 @@ import com.appunite.rx.operators.OperatorMergeNextToken;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.MergeShoutsResponses;
+import com.shoutit.app.android.db.SuggestionsTable;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
 import java.util.List;
@@ -48,20 +50,24 @@ public class SearchPresenter {
     }
 
     private final BehaviorSubject<String> querySubject = BehaviorSubject.create();
+    private final BehaviorSubject<Boolean> showSuggestionsSubject = BehaviorSubject.create();
     private final PublishSubject<String> loadMoreSubject = PublishSubject.create();
-    private final PublishSubject<String> shoutSelectedObserver = PublishSubject.create();
+    private final PublishSubject<String> shoutSelectedSubject = PublishSubject.create();
 
+    private final Observable<List<BaseAdapterItem>> suggestionsItemsObservable;
     private final Observable<List<BaseAdapterItem>> shoutsAdapterItemsObservable;
 
     private final ApiService apiService;
 
     @Inject
     public SearchPresenter(final ApiService apiService,
+                           SuggestionsTable suggestionsTable,
                            @ForActivity final Context context,
                            @NetworkScheduler final Scheduler networkScheduler,
                            @UiScheduler Scheduler uiScheduler,
                            @Nonnull final SearchType searchType,
-                           @Nullable final String contextItemId) {
+                           @Nullable final String contextItemId,
+                           boolean showSuggestions) {
         this.apiService = apiService;
 
         /** Requests **/
@@ -118,7 +124,7 @@ public class SearchPresenter {
         final Observable<ShoutsResponse> successShoutsRequest = shoutsRequest
                 .compose(ResponseOrError.<ShoutsResponse>onlySuccess());
 
-        /** Adapter Items **/
+        /** Shout Items **/
         final Observable<List<BaseAdapterItem>> shoutsItems = successShoutsRequest
                 .map(new Func1<ShoutsResponse, List<BaseAdapterItem>>() {
                     @Override
@@ -127,7 +133,7 @@ public class SearchPresenter {
                             @Nullable
                             @Override
                             public BaseAdapterItem apply(Shout input) {
-                                return new ShoutAdapterItem(input, context, shoutSelectedObserver);
+                                return new ShoutAdapterItem(input, context, shoutSelectedSubject);
                             }
                         }));
                     }
@@ -149,6 +155,40 @@ public class SearchPresenter {
                 });
 
         shoutsAdapterItemsObservable = Observable.merge(shoutsItems, clearResultsObservable);
+
+
+        /** Suggestion Items **/
+        final Observable<List<String>> suggestionsObservable = suggestionsTable
+                .getAllSuggestionsObservable()
+                .subscribeOn(networkScheduler)
+                .observeOn(uiScheduler);
+
+        suggestionsItemsObservable = Observable.combineLatest(
+                suggestionsObservable,
+                showSuggestionsSubject.startWith(showSuggestions),
+                new Func2<List<String>, Boolean, List<String>>() {
+                    @Override
+                    public List<String> call(List<String> suggestions, Boolean show) {
+                        if (show) {
+                            return suggestions;
+                        } else {
+                            return null;
+                        }
+                    }
+                })
+                .filter(Functions1.isNotNull())
+                .map(new Func1<List<String>, List<BaseAdapterItem>>() {
+                    @Override
+                    public List<BaseAdapterItem> call(List<String> suggestions) {
+                        return ImmutableList.copyOf(Iterables.transform(suggestions, new Function<String, BaseAdapterItem>() {
+                            @Nullable
+                            @Override
+                            public BaseAdapterItem apply(@Nullable String input) {
+                                return new SuggestionAdapterItem(input);
+                            }
+                        }));
+                    }
+                });
     }
 
     private Observable<ShoutsResponse> getRequest(int pageNumber,
@@ -174,10 +214,40 @@ public class SearchPresenter {
     }
 
     public Observable<String> getShoutSelectedObservable() {
-        return shoutSelectedObserver;
+        return shoutSelectedSubject;
     }
 
     public Observable<List<BaseAdapterItem>> getShoutsAdapterItemsObservable() {
         return shoutsAdapterItemsObservable;
+    }
+
+    public Observable<List<BaseAdapterItem>> getSuggestionsItemsObservable() {
+        return suggestionsItemsObservable;
+    }
+
+    public void showOrHideSuggestion(boolean show) {
+        showSuggestionsSubject.onNext(show);
+    }
+
+    public class SuggestionAdapterItem extends BaseNoIDAdapterItem {
+
+        @Nonnull
+        private final String suggestion;
+
+        public SuggestionAdapterItem(@Nonnull String suggestion) {
+            this.suggestion = suggestion;
+        }
+
+        @Override
+        public boolean matches(@Nonnull BaseAdapterItem item) {
+            return item instanceof SuggestionAdapterItem &&
+                    suggestion.equals(((SuggestionAdapterItem) item).suggestion);
+        }
+
+        @Override
+        public boolean same(@Nonnull BaseAdapterItem item) {
+            return item instanceof SuggestionAdapterItem &&
+                    suggestion.equals(((SuggestionAdapterItem) item).suggestion);
+        }
     }
 }

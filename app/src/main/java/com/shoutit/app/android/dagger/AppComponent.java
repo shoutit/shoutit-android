@@ -17,6 +17,7 @@ import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.SuggestionsDao;
+import com.shoutit.app.android.db.DbHelper;
 import com.shoutit.app.android.location.LocationManager;
 import com.squareup.picasso.Picasso;
 
@@ -75,4 +76,6 @@ public interface AppComponent {
     TransferUtility transferUtility();
 
     ContentResolver contentResolver();
+
+    DbHelper dbHelper();
 }
