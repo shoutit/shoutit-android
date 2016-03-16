@@ -29,6 +29,7 @@ import com.shoutit.app.android.view.createshout.request.CreateRequestActivity;
 import com.shoutit.app.android.view.discover.DiscoverActivity;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.main.OnSeeAllDiscoversListener;
+import com.shoutit.app.android.view.media.NativeCameraActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 
 import java.util.List;
@@ -186,10 +187,10 @@ public class HomeFragment extends BaseFragment {
     void onAddShoutClicked() {
         if (mUserPreferences.isGuest()) {
             startActivity(LoginIntroActivity.newIntent(getActivity()));
-            fab.close(false);
         } else {
-            Toast.makeText(context, "Not implemented yet", Toast.LENGTH_LONG).show();
+            startActivity(NativeCameraActivity.newIntent(getActivity()));
         }
+        fab.close(false);
     }
 
     @OnClick(R.id.fab_request_shout)

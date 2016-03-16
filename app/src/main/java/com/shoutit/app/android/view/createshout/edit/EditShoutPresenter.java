@@ -187,16 +187,7 @@ public class EditShoutPresenter {
     }
 
     private void currencySuccess(@NonNull List<Currency> responseData) {
-        final List<Pair<String, String>> list = ImmutableList.copyOf(
-                Iterables.transform(responseData,
-                        new Function<Currency, Pair<String, String>>() {
-                            @Nullable
-                            @Override
-                            public Pair<String, String> apply(Currency input) {
-                                return Pair.create(input.getCode(),
-                                        String.format("%s (%s)", input.getName(), input.getCountry()));
-                            }
-                        }));
+        final List<Pair<String, String>> list = PriceUtils.transformCurrencyToPair(responseData);
 
         mListener.setCurrenciesEnabled(true);
         mListener.setCurrencies(list);

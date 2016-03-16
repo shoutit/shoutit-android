@@ -158,6 +158,10 @@ public class LoginFragment extends BaseFragment {
                 .compose(this.<Void>bindToLifecycle())
                 .subscribe(loginPresenter.getProceedObserver());
 
+        loginPresenter.getProgressObservable()
+                .compose(this.<Boolean>bindToLifecycle())
+                .subscribe(RxView.visibility(progressView));
+
         RxView.clicks(forgotPassworTextView)
                 .compose(this.<Void>bindToLifecycle())
                 .subscribe(new Action1<Void>() {
@@ -167,9 +171,6 @@ public class LoginFragment extends BaseFragment {
                     }
                 });
 
-        loginPresenter.getProgressObservable()
-                .compose(this.<Boolean>bindToLifecycle())
-                .subscribe(RxView.visibility(progressView));
     }
 
     @OnCheckedChanged(R.id.login_lock_password)
