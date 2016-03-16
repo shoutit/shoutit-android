@@ -83,6 +83,9 @@ public interface ApiService {
                                              @Query("page") Integer page,
                                              @Query("page_size") Integer pageSize);
 
+    @GET("shouts/categories")
+    Observable<List<Category>> categories();
+
     @GET("shouts")
     Observable<ShoutsResponse> tagShouts(@Query("tags") String tagName,
                                          @Query("page") Integer page,
@@ -155,9 +158,6 @@ public interface ApiService {
 
     @GET("misc/geocode?latlng=0,0")
     Observable<UserLocation> geocodeDefault();
-
-    @GET("misc/categories")
-    Observable<List<Category>> categories();
 
     @GET("misc/suggestions?type=users,pages")
     Observable<SuggestionsResponse> suggestions(@Query("country") String country,
