@@ -90,7 +90,7 @@ public class SearchActivity extends BaseActivity implements SearchView.OnQueryTe
         toolbarShadow.setVisibility(View.GONE);
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.search_categories_fragment_container, SearchFragment.newInstance())
+                .replace(R.id.search_categories_fragment_container, MainSearchFragment.newInstance())
                 .commit();
     }
 

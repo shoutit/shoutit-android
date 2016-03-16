@@ -14,9 +14,9 @@ import dagger.Component;
                 FragmentModule.class,
         }
 )
-public interface SearchFragmentComponent extends BaseFragmentComponent {
+public interface MainSearchFragmentComponent extends BaseFragmentComponent {
 
-    void inject(SearchFragment fragment);
+    void inject(MainSearchFragment fragment);
 }
 
 

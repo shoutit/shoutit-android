@@ -19,7 +19,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 
-public class SearchFragment extends BaseFragment {
+public class MainSearchFragment extends BaseFragment {
 
     @Bind(R.id.search_view_pager)
     ViewPager viewPager;
@@ -30,7 +30,7 @@ public class SearchFragment extends BaseFragment {
     SearchPagerAdapter pagerAdapter;
 
     public static Fragment newInstance() {
-        return new SearchFragment();
+        return new MainSearchFragment();
     }
 
     @Nullable
@@ -51,7 +51,7 @@ public class SearchFragment extends BaseFragment {
     protected void injectComponent(@Nonnull BaseActivityComponent baseActivityComponent,
                                    @Nonnull FragmentModule fragmentModule,
                                    @Nullable Bundle savedInstanceState) {
-        DaggerSearchFragmentComponent.builder()
+        DaggerMainSearchFragmentComponent.builder()
                 .baseActivityComponent(baseActivityComponent)
                 .fragmentModule(fragmentModule)
                 .build()

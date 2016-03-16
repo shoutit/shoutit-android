@@ -84,6 +84,29 @@ public interface ApiService {
     @GET("shouts/categories")
     Observable<List<Category>> categories();
 
+    @GET("shouts")
+    Observable<ShoutsResponse> searchShouts(@Query("search") String query,
+                                           @Query("page") Integer page,
+                                           @Query("page_size") Integer pageSize);
+
+    @GET("shouts")
+    Observable<ShoutsResponse> searchProfileShouts(@Query("search") String query,
+                                                   @Query("page") Integer page,
+                                                   @Query("page_size") Integer pageSize,
+                                                   @Query("profile") String userName);
+
+    @GET("shouts")
+    Observable<ShoutsResponse> searchTagShouts(@Query("search") String query,
+                                                   @Query("page") Integer page,
+                                                   @Query("page_size") Integer pageSize,
+                                                   @Query("tags") String tagNameOrCategorySlug);
+
+    @GET("shouts")
+    Observable<ShoutsResponse> searchDiscoverShouts(@Query("search") String query,
+                                                   @Query("page") Integer page,
+                                                   @Query("page_size") Integer pageSize,
+                                                   @Query("discover") String userName);
+
     /**
      * OAuth
      **/
