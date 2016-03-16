@@ -63,7 +63,7 @@ public class App extends MultiDexApplication {
 
     private void initFabric() {
         final CrashlyticsCore crashlytics = new CrashlyticsCore.Builder()
-                .disabled(BuildConfig.DEBUG)
+                .disabled("debug".equals(BuildConfig.BUILD_TYPE))
                 .build();
 
         Fabric.with(this, crashlytics);
