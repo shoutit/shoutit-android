@@ -110,10 +110,10 @@
     <string name="html_activity_privacy">Privacy Policy</string>
 
     <!-- Location -->
-    <string name="location_toolbar_title">Choose location</string>
-    <string name="location_search_hint">Enter a location</string>
+    <string name="location_toolbar_title">Change your location</string>
+    <string name="location_search_hint">Type an address</string>
     <string name="location_header">My current location (automatic updates)</string>
-    <string name="location_header_selected_location">Current selection</string>
+    <string name="location_header_selected_location">Current location</string>
     <string name="location_location">%1$s, %2$s</string>
 
     <!-- Side Menu -->
@@ -289,5 +289,14 @@
     <string name="post_signup_suggested_pages">Suggested pages</string>
     <string name="post_signup_done">Done</string>
     <string name="camera_publish_currency">Currency</string>
+
+    <!-- Search -->
+    <string name="search_base_title">Search</string>
+    <string name="search_base_hint">Search</string>
+    <string name="search_category_header">Categories</string>
+
+    <!-- Tag Profile -->
+    <string name="tag_profile_related_interests">Related interests</string>
+    <string name="tag_profile_shouts">%1$s shouts</string>
 
 </resources>

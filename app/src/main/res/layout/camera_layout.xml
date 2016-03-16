@@ -28,8 +28,7 @@
         android:background="@android:color/black"
         android:gravity="center"
         android:orientation="horizontal"
-        android:visibility="gone"
-        tools:visibility="visible">
+        android:visibility="gone">
 
         <Button
             android:id="@+id/camera_preview_controlls_retake"
@@ -61,7 +60,7 @@
         android:layout_height="145dp"
         android:layout_alignParentBottom="true"
         android:background="@android:color/black"
-        tools:visibility="gone">
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/camera_text_header"
@@ -99,6 +98,7 @@
                 android:src="@drawable/camera"/>
 
             <ImageButton
+                android:id="@+id/button_gallery"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
@@ -151,14 +151,16 @@
         android:id="@+id/camera_published_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/black_20"
+        android:background="@color/black_87"
         android:clickable="true"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:paddingTop="40dp"
-        android:visibility="gone">
+        android:paddingTop="70dp"
+        android:visibility="gone"
+        tools:visibility="visible">
 
         <ImageView
+            android:id="@+id/camera_cool_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/cool"/>
@@ -166,13 +168,18 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Shout published. Congrats!"/>
+            android:layout_marginTop="30dp"
+            android:text="Shout published. Congrats!"
+            android:textColor="@android:color/white"
+            android:textSize="22sp"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
             android:text="Want to add price?"
-            android:textAllCaps="true"/>
+            android:textAllCaps="true"
+            android:textColor="@android:color/white"/>
 
         <LinearLayout android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
@@ -181,21 +188,29 @@
             <EditText
                 android:id="@+id/camera_published_price"
                 android:layout_width="120dp"
-                android:layout_height="60dp"
-                android:hint="Negotiable"/>
+                android:layout_height="wrap_content"
+                android:hint="Negotiable"
+                android:inputType="numberDecimal"
+                android:textColor="@android:color/white"
+                android:textColorHint="@android:color/white"/>
 
             <Spinner
                 android:id="@+id/camera_published_currency"
-                android:layout_width="80dp"
-                android:layout_height="60dp"/>
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"/>
 
         </LinearLayout>
 
         <Button
             android:id="@+id/camera_published_done"
-            android:layout_width="wrap_content"
+            android:layout_width="240dp"
             android:layout_height="wrap_content"
-            android:text="Done"/>
+            android:layout_marginTop="10dp"
+            android:fontFamily="sans-serif"
+            android:padding="22dp"
+            android:text="Done"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"/>
 
 
     </LinearLayout>
@@ -204,7 +219,7 @@
         android:id="@+id/camera_close"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
+        android:layout_marginLeft="8dp"
         android:layout_marginTop="@dimen/status_bar_margin"
         android:background="?selectableItemBackground"
         android:src="@drawable/close"/>

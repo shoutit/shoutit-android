@@ -21,6 +21,12 @@
         <activity
             android:name=".view.main.MainActivity"
             android:theme="@style/AppTheme.WithDrawer">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+
         </activity>
 
         <activity
@@ -70,13 +76,11 @@
         <activity android:name=".view.signin.forgotpassword.ForgotPasswordActivity"/>
 
         <activity android:name=".view.media.NativeCameraActivity"
-                  android:theme="@style/TranslucentStatusBar">
+                  android:theme="@style/TranslucentStatusBar"/>
 
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-
+        <activity android:name=".view.search.SearchActivity">
+            <meta-data android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
         </activity>
 
         <activity
@@ -85,8 +89,10 @@
 
         <activity android:name=".view.shout.ShoutActivity"/>
 
-        <activity
-            android:name=".view.profile.ProfileActivity"
+        <activity android:name=".view.profile.UserOrPageProfileActivity"
+            android:theme="@style/TranslucentStatusBar"/>
+
+        <activity android:name=".view.profile.tagprofile.TagProfileActivity"
             android:theme="@style/TranslucentStatusBar"/>
 
         <activity

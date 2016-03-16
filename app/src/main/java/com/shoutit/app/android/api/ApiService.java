@@ -15,12 +15,14 @@ import com.shoutit.app.android.api.model.EditShoutPriceRequest;
 import com.shoutit.app.android.api.model.EditShoutRequest;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.GuestSignupRequest;
+import com.shoutit.app.android.api.model.RelatedTagsResponse;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutResponse;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.SuggestionsResponse;
+import com.shoutit.app.android.api.model.TagDetail;
 import com.shoutit.app.android.api.model.TagsRequest;
 import com.shoutit.app.android.api.model.UpdateLocationRequest;
 import com.shoutit.app.android.api.model.UpdateUserRequest;
@@ -82,6 +84,14 @@ public interface ApiService {
     Observable<ShoutsResponse> shoutsRelated(@Path("id") String shoutId,
                                              @Query("page") Integer page,
                                              @Query("page_size") Integer pageSize);
+
+    @GET("shouts/categories")
+    Observable<List<Category>> categories();
+
+    @GET("shouts")
+    Observable<ShoutsResponse> tagShouts(@Query("tags") String tagName,
+                                         @Query("page") Integer page,
+                                         @Query("page_size") Integer pageSize);
 
     /**
      * OAuth
@@ -151,15 +161,15 @@ public interface ApiService {
     @GET("misc/geocode?latlng=0,0")
     Observable<UserLocation> geocodeDefault();
 
-    @GET("misc/categories")
-    Observable<List<Category>> categories();
-
     @GET("misc/suggestions?type=users,pages")
     Observable<SuggestionsResponse> suggestions(@Query("country") String country,
                                                 @Query("state") String state,
                                                 @Query("city") String city,
                                                 @Query("page") Integer page,
                                                 @Query("page_size") Integer pageSize);
+
+    @GET("misc/currencies")
+    Observable<List<Currency>> getCurrencies();
 
     /**
      * Auth
@@ -186,6 +196,19 @@ public interface ApiService {
     @GET("shouts/{id}")
     Observable<ShoutResponse> getShout(@Path("id") String id);
 
-    @GET("misc/currencies")
-    Observable<List<Currency>> getCurrencies();
+    /**
+     * Tags
+     **/
+    @GET("tags/{name}")
+    Observable<TagDetail> tagDetail(@Path("name") String tagName);
+
+    @POST("tags/{name}/listen")
+    Observable<ResponseBody> listenTag(@Path("name") String tagName);
+
+    @DELETE("tags/{name}/listen")
+    Observable<ResponseBody> unlistenTag(@Path("name") String tagName);
+
+    @GET("tags/{name}/related")
+    Observable<RelatedTagsResponse> relatedTags(@Path("name") String tagName);
+
 }

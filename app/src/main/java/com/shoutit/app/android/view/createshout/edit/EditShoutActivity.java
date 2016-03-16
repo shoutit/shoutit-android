@@ -37,6 +37,7 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.view.createshout.location.LocationActivity;
+import com.shoutit.app.android.widget.SimpleSpinnerAdapter;
 import com.shoutit.app.android.widget.SpinnerAdapter;
 import com.squareup.picasso.Picasso;
 
@@ -98,10 +99,10 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
         setContentView(R.layout.edit_shout_activity);
         ButterKnife.bind(this);
 
-        mCurrencyAdapter = new SpinnerAdapter(R.string.request_activity_currency, this);
+        mCurrencyAdapter = new SimpleSpinnerAdapter(R.string.request_activity_currency, this);
         mEditCurrencySpinner.setAdapter(mCurrencyAdapter);
 
-        mCategoryAdapter = new SpinnerAdapter(R.string.edit_shout_category, this);
+        mCategoryAdapter = new SimpleSpinnerAdapter(R.string.edit_shout_category, this);
         mEditCategorySpinner.setAdapter(mCategoryAdapter);
         mEditCategorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
@@ -280,7 +281,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
                         }
                     }));
 
-            final SpinnerAdapter adapter = new SpinnerAdapter(R.string.edit_shout_option, this);
+            final SpinnerAdapter adapter = new SimpleSpinnerAdapter(R.string.edit_shout_option, this);
             spinner.setAdapter(adapter);
             adapter.setData(optionsPairs);
 

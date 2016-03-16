@@ -1,17 +1,22 @@
 package com.shoutit.app.android.view.media;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.PorterDuff;
 import android.hardware.Camera;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.util.Pair;
 import android.util.Log;
 import android.view.Display;
@@ -30,9 +35,9 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 
 import com.appunite.rx.android.MyAndroidSchedulers;
+import com.appunite.rx.internal.Preconditions;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
-import com.google.common.io.Files;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
@@ -44,13 +49,17 @@ import com.shoutit.app.android.api.model.EditShoutPriceRequest;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.AmazonHelper;
+import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.SystemUIUtils;
 import com.shoutit.app.android.widget.FlashlightButton;
 import com.shoutit.app.android.widget.SpinnerAdapter;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -62,6 +71,9 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
+import okio.BufferedSink;
+import okio.Okio;
+import okio.Source;
 import rx.Observable;
 import rx.functions.Action0;
 import rx.functions.Action1;
@@ -75,9 +87,11 @@ public class NativeCameraActivity extends BaseActivity {
     private static final int STATE_PHOTO_TAKEN = 1;
     private static final int STATE_PHOTO_PUBLISHED = 2;
 
-    private Camera mCamera;
+    private static final int REQUEST_GALLERY_IMAGE_CODE = 0;
 
-    private CameraPreview mPreview;
+    private static final String STATE_CURRENT_STATE = "state_current_state";
+    private static final String STATE_SHOUT_ID = "state_shout_id";
+    private static final String STATE_FILE_PATH = "state_file_path";
 
     @Bind(R.id.camera_flashlight)
     FlashlightButton flashlightCheckbox;
@@ -121,15 +135,24 @@ public class NativeCameraActivity extends BaseActivity {
     @Bind(R.id.camera_progress)
     ViewGroup mProgressBar;
 
+    @Bind(R.id.camera_cool_icon)
+    ImageView mCoolIcon;
+
     @Inject
     AmazonHelper mAmazonHelper;
 
     @Inject
     ApiService mApiService;
 
+    private String mFilePath;
     private String createdShoutOfferId;
     private Integer mFaceCameraId;
     private SpinnerAdapter mCurrencyAdapter;
+    private int mCurrentState;
+
+    private Camera mCamera;
+
+    private CameraPreview mPreview;
 
     public static NativeCameraActivity newInstance() {
         return new NativeCameraActivity();
@@ -142,6 +165,39 @@ public class NativeCameraActivity extends BaseActivity {
         SystemUIUtils.setFullscreen(this);
 
         ButterKnife.bind(this);
+
+        if (savedInstanceState == null) {
+            captureState(true);
+        } else {
+            mCurrentState = savedInstanceState.getInt(STATE_CURRENT_STATE);
+            createdShoutOfferId = savedInstanceState.getString(STATE_SHOUT_ID, null);
+            mFilePath = savedInstanceState.getString(STATE_FILE_PATH, null);
+            switch (mCurrentState) {
+                case STATE_PHOTO_CAPTURE: {
+                    captureState(true);
+                    break;
+                }
+                case STATE_PHOTO_PUBLISHED: {
+                    publishedState(true);
+                    break;
+                }
+                case STATE_PHOTO_TAKEN: {
+                    photoTakenState(true);
+                    break;
+                }
+                default:
+                    throw new RuntimeException("no switch case for " + mCurrentState);
+            }
+
+            if (mFilePath != null) {
+                final File file = new File(mFilePath);
+                final Uri uri = Uri.fromFile(file);
+                mCameraImagePreview.setImageURI(uri);
+                setUpPublishButtonClickListener(file);
+            }
+        }
+
+        mCoolIcon.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
 
         flashlightCheckbox.setOnFlashStateChanged(new FlashlightButton.OnFlashStateChanged() {
             @Override
@@ -160,8 +216,6 @@ public class NativeCameraActivity extends BaseActivity {
             }
         });
 
-        safeBackCameraOpenInView();
-
         mFaceCameraId = faceCameraId();
         if (mFaceCameraId == null) {
             mCameraRotate.setVisibility(View.GONE);
@@ -169,7 +223,7 @@ public class NativeCameraActivity extends BaseActivity {
 
         closeButton.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
 
-        mCurrencyAdapter = new SpinnerAdapter(R.string.camera_publish_currency, this);
+        mCurrencyAdapter = new SpinnerAdapter(R.string.camera_publish_currency, this, R.layout.camera_publish_currency_item, android.R.layout.simple_list_item_1);
         mPublishedCurrencySpinner.setAdapter(mCurrencyAdapter);
     }
 
@@ -182,6 +236,12 @@ public class NativeCameraActivity extends BaseActivity {
     @OnClick(R.id.button_capture)
     public void capture() {
         mCamera.takePicture(null, null, mPicture);
+    }
+
+    @OnClick(R.id.button_gallery)
+    public void gallery() {
+        final Intent selectImageIntent = createSelectImageIntent();
+        startActivityForResult(selectImageIntent, REQUEST_GALLERY_IMAGE_CODE);
     }
 
     @SuppressWarnings("unchecked")
@@ -202,11 +262,19 @@ public class NativeCameraActivity extends BaseActivity {
                     }, new Action1<Throwable>() {
                         @Override
                         public void call(Throwable throwable) {
-                            // TODO
+                            ColoredSnackBar.error(ColoredSnackBar.contentView(
+                                    NativeCameraActivity.this),
+                                    R.string.error_default,
+                                    Snackbar.LENGTH_SHORT)
+                                    .show();
                         }
                     });
         } else {
-            // TODO error
+            ColoredSnackBar.error(ColoredSnackBar.contentView(
+                    NativeCameraActivity.this),
+                    R.string.error_default,
+                    Snackbar.LENGTH_SHORT)
+                    .show();
         }
     }
 
@@ -231,6 +299,7 @@ public class NativeCameraActivity extends BaseActivity {
         mCameraPreview.setVisibility(visibility);
 
         if (enter) {
+            mCurrentState = STATE_PHOTO_CAPTURE;
             safeBackCameraOpenInView();
         } else {
             releaseCameraAndPreview();
@@ -241,11 +310,16 @@ public class NativeCameraActivity extends BaseActivity {
         int visibility = enter ? View.VISIBLE : View.GONE;
         mCameraImagePreview.setVisibility(visibility);
         mCameraPreviewControlls.setVisibility(visibility);
+        if (enter) {
+            mCurrentState = STATE_PHOTO_TAKEN;
+        }
     }
 
     private void publishedState(boolean enter) {
         int visibility = enter ? View.VISIBLE : View.GONE;
         mPublishedLayout.setVisibility(visibility);
+        mCameraImagePreview.setVisibility(visibility);
+        mCameraPreviewControlls.setVisibility(visibility);
         mApiService.getCurrencies()
                 .subscribeOn(Schedulers.io())
                 .observeOn(MyAndroidSchedulers.mainThread())
@@ -258,9 +332,16 @@ public class NativeCameraActivity extends BaseActivity {
                         }, new Action1<Throwable>() {
                             @Override
                             public void call(Throwable throwable) {
-                                // TODO
+                                ColoredSnackBar.error(ColoredSnackBar.contentView(
+                                        NativeCameraActivity.this),
+                                        R.string.error_default,
+                                        Snackbar.LENGTH_SHORT)
+                                        .show();
                             }
                         });
+        if (enter) {
+            mCurrentState = STATE_PHOTO_PUBLISHED;
+        }
     }
 
     @Nullable
@@ -340,6 +421,10 @@ public class NativeCameraActivity extends BaseActivity {
         return component;
     }
 
+    public static Intent newIntent(Context context) {
+        return new Intent(context, NativeCameraActivity.class);
+    }
+
     @SuppressWarnings("deprecation")
     class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -374,7 +459,11 @@ public class NativeCameraActivity extends BaseActivity {
                 mCamera.setPreviewDisplay(mHolder);
                 mCamera.startPreview();
             } catch (Exception e) {
-                e.printStackTrace(); // TODO
+                ColoredSnackBar.error(ColoredSnackBar.contentView(
+                        NativeCameraActivity.this),
+                        R.string.error_default,
+                        Snackbar.LENGTH_SHORT)
+                        .show();
             }
         }
 
@@ -412,9 +501,15 @@ public class NativeCameraActivity extends BaseActivity {
 
         public void surfaceCreated(SurfaceHolder holder) {
             try {
-                mCamera.setPreviewDisplay(holder);
+                if (mCamera != null) {
+                    mCamera.setPreviewDisplay(holder);
+                }
             } catch (IOException e) {
-                e.printStackTrace(); // TODO
+                ColoredSnackBar.error(ColoredSnackBar.contentView(
+                        NativeCameraActivity.this),
+                        R.string.error_default,
+                        Snackbar.LENGTH_SHORT)
+                        .show();
             }
         }
 
@@ -441,7 +536,11 @@ public class NativeCameraActivity extends BaseActivity {
                 mCamera.setParameters(parameters);
                 mCamera.startPreview();
             } catch (Exception e) {
-                e.printStackTrace(); // TODO
+                ColoredSnackBar.error(ColoredSnackBar.contentView(
+                        NativeCameraActivity.this),
+                        R.string.error_default,
+                        Snackbar.LENGTH_SHORT)
+                        .show();
             }
         }
 
@@ -533,7 +632,7 @@ public class NativeCameraActivity extends BaseActivity {
                 final Optional<File> outputMediaFile = getOutputMediaFile();
                 if (outputMediaFile.isPresent()) {
                     final File file = outputMediaFile.get();
-                    Files.write(data, file); // TODO replace with compress bitmap
+                    mFilePath = file.getAbsolutePath();
 
                     final Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
                     final Matrix matrix = new Matrix();
@@ -557,55 +656,82 @@ public class NativeCameraActivity extends BaseActivity {
                             break;
                     }
 
+                    finalBitmap.compress(Bitmap.CompressFormat.JPEG, 50, new FileOutputStream(file));
+
                     mCameraImagePreview.setImageBitmap(finalBitmap);
 
                     captureState(false);
                     photoTakenState(true);
 
-                    mPublishButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            mProgressBar.setVisibility(View.VISIBLE);
-                            mAmazonHelper.uploadShoutImageObservable(file)
-                                    .flatMap(new Func1<String, Observable<CreateShoutResponse>>() {
-                                        @Override
-                                        public Observable<CreateShoutResponse> call(String url) {
-                                            return mApiService.createShoutOffer(CreateOfferShoutWithImageRequest.withImage(url))
-                                                    .subscribeOn(Schedulers.io())
-                                                    .observeOn(MyAndroidSchedulers.mainThread());
-                                        }
-                                    })
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(MyAndroidSchedulers.mainThread())
-                                    .doOnTerminate(new Action0() {
-                                        @Override
-                                        public void call() {
-                                            mProgressBar.setVisibility(View.GONE);
-                                        }
-                                    })
-                                    .subscribe(
-                                            new Action1<CreateShoutResponse>() {
-                                                @Override
-                                                public void call(CreateShoutResponse createShoutResponse) {
-                                                    createdShoutOfferId = createShoutResponse.getId();
-                                                    publishedState(true);
-                                                }
-                                            }, new Action1<Throwable>() {
-                                                @Override
-                                                public void call(Throwable throwable) {
-                                                    // TODO error
-                                                }
-                                            });
-                        }
-                    });
+                    setUpPublishButtonClickListener(file);
                 } else {
-                    // TODO
+                    ColoredSnackBar.error(ColoredSnackBar.contentView(
+                            NativeCameraActivity.this),
+                            R.string.error_default,
+                            Snackbar.LENGTH_SHORT)
+                            .show();
                 }
             } catch (IOException e) {
-                e.printStackTrace(); // TODO
+                ColoredSnackBar.error(ColoredSnackBar.contentView(
+                        NativeCameraActivity.this),
+                        R.string.error_default,
+                        Snackbar.LENGTH_SHORT)
+                        .show();
             }
         }
     };
+
+    private void setUpPublishButtonClickListener(final File file) {
+        mPublishButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mProgressBar.setVisibility(View.VISIBLE);
+                mAmazonHelper.uploadShoutImageObservable(file)
+                        .flatMap(new Func1<String, Observable<CreateShoutResponse>>() {
+                            @Override
+                            public Observable<CreateShoutResponse> call(String url) {
+                                return mApiService.createShoutOffer(CreateOfferShoutWithImageRequest.withImage(url))
+                                        .subscribeOn(Schedulers.io())
+                                        .observeOn(MyAndroidSchedulers.mainThread());
+                            }
+                        })
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(MyAndroidSchedulers.mainThread())
+                        .doOnTerminate(new Action0() {
+                            @Override
+                            public void call() {
+                                mProgressBar.setVisibility(View.GONE);
+                            }
+                        })
+                        .subscribe(
+                                new Action1<CreateShoutResponse>() {
+                                    @Override
+                                    public void call(CreateShoutResponse createShoutResponse) {
+                                        createdShoutOfferId = createShoutResponse.getId();
+                                        photoTakenState(false);
+                                        publishedState(true);
+                                    }
+                                }, new Action1<Throwable>() {
+                                    @Override
+                                    public void call(Throwable throwable) {
+                                        ColoredSnackBar.error(ColoredSnackBar.contentView(
+                                                NativeCameraActivity.this),
+                                                R.string.error_default,
+                                                Snackbar.LENGTH_SHORT)
+                                                .show();
+                                    }
+                                });
+            }
+        });
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(STATE_CURRENT_STATE, mCurrentState);
+        outState.putString(STATE_SHOUT_ID, createdShoutOfferId);
+        outState.putString(STATE_FILE_PATH, mFilePath);
+    }
 
     @SuppressLint("SimpleDateFormat")
     private Optional<File> getOutputMediaFile() {
@@ -626,5 +752,99 @@ public class NativeCameraActivity extends BaseActivity {
                 "IMG_" + timeStamp + ".jpg");
 
         return Optional.of(mediaFile);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_GALLERY_IMAGE_CODE) {
+            final Optional<Uri> uriOptional = onResult(resultCode, data);
+            final Optional<File> outputMediaFile = getOutputMediaFile();
+            if (uriOptional.isPresent() && outputMediaFile.isPresent()) {
+                final Uri uri = uriOptional.get();
+                try {
+                    final InputStream inputStream = getContentResolver().openInputStream(uri);
+                    Preconditions.checkNotNull(inputStream);
+                    final Source source = Okio.buffer(Okio.source(inputStream));
+                    final File file = outputMediaFile.get();
+                    final BufferedSink bufferedSink = Okio.buffer(Okio.sink(file));
+
+                    bufferedSink.writeAll(source);
+                    bufferedSink.flush();
+
+                    mFilePath = file.getAbsolutePath();
+
+                    mCameraImagePreview.setImageURI(Uri.fromFile(file));
+
+                    captureState(false);
+                    photoTakenState(true);
+
+                    setUpPublishButtonClickListener(file);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                ColoredSnackBar.error(ColoredSnackBar.contentView(
+                        NativeCameraActivity.this),
+                        R.string.error_default,
+                        Snackbar.LENGTH_SHORT)
+                        .show();
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    public Intent createSelectImageIntent() {
+        return new Intent(Intent.ACTION_PICK,
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                .setType("image/*");
+    }
+
+    public Optional<Intent> createSelectVideoIntent() {
+        final Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+                MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
+                .setType("video/*");
+        return Optional.of(galleryIntent);
+    }
+
+    public Optional<Uri> onResult(int resultCode, Intent intent) {
+        Uri mLastImageOrVideoUri = null;
+        if (resultCode == Activity.RESULT_OK) {
+            if (intent != null) {
+                if (intent.getData() != null) {
+                    mLastImageOrVideoUri = intent.getData();
+                } else {
+                    final String outputMediaFileUri = getUriFromBitmap((Bitmap) intent.getParcelableExtra("data"));
+                    if (outputMediaFileUri == null) {
+                        return Optional.absent();
+                    }
+                    mLastImageOrVideoUri = Uri.fromFile(new File(outputMediaFileUri));
+                }
+            }
+            return Optional.fromNullable(mLastImageOrVideoUri);
+        }
+
+        return Optional.absent();
+    }
+
+    private String getUriFromBitmap(Bitmap bitmap) {
+        try {
+            final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 40, bytes);
+
+            final File f = new File(Environment.getExternalStorageDirectory()
+                    + File.separator + System.currentTimeMillis() + ".jpg");
+
+            final FileOutputStream fo = new FileOutputStream(f);
+            try {
+                fo.write(bytes.toByteArray());
+            } finally {
+                fo.close();
+            }
+
+            return f.toString();
+        } catch (Exception ignore) {
+        }
+        return null;
     }
 }

@@ -2,6 +2,8 @@ package com.shoutit.app.android.api.model;
 
 import android.support.annotation.NonNull;
 
+import com.google.common.base.Objects;
+
 import java.util.List;
 
 public class Category {
@@ -56,5 +58,22 @@ public class Category {
     @NonNull
     public List<CategoryFilter> getFilters() {
         return filters;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Category)) return false;
+        final Category category = (Category) o;
+        return Objects.equal(name, category.name) &&
+                Objects.equal(slug, category.slug) &&
+                Objects.equal(icon, category.icon) &&
+                Objects.equal(image, category.image) &&
+                Objects.equal(filters, category.filters);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(name, slug, icon, image, filters);
     }
 }

@@ -25,11 +25,13 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.AuthInterceptor;
 import com.shoutit.app.android.constants.AmazonConstants;
+import com.shoutit.app.android.dao.CategoriesDao;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.SuggestionsDao;
+import com.shoutit.app.android.dao.TagsDao;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.utils.BadRequestThrowable;
 import com.shoutit.app.android.utils.LogHelper;
@@ -213,6 +215,13 @@ public final class AppModule {
 
     @Singleton
     @Provides
+    public TagsDao provideTagsDao(ApiService apiService,
+                                  @NetworkScheduler Scheduler networkScheduler) {
+        return new TagsDao(apiService, networkScheduler);
+    }
+
+    @Singleton
+    @Provides
     public TransferUtility providesTransferUtility(@ForApplication Context context) {
         final BasicAWSCredentials awsCredentials = new BasicAWSCredentials(
                 AmazonConstants.AMAZON_S3_ID, AmazonConstants.AMAZON_S3_SECRET);
@@ -231,5 +240,11 @@ public final class AppModule {
     @Singleton
     SuggestionsDao prpvideSuggestionsDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
         return new SuggestionsDao(apiService, networkScheduler);
+    }
+
+    @Provides
+    @Singleton
+    CategoriesDao categoriesDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
+        return new CategoriesDao(apiService, networkScheduler);
     }
 }

@@ -18,5 +18,11 @@
         <item name="popupTheme">@style/AppTheme.PopupOverlay</item>
         <item name="android:elevation">4dp</item>
         <item name="colorControlNormal">@android:color/white</item>
+        <item name="android:minHeight">?attr/actionBarSize</item>
     </style>
+
+    <style name="BaseToolbarNoElevation" parent="AppTheme.BaseToolbarStyle">
+        <item name="android:elevation">0dp</item>
+    </style>
+
 </resources>

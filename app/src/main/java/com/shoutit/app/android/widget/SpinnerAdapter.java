@@ -2,6 +2,7 @@ package com.shoutit.app.android.widget;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.v4.util.Pair;
@@ -18,10 +19,17 @@ import java.util.List;
 public class SpinnerAdapter extends BaseAdapter {
 
     private final LayoutInflater mLayoutInflater;
+    private final int mLayout;
+    private final int mDropdownLayout;
     private List<Pair<String, String>> list;
 
-    public SpinnerAdapter(@StringRes int startingText, Context context) {
+    public SpinnerAdapter(@StringRes int startingText,
+                          Context context,
+                          @LayoutRes int layout,
+                          @LayoutRes int dropdownLayout) {
+        mDropdownLayout = dropdownLayout;
         list = ImmutableList.of(new Pair<>("", context.getString(startingText)));
+        mLayout = layout;
         mLayoutInflater = LayoutInflater.from(context);
     }
 
@@ -43,14 +51,14 @@ public class SpinnerAdapter extends BaseAdapter {
     @SuppressLint("ViewHolder")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        final TextView view = (TextView) mLayoutInflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+        final TextView view = (TextView) mLayoutInflater.inflate(mLayout, parent, false);
         view.setText(list.get(position).second);
         return view;
     }
 
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
-        final TextView view = (TextView) mLayoutInflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+        final TextView view = (TextView) mLayoutInflater.inflate(mDropdownLayout, parent, false);
         view.setText(list.get(position).second);
         return view;
     }
