@@ -20,7 +20,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class ProfileSectionViewHolder extends ViewHolderManager.BaseViewHolder<ProfileAdapterItems.ProfileSectionAdapterItem<ProfileType>> {
+public class ProfileSectionViewHolder extends ViewHolderManager.BaseViewHolder<ProfileAdapterItems.BaseProfileSectionItem<ProfileType>> {
     private final Context context;
     private final Picasso picasso;
     @Bind(R.id.profile_section_iv)
@@ -34,7 +34,7 @@ public class ProfileSectionViewHolder extends ViewHolderManager.BaseViewHolder<P
     @Bind(R.id.profile_section_container)
     View container;
 
-    private ProfileAdapterItems.ProfileSectionAdapterItem<ProfileType> item;
+    private ProfileAdapterItems.BaseProfileSectionItem<ProfileType> item;
     private final Target target;
 
     public ProfileSectionViewHolder(View itemView, Context context, Picasso picasso) {
@@ -48,7 +48,7 @@ public class ProfileSectionViewHolder extends ViewHolderManager.BaseViewHolder<P
     }
 
     @Override
-    public void bind(@Nonnull ProfileAdapterItems.ProfileSectionAdapterItem<ProfileType> item) {
+    public void bind(@Nonnull ProfileAdapterItems.BaseProfileSectionItem<ProfileType> item) {
         this.item = item;
         final ProfileType sectionItem = item.getSectionItem();
 
@@ -62,8 +62,9 @@ public class ProfileSectionViewHolder extends ViewHolderManager.BaseViewHolder<P
             container.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.shape_page_middle));
         }
 
+        final boolean isTagProfile = ProfileType.TAG.equals(sectionItem.getType());
         picasso.load(sectionItem.getImage())
-                .placeholder(R.drawable.ic_rect_avatar_placeholder)
+                .placeholder(isTagProfile ? R.drawable.ic_tag_placeholder : R.drawable.ic_rect_avatar_placeholder)
                 .into(target);
 
         nameTextView.setText(sectionItem.getName());

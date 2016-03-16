@@ -1,8 +1,11 @@
 package com.shoutit.app.android.api.model;
 
 import com.google.common.base.Objects;
+import com.shoutit.app.android.model.LocationPointer;
 
 import java.io.Serializable;
+
+import javax.annotation.Nonnull;
 
 public class UserLocation implements Serializable {
     private final double latitude;
@@ -75,6 +78,11 @@ public class UserLocation implements Serializable {
 
     public boolean isFromGps() {
         return isFromGps;
+    }
+
+    @Nonnull
+    public LocationPointer getLocationPointer() {
+        return new LocationPointer(country, city);
     }
 
     @Override

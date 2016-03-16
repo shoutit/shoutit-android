@@ -47,6 +47,7 @@ public class ShoutPresenter {
     private final Observable<Boolean> isUserShoutOwnerObservable;
 
     private PublishSubject<String> addToCartSubject = PublishSubject.create();
+    private PublishSubject<String> onCategoryClickedSubject = PublishSubject.create();
     private PublishSubject<String> userShoutSelectedSubject = PublishSubject.create();
     private PublishSubject<String> relatedShoutSelectedSubject = PublishSubject.create();
     private PublishSubject<String> seeAllRelatedShoutSubject = PublishSubject.create();
@@ -127,7 +128,7 @@ public class ShoutPresenter {
                 successShoutResponse.map(new Func1<Shout, ShoutAdapterItems.MainShoutAdapterItem>() {
                     @Override
                     public ShoutAdapterItems.MainShoutAdapterItem call(Shout shout) {
-                        return new ShoutAdapterItems.MainShoutAdapterItem(addToCartSubject, shout, context.getResources());
+                        return new ShoutAdapterItems.MainShoutAdapterItem(addToCartSubject, onCategoryClickedSubject, shout, context.getResources());
                     }
                 });
 
@@ -233,6 +234,11 @@ public class ShoutPresenter {
                 })
                 .compose(ObservableExtensions.<Boolean>behaviorRefCount())
                 .first();
+    }
+
+    @Nonnull
+    public Observable<String> getOnCategoryClickedObservable() {
+        return onCategoryClickedSubject;
     }
 
     @Nonnull

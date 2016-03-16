@@ -30,7 +30,8 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
-import com.shoutit.app.android.view.profile.ProfileActivity;
+import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
+import com.shoutit.app.android.view.profile.tagprofile.TagProfileActivity;
 
 import java.util.List;
 
@@ -145,7 +146,7 @@ public class ShoutActivity extends BaseActivity {
                 .subscribe(new Action1<User>() {
                     @Override
                     public void call(User user) {
-                        startActivity(ProfileActivity.newIntent(ShoutActivity.this, user.getUsername()));
+                        startActivity(UserOrPageProfileActivity.newIntent(ShoutActivity.this, user.getUsername()));
                     }
                 });
 
@@ -155,6 +156,15 @@ public class ShoutActivity extends BaseActivity {
                     @Override
                     public void call(String s) {
                         Toast.makeText(ShoutActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+        presenter.getOnCategoryClickedObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String categorySlug) {
+                        startActivity(TagProfileActivity.newIntent(ShoutActivity.this, categorySlug));
                     }
                 });
     }
