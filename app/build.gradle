@@ -52,6 +52,10 @@ android {
         testInstrumentationRunner "com.android.test.runner.MultiDexTestRunner"
     }
 
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
@@ -103,6 +107,8 @@ android {
             buildConfigField "String", "API_URL", production_api_url
         }
     }
+
+    dexOptions
 
     productFlavors {
         dev {
