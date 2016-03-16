@@ -154,8 +154,8 @@ public class NativeCameraActivity extends BaseActivity {
 
     private CameraPreview mPreview;
 
-    public static NativeCameraActivity newInstance() {
-        return new NativeCameraActivity();
+    public static Intent newIntent(Context context) {
+        return new Intent(context, NativeCameraActivity.class);
     }
 
     @Override
@@ -419,10 +419,6 @@ public class NativeCameraActivity extends BaseActivity {
                 .build();
         component.inject(this);
         return component;
-    }
-
-    public static Intent newIntent(Context context) {
-        return new Intent(context, NativeCameraActivity.class);
     }
 
     @SuppressWarnings("deprecation")

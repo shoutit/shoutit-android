@@ -187,11 +187,10 @@ public class HomeFragment extends BaseFragment {
     void onAddShoutClicked() {
         if (mUserPreferences.isGuest()) {
             startActivity(LoginIntroActivity.newIntent(getActivity()));
-            fab.close(false);
         } else {
             startActivity(NativeCameraActivity.newIntent(getActivity()));
-            Toast.makeText(context, "Not implemented yet", Toast.LENGTH_LONG).show();
         }
+        fab.close(false);
     }
 
     @OnClick(R.id.fab_request_shout)
