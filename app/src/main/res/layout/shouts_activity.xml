@@ -55,7 +55,7 @@
     </LinearLayout>
 
     <include
-        android:id="@+id/fragment_home_fab"
+        android:id="@+id/discover_fab"
         layout="@layout/fab_green" />
 
     <ProgressBar

@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.view.createshout.edit.EditShoutActivity;
@@ -29,6 +31,12 @@ public class PublishShoutActivity extends RxAppCompatActivity {
     @Bind(R.id.publish_activity_toolbar)
     Toolbar mToolbar;
 
+    @Bind(R.id.publish_subheader)
+    TextView subHeader;
+
+    @Bind(R.id.publish_activity_create_another_shout)
+    Button button;
+
     @NonNull
     public static Intent newIntent(@NonNull Context context, @NonNull String id, boolean request) {
         return new Intent(context, PublishShoutActivity.class)
@@ -48,8 +56,10 @@ public class PublishShoutActivity extends RxAppCompatActivity {
 
         final Drawable drawable = getResources().getDrawable(R.drawable.ic_share);
         assert drawable != null;
-        drawable.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
-        mToolbar.getMenu().findItem(R.id.publish_share).setIcon(drawable);
+        final Drawable newDrawable = drawable.getConstantState().newDrawable();
+
+        newDrawable.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
+        mToolbar.getMenu().findItem(R.id.publish_share).setIcon(newDrawable);
 
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,6 +73,10 @@ public class PublishShoutActivity extends RxAppCompatActivity {
         mRequest = getIntent().getExtras().getBoolean(ARGS_REQUEST);
         mId = getIntent().getExtras().getString(ARGS_ID);
 
+        subHeader.setText(getString(R.string.published_extra_info,
+                getString(mRequest ? R.string.publish_request : R.string.publish_offer)));
+        button.setText(getString(R.string.published_create_another_shout,
+                getString(mRequest ? R.string.publish_request : R.string.publish_offer)));
     }
 
     @OnClick(R.id.publish_activity_create_another_shout)
