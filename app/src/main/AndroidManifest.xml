@@ -7,6 +7,8 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.FLASHLIGHT"/>
 
     <application
         android:name=".App"
@@ -19,10 +21,12 @@
         <activity
             android:name=".view.main.MainActivity"
             android:theme="@style/AppTheme.WithDrawer">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+
         </activity>
 
         <activity
@@ -31,7 +35,7 @@
 
         <activity
             android:name=".view.signin.LoginActivity"
-            android:theme="@style/TranslucentStatusBar"/>
+            android:theme="@style/LoginActivityTheme"/>
 
         <activity
             android:name="com.facebook.FacebookActivity"
@@ -48,8 +52,9 @@
             android:theme="@style/PreferenceStyle"/>
 
         <activity android:name=".view.postlogininterest.PostLoginInterestActivity"/>
-        
-        <activity android:name=".view.postlogininterest.postsignupsecond.PostSignupSecondActivity"
+
+        <activity
+            android:name=".view.postlogininterest.postsignupsecond.PostSignupSecondActivity"
             android:theme="@style/TranslucentStatusBar"/>
 
         <activity android:name=".view.location.LocationActivity"/>
@@ -75,6 +80,9 @@
                 android:resource="@xml/searchable" />
         </activity>
 
+        <activity android:name=".view.media.NativeCameraActivity"
+                  android:theme="@style/TranslucentStatusBar"/>
+
         <activity android:name=".view.search.results.SearchResultsActivity"/>
 
         <activity
@@ -83,8 +91,10 @@
 
         <activity android:name=".view.shout.ShoutActivity"/>
 
-        <activity
-            android:name=".view.profile.ProfileActivity"
+        <activity android:name=".view.profile.UserOrPageProfileActivity"
+            android:theme="@style/TranslucentStatusBar"/>
+
+        <activity android:name=".view.profile.tagprofile.TagProfileActivity"
             android:theme="@style/TranslucentStatusBar"/>
 
         <activity

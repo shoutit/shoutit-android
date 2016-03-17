@@ -37,7 +37,8 @@ public class SearchCategoriesPresenter {
     public SearchCategoriesPresenter(CategoriesDao categoriesDao,
                                      @UiScheduler Scheduler uiScheduler) {
 
-        final Observable<ResponseOrError<List<Category>>> categoriesRequest = categoriesDao.getListObservableResponseOrError()
+        final Observable<ResponseOrError<List<Category>>> categoriesRequest = categoriesDao
+                .getListObservableResponseOrError()
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<List<Category>>>behaviorRefCount());
 

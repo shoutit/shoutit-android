@@ -336,9 +336,10 @@ public class EditProfilePresenter {
         return new Func1<File, Observable<ResponseOrError<String>>>() {
             @Override
             public Observable<ResponseOrError<String>> call(File fileToUpload) {
-                return amazonHelper.uploadImageObservable(AmazonHelper.AmazonBucket.USER, fileToUpload)
+                return amazonHelper.uploadUserImageObservable(fileToUpload)
                         .subscribeOn(networkScheduler)
-                        .observeOn(uiScheduler);
+                        .observeOn(uiScheduler)
+                        .compose(ResponseOrError.<String>toResponseOrErrorObservable());
             }
         };
     }

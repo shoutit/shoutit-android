@@ -5,20 +5,25 @@ import android.support.annotation.Nullable;
 
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.ChangePasswordRequest;
+import com.shoutit.app.android.api.model.CreateOfferShoutWithImageRequest;
 import com.shoutit.app.android.api.model.CreateRequestShoutRequest;
+import com.shoutit.app.android.api.model.CreateRequestShoutWithPriceRequest;
 import com.shoutit.app.android.api.model.CreateShoutResponse;
 import com.shoutit.app.android.api.model.Currency;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
+import com.shoutit.app.android.api.model.EditShoutPriceRequest;
 import com.shoutit.app.android.api.model.EditShoutRequest;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.GuestSignupRequest;
+import com.shoutit.app.android.api.model.RelatedTagsResponse;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutResponse;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.SuggestionsResponse;
+import com.shoutit.app.android.api.model.TagDetail;
 import com.shoutit.app.android.api.model.TagsRequest;
 import com.shoutit.app.android.api.model.UpdateLocationRequest;
 import com.shoutit.app.android.api.model.UpdateUserRequest;
@@ -106,6 +111,10 @@ public interface ApiService {
                                                    @Query("page") Integer page,
                                                    @Query("page_size") Integer pageSize,
                                                    @Query("discover") String userName);
+    @GET("shouts")
+    Observable<ShoutsResponse> tagShouts(@Query("tags") String tagName,
+                                         @Query("page") Integer page,
+                                         @Query("page_size") Integer pageSize);
 
     /**
      * OAuth
@@ -182,6 +191,9 @@ public interface ApiService {
                                                 @Query("page") Integer page,
                                                 @Query("page_size") Integer pageSize);
 
+    @GET("misc/currencies")
+    Observable<List<Currency>> getCurrencies();
+
     /**
      * Auth
      **/
@@ -193,14 +205,36 @@ public interface ApiService {
      * create shout
      */
     @POST("shouts")
-    Observable<CreateShoutResponse> createShoutRequest(@Body CreateRequestShoutRequest request);
+    Observable<CreateShoutResponse> createShoutRequest(@Body CreateRequestShoutRequest offer);
+
+    @POST("shouts")
+    Observable<CreateShoutResponse> createShoutRequest(@Body CreateRequestShoutWithPriceRequest offer);
+
+    @POST("shouts")
+    Observable<CreateShoutResponse> createShoutOffer(@Body CreateOfferShoutWithImageRequest request);
 
     @PATCH("shouts/{id}")
     Observable<CreateShoutResponse> editShout(@Path("id") String id, @Body EditShoutRequest request);
 
+    @PATCH("shouts/{id}")
+    Observable<CreateShoutResponse> editShoutPrice(@Path("id") String id, @Body EditShoutPriceRequest request);
+
     @GET("shouts/{id}")
     Observable<ShoutResponse> getShout(@Path("id") String id);
 
-    @GET("misc/currencies")
-    Observable<List<Currency>> getCurrencies();
+    /**
+     * Tags
+     **/
+    @GET("tags/{name}")
+    Observable<TagDetail> tagDetail(@Path("name") String tagName);
+
+    @POST("tags/{name}/listen")
+    Observable<ResponseBody> listenTag(@Path("name") String tagName);
+
+    @DELETE("tags/{name}/listen")
+    Observable<ResponseBody> unlistenTag(@Path("name") String tagName);
+
+    @GET("tags/{name}/related")
+    Observable<RelatedTagsResponse> relatedTags(@Path("name") String tagName);
+
 }

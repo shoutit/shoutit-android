@@ -13,7 +13,7 @@ import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.view.profile.ProfileAdapterItems;
-import com.shoutit.app.android.view.profile.ProfilePresenter;
+import com.shoutit.app.android.view.profile.UserOrPageProfilePresenter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +40,7 @@ public class UserProfileHalfPresenter {
     @Nonnull
     private final PublishSubject<User> onListenActionClickedSubject = PublishSubject.create();
     @Nonnull
-    protected final PublishSubject<ProfilePresenter.UserWithItemToListen> sectionItemListenSubject = PublishSubject.create();
+    protected final PublishSubject<UserOrPageProfilePresenter.UserWithItemToListen> sectionItemListenSubject = PublishSubject.create();
     @Nonnull
     protected final PublishSubject<Throwable> errorSubject = PublishSubject.create();
 
@@ -58,9 +58,9 @@ public class UserProfileHalfPresenter {
 
         final Observable<ResponseOrError<User>> userWithUpdatedSectionItems = sectionItemListenSubject
                 .throttleFirst(1, TimeUnit.SECONDS)
-                .switchMap(new Func1<ProfilePresenter.UserWithItemToListen, Observable<ResponseOrError<User>>>() {
+                .switchMap(new Func1<UserOrPageProfilePresenter.UserWithItemToListen, Observable<ResponseOrError<User>>>() {
                     @Override
-                    public Observable<ResponseOrError<User>> call(final ProfilePresenter.UserWithItemToListen userWithItemToListen) {
+                    public Observable<ResponseOrError<User>> call(final UserOrPageProfilePresenter.UserWithItemToListen userWithItemToListen) {
                         final String userName = userWithItemToListen.getProfileToListen().getUsername();
                         final boolean isListeningToProfile = userWithItemToListen.getProfileToListen().isListening();
 
@@ -133,7 +133,7 @@ public class UserProfileHalfPresenter {
     }
 
     @Nonnull
-    private User updateUserWithChangedSectionItem(@Nonnull ProfilePresenter.UserWithItemToListen userWithItemToListen) {
+    private User updateUserWithChangedSectionItem(@Nonnull UserOrPageProfilePresenter.UserWithItemToListen userWithItemToListen) {
         final List<Page> pages = userWithItemToListen.getCurrentProfileUser().getPages();
         for (int i = 0; i < pages.size(); i++) {
             if (pages.get(i).getUsername().equals(userWithItemToListen.getProfileToListen().getUsername())) {
@@ -200,7 +200,7 @@ public class UserProfileHalfPresenter {
     }
 
     @Nonnull
-    public Observer<ProfilePresenter.UserWithItemToListen> getSectionItemListenObserver() {
+    public Observer<UserOrPageProfilePresenter.UserWithItemToListen> getSectionItemListenObserver() {
         return sectionItemListenSubject;
     }
 }

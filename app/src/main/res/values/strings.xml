@@ -9,6 +9,7 @@
     <string name="google_api_key" translatable="false">AIzaSyBWHadI_MPYQgDLqI4RXhymEs42YEtgTEE</string>
     <string name="facebook_app_id">353625811317277</string>
     <string name="exit_text">Press BACK again to exit</string>
+    <string name="font_roboto_regular">sans-serif</string>
 
     <!-- Errors -->
     <string name="error_default">Ooops, something went wrong</string>
@@ -271,12 +272,14 @@
     <string name="edit_profile_hint_first_name">First Name</string>
     <string name="edit_profile_hint_last_name">Last Name</string>
     <string name="edit_profile_hint_mobile">Mobile</string>
+    <string name="edit_done_btn">Edit</string>
+
+    <!-- Published -->
     <string name="published_congratulations">Congratulations!</string>
     <string name="published_extra_info">Your offer will appear on Shoutit soon.</string>
     <string name="published_add_details">Add more details</string>
-    <string name="or_label">or</string>
     <string name="published_create_another_shout">Create another Shout</string>
-    <string name="font_roboto_regular">sans-serif</string>
+    <string name="published_or_label">or</string>
 
     <!-- Forgot Password -->
     <string name="forgot_password_send">Reset password</string>
@@ -288,6 +291,7 @@
     <string name="post_signup_suggested_users">Suggested users</string>
     <string name="post_signup_suggested_pages">Suggested pages</string>
     <string name="post_signup_done">Done</string>
+    <string name="camera_publish_currency">Currency</string>
 
     <!-- Search -->
     <string name="search_base_title">Search</string>
@@ -298,5 +302,9 @@
     <string name="search_recent_searches">Recent searches</string>
     <string name="search_clear_all">Clear all</string>
     <string name="search_users_placeholder">Search Users</string>
+
+    <!-- Tag Profile -->
+    <string name="tag_profile_related_interests">Related interests</string>
+    <string name="tag_profile_shouts">%1$s shouts</string>
 
 </resources>

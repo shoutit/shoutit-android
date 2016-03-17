@@ -20,6 +20,7 @@ import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.SuggestionsDao;
 import com.shoutit.app.android.db.DbHelper;
+import com.shoutit.app.android.dao.TagsDao;
 import com.shoutit.app.android.location.LocationManager;
 import com.squareup.picasso.Picasso;
 
@@ -60,6 +61,8 @@ public interface BaseActivityComponent {
     Gson gson();
 
     ShoutsDao shoutsDao();
+
+    TagsDao tagsDao();
 
     DiscoversDao discoversDao();
 
