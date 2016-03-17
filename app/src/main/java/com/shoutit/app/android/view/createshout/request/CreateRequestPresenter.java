@@ -137,16 +137,20 @@ public class CreateRequestPresenter {
 
         mListener.showProgress();
 
-        CreateRequestShoutRequest request = Strings.isNullOrEmpty(requestData.mBudget) ?
-                new CreateRequestShoutRequest(
-                        requestData.mDescription,
-                        new UserLocationSimple(mUserLocation.getLatitude(), mUserLocation.getLongitude())) :
-                new CreateRequestShoutWithPriceRequest(
-                        requestData.mDescription,
-                        new UserLocationSimple(mUserLocation.getLatitude(), mUserLocation.getLongitude()),
-                        PriceUtils.getPriceInCents(requestData.mBudget), requestData.mCurrencyId);
 
-        pendingSubscriptions.add(mApiService.createShoutRequest(request)
+        final Observable<CreateShoutResponse> observable;
+        if (Strings.isNullOrEmpty(requestData.mBudget)) {
+            observable = mApiService.createShoutRequest(new CreateRequestShoutRequest(
+                    requestData.mDescription,
+                    new UserLocationSimple(mUserLocation.getLatitude(), mUserLocation.getLongitude())));
+        } else {
+            observable = mApiService.createShoutRequest(new CreateRequestShoutWithPriceRequest(
+                    requestData.mDescription,
+                    new UserLocationSimple(mUserLocation.getLatitude(), mUserLocation.getLongitude()),
+                    PriceUtils.getPriceInCents(requestData.mBudget), requestData.mCurrencyId));
+        }
+
+        pendingSubscriptions.add(observable
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
                 .subscribe(new Action1<CreateShoutResponse>() {
