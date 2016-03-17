@@ -18,6 +18,7 @@ import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
@@ -25,8 +26,11 @@ import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyGridLayoutManager;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
+import com.shoutit.app.android.view.createshout.request.CreateRequestActivity;
 import com.shoutit.app.android.view.home.HomeGridSpacingItemDecoration;
 import com.shoutit.app.android.view.home.HomeLinearSpacingItemDecoration;
+import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
+import com.shoutit.app.android.view.media.NativeCameraActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 
 import java.util.List;
@@ -37,6 +41,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import rx.functions.Action1;
 
 public class DiscoverShoutsActivity extends BaseActivity {
@@ -61,6 +66,9 @@ public class DiscoverShoutsActivity extends BaseActivity {
 
     @Inject
     DiscoverShoutsPresenter mShoutsPresenter;
+
+    @Inject
+    UserPreferences mUserPreferences;
 
     private HomeGridSpacingItemDecoration gridViewItemDecoration;
     private HomeLinearSpacingItemDecoration linearViewItemDecoration;
@@ -171,5 +179,24 @@ public class DiscoverShoutsActivity extends BaseActivity {
         return new Intent(context, DiscoverShoutsActivity.class)
                 .putExtra(DISCOVER_ID, discoverId)
                 .putExtra(DISCOVER_NAME, title);
+    }
+
+    @OnClick(R.id.fab_create_shout)
+    void onAddShoutClicked() {
+        if (mUserPreferences.isGuest()) {
+            startActivity(LoginIntroActivity.newIntent(this));
+        } else {
+            startActivity(NativeCameraActivity.newIntent(this));
+        }
+    }
+
+
+    @OnClick(R.id.fab_request_shout)
+    void onRequestShoutClicked() {
+        if (mUserPreferences.isGuest()) {
+            startActivity(LoginIntroActivity.newIntent(this));
+        } else {
+            startActivity(CreateRequestActivity.newIntent(this));
+        }
     }
 }
