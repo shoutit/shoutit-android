@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.search;
+package com.shoutit.app.android.view.search.main;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
@@ -7,20 +7,20 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ForActivity;
-import com.shoutit.app.android.view.search.shouts.SearchShoutFragment;
-import com.shoutit.app.android.view.search.users.SearchUsersFragment;
+import com.shoutit.app.android.view.search.SearchPresenter;
+import com.shoutit.app.android.view.search.main.shouts.SearchShoutFragment;
+import com.shoutit.app.android.view.search.main.users.SearchUsersFragment;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
-public class SearchPagerAdapter extends FragmentPagerAdapter {
-    private static final int SHOUTS_FRAGMENT_POSITION = 0;
+public class MainSearchPagerAdapter extends FragmentPagerAdapter {
+    public static final int SHOUTS_FRAGMENT_POSITION = 0;
     private static final int USER_FRAGMENT_POSITION = 1;
 
     private final Context context;
 
     @Inject
-    public SearchPagerAdapter(@ForActivity Context context, @Named("childFragmentManager") FragmentManager fm) {
+    public MainSearchPagerAdapter(@ForActivity Context context, FragmentManager fm) {
         super(fm);
         this.context = context;
     }
@@ -29,7 +29,7 @@ public class SearchPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case SHOUTS_FRAGMENT_POSITION:
-                return SearchShoutFragment.newInstance();
+                return SearchShoutFragment.newInstance(SearchPresenter.SearchType.SHOUTS, null);
             case USER_FRAGMENT_POSITION:
                 return SearchUsersFragment.newInstance();
             default:

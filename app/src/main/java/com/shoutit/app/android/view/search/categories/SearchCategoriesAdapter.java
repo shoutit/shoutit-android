@@ -58,7 +58,7 @@ public class SearchCategoriesAdapter extends BaseAdapter {
 
             titleTv.setText(category.getName());
 
-            picasso.load(category.getImage())
+            picasso.load(category.getIcon())
                     .fit()
                     .centerInside()
                     .into(iconIv);

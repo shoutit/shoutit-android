@@ -31,11 +31,11 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
     private static void createDb(@Nonnull SQLiteDatabase db) {
-        db.execSQL(SuggestionsTable.getCreateStatemant());
+        db.execSQL(RecentSearchesTable.getCreateStatemant());
     }
 
     private static void recreateDb(@NonNull SQLiteDatabase db) {
-        db.execSQL("DROP TABLE IF EXISTS " + SuggestionsTable.TABLE);
+        db.execSQL("DROP TABLE IF EXISTS " + RecentSearchesTable.TABLE);
         createDb(db);
     }
 }

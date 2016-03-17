@@ -70,10 +70,12 @@
 
         <activity android:name=".view.signin.forgotpassword.ForgotPasswordActivity"/>
 
-        <activity android:name=".view.search.SearchActivity">
+        <activity android:name=".view.search.main.MainSearchActivity" android:windowSoftInputMode="stateHidden">
             <meta-data android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
+
+        <activity android:name=".view.search.results.SearchResultsActivity"/>
 
         <activity
             android:name=".view.settings.account.AccountActivity"
@@ -112,9 +114,6 @@
         <service
             android:name="com.amazonaws.mobileconnectors.s3.transferutility.TransferService"
             android:enabled="true"/>
-
-        <provider android:name=".data.MySuggestionProvider"
-            android:authorities="com.shoutit.app.android.data.MySuggestionProvider" />
 
     </application>
 </manifest>

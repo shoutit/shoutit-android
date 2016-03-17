@@ -16,7 +16,6 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.ColoredSnackBar;
-import com.shoutit.app.android.view.search.DaggerSearchCategoriesFragmentComponent;
 
 import java.util.List;
 

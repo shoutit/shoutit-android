@@ -115,6 +115,7 @@ public class DbTableSqlBuilder {
 
         public TableBuilder setUniqueColumn(@Nonnull String uniqueColumn) {
             this.uniqueColumn = uniqueColumn;
+            return this;
         }
 
         public TableBuilder setOnConflictReplace(boolean onConflictReplace) {
@@ -136,9 +137,9 @@ public class DbTableSqlBuilder {
             }
 
             if (!Strings.isNullOrEmpty(uniqueColumn) && onConflictIgnore) {
-                stringBuilder.append("UNIQUE").append("(").append(uniqueColumn).append(")").append(ON_CONFLICT_IGNORE);
+                stringBuilder.append(separator).append("UNIQUE").append("(").append(uniqueColumn).append(")").append(ON_CONFLICT_IGNORE);
             } else if (!Strings.isNullOrEmpty(uniqueColumn) && onConflictReplace) {
-                stringBuilder.append("UNIQUE").append("(").append(uniqueColumn).append(")").append(ON_CONFLICT_REPLACE);
+                stringBuilder.append(separator).append("UNIQUE").append("(").append(uniqueColumn).append(")").append(ON_CONFLICT_REPLACE);
             }
 
             stringBuilder.append(");");

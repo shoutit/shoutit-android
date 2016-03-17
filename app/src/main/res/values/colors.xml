@@ -73,5 +73,7 @@
 
     <!-- Search -->
     <color name="search_tab_background">#ededed</color>
+    <color name="search_tabs_color">#dfdfdf</color>
+    <color name="search_bg_color">#f4f4f4</color>
 
 </resources>

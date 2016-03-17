@@ -1,10 +1,9 @@
-package com.shoutit.app.android.view.search;
+package com.shoutit.app.android.view.search.main.users;
 
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.BaseFragmentComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.dagger.FragmentScope;
-import com.shoutit.app.android.view.search.shouts.SearchShoutFragment;
 
 import dagger.Component;
 
@@ -15,9 +14,9 @@ import dagger.Component;
                 FragmentModule.class,
         }
 )
-public interface SearchFragmentComponent extends BaseFragmentComponent {
+public interface SearchUsersFragmentComponent extends BaseFragmentComponent {
 
-    void inject(SearchFragment fragment);
+    void inject(SearchUsersFragment fragment);
 }
 
 

@@ -38,10 +38,10 @@ public class SearchCategoriesPresenter {
                                      @UiScheduler Scheduler uiScheduler) {
 
         final Observable<ResponseOrError<List<Category>>> categoriesRequest = categoriesDao.getListObservableResponseOrError()
+                .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<List<Category>>>behaviorRefCount());
 
         categoriesObservable = categoriesRequest
-                .observeOn(uiScheduler)
                 .compose(ResponseOrError.<List<Category>>onlySuccess())
                 .map(new Func1<List<Category>, List<BaseAdapterItem>>() {
                     @Override

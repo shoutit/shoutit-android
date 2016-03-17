@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <searchable xmlns:android="http://schemas.android.com/apk/res/android"
     android:hint="@string/search_base_hint"
-    android:searchSuggestAuthority="com.shoutit.app.android.data.MySuggestionProvider"
-    android:searchSuggestSelection=" ?"
     android:label="@string/app_name"/>
