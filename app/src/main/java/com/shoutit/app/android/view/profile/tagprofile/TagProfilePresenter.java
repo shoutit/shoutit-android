@@ -47,6 +47,7 @@ import rx.subjects.PublishSubject;
 
 public class TagProfilePresenter implements ProfilePresenter {
     private static final int SHOUTS_PAGE_SIZE = 4;
+    private static final int MAX_RELATED_TAGS = 3;
 
     private final PublishSubject<TagDetail> onListenActionClickedSubject = PublishSubject.create();
     private final PublishSubject<ListenedTagWithRelatedTags> onListenRelatedTagClickedSubject = PublishSubject.create();
@@ -218,8 +219,9 @@ public class TagProfilePresenter implements ProfilePresenter {
                         final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
 
                         if (tags != null) {
-                            for (int i = 0; i < tags.size(); i++) {
-                                builder.add(getRelatedTagdapterItemForPosition(i, tags.get(i), relatedTagsResponse));
+                            final int tagsNumberToDisplay = Math.min(tags.size(), MAX_RELATED_TAGS);
+                            for (int i = 0; i < tagsNumberToDisplay; i++) {
+                                builder.add(getRelatedTagdapterItemForPosition(i, tags.get(i), relatedTagsResponse, tagsNumberToDisplay));
                             }
                         }
 
@@ -322,12 +324,12 @@ public class TagProfilePresenter implements ProfilePresenter {
     }
 
     private ProfileAdapterItems.RelatedTagAdapterItem getRelatedTagdapterItemForPosition(int position, TagDetail tag,
-                                                                                         RelatedTagsResponse relatedTagsResponse) {
-        final List<TagDetail> tags = relatedTagsResponse.getResults();
+                                                                                         RelatedTagsResponse relatedTagsResponse,
+                                                                                         int tagsNumberToDisplay) {
         if (position == 0) {
             return new ProfileAdapterItems.RelatedTagAdapterItem(true, false, tag, relatedTagsResponse,
-                    onListenRelatedTagClickedSubject, profileToOpenSubject, actionOnlyForLoggedInUserSubject, isLoggedInAsNormalUser, tags.size() == 1);
-        } else if (position == tags.size() - 1) {
+                    onListenRelatedTagClickedSubject, profileToOpenSubject, actionOnlyForLoggedInUserSubject, isLoggedInAsNormalUser, tagsNumberToDisplay == 1);
+        } else if (position == tagsNumberToDisplay - 1) {
             return new ProfileAdapterItems.RelatedTagAdapterItem(false, true, tag, relatedTagsResponse,
                     onListenRelatedTagClickedSubject, profileToOpenSubject, actionOnlyForLoggedInUserSubject, isLoggedInAsNormalUser, false);
         } else {
