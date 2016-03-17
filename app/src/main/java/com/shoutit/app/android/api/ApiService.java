@@ -7,6 +7,7 @@ import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.ChangePasswordRequest;
 import com.shoutit.app.android.api.model.CreateOfferShoutWithImageRequest;
 import com.shoutit.app.android.api.model.CreateRequestShoutRequest;
+import com.shoutit.app.android.api.model.CreateRequestShoutWithPriceRequest;
 import com.shoutit.app.android.api.model.CreateShoutResponse;
 import com.shoutit.app.android.api.model.Currency;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
@@ -183,6 +184,9 @@ public interface ApiService {
      */
     @POST("shouts")
     Observable<CreateShoutResponse> createShoutRequest(@Body CreateRequestShoutRequest offer);
+
+    @POST("shouts")
+    Observable<CreateShoutResponse> createShoutRequest(@Body CreateRequestShoutWithPriceRequest offer);
 
     @POST("shouts")
     Observable<CreateShoutResponse> createShoutOffer(@Body CreateOfferShoutWithImageRequest request);

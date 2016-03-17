@@ -9,6 +9,7 @@
     <string name="google_api_key" translatable="false">AIzaSyBWHadI_MPYQgDLqI4RXhymEs42YEtgTEE</string>
     <string name="facebook_app_id">353625811317277</string>
     <string name="exit_text">Press BACK again to exit</string>
+    <string name="font_roboto_regular">sans-serif</string>
 
     <!-- Errors -->
     <string name="error_default">Ooops, something went wrong</string>
@@ -271,12 +272,14 @@
     <string name="edit_profile_hint_first_name">First Name</string>
     <string name="edit_profile_hint_last_name">Last Name</string>
     <string name="edit_profile_hint_mobile">Mobile</string>
+    <string name="edit_done_btn">Edit</string>
+
+    <!-- Published -->
     <string name="published_congratulations">Congratulations!</string>
     <string name="published_extra_info">Your offer will appear on Shoutit soon.</string>
     <string name="published_add_details">Add more details</string>
-    <string name="or_label">or</string>
     <string name="published_create_another_shout">Create another Shout</string>
-    <string name="font_roboto_regular">sans-serif</string>
+    <string name="published_or_label">or</string>
 
     <!-- Forgot Password -->
     <string name="forgot_password_send">Reset password</string>

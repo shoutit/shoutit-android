@@ -30,6 +30,7 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.view.createshout.edit.EditShoutActivity;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.profile.tagprofile.TagProfileActivity;
 
@@ -73,6 +74,7 @@ public class ShoutActivity extends BaseActivity {
     ShoutAdapter adapter;
     @Inject
     UserPreferences userPreferences;
+    private String mShoutId;
 
     public static Intent newIntent(@Nonnull Context context, @Nonnull String shoutId) {
         return new Intent(context, ShoutActivity.class)
@@ -190,7 +192,7 @@ public class ShoutActivity extends BaseActivity {
 
         return new Action1<Boolean>() {
             @Override
-            public void call(Boolean isUserShoutOwner) {
+            public void call(final Boolean isUserShoutOwner) {
                 callOrDeleteTextView.setCompoundDrawablesWithIntrinsicBounds(
                         isUserShoutOwner ? R.drawable.ic_delete_red : R.drawable.ic_call_green, 0, 0, 0);
                 callOrDeleteTextView.setText(isUserShoutOwner ?
@@ -200,6 +202,16 @@ public class ShoutActivity extends BaseActivity {
                         isUserShoutOwner ? R.drawable.ic_edit_red : R.drawable.ic_video_chat_red, 0, 0, 0);
                 videoCallOrEditTextView.setText(isUserShoutOwner ?
                         R.string.shout_bottom_bar_edit : R.string.shout_bottom_bar_video_call);
+                videoCallOrEditTextView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (isUserShoutOwner) {
+                            startActivity(EditShoutActivity.newIntent(mShoutId, ShoutActivity.this));
+                        } else {
+
+                        }
+                    }
+                });
 
                 chatOrChatsTextView.setText(isUserShoutOwner ?
                         R.string.shout_bottom_bar_chats : R.string.shout_bottom_bar_chat);
@@ -222,11 +234,6 @@ public class ShoutActivity extends BaseActivity {
 
     @OnClick(R.id.shout_bottom_bar_call_or_delete)
     public void onCallOrDeleteClicked() {
-        Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
-    }
-
-    @OnClick(R.id.shout_bottom_bar_video_call_or_edit)
-    public void onVideoCallOrEditClicked() {
         Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
     }
 
@@ -308,12 +315,12 @@ public class ShoutActivity extends BaseActivity {
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
         final Intent intent = checkNotNull(getIntent());
-        final String shoutId = checkNotNull(intent.getStringExtra(KEY_SHOUT_ID));
+        mShoutId = checkNotNull(intent.getStringExtra(KEY_SHOUT_ID));
 
         final ShoutActivityComponent component = DaggerShoutActivityComponent
                 .builder()
                 .activityModule(new ActivityModule(this))
-                .shoutActivityModule(new ShoutActivityModule(this, shoutId))
+                .shoutActivityModule(new ShoutActivityModule(this, mShoutId))
                 .appComponent(App.getAppComponent(getApplication()))
                 .build();
         component.inject(this);
