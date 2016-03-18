@@ -39,6 +39,7 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.view.createshout.location.LocationActivity;
 import com.shoutit.app.android.widget.SimpleSpinnerAdapter;
 import com.shoutit.app.android.widget.SpinnerAdapter;
+import com.shoutit.app.android.widget.StateSpinner;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -295,10 +296,10 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     @SuppressWarnings("unchecked")
     private List<Pair<String, String>> getSelectedOptions() {
         final int childCount = mEditShoutContainer.getChildCount();
-        List<Pair<String, String>> list = Lists.newArrayList();
+        final List<Pair<String, String>> list = Lists.newArrayList();
         for (int i = 0; i < childCount; i++) {
             final View view = mEditShoutContainer.getChildAt(i);
-            final Spinner spinner = (Spinner) view.findViewById(R.id.option_spinner);
+            final StateSpinner spinner = (StateSpinner) view.findViewById(R.id.option_spinner);
 
             final Pair<String, String> selectedItem = (Pair<String, String>) spinner.getSelectedItem();
             if (selectedItem != null) {
