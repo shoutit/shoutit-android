@@ -299,12 +299,18 @@
 
     <!-- Search -->
     <string name="search_base_title">Search</string>
-    <string name="search_base_hint">Search</string>
+    <string name="search_base_hint">Search Shoutit</string>
     <string name="search_category_header">Categories</string>
+    <string name="search_shouts_tab">SHOUTS</string>
+    <string name="search_users_tab">USERS</string>
+    <string name="search_recent_searches">Recent searches</string>
+    <string name="search_clear_all">Clear all</string>
+    <string name="search_users_placeholder">Search Users</string>
 
     <!-- Tag Profile -->
     <string name="tag_profile_related_interests">Related interests</string>
     <string name="tag_profile_shouts">%1$s shouts</string>
+    <string name="search_hint">Search in %1$s shouts</string>
 
     <!-- Create Shout Dialog -->
     <string name="create_shout_dialog_header">What are you posting?</string>

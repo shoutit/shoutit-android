@@ -3,6 +3,7 @@ package com.shoutit.app.android.dagger;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.Resources;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
@@ -18,6 +19,7 @@ import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.SuggestionsDao;
+import com.shoutit.app.android.db.DbHelper;
 import com.shoutit.app.android.dao.TagsDao;
 import com.shoutit.app.android.location.LocationManager;
 import com.squareup.picasso.Picasso;
@@ -81,4 +83,8 @@ public interface BaseActivityComponent {
     TransferUtility transferUtility();
 
     ContentResolver contentResolver();
+
+    FragmentManager fragmentManager();
+
+    DbHelper dbHelper();
 }

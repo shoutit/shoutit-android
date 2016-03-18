@@ -3,6 +3,7 @@ package com.shoutit.app.android.view.profile.tagprofile;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.R;
@@ -19,6 +20,8 @@ import static com.appunite.rx.internal.Preconditions.checkNotNull;
 
 public class TagProfileActivity extends ProfileActivity {
 
+    private TagProfilePresenter presenter;
+
     public static Intent newIntent(@Nonnull Context context, @Nonnull String categorySlug) {
         return new Intent(context, TagProfileActivity.class)
                 .putExtra(KEY_PROFILE_ID, categorySlug);
@@ -28,7 +31,7 @@ public class TagProfileActivity extends ProfileActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        TagProfilePresenter presenter = (TagProfilePresenter) ((TagProfileActivityComponent) getActivityComponent()).getPresenter();
+        presenter = (TagProfilePresenter) ((TagProfileActivityComponent) getActivityComponent()).getPresenter();
 
         presenter.getProfileToOpenObservable()
                 .compose(this.<String>bindToLifecycle())
@@ -40,6 +43,26 @@ public class TagProfileActivity extends ProfileActivity {
                                 REQUEST_PROFILE_OPENED_FROM_PROFILE);
                     }
                 });
+
+        presenter.getSearchMenuItemClickObservable()
+                .compose(this.<Intent>bindToLifecycle())
+                .subscribe(new Action1<Intent>() {
+                    @Override
+                    public void call(Intent intent) {
+                        startActivity(intent);
+                    }
+                });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.profile_menu_search:
+                presenter.onSearchMenuItemClicked();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override

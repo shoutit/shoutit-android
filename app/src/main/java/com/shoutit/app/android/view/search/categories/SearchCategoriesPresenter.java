@@ -1,4 +1,7 @@
-package com.shoutit.app.android.view.search;
+package com.shoutit.app.android.view.search.categories;
+
+import android.content.Context;
+import android.content.Intent;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
@@ -11,7 +14,10 @@ import com.google.common.collect.Lists;
 import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
 import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
 import com.shoutit.app.android.api.model.Category;
+import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.CategoriesDao;
+import com.shoutit.app.android.view.search.SearchPresenter;
+import com.shoutit.app.android.view.search.subsearch.SubSearchActivity;
 
 import java.util.List;
 
@@ -23,19 +29,22 @@ import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.subjects.PublishSubject;
 
 public class SearchCategoriesPresenter {
 
-    private final PublishSubject<String> categorySelectedObserver = PublishSubject.create();
+    private final PublishSubject<Category> categorySelectedObserver = PublishSubject.create();
 
     private final Observable<List<BaseAdapterItem>> categoriesObservable;
+    private final Observable<Intent> categorySelectedObservable;
     private final Observable<Boolean> progressObservable;
     private final Observable<Throwable> errorsObservable;
 
     @Inject
     public SearchCategoriesPresenter(CategoriesDao categoriesDao,
-                                     @UiScheduler Scheduler uiScheduler) {
+                                     @UiScheduler Scheduler uiScheduler,
+                                     @ForActivity final Context context) {
 
         final Observable<ResponseOrError<List<Category>>> categoriesRequest = categoriesDao
                 .getListObservableResponseOrError()
@@ -68,6 +77,16 @@ public class SearchCategoriesPresenter {
 
         errorsObservable = categoriesRequest
                 .compose(ResponseOrError.<List<Category>>onlyError());
+
+        categorySelectedObservable = categorySelectedObserver
+                .map(new Func1<Category, Intent>() {
+                    @Override
+                    public Intent call(Category category) {
+                        return SubSearchActivity.newIntent(context, SearchPresenter.SearchType.TAG,
+                                category.getSlug(), category.getName());
+                    }
+                });
+
     }
 
     public Observable<List<BaseAdapterItem>> getCategoriesObservable() {
@@ -82,16 +101,16 @@ public class SearchCategoriesPresenter {
         return errorsObservable;
     }
 
-    public Observable<String> getCategorySelectedObservable() {
-        return categorySelectedObserver;
+    public Observable<Intent> getCategorySelectedObservable() {
+        return categorySelectedObservable;
     }
 
     public static class CategoryAdapterItem extends BaseNoIDAdapterItem {
 
         private final Category category;
-        private final Observer<String> categorySelectedObserver;
+        private final Observer<Category> categorySelectedObserver;
 
-        public CategoryAdapterItem(Category category, Observer<String> categorySelectedObserver) {
+        public CategoryAdapterItem(Category category, Observer<Category> categorySelectedObserver) {
             this.category = category;
             this.categorySelectedObserver = categorySelectedObserver;
         }
@@ -113,7 +132,7 @@ public class SearchCategoriesPresenter {
         }
 
         public void onCategorySelected() {
-            categorySelectedObserver.onNext(category.getSlug());
+            categorySelectedObserver.onNext(category);
         }
     }
 }
