@@ -13,16 +13,19 @@ import javax.annotation.Nonnull;
 public class DbHelper extends SQLiteOpenHelper {
 
     public static final int VERSION = 1;
-
     public static final String NAME = "shoutit_db";
+
+    private SQLiteDatabase writableDatabase;
 
     public DbHelper(@ForApplication Context context) {
         super(context, NAME, null, VERSION);
+        writableDatabase = getWritableDatabase();
     }
 
     @Override
     public void onCreate(@NonNull SQLiteDatabase db) {
         createDb(db);
+        writableDatabase = getWritableDatabase();
     }
 
     @Override
@@ -37,5 +40,9 @@ public class DbHelper extends SQLiteOpenHelper {
     private static void recreateDb(@NonNull SQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS " + RecentSearchesTable.TABLE);
         createDb(db);
+    }
+
+    public SQLiteDatabase getDatabase() {
+        return writableDatabase;
     }
 }

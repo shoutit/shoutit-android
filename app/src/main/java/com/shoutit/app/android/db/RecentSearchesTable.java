@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 
 import com.appunite.rx.operators.MoreOperators;
 import com.google.common.collect.ImmutableList;
+import com.shoutit.app.android.utils.LogHelper;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -18,6 +19,7 @@ import rx.functions.Action1;
 import rx.subjects.PublishSubject;
 
 public class RecentSearchesTable {
+    private static final String TAG = RecentSearchesTable.class.getSimpleName();
 
     public static final String TABLE = "recent_searches";
     public static final String COLUMN_GUID = "_id";
@@ -53,7 +55,7 @@ public class RecentSearchesTable {
         Cursor cursor = null;
 
         try {
-            final SQLiteDatabase db = dbHelper.getReadableDatabase();
+            final SQLiteDatabase db = dbHelper.getDatabase();
             cursor = db.query(
                     TABLE, null, null, null,
                     null, null, COLUMN_QUERY + " ASC");
@@ -73,18 +75,20 @@ public class RecentSearchesTable {
     }
 
     public void saveRecentSearch(@NonNull String suggestion) {
-        final SQLiteDatabase db = dbHelper.getWritableDatabase();
+        final SQLiteDatabase db = dbHelper.getDatabase();
         final ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_QUERY, suggestion.trim());
 
         long itemId = db.insertWithOnConflict(TABLE, null, contentValues, SQLiteDatabase.CONFLICT_IGNORE);
         if (itemId != -1) {
             refreshRecentSearches();
+        } else {
+            LogHelper.logThrowableAndCrashlytics(TAG, "Cannot insert recent search: " + suggestion, new Throwable());
         }
     }
 
     public void removeRecentSearch(@NonNull String suggestion) {
-        final SQLiteDatabase db = dbHelper.getWritableDatabase();
+        final SQLiteDatabase db = dbHelper.getDatabase();
 
         final int deletedCount = db.delete(TABLE, COLUMN_QUERY + "=?", new String[]{suggestion});
         if (deletedCount > 0) {
@@ -93,7 +97,7 @@ public class RecentSearchesTable {
     }
 
     public void clearRecentSearch() {
-        final SQLiteDatabase db = dbHelper.getWritableDatabase();
+        final SQLiteDatabase db = dbHelper.getDatabase();
 
         final int deletedCount = db.delete(TABLE, "1", null);
         if (deletedCount > 0) {
