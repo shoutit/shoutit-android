@@ -189,7 +189,6 @@ public class EditShoutPresenter {
     private void currencySuccess(@NonNull List<Currency> responseData) {
         final List<Pair<String, String>> list = PriceUtils.transformCurrencyToPair(responseData);
 
-        mListener.setCurrenciesEnabled(true);
         mListener.setCurrencies(list);
     }
 
@@ -284,6 +283,10 @@ public class EditShoutPresenter {
             mListener.setOptions(category.getFilters());
             mListener.setCategoryImage(category.getIcon());
         }
+    }
+
+    public void onBudgetChanged(String budget) {
+        mListener.setCurrenciesEnabled(!Strings.isNullOrEmpty(budget));
     }
 
     public interface Listener {
