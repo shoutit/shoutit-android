@@ -16,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.common.collect.Iterables;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
@@ -29,7 +30,9 @@ import com.shoutit.app.android.view.discover.OnNewDiscoverSelectedListener;
 import com.shoutit.app.android.view.home.HomeFragment;
 import com.shoutit.app.android.view.intro.IntroActivity;
 import com.shoutit.app.android.view.postlogininterest.PostLoginInterestActivity;
+import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.main.MainSearchActivity;
+import com.shoutit.app.android.view.search.subsearch.SubSearchActivity;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -123,10 +126,19 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
         switch (item.getItemId()) {
             case R.id.base_menu_search:
-                startActivity(MainSearchActivity.newIntent(this));
-                return true;
+                return showMainSearchActivityOrLetFragmentsHandleIt();
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private boolean showMainSearchActivityOrLetFragmentsHandleIt() {
+        final Fragment fragment = Iterables.getLast(getSupportFragmentManager().getFragments());
+        if (fragment != null && MenuHandler.FRAGMENT_DISCOVER.equals(fragment.getTag())) {
+            return false;
+        } else {
+            startActivity(MainSearchActivity.newIntent(this));
+            return true;
         }
     }
 
