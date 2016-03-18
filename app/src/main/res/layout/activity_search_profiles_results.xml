@@ -12,6 +12,7 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/search_profiles_recyclerview"
         android:layout_below="@+id/search_profiles_toolbar"
+        android:background="@android:color/white"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

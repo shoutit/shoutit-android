@@ -151,12 +151,6 @@ public abstract class ProfileActivity extends BaseActivity {
                         popupMenu.show();
                     }
                 });
-
-        presenter.getActionOnlyForLoggedInUserObservable()
-                .compose(bindToLifecycle())
-                .subscribe(ColoredSnackBar.errorSnackBarAction(
-                        ColoredSnackBar.contentView(ProfileActivity.this),
-                        R.string.error_action_only_for_logged_in_user));
     }
 
     @DrawableRes

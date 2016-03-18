@@ -11,7 +11,6 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.db.RecentSearchesTable;
-import com.shoutit.app.android.view.search.results.DaggerSearchShoutsResultsActivityComponent;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

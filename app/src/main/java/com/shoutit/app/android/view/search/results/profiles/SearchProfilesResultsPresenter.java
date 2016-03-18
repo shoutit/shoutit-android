@@ -9,12 +9,13 @@ import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.api.model.SearchProfileResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dao.ProfilesDao;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -37,11 +38,22 @@ public class SearchProfilesResultsPresenter {
 
     private final PublishSubject<Throwable> errorSubject = PublishSubject.create();
     private final PublishSubject<ProfileToListenWithLastResponse> profileListenedSubject = PublishSubject.create();
+    private final PublishSubject<String> profileToOpenSubject = PublishSubject.create();
+    private final PublishSubject<Object> actionOnlyForLoggedInUserSubject = PublishSubject.create();
+
+    private final ProfilesDao dao;
+    @Nonnull
+    private final String searchQuery;
+    private final boolean isLoggedInAsNormalUser;
 
     public SearchProfilesResultsPresenter(ProfilesDao dao, @Nonnull String searchQuery,
                                           final ApiService apiService,
                                           @UiScheduler final Scheduler uiScheduler,
-                                          @NetworkScheduler final Scheduler networkScheduler) {
+                                          @NetworkScheduler final Scheduler networkScheduler,
+                                          UserPreferences userPreferences) {
+        this.dao = dao;
+        this.searchQuery = searchQuery;
+        isLoggedInAsNormalUser = userPreferences.isNormalUser();
 
         final Observable<ResponseOrError<SearchProfileResponse>> profilesRequest = dao.getSearchProfilesDao(searchQuery)
                 .getProfilesObservable()
@@ -61,7 +73,9 @@ public class SearchProfilesResultsPresenter {
                                             @Nullable
                                             @Override
                                             public BaseAdapterItem apply(@Nullable User input) {
-                                                return new ProfileAdapterItem(searchProfileResponse, input, profileListenedSubject);
+                                                return new ProfileAdapterItem(searchProfileResponse, input,
+                                                        profileListenedSubject, profileToOpenSubject,
+                                                        actionOnlyForLoggedInUserSubject);
                                             }
                                         })
                         );
@@ -127,6 +141,14 @@ public class SearchProfilesResultsPresenter {
         return adapterItemsObservable;
     }
 
+    public Observable<String> getProfileToOpenObservable() {
+        return profileToOpenSubject;
+    }
+
+    public Observable<Object> getActionOnlyForLoggedInUserObserable() {
+        return actionOnlyForLoggedInUserSubject;
+    }
+
     private SearchProfileResponse updateLastResponse(ProfileToListenWithLastResponse profileToListenWithLastResponse) {
         final SearchProfileResponse response = profileToListenWithLastResponse.getResponse();
         final List<User> profiles = response.getResults();
@@ -147,22 +169,44 @@ public class SearchProfilesResultsPresenter {
         return response;
     }
 
+    public void refreshData() {
+        dao.getSearchProfilesDao(searchQuery).getRefreshSubject().onNext(null);
+    }
+
     public class ProfileAdapterItem extends BaseNoIDAdapterItem {
 
         private final SearchProfileResponse lastResponse;
         private final User profile;
         private final Observer<ProfileToListenWithLastResponse> profileListenedObserver;
+        private Observer<String> profileToOpenObserver;
+        private Observer<Object> actionOnlyForLoggedInUserObserver;
 
         public ProfileAdapterItem(SearchProfileResponse lastResponse,
                                   User profile,
-                                  Observer<ProfileToListenWithLastResponse> profileListenedObserver) {
+                                  Observer<ProfileToListenWithLastResponse> profileListenedObserver,
+                                  Observer<String> profileToOpenObserver,
+                                  Observer<Object> actionOnlyForLoggedInUserObserver) {
             this.lastResponse = lastResponse;
             this.profile = profile;
             this.profileListenedObserver = profileListenedObserver;
+            this.profileToOpenObserver = profileToOpenObserver;
+            this.actionOnlyForLoggedInUserObserver = actionOnlyForLoggedInUserObserver;
+        }
+
+        public User getProfile() {
+            return profile;
         }
 
         public void onProfileListened() {
             profileListenedObserver.onNext(new ProfileToListenWithLastResponse(profile, lastResponse));
+        }
+
+        public void onProfileItemSelected() {
+            profileToOpenObserver.onNext(profile.getUsername());
+        }
+
+        public void onActionOnlyForLoggedInUser() {
+            actionOnlyForLoggedInUserObserver.onNext(null);
         }
 
         @Override
@@ -175,6 +219,14 @@ public class SearchProfilesResultsPresenter {
         public boolean same(@Nonnull BaseAdapterItem item) {
             return item instanceof ProfileAdapterItem &&
                     profile.equals(((ProfileAdapterItem) item).profile);
+        }
+
+        public boolean isProfileMine() {
+            return profile.isOwner() && ProfileType.USER.equals(profile.getType());
+        }
+
+        public boolean isUserLoggedIn() {
+            return isLoggedInAsNormalUser;
         }
     }
 
