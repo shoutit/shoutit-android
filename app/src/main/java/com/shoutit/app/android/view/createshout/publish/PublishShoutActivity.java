@@ -76,7 +76,7 @@ public class PublishShoutActivity extends RxAppCompatActivity {
         subHeader.setText(getString(R.string.published_extra_info,
                 getString(mRequest ? R.string.publish_request : R.string.publish_offer)));
         button.setText(getString(R.string.published_create_another_shout,
-                getString(mRequest ? R.string.publish_request : R.string.publish_offer)));
+                getString(mRequest ? R.string.publish_request_capitalized : R.string.publish_offer_capitalized)));
     }
 
     @OnClick(R.id.publish_activity_create_another_shout)

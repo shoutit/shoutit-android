@@ -11,7 +11,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
-import com.github.clans.fab.FloatingActionMenu;
+import com.github.clans.fab.FloatingActionButton;
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
 import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.jakewharton.rxbinding.view.RxView;
@@ -25,11 +25,9 @@ import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyGridLayoutManager;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
-import com.shoutit.app.android.view.createshout.request.CreateRequestActivity;
+import com.shoutit.app.android.view.createshout.CreateShoutDialogFragment;
 import com.shoutit.app.android.view.discover.DiscoverActivity;
-import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.main.OnSeeAllDiscoversListener;
-import com.shoutit.app.android.view.media.NativeCameraActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 
 import java.util.List;
@@ -51,7 +49,7 @@ public class HomeFragment extends BaseFragment {
     @Bind(R.id.fragment_home_recycler_view)
     RecyclerView recyclerView;
     @Bind(R.id.fragment_home_fab)
-    FloatingActionMenu fab;
+    FloatingActionButton fab;
     @Bind(R.id.fragment_home_progress_bar)
     ProgressBar progressBar;
 
@@ -183,24 +181,9 @@ public class HomeFragment extends BaseFragment {
         adapter.switchLayoutManager(false);
     }
 
-    @OnClick(R.id.fab_create_shout)
+    @OnClick(R.id.fragment_home_fab)
     void onAddShoutClicked() {
-        if (mUserPreferences.isGuest()) {
-            startActivity(LoginIntroActivity.newIntent(getActivity()));
-        } else {
-            startActivity(NativeCameraActivity.newIntent(getActivity()));
-        }
-        fab.close(false);
-    }
-
-    @OnClick(R.id.fab_request_shout)
-    void onRequestShoutClicked() {
-        if (mUserPreferences.isGuest()) {
-            startActivity(LoginIntroActivity.newIntent(getActivity()));
-            fab.close(false);
-        } else {
-            startActivity(CreateRequestActivity.newIntent(getActivity()));
-        }
+        CreateShoutDialogFragment.newInstance().show(getFragmentManager(), null);
     }
 
     @Override
