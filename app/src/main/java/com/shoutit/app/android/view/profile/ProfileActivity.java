@@ -90,6 +90,10 @@ public abstract class ProfileActivity extends BaseActivity {
         }
         setUpAdapter();
 
+        if (savedInstanceState == null) {
+            presenter.refreshProfile();
+        }
+
         presenter
                 .getProgressObservable()
                 .compose(this.<Boolean>bindToLifecycle())
