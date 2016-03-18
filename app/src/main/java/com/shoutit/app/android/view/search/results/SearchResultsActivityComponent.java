@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.search;
+package com.shoutit.app.android.view.search.results;
 
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.ActivityScope;
@@ -14,9 +14,9 @@ import dagger.Component;
                 ActivityModule.class,
         }
 )
-public interface SearchActivityComponent extends BaseActivityComponent {
+public interface SearchResultsActivityComponent extends BaseActivityComponent {
 
-    void inject(SearchActivity activity);
+    void inject(SearchResultsActivity activity);
 
 }
 

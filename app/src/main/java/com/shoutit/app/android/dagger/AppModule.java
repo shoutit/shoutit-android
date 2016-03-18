@@ -31,6 +31,7 @@ import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.SuggestionsDao;
+import com.shoutit.app.android.db.DbHelper;
 import com.shoutit.app.android.dao.TagsDao;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.utils.BadRequestThrowable;
@@ -238,7 +239,7 @@ public final class AppModule {
 
     @Provides
     @Singleton
-    SuggestionsDao prpvideSuggestionsDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
+    SuggestionsDao provideSuggestionsDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
         return new SuggestionsDao(apiService, networkScheduler);
     }
 
@@ -246,5 +247,11 @@ public final class AppModule {
     @Singleton
     CategoriesDao categoriesDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
         return new CategoriesDao(apiService, networkScheduler);
+    }
+
+    @Provides
+    @Singleton
+    DbHelper dbHelper(@ForApplication Context context) {
+        return new DbHelper(context);
     }
 }

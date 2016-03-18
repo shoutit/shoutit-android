@@ -24,13 +24,12 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dao.ProfilesDao;
-import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.view.discover.DiscoverActivity;
 import com.shoutit.app.android.view.discover.OnNewDiscoverSelectedListener;
 import com.shoutit.app.android.view.home.HomeFragment;
 import com.shoutit.app.android.view.intro.IntroActivity;
 import com.shoutit.app.android.view.postlogininterest.PostLoginInterestActivity;
-import com.shoutit.app.android.view.search.SearchActivity;
+import com.shoutit.app.android.view.search.main.MainSearchActivity;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -124,7 +123,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
         switch (item.getItemId()) {
             case R.id.base_menu_search:
-                startActivity(SearchActivity.newIntent(this));
+                startActivity(MainSearchActivity.newIntent(this));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

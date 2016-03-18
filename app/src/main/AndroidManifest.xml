@@ -75,13 +75,15 @@
 
         <activity android:name=".view.signin.forgotpassword.ForgotPasswordActivity"/>
 
-        <activity android:name=".view.media.NativeCameraActivity"
-                  android:theme="@style/TranslucentStatusBar"/>
-
-        <activity android:name=".view.search.SearchActivity">
+        <activity android:name=".view.search.main.MainSearchActivity" android:windowSoftInputMode="stateHidden">
             <meta-data android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
+
+        <activity android:name=".view.media.NativeCameraActivity"
+                  android:theme="@style/TranslucentStatusBar"/>
+
+        <activity android:name=".view.search.results.SearchResultsActivity"/>
 
         <activity
             android:name=".view.settings.account.AccountActivity"
