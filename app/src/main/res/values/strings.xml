@@ -280,8 +280,10 @@
     <string name="published_add_details">Add more details</string>
     <string name="published_create_another_shout">Create another %1$s</string>
     <string name="published_or_label">or</string>
-    <string name="publish_offer">Offer</string>
-    <string name="publish_request">Request</string>
+    <string name="publish_offer">offer</string>
+    <string name="publish_request">request</string>
+    <string name="publish_offer_capitalized">Offer</string>
+    <string name="publish_request_capitalized">Request</string>
 
     <!-- Forgot Password -->
     <string name="forgot_password_send">Reset password</string>

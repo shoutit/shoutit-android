@@ -179,7 +179,7 @@ public class DiscoverShoutsActivity extends BaseActivity {
                 .putExtra(DISCOVER_NAME, title);
     }
 
-    @OnClick(R.id.fragment_home_fab)
+    @OnClick(R.id.discover_fab)
     void onAddShoutClicked() {
         CreateShoutDialogFragment.newInstance().show(getSupportFragmentManager(), null);
     }
