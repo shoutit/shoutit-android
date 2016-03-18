@@ -83,7 +83,7 @@
         <activity android:name=".view.media.NativeCameraActivity"
                   android:theme="@style/TranslucentStatusBar"/>
 
-        <activity android:name=".view.search.results.SearchResultsActivity"/>
+        <activity android:name=".view.search.results.shouts.SearchShoutsResultsActivity"/>
 
         <activity
             android:name=".view.settings.account.AccountActivity"

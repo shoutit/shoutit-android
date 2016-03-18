@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.search.results;
+package com.shoutit.app.android.view.search.results.shouts;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +11,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.db.RecentSearchesTable;
+import com.shoutit.app.android.view.search.results.DaggerSearchShoutsResultsActivityComponent;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -20,7 +21,7 @@ import butterknife.ButterKnife;
 
 import static com.appunite.rx.internal.Preconditions.checkNotNull;
 
-public class SearchResultsActivity extends BaseActivity {
+public class SearchShoutsResultsActivity extends BaseActivity {
 
     private static final String KEY_QUERY_TO_SAVE = "query_to_save";
 
@@ -28,11 +29,11 @@ public class SearchResultsActivity extends BaseActivity {
     RecentSearchesTable recentSearchesTable;
 
     public static Intent newIntent(Context context) {
-        return new Intent(context, SearchResultsActivity.class);
+        return new Intent(context, SearchShoutsResultsActivity.class);
     }
 
     public static Intent newIntent(Context context, @Nonnull String queryToSave) {
-        return new Intent(context, SearchResultsActivity.class)
+        return new Intent(context, SearchShoutsResultsActivity.class)
                 .putExtra(KEY_QUERY_TO_SAVE, queryToSave);
     }
 
@@ -58,7 +59,7 @@ public class SearchResultsActivity extends BaseActivity {
     @Nonnull
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
-        final SearchResultsActivityComponent component = DaggerSearchResultsActivityComponent
+        final SearchShoutsResultsActivityComponent component = DaggerSearchShoutsResultsActivityComponent
                 .builder()
                 .activityModule(new ActivityModule(this))
                 .appComponent(App.getAppComponent(getApplication()))
