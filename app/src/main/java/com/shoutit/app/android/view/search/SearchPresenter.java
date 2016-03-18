@@ -1,5 +1,7 @@
 package com.shoutit.app.android.view.search;
 
+import android.content.Context;
+
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
@@ -10,11 +12,13 @@ import com.appunite.rx.operators.OperatorMergeNextToken;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.shoutit.app.android.R;
 import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
 import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
+import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.MergeShoutsResponses;
 
 import java.util.List;
@@ -49,9 +53,11 @@ public class SearchPresenter {
     private final PublishSubject<String> suggestionClickedSubject = PublishSubject.create();
 
     private final Observable<List<BaseAdapterItem>> suggestionsAdapterItemsObservable;
+    private final Observable<String> hintNameObservable;
 
     private final ApiService apiService;
     private final SearchQueryPresenter searchQueryPresenter;
+    private final Context context;
 
     @Inject
     public SearchPresenter(final ApiService apiService,
@@ -59,9 +65,12 @@ public class SearchPresenter {
                            @NetworkScheduler final Scheduler networkScheduler,
                            @UiScheduler Scheduler uiScheduler,
                            @Nonnull final SearchType searchType,
-                           @Nullable final String contextItemId) {
+                           @Nullable final String contextItemId,
+                           @Nullable final String contextualItemName,
+                           @ForActivity Context context) {
         this.apiService = apiService;
         this.searchQueryPresenter = searchQueryPresenter;
+        this.context = context;
 
         /** Suggestions **/
         final OperatorMergeNextToken<ShoutsResponse, String> loadMoreOperator =
@@ -136,6 +145,11 @@ public class SearchPresenter {
                         return builder.build();
                     }
                 });
+
+        /** Hint title **/
+        final String hintName = context.getString(R.string.search_hint, contextualItemName);
+        hintNameObservable = Observable.just(hintName);
+
     }
 
     private Observable<ShoutsResponse> getSuggestionsRequest(int pageNumber,
@@ -155,6 +169,10 @@ public class SearchPresenter {
             default:
                 throw new RuntimeException("Unknwon profile type: " + SearchType.values()[searchType.ordinal()]);
         }
+    }
+
+    public Observable<String> getHintNameObservable() {
+        return hintNameObservable;
     }
 
     public BehaviorSubject<String> getQuerySubject() {

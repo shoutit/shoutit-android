@@ -29,7 +29,7 @@ public class MainSearchPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case SHOUTS_FRAGMENT_POSITION:
-                return SearchShoutFragment.newInstance(SearchPresenter.SearchType.SHOUTS, null);
+                return SearchShoutFragment.newInstance(SearchPresenter.SearchType.SHOUTS);
             case USER_FRAGMENT_POSITION:
                 return SearchUsersFragment.newInstance();
             default:

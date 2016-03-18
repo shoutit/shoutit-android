@@ -1,5 +1,6 @@
 package com.shoutit.app.android.view.discover;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.support.annotation.Nullable;
 
@@ -9,6 +10,7 @@ import com.google.common.base.Optional;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dagger.FragmentModule;
+import com.shoutit.app.android.dagger.FragmentScope;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.dao.DiscoversDao;
 
@@ -30,12 +32,15 @@ public class DiscoverFragmentModule extends FragmentModule {
     }
 
     @Provides
+    @FragmentScope
     public DiscoverPresenter provideDiscoverPresenter(UserPreferences userPreferences,
                                                       DiscoversDao dao, DiscoverShoutsDao discoverShoutsDao,
                                                       @UiScheduler Scheduler uiScheduler,
                                                       @NetworkScheduler Scheduler networkScheduler,
-                                                      @ForActivity Resources resources) {
-        return new DiscoverPresenter(userPreferences, dao, discoverShoutsDao, Optional.fromNullable(discoverId), uiScheduler, networkScheduler, resources);
+                                                      @ForActivity Resources resources,
+                                                      @ForActivity Context context) {
+        return new DiscoverPresenter(userPreferences, dao, discoverShoutsDao,
+                Optional.fromNullable(discoverId), uiScheduler, networkScheduler, resources, context);
     }
 
 

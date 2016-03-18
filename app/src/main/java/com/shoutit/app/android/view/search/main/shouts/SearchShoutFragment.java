@@ -30,7 +30,6 @@ import static com.appunite.rx.internal.Preconditions.checkNotNull;
 public class SearchShoutFragment extends BaseFragment {
 
     private static final String KEY_SEARCH_TYPE = "search_type";
-    private static final String KEY_CONTEXTUAL_ITEM_ID = "contextual_item_id";
 
     @Bind(R.id.search_recycler_view)
     RecyclerView recyclerView;
@@ -42,11 +41,9 @@ public class SearchShoutFragment extends BaseFragment {
     @Inject
     SearchAdapter adapter;
 
-    public static Fragment newInstance(@Nonnull SearchPresenter.SearchType searchType,
-                                       @Nullable String contextualItemId) {
+    public static Fragment newInstance(@Nonnull SearchPresenter.SearchType searchType) {
         final Bundle bundle = new Bundle();
         bundle.putSerializable(KEY_SEARCH_TYPE, searchType);
-        bundle.putString(KEY_CONTEXTUAL_ITEM_ID, contextualItemId);
 
         final SearchShoutFragment fragment = new SearchShoutFragment();
         fragment.setArguments(bundle);
@@ -91,12 +88,11 @@ public class SearchShoutFragment extends BaseFragment {
                                    @Nullable Bundle savedInstanceState) {
         final Bundle bundle = checkNotNull(getArguments());
         final SearchPresenter.SearchType searchType = (SearchPresenter.SearchType) bundle.getSerializable(KEY_SEARCH_TYPE);
-        final String contextualItemId = bundle.getString(KEY_CONTEXTUAL_ITEM_ID);
 
         DaggerSearchShoutFragmentComponent.builder()
                 .mainSearchActivityComponent((MainSearchActivityComponent) baseActivityComponent)
                 .fragmentModule(fragmentModule)
-                .searchShoutsFragmentModule(new SearchShoutsFragmentModule(this, searchType, contextualItemId))
+                .searchShoutsFragmentModule(new SearchShoutsFragmentModule(this, searchType))
                 .build()
                 .inject(this);
     }
