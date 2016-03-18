@@ -33,6 +33,7 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.view.createshout.edit.EditShoutActivity;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.profile.tagprofile.TagProfileActivity;
+import com.shoutit.app.android.view.search.main.MainSearchActivity;
 
 import java.util.List;
 
@@ -305,6 +306,9 @@ public class ShoutActivity extends BaseActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
+                return true;
+            case R.id.shouts_search:
+                startActivity(MainSearchActivity.newIntent(this));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

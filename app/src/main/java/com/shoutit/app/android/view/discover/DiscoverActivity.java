@@ -74,6 +74,8 @@ public class DiscoverActivity extends BaseActivity implements OnNewDiscoverSelec
                     finish();
                 }
                 return true;
+            case R.id.base_menu_search:
+                return false;
             default:
                 return super.onOptionsItemSelected(item);
         }

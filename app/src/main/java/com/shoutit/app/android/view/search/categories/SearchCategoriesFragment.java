@@ -1,5 +1,6 @@
 package com.shoutit.app.android.view.search.categories;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -7,7 +8,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.jakewharton.rxbinding.view.RxView;
@@ -68,11 +68,11 @@ public class SearchCategoriesFragment extends BaseFragment {
                 .subscribe(RxView.visibility(progressView));
 
         presenter.getCategorySelectedObservable()
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
+                .compose(this.<Intent>bindToLifecycle())
+                .subscribe(new Action1<Intent>() {
                     @Override
-                    public void call(String s) {
-                        Toast.makeText(getActivity(), "Not implemented yet", Toast.LENGTH_SHORT).show();
+                    public void call(Intent intent) {
+                        startActivity(intent);
                     }
                 });
     }

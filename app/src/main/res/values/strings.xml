@@ -306,5 +306,6 @@
     <!-- Tag Profile -->
     <string name="tag_profile_related_interests">Related interests</string>
     <string name="tag_profile_shouts">%1$s shouts</string>
+    <string name="search_hint">Search in %1$s shouts</string>
 
 </resources>
