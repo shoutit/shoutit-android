@@ -26,11 +26,9 @@ import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyGridLayoutManager;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
-import com.shoutit.app.android.view.createshout.request.CreateRequestActivity;
+import com.shoutit.app.android.view.createshout.CreateShoutDialogFragment;
 import com.shoutit.app.android.view.home.HomeGridSpacingItemDecoration;
 import com.shoutit.app.android.view.home.HomeLinearSpacingItemDecoration;
-import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
-import com.shoutit.app.android.view.media.NativeCameraActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 
 import java.util.List;
@@ -181,22 +179,8 @@ public class DiscoverShoutsActivity extends BaseActivity {
                 .putExtra(DISCOVER_NAME, title);
     }
 
-    @OnClick(R.id.fab_create_shout)
+    @OnClick(R.id.fragment_home_fab)
     void onAddShoutClicked() {
-        if (mUserPreferences.isGuest()) {
-            startActivity(LoginIntroActivity.newIntent(this));
-        } else {
-            startActivity(NativeCameraActivity.newIntent(this));
-        }
-    }
-
-
-    @OnClick(R.id.fab_request_shout)
-    void onRequestShoutClicked() {
-        if (mUserPreferences.isGuest()) {
-            startActivity(LoginIntroActivity.newIntent(this));
-        } else {
-            startActivity(CreateRequestActivity.newIntent(this));
-        }
+        CreateShoutDialogFragment.newInstance().show(getSupportFragmentManager(), null);
     }
 }
