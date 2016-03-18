@@ -25,7 +25,6 @@ public class DbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(@NonNull SQLiteDatabase db) {
         createDb(db);
-        writableDatabase = getWritableDatabase();
     }
 
     @Override
