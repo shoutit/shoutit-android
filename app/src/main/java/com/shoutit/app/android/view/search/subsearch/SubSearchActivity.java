@@ -1,8 +1,10 @@
 package com.shoutit.app.android.view.search.subsearch;
 
+import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -56,6 +58,7 @@ public class SubSearchActivity extends BaseActivity implements SearchView.OnQuer
     SearchAdapter adapter;
 
     private SearchView searchView;
+    private boolean wasViewRotated = false;
 
     public static Intent newIntent(Context context, SearchPresenter.SearchType searchType,
                                    @Nonnull String contextualItemId,
@@ -73,6 +76,10 @@ public class SubSearchActivity extends BaseActivity implements SearchView.OnQuer
         ButterKnife.bind(this);
 
         setUpToolbar();
+
+        if (savedInstanceState != null) {
+            wasViewRotated = true;
+        }
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
@@ -122,9 +129,10 @@ public class SubSearchActivity extends BaseActivity implements SearchView.OnQuer
         searchView.setIconifiedByDefault(false);
         searchView.setIconified(false);
         searchView.setMaxWidth(Integer.MAX_VALUE);
-        searchView.clearFocus();
-        searchView.setFocusable(false);
-        setSearchTruncate(searchView);
+        if (!wasViewRotated) {
+            searchView.clearFocus();
+        }
+        setSearchTruncatedAndColored(searchView);
 
         presenter.getHintNameObservable()
                 .compose(this.<String>bindToLifecycle())
@@ -138,13 +146,16 @@ public class SubSearchActivity extends BaseActivity implements SearchView.OnQuer
         return true;
     }
 
-    private void setSearchTruncate(ViewGroup parent) {
+    @SuppressLint("PrivateResource")
+    private void setSearchTruncatedAndColored(ViewGroup parent) {
         for (int i = parent.getChildCount() - 1; i >= 0; i--) {
             final View child = parent.getChildAt(i);
             if (child instanceof ViewGroup) {
-                setSearchTruncate((ViewGroup) child);
+                setSearchTruncatedAndColored((ViewGroup) child);
             } else if (child instanceof EditText && child != null) {
                 ((EditText) child).setEllipsize(TextUtils.TruncateAt.MIDDLE);
+                child.setBackground(getResources().getDrawable(R.drawable.abc_textfield_search_material));
+                child.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accent_blue), PorterDuff.Mode.SRC_OVER);
             }
         }
     }
