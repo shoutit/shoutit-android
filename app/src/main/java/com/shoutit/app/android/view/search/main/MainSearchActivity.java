@@ -1,17 +1,22 @@
 package com.shoutit.app.android.view.search.main;
 
+import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.shoutit.app.android.App;
@@ -52,6 +57,8 @@ public class MainSearchActivity extends BaseActivity implements SearchView.OnQue
     @Inject
     SearchQueryPresenter searchQueryPresenter;
 
+    private boolean wasViewRotated = false;
+
     public static Intent newIntent(Context context) {
         return new Intent(context, MainSearchActivity.class);
     }
@@ -69,6 +76,8 @@ public class MainSearchActivity extends BaseActivity implements SearchView.OnQue
                     .beginTransaction()
                     .replace(R.id.search_categories_fragment_container, SearchCategoriesFragment.newInstance())
                     .commit();
+        } else {
+            wasViewRotated = true;
         }
 
         viewPager.setAdapter(pagerAdapter);
@@ -127,8 +136,10 @@ public class MainSearchActivity extends BaseActivity implements SearchView.OnQue
         searchView.setIconified(false);
         searchView.setQueryHint(getString(R.string.search_base_hint));
         searchView.setMaxWidth(Integer.MAX_VALUE);
-        searchView.clearFocus();
-        searchView.setFocusable(false);
+        if (!wasViewRotated) {
+            searchView.clearFocus();
+        }
+        setSearchTruncatedAndColored(searchView);
 
         searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -138,6 +149,20 @@ public class MainSearchActivity extends BaseActivity implements SearchView.OnQue
         });
 
         return true;
+    }
+
+    @SuppressLint("PrivateResource")
+    private void setSearchTruncatedAndColored(ViewGroup parent) {
+        for (int i = parent.getChildCount() - 1; i >= 0; i--) {
+            final View child = parent.getChildAt(i);
+            if (child instanceof ViewGroup) {
+                setSearchTruncatedAndColored((ViewGroup) child);
+            } else if (child instanceof EditText && child != null) {
+                ((EditText) child).setEllipsize(TextUtils.TruncateAt.MIDDLE);
+                child.setBackground(getResources().getDrawable(R.drawable.abc_textfield_search_material));
+                child.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accent_blue), PorterDuff.Mode.SRC_OVER);
+            }
+        }
     }
 
     private void showPagerAdapter() {
