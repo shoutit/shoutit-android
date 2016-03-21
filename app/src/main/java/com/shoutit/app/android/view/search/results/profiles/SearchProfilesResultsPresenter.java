@@ -16,6 +16,8 @@ import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.api.model.SearchProfileResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dao.ProfilesDao;
+import com.shoutit.app.android.utils.rx.RxMoreObservers;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -90,7 +92,7 @@ public class SearchProfilesResultsPresenter {
                 errorSubject);
 
         profileListenedSubject
-                .throttleFirst(500, TimeUnit.SECONDS)
+                .throttleFirst(400, TimeUnit.MILLISECONDS, uiScheduler)
                 .switchMap(new Func1<ProfileToListenWithLastResponse, Observable<ResponseOrError<SearchProfileResponse>>>() {
                     @Override
                     public Observable<ResponseOrError<SearchProfileResponse>> call(final ProfileToListenWithLastResponse profileToListenWithLastResponse) {
@@ -126,7 +128,10 @@ public class SearchProfilesResultsPresenter {
                     }
                 })
                 .subscribe(dao.getSearchProfilesDao(searchQuery).updatedProfileLocallyObserver());
+    }
 
+    public Observer<Object> getLoadMoreObserver() {
+        return RxMoreObservers.ignoreCompleted(dao.getSearchProfilesDao(searchQuery).getLoadMoreShoutsObserver());
     }
 
     public Observable<Boolean> getProgressObservable() {

@@ -10,6 +10,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
+import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
@@ -17,6 +19,9 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.LoadMoreHelper;
+import com.shoutit.app.android.utils.MyLayoutManager;
+import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 
 import java.util.List;
@@ -59,7 +64,7 @@ public class SearchProfilesResultsActivity extends BaseActivity {
         setContentView(R.layout.activity_search_profiles_results);
         ButterKnife.bind(this);
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(new MyLinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
         setUpToolbar();
@@ -92,6 +97,11 @@ public class SearchProfilesResultsActivity extends BaseActivity {
                                 REQUEST_PROFILE_OPENED);
                     }
                 });
+
+        RxRecyclerView.scrollEvents(recyclerView)
+                .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
+                .filter(LoadMoreHelper.needLoadMore((MyLayoutManager) recyclerView.getLayoutManager(), adapter))
+                .subscribe(presenter.getLoadMoreObserver());
     }
 
     @SuppressLint("PrivateResource")

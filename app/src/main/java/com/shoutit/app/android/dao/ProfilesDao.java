@@ -11,12 +11,14 @@ import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.SearchProfileResponse;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.utils.rx.RxMoreObservers;
 
 import javax.annotation.Nonnull;
 
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.subjects.PublishSubject;
@@ -110,11 +112,11 @@ public class ProfilesDao {
         private final int SEARCH_PAGE_SIZE = 20;
 
         @Nonnull
-        private Observable<ResponseOrError<SearchProfileResponse>> profilesObservable;
+        private final Observable<ResponseOrError<SearchProfileResponse>> profilesObservable;
         @Nonnull
-        private PublishSubject<Object> refreshSubject = PublishSubject.create();
+        private final PublishSubject<Object> refreshSubject = PublishSubject.create();
         @Nonnull
-        private PublishSubject<ResponseOrError<SearchProfileResponse>> updatedProfilesLocallySubject = PublishSubject.create();
+        private final PublishSubject<ResponseOrError<SearchProfileResponse>> updatedProfilesLocallySubject = PublishSubject.create();
         @Nonnull
         private final PublishSubject<Object> loadMoreShoutsSubject = PublishSubject.create();
 
@@ -148,11 +150,16 @@ public class ProfilesDao {
 
 
             profilesObservable = loadMoreShoutsSubject.startWith((Object) null)
-                    .compose(MoreOperators.refresh(refreshSubject))
                     .lift(loadMoreOperator)
                     .compose(ResponseOrError.<SearchProfileResponse>toResponseOrErrorObservable())
+                    .compose(MoreOperators.<ResponseOrError<SearchProfileResponse>>refresh(refreshSubject))
                     .mergeWith(updatedProfilesLocallySubject)
                     .compose(MoreOperators.<ResponseOrError<SearchProfileResponse>>cacheWithTimeout(networkScheduler));
+        }
+
+        @Nonnull
+        public Observer<Object> getLoadMoreShoutsObserver() {
+            return loadMoreShoutsSubject;
         }
 
         @Nonnull
