@@ -49,5 +49,6 @@
 
     <!-- Lined Text View -->
     <dimen name="textview_padding">16dp</dimen>
+    <dimen name="camera_accept_or_dismiss_layout_height">145dp</dimen>
 
 </resources>

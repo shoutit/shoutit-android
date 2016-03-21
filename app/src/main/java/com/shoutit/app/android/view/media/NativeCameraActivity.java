@@ -263,7 +263,7 @@ public class NativeCameraActivity extends BaseActivity {
                         @Override
                         public void call(Throwable throwable) {
                             ColoredSnackBar.error(ColoredSnackBar.contentView(
-                                    NativeCameraActivity.this),
+                                            NativeCameraActivity.this),
                                     R.string.error_default,
                                     Snackbar.LENGTH_SHORT)
                                     .show();
@@ -271,7 +271,7 @@ public class NativeCameraActivity extends BaseActivity {
                     });
         } else {
             ColoredSnackBar.error(ColoredSnackBar.contentView(
-                    NativeCameraActivity.this),
+                            NativeCameraActivity.this),
                     R.string.error_default,
                     Snackbar.LENGTH_SHORT)
                     .show();
@@ -333,7 +333,7 @@ public class NativeCameraActivity extends BaseActivity {
                             @Override
                             public void call(Throwable throwable) {
                                 ColoredSnackBar.error(ColoredSnackBar.contentView(
-                                        NativeCameraActivity.this),
+                                                NativeCameraActivity.this),
                                         R.string.error_default,
                                         Snackbar.LENGTH_SHORT)
                                         .show();
@@ -456,7 +456,7 @@ public class NativeCameraActivity extends BaseActivity {
                 mCamera.startPreview();
             } catch (Exception e) {
                 ColoredSnackBar.error(ColoredSnackBar.contentView(
-                        NativeCameraActivity.this),
+                                NativeCameraActivity.this),
                         R.string.error_default,
                         Snackbar.LENGTH_SHORT)
                         .show();
@@ -502,7 +502,7 @@ public class NativeCameraActivity extends BaseActivity {
                 }
             } catch (IOException e) {
                 ColoredSnackBar.error(ColoredSnackBar.contentView(
-                        NativeCameraActivity.this),
+                                NativeCameraActivity.this),
                         R.string.error_default,
                         Snackbar.LENGTH_SHORT)
                         .show();
@@ -533,7 +533,7 @@ public class NativeCameraActivity extends BaseActivity {
                 mCamera.startPreview();
             } catch (Exception e) {
                 ColoredSnackBar.error(ColoredSnackBar.contentView(
-                        NativeCameraActivity.this),
+                                NativeCameraActivity.this),
                         R.string.error_default,
                         Snackbar.LENGTH_SHORT)
                         .show();
@@ -662,14 +662,14 @@ public class NativeCameraActivity extends BaseActivity {
                     setUpPublishButtonClickListener(file);
                 } else {
                     ColoredSnackBar.error(ColoredSnackBar.contentView(
-                            NativeCameraActivity.this),
+                                    NativeCameraActivity.this),
                             R.string.error_default,
                             Snackbar.LENGTH_SHORT)
                             .show();
                 }
             } catch (IOException e) {
                 ColoredSnackBar.error(ColoredSnackBar.contentView(
-                        NativeCameraActivity.this),
+                                NativeCameraActivity.this),
                         R.string.error_default,
                         Snackbar.LENGTH_SHORT)
                         .show();
@@ -682,7 +682,7 @@ public class NativeCameraActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 mProgressBar.setVisibility(View.VISIBLE);
-                mAmazonHelper.uploadShoutImageObservable(file)
+                mAmazonHelper.uploadShoutMediaObservable(file)
                         .flatMap(new Func1<String, Observable<CreateShoutResponse>>() {
                             @Override
                             public Observable<CreateShoutResponse> call(String url) {
@@ -711,7 +711,7 @@ public class NativeCameraActivity extends BaseActivity {
                                     @Override
                                     public void call(Throwable throwable) {
                                         ColoredSnackBar.error(ColoredSnackBar.contentView(
-                                                NativeCameraActivity.this),
+                                                        NativeCameraActivity.this),
                                                 R.string.error_default,
                                                 Snackbar.LENGTH_SHORT)
                                                 .show();
@@ -780,7 +780,7 @@ public class NativeCameraActivity extends BaseActivity {
                 }
             } else {
                 ColoredSnackBar.error(ColoredSnackBar.contentView(
-                        NativeCameraActivity.this),
+                                NativeCameraActivity.this),
                         R.string.error_default,
                         Snackbar.LENGTH_SHORT)
                         .show();

@@ -19,6 +19,13 @@
         android:theme="@style/AppTheme">
 
         <activity
+            android:name=".camera2.RecordVideoActivity"/>
+
+        <activity
+            android:name=".camera2.VideoCompressActivity"/>
+
+
+        <activity
             android:name=".view.main.MainActivity"
             android:theme="@style/AppTheme.WithDrawer">
 

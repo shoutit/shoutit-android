@@ -71,4 +71,7 @@
     <!-- Location -->
     <color name="location_input_hint">#4dffffff</color>
 
+    <!-- Camera -->
+    <color name="camera_timer_color">#FF5252</color>
+
 </resources>

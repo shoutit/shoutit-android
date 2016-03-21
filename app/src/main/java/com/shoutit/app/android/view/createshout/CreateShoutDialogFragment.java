@@ -12,12 +12,12 @@ import android.view.ViewGroup;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.camera2.RecordVideoActivity;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.view.createshout.request.CreateRequestActivity;
 import com.shoutit.app.android.view.createshout.request.CreateShoutDialogComponent;
 import com.shoutit.app.android.view.createshout.request.DaggerCreateShoutDialogComponent;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
-import com.shoutit.app.android.view.media.NativeCameraActivity;
 
 import javax.inject.Inject;
 
@@ -62,7 +62,7 @@ public class CreateShoutDialogFragment extends DialogFragment {
         if (mUserPreferences.isGuest()) {
             startActivity(LoginIntroActivity.newIntent(getActivity()));
         } else {
-            startActivity(NativeCameraActivity.newIntent(getActivity()));
+            startActivity(RecordVideoActivity.newIntent(getActivity()));
         }
     }
 

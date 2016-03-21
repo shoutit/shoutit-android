@@ -52,7 +52,7 @@ public class AmazonHelper {
         userId = userPreferences.getUser().getId();
     }
 
-    public Observable<String> uploadShoutImageObservable(@Nonnull final File fileToUpload) {
+    public Observable<String> uploadShoutMediaObservable(@Nonnull final File fileToUpload) {
         return uploadImageObservable(AmazonBucket.SHOUT, fileToUpload);
     }
 
