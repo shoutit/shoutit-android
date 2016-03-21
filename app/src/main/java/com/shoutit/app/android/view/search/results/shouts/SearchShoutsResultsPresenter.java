@@ -122,8 +122,17 @@ public class SearchShoutsResultsPresenter {
             return false;
         }
 
-        public void onLayoutSwitch() {
-            layoutManagerSwitchObserver.onNext(null);
+        public Observer<Object> getLayoutManagerSwitchObserver() {
+            return layoutManagerSwitchObserver;
+        }
+
+        public int getTotalItemsCount() {
+            return totalItemsCount;
+        }
+
+        @Nonnull
+        public String getSearchQuery() {
+            return searchQuery;
         }
     }
 }

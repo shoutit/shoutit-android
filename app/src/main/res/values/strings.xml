@@ -319,6 +319,9 @@
 
     <!-- Search Profiles Results -->
     <string name="search_profiles_results">Results</string>
+    <string name="search_shout_results_header_title">All Results for \'%1$s'</string>
+    <string name="search_shouts_results_header_count">%1$d Results</string>
+    <string name="search_results_no_results">No results found</string>
 
 
 </resources>
