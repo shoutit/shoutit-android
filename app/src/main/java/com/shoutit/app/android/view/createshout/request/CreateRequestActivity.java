@@ -15,6 +15,8 @@ import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.util.Pair;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -124,6 +126,23 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
         super.onCreate(savedInstanceState);
         setContentView(R.layout.request_activity);
         ButterKnife.bind(this);
+
+        mCreateRequestBudget.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                mCreateRequestPresenter.onBudgetChanged(s.toString());
+            }
+        });
 
         mAdapter = new SpinnerAdapter();
         mCreateRequestSpinner.setAdapter(mAdapter);
@@ -262,7 +281,7 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
 
     @Override
     public void showTitleTooShortError(boolean show) {
-        if(show) {
+        if (show) {
             mRequestActivityDescriptionLayout.setErrorEnabled(true);
             mRequestActivityDescriptionLayout.setError(getString(R.string.create_request_activity_title_too_short));
         } else {

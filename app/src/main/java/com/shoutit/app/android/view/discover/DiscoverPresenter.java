@@ -1,5 +1,7 @@
 package com.shoutit.app.android.view.discover;
 
+import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
 
@@ -29,6 +31,8 @@ import com.shoutit.app.android.model.LocationPointer;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.view.home.HomePresenter;
+import com.shoutit.app.android.view.search.SearchPresenter;
+import com.shoutit.app.android.view.search.subsearch.SubSearchActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +59,10 @@ public class DiscoverPresenter {
     private final Observable<Throwable> errorsObservable;
     @Nonnull
     private final Observable<Boolean> progressObservable;
+    @Nonnull
+    private final Observable<DiscoveryInfo> mDiscoveryInfoObservable;
+    @Nonnull
+    private final Observable<Intent> searchMenuItemClickObservable;
 
     @Nonnull
     private final PublishSubject<String> showMoreObserver = PublishSubject.create();
@@ -63,17 +71,18 @@ public class DiscoverPresenter {
     @Nonnull
     private final PublishSubject<String> shoutSelectedObserver = PublishSubject.create();
     @Nonnull
-    private final Observable<DiscoveryInfo> mDiscoveryInfoObservable;
+    private final PublishSubject<Object> searchMenuItemClickSubject = PublishSubject.create();
     @NonNull
     private final Resources mResources;
 
     public DiscoverPresenter(@Nonnull UserPreferences userPreferences,
                              @Nonnull final DiscoversDao discoversDao,
                              @Nonnull final DiscoverShoutsDao discoverShoutsDao,
-                             @Nonnull Optional<String> discoverParentId,
+                             @Nonnull final Optional<String> discoverParentId,
                              @Nonnull @UiScheduler final Scheduler uiScheduler,
                              @Nonnull @NetworkScheduler final Scheduler networkScheduler,
-                             @NonNull @ForActivity Resources resources) {
+                             @NonNull @ForActivity Resources resources,
+                             @Nonnull @ForActivity final Context context) {
         mResources = resources;
 
 
@@ -143,6 +152,7 @@ public class DiscoverPresenter {
                             }
                         })
                         .compose(ObservableExtensions.<ResponseOrError<DiscoverItemDetailsResponse>>behaviorRefCount());
+
         final Observable<DiscoverItemDetailsResponse> itemDetailsResponseObservable = discoverItemObservable
                 .compose(ResponseOrError.<DiscoverItemDetailsResponse>onlySuccess());
 
@@ -284,6 +294,22 @@ public class DiscoverPresenter {
                 return new DiscoveryInfo(id, title);
             }
         });
+
+        /** Search Click **/
+        searchMenuItemClickObservable = searchMenuItemClickSubject
+                .withLatestFrom(itemDetailsResponseObservable, new Func2<Object, DiscoverItemDetailsResponse, Intent>() {
+                    @Override
+                    public Intent call(Object o, DiscoverItemDetailsResponse response) {
+                        return SubSearchActivity.newIntent(
+                                context, SearchPresenter.SearchType.DISCOVER,
+                                response.getId(), response.getTitle());
+                    }
+                });
+    }
+
+    @Nonnull
+    public Observable<Intent> getSearchMenuItemClickObservable() {
+        return searchMenuItemClickObservable;
     }
 
     @Nonnull
@@ -314,6 +340,10 @@ public class DiscoverPresenter {
     @Nonnull
     public Observable<String> getShoutSelectedObservable() {
         return shoutSelectedObserver;
+    }
+
+    public void onSearchMenuItemClicked() {
+        searchMenuItemClickSubject.onNext(null);
     }
 
     /**

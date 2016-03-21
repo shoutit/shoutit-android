@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -16,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.common.collect.Iterables;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
@@ -24,12 +26,16 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dao.ProfilesDao;
+import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.view.discover.DiscoverActivity;
 import com.shoutit.app.android.view.discover.OnNewDiscoverSelectedListener;
 import com.shoutit.app.android.view.home.HomeFragment;
 import com.shoutit.app.android.view.intro.IntroActivity;
 import com.shoutit.app.android.view.postlogininterest.PostLoginInterestActivity;
+import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.main.MainSearchActivity;
+import com.shoutit.app.android.view.search.subsearch.SubSearchActivity;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -42,6 +48,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
         OnNewDiscoverSelectedListener, OnSeeAllDiscoversListener {
 
     private static final String MENU_SELECT_ITEM = "args_menu_item";
+    public static final int REQUST_CODE_CAMERA_PERMISSION = 1;
 
     public static Intent newIntent(@Nonnull Context context) {
         return new Intent(context, MainActivity.class);
@@ -123,10 +130,19 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
         switch (item.getItemId()) {
             case R.id.base_menu_search:
-                startActivity(MainSearchActivity.newIntent(this));
-                return true;
+                return showMainSearchActivityOrLetFragmentsHandleIt();
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private boolean showMainSearchActivityOrLetFragmentsHandleIt() {
+        final Fragment fragment = Iterables.getLast(getSupportFragmentManager().getFragments());
+        if (fragment != null && MenuHandler.FRAGMENT_DISCOVER.equals(fragment.getTag())) {
+            return false;
+        } else {
+            startActivity(MainSearchActivity.newIntent(this));
+            return true;
         }
     }
 
@@ -219,6 +235,20 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
     protected void onDestroy() {
         super.onDestroy();
         backButtonHandler.removeCallbacks(backButtonRunnable);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUST_CODE_CAMERA_PERMISSION) {
+            final boolean permissionsGranted = PermissionHelper.arePermissionsGranted(grantResults);
+            if (permissionsGranted) {
+                ColoredSnackBar.success(findViewById(android.R.id.content), R.string.permission_granted, Snackbar.LENGTH_SHORT).show();
+            } else {
+                ColoredSnackBar.error(findViewById(android.R.id.content), R.string.permission_not_granted, Snackbar.LENGTH_SHORT);
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
     @Override

@@ -147,7 +147,6 @@ public class CreateRequestPresenterTest {
         verify(mListener).showProgress();
         verify(mListener).hideProgress();
         verify(mListener).setCurrencies(anyList());
-        verify(mListener).setCurrenciesEnabled(true);
         verify(mListener).removeRetryCurrenciesListener();
     }
 
@@ -160,7 +159,6 @@ public class CreateRequestPresenterTest {
         verify(mListener).showProgress();
         verify(mListener).hideProgress();
         verify(mListener).showCurrenciesError();
-        verify(mListener).setCurrenciesEnabled(true);
         verify(mListener).setRetryCurrenciesListener();
     }
 

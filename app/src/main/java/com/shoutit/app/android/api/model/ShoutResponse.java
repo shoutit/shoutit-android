@@ -2,7 +2,7 @@ package com.shoutit.app.android.api.model;
 
 public class ShoutResponse {
 
-    private final long price;
+    private final Long price;
     private final String title;
     private final String description;
     private final String type;
@@ -10,7 +10,7 @@ public class ShoutResponse {
     private final String currency;
     private final Category category;
 
-    public ShoutResponse(long price, String title, String description, String type, UserLocation location, String currency, Category category) {
+    public ShoutResponse(Long price, String title, String description, String type, UserLocation location, String currency, Category category) {
         this.price = price;
         this.title = title;
         this.description = description;
@@ -20,7 +20,7 @@ public class ShoutResponse {
         this.category = category;
     }
 
-    public long getPrice() {
+    public Long getPrice() {
         return price;
     }
 
