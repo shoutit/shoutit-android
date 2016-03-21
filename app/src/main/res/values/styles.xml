@@ -68,7 +68,6 @@
         <item name="colorPrimary">@android:color/white</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="android:background">@android:color/white</item>
-        <item name="android:colorAccent">@color/accent_blue</item>
         <item name="colorControlActivated">@color/accent_blue</item> <!-- Cursor color -->
     </style>
 
