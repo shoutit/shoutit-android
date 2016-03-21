@@ -71,7 +71,9 @@
         android:layout_height="0.5dp"
         android:layout_alignParentBottom="true"
         android:layout_alignStart="@+id/profile_section_name_tv"
+        android:layout_alignLeft="@+id/profile_section_name_tv"
         android:layout_alignEnd="@+id/profile_section_listening_iv"
+        android:layout_alignRight="@+id/profile_section_listening_iv"
         android:layout_marginRight="8dp"
         android:layout_marginEnd="8dp"
         android:background="@color/black_12"/>
