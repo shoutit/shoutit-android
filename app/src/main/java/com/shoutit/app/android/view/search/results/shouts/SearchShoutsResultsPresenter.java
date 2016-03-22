@@ -30,6 +30,7 @@ import javax.annotation.Nullable;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.subjects.PublishSubject;
@@ -38,26 +39,36 @@ public class SearchShoutsResultsPresenter {
 
     private final PublishSubject<Object> layoutManagerSwitchSubject = PublishSubject.create();
     private final PublishSubject<String> shoutSelectedSubject = PublishSubject.create();
+    private final PublishSubject<Object> loadMoreSubject = PublishSubject.create();
 
     private final Observable<List<BaseAdapterItem>> adapterItems;
     private final Observable<Boolean> progressObservable;
     private final Observable<Throwable> errorObservable;
     private final Observable<Boolean> linearLayoutManagerObservable;
     private final Observable<String> toolbarTitleObservable;
+    private final Observable<ShoutsDao.SearchShoutsDao> daoObservable;
 
     public SearchShoutsResultsPresenter(final ShoutsDao dao, @Nonnull final String searchQuery,
                                         UserPreferences userPreferences, @ForActivity final Context context,
                                         @UiScheduler Scheduler uiScheduler) {
 
-        final Observable<ResponseOrError<ShoutsResponse>> shoutsRequest = userPreferences.getLocationObservable()
+        daoObservable = userPreferences.getLocationObservable()
                 .filter(Functions1.isNotNull())
                 .first()
-                .switchMap(new Func1<UserLocation, Observable<ResponseOrError<ShoutsResponse>>>() {
+                .map(new Func1<UserLocation, ShoutsDao.SearchShoutsDao>() {
                     @Override
-                    public Observable<ResponseOrError<ShoutsResponse>> call(UserLocation userLocation) {
+                    public ShoutsDao.SearchShoutsDao call(UserLocation userLocation) {
                         return dao.getSearchShoutsDao(new SearchShoutPointer(
-                                searchQuery, SearchPresenter.SearchType.SHOUTS, userLocation, null))
-                                .getShoutsObservable();
+                                searchQuery, SearchPresenter.SearchType.SHOUTS, userLocation, null));
+                    }
+                })
+                .compose(ObservableExtensions.<ShoutsDao.SearchShoutsDao>behaviorRefCount());
+
+        final Observable<ResponseOrError<ShoutsResponse>> shoutsRequest = daoObservable
+                .switchMap(new Func1<ShoutsDao.SearchShoutsDao, Observable<ResponseOrError<ShoutsResponse>>>() {
+                    @Override
+                    public Observable<ResponseOrError<ShoutsResponse>> call(ShoutsDao.SearchShoutsDao searchShoutsDao) {
+                        return searchShoutsDao.getShoutsObservable();
                     }
                 })
                 .observeOn(uiScheduler)
@@ -101,6 +112,20 @@ public class SearchShoutsResultsPresenter {
                 })
                 .skip(1)
                 .observeOn(uiScheduler);
+
+        loadMoreSubject
+                .withLatestFrom(daoObservable, new Func2<Object, ShoutsDao.SearchShoutsDao, Observer<Object>>() {
+                    @Override
+                    public Observer<Object> call(Object o, ShoutsDao.SearchShoutsDao searchShoutsDao) {
+                        return searchShoutsDao.getLoadMoreObserver();
+                    }
+                })
+                .subscribe(new Action1<Observer<Object>>() {
+                    @Override
+                    public void call(Observer<Object> loadMoreObserver) {
+                        loadMoreObserver.onNext(null);
+                    }
+                });
     }
 
     @Nonnull
@@ -133,6 +158,10 @@ public class SearchShoutsResultsPresenter {
 
     public Observable<String> getShoutSelectedObservable() {
         return shoutSelectedSubject;
+    }
+
+    public Observer<Object> getLoadMoreObserver() {
+        return loadMoreSubject;
     }
 
     public class ShoutHeaderAdapterItem extends BaseNoIDAdapterItem {

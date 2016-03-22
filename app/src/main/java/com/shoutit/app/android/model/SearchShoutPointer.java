@@ -1,6 +1,7 @@
 package com.shoutit.app.android.model;
 
 
+import com.google.common.base.Objects;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.view.search.SearchPresenter;
 
@@ -44,5 +45,21 @@ public class SearchShoutPointer {
     @Nullable
     public String getContextItemId() {
         return contextItemId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SearchShoutPointer)) return false;
+        final SearchShoutPointer that = (SearchShoutPointer) o;
+        return Objects.equal(query, that.query) &&
+                searchType == that.searchType &&
+                Objects.equal(location, that.location) &&
+                Objects.equal(contextItemId, that.contextItemId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(query, searchType, location, contextItemId);
     }
 }

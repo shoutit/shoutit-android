@@ -44,6 +44,7 @@
         android:id="@+id/search_results_filter_iv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
         android:layout_marginEnd="24dp"
         android:layout_marginRight="24dp"
         android:src="@drawable/ic_filter" />
@@ -52,6 +53,7 @@
         android:id="@+id/search_results_switch_iv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
         android:src="@drawable/ic_list_switch" />
 
 </LinearLayout>

@@ -14,6 +14,8 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
+import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.jakewharton.rxbinding.view.RxView;
 import com.jakewharton.rxbinding.widget.RxToolbar;
 import com.shoutit.app.android.App;
@@ -23,7 +25,9 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.db.RecentSearchesTable;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyGridLayoutManager;
+import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 
@@ -123,6 +127,11 @@ public class SearchShoutsResultsActivity extends BaseActivity {
                         startActivity(ShoutActivity.newIntent(SearchShoutsResultsActivity.this, shoutId));
                     }
                 });
+
+        RxRecyclerView.scrollEvents(recyclerView)
+                .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
+                .filter(LoadMoreHelper.needLoadMore((MyLayoutManager) recyclerView.getLayoutManager(), adapter))
+                .subscribe(presenter.getLoadMoreObserver());
     }
 
     private void initAdapter() {
@@ -136,15 +145,19 @@ public class SearchShoutsResultsActivity extends BaseActivity {
                 int position = parent.getChildAdapterPosition(view);
 
                 final RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
-                if (layoutManager instanceof LinearLayoutManager ||
-                        (layoutManager instanceof GridLayoutManager && ((GridLayoutManager) layoutManager).getSpanSizeLookup().getSpanSize(position) == 2)) {
+                if (layoutManager == null) {
+                    return;
+                }
+
+                if (layoutManager instanceof MyLinearLayoutManager ||
+                        (layoutManager instanceof MyGridLayoutManager && ((GridLayoutManager) layoutManager).getSpanSizeLookup().getSpanSize(position) == 2)) {
                     outRect.left = sideSpacing;
                     outRect.right = sideSpacing;
                 } else {
                     if (position % 2 == 0) {
-                        outRect.left = sideSpacing;
-                    } else {
                         outRect.right = sideSpacing;
+                    } else {
+                        outRect.left = sideSpacing;
                     }
                 }
             }

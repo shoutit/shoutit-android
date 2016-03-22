@@ -25,7 +25,7 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.view.search.SearchAdapter;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.SearchQueryPresenter;
-import com.shoutit.app.android.view.search.results.SearchResultsActivity;
+import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsActivity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -89,7 +89,7 @@ public class SubSearchActivity extends BaseActivity implements SearchView.OnQuer
                 .subscribe(new Action1<String>() {
                     @Override
                     public void call(String query) {
-                        startActivity(SearchResultsActivity.newIntent(SubSearchActivity.this, query));
+                        startActivity(SearchShoutsResultsActivity.newIntent(SubSearchActivity.this, query));
                     }
                 });
 

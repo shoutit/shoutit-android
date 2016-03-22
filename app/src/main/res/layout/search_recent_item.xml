@@ -5,13 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@drawable/s">
+    android:background="@drawable/white_selector">
 
     <LinearLayout
         android:id="@+id/search_recent_container"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:background="?selectableItemBackground"
+        android:background="@drawable/white_selector"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingLeft="16dp"
