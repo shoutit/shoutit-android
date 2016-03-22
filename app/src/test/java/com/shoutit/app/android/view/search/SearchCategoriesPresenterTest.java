@@ -1,5 +1,7 @@
 package com.shoutit.app.android.view.search;
 
+import android.content.Context;
+
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.collect.Iterables;
@@ -27,6 +29,8 @@ public class SearchCategoriesPresenterTest {
 
     @Mock
     CategoriesDao categoriesDao;
+    @Mock
+    Context context;
 
     private SearchCategoriesPresenter presenter;
 
@@ -38,7 +42,7 @@ public class SearchCategoriesPresenterTest {
         when(categoriesDao.getListObservableResponseOrError())
                 .thenReturn(Observable.just(ResponseOrError.fromData(categories)));
 
-        presenter = new SearchCategoriesPresenter(categoriesDao, Schedulers.immediate());
+        presenter = new SearchCategoriesPresenter(categoriesDao, Schedulers.immediate(), context);
     }
 
     @Test
@@ -66,7 +70,7 @@ public class SearchCategoriesPresenterTest {
     public void testErrorObservable() throws Exception {
         when(categoriesDao.getListObservableResponseOrError())
                 .thenReturn(Observable.just(ResponseOrError.<List<Category>>fromError(new Throwable())));
-        presenter = new SearchCategoriesPresenter(categoriesDao, Schedulers.immediate());
+        presenter = new SearchCategoriesPresenter(categoriesDao, Schedulers.immediate(), context);
 
         TestSubscriber<Throwable> errorSubscriber = new TestSubscriber<>();
         TestSubscriber<Boolean> progressSubscriber = new TestSubscriber<>();

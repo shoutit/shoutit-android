@@ -1,5 +1,6 @@
 package com.shoutit.app.android.view.discover;
 
+import android.content.Context;
 import android.content.res.Resources;
 
 import com.appunite.rx.ResponseOrError;
@@ -54,6 +55,8 @@ public class DiscoverPresenterTest {
     DiscoversDao.DiscoverItemDao discoverItemDao;
     @Mock
     Resources mResources;
+    @Mock
+    Context context;
 
     private final PublishSubject<ResponseOrError<DiscoverItemDetailsResponse>> discoverItemSubject = PublishSubject.create();
     private DiscoverPresenter presenter;
@@ -73,7 +76,7 @@ public class DiscoverPresenterTest {
                 .thenReturn(Observable.just(ResponseOrError.fromData(getShoutsResponse())));
 
         presenter = new DiscoverPresenter(userPreferences, discoversDao,
-                discoverShoutsDao, Optional.<String>absent(), Schedulers.immediate(), Schedulers.immediate(), mResources);
+                discoverShoutsDao, Optional.<String>absent(), Schedulers.immediate(), Schedulers.immediate(), mResources, context);
     }
 
     @Test

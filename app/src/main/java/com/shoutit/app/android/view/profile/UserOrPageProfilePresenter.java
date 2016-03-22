@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.profile;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 
 import com.appunite.rx.ObservableExtensions;
@@ -25,6 +26,8 @@ import com.shoutit.app.android.model.UserShoutsPointer;
 import com.shoutit.app.android.utils.PreferencesHelper;
 import com.shoutit.app.android.view.profile.myprofile.MyProfileHalfPresenter;
 import com.shoutit.app.android.view.profile.userprofile.UserProfileHalfPresenter;
+import com.shoutit.app.android.view.search.SearchPresenter;
+import com.shoutit.app.android.view.search.subsearch.SubSearchActivity;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
 import java.util.ArrayList;
@@ -60,6 +63,8 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
     private Observable<Throwable> errorObservable;
     @Nonnull
     private Observable<String> shareObservable;
+    @Nonnull
+    private Observable<Intent> searchMenuItemClickObservable;
 
     @Nonnull
     private final PublishSubject<String> showAllShoutsSubject = PublishSubject.create();
@@ -75,6 +80,8 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
     private final PublishSubject<Object> actionOnlyForLoggedInUserSubject = PublishSubject.create();
     @Nonnull
     private final PublishSubject<String> webUrlClickedSubject = PublishSubject.create();
+    @Nonnull
+    private final PublishSubject<Object> searchMenuItemClickSubject = PublishSubject.create();
 
     @Nonnull
     private final String userName;
@@ -218,12 +225,22 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
                 .startWith(true)
                 .observeOn(uiScheduler);
 
-        /** Share **/
+        /** Menu actions **/
         shareObservable = shareInitSubject
                 .withLatestFrom(userSuccessObservable, new Func2<Object, User, String>() {
                     @Override
                     public String call(Object o, User user) {
                         return user.getWebUrl();
+                    }
+                });
+
+        searchMenuItemClickObservable = searchMenuItemClickSubject
+                .withLatestFrom(userSuccessObservable, new Func2<Object, User, Intent>() {
+                    @Override
+                    public Intent call(Object o, User user) {
+                        return SubSearchActivity.newIntent(context,
+                                SearchPresenter.SearchType.PROFILE, user.getUsername(),
+                                user.getName());
                     }
                 });
     }
@@ -289,6 +306,11 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
             return new ProfileAdapterItems.ProfileSectionAdapterItem<>(false, false, user, items.get(position),
                     userProfilePresenter.getSectionItemListenObserver(), profileToOpenSubject, actionOnlyForLoggedInUserSubject, loggedInUserName, isUserLoggedIn, false);
         }
+    }
+
+    @Nonnull
+    public Observable<Intent> getSearchMenuItemClickObservable() {
+        return searchMenuItemClickObservable;
     }
 
     @Nonnull
@@ -400,6 +422,10 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
     @Override
     public void refreshProfile() {
         profilesDao.getRefreshProfileObserver(userName).onNext(null);
+    }
+
+    public void onSearchMenuItemClicked() {
+        searchMenuItemClickSubject.onNext(null);
     }
 
     public static class UserWithItemToListen {
