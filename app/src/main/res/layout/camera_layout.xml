@@ -211,14 +211,11 @@
         </LinearLayout>
 
         <Button
+            style="@style/BaseButtonDefaultBackgroundStyle"
             android:id="@+id/camera_published_done"
             android:layout_width="240dp"
-            android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:fontFamily="sans-serif"
-            android:padding="22dp"
             android:text="Done"
-            android:textAllCaps="false"
             android:textColor="@android:color/white"/>
 
 

@@ -2,6 +2,8 @@
 <resources>
     <dimen name="status_bar_margin">0dp</dimen>
     <dimen name="fab_size">56dp</dimen>
+    <dimen name="button_with_default_bg_height">52dp</dimen> <!-- It includes 12dp inset in default button bg -->
+    <dimen name="default_button_height">40dp</dimen>
 
     <!-- Home -->
     <dimen name="home_discover_image_height">90dp</dimen>
