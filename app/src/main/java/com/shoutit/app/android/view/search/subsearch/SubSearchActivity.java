@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.search.main;
+package com.shoutit.app.android.view.search.subsearch;
 
 import android.annotation.SuppressLint;
 import android.app.SearchManager;
@@ -6,9 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -17,17 +16,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.Toast;
+
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
-import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.view.search.SearchAdapter;
+import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.SearchQueryPresenter;
-import com.shoutit.app.android.view.search.categories.SearchCategoriesFragment;
-import com.shoutit.app.android.view.search.results.profiles.SearchProfilesResultsActivity;
-import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsActivity;
+import com.shoutit.app.android.view.search.results.SearchResultsActivity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -37,74 +35,68 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import rx.functions.Action1;
 
+import static com.appunite.rx.internal.Preconditions.checkNotNull;
 
-public class MainSearchActivity extends BaseActivity implements SearchView.OnQueryTextListener {
+public class SubSearchActivity extends BaseActivity implements SearchView.OnQueryTextListener {
 
+    private static final String KEY_SEARCH_TYPE = "search_type";
+    private static final String KEY_CONTEXTUAL_ITEM_ID = "contextual_item_id";
+    private static final String KEY_CONTEXTUAL_ITEM_NAME = "contextual_item_name";
+
+    @Bind(R.id.search_recycler_view)
+    RecyclerView recyclerView;
+    @Bind(R.id.base_progress)
+    View progressView;
     @Bind(R.id.search_toolbar)
     Toolbar toolbar;
-    @Bind(R.id.search_toolbar_shadow_view)
-    View toolbarShadow;
-    @Bind(R.id.search_view_pager)
-    ViewPager viewPager;
-    @Bind(R.id.search_tab_layout)
-    TabLayout tabLayout;
-    @Bind(R.id.search_view_pager_container)
-    View pagerContainer;
-    @Bind(R.id.search_categories_fragment_container)
-    View categoriesFragmentContainer;
 
     @Inject
-    MainSearchPagerAdapter pagerAdapter;
+    SearchPresenter presenter;
     @Inject
     SearchQueryPresenter searchQueryPresenter;
+    @Inject
+    SearchAdapter adapter;
 
+    private SearchView searchView;
     private boolean wasViewRotated = false;
 
-    public static Intent newIntent(Context context) {
-        return new Intent(context, MainSearchActivity.class);
+    public static Intent newIntent(Context context, SearchPresenter.SearchType searchType,
+                                   @Nonnull String contextualItemId,
+                                   @Nonnull String contextualItemName) {
+        return new Intent(context, SubSearchActivity.class)
+                .putExtra(KEY_SEARCH_TYPE, searchType)
+                .putExtra(KEY_CONTEXTUAL_ITEM_ID, contextualItemId)
+                .putExtra(KEY_CONTEXTUAL_ITEM_NAME, contextualItemName);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search);
+        setContentView(R.layout.activity_subsearch);
         ButterKnife.bind(this);
 
         setUpToolbar();
 
-        if (savedInstanceState == null) {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.search_categories_fragment_container, SearchCategoriesFragment.newInstance())
-                    .commit();
-        } else {
+        if (savedInstanceState != null) {
             wasViewRotated = true;
         }
 
-        viewPager.setAdapter(pagerAdapter);
-        tabLayout.setupWithViewPager(viewPager);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
 
-        searchQueryPresenter.getQuerySubmittedObservable()
+        searchQueryPresenter.getQuerySubmittedSubject()
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(new Action1<String>() {
                     @Override
                     public void call(String query) {
-                        if (isShoutTabSelected()) {
-                            startActivity(SearchShoutsResultsActivity.newIntent(MainSearchActivity.this, query));
-                        } else {
-                            startActivity(SearchProfilesResultsActivity.newIntent(MainSearchActivity.this, query));
-                        }
+                        startActivity(SearchResultsActivity.newIntent(SubSearchActivity.this, query));
                     }
                 });
 
-        searchQueryPresenter.getEmptyQuerySubmittedObservable()
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(ColoredSnackBar.errorSnackBarAction(
-                        ColoredSnackBar.contentView(this), R.string.search_empty_query));
-    }
-
-    private boolean isShoutTabSelected() {
-        return viewPager.getCurrentItem() == MainSearchPagerAdapter.SHOUTS_FRAGMENT_POSITION;
+        // TODO uncomment after API changes
+        /*presenter.getSuggestionsAdapterItemsObservable()
+                .compose(this.<List<BaseAdapterItem>>bindToLifecycle())
+                .subscribe(adapter);*/
     }
 
     private void setUpToolbar() {
@@ -119,9 +111,6 @@ public class MainSearchActivity extends BaseActivity implements SearchView.OnQue
             case android.R.id.home:
                 finish();
                 return true;
-            case R.id.search:
-                showPagerAdapter();
-                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -132,27 +121,27 @@ public class MainSearchActivity extends BaseActivity implements SearchView.OnQue
         getMenuInflater().inflate(R.menu.menu_search, menu);
 
         final SearchManager searchManager =
-                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        final SearchView searchView =
-                (SearchView) menu.findItem(R.id.search).getActionView();
+                 (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setSearchableInfo(
                 searchManager.getSearchableInfo(getComponentName()));
         searchView.setOnQueryTextListener(this);
         searchView.setIconifiedByDefault(false);
         searchView.setIconified(false);
-        searchView.setQueryHint(getString(R.string.search_base_hint));
         searchView.setMaxWidth(Integer.MAX_VALUE);
         if (!wasViewRotated) {
             searchView.clearFocus();
         }
         setSearchTruncatedAndColored(searchView);
 
-        searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                showPagerAdapter();
-            }
-        });
+        presenter.getHintNameObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String hint) {
+                        searchView.setQueryHint(hint);
+                    }
+                });
 
         return true;
     }
@@ -171,16 +160,6 @@ public class MainSearchActivity extends BaseActivity implements SearchView.OnQue
         }
     }
 
-    private void showPagerAdapter() {
-        toolbarShadow.setVisibility(View.GONE);
-        final Fragment fragment = getSupportFragmentManager().getFragments().get(0);
-        if (fragment != null) {
-            getSupportFragmentManager().beginTransaction()
-                    .remove(fragment)
-                    .commit();
-        }
-    }
-
     @Override
     public boolean onQueryTextSubmit(String query) {
         searchQueryPresenter.getQuerySubmittedSubject().onNext(query);
@@ -196,10 +175,16 @@ public class MainSearchActivity extends BaseActivity implements SearchView.OnQue
     @Nonnull
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
-        final MainSearchActivityComponent component = DaggerMainSearchActivityComponent
+        final Intent intent = checkNotNull(getIntent());
+        final SearchPresenter.SearchType searchType = (SearchPresenter.SearchType) intent.getSerializableExtra(KEY_SEARCH_TYPE);
+        final String contextualItemId = intent.getStringExtra(KEY_CONTEXTUAL_ITEM_ID);
+        final String contextualItemName = intent.getStringExtra(KEY_CONTEXTUAL_ITEM_NAME);
+
+        final SubSearchActivityComponent component = DaggerSubSearchActivityComponent
                 .builder()
                 .activityModule(new ActivityModule(this))
                 .appComponent(App.getAppComponent(getApplication()))
+                .subSearchActivityModule(new SubSearchActivityModule(searchType, contextualItemId, contextualItemName))
                 .build();
         component.inject(this);
 

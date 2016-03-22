@@ -359,7 +359,8 @@ public class EditProfileActivity extends BaseActivity {
 
     private void captureImage(int requestCode) {
         if (!PermissionHelper.checkPermissions(this, REQUEST_CODE_PERMISSION, ColoredSnackBar.contentView(this),
-                R.string.permission_location_explanation, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE})) {
+                R.string.permission_location_explanation,
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA})) {
             return;
         }
 
