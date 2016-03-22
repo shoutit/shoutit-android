@@ -306,6 +306,7 @@
     <string name="search_recent_searches">Recent searches</string>
     <string name="search_clear_all">Clear all</string>
     <string name="search_users_placeholder">Search Users</string>
+    <string name="search_empty_query">Search query cannot be empty</string>
 
     <!-- Tag Profile -->
     <string name="tag_profile_related_interests">Related interests</string>
@@ -316,5 +317,9 @@
     <string name="create_shout_dialog_header">What are you posting?</string>
     <string name="create_shout_dialog_offer">Offer</string>
     <string name="create_shout_dialog_request">Request</string>
+
+    <!-- Search Profiles Results -->
+    <string name="search_profiles_results">Results</string>
+
 
 </resources>

@@ -82,8 +82,6 @@ public class RecentSearchesTable {
         long itemId = db.insertWithOnConflict(TABLE, null, contentValues, SQLiteDatabase.CONFLICT_IGNORE);
         if (itemId != -1) {
             refreshRecentSearches();
-        } else {
-            LogHelper.logThrowableAndCrashlytics(TAG, "Cannot insert recent search: " + suggestion, new Throwable());
         }
     }
 

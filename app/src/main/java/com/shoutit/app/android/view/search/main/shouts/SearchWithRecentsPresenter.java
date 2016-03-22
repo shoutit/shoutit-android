@@ -1,6 +1,5 @@
 package com.shoutit.app.android.view.search.main.shouts;
 
-import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
@@ -23,7 +22,6 @@ import javax.inject.Inject;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
-import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
@@ -85,13 +83,20 @@ public class SearchWithRecentsPresenter {
                     }
                 });
 
-        recentsSearchesObservable = Observable.merge(recentsObservable, showRecentsOnEmptyQueryObservable)
-                .filter(new Func1<List<BaseAdapterItem>, Boolean>() {
+        final Observable<List<BaseAdapterItem>> clearRecentsOnNotEmptyQuery = searchPresenter.getQuerySubject()
+                .distinctUntilChanged()
+                .filter(Functions1.neg(Functions1.isNullOrEmpty()))
+                .map(new Func1<String, List<BaseAdapterItem>>() {
                     @Override
-                    public Boolean call(List<BaseAdapterItem> baseAdapterItems) {
-                        return Strings.isNullOrEmpty(searchPresenter.getQuerySubject().getValue());
+                    public List<BaseAdapterItem> call(String s) {
+                        return ImmutableList.of();
                     }
                 });
+
+        recentsSearchesObservable = Observable.merge(
+                recentsObservable,
+                showRecentsOnEmptyQueryObservable,
+                clearRecentsOnNotEmptyQuery);
 
 
         /** Suggestion db action **/
