@@ -1,14 +1,26 @@
 package com.shoutit.app.android.view.search;
 
+import com.appunite.rx.functions.Functions1;
+
+import rx.Observable;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
 public class SearchQueryPresenter {
 
     public BehaviorSubject<String> querySubject = BehaviorSubject.create();
-    public PublishSubject<String> getQuerySubmittedSubject = PublishSubject.create();
+    public PublishSubject<String> querySubmittedSubject = PublishSubject.create();
+
+    public final Observable<String> querySubmittedObservable;
+    private final Observable<String> emptyQuerySubmittedObservable;
 
     public SearchQueryPresenter() {
+
+        querySubmittedObservable = querySubmittedSubject
+                .filter(Functions1.neg(Functions1.isNullOrEmpty()));
+
+        emptyQuerySubmittedObservable = querySubmittedSubject
+                .filter(Functions1.isNullOrEmpty());
     }
 
     public BehaviorSubject<String> getQuerySubject() {
@@ -16,6 +28,14 @@ public class SearchQueryPresenter {
     }
 
     public PublishSubject<String> getQuerySubmittedSubject() {
-        return getQuerySubmittedSubject;
+        return querySubmittedSubject;
+    }
+
+    public Observable<String> getQuerySubmittedObservable() {
+        return querySubmittedObservable;
+    }
+
+    public Observable<String> getEmptyQuerySubmittedObservable() {
+        return emptyQuerySubmittedObservable;
     }
 }

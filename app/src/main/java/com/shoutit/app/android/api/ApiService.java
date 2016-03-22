@@ -18,6 +18,7 @@ import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.GuestSignupRequest;
 import com.shoutit.app.android.api.model.RelatedTagsResponse;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
+import com.shoutit.app.android.api.model.SearchProfileResponse;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutResponse;
 import com.shoutit.app.android.api.model.ShoutsResponse;
@@ -173,6 +174,11 @@ public interface ApiService {
 
     @GET("profiles/{user_name}")
     Observable<User> getProfile(@Path("user_name") String userName);
+
+    @GET("profiles")
+    Observable<SearchProfileResponse> searchProfiles(@Query("search") String searchQuery,
+                                                     @Query("page") Integer page,
+                                                     @Query("page_size") Integer pageSize);
 
 
     /**

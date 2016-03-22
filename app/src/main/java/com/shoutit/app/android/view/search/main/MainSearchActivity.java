@@ -17,16 +17,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.Toast;
-
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.view.search.SearchQueryPresenter;
 import com.shoutit.app.android.view.search.categories.SearchCategoriesFragment;
-import com.shoutit.app.android.view.search.results.SearchResultsActivity;
+import com.shoutit.app.android.view.search.results.profiles.SearchProfilesResultsActivity;
+import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsActivity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -83,18 +83,23 @@ public class MainSearchActivity extends BaseActivity implements SearchView.OnQue
         viewPager.setAdapter(pagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
 
-        searchQueryPresenter.getQuerySubmittedSubject()
+        searchQueryPresenter.getQuerySubmittedObservable()
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(new Action1<String>() {
                     @Override
                     public void call(String query) {
                         if (isShoutTabSelected()) {
-                            startActivity(SearchResultsActivity.newIntent(MainSearchActivity.this, query));
+                            startActivity(SearchShoutsResultsActivity.newIntent(MainSearchActivity.this, query));
                         } else {
-                            Toast.makeText(MainSearchActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
+                            startActivity(SearchProfilesResultsActivity.newIntent(MainSearchActivity.this, query));
                         }
                     }
                 });
+
+        searchQueryPresenter.getEmptyQuerySubmittedObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(ColoredSnackBar.errorSnackBarAction(
+                        ColoredSnackBar.contentView(this), R.string.search_empty_query));
     }
 
     private boolean isShoutTabSelected() {
