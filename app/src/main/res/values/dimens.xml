@@ -50,4 +50,7 @@
     <!-- Lined Text View -->
     <dimen name="textview_padding">16dp</dimen>
 
+    <!-- Shouts search results -->
+    <dimen name="shouts_search_results_side_spacing">6dp</dimen>
+
 </resources>

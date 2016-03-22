@@ -22,10 +22,11 @@ import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.view.search.SearchAdapter;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.SearchQueryPresenter;
-import com.shoutit.app.android.view.search.results.SearchResultsActivity;
+import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsActivity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -84,12 +85,12 @@ public class SubSearchActivity extends BaseActivity implements SearchView.OnQuer
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
-        searchQueryPresenter.getQuerySubmittedSubject()
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
+        presenter.getSubSearchSubmittedObservable()
+                .compose(this.<Intent>bindToLifecycle())
+                .subscribe(new Action1<Intent>() {
                     @Override
-                    public void call(String query) {
-                        startActivity(SearchResultsActivity.newIntent(SubSearchActivity.this, query));
+                    public void call(Intent intent) {
+                        startActivity(intent);
                     }
                 });
 
@@ -170,6 +171,12 @@ public class SubSearchActivity extends BaseActivity implements SearchView.OnQuer
     public boolean onQueryTextChange(String newText) {
         searchQueryPresenter.getQuerySubject().onNext(newText);
         return true;
+    }
+
+    @Override
+    public void finish() {
+        KeyboardHelper.hideSoftKeyboard(this);
+        super.finish();
     }
 
     @Nonnull
