@@ -46,20 +46,21 @@ public class SearchShoutsResultsPresenter {
     private final Observable<Throwable> errorObservable;
     private final Observable<Boolean> linearLayoutManagerObservable;
     private final Observable<String> toolbarTitleObservable;
-    private final Observable<ShoutsDao.SearchShoutsDao> daoObservable;
 
     public SearchShoutsResultsPresenter(final ShoutsDao dao, @Nonnull final String searchQuery,
+                                        @Nonnull final SearchPresenter.SearchType searchType,
+                                        @Nullable final String contextualItemId,
                                         UserPreferences userPreferences, @ForActivity final Context context,
                                         @UiScheduler Scheduler uiScheduler) {
 
-        daoObservable = userPreferences.getLocationObservable()
+        Observable<ShoutsDao.SearchShoutsDao> daoObservable = userPreferences.getLocationObservable()
                 .filter(Functions1.isNotNull())
                 .first()
                 .map(new Func1<UserLocation, ShoutsDao.SearchShoutsDao>() {
                     @Override
                     public ShoutsDao.SearchShoutsDao call(UserLocation userLocation) {
                         return dao.getSearchShoutsDao(new SearchShoutPointer(
-                                searchQuery, SearchPresenter.SearchType.SHOUTS, userLocation, null));
+                                searchQuery, searchType, userLocation, contextualItemId));
                     }
                 })
                 .compose(ObservableExtensions.<ShoutsDao.SearchShoutsDao>behaviorRefCount());

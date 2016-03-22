@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.search;
 
 import android.content.Context;
+import android.content.Intent;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
@@ -20,6 +21,8 @@ import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.MergeShoutsResponses;
+import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsActivity;
+import com.shoutit.app.android.view.search.subsearch.SubSearchActivity;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -54,10 +57,10 @@ public class SearchPresenter {
 
     private final Observable<List<BaseAdapterItem>> suggestionsAdapterItemsObservable;
     private final Observable<String> hintNameObservable;
+    private final Observable<Intent> subSearchSubmittedObservable;
 
     private final ApiService apiService;
     private final SearchQueryPresenter searchQueryPresenter;
-    private final Context context;
 
     @Inject
     public SearchPresenter(final ApiService apiService,
@@ -67,10 +70,9 @@ public class SearchPresenter {
                            @Nonnull final SearchType searchType,
                            @Nullable final String contextItemId,
                            @Nullable final String contextualItemName,
-                           @ForActivity Context context) {
+                           @ForActivity final Context context) {
         this.apiService = apiService;
         this.searchQueryPresenter = searchQueryPresenter;
-        this.context = context;
 
         /** Suggestions **/
         final OperatorMergeNextToken<ShoutsResponse, String> loadMoreOperator =
@@ -150,6 +152,15 @@ public class SearchPresenter {
         final String hintName = context.getString(R.string.search_hint, contextualItemName);
         hintNameObservable = Observable.just(hintName);
 
+        /** Search Submitted **/
+        subSearchSubmittedObservable = searchQueryPresenter.getQuerySubmittedSubject()
+                .map(new Func1<String, Intent>() {
+                    @Override
+                    public Intent call(String searchQuery) {
+                        return SearchShoutsResultsActivity.newIntent(context, searchQuery, contextItemId, searchType);
+                    }
+                });
+
     }
 
     private Observable<ShoutsResponse> getSuggestionsRequest(int pageNumber,
@@ -169,6 +180,10 @@ public class SearchPresenter {
             default:
                 throw new RuntimeException("Unknwon profile type: " + SearchType.values()[searchType.ordinal()]);
         }
+    }
+
+    public Observable<Intent> getSubSearchSubmittedObservable() {
+        return subSearchSubmittedObservable;
     }
 
     public Observable<String> getHintNameObservable() {

@@ -13,6 +13,7 @@ import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
+import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.view.search.SearchAdapter;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.main.MainSearchActivityComponent;
@@ -82,7 +83,8 @@ public class SearchShoutFragment extends BaseFragment {
                 .subscribe(new Action1<String>() {
                     @Override
                     public void call(String recentSearch) {
-                        startActivity(SearchShoutsResultsActivity.newIntent(getActivity(), recentSearch));
+                        startActivity(SearchShoutsResultsActivity.newIntent(getActivity(),
+                                recentSearch, null, SearchPresenter.SearchType.SHOUTS));
                     }
                 });
 

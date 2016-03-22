@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -17,7 +16,6 @@ import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
 import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.jakewharton.rxbinding.view.RxView;
-import com.jakewharton.rxbinding.widget.RxToolbar;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
@@ -29,6 +27,7 @@ import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyGridLayoutManager;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
+import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 
 import java.util.List;
@@ -46,6 +45,8 @@ import static com.appunite.rx.internal.Preconditions.checkNotNull;
 public class SearchShoutsResultsActivity extends BaseActivity {
 
     private static final String KEY_SEARCH_QUERY = "query_to_save";
+    private static final String KEY_CONTEXTUAL_ITEM_ID = "contextual_item_id";
+    private static final String KEY_SEARCH_TYPE = "search_type";
 
     @Bind(R.id.base_progress)
     View progressView;
@@ -61,9 +62,13 @@ public class SearchShoutsResultsActivity extends BaseActivity {
     @Inject
     SearchShoutsResultsAdapter adapter;
 
-    public static Intent newIntent(Context context, @Nonnull String queryToSave) {
+    public static Intent newIntent(Context context, @Nonnull String queryToSave,
+                                   @Nullable String contextualItemId,
+                                   @Nonnull SearchPresenter.SearchType searchType) {
         return new Intent(context, SearchShoutsResultsActivity.class)
-                .putExtra(KEY_SEARCH_QUERY, queryToSave);
+                .putExtra(KEY_SEARCH_QUERY, queryToSave)
+                .putExtra(KEY_CONTEXTUAL_ITEM_ID, contextualItemId)
+                .putExtra(KEY_SEARCH_TYPE, searchType);
     }
 
     @Override
@@ -223,12 +228,15 @@ public class SearchShoutsResultsActivity extends BaseActivity {
     @Nonnull
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
-        final String searchQuery = checkNotNull(getIntent().getStringExtra(KEY_SEARCH_QUERY));
+        final Intent intent = checkNotNull(getIntent());
+        final String searchQuery = checkNotNull(intent.getStringExtra(KEY_SEARCH_QUERY));
+        final String contextualItemId = intent.getStringExtra(KEY_CONTEXTUAL_ITEM_ID);
+        final SearchPresenter.SearchType searchType = (SearchPresenter.SearchType) checkNotNull(intent.getSerializableExtra(KEY_SEARCH_TYPE));
 
         final SearchShoutsResultsActivityComponent component = DaggerSearchShoutsResultsActivityComponent
                 .builder()
                 .activityModule(new ActivityModule(this))
-                .searchShoutsResultsActivityModule(new SearchShoutsResultsActivityModule(searchQuery))
+                .searchShoutsResultsActivityModule(new SearchShoutsResultsActivityModule(searchQuery, contextualItemId, searchType))
                 .appComponent(App.getAppComponent(getApplication()))
                 .build();
         component.inject(this);
