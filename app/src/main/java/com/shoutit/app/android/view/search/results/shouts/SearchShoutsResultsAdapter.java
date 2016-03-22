@@ -21,6 +21,7 @@ import com.shoutit.app.android.viewholders.NoDataViewHolder;
 import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -35,6 +36,7 @@ public class SearchShoutsResultsAdapter extends BaseAdapter {
     private final Picasso picasso;
     private boolean isLinearLayoutManager = true;
 
+    @Inject
     public SearchShoutsResultsAdapter(@ForActivity @Nonnull Context context, Picasso picasso) {
         super(context);
         this.picasso = picasso;

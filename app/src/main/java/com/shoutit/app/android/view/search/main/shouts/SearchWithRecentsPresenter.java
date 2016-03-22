@@ -5,7 +5,6 @@ import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
@@ -29,19 +28,17 @@ public class SearchWithRecentsPresenter {
 
     private final PublishSubject<Object> clearAllRecentsSubject = PublishSubject.create();
     private final PublishSubject<String> removeRecentSubject = PublishSubject.create();
+    private final PublishSubject<String> recentSearchClickedSubject = PublishSubject.create();
 
     private final Observable<Object> clearAllRecentsObservable;
     private final Observable<Object> removeRecentObservable;
     private final Observable<List<BaseAdapterItem>> recentsSearchesObservable;
-
-    private final SearchPresenter searchPresenter;
 
     @Inject
     public SearchWithRecentsPresenter(final RecentSearchesTable recentSearchesTable,
                                       @NetworkScheduler final Scheduler networkScheduler,
                                       @UiScheduler Scheduler uiScheduler,
                                       final SearchPresenter searchPresenter) {
-        this.searchPresenter = searchPresenter;
 
         /** Recent Searches Items **/
         final Observable<List<BaseAdapterItem>> recentsObservable = recentSearchesTable
@@ -61,7 +58,7 @@ public class SearchWithRecentsPresenter {
                             @Nullable
                             @Override
                             public BaseAdapterItem apply(@Nullable String input) {
-                                return new RecentSearchAdapterItem(input, removeRecentSubject);
+                                return new RecentSearchAdapterItem(input, removeRecentSubject, recentSearchClickedSubject);
                             }
                         }));
 
@@ -131,8 +128,8 @@ public class SearchWithRecentsPresenter {
         return recentsSearchesObservable;
     }
 
-    public SearchPresenter getSearchPresenter() {
-        return searchPresenter;
+    public Observable<String> getRecentSearchClickObservable() {
+        return recentSearchClickedSubject;
     }
 
     public class RecentSearchAdapterItem extends BaseNoIDAdapterItem {
@@ -140,14 +137,22 @@ public class SearchWithRecentsPresenter {
         @Nonnull
         private final String suggestion;
         private final Observer<String> suggestionRemoveObserver;
+        private final Observer<String> recentSearchClickObserver;
 
-        public RecentSearchAdapterItem(@Nonnull String suggestion, Observer<String> suggestionRemoveObserver) {
+        public RecentSearchAdapterItem(@Nonnull String suggestion,
+                                       Observer<String> suggestionRemoveObserver,
+                                       Observer<String> recentSearchClickObserver) {
             this.suggestion = suggestion;
             this.suggestionRemoveObserver = suggestionRemoveObserver;
+            this.recentSearchClickObserver = recentSearchClickObserver;
         }
 
         public void onSuggestionRemove() {
             suggestionRemoveObserver.onNext(suggestion);
+        }
+
+        public void onRecentSearchClicked() {
+            recentSearchClickObserver.onNext(suggestion);
         }
 
         @Nonnull

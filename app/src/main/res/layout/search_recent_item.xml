@@ -4,13 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/white"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@drawable/s">
 
     <LinearLayout
+        android:id="@+id/search_recent_container"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:background="@android:color/white"
+        android:background="?selectableItemBackground"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingLeft="16dp"

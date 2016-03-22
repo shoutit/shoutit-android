@@ -5,6 +5,7 @@ import android.content.Context;
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
@@ -28,7 +29,9 @@ import javax.annotation.Nullable;
 
 import rx.Observable;
 import rx.Observer;
+import rx.Scheduler;
 import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.subjects.PublishSubject;
 
 public class SearchShoutsResultsPresenter {
@@ -39,10 +42,12 @@ public class SearchShoutsResultsPresenter {
     private final Observable<List<BaseAdapterItem>> adapterItems;
     private final Observable<Boolean> progressObservable;
     private final Observable<Throwable> errorObservable;
+    private final Observable<Boolean> linearLayoutManagerObservable;
+    private final Observable<String> toolbarTitleObservable;
 
     public SearchShoutsResultsPresenter(final ShoutsDao dao, @Nonnull final String searchQuery,
-                                        final SearchPresenter.SearchType searchType, UserPreferences userPreferences,
-                                        @Nullable final String contextItemId, @ForActivity final Context context) {
+                                        UserPreferences userPreferences, @ForActivity final Context context,
+                                        @UiScheduler Scheduler uiScheduler) {
 
         final Observable<ResponseOrError<ShoutsResponse>> shoutsRequest = userPreferences.getLocationObservable()
                 .filter(Functions1.isNotNull())
@@ -51,10 +56,11 @@ public class SearchShoutsResultsPresenter {
                     @Override
                     public Observable<ResponseOrError<ShoutsResponse>> call(UserLocation userLocation) {
                         return dao.getSearchShoutsDao(new SearchShoutPointer(
-                                searchQuery, searchType, userLocation, contextItemId))
+                                searchQuery, SearchPresenter.SearchType.SHOUTS, userLocation, null))
                                 .getShoutsObservable();
                     }
                 })
+                .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<ShoutsResponse>>behaviorRefCount());
 
         adapterItems = shoutsRequest
@@ -79,11 +85,34 @@ public class SearchShoutsResultsPresenter {
                     }
                 });
 
+        toolbarTitleObservable = Observable.just(searchQuery);
+
         progressObservable = shoutsRequest.map(Functions1.returnFalse())
                 .startWith(true);
 
         errorObservable = shoutsRequest.compose(ResponseOrError.<ShoutsResponse>onlyError());
 
+        linearLayoutManagerObservable = layoutManagerSwitchSubject
+                .scan(false, new Func2<Boolean, Object, Boolean>() {
+                    @Override
+                    public Boolean call(Boolean prev, Object o) {
+                        return !prev;
+                    }
+                })
+                .skip(1)
+                .observeOn(uiScheduler);
+    }
+
+    @Nonnull
+    public Observable<Boolean> getLinearLayoutManagerObservable() {
+        return linearLayoutManagerObservable
+                .filter(Functions1.isTrue());
+    }
+
+    @Nonnull
+    public Observable<Boolean> getGridLayoutManagerObservable() {
+        return linearLayoutManagerObservable
+                .filter(Functions1.isFalse());
     }
 
     public Observable<List<BaseAdapterItem>> getAdapterItems() {
@@ -96,6 +125,14 @@ public class SearchShoutsResultsPresenter {
 
     public Observable<Boolean> getProgressObservable() {
         return progressObservable;
+    }
+
+    public Observable<String> getToolbarTitleObservable() {
+        return toolbarTitleObservable;
+    }
+
+    public Observable<String> getShoutSelectedObservable() {
+        return shoutSelectedSubject;
     }
 
     public class ShoutHeaderAdapterItem extends BaseNoIDAdapterItem {

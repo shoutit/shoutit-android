@@ -16,6 +16,7 @@ import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.view.search.SearchAdapter;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.main.MainSearchActivityComponent;
+import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsActivity;
 
 import java.util.List;
 
@@ -24,6 +25,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
+import rx.functions.Action1;
 
 import static com.appunite.rx.internal.Preconditions.checkNotNull;
 
@@ -77,6 +79,15 @@ public class SearchShoutFragment extends BaseFragment {
         presenter.getRemoveRecentObservable()
                 .compose(this.bindToLifecycle())
                 .subscribe();
+
+        presenter.getRecentSearchClickObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String recentSearch) {
+                        startActivity(SearchShoutsResultsActivity.newIntent(getActivity(), recentSearch));
+                    }
+                });
 
         // TODO uncomment when API adjust changes
 /*        presenter.getSearchPresenter()
