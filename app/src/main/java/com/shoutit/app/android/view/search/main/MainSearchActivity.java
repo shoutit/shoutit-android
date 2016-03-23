@@ -11,13 +11,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.Toast;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
@@ -145,7 +143,7 @@ public class MainSearchActivity extends BaseActivity implements SearchView.OnQue
         if (!wasViewRotated) {
             searchView.clearFocus();
         }
-        setSearchTruncatedAndColored(searchView);
+        setSearchViewBackground(searchView);
 
         searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -158,13 +156,12 @@ public class MainSearchActivity extends BaseActivity implements SearchView.OnQue
     }
 
     @SuppressLint("PrivateResource")
-    private void setSearchTruncatedAndColored(ViewGroup parent) {
+    private void setSearchViewBackground(ViewGroup parent) {
         for (int i = parent.getChildCount() - 1; i >= 0; i--) {
             final View child = parent.getChildAt(i);
             if (child instanceof ViewGroup) {
-                setSearchTruncatedAndColored((ViewGroup) child);
-            } else if (child instanceof EditText && child != null) {
-                ((EditText) child).setEllipsize(TextUtils.TruncateAt.MIDDLE);
+                setSearchViewBackground((ViewGroup) child);
+            } else if (child instanceof EditText) {
                 child.setBackground(getResources().getDrawable(R.drawable.abc_textfield_search_material));
                 child.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accent_blue), PorterDuff.Mode.SRC_OVER);
             }

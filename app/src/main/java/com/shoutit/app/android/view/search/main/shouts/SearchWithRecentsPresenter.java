@@ -5,7 +5,6 @@ import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
@@ -104,7 +103,7 @@ public class SearchWithRecentsPresenter {
                 .map(new Func1<Object, Object>() {
                     @Override
                     public Object call(Object o) {
-                        recentSearchesTable.clearRecentSearch();
+                        recentSearchesTable.clearRecentSearches();
                         return null;
                     }
                 });

@@ -6,11 +6,13 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckedTextView;
 import android.widget.ProgressBar;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.appunite.rx.functions.BothParams;
 import com.google.common.base.Preconditions;
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
 import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
@@ -29,6 +31,8 @@ import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogFragment;
 import com.shoutit.app.android.view.home.HomeGridSpacingItemDecoration;
 import com.shoutit.app.android.view.home.HomeLinearSpacingItemDecoration;
+import com.shoutit.app.android.view.search.SearchPresenter;
+import com.shoutit.app.android.view.search.subsearch.SubSearchActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 
 import java.util.List;
@@ -81,15 +85,7 @@ public class DiscoverShoutsActivity extends BaseActivity {
         final Bundle bundle = Preconditions.checkNotNull(getIntent().getExtras());
         final String name = bundle.getString(DISCOVER_NAME);
 
-        mToolbar.setTitle(getString(R.string.discover_shouts_title, name));
-        mToolbar.inflateMenu(R.menu.shouts_menu);
-        mToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
-        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
+        setUpToolbar(name);
 
         gridViewItemDecoration = new HomeGridSpacingItemDecoration(
                 getResources().getDimensionPixelSize(R.dimen.home_grid_side_spacing));
@@ -139,15 +135,52 @@ public class DiscoverShoutsActivity extends BaseActivity {
                         startActivity(ShoutActivity.newIntent(DiscoverShoutsActivity.this, shoutId));
                     }
                 });
+
+        mShoutsPresenter.getSearchClickedObservable()
+                .compose(this.<BothParams<String,String>>bindToLifecycle())
+                .subscribe(new Action1<BothParams<String, String>>() {
+                    @Override
+                    public void call(BothParams<String, String> discoverIdAndName) {
+                        startActivity(SubSearchActivity.newIntent(
+                                DiscoverShoutsActivity.this, SearchPresenter.SearchType.DISCOVER,
+                                discoverIdAndName.param1(), discoverIdAndName.param2()));
+                    }
+                });
+    }
+
+    private void setUpToolbar(String name) {
+        mToolbar.setTitle(getString(R.string.discover_shouts_title, name));
+        mToolbar.inflateMenu(R.menu.shouts_menu);
+        mToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+        mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.shouts_search:
+                        mShoutsPresenter.onSearchClicked();
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
     }
 
     @Nonnull
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
         final String discoverId = getIntent().getStringExtra(DISCOVER_ID);
+        final String name = getIntent().getStringExtra(DISCOVER_NAME);
+
         final DiscoverShoutsActivityComponent activityComponent = DaggerDiscoverShoutsActivityComponent.builder()
                 .activityModule(new ActivityModule(this))
-                .discoverShoutsActivityModule(new DiscoverShoutsActivityModule(discoverId))
+                .discoverShoutsActivityModule(new DiscoverShoutsActivityModule(discoverId, name))
                 .appComponent(App.getAppComponent(getApplication()))
                 .build();
         activityComponent.inject(this);
