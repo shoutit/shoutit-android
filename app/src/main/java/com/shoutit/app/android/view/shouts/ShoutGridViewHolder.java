@@ -1,5 +1,6 @@
 package com.shoutit.app.android.view.shouts;
 
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -41,6 +42,7 @@ public class ShoutGridViewHolder extends ViewHolderManager.BaseViewHolder<ShoutA
         this.item = item;
         final Shout shout = item.getShout();
         titleTextView.setText(shout.getTitle());
+        titleTextView.setVisibility(TextUtils.isEmpty(shout.getTitle()) ? View.GONE : View.VISIBLE);
         nameTextView.setText(shout.getProfile().getName());
         cardPriceTextView.setText(item.getShoutPrice());
 

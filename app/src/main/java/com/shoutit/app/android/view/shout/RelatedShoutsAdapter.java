@@ -81,10 +81,9 @@ public class RelatedShoutsAdapter extends BaseAdapter {
             final Shout shout = item.getShout();
             titleTextView.setText(shout.getTitle());
             nameTextView.setText(shout.getProfile().getName());
-            final String price = PriceUtils.formatPrice(shout.getPrice());
-            priceTextView.setText(context.getString(
-                    R.string.price_with_currency, price, shout.getCurrency())
-            );
+            final String price = PriceUtils.formatPriceWithCurrency(shout.getPrice(),
+                    context.getResources(), shout.getCurrency());
+            priceTextView.setText(price);
 
             picasso.load(shout.getThumbnail())
                     .placeholder(R.drawable.pattern_placeholder)

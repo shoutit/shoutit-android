@@ -159,7 +159,7 @@ public class EditShoutPresenter {
 
                         if (responseData.mShoutResponse != null) {
                             mListener.setTitle(responseData.mShoutResponse.getTitle());
-                            mListener.setPrice(PriceUtils.formatPrice(responseData.mShoutResponse.getPrice()));
+                            mListener.setPrice(PriceUtils.formatPrice(responseData.mShoutResponse.getPrice(), mContext.getResources()));
                             mListener.setDescription(responseData.mShoutResponse.getDescription());
                             mUserLocation = responseData.mShoutResponse.getLocation();
                             mListener.setLocation(
