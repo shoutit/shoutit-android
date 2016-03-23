@@ -121,6 +121,7 @@ public class SearchProfilesResultsActivity extends BaseActivity {
         if (resultCode == RESULT_OK && (requestCode == REQUEST_PROFILE_OPENED)) {
             // Need to refresh items if returned from other profile to refresh related data.
             presenter.refreshData();
+            recyclerView.scrollToPosition(0);
         } else if (requestCode == RESULT_OK) {
             super.onActivityResult(requestCode, requestCode, data);
         }

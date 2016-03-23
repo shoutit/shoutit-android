@@ -11,6 +11,7 @@ import com.shoutit.app.android.App;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.view.editprofile.EditProfileActivity;
 
@@ -95,6 +96,12 @@ public class UserOrPageProfileActivity extends ProfileActivity {
                         startActivity(intent);
                     }
                 });
+
+        presenter.getUserProfilePresenter().getActionOnlyForLoggedInUserObservable()
+                .compose(bindToLifecycle())
+                .subscribe(ColoredSnackBar.errorSnackBarAction(
+                        ColoredSnackBar.contentView(UserOrPageProfileActivity.this),
+                        R.string.error_action_only_for_logged_in_user));
     }
 
     @Override

@@ -4,5 +4,5 @@
     android:text="@string/search_results_no_results"
     android:textSize="20sp"
     android:gravity="center"
-    android:paddingTop="60dp"
+    android:paddingTop="220dp"
     android:layout_height="wrap_content"/>
