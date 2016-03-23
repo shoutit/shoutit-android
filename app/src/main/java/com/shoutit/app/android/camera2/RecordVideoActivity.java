@@ -29,7 +29,9 @@ import java.util.List;
 
 public class RecordVideoActivity extends AbstractCameraActivity
         implements CameraFragment.CameraFragmentListener {
+
     private static final String TAG_CAMERA = CameraFragment.class.getCanonicalName();
+
     private CameraFragment cameraFragment;
     private Bundle savedInstance;
     private MultiplePermissionsListener customMultiplePermissionsListener;

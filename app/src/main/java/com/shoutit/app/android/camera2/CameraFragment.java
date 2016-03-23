@@ -61,6 +61,7 @@ import okio.Source;
 public class CameraFragment extends Fragment {
 
     private static final int REQUEST_GALLERY_IMAGE_CODE = 0;
+    private static final int REQUEST_GALLERY_VIDEO_CODE = 1;
 
     public interface CameraFragmentListener {
         void onInitializationFailed(Exception cause);
@@ -85,7 +86,6 @@ public class CameraFragment extends Fragment {
     public static final String IS_IMAGE_LIST = CameraFragment.class.getName() + ".is_list";
     public static final String EXTRA_PREVIEW_OVERLAY_LAYOUT_RESOURCE = CameraFragment.class.getName() + ".preview_overlay_res";
     public static final String EXTRA_VIDEO_MIN_LENGTH = CameraFragment.class.getName() + ".video_min_len";
-    public static final String EXTRA_CONTROLS_BACKGROUND_COLOR = CameraFragment.class.getName() + ".controls_background_color";
     public static final String EXTRA_IMAGE_COMPRESSION_TYPE = CameraFragment.class.getName() + ".compression_type";
 
     public static final int DEFAULT_VIDEO_QUALITY = CamcorderProfile.QUALITY_480P;
@@ -93,7 +93,6 @@ public class CameraFragment extends Fragment {
     public static final long VIDEO_NO_MAX_LENGTH = -1;
     public static final String DEFAULT_MEDIA_NAME_PREFIX = "media_";
     public static final int DEFAULT_IMAGE_QUALITY = 100;
-    public static final int DEFAULT_CONTROLS_BACKGROUND_COLOR = 0x00000000;
 
     public static final int RC_MEDIA_COMPRESS = 1339;
     public static final int NO_OVERLAY = 0;
@@ -109,7 +108,7 @@ public class CameraFragment extends Fragment {
     private Boolean mUseFfc, isMFfcEnabled = false;
     private long mVideoMinLength, mVideoMaxLength;
     private int mVideoQuality, mImageQuality;
-    private int mPreviewOverlayLayoutResId, mControlsBackgroundColor;
+    private int mPreviewOverlayLayoutResId;
     private Bitmap.CompressFormat mCompression;
 
     @Bind(R.id.fragment_camera_preview_stack)
@@ -181,14 +180,8 @@ public class CameraFragment extends Fragment {
         outState.putInt(EXTRA_VIDEO_QUALITY, this.mVideoQuality);
         outState.putInt(EXTRA_IMAGE_QUALITY, this.mImageQuality);
         outState.putInt(EXTRA_PREVIEW_OVERLAY_LAYOUT_RESOURCE, this.mPreviewOverlayLayoutResId);
-        outState.putInt(EXTRA_CONTROLS_BACKGROUND_COLOR, this.mControlsBackgroundColor);
     }
 
-    /**
-     * Standard fragment entry point.
-     *
-     * @param savedInstanceState State of a previous instance
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -302,10 +295,6 @@ public class CameraFragment extends Fragment {
         }
     }
 
-    /**
-     * Standard lifecycle method, for when the fragment moves into
-     * the stopped state. Passed along to the CameraController.
-     */
     @Override
     public void onStop() {
         if (ctlr != null) {
@@ -317,11 +306,6 @@ public class CameraFragment extends Fragment {
         super.onStop();
     }
 
-    /**
-     * Standard lifecycle method, for when the fragment is utterly,
-     * ruthlessly destroyed. Passed along to the CameraController,
-     * because why should the fragment have all the fun?
-     */
     @Override
     public void onDestroy() {
         if (ctlr != null) {
@@ -331,15 +315,6 @@ public class CameraFragment extends Fragment {
         super.onDestroy();
     }
 
-    /**
-     * Standard callback method to create the UI managed by
-     * this fragment.
-     *
-     * @param inflater           Used to inflate layouts
-     * @param container          Parent of the fragment's UI (eventually)
-     * @param savedInstanceState State of a previous instance
-     * @return the UI being managed by this fragment
-     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -357,7 +332,6 @@ public class CameraFragment extends Fragment {
             inflater.inflate(this.mPreviewOverlayLayoutResId, this.layoutPreviewOverlayLive, true);
             this.layoutPreviewOverlayLive.setVisibility(View.VISIBLE);
         }
-        this.layoutControlsMain.setBackgroundColor(this.mControlsBackgroundColor);
         return (view);
     }
 
@@ -410,36 +384,20 @@ public class CameraFragment extends Fragment {
 
         this.mImageQuality = extras.getInt(EXTRA_IMAGE_QUALITY, DEFAULT_IMAGE_QUALITY);
         this.mPreviewOverlayLayoutResId = extras.getInt(EXTRA_PREVIEW_OVERLAY_LAYOUT_RESOURCE, NO_OVERLAY);
-        this.mControlsBackgroundColor = extras.getInt(EXTRA_CONTROLS_BACKGROUND_COLOR, DEFAULT_CONTROLS_BACKGROUND_COLOR);
 
         return true;
     }
 
 
-    /**
-     * @return the CameraController this fragment delegates to
-     */
     @SuppressWarnings("unused")
     public CameraController getController() {
         return (ctlr);
     }
 
-    /**
-     * Establishes the controller that this fragment delegates to
-     *
-     * @param ctlr the controller that this fragment delegates to
-     */
     public void setController(CameraController ctlr) {
         this.ctlr = ctlr;
     }
 
-    /**
-     * Indicates if we should mirror the preview or not. Defaults
-     * to false.
-     *
-     * @param mirror true if we should horizontally mirror the
-     *               preview, false otherwise
-     */
     public void setMirrorPreview(boolean mirror) {
         this.mirrorPreview = mirror;
     }
@@ -510,20 +468,47 @@ public class CameraFragment extends Fragment {
             }
             case REQUEST_GALLERY_IMAGE_CODE:
                 final Optional<Uri> uriOptional = onResult(resultCode, data);
-                final String file = Utils.getPictureDirectory(getActivity(), true) + File.separator + Utils.getPictureName();
+                final String imageFile = Utils.getPictureDirectory(getActivity(), true) + File.separator + Utils.getPictureName();
                 if (uriOptional.isPresent()) {
                     final Uri uri = uriOptional.get();
                     try {
-                        final InputStream inputStream = getActivity().getContentResolver().openInputStream(uri);
-                        Preconditions.checkNotNull(inputStream);
-                        final Source source = Okio.buffer(Okio.source(inputStream));
-                        final BufferedSink bufferedSink = Okio.buffer(Okio.sink(new File(file)));
+                        copyGalleryFile(imageFile, uri);
 
-                        bufferedSink.writeAll(source);
-                        bufferedSink.flush();
-
-                        imageOutput = file;
+                        imageOutput = imageFile;
                         showConfirmImage();
+                    } catch (IOException e) {
+                        ColoredSnackBar.error(
+                                ColoredSnackBar.contentView(getActivity()),
+                                R.string.error_default,
+                                Snackbar.LENGTH_SHORT)
+                                .show();
+                    }
+                } else {
+                    ColoredSnackBar.error(
+                            ColoredSnackBar.contentView(getActivity()),
+                            R.string.error_default,
+                            Snackbar.LENGTH_SHORT)
+                            .show();
+                }
+                break;
+            case REQUEST_GALLERY_VIDEO_CODE:
+                final Optional<Uri> videoUri = onResult(resultCode, data);
+                final String videoFile = Utils.getVideoDirectory(getActivity(), true) + File.separator + Utils.getVideoName();
+                if(videoUri.isPresent()){
+                    final Uri uri = videoUri.get();
+                    try {
+                        copyGalleryFile(videoFile, uri);
+                        videoOutput = videoFile;
+
+                        layoutConfirm.setVisibility(View.VISIBLE);
+
+                        getActivity().getFragmentManager()
+                                .beginTransaction()
+                                .replace(R.id.fragment_camera_layout_preview_overlay,
+                                        PlayVideoFragment.newInstance(videoOutput))
+                                .setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                                .commit();
+
                     } catch (IOException e) {
                         ColoredSnackBar.error(
                                 ColoredSnackBar.contentView(getActivity()),
@@ -545,21 +530,31 @@ public class CameraFragment extends Fragment {
         }
     }
 
+    private void copyGalleryFile(String file, Uri uri) throws IOException {
+        final InputStream inputStream = getActivity().getContentResolver().openInputStream(uri);
+        Preconditions.checkNotNull(inputStream);
+        final Source source = Okio.buffer(Okio.source(inputStream));
+        final BufferedSink bufferedSink = Okio.buffer(Okio.sink(new File(file)));
+
+        bufferedSink.writeAll(source);
+        bufferedSink.flush();
+    }
+
     public Optional<Uri> onResult(int resultCode, Intent intent) {
-        Uri mLastImageOrVideoUri = null;
+        Uri uri = null;
         if (resultCode == Activity.RESULT_OK) {
             if (intent != null) {
                 if (intent.getData() != null) {
-                    mLastImageOrVideoUri = intent.getData();
+                    uri = intent.getData();
                 } else {
                     final String outputMediaFileUri = getUriFromBitmap((Bitmap) intent.getParcelableExtra("data"));
                     if (outputMediaFileUri == null) {
                         return Optional.absent();
                     }
-                    mLastImageOrVideoUri = Uri.fromFile(new File(outputMediaFileUri));
+                    uri = Uri.fromFile(new File(outputMediaFileUri));
                 }
             }
-            return Optional.fromNullable(mLastImageOrVideoUri);
+            return Optional.fromNullable(uri);
         }
 
         return Optional.absent();
@@ -913,7 +908,10 @@ public class CameraFragment extends Fragment {
     @OnClick(R.id.fragment_camera_imageview_gallery_btn)
     void showGallery() {
         if (isVideoMode) {
-
+            final Intent selectImageIntent = new Intent(Intent.ACTION_PICK,
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                    .setType("video/*");
+            startActivityForResult(selectImageIntent, REQUEST_GALLERY_VIDEO_CODE);
         } else {
             final Intent selectImageIntent = new Intent(Intent.ACTION_PICK,
                     MediaStore.Images.Media.EXTERNAL_CONTENT_URI)

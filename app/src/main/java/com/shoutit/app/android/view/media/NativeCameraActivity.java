@@ -803,7 +803,7 @@ public class NativeCameraActivity extends BaseActivity {
         return Optional.of(galleryIntent);
     }
 
-    public Optional<Uri> onResult(int resultCode, Intent intent) {
+    private Optional<Uri> onResult(int resultCode, Intent intent) {
         Uri mLastImageOrVideoUri = null;
         if (resultCode == Activity.RESULT_OK) {
             if (intent != null) {

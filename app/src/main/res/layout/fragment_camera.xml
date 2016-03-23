@@ -39,16 +39,13 @@
             android:layout_marginTop="10dp"
             android:src="@drawable/camera_switch"/>
 
-        /
-
         <RelativeLayout
             android:id="@+id/fragment_camera_layout_controls_main"
             android:layout_width="match_parent"
             android:layout_height="145dp"
             android:layout_alignParentBottom="true"
             android:layout_gravity="bottom"
-            android:background="@android:color/black"
-            android:visibility="visible">
+            android:background="@android:color/black">
 
             <TextView
                 android:id="@+id/camera_text_header"
@@ -141,7 +138,6 @@
             </RelativeLayout>
 
         </RelativeLayout>
-        /
 
     </FrameLayout>
 

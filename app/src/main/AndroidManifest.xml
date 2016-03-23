@@ -19,11 +19,12 @@
         android:theme="@style/AppTheme">
 
         <activity
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:name=".camera2.RecordVideoActivity"/>
 
         <activity
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:name=".camera2.VideoCompressActivity"/>
-
 
         <activity
             android:name=".view.main.MainActivity"
