@@ -1,0 +1,193 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- CameraView -->
+    <FrameLayout
+        android:id="@+id/fragment_camera_preview_stack"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/black">
+
+        <com.commonsware.cwac.cam2.CameraView
+            android:id="@+id/fragment_camera_camera_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </FrameLayout>
+
+    <!-- Controls -->
+    <FrameLayout
+        android:id="@+id/fragment_camera_layout_controls"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
+
+        <FrameLayout
+            android:id="@+id/fragment_camera_layout_preview_overlay_live"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </FrameLayout>
+
+        <ImageView
+            android:id="@+id/fragment_camera_switch_camera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|right"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/camera_switch"/>
+
+        <RelativeLayout
+            android:id="@+id/fragment_camera_layout_controls_main"
+            android:layout_width="match_parent"
+            android:layout_height="145dp"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="bottom"
+            android:background="@android:color/black">
+
+            <TextView
+                android:id="@+id/camera_text_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="16dp"
+                android:text="What are you offering?"
+                android:textColor="@android:color/white"/>
+
+            <TextView
+                android:id="@+id/camera_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/camera_text_header"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="6dp"
+                android:text="This is your featured photo. Make sure it's a good one!"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true">
+
+                <TextView
+                    android:id="@+id/fragment_camera_timer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@+id/fragment_camera_action_btn"
+                    android:layout_toStartOf="@+id/fragment_camera_action_btn"
+                    android:layout_marginEnd="6dp"
+                    android:layout_marginRight="6dp"
+                    tools:text="14"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp"/>
+
+                <ImageButton
+                    android:id="@+id/fragment_camera_action_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_gravity="bottom"
+                    android:layout_margin="10dp"
+                    android:background="?selectableItemBackground"
+                    android:src="@drawable/camera_capture"/>
+
+                <ImageButton
+                    android:id="@+id/fragment_camera_imageview_gallery_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="bottom"
+                    android:layout_marginEnd="40dp"
+                    android:layout_marginRight="40dp"
+                    android:layout_toLeftOf="@+id/fragment_camera_action_btn"
+                    android:layout_toStartOf="@+id/fragment_camera_action_btn"
+                    android:background="?selectableItemBackground"
+                    android:src="@drawable/gallery"/>
+
+                <FrameLayout
+                    android:id="@+id/fragment_camera_mode_toggle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginStart="40dp"
+                    android:layout_toEndOf="@+id/fragment_camera_action_btn"
+                    android:layout_toRightOf="@+id/fragment_camera_action_btn">
+
+                    <ImageButton
+                        android:id="@+id/fragment_camera_mode_video_btn"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="?selectableItemBackground"
+                        android:src="@drawable/video_mode"
+                        android:visibility="gone"/>
+
+                    <ImageButton
+                        android:id="@+id/fragment_camera_mode_picture_btn"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="?selectableItemBackground"
+                        android:src="@drawable/camera_mode"/>
+
+                </FrameLayout>
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/fragment_camera_layout_confirm"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible">
+
+        <FrameLayout
+            android:id="@+id/fragment_camera_layout_preview_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_gravity="bottom"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/camera_accept_or_dismiss_layout_height"
+            android:layout_alignParentBottom="true"
+            android:background="@android:color/black"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/fragment_camera_confirm_no_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="40dp"
+                android:layout_marginRight="40dp"
+                android:background="?selectableItemBackground"
+                android:fontFamily="sans-serif"
+                android:text="Retake"
+                android:textAllCaps="true"
+                android:textColor="@android:color/darker_gray"/>
+
+            <Button
+                android:id="@+id/fragment_camera_confirm_yes_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="40dp"
+                android:layout_marginStart="40dp"
+                android:background="?selectableItemBackground"
+                android:fontFamily="sans-serif"
+                android:text="Publish"
+                android:textAllCaps="true"
+                android:textColor="@android:color/white"/>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</RelativeLayout>

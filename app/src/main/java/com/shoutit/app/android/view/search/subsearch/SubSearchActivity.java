@@ -26,8 +26,6 @@ import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.view.search.SearchAdapter;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.SearchQueryPresenter;
-import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsActivity;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -85,12 +83,12 @@ public class SubSearchActivity extends BaseActivity implements SearchView.OnQuer
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
-        searchQueryPresenter.getQuerySubmittedSubject()
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
+        presenter.getSubSearchSubmittedObservable()
+                .compose(this.<Intent>bindToLifecycle())
+                .subscribe(new Action1<Intent>() {
                     @Override
-                    public void call(String query) {
-                        startActivity(SearchShoutsResultsActivity.newIntent(SubSearchActivity.this, query));
+                    public void call(Intent intent) {
+                        startActivity(intent);
                     }
                 });
 

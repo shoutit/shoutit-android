@@ -6,6 +6,10 @@ import android.support.multidex.MultiDexApplication;
 
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.crashlytics.android.core.CrashlyticsCore;
+import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
+import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler;
+import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
+import com.karumi.dexter.Dexter;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.constants.UserVoiceConstants;
 import com.shoutit.app.android.dagger.AppComponent;
@@ -51,6 +55,32 @@ public class App extends MultiDexApplication {
         setupGraph();
 
         fetchLocation();
+
+        Dexter.initialize(this);
+
+        initFfmpeg();
+    }
+
+    private void initFfmpeg() {
+        FFmpeg ffmpeg = FFmpeg.getInstance(this);
+        try {
+            ffmpeg.loadBinary(new LoadBinaryResponseHandler() {
+
+                @Override
+                public void onStart() {}
+
+                @Override
+                public void onFailure() {}
+
+                @Override
+                public void onSuccess() {}
+
+                @Override
+                public void onFinish() {}
+            });
+        } catch (FFmpegNotSupportedException e) {
+            // Handle if FFmpeg is not supported by device
+        }
     }
 
     private void initUserVoice() {

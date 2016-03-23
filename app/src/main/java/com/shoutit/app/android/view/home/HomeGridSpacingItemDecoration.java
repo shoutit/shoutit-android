@@ -4,6 +4,8 @@ import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import com.shoutit.app.android.adapters.ChangeableLayoutManagerAdapter;
+
 
 public class HomeGridSpacingItemDecoration extends RecyclerView.ItemDecoration {
 
@@ -22,7 +24,7 @@ public class HomeGridSpacingItemDecoration extends RecyclerView.ItemDecoration {
         }
 
         final int viewType = parent.getAdapter().getItemViewType(position);
-        if (viewType != HomeAdapter.VIEW_TYPE_SHOUT_ITEM) {
+        if (viewType != ChangeableLayoutManagerAdapter.VIEW_TYPE_SHOUT) {
             return;
         }
 

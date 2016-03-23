@@ -19,6 +19,14 @@
         android:theme="@style/AppTheme">
 
         <activity
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:name=".view.media.RecordVideoActivity"/>
+
+        <activity
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:name=".view.media.VideoCompressActivity"/>
+
+        <activity
             android:name=".view.main.MainActivity"
             android:theme="@style/AppTheme.WithDrawer">
 
@@ -91,9 +99,6 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
-
-        <activity android:name=".view.media.NativeCameraActivity"
-                  android:theme="@style/TranslucentStatusBar"/>
 
         <activity android:name=".view.search.results.shouts.SearchShoutsResultsActivity"/>
 

@@ -21,7 +21,7 @@ import com.shoutit.app.android.view.createshout.request.CreateShoutDialogCompone
 import com.shoutit.app.android.view.createshout.request.DaggerCreateShoutDialogComponent;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.main.MainActivity;
-import com.shoutit.app.android.view.media.NativeCameraActivity;
+import com.shoutit.app.android.view.media.RecordVideoActivity;
 
 import javax.inject.Inject;
 
@@ -71,7 +71,7 @@ public class CreateShoutDialogFragment extends DialogFragment {
                     ColoredSnackBar.contentView(getActivity()),
                     R.string.permission_camera_explanation,
                     new String[] {Manifest.permission.CAMERA})) {
-                startActivity(NativeCameraActivity.newIntent(getActivity()));
+                startActivity(RecordVideoActivity.newIntent(getActivity()));
             }
         }
     }
