@@ -11,7 +11,7 @@ public class SearchQueryPresenter {
     public BehaviorSubject<String> querySubject = BehaviorSubject.create();
     public PublishSubject<String> querySubmittedSubject = PublishSubject.create();
 
-    public final Observable<String> querySubmittedObservable;
+    private final Observable<String> querySubmittedObservable;
     private final Observable<String> emptyQuerySubmittedObservable;
 
     public SearchQueryPresenter() {

@@ -12,6 +12,7 @@ import dagger.Component;
         dependencies = AppComponent.class,
         modules = {
                 ActivityModule.class,
+                SearchShoutsResultsActivityModule.class
         }
 )
 public interface SearchShoutsResultsActivityComponent extends BaseActivityComponent {

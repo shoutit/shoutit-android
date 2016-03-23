@@ -6,15 +6,15 @@ import android.view.ViewGroup;
 import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.adapters.ChangeableLayoutManagerAdapter;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.squareup.picasso.Picasso;
 
 import javax.inject.Inject;
 
-public class DiscoverShoutsAdapter extends BaseAdapter {
+public class DiscoverShoutsAdapter extends ChangeableLayoutManagerAdapter {
 
     private final Picasso mPicasso;
-    private boolean isLinearLayoutManager = false;
 
     @Inject
     public DiscoverShoutsAdapter(@ForActivity Context context, Picasso picasso) {
@@ -35,8 +35,8 @@ public class DiscoverShoutsAdapter extends BaseAdapter {
         holder.bind(items.get(position));
     }
 
-    public void switchLayoutManager(boolean isLinearLayoutManager) {
-        this.isLinearLayoutManager = isLinearLayoutManager;
-        notifyDataSetChanged();
+    @Override
+    public int getItemViewType(int position) {
+        return VIEW_TYPE_SHOUT;
     }
 }

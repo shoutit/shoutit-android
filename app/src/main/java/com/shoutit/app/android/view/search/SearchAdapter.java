@@ -53,7 +53,7 @@ public class SearchAdapter extends BaseAdapter {
         }
     }
 
-    public class RecentSearchViewHolder extends ViewHolderManager.BaseViewHolder<SearchWithRecentsPresenter.RecentSearchAdapterItem> {
+    public class RecentSearchViewHolder extends ViewHolderManager.BaseViewHolder<SearchWithRecentsPresenter.RecentSearchAdapterItem> implements View.OnClickListener {
 
         @Bind(R.id.search_recent_text_tv)
         TextView recentSearchTv;
@@ -63,6 +63,7 @@ public class SearchAdapter extends BaseAdapter {
         public RecentSearchViewHolder(@Nonnull View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            itemView.setOnClickListener(this);
         }
 
         @Override
@@ -74,6 +75,11 @@ public class SearchAdapter extends BaseAdapter {
         @OnClick(R.id.search_clear_recent_iv)
         public void onSuggestionRemove() {
             item.onSuggestionRemove();
+        }
+
+        @Override
+        public void onClick(View v) {
+            item.onRecentSearchClicked();
         }
     }
 
