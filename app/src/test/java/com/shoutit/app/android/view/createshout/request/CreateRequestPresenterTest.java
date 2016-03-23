@@ -121,7 +121,7 @@ public class CreateRequestPresenterTest {
     @Test
     public void testWhenButtonClickedAndRequestFailed_progressShownAndHiddenAndErrorShown() {
         when(mListener.getRequestData()).thenReturn(new CreateRequestPresenter.RequestData("123456", "5", ""));
-        ;
+
         when(mApiService.createShoutRequest(any(CreateRequestShoutWithPriceRequest.class))).thenReturn(Observable.<CreateShoutResponse>error(new RuntimeException("")));
         mCreateRequestPresenter.registerListener(mListener);
 
