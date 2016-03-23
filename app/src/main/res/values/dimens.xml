@@ -49,6 +49,7 @@
 
     <!-- Lined Text View -->
     <dimen name="textview_padding">16dp</dimen>
+    <dimen name="camera_accept_or_dismiss_layout_height">145dp</dimen>
 
     <!-- Shouts search results -->
     <dimen name="shouts_search_results_side_spacing">6dp</dimen>
