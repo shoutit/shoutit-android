@@ -101,7 +101,7 @@ public class SearchWithRecentsPresenter {
                 .map(new Func1<Object, Object>() {
                     @Override
                     public Object call(Object o) {
-                        recentSearchesTable.clearRecentSearch();
+                        recentSearchesTable.clearRecentSearches();
                         return null;
                     }
                 });

@@ -131,7 +131,7 @@ public class SubSearchActivity extends BaseActivity implements SearchView.OnQuer
         if (!wasViewRotated) {
             searchView.clearFocus();
         }
-        setSearchTruncatedAndColored(searchView);
+        setSearchViewBackground(searchView);
 
         presenter.getHintNameObservable()
                 .compose(this.<String>bindToLifecycle())
@@ -146,13 +146,12 @@ public class SubSearchActivity extends BaseActivity implements SearchView.OnQuer
     }
 
     @SuppressLint("PrivateResource")
-    private void setSearchTruncatedAndColored(ViewGroup parent) {
+    private void setSearchViewBackground(ViewGroup parent) {
         for (int i = parent.getChildCount() - 1; i >= 0; i--) {
             final View child = parent.getChildAt(i);
             if (child instanceof ViewGroup) {
-                setSearchTruncatedAndColored((ViewGroup) child);
-            } else if (child instanceof EditText && child != null) {
-                ((EditText) child).setEllipsize(TextUtils.TruncateAt.MIDDLE);
+                setSearchViewBackground((ViewGroup) child);
+            } else if (child instanceof EditText) {
                 child.setBackground(getResources().getDrawable(R.drawable.abc_textfield_search_material));
                 child.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accent_blue), PorterDuff.Mode.SRC_OVER);
             }
