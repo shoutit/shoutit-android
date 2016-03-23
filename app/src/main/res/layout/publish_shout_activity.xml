@@ -42,16 +42,14 @@
                 android:text="@string/published_extra_info"/>
 
             <Button
-                android:fontFamily="@string/font_roboto_regular"
+                style="@style/BaseButtonStyle"
                 android:id="@+id/publish_activity_add_more_details"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:layout_marginTop="30dp"
                 android:background="@drawable/green_border_button"
                 android:text="@string/published_add_details"
-                android:textAllCaps="false"
                 android:textColor="@color/colorAccent"/>
 
             <com.shoutit.app.android.widget.LinedTextView
@@ -67,15 +65,14 @@
                 android:textColor="@color/colorAccent"/>
 
             <Button
-                android:fontFamily="@string/font_roboto_regular"
+                style="@style/BaseButtonStyle"
                 android:id="@+id/publish_activity_create_another_shout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:layout_marginLeft="18dp"
                 android:layout_marginRight="18dp"
                 android:layout_marginTop="30dp"
                 android:text="@string/published_create_another_shout"
-                android:textAllCaps="false"
+                android:background="@drawable/selector_green_button_with_stroke"
                 android:textColor="@android:color/white"/>
 
         </LinearLayout>

@@ -15,23 +15,25 @@
     <Button
         android:id="@+id/create_shout_offer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:layout_margin="10dp"
         android:background="@color/colorAccent"
-        android:fontFamily="sans-serif"
+        android:textSize="14sp"
+        android:fontFamily="sans-serif-medium"
         android:text="@string/create_shout_dialog_offer"
-        android:textAllCaps="false"
+        android:textAllCaps="true"
         android:textColor="@android:color/white"/>
 
     <Button
         android:id="@+id/create_shout_request"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:layout_margin="10dp"
         android:background="@color/accent_blue"
-        android:fontFamily="sans-serif"
+        android:textSize="14sp"
+        android:fontFamily="sans-serif-medium"
         android:text="@string/create_shout_dialog_request"
-        android:textAllCaps="false"
+        android:textAllCaps="true"
         android:textColor="@android:color/white"/>
 
 </LinearLayout>

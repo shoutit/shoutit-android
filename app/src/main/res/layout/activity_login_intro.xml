@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout
-    android:id="@+id/activity_login_root_view"
+<RelativeLayout android:id="@+id/activity_login_root_view"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -42,43 +42,37 @@
                 android:textSize="14sp"/>
 
             <Button
+                style="@style/BaseButtonDefaultBackgroundStyle"
                 android:id="@+id/activity_login_facebook_btn"
                 android:layout_width="280dp"
-                android:layout_height="50dp"
                 android:layout_marginBottom="8dp"
                 android:drawableLeft="@drawable/ic_facebook"
                 android:drawableStart="@drawable/ic_facebook"
                 android:paddingLeft="22dp"
                 android:paddingStart="22dp"
                 android:text="@string/login_intro_facebook"
-                android:textAllCaps="false"
                 android:textColor="@android:color/white"
-                android:textSize="14sp"
                 android:theme="@style/FacebookButton"/>
 
             <Button
+                style="@style/BaseButtonDefaultBackgroundStyle"
                 android:id="@+id/activity_login_gplus_btn"
                 android:layout_width="280dp"
-                android:layout_height="50dp"
                 android:layout_marginBottom="8dp"
                 android:drawableLeft="@drawable/ic_gplus"
                 android:drawableStart="@drawable/ic_gplus"
                 android:paddingLeft="22dp"
                 android:paddingStart="22dp"
                 android:text="@string/login_intro_google"
-                android:textAllCaps="false"
                 android:textColor="@android:color/white"
-                android:textSize="14sp"
                 android:theme="@style/GoogleButton"/>
 
             <Button
+                style="@style/BaseButtonDefaultBackgroundStyle"
                 android:id="@+id/activity_login_signup"
                 android:layout_width="280dp"
-                android:layout_height="50dp"
                 android:text="@string/login_intro_signup"
-                android:textAllCaps="false"
                 android:textColor="@android:color/white"
-                android:textSize="14sp"
                 android:theme="@style/LoginButton"/>
 
             <View

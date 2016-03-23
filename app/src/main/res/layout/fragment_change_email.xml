@@ -29,9 +29,10 @@
     </android.support.design.widget.TextInputLayout>
 
     <Button
+        style="@style/BaseButtonStyle"
         android:id="@+id/account_change_email_confirm_btn"
+        android:background="@drawable/selector_green_button_with_stroke"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginTop="12dp"
