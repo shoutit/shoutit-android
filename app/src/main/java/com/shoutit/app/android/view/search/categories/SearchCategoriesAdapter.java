@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.search;
+package com.shoutit.app.android.view.search.categories;
 
 import android.content.Context;
 import android.view.View;
@@ -58,7 +58,7 @@ public class SearchCategoriesAdapter extends BaseAdapter {
 
             titleTv.setText(category.getName());
 
-            picasso.load(category.getImage())
+            picasso.load(category.getIcon())
                     .fit()
                     .centerInside()
                     .into(iconIv);

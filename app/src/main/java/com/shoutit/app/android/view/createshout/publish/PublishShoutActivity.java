@@ -7,6 +7,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
@@ -54,7 +55,8 @@ public class PublishShoutActivity extends RxAppCompatActivity {
         mToolbar.inflateMenu(R.menu.publish_shout_menu);
         mToolbar.setNavigationIcon(R.drawable.close);
 
-        final Drawable drawable = getResources().getDrawable(R.drawable.ic_share);
+
+        final Drawable drawable = ContextCompat.getDrawable(this, R.drawable.ic_share);
         assert drawable != null;
         final Drawable newDrawable = drawable.getConstantState().newDrawable();
 

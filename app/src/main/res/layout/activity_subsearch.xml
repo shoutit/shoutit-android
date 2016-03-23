@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/search_bg_color"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/search_toolbar"
+        style="@style/WhiteToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize" />
+
+    <View
+        android:id="@+id/search_toolbar_shadow_view"
+        android:layout_below="@+id/search_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@drawable/toolbar_drop_shadow" />
+
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/search_recycler_view"
+        android:layout_below="@+id/search_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <include layout="@layout/base_progress" />
+
+</RelativeLayout>

@@ -2,23 +2,66 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/default_bg_color"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/search_bg_color"
     android:orientation="vertical">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/search_toolbar"
         style="@style/WhiteToolbar"
+        android:theme="@style/WhiteToolbar"
+        app:popupTheme="@style/WhiteToolbar"
         android:layout_width="match_parent"
         android:layout_height="?actionBarSize"/>
     
     <View
+        android:id="@+id/search_toolbar_shadow_view"
         android:layout_width="match_parent"
         android:layout_height="3dp"
         android:background="@drawable/toolbar_drop_shadow"/>
-    
+
     <FrameLayout
-        android:id="@+id/search_categories_fragment_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/search_view_pager_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/search_bg_color"
+            android:orientation="vertical">
+
+            <android.support.design.widget.TabLayout
+                android:id="@+id/search_tab_layout"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                app:tabIndicatorColor="@color/accent_blue"
+                app:tabSelectedTextColor="@color/accent_blue"
+                app:tabBackground="@color/search_tab_background"
+                app:tabTextColor="@color/black_38"
+                app:tabMode="fixed"
+                app:tabMaxWidth="0dp"
+                app:tabGravity="fill"
+                android:background="@color/search_tab_background"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:background="@drawable/toolbar_drop_shadow"/>
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/search_view_pager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/search_categories_fragment_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </FrameLayout>
 
 </LinearLayout>

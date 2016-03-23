@@ -18,6 +18,7 @@
     <color name="accent_blue">#40C4FF</color>
     <color name="progress_dim">#17000000</color>
     <color name="button_stroke">#1e000000</color>
+    <color name="base_item_selected_color">#0f000000</color>
 
     <!-- Intro -->
     <color name="intro_gradient_start">#43cea2</color>
@@ -73,5 +74,10 @@
 
     <!-- Camera -->
     <color name="camera_timer_color">#FF5252</color>
+
+    <!-- Search -->
+    <color name="search_tab_background">#ededed</color>
+    <color name="search_tabs_color">#dfdfdf</color>
+    <color name="search_bg_color">#f4f4f4</color>
 
 </resources>
