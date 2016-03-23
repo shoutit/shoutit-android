@@ -18,10 +18,16 @@ public class ShoutMediaPresenter {
 
     public class ImageItem extends Item {
 
+        protected static final int VIDEO = 0;
+        protected static final int IMAGE = 1;
+
         private final String mMedia;
 
-        public ImageItem(String media) {
+        protected final int type;
+
+        public ImageItem(int type, String media) {
             mMedia = media;
+            this.type = type;
         }
 
         @Override
@@ -68,9 +74,9 @@ public class ShoutMediaPresenter {
         mMediaListener.setImages(images);
     }
 
-    public void addMediaItem(@NonNull String test) {
+    public void addMediaItem(@NonNull String media) {
         int position = getFirstAvailablePosition();
-        images.put(position, new ImageItem(test));
+        images.put(position, new ImageItem(media));
         mMediaListener.setImages(images);
     }
 

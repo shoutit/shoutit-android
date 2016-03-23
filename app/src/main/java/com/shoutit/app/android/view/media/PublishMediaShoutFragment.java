@@ -104,7 +104,6 @@ public class PublishMediaShoutFragment extends Fragment {
                 getActivity(),
                 R.layout.camera_publish_currency_item,
                 android.R.layout.simple_list_item_1);
-
     }
 
     @android.support.annotation.Nullable
