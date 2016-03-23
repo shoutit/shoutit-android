@@ -5,7 +5,6 @@ import android.support.annotation.Nullable;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.base.Objects;
-import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.utils.PriceUtils;
@@ -54,9 +53,7 @@ public class ShoutAdapterItems {
             if (price == null) {
                 return null;
             } else {
-                final String priceString = PriceUtils.formatPrice(shout.getPrice());
-                return mResources.getString(
-                        R.string.price_with_currency, priceString, shout.getCurrency());
+                return PriceUtils.formatPriceWithCurrency(shout.getPrice(), mResources, shout.getCurrency());
             }
         }
 
@@ -121,9 +118,7 @@ public class ShoutAdapterItems {
             if (price == null) {
                 return null;
             } else {
-                final String priceString = PriceUtils.formatPrice(shout.getPrice());
-                return mResources.getString(
-                        R.string.price_with_currency, priceString, shout.getCurrency());
+                return PriceUtils.formatPriceWithCurrency(shout.getPrice(), mResources, shout.getCurrency());
             }
         }
 
