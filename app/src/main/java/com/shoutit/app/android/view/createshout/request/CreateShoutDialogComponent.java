@@ -4,9 +4,7 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.ActivityScope;
 import com.shoutit.app.android.dagger.AppComponent;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
-import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogFragment;
-import com.shoutit.app.android.view.media.NativeCameraActivity;
 
 import dagger.Component;
 

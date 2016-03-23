@@ -1,4 +1,4 @@
-package com.shoutit.app.android.camera2;
+package com.shoutit.app.android.view.media;
 
 
 import android.app.Fragment;
@@ -10,8 +10,6 @@ import android.util.Log;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-
-import rx.Observable;
 
 public class VideoUtils {
     public static final String EXTRA_LOCAL_MEDIA = "EXTRA_LOCAL_MEDIA";

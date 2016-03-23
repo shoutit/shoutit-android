@@ -1,4 +1,4 @@
-package com.shoutit.app.android.camera2;
+package com.shoutit.app.android.view.media;
 
 import android.hardware.Camera;
 

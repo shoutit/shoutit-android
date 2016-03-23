@@ -1,4 +1,4 @@
-package com.shoutit.app.android.camera2;
+package com.shoutit.app.android.view.media;
 
 /**
  * Created by Darshan on 5/26/2015.

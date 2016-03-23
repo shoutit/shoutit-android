@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
-import com.shoutit.app.android.camera2.RecordVideoActivity;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PermissionHelper;
@@ -22,7 +21,7 @@ import com.shoutit.app.android.view.createshout.request.CreateShoutDialogCompone
 import com.shoutit.app.android.view.createshout.request.DaggerCreateShoutDialogComponent;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.main.MainActivity;
-import com.shoutit.app.android.view.media.NativeCameraActivity;
+
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
