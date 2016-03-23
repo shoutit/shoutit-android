@@ -17,18 +17,16 @@ import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
+import com.shoutit.app.android.BaseShoutsItemDecoration;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.LayoutManagerHelper;
 import com.shoutit.app.android.utils.LoadMoreHelper;
-import com.shoutit.app.android.utils.MyGridLayoutManager;
 import com.shoutit.app.android.utils.MyLayoutManager;
-import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogFragment;
-import com.shoutit.app.android.view.home.HomeGridSpacingItemDecoration;
-import com.shoutit.app.android.view.home.HomeLinearSpacingItemDecoration;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 
 import java.util.List;
@@ -68,9 +66,6 @@ public class DiscoverShoutsActivity extends BaseActivity {
     @Inject
     UserPreferences mUserPreferences;
 
-    private HomeGridSpacingItemDecoration gridViewItemDecoration;
-    private HomeLinearSpacingItemDecoration linearViewItemDecoration;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,11 +86,8 @@ public class DiscoverShoutsActivity extends BaseActivity {
             }
         });
 
-        gridViewItemDecoration = new HomeGridSpacingItemDecoration(
-                getResources().getDimensionPixelSize(R.dimen.home_grid_side_spacing));
-
-        linearViewItemDecoration = new HomeLinearSpacingItemDecoration(
-                getResources().getDimensionPixelSize(R.dimen.home_linear_side_spacing));
+        mRecyclerView.addItemDecoration(new BaseShoutsItemDecoration(
+                getResources().getDimensionPixelSize(R.dimen.home_linear_side_spacing)));
         setGridLayoutManager();
 
         mRecyclerView.setAdapter(mShoutsAdapter);
@@ -155,21 +147,11 @@ public class DiscoverShoutsActivity extends BaseActivity {
     }
 
     private void setLinearLayoutManager() {
-        mRecyclerView.setLayoutManager(new MyLinearLayoutManager(this));
-        mRecyclerView.removeItemDecoration(gridViewItemDecoration);
-        mRecyclerView.addItemDecoration(linearViewItemDecoration);
-        mRecyclerView.setAdapter(mShoutsAdapter);
-        mShoutsAdapter.switchLayoutManager(true);
+        LayoutManagerHelper.setLinearLayoutManager(this, mRecyclerView, mShoutsAdapter);
     }
 
     private void setGridLayoutManager() {
-        final MyGridLayoutManager gridLayoutManager = new MyGridLayoutManager(this, 2);
-
-        mRecyclerView.setLayoutManager(gridLayoutManager);
-        mRecyclerView.removeItemDecoration(linearViewItemDecoration);
-        mRecyclerView.addItemDecoration(gridViewItemDecoration);
-        mRecyclerView.setAdapter(mShoutsAdapter);
-        mShoutsAdapter.switchLayoutManager(false);
+        LayoutManagerHelper.setGridLayoutManager(this, mRecyclerView, mShoutsAdapter);
     }
 
     @NonNull

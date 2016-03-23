@@ -3,9 +3,7 @@ package com.shoutit.app.android.view.search.results.shouts;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Rect;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -23,10 +21,10 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.db.RecentSearchesTable;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.LayoutManagerHelper;
 import com.shoutit.app.android.utils.LoadMoreHelper;
-import com.shoutit.app.android.utils.MyGridLayoutManager;
 import com.shoutit.app.android.utils.MyLayoutManager;
-import com.shoutit.app.android.utils.MyLinearLayoutManager;
+import com.shoutit.app.android.BaseShoutsItemDecoration;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 
@@ -140,33 +138,8 @@ public class SearchShoutsResultsActivity extends BaseActivity {
     }
 
     private void initAdapter() {
-        recyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
-
-            final int sideSpacing = getResources().getDimensionPixelSize(R.dimen.shouts_search_results_side_spacing);
-
-            @Override
-            public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
-
-                int position = parent.getChildAdapterPosition(view);
-
-                final RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
-                if (layoutManager == null) {
-                    return;
-                }
-
-                if (layoutManager instanceof MyLinearLayoutManager ||
-                        (layoutManager instanceof MyGridLayoutManager && ((GridLayoutManager) layoutManager).getSpanSizeLookup().getSpanSize(position) == 2)) {
-                    outRect.left = sideSpacing;
-                    outRect.right = sideSpacing;
-                } else {
-                    if (position % 2 == 0) {
-                        outRect.right = sideSpacing;
-                    } else {
-                        outRect.left = sideSpacing;
-                    }
-                }
-            }
-        });
+        recyclerView.addItemDecoration(new BaseShoutsItemDecoration(
+                getResources().getDimensionPixelSize(R.dimen.shouts_search_results_side_spacing)));
         setGridLayoutManager();
     }
 
@@ -203,26 +176,11 @@ public class SearchShoutsResultsActivity extends BaseActivity {
     }
 
     private void setLinearLayoutManager() {
-        recyclerView.setLayoutManager(new MyLinearLayoutManager(this));
-        recyclerView.setAdapter(adapter);
-        adapter.switchLayoutManager(true);
+        LayoutManagerHelper.setLinearLayoutManager(this, recyclerView, adapter);
     }
 
     private void setGridLayoutManager() {
-        final MyGridLayoutManager gridLayoutManager = new MyGridLayoutManager(this, 2);
-        gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-            @Override
-            public int getSpanSize(int position) {
-                if (adapter.getItemViewType(position) == SearchShoutsResultsAdapter.VIEW_TYPE_SHOUT) {
-                    return 1;
-                } else {
-                    return 2;
-                }
-            }
-        });
-        recyclerView.setLayoutManager(gridLayoutManager);
-        recyclerView.setAdapter(adapter);
-        adapter.switchLayoutManager(false);
+        LayoutManagerHelper.setGridLayoutManager(this, recyclerView, adapter);
     }
 
     @Nonnull

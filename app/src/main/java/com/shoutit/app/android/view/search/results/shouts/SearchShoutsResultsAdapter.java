@@ -10,9 +10,9 @@ import android.widget.Toast;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.jakewharton.rxbinding.view.RxView;
-import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
+import com.shoutit.app.android.adapters.ChangeableLayoutManagerAdapter;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 import com.shoutit.app.android.view.shouts.ShoutGridViewHolder;
@@ -28,23 +28,16 @@ import butterknife.ButterKnife;
 import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
 
-public class SearchShoutsResultsAdapter extends BaseAdapter {
+public class SearchShoutsResultsAdapter extends ChangeableLayoutManagerAdapter {
     public static final int VIEW_TYPE_SHOUT_HEADER = 1;
-    public static final int VIEW_TYPE_SHOUT = 2;
     public static final int VIEW_TYPE_NO_RESULTS = 3;
 
     private final Picasso picasso;
-    private boolean isLinearLayoutManager = true;
 
     @Inject
     public SearchShoutsResultsAdapter(@ForActivity @Nonnull Context context, Picasso picasso) {
         super(context);
         this.picasso = picasso;
-    }
-
-    public void switchLayoutManager(boolean isLinearLayoutManager) {
-        this.isLinearLayoutManager = isLinearLayoutManager;
-        notifyDataSetChanged();
     }
 
     public class SearchShoutHeaderViewHolder extends ViewHolderManager.BaseViewHolder<SearchShoutsResultsPresenter.ShoutHeaderAdapterItem> {
@@ -58,7 +51,6 @@ public class SearchShoutsResultsAdapter extends BaseAdapter {
         @Bind(R.id.search_results_switch_iv)
         ImageView layoutSwitchIv;
 
-        private SearchShoutsResultsPresenter.ShoutHeaderAdapterItem item;
         private CompositeSubscription subscription;
 
         public SearchShoutHeaderViewHolder(@Nonnull View itemView) {
@@ -68,8 +60,6 @@ public class SearchShoutsResultsAdapter extends BaseAdapter {
 
         @Override
         public void bind(@Nonnull SearchShoutsResultsPresenter.ShoutHeaderAdapterItem item) {
-            this.item = item;
-
             headerTitleTv.setText(context.getString(R.string.search_shout_results_header_title, item.getSearchQuery()));
             headerCountTv.setText(context.getString(R.string.search_shouts_results_header_count, item.getTotalItemsCount()));
 

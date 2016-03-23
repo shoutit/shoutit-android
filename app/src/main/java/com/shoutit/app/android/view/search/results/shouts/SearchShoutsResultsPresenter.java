@@ -47,10 +47,12 @@ public class SearchShoutsResultsPresenter {
     private final Observable<Boolean> linearLayoutManagerObservable;
     private final Observable<String> toolbarTitleObservable;
 
-    public SearchShoutsResultsPresenter(final ShoutsDao dao, @Nonnull final String searchQuery,
+    public SearchShoutsResultsPresenter(@Nonnull final ShoutsDao dao,
+                                        @Nonnull final String searchQuery,
                                         @Nonnull final SearchPresenter.SearchType searchType,
                                         @Nullable final String contextualItemId,
-                                        UserPreferences userPreferences, @ForActivity final Context context,
+                                        @Nonnull UserPreferences userPreferences,
+                                        @Nonnull @ForActivity final Context context,
                                         @UiScheduler Scheduler uiScheduler) {
 
         Observable<ShoutsDao.SearchShoutsDao> daoObservable = userPreferences.getLocationObservable()
@@ -186,7 +188,7 @@ public class SearchShoutsResultsPresenter {
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return false;
+            return true;
         }
 
         public Observer<Object> getLayoutManagerSwitchObserver() {
