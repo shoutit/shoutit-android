@@ -9,10 +9,6 @@ import android.widget.Spinner;
 
 public class StateSpinner extends Spinner {
 
-    public StateSpinner(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes, int mode) {
-        super(context, attrs, defStyleAttr, defStyleRes, mode);
-    }
-
     public StateSpinner(Context context, AttributeSet attrs, int defStyleAttr, int mode) {
         super(context, attrs, defStyleAttr, mode);
     }
