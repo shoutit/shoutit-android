@@ -234,6 +234,8 @@ public class ShoutAdapter extends BaseAdapter {
             this.item = item;
             final Shout shout = item.getShout();
             titleTextView.setText(shout.getTitle());
+            titleTextView.setVisibility(TextUtils.isEmpty(shout.getTitle()) ?
+                    View.GONE : View.VISIBLE);
             nameTextView.setText(shout.getProfile().getName());
 
             final String shoutPrice = item.getShoutPrice();
