@@ -48,7 +48,8 @@ public class SearchPresenter {
         SHOUTS,
         PROFILE,
         TAG,
-        DISCOVER
+        DISCOVER,
+        BROWSE
     }
 
     private final PublishSubject<String> loadMoreSubject = PublishSubject.create();
@@ -172,9 +173,9 @@ public class SearchPresenter {
             case PROFILE:
                 return apiService.searchProfileShouts(query, pageNumber, PAGE_SIZE, contextItemId);
             case SHOUTS:
-                return apiService.searchShouts(query, pageNumber, PAGE_SIZE);
+                return apiService.searchShouts(query, pageNumber, PAGE_SIZE, null, null, null);
             case TAG:
-                return apiService.searchTagShouts(query, pageNumber, PAGE_SIZE, contextItemId);
+                return apiService.searchTagShouts(query, pageNumber, PAGE_SIZE, contextItemId, null, null, null);
             case DISCOVER:
                 return apiService.searchDiscoverShouts(query, pageNumber, PAGE_SIZE, contextItemId);
             default:

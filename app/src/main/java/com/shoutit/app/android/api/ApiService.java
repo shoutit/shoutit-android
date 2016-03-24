@@ -64,10 +64,11 @@ public interface ApiService {
      * Shouts
      **/
     @GET("shouts")
-    Observable<ShoutsResponse> shoutsForCity(@Query("country") String countryCode,
-                                             @Query("city") String city,
-                                             @Query("page") Integer page,
-                                             @Query("page_size") Integer pageSize);
+    Observable<ShoutsResponse> shoutsForLocation(@Query("country") String countryCode,
+                                                 @Query("city") String city,
+                                                 @Query("state") String state,
+                                                 @Query("page") Integer page,
+                                                 @Query("page_size") Integer pageSize);
 
     @GET("shouts")
     Observable<ShoutsResponse> shoutsForDiscoverItem(@Query("discover") @NonNull String discoverId,
@@ -92,8 +93,11 @@ public interface ApiService {
 
     @GET("shouts")
     Observable<ShoutsResponse> searchShouts(@Query("search") String query,
-                                           @Query("page") Integer page,
-                                           @Query("page_size") Integer pageSize);
+                                            @Query("page") Integer page,
+                                            @Query("page_size") Integer pageSize,
+                                            @Query("country") String countryCode,
+                                            @Query("city") String city,
+                                            @Query("state") String state);
 
     @GET("shouts")
     Observable<ShoutsResponse> searchProfileShouts(@Query("search") String query,
@@ -103,9 +107,12 @@ public interface ApiService {
 
     @GET("shouts")
     Observable<ShoutsResponse> searchTagShouts(@Query("search") String query,
-                                                   @Query("page") Integer page,
-                                                   @Query("page_size") Integer pageSize,
-                                                   @Query("tags") String tagNameOrCategorySlug);
+                                               @Query("page") Integer page,
+                                               @Query("page_size") Integer pageSize,
+                                               @Query("tags") String tagNameOrCategorySlug,
+                                               @Query("country") String countryCode,
+                                               @Query("city") String city,
+                                               @Query("state") String state);
 
     @GET("shouts")
     Observable<ShoutsResponse> searchDiscoverShouts(@Query("search") String query,

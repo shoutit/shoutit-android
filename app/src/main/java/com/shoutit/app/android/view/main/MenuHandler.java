@@ -23,6 +23,8 @@ import com.shoutit.app.android.view.home.HomeFragment;
 import com.shoutit.app.android.view.location.LocationActivity;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
+import com.shoutit.app.android.view.search.SearchPresenter;
+import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsFragment;
 import com.shoutit.app.android.view.settings.SettingsActivity;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -288,6 +290,7 @@ public class MenuHandler {
             case FRAGMENT_DISCOVER:
                 return DiscoverFragment.newInstance();
             case FRAGMENT_BROWSE:
+                return SearchShoutsResultsFragment.newInstance(null, null, SearchPresenter.SearchType.BROWSE);
             case FRAGMENT_CHATS:
             case FRAGMENT_ORDERS:
             case FRAGMENT_HELP:
