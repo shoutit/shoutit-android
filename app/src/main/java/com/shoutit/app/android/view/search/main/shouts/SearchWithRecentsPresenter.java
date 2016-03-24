@@ -33,12 +33,14 @@ public class SearchWithRecentsPresenter {
     private final Observable<Object> clearAllRecentsObservable;
     private final Observable<Object> removeRecentObservable;
     private final Observable<List<BaseAdapterItem>> recentsSearchesObservable;
+    private final SearchPresenter searchPresenter;
 
     @Inject
     public SearchWithRecentsPresenter(final RecentSearchesTable recentSearchesTable,
                                       @NetworkScheduler final Scheduler networkScheduler,
                                       @UiScheduler Scheduler uiScheduler,
                                       final SearchPresenter searchPresenter) {
+        this.searchPresenter = searchPresenter;
 
         /** Recent Searches Items **/
         final Observable<List<BaseAdapterItem>> recentsObservable = recentSearchesTable
@@ -114,6 +116,10 @@ public class SearchWithRecentsPresenter {
                         return null;
                     }
                 });
+    }
+
+    public SearchPresenter getSearchPresenter() {
+        return searchPresenter;
     }
 
     public Observable<Object> getClearAllRecentsObservable() {

@@ -10,13 +10,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
+import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
@@ -26,6 +26,9 @@ import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.view.search.SearchAdapter;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.SearchQueryPresenter;
+
+import java.util.List;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -92,10 +95,27 @@ public class SubSearchActivity extends BaseActivity implements SearchView.OnQuer
                     }
                 });
 
-        // TODO uncomment after API changes
-        /*presenter.getSuggestionsAdapterItemsObservable()
+        presenter.getSuggestionsAdapterItemsObservable()
                 .compose(this.<List<BaseAdapterItem>>bindToLifecycle())
-                .subscribe(adapter);*/
+                .subscribe(adapter);
+
+        presenter.getSuggestionClickedObservable()
+                .compose(this.<Intent>bindToLifecycle())
+                .subscribe(new Action1<Intent>() {
+                    @Override
+                    public void call(Intent intent) {
+                        startActivity(intent);
+                    }
+                });
+
+        searchQueryPresenter.getFillSearchWithSuggestionObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String suggestion) {
+                        searchView.setQuery(suggestion, false);
+                    }
+                });
     }
 
     private void setUpToolbar() {

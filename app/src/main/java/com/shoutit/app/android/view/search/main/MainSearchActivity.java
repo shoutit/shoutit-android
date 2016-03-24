@@ -59,6 +59,7 @@ public class MainSearchActivity extends BaseActivity implements SearchView.OnQue
     SearchQueryPresenter searchQueryPresenter;
 
     private boolean wasViewRotated = false;
+    private SearchView searchView;
 
     public static Intent newIntent(Context context) {
         return new Intent(context, MainSearchActivity.class);
@@ -103,6 +104,15 @@ public class MainSearchActivity extends BaseActivity implements SearchView.OnQue
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(ColoredSnackBar.errorSnackBarAction(
                         ColoredSnackBar.contentView(this), R.string.search_empty_query));
+
+        searchQueryPresenter.getFillSearchWithSuggestionObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String suggestion) {
+                        searchView.setQuery(suggestion, false);
+                    }
+                });
     }
 
     private boolean isShoutTabSelected() {
@@ -135,8 +145,7 @@ public class MainSearchActivity extends BaseActivity implements SearchView.OnQue
 
         final SearchManager searchManager =
                 (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        final SearchView searchView =
-                (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setSearchableInfo(
                 searchManager.getSearchableInfo(getComponentName()));
         searchView.setOnQueryTextListener(this);

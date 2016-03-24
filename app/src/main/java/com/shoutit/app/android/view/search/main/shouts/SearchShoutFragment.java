@@ -1,5 +1,6 @@
 package com.shoutit.app.android.view.search.main.shouts;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,6 +15,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.KeyboardHelper;
+import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.view.search.SearchAdapter;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.main.MainSearchActivityComponent;
@@ -88,11 +90,20 @@ public class SearchShoutFragment extends BaseFragment {
                     }
                 });
 
-        // TODO uncomment when API adjust changes
-/*        presenter.getSearchPresenter()
+        presenter.getSearchPresenter()
                 .getSuggestionsAdapterItemsObservable()
                 .compose(this.<List<BaseAdapterItem>>bindToLifecycle())
-                .subscribe(adapter);*/
+                .subscribe(adapter);
+
+        presenter.getSearchPresenter()
+                .getSuggestionClickedObservable()
+                .compose(this.<Intent>bindToLifecycle())
+                .subscribe(new Action1<Intent>() {
+                    @Override
+                    public void call(Intent intent) {
+                        startActivity(intent);
+                    }
+                });
     }
 
     @Override
@@ -100,7 +111,7 @@ public class SearchShoutFragment extends BaseFragment {
                                    @Nonnull FragmentModule fragmentModule,
                                    @Nullable Bundle savedInstanceState) {
         final Bundle bundle = checkNotNull(getArguments());
-        final SearchPresenter.SearchType searchType = (SearchPresenter.SearchType) bundle.getSerializable(KEY_SEARCH_TYPE);
+        final SearchPresenter.SearchType searchType = checkNotNull((SearchPresenter.SearchType) bundle.getSerializable(KEY_SEARCH_TYPE));
 
         DaggerSearchShoutFragmentComponent.builder()
                 .mainSearchActivityComponent((MainSearchActivityComponent) baseActivityComponent)
