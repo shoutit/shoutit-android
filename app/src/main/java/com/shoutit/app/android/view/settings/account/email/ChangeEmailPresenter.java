@@ -50,6 +50,7 @@ public class ChangeEmailPresenter {
 
         final PublishSubject<Boolean> progressSubject = PublishSubject.create();
 
+
         final Observable<Boolean> isEmailCorrectObservable = emailSubject.startWith((String) null)
                 .map(new Func1<String, Boolean>() {
                     @Override

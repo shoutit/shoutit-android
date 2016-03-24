@@ -72,9 +72,7 @@ public class ShoutAdapterItem implements BaseAdapterItem {
         if (price == null) {
             return null;
         } else {
-            final String priceString = PriceUtils.formatPrice(shout.getPrice());
-            return context.getString(
-                    R.string.price_with_currency, priceString, shout.getCurrency());
+            return PriceUtils.formatPriceWithCurrency(shout.getPrice(), context.getResources(), shout.getCurrency());
         }
     }
 

@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.profile.tagprofile;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 
 import com.appunite.rx.ObservableExtensions;
@@ -20,6 +21,7 @@ import com.shoutit.app.android.api.model.RelatedTagsResponse;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.TagDetail;
+import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ShoutsDao;
@@ -27,6 +29,8 @@ import com.shoutit.app.android.dao.TagsDao;
 import com.shoutit.app.android.model.TagShoutsPointer;
 import com.shoutit.app.android.view.profile.ProfileAdapterItems;
 import com.shoutit.app.android.view.profile.ProfilePresenter;
+import com.shoutit.app.android.view.search.SearchPresenter;
+import com.shoutit.app.android.view.search.subsearch.SubSearchActivity;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
 import java.util.ArrayList;
@@ -58,6 +62,7 @@ public class TagProfilePresenter implements ProfilePresenter {
     private final PublishSubject<String> profileToOpenSubject = PublishSubject.create();
     private final PublishSubject<String> showAllShoutsSubject = PublishSubject.create();
     private final PublishSubject<Object> shareInitSubject = PublishSubject.create();
+    private final PublishSubject<Object> searchMenuItemClickSubject = PublishSubject.create();
 
     private final Observable<String> shareObservable;
     private final Observable<String> avatarObservable;
@@ -67,6 +72,7 @@ public class TagProfilePresenter implements ProfilePresenter {
     private final Observable<List<BaseAdapterItem>> allAdapterItemsObservable;
     private final Observable<Boolean> progressObservable;
     private final Observable<Throwable> errorObservable;
+    private final Observable<Intent> searchMenuItemClickObservable;
 
     private final boolean isLoggedInAsNormalUser;
     private final TagsDao tagsDao;
@@ -312,12 +318,22 @@ public class TagProfilePresenter implements ProfilePresenter {
                 .startWith(true)
                 .observeOn(uiScheduler);
 
-        /** Share **/
+        /** Menu actions **/
         shareObservable = shareInitSubject
                 .withLatestFrom(successTagRequestObservable, new Func2<Object, TagDetail, String>() {
                     @Override
                     public String call(Object o, TagDetail tagDetail) {
                         return tagDetail.getWebUrl();
+                    }
+                });
+
+        searchMenuItemClickObservable = searchMenuItemClickSubject
+                .withLatestFrom(successTagRequestObservable, new Func2<Object, TagDetail, Intent>() {
+                    @Override
+                    public Intent call(Object o, TagDetail tagDetail) {
+                        return SubSearchActivity.newIntent(context,
+                                SearchPresenter.SearchType.TAG, tagDetail.getUsername(),
+                                tagDetail.getName());
                     }
                 });
 
@@ -353,6 +369,15 @@ public class TagProfilePresenter implements ProfilePresenter {
         }
 
         return new RelatedTagsResponse(tags);
+    }
+
+    @Nonnull
+    public Observable<Intent> getSearchMenuItemClickObservable() {
+        return searchMenuItemClickObservable;
+    }
+
+    public void onSearchMenuItemClicked() {
+        searchMenuItemClickSubject.onNext(null);
     }
 
     @Nonnull

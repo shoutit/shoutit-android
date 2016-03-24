@@ -3,12 +3,15 @@ package com.shoutit.app.android.view.profile;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.appunite.rx.android.widget.RxActivityMore;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.view.editprofile.EditProfileActivity;
 
@@ -21,6 +24,8 @@ import static com.appunite.rx.internal.Preconditions.checkNotNull;
 
 public class UserOrPageProfileActivity extends ProfileActivity {
 
+    private UserOrPageProfilePresenter presenter;
+
     public static Intent newIntent(@Nonnull Context context, @Nonnull String userName) {
         return new Intent(context, UserOrPageProfileActivity.class)
                 .putExtra(KEY_PROFILE_ID, userName);
@@ -30,7 +35,7 @@ public class UserOrPageProfileActivity extends ProfileActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        UserOrPageProfilePresenter presenter = (UserOrPageProfilePresenter) ((ProfileActivityComponent) getActivityComponent()).getPresenter();
+        presenter = (UserOrPageProfilePresenter) ((ProfileActivityComponent) getActivityComponent()).getPresenter();
 
         presenter.getWebUrlClickedObservable()
                 .compose(this.<String>bindToLifecycle())
@@ -82,6 +87,32 @@ public class UserOrPageProfileActivity extends ProfileActivity {
                         Toast.makeText(UserOrPageProfileActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
                     }
                 });
+
+        presenter.getSearchMenuItemClickObservable()
+                .compose(this.<Intent>bindToLifecycle())
+                .subscribe(new Action1<Intent>() {
+                    @Override
+                    public void call(Intent intent) {
+                        startActivity(intent);
+                    }
+                });
+
+        presenter.getUserProfilePresenter().getActionOnlyForLoggedInUserObservable()
+                .compose(bindToLifecycle())
+                .subscribe(ColoredSnackBar.errorSnackBarAction(
+                        ColoredSnackBar.contentView(UserOrPageProfileActivity.this),
+                        R.string.error_action_only_for_logged_in_user));
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.profile_menu_search:
+                presenter.onSearchMenuItemClicked();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override

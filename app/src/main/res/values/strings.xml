@@ -3,6 +3,7 @@
 
     <!-- Global strings -->
     <string name="price_with_currency">%1$s %2$s</string>
+    <string name="price_free">FREE</string>
     <string name="shout_type_offer">Offer</string>
     <string name="shout_type_request">Request</string>
     <string name="terms_of_service">Terms of Service</string>
@@ -295,20 +296,35 @@
     <string name="post_signup_suggested_users">Suggested users</string>
     <string name="post_signup_suggested_pages">Suggested pages</string>
     <string name="post_signup_done">Done</string>
-    <string name="camera_publish_currency">Currency</string>
 
     <!-- Search -->
     <string name="search_base_title">Search</string>
-    <string name="search_base_hint">Search</string>
+    <string name="search_base_hint">Search Shoutit</string>
     <string name="search_category_header">Categories</string>
+    <string name="search_shouts_tab">SHOUTS</string>
+    <string name="search_users_tab">USERS</string>
+    <string name="search_recent_searches">Recent searches</string>
+    <string name="search_clear_all">Clear all</string>
+    <string name="search_users_placeholder">Search Users</string>
+    <string name="search_empty_query">Search query cannot be empty</string>
 
     <!-- Tag Profile -->
     <string name="tag_profile_related_interests">Related interests</string>
     <string name="tag_profile_shouts">%1$s shouts</string>
+    <string name="search_hint">Search in %1$s shouts</string>
 
     <!-- Create Shout Dialog -->
     <string name="create_shout_dialog_header">What are you posting?</string>
     <string name="create_shout_dialog_offer">Offer</string>
     <string name="create_shout_dialog_request">Request</string>
+
+    <!-- Search Profiles Results -->
+    <string name="search_profiles_results">Results</string>
+    <string name="search_shout_results_header_title">All Results for \'%1$s\'</string>
+    <string name="search_shouts_results_header_count">%1$d Results</string>
+    <string name="search_results_no_results">No results found</string>
+
+    <!-- Camera -->
+    <string name="camera_publish_currency">Currency</string>
 
 </resources>

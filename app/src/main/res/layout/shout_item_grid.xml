@@ -26,7 +26,7 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="42dp"
             android:paddingBottom="5dp"
             android:paddingEnd="9dp"
             android:paddingLeft="8dp"
@@ -38,7 +38,7 @@
                 android:id="@+id/shout_grid_title_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="2dp"
+                android:layout_marginBottom="1dp"
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:textColor="#8a000000"
@@ -53,6 +53,7 @@
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/shout_grid_title_tv"
                 android:layout_marginEnd="1dp"
+                android:layout_centerVertical="true"
                 android:layout_marginRight="1dp"
                 android:layout_toLeftOf="@+id/shout_grid_price_tv"
                 android:layout_toStartOf="@+id/shout_grid_price_tv"
@@ -66,6 +67,7 @@
                 android:id="@+id/shout_grid_price_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_below="@+id/shout_grid_title_tv"

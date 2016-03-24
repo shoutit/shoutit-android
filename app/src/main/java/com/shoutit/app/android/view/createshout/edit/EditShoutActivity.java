@@ -14,6 +14,8 @@ import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.util.Pair;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -99,6 +101,23 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
         super.onCreate(savedInstanceState);
         setContentView(R.layout.edit_shout_activity);
         ButterKnife.bind(this);
+
+        mEditBudget.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                mEditShoutPresenter.onBudgetChanged(s.toString());
+            }
+        });
 
         mCurrencyAdapter = new SimpleSpinnerAdapter(R.string.request_activity_currency, this);
         mEditCurrencySpinner.setAdapter(mCurrencyAdapter);

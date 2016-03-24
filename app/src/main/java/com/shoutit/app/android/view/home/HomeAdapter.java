@@ -14,8 +14,8 @@ import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.appunite.rx.dagger.UiScheduler;
 import com.jakewharton.rxbinding.view.RxView;
-import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.adapters.ChangeableLayoutManagerAdapter;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
@@ -34,12 +34,11 @@ import rx.Subscription;
 import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
 
-public class HomeAdapter extends BaseAdapter {
+public class HomeAdapter extends ChangeableLayoutManagerAdapter {
 
     private static final int VIEW_TYPE_DISCOVER_HEADER = 1;
     private static final int VIEW_TYPE_DISCOVER_ITEMS_CONTAINER = 2;
     private static final int VIEW_TYPE_SHOUT_HEADER = 3;
-    public static final int VIEW_TYPE_SHOUT_ITEM = 4;
     public static final int VIEW_TYPE_EMPTY_SHOUTS_ITEM = 5;
 
     @Nonnull
@@ -48,7 +47,6 @@ public class HomeAdapter extends BaseAdapter {
     private final Picasso picasso;
     @Nonnull
     private final Scheduler uiScheduler;
-    private boolean isLinearLayoutManager = true;
 
     @Inject
     public HomeAdapter(@ForActivity @Nonnull Context context,
@@ -59,11 +57,6 @@ public class HomeAdapter extends BaseAdapter {
         this.homeDiscoversAdapter = homeDiscoversAdapter;
         this.picasso = picasso;
         this.uiScheduler = uiScheduler;
-    }
-
-    public void switchLayoutManager(boolean isLinearLayoutManager) {
-        this.isLinearLayoutManager = isLinearLayoutManager;
-        notifyDataSetChanged();
     }
 
     class DiscoverHeaderViewHolder extends ViewHolderManager.BaseViewHolder<HomePresenter.DiscoverHeaderAdapterItem> {
@@ -206,7 +199,7 @@ public class HomeAdapter extends BaseAdapter {
                 return new DiscoverContainerViewHolder(layoutInflater.inflate(R.layout.home_discover_container_item, parent, false));
             case VIEW_TYPE_SHOUT_HEADER:
                 return new ShoutHeaderViewHolder(layoutInflater.inflate(R.layout.home_feed_header_item, parent, false));
-            case VIEW_TYPE_SHOUT_ITEM:
+            case VIEW_TYPE_SHOUT:
                 return isLinearLayoutManager ?
                         new ShoutLinerViewHolder(layoutInflater.inflate(R.layout.home_feed_item_linear, parent, false), context, picasso) :
                         new ShoutGridViewHolder(layoutInflater.inflate(R.layout.shout_item_grid, parent, false), picasso);
@@ -233,7 +226,7 @@ public class HomeAdapter extends BaseAdapter {
         } else if (item instanceof HomePresenter.ShoutHeaderAdapterItem) {
             return VIEW_TYPE_SHOUT_HEADER;
         } else if (item instanceof ShoutAdapterItem) {
-            return VIEW_TYPE_SHOUT_ITEM;
+            return VIEW_TYPE_SHOUT;
         } else if (item instanceof HomePresenter.ShoutsEmptyAdapterItem) {
             return VIEW_TYPE_EMPTY_SHOUTS_ITEM;
         } else {

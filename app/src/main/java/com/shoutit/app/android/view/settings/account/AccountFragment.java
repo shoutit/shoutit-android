@@ -13,6 +13,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
+import com.shoutit.app.android.utils.LogoutHelper;
 import com.shoutit.app.android.view.main.MainActivity;
 
 import javax.annotation.Nonnull;
@@ -25,6 +26,8 @@ public class AccountFragment extends BaseFragment {
 
     @Inject
     UserPreferences userPreferences;
+    @Inject
+    LogoutHelper logoutHelper;
 
     public static Fragment newInstance() {
         return new AccountFragment();
@@ -54,7 +57,7 @@ public class AccountFragment extends BaseFragment {
 
     @OnClick(R.id.account_logout_tv)
     public void onLogoutClick() {
-        userPreferences.logout();
+        logoutHelper.logout();
         getActivity().finish();
         startActivity(MainActivity.newIntent(getActivity())
                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));

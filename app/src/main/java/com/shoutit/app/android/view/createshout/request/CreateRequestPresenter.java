@@ -109,7 +109,6 @@ public class CreateRequestPresenter {
                                                        }
                                                    }));
 
-                                   mListener.setCurrenciesEnabled(true);
                                    mListener.setCurrencies(list);
                                    mListener.hideProgress();
                                    mListener.removeRetryCurrenciesListener();
@@ -117,7 +116,6 @@ public class CreateRequestPresenter {
                            }, new Action1<Throwable>() {
                                @Override
                                public void call(Throwable throwable) {
-                                   mListener.setCurrenciesEnabled(true);
                                    mListener.hideProgress();
                                    mListener.showCurrenciesError();
                                    mListener.setRetryCurrenciesListener();
@@ -178,6 +176,10 @@ public class CreateRequestPresenter {
     public void updateLocation(@NonNull UserLocation userLocation) {
         locationSubscription.unsubscribe();
         setNewUserLocation(userLocation);
+    }
+
+    public void onBudgetChanged(@NonNull String budget) {
+        mListener.setCurrenciesEnabled(!Strings.isNullOrEmpty(budget));
     }
 
     public void unregister() {

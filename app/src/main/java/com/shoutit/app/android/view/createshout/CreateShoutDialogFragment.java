@@ -1,5 +1,6 @@
 package com.shoutit.app.android.view.createshout;
 
+import android.Manifest;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -13,11 +14,14 @@ import com.shoutit.app.android.App;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityModule;
+import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.view.createshout.request.CreateRequestActivity;
 import com.shoutit.app.android.view.createshout.request.CreateShoutDialogComponent;
 import com.shoutit.app.android.view.createshout.request.DaggerCreateShoutDialogComponent;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
-import com.shoutit.app.android.view.media.NativeCameraActivity;
+import com.shoutit.app.android.view.main.MainActivity;
+import com.shoutit.app.android.view.media.RecordVideoActivity;
 
 import javax.inject.Inject;
 
@@ -62,7 +66,13 @@ public class CreateShoutDialogFragment extends DialogFragment {
         if (mUserPreferences.isGuest()) {
             startActivity(LoginIntroActivity.newIntent(getActivity()));
         } else {
-            startActivity(NativeCameraActivity.newIntent(getActivity()));
+            if (PermissionHelper.checkPermissions(getActivity(),
+                    MainActivity.REQUST_CODE_CAMERA_PERMISSION,
+                    ColoredSnackBar.contentView(getActivity()),
+                    R.string.permission_camera_explanation,
+                    new String[] {Manifest.permission.CAMERA})) {
+                startActivity(RecordVideoActivity.newIntent(getActivity()));
+            }
         }
     }
 

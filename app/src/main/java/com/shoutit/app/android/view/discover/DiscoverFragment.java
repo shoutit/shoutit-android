@@ -1,11 +1,13 @@
 package com.shoutit.app.android.view.discover;
 
+import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -69,6 +71,7 @@ public class DiscoverFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        setHasOptionsMenu(true);
 
         setUpAdapter();
 
@@ -110,6 +113,43 @@ public class DiscoverFragment extends BaseFragment {
                         startActivity(ShoutActivity.newIntent(getActivity(), shoutId));
                     }
                 });
+
+        presenter.getSearchMenuItemClickObservable()
+                .compose(this.<Intent>bindToLifecycle())
+                .subscribe(new Action1<Intent>() {
+                    @Override
+                    public void call(Intent intent) {
+                        startActivity(intent);
+                    }
+                });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.base_menu_search:
+                if (isCurrentlyDisplayedFragment()) {
+                    presenter.onSearchMenuItemClicked();
+                    return true;
+                } else {
+                    return false;
+                }
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private boolean isCurrentlyDisplayedFragment() {
+        final List<Fragment> fragments = getFragmentManager().getFragments();
+        for (int i = fragments.size() - 1; i >= 0; i--) {
+            if (fragments.get(i) == null) {
+                continue;
+            } else {
+                return fragments.get(i) == this;
+            }
+        }
+
+        return false;
     }
 
     private void setUpAdapter() {

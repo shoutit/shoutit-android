@@ -72,7 +72,6 @@
 
                     <com.shoutit.app.android.widget.StateSpinner
                         android:id="@+id/create_request_spinner"
-                        style="?android:attr/editTextStyle"
                         android:layout_width="0dp"
                         android:layout_height="43dp"
                         android:layout_weight="0.35"/>
@@ -157,10 +156,11 @@
                     android:background="@android:color/darker_gray"/>
 
                 <Button
+                    style="@style/BaseButtonStyle"
                     android:id="@+id/create_request_confirm"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
                     android:layout_margin="6dp"
+                    android:background="@drawable/selector_green_button_with_stroke"
                     android:text="@string/request_activity_btn"
                     android:textColor="@android:color/white"/>
             </LinearLayout>

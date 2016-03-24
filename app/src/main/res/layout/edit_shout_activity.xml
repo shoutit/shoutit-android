@@ -73,7 +73,6 @@
 
                     <com.shoutit.app.android.widget.StateSpinner
                         android:id="@+id/edit_currency_spinner"
-                        style="?android:attr/editTextStyle"
                         android:layout_width="0dp"
                         android:layout_height="43dp"
                         android:layout_weight="0.35"/>
@@ -96,7 +95,6 @@
 
                     <com.shoutit.app.android.widget.StateSpinner
                         android:id="@+id/edit_request_category_spinner"
-                        style="?android:attr/editTextStyle"
                         android:layout_width="match_parent"
                         android:layout_height="54dp"/>
 
@@ -158,9 +156,9 @@
                     android:background="@android:color/darker_gray"/>
 
                 <Button
+                    style="@style/BaseButtonDefaultBackgroundStyle"
                     android:id="@+id/edit_confirm"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
                     android:layout_margin="6dp"
                     android:text="@string/edit_done_btn"
                     android:textColor="@android:color/white"/>

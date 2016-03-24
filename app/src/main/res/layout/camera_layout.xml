@@ -10,7 +10,8 @@
         android:id="@+id/camera_preview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/camera_capture_controlls"/>
+        android:layout_above="@+id/camera_capture_controlls"
+        tools:background="@color/black_87"/>
 
     <ImageView
         android:id="@+id/camera_preview_image"
@@ -28,7 +29,8 @@
         android:background="@android:color/black"
         android:gravity="center"
         android:orientation="horizontal"
-        android:visibility="gone">
+        android:visibility="gone"
+        tools:visiility="visible">
 
         <Button
             android:id="@+id/camera_preview_controlls_retake"
@@ -46,8 +48,8 @@
             android:id="@+id/camera_preview_controlls_publish"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="40dp"
             android:layout_marginLeft="40dp"
+            android:layout_marginStart="40dp"
             android:background="?selectableItemBackground"
             android:fontFamily="sans-serif"
             android:text="Publish"
@@ -62,7 +64,7 @@
         android:layout_height="145dp"
         android:layout_alignParentBottom="true"
         android:background="@android:color/black"
-        android:visibility="gone">
+        android:visibility="visible">
 
         <TextView
             android:id="@+id/camera_text_header"
@@ -97,7 +99,7 @@
                 android:layout_gravity="bottom"
                 android:layout_margin="10dp"
                 android:background="?selectableItemBackground"
-                android:src="@drawable/camera"/>
+                android:src="@drawable/camera_capture"/>
 
             <ImageButton
                 android:id="@+id/button_gallery"
@@ -107,8 +109,8 @@
                 android:layout_gravity="bottom"
                 android:layout_marginEnd="40dp"
                 android:layout_marginRight="40dp"
-                android:layout_toStartOf="@+id/button_capture"
                 android:layout_toLeftOf="@+id/button_capture"
+                android:layout_toStartOf="@+id/button_capture"
                 android:background="?selectableItemBackground"
                 android:src="@drawable/gallery"/>
 
@@ -117,12 +119,12 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_gravity="bottom"
-                android:layout_marginStart="40dp"
                 android:layout_marginLeft="40dp"
+                android:layout_marginStart="40dp"
                 android:layout_toEndOf="@+id/button_capture"
                 android:layout_toRightOf="@+id/button_capture"
                 android:background="?selectableItemBackground"
-                android:src="@drawable/video"/>
+                android:src="@drawable/video_mode"/>
 
         </RelativeLayout>
 
@@ -165,8 +167,7 @@
         android:gravity="center_horizontal"
         android:orientation="vertical"
         android:paddingTop="70dp"
-        android:visibility="gone"
-        tools:visibility="visible">
+        android:visibility="gone">
 
         <ImageView
             android:id="@+id/camera_cool_icon"
@@ -190,9 +191,10 @@
             android:textAllCaps="true"
             android:textColor="@android:color/white"/>
 
-        <LinearLayout android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:orientation="horizontal">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
             <EditText
                 android:id="@+id/camera_published_price"
@@ -211,14 +213,11 @@
         </LinearLayout>
 
         <Button
+            style="@style/BaseButtonDefaultBackgroundStyle"
             android:id="@+id/camera_published_done"
             android:layout_width="240dp"
-            android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:fontFamily="sans-serif"
-            android:padding="22dp"
             android:text="Done"
-            android:textAllCaps="false"
             android:textColor="@android:color/white"/>
 
 
@@ -228,8 +227,8 @@
         android:id="@+id/camera_close"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="@dimen/status_bar_margin"
         android:background="?selectableItemBackground"
         android:src="@drawable/close"/>

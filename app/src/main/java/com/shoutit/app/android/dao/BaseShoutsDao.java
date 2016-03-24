@@ -14,6 +14,7 @@ import javax.annotation.Nonnull;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
@@ -54,12 +55,16 @@ public abstract class BaseShoutsDao {
                 });
 
         shoutsObservable = loadMoreShoutsSubject.startWith((Object) null)
-                .compose(MoreOperators.refresh(refreshShoutsSubject))
                 .lift(loadMoreOperator)
+                .compose(MoreOperators.<ShoutsResponse>refresh(refreshShoutsSubject))
                 .compose(ResponseOrError.<ShoutsResponse>toResponseOrErrorObservable())
                 .compose(MoreOperators.<ResponseOrError<ShoutsResponse>>cacheWithTimeout(networkScheduler));
     }
 
+    @Nonnull
+    public PublishSubject<Object> getLoadMoreObserver() {
+        return loadMoreShoutsSubject;
+    }
 
     @Nonnull
     public Observable<ResponseOrError<ShoutsResponse>> getShoutsObservable() {

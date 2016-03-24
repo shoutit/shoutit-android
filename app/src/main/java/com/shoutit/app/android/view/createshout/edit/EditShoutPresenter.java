@@ -159,7 +159,7 @@ public class EditShoutPresenter {
 
                         if (responseData.mShoutResponse != null) {
                             mListener.setTitle(responseData.mShoutResponse.getTitle());
-                            mListener.setPrice(PriceUtils.formatPrice(responseData.mShoutResponse.getPrice()));
+                            mListener.setPrice(PriceUtils.formatPrice(responseData.mShoutResponse.getPrice(), mContext.getResources()));
                             mListener.setDescription(responseData.mShoutResponse.getDescription());
                             mUserLocation = responseData.mShoutResponse.getLocation();
                             mListener.setLocation(
@@ -189,7 +189,6 @@ public class EditShoutPresenter {
     private void currencySuccess(@NonNull List<Currency> responseData) {
         final List<Pair<String, String>> list = PriceUtils.transformCurrencyToPair(responseData);
 
-        mListener.setCurrenciesEnabled(true);
         mListener.setCurrencies(list);
     }
 
@@ -284,6 +283,10 @@ public class EditShoutPresenter {
             mListener.setOptions(category.getFilters());
             mListener.setCategoryImage(category.getIcon());
         }
+    }
+
+    public void onBudgetChanged(String budget) {
+        mListener.setCurrenciesEnabled(!Strings.isNullOrEmpty(budget));
     }
 
     public interface Listener {
