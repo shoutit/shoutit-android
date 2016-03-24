@@ -71,7 +71,7 @@
 
                     </FrameLayout>
 
-                    <Spinner
+                    <com.shoutit.app.android.widget.StateSpinner
                         android:id="@+id/edit_currency_spinner"
                         android:layout_width="0dp"
                         android:layout_height="43dp"
@@ -93,7 +93,7 @@
                         android:layout_marginLeft="6dp"
                         android:layout_marginRight="6dp"/>
 
-                    <Spinner
+                    <com.shoutit.app.android.widget.StateSpinner
                         android:id="@+id/edit_request_category_spinner"
                         android:layout_width="match_parent"
                         android:layout_height="54dp"/>
