@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.shout;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -80,6 +81,8 @@ public class RelatedShoutsAdapter extends BaseAdapter {
             this.item = item;
             final Shout shout = item.getShout();
             titleTextView.setText(shout.getTitle());
+            titleTextView.setVisibility(TextUtils.isEmpty(shout.getTitle()) ?
+                    View.GONE : View.VISIBLE);
             nameTextView.setText(shout.getProfile().getName());
             final String price = PriceUtils.formatPriceWithCurrency(shout.getPrice(),
                     context.getResources(), shout.getCurrency());
