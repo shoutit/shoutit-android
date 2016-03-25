@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class ApiErrors {
     @Nonnull
@@ -56,6 +57,16 @@ public class ApiErrors {
         @Nonnull
         public String getDeveloperMessage() {
             return developerMessage;
+        }
+
+        @Nullable
+        public String getContcatanatedMessages() {
+            final StringBuilder messages = new StringBuilder();
+            for (ApiErrors.SubError subError : errors) {
+                messages.append(subError.getMessage()).append(" | ");
+            }
+
+            return messages.toString();
         }
     }
 

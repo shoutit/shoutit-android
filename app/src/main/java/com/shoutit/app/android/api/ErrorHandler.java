@@ -1,13 +1,13 @@
 package com.shoutit.app.android.api;
 
 import android.content.Context;
-import android.util.Log;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
+import com.shoutit.app.android.BuildConfig;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.errors.ApiErrors;
+import com.shoutit.app.android.utils.ApiErrorThrowable;
 import com.shoutit.app.android.utils.LogHelper;
 
 import java.io.IOException;
@@ -44,11 +44,11 @@ public class ErrorHandler {
         try {
             apiErrors = gson.fromJson(errorBody.charStream(), ApiErrors.class);
         } catch (JsonSyntaxException | JsonIOException e) {
-            LogHelper.logThrowable(TAG, "Cannot parse error", e);
+            LogHelper.logThrowableAndCrashlytics(TAG, "Cannot parse error", e);
             return defaultMessage(context);
         }
 
-        Log.e(TAG, "API error: " + apiErrors.getError().getDeveloperMessage());
+        LogHelper.logThrowableAndCrashlytics(TAG, "Api Error", new ApiErrorThrowable(apiErrors.getError()));
         if (shouldGetErrorFromErrorsList(apiErrors.getError().getCode())) {
             return apiErrors.getError().getErrors().get(0).getMessage();
         } else {
