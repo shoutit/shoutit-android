@@ -23,6 +23,7 @@ import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutResponse;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.SignResponse;
+import com.shoutit.app.android.api.model.Suggestion;
 import com.shoutit.app.android.api.model.SuggestionsResponse;
 import com.shoutit.app.android.api.model.TagDetail;
 import com.shoutit.app.android.api.model.TagsRequest;
@@ -123,6 +124,11 @@ public interface ApiService {
     Observable<ShoutsResponse> tagShouts(@Query("tags") String tagName,
                                          @Query("page") Integer page,
                                          @Query("page_size") Integer pageSize);
+
+    @GET("shouts/autocomplete")
+    Observable<List<Suggestion>> searchSuggestions(@Query("search") String searchQuery,
+                                                   @Query("category") String categoryName,
+                                                   @Query("country") String country);
 
     /**
      * OAuth

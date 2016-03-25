@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.dagger.ActivityScope;
 import com.shoutit.app.android.dagger.ForActivity;
@@ -29,7 +30,7 @@ public class SubSearchActivityModule {
     private final String contextualItemName;
 
     public SubSearchActivityModule(@Nonnull SearchPresenter.SearchType searchType,
-                                   @Nullable String contextualItemId,
+                                   @Nonnull String contextualItemId,
                                    @Nonnull String contextualItemName) {
         this.searchType = searchType;
         this.contextualItemId = contextualItemId;
@@ -39,9 +40,9 @@ public class SubSearchActivityModule {
     @Provides
     SearchPresenter provideSearchPresenter(ApiService apiService, @NetworkScheduler Scheduler networkScheduler,
                                            @UiScheduler Scheduler uiScheduler, SearchQueryPresenter searchQueryPresenter,
-                                           @ForActivity Context context) {
+                                           @ForActivity Context context, UserPreferences userPreferences) {
         return new SearchPresenter(apiService, searchQueryPresenter, networkScheduler,
-                uiScheduler, searchType, contextualItemId, contextualItemName, context);
+                uiScheduler, searchType, contextualItemId, contextualItemName, userPreferences, context);
     }
 
     @Provides
