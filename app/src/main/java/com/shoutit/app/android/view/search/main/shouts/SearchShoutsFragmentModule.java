@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dagger.FragmentModule;
@@ -35,8 +36,8 @@ public class SearchShoutsFragmentModule extends FragmentModule {
     @Provides
     SearchPresenter provideSearchPresenter(ApiService apiService, @NetworkScheduler Scheduler networkScheduler,
                                            @UiScheduler Scheduler uiScheduler, SearchQueryPresenter searchQueryPresenter,
-                                           @ForActivity Context context) {
-        return new SearchPresenter(apiService, searchQueryPresenter, networkScheduler, uiScheduler, searchType, null, null, context);
+                                           @ForActivity Context context, UserPreferences userPreferences) {
+        return new SearchPresenter(apiService, searchQueryPresenter, networkScheduler, uiScheduler, searchType, null, null, userPreferences, context);
     }
 
 }
