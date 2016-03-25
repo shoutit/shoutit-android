@@ -139,7 +139,7 @@ public class RegisterFragment extends BaseFragment {
 
         registerPresenter.failObservable()
                 .compose(this.<Throwable>bindToLifecycle())
-                .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(getActivity()), R.string.register_error));
+                .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(getActivity())));
 
         registerPresenter.successObservable()
                 .compose(this.<SignResponse>bindToLifecycle())

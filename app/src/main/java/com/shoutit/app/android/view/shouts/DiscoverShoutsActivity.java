@@ -93,8 +93,8 @@ public class DiscoverShoutsActivity extends BaseActivity {
                 .subscribe(mShoutsAdapter);
 
         mShoutsPresenter.getFailObservable()
-                .compose(bindToLifecycle())
-                .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(this), R.string.discover_shouts_error));
+                .compose(this.<Throwable>bindToLifecycle())
+                .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(this)));
 
         mShoutsPresenter.getProgressVisible()
                 .compose(this.<Boolean>bindToLifecycle())
