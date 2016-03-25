@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.search.results.shouts;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -60,7 +61,11 @@ public class SearchShoutsResultsAdapter extends ChangeableLayoutManagerAdapter {
 
         @Override
         public void bind(@Nonnull SearchShoutsResultsPresenter.ShoutHeaderAdapterItem item) {
-            headerTitleTv.setText(context.getString(R.string.search_shout_results_header_title, item.getSearchQuery()));
+            if (TextUtils.isEmpty(item.getSearchQuery())) {
+                headerTitleTv.setText(context.getString(R.string.search_shout_results_header_title_location));
+            } else {
+                headerTitleTv.setText(context.getString(R.string.search_shout_results_header_title, item.getSearchQuery()));
+            }
             headerCountTv.setText(context.getString(R.string.search_shouts_results_header_count, item.getTotalItemsCount()));
 
             layoutSwitchIv.setImageDrawable(context.getResources().getDrawable(

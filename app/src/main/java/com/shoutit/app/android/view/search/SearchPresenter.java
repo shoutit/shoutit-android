@@ -43,7 +43,8 @@ public class SearchPresenter {
         SHOUTS,
         PROFILE,
         TAG,
-        DISCOVER
+        DISCOVER,
+        BROWSE
     }
 
     private final PublishSubject<String> suggestionClickedSubject = PublishSubject.create();

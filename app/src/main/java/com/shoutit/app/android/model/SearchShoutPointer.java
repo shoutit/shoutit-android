@@ -10,7 +10,7 @@ import javax.annotation.Nullable;
 
 public class SearchShoutPointer {
 
-    @Nonnull
+    @Nullable // Browse search does not requires query
     private final String query;
     @Nonnull
     private final SearchPresenter.SearchType searchType;
@@ -19,7 +19,7 @@ public class SearchShoutPointer {
     @Nullable
     private final String contextItemId;
 
-    public SearchShoutPointer(@Nonnull String query, @Nonnull SearchPresenter.SearchType searchType,
+    public SearchShoutPointer(@Nullable String query, @Nonnull SearchPresenter.SearchType searchType,
                               @Nonnull UserLocation location, @Nullable String contextItemId) {
         this.query = query;
         this.searchType = searchType;
@@ -27,7 +27,7 @@ public class SearchShoutPointer {
         this.contextItemId = contextItemId;
     }
 
-    @Nonnull
+    @Nullable
     public String getQuery() {
         return query;
     }
