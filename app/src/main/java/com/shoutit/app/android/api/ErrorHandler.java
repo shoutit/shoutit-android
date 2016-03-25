@@ -1,50 +1,67 @@
 package com.shoutit.app.android.api;
 
-import android.support.annotation.StringRes;
+import android.content.Context;
+import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.errors.ApiErrors;
+import com.shoutit.app.android.utils.LogHelper;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 
+import javax.annotation.Nonnull;
+
+import okhttp3.ResponseBody;
 import retrofit2.HttpException;
 import retrofit2.Response;
 
 public class ErrorHandler {
 
-    private static final String REQUEST_RESET_PASSWORD = "reset_password";
-    private static final String REQUEST_RESET_LOGIN = "access_token";
+    private static final String TAG = ErrorHandler.class.getSimpleName();
 
-    @StringRes
-    public static int getErrorMessageId(Throwable throwable) {
+    @Nonnull
+    public static String getErrorMessage(Throwable throwable, Context context) {
         if (throwable != null && throwable instanceof IOException) {
-            return R.string.error_connection;
+            return context.getString(R.string.error_connection);
         }
 
         if (throwable == null || !(throwable instanceof HttpException)) {
-            return  defaultMessage();
+            return defaultMessage(context);
         }
 
-        final int httpCode = ((HttpException) throwable).response().code();
         final Response<?> response = ((HttpException) throwable).response();
-        String requestUrl = "";
-        if (response != null) {
-            requestUrl = requestUrl + response.raw().request().url().url().toString();
+        final ResponseBody errorBody = response.errorBody();
+        if (errorBody == null) {
+            return defaultMessage(context);
         }
 
-        if (httpCode == HttpURLConnection.HTTP_BAD_REQUEST) {
-            if (requestUrl.contains(REQUEST_RESET_PASSWORD)) {
-                return R.string.error_email_not_found;
-            } else if (requestUrl.contains(REQUEST_RESET_LOGIN)) {
-                return R.string.error_wrong_email_or_password;
-            }
+        final Gson gson = new Gson();
+        final ApiErrors apiErrors;
+        try {
+            apiErrors = gson.fromJson(errorBody.charStream(), ApiErrors.class);
+        } catch (JsonSyntaxException | JsonIOException e) {
+            LogHelper.logThrowable(TAG, "Cannot parse error", e);
+            return defaultMessage(context);
         }
 
-        return defaultMessage();
+        Log.e(TAG, "API error: " + apiErrors.getError().getDeveloperMessage());
+        if (shouldGetErrorFromErrorsList(apiErrors.getError().getCode())) {
+            return apiErrors.getError().getErrors().get(0).getMessage();
+        } else {
+            return apiErrors.getError().getMessage();
+        }
     }
 
-    @StringRes
-    private static int defaultMessage() {
-        return R.string.error_default;
+    private static boolean shouldGetErrorFromErrorsList(int httpCode) {
+        return httpCode == HttpURLConnection.HTTP_BAD_REQUEST;
+    }
+
+    @Nonnull
+    private static String defaultMessage(Context context) {
+        return context.getString(R.string.error_default);
     }
 }
