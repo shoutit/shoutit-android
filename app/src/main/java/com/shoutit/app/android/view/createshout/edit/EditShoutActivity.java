@@ -38,6 +38,7 @@ import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.view.createshout.CurrencyDialog;
 import com.shoutit.app.android.view.createshout.location.LocationActivity;
 import com.shoutit.app.android.widget.SimpleSpinnerAdapter;
 import com.shoutit.app.android.widget.SpinnerAdapter;
@@ -82,6 +83,8 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     FrameLayout mEditProgress;
     @Bind(R.id.edit_shout_description)
     EditText mEditShoutDescription;
+    @Bind(R.id.edit_currency_info)
+    ImageView mEditCurrencyInfo;
 
     @Inject
     EditShoutPresenter mEditShoutPresenter;
@@ -149,6 +152,13 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
         });
 
         mEditShoutPresenter.registerListener(this);
+
+        mEditCurrencyInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CurrencyDialog.showDialog(EditShoutActivity.this);
+            }
+        });
     }
 
     @Override
@@ -270,7 +280,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
 
     @Override
     public void setDescription(@Nullable String description) {
-
+        mEditShoutDescription.setText(description);
     }
 
     @Override
@@ -348,5 +358,10 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
         mPicasso.load(image)
                 .fit()
                 .into(mEditCategoryIcon);
+    }
+
+    @Override
+    public void setActionbarTitle(@NonNull String title) {
+        mEditToolbar.setTitle(title);
     }
 }

@@ -14,6 +14,7 @@ import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
 import com.shoutit.app.android.api.model.EditShoutPriceRequest;
 import com.shoutit.app.android.api.model.EditShoutRequest;
+import com.shoutit.app.android.api.model.EditShoutRequestWithPrice;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.GuestSignupRequest;
 import com.shoutit.app.android.api.model.RelatedTagsResponse;
@@ -221,6 +222,9 @@ public interface ApiService {
 
     @PATCH("shouts/{id}")
     Observable<CreateShoutResponse> editShout(@Path("id") String id, @Body EditShoutRequest request);
+
+    @PATCH("shouts/{id}")
+    Observable<CreateShoutResponse> editShout(@Path("id") String id, @Body EditShoutRequestWithPrice request);
 
     @PATCH("shouts/{id}")
     Observable<CreateShoutResponse> editShoutPrice(@Path("id") String id, @Body EditShoutPriceRequest request);
