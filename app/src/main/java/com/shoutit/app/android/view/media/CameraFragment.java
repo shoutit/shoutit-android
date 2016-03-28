@@ -11,7 +11,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.PorterDuff;
-import android.media.CamcorderProfile;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -63,6 +62,7 @@ public class CameraFragment extends Fragment {
 
     private static final int REQUEST_GALLERY_IMAGE_CODE = 0;
     private static final int REQUEST_GALLERY_VIDEO_CODE = 1;
+    private static final int VIDEO_LENGTH = 60_000;
 
     public interface CameraFragmentListener {
         void onInitializationFailed(Exception cause);
@@ -70,47 +70,24 @@ public class CameraFragment extends Fragment {
         void onMediaResult(Intent intent);
     }
 
-    public static final String EXTRA_MEDIA_NAME_PREFIX = CameraFragment.class.getName() + ".media_name_prefix";
     public static final String EXTRA_IMAGE_URI = CameraFragment.class.getName() + ".image_path";
-    public static final String EXTRA_DISABLE_VIDEO = CameraFragment.class.getName() + ".disable_video";
     public static final String EXTRA_IMAGE_VIDEO_LIST = CameraFragment.class.getName() + ".video_image_path";
-    public static final String EXTRA_VIDEO_QUALITY = CameraFragment.class.getName() + ".video_quality";
-    public static final String EXTRA_USE_FRONT_FACING_CAMERA = CameraFragment.class.getName() + ".use_ffc";
-    public static final String EXTRA_CAMERA_SOURCE_TOGGLE_ENABLED = CameraFragment.class.getName() + ".camera_source_toggle_enabled";
-    public static final String EXTRA_VIDEO_MAX_LENGTH = CameraFragment.class.getName() + ".video_max_len";
-    public static final String EXTRA_VIDEO_ENABLED = CameraFragment.class.getName() + ".video_enabled";
-    public static final String EXTRA_PICTURE_ENABLED = CameraFragment.class.getName() + ".picture_enabled";
-    public static final String EXTRA_GALLERY_ENABLED = CameraFragment.class.getName() + ".gallery_enabled";
     public static final String EXTRA_EXISTING_MEDIA = CameraFragment.class.getName() + ".existing_media";
     public static final String EXTRA_IS_VIDEO = CameraFragment.class.getName() + ".existing_media";
-    public static final String EXTRA_IMAGE_QUALITY = CameraFragment.class.getName() + ".image_quality";
     public static final String IS_IMAGE_LIST = CameraFragment.class.getName() + ".is_list";
-    public static final String EXTRA_PREVIEW_OVERLAY_LAYOUT_RESOURCE = CameraFragment.class.getName() + ".preview_overlay_res";
-    public static final String EXTRA_VIDEO_MIN_LENGTH = CameraFragment.class.getName() + ".video_min_len";
-    public static final String EXTRA_IMAGE_COMPRESSION_TYPE = CameraFragment.class.getName() + ".compression_type";
 
-    public static final int DEFAULT_VIDEO_QUALITY = CamcorderProfile.QUALITY_480P;
-    public static final long VIDEO_NO_MIN_LENGTH = 0;
-    public static final long VIDEO_NO_MAX_LENGTH = -1;
-    public static final String DEFAULT_MEDIA_NAME_PREFIX = "media_";
     public static final int DEFAULT_IMAGE_QUALITY = 100;
 
     public static final int RC_MEDIA_COMPRESS = 1339;
-    public static final int NO_OVERLAY = 0;
 
     private CameraController ctlr;
     private boolean isVideoRecording = false;
     private boolean mirrorPreview = false;
-    private boolean isVideoMode = true;
+    private boolean isVideoMode = false;
     private CountDownTimer countDownTimer;
-    private String videoOutput, imageOutput, mMediaNamePrefix;
+    private String videoOutput, imageOutput;
     private CameraFragmentListener cameraFragmentListener;
-    private Boolean mVideoEnabled, mPictureEnabled, mGalleryEnabled, mDisableVideo, mCameraSourceToggleEnabled;
-    private Boolean mUseFfc, isMFfcEnabled = false;
-    private long mVideoMinLength, mVideoMaxLength;
-    private int mVideoQuality, mImageQuality;
-    private int mPreviewOverlayLayoutResId;
-    private Bitmap.CompressFormat mCompression;
+    private boolean isMFfcEnabled = false;
 
     @Bind(R.id.fragment_camera_preview_stack)
     ViewGroup previewStack;
@@ -140,21 +117,14 @@ public class CameraFragment extends Fragment {
     Button buttonDiscard;
     @Bind(R.id.fragment_camera_timer)
     TextView textViewTime;
+    @Bind(R.id.camera_text)
+    TextView cameraText;
 
-    public static CameraFragment newInstance(Bundle bundle) {
-        CameraFragment cameraFragment = new CameraFragment();
-        Bundle args = new Bundle(bundle);
-
-        if (bundle.containsKey(CameraFragment.EXTRA_DISABLE_VIDEO)) {
-            if (bundle.containsKey(CameraFragment.EXTRA_GALLERY_ENABLED)) {
-                args.putBoolean(CameraFragment.EXTRA_GALLERY_ENABLED, bundle.getBoolean(CameraFragment.EXTRA_GALLERY_ENABLED));
-            }
-            args.putBoolean(CameraFragment.EXTRA_DISABLE_VIDEO, bundle.getBoolean(CameraFragment.EXTRA_DISABLE_VIDEO));
-        }
-        cameraFragment.setArguments(args);
-        return cameraFragment;
+    public static CameraFragment newInstance() {
+        return new CameraFragment();
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -165,35 +135,15 @@ public class CameraFragment extends Fragment {
                             .getName());
         }
 
-        this.cameraFragmentListener = (CameraFragmentListener) getActivity();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        outState.putString(EXTRA_MEDIA_NAME_PREFIX, this.mMediaNamePrefix);
-        outState.putBoolean(EXTRA_DISABLE_VIDEO, this.mDisableVideo);
-        outState.putBoolean(EXTRA_USE_FRONT_FACING_CAMERA, this.mUseFfc);
-        outState.putBoolean(EXTRA_VIDEO_ENABLED, this.mVideoEnabled);
-        outState.putBoolean(EXTRA_PICTURE_ENABLED, this.mPictureEnabled);
-        outState.putBoolean(EXTRA_GALLERY_ENABLED, this.mGalleryEnabled);
-        outState.putLong(EXTRA_VIDEO_MIN_LENGTH, this.mVideoMinLength);
-        outState.putLong(EXTRA_VIDEO_MAX_LENGTH, this.mVideoMaxLength);
-        outState.putInt(EXTRA_VIDEO_QUALITY, this.mVideoQuality);
-        outState.putInt(EXTRA_IMAGE_QUALITY, this.mImageQuality);
-        outState.putInt(EXTRA_PREVIEW_OVERLAY_LAYOUT_RESOURCE, this.mPreviewOverlayLayoutResId);
+        cameraFragmentListener = (CameraFragmentListener) getActivity();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        this.updateMediaDB();
-        Bundle extras = savedInstanceState == null ? getArguments() : savedInstanceState;
-
-        if (!this.init(extras)) {
-            this.cameraFragmentListener.onInitializationFailed(
+        if (hasCameras()) {
+            cameraFragmentListener.onInitializationFailed(
                     new IllegalStateException("Camera not found"));
         }
         setRetainInstance(true);
@@ -204,62 +154,18 @@ public class CameraFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         if (!SHCameraInfo.getInstance().isHasFrontFacingCamera()
-                || !SHCameraInfo.getInstance().isHasBackFacingCamera()
-                || !this.mCameraSourceToggleEnabled) {
-            this.switchCameraButton.setVisibility(View.GONE);
+                || !SHCameraInfo.getInstance().isHasBackFacingCamera()) {
+            switchCameraButton.setVisibility(View.GONE);
         }
 
-        if (!this.mPictureEnabled || !this.mVideoEnabled) {
-            this.picture.setVisibility(View.GONE);
-            this.video.setVisibility(View.VISIBLE);
-            this.video.setVisibility(View.GONE);
-            this.picture.setVisibility(View.GONE);
-        }
-
-        if (!this.mVideoEnabled || this.mVideoMaxLength == VIDEO_NO_MAX_LENGTH) {
-            this.textViewTime.setVisibility(View.GONE);
-        }
-        if (this.textViewTime.getVisibility() == View.VISIBLE) {
-            this.textViewTime.setText(String.valueOf(mVideoMaxLength / 1000));
-        }
-
-        if (!this.mGalleryEnabled) {
-            this.galleryPick.setVisibility(View.GONE);
-        }
-
-        if (this.isVideoMode) {
-            this.actionBtn.setImageResource(R.drawable.video_capture);
-            this.video.setVisibility(View.GONE);
+        textViewTime.setText(String.valueOf(VIDEO_LENGTH / 1000));
+        if (isVideoMode) {
+            enableVideoMode();
         } else {
-            this.actionBtn.setImageResource(R.drawable.camera_capture);
-            this.picture.setVisibility(View.GONE);
-        }
-
-        if (this.mUseFfc && !this.mVideoEnabled) {
-            this.isVideoMode = false;
+            enablePictureMode();
         }
 
         closeButton.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
-    }
-
-    private void updateMediaDB() {
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                Intent mediaScanIntent = new Intent(
-                        Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                Uri contentUri = Uri.parse("file://"
-                        + Environment.getExternalStorageDirectory());
-                mediaScanIntent.setData(contentUri);
-                getActivity().sendBroadcast(mediaScanIntent);
-            } else {
-                getActivity().sendBroadcast(new Intent(
-                        Intent.ACTION_MEDIA_MOUNTED,
-                        Uri.parse("file://"
-                                + Environment.getExternalStorageDirectory())));
-            }
-        } catch (Exception e) {
-            Log.e("tag", "Couldn't update media DB", e);
-        }
     }
 
     @Override
@@ -323,7 +229,7 @@ public class CameraFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_camera, container, false);
+        final View view = inflater.inflate(R.layout.fragment_camera, container, false);
 
         ButterKnife.bind(this, view);
 
@@ -333,66 +239,12 @@ public class CameraFragment extends Fragment {
             prepController();
         }
 
-        if (this.mPreviewOverlayLayoutResId != NO_OVERLAY) {
-            inflater.inflate(this.mPreviewOverlayLayoutResId, this.layoutPreviewOverlayLive, true);
-            this.layoutPreviewOverlayLive.setVisibility(View.VISIBLE);
-        }
-        return (view);
+        return view;
     }
 
-    private boolean init(Bundle extras) {
-        if (SHCameraInfo.getInstance().getNumberOfCameras() == 0) {
-            return false;
-        }
-
-        if (extras.containsKey(EXTRA_MEDIA_NAME_PREFIX)) {
-            this.mMediaNamePrefix = extras.getString(EXTRA_MEDIA_NAME_PREFIX);
-        } else {
-            this.mMediaNamePrefix = DEFAULT_MEDIA_NAME_PREFIX;
-        }
-
-        this.mVideoEnabled = extras.getBoolean(EXTRA_VIDEO_ENABLED, true);
-        this.mPictureEnabled = extras.getBoolean(EXTRA_PICTURE_ENABLED, true);
-        this.mGalleryEnabled = extras.getBoolean(EXTRA_GALLERY_ENABLED, true);
-        this.mDisableVideo = extras.getBoolean(EXTRA_DISABLE_VIDEO, false);
-        this.mCameraSourceToggleEnabled = extras.getBoolean(EXTRA_CAMERA_SOURCE_TOGGLE_ENABLED, true);
-
-        this.mVideoMinLength = extras.getLong(EXTRA_VIDEO_MIN_LENGTH, VIDEO_NO_MIN_LENGTH);
-        this.mVideoMaxLength = extras.getLong(EXTRA_VIDEO_MAX_LENGTH, VIDEO_NO_MAX_LENGTH);
-
-        if (this.mVideoMinLength < 0) {
-            this.mVideoMinLength = VIDEO_NO_MIN_LENGTH;
-        }
-
-        if (this.mVideoMaxLength < -1) {
-            this.mVideoMaxLength = VIDEO_NO_MAX_LENGTH;
-        }
-
-        if (this.mVideoMaxLength != VIDEO_NO_MAX_LENGTH && this.mVideoMinLength > this.mVideoMaxLength) {
-            throw new IllegalArgumentException("Video min length > max length: " + this.mVideoMinLength + " > " + this.mVideoMaxLength);
-        }
-
-        this.mVideoQuality = extras.getInt(EXTRA_VIDEO_QUALITY, DEFAULT_VIDEO_QUALITY);
-
-        this.isVideoMode = this.mVideoEnabled;
-        this.mUseFfc = extras.getBoolean(EXTRA_USE_FRONT_FACING_CAMERA, false);
-
-        if (this.mUseFfc && SHCameraInfo.getInstance().isHasFrontFacingCamera()) {
-            this.isMFfcEnabled = true;
-        }
-
-        if (extras.containsKey(EXTRA_IMAGE_COMPRESSION_TYPE)) {
-            this.mCompression = Bitmap.CompressFormat.valueOf(extras.getString(EXTRA_IMAGE_COMPRESSION_TYPE));
-        } else {
-            this.mCompression = Bitmap.CompressFormat.JPEG;
-        }
-
-        this.mImageQuality = extras.getInt(EXTRA_IMAGE_QUALITY, DEFAULT_IMAGE_QUALITY);
-        this.mPreviewOverlayLayoutResId = extras.getInt(EXTRA_PREVIEW_OVERLAY_LAYOUT_RESOURCE, NO_OVERLAY);
-
-        return true;
+    private boolean hasCameras() {
+        return SHCameraInfo.getInstance().getNumberOfCameras() != 0;
     }
-
 
     @SuppressWarnings("unused")
     public CameraController getController() {
@@ -404,7 +256,7 @@ public class CameraFragment extends Fragment {
     }
 
     public void setMirrorPreview(boolean mirror) {
-        this.mirrorPreview = mirror;
+        mirrorPreview = mirror;
     }
 
     @SuppressWarnings("unused")
@@ -419,7 +271,7 @@ public class CameraFragment extends Fragment {
         if (countDownTimer != null) {
             countDownTimer.cancel();
         }
-        this.isVideoRecording = false;
+        isVideoRecording = false;
         actionBtn.setImageResource(R.drawable.video_capture);
         textViewTime.setTextColor(Color.WHITE);
 
@@ -472,61 +324,65 @@ public class CameraFragment extends Fragment {
                 }
             }
             case REQUEST_GALLERY_IMAGE_CODE:
-                final Optional<Uri> uriOptional = onResult(resultCode, data);
-                final String imageFile = Utils.getPictureDirectory(getActivity(), true) + File.separator + Utils.getPictureName();
-                if (uriOptional.isPresent()) {
-                    final Uri uri = uriOptional.get();
-                    try {
-                        copyGalleryFile(imageFile, uri);
+                if (resultCode == Activity.RESULT_OK) {
+                    final Optional<Uri> uriOptional = onResult(resultCode, data);
+                    final String imageFile = Utils.getPictureDirectory(getActivity(), true) + File.separator + Utils.getPictureName();
+                    if (uriOptional.isPresent()) {
+                        final Uri uri = uriOptional.get();
+                        try {
+                            copyGalleryFile(imageFile, uri);
 
-                        imageOutput = imageFile;
-                        showConfirmImage();
-                    } catch (IOException e) {
+                            imageOutput = imageFile;
+                            showConfirmImage();
+                        } catch (IOException e) {
+                            ColoredSnackBar.error(
+                                    ColoredSnackBar.contentView(getActivity()),
+                                    R.string.error_default,
+                                    Snackbar.LENGTH_SHORT)
+                                    .show();
+                        }
+                    } else {
                         ColoredSnackBar.error(
                                 ColoredSnackBar.contentView(getActivity()),
                                 R.string.error_default,
                                 Snackbar.LENGTH_SHORT)
                                 .show();
                     }
-                } else {
-                    ColoredSnackBar.error(
-                            ColoredSnackBar.contentView(getActivity()),
-                            R.string.error_default,
-                            Snackbar.LENGTH_SHORT)
-                            .show();
                 }
                 break;
             case REQUEST_GALLERY_VIDEO_CODE:
-                final Optional<Uri> videoUri = onResult(resultCode, data);
-                final String videoFile = Utils.getVideoDirectory(getActivity(), true) + File.separator + Utils.getVideoName();
-                if (videoUri.isPresent()) {
-                    final Uri uri = videoUri.get();
-                    try {
-                        copyGalleryFile(videoFile, uri);
-                        videoOutput = videoFile;
+                if (resultCode == Activity.RESULT_OK) {
+                    final Optional<Uri> videoUri = onResult(resultCode, data);
+                    final String videoFile = Utils.getVideoDirectory(getActivity(), true) + File.separator + Utils.getVideoName();
+                    if (videoUri.isPresent()) {
+                        final Uri uri = videoUri.get();
+                        try {
+                            copyGalleryFile(videoFile, uri);
+                            videoOutput = videoFile;
 
-                        layoutConfirm.setVisibility(View.VISIBLE);
+                            layoutConfirm.setVisibility(View.VISIBLE);
 
-                        getActivity().getFragmentManager()
-                                .beginTransaction()
-                                .replace(R.id.fragment_camera_layout_preview_overlay,
-                                        PlayVideoFragment.newInstance(videoOutput))
-                                .setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                                .commit();
+                            getActivity().getFragmentManager()
+                                    .beginTransaction()
+                                    .replace(R.id.fragment_camera_layout_preview_overlay,
+                                            PlayVideoFragment.newInstance(videoOutput))
+                                    .setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                                    .commit();
 
-                    } catch (IOException e) {
+                        } catch (IOException e) {
+                            ColoredSnackBar.error(
+                                    ColoredSnackBar.contentView(getActivity()),
+                                    R.string.error_default,
+                                    Snackbar.LENGTH_SHORT)
+                                    .show();
+                        }
+                    } else {
                         ColoredSnackBar.error(
                                 ColoredSnackBar.contentView(getActivity()),
                                 R.string.error_default,
                                 Snackbar.LENGTH_SHORT)
                                 .show();
                     }
-                } else {
-                    ColoredSnackBar.error(
-                            ColoredSnackBar.contentView(getActivity()),
-                            R.string.error_default,
-                            Snackbar.LENGTH_SHORT)
-                            .show();
                 }
                 break;
             default:
@@ -627,11 +483,11 @@ public class CameraFragment extends Fragment {
     }
 
     private void setTimer() {
-        countDownTimer = new CountDownTimer(mVideoMaxLength, 1000) {
+        countDownTimer = new CountDownTimer(VIDEO_LENGTH, 1000) {
 
             public void onTick(long millisUntilFinished) {
                 textViewTime.setText(String.valueOf(millisUntilFinished / 1000));
-                if (millisUntilFinished / 1000 <= mVideoMaxLength / 1000 - mVideoMinLength / 1000) {
+                if (millisUntilFinished / 1000 <= VIDEO_LENGTH / 1000) {
                     actionBtn.setEnabled(true);
                     actionBtn.setActivated(true);
                 }
@@ -705,7 +561,7 @@ public class CameraFragment extends Fragment {
                     break;
             }
 
-            if (this.isMFfcEnabled) {
+            if (isMFfcEnabled) {
                 Matrix matrix = new Matrix();
                 float[] mirrorY = {-1, 0, 0, 0, 1, 0, 0, 0, 1};
                 Matrix matrixMirrorY = new Matrix();
@@ -731,7 +587,7 @@ public class CameraFragment extends Fragment {
 
         try {
             fos = new FileOutputStream(outputFilePath);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, mImageQuality, fos);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, DEFAULT_IMAGE_QUALITY, fos);
             fos.close();
         } catch (IOException e) {
             Log.e("tag", "File output stream error", e);
@@ -766,25 +622,25 @@ public class CameraFragment extends Fragment {
         layoutPreviewOverlay.removeAllViews();
         layoutConfirm.setVisibility(View.GONE);
 
-        this.actionBtn.setEnabled(true);
-        this.actionBtn.setSelected(false);
-        this.actionBtn.setActivated(false);
+        actionBtn.setEnabled(true);
+        actionBtn.setSelected(false);
+        actionBtn.setActivated(false);
 
-        if (this.switchCameraButton.getVisibility() == View.VISIBLE) {
-            this.switchCameraButton.setEnabled(true);
+        if (switchCameraButton.getVisibility() == View.VISIBLE) {
+            switchCameraButton.setEnabled(true);
         }
 
-        this.picture.setEnabled(true);
-        this.video.setEnabled(true);
-        this.galleryPick.setEnabled(true);
+        picture.setEnabled(true);
+        video.setEnabled(true);
+        galleryPick.setEnabled(true);
 
 
-        if (this.textViewTime.getVisibility() == View.VISIBLE) {
-            this.textViewTime.setText(String.valueOf(this.mVideoMaxLength / 1000));
+        if (textViewTime.getVisibility() == View.VISIBLE) {
+            textViewTime.setText(String.valueOf(VIDEO_LENGTH / 1000));
         }
 
-        this.buttonConfirm.setEnabled(true);
-        this.buttonDiscard.setEnabled(true);
+        buttonConfirm.setEnabled(true);
+        buttonDiscard.setEnabled(true);
     }
 
 
@@ -808,7 +664,7 @@ public class CameraFragment extends Fragment {
 
                     Log.d("tag", String.format("  > %s x %s", imageBitmap.getWidth(), imageBitmap.getHeight()));
 
-                    if (CameraUtils.bitmapToFile(imageBitmap, imageFile, mCompression, mImageQuality)) {
+                    if (CameraUtils.bitmapToFile(imageBitmap, imageFile, Bitmap.CompressFormat.JPEG, DEFAULT_IMAGE_QUALITY)) {
                         Log.d("tag", String.format("  > new JPEG file size: %s bytes", imageFile.length()));
                         return new String[]{EXTRA_IMAGE_URI, "file://" + imageOutput};
                     } else {
@@ -848,7 +704,7 @@ public class CameraFragment extends Fragment {
     void switchCamera() {
         ctlr.switchCamera();
 
-        this.isMFfcEnabled = SHCameraInfo.getInstance().isHasFrontFacingCamera() && !this.isMFfcEnabled;
+        isMFfcEnabled = SHCameraInfo.getInstance().isHasFrontFacingCamera() && !isMFfcEnabled;
     }
 
     @OnClick(R.id.fragment_camera_close)
@@ -858,42 +714,52 @@ public class CameraFragment extends Fragment {
 
     @OnClick(R.id.fragment_camera_action_btn)
     void performCameraAction() {
-        if (this.isVideoMode) {
+        if (isVideoMode) {
             try {
-                this.recordVideo();
+                recordVideo();
             } catch (Exception e) {
-                Toast.makeText(CameraFragment.this.getActivity(), "camera busy", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "camera busy", Toast.LENGTH_LONG).show();
             }
         } else {
             try {
-                this.takePicture();
+                takePicture();
             } catch (Exception e) {
-                Toast.makeText(CameraFragment.this.getActivity(), "camera busy", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "camera busy", Toast.LENGTH_LONG).show();
             }
         }
     }
 
     @OnClick(R.id.fragment_camera_mode_picture_btn)
-    void enablePictureMode() {
-        this.isVideoMode = false;
+    void pictureModeClick() {
+        enablePictureMode();
+    }
+
+    private void enablePictureMode() {
+        isVideoMode = false;
         actionBtn.setImageResource(R.drawable.camera_capture);
         textViewTime.setVisibility(View.GONE);
         video.setVisibility(View.VISIBLE);
         picture.setVisibility(View.GONE);
+        cameraText.setText(getString(R.string.camera_sub_header, getString(R.string.camera_photo)));
     }
 
     @OnClick(R.id.fragment_camera_mode_video_btn)
-    void enableVideoMode() {
-        this.isVideoMode = true;
+    void videoModeClick() {
+        enableVideoMode();
+    }
+
+    private void enableVideoMode() {
+        isVideoMode = true;
         actionBtn.setImageResource(R.drawable.video_capture);
         textViewTime.setVisibility(View.VISIBLE);
         video.setVisibility(View.GONE);
         picture.setVisibility(View.VISIBLE);
+        cameraText.setText(getString(R.string.camera_sub_header, getString(R.string.camera_video)));
     }
 
     @OnClick(R.id.fragment_camera_confirm_yes_btn)
     void onConfirmMedia() {
-        if (this.isVideoMode) {
+        if (isVideoMode) {
             final File file = new File(videoOutput);
 
             final ArrayList<Image> tempImages = new ArrayList<>();

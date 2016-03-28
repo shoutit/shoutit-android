@@ -325,9 +325,11 @@
     <string name="camera_publish_currency">Currency</string>
     <string name="camera_publish">Publish</string>
     <string name="camera_retake">Retake</string>
-    <string name="camera_sub_header">This is your featured photo. Make sure it\'s a good one!
+    <string name="camera_sub_header">This is your featured %1$s. Make sure it\'s a good one!
     </string>
     <string name="camera_header">What are you offering?</string>
+    <string name="camera_video">video</string>
+    <string name="camera_photo">photo</string>
 
     <!-- Media Published -->
     <string name="publish_header">Shout published. Congrats!</string>

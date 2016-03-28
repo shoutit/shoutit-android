@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.util.Pair;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,6 +56,7 @@ public class PublishMediaShoutFragment extends Fragment {
 
     private static final String ARGS_IS_VIDEO = "args_video";
     private static final String ARGS_FILE = "args_file";
+    private static final String TAG = PublishMediaShoutFragment.class.getCanonicalName();
 
     @Bind(R.id.publish_media_shout_preview)
     ImageView mPublishMediaShoutPreview;
@@ -165,6 +167,7 @@ public class PublishMediaShoutFragment extends Fragment {
                         }, new Action1<Throwable>() {
                             @Override
                             public void call(Throwable throwable) {
+                                Log.e(TAG, "error", throwable);
                                 ColoredSnackBar.error(
                                         ColoredSnackBar.contentView(getActivity()),
                                         R.string.error_default,
@@ -250,6 +253,7 @@ public class PublishMediaShoutFragment extends Fragment {
                         }, new Action1<Throwable>() {
                             @Override
                             public void call(Throwable throwable) {
+                                Log.e(TAG, "error", throwable);
                                 ColoredSnackBar.error(
                                         ColoredSnackBar.contentView(getActivity()),
                                         R.string.error_default,
@@ -280,6 +284,7 @@ public class PublishMediaShoutFragment extends Fragment {
                     }, new Action1<Throwable>() {
                         @Override
                         public void call(Throwable throwable) {
+                            Log.e(TAG, "error", throwable);
                             ColoredSnackBar.error(
                                     ColoredSnackBar.contentView(getActivity()),
                                     R.string.error_default,

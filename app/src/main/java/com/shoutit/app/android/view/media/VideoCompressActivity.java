@@ -140,7 +140,7 @@ public class VideoCompressActivity extends Activity {
                             try {
                                 time = getMillisFromResponse(match);
                             } catch (NumberFormatException e) {
-                                Log.e("dupa", "Couldn't parse number", e);
+                                Log.e(TAG, "Couldn't parse number", e);
                             }
                             progressBar.setProgress((int) (time * 100 / duration));
                         }
