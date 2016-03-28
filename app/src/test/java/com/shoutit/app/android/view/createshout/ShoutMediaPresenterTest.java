@@ -66,12 +66,12 @@ public class ShoutMediaPresenterTest {
         ArgumentCaptor<Map> argumentCaptor = ArgumentCaptor.forClass(Map.class);
         mShoutMediaPresenter.register(mMediaListener);
 
-        mShoutMediaPresenter.addMediaItem("test");
+        mShoutMediaPresenter.addMediaItem("test", false);
 
         verify(mMediaListener, times(2)).setImages(argumentCaptor.capture());
         final ShoutMediaPresenter.Item target = (ShoutMediaPresenter.Item) argumentCaptor.getValue().get(0);
-        assert_().that(target).isInstanceOf(ShoutMediaPresenter.ImageItem.class);
-        assert_().that(((ShoutMediaPresenter.ImageItem) target).getMedia()).isEqualTo("test");
+        assert_().that(target).isInstanceOf(ShoutMediaPresenter.MediaItem.class);
+        assert_().that(((ShoutMediaPresenter.MediaItem) target).getMedia()).isEqualTo("test");
     }
 
     @SuppressWarnings("unchecked")
@@ -80,10 +80,10 @@ public class ShoutMediaPresenterTest {
         ArgumentCaptor<Map> argumentCaptor = ArgumentCaptor.forClass(Map.class);
         mShoutMediaPresenter.register(mMediaListener);
 
-        mShoutMediaPresenter.addMediaItem("test");
+        mShoutMediaPresenter.addMediaItem("test", false);
 
         verify(mMediaListener, times(2)).setImages(argumentCaptor.capture());
-        final ShoutMediaPresenter.ImageItem target = (ShoutMediaPresenter.ImageItem) argumentCaptor.getValue().get(0);
+        final ShoutMediaPresenter.MediaItem target = (ShoutMediaPresenter.MediaItem) argumentCaptor.getValue().get(0);
         target.click();
 
         verify(mMediaListener, times(3)).setImages(argumentCaptor.capture());
@@ -97,17 +97,37 @@ public class ShoutMediaPresenterTest {
         ArgumentCaptor<Map> argumentCaptor = ArgumentCaptor.forClass(Map.class);
         mShoutMediaPresenter.register(mMediaListener);
 
-        mShoutMediaPresenter.addMediaItem("test");
-        mShoutMediaPresenter.addMediaItem("test2");
+        mShoutMediaPresenter.addMediaItem("test", false);
+        mShoutMediaPresenter.addMediaItem("test2", false);
 
         verify(mMediaListener, times(3)).setImages(argumentCaptor.capture());
-        final ShoutMediaPresenter.ImageItem target = (ShoutMediaPresenter.ImageItem) argumentCaptor.getValue().get(0);
+        final ShoutMediaPresenter.MediaItem target = (ShoutMediaPresenter.MediaItem) argumentCaptor.getValue().get(0);
         target.click();
 
         verify(mMediaListener, times(4)).setImages(argumentCaptor.capture());
         final ShoutMediaPresenter.Item imageItem = (ShoutMediaPresenter.Item) argumentCaptor.getValue().get(0);
-        assert_().that(imageItem).isInstanceOf(ShoutMediaPresenter.ImageItem.class);
-
+        assert_().that(imageItem).isInstanceOf(ShoutMediaPresenter.MediaItem.class);
     }
 
+    @SuppressWarnings("unchecked")
+    @Test
+    public void whenSecondVideoAdded_DisplayAlert(){
+        mShoutMediaPresenter.register(mMediaListener);
+
+        mShoutMediaPresenter.addMediaItem("test", true);
+        mShoutMediaPresenter.addMediaItem("test2", true);
+
+        verify(mMediaListener).onlyOneVideoAllowedAlert();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void whenSecondImageAdded_DontDisplayAlert(){
+        mShoutMediaPresenter.register(mMediaListener);
+
+        mShoutMediaPresenter.addMediaItem("test", true);
+        mShoutMediaPresenter.addMediaItem("test2", false);
+
+        verify(mMediaListener, times(0)).onlyOneVideoAllowedAlert();
+    }
 }
