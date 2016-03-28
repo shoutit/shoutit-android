@@ -90,11 +90,7 @@ public class RecordVideoActivity extends AbstractCameraActivity
         final Fragment fragment = getFragmentManager().findFragmentByTag(TAG_CAMERA);
 
         if (fragment == null) {
-            cameraFragment = CameraFragment.newInstance(savedInstance);
-            final Bundle args = new Bundle();
-            args.putLong(CameraFragment.EXTRA_VIDEO_MAX_LENGTH, 60_000);
-            cameraFragment.setArguments(args);
-
+            cameraFragment = CameraFragment.newInstance();
             getFragmentManager().beginTransaction()
                     .replace(android.R.id.content, cameraFragment, TAG_CAMERA)
                     .commit();
@@ -194,14 +190,8 @@ public class RecordVideoActivity extends AbstractCameraActivity
             return;
         }
 
-        boolean isFrontFaceEnabled =
-                getIntent().getBooleanExtra(CameraFragment.EXTRA_USE_FRONT_FACING_CAMERA, false)
-                        && shCameraInfo.isHasFrontFacingCamera();
-        Facing facing = isFrontFaceEnabled ? Facing.FRONT : Facing.BACK;
-
-        boolean match = getIntent().getBooleanExtra(EXTRA_FACING_EXACT_MATCH, false);
         CameraSelectionCriteria criteria =
-                new CameraSelectionCriteria.Builder().facing(facing).facingExactMatch(match).build();
+                new CameraSelectionCriteria.Builder().facing(Facing.BACK).facingExactMatch(false).build();
 
         ctrlClassic.setEngine(CameraEngine.buildInstance(RecordVideoActivity.this, true),
                 criteria);

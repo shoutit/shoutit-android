@@ -76,7 +76,7 @@
                 android:layout_below="@+id/camera_text_header"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="6dp"
-                android:text="@string/camera_sub_header"
+                tools:text="@string/camera_sub_header"
                 android:textColor="@android:color/white"
                 android:textSize="12sp"/>
 
