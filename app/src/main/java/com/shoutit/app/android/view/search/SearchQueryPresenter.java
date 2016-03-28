@@ -3,15 +3,17 @@ package com.shoutit.app.android.view.search;
 import com.appunite.rx.functions.Functions1;
 
 import rx.Observable;
+import rx.Observer;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
 public class SearchQueryPresenter {
 
-    public BehaviorSubject<String> querySubject = BehaviorSubject.create();
-    public PublishSubject<String> querySubmittedSubject = PublishSubject.create();
+    private final BehaviorSubject<String> querySubject = BehaviorSubject.create();
+    private final PublishSubject<String> querySubmittedSubject = PublishSubject.create();
+    private final PublishSubject<String> fillSearchWithSuggestionSubject = PublishSubject.create();
 
-    public final Observable<String> querySubmittedObservable;
+    private final Observable<String> querySubmittedObservable;
     private final Observable<String> emptyQuerySubmittedObservable;
 
     public SearchQueryPresenter() {
@@ -37,5 +39,13 @@ public class SearchQueryPresenter {
 
     public Observable<String> getEmptyQuerySubmittedObservable() {
         return emptyQuerySubmittedObservable;
+    }
+
+    public Observer<String> getFillSearchWithSuggestionObserver() {
+        return fillSearchWithSuggestionSubject;
+    }
+
+    public Observable<String> getFillSearchWithSuggestionObservable() {
+        return fillSearchWithSuggestionSubject;
     }
 }

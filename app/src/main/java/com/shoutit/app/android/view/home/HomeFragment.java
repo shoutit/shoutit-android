@@ -2,7 +2,6 @@ package com.shoutit.app.android.view.home;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,15 +15,15 @@ import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
 import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.BaseFragment;
+import com.shoutit.app.android.BaseShoutsItemDecoration;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dagger.FragmentModule;
+import com.shoutit.app.android.utils.LayoutManagerHelper;
 import com.shoutit.app.android.utils.LoadMoreHelper;
-import com.shoutit.app.android.utils.MyGridLayoutManager;
 import com.shoutit.app.android.utils.MyLayoutManager;
-import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogFragment;
 import com.shoutit.app.android.view.discover.DiscoverActivity;
 import com.shoutit.app.android.view.main.OnSeeAllDiscoversListener;
@@ -61,10 +60,6 @@ public class HomeFragment extends BaseFragment {
     @Inject
     HomeAdapter adapter;
     @Inject
-    HomeGridSpacingItemDecoration gridViewItemDecoration;
-    @Inject
-    HomeLinearSpacingItemDecoration linearViewItemDecoration;
-    @Inject
     UserPreferences mUserPreferences;
     @Inject
     OnSeeAllDiscoversListener onSeeAllDiscoversListener;
@@ -81,6 +76,8 @@ public class HomeFragment extends BaseFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        recyclerView.addItemDecoration(new BaseShoutsItemDecoration(
+                getResources().getDimensionPixelSize(R.dimen.home_linear_side_spacing)));
         setGridLayoutManager();
         recyclerView.setAdapter(adapter);
 
@@ -155,30 +152,11 @@ public class HomeFragment extends BaseFragment {
     }
 
     private void setLinearLayoutManager() {
-        recyclerView.setLayoutManager(new MyLinearLayoutManager(context));
-        recyclerView.removeItemDecoration(gridViewItemDecoration);
-        recyclerView.addItemDecoration(linearViewItemDecoration);
-        recyclerView.setAdapter(adapter);
-        adapter.switchLayoutManager(true);
+        LayoutManagerHelper.setLinearLayoutManager(context, recyclerView, adapter);
     }
 
     private void setGridLayoutManager() {
-        final MyGridLayoutManager gridLayoutManager = new MyGridLayoutManager(context, 2);
-        gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-            @Override
-            public int getSpanSize(int position) {
-                if (adapter.getItemViewType(position) == HomeAdapter.VIEW_TYPE_SHOUT_ITEM) {
-                    return 1;
-                } else {
-                    return 2;
-                }
-            }
-        });
-        recyclerView.setLayoutManager(gridLayoutManager);
-        recyclerView.removeItemDecoration(linearViewItemDecoration);
-        recyclerView.addItemDecoration(gridViewItemDecoration);
-        recyclerView.setAdapter(adapter);
-        adapter.switchLayoutManager(false);
+        LayoutManagerHelper.setGridLayoutManager(context, recyclerView, adapter);
     }
 
     @OnClick(R.id.fragment_home_fab)

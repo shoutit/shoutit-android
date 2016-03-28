@@ -11,12 +11,15 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
+import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.api.model.SearchProfileResponse;
+import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
+import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,18 +72,21 @@ public class SearchProfilesResultsPresenter {
                 .map(new Func1<SearchProfileResponse, List<BaseAdapterItem>>() {
                     @Override
                     public List<BaseAdapterItem> call(final SearchProfileResponse searchProfileResponse) {
-                        return ImmutableList.copyOf(
-                                Lists.transform(searchProfileResponse.getResults(),
-                                        new Function<User, BaseAdapterItem>() {
-                                            @Nullable
-                                            @Override
-                                            public BaseAdapterItem apply(@Nullable User input) {
-                                                return new ProfileAdapterItem(searchProfileResponse, input,
-                                                        profileListenedSubject, profileToOpenSubject,
-                                                        actionOnlyForLoggedInUserSubject);
-                                            }
-                                        })
-                        );
+                        if (searchProfileResponse.getResults().isEmpty()) {
+                            return ImmutableList.<BaseAdapterItem>of(new NoDataAdapterItem());
+                        } else {
+                            return ImmutableList.copyOf(
+                                    Lists.transform(searchProfileResponse.getResults(),
+                                            new Function<User, BaseAdapterItem>() {
+                                                @Nullable
+                                                @Override
+                                                public BaseAdapterItem apply(@Nullable User input) {
+                                                    return new ProfileAdapterItem(searchProfileResponse, input,
+                                                            profileListenedSubject, profileToOpenSubject,
+                                                            actionOnlyForLoggedInUserSubject);
+                                                }
+                                            }));
+                        }
                     }
                 });
 

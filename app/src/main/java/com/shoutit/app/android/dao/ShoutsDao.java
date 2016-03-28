@@ -15,11 +15,14 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.constants.RequestsConstants;
 import com.shoutit.app.android.model.LocationPointer;
 import com.shoutit.app.android.model.RelatedShoutsPointer;
+import com.shoutit.app.android.model.SearchShoutPointer;
 import com.shoutit.app.android.model.TagShoutsPointer;
 import com.shoutit.app.android.model.UserShoutsPointer;
+import com.shoutit.app.android.view.search.SearchPresenter;
 
 import java.util.concurrent.TimeUnit;
 
@@ -53,6 +56,8 @@ public class ShoutsDao {
     private final LoadingCache<RelatedShoutsPointer, RelatedShoutsDao> relatedShoutsCache;
     @Nonnull
     private final LoadingCache<TagShoutsPointer, TagShoutsDao> tagsShoutsCache;
+    @Nonnull
+    private final LoadingCache<SearchShoutPointer, SearchShoutsDao> searchShoutCache;
 
     public ShoutsDao(@Nonnull final ApiService apiService,
                      @Nonnull @NetworkScheduler final Scheduler networkScheduler,
@@ -100,6 +105,14 @@ public class ShoutsDao {
                         return new TagShoutsDao(key);
                     }
                 });
+
+        searchShoutCache = CacheBuilder.newBuilder()
+                .build(new CacheLoader<SearchShoutPointer, SearchShoutsDao>() {
+                    @Override
+                    public SearchShoutsDao load(@Nonnull SearchShoutPointer key) throws Exception {
+                        return new SearchShoutsDao(key);
+                    }
+                });
     }
 
     @Nonnull
@@ -125,6 +138,11 @@ public class ShoutsDao {
     @Nonnull
     public Observable<ResponseOrError<ShoutsResponse>> getTagsShoutsObservable(@Nonnull TagShoutsPointer pointer) {
         return tagsShoutsCache.getUnchecked(pointer).getShoutsObservable();
+    }
+
+    @Nonnull
+    public SearchShoutsDao getSearchShoutsDao(@Nonnull SearchShoutPointer pointer) {
+        return searchShoutCache.getUnchecked(pointer);
     }
 
     @Nonnull
@@ -157,8 +175,8 @@ public class ShoutsDao {
                                             .subscribeOn(networkScheduler);
                                 } else {
                                     apiRequest = apiService
-                                            .shoutsForCity(locationPointer.getCountryCode(),
-                                                    locationPointer.getCity(), pageNumber, PAGE_SIZE)
+                                            .shoutsForLocation(locationPointer.getCountryCode(),
+                                                    locationPointer.getCity(), null, pageNumber, PAGE_SIZE)
                                             .subscribeOn(networkScheduler);
                                 }
 
@@ -259,6 +277,43 @@ public class ShoutsDao {
         Observable<ShoutsResponse> getShoutsRequest(int pageNumber) {
             return apiService
                     .tagShouts(pointer.getTagName(), pageNumber, pointer.getPageSize());
+        }
+    }
+
+    public class SearchShoutsDao extends BaseShoutsDao {
+        @Nonnull
+        private final SearchShoutPointer pointer;
+
+        public SearchShoutsDao(@Nonnull final SearchShoutPointer pointer) {
+            super(networkScheduler);
+            this.pointer = pointer;
+        }
+
+        @NonNull
+        @Override
+        Observable<ShoutsResponse> getShoutsRequest(int pageNumber) {
+            final SearchPresenter.SearchType searchType = pointer.getSearchType();
+            final String query = pointer.getQuery();
+            final String contextItemId = pointer.getContextItemId();
+            final UserLocation location = pointer.getLocation();
+
+            switch (SearchPresenter.SearchType.values()[searchType.ordinal()]) {
+                case PROFILE:
+                    return apiService.searchProfileShouts(query, pageNumber, PAGE_SIZE, contextItemId);
+                case SHOUTS:
+                    return apiService.searchShouts(query, pageNumber, PAGE_SIZE,
+                            location.getCountry(), location.getCity(), location.getState());
+                case TAG:
+                    return apiService.searchTagShouts(query, pageNumber, PAGE_SIZE, contextItemId,
+                            location.getCountry(), location.getCity(), location.getState());
+                case DISCOVER:
+                    return apiService.searchDiscoverShouts(query, pageNumber, PAGE_SIZE, contextItemId);
+                case BROWSE:
+                    return apiService.shoutsForLocation(location.getCountry(), location.getCity(),
+                            location.getState(), pageNumber, PAGE_SIZE);
+                default:
+                    throw new RuntimeException("Unknwon profile type: " + SearchPresenter.SearchType.values()[searchType.ordinal()]);
+            }
         }
     }
 }

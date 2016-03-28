@@ -3,8 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,13 +19,13 @@
             android:layout_marginBottom="10dp"/>
 
         <ScrollView
-            android:overScrollMode="never"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:overScrollMode="never">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
 
                 <android.support.design.widget.TextInputLayout
@@ -63,6 +62,7 @@
                             android:inputType="numberDecimal"/>
 
                         <ImageView
+                            android:id="@+id/create_request_currency_info"
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:layout_gravity="end|center_vertical"
@@ -71,7 +71,7 @@
 
                     </FrameLayout>
 
-                    <Spinner
+                    <com.shoutit.app.android.widget.StateSpinner
                         android:id="@+id/create_request_spinner"
                         android:layout_width="0dp"
                         android:layout_height="43dp"
@@ -157,10 +157,11 @@
                     android:background="@android:color/darker_gray"/>
 
                 <Button
+                    style="@style/BaseButtonStyle"
                     android:id="@+id/create_request_confirm"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
                     android:layout_margin="6dp"
+                    android:background="@drawable/selector_green_button_with_stroke"
                     android:text="@string/request_activity_btn"
                     android:textColor="@android:color/white"/>
             </LinearLayout>

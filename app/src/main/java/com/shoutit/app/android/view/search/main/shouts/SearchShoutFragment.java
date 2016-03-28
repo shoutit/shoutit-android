@@ -1,5 +1,6 @@
 package com.shoutit.app.android.view.search.main.shouts;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,9 +14,12 @@ import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
+import com.shoutit.app.android.utils.KeyboardHelper;
+import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.view.search.SearchAdapter;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.main.MainSearchActivityComponent;
+import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsActivity;
 
 import java.util.List;
 
@@ -24,6 +28,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
+import rx.functions.Action1;
 
 import static com.appunite.rx.internal.Preconditions.checkNotNull;
 
@@ -75,11 +80,30 @@ public class SearchShoutFragment extends BaseFragment {
                 .compose(this.bindToLifecycle())
                 .subscribe();
 
-        // TODO uncomment when API adjust changes
-/*        presenter.getSearchPresenter()
+        presenter.getRecentSearchClickObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String recentSearch) {
+                        startActivity(SearchShoutsResultsActivity.newIntent(getActivity(),
+                                recentSearch, null, SearchPresenter.SearchType.SHOUTS));
+                    }
+                });
+
+        presenter.getSearchPresenter()
                 .getSuggestionsAdapterItemsObservable()
                 .compose(this.<List<BaseAdapterItem>>bindToLifecycle())
-                .subscribe(adapter);*/
+                .subscribe(adapter);
+
+        presenter.getSearchPresenter()
+                .getSuggestionClickedObservable()
+                .compose(this.<Intent>bindToLifecycle())
+                .subscribe(new Action1<Intent>() {
+                    @Override
+                    public void call(Intent intent) {
+                        startActivity(intent);
+                    }
+                });
     }
 
     @Override
@@ -87,7 +111,7 @@ public class SearchShoutFragment extends BaseFragment {
                                    @Nonnull FragmentModule fragmentModule,
                                    @Nullable Bundle savedInstanceState) {
         final Bundle bundle = checkNotNull(getArguments());
-        final SearchPresenter.SearchType searchType = (SearchPresenter.SearchType) bundle.getSerializable(KEY_SEARCH_TYPE);
+        final SearchPresenter.SearchType searchType = checkNotNull((SearchPresenter.SearchType) bundle.getSerializable(KEY_SEARCH_TYPE));
 
         DaggerSearchShoutFragmentComponent.builder()
                 .mainSearchActivityComponent((MainSearchActivityComponent) baseActivityComponent)

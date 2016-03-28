@@ -23,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -35,6 +36,7 @@ import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.view.createshout.CurrencyDialog;
 import com.shoutit.app.android.view.createshout.location.LocationActivity;
 import com.shoutit.app.android.view.createshout.publish.PublishShoutActivity;
 
@@ -117,6 +119,8 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
     Toolbar mRequestActivityToolbar;
     @Bind(R.id.request_activity_description_layout)
     TextInputLayout mRequestActivityDescriptionLayout;
+    @Bind(R.id.create_request_currency_info)
+    ImageView mCreateCurrencyInfo;
 
     @Inject
     CreateRequestPresenter mCreateRequestPresenter;
@@ -175,6 +179,13 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
         });
 
         mCreateRequestPresenter.registerListener(this);
+
+        mCreateCurrencyInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CurrencyDialog.showDialog(CreateRequestActivity.this);
+            }
+        });
     }
 
     @Override

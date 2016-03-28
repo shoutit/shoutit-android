@@ -44,7 +44,7 @@ public class ShoutsPresenterTest {
         mBehaviorSubject = BehaviorSubject.create(ResponseOrError.fromData(new ShoutsResponse(0, "", "", ImmutableList.of(new Shout("", "", "", "", new UserLocation(0, 0, "", "", "", "", ""), "", "", 0L, 0, "", "", "", null, null, null, 0, null, null, 0)))));
         when(mDiscoverShoutsDao.getShoutsObservable(anyString())).thenReturn(mBehaviorSubject);
 
-        mShoutsPresenter = new DiscoverShoutsPresenter(Schedulers.immediate(), Schedulers.immediate(), mDiscoverShoutsDao, "", mContext);
+        mShoutsPresenter = new DiscoverShoutsPresenter(Schedulers.immediate(), Schedulers.immediate(), mDiscoverShoutsDao, "", "", mContext);
     }
 
     @Test

@@ -36,12 +36,12 @@
             <Button
                 android:id="@+id/activity_intro_login_button"
                 android:layout_width="200dp"
-                android:layout_height="47dp"
+                android:layout_height="48dp"
                 android:layout_marginTop="20dp"
                 android:background="@drawable/selector_intro"
                 android:fontFamily="sans-serif-regular"
+                android:textAllCaps="true"
                 android:text="@string/intro_login"
-                android:textAllCaps="false"
                 android:textColor="@color/colorPrimary"
                 android:textSize="14sp"/>
 

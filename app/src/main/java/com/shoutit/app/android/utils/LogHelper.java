@@ -3,6 +3,7 @@ package com.shoutit.app.android.utils;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
+import com.shoutit.app.android.BuildConfig;
 
 public class LogHelper {
 
@@ -15,7 +16,10 @@ public class LogHelper {
     }
 
     public static void logThrowableAndCrashlytics(String tag, String msg, Throwable t) {
-        Log.e(tag, msg, t);
-        Crashlytics.logException(t);
+        if ("debug".equals(BuildConfig.BUILD_TYPE)) {
+            Log.e(tag, msg, t);
+        } else {
+            Crashlytics.logException(t);
+        }
     }
 }

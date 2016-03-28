@@ -14,6 +14,7 @@ import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
 import com.shoutit.app.android.api.model.EditShoutPriceRequest;
 import com.shoutit.app.android.api.model.EditShoutRequest;
+import com.shoutit.app.android.api.model.EditShoutRequestWithPrice;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.GuestSignupRequest;
 import com.shoutit.app.android.api.model.RelatedTagsResponse;
@@ -23,6 +24,7 @@ import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutResponse;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.SignResponse;
+import com.shoutit.app.android.api.model.Suggestion;
 import com.shoutit.app.android.api.model.SuggestionsResponse;
 import com.shoutit.app.android.api.model.TagDetail;
 import com.shoutit.app.android.api.model.TagsRequest;
@@ -64,10 +66,11 @@ public interface ApiService {
      * Shouts
      **/
     @GET("shouts")
-    Observable<ShoutsResponse> shoutsForCity(@Query("country") String countryCode,
-                                             @Query("city") String city,
-                                             @Query("page") Integer page,
-                                             @Query("page_size") Integer pageSize);
+    Observable<ShoutsResponse> shoutsForLocation(@Query("country") String countryCode,
+                                                 @Query("city") String city,
+                                                 @Query("state") String state,
+                                                 @Query("page") Integer page,
+                                                 @Query("page_size") Integer pageSize);
 
     @GET("shouts")
     Observable<ShoutsResponse> shoutsForDiscoverItem(@Query("discover") @NonNull String discoverId,
@@ -92,8 +95,11 @@ public interface ApiService {
 
     @GET("shouts")
     Observable<ShoutsResponse> searchShouts(@Query("search") String query,
-                                           @Query("page") Integer page,
-                                           @Query("page_size") Integer pageSize);
+                                            @Query("page") Integer page,
+                                            @Query("page_size") Integer pageSize,
+                                            @Query("country") String countryCode,
+                                            @Query("city") String city,
+                                            @Query("state") String state);
 
     @GET("shouts")
     Observable<ShoutsResponse> searchProfileShouts(@Query("search") String query,
@@ -103,9 +109,12 @@ public interface ApiService {
 
     @GET("shouts")
     Observable<ShoutsResponse> searchTagShouts(@Query("search") String query,
-                                                   @Query("page") Integer page,
-                                                   @Query("page_size") Integer pageSize,
-                                                   @Query("tags") String tagNameOrCategorySlug);
+                                               @Query("page") Integer page,
+                                               @Query("page_size") Integer pageSize,
+                                               @Query("tags") String tagNameOrCategorySlug,
+                                               @Query("country") String countryCode,
+                                               @Query("city") String city,
+                                               @Query("state") String state);
 
     @GET("shouts")
     Observable<ShoutsResponse> searchDiscoverShouts(@Query("search") String query,
@@ -116,6 +125,11 @@ public interface ApiService {
     Observable<ShoutsResponse> tagShouts(@Query("tags") String tagName,
                                          @Query("page") Integer page,
                                          @Query("page_size") Integer pageSize);
+
+    @GET("shouts/autocomplete")
+    Observable<List<Suggestion>> searchSuggestions(@Query("search") String searchQuery,
+                                                   @Query("category") String categoryName,
+                                                   @Query("country") String country);
 
     /**
      * OAuth
@@ -221,6 +235,9 @@ public interface ApiService {
 
     @PATCH("shouts/{id}")
     Observable<CreateShoutResponse> editShout(@Path("id") String id, @Body EditShoutRequest request);
+
+    @PATCH("shouts/{id}")
+    Observable<CreateShoutResponse> editShout(@Path("id") String id, @Body EditShoutRequestWithPrice request);
 
     @PATCH("shouts/{id}")
     Observable<CreateShoutResponse> editShoutPrice(@Path("id") String id, @Body EditShoutPriceRequest request);

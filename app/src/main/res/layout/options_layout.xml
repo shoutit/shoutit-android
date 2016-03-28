@@ -9,7 +9,7 @@
         android:layout_width="60dp"
         android:layout_height="wrap_content"/>
 
-    <Spinner
+    <com.shoutit.app.android.widget.StateSpinner
         android:id="@+id/option_spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>

@@ -16,7 +16,6 @@ import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.DiscoverChild;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
@@ -495,9 +494,7 @@ public class DiscoverPresenter {
             if (price == null) {
                 return null;
             } else {
-                final String priceString = PriceUtils.formatPrice(shout.getPrice());
-                return mResources.getString(
-                        R.string.price_with_currency, priceString, shout.getCurrency());
+                return PriceUtils.formatPriceWithCurrency(shout.getPrice(), mResources, shout.getCurrency());
             }
         }
 

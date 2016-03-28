@@ -11,19 +11,19 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.Toast;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.KeyboardHelper;
+import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.SearchQueryPresenter;
 import com.shoutit.app.android.view.search.categories.SearchCategoriesFragment;
 import com.shoutit.app.android.view.search.results.profiles.SearchProfilesResultsActivity;
@@ -59,6 +59,7 @@ public class MainSearchActivity extends BaseActivity implements SearchView.OnQue
     SearchQueryPresenter searchQueryPresenter;
 
     private boolean wasViewRotated = false;
+    private SearchView searchView;
 
     public static Intent newIntent(Context context) {
         return new Intent(context, MainSearchActivity.class);
@@ -90,9 +91,11 @@ public class MainSearchActivity extends BaseActivity implements SearchView.OnQue
                     @Override
                     public void call(String query) {
                         if (isShoutTabSelected()) {
-                            startActivity(SearchShoutsResultsActivity.newIntent(MainSearchActivity.this, query));
+                            startActivity(SearchShoutsResultsActivity.newIntent(
+                                    MainSearchActivity.this, query, null, SearchPresenter.SearchType.SHOUTS));
                         } else {
-                            startActivity(SearchProfilesResultsActivity.newIntent(MainSearchActivity.this, query));
+                            startActivity(SearchProfilesResultsActivity.newIntent(
+                                    MainSearchActivity.this, query));
                         }
                     }
                 });
@@ -101,6 +104,15 @@ public class MainSearchActivity extends BaseActivity implements SearchView.OnQue
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(ColoredSnackBar.errorSnackBarAction(
                         ColoredSnackBar.contentView(this), R.string.search_empty_query));
+
+        searchQueryPresenter.getFillSearchWithSuggestionObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String suggestion) {
+                        searchView.setQuery(suggestion, false);
+                    }
+                });
     }
 
     private boolean isShoutTabSelected() {
@@ -133,8 +145,7 @@ public class MainSearchActivity extends BaseActivity implements SearchView.OnQue
 
         final SearchManager searchManager =
                 (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        final SearchView searchView =
-                (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setSearchableInfo(
                 searchManager.getSearchableInfo(getComponentName()));
         searchView.setOnQueryTextListener(this);
@@ -145,7 +156,7 @@ public class MainSearchActivity extends BaseActivity implements SearchView.OnQue
         if (!wasViewRotated) {
             searchView.clearFocus();
         }
-        setSearchTruncatedAndColored(searchView);
+        setSearchViewBackground(searchView);
 
         searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -157,14 +168,19 @@ public class MainSearchActivity extends BaseActivity implements SearchView.OnQue
         return true;
     }
 
+    @Override
+    public void finish() {
+        KeyboardHelper.hideSoftKeyboard(this);
+        super.finish();
+    }
+
     @SuppressLint("PrivateResource")
-    private void setSearchTruncatedAndColored(ViewGroup parent) {
+    private void setSearchViewBackground(ViewGroup parent) {
         for (int i = parent.getChildCount() - 1; i >= 0; i--) {
             final View child = parent.getChildAt(i);
             if (child instanceof ViewGroup) {
-                setSearchTruncatedAndColored((ViewGroup) child);
-            } else if (child instanceof EditText && child != null) {
-                ((EditText) child).setEllipsize(TextUtils.TruncateAt.MIDDLE);
+                setSearchViewBackground((ViewGroup) child);
+            } else if (child instanceof EditText) {
                 child.setBackground(getResources().getDrawable(R.drawable.abc_textfield_search_material));
                 child.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accent_blue), PorterDuff.Mode.SRC_OVER);
             }

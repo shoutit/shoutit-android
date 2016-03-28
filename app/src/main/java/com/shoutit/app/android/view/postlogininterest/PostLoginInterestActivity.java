@@ -70,8 +70,8 @@ public class PostLoginInterestActivity extends RxAppCompatActivity implements Ba
                 .subscribe(mPostLoginAdapter);
 
         mPostLoginPresenter.getErrorObservable()
-                .compose(bindToLifecycle())
-                .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(this), R.string.post_login_error));
+                .compose(this.<Throwable>bindToLifecycle())
+                .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(this)));
 
         mPostLoginPresenter.getSuccessCategoriesObservable()
                 .compose(bindToLifecycle())
@@ -83,8 +83,8 @@ public class PostLoginInterestActivity extends RxAppCompatActivity implements Ba
                 });
 
         mPostLoginPresenter.getPostCategoriesError()
-                .compose(bindToLifecycle())
-                .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(this), R.string.post_login_send_error));
+                .compose(this.<Throwable>bindToLifecycle())
+                .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(this)));
 
         RxToolbarMore.menuClick(mToolbar)
                 .filter(RxToolbarMore.filterMenuClick(R.id.post_login_next))

@@ -10,22 +10,24 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
+import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.view.search.SearchAdapter;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.SearchQueryPresenter;
-import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsActivity;
+
+import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -84,19 +86,36 @@ public class SubSearchActivity extends BaseActivity implements SearchView.OnQuer
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
-        searchQueryPresenter.getQuerySubmittedSubject()
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
+        presenter.getSubSearchSubmittedObservable()
+                .compose(this.<Intent>bindToLifecycle())
+                .subscribe(new Action1<Intent>() {
                     @Override
-                    public void call(String query) {
-                        startActivity(SearchShoutsResultsActivity.newIntent(SubSearchActivity.this, query));
+                    public void call(Intent intent) {
+                        startActivity(intent);
                     }
                 });
 
-        // TODO uncomment after API changes
-        /*presenter.getSuggestionsAdapterItemsObservable()
+        presenter.getSuggestionsAdapterItemsObservable()
                 .compose(this.<List<BaseAdapterItem>>bindToLifecycle())
-                .subscribe(adapter);*/
+                .subscribe(adapter);
+
+        presenter.getSuggestionClickedObservable()
+                .compose(this.<Intent>bindToLifecycle())
+                .subscribe(new Action1<Intent>() {
+                    @Override
+                    public void call(Intent intent) {
+                        startActivity(intent);
+                    }
+                });
+
+        searchQueryPresenter.getFillSearchWithSuggestionObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String suggestion) {
+                        searchView.setQuery(suggestion, false);
+                    }
+                });
     }
 
     private void setUpToolbar() {
@@ -132,7 +151,7 @@ public class SubSearchActivity extends BaseActivity implements SearchView.OnQuer
         if (!wasViewRotated) {
             searchView.clearFocus();
         }
-        setSearchTruncatedAndColored(searchView);
+        setSearchViewBackground(searchView);
 
         presenter.getHintNameObservable()
                 .compose(this.<String>bindToLifecycle())
@@ -147,13 +166,12 @@ public class SubSearchActivity extends BaseActivity implements SearchView.OnQuer
     }
 
     @SuppressLint("PrivateResource")
-    private void setSearchTruncatedAndColored(ViewGroup parent) {
+    private void setSearchViewBackground(ViewGroup parent) {
         for (int i = parent.getChildCount() - 1; i >= 0; i--) {
             final View child = parent.getChildAt(i);
             if (child instanceof ViewGroup) {
-                setSearchTruncatedAndColored((ViewGroup) child);
-            } else if (child instanceof EditText && child != null) {
-                ((EditText) child).setEllipsize(TextUtils.TruncateAt.MIDDLE);
+                setSearchViewBackground((ViewGroup) child);
+            } else if (child instanceof EditText) {
                 child.setBackground(getResources().getDrawable(R.drawable.abc_textfield_search_material));
                 child.getBackground().mutate().setColorFilter(getResources().getColor(R.color.accent_blue), PorterDuff.Mode.SRC_OVER);
             }
@@ -170,6 +188,12 @@ public class SubSearchActivity extends BaseActivity implements SearchView.OnQuer
     public boolean onQueryTextChange(String newText) {
         searchQueryPresenter.getQuerySubject().onNext(newText);
         return true;
+    }
+
+    @Override
+    public void finish() {
+        KeyboardHelper.hideSoftKeyboard(this);
+        super.finish();
     }
 
     @Nonnull

@@ -74,7 +74,7 @@ public class ColoredSnackBar {
         return new Action1<Throwable>() {
             @Override
             public void call(Throwable throwable) {
-                ColoredSnackBar.error(contentView, ErrorHandler.getErrorMessageId(throwable), Snackbar.LENGTH_LONG).show();
+                ColoredSnackBar.error(contentView, ErrorHandler.getErrorMessage(throwable, contentView.getContext()), Snackbar.LENGTH_LONG).show();
             }
         };
     }

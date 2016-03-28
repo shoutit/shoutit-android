@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 
 import com.appunite.rx.operators.MoreOperators;
 import com.google.common.collect.ImmutableList;
-import com.shoutit.app.android.utils.LogHelper;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -15,7 +14,6 @@ import java.util.concurrent.Callable;
 import javax.inject.Inject;
 
 import rx.Observable;
-import rx.functions.Action1;
 import rx.subjects.PublishSubject;
 
 public class RecentSearchesTable {
@@ -94,7 +92,7 @@ public class RecentSearchesTable {
         }
     }
 
-    public void clearRecentSearch() {
+    public void clearRecentSearches() {
         final SQLiteDatabase db = dbHelper.getDatabase();
 
         final int deletedCount = db.delete(TABLE, "1", null);

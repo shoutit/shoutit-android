@@ -67,10 +67,9 @@ public class ShoutLinerViewHolder extends ViewHolderManager.BaseViewHolder<Shout
         final String timeAgo = DateTimeUtils.timeAgoFromSecondsToWeek(context, shout.getDatePublishedInMillis());
         nameTextView.setText(context.getString(R.string.home_user_and_date, shout.getProfile().getName(), timeAgo));
 
-        final String price = PriceUtils.formatPrice(shout.getPrice());
-        cardPriceTextView.setText(context.getString(
-                        R.string.price_with_currency, price, shout.getCurrency())
-        );
+        final String price = PriceUtils.formatPriceWithCurrency(shout.getPrice(),
+                context.getResources(), shout.getCurrency());
+        cardPriceTextView.setText(price);
 
         typeLabelTextView.setText(shout.getTypeResId());
 
