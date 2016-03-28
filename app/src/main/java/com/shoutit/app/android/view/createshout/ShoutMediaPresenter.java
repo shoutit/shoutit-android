@@ -1,5 +1,7 @@
 package com.shoutit.app.android.view.createshout;
 
+import android.content.Context;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 
 import com.google.common.base.Predicate;
@@ -7,10 +9,15 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
+import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.view.media.MediaUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 
 public class ShoutMediaPresenter {
 
@@ -20,18 +27,20 @@ public class ShoutMediaPresenter {
 
     }
 
-    public class MediaItem extends Item {
+    public class BlankItem extends Item {
 
-        protected static final int VIDEO = 0;
-        protected static final int IMAGE = 1;
+        @Override
+        public void click() {
 
-        private final String mMedia;
+        }
+    }
 
-        protected final int type;
+    public abstract class MediaItem extends Item {
 
-        public MediaItem(int type, String media) {
-            mMedia = media;
-            this.type = type;
+        private final String mThumb;
+
+        public MediaItem(@Nullable String media) {
+            mThumb = media;
         }
 
         @Override
@@ -39,12 +48,29 @@ public class ShoutMediaPresenter {
             removeItem(this);
         }
 
-        public String getMedia() {
-            return mMedia;
+        public String getThumb() {
+            return mThumb;
+        }
+    }
+
+    public class ImageItem extends MediaItem {
+
+        public ImageItem(@NonNull String media) {
+            super(media);
+        }
+    }
+
+    public class VideoItem extends MediaItem {
+
+        private final String video;
+
+        public VideoItem(@Nullable String media, @NonNull String video) {
+            super(media);
+            this.video = video;
         }
 
-        public int getType() {
-            return type;
+        public String getVideo() {
+            return video;
         }
     }
 
@@ -58,13 +84,20 @@ public class ShoutMediaPresenter {
 
     private final BiMap<Integer, Item> mediaItems = HashBiMap.create(ImmutableMap.<Integer, Item>of(
             0, new AddImageItem(),
-            1, new AddImageItem(),
-            2, new AddImageItem(),
-            3, new AddImageItem(),
-            4, new AddImageItem()
+            1, new BlankItem(),
+            2, new BlankItem(),
+            3, new BlankItem(),
+            4, new BlankItem()
     ));
 
     private MediaListener mMediaListener;
+
+    private final Context context;
+
+    @Inject
+    public ShoutMediaPresenter(@ForActivity Context context) {
+        this.context = context;
+    }
 
     private void removeItem(@NonNull Item imageItem) {
         final int firstAvailablePosition = getFirstAvailablePosition();
@@ -79,6 +112,11 @@ public class ShoutMediaPresenter {
             }
             mediaItems.forcePut(mediaItems.size() - 1, new AddImageItem());
         }
+
+        if (position + 1 < mediaItems.values().size()) {
+            mediaItems.put(position + 1, new BlankItem());
+        }
+
         mMediaListener.setImages(mediaItems);
     }
 
@@ -88,8 +126,25 @@ public class ShoutMediaPresenter {
             return;
         }
 
-        int position = getFirstAvailablePosition();
-        mediaItems.put(position, new MediaItem(isVideo ? MediaItem.VIDEO : MediaItem.IMAGE, media));
+        final int position = getFirstAvailablePosition();
+        if (isVideo) {
+            File videoThumbnail = null;
+            try {
+                videoThumbnail = MediaUtils.createVideoThumbnail(context, Uri.parse(media));
+            } catch (IOException e) {
+                mMediaListener.thumbnailCreateError();
+            }
+            mediaItems.put(position, new VideoItem(
+                    videoThumbnail != null ? videoThumbnail.getAbsolutePath() : null,
+                    media));
+        } else {
+            mediaItems.put(position, new ImageItem(media));
+        }
+
+        if (position + 1 < mediaItems.values().size()) {
+            mediaItems.put(position + 1, new AddImageItem());
+        }
+
         mMediaListener.setImages(mediaItems);
     }
 
@@ -97,8 +152,7 @@ public class ShoutMediaPresenter {
         final boolean hasVideo = Iterables.any(mediaItems.values(), new Predicate<Item>() {
             @Override
             public boolean apply(@Nullable Item input) {
-                return input instanceof MediaItem &&
-                        ((MediaItem) input).getType() == MediaItem.VIDEO;
+                return input instanceof VideoItem;
             }
         });
         return !hasVideo;
@@ -119,6 +173,10 @@ public class ShoutMediaPresenter {
         mediaListener.setImages(mediaItems);
     }
 
+    public void unregister() {
+        mMediaListener = null;
+    }
+
     public interface MediaListener {
 
         void setImages(@NonNull Map<Integer, Item> mediaElements);
@@ -126,5 +184,7 @@ public class ShoutMediaPresenter {
         void openSelectMediaActivity();
 
         void onlyOneVideoAllowedAlert();
+
+        void thumbnailCreateError();
     }
 }
