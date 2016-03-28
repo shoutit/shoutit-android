@@ -15,7 +15,7 @@
         android:id="@+id/camera_published_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/black_87"
+        android:background="@color/black_54"
         android:clickable="true"
         android:gravity="center_horizontal"
         android:orientation="vertical"
@@ -31,7 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
-            android:text="Shout published. Congrats!"
+            android:text="@string/publish_header"
             android:textColor="@android:color/white"
             android:textSize="22sp"/>
 
@@ -39,7 +39,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
-            android:text="Want to add price?"
+            android:text="@string/publish_sub_header"
             android:textAllCaps="true"
             android:textColor="@android:color/white"/>
 
@@ -52,7 +52,7 @@
                 android:id="@+id/camera_published_price"
                 android:layout_width="120dp"
                 android:layout_height="wrap_content"
-                android:hint="Negotiable"
+                android:hint="@string/publish_price_hint"
                 android:inputType="numberDecimal"
                 android:textColor="@android:color/white"
                 android:textColorHint="@android:color/white"/>
@@ -72,10 +72,21 @@
             android:layout_marginTop="10dp"
             android:fontFamily="sans-serif"
             android:padding="22dp"
-            android:text="Done"
+            android:text="@string/publish_done"
             android:textAllCaps="false"
             android:textColor="@android:color/white"/>
     </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/fragment_camera_close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|left"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:background="?selectableItemBackground"
+        android:src="@drawable/close"/>
 
     <FrameLayout
         android:id="@+id/camera_progress"

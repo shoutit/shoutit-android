@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.PorterDuff;
 import android.media.CamcorderProfile;
 import android.media.ExifInterface;
 import android.net.Uri;
@@ -114,7 +115,9 @@ public class CameraFragment extends Fragment {
     @Bind(R.id.fragment_camera_preview_stack)
     ViewGroup previewStack;
     @Bind(R.id.fragment_camera_switch_camera)
-    ImageView viewSwitchCameraSource;
+    ImageButton switchCameraButton;
+    @Bind(R.id.fragment_camera_close)
+    ImageButton closeButton;
     @Bind(R.id.fragment_camera_mode_video_btn)
     ImageButton video;
     @Bind(R.id.fragment_camera_mode_picture_btn)
@@ -203,7 +206,7 @@ public class CameraFragment extends Fragment {
         if (!SHCameraInfo.getInstance().isHasFrontFacingCamera()
                 || !SHCameraInfo.getInstance().isHasBackFacingCamera()
                 || !this.mCameraSourceToggleEnabled) {
-            this.viewSwitchCameraSource.setVisibility(View.GONE);
+            this.switchCameraButton.setVisibility(View.GONE);
         }
 
         if (!this.mPictureEnabled || !this.mVideoEnabled) {
@@ -235,6 +238,8 @@ public class CameraFragment extends Fragment {
         if (this.mUseFfc && !this.mVideoEnabled) {
             this.isVideoMode = false;
         }
+
+        closeButton.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
     }
 
     private void updateMediaDB() {
@@ -494,7 +499,7 @@ public class CameraFragment extends Fragment {
             case REQUEST_GALLERY_VIDEO_CODE:
                 final Optional<Uri> videoUri = onResult(resultCode, data);
                 final String videoFile = Utils.getVideoDirectory(getActivity(), true) + File.separator + Utils.getVideoName();
-                if(videoUri.isPresent()){
+                if (videoUri.isPresent()) {
                     final Uri uri = videoUri.get();
                     try {
                         copyGalleryFile(videoFile, uri);
@@ -614,7 +619,7 @@ public class CameraFragment extends Fragment {
         actionBtn.setEnabled(false);
         textViewTime.setTextColor(ContextCompat.getColor(getActivity(), R.color.camera_timer_color));
         actionBtn.setImageResource(R.drawable.camera_stop);
-        viewSwitchCameraSource.setEnabled(false);
+        switchCameraButton.setEnabled(false);
         galleryPick.setEnabled(false);
         picture.setEnabled(false);
 
@@ -660,7 +665,7 @@ public class CameraFragment extends Fragment {
     private void onStartTakingPicture() {
         actionBtn.setActivated(false);
         actionBtn.setEnabled(false);
-        viewSwitchCameraSource.setEnabled(false);
+        switchCameraButton.setEnabled(false);
         galleryPick.setEnabled(false);
         picture.setEnabled(false);
     }
@@ -765,8 +770,8 @@ public class CameraFragment extends Fragment {
         this.actionBtn.setSelected(false);
         this.actionBtn.setActivated(false);
 
-        if (this.viewSwitchCameraSource.getVisibility() == View.VISIBLE) {
-            this.viewSwitchCameraSource.setEnabled(true);
+        if (this.switchCameraButton.getVisibility() == View.VISIBLE) {
+            this.switchCameraButton.setEnabled(true);
         }
 
         this.picture.setEnabled(true);
@@ -844,6 +849,11 @@ public class CameraFragment extends Fragment {
         ctlr.switchCamera();
 
         this.isMFfcEnabled = SHCameraInfo.getInstance().isHasFrontFacingCamera() && !this.isMFfcEnabled;
+    }
+
+    @OnClick(R.id.fragment_camera_close)
+    void close() {
+        getActivity().finish();
     }
 
     @OnClick(R.id.fragment_camera_action_btn)

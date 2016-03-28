@@ -249,7 +249,8 @@
     <string name="edit_shout_location">Location</string>
     <string name="edit_shout_price_hint">Price</string>
     <string name="edit_shout_title_hint">Title</string>
-    <string name="edit_shout_title">Edit Shout</string>
+    <string name="edit_shout_title">Edit %s</string>
+    <string name="edit_currency_info">If negotiable leave it empty. Set it to 0 if Free</string>
 
     <!-- Publish -->
     <string name="publish_menu_share">Share Shout</string>
@@ -322,5 +323,16 @@
 
     <!-- Camera -->
     <string name="camera_publish_currency">Currency</string>
+    <string name="camera_publish">Publish</string>
+    <string name="camera_retake">Retake</string>
+    <string name="camera_sub_header">This is your featured photo. Make sure it\'s a good one!
+    </string>
+    <string name="camera_header">What are you offering?</string>
+
+    <!-- Media Published -->
+    <string name="publish_header">Shout published. Congrats!</string>
+    <string name="publish_sub_header">Want to add a price?</string>
+    <string name="publish_price_hint">Negotiable</string>
+    <string name="publish_done">Done</string>
 
 </resources>

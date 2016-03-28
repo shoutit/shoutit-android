@@ -1,6 +1,8 @@
 package com.shoutit.app.android.view.media;
 
 import android.app.Fragment;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -10,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 
@@ -27,6 +30,7 @@ import com.shoutit.app.android.api.model.EditShoutPriceRequest;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PriceUtils;
+import com.shoutit.app.android.view.createshout.publish.PublishShoutActivity;
 import com.shoutit.app.android.widget.SpinnerAdapter;
 
 import java.io.File;
@@ -54,6 +58,8 @@ public class PublishMediaShoutFragment extends Fragment {
 
     @Bind(R.id.publish_media_shout_preview)
     ImageView mPublishMediaShoutPreview;
+    @Bind(R.id.camera_cool_icon)
+    ImageView mPublishMediaCool;
     @Bind(R.id.camera_published_price)
     EditText mCameraPublishedPrice;
     @Bind(R.id.camera_published_currency)
@@ -62,6 +68,8 @@ public class PublishMediaShoutFragment extends Fragment {
     View progress;
     @Bind(R.id.camera_published_done)
     Button mCameraPublishedDone;
+    @Bind(R.id.fragment_camera_close)
+    ImageButton closeButton;
 
     @Inject
     ApiService mApiService;
@@ -103,7 +111,6 @@ public class PublishMediaShoutFragment extends Fragment {
                 getActivity(),
                 R.layout.camera_publish_currency_item,
                 android.R.layout.simple_list_item_1);
-
     }
 
     @android.support.annotation.Nullable
@@ -122,6 +129,13 @@ public class PublishMediaShoutFragment extends Fragment {
         downloadCurrencies();
 
         uploadMedia();
+
+        if (!mIsVideo) {
+            mPublishMediaShoutPreview.setImageURI(Uri.parse(mFile));
+        }
+
+        closeButton.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
+        mPublishMediaCool.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
     }
 
     private void uploadMedia() {
@@ -261,6 +275,7 @@ public class PublishMediaShoutFragment extends Fragment {
                         @Override
                         public void call(CreateShoutResponse createShoutResponse) {
                             getActivity().finish();
+                            PublishShoutActivity.newIntent(getActivity(), createdShoutOfferId, false);
                         }
                     }, new Action1<Throwable>() {
                         @Override
@@ -273,12 +288,13 @@ public class PublishMediaShoutFragment extends Fragment {
                         }
                     });
         } else {
-            ColoredSnackBar.error(
-                    ColoredSnackBar.contentView(getActivity()),
-                    R.string.error_default,
-                    Snackbar.LENGTH_SHORT)
-                    .show();
+            getActivity().finish();
         }
+    }
+
+    @OnClick(R.id.fragment_camera_close)
+    void close() {
+        getActivity().finish();
     }
 
     @Override

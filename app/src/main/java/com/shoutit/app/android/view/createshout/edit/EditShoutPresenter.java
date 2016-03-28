@@ -12,6 +12,7 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.CategoryFilter;
@@ -158,9 +159,12 @@ public class EditShoutPresenter {
                         }
 
                         if (responseData.mShoutResponse != null) {
+                            mListener.setActionbarTitle(mContext.getString(R.string.edit_shout_title, capitalize(responseData.mShoutResponse.getType())));
                             mListener.setTitle(responseData.mShoutResponse.getTitle());
-                            mListener.setPrice(PriceUtils.formatPrice(responseData.mShoutResponse.getPrice(), mContext.getResources()));
-                            mListener.setDescription(responseData.mShoutResponse.getDescription());
+                            mListener.setPrice(PriceUtils.formatPrice(
+                                    responseData.mShoutResponse.getPrice(),
+                                    mContext.getResources()));
+                            mListener.setDescription(responseData.mShoutResponse.getText());
                             mUserLocation = responseData.mShoutResponse.getLocation();
                             mListener.setLocation(
                                     ResourcesHelper.getResourceIdForName(mUserLocation.getCountry(), mContext),
@@ -170,6 +174,10 @@ public class EditShoutPresenter {
                         }
                     }
                 }));
+    }
+
+    private String capitalize(@NonNull final String line) {
+        return Character.toUpperCase(line.charAt(0)) + line.substring(1);
     }
 
     private void categorySuccess(@NonNull List<Category> responseData) {
@@ -203,23 +211,23 @@ public class EditShoutPresenter {
 
         mListener.showProgress();
 
-        final EditShoutRequest request = Strings.isNullOrEmpty(requestData.mBudget) ?
-                new EditShoutRequest(
+        Observable<CreateShoutResponse> observable = Strings.isNullOrEmpty(requestData.mBudget) ?
+                mApiService.editShout(mShoutId, new EditShoutRequest(
                         requestData.mTitle,
                         requestData.mDescription,
                         new UserLocationSimple(mUserLocation.getLatitude(), mUserLocation.getLongitude()),
                         requestData.mCategoryId,
-                        getFilters(requestData.mOptionsIdValue)) :
-                new EditShoutRequestWithPrice(
+                        getFilters(requestData.mOptionsIdValue))) :
+                mApiService.editShout(mShoutId, new EditShoutRequestWithPrice(
                         requestData.mTitle,
                         requestData.mDescription,
                         new UserLocationSimple(mUserLocation.getLatitude(), mUserLocation.getLongitude()),
                         PriceUtils.getPriceInCents(requestData.mBudget),
                         requestData.mCurrencyId,
                         requestData.mCategoryId,
-                        getFilters(requestData.mOptionsIdValue));
+                        getFilters(requestData.mOptionsIdValue)));
 
-        pendingSubscriptions.add(mApiService.editShout(mShoutId, request)
+        pendingSubscriptions.add(observable
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
                 .subscribe(new Action1<CreateShoutResponse>() {
@@ -328,6 +336,8 @@ public class EditShoutPresenter {
         void setPrice(@NonNull String price);
 
         void setCategoryImage(@Nullable String image);
+
+        void setActionbarTitle(@NonNull String title);
     }
 
 }
