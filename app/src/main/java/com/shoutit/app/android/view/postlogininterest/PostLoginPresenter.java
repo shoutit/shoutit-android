@@ -49,7 +49,7 @@ public class PostLoginPresenter {
         mStringSelectionHelper = selectionHelper;
 
         final Observable<ResponseOrError<List<Category>>> listObservableResponseOrError = dao
-                .getListObservableResponseOrError()
+                .categoriesObservable()
                 .subscribeOn(networkScheduler)
                 .observeOn(uiScheduler);
         final Observable<List<Category>> success = listObservableResponseOrError.compose(ResponseOrError.<List<Category>>onlySuccess());

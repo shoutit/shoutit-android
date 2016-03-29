@@ -79,7 +79,7 @@ public interface ApiService {
     Observable<Shout> shout(@Path("id") String shoutId);
 
     @GET("shouts")
-    Observable<ShoutsResponse> shoutsForUser(@Query("user") String userName,
+    Observable<ShoutsResponse> shoutsForUser(@Query("profile") String userName,
                                              @Query("page") Integer page,
                                              @Query("page_size") Integer pageSize);
 
