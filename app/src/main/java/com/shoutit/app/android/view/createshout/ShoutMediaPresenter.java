@@ -4,13 +4,17 @@ import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
+import com.appunite.rx.functions.BothParams;
 import com.google.common.base.Predicate;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.view.media.MediaUtils;
 
 import java.io.File;
@@ -20,6 +24,10 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+
+import rx.Observable;
+import rx.functions.Func2;
+import rx.functions.FuncN;
 
 public class ShoutMediaPresenter {
 
@@ -62,7 +70,7 @@ public class ShoutMediaPresenter {
         }
     }
 
-    public class RemoteImageItem extends ImageItem {
+    public class RemoteImageItem extends MediaItem {
 
         public RemoteImageItem(@NonNull String media) {
             super(media);
@@ -83,10 +91,17 @@ public class ShoutMediaPresenter {
         }
     }
 
-    public class RemoteVideoItem extends VideoItem {
+    public class RemoteVideoItem extends MediaItem {
+
+        private final String video;
 
         public RemoteVideoItem(@Nullable String media, @NonNull String video) {
-            super(media, video);
+            super(media);
+            this.video = video;
+        }
+
+        public String getVideo() {
+            return video;
         }
     }
 
@@ -109,10 +124,14 @@ public class ShoutMediaPresenter {
     private MediaListener mMediaListener;
 
     private final Context context;
+    private final ApiService mApiService;
+    private final AmazonHelper mAmazonHelper;
 
     @Inject
-    public ShoutMediaPresenter(@ForActivity Context context) {
+    public ShoutMediaPresenter(@ForActivity Context context, ApiService apiService, AmazonHelper amazonHelper) {
         this.context = context;
+        mApiService = apiService;
+        mAmazonHelper = amazonHelper;
     }
 
     private void removeItem(@NonNull Item imageItem) {
@@ -221,6 +240,53 @@ public class ShoutMediaPresenter {
         }
 
         throw new IllegalStateException("cannot add image when list is full");
+    }
+
+    public void send() {
+        final List<Observable<String>> imageObservables = Lists.newArrayList();
+        Observable<BothParams<String, String>> videoObservable = null;
+
+        for (Item item : mediaItems.values()) {
+            if (item instanceof VideoItem) {
+                VideoItem videoItem = (VideoItem) item;
+                final Observable<String> videoFileObservable = mAmazonHelper.uploadShoutMediaObservable(new File(videoItem.getVideo()));
+                final Observable<String> thumbFileObservable = mAmazonHelper.uploadShoutMediaObservable(new File(videoItem.getThumb()));
+                videoObservable = Observable.zip(videoFileObservable, thumbFileObservable, new Func2<String, String, BothParams<String, String>>() {
+                    @Override
+                    public BothParams<String, String> call(String video, String thumb) {
+                        return BothParams.of(video, thumb);
+                    }
+                });
+            } else if (item instanceof ImageItem) {
+                final ImageItem imageItem = (ImageItem) item;
+                imageObservables.add(mAmazonHelper.uploadUserImageObservable(new File(imageItem.getThumb())));
+            }
+        }
+
+        final Observable<List<String>> images = Observable.zip(imageObservables, new FuncN<List<String>>() {
+            @Override
+            public List<String> call(Object... args) {
+                return null;
+            }
+        });
+
+        if (!imageObservables.isEmpty()) {
+            if (videoObservable == null) {
+                images.subscribe();
+            } else {
+                images.zipWith(videoObservable, new Func2<List<String>, BothParams<String, String>, Object>() {
+                    @Override
+                    public Object call(List<String> strings, BothParams<String, String> stringStringBothParams) {
+                        return null;
+                    }
+                }).subscribe();
+            }
+        } else {
+            if (videoObservable != null) {
+                videoObservable.subscribe()
+            }
+        }
+
     }
 
     public void register(@NonNull MediaListener mediaListener) {
