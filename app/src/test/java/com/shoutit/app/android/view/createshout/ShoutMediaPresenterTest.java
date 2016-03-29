@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 
 import com.google.common.collect.ImmutableList;
+import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.view.media.MediaUtils;
 
 import org.junit.Before;
@@ -18,7 +19,10 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
+
+import rx.Observable;
 
 import static com.google.common.truth.Truth.assert_;
 import static org.mockito.Matchers.any;
@@ -43,6 +47,9 @@ public class ShoutMediaPresenterTest {
     @Mock
     Context context;
 
+    @Mock
+    AmazonHelper mAmazonHelper;
+
     @Before
     public void setUp() throws IOException {
         MockitoAnnotations.initMocks(this);
@@ -50,7 +57,8 @@ public class ShoutMediaPresenterTest {
         PowerMockito.mockStatic(MediaUtils.class);
         when(Uri.parse(anyString())).thenReturn(null);
         when(MediaUtils.createVideoThumbnail(any(Context.class), any(Uri.class))).thenReturn(new File(""));
-        mShoutMediaPresenter = new ShoutMediaPresenter(context);
+        when(mAmazonHelper.uploadShoutMediaObservable(any(File.class))).thenReturn(Observable.just("test"));
+        mShoutMediaPresenter = new ShoutMediaPresenter(context, mAmazonHelper);
     }
 
     @SuppressWarnings("unchecked")
@@ -160,5 +168,54 @@ public class ShoutMediaPresenterTest {
         mShoutMediaPresenter.addMediaItem("test2", false);
 
         verify(mMediaListener, times(0)).onlyOneVideoAllowedAlert();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testSendOnlyVideo_videoReturned() throws Exception {
+        ArgumentCaptor<List> imagesCaptor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<List> videoCaptor = ArgumentCaptor.forClass(List.class);
+        mShoutMediaPresenter.register(mMediaListener);
+
+        mShoutMediaPresenter.addMediaItem("test", true);
+
+        mShoutMediaPresenter.send();
+
+        verify(mMediaListener).mediaUploadCompleted(imagesCaptor.capture(), videoCaptor.capture());
+        assert_().that(imagesCaptor.getValue()).isEmpty();
+        assert_().that(videoCaptor.getValue()).hasSize(1);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testSendOnlyImages_imagesReturned() throws Exception {
+        ArgumentCaptor<List> imagesCaptor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<List> videoCaptor = ArgumentCaptor.forClass(List.class);
+        mShoutMediaPresenter.register(mMediaListener);
+
+        mShoutMediaPresenter.addMediaItem("test", false);
+
+        mShoutMediaPresenter.send();
+
+        verify(mMediaListener).mediaUploadCompleted(imagesCaptor.capture(), videoCaptor.capture());
+        assert_().that(videoCaptor.getValue()).isEmpty();
+        assert_().that(imagesCaptor.getValue()).hasSize(1);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testSendVideoAndImages_videoAndImagesReturned() throws Exception {
+        ArgumentCaptor<List> imagesCaptor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<List> videoCaptor = ArgumentCaptor.forClass(List.class);
+        mShoutMediaPresenter.register(mMediaListener);
+
+        mShoutMediaPresenter.addMediaItem("test", false);
+        mShoutMediaPresenter.addMediaItem("test", true);
+
+        mShoutMediaPresenter.send();
+
+        verify(mMediaListener).mediaUploadCompleted(imagesCaptor.capture(), videoCaptor.capture());
+        assert_().that(videoCaptor.getValue()).hasSize(1);
+        assert_().that(imagesCaptor.getValue()).hasSize(1);
     }
 }

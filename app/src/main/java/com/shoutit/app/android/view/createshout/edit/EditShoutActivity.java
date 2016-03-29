@@ -26,6 +26,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.appunite.rx.functions.BothParams;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -435,5 +436,10 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     @Override
     public void thumbnailCreateError() {
 
+    }
+
+    @Override
+    public void mediaUploadCompleted(@NonNull List<String> images, @NonNull List<BothParams<String, String>> videos) {
+        // TODO
     }
 }

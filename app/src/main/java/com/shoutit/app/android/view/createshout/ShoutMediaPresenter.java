@@ -8,10 +8,10 @@ import com.appunite.rx.functions.BothParams;
 import com.google.common.base.Predicate;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.AmazonHelper;
@@ -26,6 +26,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import rx.Observable;
+import rx.functions.Action1;
 import rx.functions.Func2;
 import rx.functions.FuncN;
 
@@ -124,13 +125,11 @@ public class ShoutMediaPresenter {
     private MediaListener mMediaListener;
 
     private final Context context;
-    private final ApiService mApiService;
     private final AmazonHelper mAmazonHelper;
 
     @Inject
-    public ShoutMediaPresenter(@ForActivity Context context, ApiService apiService, AmazonHelper amazonHelper) {
+    public ShoutMediaPresenter(@ForActivity Context context, AmazonHelper amazonHelper) {
         this.context = context;
-        mApiService = apiService;
         mAmazonHelper = amazonHelper;
     }
 
@@ -259,34 +258,59 @@ public class ShoutMediaPresenter {
                 });
             } else if (item instanceof ImageItem) {
                 final ImageItem imageItem = (ImageItem) item;
-                imageObservables.add(mAmazonHelper.uploadUserImageObservable(new File(imageItem.getThumb())));
+                imageObservables.add(mAmazonHelper.uploadShoutMediaObservable(new File(imageItem.getThumb())));
             }
         }
 
-        final Observable<List<String>> images = Observable.zip(imageObservables, new FuncN<List<String>>() {
-            @Override
-            public List<String> call(Object... args) {
-                return null;
-            }
-        });
+        mergeVideoAndImagesObservable(imageObservables, videoObservable);
+    }
 
+    private void mergeVideoAndImagesObservable(List<Observable<String>> imageObservables, Observable<BothParams<String, String>> videoObservable) {
         if (!imageObservables.isEmpty()) {
-            if (videoObservable == null) {
-                images.subscribe();
-            } else {
-                images.zipWith(videoObservable, new Func2<List<String>, BothParams<String, String>, Object>() {
-                    @Override
-                    public Object call(List<String> strings, BothParams<String, String> stringStringBothParams) {
-                        return null;
+            final Observable<List<String>> images = Observable.zip(imageObservables, new FuncN<List<String>>() {
+
+                @Override
+                public List<String> call(Object... args) {
+                    final List<String> images = Lists.newArrayList();
+                    for (Object url : args) {
+                        images.add((String) url);
                     }
-                }).subscribe();
+                    return images;
+                }
+            });
+
+            if (videoObservable == null) {
+                images.subscribe(new Action1<List<String>>() {
+                    @Override
+                    public void call(List<String> images) {
+                        mMediaListener.mediaUploadCompleted(images, ImmutableList.<BothParams<String, String>>of());
+                    }
+                });
+            } else {
+                images.zipWith(
+                        videoObservable, new Func2<List<String>, BothParams<String, String>, BothParams<List<String>, BothParams<String, String>>>() {
+                            @Override
+                            public BothParams<List<String>, BothParams<String, String>> call(List<String> images, BothParams<String, String> videos) {
+                                return BothParams.of(images, videos);
+                            }
+                        })
+                        .subscribe(new Action1<BothParams<List<String>, BothParams<String, String>>>() {
+                            @Override
+                            public void call(BothParams<List<String>, BothParams<String, String>> listBothParamsBothParams) {
+                                mMediaListener.mediaUploadCompleted(listBothParamsBothParams.param1(), ImmutableList.of(listBothParamsBothParams.param2()));
+                            }
+                        });
             }
         } else {
             if (videoObservable != null) {
-                videoObservable.subscribe()
+                videoObservable.subscribe(new Action1<BothParams<String, String>>() {
+                    @Override
+                    public void call(BothParams<String, String> video) {
+                        mMediaListener.mediaUploadCompleted(ImmutableList.<String>of(), ImmutableList.of(video));
+                    }
+                });
             }
         }
-
     }
 
     public void register(@NonNull MediaListener mediaListener) {
@@ -307,5 +331,7 @@ public class ShoutMediaPresenter {
         void onlyOneVideoAllowedAlert();
 
         void thumbnailCreateError();
+
+        void mediaUploadCompleted(@NonNull List<String> images, @NonNull List<BothParams<String, String>> videos);
     }
 }
