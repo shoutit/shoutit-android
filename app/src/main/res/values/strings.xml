@@ -327,4 +327,13 @@
     <!-- Camera -->
     <string name="camera_publish_currency">Currency</string>
 
+    <!-- Filters -->
+    <string name="filters_filters">Filters</string>
+    <string name="filters_reset">Reset</string>
+    <string name="filters_done">Done</string>
+    <string name="filters_type_all">All</string>
+    <string name="filters_type_offers">Offers</string>
+    <string name="filters_type_requests">Requests</string>
+    <string name="filters_shout_type">Shout type</string>
+
 </resources>
