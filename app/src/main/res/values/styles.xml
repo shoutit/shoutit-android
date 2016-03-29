@@ -110,6 +110,7 @@
     <style name="BlueEditText" parent="ThemeOverlay.AppCompat">
         <item name="colorControlActivated">@color/accent_blue</item>
         <item name="colorControlHighlight">@color/accent_blue</item>
+        <item name="colorControlNormal">@color/accent_blue</item>
     </style>
 
     <style name="BlueSeekBar" parent="ThemeOverlay.AppCompat">

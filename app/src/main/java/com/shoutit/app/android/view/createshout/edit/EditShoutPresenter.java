@@ -195,7 +195,7 @@ public class EditShoutPresenter {
     }
 
     private void currencySuccess(@NonNull List<Currency> responseData) {
-        final List<Pair<String, String>> list = PriceUtils.transformCurrencyToPair(responseData);
+        final List<PriceUtils.SpinnerCurrency> list = PriceUtils.transformCurrencyToPair(responseData);
 
         mListener.setCurrencies(list);
     }
@@ -315,7 +315,7 @@ public class EditShoutPresenter {
 
         void showBodyError();
 
-        void setCurrencies(@NonNull List<Pair<String, String>> list);
+        void setCurrencies(@NonNull List<PriceUtils.SpinnerCurrency> list);
 
         void setCurrenciesEnabled(boolean enabled);
 
