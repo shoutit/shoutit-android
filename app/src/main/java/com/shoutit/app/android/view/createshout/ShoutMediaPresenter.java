@@ -9,11 +9,13 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
+import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.view.media.MediaUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -60,6 +62,13 @@ public class ShoutMediaPresenter {
         }
     }
 
+    public class RemoteImageItem extends ImageItem {
+
+        public RemoteImageItem(@NonNull String media) {
+            super(media);
+        }
+    }
+
     public class VideoItem extends MediaItem {
 
         private final String video;
@@ -71,6 +80,13 @@ public class ShoutMediaPresenter {
 
         public String getVideo() {
             return video;
+        }
+    }
+
+    public class RemoteVideoItem extends VideoItem {
+
+        public RemoteVideoItem(@Nullable String media, @NonNull String video) {
+            super(media, video);
         }
     }
 
@@ -120,32 +136,71 @@ public class ShoutMediaPresenter {
         mMediaListener.setImages(mediaItems);
     }
 
+    public void addRemoteMedia(List<String> images, List<Video> videos) {
+        for (String image : images) {
+            addImageItem(image, true);
+        }
+
+        for (Video video : videos) {
+            addRemoteVideoItem(video.getUrl(), video.getThumbnailUrl());
+        }
+
+        mMediaListener.setImages(mediaItems);
+    }
+
     public void addMediaItem(@NonNull String media, boolean isVideo) {
-        if (isVideo && !canAddVideo()) {
+        if (isVideo) {
+            addLocalVideoItem(media);
+        } else {
+            addImageItem(media, false);
+        }
+    }
+
+    private void addLocalVideoItem(@NonNull String media) {
+        if (!canAddVideo()) {
             mMediaListener.onlyOneVideoAllowedAlert();
             return;
         }
 
         final int position = getFirstAvailablePosition();
-        if (isVideo) {
-            File videoThumbnail = null;
-            try {
-                videoThumbnail = MediaUtils.createVideoThumbnail(context, Uri.parse(media));
-            } catch (IOException e) {
-                mMediaListener.thumbnailCreateError();
-            }
-            mediaItems.put(position, new VideoItem(
-                    videoThumbnail != null ? videoThumbnail.getAbsolutePath() : null,
-                    media));
-        } else {
-            mediaItems.put(position, new ImageItem(media));
+        File videoThumbnail = null;
+        try {
+            videoThumbnail = MediaUtils.createVideoThumbnail(context, Uri.parse(media));
+        } catch (IOException e) {
+            mMediaListener.thumbnailCreateError();
         }
+        mediaItems.put(position, new VideoItem(
+                videoThumbnail != null ? String.format("file://%1$s", videoThumbnail.getAbsolutePath()) : null,
+                media));
 
         if (position + 1 < mediaItems.values().size()) {
             mediaItems.put(position + 1, new AddImageItem());
         }
 
         mMediaListener.setImages(mediaItems);
+    }
+
+    private void addRemoteVideoItem(@NonNull String media, @NonNull String thumbnail) {
+        final int position = getFirstAvailablePosition();
+        mediaItems.put(position, new RemoteVideoItem(thumbnail, media));
+
+        if (position + 1 < mediaItems.values().size()) {
+            mediaItems.put(position + 1, new AddImageItem());
+        }
+    }
+
+    private void addImageItem(@NonNull String media, boolean isRemote) {
+        final int position = getFirstAvailablePosition();
+
+        if (position + 1 < mediaItems.values().size()) {
+            mediaItems.put(position + 1, new AddImageItem());
+        }
+
+        mediaItems.put(position, isRemote ? new RemoteImageItem(media) : new ImageItem(String.format("file://%1$s", media)));
+
+        if (!isRemote) {
+            mMediaListener.setImages(mediaItems);
+        }
     }
 
     private boolean canAddVideo() {

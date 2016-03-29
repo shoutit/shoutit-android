@@ -21,7 +21,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -37,6 +36,7 @@ import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.CategoryFilter;
 import com.shoutit.app.android.api.model.UserLocation;
+import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
@@ -384,6 +384,11 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     }
 
     @Override
+    public void setMedia(@NonNull List<String> images, @NonNull List<Video> videos) {
+        mShoutMediaPresenter.addRemoteMedia(images, videos);
+    }
+
+    @Override
     public void setImages(@NonNull Map<Integer, ShoutMediaPresenter.Item> mediaElements) {
         mEditMediaContainer.removeAllViews();
 
@@ -397,7 +402,10 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
             } else if (item instanceof ShoutMediaPresenter.MediaItem) {
                 view = layoutInflater.inflate(R.layout.edit_media_item, mEditMediaContainer, false);
                 final ImageView imageView = (ImageView) view.findViewById(R.id.edit_media_item_image);
-                imageView.setImageURI(Uri.parse(((ShoutMediaPresenter.MediaItem) item).getThumb()));
+                mPicasso.load(Uri.parse(((ShoutMediaPresenter.MediaItem) item).getThumb()))
+                        .centerCrop()
+                        .fit()
+                        .into(imageView);
             } else if (item instanceof ShoutMediaPresenter.BlankItem) {
                 view = layoutInflater.inflate(R.layout.edit_media_blank, mEditMediaContainer, false);
             } else {

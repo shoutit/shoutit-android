@@ -33,10 +33,10 @@
                     android:layout_height="wrap_content">
 
                     <LinearLayout
-                        android:orientation="horizontal"
                         android:id="@+id/edit_media_container"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"/>
 
                 </HorizontalScrollView>
 

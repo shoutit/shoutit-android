@@ -23,6 +23,7 @@ import com.shoutit.app.android.api.model.EditShoutRequestWithPrice;
 import com.shoutit.app.android.api.model.ShoutResponse;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.UserLocationSimple;
+import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.ResourcesHelper;
@@ -169,6 +170,7 @@ public class EditShoutPresenter {
                             mListener.setLocation(
                                     ResourcesHelper.getResourceIdForName(mUserLocation.getCountry(), mContext),
                                     mUserLocation.getCity());
+                            mListener.setMedia(responseData.mShoutResponse.getImages(), responseData.mShoutResponse.getVideos());
                         } else {
                             mListener.showBodyError();
                         }
@@ -338,6 +340,8 @@ public class EditShoutPresenter {
         void setCategoryImage(@Nullable String image);
 
         void setActionbarTitle(@NonNull String title);
+
+        void setMedia(@NonNull List<String> images, @NonNull List<Video> videos);
     }
 
 }

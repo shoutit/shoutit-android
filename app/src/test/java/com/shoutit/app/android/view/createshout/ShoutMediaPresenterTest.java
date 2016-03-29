@@ -99,7 +99,7 @@ public class ShoutMediaPresenterTest {
         verify(mMediaListener, times(2)).setImages(argumentCaptor.capture());
         final ShoutMediaPresenter.Item target = (ShoutMediaPresenter.Item) argumentCaptor.getValue().get(0);
         assert_().that(target).isInstanceOf(ShoutMediaPresenter.MediaItem.class);
-        assert_().that(((ShoutMediaPresenter.MediaItem) target).getThumb()).isEqualTo("test");
+        assert_().that(((ShoutMediaPresenter.MediaItem) target).getThumb()).isEqualTo("file://test");
     }
 
     @SuppressWarnings("unchecked")

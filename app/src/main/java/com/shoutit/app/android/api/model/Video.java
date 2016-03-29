@@ -14,4 +14,24 @@ public class Video {
         this.idOnProvider = idOnProvider;
         this.duration = duration;
     }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public String getThumbnailUrl() {
+        return thumbnailUrl;
+    }
+
+    public String getProvider() {
+        return provider;
+    }
+
+    public String getIdOnProvider() {
+        return idOnProvider;
+    }
+
+    public int getDuration() {
+        return duration;
+    }
 }
