@@ -10,8 +10,9 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 public class Shout {
-    private static final String TYPE_OFFER = "offer";
-    private static final String TYPE_REQUEST = "request";
+    public static final String TYPE_OFFER = "offer";
+    public static final String TYPE_REQUEST = "request";
+    public static final String TYPE_ALL = "all";
 
     @Nonnull
     private final String id;

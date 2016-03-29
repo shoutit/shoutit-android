@@ -1,5 +1,7 @@
 package com.shoutit.app.android.api.model;
 
+import com.google.common.base.Objects;
+
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -39,6 +41,20 @@ public class CategoryFilter {
         public String getSlug() {
             return slug;
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof FilterValue)) return false;
+            final FilterValue that = (FilterValue) o;
+            return Objects.equal(name, that.name) &&
+                    Objects.equal(slug, that.slug);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(name, slug);
+        }
     }
 
     @Nonnull
@@ -54,5 +70,20 @@ public class CategoryFilter {
     @Nonnull
     public String getSlug() {
         return slug;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof CategoryFilter)) return false;
+        final CategoryFilter filter = (CategoryFilter) o;
+        return Objects.equal(name, filter.name) &&
+                Objects.equal(slug, filter.slug) &&
+                Objects.equal(values, filter.values);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(name, slug, values);
     }
 }

@@ -16,6 +16,7 @@ import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
+import com.shoutit.app.android.dao.SortTypesDao;
 import com.shoutit.app.android.dao.SuggestionsDao;
 import com.shoutit.app.android.db.DbHelper;
 import com.shoutit.app.android.dao.TagsDao;
@@ -69,6 +70,8 @@ public interface AppComponent {
     DiscoverShoutsDao discoverShoutsDao();
 
     CategoriesDao categoriesDao();
+
+    SortTypesDao sortTypesDao();
 
     GoogleApiClient googleApiClient();
 

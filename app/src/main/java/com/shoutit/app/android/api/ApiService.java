@@ -23,6 +23,7 @@ import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutResponse;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.SignResponse;
+import com.shoutit.app.android.api.model.SortType;
 import com.shoutit.app.android.api.model.Suggestion;
 import com.shoutit.app.android.api.model.SuggestionsResponse;
 import com.shoutit.app.android.api.model.TagDetail;
@@ -122,6 +123,9 @@ public interface ApiService {
     Observable<List<Suggestion>> searchSuggestions(@Query("search") String searchQuery,
                                                    @Query("category") String categoryName,
                                                    @Query("country") String country);
+
+    @GET("shouts/sort_types")
+    Observable<List<SortType>> sortTypes();
 
     /**
      * OAuth
