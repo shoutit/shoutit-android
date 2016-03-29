@@ -7,7 +7,6 @@ import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.appunite.rx.operators.MoreOperators;
-import com.appunite.rx.operators.OperatorMergeNextToken;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -31,7 +30,6 @@ import javax.annotation.Nonnull;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
-import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
 public class ShoutsDao {
@@ -150,57 +148,35 @@ public class ShoutsDao {
         return loadMoreHomeShoutsSubject;
     }
 
-    public class HomeShoutsDao {
+    @Nonnull
+    public Observer<Object> getHomeShoutsRefreshObserver(LocationPointer pointer) {
+        return homeCache.getUnchecked(pointer).getRefreshObserver();
+    }
+
+    public class HomeShoutsDao extends BaseShoutsDao {
 
         @Nonnull
-        private final Observable<ResponseOrError<ShoutsResponse>> homeShoutsObservable;
+        private final LocationPointer mLocationPointer;
 
         public HomeShoutsDao(@Nonnull final LocationPointer locationPointer) {
-
-            final OperatorMergeNextToken<ShoutsResponse, Object> loadMoreOperator =
-                     OperatorMergeNextToken.create(new Func1<ShoutsResponse, Observable<ShoutsResponse>>() {
-                        private int pageNumber = 0;
-
-                        @Override
-                        public Observable<ShoutsResponse> call(ShoutsResponse previousResponse) {
-                            if (previousResponse == null || previousResponse.getNext() != null) {
-                                if (previousResponse == null) {
-                                    pageNumber = 0;
-                                }
-                                ++pageNumber;
-                                final Observable<ShoutsResponse> apiRequest;
-                                if (userPreferences.isNormalUser()) {
-                                    apiRequest = apiService
-                                            .home(RequestsConstants.USER_ME, pageNumber, PAGE_SIZE)
-                                            .subscribeOn(networkScheduler);
-                                } else {
-                                    apiRequest = apiService
-                                            .shoutsForLocation(locationPointer.getCountryCode(),
-                                                    locationPointer.getCity(), null, pageNumber, PAGE_SIZE)
-                                            .subscribeOn(networkScheduler);
-                                }
-
-                                if (previousResponse == null) {
-                                    return apiRequest;
-                                } else {
-                                    return Observable.just(previousResponse).zipWith(apiRequest, new MergeShoutsResponses());
-                                }
-                            } else {
-                                return Observable.never();
-                            }
-                        }
-                    });
-
-            homeShoutsObservable = loadMoreHomeShoutsSubject.startWith((Object) null)
-                    .lift(loadMoreOperator)
-                    .compose(ResponseOrError.<ShoutsResponse>toResponseOrErrorObservable())
-                    .compose(MoreOperators.<ShoutsResponse>repeatOnError(networkScheduler))
-                    .compose(MoreOperators.<ResponseOrError<ShoutsResponse>>cacheWithTimeout(networkScheduler));
+            super(networkScheduler);
+            mLocationPointer = locationPointer;
         }
 
+        @NonNull
         @Nonnull
-        public Observable<ResponseOrError<ShoutsResponse>> getShoutsObservable() {
-            return homeShoutsObservable;
+        @Override
+        Observable<ShoutsResponse> getShoutsRequest(int pageNumber) {
+            if (userPreferences.isNormalUser()) {
+                return apiService
+                        .home(RequestsConstants.USER_ME, pageNumber, PAGE_SIZE)
+                        .subscribeOn(networkScheduler);
+            } else {
+                return apiService
+                        .shoutsForLocation(mLocationPointer.getCountryCode(),
+                                mLocationPointer.getCity(), null, pageNumber, PAGE_SIZE)
+                        .subscribeOn(networkScheduler);
+            }
         }
     }
 

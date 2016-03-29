@@ -21,6 +21,8 @@ import com.shoutit.app.android.api.model.Currency;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.UserLocationSimple;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.ShoutsDao;
+import com.shoutit.app.android.model.LocationPointer;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.ResourcesHelper;
 
@@ -33,6 +35,7 @@ import rx.Observable;
 import rx.Scheduler;
 import rx.Subscription;
 import rx.functions.Action1;
+import rx.functions.Func1;
 import rx.subscriptions.CompositeSubscription;
 
 public class CreateRequestPresenter {
@@ -58,6 +61,7 @@ public class CreateRequestPresenter {
     private final ApiService mApiService;
     private final Scheduler mNetworkScheduler;
     private final Scheduler mUiScheduler;
+    private final ShoutsDao mShoutsDao;
     private Listener mListener;
     private UserLocation mUserLocation;
     private Subscription locationSubscription;
@@ -68,11 +72,13 @@ public class CreateRequestPresenter {
                                   @ForActivity Context context,
                                   ApiService apiService,
                                   @NetworkScheduler Scheduler networkScheduler,
-                                  @UiScheduler Scheduler uiScheduler) {
+                                  @UiScheduler Scheduler uiScheduler,
+                                  ShoutsDao shoutsDao) {
         mContext = context;
         mApiService = apiService;
         mNetworkScheduler = networkScheduler;
         mUiScheduler = uiScheduler;
+        mShoutsDao = shoutsDao;
         mLocationObservable = userPreferences.getLocationObservable()
                 .compose(ObservableExtensions.<UserLocation>behaviorRefCount());
     }
@@ -108,7 +114,6 @@ public class CreateRequestPresenter {
                                                                    String.format("%s (%s)", input.getName(), input.getCountry()));
                                                        }
                                                    }));
-
                                    mListener.setCurrencies(list);
                                    mListener.hideProgress();
                                    mListener.removeRetryCurrenciesListener();
@@ -156,6 +161,23 @@ public class CreateRequestPresenter {
                     public void call(CreateShoutResponse responseBody) {
                         mListener.hideProgress();
                         mListener.finishActivity(responseBody.getId());
+
+                        mLocationObservable
+                                .first()
+                                .map(new Func1<UserLocation, LocationPointer>() {
+                                    @Override
+                                    public LocationPointer call(UserLocation userLocation) {
+                                        return new LocationPointer(userLocation.getCountry(), userLocation.getCity());
+                                    }
+                                })
+                                .subscribe(new Action1<LocationPointer>() {
+                                    @Override
+                                    public void call(LocationPointer locationPointer) {
+                                        mShoutsDao.getHomeShoutsRefreshObserver(locationPointer).onNext(new Object());
+                                    }
+                                });
+
+
                     }
                 }, new Action1<Throwable>() {
                     @Override
