@@ -21,7 +21,7 @@ public class CategoryFilter {
         this.values = values;
     }
 
-    public class FilterValue {
+    public static class FilterValue {
         @Nonnull
         private final String name;
         @Nonnull

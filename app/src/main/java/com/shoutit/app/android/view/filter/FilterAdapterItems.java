@@ -162,6 +162,14 @@ public class FilterAdapterItems {
         public boolean same(@Nonnull BaseAdapterItem item) {
             return true;
         }
+
+        public void onDoneClicked() {
+            doneObserver.onNext(null);
+        }
+
+        public void onResetClicked() {
+            resetObserver.onNext(null);
+        }
     }
 
     public static class ShoutTypeAdapterItem extends BaseNoIDAdapterItem {
@@ -186,10 +194,10 @@ public class FilterAdapterItems {
 
     public static class CategoryAdapterItem extends BaseNoIDAdapterItem {
 
-        @Nonnull
+        @Nullable
         private final Category category;
 
-        public CategoryAdapterItem(@Nonnull Category category) {
+        public CategoryAdapterItem(@Nullable Category category) {
             this.category = category;
         }
 
@@ -201,7 +209,7 @@ public class FilterAdapterItems {
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
             return item instanceof CategoryAdapterItem
-                    && category.equals(((CategoryAdapterItem) item).category);
+                    && category != null && category.equals(((CategoryAdapterItem) item).category);
         }
     }
 
