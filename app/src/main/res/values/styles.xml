@@ -244,4 +244,13 @@
         <item name="android:ellipsize">end</item>
     </style>
 
+    <style name="FiltersHeader">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:textColor">@color/black_54</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:layout_marginTop">4dp</item>
+    </style>
+
 </resources>

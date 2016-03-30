@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="72dp">
+
+    <TextView
+        android:id="@+id/filters_price_header"
+        style="@style/FiltersHeader"
+        android:layout_marginBottom="9dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:text="@string/filters_ctegory_header" />
+
+    <EditText
+        android:id="@+id/filters_price_from_et"
+        android:layout_width="112dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/filters_price_header"
+        android:hint="@string/filters_price_from"
+        android:inputType="number"
+        android:layout_marginLeft="6dp"
+        android:layout_marginStart="6dp"
+        android:nextFocusDown="@+id/filters_price_to_et"
+        android:theme="@style/BlueEditText" />
+
+    <EditText
+        android:id="@+id/filters_price_to_et"
+        android:layout_width="112dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/filters_price_header"
+        android:hint="@string/filters_price_to"
+        android:layout_marginRight="8dp"
+        android:layout_marginEnd="8dp"
+        android:inputType="number"
+        android:theme="@style/BlueEditText" />
+
+</RelativeLayout>

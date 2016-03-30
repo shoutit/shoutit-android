@@ -335,5 +335,8 @@
     <string name="filters_type_offers">Offers</string>
     <string name="filters_type_requests">Requests</string>
     <string name="filters_shout_type">Shout type</string>
+    <string name="filters_ctegory_header">Category</string>
+    <string name="filters_price_from">From</string>
+    <string name="filters_price_to">To</string>
 
 </resources>
