@@ -43,7 +43,7 @@ public class PriceUtils {
     }
 
     public static long getPriceInCents(String price) {
-        final double doublePrice = Double.parseDouble(price);
+        final double doublePrice = Double.parseDouble(price.replace(",", "."));
         final double centsPrice = doublePrice * 100;
         return (long) centsPrice;
     }
