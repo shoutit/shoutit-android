@@ -126,7 +126,7 @@ public class ShoutMediaPresenter {
         }
     }
 
-    private final BiMap<Integer, Item> mediaItems = HashBiMap.create(ImmutableMap.<Integer, Item>of(
+    private final BiMap<Integer, Item> mediaItems = HashBiMap.create(ImmutableMap.of(
             0, new AddImageItem(),
             1, new BlankItem(),
             2, new BlankItem(),
@@ -283,7 +283,18 @@ public class ShoutMediaPresenter {
     }
 
     private void mergeVideoAndImagesObservable(List<Observable<String>> imageObservables, Observable<Video> videoObservable) {
-        if (!imageObservables.isEmpty()) {
+        if (imageObservables.isEmpty()) {
+            if (videoObservable != null) {
+                videoObservable.subscribe(new Action1<Video>() {
+                    @Override
+                    public void call(Video video) {
+                        getAllEditedImagesAndComplete(ImmutableList.<String>of(), ImmutableList.of(video));
+                    }
+                });
+            } else {
+                getAllEditedImagesAndComplete(ImmutableList.<String>of(), ImmutableList.<Video>of());
+            }
+        } else {
             final Observable<List<String>> images = Observable.zip(imageObservables, new FuncN<List<String>>() {
 
                 @Override
@@ -317,15 +328,6 @@ public class ShoutMediaPresenter {
                                 getAllEditedImagesAndComplete(listBothParamsBothParams.param1(), ImmutableList.of(listBothParamsBothParams.param2()));
                             }
                         });
-            }
-        } else {
-            if (videoObservable != null) {
-                videoObservable.subscribe(new Action1<Video>() {
-                    @Override
-                    public void call(Video video) {
-                        getAllEditedImagesAndComplete(ImmutableList.<String>of(), ImmutableList.of(video));
-                    }
-                });
             }
         }
     }
