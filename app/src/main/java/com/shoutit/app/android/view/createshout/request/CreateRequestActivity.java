@@ -12,7 +12,6 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
-import android.support.v4.util.Pair;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -33,7 +32,7 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PriceUtils;
-import com.shoutit.app.android.view.createshout.CurrencyDialog;
+import com.shoutit.app.android.view.createshout.DialogsHelper;
 import com.shoutit.app.android.view.createshout.location.LocationActivity;
 import com.shoutit.app.android.view.createshout.publish.PublishShoutActivity;
 import com.shoutit.app.android.widget.SimpleCurrencySpinnerAdapter;
@@ -138,7 +137,7 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
         mCreateCurrencyInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CurrencyDialog.showDialog(CreateRequestActivity.this);
+                DialogsHelper.showCurrencyDialog(CreateRequestActivity.this);
             }
         });
     }

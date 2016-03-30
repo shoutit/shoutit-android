@@ -7,7 +7,6 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
-import com.appunite.rx.ResponseOrError;
 import com.google.common.base.Preconditions;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.constants.AmazonConstants;
@@ -99,5 +98,9 @@ public class AmazonHelper {
     @Nonnull
     private String getImageFileName() {
         return String.format("%1$d_%2$s%3$s", System.currentTimeMillis(), userId, JPEG);
+    }
+
+    public static File getfileFromPath(@NonNull String path) {
+        return new File(path.replace("file://", ""));
     }
 }

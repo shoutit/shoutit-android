@@ -56,4 +56,8 @@
     <!-- Shouts search results -->
     <dimen name="shouts_search_results_side_spacing">6dp</dimen>
 
+    <!-- Shout detail -->
+    <dimen name="edit_shout_media_item_size">72dp</dimen>
+    <dimen name="edit_shout_media_item_padding">8dp</dimen>
+
 </resources>

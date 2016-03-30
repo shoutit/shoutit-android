@@ -20,7 +20,7 @@
 
         <activity
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-            android:name=".view.media.RecordVideoActivity"/>
+            android:name=".view.media.RecordMediaActivity"/>
 
         <activity
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"

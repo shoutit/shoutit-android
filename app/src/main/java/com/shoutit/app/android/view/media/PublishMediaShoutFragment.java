@@ -281,7 +281,7 @@ public class PublishMediaShoutFragment extends Fragment {
                         @Override
                         public void call(CreateShoutResponse createShoutResponse) {
                             getActivity().finish();
-                            PublishShoutActivity.newIntent(getActivity(), createdShoutOfferId, false);
+                            startActivity(PublishShoutActivity.newIntent(getActivity(), createdShoutOfferId, false));
                         }
                     }, new Action1<Throwable>() {
                         @Override
@@ -296,6 +296,7 @@ public class PublishMediaShoutFragment extends Fragment {
                     });
         } else {
             getActivity().finish();
+            startActivity(PublishShoutActivity.newIntent(getActivity(), createdShoutOfferId, false));
         }
     }
 
