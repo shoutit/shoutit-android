@@ -2,7 +2,6 @@ package com.shoutit.app.android.view.createshout.publish;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -58,9 +57,9 @@ public class PublishShoutActivity extends RxAppCompatActivity {
 
         final Drawable drawable = ContextCompat.getDrawable(this, R.drawable.ic_share);
         assert drawable != null;
-        final Drawable newDrawable = drawable.getConstantState().newDrawable();
+        final Drawable newDrawable = drawable.mutate();
 
-        newDrawable.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
+        newDrawable.setColorFilter(getResources().getColor(R.color.black_54), PorterDuff.Mode.SRC_IN);
         mToolbar.getMenu().findItem(R.id.publish_share).setIcon(newDrawable);
 
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
