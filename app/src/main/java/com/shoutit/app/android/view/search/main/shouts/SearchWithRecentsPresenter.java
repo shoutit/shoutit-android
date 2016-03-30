@@ -5,6 +5,7 @@ import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
@@ -84,7 +85,12 @@ public class SearchWithRecentsPresenter {
 
         final Observable<List<BaseAdapterItem>> clearRecentsOnNotEmptyQuery = searchPresenter.getQuerySubject()
                 .distinctUntilChanged()
-                .filter(Functions1.neg(Functions1.isNullOrEmpty()))
+                .filter(new Func1<String, Boolean>() {
+                    @Override
+                    public Boolean call(String query) {
+                        return !Strings.isNullOrEmpty(query) && query.length() < SearchPresenter.MINIMUM_LENGTH;
+                    }
+                })
                 .map(new Func1<String, List<BaseAdapterItem>>() {
                     @Override
                     public List<BaseAdapterItem> call(String s) {
