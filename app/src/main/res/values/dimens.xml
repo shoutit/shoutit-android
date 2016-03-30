@@ -60,4 +60,7 @@
     <dimen name="edit_shout_media_item_size">72dp</dimen>
     <dimen name="edit_shout_media_item_padding">8dp</dimen>
 
+    <!-- Notifications -->
+    <dimen name="notifications_avatar_corners">4dp</dimen>
+
 </resources>
