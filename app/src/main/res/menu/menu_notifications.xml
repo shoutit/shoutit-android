@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:title=""
+        app:showAsAction="never">
+
+        <menu>
+
+            <item
+                android:id="@+id/notifications_menu_mark"
+                android:title="@string/notifications_menu_mark"
+                app:showAsAction="always" />
+
+            <item
+                android:id="@+id/notifications_menu_settings"
+                android:title="@string/notifications_menu_settings"
+                app:showAsAction="always" />
+
+        </menu>
+
+    </item>
+
+</menu>

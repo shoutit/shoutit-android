@@ -339,4 +339,9 @@
     <string name="publish_price_hint">Negotiable</string>
     <string name="publish_done">Done</string>
 
+    <!-- Notifications -->
+    <string name="notifications_title">Notifications</string>
+    <string name="notifications_menu_mark">Mark all as read</string>
+    <string name="notifications_menu_settings">Notifications Settings</string>
+
 </resources>
