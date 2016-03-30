@@ -1,22 +1,25 @@
 <?xml version="1.0"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <item
+        android:icon="@drawable/abc_ic_menu_moreoverflow_mtrl_alpha"
         android:title=""
-        app:showAsAction="never">
+        app:showAsAction="ifRoom"
+        tools:ignore="PrivateResource">
 
         <menu>
 
             <item
                 android:id="@+id/notifications_menu_mark"
                 android:title="@string/notifications_menu_mark"
-                app:showAsAction="always" />
+                app:showAsAction="never" />
 
             <item
                 android:id="@+id/notifications_menu_settings"
                 android:title="@string/notifications_menu_settings"
-                app:showAsAction="always" />
+                app:showAsAction="never" />
 
         </menu>
 

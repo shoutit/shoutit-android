@@ -17,6 +17,7 @@ import com.shoutit.app.android.api.model.EditShoutRequest;
 import com.shoutit.app.android.api.model.EditShoutRequestWithPrice;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.GuestSignupRequest;
+import com.shoutit.app.android.api.model.NotificationsResponse;
 import com.shoutit.app.android.api.model.RelatedTagsResponse;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.api.model.SearchProfileResponse;
@@ -259,5 +260,15 @@ public interface ApiService {
 
     @GET("tags/{name}/related")
     Observable<RelatedTagsResponse> relatedTags(@Path("name") String tagName);
+
+    /** Notifications **/
+    @GET("notifications")
+    Observable<NotificationsResponse> notifications();
+
+    @POST("notifications/reset")
+    Observable<ResponseBody> markAllAsRead();
+
+    @POST("notifications/{id}/read")
+    Observable<ResponseBody> markAsRead(@Path("id") String notificationId);
 
 }

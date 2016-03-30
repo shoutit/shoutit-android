@@ -343,5 +343,6 @@
     <string name="notifications_title">Notifications</string>
     <string name="notifications_menu_mark">Mark all as read</string>
     <string name="notifications_menu_settings">Notifications Settings</string>
+    <string name="notifications_listening_to_you">started listening to you</string>
 
 </resources>

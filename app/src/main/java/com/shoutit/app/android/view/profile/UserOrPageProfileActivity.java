@@ -14,6 +14,7 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.view.editprofile.EditProfileActivity;
+import com.shoutit.app.android.view.notifications.NotificationsActivity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -84,7 +85,7 @@ public class UserOrPageProfileActivity extends ProfileActivity {
                 .subscribe(new Action1<Object>() {
                     @Override
                     public void call(Object ignore) {
-                        Toast.makeText(UserOrPageProfileActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
+                        startActivity(NotificationsActivity.newIntent(UserOrPageProfileActivity.this));
                     }
                 });
 
