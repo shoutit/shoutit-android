@@ -245,12 +245,11 @@ public class ShoutMediaPresenterTest {
         mShoutMediaPresenter.addRemoteMedia(ImmutableList.of("a"), ImmutableList.of(Video.createVideo("a", "a", 1)));
 
         mShoutMediaPresenter.addMediaItem("test", false);
-        mShoutMediaPresenter.addMediaItem("test", true);
 
         mShoutMediaPresenter.send();
 
         verify(mMediaListener).mediaEditionCompleted(imagesCaptor.capture(), videoCaptor.capture());
-        assert_().that(videoCaptor.getValue()).hasSize(2);
+        assert_().that(videoCaptor.getValue()).hasSize(1);
         assert_().that(imagesCaptor.getValue()).hasSize(2);
     }
 }

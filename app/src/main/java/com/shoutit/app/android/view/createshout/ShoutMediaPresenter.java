@@ -332,9 +332,9 @@ public class ShoutMediaPresenter {
         }
     }
 
-    private void getAllEditedImagesAndComplete(List<String> images, ImmutableList<Video> of) {
+    private void getAllEditedImagesAndComplete(List<String> images, List<Video> videos) {
         final List<String> allImages = getAllEditedImages(images);
-        final List<Video> allVideos = getAllEditedVideos(of);
+        final List<Video> allVideos = getAllEditedVideos(videos);
         mMediaListener.mediaEditionCompleted(allImages, allVideos);
     }
 
