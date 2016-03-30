@@ -40,10 +40,13 @@ import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.view.createshout.DialogsHelper;
 import com.shoutit.app.android.view.createshout.ShoutMediaPresenter;
 import com.shoutit.app.android.view.createshout.location.LocationActivity;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
+import com.shoutit.app.android.widget.CurrencySpinnerAdapter;
+import com.shoutit.app.android.widget.SimpleCurrencySpinnerAdapter;
 import com.shoutit.app.android.widget.SimpleSpinnerAdapter;
 import com.shoutit.app.android.widget.SpinnerAdapter;
 import com.shoutit.app.android.widget.StateSpinner;
@@ -101,7 +104,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     @Inject
     Picasso mPicasso;
 
-    private SpinnerAdapter mCurrencyAdapter;
+    private CurrencySpinnerAdapter mCurrencyAdapter;
     private SpinnerAdapter mCategoryAdapter;
 
     public static Intent newIntent(@NonNull String id, @NonNull Context context) {
@@ -132,7 +135,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
             }
         });
 
-        mCurrencyAdapter = new SimpleSpinnerAdapter(R.string.request_activity_currency, this);
+        mCurrencyAdapter = new SimpleCurrencySpinnerAdapter(R.string.request_activity_currency, this);
         mEditCurrencySpinner.setAdapter(mCurrencyAdapter);
 
         mCategoryAdapter = new SimpleSpinnerAdapter(R.string.edit_shout_category, this);
@@ -260,7 +263,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     }
 
     @Override
-    public void setCurrencies(@NonNull List<Pair<String, String>> list) {
+    public void setCurrencies(@NonNull List<PriceUtils.SpinnerCurrency> list) {
         mCurrencyAdapter.setData(list);
     }
 
@@ -432,7 +435,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
                 mTitle.getText().toString(),
                 mEditShoutDescription.getText().toString(),
                 mEditBudget.getText().toString(),
-                ((Pair<String, String>) mEditCurrencySpinner.getSelectedItem()).first,
+                ((PriceUtils.SpinnerCurrency) mEditCurrencySpinner.getSelectedItem()).getCode(),
                 ((Pair<String, String>) mEditCategorySpinner.getSelectedItem()).first,
                 getSelectedOptions(), images, videos);
         mEditShoutPresenter.dataReady(requestData);

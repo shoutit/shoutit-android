@@ -32,6 +32,8 @@ import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.view.createshout.publish.PublishShoutActivity;
+import com.shoutit.app.android.widget.CurrencySpinnerAdapter;
+import com.shoutit.app.android.widget.SimpleCurrencySpinnerAdapter;
 import com.shoutit.app.android.widget.SpinnerAdapter;
 
 import java.io.File;
@@ -79,7 +81,7 @@ public class PublishMediaShoutFragment extends Fragment {
     @Inject
     AmazonHelper mAmazonHelper;
 
-    private SpinnerAdapter mCurrencyAdapter;
+    private CurrencySpinnerAdapter mCurrencyAdapter;
 
     private String mFile;
     private boolean mIsVideo;
@@ -108,7 +110,7 @@ public class PublishMediaShoutFragment extends Fragment {
         mFile = arguments.getString(ARGS_FILE);
         mIsVideo = arguments.getBoolean(ARGS_IS_VIDEO);
 
-        mCurrencyAdapter = new SpinnerAdapter(
+        mCurrencyAdapter = new CurrencySpinnerAdapter(
                 R.string.camera_publish_currency,
                 getActivity(),
                 R.layout.camera_publish_currency_item,
