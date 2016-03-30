@@ -251,6 +251,8 @@
     <string name="edit_shout_title_hint">Title</string>
     <string name="edit_shout_title">Edit %s</string>
     <string name="edit_currency_info">If negotiable leave it empty. Set it to 0 if Free</string>
+    <string name="edit_only_one_video">Only one video is allowed</string>
+    <string name="edit_thumbnail_error">Error creating thumbnail</string>
 
     <!-- Publish -->
     <string name="publish_menu_share">Share Shout</string>

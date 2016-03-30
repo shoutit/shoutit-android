@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 
 import com.google.common.collect.ImmutableList;
+import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.view.media.MediaUtils;
 
@@ -50,12 +51,16 @@ public class ShoutMediaPresenterTest {
     @Mock
     AmazonHelper mAmazonHelper;
 
+    @Mock
+    Uri uri;
+
     @Before
     public void setUp() throws IOException {
         MockitoAnnotations.initMocks(this);
         PowerMockito.mockStatic(Uri.class);
         PowerMockito.mockStatic(MediaUtils.class);
-        when(Uri.parse(anyString())).thenReturn(null);
+        when(Uri.parse(anyString())).thenReturn(uri);
+        when(uri.getLastPathSegment()).thenReturn("video");
         when(MediaUtils.createVideoThumbnail(any(Context.class), any(Uri.class))).thenReturn(new File(""));
         when(mAmazonHelper.uploadShoutMediaObservable(any(File.class))).thenReturn(Observable.just("test"));
         mShoutMediaPresenter = new ShoutMediaPresenter(context, mAmazonHelper);
@@ -161,6 +166,18 @@ public class ShoutMediaPresenterTest {
 
     @SuppressWarnings("unchecked")
     @Test
+    public void whenVideoAddedAndRemoteVideoAlreadySet_DisplayAlert() {
+        mShoutMediaPresenter.register(mMediaListener);
+        mShoutMediaPresenter.addRemoteMedia(ImmutableList.<String>of(), ImmutableList.of(Video.createVideo("", "", 1)));
+
+        mShoutMediaPresenter.addMediaItem("test", true);
+
+        verify(mMediaListener).onlyOneVideoAllowedAlert();
+    }
+
+
+    @SuppressWarnings("unchecked")
+    @Test
     public void whenSecondImageAdded_DontDisplayAlert() {
         mShoutMediaPresenter.register(mMediaListener);
 
@@ -181,7 +198,7 @@ public class ShoutMediaPresenterTest {
 
         mShoutMediaPresenter.send();
 
-        verify(mMediaListener).mediaUploadCompleted(imagesCaptor.capture(), videoCaptor.capture());
+        verify(mMediaListener).mediaEditionCompleted(imagesCaptor.capture(), videoCaptor.capture());
         assert_().that(imagesCaptor.getValue()).isEmpty();
         assert_().that(videoCaptor.getValue()).hasSize(1);
     }
@@ -197,7 +214,7 @@ public class ShoutMediaPresenterTest {
 
         mShoutMediaPresenter.send();
 
-        verify(mMediaListener).mediaUploadCompleted(imagesCaptor.capture(), videoCaptor.capture());
+        verify(mMediaListener).mediaEditionCompleted(imagesCaptor.capture(), videoCaptor.capture());
         assert_().that(videoCaptor.getValue()).isEmpty();
         assert_().that(imagesCaptor.getValue()).hasSize(1);
     }
@@ -214,8 +231,26 @@ public class ShoutMediaPresenterTest {
 
         mShoutMediaPresenter.send();
 
-        verify(mMediaListener).mediaUploadCompleted(imagesCaptor.capture(), videoCaptor.capture());
+        verify(mMediaListener).mediaEditionCompleted(imagesCaptor.capture(), videoCaptor.capture());
         assert_().that(videoCaptor.getValue()).hasSize(1);
         assert_().that(imagesCaptor.getValue()).hasSize(1);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testSendVideoAndImagesWithRemoteMedia_videoAndImagesAndRemotesReturned() throws Exception {
+        ArgumentCaptor<List> imagesCaptor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<List> videoCaptor = ArgumentCaptor.forClass(List.class);
+        mShoutMediaPresenter.register(mMediaListener);
+        mShoutMediaPresenter.addRemoteMedia(ImmutableList.of("a"), ImmutableList.of(Video.createVideo("a", "a", 1)));
+
+        mShoutMediaPresenter.addMediaItem("test", false);
+        mShoutMediaPresenter.addMediaItem("test", true);
+
+        mShoutMediaPresenter.send();
+
+        verify(mMediaListener).mediaEditionCompleted(imagesCaptor.capture(), videoCaptor.capture());
+        assert_().that(videoCaptor.getValue()).hasSize(2);
+        assert_().that(imagesCaptor.getValue()).hasSize(2);
     }
 }

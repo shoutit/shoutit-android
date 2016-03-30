@@ -22,6 +22,6 @@ public class CreateOfferShoutWithImageRequest {
     }
 
     public static CreateOfferShoutWithImageRequest withVideo(@NonNull String thumbnail, @NonNull String url) {
-        return new CreateOfferShoutWithImageRequest(ImmutableList.<String>of(), ImmutableList.of(Video.createVideo(thumbnail, url)));
+        return new CreateOfferShoutWithImageRequest(ImmutableList.<String>of(), ImmutableList.of(Video.createVideo(thumbnail, url, 40)));// TODO duration
     }
 }

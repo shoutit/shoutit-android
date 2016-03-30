@@ -11,8 +11,8 @@ public class Video {
     private final String idOnProvider;
     private final int duration;
 
-    public static Video createVideo(String url, String thumbnail) {
-        return new Video(url, thumbnail, Uri.parse(url).getLastPathSegment(), 40); // TODO duration
+    public static Video createVideo(String url, String thumbnail, int duration) {
+        return new Video(url, thumbnail, Uri.parse(url).getLastPathSegment(), duration);
     }
 
     public Video(

@@ -81,28 +81,40 @@ public class ShoutMediaPresenter {
     public class VideoItem extends MediaItem {
 
         private final String video;
+        private final int duration;
 
-        public VideoItem(@Nullable String media, @NonNull String video) {
+        public VideoItem(@Nullable String media, @NonNull String video, int duration) {
             super(media);
             this.video = video;
+            this.duration = duration;
         }
 
         public String getVideo() {
             return video;
+        }
+
+        public int getDuration() {
+            return duration;
         }
     }
 
     public class RemoteVideoItem extends MediaItem {
 
         private final String video;
+        private final int duration;
 
-        public RemoteVideoItem(@Nullable String media, @NonNull String video) {
+        public RemoteVideoItem(@Nullable String media, @NonNull String video, int duration) {
             super(media);
             this.video = video;
+            this.duration = duration;
         }
 
         public String getVideo() {
             return video;
+        }
+
+        public int getDuration() {
+            return duration;
         }
     }
 
@@ -160,7 +172,7 @@ public class ShoutMediaPresenter {
         }
 
         for (Video video : videos) {
-            addRemoteVideoItem(video.getUrl(), video.getThumbnailUrl());
+            addRemoteVideoItem(video.getUrl(), video.getThumbnailUrl(), video.getDuration());
         }
 
         mMediaListener.setImages(mediaItems);
@@ -187,9 +199,12 @@ public class ShoutMediaPresenter {
         } catch (IOException e) {
             mMediaListener.thumbnailCreateError();
         }
+
+        final int videoLength = MediaUtils.getVideoLength(context, media);
         mediaItems.put(position, new VideoItem(
                 videoThumbnail != null ? String.format("file://%1$s", videoThumbnail.getAbsolutePath()) : null,
-                media));
+                media,
+                videoLength));
 
         if (position + 1 < mediaItems.values().size()) {
             mediaItems.put(position + 1, new AddImageItem());
@@ -198,9 +213,9 @@ public class ShoutMediaPresenter {
         mMediaListener.setImages(mediaItems);
     }
 
-    private void addRemoteVideoItem(@NonNull String media, @NonNull String thumbnail) {
+    private void addRemoteVideoItem(@NonNull String media, @NonNull String thumbnail, int duration) {
         final int position = getFirstAvailablePosition();
-        mediaItems.put(position, new RemoteVideoItem(thumbnail, media));
+        mediaItems.put(position, new RemoteVideoItem(thumbnail, media, duration));
 
         if (position + 1 < mediaItems.values().size()) {
             mediaItems.put(position + 1, new AddImageItem());
@@ -225,7 +240,7 @@ public class ShoutMediaPresenter {
         final boolean hasVideo = Iterables.any(mediaItems.values(), new Predicate<Item>() {
             @Override
             public boolean apply(@Nullable Item input) {
-                return input instanceof VideoItem;
+                return input instanceof VideoItem || input instanceof RemoteVideoItem;
             }
         });
         return !hasVideo;
@@ -242,30 +257,32 @@ public class ShoutMediaPresenter {
     }
 
     public void send() {
+        mMediaListener.showMediaProgress();
+
         final List<Observable<String>> imageObservables = Lists.newArrayList();
-        Observable<BothParams<String, String>> videoObservable = null;
+        Observable<Video> videoObservable = null;
 
         for (Item item : mediaItems.values()) {
             if (item instanceof VideoItem) {
-                VideoItem videoItem = (VideoItem) item;
-                final Observable<String> videoFileObservable = mAmazonHelper.uploadShoutMediaObservable(new File(videoItem.getVideo()));
-                final Observable<String> thumbFileObservable = mAmazonHelper.uploadShoutMediaObservable(new File(videoItem.getThumb()));
-                videoObservable = Observable.zip(videoFileObservable, thumbFileObservable, new Func2<String, String, BothParams<String, String>>() {
+                final VideoItem videoItem = (VideoItem) item;
+                final Observable<String> videoFileObservable = mAmazonHelper.uploadShoutMediaObservable(AmazonHelper.getfileFromPath(videoItem.getVideo()));
+                final Observable<String> thumbFileObservable = mAmazonHelper.uploadShoutMediaObservable(AmazonHelper.getfileFromPath(videoItem.getThumb()));
+                videoObservable = Observable.zip(videoFileObservable, thumbFileObservable, new Func2<String, String, Video>() {
                     @Override
-                    public BothParams<String, String> call(String video, String thumb) {
-                        return BothParams.of(video, thumb);
+                    public Video call(String video, String thumb) {
+                        return Video.createVideo(video, thumb, videoItem.getDuration());
                     }
                 });
             } else if (item instanceof ImageItem) {
                 final ImageItem imageItem = (ImageItem) item;
-                imageObservables.add(mAmazonHelper.uploadShoutMediaObservable(new File(imageItem.getThumb())));
+                imageObservables.add(mAmazonHelper.uploadShoutMediaObservable(AmazonHelper.getfileFromPath(imageItem.getThumb())));
             }
         }
 
         mergeVideoAndImagesObservable(imageObservables, videoObservable);
     }
 
-    private void mergeVideoAndImagesObservable(List<Observable<String>> imageObservables, Observable<BothParams<String, String>> videoObservable) {
+    private void mergeVideoAndImagesObservable(List<Observable<String>> imageObservables, Observable<Video> videoObservable) {
         if (!imageObservables.isEmpty()) {
             final Observable<List<String>> images = Observable.zip(imageObservables, new FuncN<List<String>>() {
 
@@ -283,34 +300,62 @@ public class ShoutMediaPresenter {
                 images.subscribe(new Action1<List<String>>() {
                     @Override
                     public void call(List<String> images) {
-                        mMediaListener.mediaUploadCompleted(images, ImmutableList.<BothParams<String, String>>of());
+                        getAllEditedImagesAndComplete(images, ImmutableList.<Video>of());
                     }
                 });
             } else {
                 images.zipWith(
-                        videoObservable, new Func2<List<String>, BothParams<String, String>, BothParams<List<String>, BothParams<String, String>>>() {
+                        videoObservable, new Func2<List<String>, Video, BothParams<List<String>, Video>>() {
                             @Override
-                            public BothParams<List<String>, BothParams<String, String>> call(List<String> images, BothParams<String, String> videos) {
-                                return BothParams.of(images, videos);
+                            public BothParams<List<String>, Video> call(List<String> images, Video video) {
+                                return BothParams.of(images, video);
                             }
                         })
-                        .subscribe(new Action1<BothParams<List<String>, BothParams<String, String>>>() {
+                        .subscribe(new Action1<BothParams<List<String>, Video>>() {
                             @Override
-                            public void call(BothParams<List<String>, BothParams<String, String>> listBothParamsBothParams) {
-                                mMediaListener.mediaUploadCompleted(listBothParamsBothParams.param1(), ImmutableList.of(listBothParamsBothParams.param2()));
+                            public void call(BothParams<List<String>, Video> listBothParamsBothParams) {
+                                getAllEditedImagesAndComplete(listBothParamsBothParams.param1(), ImmutableList.of(listBothParamsBothParams.param2()));
                             }
                         });
             }
         } else {
             if (videoObservable != null) {
-                videoObservable.subscribe(new Action1<BothParams<String, String>>() {
+                videoObservable.subscribe(new Action1<Video>() {
                     @Override
-                    public void call(BothParams<String, String> video) {
-                        mMediaListener.mediaUploadCompleted(ImmutableList.<String>of(), ImmutableList.of(video));
+                    public void call(Video video) {
+                        getAllEditedImagesAndComplete(ImmutableList.<String>of(), ImmutableList.of(video));
                     }
                 });
             }
         }
+    }
+
+    private void getAllEditedImagesAndComplete(List<String> images, ImmutableList<Video> of) {
+        final List<String> allImages = getAllEditedImages(images);
+        final List<Video> allVideos = getAllEditedVideos(of);
+        mMediaListener.mediaEditionCompleted(allImages, allVideos);
+    }
+
+    private List<String> getAllEditedImages(List<String> localImages) {
+        final List<String> remoteImages = Lists.newArrayList();
+        for (Item item : mediaItems.values()) {
+            if (item instanceof RemoteImageItem) {
+                remoteImages.add(((RemoteImageItem) item).getThumb());
+            }
+        }
+
+        return ImmutableList.copyOf(Iterables.concat(localImages, remoteImages));
+    }
+
+    private List<Video> getAllEditedVideos(List<Video> localVideos) {
+        final List<Video> remoteVideos = Lists.newArrayList();
+        for (Item item : mediaItems.values()) {
+            if (item instanceof RemoteVideoItem) {
+                final RemoteVideoItem remoteVideoItem = (RemoteVideoItem) item;
+                remoteVideos.add(Video.createVideo(remoteVideoItem.getVideo(), remoteVideoItem.getThumb(), remoteVideoItem.getDuration()));
+            }
+        }
+        return ImmutableList.copyOf(Iterables.concat(localVideos, remoteVideos));
     }
 
     public void register(@NonNull MediaListener mediaListener) {
@@ -332,6 +377,8 @@ public class ShoutMediaPresenter {
 
         void thumbnailCreateError();
 
-        void mediaUploadCompleted(@NonNull List<String> images, @NonNull List<BothParams<String, String>> videos);
+        void mediaEditionCompleted(@NonNull List<String> images, @NonNull List<Video> videos);
+
+        void showMediaProgress();
     }
 }

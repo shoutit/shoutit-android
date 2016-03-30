@@ -26,7 +26,6 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.appunite.rx.functions.BothParams;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -196,7 +195,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
 
     @OnClick(R.id.edit_confirm)
     public void onClick() {
-        mEditShoutPresenter.confirmClicked();
+        mShoutMediaPresenter.send();
     }
 
     @OnClick(R.id.edit_location_btn)
@@ -218,18 +217,6 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public EditShoutPresenter.RequestData getRequestData() {
-        return new EditShoutPresenter.RequestData(
-                mTitle.getText().toString(),
-                mEditShoutDescription.getText().toString(),
-                mEditBudget.getText().toString(),
-                ((Pair<String, String>) mEditCurrencySpinner.getSelectedItem()).first,
-                ((Pair<String, String>) mEditCategorySpinner.getSelectedItem()).first,
-                getSelectedOptions());
     }
 
     @Override
@@ -435,11 +422,24 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
 
     @Override
     public void thumbnailCreateError() {
+        ColoredSnackBar.error(ColoredSnackBar.contentView(this), R.string.edit_thumbnail_error, Snackbar.LENGTH_SHORT).show();
+    }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public void mediaEditionCompleted(@NonNull List<String> images, @NonNull List<Video> videos) {
+        final EditShoutPresenter.RequestData requestData = new EditShoutPresenter.RequestData(
+                mTitle.getText().toString(),
+                mEditShoutDescription.getText().toString(),
+                mEditBudget.getText().toString(),
+                ((Pair<String, String>) mEditCurrencySpinner.getSelectedItem()).first,
+                ((Pair<String, String>) mEditCategorySpinner.getSelectedItem()).first,
+                getSelectedOptions(), images, videos);
+        mEditShoutPresenter.dataReady(requestData);
     }
 
     @Override
-    public void mediaUploadCompleted(@NonNull List<String> images, @NonNull List<BothParams<String, String>> videos) {
-        // TODO
+    public void showMediaProgress() {
+        mEditProgress.setVisibility(View.VISIBLE);
     }
 }

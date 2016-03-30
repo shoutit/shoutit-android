@@ -27,6 +27,6 @@ public class DialogsHelper {
     }
 
     public static void showOnlyOneVideoDialog(@NonNull Context context) {
-        showDialog(context, R.string.edit_currency_info);
+        showDialog(context, R.string.edit_only_one_video);
     }
 }
