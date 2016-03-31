@@ -2,6 +2,8 @@ package com.shoutit.app.android.view.filter;
 
 import android.content.Context;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
@@ -12,6 +14,8 @@ import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+
+import butterknife.Bind;
 
 public class FiltersAdapter extends BaseAdapter {
     private final int VIEW_TYPE_HEADER = 1;
@@ -40,7 +44,7 @@ public class FiltersAdapter extends BaseAdapter {
             case VIEW_TYPE_SHOUT_TYPE:
                 return new FilterViewHolders.ShoutTypeViewHolder(layoutInflater.inflate(R.layout.filters_shout_type_item, parent, false));
             case VIEW_TYPE_CATEGORY:
-                return new FilterViewHolders.CategoryViewHolder(layoutInflater.inflate(R.layout.filters_category_item, parent, false));
+                return new FilterViewHolders.CategoryViewHolder(layoutInflater.inflate(R.layout.filters_category_item, parent, false), picasso, context);
             case VIEW_TYPE_PRICE:
                 return new FilterViewHolders.PriceViewHolder(layoutInflater.inflate(R.layout.filters_price_item, parent, false));
             case VIEW_TYPE_LOCATION:
@@ -48,9 +52,11 @@ public class FiltersAdapter extends BaseAdapter {
             case VIEW_TYPE_DISTANCE:
                 return new FilterViewHolders.DistanceViewHolder(layoutInflater.inflate(R.layout.filters_distance_item, parent, false));
             case VIEW_TYPE_FILTER:
-                return new FilterViewHolders.FilterViewHolder(layoutInflater.inflate(R.layout.filitem))
-
-
+                return new FilterViewHolders.FilterViewHolder(layoutInflater.inflate(R.layout.filters_filter_item, parent, false));
+            case VIEW_TYPE_FILTER_VALUE:
+                return new FilterViewHolders.FilterValueViewHolder(layoutInflater.inflate(R.layout.filters_filter_value_item, parent, false));
+            default:
+                throw new RuntimeException("Unknown view type:" + viewType);
         }
     }
 

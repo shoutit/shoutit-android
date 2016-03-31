@@ -341,5 +341,6 @@
     <string name="filters_location_header">Location</string>
     <string name="filters_search_within">Search within:</string>
     <string name="filters_search_init_distance">"0 KM</string>
+    <string name="filters_default_category_name">All Categories</string>
 
 </resources>

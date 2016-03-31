@@ -190,15 +190,27 @@ public class FiltersAdapterItems {
         public boolean same(@Nonnull BaseAdapterItem item) {
             return false;
         }
+
+        public void onTypeSelected(@Nonnull String type) {
+            shoutTypeObserver.onNext(type);
+        }
     }
 
     public static class CategoryAdapterItem extends BaseNoIDAdapterItem {
 
-        @Nullable
+        @Nonnull
         private final Category category;
+        @Nonnull
+        private final List<Category> categories;
+        @Nonnull
+        private final Observer<Category> categorySelectedObserver;
 
-        public CategoryAdapterItem(@Nullable Category category) {
+        public CategoryAdapterItem(@Nonnull Category category,
+                                   @Nonnull List<Category> categories,
+                                   @Nonnull Observer<Category> categorySelectedObserver) {
             this.category = category;
+            this.categories = categories;
+            this.categorySelectedObserver = categorySelectedObserver;
         }
 
         @Override
@@ -209,13 +221,35 @@ public class FiltersAdapterItems {
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
             return item instanceof CategoryAdapterItem
-                    && category != null && category.equals(((CategoryAdapterItem) item).category);
+                    && category.equals(((CategoryAdapterItem) item).category);
+        }
+
+        @Nonnull
+        public Category getCategory() {
+            return category;
+        }
+
+        @Nonnull
+        public List<Category> getCategories() {
+            return categories;
+        }
+
+        public void onCategorySelected(Category category) {
+            categorySelectedObserver.onNext(category);
         }
     }
 
     public static class PriceAdapterItem extends BaseNoIDAdapterItem {
 
-        public PriceAdapterItem() {
+        @Nonnull
+        private final Observer<String> priceFromObserver;
+        @Nonnull
+        private final Observer<String> priceToObserver;
+
+        public PriceAdapterItem(@Nonnull Observer<String> priceFromObserver,
+                                @Nonnull Observer<String> priceToObserver) {
+            this.priceFromObserver = priceFromObserver;
+            this.priceToObserver = priceToObserver;
         }
 
         @Override
@@ -228,6 +262,15 @@ public class FiltersAdapterItems {
             return true;
         }
 
+        @Nonnull
+        public Observer<String> getPriceFromObserver() {
+            return priceFromObserver;
+        }
+
+        @Nonnull
+        public Observer<String> getPriceToObserver() {
+            return priceToObserver;
+        }
     }
 
     public static class LocationAdapterItem extends BaseNoIDAdapterItem {
@@ -252,6 +295,15 @@ public class FiltersAdapterItems {
         public boolean same(@Nonnull BaseAdapterItem item) {
             return item instanceof LocationAdapterItem &&
                     userLocation.equals(((LocationAdapterItem) item).userLocation);
+        }
+
+        @Nonnull
+        public UserLocation getUserLocation() {
+            return userLocation;
+        }
+
+        public void onLocationChangeClicked() {
+            locationChangeClickObserver.onNext(null);
         }
     }
 

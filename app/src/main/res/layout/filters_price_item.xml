@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:minHeight="72dp">
 
     <TextView
@@ -14,27 +15,32 @@
 
     <EditText
         android:id="@+id/filters_price_from_et"
-        android:layout_width="112dp"
+        android:layout_width="126dp"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/filters_price_header"
         android:hint="@string/filters_price_from"
-        android:inputType="number"
+        android:inputType="numberDecimal"
         android:layout_marginLeft="6dp"
         android:layout_marginStart="6dp"
+        android:maxLength="12"
+        tools:text="12342343243243243243243243434"
+        android:ellipsize="end"
         android:nextFocusDown="@+id/filters_price_to_et"
         android:theme="@style/BlueEditText" />
 
     <EditText
         android:id="@+id/filters_price_to_et"
-        android:layout_width="112dp"
+        android:layout_width="126dp"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_below="@+id/filters_price_header"
         android:hint="@string/filters_price_to"
+        android:maxLength="12"
         android:layout_marginRight="8dp"
         android:layout_marginEnd="8dp"
-        android:inputType="number"
+        android:ellipsize="end"
+        android:inputType="numberDecimal"
         android:theme="@style/BlueEditText" />
 
 </RelativeLayout>

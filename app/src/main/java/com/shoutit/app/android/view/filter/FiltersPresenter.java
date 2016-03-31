@@ -1,5 +1,6 @@
 package com.shoutit.app.android.view.filter;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.appunite.rx.ObservableExtensions;
@@ -11,12 +12,14 @@ import com.appunite.rx.operators.MoreOperators;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Multimap;
+import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.CategoryFilter;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.SortType;
 import com.shoutit.app.android.api.model.UserLocation;
+import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.CategoriesDao;
 import com.shoutit.app.android.dao.SortTypesDao;
 
@@ -39,6 +42,8 @@ import rx.subjects.PublishSubject;
 
 public class FiltersPresenter {
 
+    private static final String DEFAULT_CATEGORY_SLUG = "all_categories_slug";
+
     private final PublishSubject<Object> filterVisibilityChanged = PublishSubject.create();
     private final PublishSubject<Object> filterValueSelectionChanged = PublishSubject.create();
     private final PublishSubject<String> selectedCategorySubject = PublishSubject.create();
@@ -55,12 +60,16 @@ public class FiltersPresenter {
     private final BehaviorSubject<String> endPriceSubject = BehaviorSubject.create();
 
     private final Observable<List<BaseAdapterItem>> allAdapterItems;
+    @Nonnull
+    private final Context context;
 
 
     public FiltersPresenter(@Nonnull CategoriesDao categoriesDao,
                             @Nonnull SortTypesDao sortTypesDao,
                             @Nonnull @UiScheduler Scheduler uiScheduler,
+                            @Nonnull @ForActivity Context context,
                             @Nonnull UserPreferences userPreferences) {
+        this.context = context;
 
         final Observable<String> shoutTypeObservable = shoutTypeSelectedSubject
                 .startWith(Shout.TYPE_ALL)
@@ -98,6 +107,7 @@ public class FiltersPresenter {
                     @Override
                     public HashMap<String, Category> call(List<Category> categories) {
                         final HashMap<String, Category> linkedHashMap = new LinkedHashMap<>();
+                        linkedHashMap.put(DEFAULT_CATEGORY_SLUG, getDefaultCategory());
                         for (Category category : categories) {
                             linkedHashMap.put(category.getSlug(), category);
                         }
@@ -115,6 +125,7 @@ public class FiltersPresenter {
                                 return categoriesMap.get(categorySlug);
                             }
                         })
+                .startWith(getDefaultCategory())
                 .compose(ObservableExtensions.<Category>behaviorRefCount());
 
         /** Selected category filters map **/
@@ -195,6 +206,11 @@ public class FiltersPresenter {
                                 .build();
                     }
                 });
+    }
+
+    private Category getDefaultCategory() {
+        return new Category(context.getString(R.string.filters_default_category_name),
+                DEFAULT_CATEGORY_SLUG, null, null, ImmutableList.<CategoryFilter>of());
     }
 
     @NonNull
