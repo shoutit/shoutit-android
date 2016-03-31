@@ -63,13 +63,13 @@ public class FiltersPresenterTest {
         testSubscriber.assertNoErrors();
         testSubscriber.assertValueCount(1);
         final List<BaseAdapterItem> lastEvent = getLastEvent(testSubscriber);
-        assert_().that(lastEvent.get(0)).isInstanceOf(FilterAdapterItems.HeaderAdapterItem.class);
-        assert_().that(lastEvent.get(1)).isInstanceOf(FilterAdapterItems.ShoutTypeAdapterItem.class);
-        assert_().that(lastEvent.get(2)).isInstanceOf(FilterAdapterItems.SortAdapterItem.class);
-        assert_().that(lastEvent.get(3)).isInstanceOf(FilterAdapterItems.CategoryAdapterItem.class);
-        assert_().that(lastEvent.get(4)).isInstanceOf(FilterAdapterItems.PriceAdapterItem.class);
-        assert_().that(lastEvent.get(5)).isInstanceOf(FilterAdapterItems.LocationAdapterItem.class);
-        assert_().that(lastEvent.get(6)).isInstanceOf(FilterAdapterItems.DistanceAdapterItem.class);
+        assert_().that(lastEvent.get(0)).isInstanceOf(FiltersAdapterItems.HeaderAdapterItem.class);
+        assert_().that(lastEvent.get(1)).isInstanceOf(FiltersAdapterItems.ShoutTypeAdapterItem.class);
+        assert_().that(lastEvent.get(2)).isInstanceOf(FiltersAdapterItems.SortAdapterItem.class);
+        assert_().that(lastEvent.get(3)).isInstanceOf(FiltersAdapterItems.CategoryAdapterItem.class);
+        assert_().that(lastEvent.get(4)).isInstanceOf(FiltersAdapterItems.PriceAdapterItem.class);
+        assert_().that(lastEvent.get(5)).isInstanceOf(FiltersAdapterItems.LocationAdapterItem.class);
+        assert_().that(lastEvent.get(6)).isInstanceOf(FiltersAdapterItems.DistanceAdapterItem.class);
     }
 
     @Test
@@ -81,14 +81,14 @@ public class FiltersPresenterTest {
 
         testSubscriber.assertNoErrors();
         final List<BaseAdapterItem> lastEvent = getLastEvent(testSubscriber);
-        assert_().that(lastEvent.get(0)).isInstanceOf(FilterAdapterItems.HeaderAdapterItem.class);
-        assert_().that(lastEvent.get(1)).isInstanceOf(FilterAdapterItems.ShoutTypeAdapterItem.class);
-        assert_().that(lastEvent.get(2)).isInstanceOf(FilterAdapterItems.SortAdapterItem.class);
-        assert_().that(lastEvent.get(3)).isInstanceOf(FilterAdapterItems.CategoryAdapterItem.class);
-        assert_().that(lastEvent.get(4)).isInstanceOf(FilterAdapterItems.PriceAdapterItem.class);
-        assert_().that(lastEvent.get(5)).isInstanceOf(FilterAdapterItems.LocationAdapterItem.class);
-        assert_().that(lastEvent.get(6)).isInstanceOf(FilterAdapterItems.DistanceAdapterItem.class);
-        assert_().that(lastEvent.get(7)).isInstanceOf(FilterAdapterItems.FilterAdapterItem.class);
+        assert_().that(lastEvent.get(0)).isInstanceOf(FiltersAdapterItems.HeaderAdapterItem.class);
+        assert_().that(lastEvent.get(1)).isInstanceOf(FiltersAdapterItems.ShoutTypeAdapterItem.class);
+        assert_().that(lastEvent.get(2)).isInstanceOf(FiltersAdapterItems.SortAdapterItem.class);
+        assert_().that(lastEvent.get(3)).isInstanceOf(FiltersAdapterItems.CategoryAdapterItem.class);
+        assert_().that(lastEvent.get(4)).isInstanceOf(FiltersAdapterItems.PriceAdapterItem.class);
+        assert_().that(lastEvent.get(5)).isInstanceOf(FiltersAdapterItems.LocationAdapterItem.class);
+        assert_().that(lastEvent.get(6)).isInstanceOf(FiltersAdapterItems.DistanceAdapterItem.class);
+        assert_().that(lastEvent.get(7)).isInstanceOf(FiltersAdapterItems.FilterAdapterItem.class);
     }
 
     @Test
@@ -100,19 +100,19 @@ public class FiltersPresenterTest {
 
         testSubscriber.assertNoErrors();
         List<BaseAdapterItem> lastEvent = getLastEvent(testSubscriber);
-        assert_().that(lastEvent.get(7)).isInstanceOf(FilterAdapterItems.FilterAdapterItem.class);
-        ((FilterAdapterItems.FilterAdapterItem) lastEvent.get(7)).onVisibilityChanged();
+        assert_().that(lastEvent.get(7)).isInstanceOf(FiltersAdapterItems.FilterAdapterItem.class);
+        ((FiltersAdapterItems.FilterAdapterItem) lastEvent.get(7)).onVisibilityChanged();
 
         lastEvent = getLastEvent(testSubscriber);
-        assert_().that(lastEvent.get(0)).isInstanceOf(FilterAdapterItems.HeaderAdapterItem.class);
-        assert_().that(lastEvent.get(1)).isInstanceOf(FilterAdapterItems.ShoutTypeAdapterItem.class);
-        assert_().that(lastEvent.get(2)).isInstanceOf(FilterAdapterItems.SortAdapterItem.class);
-        assert_().that(lastEvent.get(3)).isInstanceOf(FilterAdapterItems.CategoryAdapterItem.class);
-        assert_().that(lastEvent.get(4)).isInstanceOf(FilterAdapterItems.PriceAdapterItem.class);
-        assert_().that(lastEvent.get(5)).isInstanceOf(FilterAdapterItems.LocationAdapterItem.class);
-        assert_().that(lastEvent.get(6)).isInstanceOf(FilterAdapterItems.DistanceAdapterItem.class);
-        assert_().that(lastEvent.get(7)).isInstanceOf(FilterAdapterItems.FilterAdapterItem.class);
-        assert_().that(lastEvent.get(8)).isInstanceOf(FilterAdapterItems.FilterValueAdapterItem.class);
+        assert_().that(lastEvent.get(0)).isInstanceOf(FiltersAdapterItems.HeaderAdapterItem.class);
+        assert_().that(lastEvent.get(1)).isInstanceOf(FiltersAdapterItems.ShoutTypeAdapterItem.class);
+        assert_().that(lastEvent.get(2)).isInstanceOf(FiltersAdapterItems.SortAdapterItem.class);
+        assert_().that(lastEvent.get(3)).isInstanceOf(FiltersAdapterItems.CategoryAdapterItem.class);
+        assert_().that(lastEvent.get(4)).isInstanceOf(FiltersAdapterItems.PriceAdapterItem.class);
+        assert_().that(lastEvent.get(5)).isInstanceOf(FiltersAdapterItems.LocationAdapterItem.class);
+        assert_().that(lastEvent.get(6)).isInstanceOf(FiltersAdapterItems.DistanceAdapterItem.class);
+        assert_().that(lastEvent.get(7)).isInstanceOf(FiltersAdapterItems.FilterAdapterItem.class);
+        assert_().that(lastEvent.get(8)).isInstanceOf(FiltersAdapterItems.FilterValueAdapterItem.class);
     }
 
     @Test
@@ -124,20 +124,20 @@ public class FiltersPresenterTest {
 
         testSubscriber.assertNoErrors();
         List<BaseAdapterItem> lastEvent = getLastEvent(testSubscriber);
-        assert_().that(lastEvent.get(7)).isInstanceOf(FilterAdapterItems.FilterAdapterItem.class);
-        ((FilterAdapterItems.FilterAdapterItem) lastEvent.get(7)).onVisibilityChanged();
+        assert_().that(lastEvent.get(7)).isInstanceOf(FiltersAdapterItems.FilterAdapterItem.class);
+        ((FiltersAdapterItems.FilterAdapterItem) lastEvent.get(7)).onVisibilityChanged();
         lastEvent = getLastEvent(testSubscriber);
-        ((FilterAdapterItems.FilterAdapterItem) lastEvent.get(7)).onVisibilityChanged();
+        ((FiltersAdapterItems.FilterAdapterItem) lastEvent.get(7)).onVisibilityChanged();
 
         lastEvent = getLastEvent(testSubscriber);
-        assert_().that(lastEvent.get(0)).isInstanceOf(FilterAdapterItems.HeaderAdapterItem.class);
-        assert_().that(lastEvent.get(1)).isInstanceOf(FilterAdapterItems.ShoutTypeAdapterItem.class);
-        assert_().that(lastEvent.get(2)).isInstanceOf(FilterAdapterItems.SortAdapterItem.class);
-        assert_().that(lastEvent.get(3)).isInstanceOf(FilterAdapterItems.CategoryAdapterItem.class);
-        assert_().that(lastEvent.get(4)).isInstanceOf(FilterAdapterItems.PriceAdapterItem.class);
-        assert_().that(lastEvent.get(5)).isInstanceOf(FilterAdapterItems.LocationAdapterItem.class);
-        assert_().that(lastEvent.get(6)).isInstanceOf(FilterAdapterItems.DistanceAdapterItem.class);
-        assert_().that(lastEvent.get(7)).isInstanceOf(FilterAdapterItems.FilterAdapterItem.class);
+        assert_().that(lastEvent.get(0)).isInstanceOf(FiltersAdapterItems.HeaderAdapterItem.class);
+        assert_().that(lastEvent.get(1)).isInstanceOf(FiltersAdapterItems.ShoutTypeAdapterItem.class);
+        assert_().that(lastEvent.get(2)).isInstanceOf(FiltersAdapterItems.SortAdapterItem.class);
+        assert_().that(lastEvent.get(3)).isInstanceOf(FiltersAdapterItems.CategoryAdapterItem.class);
+        assert_().that(lastEvent.get(4)).isInstanceOf(FiltersAdapterItems.PriceAdapterItem.class);
+        assert_().that(lastEvent.get(5)).isInstanceOf(FiltersAdapterItems.LocationAdapterItem.class);
+        assert_().that(lastEvent.get(6)).isInstanceOf(FiltersAdapterItems.DistanceAdapterItem.class);
+        assert_().that(lastEvent.get(7)).isInstanceOf(FiltersAdapterItems.FilterAdapterItem.class);
     }
 
     @Test
@@ -149,19 +149,19 @@ public class FiltersPresenterTest {
 
         testSubscriber.assertNoErrors();
         List<BaseAdapterItem> lastEvent = getLastEvent(testSubscriber);
-        assert_().that(lastEvent.get(7)).isInstanceOf(FilterAdapterItems.FilterAdapterItem.class);
-        ((FilterAdapterItems.FilterAdapterItem) lastEvent.get(7)).onVisibilityChanged();
-        ((FilterAdapterItems.HeaderAdapterItem) lastEvent.get(0)).onResetClicked();
+        assert_().that(lastEvent.get(7)).isInstanceOf(FiltersAdapterItems.FilterAdapterItem.class);
+        ((FiltersAdapterItems.FilterAdapterItem) lastEvent.get(7)).onVisibilityChanged();
+        ((FiltersAdapterItems.HeaderAdapterItem) lastEvent.get(0)).onResetClicked();
 
         lastEvent = getLastEvent(testSubscriber);
-        assert_().that(lastEvent.get(0)).isInstanceOf(FilterAdapterItems.HeaderAdapterItem.class);
-        assert_().that(lastEvent.get(1)).isInstanceOf(FilterAdapterItems.ShoutTypeAdapterItem.class);
-        assert_().that(lastEvent.get(2)).isInstanceOf(FilterAdapterItems.SortAdapterItem.class);
-        assert_().that(lastEvent.get(3)).isInstanceOf(FilterAdapterItems.CategoryAdapterItem.class);
-        assert_().that(lastEvent.get(4)).isInstanceOf(FilterAdapterItems.PriceAdapterItem.class);
-        assert_().that(lastEvent.get(5)).isInstanceOf(FilterAdapterItems.LocationAdapterItem.class);
-        assert_().that(lastEvent.get(6)).isInstanceOf(FilterAdapterItems.DistanceAdapterItem.class);
-        assert_().that(lastEvent.get(7)).isInstanceOf(FilterAdapterItems.FilterAdapterItem.class);
+        assert_().that(lastEvent.get(0)).isInstanceOf(FiltersAdapterItems.HeaderAdapterItem.class);
+        assert_().that(lastEvent.get(1)).isInstanceOf(FiltersAdapterItems.ShoutTypeAdapterItem.class);
+        assert_().that(lastEvent.get(2)).isInstanceOf(FiltersAdapterItems.SortAdapterItem.class);
+        assert_().that(lastEvent.get(3)).isInstanceOf(FiltersAdapterItems.CategoryAdapterItem.class);
+        assert_().that(lastEvent.get(4)).isInstanceOf(FiltersAdapterItems.PriceAdapterItem.class);
+        assert_().that(lastEvent.get(5)).isInstanceOf(FiltersAdapterItems.LocationAdapterItem.class);
+        assert_().that(lastEvent.get(6)).isInstanceOf(FiltersAdapterItems.DistanceAdapterItem.class);
+        assert_().that(lastEvent.get(7)).isInstanceOf(FiltersAdapterItems.FilterAdapterItem.class);
     }
 
     private List<Category> getCategories() {

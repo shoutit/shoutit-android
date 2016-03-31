@@ -16,7 +16,7 @@ import javax.annotation.Nullable;
 
 import rx.Observer;
 
-public class FilterAdapterItems {
+public class FiltersAdapterItems {
 
     public static class FilterValueAdapterItem extends BaseNoIDAdapterItem {
 

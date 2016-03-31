@@ -136,13 +136,13 @@ public class FiltersPresenter {
 
                             builder.put(
                                     filter.getSlug(),
-                                    new FilterAdapterItems.FilterAdapterItem(filter, ImmutableList.<CategoryFilter.FilterValue>of(), filterVisibilityChanged)
+                                    new FiltersAdapterItems.FilterAdapterItem(filter, ImmutableList.<CategoryFilter.FilterValue>of(), filterVisibilityChanged)
                             );
 
                             for (CategoryFilter.FilterValue value : filter.getValues()) {
                                 builder.put(
                                         filter.getSlug(),
-                                        new FilterAdapterItems.FilterValueAdapterItem(value, filterValueSelectionChanged)
+                                        new FiltersAdapterItems.FilterValueAdapterItem(value, filterValueSelectionChanged)
                                 );
                             }
                         }
@@ -184,13 +184,13 @@ public class FiltersPresenter {
                                                       @Nullable Category category, UserLocation userLocation,
                                                       List<BaseAdapterItem> filtersItems) {
                         return ImmutableList.<BaseAdapterItem>builder()
-                                .add(new FilterAdapterItems.HeaderAdapterItem(resetClickedSubject, doneClickedSubject))
-                                .add(new FilterAdapterItems.ShoutTypeAdapterItem(shoutTypeSelectedSubject))
-                                .add(new FilterAdapterItems.SortAdapterItem(sortType, sortTypeChangeClickedObserver))
-                                .add(new FilterAdapterItems.CategoryAdapterItem(category))
-                                .add(new FilterAdapterItems.PriceAdapterItem())
-                                .add(new FilterAdapterItems.LocationAdapterItem(userLocation, locationChangeClickSubject))
-                                .add(new FilterAdapterItems.DistanceAdapterItem(distanceSubject))
+                                .add(new FiltersAdapterItems.HeaderAdapterItem(resetClickedSubject, doneClickedSubject))
+                                .add(new FiltersAdapterItems.ShoutTypeAdapterItem(shoutTypeSelectedSubject))
+                                .add(new FiltersAdapterItems.SortAdapterItem(sortType, sortTypeChangeClickedObserver))
+                                .add(new FiltersAdapterItems.CategoryAdapterItem(category))
+                                .add(new FiltersAdapterItems.PriceAdapterItem())
+                                .add(new FiltersAdapterItems.LocationAdapterItem(userLocation, locationChangeClickSubject))
+                                .add(new FiltersAdapterItems.DistanceAdapterItem(distanceSubject))
                                 .addAll(filtersItems)
                                 .build();
                     }
@@ -208,16 +208,16 @@ public class FiltersPresenter {
 
                     final Collection<BaseAdapterItem> filterItems = itemsMultiMap.get(key);
                     final ImmutableList.Builder<CategoryFilter.FilterValue> filterValuesBuilder = ImmutableList.builder();
-                    FilterAdapterItems.FilterAdapterItem filterAdapterItem = null;
+                    FiltersAdapterItems.FilterAdapterItem filterAdapterItem = null;
                     boolean isFilterVisible = true;
 
                     for (final BaseAdapterItem item : filterItems) {
-                        if (item instanceof FilterAdapterItems.FilterAdapterItem) {
-                            filterAdapterItem = (FilterAdapterItems.FilterAdapterItem) item;
-                            isFilterVisible = ((FilterAdapterItems.FilterAdapterItem) item).isVisible();
+                        if (item instanceof FiltersAdapterItems.FilterAdapterItem) {
+                            filterAdapterItem = (FiltersAdapterItems.FilterAdapterItem) item;
+                            isFilterVisible = ((FiltersAdapterItems.FilterAdapterItem) item).isVisible();
                             allItemsBuilder.add(item);
-                        } else if (item instanceof FilterAdapterItems.FilterValueAdapterItem) {
-                            filterValuesBuilder.add(((FilterAdapterItems.FilterValueAdapterItem) item).getFilterValue());
+                        } else if (item instanceof FiltersAdapterItems.FilterValueAdapterItem) {
+                            filterValuesBuilder.add(((FiltersAdapterItems.FilterValueAdapterItem) item).getFilterValue());
                             if (isFilterVisible) {
                                 allItemsBuilder.add(item);
                             }
