@@ -1,22 +1,22 @@
 package com.shoutit.app.android.view.conversations;
 
-import com.shoutit.app.android.dagger.ActivityModule;
-import com.shoutit.app.android.dagger.ActivityScope;
-import com.shoutit.app.android.dagger.AppComponent;
-import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.dagger.FragmentScope;
+import com.shoutit.app.android.dagger.BaseFragmentComponent;
+import com.shoutit.app.android.dagger.FragmentModule;
+import com.shoutit.app.android.view.main.MainActivityComponent;
 
 import dagger.Component;
 
-@ActivityScope
+@FragmentScope
 @Component(
-        dependencies = AppComponent.class,
+        dependencies = MainActivityComponent.class,
         modules = {
-                ActivityModule.class,
+                FragmentModule.class,
         }
 )
-public interface ConversationsActivityComponent extends BaseActivityComponent {
+public interface ConversationsActivityComponent extends BaseFragmentComponent {
 
-    void inject(ConverstationsActivity activity);
+    void inject(ConverstationsFragment activity);
 
 }
 

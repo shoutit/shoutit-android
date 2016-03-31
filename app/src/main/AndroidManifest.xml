@@ -55,8 +55,6 @@
 
         <activity android:name=".view.webview.HtmlAssetViewerActivity"/>
 
-        <activity android:name=".view.conversations.ConverstationsActivity"/>
-
         <activity
             android:name=".view.about.AboutActivity"
             android:theme="@style/PreferenceStyle"/>
