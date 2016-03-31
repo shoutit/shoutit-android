@@ -37,8 +37,6 @@ public class ShoutsDao {
     private final static int PAGE_SIZE = 20;
 
     @Nonnull
-    private final PublishSubject<Object> loadMoreHomeShoutsSubject = PublishSubject.create();
-    @Nonnull
     private final ApiService apiService;
     @Nonnull
     private final Scheduler networkScheduler;
@@ -124,6 +122,16 @@ public class ShoutsDao {
     }
 
     @Nonnull
+    public ShoutDao getShoutDao(@Nonnull String shoutId) {
+        return shoutCache.getUnchecked(shoutId);
+    }
+
+    @Nonnull
+    public UserShoutsDao getUserShoutsDao(@Nonnull UserShoutsPointer pointer) {
+        return userShoutsCache.getUnchecked(pointer);
+    }
+
+    @Nonnull
     public Observable<ResponseOrError<ShoutsResponse>> getUserShoutObservable(@Nonnull UserShoutsPointer pointer) {
         return userShoutsCache.getUnchecked(pointer).getShoutsObservable();
     }
@@ -144,8 +152,8 @@ public class ShoutsDao {
     }
 
     @Nonnull
-    public Observer<Object> getLoadMoreHomeShoutsObserver() {
-        return loadMoreHomeShoutsSubject;
+    public Observer<Object> getLoadMoreHomeShoutsObserver(LocationPointer locationPointer) {
+        return homeCache.getUnchecked(locationPointer).getLoadMoreObserver();
     }
 
     @Nonnull
@@ -183,14 +191,17 @@ public class ShoutsDao {
     public class ShoutDao {
         @Nonnull
         private Observable<ResponseOrError<Shout>> shoutObservable;
+        @Nonnull
+        protected final PublishSubject<Object> refreshShoutsSubject = PublishSubject.create();
 
         public ShoutDao(@Nonnull String shoutId) {
             final Observable<Object> refreshWithCache = Observable
-                    .interval(1, TimeUnit.MINUTES, networkScheduler)
+                    .interval(2, TimeUnit.MINUTES, networkScheduler)
                     .map(Functions1.toObject());
 
             shoutObservable = apiService.shout(shoutId)
                     .subscribeOn(networkScheduler)
+                    .compose(MoreOperators.<Shout>refresh(refreshShoutsSubject))
                     .compose(ResponseOrError.<Shout>toResponseOrErrorObservable())
                     .compose(MoreOperators.<ResponseOrError<Shout>>refresh(refreshWithCache))
                     .compose(MoreOperators.<ResponseOrError<Shout>>cacheWithTimeout(networkScheduler));
@@ -200,6 +211,11 @@ public class ShoutsDao {
         @Nonnull
         public Observable<ResponseOrError<Shout>> getShoutObservable() {
             return shoutObservable;
+        }
+
+        @Nonnull
+        public Observer<Object> getRefreshObserver() {
+            return refreshShoutsSubject;
         }
     }
 

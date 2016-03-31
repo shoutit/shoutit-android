@@ -7,10 +7,10 @@ import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.UiScheduler;
-import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.UserPreferences;
@@ -23,6 +23,7 @@ import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ShoutsDao;
+import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.model.LocationPointer;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
@@ -37,8 +38,10 @@ import javax.inject.Inject;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
+import rx.functions.Func3;
 import rx.subjects.PublishSubject;
 
 public class HomePresenter {
@@ -53,6 +56,8 @@ public class HomePresenter {
     private final PublishSubject<String> onDiscoverSelectedSubject = PublishSubject.create();
     @Nonnull
     private final PublishSubject<String> shoutSelectedObserver = PublishSubject.create();
+    @Nonnull
+    private final PublishSubject<Object> loadMoreShoutsSubject = PublishSubject.create();
 
     @Nonnull
     private final Observable<Throwable> errorObservable;
@@ -64,22 +69,21 @@ public class HomePresenter {
     private final Observable<Boolean> linearLayoutManagerObservable;
 
     @Nonnull
-    private final ShoutsDao shoutsDao;
-    @Nonnull
     private final Scheduler uiScheduler;
+    private final Observable<LocationPointer> locationObservable;
 
     @Inject
     public HomePresenter(@Nonnull final ShoutsDao shoutsDao,
                          @Nonnull final DiscoversDao discoversDao,
                          @Nonnull final UserPreferences userPreferences,
                          @ForActivity final Context context,
-                         @Nonnull @UiScheduler Scheduler uiScheduler) {
-        this.shoutsDao = shoutsDao;
+                         @Nonnull @UiScheduler Scheduler uiScheduler,
+                         @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter) {
         this.uiScheduler = uiScheduler;
 
         final boolean isNormalUser = userPreferences.isNormalUser();
 
-        final Observable<LocationPointer> locationObservable = userPreferences.getLocationObservable()
+        locationObservable = userPreferences.getLocationObservable()
                 .map(new Func1<UserLocation, LocationPointer>() {
                     @Override
                     public LocationPointer call(UserLocation userLocation) {
@@ -142,7 +146,7 @@ public class HomePresenter {
                 })
                 .compose(ObservableExtensions.<ResponseOrError<DiscoverResponse>>behaviorRefCount());
 
-        final Observable<String> mainDiscoverIdObservable = discoverRequestObservable
+        final Observable<Optional<String>> mainDiscoverIdObservable = discoverRequestObservable
                 .compose(ResponseOrError.<DiscoverResponse>onlySuccess())
                 .filter(new Func1<DiscoverResponse, Boolean>() {
                     @Override
@@ -151,19 +155,27 @@ public class HomePresenter {
                                 !discoverResponse.getDiscovers().isEmpty();
                     }
                 })
-                .map(new Func1<DiscoverResponse, String>() {
+                .map(new Func1<DiscoverResponse, Optional<String>>() {
                     @Override
-                    public String call(DiscoverResponse response) {
-                        assert response.getDiscovers() != null;
-                        return response.getDiscovers().get(0).getId();
+                    public Optional<String> call(DiscoverResponse response) {
+                        if (response.getDiscovers() == null || response.getDiscovers().isEmpty()) {
+                            return Optional.absent();
+                        } else {
+                            return Optional.of(response.getDiscovers().get(0).getId());
+                        }
                     }
                 });
 
         final Observable<ResponseOrError<DiscoverItemDetailsResponse>> discoverItemDetailsObservable = mainDiscoverIdObservable
-                .switchMap(new Func1<String, Observable<ResponseOrError<DiscoverItemDetailsResponse>>>() {
+                .filter(MoreFunctions1.<String>isPresent())
+                .switchMap(new Func1<Optional<String>, Observable<ResponseOrError<DiscoverItemDetailsResponse>>>() {
                     @Override
-                    public Observable<ResponseOrError<DiscoverItemDetailsResponse>> call(String discoverId) {
-                        return discoversDao.getDiscoverItemDao(discoverId).getDiscoverItemObservable();
+                    public Observable<ResponseOrError<DiscoverItemDetailsResponse>> call(Optional<String> discoverId) {
+                        if (discoverId.isPresent()) {
+                            return discoversDao.getDiscoverItemDao(discoverId.get()).getDiscoverItemObservable();
+                        } else {
+                            return Observable.just(ResponseOrError.<DiscoverItemDetailsResponse>fromError(new Throwable()));
+                        }
                     }
                 })
                 .compose(ObservableExtensions.<ResponseOrError<DiscoverItemDetailsResponse>>behaviorRefCount());
@@ -202,18 +214,13 @@ public class HomePresenter {
         /** Combines adapter items **/
         allAdapterItemsObservable = Observable.combineLatest(
                 locationObservable,
-                Observable.zip(allDiscoverAdapterItems.startWith(new ArrayList<BaseAdapterItem>()), allShoutAdapterItems.startWith(new ArrayList<BaseAdapterItem>()), new Func2<List<BaseAdapterItem>, List<BaseAdapterItem>, BothParams<List<BaseAdapterItem>, List<BaseAdapterItem>>>() {
+                allDiscoverAdapterItems,
+                allShoutAdapterItems,
+                new Func3<LocationPointer, List<BaseAdapterItem>, List<BaseAdapterItem>, List<BaseAdapterItem>>() {
                     @Override
-                    public BothParams<List<BaseAdapterItem>, List<BaseAdapterItem>> call(List<BaseAdapterItem> discover, List<BaseAdapterItem> shout) {
-                        return BothParams.of(discover, shout);
-                    }
-                }),
-                new Func2<LocationPointer, BothParams<List<BaseAdapterItem>, List<BaseAdapterItem>>, List<BaseAdapterItem>>() {
-                    @Override
-                    public List<BaseAdapterItem> call(LocationPointer locationPointer, BothParams<List<BaseAdapterItem>, List<BaseAdapterItem>> listListBothParams) {
-                        final List<BaseAdapterItem> discovers = listListBothParams.param1();
-                        final List<BaseAdapterItem> shouts = listListBothParams.param2();
-
+                    public List<BaseAdapterItem> call(LocationPointer locationPointer,
+                                                      List<BaseAdapterItem> discovers,
+                                                      List<BaseAdapterItem> shouts) {
                         final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
                         if (!discovers.isEmpty()) {
                             builder.add(new DiscoverHeaderAdapterItem(locationPointer.getCity()))
@@ -252,6 +259,37 @@ public class HomePresenter {
                 })
                 .skip(1)
                 .observeOn(uiScheduler);
+
+        shoutsGlobalRefreshPresenter
+                .getShoutsGlobalRefreshObservable()
+                .switchMap(new Func1<Object, Observable<LocationPointer>>() {
+                    @Override
+                    public Observable<LocationPointer> call(Object o) {
+                        return locationObservable;
+                    }
+                })
+                .doOnNext(new Action1<LocationPointer>() {
+                    @Override
+                    public void call(LocationPointer locationPointer) {
+                        shoutsDao.getHomeShoutsRefreshObserver(locationPointer).onNext(null);
+                    }
+                })
+                .subscribe();
+
+        loadMoreShoutsSubject
+                .switchMap(new Func1<Object, Observable<LocationPointer>>() {
+                    @Override
+                    public Observable<LocationPointer> call(Object o) {
+                        return locationObservable;
+                    }
+                })
+                .doOnNext(new Action1<LocationPointer>() {
+                    @Override
+                    public void call(LocationPointer locationPointer) {
+                        shoutsDao.getLoadMoreHomeShoutsObserver(locationPointer).onNext(null);
+                    }
+                })
+                .subscribe();
     }
 
     @Nonnull
@@ -271,7 +309,7 @@ public class HomePresenter {
 
     @Nonnull
     public Observer<Object> getLoadMoreShouts() {
-        return RxMoreObservers.ignoreCompleted(shoutsDao.getLoadMoreHomeShoutsObserver());
+        return RxMoreObservers.ignoreCompleted(loadMoreShoutsSubject);
     }
 
     @Nonnull

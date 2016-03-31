@@ -26,6 +26,7 @@ import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.dao.DiscoversDao;
+import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.model.LocationPointer;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.utils.PriceUtils;
@@ -81,7 +82,8 @@ public class DiscoverPresenter {
                              @Nonnull @UiScheduler final Scheduler uiScheduler,
                              @Nonnull @NetworkScheduler final Scheduler networkScheduler,
                              @NonNull @ForActivity Resources resources,
-                             @Nonnull @ForActivity final Context context) {
+                             @Nonnull @ForActivity final Context context,
+                             @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter) {
         mResources = resources;
 
 
@@ -304,6 +306,24 @@ public class DiscoverPresenter {
                                 response.getId(), response.getTitle());
                     }
                 });
+
+        shoutsGlobalRefreshPresenter
+                .getShoutsGlobalRefreshObservable()
+                .switchMap(new Func1<Object, Observable<DiscoverItemDetailsResponse>>() {
+                    @Override
+                    public Observable<DiscoverItemDetailsResponse> call(Object o) {
+                        return itemDetailsResponseObservable;
+                    }
+                })
+                .map(new Func1<DiscoverItemDetailsResponse, Object>() {
+                    @Override
+                    public Object call(DiscoverItemDetailsResponse response) {
+                        discoverShoutsDao.getRefreshObserver(response.getId()).onNext(null);
+                        return null;
+                    }
+                })
+                .subscribe();
+
     }
 
     @Nonnull

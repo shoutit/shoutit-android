@@ -12,6 +12,7 @@ import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dao.ShoutsDao;
+import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.model.RelatedShoutsPointer;
 import com.shoutit.app.android.model.UserShoutsPointer;
 
@@ -25,6 +26,7 @@ import java.util.List;
 import rx.Observable;
 import rx.observers.TestSubscriber;
 import rx.schedulers.Schedulers;
+import rx.subjects.PublishSubject;
 
 import static com.google.common.truth.Truth.assert_;
 import static org.mockito.Matchers.any;
@@ -40,6 +42,10 @@ public class ShoutPresenterTest {
     Context context;
     @Mock
     UserPreferences userPreferences;
+    @Mock
+    ShoutsGlobalRefreshPresenter globalRefreshPresenter;
+    @Mock
+    ShoutsDao.ShoutDao shoutDao;
 
     private ShoutPresenter presenter;
 
@@ -58,11 +64,17 @@ public class ShoutPresenterTest {
                 null, false, false, false, null, 1, null, null, null, 1, null, false, null, null, null)));
         when(userPreferences.isNormalUser())
                 .thenReturn(true);
+        when(globalRefreshPresenter.getShoutsGlobalRefreshObservable())
+                .thenReturn(Observable.just(null));
+        when(shoutsDao.getShoutDao(anyString()))
+                .thenReturn(shoutDao);
+        when(shoutsDao.getShoutDao(anyString()).getRefreshObserver())
+                .thenReturn(PublishSubject.create());
 
         when(context.getString(anyInt(), anyString()))
                 .thenReturn("text");
 
-        presenter = new ShoutPresenter(shoutsDao, "zz", context, Schedulers.immediate(), userPreferences);
+        presenter = new ShoutPresenter(shoutsDao, "zz", context, Schedulers.immediate(), userPreferences, globalRefreshPresenter);
     }
 
     @Test
