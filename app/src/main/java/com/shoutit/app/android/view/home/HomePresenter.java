@@ -66,9 +66,14 @@ public class HomePresenter {
     private final Observable<List<BaseAdapterItem>> allAdapterItemsObservable;
     @Nonnull
     private final Observable<Boolean> linearLayoutManagerObservable;
+    @Nonnull
+    private final Observable<Object> refreshShoutsObservable;
+    @Nonnull
+    private final Observable<Object> loadMoreObservable;
 
     @Nonnull
     private final Scheduler uiScheduler;
+
 
     @Inject
     public HomePresenter(@Nonnull final ShoutsDao shoutsDao,
@@ -258,7 +263,7 @@ public class HomePresenter {
                 .skip(1)
                 .observeOn(uiScheduler);
 
-        shoutsGlobalRefreshPresenter
+        refreshShoutsObservable = shoutsGlobalRefreshPresenter
                 .getShoutsGlobalRefreshObservable()
                 .withLatestFrom(locationObservable, new Func2<Object, LocationPointer, Object>() {
                     @Override
@@ -266,18 +271,26 @@ public class HomePresenter {
                         shoutsDao.getHomeShoutsRefreshObserver(locationPointer).onNext(null);
                         return null;
                     }
-                })
-                .subscribe();
+                });
 
-        loadMoreShoutsSubject
+        loadMoreObservable = loadMoreShoutsSubject
                 .withLatestFrom(locationObservable, new Func2<Object, LocationPointer, Object>() {
                     @Override
                     public Object call(Object o, LocationPointer locationPointer) {
                         shoutsDao.getLoadMoreHomeShoutsObserver(locationPointer).onNext(null);
                         return null;
                     }
-                })
-                .subscribe();
+                });
+    }
+
+    @Nonnull
+    public Observable<Object> getLoadMoreObservable() {
+        return loadMoreObservable;
+    }
+
+    @Nonnull
+    public Observable<Object> getRefreshShoutsObservable() {
+        return refreshShoutsObservable;
     }
 
     @Nonnull

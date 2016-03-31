@@ -144,6 +144,14 @@ public class HomeFragment extends BaseFragment {
                     }
                 });
 
+        presenter.getRefreshShoutsObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
+
+        presenter.getLoadMoreObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
+
     }
 
     private void setLinearLayoutManager() {

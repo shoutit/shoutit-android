@@ -63,6 +63,8 @@ public class DiscoverPresenter {
     private final Observable<DiscoveryInfo> mDiscoveryInfoObservable;
     @Nonnull
     private final Observable<Intent> searchMenuItemClickObservable;
+    @Nonnull
+    private final Observable<Object> shoutsRefreshObservable;
 
     @Nonnull
     private final PublishSubject<String> showMoreObserver = PublishSubject.create();
@@ -307,7 +309,7 @@ public class DiscoverPresenter {
                     }
                 });
 
-        shoutsGlobalRefreshPresenter
+        shoutsRefreshObservable = shoutsGlobalRefreshPresenter
                 .getShoutsGlobalRefreshObservable()
                 .withLatestFrom(itemDetailsResponseObservable, new Func2<Object, DiscoverItemDetailsResponse, Object>() {
                     @Override
@@ -315,9 +317,13 @@ public class DiscoverPresenter {
                         discoverShoutsDao.getRefreshObserver(response.getId()).onNext(null);
                         return null;
                     }
-                })
-                .subscribe();
+                });
 
+    }
+
+    @Nonnull
+    public Observable<Object> getShoutsRefreshObservable() {
+        return shoutsRefreshObservable;
     }
 
     @Nonnull
