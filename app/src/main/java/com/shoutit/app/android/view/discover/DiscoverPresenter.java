@@ -309,15 +309,9 @@ public class DiscoverPresenter {
 
         shoutsGlobalRefreshPresenter
                 .getShoutsGlobalRefreshObservable()
-                .switchMap(new Func1<Object, Observable<DiscoverItemDetailsResponse>>() {
+                .withLatestFrom(itemDetailsResponseObservable, new Func2<Object, DiscoverItemDetailsResponse, Object>() {
                     @Override
-                    public Observable<DiscoverItemDetailsResponse> call(Object o) {
-                        return itemDetailsResponseObservable;
-                    }
-                })
-                .map(new Func1<DiscoverItemDetailsResponse, Object>() {
-                    @Override
-                    public Object call(DiscoverItemDetailsResponse response) {
+                    public Object call(Object o, DiscoverItemDetailsResponse response) {
                         discoverShoutsDao.getRefreshObserver(response.getId()).onNext(null);
                         return null;
                     }

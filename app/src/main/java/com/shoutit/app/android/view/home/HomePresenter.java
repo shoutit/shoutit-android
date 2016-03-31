@@ -38,7 +38,6 @@ import javax.inject.Inject;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
-import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.functions.Func3;
@@ -70,7 +69,6 @@ public class HomePresenter {
 
     @Nonnull
     private final Scheduler uiScheduler;
-    private final Observable<LocationPointer> locationObservable;
 
     @Inject
     public HomePresenter(@Nonnull final ShoutsDao shoutsDao,
@@ -83,7 +81,7 @@ public class HomePresenter {
 
         final boolean isNormalUser = userPreferences.isNormalUser();
 
-        locationObservable = userPreferences.getLocationObservable()
+        Observable<LocationPointer> locationObservable = userPreferences.getLocationObservable()
                 .map(new Func1<UserLocation, LocationPointer>() {
                     @Override
                     public LocationPointer call(UserLocation userLocation) {
@@ -262,31 +260,21 @@ public class HomePresenter {
 
         shoutsGlobalRefreshPresenter
                 .getShoutsGlobalRefreshObservable()
-                .switchMap(new Func1<Object, Observable<LocationPointer>>() {
+                .withLatestFrom(locationObservable, new Func2<Object, LocationPointer, Object>() {
                     @Override
-                    public Observable<LocationPointer> call(Object o) {
-                        return locationObservable;
-                    }
-                })
-                .doOnNext(new Action1<LocationPointer>() {
-                    @Override
-                    public void call(LocationPointer locationPointer) {
+                    public Object call(Object o, LocationPointer locationPointer) {
                         shoutsDao.getHomeShoutsRefreshObserver(locationPointer).onNext(null);
+                        return null;
                     }
                 })
                 .subscribe();
 
         loadMoreShoutsSubject
-                .switchMap(new Func1<Object, Observable<LocationPointer>>() {
+                .withLatestFrom(locationObservable, new Func2<Object, LocationPointer, Object>() {
                     @Override
-                    public Observable<LocationPointer> call(Object o) {
-                        return locationObservable;
-                    }
-                })
-                .doOnNext(new Action1<LocationPointer>() {
-                    @Override
-                    public void call(LocationPointer locationPointer) {
+                    public Object call(Object o, LocationPointer locationPointer) {
                         shoutsDao.getLoadMoreHomeShoutsObserver(locationPointer).onNext(null);
+                        return null;
                     }
                 })
                 .subscribe();
