@@ -18,6 +18,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.utils.BlurTransform;
 import com.shoutit.app.android.utils.PicassoHelper;
+import com.shoutit.app.android.view.conversations.ConverstationsActivity;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogFragment;
 import com.shoutit.app.android.view.discover.DiscoverFragment;
 import com.shoutit.app.android.view.home.HomeFragment;
@@ -171,7 +172,7 @@ public class MenuHandler {
                 if (userPreferences.isNormalUser()) {
                     onMenuItemSelectedListener.onMenuItemSelected(FRAGMENT_CHATS);
                     selectItem(view.getId());
-                    Toast.makeText(rxActivity, "Not implemented yet", Toast.LENGTH_SHORT).show();
+                    rxActivity.startActivity(ConverstationsActivity.newIntent(rxActivity));
                 } else {
                     showLoginActivity();
                 }

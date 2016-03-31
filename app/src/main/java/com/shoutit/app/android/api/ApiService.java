@@ -267,4 +267,7 @@ public interface ApiService {
      */
     @GET("conversations")
     Observable<ConversationsResponse> getConversations();
+
+    @GET("conversations")
+    Observable<ConversationsResponse> getConversations(@NonNull @Query("after") String timestamp);
 }

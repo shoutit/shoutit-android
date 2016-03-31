@@ -1,6 +1,5 @@
 package com.shoutit.app.android.api.model;
 
-
 import java.util.List;
 
 public class ConversationsResponse {
@@ -55,14 +54,21 @@ public class ConversationsResponse {
     }
 
     public static class ConversationProfile {
+
+        public static final String TYPE_USER = "user";
+
         private final String id;
         private final String firstName;
         private final String username;
+        private final String type;
+        private final String image;
 
-        public ConversationProfile(String id, String firstName, String username) {
+        public ConversationProfile(String id, String firstName, String username, String type, String image) {
             this.id = id;
             this.firstName = firstName;
             this.username = username;
+            this.type = type;
+            this.image = image;
         }
 
         public String getId() {
@@ -75,6 +81,14 @@ public class ConversationsResponse {
 
         public String getUsername() {
             return username;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public String getImage() {
+            return image;
         }
     }
 
@@ -112,12 +126,17 @@ public class ConversationsResponse {
 
     public static class MessageAttachment {
 
+        public static final String ATTACHMENT_TYPE_SHOUT = "shout";
+        public static final String ATTACHMENT_TYPE_LOCATION = "location";
+
         private final String type;
         private final MessageLocation location;
+        private final Shout shout;
 
-        public MessageAttachment(String type, MessageLocation location) {
+        public MessageAttachment(String type, MessageLocation location, Shout shout) {
             this.type = type;
             this.location = location;
+            this.shout = shout;
         }
 
         public class MessageLocation {
@@ -136,6 +155,18 @@ public class ConversationsResponse {
             public double getLongitude() {
                 return longitude;
             }
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public MessageLocation getLocation() {
+            return location;
+        }
+
+        public Shout getShout() {
+            return shout;
         }
     }
 
