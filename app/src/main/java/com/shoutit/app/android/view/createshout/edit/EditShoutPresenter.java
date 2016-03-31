@@ -24,8 +24,8 @@ import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutResponse;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.UserLocationSimple;
+import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ForActivity;
-import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.ResourcesHelper;
@@ -59,19 +59,27 @@ public class EditShoutPresenter {
         private final String mCategoryId;
         @Nullable
         private final List<Pair<String, String>> mOptionsIdValue;
+        @NonNull
+        private final List<String> mImages;
+        @NonNull
+        private final List<Video> mVideos;
 
         public RequestData(@NonNull String title,
                            @NonNull String description,
                            @NonNull String budget,
                            @NonNull String currencyId,
                            @Nullable String categoryId,
-                           @Nullable List<Pair<String, String>> optionsIdValue) {
+                           @Nullable List<Pair<String, String>> optionsIdValue,
+                           @NonNull List<String> images,
+                           @NonNull List<Video> videos) {
             mTitle = title;
             mDescription = description;
             mBudget = budget;
             mCurrencyId = currencyId;
             mCategoryId = categoryId;
             mOptionsIdValue = optionsIdValue;
+            mImages = images;
+            mVideos = videos;
         }
     }
 
@@ -179,6 +187,7 @@ public class EditShoutPresenter {
                             mListener.setLocation(
                                     ResourcesHelper.getResourceIdForName(mUserLocation.getCountry(), mContext),
                                     mUserLocation.getCity());
+                            mListener.setMedia(responseData.mShoutResponse.getImages(), responseData.mShoutResponse.getVideos());
                         } else {
                             mListener.showBodyError();
                         }
@@ -205,7 +214,7 @@ public class EditShoutPresenter {
     }
 
     private void currencySuccess(@NonNull List<Currency> responseData) {
-        final List<Pair<String, String>> list = PriceUtils.transformCurrencyToPair(responseData);
+        final List<PriceUtils.SpinnerCurrency> list = PriceUtils.transformCurrencyToPair(responseData);
 
         mListener.setCurrencies(list);
     }
@@ -213,47 +222,6 @@ public class EditShoutPresenter {
     private void setNewUserLocation(@NonNull UserLocation userLocation) {
         mUserLocation = userLocation;
         mListener.setLocation(ResourcesHelper.getResourceIdForName(userLocation.getCountry(), mContext), userLocation.getCity());
-    }
-
-    public void confirmClicked() {
-        final RequestData requestData = mListener.getRequestData();
-        if (!checkValidity(requestData)) return;
-
-        mListener.showProgress();
-
-        Observable<CreateShoutResponse> observable = Strings.isNullOrEmpty(requestData.mBudget) ?
-                mApiService.editShout(mShoutId, new EditShoutRequest(
-                        requestData.mTitle,
-                        requestData.mDescription,
-                        new UserLocationSimple(mUserLocation.getLatitude(), mUserLocation.getLongitude()),
-                        requestData.mCategoryId,
-                        getFilters(requestData.mOptionsIdValue))) :
-                mApiService.editShout(mShoutId, new EditShoutRequestWithPrice(
-                        requestData.mTitle,
-                        requestData.mDescription,
-                        new UserLocationSimple(mUserLocation.getLatitude(), mUserLocation.getLongitude()),
-                        PriceUtils.getPriceInCents(requestData.mBudget),
-                        requestData.mCurrencyId,
-                        requestData.mCategoryId,
-                        getFilters(requestData.mOptionsIdValue)));
-
-        pendingSubscriptions.add(observable
-                .subscribeOn(mNetworkScheduler)
-                .observeOn(mUiScheduler)
-                .subscribe(new Action1<CreateShoutResponse>() {
-                    @Override
-                    public void call(CreateShoutResponse responseBody) {
-                        shoutsGlobalRefreshPresenter.refreshShouts();
-                        mListener.hideProgress();
-                        mListener.finishActivity();
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        mListener.hideProgress();
-                        mListener.showPostError();
-                    }
-                }));
     }
 
     private List<EditShoutRequestWithPrice.FilterValue> getFilters(List<Pair<String, String>> optionsIdValue) {
@@ -314,9 +282,47 @@ public class EditShoutPresenter {
         mListener.setCurrenciesEnabled(!Strings.isNullOrEmpty(budget));
     }
 
-    public interface Listener {
+    public void dataReady(RequestData requestData) {
+        if (!checkValidity(requestData)) return;
 
-        RequestData getRequestData();
+        mListener.showProgress();
+
+        Observable<CreateShoutResponse> observable = Strings.isNullOrEmpty(requestData.mBudget) ?
+                mApiService.editShout(mShoutId, new EditShoutRequest(
+                        requestData.mTitle,
+                        requestData.mDescription,
+                        new UserLocationSimple(mUserLocation.getLatitude(), mUserLocation.getLongitude()),
+                        requestData.mCategoryId,
+                        getFilters(requestData.mOptionsIdValue), requestData.mImages, requestData.mVideos)) :
+                mApiService.editShout(mShoutId, new EditShoutRequestWithPrice(
+                        requestData.mTitle,
+                        requestData.mDescription,
+                        new UserLocationSimple(mUserLocation.getLatitude(), mUserLocation.getLongitude()),
+                        PriceUtils.getPriceInCents(requestData.mBudget),
+                        requestData.mCurrencyId,
+                        requestData.mCategoryId,
+                        getFilters(requestData.mOptionsIdValue), requestData.mImages, requestData.mVideos));
+
+        pendingSubscriptions.add(observable
+                .subscribeOn(mNetworkScheduler)
+                .observeOn(mUiScheduler)
+                .subscribe(new Action1<CreateShoutResponse>() {
+                    @Override
+                    public void call(CreateShoutResponse responseBody) {
+                        shoutsGlobalRefreshPresenter.refreshShouts();
+                        mListener.hideProgress();
+                        mListener.finishActivity();
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        mListener.hideProgress();
+                        mListener.showPostError();
+                    }
+                }));
+    }
+
+    public interface Listener {
 
         void setLocation(@DrawableRes int flag, @NonNull String name);
 
@@ -332,7 +338,7 @@ public class EditShoutPresenter {
 
         void showBodyError();
 
-        void setCurrencies(@NonNull List<Pair<String, String>> list);
+        void setCurrencies(@NonNull List<PriceUtils.SpinnerCurrency> list);
 
         void setCurrenciesEnabled(boolean enabled);
 
@@ -355,6 +361,8 @@ public class EditShoutPresenter {
         void setCategoryImage(@Nullable String image);
 
         void setActionbarTitle(@NonNull String title);
+
+        void setMedia(@NonNull List<String> images, @NonNull List<Video> videos);
     }
 
 }

@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent" xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -30,13 +30,14 @@
 
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/request_activity_description_layout"
-                    style="@style/BlueInputStyle"
+                    app:hintTextAppearance="@style/BlueInputStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp">
 
                     <EditText
                         android:id="@+id/create_request_descirption"
+                        android:theme="@style/BlueEditText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/request_activity_what_are_you_looking_for"/>
@@ -56,6 +57,7 @@
 
                         <EditText
                             android:id="@+id/create_request_budget"
+                            android:theme="@style/BlueEditText"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="@string/request_activity_budget"

@@ -6,7 +6,6 @@ import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v4.util.Pair;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,7 +31,7 @@ import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.view.createshout.publish.PublishShoutActivity;
-import com.shoutit.app.android.widget.SpinnerAdapter;
+import com.shoutit.app.android.widget.CurrencySpinnerAdapter;
 
 import java.io.File;
 import java.io.IOException;
@@ -79,7 +78,7 @@ public class PublishMediaShoutFragment extends Fragment {
     @Inject
     AmazonHelper mAmazonHelper;
 
-    private SpinnerAdapter mCurrencyAdapter;
+    private CurrencySpinnerAdapter mCurrencyAdapter;
 
     private String mFile;
     private boolean mIsVideo;
@@ -108,7 +107,7 @@ public class PublishMediaShoutFragment extends Fragment {
         mFile = arguments.getString(ARGS_FILE);
         mIsVideo = arguments.getBoolean(ARGS_IS_VIDEO);
 
-        mCurrencyAdapter = new SpinnerAdapter(
+        mCurrencyAdapter = new CurrencySpinnerAdapter(
                 R.string.camera_publish_currency,
                 getActivity(),
                 R.layout.camera_publish_currency_item,
@@ -271,15 +270,15 @@ public class PublishMediaShoutFragment extends Fragment {
         final String price = mCameraPublishedPrice.getText().toString();
         if (!Strings.isNullOrEmpty(price)) {
             final long priceInCents = PriceUtils.getPriceInCents(price);
-            final Pair<String, String> selectedItem = (Pair<String, String>) mCameraPublishedCurrency.getSelectedItem();
-            mApiService.editShoutPrice(createdShoutOfferId, new EditShoutPriceRequest(priceInCents, selectedItem.first))
+            final PriceUtils.SpinnerCurrency selectedItem = (PriceUtils.SpinnerCurrency) mCameraPublishedCurrency.getSelectedItem();
+            mApiService.editShoutPrice(createdShoutOfferId, new EditShoutPriceRequest(priceInCents, selectedItem.getCode()))
                     .subscribeOn(Schedulers.io())
                     .observeOn(MyAndroidSchedulers.mainThread())
                     .subscribe(new Action1<CreateShoutResponse>() {
                         @Override
                         public void call(CreateShoutResponse createShoutResponse) {
                             getActivity().finish();
-                            PublishShoutActivity.newIntent(getActivity(), createdShoutOfferId, false);
+                            startActivity(PublishShoutActivity.newIntent(getActivity(), createdShoutOfferId, false));
                         }
                     }, new Action1<Throwable>() {
                         @Override
@@ -294,6 +293,7 @@ public class PublishMediaShoutFragment extends Fragment {
                     });
         } else {
             getActivity().finish();
+            startActivity(PublishShoutActivity.newIntent(getActivity(), createdShoutOfferId, false));
         }
     }
 

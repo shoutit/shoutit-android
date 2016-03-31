@@ -28,6 +28,7 @@ import com.shoutit.app.android.constants.AmazonConstants;
 import com.shoutit.app.android.dao.CategoriesDao;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.dao.DiscoversDao;
+import com.shoutit.app.android.dao.NotificationsDao;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
@@ -209,6 +210,13 @@ public final class AppModule {
     @Provides
     public ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter() {
         return new ShoutsGlobalRefreshPresenter();
+    }
+
+    @Singleton
+    @Provides
+    public NotificationsDao notificationsDao(ApiService apiService,
+                                             @NetworkScheduler Scheduler networkScheduler) {
+        return new NotificationsDao(apiService, networkScheduler);
     }
 
     @Singleton

@@ -80,6 +80,7 @@ android {
             applicationIdSuffix '.debug'
             versionNameSuffix "-debug"
             buildConfigField "String", "API_URL", dev_runscope_api_url
+            buildConfigField 'Boolean', 'enableCrashlytics', 'false'
         }
 
         staging {
@@ -92,6 +93,7 @@ android {
             applicationIdSuffix '.staging'
             versionNameSuffix "-staging"
             buildConfigField "String", "API_URL", dev_runscope_api_url
+            buildConfigField 'Boolean', 'enableCrashlytics', 'true'
         }
 
         release {
@@ -102,6 +104,7 @@ android {
             ext.betaDistributionNotifications = false
             ext.enableCrashlytics = true
             buildConfigField "String", "API_URL", production_api_url
+            buildConfigField 'Boolean', 'enableCrashlytics', 'true'
         }
     }
 

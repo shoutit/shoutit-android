@@ -9,13 +9,18 @@ public class EditShoutRequest {
     private final UserLocationSimple location;
     private final String category;
     private final List<FilterValue> filters;
+    private final List<String> images;
+    private final List<Video> videos;
 
-    public EditShoutRequest(String title, String text, UserLocationSimple location, String category, List<FilterValue> filters) {
+    public EditShoutRequest(String title, String text, UserLocationSimple location, String category,
+                            List<FilterValue> filters, List<String> images, List<Video> videos) {
         this.title = title;
         this.text = text;
         this.location = location;
         this.category = category;
         this.filters = filters;
+        this.images = images;
+        this.videos = videos;
     }
 
     public static class FilterValue {

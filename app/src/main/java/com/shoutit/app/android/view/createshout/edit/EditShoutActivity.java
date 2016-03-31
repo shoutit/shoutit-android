@@ -1,10 +1,10 @@
 package com.shoutit.app.android.view.createshout.edit;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
@@ -27,6 +27,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -35,17 +36,24 @@ import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.CategoryFilter;
 import com.shoutit.app.android.api.model.UserLocation;
+import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
-import com.shoutit.app.android.view.createshout.CurrencyDialog;
+import com.shoutit.app.android.utils.PriceUtils;
+import com.shoutit.app.android.view.createshout.DialogsHelper;
+import com.shoutit.app.android.view.createshout.ShoutMediaPresenter;
 import com.shoutit.app.android.view.createshout.location.LocationActivity;
+import com.shoutit.app.android.view.media.RecordMediaActivity;
+import com.shoutit.app.android.widget.CurrencySpinnerAdapter;
+import com.shoutit.app.android.widget.SimpleCurrencySpinnerAdapter;
 import com.shoutit.app.android.widget.SimpleSpinnerAdapter;
 import com.shoutit.app.android.widget.SpinnerAdapter;
 import com.shoutit.app.android.widget.StateSpinner;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -55,9 +63,10 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class EditShoutActivity extends BaseActivity implements EditShoutPresenter.Listener {
+public class EditShoutActivity extends BaseActivity implements EditShoutPresenter.Listener, ShoutMediaPresenter.MediaListener {
 
     private static final int LOCATION_REQUEST = 0;
+    private static final int MEDIA_REQUEST_CODE = 1;
 
     private static final String ARGS_ID = "args_id";
 
@@ -85,13 +94,17 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     EditText mEditShoutDescription;
     @Bind(R.id.edit_currency_info)
     ImageView mEditCurrencyInfo;
+    @Bind(R.id.edit_media_container)
+    LinearLayout mEditMediaContainer;
 
     @Inject
     EditShoutPresenter mEditShoutPresenter;
     @Inject
+    ShoutMediaPresenter mShoutMediaPresenter;
+    @Inject
     Picasso mPicasso;
 
-    private SpinnerAdapter mCurrencyAdapter;
+    private CurrencySpinnerAdapter mCurrencyAdapter;
     private SpinnerAdapter mCategoryAdapter;
 
     public static Intent newIntent(@NonNull String id, @NonNull Context context) {
@@ -122,7 +135,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
             }
         });
 
-        mCurrencyAdapter = new SimpleSpinnerAdapter(R.string.request_activity_currency, this);
+        mCurrencyAdapter = new SimpleCurrencySpinnerAdapter(R.string.request_activity_currency, this);
         mEditCurrencySpinner.setAdapter(mCurrencyAdapter);
 
         mCategoryAdapter = new SimpleSpinnerAdapter(R.string.edit_shout_category, this);
@@ -152,11 +165,12 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
         });
 
         mEditShoutPresenter.registerListener(this);
+        mShoutMediaPresenter.register(this);
 
         mEditCurrencyInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CurrencyDialog.showDialog(EditShoutActivity.this);
+                DialogsHelper.showCurrencyDialog(EditShoutActivity.this);
             }
         });
     }
@@ -164,6 +178,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     @Override
     protected void onDestroy() {
         mEditShoutPresenter.unregister();
+        mShoutMediaPresenter.unregister();
         super.onDestroy();
     }
 
@@ -183,7 +198,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
 
     @OnClick(R.id.edit_confirm)
     public void onClick() {
-        mEditShoutPresenter.confirmClicked();
+        mShoutMediaPresenter.send();
     }
 
     @OnClick(R.id.edit_location_btn)
@@ -193,24 +208,18 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == LOCATION_REQUEST && resultCode == Activity.RESULT_OK) {
+        if (requestCode == LOCATION_REQUEST && resultCode == RESULT_OK) {
             final UserLocation userLocation = (UserLocation) data.getSerializableExtra(LocationActivity.EXTRAS_USER_LOCATION);
             mEditShoutPresenter.updateLocation(userLocation);
+        } else if (requestCode == MEDIA_REQUEST_CODE && resultCode == RESULT_OK) {
+            final Bundle extras = data.getExtras();
+            final boolean isVideo = extras.getBoolean(RecordMediaActivity.EXTRA_IS_VIDEO);
+            final String media = extras.getString(RecordMediaActivity.EXTRA_MEDIA);
+            Preconditions.checkNotNull(media);
+            mShoutMediaPresenter.addMediaItem(media, isVideo);
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public EditShoutPresenter.RequestData getRequestData() {
-        return new EditShoutPresenter.RequestData(
-                mTitle.getText().toString(),
-                mEditShoutDescription.getText().toString(),
-                mEditBudget.getText().toString(),
-                ((Pair<String, String>) mEditCurrencySpinner.getSelectedItem()).first,
-                ((Pair<String, String>) mEditCategorySpinner.getSelectedItem()).first,
-                getSelectedOptions());
     }
 
     @Override
@@ -254,7 +263,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     }
 
     @Override
-    public void setCurrencies(@NonNull List<Pair<String, String>> list) {
+    public void setCurrencies(@NonNull List<PriceUtils.SpinnerCurrency> list) {
         mCurrencyAdapter.setData(list);
     }
 
@@ -363,5 +372,77 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     @Override
     public void setActionbarTitle(@NonNull String title) {
         mEditToolbar.setTitle(title);
+    }
+
+    @Override
+    public void setMedia(@NonNull List<String> images, @NonNull List<Video> videos) {
+        mShoutMediaPresenter.addRemoteMedia(images, videos);
+    }
+
+    @Override
+    public void setImages(@NonNull Map<Integer, ShoutMediaPresenter.Item> mediaElements) {
+        mEditMediaContainer.removeAllViews();
+
+        for (int i = 0; i < mediaElements.size(); i++) {
+            final ShoutMediaPresenter.Item item = mediaElements.get(i);
+            final LayoutInflater layoutInflater = getLayoutInflater();
+            final View view;
+
+            if (item instanceof ShoutMediaPresenter.AddImageItem) {
+                view = layoutInflater.inflate(R.layout.edit_media_add, mEditMediaContainer, false);
+            } else if (item instanceof ShoutMediaPresenter.MediaItem) {
+                view = layoutInflater.inflate(R.layout.edit_media_item, mEditMediaContainer, false);
+                final ImageView imageView = (ImageView) view.findViewById(R.id.edit_media_item_image);
+                mPicasso.load(Uri.parse(((ShoutMediaPresenter.MediaItem) item).getThumb()))
+                        .centerCrop()
+                        .fit()
+                        .into(imageView);
+            } else if (item instanceof ShoutMediaPresenter.BlankItem) {
+                view = layoutInflater.inflate(R.layout.edit_media_blank, mEditMediaContainer, false);
+            } else {
+                throw new RuntimeException();
+            }
+
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    item.click();
+                }
+            });
+            mEditMediaContainer.addView(view);
+        }
+    }
+
+    @Override
+    public void openSelectMediaActivity() {
+        startActivityForResult(RecordMediaActivity.newIntent(this, true), MEDIA_REQUEST_CODE);
+    }
+
+    @Override
+    public void onlyOneVideoAllowedAlert() {
+        DialogsHelper.showOnlyOneVideoDialog(this);
+    }
+
+    @Override
+    public void thumbnailCreateError() {
+        ColoredSnackBar.error(ColoredSnackBar.contentView(this), R.string.edit_thumbnail_error, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void mediaEditionCompleted(@NonNull List<String> images, @NonNull List<Video> videos) {
+        final EditShoutPresenter.RequestData requestData = new EditShoutPresenter.RequestData(
+                mTitle.getText().toString(),
+                mEditShoutDescription.getText().toString(),
+                mEditBudget.getText().toString(),
+                ((PriceUtils.SpinnerCurrency) mEditCurrencySpinner.getSelectedItem()).getCode(),
+                ((Pair<String, String>) mEditCategorySpinner.getSelectedItem()).first,
+                getSelectedOptions(), images, videos);
+        mEditShoutPresenter.dataReady(requestData);
+    }
+
+    @Override
+    public void showMediaProgress() {
+        mEditProgress.setVisibility(View.VISIBLE);
     }
 }

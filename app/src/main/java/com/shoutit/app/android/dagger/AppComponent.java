@@ -14,6 +14,7 @@ import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.dao.CategoriesDao;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.dao.DiscoversDao;
+import com.shoutit.app.android.dao.NotificationsDao;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
@@ -72,6 +73,8 @@ public interface AppComponent {
     CategoriesDao categoriesDao();
 
     ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter();
+
+    NotificationsDao notificationsDao();
 
     GoogleApiClient googleApiClient();
 

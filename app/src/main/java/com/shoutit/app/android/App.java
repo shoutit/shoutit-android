@@ -5,6 +5,7 @@ import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
 
 import com.appunite.rx.dagger.NetworkScheduler;
+import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
 import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
 import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler;
@@ -92,11 +93,9 @@ public class App extends MultiDexApplication {
     }
 
     private void initFabric() {
-        final CrashlyticsCore crashlytics = new CrashlyticsCore.Builder()
-                .disabled("debug".equals(BuildConfig.BUILD_TYPE))
-                .build();
-
-        Fabric.with(this, crashlytics);
+        if (BuildConfig.enableCrashlytics == true) {
+            Fabric.with(this, new CrashlyticsCore.Builder().build(), new Crashlytics());
+        }
     }
 
     private void setupGraph() {

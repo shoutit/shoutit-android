@@ -1,5 +1,7 @@
 package com.shoutit.app.android.api.model;
 
+import java.util.List;
+
 public class ShoutResponse {
 
     private final Long price;
@@ -9,8 +11,11 @@ public class ShoutResponse {
     private final UserLocation location;
     private final String currency;
     private final Category category;
+    private final List<String> images;
+    private final List<Video> videos;
 
-    public ShoutResponse(Long price, String title, String text, String type, UserLocation location, String currency, Category category) {
+    public ShoutResponse(Long price, String title, String text, String type, UserLocation location,
+                         String currency, Category category, List<String> images, List<Video> videos) {
         this.price = price;
         this.title = title;
         this.text = text;
@@ -18,6 +23,8 @@ public class ShoutResponse {
         this.location = location;
         this.currency = currency;
         this.category = category;
+        this.images = images;
+        this.videos = videos;
     }
 
     public Long getPrice() {
@@ -46,5 +53,13 @@ public class ShoutResponse {
 
     public String getText() {
         return text;
+    }
+
+    public List<String> getImages() {
+        return images;
+    }
+
+    public List<Video> getVideos() {
+        return videos;
     }
 }
