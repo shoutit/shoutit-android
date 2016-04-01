@@ -12,7 +12,6 @@ import com.shoutit.app.android.api.model.UserLocation;
 import java.util.List;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import rx.Observer;
 
@@ -105,6 +104,10 @@ public class FiltersAdapterItems {
 
         public void setSelectedValues(ImmutableList<CategoryFilter.FilterValue> selectedValues) {
             this.selectedValues = selectedValues;
+        }
+
+        public String getTitle() {
+            return categoryFilter.getName();
         }
 
         @Nonnull
@@ -203,11 +206,11 @@ public class FiltersAdapterItems {
         @Nonnull
         private final List<Category> categories;
         @Nonnull
-        private final Observer<Category> categorySelectedObserver;
+        private final Observer<String> categorySelectedObserver;
 
         public CategoryAdapterItem(@Nonnull Category category,
                                    @Nonnull List<Category> categories,
-                                   @Nonnull Observer<Category> categorySelectedObserver) {
+                                   @Nonnull Observer<String> categorySelectedObserver) {
             this.category = category;
             this.categories = categories;
             this.categorySelectedObserver = categorySelectedObserver;
@@ -235,7 +238,7 @@ public class FiltersAdapterItems {
         }
 
         public void onCategorySelected(Category category) {
-            categorySelectedObserver.onNext(category);
+            categorySelectedObserver.onNext(category.getSlug());
         }
     }
 
@@ -332,12 +335,26 @@ public class FiltersAdapterItems {
         @Nonnull
         private final SortType sortType;
         @Nonnull
-        private final Observer<Object> sortTypeChangeClickedObserver;
+        private final List<SortType> sortTypes;
+        @Nonnull
+        private final Observer<SortType> sortTypeChangeObserver;
 
         public SortAdapterItem(@Nonnull SortType sortType,
-                               @Nonnull Observer<Object> sortTypeChangeClickedObserver) {
+                               @Nonnull List<SortType> sortTypes,
+                               @Nonnull Observer<SortType> sortTypeChangeObserver) {
             this.sortType = sortType;
-            this.sortTypeChangeClickedObserver = sortTypeChangeClickedObserver;
+            this.sortTypes = sortTypes;
+            this.sortTypeChangeObserver = sortTypeChangeObserver;
+        }
+
+        @Nonnull
+        public SortType getSortType() {
+            return sortType;
+        }
+
+        @Nonnull
+        public List<SortType> getSortTypes() {
+            return sortTypes;
         }
 
         @Override
@@ -349,6 +366,10 @@ public class FiltersAdapterItems {
         public boolean same(@Nonnull BaseAdapterItem item) {
             return item instanceof SortAdapterItem &&
                     sortType.equals(((SortAdapterItem) item).sortType);
+        }
+
+        public void onSortTypeSelected(SortType sortType) {
+            sortTypeChangeObserver.onNext(sortType);
         }
     }
 }

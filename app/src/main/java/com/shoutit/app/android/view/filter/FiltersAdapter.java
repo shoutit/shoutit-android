@@ -2,8 +2,6 @@ package com.shoutit.app.android.view.filter;
 
 import android.content.Context;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
@@ -15,8 +13,6 @@ import com.squareup.picasso.Picasso;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
-import butterknife.Bind;
-
 public class FiltersAdapter extends BaseAdapter {
     private final int VIEW_TYPE_HEADER = 1;
     private final int VIEW_TYPE_SHOUT_TYPE = 2;
@@ -26,6 +22,7 @@ public class FiltersAdapter extends BaseAdapter {
     private final int VIEW_TYPE_DISTANCE = 6;
     private final int VIEW_TYPE_FILTER = 7;
     private final int VIEW_TYPE_FILTER_VALUE = 8;
+    private final int VIEW_TYPE_SORT_TYPE = 9;
 
     @Nonnull
     private final Picasso picasso;
@@ -48,13 +45,15 @@ public class FiltersAdapter extends BaseAdapter {
             case VIEW_TYPE_PRICE:
                 return new FilterViewHolders.PriceViewHolder(layoutInflater.inflate(R.layout.filters_price_item, parent, false));
             case VIEW_TYPE_LOCATION:
-                return new FilterViewHolders.LocationViewHolder(layoutInflater.inflate(R.layout.filters_location_item, parent, false));
+                return new FilterViewHolders.LocationViewHolder(layoutInflater.inflate(R.layout.filters_location_item, parent, false), context, picasso);
             case VIEW_TYPE_DISTANCE:
-                return new FilterViewHolders.DistanceViewHolder(layoutInflater.inflate(R.layout.filters_distance_item, parent, false));
+                return new FilterViewHolders.DistanceViewHolder(layoutInflater.inflate(R.layout.filters_distance_item, parent, false), context);
             case VIEW_TYPE_FILTER:
                 return new FilterViewHolders.FilterViewHolder(layoutInflater.inflate(R.layout.filters_filter_item, parent, false));
             case VIEW_TYPE_FILTER_VALUE:
                 return new FilterViewHolders.FilterValueViewHolder(layoutInflater.inflate(R.layout.filters_filter_value_item, parent, false));
+            case VIEW_TYPE_SORT_TYPE:
+                return new FilterViewHolders.SortTypeViewHolder(layoutInflater.inflate(R.layout.filers_sort_types_item, parent, false), context);
             default:
                 throw new RuntimeException("Unknown view type:" + viewType);
         }
@@ -79,6 +78,8 @@ public class FiltersAdapter extends BaseAdapter {
             return VIEW_TYPE_FILTER;
         } else if (item instanceof FiltersAdapterItems.FilterValueAdapterItem) {
             return VIEW_TYPE_FILTER_VALUE;
+        } else if (item instanceof FiltersAdapterItems.SortAdapterItem) {
+            return VIEW_TYPE_SORT_TYPE;
         } else {
             throw new RuntimeException("Unknown view type: " + item.getClass().getSimpleName());
         }

@@ -3,7 +3,10 @@ package com.shoutit.app.android.view.search.results.shouts;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -52,6 +55,10 @@ public class SearchShoutsResultsActivity extends BaseActivity {
     Toolbar toolbar;
     @Bind(R.id.search_shouts_results_recycler_view)
     RecyclerView recyclerView;
+    @Bind(R.id.search_results_drawer_layout)
+    DrawerLayout drawerLayout;
+    @Bind(R.id.filter_drawer)
+    View filterLayout;
 
     @Inject
     RecentSearchesTable recentSearchesTable;
@@ -59,6 +66,8 @@ public class SearchShoutsResultsActivity extends BaseActivity {
     SearchShoutsResultsPresenter presenter;
     @Inject
     SearchShoutsResultsAdapter adapter;
+
+    private ActionBarDrawerToggle drawerToggle;
 
     public static Intent newIntent(Context context, @Nonnull String queryToSave,
                                    @Nullable String contextualItemId,
@@ -81,6 +90,7 @@ public class SearchShoutsResultsActivity extends BaseActivity {
             saveSearchQuery();
         }
 
+        initFiltersDrawer();
         initAdapter();
 
         presenter.getAdapterItems()
@@ -135,6 +145,26 @@ public class SearchShoutsResultsActivity extends BaseActivity {
                 .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
                 .filter(LoadMoreHelper.needLoadMore((MyLayoutManager) recyclerView.getLayoutManager(), adapter))
                 .subscribe(presenter.getLoadMoreObserver());
+
+        presenter.getFiltersOpenObservable()
+                .compose(bindToLifecycle())
+                .subscribe(new Action1<Object>() {
+                    @Override
+                    public void call(Object o) {
+                        drawerLayout.openDrawer(filterLayout);
+                    }
+                });
+    }
+
+    private void initFiltersDrawer() {
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
+                R.string.drawer_open, R.string.drawer_close);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        drawerToggle.onConfigurationChanged(newConfig);
     }
 
     private void initAdapter() {

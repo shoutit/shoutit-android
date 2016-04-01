@@ -1,5 +1,7 @@
 package com.shoutit.app.android.view.filter;
 
+import android.content.Context;
+
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.collect.Iterables;
@@ -34,6 +36,8 @@ public class FiltersPresenterTest {
     SortTypesDao sortTypesDao;
     @Mock
     UserPreferences userPreferences;
+    @Mock
+    Context context;
 
     private FiltersPresenter presenter;
 
@@ -51,7 +55,7 @@ public class FiltersPresenterTest {
         when(userPreferences.getLocation())
                 .thenReturn(new UserLocation(2d, 3d, "PL", null, null, null, null));
 
-        presenter = new FiltersPresenter(categoriesDao, sortTypesDao, Schedulers.immediate(), userPreferences);
+        presenter = new FiltersPresenter(categoriesDao, sortTypesDao, Schedulers.immediate(), context, userPreferences);
     }
 
     @Test

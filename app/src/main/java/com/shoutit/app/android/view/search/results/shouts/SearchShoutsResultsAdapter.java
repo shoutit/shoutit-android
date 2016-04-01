@@ -5,7 +5,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
@@ -25,7 +24,6 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
 
 public class SearchShoutsResultsAdapter extends ChangeableLayoutManagerAdapter {
@@ -71,12 +69,7 @@ public class SearchShoutsResultsAdapter extends ChangeableLayoutManagerAdapter {
                             .subscribe(item.getLayoutManagerSwitchObserver()),
 
                     RxView.clicks(filterIv)
-                            .subscribe(new Action1<Void>() {
-                                @Override
-                                public void call(Void aVoid) {
-                                    Toast.makeText(context, "Not implemented yet", Toast.LENGTH_LONG).show();
-                                }
-                            })
+                            .subscribe(item.getOnFilterClickObserver())
             );
         }
 

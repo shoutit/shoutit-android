@@ -26,7 +26,9 @@ public abstract class BaseSpinnerAdapter<T> extends BaseAdapter {
     }
 
     public void bindData(@Nonnull List<T> newItems) {
-        mItems = newItems;
+        mItems = ImmutableList.<T>builder()
+                .addAll(newItems)
+                .build();
         notifyDataSetChanged();
     }
 

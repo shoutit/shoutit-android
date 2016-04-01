@@ -40,6 +40,7 @@ public class SearchShoutsResultsPresenter {
     private final PublishSubject<Object> layoutManagerSwitchSubject = PublishSubject.create();
     private final PublishSubject<String> shoutSelectedSubject = PublishSubject.create();
     private final PublishSubject<Object> loadMoreSubject = PublishSubject.create();
+    private final PublishSubject<Object> filtersOpenSubject = PublishSubject.create();
 
     private final Observable<List<BaseAdapterItem>> adapterItems;
     private final Observable<Boolean> progressObservable;
@@ -86,7 +87,7 @@ public class SearchShoutsResultsPresenter {
                             return ImmutableList.<BaseAdapterItem>of(new NoDataAdapterItem());
                         } else {
                             final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
-                            builder.add(new ShoutHeaderAdapterItem(searchQuery, shoutsResponse.getCount(), layoutManagerSwitchSubject));
+                            builder.add(new ShoutHeaderAdapterItem(searchQuery, shoutsResponse.getCount(), layoutManagerSwitchSubject, filtersOpenSubject));
                             builder.addAll(Lists.transform(shoutsResponse.getShouts(), new Function<Shout, BaseAdapterItem>() {
                                 @Nullable
                                 @Override
@@ -167,18 +168,25 @@ public class SearchShoutsResultsPresenter {
         return loadMoreSubject;
     }
 
+    public Observable<Object> getFiltersOpenObservable() {
+        return filtersOpenSubject;
+    }
+
     public class ShoutHeaderAdapterItem extends BaseNoIDAdapterItem {
 
         @Nonnull
         private final String searchQuery;
         private final int totalItemsCount;
         private final Observer<Object> layoutManagerSwitchObserver;
+        private final Observer<Object> filtersOpenObserver;
 
         public ShoutHeaderAdapterItem(@Nonnull String searchQuery, int totalItemsCount,
-                                      Observer<Object> layoutManagerSwitchObserver) {
+                                      Observer<Object> layoutManagerSwitchObserver,
+                                      Observer<Object> filtersOpenObserver) {
             this.searchQuery = searchQuery;
             this.totalItemsCount = totalItemsCount;
             this.layoutManagerSwitchObserver = layoutManagerSwitchObserver;
+            this.filtersOpenObserver = filtersOpenObserver;
         }
 
         @Override
@@ -193,6 +201,10 @@ public class SearchShoutsResultsPresenter {
 
         public Observer<Object> getLayoutManagerSwitchObserver() {
             return layoutManagerSwitchObserver;
+        }
+
+        public Observer<Object> getOnFilterClickObserver() {
+            return filtersOpenObserver;
         }
 
         public int getTotalItemsCount() {

@@ -2,8 +2,12 @@ package com.shoutit.app.android.view.filter;
 
 import android.content.Context;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioGroup;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -11,15 +15,18 @@ import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import com.jakewharton.rxbinding.widget.RxAdapterView;
+import com.jakewharton.rxbinding.widget.RxRadioGroup;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.Shout;
+import com.shoutit.app.android.api.model.SortType;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.widget.CategorySpinnerAdapter;
+import com.shoutit.app.android.widget.SortTypeSpinnerAdapter;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -61,7 +68,10 @@ public class FilterViewHolders {
 
     public static class ShoutTypeViewHolder extends ViewHolderManager.BaseViewHolder<FiltersAdapterItems.ShoutTypeAdapterItem> {
 
-        private FiltersAdapterItems.ShoutTypeAdapterItem item;
+        @Bind(R.id.filters_radio_group)
+        RadioGroup radioGroup;
+
+        private Subscription subscription;
 
         public ShoutTypeViewHolder(@Nonnull View itemView) {
             super(itemView);
@@ -69,22 +79,38 @@ public class FilterViewHolders {
         }
 
         @Override
-        public void bind(@Nonnull FiltersAdapterItems.ShoutTypeAdapterItem item) {
-            this.item = item;
+        public void bind(@Nonnull final FiltersAdapterItems.ShoutTypeAdapterItem item) {
+            recycle();
+
+            subscription = RxRadioGroup.checkedChanges(radioGroup)
+                    .subscribe(new Action1<Integer>() {
+                        @Override
+                        public void call(Integer viewId) {
+                            switch (viewId) {
+                                case R.id.filter_all_rb:
+                                    item.onTypeSelected(Shout.TYPE_ALL);
+                                    break;
+                                case R.id.filter_offers_rb:
+                                    item.onTypeSelected(Shout.TYPE_OFFER);
+                                    break;
+                                case R.id.filter_requests_rb:
+                                    item.onTypeSelected(Shout.TYPE_REQUEST);
+                                    break;
+                            }
+                        }
+                    });
         }
 
-        @OnClick({R.id.filter_all_rb, R.id.filter_offers_rb, R.id.filter_requests_rb})
-        public void onTypeSelected(View view) {
-            switch (view.getId()) {
-                case R.id.filter_all_rb:
-                    item.onTypeSelected(Shout.TYPE_ALL);
-                    break;
-                case R.id.filter_offers_rb:
-                    item.onTypeSelected(Shout.TYPE_OFFER);
-                    break;
-                case R.id.filter_requests_rb:
-                    item.onTypeSelected(Shout.TYPE_REQUEST);
-                    break;
+        @Override
+        public void onViewRecycled() {
+            recycle();
+            super.onViewRecycled();
+        }
+
+        private void recycle() {
+            if (subscription != null) {
+                subscription.unsubscribe();
+                subscription = null;
             }
         }
     }
@@ -111,6 +137,8 @@ public class FilterViewHolders {
 
         @Override
         public void bind(@Nonnull final FiltersAdapterItems.CategoryAdapterItem item) {
+            recycle();
+
             final Category category = item.getCategory();
 
             if (categorySpinner.getAdapter() == null) {
@@ -122,6 +150,9 @@ public class FilterViewHolders {
                     .subscribe(new Action1<Integer>() {
                         @Override
                         public void call(Integer position) {
+                            if (position < 0) {
+                                return;
+                            }
                             final Category selectedCategory = spinnerAdapter.getItem(position);
                             item.onCategorySelected(selectedCategory);
 
@@ -129,6 +160,58 @@ public class FilterViewHolders {
                                     .fit()
                                     .centerInside()
                                     .into(categoryIcon);
+                        }
+                    });
+        }
+
+        @Override
+        public void onViewRecycled() {
+            recycle();
+            super.onViewRecycled();
+        }
+
+        private void recycle() {
+            if (subscription != null) {
+                subscription.unsubscribe();
+                subscription = null;
+            }
+        }
+    }
+
+    public static class SortTypeViewHolder extends ViewHolderManager.BaseViewHolder<FiltersAdapterItems.SortAdapterItem> {
+
+        @Bind(R.id.filters_sort_types_spinner)
+        Spinner sortTypesSpinner;
+
+        private final SortTypeSpinnerAdapter spinnerAdapter;
+        private Subscription subscription;
+
+        public SortTypeViewHolder(@Nonnull View itemView, Context context) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+
+            spinnerAdapter = new SortTypeSpinnerAdapter(
+                    context, android.R.layout.simple_list_item_1);
+        }
+
+        @Override
+        public void bind(@Nonnull final FiltersAdapterItems.SortAdapterItem item) {
+            recycle();
+
+            if (sortTypesSpinner.getAdapter() == null) {
+                sortTypesSpinner.setAdapter(spinnerAdapter);
+                spinnerAdapter.bindData(item.getSortTypes());
+            }
+
+            subscription = RxAdapterView.itemSelections(sortTypesSpinner)
+                    .subscribe(new Action1<Integer>() {
+                        @Override
+                        public void call(Integer position) {
+                            if (position < 0) {
+                                return;
+                            }
+                            final SortType sortType = spinnerAdapter.getItem(position);
+                            item.onSortTypeSelected(sortType);
                         }
                     });
         }
@@ -162,6 +245,7 @@ public class FilterViewHolders {
 
         @Override
         public void bind(@Nonnull FiltersAdapterItems.PriceAdapterItem item) {
+            recycle();
 
             subscription = new CompositeSubscription(
 
@@ -239,31 +323,119 @@ public class FilterViewHolders {
 
     public static class DistanceViewHolder extends ViewHolderManager.BaseViewHolder<FiltersAdapterItems.DistanceAdapterItem> {
 
-        public DistanceViewHolder(@Nonnull View itemView) {
+        @Bind(R.id.filters_distance_tv)
+        TextView distanceTv;
+        @Bind(R.id.filters_distance_seekbar)
+        SeekBar distanceSeekbar;
+
+        public DistanceViewHolder(@Nonnull View itemView, final Context context) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+
+            distanceSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                final int maxProgress = 100;
+                final int valuesCount = 16;
+                final int singleValueRange = maxProgress / valuesCount;
+
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    distanceTv.setText(getDisplayText(progress));
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+                }
+
+                public String getDisplayText(int progress) {
+                    switch (progress / singleValueRange) {
+                        case 0:
+                            return context.getString(R.string.filters_distance_0KM);
+                        case 1:
+                            return context.getString(R.string.filters_distance_1KM);
+                        case 2:
+                            return context.getString(R.string.filters_distance_2KM);
+                        case 3:
+                            return context.getString(R.string.filters_distance_3KM);
+                        case 4:
+                            return context.getString(R.string.filters_distance_5KM);
+                        case 5:
+                            return context.getString(R.string.filters_distance_7KM);
+                        case 6:
+                            return context.getString(R.string.filters_distance_10KM);
+                        case 7:
+                            return context.getString(R.string.filters_distance_15KM);
+                        case 8:
+                            return context.getString(R.string.filters_distance_20KM);
+                        case 9:
+                            return context.getString(R.string.filters_distance_30KM);
+                        case 10:
+                            return context.getString(R.string.filters_distance_60KM);
+                        case 11:
+                            return context.getString(R.string.filters_distance_100KM);
+                        case 12:
+                            return context.getString(R.string.filters_distance_200KM);
+                        case 13:
+                            return context.getString(R.string.filters_distance_300KM);
+                        case 14:
+                            return context.getString(R.string.filters_distance_400KM);
+                        case 15:
+                            return context.getString(R.string.filters_distance_500KM);
+                        case 16:
+                            return context.getString(R.string.filters_distance_entire_country);
+                        default:
+                            throw new RuntimeException("Unknown progress: " + progress);
+                    }
+                }
+            });
         }
 
         @Override
         public void bind(@Nonnull FiltersAdapterItems.DistanceAdapterItem item) {
-
         }
     }
 
     public static class FilterViewHolder extends ViewHolderManager.BaseViewHolder<FiltersAdapterItems.FilterAdapterItem> {
 
-        public FilterViewHolder(@Nonnull View itemView) {
+        @Bind(R.id.filters_filter_name_tv)
+        TextView nameTv;
+        @Bind(R.id.filters_filter_values_tv)
+        TextView valuesTv;
+        @Bind(R.id.filter_filter_icon_iv)
+        ImageView iconIv;
+
+        private FiltersAdapterItems.FilterAdapterItem item;
+        private final Context context;
+
+        public FilterViewHolder(@Nonnull View itemView, Context context) {
             super(itemView);
+            this.context = context;
             ButterKnife.bind(this, itemView);
         }
 
         @Override
         public void bind(@Nonnull FiltersAdapterItems.FilterAdapterItem item) {
+            this.item = item;
+            nameTv.setText(item.getTitle());
+            valuesTv.setText(item.getSelectedValues());
+            iconIv.setImageDrawable(context.getResources().getDrawable(item.isVisible() ?
+                    R.drawable.ic_expand_less : R.drawable.ic_expand_more));
+        }
 
+        @OnClick(R.id.filters_filter_root_view)
+        public void onItemClicked() {
+            item.onVisibilityChanged();
         }
     }
 
     public static class FilterValueViewHolder extends ViewHolderManager.BaseViewHolder<FiltersAdapterItems.FilterValueAdapterItem> {
+        @Bind(R.id.filters_value_tv)
+        TextView valueTv;
+        @Bind(R.id.filters_value_checkbox)
+        CheckBox filtersValueCheckbox;
 
         public FilterValueViewHolder(@Nonnull View itemView) {
             super(itemView);
@@ -271,8 +443,15 @@ public class FilterViewHolders {
         }
 
         @Override
-        public void bind(@Nonnull FiltersAdapterItems.FilterValueAdapterItem item) {
+        public void bind(@Nonnull final FiltersAdapterItems.FilterValueAdapterItem item) {
+            valueTv.setText(item.getFilterValue().getName());
 
+            filtersValueCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    item.toggleValueSelection();
+                }
+            });
         }
     }
 

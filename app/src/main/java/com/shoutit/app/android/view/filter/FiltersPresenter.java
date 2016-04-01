@@ -30,6 +30,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Observer;
@@ -37,6 +38,8 @@ import rx.Scheduler;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.functions.Func5;
+import rx.functions.Func6;
+import rx.functions.Func7;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
@@ -48,22 +51,24 @@ public class FiltersPresenter {
     private final PublishSubject<Object> filterValueSelectionChanged = PublishSubject.create();
     private final PublishSubject<String> selectedCategorySubject = PublishSubject.create();
     private final PublishSubject<String> shoutTypeSelectedSubject = PublishSubject.create();
-    private final PublishSubject<UserLocation> locationSelectedSubject = PublishSubject.create();
     private final PublishSubject<Object> locationChangeClickSubject = PublishSubject.create();
     private final PublishSubject<Object> doneClickedSubject = PublishSubject.create();
     private final PublishSubject<Object> resetClickedSubject = PublishSubject.create();
-    private final PublishSubject<SortType> sortTypeSelectedSubject = PublishSubject.create();
-    private final PublishSubject<Object> sortTypeChangeClickedObserver = PublishSubject.create();
 
+    private final BehaviorSubject<UserLocation> locationSelectedSubject = BehaviorSubject.create();
+    private final BehaviorSubject<SortType> sortTypeSelectedSubject = BehaviorSubject.create();
     private final BehaviorSubject<Integer> distanceSubject = BehaviorSubject.create();
     private final BehaviorSubject<String> startPriceSubject = BehaviorSubject.create();
     private final BehaviorSubject<String> endPriceSubject = BehaviorSubject.create();
 
     private final Observable<List<BaseAdapterItem>> allAdapterItems;
+    private final Observable<Throwable> errorObservable;
+    private final Observable<Boolean> progressObservable;
+
     @Nonnull
     private final Context context;
 
-
+    @Inject
     public FiltersPresenter(@Nonnull CategoriesDao categoriesDao,
                             @Nonnull SortTypesDao sortTypesDao,
                             @Nonnull @UiScheduler Scheduler uiScheduler,
@@ -80,12 +85,14 @@ public class FiltersPresenter {
                 .filter(Functions1.isNotNull());
 
         /** Sort types request **/
-        final Observable<ResponseOrError<List<SortType>>> sortTypes = sortTypesDao.sortTypesObservable()
+        final Observable<ResponseOrError<List<SortType>>> sortTypesObservable = sortTypesDao.sortTypesObservable()
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<List<SortType>>>behaviorRefCount());
 
-        final Observable<SortType> sortTypeObservable = sortTypes
-                .compose(ResponseOrError.<List<SortType>>onlySuccess())
+        final Observable<List<SortType>> successSortTypes = sortTypesObservable
+                .compose(ResponseOrError.<List<SortType>>onlySuccess());
+
+        final Observable<SortType> sortTypeObservable = successSortTypes
                 .map(new Func1<List<SortType>, SortType>() {
                     @Override
                     public SortType call(List<SortType> sortTypes) {
@@ -101,8 +108,10 @@ public class FiltersPresenter {
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<List<Category>>>behaviorRefCount());
 
-        final Observable<HashMap<String, Category>> successCategoriesObservable = categoriesObservable
-                .compose(ResponseOrError.<List<Category>>onlySuccess())
+        final Observable<List<Category>> categoriesSuccessObservable = categoriesObservable
+                .compose(ResponseOrError.<List<Category>>onlySuccess());
+
+        final Observable<HashMap<String, Category>> successCategoriesObservable = categoriesSuccessObservable
                 .map(new Func1<List<Category>, HashMap<String, Category>>() {
                     @Override
                     public HashMap<String, Category> call(List<Category> categories) {
@@ -184,28 +193,45 @@ public class FiltersPresenter {
 
         /** All Adapter Items **/
         allAdapterItems = Observable.combineLatest(
-                shoutTypeObservable,
-                sortTypeObservable,
+                categoriesSuccessObservable.first(),
+                successSortTypes.first(),
+                shoutTypeObservable.first(),
+                sortTypeObservable.first(),
                 selectedCategoryObservable.startWith((Category) null),
                 locationObservable,
                 filterAdapterItems.startWith(ImmutableList.<BaseAdapterItem>of()),
-                new Func5<String, SortType, Category, UserLocation, List<BaseAdapterItem>, List<BaseAdapterItem>>() {
+                new Func7<List<Category>, List<SortType>, String, SortType, Category, UserLocation, List<BaseAdapterItem>, List<BaseAdapterItem>>() {
                     @Override
-                    public List<BaseAdapterItem> call(String shoutType, SortType sortType,
-                                                      @Nullable Category category, UserLocation userLocation,
+                    public List<BaseAdapterItem> call(List<Category> categories, List<SortType> sortTypes,
+                                                      String shoutType, SortType sortType,
+                                                      Category category, UserLocation userLocation,
                                                       List<BaseAdapterItem> filtersItems) {
                         return ImmutableList.<BaseAdapterItem>builder()
                                 .add(new FiltersAdapterItems.HeaderAdapterItem(resetClickedSubject, doneClickedSubject))
                                 .add(new FiltersAdapterItems.ShoutTypeAdapterItem(shoutTypeSelectedSubject))
-                                .add(new FiltersAdapterItems.SortAdapterItem(sortType, sortTypeChangeClickedObserver))
-                                .add(new FiltersAdapterItems.CategoryAdapterItem(category))
-                                .add(new FiltersAdapterItems.PriceAdapterItem())
+                                .add(new FiltersAdapterItems.SortAdapterItem(sortType, sortTypes, sortTypeSelectedSubject))
+                                .add(new FiltersAdapterItems.CategoryAdapterItem(category, categories, selectedCategorySubject))
+                                .add(new FiltersAdapterItems.PriceAdapterItem(startPriceSubject, endPriceSubject))
                                 .add(new FiltersAdapterItems.LocationAdapterItem(userLocation, locationChangeClickSubject))
                                 .add(new FiltersAdapterItems.DistanceAdapterItem(distanceSubject))
                                 .addAll(filtersItems)
                                 .build();
                     }
                 });
+
+        errorObservable = ResponseOrError.combineErrorsObservable(
+                ImmutableList.of(
+                        ResponseOrError.transform(categoriesObservable),
+                        ResponseOrError.transform(sortTypesObservable)
+                )
+        ).filter(Functions1.isNotNull());
+
+        progressObservable = Observable.zip(successSortTypes, successCategoriesObservable, new Func2<List<SortType>, HashMap<String,Category>, Boolean>() {
+            @Override
+            public Boolean call(List<SortType> sortTypes, HashMap<String, Category> stringCategoryHashMap) {
+                return false;
+            }
+        }).mergeWith(errorObservable.map(Functions1.returnFalse()));
     }
 
     private Category getDefaultCategory() {
@@ -256,5 +282,13 @@ public class FiltersPresenter {
 
     public Observer<String> getSelectedCategoryObserver() {
         return selectedCategorySubject;
+    }
+
+    public Observable<Throwable> getErrorObservable() {
+        return errorObservable;
+    }
+
+    public Observable<Boolean> getProgressObservable() {
+        return progressObservable;
     }
 }
