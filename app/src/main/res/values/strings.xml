@@ -15,7 +15,6 @@
     <!-- Errors -->
     <string name="error_default">Ooops, something went wrong</string>
     <string name="error_connection">Ooops, probably there is no Internet connection</string>
-    <string name="error_email_not_found">The email or username you entered do not belong to any account.</string>
     <string name="error_field_empty">Field cannot be empty</string>
     <string name="error_wrong_email_or_password">Wrong email or password</string>
     <string name="error_action_only_for_logged_in_user">Only for logged in users</string>
@@ -67,7 +66,6 @@
     <string name="register_email">Email</string>
     <string name="register_password">Password</string>
     <string name="register_login_text">Have an account? Log in</string>
-    <string name="register_error">Failed to register</string>
     <string name="register_empty_mail">Mail cannot be empty.</string>
     <string name="register_empty_password">Password must have at least 6 and no more than 20 characters.</string>
     <string name="register_empty_name">Name cannot be empty</string>
@@ -136,8 +134,6 @@
     <string name="menu_version_name">Shoutit %1$s</string>
 
     <!-- Post Login -->
-    <string name="post_login_error">Error fetching data</string>
-    <string name="post_login_send_error">Error sending interests</string>
     <string name="post_login_next">next</string>
     <string name="post_login_activity_title">Listen to your Interest!</string>
     <string name="location_fetching_error">Sorry, cannot get locations</string>
@@ -158,7 +154,6 @@
     <string name="shout_color">Color</string>
 
     <!-- Discover Shouts -->
-    <string name="discover_shouts_error">Failed to load shouts</string>
     <string name="discover_shouts_share">Share</string>
     <string name="discover_shouts_title">%s Shouts</string>
 
@@ -254,7 +249,10 @@
     <string name="edit_shout_location">Location</string>
     <string name="edit_shout_price_hint">Price</string>
     <string name="edit_shout_title_hint">Title</string>
-    <string name="edit_shout_title">Edit Shout</string>
+    <string name="edit_shout_title">Edit %s</string>
+    <string name="edit_currency_info">If negotiable leave it empty. Set it to 0 if Free</string>
+    <string name="edit_only_one_video">Only one video is allowed</string>
+    <string name="edit_thumbnail_error">Error creating thumbnail</string>
 
     <!-- Publish -->
     <string name="publish_menu_share">Share Shout</string>
@@ -318,14 +316,34 @@
     <string name="create_shout_dialog_offer">Offer</string>
     <string name="create_shout_dialog_request">Request</string>
 
-    <!-- Search Profiles Results -->
+    <!-- Search Results -->
     <string name="search_profiles_results">Results</string>
     <string name="search_shout_results_header_title">All Results for \'%1$s\'</string>
+    <string name="search_shout_results_header_title_location">All Results for your location</string>
     <string name="search_shouts_results_header_count">%1$d Results</string>
     <string name="search_results_no_results">No results found</string>
 
     <!-- Camera -->
     <string name="camera_publish_currency">Currency</string>
+    <string name="camera_publish">Publish</string>
+    <string name="camera_retake">Retake</string>
+    <string name="camera_sub_header">This is your featured %1$s. Make sure it\'s a good one!
+    </string>
+    <string name="camera_header">What are you offering?</string>
+    <string name="camera_video">video</string>
+    <string name="camera_photo">photo</string>
+
+    <!-- Media Published -->
+    <string name="publish_header">Shout published. Congrats!</string>
+    <string name="publish_sub_header">Want to add a price?</string>
+    <string name="publish_price_hint">Negotiable</string>
+    <string name="publish_done">Done</string>
+
+    <!-- Notifications -->
+    <string name="notifications_title">Notifications</string>
+    <string name="notifications_menu_mark">Mark all as read</string>
+    <string name="notifications_menu_settings">Notifications Settings</string>
+    <string name="notifications_listening_to_you">started listening to you</string>
 
     <!-- Filters -->
     <string name="filters_filters">Filters</string>

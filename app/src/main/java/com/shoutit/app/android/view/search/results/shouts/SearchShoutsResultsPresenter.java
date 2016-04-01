@@ -8,6 +8,7 @@ import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
+import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.UserPreferences;
@@ -46,10 +47,9 @@ public class SearchShoutsResultsPresenter {
     private final Observable<Boolean> progressObservable;
     private final Observable<Throwable> errorObservable;
     private final Observable<Boolean> linearLayoutManagerObservable;
-    private final Observable<String> toolbarTitleObservable;
 
     public SearchShoutsResultsPresenter(@Nonnull final ShoutsDao dao,
-                                        @Nonnull final String searchQuery,
+                                        @Nullable final String searchQuery,
                                         @Nonnull final SearchPresenter.SearchType searchType,
                                         @Nullable final String contextualItemId,
                                         @Nonnull UserPreferences userPreferences,
@@ -58,7 +58,7 @@ public class SearchShoutsResultsPresenter {
 
         Observable<ShoutsDao.SearchShoutsDao> daoObservable = userPreferences.getLocationObservable()
                 .filter(Functions1.isNotNull())
-                .first()
+                .distinctUntilChanged()
                 .map(new Func1<UserLocation, ShoutsDao.SearchShoutsDao>() {
                     @Override
                     public ShoutsDao.SearchShoutsDao call(UserLocation userLocation) {
@@ -91,7 +91,7 @@ public class SearchShoutsResultsPresenter {
                             builder.addAll(Lists.transform(shoutsResponse.getShouts(), new Function<Shout, BaseAdapterItem>() {
                                 @Nullable
                                 @Override
-                                public BaseAdapterItem apply(@Nullable Shout input) {
+                                public BaseAdapterItem apply(Shout input) {
                                     return new ShoutAdapterItem(input, context, shoutSelectedSubject);
                                 }
                             }));
@@ -99,8 +99,6 @@ public class SearchShoutsResultsPresenter {
                         }
                     }
                 });
-
-        toolbarTitleObservable = Observable.just(searchQuery);
 
         progressObservable = shoutsRequest.map(Functions1.returnFalse())
                 .startWith(true);
@@ -156,10 +154,6 @@ public class SearchShoutsResultsPresenter {
         return progressObservable;
     }
 
-    public Observable<String> getToolbarTitleObservable() {
-        return toolbarTitleObservable;
-    }
-
     public Observable<String> getShoutSelectedObservable() {
         return shoutSelectedSubject;
     }
@@ -183,6 +177,7 @@ public class SearchShoutsResultsPresenter {
         public ShoutHeaderAdapterItem(@Nonnull String searchQuery, int totalItemsCount,
                                       Observer<Object> layoutManagerSwitchObserver,
                                       Observer<Object> filtersOpenObserver) {
+
             this.searchQuery = searchQuery;
             this.totalItemsCount = totalItemsCount;
             this.layoutManagerSwitchObserver = layoutManagerSwitchObserver;
@@ -196,7 +191,8 @@ public class SearchShoutsResultsPresenter {
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return true;
+            return item instanceof ShoutHeaderAdapterItem
+                    && this.equals(item);
         }
 
         public Observer<Object> getLayoutManagerSwitchObserver() {
@@ -207,11 +203,25 @@ public class SearchShoutsResultsPresenter {
             return filtersOpenObserver;
         }
 
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof ShoutHeaderAdapterItem)) return false;
+            final ShoutHeaderAdapterItem that = (ShoutHeaderAdapterItem) o;
+            return totalItemsCount == that.totalItemsCount &&
+                    Objects.equal(searchQuery, that.searchQuery);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(searchQuery, totalItemsCount);
+        }
+
         public int getTotalItemsCount() {
             return totalItemsCount;
         }
 
-        @Nonnull
+        @Nullable
         public String getSearchQuery() {
             return searchQuery;
         }

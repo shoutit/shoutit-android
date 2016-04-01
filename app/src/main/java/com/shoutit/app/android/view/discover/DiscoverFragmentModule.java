@@ -13,6 +13,7 @@ import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.dagger.FragmentScope;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.dao.DiscoversDao;
+import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 
 import dagger.Module;
 import dagger.Provides;
@@ -38,9 +39,10 @@ public class DiscoverFragmentModule extends FragmentModule {
                                                       @UiScheduler Scheduler uiScheduler,
                                                       @NetworkScheduler Scheduler networkScheduler,
                                                       @ForActivity Resources resources,
-                                                      @ForActivity Context context) {
+                                                      @ForActivity Context context,
+                                                      ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter) {
         return new DiscoverPresenter(userPreferences, dao, discoverShoutsDao,
-                Optional.fromNullable(discoverId), uiScheduler, networkScheduler, resources, context);
+                Optional.fromNullable(discoverId), uiScheduler, networkScheduler, resources, context, shoutsGlobalRefreshPresenter);
     }
 
 

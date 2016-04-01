@@ -58,6 +58,7 @@ public abstract class BaseShoutsDao {
                 .compose(MoreOperators.<ShoutsResponse>refresh(refreshShoutsSubject))
                 .compose(ResponseOrError.<ShoutsResponse>toResponseOrErrorObservable())
                 .compose(MoreOperators.<ResponseOrError<ShoutsResponse>>cacheWithTimeout(networkScheduler));
+
     }
 
     @Nonnull

@@ -16,14 +16,11 @@
             android:layout_width="match_parent"
             android:layout_height="?actionBarSize" />
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/search_shouts_results_recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+        <FrameLayout
             android:layout_below="@+id/search_shouts_results_toolbar"
-            android:background="@color/default_bg_color" />
-
-        <include layout="@layout/base_progress" />
+            android:id="@+id/activity_search_results_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
     </RelativeLayout>
 
@@ -31,15 +28,7 @@
         android:id="@+id/filter_drawer"
         android:layout_width="304dp"
         android:layout_height="match_parent"
-        android:layout_gravity="end|right">
-
-        <fragment
-            android:id="@+id/search_filter_fragment"
-            android:layout_width="304dp"
-            android:layout_height="match_parent"
-            android:name="com.shoutit.app.android.view.filter.FiltersFragment"/>
-
-    </FrameLayout>
-
+        android:layout_gravity="end|right"/>
 
 </android.support.v4.widget.DrawerLayout>
+

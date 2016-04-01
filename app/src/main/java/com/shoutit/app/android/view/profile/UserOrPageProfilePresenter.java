@@ -22,6 +22,7 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
+import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.model.UserShoutsPointer;
 import com.shoutit.app.android.utils.PreferencesHelper;
 import com.shoutit.app.android.view.profile.myprofile.MyProfileHalfPresenter;
@@ -107,7 +108,8 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
                                       @Nonnull ProfilesDao profilesDao,
                                       @Nonnull MyProfileHalfPresenter myProfilePresenter,
                                       @Nonnull UserProfileHalfPresenter userProfilePresenter,
-                                      @Nonnull PreferencesHelper preferencesHelper) {
+                                      @Nonnull PreferencesHelper preferencesHelper,
+                                      @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter) {
         this.userName = userName;
         this.context = context;
         this.profilesDao = profilesDao;
@@ -243,6 +245,10 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
                                 user.getName());
                     }
                 });
+
+        shoutsGlobalRefreshPresenter
+                .getShoutsGlobalRefreshObservable()
+                .subscribe(shoutsDao.getUserShoutsDao(new UserShoutsPointer(SHOUTS_PAGE_SIZE, userName)).getRefreshObserver());
     }
 
     @NonNull

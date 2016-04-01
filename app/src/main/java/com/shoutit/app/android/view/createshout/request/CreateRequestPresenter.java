@@ -3,15 +3,11 @@ package com.shoutit.app.android.view.createshout.request;
 import android.content.Context;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
-import android.support.v4.util.Pair;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
-import com.google.common.base.Function;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.CreateRequestShoutRequest;
@@ -21,12 +17,12 @@ import com.shoutit.app.android.api.model.Currency;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.UserLocationSimple;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.ResourcesHelper;
 
 import java.util.List;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import rx.Observable;
@@ -58,6 +54,8 @@ public class CreateRequestPresenter {
     private final ApiService mApiService;
     private final Scheduler mNetworkScheduler;
     private final Scheduler mUiScheduler;
+    @NonNull
+    private final ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter;
     private Listener mListener;
     private UserLocation mUserLocation;
     private Subscription locationSubscription;
@@ -68,11 +66,13 @@ public class CreateRequestPresenter {
                                   @ForActivity Context context,
                                   ApiService apiService,
                                   @NetworkScheduler Scheduler networkScheduler,
-                                  @UiScheduler Scheduler uiScheduler) {
+                                  @UiScheduler Scheduler uiScheduler,
+                                  @NonNull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter) {
         mContext = context;
         mApiService = apiService;
         mNetworkScheduler = networkScheduler;
         mUiScheduler = uiScheduler;
+        this.shoutsGlobalRefreshPresenter = shoutsGlobalRefreshPresenter;
         mLocationObservable = userPreferences.getLocationObservable()
                 .compose(ObservableExtensions.<UserLocation>behaviorRefCount());
     }
@@ -98,18 +98,7 @@ public class CreateRequestPresenter {
                 .subscribe(new Action1<List<Currency>>() {
                                @Override
                                public void call(@NonNull List<Currency> responseBody) {
-                                   final ImmutableList<Pair<String, String>> list = ImmutableList.copyOf(
-                                           Iterables.transform(responseBody,
-                                                   new Function<Currency, Pair<String, String>>() {
-                                                       @Nullable
-                                                       @Override
-                                                       public Pair<String, String> apply(Currency input) {
-                                                           return Pair.create(input.getCode(),
-                                                                   String.format("%s (%s)", input.getName(), input.getCountry()));
-                                                       }
-                                                   }));
-
-                                   mListener.setCurrencies(list);
+                                   mListener.setCurrencies(PriceUtils.transformCurrencyToPair(responseBody));
                                    mListener.hideProgress();
                                    mListener.removeRetryCurrenciesListener();
                                }
@@ -156,6 +145,7 @@ public class CreateRequestPresenter {
                     public void call(CreateShoutResponse responseBody) {
                         mListener.hideProgress();
                         mListener.finishActivity(responseBody.getId());
+                        shoutsGlobalRefreshPresenter.refreshShouts();
                     }
                 }, new Action1<Throwable>() {
                     @Override
@@ -204,7 +194,7 @@ public class CreateRequestPresenter {
 
         void showError();
 
-        void setCurrencies(@NonNull List<Pair<String, String>> list);
+        void setCurrencies(@NonNull List<PriceUtils.SpinnerCurrency> list);
 
         void showCurrenciesError();
 

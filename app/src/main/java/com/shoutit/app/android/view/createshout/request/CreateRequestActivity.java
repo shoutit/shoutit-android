@@ -1,6 +1,5 @@
 package com.shoutit.app.android.view.createshout.request;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -13,21 +12,18 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
-import android.support.v4.util.Pair;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
@@ -35,8 +31,11 @@ import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.PriceUtils;
+import com.shoutit.app.android.view.createshout.DialogsHelper;
 import com.shoutit.app.android.view.createshout.location.LocationActivity;
 import com.shoutit.app.android.view.createshout.publish.PublishShoutActivity;
+import com.shoutit.app.android.widget.SimpleCurrencySpinnerAdapter;
 
 import java.util.List;
 
@@ -52,53 +51,10 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
 
     private static final int LOCATION_REQUEST = 0;
 
-    private SpinnerAdapter mAdapter;
+    private SimpleCurrencySpinnerAdapter mAdapter;
 
     public static Intent newIntent(Context activity) {
         return new Intent(activity, CreateRequestActivity.class);
-    }
-
-    private class SpinnerAdapter extends BaseAdapter {
-
-        private List<Pair<String, String>> list = ImmutableList.of(new Pair<>("", CreateRequestActivity.this.getString(R.string.request_activity_currency)));
-
-        public SpinnerAdapter() {
-        }
-
-        @Override
-        public int getCount() {
-            return list.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return list.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return list.get(position).first.hashCode();
-        }
-
-        @SuppressLint("ViewHolder")
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            final TextView view = (TextView) getLayoutInflater().inflate(android.R.layout.simple_list_item_1, parent, false);
-            view.setText(list.get(position).second);
-            return view;
-        }
-
-        @Override
-        public View getDropDownView(int position, View convertView, ViewGroup parent) {
-            final TextView view = (TextView) getLayoutInflater().inflate(android.R.layout.simple_list_item_1, parent, false);
-            view.setText(list.get(position).second);
-            return view;
-        }
-
-        public void setData(@NonNull List<Pair<String, String>> list) {
-            this.list = list;
-            notifyDataSetChanged();
-        }
     }
 
     @Bind(R.id.create_request_descirption)
@@ -117,6 +73,8 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
     Toolbar mRequestActivityToolbar;
     @Bind(R.id.request_activity_description_layout)
     TextInputLayout mRequestActivityDescriptionLayout;
+    @Bind(R.id.create_request_currency_info)
+    ImageView mCreateCurrencyInfo;
 
     @Inject
     CreateRequestPresenter mCreateRequestPresenter;
@@ -144,7 +102,7 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
             }
         });
 
-        mAdapter = new SpinnerAdapter();
+        mAdapter = new SimpleCurrencySpinnerAdapter(R.string.request_activity_currency, this);
         mCreateRequestSpinner.setAdapter(mAdapter);
 
         mRequestActivityToolbar.setTitle(getString(R.string.request_activity_title));
@@ -175,6 +133,13 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
         });
 
         mCreateRequestPresenter.registerListener(this);
+
+        mCreateCurrencyInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DialogsHelper.showCurrencyDialog(CreateRequestActivity.this);
+            }
+        });
     }
 
     @Override
@@ -220,7 +185,7 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
         return new CreateRequestPresenter.RequestData(
                 mCreateRequestDescirption.getText().toString(),
                 mCreateRequestBudget.getText().toString(),
-                ((Pair<String, String>) mCreateRequestSpinner.getSelectedItem()).first);
+                ((PriceUtils.SpinnerCurrency) mCreateRequestSpinner.getSelectedItem()).getCode());
     }
 
     @Override
@@ -249,7 +214,7 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
     }
 
     @Override
-    public void setCurrencies(@NonNull List<Pair<String, String>> list) {
+    public void setCurrencies(@NonNull List<PriceUtils.SpinnerCurrency> list) {
         mAdapter.setData(list);
     }
 

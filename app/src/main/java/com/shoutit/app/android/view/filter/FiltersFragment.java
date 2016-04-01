@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.filter;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -34,6 +35,10 @@ public class FiltersFragment extends BaseFragment {
     FiltersPresenter presenter;
     @Inject
     FiltersAdapter adapter;
+
+    public static Fragment newInstance() {
+        return new FiltersFragment();
+    }
 
     @Nullable
     @Override
@@ -72,4 +77,5 @@ public class FiltersFragment extends BaseFragment {
                 .build()
                 .inject(this);
     }
+
 }

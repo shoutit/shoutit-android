@@ -80,4 +80,8 @@
     <color name="search_tabs_color">#dfdfdf</color>
     <color name="search_bg_color">#f4f4f4</color>
 
+    <!-- Notifications -->
+    <color name="notification_read_selector_normal">#c8e6c9</color>
+    <color name="notification_read_selector_pressed">#96d498</color>
+
 </resources>

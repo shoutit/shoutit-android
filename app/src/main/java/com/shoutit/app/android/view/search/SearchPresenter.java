@@ -37,13 +37,14 @@ import rx.subjects.PublishSubject;
 
 public class SearchPresenter {
 
-    private static final int MINIMUM_LENGTH = 3;
+    public static final int MINIMUM_LENGTH = 3;
 
     public enum SearchType {
         SHOUTS,
         PROFILE,
         TAG,
-        DISCOVER
+        DISCOVER,
+        BROWSE
     }
 
     private final PublishSubject<String> suggestionClickedSubject = PublishSubject.create();
@@ -77,7 +78,7 @@ public class SearchPresenter {
                         return searchQuery != null && searchQuery.length() >= MINIMUM_LENGTH;
                     }
                 })
-                .throttleFirst(500, TimeUnit.MILLISECONDS)
+                .throttleLast(400, TimeUnit.MILLISECONDS)
                 .switchMap(new Func1<String, Observable<ResponseOrError<List<Suggestion>>>>() {
                     @Override
                     public Observable<ResponseOrError<List<Suggestion>>> call(String query) {

@@ -1,15 +1,20 @@
 package com.shoutit.app.android.view.media;
 
 import android.app.Fragment;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v4.util.Pair;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 
@@ -27,7 +32,8 @@ import com.shoutit.app.android.api.model.EditShoutPriceRequest;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PriceUtils;
-import com.shoutit.app.android.widget.SpinnerAdapter;
+import com.shoutit.app.android.view.createshout.publish.PublishShoutActivity;
+import com.shoutit.app.android.widget.CurrencySpinnerAdapter;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,9 +57,12 @@ public class PublishMediaShoutFragment extends Fragment {
 
     private static final String ARGS_IS_VIDEO = "args_video";
     private static final String ARGS_FILE = "args_file";
+    private static final String TAG = PublishMediaShoutFragment.class.getCanonicalName();
 
     @Bind(R.id.publish_media_shout_preview)
     ImageView mPublishMediaShoutPreview;
+    @Bind(R.id.camera_cool_icon)
+    ImageView mPublishMediaCool;
     @Bind(R.id.camera_published_price)
     EditText mCameraPublishedPrice;
     @Bind(R.id.camera_published_currency)
@@ -62,6 +71,8 @@ public class PublishMediaShoutFragment extends Fragment {
     View progress;
     @Bind(R.id.camera_published_done)
     Button mCameraPublishedDone;
+    @Bind(R.id.fragment_camera_close)
+    ImageButton closeButton;
 
     @Inject
     ApiService mApiService;
@@ -69,7 +80,7 @@ public class PublishMediaShoutFragment extends Fragment {
     @Inject
     AmazonHelper mAmazonHelper;
 
-    private SpinnerAdapter mCurrencyAdapter;
+    private CurrencySpinnerAdapter mCurrencyAdapter;
 
     private String mFile;
     private boolean mIsVideo;
@@ -98,12 +109,11 @@ public class PublishMediaShoutFragment extends Fragment {
         mFile = arguments.getString(ARGS_FILE);
         mIsVideo = arguments.getBoolean(ARGS_IS_VIDEO);
 
-        mCurrencyAdapter = new SpinnerAdapter(
+        mCurrencyAdapter = new CurrencySpinnerAdapter(
                 R.string.camera_publish_currency,
                 getActivity(),
                 R.layout.camera_publish_currency_item,
                 android.R.layout.simple_list_item_1);
-
     }
 
     @android.support.annotation.Nullable
@@ -118,10 +128,35 @@ public class PublishMediaShoutFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mCameraPublishedCurrency.setAdapter(mCurrencyAdapter);
+        mCameraPublishedCurrency.setEnabled(false);
+
+        mCameraPublishedPrice.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                mCameraPublishedCurrency.setEnabled(s.length() != 0);
+            }
+        });
 
         downloadCurrencies();
 
         uploadMedia();
+
+        if (!mIsVideo) {
+            mPublishMediaShoutPreview.setImageURI(Uri.parse(mFile));
+        }
+
+        closeButton.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
+        mPublishMediaCool.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
     }
 
     private void uploadMedia() {
@@ -151,6 +186,7 @@ public class PublishMediaShoutFragment extends Fragment {
                         }, new Action1<Throwable>() {
                             @Override
                             public void call(Throwable throwable) {
+                                Log.e(TAG, "error", throwable);
                                 ColoredSnackBar.error(
                                         ColoredSnackBar.contentView(getActivity()),
                                         R.string.error_default,
@@ -236,6 +272,7 @@ public class PublishMediaShoutFragment extends Fragment {
                         }, new Action1<Throwable>() {
                             @Override
                             public void call(Throwable throwable) {
+                                Log.e(TAG, "error", throwable);
                                 ColoredSnackBar.error(
                                         ColoredSnackBar.contentView(getActivity()),
                                         R.string.error_default,
@@ -253,18 +290,20 @@ public class PublishMediaShoutFragment extends Fragment {
         final String price = mCameraPublishedPrice.getText().toString();
         if (!Strings.isNullOrEmpty(price)) {
             final long priceInCents = PriceUtils.getPriceInCents(price);
-            final Pair<String, String> selectedItem = (Pair<String, String>) mCameraPublishedCurrency.getSelectedItem();
-            mApiService.editShoutPrice(createdShoutOfferId, new EditShoutPriceRequest(priceInCents, selectedItem.first))
+            final PriceUtils.SpinnerCurrency selectedItem = (PriceUtils.SpinnerCurrency) mCameraPublishedCurrency.getSelectedItem();
+            mApiService.editShoutPrice(createdShoutOfferId, new EditShoutPriceRequest(priceInCents, selectedItem.getCode()))
                     .subscribeOn(Schedulers.io())
                     .observeOn(MyAndroidSchedulers.mainThread())
                     .subscribe(new Action1<CreateShoutResponse>() {
                         @Override
                         public void call(CreateShoutResponse createShoutResponse) {
                             getActivity().finish();
+                            startActivity(PublishShoutActivity.newIntent(getActivity(), createdShoutOfferId, false));
                         }
                     }, new Action1<Throwable>() {
                         @Override
                         public void call(Throwable throwable) {
+                            Log.e(TAG, "error", throwable);
                             ColoredSnackBar.error(
                                     ColoredSnackBar.contentView(getActivity()),
                                     R.string.error_default,
@@ -273,12 +312,14 @@ public class PublishMediaShoutFragment extends Fragment {
                         }
                     });
         } else {
-            ColoredSnackBar.error(
-                    ColoredSnackBar.contentView(getActivity()),
-                    R.string.error_default,
-                    Snackbar.LENGTH_SHORT)
-                    .show();
+            getActivity().finish();
+            startActivity(PublishShoutActivity.newIntent(getActivity(), createdShoutOfferId, false));
         }
+    }
+
+    @OnClick(R.id.fragment_camera_close)
+    void close() {
+        getActivity().finish();
     }
 
     @Override

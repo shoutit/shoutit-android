@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="match_parent" xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:ignore="ContentDescription">
 
     <LinearLayout
@@ -28,16 +28,28 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <android.support.design.widget.TextInputLayout
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
+                    <LinearLayout
+                        android:id="@+id/edit_media_container"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"/>
+
+                </HorizontalScrollView>
+
+                <android.support.design.widget.TextInputLayout
                     android:id="@+id/edit_description_layout"
-                    style="@style/BlueInputStyle"
+                    app:hintTextAppearance="@style/BlueInputStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp">
 
                     <EditText
                         android:id="@+id/edit_shout_title"
+                        android:theme="@style/BlueEditText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/edit_shout_title_hint"/>
@@ -57,12 +69,14 @@
 
                         <EditText
                             android:id="@+id/edit_budget"
+                            android:theme="@style/BlueEditText"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="@string/edit_shout_price_hint"
                             android:inputType="numberDecimal"/>
 
                         <ImageView
+                            android:id="@+id/edit_currency_info"
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:layout_gravity="end|center_vertical"
@@ -102,6 +116,7 @@
 
                 <EditText
                     android:id="@+id/edit_shout_description"
+                    android:theme="@style/BlueEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/edit_shout_description_hint"/>
@@ -156,8 +171,8 @@
                     android:background="@android:color/darker_gray"/>
 
                 <Button
-                    style="@style/BaseButtonDefaultBackgroundStyle"
                     android:id="@+id/edit_confirm"
+                    style="@style/BaseButtonDefaultBackgroundStyle"
                     android:layout_width="match_parent"
                     android:layout_margin="6dp"
                     android:text="@string/edit_done_btn"

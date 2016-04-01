@@ -7,7 +7,6 @@ import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.appunite.rx.operators.MoreOperators;
-import com.appunite.rx.operators.OperatorMergeNextToken;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -15,6 +14,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.constants.RequestsConstants;
 import com.shoutit.app.android.model.LocationPointer;
 import com.shoutit.app.android.model.RelatedShoutsPointer;
@@ -30,15 +30,12 @@ import javax.annotation.Nonnull;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
-import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
 public class ShoutsDao {
 
     private final static int PAGE_SIZE = 20;
 
-    @Nonnull
-    private final PublishSubject<Object> loadMoreHomeShoutsSubject = PublishSubject.create();
     @Nonnull
     private final ApiService apiService;
     @Nonnull
@@ -125,6 +122,16 @@ public class ShoutsDao {
     }
 
     @Nonnull
+    public ShoutDao getShoutDao(@Nonnull String shoutId) {
+        return shoutCache.getUnchecked(shoutId);
+    }
+
+    @Nonnull
+    public UserShoutsDao getUserShoutsDao(@Nonnull UserShoutsPointer pointer) {
+        return userShoutsCache.getUnchecked(pointer);
+    }
+
+    @Nonnull
     public Observable<ResponseOrError<ShoutsResponse>> getUserShoutObservable(@Nonnull UserShoutsPointer pointer) {
         return userShoutsCache.getUnchecked(pointer).getShoutsObservable();
     }
@@ -145,75 +152,56 @@ public class ShoutsDao {
     }
 
     @Nonnull
-    public Observer<Object> getLoadMoreHomeShoutsObserver() {
-        return loadMoreHomeShoutsSubject;
+    public Observer<Object> getLoadMoreHomeShoutsObserver(LocationPointer locationPointer) {
+        return homeCache.getUnchecked(locationPointer).getLoadMoreObserver();
     }
 
-    public class HomeShoutsDao {
+    @Nonnull
+    public Observer<Object> getHomeShoutsRefreshObserver(LocationPointer pointer) {
+        return homeCache.getUnchecked(pointer).getRefreshObserver();
+    }
+
+    public class HomeShoutsDao extends BaseShoutsDao {
 
         @Nonnull
-        private final Observable<ResponseOrError<ShoutsResponse>> homeShoutsObservable;
+        private final LocationPointer mLocationPointer;
 
         public HomeShoutsDao(@Nonnull final LocationPointer locationPointer) {
-
-            final OperatorMergeNextToken<ShoutsResponse, Object> loadMoreOperator =
-                     OperatorMergeNextToken.create(new Func1<ShoutsResponse, Observable<ShoutsResponse>>() {
-                        private int pageNumber = 0;
-
-                        @Override
-                        public Observable<ShoutsResponse> call(ShoutsResponse previousResponse) {
-                            if (previousResponse == null || previousResponse.getNext() != null) {
-                                if (previousResponse == null) {
-                                    pageNumber = 0;
-                                }
-                                ++pageNumber;
-                                final Observable<ShoutsResponse> apiRequest;
-                                if (userPreferences.isNormalUser()) {
-                                    apiRequest = apiService
-                                            .home(RequestsConstants.USER_ME, pageNumber, PAGE_SIZE)
-                                            .subscribeOn(networkScheduler);
-                                } else {
-                                    apiRequest = apiService
-                                            .shoutsForCity(locationPointer.getCountryCode(),
-                                                    locationPointer.getCity(), pageNumber, PAGE_SIZE)
-                                            .subscribeOn(networkScheduler);
-                                }
-
-                                if (previousResponse == null) {
-                                    return apiRequest;
-                                } else {
-                                    return Observable.just(previousResponse).zipWith(apiRequest, new MergeShoutsResponses());
-                                }
-                            } else {
-                                return Observable.never();
-                            }
-                        }
-                    });
-
-            homeShoutsObservable = loadMoreHomeShoutsSubject.startWith((Object) null)
-                    .lift(loadMoreOperator)
-                    .compose(ResponseOrError.<ShoutsResponse>toResponseOrErrorObservable())
-                    .compose(MoreOperators.<ShoutsResponse>repeatOnError(networkScheduler))
-                    .compose(MoreOperators.<ResponseOrError<ShoutsResponse>>cacheWithTimeout(networkScheduler));
+            super(networkScheduler);
+            mLocationPointer = locationPointer;
         }
 
+        @NonNull
         @Nonnull
-        public Observable<ResponseOrError<ShoutsResponse>> getShoutsObservable() {
-            return homeShoutsObservable;
+        @Override
+        Observable<ShoutsResponse> getShoutsRequest(int pageNumber) {
+            if (userPreferences.isNormalUser()) {
+                return apiService
+                        .home(RequestsConstants.USER_ME, pageNumber, PAGE_SIZE)
+                        .subscribeOn(networkScheduler);
+            } else {
+                return apiService
+                        .shoutsForLocation(mLocationPointer.getCountryCode(),
+                                mLocationPointer.getCity(), null, pageNumber, PAGE_SIZE)
+                        .subscribeOn(networkScheduler);
+            }
         }
     }
 
     public class ShoutDao {
         @Nonnull
         private Observable<ResponseOrError<Shout>> shoutObservable;
+        @Nonnull
+        protected final PublishSubject<Object> refreshShoutsSubject = PublishSubject.create();
 
         public ShoutDao(@Nonnull String shoutId) {
             final Observable<Object> refreshWithCache = Observable
-                    .interval(1, TimeUnit.MINUTES, networkScheduler)
+                    .interval(2, TimeUnit.MINUTES, networkScheduler)
                     .map(Functions1.toObject());
 
             shoutObservable = apiService.shout(shoutId)
                     .subscribeOn(networkScheduler)
+                    .compose(MoreOperators.<Shout>refresh(refreshShoutsSubject))
                     .compose(ResponseOrError.<Shout>toResponseOrErrorObservable())
                     .compose(MoreOperators.<ResponseOrError<Shout>>refresh(refreshWithCache))
                     .compose(MoreOperators.<ResponseOrError<Shout>>cacheWithTimeout(networkScheduler));
@@ -223,6 +211,11 @@ public class ShoutsDao {
         @Nonnull
         public Observable<ResponseOrError<Shout>> getShoutObservable() {
             return shoutObservable;
+        }
+
+        @Nonnull
+        public Observer<Object> getRefreshObserver() {
+            return refreshShoutsSubject;
         }
     }
 
@@ -294,16 +287,22 @@ public class ShoutsDao {
             final SearchPresenter.SearchType searchType = pointer.getSearchType();
             final String query = pointer.getQuery();
             final String contextItemId = pointer.getContextItemId();
+            final UserLocation location = pointer.getLocation();
 
             switch (SearchPresenter.SearchType.values()[searchType.ordinal()]) {
                 case PROFILE:
                     return apiService.searchProfileShouts(query, pageNumber, PAGE_SIZE, contextItemId);
                 case SHOUTS:
-                    return apiService.searchShouts(query, pageNumber, PAGE_SIZE);
+                    return apiService.searchShouts(query, pageNumber, PAGE_SIZE,
+                            location.getCountry(), location.getCity(), location.getState());
                 case TAG:
-                    return apiService.searchTagShouts(query, pageNumber, PAGE_SIZE, contextItemId);
+                    return apiService.searchTagShouts(query, pageNumber, PAGE_SIZE, contextItemId,
+                            location.getCountry(), location.getCity(), location.getState());
                 case DISCOVER:
                     return apiService.searchDiscoverShouts(query, pageNumber, PAGE_SIZE, contextItemId);
+                case BROWSE:
+                    return apiService.shoutsForLocation(location.getCountry(), location.getCity(),
+                            location.getState(), pageNumber, PAGE_SIZE);
                 default:
                     throw new RuntimeException("Unknwon profile type: " + SearchPresenter.SearchType.values()[searchType.ordinal()]);
             }

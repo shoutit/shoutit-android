@@ -17,7 +17,7 @@ import rx.Scheduler;
 
 
 @Module
-public class SearchShoutsResultsActivityModule {
+public class SearchShoutsResultsFragmentModule {
 
     private final String searchQuery;
     @Nullable
@@ -25,7 +25,7 @@ public class SearchShoutsResultsActivityModule {
     @Nonnull
     private final SearchPresenter.SearchType searchType;
 
-    public SearchShoutsResultsActivityModule(@Nonnull String searchQuery,
+    public SearchShoutsResultsFragmentModule(@Nullable String searchQuery,
                                              @Nullable String contextualItemId,
                                              @Nonnull SearchPresenter.SearchType searchType) {
         this.contextualItemId = contextualItemId;

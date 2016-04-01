@@ -27,17 +27,26 @@ import com.shoutit.app.android.R;
 
 import java.util.List;
 
-public class RecordVideoActivity extends AbstractCameraActivity
+public class RecordMediaActivity extends AbstractCameraActivity
         implements CameraFragment.CameraFragmentListener {
 
     private static final String TAG_CAMERA = CameraFragment.class.getCanonicalName();
+    public static final String EXTRA_IS_VIDEO = "extra_is_video";
+    public static final String EXTRA_MEDIA = "extra_media";
+    private static final String EXTRA_IS_FOR_RESULT = "extra_for_result";
 
     private CameraFragment cameraFragment;
-    private Bundle savedInstance;
     private MultiplePermissionsListener customMultiplePermissionsListener;
 
+    private boolean isActivityForResult;
+
     public static Intent newIntent(Context context) {
-        return new Intent(context, RecordVideoActivity.class);
+        return newIntent(context, false);
+    }
+
+    public static Intent newIntent(Context context, boolean activityForResult) {
+        return new Intent(context, RecordMediaActivity.class)
+                .putExtra(EXTRA_IS_FOR_RESULT, activityForResult);
     }
 
     @Override
@@ -72,12 +81,9 @@ public class RecordVideoActivity extends AbstractCameraActivity
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
-            this.savedInstance = savedInstanceState;
-        } else if (getIntent().getExtras() != null) {
-            this.savedInstance = getIntent().getExtras();
-        } else {
-            this.savedInstance = new Bundle();
+        final Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            isActivityForResult = extras.getBoolean(EXTRA_IS_FOR_RESULT);
         }
 
         Dexter.continuePendingRequestsIfPossible(customMultiplePermissionsListener);
@@ -90,11 +96,7 @@ public class RecordVideoActivity extends AbstractCameraActivity
         final Fragment fragment = getFragmentManager().findFragmentByTag(TAG_CAMERA);
 
         if (fragment == null) {
-            cameraFragment = CameraFragment.newInstance(savedInstance);
-            final Bundle args = new Bundle();
-            args.putLong(CameraFragment.EXTRA_VIDEO_MAX_LENGTH, 60_000);
-            cameraFragment.setArguments(args);
-
+            cameraFragment = CameraFragment.newInstance();
             getFragmentManager().beginTransaction()
                     .replace(android.R.id.content, cameraFragment, TAG_CAMERA)
                     .commit();
@@ -124,7 +126,7 @@ public class RecordVideoActivity extends AbstractCameraActivity
                 if (report.areAllPermissionsGranted()) {
                     initCamera();
                 } else {
-                    new AlertDialog.Builder(RecordVideoActivity.this).setTitle("denied permission")
+                    new AlertDialog.Builder(RecordMediaActivity.this).setTitle("denied permission")
                             .setMessage("denied permission")
                             .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                                 @Override
@@ -147,12 +149,6 @@ public class RecordVideoActivity extends AbstractCameraActivity
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putAll(this.savedInstance);
-    }
-
-    @Override
     public void onInitializationFailed(Exception cause) {
 
     }
@@ -172,10 +168,17 @@ public class RecordVideoActivity extends AbstractCameraActivity
         }
         Preconditions.checkNotNull(mediaFile);
 
-        final Fragment publishMediaShoutFragment = PublishMediaShoutFragment.newInstance(mediaFile, isVideo);
-        getFragmentManager().beginTransaction()
-                .replace(android.R.id.content, publishMediaShoutFragment, TAG_CAMERA)
-                .commit();
+        if (isActivityForResult) {
+            setResult(RESULT_OK, new Intent()
+                    .putExtra(EXTRA_IS_VIDEO, isVideo)
+                    .putExtra(EXTRA_MEDIA, mediaFile));
+            finish();
+        } else {
+            final Fragment publishMediaShoutFragment = PublishMediaShoutFragment.newInstance(mediaFile, isVideo);
+            getFragmentManager().beginTransaction()
+                    .replace(android.R.id.content, publishMediaShoutFragment, TAG_CAMERA)
+                    .commit();
+        }
     }
 
     private void initCamera() {
@@ -194,16 +197,10 @@ public class RecordVideoActivity extends AbstractCameraActivity
             return;
         }
 
-        boolean isFrontFaceEnabled =
-                getIntent().getBooleanExtra(CameraFragment.EXTRA_USE_FRONT_FACING_CAMERA, false)
-                        && shCameraInfo.isHasFrontFacingCamera();
-        Facing facing = isFrontFaceEnabled ? Facing.FRONT : Facing.BACK;
-
-        boolean match = getIntent().getBooleanExtra(EXTRA_FACING_EXACT_MATCH, false);
         CameraSelectionCriteria criteria =
-                new CameraSelectionCriteria.Builder().facing(facing).facingExactMatch(match).build();
+                new CameraSelectionCriteria.Builder().facing(Facing.BACK).facingExactMatch(false).build();
 
-        ctrlClassic.setEngine(CameraEngine.buildInstance(RecordVideoActivity.this, true),
+        ctrlClassic.setEngine(CameraEngine.buildInstance(RecordMediaActivity.this, true),
                 criteria);
         ctrlClassic.getEngine().setDebug(getIntent().getBooleanExtra(EXTRA_DEBUG_ENABLED, true));
 

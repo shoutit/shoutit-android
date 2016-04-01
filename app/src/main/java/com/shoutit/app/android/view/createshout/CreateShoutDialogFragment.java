@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +22,7 @@ import com.shoutit.app.android.view.createshout.request.CreateShoutDialogCompone
 import com.shoutit.app.android.view.createshout.request.DaggerCreateShoutDialogComponent;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.main.MainActivity;
-import com.shoutit.app.android.view.media.RecordVideoActivity;
+import com.shoutit.app.android.view.media.RecordMediaActivity;
 
 import javax.inject.Inject;
 
@@ -70,10 +71,11 @@ public class CreateShoutDialogFragment extends DialogFragment {
                     MainActivity.REQUST_CODE_CAMERA_PERMISSION,
                     ColoredSnackBar.contentView(getActivity()),
                     R.string.permission_camera_explanation,
-                    new String[] {Manifest.permission.CAMERA})) {
-                startActivity(RecordVideoActivity.newIntent(getActivity()));
+                    new String[]{Manifest.permission.CAMERA})) {
+                startActivity(RecordMediaActivity.newIntent(getActivity()));
             }
         }
+        dismiss();
     }
 
     @OnClick(R.id.create_shout_request)
@@ -83,5 +85,6 @@ public class CreateShoutDialogFragment extends DialogFragment {
         } else {
             startActivity(CreateRequestActivity.newIntent(getActivity()));
         }
+        dismiss();
     }
 }

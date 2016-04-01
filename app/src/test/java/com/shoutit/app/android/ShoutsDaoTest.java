@@ -43,7 +43,7 @@ public class ShoutsDaoTest {
         locationPointer = new LocationPointer("GE", "Berlin");
 
         when(userPreferences.isUserLoggedIn()).thenReturn(true);
-        when(apiService.shoutsForCity(anyString(), anyString(), anyInt(), anyInt()))
+        when(apiService.shoutsForLocation(anyString(), anyString(),anyString(), anyInt(), anyInt()))
                 .thenReturn(Observable.just(shoutsResponse()));
         when(apiService.home(anyString(), anyInt(), anyInt()))
                 .thenReturn(Observable.just(shoutsResponse()));
@@ -82,7 +82,7 @@ public class ShoutsDaoTest {
 
         shoutsDao.getHomeShoutsObservable(locationPointer).subscribe(subscriber);
         scheduler.triggerActions();
-        shoutsDao.getLoadMoreHomeShoutsObserver().onNext(null);
+        shoutsDao.getLoadMoreHomeShoutsObserver(locationPointer).onNext(null);
         scheduler.triggerActions();
 
         subscriber.assertNoErrors();
@@ -98,7 +98,7 @@ public class ShoutsDaoTest {
 
         shoutsDao.getHomeShoutsObservable(locationPointer).subscribe(subscriber);
         scheduler.triggerActions();
-        shoutsDao.getLoadMoreHomeShoutsObserver().onNext(null);
+        shoutsDao.getLoadMoreHomeShoutsObserver(locationPointer).onNext(null);
         scheduler.triggerActions();
 
         subscriber.assertNoErrors();

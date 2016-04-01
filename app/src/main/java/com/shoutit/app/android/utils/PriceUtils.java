@@ -1,8 +1,8 @@
 package com.shoutit.app.android.utils;
 
 import android.content.res.Resources;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.util.Pair;
 
 import com.google.common.base.Function;
 import com.google.common.base.Strings;
@@ -22,7 +22,7 @@ public class PriceUtils {
     public static String formatPrice(@Nullable Long price, @Nonnull Resources resources) {
         if (price == null) {
             return "";
-        } else if (price == 0){
+        } else if (price == 0) {
             return resources.getString(R.string.price_free);
         } else {
             final float formattedPrice = (float) price / 100;
@@ -43,21 +43,52 @@ public class PriceUtils {
     }
 
     public static long getPriceInCents(String price) {
-        final double doublePrice = Double.parseDouble(price);
+        final double doublePrice = Double.parseDouble(price.replace(",", "."));
         final double centsPrice = doublePrice * 100;
         return (long) centsPrice;
     }
 
-    public static List<Pair<String, String>> transformCurrencyToPair(List<Currency> currencies) {
+    public static List<SpinnerCurrency> transformCurrencyToPair(List<Currency> currencies) {
         return ImmutableList.copyOf(
                 Iterables.transform(currencies,
-                        new Function<Currency, Pair<String, String>>() {
+                        new Function<Currency, SpinnerCurrency>() {
                             @javax.annotation.Nullable
                             @Override
-                            public Pair<String, String> apply(Currency input) {
-                                return Pair.create(input.getCode(),
+                            public SpinnerCurrency apply(Currency input) {
+                                return new SpinnerCurrency(
+                                        input.getCode(),
+                                        input.getCountry(),
                                         String.format("%s (%s)", input.getName(), input.getCountry()));
                             }
                         }));
+    }
+
+    public static class SpinnerCurrency {
+
+        private final String code;
+        private final String country;
+        private final String name;
+
+        public SpinnerCurrency(@NonNull String code, @NonNull String country, @NonNull String name) {
+            this.code = code;
+            this.country = country;
+            this.name = name;
+        }
+
+        @NonNull
+        public String getCode() {
+            return code;
+        }
+
+        @NonNull
+        public String getCountry() {
+            return country;
+        }
+
+        @NonNull
+        public String getName() {
+            return name;
+        }
+
     }
 }
