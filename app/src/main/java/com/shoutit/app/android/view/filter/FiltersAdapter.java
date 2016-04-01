@@ -49,7 +49,7 @@ public class FiltersAdapter extends BaseAdapter {
             case VIEW_TYPE_DISTANCE:
                 return new FilterViewHolders.DistanceViewHolder(layoutInflater.inflate(R.layout.filters_distance_item, parent, false), context);
             case VIEW_TYPE_FILTER:
-                return new FilterViewHolders.FilterViewHolder(layoutInflater.inflate(R.layout.filters_filter_item, parent, false));
+                return new FilterViewHolders.FilterViewHolder(layoutInflater.inflate(R.layout.filters_filter_item, parent, false), context);
             case VIEW_TYPE_FILTER_VALUE:
                 return new FilterViewHolders.FilterValueViewHolder(layoutInflater.inflate(R.layout.filters_filter_value_item, parent, false));
             case VIEW_TYPE_SORT_TYPE:

@@ -3,16 +3,19 @@ package com.shoutit.app.android.view.filter;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMultimap;
 import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.CategoryFilter;
 import com.shoutit.app.android.api.model.SortType;
 import com.shoutit.app.android.api.model.UserLocation;
 
+import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import rx.Observable;
 import rx.Observer;
 
 public class FiltersAdapterItems {
@@ -20,20 +23,23 @@ public class FiltersAdapterItems {
     public static class FilterValueAdapterItem extends BaseNoIDAdapterItem {
 
         @Nonnull
+        private final CategoryFilter categoryFilter;
+        @Nonnull
         private final CategoryFilter.FilterValue filterValue;
         @Nonnull
-        private final Observer<Object> selectedFilterValuesObserver;
-        private boolean isSelected = false;
+        private final Observer<FiltersPresenter.AdapterFilterValue> selectedFilterValuesObserver;
 
-        public FilterValueAdapterItem(@Nonnull CategoryFilter.FilterValue filterValue,
-                                      @Nonnull Observer<Object> selectedFilterValuesObserver) {
+        public FilterValueAdapterItem(@Nonnull CategoryFilter categoryFilter,
+                                      @Nonnull CategoryFilter.FilterValue filterValue,
+                                      @Nonnull Observer<FiltersPresenter.AdapterFilterValue> selectedFilterValuesObserver) {
+            this.categoryFilter = categoryFilter;
             this.filterValue = filterValue;
             this.selectedFilterValuesObserver = selectedFilterValuesObserver;
         }
 
-        public void toggleValueSelection() {
-            isSelected = !isSelected;
-            selectedFilterValuesObserver.onNext(null);
+        public void toggleValueSelection(boolean isSelected) {
+            selectedFilterValuesObserver.onNext(
+                    new FiltersPresenter.AdapterFilterValue(categoryFilter, filterValue, isSelected));
         }
 
         @Override
@@ -52,18 +58,22 @@ public class FiltersAdapterItems {
             return filterValue;
         }
 
+        @Nonnull
+        public CategoryFilter getCategoryFilter() {
+            return categoryFilter;
+        }
+
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (!(o instanceof FilterValueAdapterItem)) return false;
             final FilterValueAdapterItem that = (FilterValueAdapterItem) o;
-            return isSelected == that.isSelected &&
-                    Objects.equal(filterValue, that.filterValue);
+            return Objects.equal(filterValue, that.filterValue);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(filterValue, isSelected);
+            return Objects.hashCode(filterValue);
         }
     }
 
@@ -75,15 +85,19 @@ public class FiltersAdapterItems {
         private final List<CategoryFilter.FilterValue> selectedFilters;
         @Nonnull
         private final Observer<Object> filterVisibilityChangedObserver;
+        @Nonnull
+        private final Observable<ImmutableMultimap<String, CategoryFilter.FilterValue>> selectedValuesMapObservable;
         private boolean isVisible = false;
         private List<CategoryFilter.FilterValue> selectedValues = ImmutableList.of();
 
         public FilterAdapterItem(@Nonnull CategoryFilter categoryFilter,
                                  @Nonnull List<CategoryFilter.FilterValue> selectedFilters,
-                                 @Nonnull Observer<Object> filterVisibilityChangedObserver) {
+                                 @Nonnull Observer<Object> filterVisibilityChangedObserver,
+                                 @Nonnull Observable<ImmutableMultimap<String, CategoryFilter.FilterValue>> selectedValuesMapObservable) {
             this.categoryFilter = categoryFilter;
             this.selectedFilters = selectedFilters;
             this.filterVisibilityChangedObserver = filterVisibilityChangedObserver;
+            this.selectedValuesMapObservable = selectedValuesMapObservable;
         }
 
         public void onVisibilityChanged() {
@@ -102,16 +116,32 @@ public class FiltersAdapterItems {
             return item instanceof FilterAdapterItem && this.equals(item);
         }
 
-        public void setSelectedValues(ImmutableList<CategoryFilter.FilterValue> selectedValues) {
-            this.selectedValues = selectedValues;
-        }
-
         public String getTitle() {
             return categoryFilter.getName();
         }
 
         @Nonnull
-        public String getSelectedValues() {
+        public List<CategoryFilter.FilterValue> getFilterValues() {
+            return categoryFilter.getValues();
+        }
+
+        @Nonnull
+        public CategoryFilter getCategoryFilter() {
+            return categoryFilter;
+        }
+
+        @Nonnull
+        public Observable<ImmutableMultimap<String, CategoryFilter.FilterValue>> getSelectedValuesMapObservable() {
+            return selectedValuesMapObservable;
+        }
+
+        @Nonnull
+        public String getFilterSlug() {
+            return categoryFilter.getSlug();
+        }
+
+        @Nonnull
+        public String getSelectedValues(@Nonnull Collection<CategoryFilter.FilterValue> selectedValues) {
             String separator = "";
             final StringBuilder builder = new StringBuilder();
             for (CategoryFilter.FilterValue value : selectedValues) {

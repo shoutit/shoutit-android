@@ -14,11 +14,13 @@ import android.widget.TextView;
 import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableMultimap;
 import com.jakewharton.rxbinding.widget.RxAdapterView;
 import com.jakewharton.rxbinding.widget.RxRadioGroup;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.Category;
+import com.shoutit.app.android.api.model.CategoryFilter;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.SortType;
 import com.shoutit.app.android.api.model.UserLocation;
@@ -417,12 +419,20 @@ public class FilterViewHolders {
         }
 
         @Override
-        public void bind(@Nonnull FiltersAdapterItems.FilterAdapterItem item) {
+        public void bind(@Nonnull final FiltersAdapterItems.FilterAdapterItem item) {
             this.item = item;
             nameTv.setText(item.getTitle());
-            valuesTv.setText(item.getSelectedValues());
             iconIv.setImageDrawable(context.getResources().getDrawable(item.isVisible() ?
                     R.drawable.ic_expand_less : R.drawable.ic_expand_more));
+
+            item.getSelectedValuesMapObservable()
+                    .subscribe(new Action1<ImmutableMultimap<String, CategoryFilter.FilterValue>>() {
+                        @Override
+                        public void call(ImmutableMultimap<String, CategoryFilter.FilterValue> selectedValuesMap) {
+                            final String selectedValues = item.getSelectedValues(selectedValuesMap.get(item.getFilterSlug()));
+                            valuesTv.setText(selectedValues);
+                        }
+                    });
         }
 
         @OnClick(R.id.filters_filter_root_view)
@@ -449,7 +459,7 @@ public class FilterViewHolders {
             filtersValueCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    item.toggleValueSelection();
+                    item.toggleValueSelection(isChecked);
                 }
             });
         }
