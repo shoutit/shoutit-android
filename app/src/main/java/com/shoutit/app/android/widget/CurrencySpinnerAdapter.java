@@ -52,7 +52,7 @@ public class CurrencySpinnerAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         final TextView view = (TextView) mLayoutInflater.inflate(mLayout, parent, false);
-        view.setText(list.get(position).getCountry());
+        view.setText(list.get(position).getCode());
         return view;
     }
 
