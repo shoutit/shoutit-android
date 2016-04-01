@@ -79,6 +79,7 @@ public class ConverstationsFragment extends BaseFragment implements Conversation
         setHasOptionsMenu(true);
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -99,6 +100,7 @@ public class ConverstationsFragment extends BaseFragment implements Conversation
         presenter.register(this);
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public void onDestroyView() {
         super.onDestroyView();

@@ -13,7 +13,10 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.ConversationProfile;
 import com.shoutit.app.android.api.model.ConversationsResponse;
+import com.shoutit.app.android.api.model.Message;
+import com.shoutit.app.android.api.model.MessageAttachment;
 import com.shoutit.app.android.dagger.ForActivity;
 
 import java.util.List;
@@ -131,8 +134,8 @@ public class ConversationsPresenter {
 
     @NonNull
     private BaseAdapterItem getConversationItem(@NonNull ConversationsResponse.Conversation input) {
-        final ConversationsResponse.Message lastMessage = input.getLastMessage();
-        final List<ConversationsResponse.ConversationProfile> profiles = input.getProfiles();
+        final Message lastMessage = input.getLastMessage();
+        final List<ConversationProfile> profiles = input.getProfiles();
 
         final String message = getMessageString(lastMessage);
         final String elapsedTime = DateUtils.getRelativeTimeSpanString(mContext, lastMessage.getCreatedAt() * 1000).toString();
@@ -148,19 +151,19 @@ public class ConversationsPresenter {
         }
     }
 
-    private String getImage(List<ConversationsResponse.ConversationProfile> profiles) {
+    private String getImage(List<ConversationProfile> profiles) {
         return profiles.get(0).getImage();
     }
 
-    private String getChatWithString(List<ConversationsResponse.ConversationProfile> profiles) {
+    private String getChatWithString(List<ConversationProfile> profiles) {
         String chatWith;
         if (profiles.size() == 2) {
-            final ConversationsResponse.ConversationProfile conversationProfile = profiles.get(0);
+            final ConversationProfile conversationProfile = profiles.get(0);
             chatWith = conversationProfile.getUsername();
         } else {
             final StringBuilder nameBuilder = new StringBuilder();
-            for (final ConversationsResponse.ConversationProfile profile : profiles) {
-                if (profile.getType().equals(ConversationsResponse.ConversationProfile.TYPE_USER)) {
+            for (final ConversationProfile profile : profiles) {
+                if (profile.getType().equals(ConversationProfile.TYPE_USER)) {
                     nameBuilder.append(profile.getFirstName());
                 } else {
                     nameBuilder.append(profile.getUsername());
@@ -171,15 +174,15 @@ public class ConversationsPresenter {
         return chatWith;
     }
 
-    private String getMessageString(ConversationsResponse.Message lastMessage) {
-        final List<ConversationsResponse.MessageAttachment> attachments = lastMessage.getAttachments();
+    private String getMessageString(Message lastMessage) {
+        final List<MessageAttachment> attachments = lastMessage.getAttachments();
         if (attachments == null || attachments.isEmpty()) {
             return lastMessage.getText();
         } else {
-            final ConversationsResponse.MessageAttachment messageAttachment = attachments.get(0);
-            if (ConversationsResponse.MessageAttachment.ATTACHMENT_TYPE_LOCATION.equals(messageAttachment.getType())) {
+            final MessageAttachment messageAttachment = attachments.get(0);
+            if (MessageAttachment.ATTACHMENT_TYPE_LOCATION.equals(messageAttachment.getType())) {
                 return "Location";
-            } else if (ConversationsResponse.MessageAttachment.ATTACHMENT_TYPE_SHOUT.equals(messageAttachment.getType())) {
+            } else if (MessageAttachment.ATTACHMENT_TYPE_SHOUT.equals(messageAttachment.getType())) {
                 return "Shout";
             } else {
                 throw new RuntimeException(messageAttachment.getType() + " : unknown type");

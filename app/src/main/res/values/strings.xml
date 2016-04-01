@@ -339,5 +339,6 @@
     <string name="publish_price_hint">Negotiable</string>
     <string name="publish_done">Done</string>
     <string name="conversation_title">Chats</string>
+    <string name="chat_show_map">Show Map</string>
 
 </resources>
