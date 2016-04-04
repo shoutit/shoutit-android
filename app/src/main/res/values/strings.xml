@@ -338,6 +338,7 @@
     <string name="publish_sub_header">Want to add a price?</string>
     <string name="publish_price_hint">Negotiable</string>
     <string name="publish_done">Done</string>
+    <string name="conversation_title">Chats</string>
 
     <!-- Notifications -->
     <string name="notifications_title">Notifications</string>

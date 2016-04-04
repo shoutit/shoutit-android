@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.ChangePasswordRequest;
+import com.shoutit.app.android.api.model.ConversationsResponse;
 import com.shoutit.app.android.api.model.CreateOfferShoutWithImageRequest;
 import com.shoutit.app.android.api.model.CreateRequestShoutRequest;
 import com.shoutit.app.android.api.model.CreateRequestShoutWithPriceRequest;
@@ -119,9 +120,10 @@ public interface ApiService {
 
     @GET("shouts")
     Observable<ShoutsResponse> searchDiscoverShouts(@Query("search") String query,
-                                                   @Query("page") Integer page,
-                                                   @Query("page_size") Integer pageSize,
-                                                   @Query("discover") String userName);
+                                                    @Query("page") Integer page,
+                                                    @Query("page_size") Integer pageSize,
+                                                    @Query("discover") String userName);
+
     @GET("shouts")
     Observable<ShoutsResponse> tagShouts(@Query("tags") String tagName,
                                          @Query("page") Integer page,
@@ -261,6 +263,15 @@ public interface ApiService {
     @GET("tags/{name}/related")
     Observable<RelatedTagsResponse> relatedTags(@Path("name") String tagName);
 
+    /**
+     * Conversations
+     */
+    @GET("conversations")
+    Observable<ConversationsResponse> getConversations();
+
+    @GET("conversations")
+    Observable<ConversationsResponse> getConversations(@NonNull @Query("after") String timestamp);
+
     /** Notifications **/
     @GET("notifications")
     Observable<NotificationsResponse> notifications();
@@ -270,5 +281,4 @@ public interface ApiService {
 
     @POST("notifications/{id}/read")
     Observable<ResponseBody> markAsRead(@Path("id") String notificationId);
-
 }
