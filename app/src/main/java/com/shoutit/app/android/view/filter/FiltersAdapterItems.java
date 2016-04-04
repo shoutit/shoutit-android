@@ -28,18 +28,27 @@ public class FiltersAdapterItems {
         private final CategoryFilter.FilterValue filterValue;
         @Nonnull
         private final Observer<FiltersPresenter.AdapterFilterValue> selectedFilterValuesObserver;
+        @Nonnull
+        private final Observable<ImmutableMultimap<String, CategoryFilter.FilterValue>> selectedValuesMapObservable;
 
         public FilterValueAdapterItem(@Nonnull CategoryFilter categoryFilter,
                                       @Nonnull CategoryFilter.FilterValue filterValue,
-                                      @Nonnull Observer<FiltersPresenter.AdapterFilterValue> selectedFilterValuesObserver) {
+                                      @Nonnull Observer<FiltersPresenter.AdapterFilterValue> selectedFilterValuesObserver,
+                                      @Nonnull Observable<ImmutableMultimap<String, CategoryFilter.FilterValue>> selectedValuesMapObservable) {
             this.categoryFilter = categoryFilter;
             this.filterValue = filterValue;
             this.selectedFilterValuesObserver = selectedFilterValuesObserver;
+            this.selectedValuesMapObservable = selectedValuesMapObservable;
         }
 
         public void toggleValueSelection(boolean isSelected) {
             selectedFilterValuesObserver.onNext(
                     new FiltersPresenter.AdapterFilterValue(categoryFilter, filterValue, isSelected));
+        }
+
+        @Nonnull
+        public Observable<ImmutableMultimap<String, CategoryFilter.FilterValue>> getSelectedValuesMapObservable() {
+            return selectedValuesMapObservable;
         }
 
         @Override
@@ -209,9 +218,13 @@ public class FiltersAdapterItems {
 
         @Nonnull
         private final Observer<String> shoutTypeObserver;
+        @Nonnull
+        private final String shoutTypeSelected;
 
-        public ShoutTypeAdapterItem(@Nonnull Observer<String> shoutTypeObserver) {
+        public ShoutTypeAdapterItem(@Nonnull Observer<String> shoutTypeObserver,
+                                    @Nonnull String shoutTypeSelected) {
             this.shoutTypeObserver = shoutTypeObserver;
+            this.shoutTypeSelected = shoutTypeSelected;
         }
 
         @Override
@@ -226,6 +239,11 @@ public class FiltersAdapterItems {
 
         public void onTypeSelected(@Nonnull String type) {
             shoutTypeObserver.onNext(type);
+        }
+
+        @Nonnull
+        public String getShoutTypeSelected() {
+            return shoutTypeSelected;
         }
     }
 

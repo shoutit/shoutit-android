@@ -3,9 +3,9 @@ package com.shoutit.app.android.view.filter;
 import android.content.Context;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.Spinner;
@@ -14,8 +14,10 @@ import android.widget.TextView;
 import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableMultimap;
 import com.jakewharton.rxbinding.widget.RxAdapterView;
+import com.jakewharton.rxbinding.widget.RxCompoundButton;
 import com.jakewharton.rxbinding.widget.RxRadioGroup;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.R;
@@ -72,6 +74,12 @@ public class FilterViewHolders {
 
         @Bind(R.id.filters_radio_group)
         RadioGroup radioGroup;
+        @Bind(R.id.filter_all_rb)
+        RadioButton allButton;
+        @Bind(R.id.filter_offers_rb)
+        RadioButton offersButton;
+        @Bind(R.id.filter_requests_rb)
+        RadioButton requestButton;
 
         private Subscription subscription;
 
@@ -84,7 +92,20 @@ public class FilterViewHolders {
         public void bind(@Nonnull final FiltersAdapterItems.ShoutTypeAdapterItem item) {
             recycle();
 
+            switch (item.getShoutTypeSelected()) {
+                case Shout.TYPE_ALL:
+                    allButton.setChecked(true);
+                    break;
+                case Shout.TYPE_OFFER:
+                    offersButton.setChecked(true);
+                    break;
+                default:
+                    requestButton.setChecked(true);
+                    break;
+            }
+
             subscription = RxRadioGroup.checkedChanges(radioGroup)
+                    .distinctUntilChanged()
                     .subscribe(new Action1<Integer>() {
                         @Override
                         public void call(Integer viewId) {
@@ -149,6 +170,7 @@ public class FilterViewHolders {
             }
 
             subscription = RxAdapterView.itemSelections(categorySpinner)
+                    .distinctUntilChanged()
                     .subscribe(new Action1<Integer>() {
                         @Override
                         public void call(Integer position) {
@@ -206,6 +228,7 @@ public class FilterViewHolders {
             }
 
             subscription = RxAdapterView.itemSelections(sortTypesSpinner)
+                    .distinctUntilChanged()
                     .subscribe(new Action1<Integer>() {
                         @Override
                         public void call(Integer position) {
@@ -429,8 +452,11 @@ public class FilterViewHolders {
                     .subscribe(new Action1<ImmutableMultimap<String, CategoryFilter.FilterValue>>() {
                         @Override
                         public void call(ImmutableMultimap<String, CategoryFilter.FilterValue> selectedValuesMap) {
-                            final String selectedValues = item.getSelectedValues(selectedValuesMap.get(item.getFilterSlug()));
-                            valuesTv.setText(selectedValues);
+                            final ImmutableCollection<CategoryFilter.FilterValue> filterValues = selectedValuesMap.get(item.getFilterSlug());
+                            if (filterValues != null) {
+                                final String selectedValues = item.getSelectedValues(filterValues);
+                                valuesTv.setText(selectedValues);
+                            }
                         }
                     });
         }
@@ -447,6 +473,8 @@ public class FilterViewHolders {
         @Bind(R.id.filters_value_checkbox)
         CheckBox filtersValueCheckbox;
 
+        private Subscription subscription;
+
         public FilterValueViewHolder(@Nonnull View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -454,14 +482,53 @@ public class FilterViewHolders {
 
         @Override
         public void bind(@Nonnull final FiltersAdapterItems.FilterValueAdapterItem item) {
+            recycle();
+
             valueTv.setText(item.getFilterValue().getName());
 
-            filtersValueCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    item.toggleValueSelection(isChecked);
-                }
-            });
+            subscription = new CompositeSubscription(
+
+                    RxCompoundButton.checkedChanges(filtersValueCheckbox)
+                            .distinctUntilChanged()
+                            .subscribe(new Action1<Boolean>() {
+                                @Override
+                                public void call(Boolean isChecked) {
+                                    item.toggleValueSelection(isChecked);
+                                }
+                            }),
+
+                    item.getSelectedValuesMapObservable()
+                            .subscribe(new Action1<ImmutableMultimap<String, CategoryFilter.FilterValue>>() {
+                                @Override
+                                public void call(ImmutableMultimap<String, CategoryFilter.FilterValue> selectedValuesMap) {
+                                    final ImmutableCollection<CategoryFilter.FilterValue> filterValues =
+                                            selectedValuesMap.get(item.getCategoryFilter().getSlug());
+
+                                    for (CategoryFilter.FilterValue filterValue : filterValues) {
+                                        if (filterValue.getSlug().equals(item.getFilterValue().getSlug())) {
+                                            filtersValueCheckbox.setChecked(true);
+                                            return;
+                                        }
+                                    }
+
+                                    filtersValueCheckbox.setChecked(false);
+                                }
+                            })
+            );
+        }
+
+
+        @Override
+        public void onViewRecycled() {
+            recycle();
+            super.onViewRecycled();
+        }
+
+        private void recycle() {
+            if (subscription != null) {
+                subscription.unsubscribe();
+                subscription = null;
+            }
         }
     }
 
