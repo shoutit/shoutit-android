@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent" android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/chats_sent_message_message_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/chat_sent_msg_item_margin_left"
+        android:layout_marginStart="@dimen/chat_sent_msg_item_margin_left"
+        android:paddingRight="10dp"
+        android:paddingEnd="10dp"
+        tools:text="This is a one liner message This is a one liner message This is a one liner message This is a one liner message This is a one liner message This is a one liner message This is a one liner message"/>
+
+    <TextView
+        android:id="@+id/chats_sent_message_date_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:textSize="12sp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginRight="4dp"
+        android:paddingTop="8dp"
+        tools:text="18:04"/>
+
+</FrameLayout>

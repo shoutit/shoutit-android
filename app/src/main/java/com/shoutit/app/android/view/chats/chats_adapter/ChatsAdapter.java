@@ -7,10 +7,10 @@ import android.view.ViewGroup;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.shoutit.app.android.BaseAdapter;
-import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.view.chats.message_models.DateItem;
 import com.shoutit.app.android.view.chats.message_models.ReceivedImageMessage;
+import com.shoutit.app.android.view.chats.message_models.ReceivedLocationMessage;
 import com.shoutit.app.android.view.chats.message_models.ReceivedShoutMessage;
 import com.shoutit.app.android.view.chats.message_models.ReceivedTextMessage;
 import com.shoutit.app.android.view.chats.message_models.ReceivedVideoMessage;
@@ -19,7 +19,6 @@ import com.shoutit.app.android.view.chats.message_models.SentLocationMessage;
 import com.shoutit.app.android.view.chats.message_models.SentShoutMessage;
 import com.shoutit.app.android.view.chats.message_models.SentTextMessage;
 import com.shoutit.app.android.view.chats.message_models.SentVideoMessage;
-import com.shoutit.app.android.view.conversations.ConversationsPresenter;
 import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;
@@ -52,27 +51,27 @@ public class ChatsAdapter extends BaseAdapter {
     public ViewHolderManager.BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         switch (viewType) {
             case DATE_ITEM:
-                return DateItemHolder.create(layoutInflater.inflate(R.layout.conversation_chat_item, parent, false));
+                return DateItemHolder.create(layoutInflater.inflate(DateItemHolder.getLayoutRes(), parent, false));
             case RECEIVER_IMAGE:
-                return ReceivedImageMessageHolder.create(layoutInflater.inflate(R.layout.conversation_shout_item, parent, false), mPicasso);
+                return ReceivedImageMessageHolder.create(layoutInflater.inflate(ReceivedImageMessageHolder.getLayoutRes(), parent, false), mPicasso);
             case RECEIVER_LOCATION:
-                return ReceivedLocationMessageHolder.create(layoutInflater.inflate(R.layout.conversation_shout_item, parent, false));
+                return ReceivedLocationMessageHolder.create(layoutInflater.inflate(ReceivedLocationMessageHolder.getLayoutRes(), parent, false), mPicasso);
             case RECEIVER_TEXT:
-                return ReceivedTextMessageHolder.create(layoutInflater.inflate(R.layout.conversation_shout_item, parent, false));
+                return ReceivedTextMessageHolder.create(layoutInflater.inflate(ReceivedTextMessageHolder.getLayoutRes(), parent, false), mPicasso);
             case RECEIVED_SHOUT:
-                return ReceivedShoutMessageHolder.create(layoutInflater.inflate(R.layout.conversation_shout_item, parent, false));
+                return ReceivedShoutMessageHolder.create(layoutInflater.inflate(ReceivedShoutMessageHolder.getLayoutRes(), parent, false), mPicasso);
             case RECEIVER_VIDEO:
-                return ReceivedVideoMessageHolder.create(layoutInflater.inflate(R.layout.conversation_shout_item, parent, false), mPicasso);
+                return ReceivedVideoMessageHolder.create(layoutInflater.inflate(ReceivedVideoMessageHolder.getLayoutRes(), parent, false), mPicasso);
             case SENT_IMAGE:
-                return SentImageMessageHolder.create(layoutInflater.inflate(R.layout.conversation_shout_item, parent, false), mPicasso);
+                return SentImageMessageHolder.create(layoutInflater.inflate(SentImageMessageHolder.getLayoutRes(), parent, false), mPicasso);
             case SENT_LOCATION:
-                return SentLocationMessageHolder.create(layoutInflater.inflate(R.layout.conversation_shout_item, parent, false));
+                return SentLocationMessageHolder.create(layoutInflater.inflate(SentLocationMessageHolder.getLayoutRes(), parent, false));
             case SENT_SHOUT:
-                return SentShoutMessageHolder.create(layoutInflater.inflate(R.layout.conversation_shout_item, parent, false), mPicasso);
+                return SentShoutMessageHolder.create(layoutInflater.inflate(SentShoutMessageHolder.getLayoutRes(), parent, false), mPicasso);
             case SENT_TEXT:
-                return SentTextMessageHolder.create(layoutInflater.inflate(R.layout.conversation_shout_item, parent, false));
+                return SentTextMessageHolder.create(layoutInflater.inflate(SentTextMessageHolder.getLayoutRes(), parent, false));
             case SENT_VIDEO:
-                return SentVideoMessageHolder.create(layoutInflater.inflate(R.layout.conversation_shout_item, parent, false), mPicasso);
+                return SentVideoMessageHolder.create(layoutInflater.inflate(SentVideoMessageHolder.getLayoutRes(), parent, false), mPicasso);
             default:
                 throw new RuntimeException();
         }
@@ -87,12 +86,12 @@ public class ChatsAdapter extends BaseAdapter {
     @Override
     public int getItemViewType(int position) {
         final BaseAdapterItem baseAdapterItem = items.get(position);
-        if (baseAdapterItem instanceof ConversationsPresenter.ConversationChatItem) {
-            return DATE_ITEM;
-        } else if (baseAdapterItem instanceof DateItem) {
-            return RECEIVER_IMAGE;
-        } else if (baseAdapterItem instanceof ReceivedImageMessage) {
+        if (baseAdapterItem instanceof ReceivedLocationMessage) {
             return RECEIVER_LOCATION;
+        } else if (baseAdapterItem instanceof DateItem) {
+            return DATE_ITEM;
+        } else if (baseAdapterItem instanceof ReceivedImageMessage) {
+            return RECEIVER_IMAGE;
         } else if (baseAdapterItem instanceof ReceivedVideoMessage) {
             return RECEIVER_VIDEO;
         } else if (baseAdapterItem instanceof ReceivedShoutMessage) {

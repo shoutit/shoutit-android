@@ -9,8 +9,8 @@ public class ReceivedImageMessage extends ReceivedMessage {
     private final String time;
     private final String url;
 
-    public ReceivedImageMessage(boolean isFirst, String time, String url) {
-        super(isFirst);
+    public ReceivedImageMessage(boolean isFirst, String time, String url, String avatarUrl) {
+        super(isFirst, avatarUrl);
         this.time = time;
         this.url = url;
     }

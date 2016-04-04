@@ -6,8 +6,21 @@ import javax.annotation.Nonnull;
 
 public class ReceivedVideoMessage extends ReceivedMessage {
 
-    public ReceivedVideoMessage(boolean isFirst) {
-        super(isFirst);
+    private final String videoThumbnail;
+    private final String time;
+
+    public ReceivedVideoMessage(boolean isFirst, String videoThumbnail, String time, String avatarUrl) {
+        super(isFirst, avatarUrl);
+        this.videoThumbnail = videoThumbnail;
+        this.time = time;
+    }
+
+    public String getVideoThumbnail() {
+        return videoThumbnail;
+    }
+
+    public String getTime() {
+        return time;
     }
 
     @Override

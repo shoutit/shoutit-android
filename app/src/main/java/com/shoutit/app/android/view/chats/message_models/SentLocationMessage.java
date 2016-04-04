@@ -6,6 +6,16 @@ import javax.annotation.Nonnull;
 
 public class SentLocationMessage implements BaseAdapterItem {
 
+    private final String time;
+
+    public SentLocationMessage(String time) {
+        this.time = time;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
     @Override
     public long adapterId() {
         return 0;

@@ -1,17 +1,26 @@
 package com.shoutit.app.android.view.chats.chats_adapter;
 
+import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.view.View;
+import android.widget.TextView;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
+import com.shoutit.app.android.R;
+import com.shoutit.app.android.view.chats.message_models.ReceivedLocationMessage;
+import com.shoutit.app.android.view.chats.message_models.SentLocationMessage;
 import com.shoutit.app.android.view.conversations.ConversationsPresenter;
 
 import javax.annotation.Nonnull;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
 
 public class SentLocationMessageHolder extends ViewHolderManager.BaseViewHolder<BaseAdapterItem> {
+
+    @Bind(R.id.chats_sent_location_date_textview)
+    TextView mChatsSentLocationDateTextview;
 
     public SentLocationMessageHolder(@Nonnull View itemView) {
         super(itemView);
@@ -20,10 +29,17 @@ public class SentLocationMessageHolder extends ViewHolderManager.BaseViewHolder<
 
     @Override
     public void bind(@Nonnull BaseAdapterItem item) {
-        final ConversationsPresenter.ConversationChatItem conversationChatItem = (ConversationsPresenter.ConversationChatItem) item;
+        final SentLocationMessage message = (SentLocationMessage) item;
+        mChatsSentLocationDateTextview.setText(message.getTime());
+
     }
 
     public static ViewHolderManager.BaseViewHolder create(@NonNull View view) {
         return new SentLocationMessageHolder(view);
+    }
+
+    @LayoutRes
+    public static int getLayoutRes() {
+        return R.layout.chat_sent_location_message;
     }
 }

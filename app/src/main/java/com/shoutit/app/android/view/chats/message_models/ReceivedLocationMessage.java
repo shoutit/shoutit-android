@@ -8,8 +8,8 @@ public class ReceivedLocationMessage extends ReceivedMessage {
 
     private final String time;
 
-    public ReceivedLocationMessage(boolean isFirst, String time) {
-        super(isFirst);
+    public ReceivedLocationMessage(boolean isFirst, String time, String avatarUrl) {
+        super(isFirst, avatarUrl);
         this.time = time;
     }
 

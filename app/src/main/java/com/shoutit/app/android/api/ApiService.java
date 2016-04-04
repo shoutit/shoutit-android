@@ -276,5 +276,5 @@ public interface ApiService {
     Observable<MessagesResponse> getMessages(@NonNull @Path("id") String conversationId);
 
     @GET("conversations/{id}/messages")
-    Observable<MessagesResponse> getMessages(@NonNull @Query("after") String timestamp, @NonNull @Path("id") String conversationId);
+    Observable<MessagesResponse> getMessages(@NonNull @Path("id") String conversationId, @NonNull @Query("after") String timestamp);
 }

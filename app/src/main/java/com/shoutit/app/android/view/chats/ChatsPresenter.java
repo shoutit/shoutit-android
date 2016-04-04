@@ -1,5 +1,7 @@
 package com.shoutit.app.android.view.chats;
 
+import android.annotation.SuppressLint;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
@@ -15,7 +17,10 @@ import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessageAttachment;
 import com.shoutit.app.android.api.model.MessagesResponse;
+import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.view.chats.message_models.DateItem;
 import com.shoutit.app.android.view.chats.message_models.ReceivedImageMessage;
 import com.shoutit.app.android.view.chats.message_models.ReceivedLocationMessage;
@@ -30,9 +35,11 @@ import com.shoutit.app.android.view.chats.message_models.SentVideoMessage;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Observer;
@@ -79,7 +86,10 @@ public class ChatsPresenter {
                 }
             });
 
-    private final SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat();
+    @SuppressLint("SimpleDateFormat")
+    private final SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("MMMMM dd, yyyy");
+    @SuppressLint("SimpleDateFormat")
+    private final SimpleDateFormat mSimpleTimeFormat = new SimpleDateFormat("hh:mm");
 
     @NonNull
     private final String conversationId;
@@ -88,20 +98,24 @@ public class ChatsPresenter {
     private final Scheduler mUiScheduler;
     private final Scheduler mNetworkScheduler;
     private final UserPreferences mUserPreferences;
+    private final Resources mResources;
     private Listener mListener;
     private Subscription mSubscribe;
     private final PublishSubject<Object> requestSubject = PublishSubject.create();
 
+    @Inject
     public ChatsPresenter(@NonNull String conversationId,
                           @NonNull ApiService apiService,
                           @UiScheduler Scheduler uiScheduler,
                           @NetworkScheduler Scheduler networkScheduler,
-                          UserPreferences userPreferences) {
+                          UserPreferences userPreferences,
+                          @ForActivity Resources resources) {
         this.conversationId = conversationId;
         mApiService = apiService;
         mUiScheduler = uiScheduler;
         mNetworkScheduler = networkScheduler;
         mUserPreferences = userPreferences;
+        mResources = resources;
     }
 
     public void register(@NonNull Listener listener) {
@@ -159,10 +173,12 @@ public class ChatsPresenter {
 
     @Nullable
     private DateItem getDateItem(@NonNull List<Message> results, int currentPosition) {
+        final Message currentMessage = results.get(currentPosition);
         if (currentPosition == 0) {
+            final String date = mSimpleDateFormat.format(new Date(currentMessage.getCreatedAt() * 1000));
             return new DateItem(date);
         } else {
-            final long currentCreatedAt = results.get(currentPosition).getCreatedAt();
+            final long currentCreatedAt = currentMessage.getCreatedAt();
             final long previousCreatedAt = results.get(currentPosition - 1).getCreatedAt();
 
             final Calendar currentCalendar = Calendar.getInstance();
@@ -178,6 +194,7 @@ public class ChatsPresenter {
             final int previousYear = previousCalendar.get(Calendar.YEAR);
 
             if (currentYear != previousYear || currentDayOfTheYear != previousDayOfTheYear) {
+                final String date = mSimpleDateFormat.format(new Date(currentMessage.getCreatedAt() * 1000));
                 return new DateItem(date);
             } else {
                 return null;
@@ -187,14 +204,16 @@ public class ChatsPresenter {
 
     private BaseAdapterItem getItem(@NonNull List<Message> results, String userId, int currentPosition) {
         final Message message = results.get(currentPosition);
-        final List<MessageAttachment> attachments = message.getAttachments();
 
+        
         final String messageProfileId = message.getProfile().getId();
+
+        final String time = mSimpleTimeFormat.format(new Date(message.getCreatedAt() * 1000));
         if (messageProfileId.equals(userId)) {
-            return getSentItem(attachments);
+            return getSentItem(message, time);
         } else {
             final boolean isFirst = isFirst(currentPosition, results, messageProfileId);
-            return getReceivedItem(attachments, isFirst);
+            return getReceivedItem(message, isFirst, time);
         }
     }
 
@@ -207,40 +226,52 @@ public class ChatsPresenter {
         }
     }
 
-    private BaseAdapterItem getReceivedItem(List<MessageAttachment> attachments, boolean isFirst) {
+    private BaseAdapterItem getReceivedItem(Message message, boolean isFirst, String time) {
+        final List<MessageAttachment> attachments = message.getAttachments();
+        final String avatarUrl = message.getProfile().getImage();
         if (attachments.isEmpty()) {
-            return new ReceivedTextMessage(isFirst, time, message);
+            return new ReceivedTextMessage(isFirst, time, message.getText(), avatarUrl);
         } else {
             final MessageAttachment messageAttachment = attachments.get(0);
             final String type = messageAttachment.getType();
             if (MessageAttachment.ATTACHMENT_TYPE_IMAGE.equals(type)) {
-                return new ReceivedImageMessage(isFirst, time, url);
+                return new ReceivedImageMessage(isFirst, time, messageAttachment.getImage().getUrl(), avatarUrl);
             } else if (MessageAttachment.ATTACHMENT_TYPE_VIDEO.equals(type)) {
-                return new ReceivedVideoMessage(isFirst);
+                return new ReceivedVideoMessage(isFirst, messageAttachment.getVideo().getThumbnailUrl(), time, avatarUrl);
             } else if (MessageAttachment.ATTACHMENT_TYPE_LOCATION.equals(type)) {
-                return new ReceivedLocationMessage(isFirst, time);
+                return new ReceivedLocationMessage(isFirst, time, avatarUrl);
             } else if (MessageAttachment.ATTACHMENT_TYPE_SHOUT.equals(type)) {
-                return new ReceivedShoutMessage(isFirst, shoutImageUrl, time, price, description, author, avatarUrl);
+                final Shout shout = messageAttachment.getShout();
+                return new ReceivedShoutMessage(
+                        isFirst,
+                        shout.getThumbnail(),
+                        time,
+                        PriceUtils.formatPriceWithCurrency(shout.getPrice(), mResources, shout.getCurrency()),
+                        shout.getText(),
+                        shout.getProfile().getName(),
+                        avatarUrl);
             } else {
                 throw new RuntimeException(type);
             }
         }
     }
 
-    private BaseAdapterItem getSentItem(List<MessageAttachment> attachments) {
+    private BaseAdapterItem getSentItem(Message message, String time) {
+        final List<MessageAttachment> attachments = message.getAttachments();
         if (attachments.isEmpty()) {
-            return new SentTextMessage();
+            return new SentTextMessage(time, message.getText());
         } else {
             final MessageAttachment messageAttachment = attachments.get(0);
             final String type = messageAttachment.getType();
             if (MessageAttachment.ATTACHMENT_TYPE_IMAGE.equals(type)) {
-                return new SentImageMessage();
+                return new SentImageMessage(time, messageAttachment.getImage().getUrl());
             } else if (MessageAttachment.ATTACHMENT_TYPE_VIDEO.equals(type)) {
-                return new SentVideoMessage();
+                return new SentVideoMessage(messageAttachment.getVideo().getThumbnailUrl(), time);
             } else if (MessageAttachment.ATTACHMENT_TYPE_LOCATION.equals(type)) {
-                return new SentLocationMessage();
+                return new SentLocationMessage(time);
             } else if (MessageAttachment.ATTACHMENT_TYPE_SHOUT.equals(type)) {
-                return new SentShoutMessage();
+                final Shout shout = messageAttachment.getShout();
+                return new SentShoutMessage(shout.getThumbnail(), time, PriceUtils.formatPriceWithCurrency(shout.getPrice(), mResources, shout.getCurrency()), shout.getText(), shout.getProfile().getName());
             } else {
                 throw new RuntimeException(type);
             }

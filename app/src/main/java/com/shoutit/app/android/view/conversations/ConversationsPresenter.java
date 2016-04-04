@@ -208,6 +208,8 @@ public class ConversationsPresenter {
         void setData(@NonNull List<BaseAdapterItem> items);
 
         void error();
+
+        void onItemClicked(@NonNull String id);
     }
 
     public class ConversationChatItem implements BaseAdapterItem {
@@ -258,6 +260,10 @@ public class ConversationsPresenter {
 
         public String getImage() {
             return image;
+        }
+
+        public void click() {
+            mListener.onItemClicked(id);
         }
     }
 
@@ -315,6 +321,10 @@ public class ConversationsPresenter {
 
         public String getImage() {
             return image;
+        }
+
+        public void click() {
+            mListener.onItemClicked(id);
         }
     }
 
