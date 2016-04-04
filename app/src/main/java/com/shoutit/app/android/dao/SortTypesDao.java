@@ -20,6 +20,7 @@ public class SortTypesDao {
     public SortTypesDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
         sortTypesObservable = apiService
                 .sortTypes()
+                .mergeWith(Observable.<List<SortType>>never())
                 .subscribeOn(networkScheduler)
                 .compose(ResponseOrError.<List<SortType>>toResponseOrErrorObservable())
                 .compose(MoreOperators.<ResponseOrError<List<SortType>>>cacheWithTimeout(networkScheduler));

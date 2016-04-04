@@ -360,7 +360,6 @@
     <string name="filters_search_within">Search within:</string>
     <string name="filters_search_init_distance">"0 KM</string>
     <string name="filters_default_category_name">All Categories</string>
-    <string name="filters_distance_0KM">0KM</string>
     <string name="filters_distance_1KM">1KM</string>
     <string name="filters_distance_2KM">2KM</string>
     <string name="filters_distance_3KM">3KM</string>

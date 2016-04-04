@@ -65,7 +65,7 @@ public class FiltersPresenterTest {
         presenter.getAllAdapterItems().subscribe(testSubscriber);
 
         testSubscriber.assertNoErrors();
-        testSubscriber.assertValueCount(1);
+        testSubscriber.assertValueCount(2);
         final List<BaseAdapterItem> lastEvent = getLastEvent(testSubscriber);
         assert_().that(lastEvent.get(0)).isInstanceOf(FiltersAdapterItems.HeaderAdapterItem.class);
         assert_().that(lastEvent.get(1)).isInstanceOf(FiltersAdapterItems.ShoutTypeAdapterItem.class);

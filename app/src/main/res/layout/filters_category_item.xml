@@ -21,7 +21,7 @@
         tools:src="@drawable/ic_call_green"
         android:layout_marginRight="24dp"
         android:layout_marginEnd="24dp"
-        android:layout_centerVertical="true"
+        android:layout_marginTop="44dp"
         />
 
     <Spinner

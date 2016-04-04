@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.google.common.collect.ImmutableList;
 
+import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -25,7 +26,7 @@ public abstract class BaseSpinnerAdapter<T> extends BaseAdapter {
         mLayoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-    public void bindData(@Nonnull List<T> newItems) {
+    public void bindData(@Nonnull Collection<T> newItems) {
         mItems = ImmutableList.<T>builder()
                 .addAll(newItems)
                 .build();
@@ -74,5 +75,15 @@ public abstract class BaseSpinnerAdapter<T> extends BaseAdapter {
 
         final String name = getDisplayName(position);
         textView.setText(name);
+    }
+
+    public int getItemPosition(@Nonnull T item) {
+        for (int i = 0; i <= mItems.size(); i++) {
+            if (mItems.get(i).equals(item)) {
+                return i;
+            }
+        }
+
+        throw new RuntimeException("Item do not belong to adapter: " + item.getClass().getSimpleName());
     }
 }

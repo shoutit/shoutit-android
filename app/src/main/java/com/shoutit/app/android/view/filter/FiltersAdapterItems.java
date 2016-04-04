@@ -2,7 +2,6 @@ package com.shoutit.app.android.view.filter;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultimap;
 import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
 import com.shoutit.app.android.api.model.Category;
@@ -12,11 +11,13 @@ import com.shoutit.app.android.api.model.UserLocation;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 
 import rx.Observable;
 import rx.Observer;
+import rx.subjects.BehaviorSubject;
 
 public class FiltersAdapterItems {
 
@@ -97,7 +98,6 @@ public class FiltersAdapterItems {
         @Nonnull
         private final Observable<ImmutableMultimap<String, CategoryFilter.FilterValue>> selectedValuesMapObservable;
         private boolean isVisible = false;
-        private List<CategoryFilter.FilterValue> selectedValues = ImmutableList.of();
 
         public FilterAdapterItem(@Nonnull CategoryFilter categoryFilter,
                                  @Nonnull List<CategoryFilter.FilterValue> selectedFilters,
@@ -168,13 +168,12 @@ public class FiltersAdapterItems {
             final FilterAdapterItem that = (FilterAdapterItem) o;
             return isVisible == that.isVisible &&
                     Objects.equal(categoryFilter, that.categoryFilter) &&
-                    Objects.equal(selectedFilters, that.selectedFilters) &&
-                    Objects.equal(selectedValues, that.selectedValues);
+                    Objects.equal(selectedFilters, that.selectedFilters);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(categoryFilter, selectedFilters, isVisible, selectedValues);
+            return Objects.hashCode(categoryFilter, selectedFilters, isVisible);
         }
 
         public boolean isVisible() {
@@ -252,16 +251,20 @@ public class FiltersAdapterItems {
         @Nonnull
         private final Category category;
         @Nonnull
-        private final List<Category> categories;
+        private final Map<String, Category> categories;
         @Nonnull
         private final Observer<String> categorySelectedObserver;
+        @Nonnull
+        private final Observable<Category> categoryObservable;
 
         public CategoryAdapterItem(@Nonnull Category category,
-                                   @Nonnull List<Category> categories,
-                                   @Nonnull Observer<String> categorySelectedObserver) {
+                                   @Nonnull Map<String, Category> categories,
+                                   @Nonnull Observer<String> categorySelectedObserver,
+                                   @Nonnull Observable<Category> categoryObservable) {
             this.category = category;
             this.categories = categories;
             this.categorySelectedObserver = categorySelectedObserver;
+            this.categoryObservable = categoryObservable;
         }
 
         @Override
@@ -281,12 +284,17 @@ public class FiltersAdapterItems {
         }
 
         @Nonnull
-        public List<Category> getCategories() {
+        public Map<String, Category> getCategories() {
             return categories;
         }
 
         public void onCategorySelected(Category category) {
             categorySelectedObserver.onNext(category.getSlug());
+        }
+
+        @Nonnull
+        public Observable<Category> getCategoryObservable() {
+            return categoryObservable;
         }
     }
 
@@ -361,10 +369,10 @@ public class FiltersAdapterItems {
     public static class DistanceAdapterItem extends BaseNoIDAdapterItem {
 
         @Nonnull
-        private final Observer<Integer> distanceChangedObserver;
+        private final BehaviorSubject<Integer> distanceChangedSubject;
 
-        public DistanceAdapterItem(@Nonnull Observer<Integer> distanceChangedObserver) {
-            this.distanceChangedObserver = distanceChangedObserver;
+        public DistanceAdapterItem(@Nonnull BehaviorSubject<Integer> distanceChangedSubject) {
+            this.distanceChangedSubject = distanceChangedSubject;
         }
 
         @Override
@@ -375,6 +383,15 @@ public class FiltersAdapterItems {
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
             return true;
+        }
+
+        public void onDistanceChanged(int distance) {
+            distanceChangedSubject.onNext(distance);
+        }
+
+        @Nonnull
+        public Observable<Integer> getDistanceObservable() {
+            return distanceChangedSubject;
         }
     }
 

@@ -63,6 +63,12 @@ public class SearchShoutsResultsActivity extends BaseActivity {
         }
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Let fragment handle results
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
     @SuppressLint("PrivateResource")
     private void setUpToolbar(String title) {
         toolbar.setTitle(title);

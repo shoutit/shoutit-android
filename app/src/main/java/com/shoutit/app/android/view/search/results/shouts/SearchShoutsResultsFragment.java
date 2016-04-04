@@ -1,5 +1,6 @@
 package com.shoutit.app.android.view.search.results.shouts;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -181,6 +182,11 @@ public class SearchShoutsResultsFragment extends BaseFragment {
         drawerToggle.onConfigurationChanged(newConfig);
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Let child fragment handle results
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 
     @Override
     protected void injectComponent(@Nonnull BaseActivityComponent baseActivityComponent,

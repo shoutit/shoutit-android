@@ -53,7 +53,7 @@ public class FiltersAdapter extends BaseAdapter {
             case VIEW_TYPE_FILTER_VALUE:
                 return new FilterViewHolders.FilterValueViewHolder(layoutInflater.inflate(R.layout.filters_filter_value_item, parent, false));
             case VIEW_TYPE_SORT_TYPE:
-                return new FilterViewHolders.SortTypeViewHolder(layoutInflater.inflate(R.layout.filers_sort_types_item, parent, false), context);
+                return new FilterViewHolders.SortByViewHolder(layoutInflater.inflate(R.layout.filers_sort_types_item, parent, false), context);
             default:
                 throw new RuntimeException("Unknown view type:" + viewType);
         }
