@@ -20,11 +20,13 @@ import com.shoutit.app.android.api.model.CreateShoutResponse;
 import com.shoutit.app.android.api.model.Currency;
 import com.shoutit.app.android.api.model.EditShoutRequest;
 import com.shoutit.app.android.api.model.EditShoutRequestWithPrice;
+import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutResponse;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.UserLocationSimple;
 import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.ResourcesHelper;
 
@@ -40,6 +42,8 @@ import rx.functions.Func3;
 import rx.subscriptions.CompositeSubscription;
 
 public class EditShoutPresenter {
+
+    private String shoutType;
 
     public static class RequestData {
 
@@ -99,6 +103,8 @@ public class EditShoutPresenter {
     private final Scheduler mNetworkScheduler;
     private final Scheduler mUiScheduler;
     private final String mShoutId;
+    @NonNull
+    private final ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter;
     private List<Category> mCategories;
     private Listener mListener;
     private UserLocation mUserLocation;
@@ -109,12 +115,14 @@ public class EditShoutPresenter {
                               ApiService apiService,
                               @NetworkScheduler Scheduler networkScheduler,
                               @UiScheduler Scheduler uiScheduler,
-                              @NonNull String shoutId) {
+                              @NonNull String shoutId,
+                              @NonNull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter) {
         mContext = context;
         mApiService = apiService;
         mNetworkScheduler = networkScheduler;
         mUiScheduler = uiScheduler;
         mShoutId = shoutId;
+        this.shoutsGlobalRefreshPresenter = shoutsGlobalRefreshPresenter;
     }
 
     public void registerListener(@NonNull Listener listener) {
@@ -168,7 +176,8 @@ public class EditShoutPresenter {
                         }
 
                         if (responseData.mShoutResponse != null) {
-                            mListener.setActionbarTitle(mContext.getString(R.string.edit_shout_title, capitalize(responseData.mShoutResponse.getType())));
+                            shoutType = responseData.mShoutResponse.getType();
+                            mListener.setActionbarTitle(mContext.getString(R.string.edit_shout_title, capitalize(shoutType)));
                             mListener.setTitle(responseData.mShoutResponse.getTitle());
                             mListener.setPrice(PriceUtils.formatPrice(
                                     responseData.mShoutResponse.getPrice(),
@@ -227,10 +236,16 @@ public class EditShoutPresenter {
     }
 
     private boolean checkValidity(@NonNull RequestData requestData) {
-        final boolean erroredTitle = requestData.mTitle.length() < 6;
-        mListener.showTitleTooShortError(erroredTitle);
+        final boolean isTitleError;
+        if (Shout.TYPE_OFFER.equals(shoutType)) {
+            isTitleError = requestData.mTitle.length() > 0 && requestData.mTitle.length() < 6;
+        } else {
+            isTitleError = requestData.mTitle.length() < 6;
+        }
 
-        return !erroredTitle;
+        mListener.showTitleTooShortError(isTitleError);
+
+        return !isTitleError;
     }
 
     public void updateLocation(@NonNull UserLocation userLocation) {
@@ -294,6 +309,7 @@ public class EditShoutPresenter {
                 .subscribe(new Action1<CreateShoutResponse>() {
                     @Override
                     public void call(CreateShoutResponse responseBody) {
+                        shoutsGlobalRefreshPresenter.refreshShouts();
                         mListener.hideProgress();
                         mListener.finishActivity();
                     }

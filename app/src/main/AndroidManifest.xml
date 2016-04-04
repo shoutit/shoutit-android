@@ -121,6 +121,8 @@
             android:name=".view.editprofile.EditProfileActivity"
             android:windowSoftInputMode="stateHidden"/>
 
+        <activity android:name=".view.notifications.NotificationsActivity"/>
+
         <!-- Facebook -->
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"

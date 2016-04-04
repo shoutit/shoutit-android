@@ -122,6 +122,10 @@ public class DiscoverFragment extends BaseFragment {
                         startActivity(intent);
                     }
                 });
+
+        presenter.getShoutsRefreshObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
     }
 
     @Override

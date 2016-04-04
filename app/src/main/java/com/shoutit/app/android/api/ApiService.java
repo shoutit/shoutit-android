@@ -18,6 +18,7 @@ import com.shoutit.app.android.api.model.EditShoutRequest;
 import com.shoutit.app.android.api.model.EditShoutRequestWithPrice;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.GuestSignupRequest;
+import com.shoutit.app.android.api.model.NotificationsResponse;
 import com.shoutit.app.android.api.model.RelatedTagsResponse;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.api.model.SearchProfileResponse;
@@ -161,21 +162,21 @@ public interface ApiService {
     /**
      * User
      **/
-    @GET("users/{user_name}")
+    @GET("profiles/{user_name}")
     Observable<User> getUser(@Path("user_name") String userName);
 
-    @GET("users/me")
+    @GET("profiles/me")
     Observable<User> getMyUser();
 
-    @PATCH("users/me")
+    @PATCH("profiles/me")
     Observable<User> updateUserLocation(@Body UpdateLocationRequest updateLocationRequest);
 
-    @GET("users/{user_name}/home")
+    @GET("profiles/{user_name}/home")
     Observable<ShoutsResponse> home(@Path("user_name") String userName,
                                     @Query("page") Integer page,
                                     @Query("page_size") Integer pageSize);
 
-    @PATCH("users/me")
+    @PATCH("profiles/me")
     Observable<User> updateUser(@Body UpdateUserRequest updateUserRequest);
 
 
@@ -270,4 +271,14 @@ public interface ApiService {
 
     @GET("conversations")
     Observable<ConversationsResponse> getConversations(@NonNull @Query("after") String timestamp);
+
+    /** Notifications **/
+    @GET("notifications")
+    Observable<NotificationsResponse> notifications();
+
+    @POST("notifications/reset")
+    Observable<ResponseBody> markAllAsRead();
+
+    @POST("notifications/{id}/read")
+    Observable<ResponseBody> markAsRead(@Path("id") String notificationId);
 }

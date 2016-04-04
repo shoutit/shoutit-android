@@ -17,6 +17,7 @@ import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ShoutsDao;
+import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.model.RelatedShoutsPointer;
 import com.shoutit.app.android.model.UserShoutsPointer;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
@@ -61,7 +62,8 @@ public class ShoutPresenter {
                           @Nonnull final String shoutId,
                           @Nonnull @ForActivity final Context context,
                           @Nonnull @UiScheduler Scheduler uiScheduler,
-                          @Nonnull UserPreferences userPreferences) {
+                          @Nonnull UserPreferences userPreferences,
+                          @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter) {
         this.uiScheduler = uiScheduler;
 
         /** Requests **/
@@ -234,6 +236,9 @@ public class ShoutPresenter {
                 })
                 .compose(ObservableExtensions.<Boolean>behaviorRefCount())
                 .first();
+
+        shoutsGlobalRefreshPresenter.getShoutsGlobalRefreshObservable()
+                .subscribe(shoutsDao.getShoutDao(shoutId).getRefreshObserver());
     }
 
     @Nonnull

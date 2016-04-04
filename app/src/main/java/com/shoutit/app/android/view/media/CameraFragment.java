@@ -63,6 +63,7 @@ public class CameraFragment extends Fragment {
     private static final int REQUEST_GALLERY_IMAGE_CODE = 0;
     private static final int REQUEST_GALLERY_VIDEO_CODE = 1;
     private static final int VIDEO_LENGTH = 60_000;
+    private static final String TAG = CameraFragment.class.getCanonicalName();
 
     public interface CameraFragmentListener {
         void onInitializationFailed(Exception cause);
@@ -323,6 +324,7 @@ public class CameraFragment extends Fragment {
                     cameraFragmentListener.onMediaResult(result);
                 }
             }
+            break;
             case REQUEST_GALLERY_IMAGE_CODE:
                 if (resultCode == Activity.RESULT_OK) {
                     final Optional<Uri> uriOptional = onResult(resultCode, data);
@@ -335,6 +337,7 @@ public class CameraFragment extends Fragment {
                             imageOutput = imageFile;
                             showConfirmImage();
                         } catch (IOException e) {
+                            Log.e(TAG, "error", e);
                             ColoredSnackBar.error(
                                     ColoredSnackBar.contentView(getActivity()),
                                     R.string.error_default,
@@ -370,6 +373,7 @@ public class CameraFragment extends Fragment {
                                     .commit();
 
                         } catch (IOException e) {
+                            Log.e(TAG, "error", e);
                             ColoredSnackBar.error(
                                     ColoredSnackBar.contentView(getActivity()),
                                     R.string.error_default,

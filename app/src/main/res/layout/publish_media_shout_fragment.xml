@@ -47,6 +47,7 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:baselineAligned="false"
             android:orientation="horizontal">
 
             <EditText
@@ -58,7 +59,7 @@
                 android:textColor="@android:color/white"
                 android:textColorHint="@android:color/white"/>
 
-            <Spinner
+            <com.shoutit.app.android.widget.StateSpinner
                 android:id="@+id/camera_published_currency"
                 android:layout_width="120dp"
                 android:layout_height="wrap_content"/>
