@@ -25,6 +25,7 @@
             android:layout_height="match_parent">
 
             <LinearLayout
+                android:gravity="start"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
@@ -32,7 +33,7 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
                     android:text="@string/edit_shout_add_pictures_label"
@@ -53,7 +54,7 @@
                 </HorizontalScrollView>
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
                     android:text="@string/request_activity_what_are_you_looking_for"
@@ -67,6 +68,7 @@
                     app:hintTextAppearance="@style/BlueInputStyle">
 
                     <EditText
+                        android:gravity="start"
                         android:id="@+id/edit_shout_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -77,7 +79,7 @@
                 </com.shoutit.app.android.widget.ErrorTextInputLayout>
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
                     android:text="@string/request_activity_budget"
@@ -90,6 +92,7 @@
                     android:orientation="horizontal">
 
                     <EditText
+                        android:gravity="start"
                         android:id="@+id/edit_budget"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -114,7 +117,7 @@
                 </LinearLayout>
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
                     android:text="@string/request_activity_when"
@@ -142,7 +145,7 @@
                 </LinearLayout>
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
                     android:text="@string/edit_shout_description_hint"
@@ -150,6 +153,7 @@
                     android:textSize="12sp" />
 
                 <EditText
+                    android:gravity="start"
                     android:id="@+id/edit_shout_description"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -164,7 +168,7 @@
                     android:orientation="vertical" />
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
                     android:text="@string/edit_shout_location"
