@@ -13,9 +13,11 @@ public class ShoutResponse {
     private final Category category;
     private final List<String> images;
     private final List<Video> videos;
+    private final List<CategoryFilter> filters;
 
     public ShoutResponse(Long price, String title, String text, String type, UserLocation location,
-                         String currency, Category category, List<String> images, List<Video> videos) {
+                         String currency, Category category, List<String> images, List<Video> videos,
+                         List<CategoryFilter> filters) {
         this.price = price;
         this.title = title;
         this.text = text;
@@ -25,6 +27,7 @@ public class ShoutResponse {
         this.category = category;
         this.images = images;
         this.videos = videos;
+        this.filters = filters;
     }
 
     public Long getPrice() {
@@ -61,5 +64,9 @@ public class ShoutResponse {
 
     public List<Video> getVideos() {
         return videos;
+    }
+
+    public List<CategoryFilter> getFilters() {
+        return filters;
     }
 }

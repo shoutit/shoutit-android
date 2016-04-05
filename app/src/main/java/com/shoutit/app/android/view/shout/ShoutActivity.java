@@ -208,8 +208,6 @@ public class ShoutActivity extends BaseActivity {
                     public void onClick(View v) {
                         if (isUserShoutOwner) {
                             startActivity(EditShoutActivity.newIntent(mShoutId, ShoutActivity.this));
-                        } else {
-
                         }
                     }
                 });

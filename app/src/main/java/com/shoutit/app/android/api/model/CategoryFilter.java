@@ -1,5 +1,9 @@
 package com.shoutit.app.android.api.model;
 
+import android.support.annotation.Nullable;
+
+import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -12,8 +16,12 @@ public class CategoryFilter {
     private final String slug;
     @Nonnull
     private final List<FilterValue> values;
+    @Nullable
+    @SerializedName("value")
+    private FilterValue selectedValue;
 
-    public CategoryFilter(@Nonnull String name, @Nonnull String slug, @Nonnull List<FilterValue> values) {
+    public CategoryFilter(@Nonnull String name, @Nonnull String slug,
+                          @Nonnull List<FilterValue> values) {
         this.name = name;
         this.slug = slug;
         this.values = values;
@@ -54,5 +62,14 @@ public class CategoryFilter {
     @Nonnull
     public String getSlug() {
         return slug;
+    }
+
+    @Nullable
+    public FilterValue getSelectedValue() {
+        return selectedValue;
+    }
+
+    public void setSelectedValue(@Nullable FilterValue selectedValue) {
+        this.selectedValue = selectedValue;
     }
 }
