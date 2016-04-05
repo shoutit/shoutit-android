@@ -38,6 +38,7 @@ import com.shoutit.app.android.dao.SuggestionsDao;
 import com.shoutit.app.android.dao.TagsDao;
 import com.shoutit.app.android.db.DbHelper;
 import com.shoutit.app.android.location.LocationManager;
+import com.shoutit.app.android.utils.PusherHelper;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -244,10 +245,7 @@ public final class AppModule {
 
     @Provides
     @Singleton
-    Pusher providePusher(UserPreferences userPreferences) {
-        final HttpAuthorizer authorizer = new HttpAuthorizer(BuildConfig.API_URL + "pusher/auth");
-        authorizer.setHeaders(ImmutableMap.of("Authorization", "Bearer " + userPreferences.getAuthToken().get()));
-        final PusherOptions options = new PusherOptions().setAuthorizer(authorizer);
-        return new Pusher(BuildConfig.DEBUG ? "7bee1e468fabb6287fc5" : "86d676926d4afda44089", options);
+    PusherHelper providePusher() {
+        return new PusherHelper();
     }
 }

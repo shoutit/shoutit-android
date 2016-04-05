@@ -3,7 +3,6 @@ package com.shoutit.app.android;
 import android.app.Application;
 import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
-import android.util.Log;
 
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.crashlytics.android.core.CrashlyticsCore;
@@ -11,10 +10,6 @@ import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
 import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler;
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
 import com.karumi.dexter.Dexter;
-import com.pusher.client.Pusher;
-import com.pusher.client.channel.Channel;
-import com.pusher.client.connection.ConnectionEventListener;
-import com.pusher.client.connection.ConnectionStateChange;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.constants.UserVoiceConstants;
 import com.shoutit.app.android.dagger.AppComponent;
@@ -23,6 +18,7 @@ import com.shoutit.app.android.dagger.BaseModule;
 import com.shoutit.app.android.dagger.DaggerAppComponent;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.utils.LogHelper;
+import com.shoutit.app.android.utils.PusherHelper;
 import com.uservoice.uservoicesdk.Config;
 import com.uservoice.uservoicesdk.UserVoice;
 
@@ -30,11 +26,11 @@ import javax.inject.Inject;
 
 import io.fabric.sdk.android.Fabric;
 import rx.Scheduler;
+import rx.functions.Action1;
 import rx.plugins.RxJavaErrorHandler;
 import rx.plugins.RxJavaPlugins;
 
 public class App extends MultiDexApplication {
-    private static final String TAG = App.class.getSimpleName();
 
     private AppComponent component;
 
@@ -48,7 +44,7 @@ public class App extends MultiDexApplication {
     @Inject
     LocationManager locationManager;
     @Inject
-    Pusher pusher;
+    PusherHelper pusher;
 
     @Override
     public void onCreate() {
@@ -67,17 +63,24 @@ public class App extends MultiDexApplication {
 
         initFfmpeg();
 
-        pusher.connect(new ConnectionEventListener() {
-            @Override
-            public void onConnectionStateChange(ConnectionStateChange connectionStateChange) {
-                Log.i("dupa", connectionStateChange.getCurrentState().name());
-            }
+        initPusher();
+    }
 
-            @Override
-            public void onError(String s, String s1, Exception e) {
-                Log.e("dupa", "fail", e);
-            }
-        });
+    private void initPusher() {
+        if (userPreferences.isUserLoggedIn()) {
+            pusher.init(userPreferences.getAuthToken().get());
+            pusher.getPusher().connect();
+        } else {
+            userPreferences.getTokenObservable()
+                    .first()
+                    .subscribe(new Action1<String>() {
+                        @Override
+                        public void call(String token) {
+                            pusher.init(token);
+                            pusher.getPusher().connect();
+                        }
+                    });
+        }
     }
 
     private void initFfmpeg() {

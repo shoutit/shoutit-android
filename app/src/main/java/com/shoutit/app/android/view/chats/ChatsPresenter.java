@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.NetworkScheduler;
@@ -14,7 +13,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
-import com.pusher.client.Pusher;
 import com.pusher.client.channel.PresenceChannel;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
@@ -28,6 +26,7 @@ import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.PriceUtils;
+import com.shoutit.app.android.utils.PusherHelper;
 import com.shoutit.app.android.view.chats.message_models.DateItem;
 import com.shoutit.app.android.view.chats.message_models.ReceivedImageMessage;
 import com.shoutit.app.android.view.chats.message_models.ReceivedLocationMessage;
@@ -108,7 +107,7 @@ public class ChatsPresenter {
     private final Scheduler mNetworkScheduler;
     private final UserPreferences mUserPreferences;
     private final Resources mResources;
-    private final Pusher mPusher;
+    private final PusherHelper mPusher;
     private final Gson mGson;
     private Listener mListener;
     private Subscription mSubscribe;
@@ -122,7 +121,7 @@ public class ChatsPresenter {
                           @NetworkScheduler Scheduler networkScheduler,
                           UserPreferences userPreferences,
                           @ForActivity Resources resources,
-                          Pusher pusher,
+                          PusherHelper pusher,
                           Gson gson) {
         this.conversationId = conversationId;
         mApiService = apiService;
@@ -137,7 +136,7 @@ public class ChatsPresenter {
     public void register(@NonNull Listener listener) {
         final User user = mUserPreferences.getUser();
         assert user != null;
-        final PresenceChannel userChannel = mPusher.subscribePresence(String.format("presence-u-%1$s", user.getId()));
+        final PresenceChannel userChannel = mPusher.getPusher().subscribePresence(String.format("presence-u-%1$s", user.getId()));
 
         final Observable<PusherMessage> pusherMessageObservable = Observable
                 .create(new Observable.OnSubscribe<PusherMessage>() {
@@ -392,8 +391,8 @@ public class ChatsPresenter {
     public void unregister() {
         mListener = null;
         mSubscribe.unsubscribe();
-        mPusher.unsubscribe(String.format("presence-c-%1$s", conversationId));
-        mPusher.unsubscribe(String.format("presence-u-%1$s", mUserPreferences.getUser().getId()));
+        mPusher.getPusher().unsubscribe(String.format("presence-c-%1$s", conversationId));
+        mPusher.getPusher().unsubscribe(String.format("presence-u-%1$s", mUserPreferences.getUser().getId()));
     }
 
     public interface Listener {
