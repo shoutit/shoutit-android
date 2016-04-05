@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="wrap_content"
+                android:layout_height="100dp">
+
+    <ImageView
+        android:layout_centerVertical="true"
+        android:id="@+id/conversation_shout_item_image"
+        android:layout_marginLeft="15dp"
+        android:layout_marginStart="15dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:scaleType="centerCrop"
+        tools:src="@drawable/ca"/>
+
+    <LinearLayout android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_alignTop="@+id/conversation_shout_item_image"
+                  android:layout_marginStart="15dp"
+                  android:layout_marginLeft="15dp"
+                  android:layout_toEndOf="@+id/conversation_shout_item_image"
+                  android:layout_toRightOf="@+id/conversation_shout_item_image"
+                  android:orientation="vertical">
+
+        <TextView
+            android:textAlignment="gravity"
+            android:gravity="top"
+            android:singleLine="true"
+            android:id="@+id/conversation_shout_item_shout_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:textColor="@color/accent_blue"
+            tools:text="sample Shout Title Which is quite Long"/>
+
+        <TextView
+            android:textAlignment="gravity"
+            android:gravity="top"
+            android:id="@+id/conversation_shout_item_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black_87"
+            tools:text="phillip Jenkins"/>
+
+        <TextView
+            android:textAlignment="gravity"
+            android:gravity="top"
+            android:id="@+id/conversation_shout_item_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="this is a sample message."/>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/conversation_shout_item_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginEnd="12dp"
+        android:layout_marginRight="12dp"
+        android:layout_marginTop="8dp"
+        android:textSize="12sp"
+        tools:text="21 hours"/>
+
+    <View
+        android:background="@color/black_12"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="78dp"
+        android:layout_marginStart="78dp"
+        android:layout_width="match_parent" android:layout_height="1dp"/>
+
+</RelativeLayout>

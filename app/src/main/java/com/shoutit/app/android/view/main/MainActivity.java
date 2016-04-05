@@ -33,9 +33,7 @@ import com.shoutit.app.android.view.discover.OnNewDiscoverSelectedListener;
 import com.shoutit.app.android.view.home.HomeFragment;
 import com.shoutit.app.android.view.intro.IntroActivity;
 import com.shoutit.app.android.view.postlogininterest.PostLoginInterestActivity;
-import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.main.MainSearchActivity;
-import com.shoutit.app.android.view.search.subsearch.SubSearchActivity;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;

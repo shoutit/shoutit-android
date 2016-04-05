@@ -19,6 +19,7 @@ import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.dao.DiscoversDao;
+import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.model.LocationPointer;
 
 import org.junit.Before;
@@ -60,11 +61,13 @@ public class DiscoverPresenterTest {
 
     private final PublishSubject<ResponseOrError<DiscoverItemDetailsResponse>> discoverItemSubject = PublishSubject.create();
     private DiscoverPresenter presenter;
+    private ShoutsGlobalRefreshPresenter globalRefreshPresenter;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
+        globalRefreshPresenter = new ShoutsGlobalRefreshPresenter();
         when(userPreferences.getLocationObservable())
                 .thenReturn(Observable.just(new UserLocation(0, 0, "z", null, null, null, null)));
 
@@ -76,7 +79,7 @@ public class DiscoverPresenterTest {
                 .thenReturn(Observable.just(ResponseOrError.fromData(getShoutsResponse())));
 
         presenter = new DiscoverPresenter(userPreferences, discoversDao,
-                discoverShoutsDao, Optional.<String>absent(), Schedulers.immediate(), Schedulers.immediate(), mResources, context);
+                discoverShoutsDao, Optional.<String>absent(), Schedulers.immediate(), Schedulers.immediate(), mResources, context, globalRefreshPresenter);
     }
 
     @Test

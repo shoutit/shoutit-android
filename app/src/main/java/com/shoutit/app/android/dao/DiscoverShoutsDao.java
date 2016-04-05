@@ -2,8 +2,6 @@ package com.shoutit.app.android.dao;
 
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
-import com.appunite.rx.operators.MoreOperators;
-import com.appunite.rx.operators.OperatorMergeNextToken;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -13,8 +11,8 @@ import com.shoutit.app.android.api.model.ShoutsResponse;
 import javax.annotation.Nonnull;
 
 import rx.Observable;
+import rx.Observer;
 import rx.Scheduler;
-import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
 public class DiscoverShoutsDao {
@@ -44,47 +42,21 @@ public class DiscoverShoutsDao {
                 });
     }
 
-    public class ShoutsDao {
+    public class ShoutsDao extends BaseShoutsDao {
         @Nonnull
-        private final Observable<ResponseOrError<ShoutsResponse>> shoutsObservable;
+        private final String discoverId;
 
         public ShoutsDao(@Nonnull final String discoverId) {
-
-            final OperatorMergeNextToken<ShoutsResponse, Object> loadMoreOperator =
-                    OperatorMergeNextToken.create(new Func1<ShoutsResponse, Observable<ShoutsResponse>>() {
-                        private int pageNumber = 0;
-
-                        @Override
-                        public Observable<ShoutsResponse> call(ShoutsResponse previousResponse) {
-                            if (previousResponse == null || previousResponse.getNext() != null) {
-                                if (previousResponse == null) {
-                                    pageNumber = 0;
-                                }
-                                ++pageNumber;
-
-                                final Observable<ShoutsResponse> apiRequest = apiService
-                                        .shoutsForDiscoverItem(discoverId, pageNumber, PAGE_SIZE)
-                                        .subscribeOn(networkScheduler);
-                                if (previousResponse == null) {
-                                    return apiRequest;
-                                } else {
-                                    return Observable.just(previousResponse).zipWith(apiRequest, new MergeShoutsResponses());
-                                }
-                            } else {
-                                return Observable.never();
-                            }
-                        }
-                    });
-
-            shoutsObservable = loadMoreShoutsSubject.startWith((Object) null)
-                    .lift(loadMoreOperator)
-                    .compose(ResponseOrError.<ShoutsResponse>toResponseOrErrorObservable())
-                    .compose(MoreOperators.<ResponseOrError<ShoutsResponse>>cacheWithTimeout(networkScheduler));
+            super(networkScheduler);
+            this.discoverId = discoverId;
         }
 
         @Nonnull
-        public Observable<ResponseOrError<ShoutsResponse>> getShoutsObservable() {
-            return shoutsObservable;
+        @Override
+        Observable<ShoutsResponse> getShoutsRequest(int pageNumber) {
+            return apiService
+                    .shoutsForDiscoverItem(discoverId, pageNumber, PAGE_SIZE)
+                    .subscribeOn(networkScheduler);
         }
     }
 
@@ -94,7 +66,17 @@ public class DiscoverShoutsDao {
     }
 
     @Nonnull
+    public ShoutsDao getShoutsDao(String discoverId) {
+        return shoutsCache.getUnchecked(discoverId);
+    }
+
+    @Nonnull
     public PublishSubject<Object> getLoadMoreShoutsSubject() {
         return loadMoreShoutsSubject;
+    }
+
+    @Nonnull
+    public Observer<Object> getRefreshObserver(@Nonnull String discoverId) {
+        return shoutsCache.getUnchecked(discoverId).getRefreshObserver();
     }
 }
