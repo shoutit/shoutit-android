@@ -62,5 +62,6 @@
 
     <!-- Notifications -->
     <dimen name="notifications_avatar_corners">4dp</dimen>
+    <dimen name="post_login_logo_margin">50dp</dimen>
 
 </resources>
