@@ -82,7 +82,7 @@ public class ShoutsDaoTest {
 
         shoutsDao.getHomeShoutsObservable(locationPointer).subscribe(subscriber);
         scheduler.triggerActions();
-        shoutsDao.getLoadMoreHomeShoutsObserver().onNext(null);
+        shoutsDao.getLoadMoreHomeShoutsObserver(locationPointer).onNext(null);
         scheduler.triggerActions();
 
         subscriber.assertNoErrors();
@@ -98,7 +98,7 @@ public class ShoutsDaoTest {
 
         shoutsDao.getHomeShoutsObservable(locationPointer).subscribe(subscriber);
         scheduler.triggerActions();
-        shoutsDao.getLoadMoreHomeShoutsObserver().onNext(null);
+        shoutsDao.getLoadMoreHomeShoutsObserver(locationPointer).onNext(null);
         scheduler.triggerActions();
 
         subscriber.assertNoErrors();

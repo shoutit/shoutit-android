@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.ChangePasswordRequest;
+import com.shoutit.app.android.api.model.ConversationsResponse;
 import com.shoutit.app.android.api.model.CreateOfferShoutWithImageRequest;
 import com.shoutit.app.android.api.model.CreateRequestShoutRequest;
 import com.shoutit.app.android.api.model.CreateRequestShoutWithPriceRequest;
@@ -119,9 +120,10 @@ public interface ApiService {
 
     @GET("shouts")
     Observable<ShoutsResponse> searchDiscoverShouts(@Query("search") String query,
-                                                   @Query("page") Integer page,
-                                                   @Query("page_size") Integer pageSize,
-                                                   @Query("discover") String userName);
+                                                    @Query("page") Integer page,
+                                                    @Query("page_size") Integer pageSize,
+                                                    @Query("discover") String userName);
+
     @GET("shouts")
     Observable<ShoutsResponse> tagShouts(@Query("tags") String tagName,
                                          @Query("page") Integer page,
@@ -160,21 +162,21 @@ public interface ApiService {
     /**
      * User
      **/
-    @GET("users/{user_name}")
+    @GET("profiles/{user_name}")
     Observable<User> getUser(@Path("user_name") String userName);
 
-    @GET("users/me")
+    @GET("profiles/me")
     Observable<User> getMyUser();
 
-    @PATCH("users/me")
+    @PATCH("profiles/me")
     Observable<User> updateUserLocation(@Body UpdateLocationRequest updateLocationRequest);
 
-    @GET("users/{user_name}/home")
+    @GET("profiles/{user_name}/home")
     Observable<ShoutsResponse> home(@Path("user_name") String userName,
                                     @Query("page") Integer page,
                                     @Query("page_size") Integer pageSize);
 
-    @PATCH("users/me")
+    @PATCH("profiles/me")
     Observable<User> updateUser(@Body UpdateUserRequest updateUserRequest);
 
 
@@ -261,6 +263,15 @@ public interface ApiService {
     @GET("tags/{name}/related")
     Observable<RelatedTagsResponse> relatedTags(@Path("name") String tagName);
 
+    /**
+     * Conversations
+     */
+    @GET("conversations")
+    Observable<ConversationsResponse> getConversations();
+
+    @GET("conversations")
+    Observable<ConversationsResponse> getConversations(@NonNull @Query("after") String timestamp);
+
     /** Notifications **/
     @GET("notifications")
     Observable<NotificationsResponse> notifications();
@@ -270,5 +281,4 @@ public interface ApiService {
 
     @POST("notifications/{id}/read")
     Observable<ResponseBody> markAsRead(@Path("id") String notificationId);
-
 }
