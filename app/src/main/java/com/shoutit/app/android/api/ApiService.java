@@ -30,15 +30,19 @@ import com.shoutit.app.android.api.model.Suggestion;
 import com.shoutit.app.android.api.model.SuggestionsResponse;
 import com.shoutit.app.android.api.model.TagDetail;
 import com.shoutit.app.android.api.model.TagsRequest;
+import com.shoutit.app.android.api.model.TwilioResponse;
 import com.shoutit.app.android.api.model.UpdateLocationRequest;
 import com.shoutit.app.android.api.model.UpdateUserRequest;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.api.model.UserIdentity;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.login.EmailLoginRequest;
 import com.shoutit.app.android.api.model.login.FacebookLogin;
 import com.shoutit.app.android.api.model.login.GoogleLogin;
 
 import java.util.List;
+
+import javax.annotation.Generated;
 
 import okhttp3.ResponseBody;
 import retrofit2.http.Body;
@@ -281,4 +285,11 @@ public interface ApiService {
 
     @POST("notifications/{id}/read")
     Observable<ResponseBody> markAsRead(@Path("id") String notificationId);
+
+    /** Twilio **/
+    @POST("twilio/video_auth")
+    Observable<TwilioResponse> getTokenAndIdentity();
+
+    @GET("twilio/video_identity")
+    Observable<UserIdentity> getUserIdentity(@Query("profile") String username);
 }
