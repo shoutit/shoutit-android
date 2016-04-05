@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
-import com.appunite.rx.android.util.LogTransformer;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.functions.Functions1;
@@ -235,13 +234,13 @@ public class FiltersPresenter {
 
         /** All Adapter Items **/
         allAdapterItems = Observable.combineLatest(
-                successCategoriesObservable.take(1).compose(LogTransformer.<Map<String, Category>>transformer("lol", "categoriesSuccessObservable")),
-                successSortTypes.take(1).compose(LogTransformer.<List<SortType>>transformer("lol", "successSortTypes")),
-                shoutTypeObservable.compose(LogTransformer.<String>transformer("lol", "shoutType")),
-                sortTypeObservable.take(1).compose(LogTransformer.<SortType>transformer("lol", "sortTypeObservable")),
-                selectedCategoryObservable.startWith((Category) null).compose(LogTransformer.<Category>transformer("lol", "selectedCategory")),
-                locationObservable.compose(LogTransformer.<UserLocation>transformer("lol", "location")),
-                filterAdapterItems.startWith(ImmutableList.<BaseAdapterItem>of()).compose(LogTransformer.<List<BaseAdapterItem>>transformer("lol", "filters")),
+                successCategoriesObservable.take(1),
+                successSortTypes.take(1),
+                shoutTypeObservable,
+                sortTypeObservable.take(1),
+                selectedCategoryObservable.startWith((Category) null),
+                locationObservable,
+                filterAdapterItems.startWith(ImmutableList.<BaseAdapterItem>of()),
                 new Func7<Map<String, Category>, List<SortType>, String, SortType, Category, UserLocation, List<BaseAdapterItem>, List<BaseAdapterItem>>() {
                     @Override
                     public List<BaseAdapterItem> call(Map<String, Category> categories, List<SortType> sortTypes,

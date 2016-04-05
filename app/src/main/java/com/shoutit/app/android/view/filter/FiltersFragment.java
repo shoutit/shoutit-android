@@ -18,6 +18,7 @@ import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.model.FiltersToSubmit;
+import com.shoutit.app.android.retainfragment.RetainFragmentHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.view.createshout.location.LocationActivity;
@@ -45,10 +46,11 @@ public class FiltersFragment extends BaseFragment {
     View progressView;
 
     @Inject
-    FiltersPresenter presenter;
-    @Inject
     FiltersAdapter adapter;
+    @Inject
+    FilterPresenterFactory filterPresenterFactory;
 
+    private FiltersPresenter presenter;
     private OnFiltersSubmitListener onFiltersSubmitListener;
 
     public static Fragment newInstance() {
@@ -78,6 +80,17 @@ public class FiltersFragment extends BaseFragment {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(adapter);
+
+        if (savedInstanceState == null) {
+            presenter = filterPresenterFactory.getFiltersPresenter();
+            RetainFragmentHelper.setObject(this, getActivity().getSupportFragmentManager(), presenter);
+        } else {
+            presenter = RetainFragmentHelper.getObjectOrNull(this, getChildFragmentManager());
+            if (presenter == null) {
+                presenter = filterPresenterFactory.getFiltersPresenter();
+                RetainFragmentHelper.setObject(this, getActivity().getSupportFragmentManager(), presenter);
+            }
+        }
 
         presenter.getAllAdapterItems()
                 .compose(this.<List<BaseAdapterItem>>bindToLifecycle())

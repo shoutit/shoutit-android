@@ -24,14 +24,6 @@
         android:id="@+id/filter_drawer"
         android:layout_width="304dp"
         android:layout_height="match_parent"
-        android:layout_gravity="end|right">
-
-        <fragment
-            android:id="@+id/search_filter_fragment"
-            android:name="com.shoutit.app.android.view.filter.FiltersFragment"
-            android:layout_width="304dp"
-            android:layout_height="match_parent" />
-
-    </FrameLayout>
+        android:layout_gravity="end|right"/>
 
 </android.support.v4.widget.DrawerLayout>

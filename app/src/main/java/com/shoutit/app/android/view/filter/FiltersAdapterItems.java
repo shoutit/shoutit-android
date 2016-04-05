@@ -324,7 +324,7 @@ public class FiltersAdapterItems {
         }
 
         @Nonnull
-        public Observable<Object> getResetClickedObserver() {
+        public Observable<Object> getResetClickedObservable() {
             return resetClickedObserver;
         }
     }

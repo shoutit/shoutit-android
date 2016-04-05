@@ -375,16 +375,16 @@ public class FilterViewHolders {
 
                             RxTextView.textChangeEvents(maxPriceEt)
                                     .map(MoreFunctions1.mapTextChangeEventToString())
-                                    .subscribe(item.getMaxPriceObserver()),
+                                    .subscribe(item.getMaxPriceObserver())
 
-                            item.getResetClickedObserver()
+                   /*         item.getResetClickedObservable()
                                     .subscribe(new Action1<Object>() {
                                         @Override
                                         public void call(Object o) {
                                             minPriceEt.setText(null);
                                             maxPriceEt.setText(null);
                                         }
-                                    })
+                                    })*/
                     );
                 }
             };
@@ -503,7 +503,9 @@ public class FilterViewHolders {
                                     .subscribe(new Action1<Object>() {
                                         @Override
                                         public void call(Object o) {
-                                            distanceSeekbar.setProgress(0);
+                                            distanceSeekbar.setProgress(maxProgress);
+                                            final int whichValue = (int) Math.ceil((float) maxProgress / singleValueRange);
+                                            distanceTv.setText(getDisplayText(whichValue));
                                         }
                                     })
 

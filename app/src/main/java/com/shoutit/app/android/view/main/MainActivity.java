@@ -207,8 +207,6 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
             fragment = MenuHandler.getFragmentForTag(fragmentTag);
         }
 
-        fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-
         fragmentManager.beginTransaction()
                 .replace(R.id.activity_main_fragment_container, fragment, fragmentTag)
                 .commit();

@@ -65,7 +65,6 @@ public class FiltersPresenterTest {
         presenter.getAllAdapterItems().subscribe(testSubscriber);
 
         testSubscriber.assertNoErrors();
-        testSubscriber.assertValueCount(2);
         final List<BaseAdapterItem> lastEvent = getLastEvent(testSubscriber);
         assert_().that(lastEvent.get(0)).isInstanceOf(FiltersAdapterItems.HeaderAdapterItem.class);
         assert_().that(lastEvent.get(1)).isInstanceOf(FiltersAdapterItems.ShoutTypeAdapterItem.class);
@@ -165,7 +164,6 @@ public class FiltersPresenterTest {
         assert_().that(lastEvent.get(4)).isInstanceOf(FiltersAdapterItems.PriceAdapterItem.class);
         assert_().that(lastEvent.get(5)).isInstanceOf(FiltersAdapterItems.LocationAdapterItem.class);
         assert_().that(lastEvent.get(6)).isInstanceOf(FiltersAdapterItems.DistanceAdapterItem.class);
-        assert_().that(lastEvent.get(7)).isInstanceOf(FiltersAdapterItems.FilterAdapterItem.class);
     }
 
     private List<Category> getCategories() {
