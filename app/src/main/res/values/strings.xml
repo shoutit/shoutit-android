@@ -345,6 +345,10 @@
     <string name="notifications_menu_mark">Mark all as read</string>
     <string name="notifications_menu_settings">Notifications Settings</string>
     <string name="notifications_listening_to_you">started listening to you</string>
+    <string name="create_request_description">Title</string>
+    <string name="create_request_price">Price</string>
+    <string name="edit_shout_add_pictures_label">Add pictures and videos</string>
+    <string name="option_not_set">Not set</string>
 
     <!-- Video Calls -->
     <string name="video_calls_no_premissions">Camera and Microphone permissions needed.</string>
