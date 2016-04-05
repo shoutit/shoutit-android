@@ -346,4 +346,12 @@
     <string name="notifications_menu_settings">Notifications Settings</string>
     <string name="notifications_listening_to_you">started listening to you</string>
 
+    <!-- Video Calls -->
+    <string name="video_calls_no_premissions">Camera and Microphone permissions needed.</string>
+    <string name="video_calls_button_call">Call</string>
+    <string name="video_calls_camera_issue">Problem with camera preview</string>
+    <string name="video_calls_caller_name">Someone is calling to You!</string>
+    <string name="video_calls_accept_call">Accept Call</string>
+    <string name="video_calls_reject_call">Reject Call</string>
+
 </resources>
