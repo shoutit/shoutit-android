@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.filter;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.appunite.rx.functions.BothParams;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMultimap;
 import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
@@ -42,9 +43,9 @@ public class FiltersAdapterItems {
             this.selectedValuesMapObservable = selectedValuesMapObservable;
         }
 
-        public void toggleValueSelection(boolean isSelected) {
+        public void toggleValueSelection() {
             selectedFilterValuesObserver.onNext(
-                    new FiltersPresenter.AdapterFilterValue(categoryFilter, filterValue, isSelected));
+                    new FiltersPresenter.AdapterFilterValue(categoryFilter, filterValue));
         }
 
         @Nonnull
@@ -92,26 +93,24 @@ public class FiltersAdapterItems {
         @Nonnull
         private final CategoryFilter categoryFilter;
         @Nonnull
-        private final List<CategoryFilter.FilterValue> selectedFilters;
-        @Nonnull
-        private final Observer<Object> filterVisibilityChangedObserver;
+        private final Observer<BothParams<String, Boolean>> filterVisibilityChangedObserver;
         @Nonnull
         private final Observable<ImmutableMultimap<String, CategoryFilter.FilterValue>> selectedValuesMapObservable;
-        private boolean isVisible = false;
+        private boolean hasVisibleValues = false;
 
         public FilterAdapterItem(@Nonnull CategoryFilter categoryFilter,
-                                 @Nonnull List<CategoryFilter.FilterValue> selectedFilters,
-                                 @Nonnull Observer<Object> filterVisibilityChangedObserver,
-                                 @Nonnull Observable<ImmutableMultimap<String, CategoryFilter.FilterValue>> selectedValuesMapObservable) {
+                                 @Nonnull Observer<BothParams<String, Boolean>> filterVisibilityChangedObserver,
+                                 @Nonnull Observable<ImmutableMultimap<String, CategoryFilter.FilterValue>> selectedValuesMapObservable,
+                                 boolean hasVisibleValues) {
             this.categoryFilter = categoryFilter;
-            this.selectedFilters = selectedFilters;
             this.filterVisibilityChangedObserver = filterVisibilityChangedObserver;
             this.selectedValuesMapObservable = selectedValuesMapObservable;
+            this.hasVisibleValues = hasVisibleValues;
         }
 
         public void onVisibilityChanged() {
-            isVisible = !isVisible;
-            filterVisibilityChangedObserver.onNext(null);
+            filterVisibilityChangedObserver.onNext(
+                    new BothParams<>(categoryFilter.getSlug(), !hasVisibleValues));
         }
 
         @Override
@@ -127,16 +126,6 @@ public class FiltersAdapterItems {
 
         public String getTitle() {
             return categoryFilter.getName();
-        }
-
-        @Nonnull
-        public List<CategoryFilter.FilterValue> getFilterValues() {
-            return categoryFilter.getValues();
-        }
-
-        @Nonnull
-        public CategoryFilter getCategoryFilter() {
-            return categoryFilter;
         }
 
         @Nonnull
@@ -166,18 +155,17 @@ public class FiltersAdapterItems {
             if (this == o) return true;
             if (!(o instanceof FilterAdapterItem)) return false;
             final FilterAdapterItem that = (FilterAdapterItem) o;
-            return isVisible == that.isVisible &&
-                    Objects.equal(categoryFilter, that.categoryFilter) &&
-                    Objects.equal(selectedFilters, that.selectedFilters);
+            return hasVisibleValues == that.hasVisibleValues &&
+                    Objects.equal(categoryFilter, that.categoryFilter);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(categoryFilter, selectedFilters, isVisible);
+            return Objects.hashCode(categoryFilter, hasVisibleValues);
         }
 
-        public boolean isVisible() {
-            return isVisible;
+        public boolean isHasVisibleValues() {
+            return hasVisibleValues;
         }
     }
 
@@ -301,14 +289,18 @@ public class FiltersAdapterItems {
     public static class PriceAdapterItem extends BaseNoIDAdapterItem {
 
         @Nonnull
-        private final Observer<String> priceFromObserver;
+        private final Observer<String> minPriceObserver;
         @Nonnull
-        private final Observer<String> priceToObserver;
+        private final Observer<String> maxPriceObserver;
+        @Nonnull
+        private final Observable<Object> resetClickedObserver;
 
-        public PriceAdapterItem(@Nonnull Observer<String> priceFromObserver,
-                                @Nonnull Observer<String> priceToObserver) {
-            this.priceFromObserver = priceFromObserver;
-            this.priceToObserver = priceToObserver;
+        public PriceAdapterItem(@Nonnull Observer<String> minPriceObserver,
+                                @Nonnull Observer<String> maxPriceObserver,
+                                @Nonnull Observable<Object> resetClickedObserver) {
+            this.minPriceObserver = minPriceObserver;
+            this.maxPriceObserver = maxPriceObserver;
+            this.resetClickedObserver = resetClickedObserver;
         }
 
         @Override
@@ -322,13 +314,18 @@ public class FiltersAdapterItems {
         }
 
         @Nonnull
-        public Observer<String> getPriceFromObserver() {
-            return priceFromObserver;
+        public Observer<String> getMinPriceObserver() {
+            return minPriceObserver;
         }
 
         @Nonnull
-        public Observer<String> getPriceToObserver() {
-            return priceToObserver;
+        public Observer<String> getMaxPriceObserver() {
+            return maxPriceObserver;
+        }
+
+        @Nonnull
+        public Observable<Object> getResetClickedObserver() {
+            return resetClickedObserver;
         }
     }
 
@@ -370,9 +367,13 @@ public class FiltersAdapterItems {
 
         @Nonnull
         private final BehaviorSubject<Integer> distanceChangedSubject;
+        @Nonnull
+        private final Observable<Object> resetClickedObserver;
 
-        public DistanceAdapterItem(@Nonnull BehaviorSubject<Integer> distanceChangedSubject) {
+        public DistanceAdapterItem(@Nonnull BehaviorSubject<Integer> distanceChangedSubject,
+                                   @Nonnull Observable<Object> resetClickedObserver) {
             this.distanceChangedSubject = distanceChangedSubject;
+            this.resetClickedObserver = resetClickedObserver;
         }
 
         @Override
@@ -393,6 +394,11 @@ public class FiltersAdapterItems {
         public Observable<Integer> getDistanceObservable() {
             return distanceChangedSubject;
         }
+
+        @Nonnull
+        public Observable<Object> getResetClickedObserver() {
+            return resetClickedObserver;
+        }
     }
 
     public static class SortAdapterItem extends BaseNoIDAdapterItem {
@@ -403,18 +409,31 @@ public class FiltersAdapterItems {
         private final List<SortType> sortTypes;
         @Nonnull
         private final Observer<SortType> sortTypeChangeObserver;
+        @Nonnull
+        private final Observable<SortType> sortTypeObservable;
+        @Nonnull
+        private final Observable<Object> resetClickedObserver;
 
         public SortAdapterItem(@Nonnull SortType sortType,
                                @Nonnull List<SortType> sortTypes,
-                               @Nonnull Observer<SortType> sortTypeChangeObserver) {
+                               @Nonnull Observer<SortType> sortTypeChangeObserver,
+                               @Nonnull Observable<SortType> sortTypeObservable,
+                               @Nonnull Observable<Object> resetClickedObserver) {
             this.sortType = sortType;
             this.sortTypes = sortTypes;
             this.sortTypeChangeObserver = sortTypeChangeObserver;
+            this.sortTypeObservable = sortTypeObservable;
+            this.resetClickedObserver = resetClickedObserver;
         }
 
         @Nonnull
-        public SortType getSortType() {
-            return sortType;
+        public Observable<SortType> getSortTypeObservable() {
+            return sortTypeObservable;
+        }
+
+        @Nonnull
+        public Observable<Object> getResetClickedObserver() {
+            return resetClickedObserver;
         }
 
         @Nonnull

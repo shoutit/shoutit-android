@@ -39,6 +39,7 @@ import com.shoutit.app.android.api.model.login.FacebookLogin;
 import com.shoutit.app.android.api.model.login.GoogleLogin;
 
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.ResponseBody;
 import retrofit2.http.Body;
@@ -48,6 +49,7 @@ import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import retrofit2.http.QueryMap;
 import rx.Observable;
 
 public interface ApiService {
@@ -101,7 +103,13 @@ public interface ApiService {
                                             @Query("page_size") Integer pageSize,
                                             @Query("country") String countryCode,
                                             @Query("city") String city,
-                                            @Query("state") String state);
+                                            @Query("state") String state,
+                                            @Query("min_price") Integer minPrice,
+                                            @Query("max_price") Integer maxPrice,
+                                            @Query("within") Integer distance,
+                                            @Query("shout_type") String shoutType,
+                                            @Query("sort") String sortBy,
+                                            @QueryMap Map<String, String> filtersMap);
 
     @GET("shouts")
     Observable<ShoutsResponse> searchProfileShouts(@Query("search") String query,
@@ -116,13 +124,25 @@ public interface ApiService {
                                                @Query("tags") String tagNameOrCategorySlug,
                                                @Query("country") String countryCode,
                                                @Query("city") String city,
-                                               @Query("state") String state);
+                                               @Query("state") String state,
+                                               @Query("min_price") Integer minPrice,
+                                               @Query("max_price") Integer maxPrice,
+                                               @Query("within") Integer distance,
+                                               @Query("shout_type") String shoutType,
+                                               @Query("sort") String sortBy,
+                                               @QueryMap Map<String, String> filtersMap);
 
     @GET("shouts")
     Observable<ShoutsResponse> searchDiscoverShouts(@Query("search") String query,
-                                                   @Query("page") Integer page,
-                                                   @Query("page_size") Integer pageSize,
-                                                   @Query("discover") String userName);
+                                                    @Query("page") Integer page,
+                                                    @Query("page_size") Integer pageSize,
+                                                    @Query("discover") String userName,
+                                                    @Query("min_price") Integer minPrice,
+                                                    @Query("max_price") Integer maxPrice,
+                                                    @Query("within") Integer distance,
+                                                    @Query("shout_type") String shoutType,
+                                                    @Query("sort") String sortBy,
+                                                    @QueryMap Map<String, String> filtersMap);
     @GET("shouts")
     Observable<ShoutsResponse> tagShouts(@Query("tags") String tagName,
                                          @Query("page") Integer page,

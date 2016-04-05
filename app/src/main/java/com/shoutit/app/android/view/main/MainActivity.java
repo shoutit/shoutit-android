@@ -252,12 +252,6 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // Let fragment handle results
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
     public void onBackPressed() {
         if (doubleBackToExitPressedOnce || getSupportFragmentManager().getBackStackEntryCount() != 0) {
             super.onBackPressed();

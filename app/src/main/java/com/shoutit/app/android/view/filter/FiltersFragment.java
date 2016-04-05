@@ -17,7 +17,9 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
+import com.shoutit.app.android.model.FiltersToSubmit;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.view.createshout.location.LocationActivity;
 
 import java.util.List;
@@ -31,6 +33,10 @@ import rx.functions.Action1;
 
 public class FiltersFragment extends BaseFragment {
 
+    public interface OnFiltersSubmitListener {
+        void onFiltersSubmit(@Nonnull FiltersToSubmit filtersToSubmit);
+    }
+
     private static final int REQUEST_GET_LOCATION = 1;
 
     @Bind(R.id.filters_recycler_view)
@@ -43,8 +49,21 @@ public class FiltersFragment extends BaseFragment {
     @Inject
     FiltersAdapter adapter;
 
+    private OnFiltersSubmitListener onFiltersSubmitListener;
+
     public static Fragment newInstance() {
         return new FiltersFragment();
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            onFiltersSubmitListener = (OnFiltersSubmitListener) getParentFragment();
+        } catch (ClassCastException e) {
+            throw new ClassCastException(
+                    getParentFragment().getClass().getSimpleName() + " must implement OnFiltersSubmitListener");
+        }
     }
 
     @Nullable
@@ -77,7 +96,26 @@ public class FiltersFragment extends BaseFragment {
                 .subscribe(new Action1<Object>() {
                     @Override
                     public void call(Object o) {
-                        startActivityForResult(LocationActivity.newIntent(getActivity()), REQUEST_GET_LOCATION);
+                        if (getParentFragment() != null) {
+                            getParentFragment().startActivityForResult(
+                                    LocationActivity.newIntent(getActivity()), REQUEST_GET_LOCATION);
+                        } else {
+                            startActivityForResult(
+                                    LocationActivity.newIntent(getActivity()), REQUEST_GET_LOCATION);
+                        }
+
+                    }
+                });
+
+        presenter.getSelectedFiltersObservable()
+                .compose(this.<FiltersToSubmit>bindToLifecycle())
+                .subscribe(new Action1<FiltersToSubmit>() {
+                    @Override
+                    public void call(FiltersToSubmit filtersToSubmit) {
+                        if (onFiltersSubmitListener != null) {
+                            onFiltersSubmitListener.onFiltersSubmit(filtersToSubmit);
+                            KeyboardHelper.hideSoftKeyboard(getActivity());
+                        }
                     }
                 });
     }
@@ -96,11 +134,11 @@ public class FiltersFragment extends BaseFragment {
     protected void injectComponent(@Nonnull BaseActivityComponent baseActivityComponent,
                                    @Nonnull FragmentModule fragmentModule,
                                    @Nullable Bundle savedInstanceState) {
-        DaggerFiltersFragmentComponent.builder()
-                .baseActivityComponent(baseActivityComponent)
-                .fragmentModule(fragmentModule)
-                .build()
-                .inject(this);
+            DaggerFiltersFragmentComponent.builder()
+                    .baseActivityComponent(baseActivityComponent)
+                    .fragmentModule(fragmentModule)
+                    .build()
+                    .inject(this);
     }
 
 }
