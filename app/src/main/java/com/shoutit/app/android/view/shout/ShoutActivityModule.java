@@ -13,6 +13,7 @@ public class ShoutActivityModule {
 
     public ShoutActivityModule(ShoutActivity shoutActivity, @Nonnull String shoutId) {
         this.shoutId = shoutId;
+
     }
 
     @Provides

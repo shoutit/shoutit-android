@@ -29,15 +29,19 @@ import com.shoutit.app.android.api.model.Suggestion;
 import com.shoutit.app.android.api.model.SuggestionsResponse;
 import com.shoutit.app.android.api.model.TagDetail;
 import com.shoutit.app.android.api.model.TagsRequest;
+import com.shoutit.app.android.api.model.TwilioResponse;
 import com.shoutit.app.android.api.model.UpdateLocationRequest;
 import com.shoutit.app.android.api.model.UpdateUserRequest;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.api.model.UserIdentity;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.login.EmailLoginRequest;
 import com.shoutit.app.android.api.model.login.FacebookLogin;
 import com.shoutit.app.android.api.model.login.GoogleLogin;
 
 import java.util.List;
+
+import javax.annotation.Generated;
 
 import okhttp3.ResponseBody;
 import retrofit2.http.Body;
@@ -160,21 +164,21 @@ public interface ApiService {
     /**
      * User
      **/
-    @GET("users/{user_name}")
+    @GET("profiles/{user_name}")
     Observable<User> getUser(@Path("user_name") String userName);
 
-    @GET("users/me")
+    @GET("profiles/me")
     Observable<User> getMyUser();
 
-    @PATCH("users/me")
+    @PATCH("profiles/me")
     Observable<User> updateUserLocation(@Body UpdateLocationRequest updateLocationRequest);
 
-    @GET("users/{user_name}/home")
+    @GET("profiles/{user_name}/home")
     Observable<ShoutsResponse> home(@Path("user_name") String userName,
                                     @Query("page") Integer page,
                                     @Query("page_size") Integer pageSize);
 
-    @PATCH("users/me")
+    @PATCH("profiles/me")
     Observable<User> updateUser(@Body UpdateUserRequest updateUserRequest);
 
 
@@ -271,4 +275,10 @@ public interface ApiService {
     @POST("notifications/{id}/read")
     Observable<ResponseBody> markAsRead(@Path("id") String notificationId);
 
+    /** Twilio **/
+    @POST("twilio/video_auth")
+    Observable<TwilioResponse> getTokenAndIdentity();
+
+    @GET("twilio/video_identity")
+    Observable<UserIdentity> getUserIdentity(@Query("profile") String username);
 }

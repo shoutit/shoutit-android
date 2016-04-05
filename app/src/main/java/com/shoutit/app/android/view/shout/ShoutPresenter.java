@@ -1,6 +1,8 @@
 package com.shoutit.app.android.view.shout;
 
 import android.content.Context;
+import android.util.Log;
+
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
@@ -15,8 +17,11 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.api.model.UserIdentity;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
+import com.shoutit.app.android.dao.UsersIdentityDao;
 import com.shoutit.app.android.model.RelatedShoutsPointer;
 import com.shoutit.app.android.model.UserShoutsPointer;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
@@ -44,7 +49,13 @@ public class ShoutPresenter {
     private final Observable<Throwable> errorObservable;
     private final Observable<Boolean> progressObservable;
     private final Observable<String> titleObservable;
+    private final Observable<String> usernameObservable;
     private final Observable<Boolean> isUserShoutOwnerObservable;
+    private final Observable<ResponseOrError<UserIdentity>> userIdentityResponse;
+    private Observable<String> identityUserObservable;
+
+    private Observable<UserIdentity> successUserIdentity;
+    private Observable<Throwable> failedUserIdentity;
 
     private PublishSubject<String> addToCartSubject = PublishSubject.create();
     private PublishSubject<String> onCategoryClickedSubject = PublishSubject.create();
@@ -60,8 +71,10 @@ public class ShoutPresenter {
     public ShoutPresenter(@Nonnull final ShoutsDao shoutsDao,
                           @Nonnull final String shoutId,
                           @Nonnull @ForActivity final Context context,
-                          @Nonnull @UiScheduler Scheduler uiScheduler,
-                          @Nonnull UserPreferences userPreferences) {
+                          @Nonnull @UiScheduler final Scheduler uiScheduler,
+                          @Nonnull UserPreferences userPreferences,
+                          @Nonnull final UsersIdentityDao usersIdentityDao
+    ) {
         this.uiScheduler = uiScheduler;
 
         /** Requests **/
@@ -85,6 +98,14 @@ public class ShoutPresenter {
                     @Override
                     public String call(Shout shout) {
                         return shout.getTitle();
+                    }
+                });
+
+        usernameObservable = successShoutResponse
+                .map(new Func1<Shout, String>() {
+                    @Override
+                    public String call(Shout shout) {
+                        return shout.getProfile().getUsername();
                     }
                 });
 
@@ -234,6 +255,43 @@ public class ShoutPresenter {
                 })
                 .compose(ObservableExtensions.<Boolean>behaviorRefCount())
                 .first();
+
+        /** Shout Owner Identity**/
+
+        userIdentityResponse = getUsernameObservable()
+                .filter(new Func1<String, Boolean>() {
+                    @Override
+                    public Boolean call(String s) {
+                        return s != null;
+                    }
+                })
+                .flatMap(new Func1<String, Observable<ResponseOrError<UserIdentity>>>() {
+                    @Override
+                    public Observable<ResponseOrError<UserIdentity>> call(String username) {
+                        return usersIdentityDao.getUserIdentityObservable(username);
+                    }
+                });
+
+
+        successUserIdentity = userIdentityResponse
+                .compose(ResponseOrError.<UserIdentity>onlySuccess());
+
+        failedUserIdentity = userIdentityResponse
+                .compose(ResponseOrError.<UserIdentity>onlyError());
+
+        identityUserObservable = successUserIdentity
+                .map(new Func1<UserIdentity, String>() {
+                    @Override
+                    public String call(UserIdentity userIdentity) {
+                        return userIdentity.getIdentity();
+                    }
+                }).observeOn(uiScheduler);
+
+    }
+
+    @Nonnull
+    public Observable<String> getIdentityUserObservable() {
+        return identityUserObservable;
     }
 
     @Nonnull
@@ -298,6 +356,10 @@ public class ShoutPresenter {
                     }
                 })
                 .observeOn(uiScheduler);
+    }
+
+    public Observable<String> getUsernameObservable() {
+        return usernameObservable;
     }
 }
 
