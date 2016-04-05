@@ -153,12 +153,13 @@ public class EditShoutPresenter {
                             mListener.showCategoriesError();
                         }
 
+                        final ShoutResponse shoutResponse = responseData.mShoutResponse;
                         if (responseData.mCurrencies != null) {
                             currencySuccess(responseData.mCurrencies);
-                            if (responseData.mShoutResponse != null) {
+                            if (shoutResponse != null) {
                                 for (int i = 0; i < responseData.mCurrencies.size(); i++) {
                                     final Currency currency = responseData.mCurrencies.get(i);
-                                    if (currency.getCode().equals(responseData.mShoutResponse.getCurrency())) {
+                                    if (currency.getCode().equals(shoutResponse.getCurrency())) {
                                         mListener.setSelectedCurrency(i);
                                     }
                                 }
@@ -167,18 +168,19 @@ public class EditShoutPresenter {
                             mListener.showCurrenciesError();
                         }
 
-                        if (responseData.mShoutResponse != null) {
-                            mListener.setActionbarTitle(mContext.getString(R.string.edit_shout_title, capitalize(responseData.mShoutResponse.getType())));
-                            mListener.setTitle(responseData.mShoutResponse.getTitle());
+                        if (shoutResponse != null) {
+                            mListener.setActionbarTitle(mContext.getString(R.string.edit_shout_title, capitalize(shoutResponse.getType())));
+                            mListener.setTitle(shoutResponse.getTitle());
                             mListener.setPrice(PriceUtils.formatPrice(
-                                    responseData.mShoutResponse.getPrice(),
+                                    shoutResponse.getPrice(),
                                     mContext.getResources()));
-                            mListener.setDescription(responseData.mShoutResponse.getText());
-                            mUserLocation = responseData.mShoutResponse.getLocation();
+                            mListener.setDescription(shoutResponse.getText());
+                            mUserLocation = shoutResponse.getLocation();
                             mListener.setLocation(
                                     ResourcesHelper.getResourceIdForName(mUserLocation.getCountry(), mContext),
                                     mUserLocation.getCity());
-                            mListener.setMedia(responseData.mShoutResponse.getImages(), responseData.mShoutResponse.getVideos());
+                            mListener.setMedia(shoutResponse.getImages(), shoutResponse.getVideos());
+                            changeCategoryWithSelectedOptions(shoutResponse.getCategory().getSlug(), shoutResponse.getFilters());
                         } else {
                             mListener.showBodyError();
                         }
@@ -246,7 +248,7 @@ public class EditShoutPresenter {
         changeCategory(id);
     }
 
-    private void changeCategory(@NonNull final String id) {
+    private void changeCategoryWithSelectedOptions(@NonNull final String id, @Nullable List<CategoryFilter> selectedOptions) {
         if (mCategories != null) {
             final Iterable<Category> filters = Iterables.filter(mCategories, new Predicate<Category>() {
                 @Override
@@ -257,10 +259,24 @@ public class EditShoutPresenter {
             });
             final Category category = filters.iterator().next();
 
-
-            mListener.setOptions(category.getFilters());
-            mListener.setCategoryImage(category.getIcon());
+            final List<CategoryFilter> categoryFilters = category.getFilters();
+            if (selectedOptions != null) {
+                for (CategoryFilter selectedOption : selectedOptions) {
+                    for (CategoryFilter categoryFilter : categoryFilters) {
+                        if (categoryFilter.getSlug().equals(selectedOption.getSlug())) {
+                            categoryFilter.setSelectedValue(selectedOption.getSelectedValue());
+                        }
+                    }
+                }
+            } else {
+                mListener.setOptions(categoryFilters);
+            }
+            mListener.setCategory(category);
         }
+    }
+
+    private void changeCategory(@NonNull final String id) {
+        changeCategoryWithSelectedOptions(id, null);
     }
 
     public void onBudgetChanged(String budget) {
@@ -342,7 +358,7 @@ public class EditShoutPresenter {
 
         void setPrice(@NonNull String price);
 
-        void setCategoryImage(@Nullable String image);
+        void setCategory(@Nullable Category category);
 
         void setActionbarTitle(@NonNull String title);
 
