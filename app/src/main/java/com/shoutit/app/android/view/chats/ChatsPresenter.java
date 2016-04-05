@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.NetworkScheduler;
@@ -12,11 +13,17 @@ import com.appunite.rx.operators.OperatorMergeNextToken;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.gson.Gson;
+import com.pusher.client.Pusher;
+import com.pusher.client.channel.PresenceChannel;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.ConversationProfile;
 import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessageAttachment;
 import com.shoutit.app.android.api.model.MessagesResponse;
+import com.shoutit.app.android.api.model.PostMessage;
+import com.shoutit.app.android.api.model.PusherMessage;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
@@ -33,6 +40,7 @@ import com.shoutit.app.android.view.chats.message_models.SentShoutMessage;
 import com.shoutit.app.android.view.chats.message_models.SentTextMessage;
 import com.shoutit.app.android.view.chats.message_models.SentVideoMessage;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -44,6 +52,7 @@ import javax.inject.Inject;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
+import rx.Subscriber;
 import rx.Subscription;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -99,9 +108,12 @@ public class ChatsPresenter {
     private final Scheduler mNetworkScheduler;
     private final UserPreferences mUserPreferences;
     private final Resources mResources;
+    private final Pusher mPusher;
+    private final Gson mGson;
     private Listener mListener;
     private Subscription mSubscribe;
     private final PublishSubject<Object> requestSubject = PublishSubject.create();
+    private final PublishSubject<PusherMessage> newMessagesSubject = PublishSubject.create();
 
     @Inject
     public ChatsPresenter(@NonNull String conversationId,
@@ -109,41 +121,110 @@ public class ChatsPresenter {
                           @UiScheduler Scheduler uiScheduler,
                           @NetworkScheduler Scheduler networkScheduler,
                           UserPreferences userPreferences,
-                          @ForActivity Resources resources) {
+                          @ForActivity Resources resources,
+                          Pusher pusher,
+                          Gson gson) {
         this.conversationId = conversationId;
         mApiService = apiService;
         mUiScheduler = uiScheduler;
         mNetworkScheduler = networkScheduler;
         mUserPreferences = userPreferences;
         mResources = resources;
+        mPusher = pusher;
+        mGson = gson;
     }
 
     public void register(@NonNull Listener listener) {
-        mListener = listener;
-        mListener.showProgress(true);
-        mSubscribe = requestSubject
+        final User user = mUserPreferences.getUser();
+        assert user != null;
+        final PresenceChannel userChannel = mPusher.subscribePresence(String.format("presence-u-%1$s", user.getId()));
+
+        final Observable<PusherMessage> pusherMessageObservable = Observable
+                .create(new Observable.OnSubscribe<PusherMessage>() {
+                    @Override
+                    public void call(final Subscriber<? super PusherMessage> subscriber) {
+                        userChannel.bind("new_message", new PresenceChannelEventListenerAdapter() {
+
+                            @Override
+                            public void onEvent(String channelName, String eventName, String data) {
+                                try {
+                                    final PusherMessage pusherMessage = mGson.getAdapter(PusherMessage.class).fromJson(data);
+                                    if (pusherMessage.getConversationId().equals(conversationId)) {
+                                        subscriber.onNext(pusherMessage);
+                                    }
+                                } catch (IOException e) {
+                                    subscriber.onError(e);
+                                }
+                            }
+                        });
+                    }
+                })
+                .observeOn(mUiScheduler);
+
+        userChannel.bind("client-is_typing", new PresenceChannelEventListenerAdapter() {
+
+            @Override
+            public void onEvent(String channelName, String eventName, String data) {
+                // TODO
+            }
+        });
+
+        final Observable<MessagesResponse> apiMessages = requestSubject
                 .startWith(new Object())
                 .lift(loadMoreOperator)
                 .subscribeOn(mNetworkScheduler)
-                .observeOn(mUiScheduler)
-                .subscribe(
-                        new Action1<MessagesResponse>() {
-                            @Override
-                            public void call(@NonNull MessagesResponse messagesResponse) {
-                                mListener.showProgress(false);
-                                if (messagesResponse.getResults().isEmpty()) {
-                                    mListener.emptyList();
-                                } else {
-                                    mListener.setData(transform(messagesResponse.getResults()));
-                                }
+                .observeOn(mUiScheduler);
+
+        final Observable<List<PusherMessage>> localAndPusherMessages = pusherMessageObservable.mergeWith(newMessagesSubject)
+                .scan(ImmutableList.<PusherMessage>of(), new Func2<List<PusherMessage>, PusherMessage, List<PusherMessage>>() {
+                    @Override
+                    public List<PusherMessage> call(List<PusherMessage> pusherMessages, PusherMessage pusherMessage) {
+                        return ImmutableList.<PusherMessage>builder()
+                                .addAll(pusherMessages)
+                                .add(pusherMessage)
+                                .build();
+                    }
+                });
+
+        mListener = listener;
+        mListener.showProgress(true);
+        mSubscribe = Observable.combineLatest(apiMessages, localAndPusherMessages.startWith((List<PusherMessage>) null),
+                new Func2<MessagesResponse, List<PusherMessage>, List<BaseAdapterItem>>() {
+                    @Override
+                    public List<BaseAdapterItem> call(MessagesResponse messagesResponse, List<PusherMessage> pusherMessage) {
+                        final ImmutableList.Builder<Message> builder = ImmutableList.<Message>builder()
+                                .addAll(messagesResponse.getResults());
+
+                        if (pusherMessage != null) {
+                            for (PusherMessage message : pusherMessage) {
+                                builder.add(new Message(
+                                        message.getUser(),
+                                        message.getId(),
+                                        message.getText(),
+                                        message.getAttachments(),
+                                        message.getCreatedAt()));
                             }
-                        }, new Action1<Throwable>() {
-                            @Override
-                            public void call(Throwable throwable) {
-                                mListener.showProgress(false);
-                                mListener.error();
-                            }
-                        });
+                        }
+                        return transform(builder.build());
+                    }
+                })
+                .subscribe(new Action1<List<BaseAdapterItem>>() {
+                    @Override
+                    public void call(@NonNull List<BaseAdapterItem> baseAdapterItems) {
+                        mListener.showProgress(false);
+                        if (baseAdapterItems.isEmpty()) {
+                            mListener.emptyList();
+                        } else {
+                            mListener.setData(baseAdapterItems);
+                        }
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        mListener.showProgress(false);
+                        mListener.error();
+                    }
+                });
     }
 
     @NonNull
@@ -165,7 +246,10 @@ public class ChatsPresenter {
                 objects.add(dateItem);
             }
 
-            objects.add(getItem(results, userId, i));
+            final BaseAdapterItem item = getItem(results, userId, i);
+            if (item != null) {
+                objects.add(item);
+            }
         }
 
         return ImmutableList.copyOf(objects);
@@ -202,18 +286,45 @@ public class ChatsPresenter {
         }
     }
 
+    public void postTextMessage(@NonNull String text) {
+        mApiService.postMessage(conversationId, new PostMessage(text, ImmutableList.<MessageAttachment>of()))
+                .subscribeOn(mNetworkScheduler)
+                .observeOn(mUiScheduler)
+                .subscribe(new Action1<Message>() {
+                    @Override
+                    public void call(Message messagesResponse) {
+                        newMessagesSubject.onNext(new PusherMessage(
+                                messagesResponse.getProfile(),
+                                conversationId,
+                                messagesResponse.getId(),
+                                messagesResponse.getText(),
+                                messagesResponse.getAttachments(),
+                                messagesResponse.getCreatedAt()));
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        mListener.error();
+                    }
+                });
+    }
+
     private BaseAdapterItem getItem(@NonNull List<Message> results, String userId, int currentPosition) {
         final Message message = results.get(currentPosition);
 
-        
-        final String messageProfileId = message.getProfile().getId();
+        final ConversationProfile profile = message.getProfile();
+        if (profile != null) {
+            final String messageProfileId = profile.getId();
 
-        final String time = mSimpleTimeFormat.format(new Date(message.getCreatedAt() * 1000));
-        if (messageProfileId.equals(userId)) {
-            return getSentItem(message, time);
+            final String time = mSimpleTimeFormat.format(new Date(message.getCreatedAt() * 1000));
+            if (messageProfileId.equals(userId)) {
+                return getSentItem(message, time);
+            } else {
+                final boolean isFirst = isFirst(currentPosition, results, messageProfileId);
+                return getReceivedItem(message, isFirst, time);
+            }
         } else {
-            final boolean isFirst = isFirst(currentPosition, results, messageProfileId);
-            return getReceivedItem(message, isFirst, time);
+            return null; // TODO handle special message
         }
     }
 
@@ -281,6 +392,8 @@ public class ChatsPresenter {
     public void unregister() {
         mListener = null;
         mSubscribe.unsubscribe();
+        mPusher.unsubscribe(String.format("presence-c-%1$s", conversationId));
+        mPusher.unsubscribe(String.format("presence-u-%1$s", mUserPreferences.getUser().getId()));
     }
 
     public interface Listener {

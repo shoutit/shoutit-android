@@ -8,6 +8,7 @@ import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.Gson;
+import com.pusher.client.Pusher;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
@@ -81,4 +82,6 @@ public interface AppComponent {
     ContentResolver contentResolver();
 
     DbHelper dbHelper();
+
+    Pusher pusher();
 }

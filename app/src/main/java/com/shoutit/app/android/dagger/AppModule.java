@@ -17,8 +17,12 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.jakewharton.picasso.OkHttp3Downloader;
+import com.pusher.client.Pusher;
+import com.pusher.client.PusherOptions;
+import com.pusher.client.util.HttpAuthorizer;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BuildConfig;
 import com.shoutit.app.android.UserPreferences;
@@ -236,5 +240,14 @@ public final class AppModule {
     @Singleton
     DbHelper dbHelper(@ForApplication Context context) {
         return new DbHelper(context);
+    }
+
+    @Provides
+    @Singleton
+    Pusher providePusher(UserPreferences userPreferences) {
+        final HttpAuthorizer authorizer = new HttpAuthorizer(BuildConfig.API_URL + "pusher/auth");
+        authorizer.setHeaders(ImmutableMap.of("Authorization", "Bearer " + userPreferences.getAuthToken().get()));
+        final PusherOptions options = new PusherOptions().setAuthorizer(authorizer);
+        return new Pusher(BuildConfig.DEBUG ? "7bee1e468fabb6287fc5" : "86d676926d4afda44089", options);
     }
 }

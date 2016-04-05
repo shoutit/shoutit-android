@@ -18,7 +18,9 @@ import com.shoutit.app.android.api.model.EditShoutRequest;
 import com.shoutit.app.android.api.model.EditShoutRequestWithPrice;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.GuestSignupRequest;
+import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessagesResponse;
+import com.shoutit.app.android.api.model.PostMessage;
 import com.shoutit.app.android.api.model.RelatedTagsResponse;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.api.model.SearchProfileResponse;
@@ -277,4 +279,7 @@ public interface ApiService {
 
     @GET("conversations/{id}/messages")
     Observable<MessagesResponse> getMessages(@NonNull @Path("id") String conversationId, @NonNull @Query("after") String timestamp);
+
+    @POST("conversations/{id}/reply")
+    Observable<Message> postMessage(@NonNull @Path("id") String conversationId, @NonNull @Body PostMessage message);
 }

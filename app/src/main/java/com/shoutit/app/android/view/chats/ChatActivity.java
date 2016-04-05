@@ -10,7 +10,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
@@ -35,6 +34,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class ChatActivity extends BaseActivity implements ChatsPresenter.Listener {
 
@@ -54,8 +54,6 @@ public class ChatActivity extends BaseActivity implements ChatsPresenter.Listene
     RecyclerView mChatsRecyclerview;
     @Bind(R.id.chats_message_edittext)
     EditText mChatsMessageEdittext;
-    @Bind(R.id.chats_message_send_button)
-    ImageButton mChatsMessageSendButton;
     @Bind(R.id.chats_progress)
     ProgressBar mChatsProgress;
 
@@ -96,6 +94,13 @@ public class ChatActivity extends BaseActivity implements ChatsPresenter.Listene
         component.inject(this);
 
         return component;
+    }
+
+    @OnClick(R.id.chats_message_send_button)
+    void onSend() {
+        final String text = mChatsMessageEdittext.getText().toString();
+        presenter.postTextMessage(text);
+        mChatsMessageEdittext.setText(null);
     }
 
     @Override

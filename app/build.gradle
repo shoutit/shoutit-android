@@ -16,6 +16,7 @@ repositories {
     jcenter()
     maven { url "https://s3.amazonaws.com/repo.commonsware.com" }
     maven { url 'https://maven.fabric.io/public' }
+    maven { url 'http://clojars.org/repo' }
 }
 
 apply plugin: 'com.android.application'
@@ -206,6 +207,8 @@ dependencies {
         transitive = true;
     }
     compile 'com.commonsware.cwac:cam2:0.5.3'
+    compile 'com.pusher:pusher-java-client:1.1.2'
+
 
     // Tests
     testCompile 'junit:junit:4.12'

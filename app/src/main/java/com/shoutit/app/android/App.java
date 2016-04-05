@@ -3,6 +3,7 @@ package com.shoutit.app.android;
 import android.app.Application;
 import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
+import android.util.Log;
 
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.crashlytics.android.core.CrashlyticsCore;
@@ -10,6 +11,10 @@ import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
 import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler;
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
 import com.karumi.dexter.Dexter;
+import com.pusher.client.Pusher;
+import com.pusher.client.channel.Channel;
+import com.pusher.client.connection.ConnectionEventListener;
+import com.pusher.client.connection.ConnectionStateChange;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.constants.UserVoiceConstants;
 import com.shoutit.app.android.dagger.AppComponent;
@@ -42,6 +47,8 @@ public class App extends MultiDexApplication {
     UserPreferences userPreferences;
     @Inject
     LocationManager locationManager;
+    @Inject
+    Pusher pusher;
 
     @Override
     public void onCreate() {
@@ -59,6 +66,18 @@ public class App extends MultiDexApplication {
         Dexter.initialize(this);
 
         initFfmpeg();
+
+        pusher.connect(new ConnectionEventListener() {
+            @Override
+            public void onConnectionStateChange(ConnectionStateChange connectionStateChange) {
+                Log.i("dupa", connectionStateChange.getCurrentState().name());
+            }
+
+            @Override
+            public void onError(String s, String s1, Exception e) {
+                Log.e("dupa", "fail", e);
+            }
+        });
     }
 
     private void initFfmpeg() {
@@ -67,16 +86,20 @@ public class App extends MultiDexApplication {
             ffmpeg.loadBinary(new LoadBinaryResponseHandler() {
 
                 @Override
-                public void onStart() {}
+                public void onStart() {
+                }
 
                 @Override
-                public void onFailure() {}
+                public void onFailure() {
+                }
 
                 @Override
-                public void onSuccess() {}
+                public void onSuccess() {
+                }
 
                 @Override
-                public void onFinish() {}
+                public void onFinish() {
+                }
             });
         } catch (FFmpegNotSupportedException e) {
             // Handle if FFmpeg is not supported by device
