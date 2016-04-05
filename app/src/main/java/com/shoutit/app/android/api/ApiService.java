@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.ChangePasswordRequest;
+import com.shoutit.app.android.api.model.ConversationsResponse;
 import com.shoutit.app.android.api.model.CreateOfferShoutWithImageRequest;
 import com.shoutit.app.android.api.model.CreateRequestShoutRequest;
 import com.shoutit.app.android.api.model.CreateRequestShoutWithPriceRequest;
@@ -143,6 +144,7 @@ public interface ApiService {
                                                     @Query("shout_type") String shoutType,
                                                     @Query("sort") String sortBy,
                                                     @QueryMap Map<String, String> filtersMap);
+
     @GET("shouts")
     Observable<ShoutsResponse> tagShouts(@Query("tags") String tagName,
                                          @Query("page") Integer page,
@@ -285,6 +287,15 @@ public interface ApiService {
     @GET("tags/{name}/related")
     Observable<RelatedTagsResponse> relatedTags(@Path("name") String tagName);
 
+    /**
+     * Conversations
+     */
+    @GET("conversations")
+    Observable<ConversationsResponse> getConversations();
+
+    @GET("conversations")
+    Observable<ConversationsResponse> getConversations(@NonNull @Query("after") String timestamp);
+
     /** Notifications **/
     @GET("notifications")
     Observable<NotificationsResponse> notifications();
@@ -294,5 +305,4 @@ public interface ApiService {
 
     @POST("notifications/{id}/read")
     Observable<ResponseBody> markAsRead(@Path("id") String notificationId);
-
 }
