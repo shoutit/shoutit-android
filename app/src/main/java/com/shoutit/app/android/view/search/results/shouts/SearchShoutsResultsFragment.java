@@ -201,6 +201,7 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
     @Override
     public void onFiltersSubmit(@Nonnull FiltersToSubmit filtersToSubmit) {
         presenter.getFiltersSelectedObserver().onNext(filtersToSubmit);
+        drawerLayout.closeDrawers();
     }
 
     @Override
