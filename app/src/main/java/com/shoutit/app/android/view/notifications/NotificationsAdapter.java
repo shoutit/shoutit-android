@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
+import com.google.common.base.Strings;
 import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
@@ -29,6 +30,7 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
@@ -118,8 +120,8 @@ public class NotificationsAdapter extends BaseAdapter {
         }
 
         @Nonnull
-        private SpannableString getSpannedText(String name, String message) {
-            final String text = name + "  " + message;
+        private SpannableString getSpannedText(String name, @Nullable String message) {
+            final String text = name + "  " + Strings.nullToEmpty(message);
             final SpannableString spannableString = new SpannableString(text);
 
             spannableString.setSpan(boldedName, 0, name.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
