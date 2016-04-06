@@ -35,6 +35,8 @@ import com.shoutit.app.android.dao.SortTypesDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.dao.SuggestionsDao;
 import com.shoutit.app.android.dao.TagsDao;
+import com.shoutit.app.android.dao.UsersIdentityDao;
+import com.shoutit.app.android.dao.VideoCallsDao;
 import com.shoutit.app.android.db.DbHelper;
 import com.shoutit.app.android.location.LocationManager;
 import com.squareup.picasso.Picasso;
@@ -246,6 +248,18 @@ public final class AppModule {
     @Singleton
     CategoriesDao categoriesDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
         return new CategoriesDao(apiService, networkScheduler);
+    }
+
+    @Singleton
+    @Provides
+    public VideoCallsDao provideVideoCallsDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
+        return new VideoCallsDao(apiService, networkScheduler);
+    }
+
+    @Singleton
+    @Provides
+    public UsersIdentityDao provideUsersIdentityDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
+        return new UsersIdentityDao(apiService, networkScheduler);
     }
 
     @Provides

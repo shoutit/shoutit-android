@@ -67,4 +67,15 @@ public class SpinnerAdapter extends BaseAdapter {
         this.list = list;
         notifyDataSetChanged();
     }
+
+    public int getPosition(@NonNull String key) {
+        int position = 0;
+        for (Pair<String, String> stringStringPair : list) {
+            if (key.equals(stringStringPair.first)){
+                return position;
+            }
+            position++;
+        }
+        return -1;
+    }
 }
