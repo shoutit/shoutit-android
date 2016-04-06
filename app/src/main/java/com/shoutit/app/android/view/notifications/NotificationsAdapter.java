@@ -1,6 +1,11 @@
 package com.shoutit.app.android.view.notifications;
 
 import android.content.Context;
+import android.graphics.Typeface;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.StyleSpan;
+import android.text.style.TypefaceSpan;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -49,8 +54,6 @@ public class NotificationsAdapter extends BaseAdapter {
         View rootView;
         @Bind(R.id.notifications_text_tv)
         TextView textTv;
-        @Bind(R.id.notifications_user_tv)
-        TextView userTv;
         @Bind(R.id.notifications_time_ago_tv)
         TextView timeAgoTextView;
         @Bind(R.id.notifications_avatar_iv)
@@ -84,19 +87,38 @@ public class NotificationsAdapter extends BaseAdapter {
                 if (notification.isMessageNotification() && attachedObject.getMessage() != null) {
                     final BaseProfile profile = attachedObject.getMessage().getProfile();
                     imageUrl = profile.getImage();
-                    userTv.setText(profile.getFirstName());
-                    textTv.setText(attachedObject.getMessage().getText());
+
+                    final String spannedText = getSpannedText(
+                            profile.getFirstName(),
+                            attachedObject.getMessage().getText());
+                    textTv.setText(spannedText);
                 } else if (notification.isListenNotification() && attachedObject.getProfile() != null) {
                     final BaseProfile profile = attachedObject.getProfile();
                     imageUrl = profile.getImage();
-                    userTv.setText(profile.getFirstName());
-                    textTv.setText(context.getString(R.string.notifications_listening_to_you));
+
+                    final String spannedText = getSpannedText(
+                            profile.getFirstName(),
+                            context.getString(R.string.notifications_listening_to_you));
+                    textTv.setText(spannedText);
                 }
 
                 picasso.load(imageUrl)
                         .placeholder(R.drawable.ic_rect_avatar_placeholder)
                         .into(target);
             }
+        }
+
+        @Nonnull
+        private String getSpannedText(String name, String message) {
+            final String text = name + "  " + message;
+            final SpannableStringBuilder builder = new SpannableStringBuilder(text);
+            final StyleSpan boldedName = new StyleSpan(Typeface.BOLD);
+            final TypefaceSpan typefaceSpan = new TypefaceSpan("sans-serif-medium");
+
+            builder.setSpan(boldedName, 0, name.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            builder.setSpan(typefaceSpan, 0, name.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+
+            return builder.toString();
         }
 
         @OnClick(R.id.notifications_root_view)
