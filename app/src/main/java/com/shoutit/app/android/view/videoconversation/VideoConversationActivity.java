@@ -12,8 +12,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
+import com.appunite.rx.functions.Functions1;
 import com.jakewharton.rxbinding.view.RxView;
+import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
@@ -57,7 +60,9 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import rx.Observable;
 import rx.functions.Action1;
+import rx.subjects.BehaviorSubject;
 
 public class VideoConversationActivity extends BaseActivity {
 
@@ -85,6 +90,8 @@ public class VideoConversationActivity extends BaseActivity {
     Button callButton;
     @Bind(R.id.video_conversation_button_dismiss_call)
     ImageButton dismissCallButton;
+    @Bind(R.id.video_conversation_info)
+    TextView conversationInfo;
 
     @Inject
     VideoConversationPresenter presenter;
@@ -93,6 +100,9 @@ public class VideoConversationActivity extends BaseActivity {
 
     private String username;
     private ConversationsClient conversationClient;
+
+    private BehaviorSubject<String> conversationInfoSubject = BehaviorSubject.create();
+    private BehaviorSubject<String> conversationErrorSubject = BehaviorSubject.create();
 
     public static Intent newIntent(@Nullable String username, @Nonnull Context context) {
         return new Intent(context, VideoConversationActivity.class).putExtra(ARGS_USERNAME, username);
@@ -128,7 +138,28 @@ public class VideoConversationActivity extends BaseActivity {
                 .subscribe(new Action1<Void>() {
                     @Override
                     public void call(Void aVoid) {
-                        closeActivity();
+                        closeConversation();
+                        finish();
+                    }
+                });
+
+        /** Conversation Info **/
+        Observable<String> conversationInfoObservable = conversationInfoSubject
+                .filter(Functions1.isNotNull());
+
+        Observable<String> conversationErrorObservable = conversationErrorSubject
+                .filter(Functions1.isNotNull());
+
+        conversationInfoObservable
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(RxTextView.text(conversationInfo));
+
+        conversationErrorObservable
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String error) {
+                        Snackbar.make(videoCallView, error, Snackbar.LENGTH_LONG).show();
                     }
                 });
     }
@@ -152,18 +183,20 @@ public class VideoConversationActivity extends BaseActivity {
     private void AcceptIncomingCall() {
 
         callButton.setVisibility(View.GONE);
-        invite.accept(setupLocalMedia(), new ConversationCallback() {
-            @Override
-            public void onConversation(Conversation conversation, TwilioConversationsException exception) {
-                if (exception == null) {
-                    VideoConversationActivity.this.conversation = conversation;
-                    conversation.setConversationListener(conversationListener());
-                } else {
-                    Log.e(VC_ERROR, "AcceptIncomingCall" + exception.getMessage());
-                    closeActivity();
+        if (invite != null) {
+            invite.accept(setupLocalMedia(), new ConversationCallback() {
+                @Override
+                public void onConversation(Conversation conversation, TwilioConversationsException exception) {
+                    if (exception == null) {
+                        VideoConversationActivity.this.conversation = conversation;
+                        conversation.setConversationListener(conversationListener());
+                    } else {
+                        Log.e(VC_ERROR, "AcceptIncomingCall" + exception.getMessage());
+                        conversationErrorSubject.onNext(exception.getMessage());
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     private void MakeOutgoingCall() {
@@ -184,8 +217,8 @@ public class VideoConversationActivity extends BaseActivity {
                                 VideoConversationActivity.this.conversation = conversation;
                                 conversation.setConversationListener(conversationListener());
                             } else {
-                                Log.e(VC_ERROR,"MakeOutgoingCall: " + exception.getMessage());
-                                closeActivity();
+                                Log.e(VC_ERROR, "MakeOutgoingCall: " + exception.getMessage());
+                                conversationErrorSubject.onNext(exception.getMessage());
                             }
                         }
                     });
@@ -200,6 +233,7 @@ public class VideoConversationActivity extends BaseActivity {
                 cameraCapturer.stopPreview();
                 localVideoRenderer = new VideoViewRenderer(VideoConversationActivity.this, localWindow);
                 localVideoTrack.addRenderer(localVideoRenderer);
+                conversationInfoSubject.onNext(String.format(getString(R.string.video_calls_connecting), username));
 
             }
 
@@ -207,7 +241,7 @@ public class VideoConversationActivity extends BaseActivity {
             public void onLocalVideoTrackRemoved(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
                 Log.d(VC, "localMediaListener : onLocalVideoTrackRemoved");
                 localWindow.removeAllViews();
-                ((App) getApplication()).getConversationsClient().listen();
+                closeConversation();
 
             }
 
@@ -224,6 +258,11 @@ public class VideoConversationActivity extends BaseActivity {
             public void onParticipantConnected(Conversation conversation, Participant participant) {
                 Log.d(VC, "conversationListener : onParticipantConnected " + participant.getIdentity());
                 participant.setParticipantListener(participantListener());
+                if(username != null) {
+                    conversationInfoSubject.onNext(String.format(getString(R.string.video_calls_connected), username));
+                }else{
+                    conversationInfoSubject.onNext(String.format(getString(R.string.video_calls_connected), invite.getParticipants().toString()));
+                }
             }
 
             @Override
@@ -234,18 +273,13 @@ public class VideoConversationActivity extends BaseActivity {
             @Override
             public void onParticipantDisconnected(Conversation conversation, Participant participant) {
                 Log.d(VC, "conversationListener : onParticipantDisconnected " + participant.getIdentity());
-                closeActivity();
-
+                conversationInfoSubject.onNext(getString(R.string.video_calls_participant_disconected));
             }
 
             @Override
             public void onConversationEnded(Conversation conversation, TwilioConversationsException e) {
                 Log.d(VC, "conversationListener : onConversationEnded");
-//                cameraCapturer.stopPreview();
-//                ((App) getApplication()).getConversationsClient().listen();
-//                if (conversation != null) {
-//                    conversation.disconnect();
-//                }
+                conversationInfoSubject.onNext(getString(R.string.video_calls_conversation_ended));
             }
         };
     }
@@ -304,8 +338,8 @@ public class VideoConversationActivity extends BaseActivity {
         cameraCapturer = CameraCapturerFactory.createCameraCapturer(VideoConversationActivity.this,
                 CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA, localVideoPreview, capturerErrorListener());
         setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
-        conversationClient.setAudioOutput(AudioOutput.SPEAKERPHONE);
         cameraCapturer.startPreview();
+        conversationClient.setAudioOutput(AudioOutput.SPEAKERPHONE);
     }
 
     private void setupVariablesFromApp() {
@@ -349,17 +383,14 @@ public class VideoConversationActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         cameraCapturer.stopPreview();
-        ((App) getApplication()).getConversationsClient().listen();
     }
 
-    private void closeActivity() {
+    private void closeConversation() {
         if (conversation != null) {
             conversation.disconnect();
         }
-        else if (outgoingInvite != null) {
-                 outgoingInvite.cancel();
-        }
-        finish();
+        cameraCapturer.stopPreview();
+        ((App) getApplication()).getConversationsClient().listen();
     }
 
     @Nonnull

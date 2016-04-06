@@ -1,6 +1,7 @@
 package com.shoutit.app.android;
 
 import android.app.Application;
+import android.app.Dialog;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.multidex.MultiDex;
@@ -223,13 +224,7 @@ public class App extends MultiDexApplication {
             @Override
             public void onStopListeningForInvites(ConversationsClient conversationsClient) {
                 Log.d(VC, "conversationsClientListener : Stop listening for Conversations");
-                presenter.getTwilioRequirementObservable()
-                        .subscribe(new Action1<String>() {
-                            @Override
-                            public void call(String apiKey) {
-                                initializeVideoCalls(apiKey);
-                            }
-                        });
+                conversationsClient.listen();
             }
 
             @Override
@@ -242,7 +237,7 @@ public class App extends MultiDexApplication {
             public void onIncomingInvite(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
                 Log.d(VC, "conversationsClientListener : Incoming call");
                 invite = incomingInvite;
-                Intent intent = new Intent(getApplicationContext(), DialogCallActivity.class);
+                Intent intent = DialogCallActivity.newIntent(getApplicationContext());
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
             }

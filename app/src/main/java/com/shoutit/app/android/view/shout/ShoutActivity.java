@@ -222,7 +222,7 @@ public class ShoutActivity extends BaseActivity {
                         if (isUserShoutOwner) {
                             startActivity(EditShoutActivity.newIntent(mShoutId, ShoutActivity.this));
                         } else {
-                            startActivity(VideoConversationActivity.newIntent(shoutOwnerId,ShoutActivity.this));
+                            startActivity(VideoConversationActivity.newIntent(shoutOwnerId, ShoutActivity.this));
                         }
                     }
                 });

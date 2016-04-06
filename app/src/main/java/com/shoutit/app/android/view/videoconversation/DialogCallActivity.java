@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.App;
@@ -14,6 +15,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.twilio.conversations.IncomingInvite;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -29,11 +31,13 @@ public class DialogCallActivity extends BaseActivity {
     Button acceptButton;
     @Bind(R.id.dialog_call_reject)
     Button rejectButton;
+    @Bind(R.id.dialog_call_info)
+    TextView callInfo;
 
     @Inject
     UserPreferences preferences;
 
-    public static Intent newIntent( @Nonnull Context context) {
+    public static Intent newIntent( @Nonnull final Context context) {
         return new Intent(context, DialogCallActivity.class);
     }
 
@@ -42,6 +46,12 @@ public class DialogCallActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dialog_call);
         ButterKnife.bind(this);
+
+        if (((App) getApplication()).getInvite() != null) {
+            callInfo.setText(String.format(getString(R.string.video_calls_caller_name), ((App) getApplication()).getInvite().getParticipants().toString()));
+        } else{
+            finish();
+        }
 
         RxView.clicks(acceptButton)
                 .subscribe(new Action1<Void>() {
@@ -57,7 +67,6 @@ public class DialogCallActivity extends BaseActivity {
                     @Override
                     public void call(Void aVoid) {
                         ((App) getApplication()).getInvite().reject();
-                        preferences.setIsCallRejected(true);
                         finish();
                     }
                 });
