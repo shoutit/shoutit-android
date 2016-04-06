@@ -200,6 +200,22 @@
 
                 </LinearLayout>
 
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/edit_shout_mobile_hint"
+                    android:textColor="#8a000000"
+                    android:textSize="12sp" />
+
+                <EditText
+                    android:id="@+id/edit_shout_mobile"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="-4dp"
+                    android:inputType="phone"
+                    android:hint="@string/edit_shout_mobile_hint"
+                    android:theme="@style/BlueEditText" />
 
                 <View
                     android:layout_width="match_parent"

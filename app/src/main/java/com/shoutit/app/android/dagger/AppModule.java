@@ -195,8 +195,9 @@ public final class AppModule {
     @Singleton
     @Provides
     public ProfilesDao provideProfilesDao(ApiService apiService,
-                                          @NetworkScheduler Scheduler networkScheduler) {
-        return new ProfilesDao(apiService, networkScheduler);
+                                          @NetworkScheduler Scheduler networkScheduler,
+                                          UserPreferences userPreferences) {
+        return new ProfilesDao(apiService, networkScheduler, userPreferences);
     }
 
     @Singleton

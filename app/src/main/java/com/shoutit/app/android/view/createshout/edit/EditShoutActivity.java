@@ -98,6 +98,8 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     ImageView mEditCurrencyInfo;
     @Bind(R.id.edit_media_container)
     LinearLayout mEditMediaContainer;
+    @Bind(R.id.edit_shout_mobile)
+    EditText mobileEdittext;
 
     @Inject
     EditShoutPresenter mEditShoutPresenter;
@@ -445,13 +447,14 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     @SuppressWarnings("unchecked")
     @Override
     public void mediaEditionCompleted(@NonNull List<String> images, @NonNull List<Video> videos) {
+        final String mobile = mobileEdittext.getText().toString();
         final EditShoutPresenter.RequestData requestData = new EditShoutPresenter.RequestData(
                 mTitle.getText().toString(),
                 mEditShoutDescription.getText().toString(),
                 mEditBudget.getText().toString(),
                 ((PriceUtils.SpinnerCurrency) mEditCurrencySpinner.getSelectedItem()).getCode(),
                 ((Pair<String, String>) mEditCategorySpinner.getSelectedItem()).first,
-                getSelectedOptions(), images, videos);
+                getSelectedOptions(), images, videos, (Strings.isNullOrEmpty(mobile) || mobile.endsWith(".")) ? null : mobile);
         mEditShoutPresenter.dataReady(requestData);
     }
 

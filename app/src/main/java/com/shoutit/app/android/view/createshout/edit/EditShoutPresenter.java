@@ -32,6 +32,7 @@ import com.shoutit.app.android.utils.ResourcesHelper;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
@@ -63,6 +64,8 @@ public class EditShoutPresenter {
         private final List<String> mImages;
         @NonNull
         private final List<Video> mVideos;
+        @Nonnull
+        private final String mMobile;
 
         public RequestData(@NonNull String title,
                            @NonNull String description,
@@ -71,7 +74,8 @@ public class EditShoutPresenter {
                            @Nullable String categoryId,
                            @Nullable List<Pair<String, String>> optionsIdValue,
                            @NonNull List<String> images,
-                           @NonNull List<Video> videos) {
+                           @NonNull List<Video> videos,
+                           @Nullable String mobile) {
             mTitle = title;
             mDescription = description;
             mBudget = budget;
@@ -80,6 +84,7 @@ public class EditShoutPresenter {
             mOptionsIdValue = optionsIdValue;
             mImages = images;
             mVideos = videos;
+            mMobile = mobile;
         }
     }
 
@@ -307,7 +312,7 @@ public class EditShoutPresenter {
                         requestData.mDescription,
                         new UserLocationSimple(mUserLocation.getLatitude(), mUserLocation.getLongitude()),
                         requestData.mCategoryId,
-                        getFilters(requestData.mOptionsIdValue), requestData.mImages, requestData.mVideos)) :
+                        getFilters(requestData.mOptionsIdValue), requestData.mImages, requestData.mVideos, requestData.mMobile)) :
                 mApiService.editShout(mShoutId, new EditShoutRequestWithPrice(
                         requestData.mTitle,
                         requestData.mDescription,
