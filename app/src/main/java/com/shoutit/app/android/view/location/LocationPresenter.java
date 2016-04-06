@@ -285,14 +285,9 @@ public class LocationPresenter {
                     public Observable<ResponseOrError<User>> call(UserLocation userLocation) {
                         userPreferences.setAutomaticLocationTrackingEnabled(userLocation.isFromGps());
 
-                        if (!userPreferences.isUserLoggedIn()) { // TODO remove this if guest user will be handled by API
-                            userPreferences.saveLocation(userLocation);
-                            return Observable.just(ResponseOrError.fromData(User.guestUser(userLocation)));
-                        } else {
-                            return apiService.updateUserLocation(new UpdateLocationRequest(userLocation))
-                                    .subscribeOn(networkScheduler)
-                                    .compose(ResponseOrError.<User>toResponseOrErrorObservable());
-                        }
+                        return apiService.updateUserLocation(new UpdateLocationRequest(userLocation))
+                                .subscribeOn(networkScheduler)
+                                .compose(ResponseOrError.<User>toResponseOrErrorObservable());
                     }
                 })
                 .compose(ObservableExtensions.<ResponseOrError<User>>behaviorRefCount());
@@ -304,8 +299,6 @@ public class LocationPresenter {
                 .observeOn(uiScheduler)
                 .map(Functions1.toObject())
                 .observeOn(uiScheduler);
-
-
 
         // Progress and Errors
 
@@ -336,7 +329,6 @@ public class LocationPresenter {
             @Override
             public void call(User user) {
                 userPreferences.saveUserAsJson(user);
-                userPreferences.saveLocation(user.getLocation());
             }
         };
     }
