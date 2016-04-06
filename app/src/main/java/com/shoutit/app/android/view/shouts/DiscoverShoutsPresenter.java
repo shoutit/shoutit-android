@@ -3,6 +3,7 @@ package com.shoutit.app.android.view.shouts;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.NetworkScheduler;
@@ -35,7 +36,9 @@ public class DiscoverShoutsPresenter {
     private final Observable<Throwable> mThrowableObservable;
     private final Observable<Boolean> mProgressObservable;
     private final Observable<BothParams<String, String>> searchClickedObservable;
+    private final Observable<Integer> countObservable;
     private final DiscoverShoutsDao mDiscoverShoutsDao;
+    private final String discoverId;
 
     @Nonnull
     private final PublishSubject<String> shoutSelectedObserver = PublishSubject.create();
@@ -49,7 +52,9 @@ public class DiscoverShoutsPresenter {
                                    final String discoverName,
                                    @ForActivity final Context context) {
         mDiscoverShoutsDao = discoverShoutsDao;
+        this.discoverId = discoverId;
         final Observable<ResponseOrError<ShoutsResponse>> observable = discoverShoutsDao.getShoutsObservable(discoverId)
+                .compose(ObservableExtensions.<ResponseOrError<ShoutsResponse>>behaviorRefCount())
                 .subscribeOn(networkScheduler)
                 .observeOn(uiScheduler);
 
@@ -67,6 +72,15 @@ public class DiscoverShoutsPresenter {
                     }
                 });
 
+        countObservable = observable.compose(ResponseOrError.<ShoutsResponse>onlySuccess())
+                .map(new Func1<ShoutsResponse, Integer>() {
+                    @Override
+                    public Integer call(ShoutsResponse shoutsResponse) {
+                        return shoutsResponse.getCount();
+                    }
+                });
+
+
         mThrowableObservable = observable.compose(ResponseOrError.<ShoutsResponse>onlyError());
         mProgressObservable = observable.map(Functions1.returnFalse()).startWith(true);
 
@@ -77,6 +91,11 @@ public class DiscoverShoutsPresenter {
                         return new BothParams<>(discoverId, discoverName);
                     }
                 });
+    }
+
+    @Nonnull
+    public Observable<Integer> getCountObservable() {
+        return countObservable;
     }
 
     @Nonnull
@@ -101,7 +120,7 @@ public class DiscoverShoutsPresenter {
 
     @NonNull
     public Observer<Object> getLoadMoreObserver() {
-        return RxMoreObservers.ignoreCompleted(mDiscoverShoutsDao.getLoadMoreShoutsSubject());
+        return RxMoreObservers.ignoreCompleted(mDiscoverShoutsDao.getShoutsDao(discoverId).getLoadMoreObserver());
     }
 
     @Nonnull

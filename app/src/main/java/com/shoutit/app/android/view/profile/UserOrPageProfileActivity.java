@@ -15,6 +15,8 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.view.editprofile.EditProfileActivity;
 import com.shoutit.app.android.view.notifications.NotificationsActivity;
+import com.shoutit.app.android.view.search.SearchPresenter;
+import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsActivity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -103,6 +105,16 @@ public class UserOrPageProfileActivity extends ProfileActivity {
                 .subscribe(ColoredSnackBar.errorSnackBarAction(
                         ColoredSnackBar.contentView(UserOrPageProfileActivity.this),
                         R.string.error_action_only_for_logged_in_user));
+
+        presenter.getSeeAllShoutsObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String userName) {
+                        startActivity(SearchShoutsResultsActivity.newIntent(
+                                UserOrPageProfileActivity.this, null, userName, SearchPresenter.SearchType.PROFILE));
+                    }
+                });
     }
 
     @Override

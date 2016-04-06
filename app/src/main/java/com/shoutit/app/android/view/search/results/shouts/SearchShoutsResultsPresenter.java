@@ -8,11 +8,9 @@ import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
-import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.UserPreferences;
-import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
 import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
@@ -39,16 +37,14 @@ import rx.subjects.PublishSubject;
 
 public class SearchShoutsResultsPresenter {
 
-    private final PublishSubject<Object> layoutManagerSwitchSubject = PublishSubject.create();
     private final PublishSubject<String> shoutSelectedSubject = PublishSubject.create();
     private final PublishSubject<Object> loadMoreSubject = PublishSubject.create();
-    private final PublishSubject<Object> filtersOpenSubject = PublishSubject.create();
     private final PublishSubject<FiltersToSubmit> filtersSelectedSubject = PublishSubject.create();
 
     private final Observable<List<BaseAdapterItem>> adapterItems;
     private final Observable<Boolean> progressObservable;
     private final Observable<Throwable> errorObservable;
-    private final Observable<Boolean> linearLayoutManagerObservable;
+    private final Observable<Integer> countObservable;
 
     public SearchShoutsResultsPresenter(@Nonnull final ShoutsDao dao,
                                         @Nullable final String searchQuery,
@@ -91,6 +87,15 @@ public class SearchShoutsResultsPresenter {
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<ShoutsResponse>>behaviorRefCount());
 
+        countObservable = shoutsRequest
+                .compose(ResponseOrError.<ShoutsResponse>onlySuccess())
+                .map(new Func1<ShoutsResponse, Integer>() {
+                    @Override
+                    public Integer call(ShoutsResponse shoutsResponse) {
+                        return shoutsResponse.getCount();
+                    }
+                });
+
         adapterItems = shoutsRequest
                 .compose(ResponseOrError.<ShoutsResponse>onlySuccess())
                 .map(new Func1<ShoutsResponse, List<BaseAdapterItem>>() {
@@ -100,7 +105,6 @@ public class SearchShoutsResultsPresenter {
                             return ImmutableList.<BaseAdapterItem>of(new NoDataAdapterItem());
                         } else {
                             final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
-                            builder.add(new ShoutHeaderAdapterItem(searchQuery, shoutsResponse.getCount(), layoutManagerSwitchSubject, filtersOpenSubject));
                             builder.addAll(Lists.transform(shoutsResponse.getShouts(), new Function<Shout, BaseAdapterItem>() {
                                 @Nullable
                                 @Override
@@ -118,16 +122,6 @@ public class SearchShoutsResultsPresenter {
 
         errorObservable = shoutsRequest.compose(ResponseOrError.<ShoutsResponse>onlyError());
 
-        linearLayoutManagerObservable = layoutManagerSwitchSubject
-                .scan(false, new Func2<Boolean, Object, Boolean>() {
-                    @Override
-                    public Boolean call(Boolean prev, Object o) {
-                        return !prev;
-                    }
-                })
-                .skip(1)
-                .observeOn(uiScheduler);
-
         loadMoreSubject
                 .withLatestFrom(daoObservable, new Func2<Object, ShoutsDao.SearchShoutsDao, Observer<Object>>() {
                     @Override
@@ -141,18 +135,6 @@ public class SearchShoutsResultsPresenter {
                         loadMoreObserver.onNext(null);
                     }
                 });
-    }
-
-    @Nonnull
-    public Observable<Boolean> getLinearLayoutManagerObservable() {
-        return linearLayoutManagerObservable
-                .filter(Functions1.isTrue());
-    }
-
-    @Nonnull
-    public Observable<Boolean> getGridLayoutManagerObservable() {
-        return linearLayoutManagerObservable
-                .filter(Functions1.isFalse());
     }
 
     public Observable<List<BaseAdapterItem>> getAdapterItems() {
@@ -175,72 +157,11 @@ public class SearchShoutsResultsPresenter {
         return loadMoreSubject;
     }
 
-    public Observable<Object> getFiltersOpenObservable() {
-        return filtersOpenSubject;
-    }
-
     public Observer<FiltersToSubmit> getFiltersSelectedObserver() {
         return filtersSelectedSubject;
     }
 
-    public class ShoutHeaderAdapterItem extends BaseNoIDAdapterItem {
-
-        @Nullable
-        private final String searchQuery;
-        private final int totalItemsCount;
-        private final Observer<Object> layoutManagerSwitchObserver;
-        private final Observer<Object> filtersOpenObserver;
-
-        public ShoutHeaderAdapterItem(@Nullable String searchQuery, int totalItemsCount,
-                                      Observer<Object> layoutManagerSwitchObserver,
-                                      Observer<Object> filtersOpenObserver) {
-
-            this.searchQuery = searchQuery;
-            this.totalItemsCount = totalItemsCount;
-            this.layoutManagerSwitchObserver = layoutManagerSwitchObserver;
-            this.filtersOpenObserver = filtersOpenObserver;
-        }
-
-        @Override
-        public boolean matches(@Nonnull BaseAdapterItem item) {
-            return item instanceof ShoutHeaderAdapterItem;
-        }
-
-        @Override
-        public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof ShoutHeaderAdapterItem
-                    && this.equals(item);
-        }
-
-        public Observer<Object> getLayoutManagerSwitchObserver() {
-            return layoutManagerSwitchObserver;
-        }
-
-        public Observer<Object> getOnFilterClickObserver() {
-            return filtersOpenObserver;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof ShoutHeaderAdapterItem)) return false;
-            final ShoutHeaderAdapterItem that = (ShoutHeaderAdapterItem) o;
-            return totalItemsCount == that.totalItemsCount &&
-                    Objects.equal(searchQuery, that.searchQuery);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hashCode(searchQuery, totalItemsCount);
-        }
-
-        public int getTotalItemsCount() {
-            return totalItemsCount;
-        }
-
-        @Nullable
-        public String getSearchQuery() {
-            return searchQuery;
-        }
+    public Observable<Integer> getCountObservable() {
+        return countObservable;
     }
 }

@@ -71,11 +71,6 @@ public class DiscoverShoutsDao {
     }
 
     @Nonnull
-    public PublishSubject<Object> getLoadMoreShoutsSubject() {
-        return loadMoreShoutsSubject;
-    }
-
-    @Nonnull
     public Observer<Object> getRefreshObserver(@Nonnull String discoverId) {
         return shoutsCache.getUnchecked(discoverId).getRefreshObserver();
     }

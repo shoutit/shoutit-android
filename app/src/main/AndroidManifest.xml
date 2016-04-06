@@ -74,6 +74,7 @@
         <activity
             android:name=".view.search.main.MainSearchActivity"
             android:screenOrientation="portrait"
+            android:launchMode="singleTask"
             android:windowSoftInputMode="stateHidden">
             <meta-data
                 android:name="android.app.searchable"
