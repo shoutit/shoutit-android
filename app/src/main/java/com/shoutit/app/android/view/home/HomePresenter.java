@@ -57,6 +57,8 @@ public class HomePresenter {
     private final PublishSubject<String> shoutSelectedObserver = PublishSubject.create();
     @Nonnull
     private final PublishSubject<Object> loadMoreShoutsSubject = PublishSubject.create();
+    @Nonnull
+    private final PublishSubject<Object> onShowInterestsClickedSubject = PublishSubject.create();
 
     @Nonnull
     private final Observable<Throwable> errorObservable;
@@ -129,7 +131,7 @@ public class HomePresenter {
 
                                 builder.addAll(items);
                             } else {
-                                builder.add(new ShoutsEmptyAdapterItem());
+                                builder.add(new ShoutsEmptyAdapterItem(isNormalUser, onShowInterestsClickedSubject));
                             }
 
                             return builder.build();
@@ -340,6 +342,11 @@ public class HomePresenter {
     @Nonnull
     public Observable<String> getShoutSelectedObservable() {
         return shoutSelectedObserver;
+    }
+
+    @Nonnull
+    public Observable<Object> openInterestsObservable() {
+        return onShowInterestsClickedSubject;
     }
 
     /**
@@ -568,6 +575,16 @@ public class HomePresenter {
 
     public class ShoutsEmptyAdapterItem implements BaseAdapterItem {
 
+        private final boolean isLoggedInAsNormalUser;
+        @Nonnull
+        private final Observer<Object> onShowInterestsClickedObserver;
+
+        public ShoutsEmptyAdapterItem(boolean isLoggedInAsNormalUser,
+                                      @Nonnull Observer<Object> onShowInterestsClickedObserver) {
+            this.isLoggedInAsNormalUser = isLoggedInAsNormalUser;
+            this.onShowInterestsClickedObserver = onShowInterestsClickedObserver;
+        }
+
         @Override
         public long adapterId() {
             return BaseAdapterItem.NO_ID;
@@ -580,7 +597,16 @@ public class HomePresenter {
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof ShoutsEmptyAdapterItem;
+            return item instanceof ShoutsEmptyAdapterItem &&
+                    isLoggedInAsNormalUser == ((ShoutsEmptyAdapterItem) item).isLoggedInAsNormalUser;
+        }
+
+        public boolean isLoggedInAsNormalUser() {
+            return isLoggedInAsNormalUser;
+        }
+
+        public void onShowInterestsClicked() {
+            onShowInterestsClickedObserver.onNext(null);
         }
     }
     /** END OF ADAPTER ITEMS **/
