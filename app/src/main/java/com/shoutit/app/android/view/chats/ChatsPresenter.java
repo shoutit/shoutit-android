@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.chats;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -24,7 +25,9 @@ import com.shoutit.app.android.api.model.PostMessage;
 import com.shoutit.app.android.api.model.PusherMessage;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.PusherHelper;
 import com.shoutit.app.android.view.chats.message_models.DateItem;
@@ -38,7 +41,9 @@ import com.shoutit.app.android.view.chats.message_models.SentLocationMessage;
 import com.shoutit.app.android.view.chats.message_models.SentShoutMessage;
 import com.shoutit.app.android.view.chats.message_models.SentTextMessage;
 import com.shoutit.app.android.view.chats.message_models.SentVideoMessage;
+import com.shoutit.app.android.view.media.MediaUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -52,11 +57,11 @@ import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
 import rx.Subscriber;
-import rx.Subscription;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.subjects.PublishSubject;
+import rx.subscriptions.CompositeSubscription;
 
 public class ChatsPresenter {
 
@@ -107,10 +112,12 @@ public class ChatsPresenter {
     private final Scheduler mNetworkScheduler;
     private final UserPreferences mUserPreferences;
     private final Resources mResources;
+    private final Context mContext;
     private final PusherHelper mPusher;
     private final Gson mGson;
+    private final AmazonHelper mAmazonHelper;
     private Listener mListener;
-    private Subscription mSubscribe;
+    private CompositeSubscription mSubscribe = new CompositeSubscription();
     private final PublishSubject<Object> requestSubject = PublishSubject.create();
     private final PublishSubject<PusherMessage> newMessagesSubject = PublishSubject.create();
 
@@ -121,16 +128,20 @@ public class ChatsPresenter {
                           @NetworkScheduler Scheduler networkScheduler,
                           UserPreferences userPreferences,
                           @ForActivity Resources resources,
+                          @ForActivity Context context,
                           PusherHelper pusher,
-                          Gson gson) {
+                          Gson gson,
+                          AmazonHelper amazonHelper) {
         this.conversationId = conversationId;
         mApiService = apiService;
         mUiScheduler = uiScheduler;
         mNetworkScheduler = networkScheduler;
         mUserPreferences = userPreferences;
         mResources = resources;
+        mContext = context;
         mPusher = pusher;
         mGson = gson;
+        mAmazonHelper = amazonHelper;
     }
 
     public void register(@NonNull Listener listener) {
@@ -187,7 +198,7 @@ public class ChatsPresenter {
 
         mListener = listener;
         mListener.showProgress(true);
-        mSubscribe = Observable.combineLatest(apiMessages, localAndPusherMessages.startWith((List<PusherMessage>) null),
+        mSubscribe.add(Observable.combineLatest(apiMessages, localAndPusherMessages.startWith((List<PusherMessage>) null),
                 new Func2<MessagesResponse, List<PusherMessage>, List<BaseAdapterItem>>() {
                     @Override
                     public List<BaseAdapterItem> call(MessagesResponse messagesResponse, List<PusherMessage> pusherMessage) {
@@ -221,9 +232,9 @@ public class ChatsPresenter {
                     @Override
                     public void call(Throwable throwable) {
                         mListener.showProgress(false);
-                        mListener.error();
+                        mListener.error(throwable);
                     }
-                });
+                }));
     }
 
     @NonNull
@@ -292,18 +303,12 @@ public class ChatsPresenter {
                 .subscribe(new Action1<Message>() {
                     @Override
                     public void call(Message messagesResponse) {
-                        newMessagesSubject.onNext(new PusherMessage(
-                                messagesResponse.getProfile(),
-                                conversationId,
-                                messagesResponse.getId(),
-                                messagesResponse.getText(),
-                                messagesResponse.getAttachments(),
-                                messagesResponse.getCreatedAt()));
+                        postLocalMessage(messagesResponse);
                     }
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        mListener.error();
+                        mListener.error(throwable);
                     }
                 });
     }
@@ -344,10 +349,13 @@ public class ChatsPresenter {
         } else {
             final MessageAttachment messageAttachment = attachments.get(0);
             final String type = messageAttachment.getType();
-            if (MessageAttachment.ATTACHMENT_TYPE_IMAGE.equals(type)) {
-                return new ReceivedImageMessage(isFirst, time, messageAttachment.getImage().getUrl(), avatarUrl);
-            } else if (MessageAttachment.ATTACHMENT_TYPE_VIDEO.equals(type)) {
-                return new ReceivedVideoMessage(isFirst, messageAttachment.getVideo().getThumbnailUrl(), time, avatarUrl);
+            if (MessageAttachment.ATTACHMENT_TYPE_MEDIA.equals(type)) {
+                final List<String> images = messageAttachment.getImages();
+                if (images != null && !images.isEmpty()) {
+                    return new ReceivedImageMessage(isFirst, time, images.get(0), avatarUrl);
+                } else {
+                    return new ReceivedVideoMessage(isFirst, messageAttachment.getVideos().get(0).getThumbnailUrl(), time, avatarUrl);
+                }
             } else if (MessageAttachment.ATTACHMENT_TYPE_LOCATION.equals(type)) {
                 return new ReceivedLocationMessage(isFirst, time, avatarUrl);
             } else if (MessageAttachment.ATTACHMENT_TYPE_SHOUT.equals(type)) {
@@ -373,10 +381,13 @@ public class ChatsPresenter {
         } else {
             final MessageAttachment messageAttachment = attachments.get(0);
             final String type = messageAttachment.getType();
-            if (MessageAttachment.ATTACHMENT_TYPE_IMAGE.equals(type)) {
-                return new SentImageMessage(time, messageAttachment.getImage().getUrl());
-            } else if (MessageAttachment.ATTACHMENT_TYPE_VIDEO.equals(type)) {
-                return new SentVideoMessage(messageAttachment.getVideo().getThumbnailUrl(), time);
+            if (MessageAttachment.ATTACHMENT_TYPE_MEDIA.equals(type)) {
+                final List<String> images = messageAttachment.getImages();
+                if (images != null && !images.isEmpty()) {
+                    return new SentImageMessage(time, images.get(0));
+                } else {
+                    return new SentVideoMessage(messageAttachment.getVideos().get(0).getThumbnailUrl(), time);
+                }
             } else if (MessageAttachment.ATTACHMENT_TYPE_LOCATION.equals(type)) {
                 return new SentLocationMessage(time);
             } else if (MessageAttachment.ATTACHMENT_TYPE_SHOUT.equals(type)) {
@@ -395,6 +406,105 @@ public class ChatsPresenter {
         mPusher.getPusher().unsubscribe(String.format("presence-u-%1$s", mUserPreferences.getUser().getId()));
     }
 
+    public void addMedia(@NonNull String media, boolean isVideo) {
+        mListener.showProgress(true);
+        if (isVideo) {
+            try {
+                final File videoThumbnail = MediaUtils.createVideoThumbnail(mContext, Uri.parse(media));
+                final int videoLength = MediaUtils.getVideoLength(mContext, media);
+                final Observable<String> videoFileObservable = mAmazonHelper.uploadShoutMediaObservable(AmazonHelper.getfileFromPath(media));
+                final Observable<String> thumbFileObservable = mAmazonHelper.uploadShoutMediaObservable(AmazonHelper.getfileFromPath(videoThumbnail.getAbsolutePath()));
+                mSubscribe.add(Observable
+                        .zip(videoFileObservable, thumbFileObservable, new Func2<String, String, Video>() {
+                            @Override
+                            public Video call(String video, String thumb) {
+                                return Video.createVideo(video, thumb, videoLength);
+                            }
+                        })
+                        .flatMap(new Func1<Video, Observable<Message>>() {
+                            @Override
+                            public Observable<Message> call(Video video) {
+                                return mApiService.postMessage(conversationId, new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_MEDIA, null, null, null, ImmutableList.of(video)))))
+                                        .subscribeOn(mNetworkScheduler)
+                                        .observeOn(mUiScheduler);
+                            }
+                        })
+                        .subscribeOn(mNetworkScheduler)
+                        .observeOn(mUiScheduler)
+                        .subscribe(new Action1<Message>() {
+                            @Override
+                            public void call(Message messagesResponse) {
+                                postLocalMessage(messagesResponse);
+                                mListener.showProgress(false);
+                            }
+                        }, new Action1<Throwable>() {
+                            @Override
+                            public void call(Throwable throwable) {
+                                mListener.showProgress(false);
+                                mListener.error(throwable);
+                            }
+                        }));
+            } catch (IOException e) {
+                mListener.error(e);
+            }
+        } else {
+            mSubscribe.add(mAmazonHelper.uploadShoutMediaObservable(AmazonHelper.getfileFromPath(media))
+                    .flatMap(new Func1<String, Observable<Message>>() {
+                        @Override
+                        public Observable<Message> call(String url) {
+                            return mApiService.postMessage(
+                                    conversationId,
+                                    new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_MEDIA, null, null, ImmutableList.of(url), null))))
+                                    .subscribeOn(mNetworkScheduler)
+                                    .observeOn(mUiScheduler);
+
+                        }
+                    })
+                    .subscribeOn(mNetworkScheduler)
+                    .observeOn(mUiScheduler)
+                    .subscribe(new Action1<Message>() {
+                        @Override
+                        public void call(Message messagesResponse) {
+                            postLocalMessage(messagesResponse);
+                            mListener.showProgress(false);
+                        }
+                    }, new Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable throwable) {
+                            mListener.showProgress(false);
+                            mListener.error(throwable);
+                        }
+                    }));
+        }
+    }
+
+    private void postLocalMessage(Message messagesResponse) {
+        newMessagesSubject.onNext(new PusherMessage(
+                messagesResponse.getProfile(),
+                conversationId,
+                messagesResponse.getId(),
+                messagesResponse.getText(),
+                messagesResponse.getAttachments(),
+                messagesResponse.getCreatedAt()));
+    }
+
+    public void sendLocation(double latitude, double longitude) {
+        mApiService.postMessage(conversationId, new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_LOCATION, new MessageAttachment.MessageLocation(latitude, longitude), null, null, null))))
+                .subscribeOn(mNetworkScheduler)
+                .observeOn(mUiScheduler)
+                .subscribe(new Action1<Message>() {
+                    @Override
+                    public void call(Message message) {
+                        postLocalMessage(message);
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        mListener.error(throwable);
+                    }
+                });
+    }
+
     public interface Listener {
 
         void emptyList();
@@ -403,7 +513,7 @@ public class ChatsPresenter {
 
         void setData(@NonNull List<BaseAdapterItem> items);
 
-        void error();
+        void error(Throwable throwable);
 
     }
 }

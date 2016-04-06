@@ -105,6 +105,7 @@ public class UserPreferences {
                 .putString(REFRESH_TOKEN, refreshToken)
                 .putBoolean(IS_GUEST, false);
         editor.commit();
+        tokenRefreshSubject.onNext(new Object());
     }
 
     @SuppressLint("CommitPrefEdits")
@@ -115,6 +116,7 @@ public class UserPreferences {
                 .putString(REFRESH_TOKEN, refreshToken)
                 .putBoolean(IS_GUEST, true);
         editor.commit();
+        tokenRefreshSubject.onNext(new Object());
     }
 
     @SuppressLint("CommitPrefEdits")

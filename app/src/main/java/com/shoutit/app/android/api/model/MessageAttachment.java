@@ -1,27 +1,28 @@
 package com.shoutit.app.android.api.model;
 
+import java.util.List;
+
 public class MessageAttachment {
 
     public static final String ATTACHMENT_TYPE_SHOUT = "shout";
     public static final String ATTACHMENT_TYPE_LOCATION = "location";
-    public static final String ATTACHMENT_TYPE_VIDEO = "video";
-    public static final String ATTACHMENT_TYPE_IMAGE = "image";
+    public static final String ATTACHMENT_TYPE_MEDIA = "media";
 
     private final String type;
     private final MessageLocation location;
     private final Shout shout;
-    private final MessageImage image;
-    private final Video video;
+    private final List<String> images;
+    private final List<Video> videos;
 
-    public MessageAttachment(String type, MessageLocation location, Shout shout, MessageImage image, Video video) {
+    public MessageAttachment(String type, MessageLocation location, Shout shout, List<String> image, List<Video> video) {
         this.type = type;
         this.location = location;
         this.shout = shout;
-        this.image = image;
-        this.video = video;
+        this.images = image;
+        this.videos = video;
     }
 
-    public class MessageLocation {
+    public static class MessageLocation {
         private final double latitude;
         private final double longitude;
 
@@ -51,25 +52,12 @@ public class MessageAttachment {
         return shout;
     }
 
-    public MessageImage getImage() {
-        return image;
+    public List<String> getImages() {
+        return images;
     }
 
-    public Video getVideo() {
-        return video;
-    }
-
-    public class MessageImage {
-
-        private final String url;
-
-        public MessageImage(String url) {
-            this.url = url;
-        }
-
-        public String getUrl() {
-            return url;
-        }
+    public List<Video> getVideos() {
+        return videos;
     }
 
 }

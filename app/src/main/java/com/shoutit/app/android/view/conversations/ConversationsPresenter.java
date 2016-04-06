@@ -184,6 +184,8 @@ public class ConversationsPresenter {
                 return "Location";
             } else if (MessageAttachment.ATTACHMENT_TYPE_SHOUT.equals(messageAttachment.getType())) {
                 return "Shout";
+            } else if (MessageAttachment.ATTACHMENT_TYPE_MEDIA.equals(messageAttachment.getType())) {
+                return "Media";
             } else {
                 throw new RuntimeException(messageAttachment.getType() + " : unknown type");
             }

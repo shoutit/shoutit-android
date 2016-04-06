@@ -8,12 +8,21 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.common.base.Preconditions;
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
 import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.shoutit.app.android.App;
@@ -26,6 +35,7 @@ import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
+import com.shoutit.app.android.view.media.RecordMediaActivity;
 
 import java.util.List;
 
@@ -39,6 +49,11 @@ import butterknife.OnClick;
 public class ChatActivity extends BaseActivity implements ChatsPresenter.Listener {
 
     private static final String ARGS_CONVERSATION_ID = "conversation_id";
+
+    private static final int REQUEST_ATTACHMENT = 0;
+    private static final int REQUEST_LOCATION = 1;
+
+    private static final String TAG = ChatActivity.class.getCanonicalName();
 
     @Inject
     ChatsPresenter presenter;
@@ -57,6 +72,13 @@ public class ChatActivity extends BaseActivity implements ChatsPresenter.Listene
     @Bind(R.id.chats_progress)
     ProgressBar mChatsProgress;
 
+    @Bind(R.id.chats_attatchments_layout)
+    FrameLayout mChatsAttatchmentsLayout;
+    @Bind(R.id.chats_attatchments_shout)
+    LinearLayout mChatsAttatchmentsShout;
+    @Bind(R.id.chats_attatchments_location)
+    LinearLayout mChatsAttatchmentsLocation;
+
     public static Intent newIntent(@Nonnull Context context, @NonNull String conversationId) {
         return new Intent(context, ChatActivity.class)
                 .putExtra(ARGS_CONVERSATION_ID, conversationId);
@@ -64,11 +86,37 @@ public class ChatActivity extends BaseActivity implements ChatsPresenter.Listene
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chats);
         ButterKnife.bind(this);
+
+        mChatsToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        mChatsToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+        mChatsToolbar.inflateMenu(R.menu.chats_menu);
+        mChatsToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                final int itemId = item.getItemId();
+                switch (itemId) {
+                    case R.id.chats_attatchments_menu: {
+                        final int visibility = mChatsAttatchmentsLayout.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE;
+                        mChatsAttatchmentsLayout.setVisibility(visibility);
+                        return true;
+                    }
+                    case R.id.chats_video_menu: {
+
+                        return true;
+                    }
+                    default:
+                        return false;
+                }
+            }
+        });
 
         mChatsRecyclerview.setAdapter(chatsAdapter);
         mChatsRecyclerview.setLayoutManager(new MyLinearLayoutManager(this));
@@ -119,7 +167,8 @@ public class ChatActivity extends BaseActivity implements ChatsPresenter.Listene
     }
 
     @Override
-    public void error() {
+    public void error(Throwable throwable) {
+        Log.e(TAG, "error", throwable);
         ColoredSnackBar.error(ColoredSnackBar.contentView(this), R.string.error_default, Snackbar.LENGTH_SHORT).show();
     }
 
@@ -127,5 +176,41 @@ public class ChatActivity extends BaseActivity implements ChatsPresenter.Listene
     protected void onDestroy() {
         presenter.unregister();
         super.onDestroy();
+    }
+
+    @OnClick(R.id.chats_attatchments_video)
+    void videoClicked() {
+        startActivityForResult(RecordMediaActivity.newIntent(this, true, true), REQUEST_ATTACHMENT);
+    }
+
+    @OnClick(R.id.chats_attatchments_photo)
+    void photoClicked() {
+        startActivityForResult(RecordMediaActivity.newIntent(this, true, false), REQUEST_ATTACHMENT);
+    }
+
+    @OnClick(R.id.chats_attatchments_location)
+    void locationClicked() {
+        try {
+            startActivityForResult(new PlacePicker.IntentBuilder().build(this), REQUEST_LOCATION);
+        } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
+            ColoredSnackBar.error(ColoredSnackBar.contentView(this), R.string.error_default, Snackbar.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_ATTACHMENT && resultCode == RESULT_OK) {
+            final Bundle extras = data.getExtras();
+            final boolean isVideo = extras.getBoolean(RecordMediaActivity.EXTRA_IS_VIDEO);
+            final String media = extras.getString(RecordMediaActivity.EXTRA_MEDIA);
+            Preconditions.checkNotNull(media);
+            presenter.addMedia(media, isVideo);
+        } else if (requestCode == REQUEST_LOCATION && resultCode == RESULT_OK) {
+            final Place place = PlacePicker.getPlace(this, data);
+            final LatLng latLng = place.getLatLng();
+            presenter.sendLocation(latLng.latitude, latLng.longitude);
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 }

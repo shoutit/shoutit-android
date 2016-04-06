@@ -63,6 +63,7 @@ public class CameraFragment extends Fragment {
     private static final int REQUEST_GALLERY_IMAGE_CODE = 0;
     private static final int REQUEST_GALLERY_VIDEO_CODE = 1;
     private static final int VIDEO_LENGTH = 60_000;
+    private static final String ARGS_VIDEO_FIRST = "arg_video_first";
 
     public interface CameraFragmentListener {
         void onInitializationFailed(Exception cause);
@@ -120,8 +121,12 @@ public class CameraFragment extends Fragment {
     @Bind(R.id.camera_text)
     TextView cameraText;
 
-    public static CameraFragment newInstance() {
-        return new CameraFragment();
+    public static CameraFragment newInstance(boolean videoFirst) {
+        final Bundle args = new Bundle();
+        args.putBoolean(ARGS_VIDEO_FIRST, videoFirst);
+        final CameraFragment cameraFragment = new CameraFragment();
+        cameraFragment.setArguments(args);
+        return cameraFragment;
     }
 
     @SuppressWarnings("deprecation")
@@ -141,6 +146,8 @@ public class CameraFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        isVideoMode = getArguments().getBoolean(ARGS_VIDEO_FIRST);
 
         if (hasCameras()) {
             cameraFragmentListener.onInitializationFailed(
