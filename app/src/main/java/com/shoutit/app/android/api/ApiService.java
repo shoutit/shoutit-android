@@ -40,12 +40,13 @@ import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.login.EmailLoginRequest;
 import com.shoutit.app.android.api.model.login.FacebookLogin;
 import com.shoutit.app.android.api.model.login.GoogleLogin;
+import com.shoutit.app.android.model.MobilePhoneResponse;
+import com.shoutit.app.android.model.ReportBody;
 
 import java.util.List;
 
-import javax.annotation.Generated;
-
 import okhttp3.ResponseBody;
+import retrofit2.Response;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
@@ -255,6 +256,12 @@ public interface ApiService {
     @GET("shouts/{id}")
     Observable<ShoutResponse> getShout(@Path("id") String id);
 
+    @DELETE("shouts/{id}")
+    Observable<Response<Object>> deleteShout(@Path("id") String id);
+
+    @GET("shouts/{id}/call")
+    Observable<MobilePhoneResponse> shoutCall(@Path("id") String id);
+
     /**
      * Tags
      **/
@@ -295,4 +302,8 @@ public interface ApiService {
 
     @GET("twilio/video_identity")
     Observable<UserIdentity> getUserIdentity(@Query("profile") String username);
+
+    /** Misc **/
+    @POST("misc/reports")
+    Observable<Response<Object>> reportShout(@Body ReportBody reportShoutBody);
 }

@@ -1,12 +1,15 @@
 package com.shoutit.app.android.view.profile;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -14,13 +17,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.google.common.base.Strings;
 import com.jakewharton.rxbinding.view.RxView;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.BaseActivity;
@@ -36,6 +40,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import retrofit2.Response;
 import rx.functions.Action1;
 
 public abstract class ProfileActivity extends BaseActivity {
@@ -137,7 +142,8 @@ public abstract class ProfileActivity extends BaseActivity {
                 .subscribe(new Action1<String>() {
                     @Override
                     public void call(String shoutId) {
-                        startActivity(ShoutActivity.newIntent(ProfileActivity.this, shoutId));
+                        startActivityForResult(ShoutActivity.newIntent(ProfileActivity.this, shoutId),
+                                REQUEST_CODE_FROM_EDIT_PROFILE);
                     }
                 });
 
@@ -155,6 +161,20 @@ public abstract class ProfileActivity extends BaseActivity {
                         popupMenu.show();
                     }
                 });
+
+        presenter.getReportShoutObservable()
+                .compose(this.<Response<Object>>bindToLifecycle())
+                .subscribe(new Action1<Response<Object>>() {
+                    @Override
+                    public void call(Response<Object> objectResponse) {
+                        if (objectResponse.isSuccess()) {
+                            ColoredSnackBar.success(findViewById(android.R.id.content), R.string.report_send_success, Snackbar.LENGTH_SHORT).show();
+                        } else {
+                            ColoredSnackBar.error(findViewById(android.R.id.content), R.string.error_default, Snackbar.LENGTH_SHORT);
+                        }
+                    }
+                }, ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(this)));
+
     }
 
     @DrawableRes
@@ -173,7 +193,30 @@ public abstract class ProfileActivity extends BaseActivity {
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                Toast.makeText(ProfileActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
+                final EditText editText = new EditText(ProfileActivity.this);
+                editText.setHint(R.string.report_dialog_hint);
+
+                final int spacing = getResources().getDimensionPixelOffset(R.dimen.activity_horizontal_margin);
+                new AlertDialog.Builder(ProfileActivity.this)
+                        .setTitle(R.string.shout_bottom_bar_report)
+                        .setView(editText, spacing, spacing / 2, spacing, spacing / 2)
+                        .setPositiveButton(getString(R.string.send_report_positive_button), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                final String reportBody = editText.getText().toString();
+                                if (Strings.isNullOrEmpty(reportBody)) {
+                                    editText.setError(getString(R.string.report_dialog_empty_error));
+                                    dialog.dismiss();
+                                    return;
+                                }
+
+                                presenter.sendReportObserver().onNext(reportBody);
+                                dialog.dismiss();
+                            }
+                        })
+                        .setNegativeButton(getString(R.string.dialog_cancel_button), null)
+                        .show();
+
                 return true;
             }
         });

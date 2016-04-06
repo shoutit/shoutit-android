@@ -99,7 +99,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     @Bind(R.id.edit_media_container)
     LinearLayout mEditMediaContainer;
     @Bind(R.id.edit_shout_mobile)
-    EditText mobileEdittext;
+    EditText mobileEditText;
 
     @Inject
     EditShoutPresenter mEditShoutPresenter;
@@ -281,6 +281,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
         if (show) {
             mEditLayout.setErrorEnabled(true);
             mEditLayout.setError(getString(R.string.create_request_activity_title_too_short));
+            hideProgress();
         } else {
             mEditLayout.setErrorEnabled(false);
         }
@@ -396,6 +397,11 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     }
 
     @Override
+    public void setMobilePhone(@Nullable String mobileHint) {
+        mobileEditText.setText(mobileHint);
+    }
+
+    @Override
     public void setImages(@NonNull Map<Integer, ShoutMediaPresenter.Item> mediaElements) {
         mEditMediaContainer.removeAllViews();
 
@@ -447,7 +453,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     @SuppressWarnings("unchecked")
     @Override
     public void mediaEditionCompleted(@NonNull List<String> images, @NonNull List<Video> videos) {
-        final String mobile = mobileEdittext.getText().toString();
+        final String mobile = mobileEditText.getText().toString();
         final EditShoutPresenter.RequestData requestData = new EditShoutPresenter.RequestData(
                 mTitle.getText().toString(),
                 mEditShoutDescription.getText().toString(),

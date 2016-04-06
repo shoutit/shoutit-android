@@ -48,6 +48,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
     private static final String MENU_SELECT_ITEM = "args_menu_item";
     public static final int REQUST_CODE_CAMERA_PERMISSION = 1;
+    public static final int REQUST_CODE_CALL_PHONE_PERMISSION = 2;
 
     public static Intent newIntent(@Nonnull Context context) {
         return new Intent(context, MainActivity.class);
@@ -244,7 +245,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == REQUST_CODE_CAMERA_PERMISSION) {
+        if (requestCode == REQUST_CODE_CAMERA_PERMISSION || requestCode == REQUST_CODE_CALL_PHONE_PERMISSION) {
             final boolean permissionsGranted = PermissionHelper.arePermissionsGranted(grantResults);
             if (permissionsGranted) {
                 ColoredSnackBar.success(findViewById(android.R.id.content), R.string.permission_granted, Snackbar.LENGTH_SHORT).show();

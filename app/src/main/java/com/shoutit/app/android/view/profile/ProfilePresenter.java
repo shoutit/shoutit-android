@@ -1,16 +1,15 @@
 package com.shoutit.app.android.view.profile;
 
 
-
 import android.support.annotation.NonNull;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 
 import java.util.List;
 
-
 import javax.annotation.Nonnull;
 
+import retrofit2.Response;
 import rx.Observable;
 import rx.Observer;
 
@@ -59,4 +58,10 @@ public interface ProfilePresenter {
     Observable<Object> getMoreMenuOptionClickedSubject();
 
     void refreshProfile();
+
+    @Nonnull
+    Observer<String> sendReportObserver();
+
+    @Nonnull
+    Observable<Response<Object>> getReportShoutObservable();
 }

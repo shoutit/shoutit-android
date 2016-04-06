@@ -358,5 +358,19 @@
     <string name="video_calls_caller_name">Someone is calling to You!</string>
     <string name="video_calls_accept_call">Accept Call</string>
     <string name="video_calls_reject_call">Reject Call</string>
+    <string name="no_phone_number_error">Phone number is not currently available.</string>
+    <string name="call_dialog_positive_button">Call</string>
+    <string name="dialog_cancel_button">Cancel</string>
+    <string name="call_dialog_message">"Call %1$s ?"</string>
+    <string name="permission_call_phone_explanation">Permissions needed to start call.</string>
+    <string name="delete_shout_error">Currently, You can not delete this shoutit. Please try again later.</string>
+    <string name="delete_shout_success">Shout was deleted.</string>
+    <string name="send_report_positive_button">Send</string>
+    <string name="report_dialog_hint">Enter report</string>
+    <string name="report_dialog_empty_error">Body cannot be empty</string>
+    <string name="delete_shout_dialog_title">Delete shout</string>
+    <string name="delete_shout_dialog_message">Are You sure?</string>
+    <string name="delete_shout_dialog_button">Delete</string>
+    <string name="report_send_success">Report was send</string>
 
 </resources>

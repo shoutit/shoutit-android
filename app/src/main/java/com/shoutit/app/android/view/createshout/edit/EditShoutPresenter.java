@@ -191,6 +191,7 @@ public class EditShoutPresenter {
                             mListener.setLocation(
                                     ResourcesHelper.getResourceIdForName(mUserLocation.getCountry(), mContext),
                                     mUserLocation.getCity());
+                            mListener.setMobilePhone(shoutResponse.getMobileHint());
                             mListener.setMedia(shoutResponse.getImages(), shoutResponse.getVideos());
                             changeCategoryWithSelectedOptions(shoutResponse.getCategory().getSlug(), shoutResponse.getFilters());
                         } else {
@@ -320,7 +321,7 @@ public class EditShoutPresenter {
                         PriceUtils.getPriceInCents(requestData.mBudget),
                         requestData.mCurrencyId,
                         requestData.mCategoryId,
-                        getFilters(requestData.mOptionsIdValue), requestData.mImages, requestData.mVideos));
+                        getFilters(requestData.mOptionsIdValue), requestData.mImages, requestData.mVideos, requestData.mMobile));
 
         pendingSubscriptions.add(observable
                 .subscribeOn(mNetworkScheduler)
@@ -382,6 +383,8 @@ public class EditShoutPresenter {
         void setActionbarTitle(@NonNull String title);
 
         void setMedia(@NonNull List<String> images, @NonNull List<Video> videos);
+
+        void setMobilePhone(@Nullable String mobileHint);
     }
 
 }

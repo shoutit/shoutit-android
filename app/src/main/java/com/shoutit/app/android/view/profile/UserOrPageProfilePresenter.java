@@ -37,6 +37,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import retrofit2.Response;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
@@ -86,6 +87,7 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
 
     @Nonnull
     private final String userName;
+    private ShoutsDao shoutsDao;
     @Nonnull
     private final Context context;
     @Nonnull
@@ -111,6 +113,7 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
                                       @Nonnull PreferencesHelper preferencesHelper,
                                       @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter) {
         this.userName = userName;
+        this.shoutsDao = shoutsDao;
         this.context = context;
         this.profilesDao = profilesDao;
         this.myProfilePresenter = myProfilePresenter;
@@ -428,6 +431,20 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
     @Override
     public void refreshProfile() {
         profilesDao.getRefreshProfileObserver(userName).onNext(null);
+        shoutsDao.getUserShoutsDao(new UserShoutsPointer(SHOUTS_PAGE_SIZE, userName))
+                .getRefreshObserver().onNext(null);
+    }
+
+    @Nonnull
+    @Override
+    public Observer<String> sendReportObserver() {
+        return profilesDao.getProfileDao(userName).getReportProfileObserver();
+    }
+
+    @Nonnull
+    @Override
+    public Observable<Response<Object>> getReportShoutObservable() {
+        return profilesDao.getProfileDao(userName).getReportProfileResponseObservable();
     }
 
     public void onSearchMenuItemClicked() {

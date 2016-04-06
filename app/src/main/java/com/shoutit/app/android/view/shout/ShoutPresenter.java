@@ -21,6 +21,7 @@ import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.dao.UsersIdentityDao;
+import com.shoutit.app.android.model.MobilePhoneResponse;
 import com.shoutit.app.android.model.RelatedShoutsPointer;
 import com.shoutit.app.android.model.UserShoutsPointer;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
@@ -31,10 +32,13 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
+import retrofit2.Response;
 import rx.Observable;
+import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.functions.Func3;
 import rx.subjects.PublishSubject;
 
@@ -51,6 +55,13 @@ public class ShoutPresenter {
     private final Observable<String> usernameObservable;
     private final Observable<Boolean> isUserShoutOwnerObservable;
     private final Observable<ResponseOrError<UserIdentity>> userIdentityResponse;
+    private final Observable<ResponseOrError<MobilePhoneResponse>> callErrorObservable;
+    private final Observable<Boolean> hasMobilePhoneObservable;
+    private final Observable<Response<Object>> deleteShoutResponseObservable;
+    private final Observable<Boolean> showDeleteDialogObservable;
+    private final PublishSubject<Object> deleteShoutSubject = PublishSubject.create();
+    private final Observable<Response<Object>> reportShoutObservable;
+
     private Observable<String> identityUserObservable;
 
     private Observable<UserIdentity> successUserIdentity;
@@ -65,6 +76,9 @@ public class ShoutPresenter {
 
     @Nonnull
     private final Scheduler uiScheduler;
+    @Nonnull
+    private final PublishSubject<Object> callOrDeleteSubject = PublishSubject.create();
+    private final PublishSubject<String> sendReportObserver = PublishSubject.create();
 
     @Inject
     public ShoutPresenter(@Nonnull final ShoutsDao shoutsDao,
@@ -98,6 +112,14 @@ public class ShoutPresenter {
                     @Override
                     public String call(Shout shout) {
                         return shout.getTitle();
+                    }
+                });
+
+        hasMobilePhoneObservable = successShoutResponse
+                .map(new Func1<Shout, Boolean>() {
+                    @Override
+                    public Boolean call(Shout shout) {
+                        return shout.isMobileSet();
                     }
                 });
 
@@ -290,6 +312,41 @@ public class ShoutPresenter {
                     }
                 }).observeOn(uiScheduler);
 
+        final Observable<Boolean> callOrEditObservable = Observable
+                .combineLatest(callOrDeleteSubject, isUserShoutOwnerObservable, new Func2<Object, Boolean, Boolean>() {
+                    @Override
+                    public Boolean call(Object o, Boolean isOwner) {
+                        return isOwner;
+                    }
+                });
+
+        final Observable<ResponseOrError<MobilePhoneResponse>> shoutMobilePhoneErrorObservable = shoutsDao
+                .getShoutMobilePhoneObservable(shoutId)
+                .compose(ObservableExtensions.<ResponseOrError<MobilePhoneResponse>>behaviorRefCount());
+
+        callErrorObservable = callOrEditObservable
+                .filter(Functions1.isFalse())
+                .flatMap(new Func1<Boolean, Observable<ResponseOrError<MobilePhoneResponse>>>() {
+                    @Override
+                    public Observable<ResponseOrError<MobilePhoneResponse>> call(Boolean aBoolean) {
+                        return shoutMobilePhoneErrorObservable;
+                    }
+                })
+                .observeOn(uiScheduler);
+
+        deleteShoutSubject.subscribe(shoutsDao.getDeleteShoutObserver(shoutId));
+
+        sendReportObserver.subscribe(shoutsDao.getReportShoutObserver(shoutId));
+
+        reportShoutObservable = shoutsDao.getReportShoutObservable(shoutId)
+                .observeOn(uiScheduler);
+
+        showDeleteDialogObservable = callOrEditObservable
+                .filter(Functions1.isTrue())
+                .observeOn(uiScheduler);
+
+        deleteShoutResponseObservable = shoutsDao.getDeleteShoutObservable(shoutId)
+                .observeOn(uiScheduler);
     }
 
     @Nonnull
@@ -363,6 +420,46 @@ public class ShoutPresenter {
 
     public Observable<String> getUsernameObservable() {
         return usernameObservable;
+    }
+
+    @Nonnull
+    public Observer<Object> callOrDeleteObserver() {
+        return callOrDeleteSubject;
+    }
+
+    @Nonnull
+    public Observable<ResponseOrError<MobilePhoneResponse>> getCallErrorObservable() {
+        return callErrorObservable;
+    }
+
+    @Nonnull
+    public Observable<Boolean> getHasMobilePhoneObservable() {
+        return hasMobilePhoneObservable;
+    }
+
+    @Nonnull
+    public Observable<Response<Object>> getDeleteShoutResponseObservable() {
+        return deleteShoutResponseObservable;
+    }
+
+    @Nonnull
+    public Observer<String> sendReportObserver() {
+        return sendReportObserver;
+    }
+
+    @Nonnull
+    public Observable<Boolean> getShowDeleteDialogObservable() {
+        return showDeleteDialogObservable;
+    }
+
+    @Nonnull
+    public Observer<Object> getDeleteShoutObserver() {
+        return deleteShoutSubject;
+    }
+
+    @Nonnull
+    public Observable<Response<Object>> getReportShoutObservable() {
+        return reportShoutObservable;
     }
 }
 

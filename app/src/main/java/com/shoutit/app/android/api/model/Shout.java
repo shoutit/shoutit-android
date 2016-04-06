@@ -33,11 +33,12 @@ public class Shout {
     private final List<Video> videos;
     private final List<Filter> filters;
     private final int availableCount;
+    private final Boolean isMobileSet;
 
     public Shout(@Nonnull String id, String apiUrl, String webUrl, String type,
                  UserLocation location, String title, String text, Long price, float number,
                  String currency, String thumbnail, String videoUrl, User profile,
-                 Category category, List<Filter> filters, long datePublished, List<String> images, List<Video> videos, int availableCount) {
+                 Category category, List<Filter> filters, long datePublished, List<String> images, List<Video> videos, int availableCount, boolean isMobileSet) {
         this.id = id;
         this.apiUrl = apiUrl;
         this.webUrl = webUrl;
@@ -57,6 +58,7 @@ public class Shout {
         this.filters = filters;
         this.videos = videos;
         this.availableCount = availableCount;
+        this.isMobileSet = isMobileSet;
     }
 
     @Nonnull
@@ -141,6 +143,10 @@ public class Shout {
 
     public List<Filter> getFilters() {
         return filters;
+    }
+
+    public Boolean isMobileSet() {
+        return isMobileSet;
     }
 
     @Override
