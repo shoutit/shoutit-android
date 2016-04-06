@@ -63,7 +63,7 @@ public class PostLoginPresenter {
                     @Nullable
                     @Override
                     public CategoryItem apply(Category input) {
-                        return new CategoryItem(input.getImage(), input.getName(), input.getSlug());
+                        return new CategoryItem(input.getIcon(), input.getName(), input.getSlug());
                     }
                 }));
             }
