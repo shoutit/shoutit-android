@@ -185,13 +185,13 @@ public class SearchShoutsResultsPresenter {
 
     public class ShoutHeaderAdapterItem extends BaseNoIDAdapterItem {
 
-        @Nonnull
+        @Nullable
         private final String searchQuery;
         private final int totalItemsCount;
         private final Observer<Object> layoutManagerSwitchObserver;
         private final Observer<Object> filtersOpenObserver;
 
-        public ShoutHeaderAdapterItem(@Nonnull String searchQuery, int totalItemsCount,
+        public ShoutHeaderAdapterItem(@Nullable String searchQuery, int totalItemsCount,
                                       Observer<Object> layoutManagerSwitchObserver,
                                       Observer<Object> filtersOpenObserver) {
 

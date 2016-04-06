@@ -172,7 +172,6 @@ public class ShoutsDao {
             mLocationPointer = locationPointer;
         }
 
-        @NonNull
         @Nonnull
         @Override
         Observable<ShoutsResponse> getShoutsRequest(int pageNumber) {
@@ -183,7 +182,8 @@ public class ShoutsDao {
             } else {
                 return apiService
                         .shoutsForLocation(mLocationPointer.getCountryCode(),
-                                mLocationPointer.getCity(), null, pageNumber, PAGE_SIZE)
+                                mLocationPointer.getCity(), null, pageNumber, PAGE_SIZE,
+                                null, null, null, null, null, null)
                         .subscribeOn(networkScheduler);
             }
         }
@@ -329,8 +329,16 @@ public class ShoutsDao {
                                 null, null, null, null, null, null);
                     }
                 case BROWSE:
-                    return apiService.shoutsForLocation(location.getCountry(), location.getCity(),
-                            location.getState(), pageNumber, PAGE_SIZE);
+                    if (filtersToSubmit != null) {
+                        return apiService.shoutsForLocation(location.getCountry(), filtersToSubmit.getCity(),
+                                filtersToSubmit.getState(), pageNumber, PAGE_SIZE,
+                                filtersToSubmit.getMinPrice(), filtersToSubmit.getMaxPrice(),
+                                filtersToSubmit.getDistance(), filtersToSubmit.getShoutType(),
+                                filtersToSubmit.getSortType().getType(), filtersToSubmit.getFiltersQueryMap());
+                    } else {
+                        return apiService.shoutsForLocation(location.getCountry(), location.getCity(),
+                                location.getState(), pageNumber, PAGE_SIZE, null, null, null, null, null, null);
+                    }
                 default:
                     throw new RuntimeException("Unknwon profile type: " + SearchPresenter.SearchType.values()[searchType.ordinal()]);
             }

@@ -1,34 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/search_results_drawer_layout"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/default_bg_color">
 
-    <RelativeLayout
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/search_shouts_results_toolbar"
+        style="@style/AppTheme.BaseToolbarStyle"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/default_bg_color">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/search_shouts_results_toolbar"
-            style="@style/AppTheme.BaseToolbarStyle"
-            android:layout_width="match_parent"
-            android:layout_height="?actionBarSize" />
-
-        <FrameLayout
-            android:layout_below="@+id/search_shouts_results_toolbar"
-            android:id="@+id/activity_search_results_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-    </RelativeLayout>
+        android:layout_height="?actionBarSize" />
 
     <FrameLayout
-        android:id="@+id/filter_drawer"
-        android:layout_width="304dp"
+        android:id="@+id/activity_search_results_container"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="end|right"/>
+        android:layout_below="@+id/search_shouts_results_toolbar" />
 
-</android.support.v4.widget.DrawerLayout>
+</RelativeLayout>
+
 

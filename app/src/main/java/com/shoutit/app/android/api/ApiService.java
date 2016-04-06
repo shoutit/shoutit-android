@@ -79,7 +79,13 @@ public interface ApiService {
                                                  @Query("city") String city,
                                                  @Query("state") String state,
                                                  @Query("page") Integer page,
-                                                 @Query("page_size") Integer pageSize);
+                                                 @Query("page_size") Integer pageSize,
+                                                 @Query("min_price") Integer minPrice,
+                                                 @Query("max_price") Integer maxPrice,
+                                                 @Query("within") Integer distance,
+                                                 @Query("shout_type") String shoutType,
+                                                 @Query("sort") String sortBy,
+                                                 @QueryMap Map<String, String> filtersMap);
 
     @GET("shouts")
     Observable<ShoutsResponse> shoutsForDiscoverItem(@Query("discover") @NonNull String discoverId,
