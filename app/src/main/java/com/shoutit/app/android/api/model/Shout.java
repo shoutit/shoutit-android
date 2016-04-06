@@ -34,11 +34,13 @@ public class Shout {
     private final List<Video> videos;
     private final List<Filter> filters;
     private final int availableCount;
+    private final List<Conversation> conversations;
 
     public Shout(@Nonnull String id, String apiUrl, String webUrl, String type,
                  UserLocation location, String title, String text, Long price, float number,
                  String currency, String thumbnail, String videoUrl, User profile,
-                 Category category, List<Filter> filters, long datePublished, List<String> images, List<Video> videos, int availableCount) {
+                 Category category, List<Filter> filters, long datePublished, List<String> images,
+                 List<Video> videos, int availableCount, List<Conversation> conversations) {
         this.id = id;
         this.apiUrl = apiUrl;
         this.webUrl = webUrl;
@@ -58,6 +60,7 @@ public class Shout {
         this.filters = filters;
         this.videos = videos;
         this.availableCount = availableCount;
+        this.conversations = conversations;
     }
 
     @Nonnull
@@ -142,6 +145,10 @@ public class Shout {
 
     public List<Filter> getFilters() {
         return filters;
+    }
+
+    public List<Conversation> getConversations() {
+        return conversations;
     }
 
     @Override

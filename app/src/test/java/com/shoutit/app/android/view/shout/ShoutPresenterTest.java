@@ -4,10 +4,12 @@ import android.content.Context;
 
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
+import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
@@ -64,7 +66,7 @@ public class ShoutPresenterTest {
                 .thenReturn(Observable.just(ResponseOrError.fromData(new ShoutsResponse(1, "z", "z", Lists.newArrayList(getShout())))));
         when(userPreferences.getUserObservable())
                 .thenReturn(Observable.just(new User("z", null, null, null, null, null, null, null, false, null,
-                null, false, false, false, null, 1, null, null, null, 1, null, false, null, null, null)));
+                null, false, false, false, null, 1, null, null, null, 1, null, false, null, null, null, null)));
         when(userPreferences.isNormalUser())
                 .thenReturn(true);
         when(globalRefreshPresenter.getShoutsGlobalRefreshObservable())
@@ -174,12 +176,12 @@ public class ShoutPresenterTest {
     }
 
     private Shout getShout() {
-        return new Shout("id", null, null, null, null, null, null, 1L, 2, null, null, null, getUser(), null, null, 1, null, null, 0);
+        return new Shout("id", null, null, null, null, null, null, 1L, 2, null, null, null, getUser(), null, null, 1, null, null, 0, ImmutableList.<Conversation>of());
     }
 
     private User getUser() {
         return new User("z", null, null, null, null, null, null, null, false, null,
-                null, false, false, false, null, 1, null, null, null, 1, null, false, null, null, null);
+                null, false, false, false, null, 1, null, null, null, 1, null, false, null, null, null, null);
     }
 
 

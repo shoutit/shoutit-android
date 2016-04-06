@@ -13,7 +13,11 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.Conversation;
+import com.shoutit.app.android.api.model.ConversationProfile;
 import com.shoutit.app.android.api.model.ConversationsResponse;
+import com.shoutit.app.android.api.model.Message;
+import com.shoutit.app.android.api.model.MessageAttachment;
 import com.shoutit.app.android.dagger.ForActivity;
 
 import java.util.List;
@@ -102,16 +106,16 @@ public class ConversationsPresenter {
                     public void call(ConversationsResponse conversationsResponse) {
                         mListener.showProgress(false);
 
-                        final List<ConversationsResponse.Conversation> conversations = conversationsResponse.getResults();
+                        final List<Conversation> conversations = conversationsResponse.getResults();
                         if (conversations.isEmpty()) {
                             mListener.emptyList();
                         } else {
                             final ImmutableList<BaseAdapterItem> items = ImmutableList.copyOf(Iterables.transform(
                                     conversations,
-                                    new Function<ConversationsResponse.Conversation, BaseAdapterItem>() {
+                                    new Function<Conversation, BaseAdapterItem>() {
                                         @Nullable
                                         @Override
-                                        public BaseAdapterItem apply(@Nullable ConversationsResponse.Conversation input) {
+                                        public BaseAdapterItem apply(@Nullable Conversation input) {
                                             assert input != null;
                                             return getConversationItem(input);
                                         }
@@ -130,37 +134,37 @@ public class ConversationsPresenter {
     }
 
     @NonNull
-    private BaseAdapterItem getConversationItem(@NonNull ConversationsResponse.Conversation input) {
-        final ConversationsResponse.Message lastMessage = input.getLastMessage();
-        final List<ConversationsResponse.ConversationProfile> profiles = input.getProfiles();
+    private BaseAdapterItem getConversationItem(@NonNull Conversation input) {
+        final Message lastMessage = input.getLastMessage();
+        final List<ConversationProfile> profiles = input.getProfiles();
 
         final String message = getMessageString(lastMessage);
         final String elapsedTime = DateUtils.getRelativeTimeSpanString(mContext, lastMessage.getCreatedAt() * 1000).toString();
         final String chatWith = getChatWithString(profiles);
         final String image = getImage(profiles);
 
-        if (ConversationsResponse.Conversation.ABOUT_SHOUT_TYPE.equals(input.getType())) {
+        if (Conversation.ABOUT_SHOUT_TYPE.equals(input.getType())) {
             return new ConversationShoutItem(input.getId(), input.getAbout().getTitle(), chatWith, message, elapsedTime, image);
-        } else if (ConversationsResponse.Conversation.CHAT_TYPE.equals(input.getType())) {
+        } else if (Conversation.CHAT_TYPE.equals(input.getType())) {
             return new ConversationChatItem(input.getId(), message, chatWith, elapsedTime, image);
         } else {
             throw new RuntimeException(input.getType() + " : unknown type");
         }
     }
 
-    private String getImage(List<ConversationsResponse.ConversationProfile> profiles) {
+    private String getImage(List<ConversationProfile> profiles) {
         return profiles.get(0).getImage();
     }
 
-    private String getChatWithString(List<ConversationsResponse.ConversationProfile> profiles) {
+    private String getChatWithString(List<ConversationProfile> profiles) {
         String chatWith;
         if (profiles.size() == 2) {
-            final ConversationsResponse.ConversationProfile conversationProfile = profiles.get(0);
+            final ConversationProfile conversationProfile = profiles.get(0);
             chatWith = conversationProfile.getUsername();
         } else {
             final StringBuilder nameBuilder = new StringBuilder();
-            for (final ConversationsResponse.ConversationProfile profile : profiles) {
-                if (profile.getType().equals(ConversationsResponse.ConversationProfile.TYPE_USER)) {
+            for (final ConversationProfile profile : profiles) {
+                if (profile.getType().equals(ConversationProfile.TYPE_USER)) {
                     nameBuilder.append(profile.getFirstName());
                 } else {
                     nameBuilder.append(profile.getUsername());
@@ -171,16 +175,18 @@ public class ConversationsPresenter {
         return chatWith;
     }
 
-    private String getMessageString(ConversationsResponse.Message lastMessage) {
-        final List<ConversationsResponse.MessageAttachment> attachments = lastMessage.getAttachments();
+    private String getMessageString(Message lastMessage) {
+        final List<MessageAttachment> attachments = lastMessage.getAttachments();
         if (attachments == null || attachments.isEmpty()) {
             return lastMessage.getText();
         } else {
-            final ConversationsResponse.MessageAttachment messageAttachment = attachments.get(0);
-            if (ConversationsResponse.MessageAttachment.ATTACHMENT_TYPE_LOCATION.equals(messageAttachment.getType())) {
+            final MessageAttachment messageAttachment = attachments.get(0);
+            if (MessageAttachment.ATTACHMENT_TYPE_LOCATION.equals(messageAttachment.getType())) {
                 return "Location";
-            } else if (ConversationsResponse.MessageAttachment.ATTACHMENT_TYPE_SHOUT.equals(messageAttachment.getType())) {
+            } else if (MessageAttachment.ATTACHMENT_TYPE_SHOUT.equals(messageAttachment.getType())) {
                 return "Shout";
+            } else if (MessageAttachment.ATTACHMENT_TYPE_MEDIA.equals(messageAttachment.getType())) {
+                return "Media";
             } else {
                 throw new RuntimeException(messageAttachment.getType() + " : unknown type");
             }
@@ -205,6 +211,8 @@ public class ConversationsPresenter {
         void setData(@NonNull List<BaseAdapterItem> items);
 
         void error();
+
+        void onItemClicked(@NonNull String id, boolean shoutChat);
     }
 
     public class ConversationChatItem implements BaseAdapterItem {
@@ -255,6 +263,10 @@ public class ConversationsPresenter {
 
         public String getImage() {
             return image;
+        }
+
+        public void click() {
+            mListener.onItemClicked(id, false);
         }
     }
 
@@ -312,6 +324,10 @@ public class ConversationsPresenter {
 
         public String getImage() {
             return image;
+        }
+
+        public void click() {
+            mListener.onItemClicked(id, true);
         }
     }
 
