@@ -209,6 +209,11 @@ public class ShoutAdapter extends BaseAdapter {
             locationContainer.setBackgroundColor(context.getResources().getColor(
                     isLastElementLight ? android.R.color.white : R.color.black_12));
         }
+
+        @OnClick(R.id.shout_detail_category_row)
+        public void onCategoryClick() {
+            item.onCategoryClick(item.getShout().getCategory().getSlug());
+        }
     }
 
     public class UserShoutViewHolder extends ViewHolderManager.BaseViewHolder<ShoutAdapterItems.UserShoutAdapterItem> implements View.OnClickListener {

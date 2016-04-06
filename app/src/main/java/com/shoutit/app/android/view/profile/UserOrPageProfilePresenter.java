@@ -428,6 +428,12 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
         return userProfilePresenter.getMoreMenuOptionClickedSubject();
     }
 
+    @Nonnull
+    @Override
+    public Observable<String> getSeeAllShoutsObservable() {
+        return showAllShoutsSubject;
+    }
+
     @Override
     public void refreshProfile() {
         profilesDao.getRefreshProfileObserver(userName).onNext(null);

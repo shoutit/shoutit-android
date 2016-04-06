@@ -29,7 +29,9 @@
 
         </LinearLayout>
 
-        <LinearLayout style="@style/ShoutCardItemDark">
+        <LinearLayout
+            android:id="@+id/shout_detail_category_row"
+            style="@style/ShoutCardItemDark">
 
             <TextView
                 style="@style/ShoutCardSection"

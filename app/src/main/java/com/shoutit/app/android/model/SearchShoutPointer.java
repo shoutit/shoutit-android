@@ -18,6 +18,9 @@ public class SearchShoutPointer {
     private final UserLocation location;
     @Nullable
     private final String contextItemId;
+    @Nullable
+    FiltersToSubmit filtersToSubmit;
+
 
     public SearchShoutPointer(@Nullable String query, @Nonnull SearchPresenter.SearchType searchType,
                               @Nonnull UserLocation location, @Nullable String contextItemId) {
@@ -25,6 +28,17 @@ public class SearchShoutPointer {
         this.searchType = searchType;
         this.location = location;
         this.contextItemId = contextItemId;
+    }
+
+    public SearchShoutPointer(@Nullable String query,
+                              @Nonnull SearchPresenter.SearchType searchType,
+                              @Nullable String contextItemId,
+                              @Nonnull FiltersToSubmit filtersToSubmit) {
+        this.query = query;
+        this.searchType = searchType;
+        this.contextItemId = contextItemId;
+        this.filtersToSubmit = filtersToSubmit;
+        this.location = filtersToSubmit.getUserLocation();
     }
 
     @Nullable
@@ -47,6 +61,11 @@ public class SearchShoutPointer {
         return contextItemId;
     }
 
+    @Nullable
+    public FiltersToSubmit getFiltersToSubmit() {
+        return filtersToSubmit;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -55,11 +74,12 @@ public class SearchShoutPointer {
         return Objects.equal(query, that.query) &&
                 searchType == that.searchType &&
                 Objects.equal(location, that.location) &&
-                Objects.equal(contextItemId, that.contextItemId);
+                Objects.equal(contextItemId, that.contextItemId) &&
+                Objects.equal(filtersToSubmit, that.filtersToSubmit);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(query, searchType, location, contextItemId);
+        return Objects.hashCode(query, searchType, location, contextItemId, filtersToSubmit);
     }
 }

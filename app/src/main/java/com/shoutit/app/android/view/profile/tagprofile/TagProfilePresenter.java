@@ -447,6 +447,12 @@ public class TagProfilePresenter implements ProfilePresenter {
         return moreMenuOptionClickedSubject;
     }
 
+    @Nonnull
+    @Override
+    public Observable<String> getSeeAllShoutsObservable() {
+        return showAllShoutsSubject;
+    }
+
     @Override
     public void refreshProfile() {
         tagsDao.refreshRelatedTags(tagName);

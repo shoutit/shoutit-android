@@ -17,6 +17,7 @@ import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.NotificationsDao;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
+import com.shoutit.app.android.dao.SortTypesDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.dao.SuggestionsDao;
 import com.shoutit.app.android.db.DbHelper;
@@ -71,6 +72,8 @@ public interface AppComponent {
     DiscoverShoutsDao discoverShoutsDao();
 
     CategoriesDao categoriesDao();
+
+    SortTypesDao sortTypesDao();
 
     ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter();
 

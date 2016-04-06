@@ -57,6 +57,9 @@ public interface ProfilePresenter {
     @Nonnull
     Observable<Object> getMoreMenuOptionClickedSubject();
 
+    @Nonnull
+    Observable<String> getSeeAllShoutsObservable();
+
     void refreshProfile();
 
     @Nonnull

@@ -1,15 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/search_results_drawer_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/default_bg_color">
+    android:layout_height="match_parent">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/search_shouts_results_recycler_view"
-        android:background="@color/default_bg_color"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:background="@color/default_bg_color">
 
-    <include layout="@layout/base_progress" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-</FrameLayout>
+            <include layout="@layout/search_shout_results_header_item"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/search_shouts_results_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/default_bg_color" />
+
+        </LinearLayout>
+
+        <include layout="@layout/base_progress" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/filter_drawer"
+        android:layout_width="304dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="end|right"/>
+
+</android.support.v4.widget.DrawerLayout>
