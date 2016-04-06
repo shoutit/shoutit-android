@@ -13,6 +13,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.utils.ColoredSnackBar;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

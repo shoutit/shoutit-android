@@ -3,6 +3,8 @@ package com.shoutit.app.android.view.videoconversation;
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.UiScheduler;
+import com.appunite.rx.functions.Functions1;
+import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.api.model.TwilioResponse;
 import com.shoutit.app.android.api.model.UserIdentity;
 import com.shoutit.app.android.dao.UsersIdentityDao;
@@ -13,6 +15,7 @@ import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Scheduler;
+import rx.functions.Action1;
 import rx.functions.Func1;
 
 public class VideoConversationPresenter {
@@ -23,6 +26,8 @@ public class VideoConversationPresenter {
     private Observable<String> apiKeyUserObservable;
     @Nonnull
     private Observable<String> twilioRequirementObservable;
+    @Nonnull
+    private Observable<Throwable> errorObservable;
 
     @Inject
     public VideoConversationPresenter(@Nonnull final VideoCallsDao videoCallsDao,
@@ -55,13 +60,31 @@ public class VideoConversationPresenter {
                         return apiKey != null;
                     }
                 });
+
+        /** Errors **/
+        errorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
+                ResponseOrError.transform(twilioResponse)))
+                .filter(Functions1.isNotNull()).doOnNext(new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+
+                    }
+                })
+                .observeOn(uiScheduler);
+
     }
 
+    @Nonnull
     public Observable<String> getApiKeyUserObservable() {
         return apiKeyUserObservable;
     }
 
+    @Nonnull
     public Observable<String> getTwilioRequirementObservable() {
         return twilioRequirementObservable;
+    }
+    @Nonnull
+    public Observable<Throwable> getErrorObservable() {
+        return errorObservable;
     }
 }

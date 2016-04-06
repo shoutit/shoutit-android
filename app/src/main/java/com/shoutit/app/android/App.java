@@ -22,6 +22,7 @@ import com.shoutit.app.android.dagger.AppModule;
 import com.shoutit.app.android.dagger.BaseModule;
 import com.shoutit.app.android.dagger.DaggerAppComponent;
 import com.shoutit.app.android.location.LocationManager;
+import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.view.videoconversation.DialogCallActivity;
 import com.shoutit.app.android.view.videoconversation.VideoConversationPresenter;
@@ -49,16 +50,14 @@ import rx.plugins.RxJavaPlugins;
 
 public class App extends MultiDexApplication {
 
-    private static final String VC = "TWILIO";
+    private static final String VC = "APP_TWILIO";
     private static final String TAG = App.class.getSimpleName();
 
     private AppComponent component;
-    private String apiKey;
 
     private TwilioAccessManager accessManager;
     private ConversationsClient conversationsClient;
     private IncomingInvite invite;
-    private OutgoingInvite outgoingInvite;
 
     @Inject
     ApiService apiService;
@@ -95,7 +94,13 @@ public class App extends MultiDexApplication {
                     @Override
                     public void call(String apiKey) {
                         initializeVideoCalls(apiKey);
-                        Log.d("TWILIO", "MY API KEY: " + apiKey);
+                    }
+                });
+        presenter.getErrorObservable()
+                .subscribe(new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        Toast.makeText(getApplicationContext(), "Failed to fetch data: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -192,19 +197,17 @@ public class App extends MultiDexApplication {
         return new TwilioAccessManagerListener() {
             @Override
             public void onAccessManagerTokenExpire(TwilioAccessManager twilioAccessManager) {
-                Log.d(VC,"Token Expired");
-
+                Log.d(VC,"accessManagerListener : Token Expired");
             }
 
             @Override
             public void onTokenUpdated(TwilioAccessManager twilioAccessManager) {
-                Log.d(VC, "Token Updated");
-
+                Log.d(VC, "accessManagerListener : Token Updated");
             }
 
             @Override
             public void onError(TwilioAccessManager twilioAccessManager, String s) {
-                Log.d(VC, "Error");
+                Log.d(VC, "accessManagerListener : Error on Token");
             }
         };
     }
@@ -214,22 +217,30 @@ public class App extends MultiDexApplication {
         return new ConversationsClientListener() {
             @Override
             public void onStartListeningForInvites(ConversationsClient conversationsClient) {
-                Log.d(VC, "Listen for Conversations");
+                Log.d(VC, "conversationsClientListener : Listen for Conversations");
             }
 
             @Override
             public void onStopListeningForInvites(ConversationsClient conversationsClient) {
-                Log.d(VC, "Stop listening for Conversations");
+                Log.d(VC, "conversationsClientListener : Stop listening for Conversations");
+                presenter.getTwilioRequirementObservable()
+                        .subscribe(new Action1<String>() {
+                            @Override
+                            public void call(String apiKey) {
+                                initializeVideoCalls(apiKey);
+                            }
+                        });
             }
 
             @Override
             public void onFailedToStartListening(ConversationsClient conversationsClient, TwilioConversationsException e) {
-                Log.d(VC, "Failed to listening for Conversations");
+                Log.d(VC, "conversationsClientListener : Failed to listening for Conversations");
+                if(e != null) Log.d(VC, "ERROR: Failed to listening for Conversations" + e.getMessage());
             }
 
             @Override
             public void onIncomingInvite(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
-                Log.d(VC, "Incoming call");
+                Log.d(VC, "conversationsClientListener : Incoming call");
                 invite = incomingInvite;
                 Intent intent = new Intent(getApplicationContext(), DialogCallActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -238,7 +249,7 @@ public class App extends MultiDexApplication {
 
             @Override
             public void onIncomingInviteCancelled(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
-                Log.d(VC, "Incoming call canceled");
+                Log.d(VC, "conversationsClientListener : Incoming call canceled");
                 conversationsClient.listen();
             }
         };
@@ -252,10 +263,4 @@ public class App extends MultiDexApplication {
     public ConversationsClient getConversationsClient(){
         return conversationsClient;
     }
-
-    public void setConversationsClient(ConversationsClient conversationsClient) {
-        this.conversationsClient = conversationsClient;
-        conversationsClient.listen();
-    }
-
 }

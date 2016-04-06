@@ -193,6 +193,32 @@ public class ShoutPresenter {
                     }
                 });
 
+        /** Shout Owner Identity**/
+        userIdentityResponse = getUsernameObservable()
+                .filter(new Func1<String, Boolean>() {
+                    @Override
+                    public Boolean call(String s) {
+                        return s != null;
+                    }
+                })
+                .flatMap(new Func1<String, Observable<ResponseOrError<UserIdentity>>>() {
+                    @Override
+                    public Observable<ResponseOrError<UserIdentity>> call(String username) {
+                        return usersIdentityDao.getUserIdentityObservable(username);
+                    }
+                });
+
+        successUserIdentity = userIdentityResponse
+                .compose(ResponseOrError.<UserIdentity>onlySuccess());
+
+        identityUserObservable = successUserIdentity
+                .map(new Func1<UserIdentity, String>() {
+                    @Override
+                    public String call(UserIdentity userIdentity) {
+                        return userIdentity.getIdentity();
+                    }
+                }).observeOn(uiScheduler);
+
         allAdapterItemsObservable = Observable.combineLatest(
                 shoutItemObservable,
                 userShoutItemsObservable.startWith(ImmutableList.<BaseAdapterItem>of()),
@@ -228,7 +254,8 @@ public class ShoutPresenter {
         errorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
                 ResponseOrError.transform(userShoutsObservable),
                 ResponseOrError.transform(shoutResponse),
-                ResponseOrError.transform(relatedShoutsObservable)))
+                ResponseOrError.transform(relatedShoutsObservable),
+                ResponseOrError.transform(userIdentityResponse)))
                 .filter(Functions1.isNotNull()).doOnNext(new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
@@ -255,37 +282,6 @@ public class ShoutPresenter {
                 })
                 .compose(ObservableExtensions.<Boolean>behaviorRefCount())
                 .first();
-
-        /** Shout Owner Identity**/
-
-        userIdentityResponse = getUsernameObservable()
-                .filter(new Func1<String, Boolean>() {
-                    @Override
-                    public Boolean call(String s) {
-                        return s != null;
-                    }
-                })
-                .flatMap(new Func1<String, Observable<ResponseOrError<UserIdentity>>>() {
-                    @Override
-                    public Observable<ResponseOrError<UserIdentity>> call(String username) {
-                        return usersIdentityDao.getUserIdentityObservable(username);
-                    }
-                });
-
-
-        successUserIdentity = userIdentityResponse
-                .compose(ResponseOrError.<UserIdentity>onlySuccess());
-
-        failedUserIdentity = userIdentityResponse
-                .compose(ResponseOrError.<UserIdentity>onlyError());
-
-        identityUserObservable = successUserIdentity
-                .map(new Func1<UserIdentity, String>() {
-                    @Override
-                    public String call(UserIdentity userIdentity) {
-                        return userIdentity.getIdentity();
-                    }
-                }).observeOn(uiScheduler);
 
     }
 
