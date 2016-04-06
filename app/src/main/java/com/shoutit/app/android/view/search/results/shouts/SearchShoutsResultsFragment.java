@@ -16,7 +16,6 @@ import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
 import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.jakewharton.rxbinding.view.RxView;
-import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.BaseFragmentWithComponent;
 import com.shoutit.app.android.BaseShoutsItemDecoration;
 import com.shoutit.app.android.R;
@@ -30,7 +29,6 @@ import com.shoutit.app.android.utils.LayoutManagerHelper;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.view.filter.FiltersFragment;
-import com.shoutit.app.android.view.filter.FiltersPresenter;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 
@@ -64,6 +62,7 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
     SearchShoutsResultsAdapter adapter;
 
     private ActionBarDrawerToggle drawerToggle;
+    private SearchPresenter.SearchType searchType;
 
     public static Fragment newInstance(@Nullable String searchQuery,
                                        @Nullable String contextualItemId,
@@ -89,7 +88,11 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (savedInstanceState == null) {
+
+        searchType = (SearchPresenter.SearchType)
+                checkNotNull(getArguments().getSerializable(SearchShoutsResultsActivity.KEY_SEARCH_TYPE));
+
+        if (savedInstanceState == null && shouldShowFilters()) {
             getChildFragmentManager()
                     .beginTransaction()
                     .replace(R.id.filter_drawer, FiltersFragment.newInstance())
@@ -150,9 +153,17 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
                 .subscribe(new Action1<Object>() {
                     @Override
                     public void call(Object o) {
-                        drawerLayout.openDrawer(filterLayout);
+                        if (shouldShowFilters()) {
+                            drawerLayout.openDrawer(filterLayout);
+
+                        }
                     }
                 });
+    }
+
+    private boolean shouldShowFilters() {
+        return !(searchType.equals(SearchPresenter.SearchType.DISCOVER) ||
+                searchType.equals(SearchPresenter.SearchType.PROFILE));
     }
 
     private void initAdapter() {
@@ -178,6 +189,9 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
     private void initFiltersDrawer() {
         drawerToggle = new ActionBarDrawerToggle(getActivity(), drawerLayout,
                 R.string.drawer_open, R.string.drawer_close);
+        if (!shouldShowFilters()) {
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        }
     }
 
     @Override

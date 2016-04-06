@@ -156,6 +156,10 @@
     <!-- Discover Shouts -->
     <string name="discover_shouts_share">Share</string>
     <string name="discover_shouts_title">%s Shouts</string>
+    <plurals name="discover_shouts_results">
+        <item quantity="one">%1$d result</item>
+        <item quantity="other">%1$d results</item>
+    </plurals>
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>
@@ -320,6 +324,7 @@
     <string name="search_profiles_results">Results</string>
     <string name="search_shout_results_header_title">All Results for \'%1$s\'</string>
     <string name="search_shout_results_header_title_location">All Results for your location</string>
+    <string name="search_shout_results_all_results">All Results</string>
     <string name="search_shouts_results_header_count">%1$d Results</string>
     <string name="search_results_no_results">No results found</string>
 

@@ -34,7 +34,9 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.view.createshout.edit.EditShoutActivity;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.profile.tagprofile.TagProfileActivity;
+import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.main.MainSearchActivity;
+import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsActivity;
 import com.shoutit.app.android.view.videoconversation.VideoConversationActivity;
 
 import java.util.List;
@@ -126,7 +128,8 @@ public class ShoutActivity extends BaseActivity {
                 .subscribe(new Action1<String>() {
                     @Override
                     public void call(String shoutId) {
-                        Toast.makeText(ShoutActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
+                        startActivity(SearchShoutsResultsActivity.newIntent(
+                                ShoutActivity.this, null, shoutId, SearchPresenter.SearchType.RELATED_SHOUTS));
                     }
                 });
 

@@ -14,6 +14,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
 import com.shoutit.app.android.adapters.ChangeableLayoutManagerAdapter;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 import com.shoutit.app.android.view.shouts.ShoutGridViewHolder;
 import com.shoutit.app.android.view.shouts.ShoutLinerViewHolder;
@@ -60,11 +61,16 @@ public class SearchShoutsResultsAdapter extends ChangeableLayoutManagerAdapter {
         @Override
         public void bind(@Nonnull SearchShoutsResultsPresenter.ShoutHeaderAdapterItem item) {
             if (TextUtils.isEmpty(item.getSearchQuery())) {
-                headerTitleTv.setText(context.getString(R.string.search_shout_results_header_title_location));
+                if (SearchPresenter.SearchType.BROWSE.equals(item.getSearchType())) {
+                    headerTitleTv.setText(context.getString(R.string.search_shout_results_header_title_location));
+                } else {
+                    headerTitleTv.setText(context.getString(R.string.search_shout_results_all_results));
+                }
             } else {
                 headerTitleTv.setText(context.getString(R.string.search_shout_results_header_title, item.getSearchQuery()));
             }
             headerCountTv.setText(context.getString(R.string.search_shouts_results_header_count, item.getTotalItemsCount()));
+            filterIv.setVisibility(shouldShowFilters(item.getSearchType()) ? View.VISIBLE : View.GONE);
 
             layoutSwitchIv.setImageDrawable(context.getResources().getDrawable(
                     isLinearLayoutManager ? R.drawable.ic_grid_switch : R.drawable.ic_list_switch));
@@ -76,6 +82,11 @@ public class SearchShoutsResultsAdapter extends ChangeableLayoutManagerAdapter {
                     RxView.clicks(filterIv)
                             .subscribe(item.getOnFilterClickObserver())
             );
+        }
+
+        private boolean shouldShowFilters(SearchPresenter.SearchType searchType) {
+            return !(searchType.equals(SearchPresenter.SearchType.PROFILE) ||
+                    searchType.equals(SearchPresenter.SearchType.DISCOVER));
         }
 
         @Override

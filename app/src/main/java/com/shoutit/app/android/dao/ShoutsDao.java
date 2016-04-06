@@ -306,6 +306,8 @@ public class ShoutsDao {
                                 location.getCountry(), location.getCity(), location.getState(),
                                 null, null, null, null, null, null);
                     }
+                case RELATED_SHOUTS:
+                    return apiService.shoutsRelated(contextItemId, pageNumber, PAGE_SIZE);
                 case TAG:
                     if (filtersToSubmit != null) {
                         return apiService.searchTagShouts(query, pageNumber, PAGE_SIZE, contextItemId,

@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckedTextView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.functions.BothParams;
@@ -58,6 +59,9 @@ public class DiscoverShoutsActivity extends BaseActivity {
     @Bind(R.id.shouts_layout_btn)
     CheckedTextView mShoutsCheckedTextView;
 
+    @Bind(R.id.discover_shouts_title)
+    TextView countTv;
+
     @Bind(R.id.shouts_toolbar)
     Toolbar mToolbar;
 
@@ -73,7 +77,7 @@ public class DiscoverShoutsActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.shouts_activity);
+        setContentView(R.layout.activity_discover_shouts);
 
         ButterKnife.bind(this);
 
@@ -136,6 +140,16 @@ public class DiscoverShoutsActivity extends BaseActivity {
                         startActivity(SubSearchActivity.newIntent(
                                 DiscoverShoutsActivity.this, SearchPresenter.SearchType.DISCOVER,
                                 discoverIdAndName.param1(), discoverIdAndName.param2()));
+                    }
+                });
+
+        mShoutsPresenter.getCountObservable()
+                .compose(this.<Integer>bindToLifecycle())
+                .subscribe(new Action1<Integer>() {
+                    @Override
+                    public void call(Integer integer) {
+                        countTv.setText(getResources().
+                                getQuantityString(R.plurals.discover_shouts_results, integer, integer));
                     }
                 });
     }

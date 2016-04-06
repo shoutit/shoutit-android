@@ -100,7 +100,8 @@ public class SearchShoutsResultsPresenter {
                             return ImmutableList.<BaseAdapterItem>of(new NoDataAdapterItem());
                         } else {
                             final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
-                            builder.add(new ShoutHeaderAdapterItem(searchQuery, shoutsResponse.getCount(), layoutManagerSwitchSubject, filtersOpenSubject));
+                            builder.add(new ShoutHeaderAdapterItem(searchQuery, shoutsResponse.getCount(),
+                                    layoutManagerSwitchSubject, filtersOpenSubject, searchType));
                             builder.addAll(Lists.transform(shoutsResponse.getShouts(), new Function<Shout, BaseAdapterItem>() {
                                 @Nullable
                                 @Override
@@ -190,15 +191,18 @@ public class SearchShoutsResultsPresenter {
         private final int totalItemsCount;
         private final Observer<Object> layoutManagerSwitchObserver;
         private final Observer<Object> filtersOpenObserver;
+        private final SearchPresenter.SearchType searchType;
 
         public ShoutHeaderAdapterItem(@Nullable String searchQuery, int totalItemsCount,
                                       Observer<Object> layoutManagerSwitchObserver,
-                                      Observer<Object> filtersOpenObserver) {
+                                      Observer<Object> filtersOpenObserver,
+                                      SearchPresenter.SearchType searchType) {
 
             this.searchQuery = searchQuery;
             this.totalItemsCount = totalItemsCount;
             this.layoutManagerSwitchObserver = layoutManagerSwitchObserver;
             this.filtersOpenObserver = filtersOpenObserver;
+            this.searchType = searchType;
         }
 
         @Override
@@ -226,12 +230,13 @@ public class SearchShoutsResultsPresenter {
             if (!(o instanceof ShoutHeaderAdapterItem)) return false;
             final ShoutHeaderAdapterItem that = (ShoutHeaderAdapterItem) o;
             return totalItemsCount == that.totalItemsCount &&
-                    Objects.equal(searchQuery, that.searchQuery);
+                    Objects.equal(searchQuery, that.searchQuery) &&
+                    searchType == that.searchType;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(searchQuery, totalItemsCount);
+            return Objects.hashCode(searchQuery, totalItemsCount, searchType);
         }
 
         public int getTotalItemsCount() {
@@ -241,6 +246,10 @@ public class SearchShoutsResultsPresenter {
         @Nullable
         public String getSearchQuery() {
             return searchQuery;
+        }
+
+        public SearchPresenter.SearchType getSearchType() {
+            return searchType;
         }
     }
 }
