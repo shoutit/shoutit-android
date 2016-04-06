@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.chats;
+package com.shoutit.app.android.view.chats.chatsfirstconversation;
 
 import android.content.Context;
 import android.content.Intent;
@@ -23,17 +23,14 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.common.base.Preconditions;
-import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
-import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
-import com.shoutit.app.android.utils.LoadMoreHelper;
-import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
+import com.shoutit.app.android.view.chats.ChatActivity;
 import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
 
@@ -46,18 +43,18 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class ChatActivity extends BaseActivity implements ChatsPresenter.Listener {
+public class ChatFirstConversationActivity extends BaseActivity implements ChatsFirstConversationPresenter.Listener {
 
+    private static final String ARGS_ID_FOR_CREATION = "args_id_for_creation";
     private static final String ARGS_IS_SHOUT_CONVERSATION = "args_shout_conversation";
-    private static final String ARGS_CONVERSATION_ID = "conversation_id";
 
     private static final int REQUEST_ATTACHMENT = 0;
-    private static final int REQUEST_LOCATION = 1;
 
-    private static final String TAG = ChatActivity.class.getCanonicalName();
+    private static final int REQUEST_LOCATION = 1;
+    private static final String TAG = ChatFirstConversationActivity.class.getCanonicalName();
 
     @Inject
-    ChatsPresenter presenter;
+    ChatsFirstConversationPresenter presenter;
 
     @Inject
     ChatsAdapter chatsAdapter;
@@ -76,10 +73,10 @@ public class ChatActivity extends BaseActivity implements ChatsPresenter.Listene
     @Bind(R.id.chats_attatchments_layout)
     FrameLayout mChatsAttatchmentsLayout;
 
-    public static Intent newIntent(@Nonnull Context context, @NonNull String conversationId, boolean shoutConversation) {
-        return new Intent(context, ChatActivity.class)
-                .putExtra(ARGS_CONVERSATION_ID, conversationId)
-                .putExtra(ARGS_IS_SHOUT_CONVERSATION, shoutConversation);
+    public static Intent newIntent(@Nonnull Context context, boolean shoutConversation, @NonNull String idForCreation) {
+        return new Intent(context, ChatFirstConversationActivity.class)
+                .putExtra(ARGS_IS_SHOUT_CONVERSATION, shoutConversation)
+                .putExtra(ARGS_ID_FOR_CREATION, idForCreation);
     }
 
     @Override
@@ -119,25 +116,20 @@ public class ChatActivity extends BaseActivity implements ChatsPresenter.Listene
         mChatsRecyclerview.setAdapter(chatsAdapter);
         mChatsRecyclerview.setLayoutManager(new MyLinearLayoutManager(this));
 
-        RxRecyclerView.scrollEvents(mChatsRecyclerview)
-                .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
-                .filter(LoadMoreHelper.needLoadMore((MyLayoutManager) mChatsRecyclerview.getLayoutManager(), chatsAdapter))
-                .subscribe(presenter.getRequestSubject());
-
         presenter.register(this);
     }
 
     @Nonnull
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
-        final Intent intent = getIntent();
-        final String conversationId = intent.getStringExtra(ARGS_CONVERSATION_ID);
-        final boolean isShoutConversation = intent.getExtras().getBoolean(ARGS_IS_SHOUT_CONVERSATION);
-        final ChatActivityComponent component = DaggerChatActivityComponent
+        final Bundle extras = getIntent().getExtras();
+        final boolean isShoutConversation = extras.getBoolean(ARGS_IS_SHOUT_CONVERSATION);
+        final String idForCreation = extras.getString(ARGS_ID_FOR_CREATION);
+        final ChatFirstConversationActivityComponent component = DaggerChatFirstConversationActivityComponent
                 .builder()
                 .activityModule(new ActivityModule(this))
                 .appComponent(App.getAppComponent(getApplication()))
-                .chatsActivityModule(new ChatsActivityModule(conversationId, isShoutConversation))
+                .chatsFirstConversationActivityModule(new ChatsFirstConversationActivityModule(isShoutConversation, idForCreation))
                 .build();
         component.inject(this);
 

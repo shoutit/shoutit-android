@@ -4,6 +4,7 @@ import java.util.List;
 
 public class Message {
 
+    private final String conversationId;
     private final ConversationProfile profile;
     private final String id;
     private final String text;
@@ -11,7 +12,8 @@ public class Message {
     private final long createdAt;
 
 
-    public Message(ConversationProfile profile, String id, String text, List<MessageAttachment> attachments, long createdAt) {
+    public Message(String conversationId, ConversationProfile profile, String id, String text, List<MessageAttachment> attachments, long createdAt) {
+        this.conversationId = conversationId;
         this.profile = profile;
         this.id = id;
         this.text = text;
@@ -37,5 +39,9 @@ public class Message {
 
     public ConversationProfile getProfile() {
         return profile;
+    }
+
+    public String getConversationId() {
+        return conversationId;
     }
 }

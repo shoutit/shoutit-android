@@ -147,7 +147,7 @@ public class ConverstationsFragment extends BaseFragment implements Conversation
     }
 
     @Override
-    public void onItemClicked(@NonNull String id) {
-        startActivity(ChatActivity.newIntent(getActivity(), id));
+    public void onItemClicked(@NonNull String id, boolean shoutChat) {
+        startActivity(ChatActivity.newIntent(getActivity(), id, shoutChat));
     }
 }

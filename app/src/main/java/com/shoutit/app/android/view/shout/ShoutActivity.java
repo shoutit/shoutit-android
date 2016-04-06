@@ -12,7 +12,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,6 +30,8 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.view.chats.ChatActivity;
+import com.shoutit.app.android.view.chats.chatsfirstconversation.ChatFirstConversationActivity;
 import com.shoutit.app.android.view.createshout.edit.EditShoutActivity;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.profile.tagprofile.TagProfileActivity;
@@ -97,7 +98,7 @@ public class ShoutActivity extends BaseActivity {
         setUpAdapter();
 
         presenter.getIsUserShoutOwnerObservable()
-                .compose(this.<Boolean>bindToLifecycle())
+                .compose(this.<ShoutPresenter.BottomBarData>bindToLifecycle())
                 .subscribe(setUpBottomBar());
 
         presenter.getAllAdapterItemsObservable()
@@ -186,7 +187,7 @@ public class ShoutActivity extends BaseActivity {
     }
 
     @NonNull
-    private Action1<Boolean> setUpBottomBar() {
+    private Action1<ShoutPresenter.BottomBarData> setUpBottomBar() {
         final PopupMenu popupMenu = new PopupMenu(toolbar.getContext(), showMoreIcon);
         popupMenu.inflate(R.menu.menu_shout_bottom_bar);
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -204,31 +205,41 @@ public class ShoutActivity extends BaseActivity {
             }
         });
 
-        return new Action1<Boolean>() {
+        return new Action1<ShoutPresenter.BottomBarData>() {
             @Override
-            public void call(final Boolean isUserShoutOwner) {
+            public void call(final ShoutPresenter.BottomBarData bottomBarData) {
                 callOrDeleteTextView.setCompoundDrawablesWithIntrinsicBounds(
-                        isUserShoutOwner ? R.drawable.ic_delete_red : R.drawable.ic_call_green, 0, 0, 0);
-                callOrDeleteTextView.setText(isUserShoutOwner ?
+                        bottomBarData.isUser() ? R.drawable.ic_delete_red : R.drawable.ic_call_green, 0, 0, 0);
+                callOrDeleteTextView.setText(bottomBarData.isUser() ?
                         R.string.shout_bottom_bar_delete : R.string.shout_bottom_bar_call);
 
                 videoCallOrEditTextView.setCompoundDrawablesWithIntrinsicBounds(
-                        isUserShoutOwner ? R.drawable.ic_edit_red : R.drawable.ic_video_chat_red, 0, 0, 0);
-                videoCallOrEditTextView.setText(isUserShoutOwner ?
+                        bottomBarData.isUser() ? R.drawable.ic_edit_red : R.drawable.ic_video_chat_red, 0, 0, 0);
+                videoCallOrEditTextView.setText(bottomBarData.isUser() ?
                         R.string.shout_bottom_bar_edit : R.string.shout_bottom_bar_video_call);
                 videoCallOrEditTextView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (isUserShoutOwner) {
+                        if (bottomBarData.isUser()) {
                             startActivity(EditShoutActivity.newIntent(mShoutId, ShoutActivity.this));
                         } else {
-                            startActivity(VideoConversationActivity.newIntent(shoutOwnerId,ShoutActivity.this));
+                            startActivity(VideoConversationActivity.newIntent(shoutOwnerId, ShoutActivity.this));
                         }
                     }
                 });
 
-                chatOrChatsTextView.setText(isUserShoutOwner ?
+                chatOrChatsTextView.setText(bottomBarData.isUser() ?
                         R.string.shout_bottom_bar_chats : R.string.shout_bottom_bar_chat);
+                chatOrChatsTextView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (bottomBarData.isHasConversation()) {
+                            startActivity(ChatActivity.newIntent(ShoutActivity.this, bottomBarData.getConversationId(), true));
+                        } else {
+                            startActivity(ChatFirstConversationActivity.newIntent(ShoutActivity.this, true, mShoutId));
+                        }
+                    }
+                });
 
                 final int bottomBarHeight = getResources().getDimensionPixelSize(R.dimen.shout_bottom_bar);
                 final ObjectAnimator animator = ObjectAnimator.ofFloat(bottomBar, "translationY", bottomBarHeight, 0);
@@ -248,11 +259,6 @@ public class ShoutActivity extends BaseActivity {
 
     @OnClick(R.id.shout_bottom_bar_call_or_delete)
     public void onCallOrDeleteClicked() {
-        Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
-    }
-
-    @OnClick(R.id.shout_bottom_bar_chat_or_chats)
-    public void onChatClicked() {
         Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
     }
 

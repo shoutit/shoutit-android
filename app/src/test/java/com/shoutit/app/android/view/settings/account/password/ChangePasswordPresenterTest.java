@@ -36,7 +36,7 @@ public class ChangePasswordPresenterTest {
 
         when(userPreferences.getUserObservable())
                 .thenReturn(Observable.just(new User("z", null, null, null, null, null, null, null, false, null,
-                null, false, false, false, null, 1, null, null, null, 1, null, false, null, null, null)));
+                null, false, false, false, null, 1, null, null, null, 1, null, false, null, null, null, conversation)));
 
         presenter = new ChangePasswordPresenter(apiService, userPreferences, Schedulers.immediate(), Schedulers.immediate());
     }
@@ -153,6 +153,6 @@ public class ChangePasswordPresenterTest {
 
     private User userWithPasswordSet() {
         return new User("z", null, null, null, null, null, null, null, false, null,
-                null, false, false, false, null, 1, null, null, null, 1, null, false, null, null, null);
+                null, false, false, false, null, 1, null, null, null, 1, null, false, null, null, null, conversation);
     }
 }

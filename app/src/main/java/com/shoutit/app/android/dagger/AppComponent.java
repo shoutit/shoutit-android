@@ -41,7 +41,7 @@ import rx.Scheduler;
 )
 public interface AppComponent {
 
-    void inject(App app);
+    void inject(App.AppMultidexFix app);
 
     @UiScheduler
     Scheduler getUiScheduler();

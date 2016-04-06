@@ -316,6 +316,12 @@ public interface ApiService {
     @POST("conversations/{id}/reply")
     Observable<Message> postMessage(@NonNull @Path("id") String conversationId, @NonNull @Body PostMessage message);
 
+    @POST("shouts/{id}/reply")
+    Observable<Message> createShoutConversation(@NonNull @Path("id") String shoutId, @NonNull @Body PostMessage message);
+
+    @POST("profiles/{id}/chat")
+    Observable<Message> createChatConversation(@NonNull @Path("id") String userName, @NonNull @Body PostMessage message);
+
     /** Notifications **/
     @GET("notifications")
     Observable<NotificationsResponse> notifications();

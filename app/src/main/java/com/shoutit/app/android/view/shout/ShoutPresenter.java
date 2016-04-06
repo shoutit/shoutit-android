@@ -13,6 +13,7 @@ import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
+import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
@@ -35,6 +36,7 @@ import rx.Observable;
 import rx.Scheduler;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.functions.Func3;
 import rx.subjects.PublishSubject;
 
@@ -51,6 +53,7 @@ public class ShoutPresenter {
     private final Observable<String> usernameObservable;
     private final Observable<Boolean> isUserShoutOwnerObservable;
     private final Observable<ResponseOrError<UserIdentity>> userIdentityResponse;
+    private final Observable<List<Conversation>> conversationObservable;
     private Observable<String> identityUserObservable;
 
     private Observable<UserIdentity> successUserIdentity;
@@ -106,6 +109,14 @@ public class ShoutPresenter {
                     @Override
                     public String call(Shout shout) {
                         return shout.getProfile().getUsername();
+                    }
+                });
+
+        conversationObservable = successShoutResponse
+                .map(new Func1<Shout, List<Conversation>>() {
+                    @Override
+                    public List<Conversation> call(Shout shout) {
+                        return shout.getConversations();
                     }
                 });
 
@@ -349,13 +360,19 @@ public class ShoutPresenter {
     }
 
     @Nonnull
-    public Observable<Boolean> getIsUserShoutOwnerObservable() {
+    public Observable<BottomBarData> getIsUserShoutOwnerObservable() {
         return allAdapterItemsObservable
                 .first()
-                .flatMap(new Func1<List<BaseAdapterItem>, Observable<Boolean>>() {
+                .flatMap(new Func1<List<BaseAdapterItem>, Observable<BottomBarData>>() {
                     @Override
-                    public Observable<Boolean> call(List<BaseAdapterItem> baseAdapterItems) {
-                        return isUserShoutOwnerObservable;
+                    public Observable<BottomBarData> call(List<BaseAdapterItem> baseAdapterItems) {
+                        return isUserShoutOwnerObservable.zipWith(conversationObservable, new Func2<Boolean, List<Conversation>, BottomBarData>() {
+                            @Override
+                            public BottomBarData call(Boolean aBoolean, List<Conversation> conversations) {
+                                final boolean hasConversation = conversations != null && !conversations.isEmpty();
+                                return new BottomBarData(aBoolean, hasConversation, hasConversation ? conversations.get(0).getId() : null);
+                            }
+                        });
                     }
                 })
                 .observeOn(uiScheduler);
@@ -363,6 +380,31 @@ public class ShoutPresenter {
 
     public Observable<String> getUsernameObservable() {
         return usernameObservable;
+    }
+
+    public static class BottomBarData {
+
+        private final boolean isUser;
+        private final boolean hasConversation;
+        private final String conversationId;
+
+        public BottomBarData(boolean isUser, boolean hasConversation, String conversationId) {
+            this.isUser = isUser;
+            this.hasConversation = hasConversation;
+            this.conversationId = conversationId;
+        }
+
+        public boolean isUser() {
+            return isUser;
+        }
+
+        public boolean isHasConversation() {
+            return hasConversation;
+        }
+
+        public String getConversationId() {
+            return conversationId;
+        }
     }
 }
 

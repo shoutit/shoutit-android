@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.chats;
+package com.shoutit.app.android.view.chats.chatsfirstconversation;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
-import com.appunite.rx.operators.OperatorMergeNextToken;
+import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -20,7 +20,6 @@ import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.ConversationProfile;
 import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessageAttachment;
-import com.shoutit.app.android.api.model.MessagesResponse;
 import com.shoutit.app.android.api.model.PostMessage;
 import com.shoutit.app.android.api.model.PusherMessage;
 import com.shoutit.app.android.api.model.Shout;
@@ -30,6 +29,7 @@ import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.PusherHelper;
+import com.shoutit.app.android.view.chats.PresenceChannelEventListenerAdapter;
 import com.shoutit.app.android.view.chats.message_models.DateItem;
 import com.shoutit.app.android.view.chats.message_models.ReceivedImageMessage;
 import com.shoutit.app.android.view.chats.message_models.ReceivedLocationMessage;
@@ -54,7 +54,6 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import rx.Observable;
-import rx.Observer;
 import rx.Scheduler;
 import rx.Subscriber;
 import rx.functions.Action1;
@@ -63,49 +62,16 @@ import rx.functions.Func2;
 import rx.subjects.PublishSubject;
 import rx.subscriptions.CompositeSubscription;
 
-public class ChatsPresenter {
-
-    final OperatorMergeNextToken<MessagesResponse, Object> loadMoreOperator =
-            OperatorMergeNextToken.create(new Func1<MessagesResponse, Observable<MessagesResponse>>() {
-
-                @Override
-                public Observable<MessagesResponse> call(MessagesResponse conversationsResponse) {
-                    if (conversationsResponse == null || conversationsResponse.getNext() != null) {
-                        if (conversationsResponse == null) {
-                            return mApiService.getMessages(conversationId)
-                                    .subscribeOn(mNetworkScheduler)
-                                    .observeOn(mUiScheduler);
-                        } else {
-                            final String after = Uri.parse(conversationsResponse.getNext()).getQueryParameter("after");
-                            return Observable.just(
-                                    conversationsResponse)
-                                    .zipWith(
-                                            mApiService.getMessages(conversationId, after)
-                                                    .subscribeOn(mNetworkScheduler)
-                                                    .observeOn(mUiScheduler),
-                                            new Func2<MessagesResponse, MessagesResponse, MessagesResponse>() {
-                                                @Override
-                                                public MessagesResponse call(MessagesResponse conversationsResponse, MessagesResponse newResponse) {
-                                                    return new MessagesResponse(newResponse.getNext(),
-                                                            ImmutableList.copyOf(Iterables.concat(
-                                                                    conversationsResponse.getResults(),
-                                                                    newResponse.getResults())));
-                                                }
-                                            });
-                        }
-                    } else {
-                        return Observable.never();
-                    }
-                }
-            });
+public class ChatsFirstConversationPresenter {
 
     @SuppressLint("SimpleDateFormat")
     private final SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("MMMMM dd, yyyy");
     @SuppressLint("SimpleDateFormat")
     private final SimpleDateFormat mSimpleTimeFormat = new SimpleDateFormat("hh:mm");
 
-    @NonNull
-    private final String conversationId;
+    private String conversationId;
+    private boolean conversationCreated;
+
     @NonNull
     private final ApiService mApiService;
     private final Scheduler mUiScheduler;
@@ -116,23 +82,25 @@ public class ChatsPresenter {
     private final PusherHelper mPusher;
     private final Gson mGson;
     private final AmazonHelper mAmazonHelper;
+    private final String mIdForCreation;
+    private final boolean mIsShoutConversation;
     private Listener mListener;
-    private CompositeSubscription mSubscribe = new CompositeSubscription();
-    private final PublishSubject<Object> requestSubject = PublishSubject.create();
+    private final CompositeSubscription mSubscribe = new CompositeSubscription();
     private final PublishSubject<PusherMessage> newMessagesSubject = PublishSubject.create();
 
     @Inject
-    public ChatsPresenter(@NonNull String conversationId,
-                          @NonNull ApiService apiService,
-                          @UiScheduler Scheduler uiScheduler,
-                          @NetworkScheduler Scheduler networkScheduler,
-                          UserPreferences userPreferences,
-                          @ForActivity Resources resources,
-                          @ForActivity Context context,
-                          PusherHelper pusher,
-                          Gson gson,
-                          AmazonHelper amazonHelper) {
-        this.conversationId = conversationId;
+    public ChatsFirstConversationPresenter(boolean isShoutConversation,
+                                           @NonNull ApiService apiService,
+                                           @UiScheduler Scheduler uiScheduler,
+                                           @NetworkScheduler Scheduler networkScheduler,
+                                           UserPreferences userPreferences,
+                                           @ForActivity Resources resources,
+                                           @ForActivity Context context,
+                                           PusherHelper pusher,
+                                           Gson gson,
+                                           AmazonHelper amazonHelper,
+                                           String idForCreation) {
+        mIsShoutConversation = isShoutConversation;
         mApiService = apiService;
         mUiScheduler = uiScheduler;
         mNetworkScheduler = networkScheduler;
@@ -142,6 +110,7 @@ public class ChatsPresenter {
         mPusher = pusher;
         mGson = gson;
         mAmazonHelper = amazonHelper;
+        mIdForCreation = idForCreation;
     }
 
     public void register(@NonNull Listener listener) {
@@ -179,12 +148,6 @@ public class ChatsPresenter {
             }
         });
 
-        final Observable<MessagesResponse> apiMessages = requestSubject
-                .startWith(new Object())
-                .lift(loadMoreOperator)
-                .subscribeOn(mNetworkScheduler)
-                .observeOn(mUiScheduler);
-
         final Observable<List<PusherMessage>> localAndPusherMessages = pusherMessageObservable.mergeWith(newMessagesSubject)
                 .scan(ImmutableList.<PusherMessage>of(), new Func2<List<PusherMessage>, PusherMessage, List<PusherMessage>>() {
                     @Override
@@ -198,24 +161,23 @@ public class ChatsPresenter {
 
         mListener = listener;
         mListener.showProgress(true);
-        mSubscribe.add(Observable.combineLatest(apiMessages, localAndPusherMessages.startWith((List<PusherMessage>) null),
-                new Func2<MessagesResponse, List<PusherMessage>, List<BaseAdapterItem>>() {
+        mSubscribe.add(localAndPusherMessages
+                .map(new Func1<List<PusherMessage>, List<BaseAdapterItem>>() {
                     @Override
-                    public List<BaseAdapterItem> call(MessagesResponse messagesResponse, List<PusherMessage> pusherMessage) {
-                        final ImmutableList.Builder<Message> builder = ImmutableList.<Message>builder()
-                                .addAll(messagesResponse.getResults());
-
-                        if (pusherMessage != null) {
-                            for (PusherMessage message : pusherMessage) {
-                                builder.add(new Message(
+                    public List<BaseAdapterItem> call(List<PusherMessage> pusherMessages) {
+                        return transform(ImmutableList.copyOf(Iterables.transform(pusherMessages, new Function<PusherMessage, Message>() {
+                            @Nullable
+                            @Override
+                            public Message apply(@Nullable PusherMessage message) {
+                                assert message != null;
+                                return new Message(
                                         conversationId, message.getUser(),
                                         message.getId(),
                                         message.getText(),
                                         message.getAttachments(),
-                                        message.getCreatedAt()));
+                                        message.getCreatedAt());
                             }
-                        }
-                        return transform(builder.build());
+                        })));
                     }
                 })
                 .subscribe(new Action1<List<BaseAdapterItem>>() {
@@ -235,11 +197,6 @@ public class ChatsPresenter {
                         mListener.error(throwable);
                     }
                 }));
-    }
-
-    @NonNull
-    public Observer<Object> getRequestSubject() {
-        return requestSubject;
     }
 
     @NonNull
@@ -297,9 +254,8 @@ public class ChatsPresenter {
     }
 
     public void postTextMessage(@NonNull String text) {
-        mApiService.postMessage(conversationId, new PostMessage(text, ImmutableList.<MessageAttachment>of()))
-                .subscribeOn(mNetworkScheduler)
-                .observeOn(mUiScheduler)
+        final PostMessage message = new PostMessage(text, ImmutableList.<MessageAttachment>of());
+        sendMessage(message)
                 .subscribe(new Action1<Message>() {
                     @Override
                     public void call(Message messagesResponse) {
@@ -311,6 +267,33 @@ public class ChatsPresenter {
                         mListener.error(throwable);
                     }
                 });
+        ;
+    }
+
+    private Observable<Message> sendMessage(PostMessage message) {
+        Observable<Message> observable;
+        if (conversationCreated) {
+            observable = mApiService.postMessage(conversationId, message)
+                    .subscribeOn(mNetworkScheduler)
+                    .observeOn(mUiScheduler);
+        } else {
+            if (mIsShoutConversation) {
+                observable = mApiService.createShoutConversation(mIdForCreation, message)
+                        .subscribeOn(mNetworkScheduler)
+                        .observeOn(mUiScheduler);
+            } else {
+                observable = mApiService.createChatConversation(mIdForCreation, message)
+                        .subscribeOn(mNetworkScheduler)
+                        .observeOn(mUiScheduler);
+            }
+        }
+        return observable.doOnNext(new Action1<Message>() {
+            @Override
+            public void call(Message message) {
+                conversationCreated = true;
+                conversationId = message.getConversationId();
+            }
+        });
     }
 
     private BaseAdapterItem getItem(@NonNull List<Message> results, String userId, int currentPosition) {
@@ -424,9 +407,8 @@ public class ChatsPresenter {
                         .flatMap(new Func1<Video, Observable<Message>>() {
                             @Override
                             public Observable<Message> call(Video video) {
-                                return mApiService.postMessage(conversationId, new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_MEDIA, null, null, null, ImmutableList.of(video)))))
-                                        .subscribeOn(mNetworkScheduler)
-                                        .observeOn(mUiScheduler);
+                                final PostMessage message = new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_MEDIA, null, null, null, ImmutableList.of(video))));
+                                return sendMessage(message);
                             }
                         })
                         .subscribeOn(mNetworkScheduler)
@@ -452,12 +434,8 @@ public class ChatsPresenter {
                     .flatMap(new Func1<String, Observable<Message>>() {
                         @Override
                         public Observable<Message> call(String url) {
-                            return mApiService.postMessage(
-                                    conversationId,
-                                    new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_MEDIA, null, null, ImmutableList.of(url), null))))
-                                    .subscribeOn(mNetworkScheduler)
-                                    .observeOn(mUiScheduler);
-
+                            final PostMessage message = new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_MEDIA, null, null, ImmutableList.of(url), null)));
+                            return sendMessage(message);
                         }
                     })
                     .subscribeOn(mNetworkScheduler)
@@ -489,9 +467,8 @@ public class ChatsPresenter {
     }
 
     public void sendLocation(double latitude, double longitude) {
-        mApiService.postMessage(conversationId, new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_LOCATION, new MessageAttachment.MessageLocation(latitude, longitude), null, null, null))))
-                .subscribeOn(mNetworkScheduler)
-                .observeOn(mUiScheduler)
+        final PostMessage message = new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_LOCATION, new MessageAttachment.MessageLocation(latitude, longitude), null, null, null)));
+        sendMessage(message)
                 .subscribe(new Action1<Message>() {
                     @Override
                     public void call(Message message) {

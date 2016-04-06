@@ -13,6 +13,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.ConversationProfile;
 import com.shoutit.app.android.api.model.ConversationsResponse;
 import com.shoutit.app.android.api.model.Message;
@@ -105,16 +106,16 @@ public class ConversationsPresenter {
                     public void call(ConversationsResponse conversationsResponse) {
                         mListener.showProgress(false);
 
-                        final List<ConversationsResponse.Conversation> conversations = conversationsResponse.getResults();
+                        final List<Conversation> conversations = conversationsResponse.getResults();
                         if (conversations.isEmpty()) {
                             mListener.emptyList();
                         } else {
                             final ImmutableList<BaseAdapterItem> items = ImmutableList.copyOf(Iterables.transform(
                                     conversations,
-                                    new Function<ConversationsResponse.Conversation, BaseAdapterItem>() {
+                                    new Function<Conversation, BaseAdapterItem>() {
                                         @Nullable
                                         @Override
-                                        public BaseAdapterItem apply(@Nullable ConversationsResponse.Conversation input) {
+                                        public BaseAdapterItem apply(@Nullable Conversation input) {
                                             assert input != null;
                                             return getConversationItem(input);
                                         }
@@ -133,7 +134,7 @@ public class ConversationsPresenter {
     }
 
     @NonNull
-    private BaseAdapterItem getConversationItem(@NonNull ConversationsResponse.Conversation input) {
+    private BaseAdapterItem getConversationItem(@NonNull Conversation input) {
         final Message lastMessage = input.getLastMessage();
         final List<ConversationProfile> profiles = input.getProfiles();
 
@@ -142,9 +143,9 @@ public class ConversationsPresenter {
         final String chatWith = getChatWithString(profiles);
         final String image = getImage(profiles);
 
-        if (ConversationsResponse.Conversation.ABOUT_SHOUT_TYPE.equals(input.getType())) {
+        if (Conversation.ABOUT_SHOUT_TYPE.equals(input.getType())) {
             return new ConversationShoutItem(input.getId(), input.getAbout().getTitle(), chatWith, message, elapsedTime, image);
-        } else if (ConversationsResponse.Conversation.CHAT_TYPE.equals(input.getType())) {
+        } else if (Conversation.CHAT_TYPE.equals(input.getType())) {
             return new ConversationChatItem(input.getId(), message, chatWith, elapsedTime, image);
         } else {
             throw new RuntimeException(input.getType() + " : unknown type");
@@ -211,7 +212,7 @@ public class ConversationsPresenter {
 
         void error();
 
-        void onItemClicked(@NonNull String id);
+        void onItemClicked(@NonNull String id, boolean shoutChat);
     }
 
     public class ConversationChatItem implements BaseAdapterItem {
@@ -265,7 +266,7 @@ public class ConversationsPresenter {
         }
 
         public void click() {
-            mListener.onItemClicked(id);
+            mListener.onItemClicked(id, false);
         }
     }
 
@@ -326,7 +327,7 @@ public class ConversationsPresenter {
         }
 
         public void click() {
-            mListener.onItemClicked(id);
+            mListener.onItemClicked(id, true);
         }
     }
 
