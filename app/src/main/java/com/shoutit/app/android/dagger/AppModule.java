@@ -32,10 +32,15 @@ import com.shoutit.app.android.constants.AmazonConstants;
 import com.shoutit.app.android.dao.CategoriesDao;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.dao.DiscoversDao;
+import com.shoutit.app.android.dao.NotificationsDao;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
+import com.shoutit.app.android.dao.SortTypesDao;
+import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.dao.SuggestionsDao;
 import com.shoutit.app.android.dao.TagsDao;
+import com.shoutit.app.android.dao.UsersIdentityDao;
+import com.shoutit.app.android.dao.VideoCallsDao;
 import com.shoutit.app.android.db.DbHelper;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.utils.PusherHelper;
@@ -211,6 +216,19 @@ public final class AppModule {
 
     @Singleton
     @Provides
+    public ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter() {
+        return new ShoutsGlobalRefreshPresenter();
+    }
+
+    @Singleton
+    @Provides
+    public NotificationsDao notificationsDao(ApiService apiService,
+                                             @NetworkScheduler Scheduler networkScheduler) {
+        return new NotificationsDao(apiService, networkScheduler);
+    }
+
+    @Singleton
+    @Provides
     public TransferUtility providesTransferUtility(@ForApplication Context context) {
         final BasicAWSCredentials awsCredentials = new BasicAWSCredentials(
                 AmazonConstants.AMAZON_S3_ID, AmazonConstants.AMAZON_S3_SECRET);
@@ -235,6 +253,24 @@ public final class AppModule {
     @Singleton
     CategoriesDao categoriesDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
         return new CategoriesDao(apiService, networkScheduler);
+    }
+
+    @Singleton
+    @Provides
+    public VideoCallsDao provideVideoCallsDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
+        return new VideoCallsDao(apiService, networkScheduler);
+    }
+
+    @Singleton
+    @Provides
+    public UsersIdentityDao provideUsersIdentityDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
+        return new UsersIdentityDao(apiService, networkScheduler);
+    }
+
+    @Provides
+    @Singleton
+    SortTypesDao sortTypesDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
+        return new SortTypesDao(apiService, networkScheduler);
     }
 
     @Provides

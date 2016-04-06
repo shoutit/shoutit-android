@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -74,6 +75,7 @@ public class CreateShoutDialogFragment extends DialogFragment {
                 startActivity(RecordMediaActivity.newIntent(getActivity(), false));
             }
         }
+        dismiss();
     }
 
     @OnClick(R.id.create_shout_request)
@@ -83,5 +85,6 @@ public class CreateShoutDialogFragment extends DialogFragment {
         } else {
             startActivity(CreateRequestActivity.newIntent(getActivity()));
         }
+        dismiss();
     }
 }

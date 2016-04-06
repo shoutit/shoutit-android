@@ -48,6 +48,10 @@ public class ErrorHandler {
             return defaultMessage(context);
         }
 
+        if (apiErrors == null) {
+            return defaultMessage(context);
+        }
+
         LogHelper.logThrowableAndCrashlytics(TAG, "Api Error", new ApiErrorThrowable(apiErrors.getError()));
         if (shouldGetErrorFromErrorsList(apiErrors.getError().getCode())) {
             return apiErrors.getError().getErrors().get(0).getMessage();

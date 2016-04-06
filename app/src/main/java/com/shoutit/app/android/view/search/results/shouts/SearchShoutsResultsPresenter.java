@@ -19,6 +19,7 @@ import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ShoutsDao;
+import com.shoutit.app.android.model.FiltersToSubmit;
 import com.shoutit.app.android.model.SearchShoutPointer;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
@@ -41,6 +42,8 @@ public class SearchShoutsResultsPresenter {
     private final PublishSubject<Object> layoutManagerSwitchSubject = PublishSubject.create();
     private final PublishSubject<String> shoutSelectedSubject = PublishSubject.create();
     private final PublishSubject<Object> loadMoreSubject = PublishSubject.create();
+    private final PublishSubject<Object> filtersOpenSubject = PublishSubject.create();
+    private final PublishSubject<FiltersToSubmit> filtersSelectedSubject = PublishSubject.create();
 
     private final Observable<List<BaseAdapterItem>> adapterItems;
     private final Observable<Boolean> progressObservable;
@@ -55,8 +58,18 @@ public class SearchShoutsResultsPresenter {
                                         @Nonnull @ForActivity final Context context,
                                         @UiScheduler Scheduler uiScheduler) {
 
-        Observable<ShoutsDao.SearchShoutsDao> daoObservable = userPreferences.getLocationObservable()
+        final Observable<ShoutsDao.SearchShoutsDao> daoWithFilters = filtersSelectedSubject
+                .map(new Func1<FiltersToSubmit, ShoutsDao.SearchShoutsDao>() {
+                    @Override
+                    public ShoutsDao.SearchShoutsDao call(FiltersToSubmit filtersToSubmit) {
+                        return dao.getSearchShoutsDao(new SearchShoutPointer(
+                                searchQuery, searchType, contextualItemId, filtersToSubmit));
+                    }
+                });
+
+        final Observable<ShoutsDao.SearchShoutsDao> daoObservable = userPreferences.getLocationObservable()
                 .filter(Functions1.isNotNull())
+                .first()
                 .distinctUntilChanged()
                 .map(new Func1<UserLocation, ShoutsDao.SearchShoutsDao>() {
                     @Override
@@ -65,6 +78,7 @@ public class SearchShoutsResultsPresenter {
                                 searchQuery, searchType, userLocation, contextualItemId));
                     }
                 })
+                .mergeWith(daoWithFilters)
                 .compose(ObservableExtensions.<ShoutsDao.SearchShoutsDao>behaviorRefCount());
 
         final Observable<ResponseOrError<ShoutsResponse>> shoutsRequest = daoObservable
@@ -86,7 +100,7 @@ public class SearchShoutsResultsPresenter {
                             return ImmutableList.<BaseAdapterItem>of(new NoDataAdapterItem());
                         } else {
                             final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
-                            builder.add(new ShoutHeaderAdapterItem(searchQuery, shoutsResponse.getCount(), layoutManagerSwitchSubject));
+                            builder.add(new ShoutHeaderAdapterItem(searchQuery, shoutsResponse.getCount(), layoutManagerSwitchSubject, filtersOpenSubject));
                             builder.addAll(Lists.transform(shoutsResponse.getShouts(), new Function<Shout, BaseAdapterItem>() {
                                 @Nullable
                                 @Override
@@ -161,18 +175,30 @@ public class SearchShoutsResultsPresenter {
         return loadMoreSubject;
     }
 
+    public Observable<Object> getFiltersOpenObservable() {
+        return filtersOpenSubject;
+    }
+
+    public Observer<FiltersToSubmit> getFiltersSelectedObserver() {
+        return filtersSelectedSubject;
+    }
+
     public class ShoutHeaderAdapterItem extends BaseNoIDAdapterItem {
 
         @Nullable
         private final String searchQuery;
         private final int totalItemsCount;
         private final Observer<Object> layoutManagerSwitchObserver;
+        private final Observer<Object> filtersOpenObserver;
 
         public ShoutHeaderAdapterItem(@Nullable String searchQuery, int totalItemsCount,
-                                      Observer<Object> layoutManagerSwitchObserver) {
+                                      Observer<Object> layoutManagerSwitchObserver,
+                                      Observer<Object> filtersOpenObserver) {
+
             this.searchQuery = searchQuery;
             this.totalItemsCount = totalItemsCount;
             this.layoutManagerSwitchObserver = layoutManagerSwitchObserver;
+            this.filtersOpenObserver = filtersOpenObserver;
         }
 
         @Override
@@ -188,6 +214,10 @@ public class SearchShoutsResultsPresenter {
 
         public Observer<Object> getLayoutManagerSwitchObserver() {
             return layoutManagerSwitchObserver;
+        }
+
+        public Observer<Object> getOnFilterClickObserver() {
+            return filtersOpenObserver;
         }
 
         @Override

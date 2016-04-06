@@ -12,6 +12,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,6 +35,7 @@ import com.shoutit.app.android.view.createshout.edit.EditShoutActivity;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.profile.tagprofile.TagProfileActivity;
 import com.shoutit.app.android.view.search.main.MainSearchActivity;
+import com.shoutit.app.android.view.videoconversation.VideoConversationActivity;
 
 import java.util.List;
 
@@ -75,7 +77,9 @@ public class ShoutActivity extends BaseActivity {
     ShoutAdapter adapter;
     @Inject
     UserPreferences userPreferences;
+
     private String mShoutId;
+    private String shoutOwnerId;
 
     public static Intent newIntent(@Nonnull Context context, @Nonnull String shoutId) {
         return new Intent(context, ShoutActivity.class)
@@ -170,6 +174,15 @@ public class ShoutActivity extends BaseActivity {
                         startActivity(TagProfileActivity.newIntent(ShoutActivity.this, categorySlug));
                     }
                 });
+
+        presenter.getIdentityUserObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String shoutOwnerIdentity) {
+                        shoutOwnerId = shoutOwnerIdentity;
+                    }
+                });
     }
 
     @NonNull
@@ -209,7 +222,7 @@ public class ShoutActivity extends BaseActivity {
                         if (isUserShoutOwner) {
                             startActivity(EditShoutActivity.newIntent(mShoutId, ShoutActivity.this));
                         } else {
-
+                            startActivity(VideoConversationActivity.newIntent(shoutOwnerId,ShoutActivity.this));
                         }
                     }
                 });

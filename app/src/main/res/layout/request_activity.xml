@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,7 +16,7 @@
             style="@style/AppTheme.BaseToolbarStyle"
             android:layout_width="match_parent"
             android:layout_height="?actionBarSize"
-            android:layout_marginBottom="10dp"/>
+            android:layout_marginBottom="10dp" />
 
         <ScrollView
             android:layout_width="match_parent"
@@ -26,106 +26,88 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <android.support.design.widget.TextInputLayout
-                    android:id="@+id/request_activity_description_layout"
-                    app:hintTextAppearance="@style/BlueInputStyle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp">
-
-                    <EditText
-                        android:id="@+id/create_request_descirption"
-                        android:theme="@style/BlueEditText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/request_activity_what_are_you_looking_for"/>
-
-                </android.support.design.widget.TextInputLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:orientation="horizontal">
-
-                    <FrameLayout
-                        android:layout_width="0dp"
-                        android:layout_height="54dp"
-                        android:layout_weight="0.5">
-
-                        <EditText
-                            android:id="@+id/create_request_budget"
-                            android:theme="@style/BlueEditText"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="@string/request_activity_budget"
-                            android:inputType="numberDecimal"/>
-
-                        <ImageView
-                            android:id="@+id/create_request_currency_info"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_gravity="end|center_vertical"
-                            android:layout_marginBottom="8dp"
-                            android:src="@drawable/info"/>
-
-                    </FrameLayout>
-
-                    <com.shoutit.app.android.widget.StateSpinner
-                        android:id="@+id/create_request_spinner"
-                        android:layout_width="0dp"
-                        android:layout_height="43dp"
-                        android:layout_weight="0.35"/>
-
-                </LinearLayout>
+                android:orientation="vertical"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:text="@string/request_activity_when"/>
+                    android:layout_marginTop="14dp"
+                    android:text="@string/request_activity_what_are_you_looking_for"
+                    android:textColor="#8a000000"
+                    android:textSize="12sp" />
+
+                <com.shoutit.app.android.widget.ErrorTextInputLayout
+                    android:id="@+id/request_activity_description_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:hintTextAppearance="@style/BlueInputStyle">
+
+                    <EditText
+                        android:layout_marginLeft="-4dp"
+                        android:id="@+id/create_request_descirption"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/create_request_description"
+                        android:theme="@style/BlueEditText" />
+
+                </com.shoutit.app.android.widget.ErrorTextInputLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/request_activity_budget"
+                    android:textColor="#8a000000"
+                    android:textSize="12sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
                     android:orientation="horizontal">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <EditText
+                        android:layout_marginLeft="-4dp"
+                        android:id="@+id/create_request_budget"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:text="now"
-                        android:textAllCaps="true"
-                        android:textColor="@android:color/black"/>
+                        android:layout_weight="1"
+                        android:hint="@string/create_request_price"
+                        android:inputType="numberDecimal"
+                        android:theme="@style/BlueEditText" />
 
-                    <SeekBar
-                        android:id="@+id/create_request_time"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:theme="@style/BlueSeekBar"/>
+                    <ImageView
+                        android:id="@+id/create_request_currency_info"
+                        android:layout_width="24dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:src="@drawable/info" />
+
+                    <com.shoutit.app.android.widget.StateSpinner
+                        android:id="@+id/create_request_spinner"
+                        android:layout_width="130dp"
+                        android:layout_height="43dp" />
 
                 </LinearLayout>
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1px"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:background="@android:color/darker_gray"/>
+                    android:background="@android:color/darker_gray" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:text="@string/request_activity_where"/>
+                    android:layout_marginBottom="6dp"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/request_activity_where"
+                    android:textColor="#8a000000"
+                    android:textSize="12sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="6dp"
                     android:orientation="horizontal">
 
                     <TextView
@@ -138,7 +120,7 @@
                         android:paddingLeft="6dp"
                         android:textColor="@android:color/black"
                         tools:drawableLeft="@drawable/ec"
-                        tools:text="Dubai, United Arab Emirates"/>
+                        tools:text="Dubai, United Arab Emirates" />
 
                     <Button
                         android:id="@+id/create_request_location_btn"
@@ -147,25 +129,24 @@
                         android:layout_weight="0.25"
                         android:background="?selectableItemBackground"
                         android:text="@string/request_activity_change_location"
-                        android:textColor="@color/accent_blue"/>
+                        android:textColor="@color/accent_blue"
+                        android:textSize="12sp" />
 
                 </LinearLayout>
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1px"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:background="@android:color/darker_gray"/>
+                    android:layout_marginBottom="10dp"
+                    android:background="@android:color/darker_gray" />
 
                 <Button
-                    style="@style/BaseButtonStyle"
                     android:id="@+id/create_request_confirm"
+                    style="@style/BaseButtonStyle"
                     android:layout_width="match_parent"
-                    android:layout_margin="6dp"
                     android:background="@drawable/selector_green_button_with_stroke"
                     android:text="@string/request_activity_btn"
-                    android:textColor="@android:color/white"/>
+                    android:textColor="@android:color/white" />
             </LinearLayout>
         </ScrollView>
     </LinearLayout>
@@ -181,7 +162,7 @@
         <ProgressBar
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center" />
 
     </FrameLayout>
 

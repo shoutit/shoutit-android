@@ -6,10 +6,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+import android.view.View;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
-import com.appunite.rx.android.widget.RxToolbarMore;
+import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
@@ -35,9 +35,10 @@ public class PostLoginInterestActivity extends RxAppCompatActivity implements Ba
 
     @Bind(R.id.post_login_list)
     RecyclerView mRecyclerView;
-
-    @Bind(R.id.post_login_toolbar)
-    Toolbar mToolbar;
+    @Bind(R.id.next_btn)
+    View nextBtn;
+    @Bind(R.id.skip_btn)
+    View skipBtn;
 
     @Inject
     PostLoginAdapter mPostLoginAdapter;
@@ -57,9 +58,6 @@ public class PostLoginInterestActivity extends RxAppCompatActivity implements Ba
         setContentView(R.layout.post_login_activity);
 
         ButterKnife.bind(this);
-
-        mToolbar.inflateMenu(R.menu.post_login_menu);
-        mToolbar.setNavigationIcon(R.drawable.ic_clear_black_24dp);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setAdapter(mPostLoginAdapter);
@@ -86,12 +84,11 @@ public class PostLoginInterestActivity extends RxAppCompatActivity implements Ba
                 .compose(this.<Throwable>bindToLifecycle())
                 .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(this)));
 
-        RxToolbarMore.menuClick(mToolbar)
-                .filter(RxToolbarMore.filterMenuClick(R.id.post_login_next))
+        RxView.clicks(nextBtn)
                 .compose(bindToLifecycle())
                 .subscribe(mPostLoginPresenter.nextClickedObserver());
 
-        RxToolbarMore.navigationClick(mToolbar)
+        RxView.clicks(skipBtn)
                 .compose(bindToLifecycle())
                 .subscribe(getFinishActivity());
     }

@@ -83,4 +83,13 @@
     <!-- Chats -->
     <color name="chats_color_accent">#80D8FF</color>
 
+    <!-- Notifications -->
+    <color name="notification_read_selector_normal">#c8e6c9</color>
+    <color name="notification_read_selector_pressed">#96d498</color>
+
+    <!-- Video Conversations -->
+    <color name="video_calls_call_button">#4CAF50</color>
+    <color name="video_calls_dismiss_call_button">#FF0000</color>
+    <color name="video_calls_semi_transparent_background">#80000000</color>
+
 </resources>

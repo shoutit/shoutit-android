@@ -26,7 +26,7 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="45dp"
             android:paddingBottom="5dp"
             android:paddingEnd="9dp"
             android:paddingLeft="8dp"
@@ -53,6 +53,7 @@
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/discover_shout_card_title_tv"
                 android:layout_marginEnd="1dp"
+                android:layout_centerVertical="true"
                 android:layout_marginRight="1dp"
                 android:layout_toLeftOf="@+id/discover_shout_card_price_tv"
                 android:layout_toStartOf="@+id/discover_shout_card_price_tv"
@@ -66,6 +67,7 @@
                 android:id="@+id/discover_shout_card_price_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_below="@+id/discover_shout_card_title_tv"

@@ -21,6 +21,7 @@ import com.shoutit.app.android.api.model.GuestSignupRequest;
 import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessagesResponse;
 import com.shoutit.app.android.api.model.PostMessage;
+import com.shoutit.app.android.api.model.NotificationsResponse;
 import com.shoutit.app.android.api.model.RelatedTagsResponse;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.api.model.SearchProfileResponse;
@@ -28,19 +29,23 @@ import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutResponse;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.SignResponse;
+import com.shoutit.app.android.api.model.SortType;
 import com.shoutit.app.android.api.model.Suggestion;
 import com.shoutit.app.android.api.model.SuggestionsResponse;
 import com.shoutit.app.android.api.model.TagDetail;
 import com.shoutit.app.android.api.model.TagsRequest;
+import com.shoutit.app.android.api.model.TwilioResponse;
 import com.shoutit.app.android.api.model.UpdateLocationRequest;
 import com.shoutit.app.android.api.model.UpdateUserRequest;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.api.model.UserIdentity;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.login.EmailLoginRequest;
 import com.shoutit.app.android.api.model.login.FacebookLogin;
 import com.shoutit.app.android.api.model.login.GoogleLogin;
 
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.ResponseBody;
 import retrofit2.http.Body;
@@ -50,6 +55,7 @@ import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import retrofit2.http.QueryMap;
 import rx.Observable;
 
 public interface ApiService {
@@ -74,7 +80,13 @@ public interface ApiService {
                                                  @Query("city") String city,
                                                  @Query("state") String state,
                                                  @Query("page") Integer page,
-                                                 @Query("page_size") Integer pageSize);
+                                                 @Query("page_size") Integer pageSize,
+                                                 @Query("min_price") Integer minPrice,
+                                                 @Query("max_price") Integer maxPrice,
+                                                 @Query("within") Integer distance,
+                                                 @Query("shout_type") String shoutType,
+                                                 @Query("sort") String sortBy,
+                                                 @QueryMap Map<String, String> filtersMap);
 
     @GET("shouts")
     Observable<ShoutsResponse> shoutsForDiscoverItem(@Query("discover") @NonNull String discoverId,
@@ -85,7 +97,7 @@ public interface ApiService {
     Observable<Shout> shout(@Path("id") String shoutId);
 
     @GET("shouts")
-    Observable<ShoutsResponse> shoutsForUser(@Query("user") String userName,
+    Observable<ShoutsResponse> shoutsForUser(@Query("profile") String userName,
                                              @Query("page") Integer page,
                                              @Query("page_size") Integer pageSize);
 
@@ -103,7 +115,13 @@ public interface ApiService {
                                             @Query("page_size") Integer pageSize,
                                             @Query("country") String countryCode,
                                             @Query("city") String city,
-                                            @Query("state") String state);
+                                            @Query("state") String state,
+                                            @Query("min_price") Integer minPrice,
+                                            @Query("max_price") Integer maxPrice,
+                                            @Query("within") Integer distance,
+                                            @Query("shout_type") String shoutType,
+                                            @Query("sort") String sortBy,
+                                            @QueryMap Map<String, String> filtersMap);
 
     @GET("shouts")
     Observable<ShoutsResponse> searchProfileShouts(@Query("search") String query,
@@ -118,13 +136,25 @@ public interface ApiService {
                                                @Query("tags") String tagNameOrCategorySlug,
                                                @Query("country") String countryCode,
                                                @Query("city") String city,
-                                               @Query("state") String state);
+                                               @Query("state") String state,
+                                               @Query("min_price") Integer minPrice,
+                                               @Query("max_price") Integer maxPrice,
+                                               @Query("within") Integer distance,
+                                               @Query("shout_type") String shoutType,
+                                               @Query("sort") String sortBy,
+                                               @QueryMap Map<String, String> filtersMap);
 
     @GET("shouts")
     Observable<ShoutsResponse> searchDiscoverShouts(@Query("search") String query,
                                                     @Query("page") Integer page,
                                                     @Query("page_size") Integer pageSize,
-                                                    @Query("discover") String userName);
+                                                    @Query("discover") String userName,
+                                                    @Query("min_price") Integer minPrice,
+                                                    @Query("max_price") Integer maxPrice,
+                                                    @Query("within") Integer distance,
+                                                    @Query("shout_type") String shoutType,
+                                                    @Query("sort") String sortBy,
+                                                    @QueryMap Map<String, String> filtersMap);
 
     @GET("shouts")
     Observable<ShoutsResponse> tagShouts(@Query("tags") String tagName,
@@ -135,6 +165,9 @@ public interface ApiService {
     Observable<List<Suggestion>> searchSuggestions(@Query("search") String searchQuery,
                                                    @Query("category") String categoryName,
                                                    @Query("country") String country);
+
+    @GET("shouts/sort_types")
+    Observable<List<SortType>> sortTypes();
 
     /**
      * OAuth
@@ -164,21 +197,21 @@ public interface ApiService {
     /**
      * User
      **/
-    @GET("users/{user_name}")
+    @GET("profiles/{user_name}")
     Observable<User> getUser(@Path("user_name") String userName);
 
-    @GET("users/me")
+    @GET("profiles/me")
     Observable<User> getMyUser();
 
-    @PATCH("users/me")
+    @PATCH("profiles/me")
     Observable<User> updateUserLocation(@Body UpdateLocationRequest updateLocationRequest);
 
-    @GET("users/{user_name}/home")
+    @GET("profiles/{user_name}/home")
     Observable<ShoutsResponse> home(@Path("user_name") String userName,
                                     @Query("page") Integer page,
                                     @Query("page_size") Integer pageSize);
 
-    @PATCH("users/me")
+    @PATCH("profiles/me")
     Observable<User> updateUser(@Body UpdateUserRequest updateUserRequest);
 
 
@@ -282,4 +315,21 @@ public interface ApiService {
 
     @POST("conversations/{id}/reply")
     Observable<Message> postMessage(@NonNull @Path("id") String conversationId, @NonNull @Body PostMessage message);
+
+    /** Notifications **/
+    @GET("notifications")
+    Observable<NotificationsResponse> notifications();
+
+    @POST("notifications/reset")
+    Observable<ResponseBody> markAllAsRead();
+
+    @POST("notifications/{id}/read")
+    Observable<ResponseBody> markAsRead(@Path("id") String notificationId);
+
+    /** Twilio **/
+    @POST("twilio/video_auth")
+    Observable<TwilioResponse> getTokenAndIdentity();
+
+    @GET("twilio/video_identity")
+    Observable<UserIdentity> getUserIdentity(@Query("profile") String username);
 }

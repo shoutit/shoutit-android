@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 
 import com.appunite.rx.functions.BothParams;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -146,10 +147,10 @@ public class ShoutMediaPresenter {
     }
 
     private void removeItem(@NonNull Item imageItem) {
-        final int firstAvailablePosition = getFirstAvailablePosition();
+        final Integer firstAvailablePosition = getFirstAvailablePosition();
         final Integer position = mediaItems.inverse().get(imageItem);
 
-        if (firstAvailablePosition - 1 == position) {
+        if (firstAvailablePosition == null || firstAvailablePosition - 1 == position) {
             mediaItems.forcePut(position, new AddImageItem());
         } else {
             for (int i = position + 1; i < firstAvailablePosition; i++) {
@@ -192,7 +193,7 @@ public class ShoutMediaPresenter {
             return;
         }
 
-        final int position = getFirstAvailablePosition();
+        final Integer position = getFirstAvailablePositionAndCheck();
         File videoThumbnail = null;
         try {
             videoThumbnail = MediaUtils.createVideoThumbnail(context, Uri.parse(media));
@@ -214,7 +215,7 @@ public class ShoutMediaPresenter {
     }
 
     private void addRemoteVideoItem(@NonNull String media, @NonNull String thumbnail, int duration) {
-        final int position = getFirstAvailablePosition();
+        final int position = getFirstAvailablePositionAndCheck();
         mediaItems.put(position, new RemoteVideoItem(thumbnail, media, duration));
 
         if (position + 1 < mediaItems.values().size()) {
@@ -223,7 +224,7 @@ public class ShoutMediaPresenter {
     }
 
     private void addImageItem(@NonNull String media, boolean isRemote) {
-        final int position = getFirstAvailablePosition();
+        final int position = getFirstAvailablePositionAndCheck();
 
         if (position + 1 < mediaItems.values().size()) {
             mediaItems.put(position + 1, new AddImageItem());
@@ -246,14 +247,19 @@ public class ShoutMediaPresenter {
         return !hasVideo;
     }
 
-    private int getFirstAvailablePosition() {
+    private Integer getFirstAvailablePosition() {
         for (int i = 0; i < mediaItems.size(); i++) {
             if (mediaItems.get(i) instanceof AddImageItem) {
                 return i;
             }
         }
+        return null;
+    }
 
-        throw new IllegalStateException("cannot add image when list is full");
+    private int getFirstAvailablePositionAndCheck() {
+        final Integer firstAvailablePosition = getFirstAvailablePosition();
+        Preconditions.checkNotNull(firstAvailablePosition);
+        return firstAvailablePosition;
     }
 
     public void send() {

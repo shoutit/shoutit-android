@@ -39,7 +39,7 @@ public class SearchCategoriesPresenterTest {
         MockitoAnnotations.initMocks(this);
 
         final List<Category> categories = Lists.newArrayList(new Category(null, null, null, null, null));
-        when(categoriesDao.getListObservableResponseOrError())
+        when(categoriesDao.categoriesObservable())
                 .thenReturn(Observable.just(ResponseOrError.fromData(categories)));
 
         presenter = new SearchCategoriesPresenter(categoriesDao, Schedulers.immediate(), context);
@@ -68,7 +68,7 @@ public class SearchCategoriesPresenterTest {
 
     @Test
     public void testErrorObservable() throws Exception {
-        when(categoriesDao.getListObservableResponseOrError())
+        when(categoriesDao.categoriesObservable())
                 .thenReturn(Observable.just(ResponseOrError.<List<Category>>fromError(new Throwable())));
         presenter = new SearchCategoriesPresenter(categoriesDao, Schedulers.immediate(), context);
 

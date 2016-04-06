@@ -17,6 +17,13 @@ public class DateTimeUtils {
                 .toString();
     }
 
+    @Nonnull
+    public static String timeAgoFromDate(long dateInMillis) {
+        return android.text.format.DateUtils.getRelativeTimeSpanString(
+                dateInMillis, System.currentTimeMillis(), android.text.format.DateUtils.SECOND_IN_MILLIS)
+                .toString();
+    }
+
     public static String getShoutDetailDate(Context context, long datePublishedInMillis) {
         final SimpleDateFormat dateFormat = new SimpleDateFormat("dd - MM - yyyy", Locale.getDefault());
         return dateFormat.format(new Date(datePublishedInMillis));

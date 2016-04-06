@@ -21,6 +21,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dagger.FragmentModule;
+import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LayoutManagerHelper;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
@@ -114,13 +115,7 @@ public class HomeFragment extends BaseFragment {
 
         presenter.getErrorObservable()
                 .compose(this.<Throwable>bindToLifecycle())
-                .subscribe(new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        // TODO handle error
-                        Toast.makeText(context, "Error: " + throwable.getMessage(), Toast.LENGTH_LONG).show();
-                    }
-                });
+                .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(getActivity())));
 
         presenter.getShowAllDiscoversObservable()
                 .compose(this.bindToLifecycle())
@@ -148,6 +143,14 @@ public class HomeFragment extends BaseFragment {
                         startActivity(ShoutActivity.newIntent(context, shoutId));
                     }
                 });
+
+        presenter.getRefreshShoutsObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
+
+        presenter.getLoadMoreObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
 
     }
 

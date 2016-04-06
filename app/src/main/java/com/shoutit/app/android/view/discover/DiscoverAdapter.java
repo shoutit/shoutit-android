@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.discover;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -142,6 +143,7 @@ public class DiscoverAdapter extends BaseAdapter {
                     .into(cardImageView);
 
             titleTextView.setText(shout.getTitle());
+            titleTextView.setVisibility(TextUtils.isEmpty(shout.getTitle()) ? View.GONE : View.VISIBLE);
             shoutNameTextView.setText(shout.getProfile().getName());
 
             shoutPriceTextView.setText(item.getShoutPrice());

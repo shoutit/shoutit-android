@@ -35,6 +35,7 @@ public class UserPreferences {
     private static final String IS_GUEST = "is_guest";
     private static final String KEY_LOCATION_TRACKING = "location_tracking";
     private static final String SHOULD_ASK_FOR_INTEREST = "is_first_run";
+    private static final String IS_CALL_REJECTED = "call_rejected";
 
     private final PublishSubject<Object> userRefreshSubject = PublishSubject.create();
     private final PublishSubject<Object> locationRefreshSubject = PublishSubject.create();
@@ -237,4 +238,17 @@ public class UserPreferences {
                 .putString(KEY_LOCATION, locationJson)
                 .commit();
     }
+
+    @SuppressLint("CommitPrefEdits")
+    public void setIsCallRejected(boolean isCallRejected) {
+        final SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putBoolean(IS_CALL_REJECTED, isCallRejected);
+        editor.commit();
+    }
+
+    @Nullable
+    public boolean getIsCallRejected() {
+        return mPreferences.getBoolean(IS_CALL_REJECTED, false);
+    }
+
 }

@@ -63,18 +63,19 @@
         android:layout_height="wrap_content"
         android:background="@android:color/white"
         android:orientation="horizontal"
+        android:gravity="center_horizontal"
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
         android:paddingBottom="6dp"
         android:paddingTop="16dp">
 
         <LinearLayout
+            android:id="@+id/profile_tag_listeners_container"
             android:layout_width="120dp"
             android:layout_height="wrap_content"
-            android:layout_toLeftOf="@+id/profile_tag_icon_tv"
-            android:layout_toStartOf="@+id/profile_tag_icon_tv"
             android:background="?selectableItemBackground"
             android:gravity="center"
+            android:padding="2dp"
             android:orientation="vertical">
 
             <TextView
@@ -97,36 +98,23 @@
                 android:gravity="center"
                 android:maxLines="1"
                 android:text="@string/profile_listeners_label"
+                tools:text="adfgadfgfadgadfgafdgdfagdfagdfagafdgadfgfdagadfgdafgdfag"
                 android:textColor="@color/black_54"
                 android:textSize="14sp" />
 
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/profile_tag_icon_tv"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginLeft="4dp"
-            android:layout_marginRight="4dp"
-            android:layout_marginTop="2dp"
-            android:background="?selectableItemBackground"
-            android:drawableTop="@drawable/ic_chat_gray"
-            android:ellipsize="end"
-            android:gravity="center"
-            android:maxLines="1"
-            android:textColor="@color/black_54"
-            android:textSize="14sp"
-            android:text="Computers" />
-
         <LinearLayout
             android:id="@+id/profile_listen_action_container"
             android:layout_width="120dp"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@+id/profile_tag_icon_tv"
-            android:layout_toRightOf="@+id/profile_tag_icon_tv"
+            android:padding="2dp"
+            android:layout_toRightOf="@+id/profile_tag_listeners_container"
+            android:layout_toEndOf="@+id/profile_tag_listeners_container"
             android:background="?selectableItemBackground"
             android:gravity="center"
+            android:layout_marginLeft="22dp"
+            android:layout_marginStart="22dp"
             android:orientation="vertical">
 
             <ImageView
@@ -148,7 +136,8 @@
                 android:text="@string/profile_listen_label"
                 android:textColor="@color/black_54"
                 android:textSize="14sp"
-                tools:text="Stio Listening lol" />
+                android:ellipsize="end"
+                tools:text="Stio Listening loldsfdsfdsfdsfdsfdsfdsfdfg" />
 
         </LinearLayout>
 

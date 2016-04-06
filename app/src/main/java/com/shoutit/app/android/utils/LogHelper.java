@@ -16,10 +16,10 @@ public class LogHelper {
     }
 
     public static void logThrowableAndCrashlytics(String tag, String msg, Throwable t) {
-        if ("debug".equals(BuildConfig.BUILD_TYPE)) {
-            Log.e(tag, msg, t);
-        } else {
+        if (BuildConfig.enableCrashlytics == true) {
             Crashlytics.logException(t);
+        } else {
+            Log.e(tag, msg, t);
         }
     }
 }
