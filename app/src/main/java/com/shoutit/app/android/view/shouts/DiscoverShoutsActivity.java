@@ -57,7 +57,7 @@ public class DiscoverShoutsActivity extends BaseActivity {
     ProgressBar mProgress;
 
     @Bind(R.id.shouts_layout_btn)
-    CheckedTextView mShoutsCheckedTextView;
+    CheckedTextView layoutSwitchIcon;
 
     @Bind(R.id.discover_shouts_title)
     TextView countTv;
@@ -109,15 +109,15 @@ public class DiscoverShoutsActivity extends BaseActivity {
                 .filter(LoadMoreHelper.needLoadMore((MyLayoutManager) mRecyclerView.getLayoutManager(), mShoutsAdapter))
                 .subscribe(mShoutsPresenter.getLoadMoreObserver());
 
-        mShoutsCheckedTextView.setOnClickListener(new View.OnClickListener() {
+        layoutSwitchIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mShoutsCheckedTextView.setChecked(!mShoutsCheckedTextView.isChecked());
-                if (mShoutsCheckedTextView.isChecked()) {
-                    mShoutsCheckedTextView.setBackground(getResources().getDrawable(R.drawable.ic_grid_switch));
+                layoutSwitchIcon.setChecked(!layoutSwitchIcon.isChecked());
+                if (layoutSwitchIcon.isChecked()) {
+                    layoutSwitchIcon.setBackground(getResources().getDrawable(R.drawable.ic_grid_switch));
                     setLinearLayoutManager();
                 } else {
-                    mShoutsCheckedTextView.setBackground(getResources().getDrawable(R.drawable.ic_list_switch));
+                    layoutSwitchIcon.setBackground(getResources().getDrawable(R.drawable.ic_list_switch));
                     setGridLayoutManager();
                 }
             }
@@ -149,7 +149,7 @@ public class DiscoverShoutsActivity extends BaseActivity {
                     @Override
                     public void call(Integer integer) {
                         countTv.setText(getResources().
-                                getQuantityString(R.plurals.discover_shouts_results, integer, integer));
+                                getQuantityString(R.plurals.shouts_results_pluaral, integer, integer));
                     }
                 });
     }

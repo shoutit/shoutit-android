@@ -11,6 +11,9 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckedTextView;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
@@ -53,6 +56,14 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
     DrawerLayout drawerLayout;
     @Bind(R.id.filter_drawer)
     View filterLayout;
+    @Bind(R.id.search_results_header_title_tv)
+    TextView headerTitleTv;
+    @Bind(R.id.search_results_header_count_tv)
+    TextView headerCountTv;
+    @Bind(R.id.search_results_filter_iv)
+    ImageView filterIv;
+    @Bind(R.id.search_results_switch_iv)
+    CheckedTextView layoutSwitchIcon;
 
     @Inject
     RecentSearchesTable recentSearchesTable;
@@ -63,6 +74,7 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
 
     private ActionBarDrawerToggle drawerToggle;
     private SearchPresenter.SearchType searchType;
+    private String searchQuery;
 
     public static Fragment newInstance(@Nullable String searchQuery,
                                        @Nullable String contextualItemId,
@@ -91,6 +103,7 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
 
         searchType = (SearchPresenter.SearchType)
                 checkNotNull(getArguments().getSerializable(SearchShoutsResultsActivity.KEY_SEARCH_TYPE));
+        searchQuery = getArguments().getString(SearchShoutsResultsActivity.KEY_SEARCH_QUERY);
 
         if (savedInstanceState == null && shouldShowFilters()) {
             getChildFragmentManager()
@@ -101,6 +114,7 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
 
         final String searchQuery = getArguments().getString(SearchShoutsResultsActivity.KEY_SEARCH_QUERY);
         saveSearchQuery(searchQuery);
+        setupHeader();
         initFiltersDrawer();
         initAdapter();
 
@@ -116,24 +130,6 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
                 .compose(this.<Throwable>bindToLifecycle())
                 .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(getActivity())));
 
-        presenter.getLinearLayoutManagerObservable()
-                .compose(this.<Boolean>bindToLifecycle())
-                .subscribe(new Action1<Boolean>() {
-                    @Override
-                    public void call(Boolean ignore) {
-                        setLinearLayoutManager();
-                    }
-                });
-
-        presenter.getGridLayoutManagerObservable()
-                .compose(this.<Boolean>bindToLifecycle())
-                .subscribe(new Action1<Boolean>() {
-                    @Override
-                    public void call(Boolean ignore) {
-                        setGridLayoutManager();
-                    }
-                });
-
         presenter.getShoutSelectedObservable()
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(new Action1<String>() {
@@ -148,17 +144,51 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
                 .filter(LoadMoreHelper.needLoadMore((MyLayoutManager) recyclerView.getLayoutManager(), adapter))
                 .subscribe(presenter.getLoadMoreObserver());
 
-        presenter.getFiltersOpenObservable()
-                .compose(bindToLifecycle())
-                .subscribe(new Action1<Object>() {
+        presenter.getCountObservable()
+                .compose(this.<Integer>bindToLifecycle())
+                .subscribe(new Action1<Integer>() {
                     @Override
-                    public void call(Object o) {
-                        if (shouldShowFilters()) {
-                            drawerLayout.openDrawer(filterLayout);
-
-                        }
+                    public void call(Integer integer) {
+                        headerCountTv.setText(getResources().getQuantityString(
+                                R.plurals.shouts_results_pluaral, integer, integer));
                     }
                 });
+
+        filterIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (shouldShowFilters()) {
+                    drawerLayout.openDrawer(filterLayout);
+                }
+            }
+        });
+
+        layoutSwitchIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                layoutSwitchIcon.setChecked(!layoutSwitchIcon.isChecked());
+                if (layoutSwitchIcon.isChecked()) {
+                    layoutSwitchIcon.setBackground(getResources().getDrawable(R.drawable.ic_grid_switch));
+                    setLinearLayoutManager();
+                } else {
+                    layoutSwitchIcon.setBackground(getResources().getDrawable(R.drawable.ic_list_switch));
+                    setGridLayoutManager();
+                }
+            }
+        });
+    }
+
+    private void setupHeader() {
+        if (TextUtils.isEmpty(searchQuery)) {
+            if (SearchPresenter.SearchType.BROWSE.equals(searchType)) {
+                headerTitleTv.setText(getString(R.string.search_shout_results_header_title_location));
+            } else {
+                headerTitleTv.setText(getString(R.string.search_shout_results_all_results));
+            }
+        } else {
+            headerTitleTv.setText(getString(R.string.search_shout_results_header_title, searchQuery));
+        }
+        filterIv.setVisibility(shouldShowFilters() ? View.VISIBLE : View.GONE);
     }
 
     private boolean shouldShowFilters() {

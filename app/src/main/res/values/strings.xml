@@ -156,7 +156,7 @@
     <!-- Discover Shouts -->
     <string name="discover_shouts_share">Share</string>
     <string name="discover_shouts_title">%s Shouts</string>
-    <plurals name="discover_shouts_results">
+    <plurals name="shouts_results_pluaral">
         <item quantity="one">%1$d result</item>
         <item quantity="other">%1$d results</item>
     </plurals>
