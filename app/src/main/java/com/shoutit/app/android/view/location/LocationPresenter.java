@@ -272,7 +272,7 @@ public class LocationPresenter {
                         .switchMap(new Func1<LatLng, Observable<ResponseOrError<UserLocation>>>() {
                             @Override
                             public Observable<ResponseOrError<UserLocation>> call(LatLng latLng) {
-                                return getGeoCodeRequest(latLng.latitude, latLng.longitude);  // TODO remove this request if guest user will be handled by API
+                                return getGeoCodeRequest(latLng.latitude, latLng.longitude);
                             }
                         })
                         .compose(ObservableExtensions.<ResponseOrError<UserLocation>>behaviorRefCount());
