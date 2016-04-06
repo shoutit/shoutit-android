@@ -139,7 +139,8 @@
     <string name="location_fetching_error">Sorry, cannot get locations</string>
     <string name="location_update_error">Sorry, cannot update your location. Please try again.</string>
     <string name="location_update_success">Location successfully changed</string>
-    <string name="home_no_shouts">No shouts to display</string>
+    <string name="home_no_shouts">No shouts in current location</string>
+    <string name="home_no_shouts_logged_in_user">Nothing in your feed click here to add some interests</string>
 
     <!-- Discover -->
     <string name="discover_shouts_header">Discover shouts</string>

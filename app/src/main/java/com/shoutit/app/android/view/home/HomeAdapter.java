@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
@@ -28,6 +27,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import rx.Observable;
 import rx.Scheduler;
 import rx.Subscription;
@@ -128,8 +128,6 @@ public class HomeAdapter extends ChangeableLayoutManagerAdapter {
     class ShoutHeaderViewHolder extends ViewHolderManager.BaseViewHolder<HomePresenter.ShoutHeaderAdapterItem> {
         @Bind(R.id.home_shouts_header_tv)
         TextView headerTextView;
-        @Bind(R.id.home_filter_iv)
-        View filterIcon;
         @Bind(R.id.home_switch_iv)
         ImageView layoutManagerSwitchView;
 
@@ -153,16 +151,7 @@ public class HomeAdapter extends ChangeableLayoutManagerAdapter {
 
             subscription = new CompositeSubscription(
                     RxView.clicks(layoutManagerSwitchView)
-                            .subscribe(item.getLayoutManagerSwitchObserver()),
-
-                    RxView.clicks(filterIcon)
-                            .observeOn(uiScheduler)
-                            .subscribe(new Action1<Void>() {
-                                @Override
-                                public void call(Void aVoid) {
-                                    Toast.makeText(context, "Not implemented yet", Toast.LENGTH_LONG).show();
-                                }
-                            })
+                            .subscribe(item.getLayoutManagerSwitchObserver())
             );
         }
 
@@ -181,12 +170,30 @@ public class HomeAdapter extends ChangeableLayoutManagerAdapter {
     }
 
     class ShoutEmptyViewHolder extends ViewHolderManager.BaseViewHolder<HomePresenter.ShoutsEmptyAdapterItem> {
+
+        @Bind(R.id.home_shouts_empty_tv)
+        TextView emptyTextView;
+        private HomePresenter.ShoutsEmptyAdapterItem item;
+
         public ShoutEmptyViewHolder(@Nonnull View itemView) {
             super(itemView);
+            ButterKnife.bind(this, itemView);
         }
 
         @Override
         public void bind(@Nonnull HomePresenter.ShoutsEmptyAdapterItem item) {
+            this.item = item;
+
+            final String text = context.getString(item.isLoggedInAsNormalUser() ?
+                    R.string.home_no_shouts_logged_in_user : R.string.home_no_shouts);
+            emptyTextView.setText(text);
+        }
+
+        @OnClick(R.id.home_shouts_empty_tv)
+        public void onEmptyItemClicked() {
+            if (item.isLoggedInAsNormalUser()) {
+                item.onShowInterestsClicked();
+            }
         }
     }
 
