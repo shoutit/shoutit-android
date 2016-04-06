@@ -2,8 +2,10 @@ package com.shoutit.app.android.view.notifications;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
 import android.view.View;
@@ -61,10 +63,17 @@ public class NotificationsAdapter extends BaseAdapter {
 
         private NotificationsPresenter.NotificationAdapterItem item;
         private final Target target;
+        private final StyleSpan boldedName;
+        private final ForegroundColorSpan colorSpan;
+        private final TypefaceSpan typefaceSpan;
 
         public NotificationViewHolder(@Nonnull View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+
+            boldedName = new StyleSpan(Typeface.BOLD);
+            colorSpan = new ForegroundColorSpan(context.getResources().getColor(R.color.black_87));
+            typefaceSpan = new TypefaceSpan("sans-serif-medium");
 
             target = PicassoHelper.getRoundedBitmapTarget(context, avatarImageView,
                     context.getResources().getDimensionPixelSize(R.dimen.notifications_avatar_corners));
@@ -88,7 +97,7 @@ public class NotificationsAdapter extends BaseAdapter {
                     final BaseProfile profile = attachedObject.getMessage().getProfile();
                     imageUrl = profile.getImage();
 
-                    final String spannedText = getSpannedText(
+                    final SpannableString spannedText = getSpannedText(
                             profile.getFirstName(),
                             attachedObject.getMessage().getText());
                     textTv.setText(spannedText);
@@ -96,7 +105,7 @@ public class NotificationsAdapter extends BaseAdapter {
                     final BaseProfile profile = attachedObject.getProfile();
                     imageUrl = profile.getImage();
 
-                    final String spannedText = getSpannedText(
+                    final SpannableString spannedText = getSpannedText(
                             profile.getFirstName(),
                             context.getString(R.string.notifications_listening_to_you));
                     textTv.setText(spannedText);
@@ -109,16 +118,15 @@ public class NotificationsAdapter extends BaseAdapter {
         }
 
         @Nonnull
-        private String getSpannedText(String name, String message) {
+        private SpannableString getSpannedText(String name, String message) {
             final String text = name + "  " + message;
-            final SpannableStringBuilder builder = new SpannableStringBuilder(text);
-            final StyleSpan boldedName = new StyleSpan(Typeface.BOLD);
-            final TypefaceSpan typefaceSpan = new TypefaceSpan("sans-serif-medium");
+            final SpannableString spannableString = new SpannableString(text);
 
-            builder.setSpan(boldedName, 0, name.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-            builder.setSpan(typefaceSpan, 0, name.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            spannableString.setSpan(boldedName, 0, name.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            spannableString.setSpan(typefaceSpan, 0, name.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            spannableString.setSpan(colorSpan, 0, name.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
 
-            return builder.toString();
+            return spannableString;
         }
 
         @OnClick(R.id.notifications_root_view)
