@@ -17,8 +17,8 @@ import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.NotificationsDao;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
-import com.shoutit.app.android.dao.SortTypesDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
+import com.shoutit.app.android.dao.SortTypesDao;
 import com.shoutit.app.android.dao.SuggestionsDao;
 import com.shoutit.app.android.dao.TagsDao;
 import com.shoutit.app.android.db.DbHelper;
@@ -41,7 +41,7 @@ import rx.Scheduler;
 )
 public interface AppComponent {
 
-    void inject(App.AppMultidexFix app);
+    void inject(App app);
 
     @UiScheduler
     Scheduler getUiScheduler();
