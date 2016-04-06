@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.chats.message_models;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.shoutit.app.android.view.chats.Listener;
 
 import javax.annotation.Nonnull;
 
@@ -8,11 +9,13 @@ public class SentImageMessage implements BaseAdapterItem {
 
     private final String time;
     private final String url;
+    private final Listener mListener;
 
-    public SentImageMessage(String time, String url) {
+    public SentImageMessage(String time, String url, Listener listener) {
         super();
         this.time = time;
         this.url = url;
+        mListener = listener;
     }
 
     public String getTime() {
@@ -39,4 +42,7 @@ public class SentImageMessage implements BaseAdapterItem {
         return false;
     }
 
+    public void click() {
+        mListener.onImageClicked(url);
+    }
 }

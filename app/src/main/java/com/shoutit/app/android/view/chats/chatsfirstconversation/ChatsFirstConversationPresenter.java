@@ -29,6 +29,7 @@ import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.PusherHelper;
+import com.shoutit.app.android.view.chats.Listener;
 import com.shoutit.app.android.view.chats.PresenceChannelEventListenerAdapter;
 import com.shoutit.app.android.view.chats.message_models.DateItem;
 import com.shoutit.app.android.view.chats.message_models.ReceivedImageMessage;
@@ -335,12 +336,14 @@ public class ChatsFirstConversationPresenter {
             if (MessageAttachment.ATTACHMENT_TYPE_MEDIA.equals(type)) {
                 final List<String> images = messageAttachment.getImages();
                 if (images != null && !images.isEmpty()) {
-                    return new ReceivedImageMessage(isFirst, time, images.get(0), avatarUrl);
+                    return new ReceivedImageMessage(isFirst, time, images.get(0), avatarUrl, mListener);
                 } else {
-                    return new ReceivedVideoMessage(isFirst, messageAttachment.getVideos().get(0).getThumbnailUrl(), time, avatarUrl);
+                    final Video video = messageAttachment.getVideos().get(0);
+                    return new ReceivedVideoMessage(isFirst, video.getThumbnailUrl(), time, avatarUrl, mListener, video.getUrl());
                 }
             } else if (MessageAttachment.ATTACHMENT_TYPE_LOCATION.equals(type)) {
-                return new ReceivedLocationMessage(isFirst, time, avatarUrl);
+                final MessageAttachment.MessageLocation location = messageAttachment.getLocation();
+                return new ReceivedLocationMessage(isFirst, time, avatarUrl, mListener, location.getLatitude(), location.getLongitude());
             } else if (MessageAttachment.ATTACHMENT_TYPE_SHOUT.equals(type)) {
                 final Shout shout = messageAttachment.getShout();
                 return new ReceivedShoutMessage(
@@ -367,12 +370,14 @@ public class ChatsFirstConversationPresenter {
             if (MessageAttachment.ATTACHMENT_TYPE_MEDIA.equals(type)) {
                 final List<String> images = messageAttachment.getImages();
                 if (images != null && !images.isEmpty()) {
-                    return new SentImageMessage(time, images.get(0));
+                    return new SentImageMessage(time, images.get(0), mListener);
                 } else {
-                    return new SentVideoMessage(messageAttachment.getVideos().get(0).getThumbnailUrl(), time);
+                    final Video video = messageAttachment.getVideos().get(0);
+                    return new SentVideoMessage(video.getThumbnailUrl(), time, mListener, video.getUrl());
                 }
             } else if (MessageAttachment.ATTACHMENT_TYPE_LOCATION.equals(type)) {
-                return new SentLocationMessage(time);
+                final MessageAttachment.MessageLocation location = messageAttachment.getLocation();
+                return new SentLocationMessage(time, mListener, location.getLatitude(), location.getLongitude());
             } else if (MessageAttachment.ATTACHMENT_TYPE_SHOUT.equals(type)) {
                 final Shout shout = messageAttachment.getShout();
                 return new SentShoutMessage(shout.getThumbnail(), time, PriceUtils.formatPriceWithCurrency(shout.getPrice(), mResources, shout.getCurrency()), shout.getText(), shout.getProfile().getName());
@@ -480,17 +485,5 @@ public class ChatsFirstConversationPresenter {
                         mListener.error(throwable);
                     }
                 });
-    }
-
-    public interface Listener {
-
-        void emptyList();
-
-        void showProgress(boolean show);
-
-        void setData(@NonNull List<BaseAdapterItem> items);
-
-        void error(Throwable throwable);
-
     }
 }

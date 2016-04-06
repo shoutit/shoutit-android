@@ -54,5 +54,4 @@ public class SentShoutMessage implements BaseAdapterItem {
     public boolean same(@Nonnull BaseAdapterItem item) {
         return false;
     }
-
 }

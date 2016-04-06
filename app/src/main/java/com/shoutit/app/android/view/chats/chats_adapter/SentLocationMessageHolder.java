@@ -19,11 +19,14 @@ import butterknife.ButterKnife;
 
 public class SentLocationMessageHolder extends ViewHolderManager.BaseViewHolder<BaseAdapterItem> {
 
+    @Nonnull
+    private final View mItemView;
     @Bind(R.id.chats_sent_location_date_textview)
     TextView mChatsSentLocationDateTextview;
 
     public SentLocationMessageHolder(@Nonnull View itemView) {
         super(itemView);
+        mItemView = itemView;
         ButterKnife.bind(this, itemView);
     }
 
@@ -31,6 +34,13 @@ public class SentLocationMessageHolder extends ViewHolderManager.BaseViewHolder<
     public void bind(@Nonnull BaseAdapterItem item) {
         final SentLocationMessage message = (SentLocationMessage) item;
         mChatsSentLocationDateTextview.setText(message.getTime());
+
+        mItemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                message.click();
+            }
+        });
 
     }
 

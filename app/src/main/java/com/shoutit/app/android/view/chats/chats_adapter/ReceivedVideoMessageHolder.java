@@ -19,6 +19,8 @@ import butterknife.ButterKnife;
 
 public class ReceivedVideoMessageHolder extends ViewHolderManager.BaseViewHolder<BaseAdapterItem> {
 
+    @Nonnull
+    private final View mItemView;
     private final Picasso mPicasso;
 
     @Bind(R.id.chats_received_avatar)
@@ -30,6 +32,7 @@ public class ReceivedVideoMessageHolder extends ViewHolderManager.BaseViewHolder
 
     public ReceivedVideoMessageHolder(@Nonnull View itemView, Picasso picasso) {
         super(itemView);
+        mItemView = itemView;
         mPicasso = picasso;
         ButterKnife.bind(this, itemView);
     }
@@ -45,6 +48,13 @@ public class ReceivedVideoMessageHolder extends ViewHolderManager.BaseViewHolder
                 .centerCrop()
                 .into(mChatsReceivedVideoImageview);
         mChatsReceivedVideoTextview.setText(message.getTime());
+
+        mItemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                message.click();
+            }
+        });
     }
 
     public static ViewHolderManager.BaseViewHolder create(@NonNull View view, Picasso picasso) {

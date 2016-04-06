@@ -19,4 +19,6 @@ public abstract class ReceivedMessage implements BaseAdapterItem {
     public String getAvatarUrl() {
         return mAvatarUrl;
     }
+
+
 }

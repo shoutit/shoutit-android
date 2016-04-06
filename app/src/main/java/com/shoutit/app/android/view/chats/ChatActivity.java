@@ -2,6 +2,7 @@ package com.shoutit.app.android.view.chats;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -46,7 +47,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class ChatActivity extends BaseActivity implements ChatsPresenter.Listener {
+public class ChatActivity extends BaseActivity implements Listener {
 
     private static final String ARGS_IS_SHOUT_CONVERSATION = "args_shout_conversation";
     private static final String ARGS_CONVERSATION_ID = "conversation_id";
@@ -170,6 +171,29 @@ public class ChatActivity extends BaseActivity implements ChatsPresenter.Listene
     public void error(Throwable throwable) {
         Log.e(TAG, "error", throwable);
         ColoredSnackBar.error(ColoredSnackBar.contentView(this), R.string.error_default, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onVideoClicked(String url) {
+        Intent intent = new Intent();
+        intent.setAction(android.content.Intent.ACTION_VIEW);
+        intent.setDataAndType(Uri.parse(url), "video/*");
+        startActivity(intent);
+    }
+
+    @Override
+    public void onLocationClicked(double latitude, double longitude) {
+        Uri uri = Uri.parse("geo:" + latitude + "," + longitude);
+        Intent intent = new Intent(android.content.Intent.ACTION_VIEW, uri);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onImageClicked(String url) {
+        Intent intent = new Intent();
+        intent.setAction(android.content.Intent.ACTION_VIEW);
+        intent.setDataAndType(Uri.parse(url), "image/*");
+        startActivity(intent);
     }
 
     @Override

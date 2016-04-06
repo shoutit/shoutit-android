@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.chats.message_models;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.shoutit.app.android.view.chats.Listener;
 
 import javax.annotation.Nonnull;
 
@@ -8,11 +9,13 @@ public class ReceivedImageMessage extends ReceivedMessage {
 
     private final String time;
     private final String url;
+    private final Listener mListener;
 
-    public ReceivedImageMessage(boolean isFirst, String time, String url, String avatarUrl) {
+    public ReceivedImageMessage(boolean isFirst, String time, String url, String avatarUrl, Listener listener) {
         super(isFirst, avatarUrl);
         this.time = time;
         this.url = url;
+        mListener = listener;
     }
 
     public String getTime() {
@@ -38,5 +41,9 @@ public class ReceivedImageMessage extends ReceivedMessage {
     @Override
     public boolean same(@Nonnull BaseAdapterItem item) {
         return false;
+    }
+
+    public void click() {
+        mListener.onImageClicked(url);
     }
 }
