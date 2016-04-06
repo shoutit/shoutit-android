@@ -31,6 +31,7 @@ import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.NotificationsDao;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
+import com.shoutit.app.android.dao.SortTypesDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.dao.SuggestionsDao;
 import com.shoutit.app.android.dao.TagsDao;
@@ -259,6 +260,12 @@ public final class AppModule {
     @Provides
     public UsersIdentityDao provideUsersIdentityDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
         return new UsersIdentityDao(apiService, networkScheduler);
+    }
+
+    @Provides
+    @Singleton
+    SortTypesDao sortTypesDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
+        return new SortTypesDao(apiService, networkScheduler);
     }
 
     @Provides
