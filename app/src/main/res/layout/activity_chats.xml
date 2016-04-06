@@ -57,11 +57,11 @@
     </LinearLayout>
 
     <FrameLayout
-        android:background="@android:color/white"
         android:id="@+id/chats_attatchments_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/chats_toolbar"
+        android:background="@android:color/white"
         android:visibility="gone">
 
         <GridLayout
@@ -72,74 +72,88 @@
             android:rowCount="2">
 
             <LinearLayout
-                android:layout_margin="20dp"
-                android:id="@+id/chats_attatchments_photo"
+                android:layout_marginEnd="6dp"
+                android:layout_marginRight="60dp"
+                android:layout_marginTop="20dp"
                 android:orientation="vertical">
 
                 <ImageButton
-                    android:background="?selectableItemBackground"
+                    android:id="@+id/chats_attatchments_photo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="?selectableItemBackground"
                     android:src="@drawable/photo_attachment"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:layout_marginTop="2dp"
                     android:text="@string/chats_attatchments_photo"/>
             </LinearLayout>
 
             <LinearLayout
-                android:layout_margin="20dp"
-                android:id="@+id/chats_attatchments_video"
+                android:layout_marginLeft="60dp"
+                android:layout_marginStart="60dp"
+                android:layout_marginTop="20dp"
                 android:orientation="vertical">
 
                 <ImageButton
-                    android:background="?selectableItemBackground"
+                    android:id="@+id/chats_attatchments_video"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="?selectableItemBackground"
                     android:src="@drawable/video_attachment"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:layout_marginTop="2dp"
                     android:text="@string/chats_attatchments_video"/>
             </LinearLayout>
 
             <LinearLayout
-                android:layout_margin="20dp"
-                android:id="@+id/chats_attatchments_shout"
+                android:layout_marginBottom="20dp"
+                android:layout_marginEnd="60dp"
+                android:layout_marginRight="60dp"
+                android:layout_marginTop="20dp"
                 android:orientation="vertical">
 
                 <ImageButton
-                    android:background="?selectableItemBackground"
+                    android:id="@+id/chats_attatchments_shout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="?selectableItemBackground"
                     android:src="@drawable/shout"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:layout_marginTop="2dp"
                     android:text="@string/chats_attatchments_shout"/>
             </LinearLayout>
 
             <LinearLayout
-                android:layout_margin="20dp"
-                android:id="@+id/chats_attatchments_location"
+                android:layout_marginBottom="20dp"
+                android:layout_marginLeft="60dp"
+                android:layout_marginStart="60dp"
+                android:layout_marginTop="20dp"
                 android:orientation="vertical">
 
                 <ImageButton
-                    android:background="?selectableItemBackground"
+                    android:id="@+id/chats_attatchments_location"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="?selectableItemBackground"
                     android:src="@drawable/location_attachment"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:layout_marginTop="2dp"
                     android:text="@string/chats_attatchments_location"/>
             </LinearLayout>
 

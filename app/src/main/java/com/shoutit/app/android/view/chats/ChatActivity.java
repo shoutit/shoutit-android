@@ -74,10 +74,6 @@ public class ChatActivity extends BaseActivity implements ChatsPresenter.Listene
 
     @Bind(R.id.chats_attatchments_layout)
     FrameLayout mChatsAttatchmentsLayout;
-    @Bind(R.id.chats_attatchments_shout)
-    LinearLayout mChatsAttatchmentsShout;
-    @Bind(R.id.chats_attatchments_location)
-    LinearLayout mChatsAttatchmentsLocation;
 
     public static Intent newIntent(@Nonnull Context context, @NonNull String conversationId) {
         return new Intent(context, ChatActivity.class)
