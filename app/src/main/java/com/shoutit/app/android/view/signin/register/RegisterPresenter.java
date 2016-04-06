@@ -14,8 +14,10 @@ import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.login.LoginUser;
 import com.shoutit.app.android.utils.MoreFunctions1;
+import com.shoutit.app.android.utils.Validators;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import rx.Observable;
@@ -43,6 +45,7 @@ public class RegisterPresenter {
     private final Observable<String> mPasswordNotEmpty;
     private final Observable<String> mEmailNotEmpty;
     private final Observable<String> mNameNotEmpty;
+    private final Observable<Boolean> wrongEmailErrorObservable;
 
     @Inject
     public RegisterPresenter(@NonNull final ApiService apiService,
@@ -55,11 +58,27 @@ public class RegisterPresenter {
                 .startWith((UserLocation) null)
                 .compose(ObservableExtensions.<UserLocation>behaviorRefCount());
 
-        final Observable<ResponseOrError<SignResponse>> responseOrErrorObservable = mProceedSubject
-                .withLatestFrom(mLocationObservable, new Func2<Object, UserLocation, UserLocation>() {
+        final Observable<Boolean> isEmailCorrectObservable = mEmailSubject.startWith((String) null)
+                .map(new Func1<String, Boolean>() {
                     @Override
-                    public UserLocation call(Object o, UserLocation location) {
-                        return location;
+                    public Boolean call(String email) {
+                        return Validators.isEmailValid(email);
+                    }
+                })
+                .compose(ObservableExtensions.<Boolean>behaviorRefCount());
+
+        final Observable<ResponseOrError<SignResponse>> responseOrErrorObservable = mProceedSubject
+                .withLatestFrom(isEmailCorrectObservable, new Func2<Object, Boolean, Boolean>() {
+                    @Override
+                    public Boolean call(Object o, Boolean isEmailValid) {
+                        return isEmailValid;
+                    }
+                })
+                .filter(Functions1.isTrue())
+                .switchMap(new Func1<Boolean, Observable<UserLocation>>() {
+                    @Override
+                    public Observable<UserLocation> call(Boolean aBoolean) {
+                        return mLocationObservable;
                     }
                 })
                 .switchMap(new Func1<UserLocation, Observable<EmailSignupRequest>>() {
@@ -110,6 +129,14 @@ public class RegisterPresenter {
                 });
 
         mErrorObservable = responseOrErrorObservable.compose(ResponseOrError.<SignResponse>onlyError());
+
+        wrongEmailErrorObservable = mProceedSubject
+                .flatMap(MoreFunctions1.returnObservableFirst(isEmailCorrectObservable.map(Functions1.neg())));
+    }
+
+    @Nonnull
+    public Observable<Boolean> getWrongEmailErrorObservable() {
+        return wrongEmailErrorObservable;
     }
 
     @NonNull
