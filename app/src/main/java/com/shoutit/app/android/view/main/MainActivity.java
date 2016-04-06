@@ -17,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.appunite.appunitegcm.AppuniteGcm;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
@@ -105,6 +106,12 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
         } else {
             final int selectedItem = savedInstanceState.getInt(MENU_SELECT_ITEM);
             menuHandler.initMenu(drawerLayout, selectedItem);
+        }
+
+
+        if (mUserPreferences.getGcmPushToken() == null) {
+            profilesDao.registerToGcmAction(AppuniteGcm.getInstance()
+                    .getPushToken());
         }
     }
 

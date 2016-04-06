@@ -19,6 +19,7 @@ import com.shoutit.app.android.api.model.EditShoutRequestWithPrice;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.GuestSignupRequest;
 import com.shoutit.app.android.api.model.NotificationsResponse;
+import com.shoutit.app.android.api.model.RegisterDeviceRequest;
 import com.shoutit.app.android.api.model.RelatedTagsResponse;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.api.model.SearchProfileResponse;
@@ -179,6 +180,8 @@ public interface ApiService {
     @PATCH("profiles/me")
     Observable<User> updateUser(@Body UpdateUserRequest updateUserRequest);
 
+    @PATCH("profiles/me")
+    Observable<User> registerGcmToken(@Body RegisterDeviceRequest registerDeviceRequest);
 
     /**
      * Profile

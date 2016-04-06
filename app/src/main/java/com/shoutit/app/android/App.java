@@ -4,6 +4,7 @@ import android.app.Application;
 import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
 
+import com.appunite.appunitegcm.AppuniteGcm;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
@@ -31,6 +32,8 @@ import rx.plugins.RxJavaPlugins;
 
 public class App extends MultiDexApplication {
     private static final String TAG = App.class.getSimpleName();
+
+    private static final String GCM_TOKEN = "935842257865";
 
     private AppComponent component;
 
@@ -60,6 +63,11 @@ public class App extends MultiDexApplication {
         Dexter.initialize(this);
 
         initFfmpeg();
+
+        AppuniteGcm.initialize(this, GCM_TOKEN)
+                .loggingEnabled(!BuildConfig.DEBUG)
+                .getPushBundleObservable()
+                .subscribe(NotificationHelper.sendNotificationAction(this));
     }
 
     private void initFfmpeg() {

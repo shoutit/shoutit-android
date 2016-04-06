@@ -1,5 +1,8 @@
 package com.shoutit.app.android.dao;
 
+import android.util.Log;
+
+import com.appunite.appunitegcm.AppuniteGcm;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.operators.MoreOperators;
@@ -8,10 +11,11 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.RegisterDeviceRequest;
 import com.shoutit.app.android.api.model.SearchProfileResponse;
 import com.shoutit.app.android.api.model.User;
-import com.shoutit.app.android.utils.rx.RxMoreObservers;
 
 import javax.annotation.Nonnull;
 
@@ -32,11 +36,14 @@ public class ProfilesDao {
     @Nonnull
     private final ApiService apiService;
     private final Scheduler networkScheduler;
+    private UserPreferences userPreferences;
 
     public ProfilesDao(@Nonnull ApiService apiService,
-                       @NetworkScheduler Scheduler networkScheduler) {
+                       @NetworkScheduler Scheduler networkScheduler,
+                       @Nonnull UserPreferences userPreferences) {
         this.apiService = apiService;
         this.networkScheduler = networkScheduler;
+        this.userPreferences = userPreferences;
 
         profilesCache = CacheBuilder.newBuilder()
                 .build(new CacheLoader<String, ProfileDao>() {
@@ -73,6 +80,22 @@ public class ProfilesDao {
     @Nonnull
     public ProfileDao getProfileDao(@Nonnull String userName) {
         return profilesCache.getUnchecked(userName);
+    }
+
+    public void registerToGcmAction(final String token) {
+        apiService.registerGcmToken(new RegisterDeviceRequest(token))
+                .subscribeOn(networkScheduler)
+                .subscribe(new Action1<User>() {
+                    @Override
+                    public void call(User user) {
+                        userPreferences.setGcmPushToken(token);
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        Log.d(AppuniteGcm.TAG, "error" ,throwable);
+                    }
+                });
     }
 
     public class ProfileDao {
