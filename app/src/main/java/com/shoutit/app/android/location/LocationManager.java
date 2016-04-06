@@ -87,7 +87,7 @@ public class LocationManager {
                     }
                 });
 
-        final Observable<UserLocation> locationFromIpOnGpsFailObservable = gpsLocationObservable
+        final Observable<UserLocation> locationFromIpOrGpsFailObservable = gpsLocationObservable
                 .filter(Functions1.isNull())
                 .switchMap(new Func1<Location, Observable<UserLocation>>() {
                     @Override
@@ -102,7 +102,7 @@ public class LocationManager {
                     @Override
                     public Observable<UserLocation> call() {
                         if (userPreferences.automaticLocationTrackingEnabled() && hasLocationPermissions(context)) {
-                            return Observable.merge(successGpsLocationObservable, locationFromIpOnGpsFailObservable);
+                            return Observable.merge(successGpsLocationObservable, locationFromIpOrGpsFailObservable);
                         } else if (userPreferences.automaticLocationTrackingEnabled()) {
                             return locationFromIPObservable;
                         } else {
@@ -114,13 +114,13 @@ public class LocationManager {
                 .filter(Functions1.isNotNull())
                 .filter(locationChangedFilter())
                 .lift(MoreOperators.callOnNext(updateUserSubject))
-                .doOnNext(saveToPreferences()); // TODO remove this if guest user will be handled by API*/
+                .doOnNext(saveToPreferences());
 
         updateUserSubject
                 .filter(new Func1<UserLocation, Boolean>() {
                     @Override
                     public Boolean call(UserLocation location) {
-                        return userPreferences.isUserLoggedIn(); // TODO remove this if guest user will be handled by API
+                        return userPreferences.isUserLoggedIn();
                     }
                 })
                 .switchMap(updateUserWithNewLocation())
@@ -155,7 +155,7 @@ public class LocationManager {
             public Boolean call(@Nonnull UserLocation location) {
                 final UserLocation currentLocation = userPreferences.getLocation();
                 return currentLocation == null ||
-                        (currentLocation != null && !Strings.nullToEmpty(currentLocation.getCity()).equalsIgnoreCase(location.getCity()));
+                        !Strings.nullToEmpty(currentLocation.getCity()).equalsIgnoreCase(location.getCity());
             }
         };
     }
