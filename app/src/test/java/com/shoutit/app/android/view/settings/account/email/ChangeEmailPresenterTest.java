@@ -42,7 +42,7 @@ public class ChangeEmailPresenterTest {
 
         when(apiService.updateUser(any(UpdateUserRequest.class)))
                 .thenReturn(Observable.just(new User("z", null, null, null, null, null, null, null, false, null,
-                null, false, false, false, null, 1, null, null, null, 1, null, false, null, null, null, conversation)));
+                null, false, false, false, null, 1, null, null, null, 1, null, false, null, null, null, null)));
         when(Validators.isEmailValid(anyString())).thenReturn(true);
 
         presenter = new ChangeEmailPresenter(apiService, scheduler, scheduler, userPreferences);
