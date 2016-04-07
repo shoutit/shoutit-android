@@ -1,5 +1,9 @@
 package com.shoutit.app.android.model;
 
+import android.support.annotation.Nullable;
+
+import javax.annotation.Nonnull;
+
 public class ReportBody {
     private final String text;
     private final AttachedObject attachedObject;
@@ -18,27 +22,31 @@ public class ReportBody {
     }
 
     static class AttachedObject {
+        @Nullable
         private final Profile profile;
+        @Nullable
         private final Shout shout;
 
-        AttachedObject(Profile profile, Shout shout) {
+        AttachedObject(@Nullable Profile profile, @Nullable Shout shout) {
             this.profile = profile;
             this.shout = shout;
         }
     }
 
     static class Profile {
+        @Nonnull
         private final String id;
 
-        Profile(String id) {
+        Profile(@Nonnull String id) {
             this.id = id;
         }
     }
 
     static class Shout {
+        @Nonnull
         private final String id;
 
-        Shout(String id) {
+        Shout(@Nonnull String id) {
             this.id = id;
         }
     }

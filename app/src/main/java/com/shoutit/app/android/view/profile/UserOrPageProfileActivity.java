@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.appunite.rx.android.widget.RxActivityMore;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
@@ -69,6 +68,10 @@ public class UserOrPageProfileActivity extends ProfileActivity {
                         Toast.makeText(UserOrPageProfileActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
                     }
                 });
+
+        presenter.getReportSuccessObservable()
+                .compose(this.bindToLifecycle())
+                .subscribe(ColoredSnackBar.successSnackBarAction(ColoredSnackBar.contentView(this), R.string.profile_report_succes));
 
         // My Profile specific subscriptions
         presenter.getMyProfilePresenter().getEditProfileClickObservable()

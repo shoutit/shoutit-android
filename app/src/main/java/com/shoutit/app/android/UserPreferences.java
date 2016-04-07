@@ -136,6 +136,7 @@ public class UserPreferences {
         mPreferences.edit().putString(GCM_PUSH_TOKEN, gcmPushToken).apply();
     }
 
+    @Nullable
     public String getGcmPushToken() {
         return mPreferences.getString(GCM_PUSH_TOKEN, null);
     }

@@ -255,6 +255,9 @@ public interface ApiService {
     @GET("misc/currencies")
     Observable<List<Currency>> getCurrencies();
 
+    @POST("misc/reports")
+    Observable<ResponseBody> report(@Body ReportBody reportShoutBody);
+
     /**
      * Auth
      **/
@@ -332,8 +335,4 @@ public interface ApiService {
 
     @GET("twilio/video_identity")
     Observable<UserIdentity> getUserIdentity(@Query("profile") String username);
-
-    /** Misc **/
-    @POST("misc/reports")
-    Observable<Response<Object>> reportShout(@Body ReportBody reportShoutBody);
 }

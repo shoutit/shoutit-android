@@ -267,7 +267,7 @@ public class ShoutsDao {
                     .flatMap(new Func1<String, Observable<Response<Object>>>() {
                         @Override
                         public Observable<Response<Object>> call(String body) {
-                            return apiService.reportShout(ReportBody.forShout(shoutId, body))
+                            return apiService.report(ReportBody.forShout(shoutId, body))
                                     .subscribeOn(networkScheduler);
                         }
                     });
