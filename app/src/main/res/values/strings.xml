@@ -69,10 +69,8 @@
     <string name="register_email">Email</string>
     <string name="register_password">Password</string>
     <string name="register_login_text">Have an account? Log in</string>
-    <string name="register_empty_mail">Mail cannot be empty.</string>
-    <string name="register_empty_password">Password must have at least 6 and no more than 20
-        characters.
-    </string>
+    <string name="register_empty_mail">Email cannot be empty.</string>
+    <string name="register_empty_password">Password must have at least 6 and no more than 20 characters.</string>
     <string name="register_empty_name">Name cannot be empty</string>
     <string name="register_have_an_account">Have an account?</string>
     <string name="register_log_in">Log in</string>
@@ -375,6 +373,7 @@
     <string name="edit_shout_add_pictures_label">Add pictures and videos</string>
     <string name="option_not_set">Not set</string>
     <string name="edit_shout_mobile_hint">Mobile</string>
+    <string name="notifications_message_replacement">sends you a message</string>
 
     <!-- Video Calls -->
     <string name="video_calls_no_premissions">Camera and Microphone permissions needed.</string>
