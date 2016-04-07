@@ -157,7 +157,7 @@ public class ShoutAdapter extends BaseAdapter {
 
             shoutViewPager.setAdapter(imagesPagerAdapter);
             pageIndicator.setViewPager(shoutViewPager);
-            imagesPagerAdapter.setData(shout.getImages());
+            imagesPagerAdapter.setData(shout.getImages(), shout.getVideos());
             boolean hasAnyMedia = !shout.getImages().isEmpty() || !shout.getVideos().isEmpty();
             viewPagerContainer.setVisibility(hasAnyMedia ? View.VISIBLE : View.GONE);
 
