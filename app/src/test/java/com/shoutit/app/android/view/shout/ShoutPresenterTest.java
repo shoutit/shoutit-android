@@ -53,6 +53,10 @@ public class ShoutPresenterTest {
     ShoutsDao.ShoutDao shoutDao;
     @Mock
     UsersIdentityDao userIdentityDao;
+    @Mock
+    ShoutsDao.RelatedShoutsDao relatedShoutsDao;
+    @Mock
+    ShoutsDao.UserShoutsDao userShoutsDao;
 
     private ShoutPresenter presenter;
 
@@ -83,6 +87,14 @@ public class ShoutPresenterTest {
                 .thenReturn(Observable.just(Response.success(new Object())));
         when(shoutsDao.getDeleteShoutObservable(anyString()))
                 .thenReturn(Observable.just(Response.success(new Object())));
+        when(relatedShoutsDao.getRefreshObserver())
+                .thenReturn(PublishSubject.create());
+        when(shoutsDao.getRelatedShoutsDao(any(RelatedShoutsPointer.class)))
+                .thenReturn(relatedShoutsDao);
+        when(shoutsDao.getUserShoutsDao(any(UserShoutsPointer.class)))
+                .thenReturn(userShoutsDao);
+        when(userShoutsDao.getShoutsObservable())
+                .thenReturn(Observable.just(ResponseOrError.fromData(new ShoutsResponse(1, "z", "z", Lists.newArrayList(getShout())))));
 
         when(context.getString(anyInt(), anyString()))
                 .thenReturn("text");
@@ -107,7 +119,7 @@ public class ShoutPresenterTest {
 
     @Test
     public void testOnSubscribeWithoutUserShouts_correctItemsReturned() throws Exception {
-        when(shoutsDao.getUserShoutObservable(any(UserShoutsPointer.class)))
+        when(userShoutsDao.getShoutsObservable())
                 .thenReturn(Observable.<ResponseOrError<ShoutsResponse>>empty());
         final TestSubscriber<List<BaseAdapterItem>> subscriber = new TestSubscriber<>();
         presenter.getAllAdapterItemsObservable().subscribe(subscriber);
@@ -174,7 +186,7 @@ public class ShoutPresenterTest {
 
     @Test
     public void testOnFail_errorDisplayed() throws Exception {
-        when(shoutsDao.getUserShoutObservable(any(UserShoutsPointer.class)))
+        when(userShoutsDao.getShoutsObservable())
                 .thenReturn(Observable.just(ResponseOrError.<ShoutsResponse>fromError(new Throwable("error"))));
         final TestSubscriber<Throwable> subscriber = new TestSubscriber<>();
         presenter.getErrorObservable().subscribe(subscriber);

@@ -150,7 +150,6 @@ public class ShoutPresenter {
                 })
                 .compose(ObservableExtensions.<ShoutsDao.UserShoutsDao>behaviorRefCount());
 
-
         final Observable<ResponseOrError<ShoutsResponse>> userShoutsObservable = userShoutDaoObservable
                 .flatMap(new Func1<ShoutsDao.UserShoutsDao, Observable<ResponseOrError<ShoutsResponse>>>() {
                     @Override
@@ -271,12 +270,7 @@ public class ShoutPresenter {
                 ResponseOrError.transform(userShoutsObservable),
                 ResponseOrError.transform(shoutResponse),
                 ResponseOrError.transform(relatedShoutsObservable)))
-                .filter(Functions1.isNotNull()).doOnNext(new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-
-                    }
-                })
+                .filter(Functions1.isNotNull())
                 .observeOn(uiScheduler);
 
         /** Progress **/
