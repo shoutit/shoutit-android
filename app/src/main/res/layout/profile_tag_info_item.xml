@@ -42,6 +42,7 @@
                 android:background="?selectableItemBackground"
                 android:paddingBottom="2dp"
                 android:paddingLeft="6dp"
+                android:visibility="gone"
                 android:paddingRight="6dp"
                 android:paddingTop="2dp"
                 android:src="@drawable/ic_more" />

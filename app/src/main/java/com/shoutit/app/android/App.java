@@ -8,6 +8,7 @@ import android.support.multidex.MultiDexApplication;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.appunite.appunitegcm.AppuniteGcm;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
@@ -44,6 +45,7 @@ import javax.inject.Inject;
 
 import io.fabric.sdk.android.Fabric;
 import rx.Scheduler;
+import rx.Subscription;
 import rx.functions.Action1;
 import rx.plugins.RxJavaErrorHandler;
 import rx.plugins.RxJavaPlugins;
@@ -52,6 +54,8 @@ public class App extends MultiDexApplication {
 
     private static final String VC = "TWILIO";
     private static final String TAG = App.class.getSimpleName();
+
+    private static final String GCM_TOKEN = "935842257865";
 
     private AppComponent component;
     private String apiKey;
@@ -92,6 +96,9 @@ public class App extends MultiDexApplication {
 
         initFfmpeg();
 
+        initGcm();
+
+        /** Video Conversations **/
         initPusher();
 
         presenter.getTwilioRequirementObservable()
@@ -102,6 +109,13 @@ public class App extends MultiDexApplication {
                         Log.d("TWILIO", "MY API KEY: " + apiKey);
                     }
                 });
+    }
+
+    private void initGcm() {
+        AppuniteGcm.initialize(this, GCM_TOKEN)
+                .loggingEnabled(!BuildConfig.DEBUG)
+                .getPushBundleObservable()
+                .subscribe(NotificationHelper.sendNotificationAction(this));
     }
 
     private void initPusher() {

@@ -201,6 +201,7 @@ dependencies {
         exclude group: 'com.google.code.findbugs', module: 'annotations'
     }
     compile project(":FFmpegAndroid")
+    compile project(":appuniteGcm")
     compile 'com.karumi:dexter:2.1.0'
 
     // other

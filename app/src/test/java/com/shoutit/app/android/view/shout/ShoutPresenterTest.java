@@ -16,6 +16,7 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.dao.UsersIdentityDao;
+import com.shoutit.app.android.model.MobilePhoneResponse;
 import com.shoutit.app.android.model.RelatedShoutsPointer;
 import com.shoutit.app.android.model.UserShoutsPointer;
 
@@ -26,6 +27,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 
+import retrofit2.Response;
 import rx.Observable;
 import rx.observers.TestSubscriber;
 import rx.schedulers.Schedulers;
@@ -51,6 +53,10 @@ public class ShoutPresenterTest {
     ShoutsDao.ShoutDao shoutDao;
     @Mock
     UsersIdentityDao userIdentityDao;
+    @Mock
+    ShoutsDao.RelatedShoutsDao relatedShoutsDao;
+    @Mock
+    ShoutsDao.UserShoutsDao userShoutsDao;
 
     private ShoutPresenter presenter;
 
@@ -75,6 +81,20 @@ public class ShoutPresenterTest {
                 .thenReturn(shoutDao);
         when(shoutsDao.getShoutDao(anyString()).getRefreshObserver())
                 .thenReturn(PublishSubject.create());
+        when(shoutsDao.getShoutMobilePhoneObservable(anyString()))
+                .thenReturn(Observable.just(ResponseOrError.fromData(new MobilePhoneResponse("123"))));
+        when(shoutsDao.getReportShoutObservable(anyString()))
+                .thenReturn(Observable.just(Response.success(new Object())));
+        when(shoutsDao.getDeleteShoutObservable(anyString()))
+                .thenReturn(Observable.just(Response.success(new Object())));
+        when(relatedShoutsDao.getRefreshObserver())
+                .thenReturn(PublishSubject.create());
+        when(shoutsDao.getRelatedShoutsDao(any(RelatedShoutsPointer.class)))
+                .thenReturn(relatedShoutsDao);
+        when(shoutsDao.getUserShoutsDao(any(UserShoutsPointer.class)))
+                .thenReturn(userShoutsDao);
+        when(userShoutsDao.getShoutsObservable())
+                .thenReturn(Observable.just(ResponseOrError.fromData(new ShoutsResponse(1, "z", "z", Lists.newArrayList(getShout())))));
 
         when(context.getString(anyInt(), anyString()))
                 .thenReturn("text");
@@ -99,7 +119,7 @@ public class ShoutPresenterTest {
 
     @Test
     public void testOnSubscribeWithoutUserShouts_correctItemsReturned() throws Exception {
-        when(shoutsDao.getUserShoutObservable(any(UserShoutsPointer.class)))
+        when(userShoutsDao.getShoutsObservable())
                 .thenReturn(Observable.<ResponseOrError<ShoutsResponse>>empty());
         final TestSubscriber<List<BaseAdapterItem>> subscriber = new TestSubscriber<>();
         presenter.getAllAdapterItemsObservable().subscribe(subscriber);
@@ -166,7 +186,7 @@ public class ShoutPresenterTest {
 
     @Test
     public void testOnFail_errorDisplayed() throws Exception {
-        when(shoutsDao.getUserShoutObservable(any(UserShoutsPointer.class)))
+        when(userShoutsDao.getShoutsObservable())
                 .thenReturn(Observable.just(ResponseOrError.<ShoutsResponse>fromError(new Throwable("error"))));
         final TestSubscriber<Throwable> subscriber = new TestSubscriber<>();
         presenter.getErrorObservable().subscribe(subscriber);
@@ -176,7 +196,8 @@ public class ShoutPresenterTest {
     }
 
     private Shout getShout() {
-        return new Shout("id", null, null, null, null, null, null, 1L, 2, null, null, null, getUser(), null, null, 1, null, null, 0, ImmutableList.<Conversation>of());
+        return new Shout("id", null, null, null, null, null, null, 1L, 2, null, null, null,
+                getUser(), null, null, 1, null, null, 0, ImmutableList.<Conversation>of(), true);
     }
 
     private User getUser() {
