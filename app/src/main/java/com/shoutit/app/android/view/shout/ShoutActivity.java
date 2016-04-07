@@ -39,6 +39,7 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.model.MobilePhoneResponse;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.ImageHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.view.createshout.edit.EditShoutActivity;
 import com.shoutit.app.android.view.main.MainActivity;
@@ -82,7 +83,7 @@ public class ShoutActivity extends BaseActivity {
     @Bind(R.id.shout_bottom_bar_chat_or_chats)
     TextView chatOrChatsTextView;
     @Bind(R.id.shout_bottom_bar_more)
-    View showMoreIcon;
+    TextView showMoreIcon;
 
     @Inject
     ShoutPresenter presenter;
@@ -339,17 +340,20 @@ public class ShoutActivity extends BaseActivity {
             }
         });
 
-        showMoreIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupMenu.show();
-            }
-        });
-
         return new Action1<Boolean>() {
             @Override
             public void call(final Boolean isUserShoutOwner) {
-                showMoreIcon.setVisibility(isUserShoutOwner ? View.GONE : View.VISIBLE);
+                ImageHelper.setStartCompoundRelativeDrawable(showMoreIcon,
+                        isUserShoutOwner ? R.drawable.ic_more_disabled : R.drawable.ic_more_white);
+
+                if (!isUserShoutOwner) {
+                    showMoreIcon.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            popupMenu.show();
+                        }
+                    });
+                }
 
                 callOrDeleteTextView.setCompoundDrawablesWithIntrinsicBounds(
                         isUserShoutOwner ? R.drawable.ic_delete_red : R.drawable.ic_call_green, 0, 0, 0);
