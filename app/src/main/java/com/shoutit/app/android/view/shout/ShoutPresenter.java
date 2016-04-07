@@ -85,7 +85,7 @@ public class ShoutPresenter {
                           @Nonnull final String shoutId,
                           @Nonnull @ForActivity final Context context,
                           @Nonnull @UiScheduler final Scheduler uiScheduler,
-                          @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
+                          @Nonnull final ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
                           @Nonnull UserPreferences userPreferences,
                           @Nonnull final UsersIdentityDao usersIdentityDao
     ) {
@@ -346,7 +346,13 @@ public class ShoutPresenter {
                 .observeOn(uiScheduler);
 
         deleteShoutResponseObservable = shoutsDao.getDeleteShoutObservable(shoutId)
-                .observeOn(uiScheduler);
+                .observeOn(uiScheduler)
+                .doOnNext(new Action1<Response<Object>>() {
+                    @Override
+                    public void call(Response<Object> objectResponse) {
+                        shoutsGlobalRefreshPresenter.refreshShouts();
+                    }
+                });
     }
 
     @Nonnull
