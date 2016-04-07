@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.shouts;
+package com.shoutit.app.android.view.shouts.discover;
 
 import android.content.Context;
 import android.view.ViewGroup;
@@ -8,6 +8,8 @@ import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.adapters.ChangeableLayoutManagerAdapter;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.view.shouts.ShoutGridViewHolder;
+import com.shoutit.app.android.view.shouts.ShoutLinerViewHolder;
 import com.squareup.picasso.Picasso;
 
 import javax.inject.Inject;

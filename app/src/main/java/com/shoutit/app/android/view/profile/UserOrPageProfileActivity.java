@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.R;
@@ -71,7 +70,6 @@ public class UserOrPageProfileActivity extends ProfileActivity {
                         } else {
                             startActivity(ChatActivity.newIntent(UserOrPageProfileActivity.this, conversationId, false));
                         }
-                        Toast.makeText(UserOrPageProfileActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
                     }
                 });
 

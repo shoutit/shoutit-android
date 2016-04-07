@@ -1,59 +1,60 @@
-package com.shoutit.app.android.view.shouts;
+package com.shoutit.app.android.view.shouts.selectshout;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
-import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
+import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
-import com.shoutit.app.android.dao.DiscoverShoutsDao;
-import com.shoutit.app.android.utils.rx.RxMoreObservers;
+import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
 import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 
 import rx.Observable;
-import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
-public class DiscoverShoutsPresenter {
+public class SelectShoutsPresenter {
 
     private final Observable<List<BaseAdapterItem>> mListObservable;
     private final Observable<Throwable> mThrowableObservable;
     private final Observable<Boolean> mProgressObservable;
-    private final Observable<BothParams<String, String>> searchClickedObservable;
-    private final DiscoverShoutsDao mDiscoverShoutsDao;
 
     @Nonnull
     private final PublishSubject<String> shoutSelectedObserver = PublishSubject.create();
-    @Nonnull
-    private final PublishSubject<Object> searchMenuItemClicked = PublishSubject.create();
 
-    public DiscoverShoutsPresenter(@NetworkScheduler Scheduler networkScheduler,
-                                   @UiScheduler Scheduler uiScheduler,
-                                   DiscoverShoutsDao discoverShoutsDao,
-                                   final String discoverId,
-                                   final String discoverName,
-                                   @ForActivity final Context context) {
-        mDiscoverShoutsDao = discoverShoutsDao;
-        final Observable<ResponseOrError<ShoutsResponse>> observable = discoverShoutsDao.getShoutsObservable(discoverId)
+    @Inject
+    public SelectShoutsPresenter(@NetworkScheduler Scheduler networkScheduler,
+                                 @UiScheduler Scheduler uiScheduler,
+                                 ApiService apiService,
+                                 UserPreferences userPreferences,
+                                 @ForActivity final Context context) {
+        final User user = userPreferences.getUser();
+        assert user != null;
+        final Observable<ResponseOrError<ShoutsResponse>> shoutsResponse = apiService.shoutsForUser(user.getUsername(), 0, 100)
                 .subscribeOn(networkScheduler)
-                .observeOn(uiScheduler);
+                .observeOn(uiScheduler)
+                .compose(ResponseOrError.<ShoutsResponse>toResponseOrErrorObservable())
+                .compose(ObservableExtensions.<ResponseOrError<ShoutsResponse>>behaviorRefCount());
 
-        mListObservable = observable.compose(ResponseOrError.<ShoutsResponse>onlySuccess())
+        mListObservable = shoutsResponse.compose(ResponseOrError.<ShoutsResponse>onlySuccess())
                 .map(new Func1<ShoutsResponse, List<BaseAdapterItem>>() {
                     @Override
                     public List<BaseAdapterItem> call(ShoutsResponse shoutsResponse) {
@@ -67,22 +68,10 @@ public class DiscoverShoutsPresenter {
                     }
                 });
 
-        mThrowableObservable = observable.compose(ResponseOrError.<ShoutsResponse>onlyError());
-        mProgressObservable = observable.map(Functions1.returnFalse()).startWith(true);
-
-        searchClickedObservable = searchMenuItemClicked
-                .map(new Func1<Object, BothParams<String, String>>() {
-                    @Override
-                    public BothParams<String, String> call(Object o) {
-                        return new BothParams<>(discoverId, discoverName);
-                    }
-                });
+        mThrowableObservable = shoutsResponse.compose(ResponseOrError.<ShoutsResponse>onlyError());
+        mProgressObservable = shoutsResponse.map(Functions1.returnFalse()).startWith(true);
     }
 
-    @Nonnull
-    public Observable<BothParams<String, String>> getSearchClickedObservable() {
-        return searchClickedObservable;
-    }
 
     @NonNull
     public Observable<List<BaseAdapterItem>> getSuccessObservable() {
@@ -99,17 +88,8 @@ public class DiscoverShoutsPresenter {
         return mProgressObservable;
     }
 
-    @NonNull
-    public Observer<Object> getLoadMoreObserver() {
-        return RxMoreObservers.ignoreCompleted(mDiscoverShoutsDao.getLoadMoreShoutsSubject());
-    }
-
     @Nonnull
     public Observable<String> getShoutSelectedObservable() {
         return shoutSelectedObserver;
-    }
-
-    public void onSearchClicked() {
-        searchMenuItemClicked.onNext(null);
     }
 }

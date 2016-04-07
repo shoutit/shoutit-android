@@ -37,7 +37,9 @@ import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
+import com.shoutit.app.android.view.chats.chatsfirstconversation.ChatFirstConversationActivity;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
+import com.shoutit.app.android.view.shouts.selectshout.SelectShoutActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -56,6 +58,7 @@ public class ChatActivity extends BaseActivity implements Listener {
 
     private static final int REQUEST_ATTACHMENT = 0;
     private static final int REQUEST_LOCATION = 1;
+    private static final int SELECT_SHOUT_REQUEST_CODE = 2;
 
     private static final String TAG = ChatActivity.class.getCanonicalName();
 
@@ -139,11 +142,7 @@ public class ChatActivity extends BaseActivity implements Listener {
                 .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
                 .filter(LoadMoreHelper.needLoadMore((MyLayoutManager) mChatsRecyclerview.getLayoutManager(), chatsAdapter))
                 .subscribe(presenter.getRequestSubject());
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
         presenter.register(this);
     }
 
@@ -229,9 +228,14 @@ public class ChatActivity extends BaseActivity implements Listener {
     }
 
     @Override
-    protected void onPause() {
+    public void onShoutClicked(String shoutId) {
+        startActivityForResult(SelectShoutActivity.newIntent(ChatActivity.this), SELECT_SHOUT_REQUEST_CODE);
+    }
+
+    @Override
+    protected void onDestroy() {
         presenter.unregister();
-        super.onPause();
+        super.onDestroy();
     }
 
     @OnClick(R.id.chats_attatchments_video)
@@ -242,6 +246,11 @@ public class ChatActivity extends BaseActivity implements Listener {
     @OnClick(R.id.chats_attatchments_photo)
     void photoClicked() {
         startActivityForResult(RecordMediaActivity.newIntent(this, true, false), REQUEST_ATTACHMENT);
+    }
+
+    @OnClick(R.id.chats_attatchments_shout)
+    void shoutClicked() {
+        startActivityForResult(SelectShoutActivity.newIntent(ChatActivity.this), SELECT_SHOUT_REQUEST_CODE);
     }
 
     @OnClick(R.id.chats_attatchments_location)
@@ -265,6 +274,9 @@ public class ChatActivity extends BaseActivity implements Listener {
             final Place place = PlacePicker.getPlace(this, data);
             final LatLng latLng = place.getLatLng();
             presenter.sendLocation(latLng.latitude, latLng.longitude);
+        } else if (requestCode == SELECT_SHOUT_REQUEST_CODE && resultCode == RESULT_OK) {
+            final String shoutId = data.getStringExtra(SelectShoutActivity.RESULT_SHOUT_ID);
+            presenter.sendShout(shoutId);
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }

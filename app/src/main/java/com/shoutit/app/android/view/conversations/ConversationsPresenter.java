@@ -115,7 +115,7 @@ public class ConversationsPresenter {
     public void register(@NonNull final Listener listener) {
         final User user = mUserPreferences.getUser();
         assert user != null;
-        final PresenceChannel userChannel = mPusherHelper.getPusher().subscribePresence(String.format("presence-u-%1$s", user.getId()));
+        final PresenceChannel userChannel = mPusherHelper.getPusher().getPresenceChannel(String.format("presence-u-%1$s", user.getId()));
 
         final Observable<HashMap<String, Conversation>> mapObservable = Observable
                 .create(new Observable.OnSubscribe<PusherMessage>() {
@@ -287,7 +287,6 @@ public class ConversationsPresenter {
     public void unregister() {
         mListener = null;
         mSubscription.unsubscribe();
-        mPusherHelper.getPusher().unsubscribe(String.format("presence-u-%1$s", mUserPreferences.getUser().getId()));
     }
 
     public interface Listener {

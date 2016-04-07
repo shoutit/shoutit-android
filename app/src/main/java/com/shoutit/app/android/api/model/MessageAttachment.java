@@ -67,7 +67,7 @@ public class MessageAttachment {
         return videos;
     }
 
-    public class AttachtmentShout {
+    public static class AttachtmentShout {
         public static final String TYPE_OFFER = "offer";
         public static final String TYPE_REQUEST = "request";
         public static final String TYPE_ALL = "all";
@@ -89,17 +89,13 @@ public class MessageAttachment {
         private final User user; // api is funny so duplicate field
         private final Category category;
         private final long datePublished;
-        private final List<String> images;
-        private final List<Video> videos;
-        private final List<Filter> filters;
         private final int availableCount;
-        private final List<Conversation> conversations;
 
         public AttachtmentShout(@Nonnull String id, String apiUrl, String webUrl, String type,
                                 UserLocation location, String title, String text, Long price, float number,
-                                String currency, String thumbnail, String videoUrl, User profile1, User profile,
-                                Category category, List<Filter> filters, long datePublished, List<String> images,
-                                List<Video> videos, int availableCount, List<Conversation> conversations) {
+                                String currency, String thumbnail, String videoUrl, User profile,
+                                Category category, long datePublished, int availableCount) {
+            this.user = null;
             this.id = id;
             this.apiUrl = apiUrl;
             this.webUrl = webUrl;
@@ -112,15 +108,10 @@ public class MessageAttachment {
             this.currency = currency;
             this.thumbnail = thumbnail;
             this.videoUrl = videoUrl;
-            this.profile = profile1;
-            this.user = profile;
+            this.profile = profile;
             this.category = category;
             this.datePublished = datePublished;
-            this.images = images;
-            this.filters = filters;
-            this.videos = videos;
             this.availableCount = availableCount;
-            this.conversations = conversations;
         }
 
         @Nonnull
@@ -191,24 +182,8 @@ public class MessageAttachment {
             return datePublished * 1000;
         }
 
-        public List<String> getImages() {
-            return images;
-        }
-
-        public List<Video> getVideos() {
-            return videos;
-        }
-
         public int getAvailableCount() {
             return availableCount;
-        }
-
-        public List<Filter> getFilters() {
-            return filters;
-        }
-
-        public List<Conversation> getConversations() {
-            return conversations;
         }
 
         @Override
@@ -231,15 +206,13 @@ public class MessageAttachment {
                     Objects.equal(category, shout.category) &&
                     Objects.equal(datePublished, shout.datePublished) &&
                     Objects.equal(price, shout.price) &&
-                    Objects.equal(availableCount, shout.availableCount) &&
-                    Objects.equal(videos, shout.videos) &&
-                    Objects.equal(images, shout.images);
+                    Objects.equal(availableCount, shout.availableCount);
         }
 
         @Override
         public int hashCode() {
             return Objects.hashCode(id, apiUrl, webUrl, type, location, title, text, price,
-                    number, currency, thumbnail, videoUrl, user, category, datePublished, images, availableCount, videos);
+                    number, currency, thumbnail, videoUrl, user, category, datePublished, availableCount);
         }
     }
 

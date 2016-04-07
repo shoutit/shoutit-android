@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.shouts;
+package com.shoutit.app.android.view.shouts.selectshout;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,26 +12,16 @@ import android.widget.CheckedTextView;
 import android.widget.ProgressBar;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
-import com.appunite.rx.functions.BothParams;
-import com.google.common.base.Preconditions;
-import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
-import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.BaseShoutsItemDecoration;
 import com.shoutit.app.android.R;
-import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LayoutManagerHelper;
-import com.shoutit.app.android.utils.LoadMoreHelper;
-import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogFragment;
-import com.shoutit.app.android.view.search.SearchPresenter;
-import com.shoutit.app.android.view.search.subsearch.SubSearchActivity;
-import com.shoutit.app.android.view.shout.ShoutActivity;
 
 import java.util.List;
 
@@ -44,10 +34,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.functions.Action1;
 
-public class DiscoverShoutsActivity extends BaseActivity {
+public class SelectShoutActivity extends BaseActivity {
 
-    private static final String DISCOVER_ID = "discover_id";
-    private static final String DISCOVER_NAME = "discover_name";
+    public static final String RESULT_SHOUT_ID = "extra_shout_id";
 
     @Bind(R.id.shouts_activity_list)
     RecyclerView mRecyclerView;
@@ -62,13 +51,10 @@ public class DiscoverShoutsActivity extends BaseActivity {
     Toolbar mToolbar;
 
     @Inject
-    DiscoverShoutsAdapter mShoutsAdapter;
+    SelectShoutsAdapter mShoutsAdapter;
 
     @Inject
-    DiscoverShoutsPresenter mShoutsPresenter;
-
-    @Inject
-    UserPreferences mUserPreferences;
+    SelectShoutsPresenter mShoutsPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,11 +62,6 @@ public class DiscoverShoutsActivity extends BaseActivity {
         setContentView(R.layout.shouts_activity);
 
         ButterKnife.bind(this);
-
-        final Bundle bundle = Preconditions.checkNotNull(getIntent().getExtras());
-        final String name = bundle.getString(DISCOVER_NAME);
-
-        setUpToolbar(name);
 
         mRecyclerView.addItemDecoration(new BaseShoutsItemDecoration(
                 getResources().getDimensionPixelSize(R.dimen.home_linear_side_spacing)));
@@ -100,10 +81,10 @@ public class DiscoverShoutsActivity extends BaseActivity {
                 .compose(this.<Boolean>bindToLifecycle())
                 .subscribe(RxView.visibility(mProgress));
 
-        RxRecyclerView.scrollEvents(mRecyclerView)
-                .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
-                .filter(LoadMoreHelper.needLoadMore((MyLayoutManager) mRecyclerView.getLayoutManager(), mShoutsAdapter))
-                .subscribe(mShoutsPresenter.getLoadMoreObserver());
+//        RxRecyclerView.scrollEvents(mRecyclerView)
+//                .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
+//                .filter(LoadMoreHelper.needLoadMore((MyLayoutManager) mRecyclerView.getLayoutManager(), mShoutsAdapter))
+//                .subscribe(mShoutsPresenter.getLoadMoreObserver());
 
         mShoutsCheckedTextView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -124,18 +105,8 @@ public class DiscoverShoutsActivity extends BaseActivity {
                 .subscribe(new Action1<String>() {
                     @Override
                     public void call(String shoutId) {
-                        startActivity(ShoutActivity.newIntent(DiscoverShoutsActivity.this, shoutId));
-                    }
-                });
-
-        mShoutsPresenter.getSearchClickedObservable()
-                .compose(this.<BothParams<String,String>>bindToLifecycle())
-                .subscribe(new Action1<BothParams<String, String>>() {
-                    @Override
-                    public void call(BothParams<String, String> discoverIdAndName) {
-                        startActivity(SubSearchActivity.newIntent(
-                                DiscoverShoutsActivity.this, SearchPresenter.SearchType.DISCOVER,
-                                discoverIdAndName.param1(), discoverIdAndName.param2()));
+                        setResult(RESULT_OK, new Intent().putExtra(RESULT_SHOUT_ID, shoutId));
+                        finish();
                     }
                 });
     }
@@ -155,7 +126,6 @@ public class DiscoverShoutsActivity extends BaseActivity {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.shouts_search:
-                        mShoutsPresenter.onSearchClicked();
                         return true;
                     default:
                         return false;
@@ -167,12 +137,8 @@ public class DiscoverShoutsActivity extends BaseActivity {
     @Nonnull
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
-        final String discoverId = getIntent().getStringExtra(DISCOVER_ID);
-        final String name = getIntent().getStringExtra(DISCOVER_NAME);
-
-        final DiscoverShoutsActivityComponent activityComponent = DaggerDiscoverShoutsActivityComponent.builder()
+        final SelectShoutsActivityComponent activityComponent = DaggerSelectShoutsActivityComponent.builder()
                 .activityModule(new ActivityModule(this))
-                .discoverShoutsActivityModule(new DiscoverShoutsActivityModule(discoverId, name))
                 .appComponent(App.getAppComponent(getApplication()))
                 .build();
         activityComponent.inject(this);
@@ -188,10 +154,8 @@ public class DiscoverShoutsActivity extends BaseActivity {
     }
 
     @NonNull
-    public static Intent newIntent(Context context, String discoverId, String title) {
-        return new Intent(context, DiscoverShoutsActivity.class)
-                .putExtra(DISCOVER_ID, discoverId)
-                .putExtra(DISCOVER_NAME, title);
+    public static Intent newIntent(Context context) {
+        return new Intent(context, SelectShoutActivity.class);
     }
 
     @OnClick(R.id.discover_fab)

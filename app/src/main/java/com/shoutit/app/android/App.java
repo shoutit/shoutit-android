@@ -15,7 +15,10 @@ import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
 import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler;
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
 import com.karumi.dexter.Dexter;
+import com.pusher.client.Pusher;
+import com.pusher.client.channel.PresenceChannel;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.constants.UserVoiceConstants;
 import com.shoutit.app.android.dagger.AppComponent;
 import com.shoutit.app.android.dagger.AppModule;
@@ -71,7 +74,7 @@ public class App extends MultiDexApplication {
     @Inject
     LocationManager locationManager;
     @Inject
-    PusherHelper pusher;
+    PusherHelper mPusherHelper;
     @Inject
     VideoConversationPresenter presenter;
 
@@ -106,19 +109,26 @@ public class App extends MultiDexApplication {
 
     private void initPusher() {
         if (userPreferences.isUserLoggedIn()) {
-            pusher.init(userPreferences.getAuthToken().get());
-            pusher.getPusher().connect();
+            initPusher(userPreferences.getAuthToken().get());
         } else {
             userPreferences.getTokenObservable()
                     .first()
                     .subscribe(new Action1<String>() {
                         @Override
                         public void call(String token) {
-                            pusher.init(token);
-                            pusher.getPusher().connect();
+                            initPusher(token);
                         }
                     });
         }
+    }
+
+    private void initPusher(String token) {
+        mPusherHelper.init(token);
+        final Pusher pusher = mPusherHelper.getPusher();
+        pusher.connect();
+        final User user = userPreferences.getUser();
+        assert user != null;
+        pusher.subscribePresence(String.format("presence-u-%1$s", user.getId()));
     }
 
     private void initFfmpeg() {

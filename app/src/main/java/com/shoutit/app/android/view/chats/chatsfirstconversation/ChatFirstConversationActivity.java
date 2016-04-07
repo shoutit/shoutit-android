@@ -15,7 +15,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -36,6 +35,7 @@ import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.chats.Listener;
 import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
+import com.shoutit.app.android.view.shouts.selectshout.SelectShoutActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -54,6 +54,7 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
 
     private static final int REQUEST_ATTACHMENT = 0;
     private static final int REQUEST_LOCATION = 1;
+    private static final int SELECT_SHOUT_REQUEST_CODE = 2;
 
     private static final String TAG = ChatFirstConversationActivity.class.getCanonicalName();
 
@@ -221,6 +222,11 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
     }
 
     @Override
+    public void onShoutClicked(String shoutId) {
+
+    }
+
+    @Override
     protected void onDestroy() {
         presenter.unregister();
         super.onDestroy();
@@ -234,6 +240,11 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
     @OnClick(R.id.chats_attatchments_photo)
     void photoClicked() {
         startActivityForResult(RecordMediaActivity.newIntent(this, true, false), REQUEST_ATTACHMENT);
+    }
+
+    @OnClick(R.id.chats_attatchments_shout)
+    void shoutClicked() {
+        startActivityForResult(SelectShoutActivity.newIntent(ChatFirstConversationActivity.this), SELECT_SHOUT_REQUEST_CODE);
     }
 
     @OnClick(R.id.chats_attatchments_location)
@@ -257,6 +268,9 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
             final Place place = PlacePicker.getPlace(this, data);
             final LatLng latLng = place.getLatLng();
             presenter.sendLocation(latLng.latitude, latLng.longitude);
+        } else if (requestCode == SELECT_SHOUT_REQUEST_CODE && resultCode == RESULT_OK) {
+            final String shoutId = data.getStringExtra(SelectShoutActivity.RESULT_SHOUT_ID);
+            presenter.sendShout(shoutId);
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
