@@ -5,11 +5,13 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.text.format.DateUtils;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.google.common.base.Function;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -198,6 +200,29 @@ public class ChatsFirstConversationPresenter {
                         mListener.error(throwable);
                     }
                 }));
+        if (mIsShoutConversation) {
+            mSubscribe.add(mApiService.shout(mIdForCreation)
+                    .subscribeOn(mNetworkScheduler)
+                    .observeOn(mUiScheduler)
+                    .subscribe(new Action1<Shout>() {
+                        @Override
+                        public void call(Shout about) {
+                            final String title = about.getTitle();
+                            final String thumbnail = Strings.emptyToNull(about.getThumbnail());
+                            final String type = about.getType().equals(Shout.TYPE_OFFER) ? "Offer" : "Request";
+                            final String price = PriceUtils.formatPriceWithCurrency(about.getPrice(), mResources, about.getCurrency());
+                            final String authorAndTime = about.getProfile().getName() + DateUtils.getRelativeTimeSpanString(mContext, about.getDatePublishedInMillis());
+
+                            mListener.setAboutShoutData(title, thumbnail, type, price, authorAndTime);
+                        }
+                    }, new Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable throwable) {
+                            mListener.error(throwable);
+                        }
+                    }));
+        }
+
     }
 
     @NonNull
@@ -345,14 +370,14 @@ public class ChatsFirstConversationPresenter {
                 final MessageAttachment.MessageLocation location = messageAttachment.getLocation();
                 return new ReceivedLocationMessage(isFirst, time, avatarUrl, mListener, location.getLatitude(), location.getLongitude());
             } else if (MessageAttachment.ATTACHMENT_TYPE_SHOUT.equals(type)) {
-                final Shout shout = messageAttachment.getShout();
+                final MessageAttachment.AttachtmentShout shout = messageAttachment.getShout();
                 return new ReceivedShoutMessage(
                         isFirst,
                         shout.getThumbnail(),
                         time,
                         PriceUtils.formatPriceWithCurrency(shout.getPrice(), mResources, shout.getCurrency()),
                         shout.getText(),
-                        shout.getProfile().getName(),
+                        shout.getUser().getName(),
                         avatarUrl);
             } else {
                 throw new RuntimeException(type);
@@ -379,8 +404,8 @@ public class ChatsFirstConversationPresenter {
                 final MessageAttachment.MessageLocation location = messageAttachment.getLocation();
                 return new SentLocationMessage(time, mListener, location.getLatitude(), location.getLongitude());
             } else if (MessageAttachment.ATTACHMENT_TYPE_SHOUT.equals(type)) {
-                final Shout shout = messageAttachment.getShout();
-                return new SentShoutMessage(shout.getThumbnail(), time, PriceUtils.formatPriceWithCurrency(shout.getPrice(), mResources, shout.getCurrency()), shout.getText(), shout.getProfile().getName());
+                final MessageAttachment.AttachtmentShout shout = messageAttachment.getShout();
+                return new SentShoutMessage(shout.getThumbnail(), time, PriceUtils.formatPriceWithCurrency(shout.getPrice(), mResources, shout.getCurrency()), shout.getText(), shout.getUser().getName());
             } else {
                 throw new RuntimeException(type);
             }

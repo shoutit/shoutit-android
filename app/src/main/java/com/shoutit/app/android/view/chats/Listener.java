@@ -21,4 +21,6 @@ public interface Listener {
     void onLocationClicked(double latitude, double longitude);
 
     void onImageClicked(String url);
+
+    void setAboutShoutData(String title, String thumbnail, String type, String price, String authorAndTime);
 }

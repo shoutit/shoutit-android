@@ -14,8 +14,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -37,6 +39,7 @@ import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -58,6 +61,9 @@ public class ChatActivity extends BaseActivity implements Listener {
     private static final String TAG = ChatActivity.class.getCanonicalName();
 
     @Inject
+    Picasso picasso;
+
+    @Inject
     ChatsPresenter presenter;
 
     @Inject
@@ -65,8 +71,8 @@ public class ChatActivity extends BaseActivity implements Listener {
 
     @Bind(R.id.chats_toolbar)
     Toolbar mChatsToolbar;
-    @Bind(R.id.chats_shout_layout)
-    LinearLayout mChatsShoutLayout;
+    @Bind(R.id.chats_attatchments_layout)
+    FrameLayout mChatsAttatchmentsLayout;
     @Bind(R.id.chats_recyclerview)
     RecyclerView mChatsRecyclerview;
     @Bind(R.id.chats_message_edittext)
@@ -74,8 +80,18 @@ public class ChatActivity extends BaseActivity implements Listener {
     @Bind(R.id.chats_progress)
     ProgressBar mChatsProgress;
 
-    @Bind(R.id.chats_attatchments_layout)
-    FrameLayout mChatsAttatchmentsLayout;
+    @Bind(R.id.chats_shout_layout)
+    View mChatsShoutLayout;
+    @Bind(R.id.chats_shout_image)
+    ImageView mChatsShoutImage;
+    @Bind(R.id.chats_shout_layout_title)
+    TextView mChatsShoutLayoutTitle;
+    @Bind(R.id.chats_shout_layout_author_date)
+    TextView mChatsShoutLayoutAuthorDate;
+    @Bind(R.id.chats_shout_layout_type)
+    TextView mChatsShoutLayoutType;
+    @Bind(R.id.chats_shout_layout_price)
+    TextView mChatsShoutLayoutPrice;
 
     public static Intent newIntent(@Nonnull Context context, @NonNull String conversationId, boolean shoutConversation) {
         return new Intent(context, ChatActivity.class)
@@ -176,7 +192,7 @@ public class ChatActivity extends BaseActivity implements Listener {
     @Override
     public void onVideoClicked(String url) {
         Intent intent = new Intent();
-        intent.setAction(android.content.Intent.ACTION_VIEW);
+        intent.setAction(Intent.ACTION_VIEW);
         intent.setDataAndType(Uri.parse(url), "video/*");
         startActivity(intent);
     }
@@ -184,16 +200,29 @@ public class ChatActivity extends BaseActivity implements Listener {
     @Override
     public void onLocationClicked(double latitude, double longitude) {
         Uri uri = Uri.parse("geo:" + latitude + "," + longitude);
-        Intent intent = new Intent(android.content.Intent.ACTION_VIEW, uri);
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
         startActivity(intent);
     }
 
     @Override
     public void onImageClicked(String url) {
         Intent intent = new Intent();
-        intent.setAction(android.content.Intent.ACTION_VIEW);
+        intent.setAction(Intent.ACTION_VIEW);
         intent.setDataAndType(Uri.parse(url), "image/*");
         startActivity(intent);
+    }
+
+    @Override
+    public void setAboutShoutData(String title, String thumbnail, String type, String price, String authorAndTime) {
+        mChatsShoutLayout.setVisibility(View.VISIBLE);
+        picasso.load(thumbnail)
+                .centerCrop()
+                .fit()
+                .into(mChatsShoutImage);
+        mChatsShoutLayoutType.setText(type);
+        mChatsShoutLayoutTitle.setText(title);
+        mChatsShoutLayoutPrice.setText(price);
+        mChatsShoutLayoutAuthorDate.setText(authorAndTime);
     }
 
     @Override
