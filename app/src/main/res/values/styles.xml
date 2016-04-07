@@ -96,6 +96,7 @@
     </style>
 
     <style name="ProfileInputStyle" parent="@style/TextAppearance.AppCompat">
+        <item name="colorControlNormal">@color/black_20</item>
         <item name="android:textColorHint">@color/black_38</item>
         <item name="android:textColor">@color/accent_blue</item>
         <item name="android:textSize">12sp</item>
@@ -110,7 +111,7 @@
     <style name="BlueEditText" parent="ThemeOverlay.AppCompat">
         <item name="colorControlActivated">@color/accent_blue</item>
         <item name="colorControlHighlight">@color/accent_blue</item>
-        <item name="colorControlNormal">@color/accent_blue</item>
+        <item name="colorControlNormal">@color/black_20</item>
     </style>
 
     <style name="BlueSeekBar" parent="ThemeOverlay.AppCompat">

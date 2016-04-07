@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.util.Pair;
@@ -47,7 +48,6 @@ import com.shoutit.app.android.view.createshout.ShoutMediaPresenter;
 import com.shoutit.app.android.view.createshout.location.LocationActivity;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
 import com.shoutit.app.android.widget.CurrencySpinnerAdapter;
-import com.shoutit.app.android.widget.ErrorTextInputLayout;
 import com.shoutit.app.android.widget.SimpleCurrencySpinnerAdapter;
 import com.shoutit.app.android.widget.SimpleSpinnerAdapter;
 import com.shoutit.app.android.widget.SpinnerAdapter;
@@ -77,7 +77,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     @Bind(R.id.edit_shout_title)
     EditText mTitle;
     @Bind(R.id.edit_description_layout)
-    ErrorTextInputLayout mEditLayout;
+    TextInputLayout mEditLayout;
     @Bind(R.id.edit_budget)
     EditText mEditBudget;
     @Bind(R.id.edit_currency_spinner)
