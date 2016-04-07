@@ -237,7 +237,7 @@ public class ShoutsDao {
 
         public ShoutDao(@Nonnull final String shoutId) {
             final Observable<Object> refreshWithCache = Observable
-                    .interval(2, TimeUnit.MINUTES, networkScheduler)
+                    .interval(5, TimeUnit.MINUTES, networkScheduler)
                     .map(Functions1.toObject());
 
             shoutObservable = apiService.shout(shoutId)
@@ -251,7 +251,6 @@ public class ShoutsDao {
                     .subscribeOn(networkScheduler)
                     .compose(MoreOperators.<MobilePhoneResponse>refresh(refreshShoutsSubject))
                     .compose(ResponseOrError.<MobilePhoneResponse>toResponseOrErrorObservable())
-                    .compose(MoreOperators.<ResponseOrError<MobilePhoneResponse>>refresh(refreshWithCache))
                     .compose(MoreOperators.<ResponseOrError<MobilePhoneResponse>>cacheWithTimeout(networkScheduler));
 
             deleteShoutResponseObservable = deleteShoutObserver

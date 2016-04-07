@@ -106,10 +106,6 @@ public class ProfilesDao {
         @Nonnull
         private PublishSubject<ResponseOrError<User>> updatedProfileLocallySubject = PublishSubject.create();
 
-        @Nonnull
-        private final PublishSubject<BothParams<String, String>> reportProfileObserver = PublishSubject.create();
-
-
         public ProfileDao(@Nonnull final String userName) {
             profileObservable = apiService.getProfile(userName)
                     .subscribeOn(networkScheduler)
@@ -132,11 +128,6 @@ public class ProfilesDao {
         @Nonnull
         public Observer<ResponseOrError<User>> updatedProfileLocallyObserver() {
             return updatedProfileLocallySubject;
-        }
-
-        @Nonnull
-        public PublishSubject<BothParams<String, String>> getReportProfileObserver() {
-            return reportProfileObserver;
         }
     }
 

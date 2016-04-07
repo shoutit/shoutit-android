@@ -256,7 +256,7 @@ public interface ApiService {
     Observable<List<Currency>> getCurrencies();
 
     @POST("misc/reports")
-    Observable<ResponseBody> report(@Body ReportBody reportShoutBody);
+    Observable<Response<Object>> report(@Body ReportBody reportShoutBody);
 
     /**
      * Auth

@@ -9,7 +9,6 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import retrofit2.Response;
 import rx.Observable;
 import rx.Observer;
 
@@ -64,7 +63,4 @@ public interface ProfilePresenter {
 
     @Nonnull
     Observer<String> sendReportObserver();
-
-    @Nonnull
-    Observable<Response<Object>> getReportShoutObservable();
 }

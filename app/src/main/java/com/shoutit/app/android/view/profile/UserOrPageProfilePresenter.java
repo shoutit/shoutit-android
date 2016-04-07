@@ -226,29 +226,29 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
                 combineAdapterItems());
 
         /** Report **/
-        final Observable<ResponseOrError<ResponseBody>> reportRequestObservable = reportSubmitSubject
+        final Observable<ResponseOrError<Response<Object>>> reportRequestObservable = reportSubmitSubject
                 .withLatestFrom(userSuccessObservable, new Func2<String, User, BothParams<String, String>>() {
                     @Override
                     public BothParams<String, String> call(String reportText, User user) {
-                        return new BothParams<>(reportText, user.getId());
+                        return new BothParams<>(user.getId(), reportText);
                     }
                 })
-                .flatMap(new Func1<BothParams<String, String>, Observable<ResponseOrError<ResponseBody>>>() {
+                .flatMap(new Func1<BothParams<String, String>, Observable<ResponseOrError<Response<Object>>>>() {
                     @Override
-                    public Observable<ResponseOrError<ResponseBody>> call(BothParams<String, String> userIdWithReportText) {
+                    public Observable<ResponseOrError<Response<Object>>> call(BothParams<String, String> userIdWithReportText) {
                         final String userId = userIdWithReportText.param1();
                         final String reportText = userIdWithReportText.param2();
 
                         return apiService.report(ReportBody.forProfile(userId, reportText))
+                                .compose(ResponseOrError.<Response<Object>>toResponseOrErrorObservable())
                                 .subscribeOn(networkScheduler)
-                                .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable())
                                 .observeOn(uiScheduler);
                     }
                 })
-                .compose(ObservableExtensions.<ResponseOrError<ResponseBody>>behaviorRefCount());
+                .compose(ObservableExtensions.<ResponseOrError<Response<Object>>>behaviorRefCount());
 
         reportSuccessObservable = reportRequestObservable
-                .compose(ResponseOrError.<ResponseBody>onlySuccess())
+                .compose(ResponseOrError.<Response<Object>>onlySuccess())
                 .map(Functions1.toObject());
 
 
@@ -488,13 +488,7 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
     @Nonnull
     @Override
     public Observer<String> sendReportObserver() {
-        return profilesDao.getProfileDao(userName).getReportProfileObserver();
-    }
-
-    @Nonnull
-    @Override
-    public Observable<Response<Object>> getReportShoutObservable() {
-        return profilesDao.getProfileDao(userName).getReportProfileResponseObservable();
+        return reportSubmitSubject;
     }
 
     public void onSearchMenuItemClicked() {

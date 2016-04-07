@@ -465,12 +465,6 @@ public class TagProfilePresenter implements ProfilePresenter {
         return Observers.empty();
     }
 
-    @Nonnull
-    @Override
-    public Observable<Response<Object>> getReportShoutObservable() {
-        return Observable.empty();
-    }
-
     @NonNull
     @Override
     public Observable<List<BaseAdapterItem>> getAllAdapterItemsObservable() {
