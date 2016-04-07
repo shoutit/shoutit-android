@@ -69,10 +69,8 @@
     <string name="register_email">Email</string>
     <string name="register_password">Password</string>
     <string name="register_login_text">Have an account? Log in</string>
-    <string name="register_empty_mail">Mail cannot be empty.</string>
-    <string name="register_empty_password">Password must have at least 6 and no more than 20
-        characters.
-    </string>
+    <string name="register_empty_mail">Email cannot be empty.</string>
+    <string name="register_empty_password">Password must have at least 6 and no more than 20 characters.</string>
     <string name="register_empty_name">Name cannot be empty</string>
     <string name="register_have_an_account">Have an account?</string>
     <string name="register_log_in">Log in</string>
