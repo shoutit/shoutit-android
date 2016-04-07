@@ -1,12 +1,14 @@
 package com.shoutit.app.android.view.signin.register;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
+import com.google.common.base.Strings;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
@@ -25,7 +27,6 @@ import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.functions.Func2;
 import rx.functions.Func3;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
@@ -58,36 +59,24 @@ public class RegisterPresenter {
                 .startWith((UserLocation) null)
                 .compose(ObservableExtensions.<UserLocation>behaviorRefCount());
 
-        final Observable<Boolean> isEmailCorrectObservable = mEmailSubject.startWith((String) null)
-                .map(new Func1<String, Boolean>() {
-                    @Override
-                    public Boolean call(String email) {
-                        return Validators.isEmailValid(email);
-                    }
-                })
-                .compose(ObservableExtensions.<Boolean>behaviorRefCount());
-
         final Observable<ResponseOrError<SignResponse>> responseOrErrorObservable = mProceedSubject
-                .withLatestFrom(isEmailCorrectObservable, new Func2<Object, Boolean, Boolean>() {
+                .map(new Func1<Object, Boolean>() {
                     @Override
-                    public Boolean call(Object o, Boolean isEmailValid) {
-                        return isEmailValid;
+                    public Boolean call(Object o) {
+                        return areValuesCorrect();
                     }
                 })
                 .filter(Functions1.isTrue())
                 .switchMap(new Func1<Boolean, Observable<UserLocation>>() {
                     @Override
                     public Observable<UserLocation> call(Boolean aBoolean) {
-                        return mLocationObservable;
+                        return mLocationObservable.filter(Functions1.isNotNull());
                     }
                 })
                 .switchMap(new Func1<UserLocation, Observable<EmailSignupRequest>>() {
                     @Override
                     public Observable<EmailSignupRequest> call(final UserLocation location) {
-                        return Observable.zip(
-                                mNameSubject.filter(getNotEmptyFunc1()),
-                                mEmailSubject.filter(getNotEmptyFunc1()),
-                                mPasswordSubject.filter(Functions1.neg(getLessThan6AndMoreThan20CharsFunc1())),
+                        return Observable.zip(mNameSubject, mEmailSubject, mPasswordSubject,
                                 new Func3<String, String, String, EmailSignupRequest>() {
                                     @Override
                                     public EmailSignupRequest call(String name, String email, String password) {
@@ -131,17 +120,27 @@ public class RegisterPresenter {
         mErrorObservable = responseOrErrorObservable.compose(ResponseOrError.<SignResponse>onlyError());
 
         wrongEmailErrorObservable = mProceedSubject
-                .flatMap(MoreFunctions1.returnObservableFirst(isEmailCorrectObservable.map(Functions1.neg())));
+                .map(new Func1<Object, Boolean>() {
+                    @Override
+                    public Boolean call(Object o) {
+                        return !isEmailCorrect();
+                    }
+                });
+    }
+
+    private boolean areValuesCorrect() {
+        return isEmailCorrect() &&
+                !Strings.isNullOrEmpty(mNameSubject.getValue()) &&
+                isPasswordCorrect(mPasswordSubject.getValue());
+    }
+
+    private boolean isEmailCorrect() {
+        return Validators.isEmailValid(mEmailSubject.getValue());
     }
 
     @Nonnull
     public Observable<Boolean> getWrongEmailErrorObservable() {
         return wrongEmailErrorObservable;
-    }
-
-    @NonNull
-    private Func1<? super CharSequence, Boolean> getNotEmptyFunc1() {
-        return Functions1.neg(Functions1.isNullOrEmpty());
     }
 
     @NonNull
@@ -153,6 +152,10 @@ public class RegisterPresenter {
                 return length < 6 || length > 20;
             }
         };
+    }
+
+    private boolean isPasswordCorrect(@Nullable String password) {
+        return password != null && password.length() >= 6 && password.length() <= 20;
     }
 
     @NonNull
