@@ -17,12 +17,13 @@ import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.NotificationsDao;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
-import com.shoutit.app.android.dao.SortTypesDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
+import com.shoutit.app.android.dao.SortTypesDao;
 import com.shoutit.app.android.dao.SuggestionsDao;
-import com.shoutit.app.android.db.DbHelper;
 import com.shoutit.app.android.dao.TagsDao;
+import com.shoutit.app.android.db.DbHelper;
 import com.shoutit.app.android.location.LocationManager;
+import com.shoutit.app.android.utils.PusherHelper;
 import com.squareup.picasso.Picasso;
 
 import javax.inject.Singleton;
@@ -90,4 +91,6 @@ public interface AppComponent {
     ContentResolver contentResolver();
 
     DbHelper dbHelper();
+
+    PusherHelper pusher();
 }

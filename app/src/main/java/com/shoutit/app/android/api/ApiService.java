@@ -18,6 +18,9 @@ import com.shoutit.app.android.api.model.EditShoutRequest;
 import com.shoutit.app.android.api.model.EditShoutRequestWithPrice;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.GuestSignupRequest;
+import com.shoutit.app.android.api.model.Message;
+import com.shoutit.app.android.api.model.MessagesResponse;
+import com.shoutit.app.android.api.model.PostMessage;
 import com.shoutit.app.android.api.model.NotificationsResponse;
 import com.shoutit.app.android.api.model.RegisterDeviceRequest;
 import com.shoutit.app.android.api.model.RelatedTagsResponse;
@@ -318,6 +321,21 @@ public interface ApiService {
 
     @GET("conversations")
     Observable<ConversationsResponse> getConversations(@NonNull @Query("after") String timestamp);
+
+    @GET("conversations/{id}/messages")
+    Observable<MessagesResponse> getMessages(@NonNull @Path("id") String conversationId);
+
+    @GET("conversations/{id}/messages")
+    Observable<MessagesResponse> getMessages(@NonNull @Path("id") String conversationId, @NonNull @Query("after") String timestamp);
+
+    @POST("conversations/{id}/reply")
+    Observable<Message> postMessage(@NonNull @Path("id") String conversationId, @NonNull @Body PostMessage message);
+
+    @POST("shouts/{id}/reply")
+    Observable<Message> createShoutConversation(@NonNull @Path("id") String shoutId, @NonNull @Body PostMessage message);
+
+    @POST("profiles/{id}/chat")
+    Observable<Message> createChatConversation(@NonNull @Path("id") String userName, @NonNull @Body PostMessage message);
 
     /** Notifications **/
     @GET("notifications")

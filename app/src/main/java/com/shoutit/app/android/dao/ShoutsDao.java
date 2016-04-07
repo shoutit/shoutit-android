@@ -147,6 +147,11 @@ public class ShoutsDao {
     }
 
     @Nonnull
+    public RelatedShoutsDao getRelatedShoutsDao(@Nonnull RelatedShoutsPointer pointer) {
+        return relatedShoutsCache.getUnchecked(pointer);
+    }
+
+    @Nonnull
     public Observable<ResponseOrError<ShoutsResponse>> getTagsShoutsObservable(@Nonnull TagShoutsPointer pointer) {
         return tagsShoutsCache.getUnchecked(pointer).getShoutsObservable();
     }

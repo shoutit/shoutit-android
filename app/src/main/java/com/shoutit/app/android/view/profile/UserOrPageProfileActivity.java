@@ -17,6 +17,8 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.IntentHelper;
+import com.shoutit.app.android.view.chats.ChatActivity;
+import com.shoutit.app.android.view.chats.chatsfirstconversation.ChatFirstConversationActivity;
 import com.shoutit.app.android.view.editprofile.EditProfileActivity;
 import com.shoutit.app.android.view.notifications.NotificationsActivity;
 import com.shoutit.app.android.view.search.SearchPresenter;
@@ -69,10 +71,16 @@ public class UserOrPageProfileActivity extends ProfileActivity {
 
         // User Profile specific subscriptions
         presenter.getUserProfilePresenter().getOnChatIconClickedSubject()
-                .compose(bindToLifecycle())
-                .subscribe(new Action1<Object>() {
+                .compose(this.<ChatInfo>bindToLifecycle())
+                .subscribe(new Action1<ChatInfo>() {
                     @Override
-                    public void call(Object ignore) {
+                    public void call(ChatInfo chatInfo) {
+                        final String conversationId = chatInfo.getConversationId();
+                        if (conversationId == null) {
+                            startActivity(ChatFirstConversationActivity.newIntent(UserOrPageProfileActivity.this, false, chatInfo.getUsername()));
+                        } else {
+                            startActivity(ChatActivity.newIntent(UserOrPageProfileActivity.this, conversationId, false));
+                        }
                         Toast.makeText(UserOrPageProfileActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
                     }
                 });

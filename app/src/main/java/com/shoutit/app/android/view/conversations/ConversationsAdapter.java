@@ -25,6 +25,8 @@ public class ConversationsAdapter extends BaseAdapter {
 
     public static class ConversationChatItemHolder extends ViewHolderManager.BaseViewHolder<BaseAdapterItem> {
 
+        @Nonnull
+        private final View mItemView;
         private final Picasso mPicasso;
 
         @Bind(R.id.conversation_chat_item_image)
@@ -38,6 +40,7 @@ public class ConversationsAdapter extends BaseAdapter {
 
         public ConversationChatItemHolder(@Nonnull View itemView, Picasso picasso) {
             super(itemView);
+            mItemView = itemView;
             mPicasso = picasso;
             ButterKnife.bind(this, itemView);
         }
@@ -50,6 +53,13 @@ public class ConversationsAdapter extends BaseAdapter {
             mConversationChatItemName.setText(conversationChatItem.getUser());
             mConversationChatItemMessage.setText(conversationChatItem.getMessage());
             mConversationShoutItemTime.setText(conversationChatItem.getTime());
+
+            mItemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    conversationChatItem.click();
+                }
+            });
         }
 
         private static ViewHolderManager.BaseViewHolder create(@NonNull View view, Picasso picasso) {
@@ -59,6 +69,8 @@ public class ConversationsAdapter extends BaseAdapter {
 
     public static class ConversationShoutItemHolder extends ViewHolderManager.BaseViewHolder<BaseAdapterItem> {
 
+        @Nonnull
+        private final View mItemView;
         private final Picasso mPicasso;
 
         @Bind(R.id.conversation_shout_item_image)
@@ -74,12 +86,13 @@ public class ConversationsAdapter extends BaseAdapter {
 
         public ConversationShoutItemHolder(@Nonnull View itemView, Picasso picasso) {
             super(itemView);
+            mItemView = itemView;
             mPicasso = picasso;
             ButterKnife.bind(this, itemView);
         }
 
         @Override
-        public void bind(@Nonnull BaseAdapterItem item) {
+        public void bind(@Nonnull final BaseAdapterItem item) {
             final ConversationsPresenter.ConversationShoutItem conversationShoutItem = (ConversationsPresenter.ConversationShoutItem) item;
 
             mPicasso.load(conversationShoutItem.getImage())
@@ -94,6 +107,13 @@ public class ConversationsAdapter extends BaseAdapter {
             mConversationShoutItemName.setText(conversationShoutItem.getUserNames());
             mConversationShoutItemMessage.setText(conversationShoutItem.getMessage());
             mConversationShoutItemTime.setText(conversationShoutItem.getTime());
+
+            mItemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    conversationShoutItem.click();
+                }
+            });
         }
 
         private static ViewHolderManager.BaseViewHolder create(@NonNull View view, Picasso picasso) {

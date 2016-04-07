@@ -9,6 +9,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.Category;
+import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.Discover;
 import com.shoutit.app.android.api.model.DiscoverChild;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
@@ -217,7 +218,7 @@ public class HomePresenterTest {
     private ResponseOrError<ShoutsResponse> shoutsResponse() {
         return ResponseOrError.fromData(new ShoutsResponse(1, "2", null, Lists.newArrayList(
                 new Shout("id", null, null, null, null, null, null, 2L, 2f, null, null, null,
-                        user, category, null, 2, null, null, 0, true))));
+                        user, category, null, 2, null, null, 0, ImmutableList.<Conversation>of(), true))));
     }
 
     @Nonnull

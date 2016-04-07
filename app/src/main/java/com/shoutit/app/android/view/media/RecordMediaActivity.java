@@ -34,19 +34,22 @@ public class RecordMediaActivity extends AbstractCameraActivity
     public static final String EXTRA_IS_VIDEO = "extra_is_video";
     public static final String EXTRA_MEDIA = "extra_media";
     private static final String EXTRA_IS_FOR_RESULT = "extra_for_result";
+    private static final String EXTRA_VIDEO_FIRST = "extra_video_first";
 
     private CameraFragment cameraFragment;
     private MultiplePermissionsListener customMultiplePermissionsListener;
 
     private boolean isActivityForResult;
-
-    public static Intent newIntent(Context context) {
-        return newIntent(context, false);
-    }
+    private boolean isVideoFirst;
 
     public static Intent newIntent(Context context, boolean activityForResult) {
+        return newIntent(context, activityForResult, false);
+    }
+
+    public static Intent newIntent(Context context, boolean activityForResult, boolean videoFirst) {
         return new Intent(context, RecordMediaActivity.class)
-                .putExtra(EXTRA_IS_FOR_RESULT, activityForResult);
+                .putExtra(EXTRA_IS_FOR_RESULT, activityForResult)
+                .putExtra(EXTRA_VIDEO_FIRST, videoFirst);
     }
 
     @Override
@@ -84,6 +87,7 @@ public class RecordMediaActivity extends AbstractCameraActivity
         final Bundle extras = getIntent().getExtras();
         if (extras != null) {
             isActivityForResult = extras.getBoolean(EXTRA_IS_FOR_RESULT);
+            isVideoFirst = extras.getBoolean(EXTRA_VIDEO_FIRST);
         }
 
         Dexter.continuePendingRequestsIfPossible(customMultiplePermissionsListener);
@@ -96,7 +100,7 @@ public class RecordMediaActivity extends AbstractCameraActivity
         final Fragment fragment = getFragmentManager().findFragmentByTag(TAG_CAMERA);
 
         if (fragment == null) {
-            cameraFragment = CameraFragment.newInstance();
+            cameraFragment = CameraFragment.newInstance(isVideoFirst);
             getFragmentManager().beginTransaction()
                     .replace(android.R.id.content, cameraFragment, TAG_CAMERA)
                     .commit();

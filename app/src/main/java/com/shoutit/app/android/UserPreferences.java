@@ -22,6 +22,7 @@ import javax.inject.Singleton;
 import rx.Observable;
 import rx.Scheduler;
 import rx.functions.Func0;
+import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
 @Singleton
@@ -39,8 +40,10 @@ public class UserPreferences {
 
     private final PublishSubject<Object> userRefreshSubject = PublishSubject.create();
     private final PublishSubject<Object> locationRefreshSubject = PublishSubject.create();
+    private final PublishSubject<Object> tokenRefreshSubject = PublishSubject.create();
     private final Observable<User> userObservable;
     private final Observable<UserLocation> locationObservable;
+    private final Observable<String> tokenObservable;
 
     @SuppressLint("CommitPrefEdits")
     private final SharedPreferences mPreferences;
@@ -72,6 +75,28 @@ public class UserPreferences {
                 })
                 .compose(MoreOperators.<User>refresh(userRefreshSubject))
                 .observeOn(uiScheduler);
+
+        tokenObservable = Observable
+                .defer(new Func0<Observable<Optional<String>>>() {
+                    @Override
+                    public Observable<Optional<String>> call() {
+                        return Observable.just(getAuthToken());
+                    }
+                })
+                .filter(new Func1<Optional<String>, Boolean>() {
+                    @Override
+                    public Boolean call(Optional<String> stringOptional) {
+                        return stringOptional.isPresent();
+                    }
+                })
+                .map(new Func1<Optional<String>, String>() {
+                    @Override
+                    public String call(Optional<String> stringOptional) {
+                        return stringOptional.get();
+                    }
+                })
+                .compose(MoreOperators.<String>refresh(tokenRefreshSubject))
+                .observeOn(uiScheduler);
     }
 
     @SuppressLint("CommitPrefEdits")
@@ -82,6 +107,7 @@ public class UserPreferences {
                 .putString(REFRESH_TOKEN, refreshToken)
                 .putBoolean(IS_GUEST, false);
         editor.commit();
+        tokenRefreshSubject.onNext(new Object());
     }
 
     @SuppressLint("CommitPrefEdits")
@@ -92,6 +118,7 @@ public class UserPreferences {
                 .putString(REFRESH_TOKEN, refreshToken)
                 .putBoolean(IS_GUEST, true);
         editor.commit();
+        tokenRefreshSubject.onNext(new Object());
     }
 
     @SuppressLint("CommitPrefEdits")
@@ -182,6 +209,10 @@ public class UserPreferences {
 
     public Observable<UserLocation> getLocationObservable() {
         return locationObservable;
+    }
+
+    public Observable<String> getTokenObservable() {
+        return tokenObservable;
     }
 
     public void saveLocation(@Nullable UserLocation location) {
