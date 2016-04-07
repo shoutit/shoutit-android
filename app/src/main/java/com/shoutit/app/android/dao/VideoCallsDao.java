@@ -1,5 +1,6 @@
 package com.shoutit.app.android.dao;
 
+import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.operators.MoreOperators;
@@ -21,9 +22,6 @@ public class VideoCallsDao {
     @Nonnull
     private Observable<ResponseOrError<TwilioResponse>> videoCallsObservable;
     @Nonnull
-    private PublishSubject<Object> refreshSubject = PublishSubject.create();
-
-    @Nonnull
     private final ApiService apiService;
     @Nonnull
     private final Scheduler networkScheduler;
@@ -36,18 +34,13 @@ public class VideoCallsDao {
 
         videoCallsObservable = apiService.getTokenAndIdentity()
                 .subscribeOn(networkScheduler)
-                .compose(MoreOperators.<TwilioResponse>refresh(refreshSubject))
                 .compose(ResponseOrError.<TwilioResponse>toResponseOrErrorObservable())
-                .compose(MoreOperators.<ResponseOrError<TwilioResponse>>cacheWithTimeout(networkScheduler));
+                .compose(MoreOperators.<ResponseOrError<TwilioResponse>>cacheWithTimeout(networkScheduler))
+                .compose(ObservableExtensions.<ResponseOrError<TwilioResponse>>behaviorRefCount());
     }
 
     @Nonnull
     public Observable<ResponseOrError<TwilioResponse>> getVideoCallsObservable() {
         return videoCallsObservable;
-    }
-
-    @Nonnull
-    public PublishSubject<Object> getRefreshSubject() {
-        return refreshSubject;
     }
 }

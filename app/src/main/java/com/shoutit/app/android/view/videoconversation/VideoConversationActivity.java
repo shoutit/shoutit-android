@@ -1,8 +1,10 @@
 package com.shoutit.app.android.view.videoconversation;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.CameraManager;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -24,7 +26,6 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
-import com.shoutit.app.android.utils.PermissionHelper;
 import com.twilio.conversations.AudioOutput;
 import com.twilio.conversations.AudioTrack;
 import com.twilio.conversations.CameraCapturer;
@@ -64,9 +65,10 @@ import rx.Observable;
 import rx.functions.Action1;
 import rx.subjects.BehaviorSubject;
 
+import static com.appunite.rx.internal.Preconditions.checkNotNull;
+
 public class VideoConversationActivity extends BaseActivity {
 
-    private static final int CAMERA_MIC_PERMISSION_REQUEST_CODE = 1;
     private static final String VC = "VIDEO_CALL_TWILIO";
     private static final String VC_ERROR ="VIDEO_CALL_ERROR";
     private static final String ARGS_USERNAME = "args_username";
@@ -100,6 +102,9 @@ public class VideoConversationActivity extends BaseActivity {
 
     private String username;
     private ConversationsClient conversationClient;
+    private CameraManager cameraManager;
+
+
 
     private BehaviorSubject<String> conversationInfoSubject = BehaviorSubject.create();
     private BehaviorSubject<String> conversationErrorSubject = BehaviorSubject.create();
@@ -114,13 +119,9 @@ public class VideoConversationActivity extends BaseActivity {
         setContentView(R.layout.activity_video_conversation);
         ButterKnife.bind(this);
 
+        conversationInfo.bringToFront();
         setupVariablesFromApp();
         setupAudioVideo();
-
-        PermissionHelper.
-                checkPermissions(this, CAMERA_MIC_PERMISSION_REQUEST_CODE,
-                        ColoredSnackBar.contentView(this), R.string.video_calls_no_premissions,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA});
 
         if (username == null) {
             AcceptIncomingCall();
@@ -159,7 +160,7 @@ public class VideoConversationActivity extends BaseActivity {
                 .subscribe(new Action1<String>() {
                     @Override
                     public void call(String error) {
-                        Snackbar.make(videoCallView, error, Snackbar.LENGTH_LONG).show();
+                        ColoredSnackBar.colorSnackBar(videoCallView, error, Snackbar.LENGTH_LONG,R.color.snackbar_error).show();
                     }
                 });
     }
@@ -168,7 +169,12 @@ public class VideoConversationActivity extends BaseActivity {
         return new CapturerErrorListener() {
             @Override
             public void onError(CapturerException e) {
-                ColoredSnackBar.colorSnackBar(videoCallView, R.string.video_calls_camera_issue, Snackbar.LENGTH_SHORT, R.color.snackbar_error);
+                conversationErrorSubject.onNext(getString(R.string.video_calls_camera_issue));
+
+                if(cameraCapturer.isPreviewing()){
+                    cameraCapturer.stopPreview();
+                }
+                cameraCapturer.startPreview();
             }
         };
     }
@@ -191,8 +197,7 @@ public class VideoConversationActivity extends BaseActivity {
                         VideoConversationActivity.this.conversation = conversation;
                         conversation.setConversationListener(conversationListener());
                     } else {
-                        Log.e(VC_ERROR, "AcceptIncomingCall" + exception.getMessage());
-                        conversationErrorSubject.onNext(exception.getMessage());
+                        conversationErrorSubject.onNext(exception.getMessage().substring(18, exception.getMessage().length()));
                     }
                 }
             });
@@ -217,8 +222,11 @@ public class VideoConversationActivity extends BaseActivity {
                                 VideoConversationActivity.this.conversation = conversation;
                                 conversation.setConversationListener(conversationListener());
                             } else {
-                                Log.e(VC_ERROR, "MakeOutgoingCall: " + exception.getMessage());
-                                conversationErrorSubject.onNext(exception.getMessage());
+                                if(exception.getErrorCode() == 109){
+                                    conversationInfoSubject.onNext(getString(R.string.video_calls_participant_reject));
+                                }else {
+                                    conversationErrorSubject.onNext(exception.getMessage().substring(18, exception.getMessage().length()));
+                                }
                             }
                         }
                     });
@@ -229,7 +237,6 @@ public class VideoConversationActivity extends BaseActivity {
         return new LocalMediaListener() {
             @Override
             public void onLocalVideoTrackAdded(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
-                Log.d(VC, "localMediaListener : onLocalVideoTrackAdded");
                 cameraCapturer.stopPreview();
                 localVideoRenderer = new VideoViewRenderer(VideoConversationActivity.this, localWindow);
                 localVideoTrack.addRenderer(localVideoRenderer);
@@ -239,15 +246,16 @@ public class VideoConversationActivity extends BaseActivity {
 
             @Override
             public void onLocalVideoTrackRemoved(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
-                Log.d(VC, "localMediaListener : onLocalVideoTrackRemoved");
                 localWindow.removeAllViews();
-                closeConversation();
+                if (conversation != null) {
+                    conversation.disconnect();
+                }
+                cameraCapturer.stopPreview();
 
             }
 
             @Override
             public void onLocalVideoTrackError(LocalMedia localMedia, LocalVideoTrack localVideoTrack, TwilioConversationsException e) {
-                Log.e(VC_ERROR, "localMediaListener : LocalVideoTrackError: " + e.getMessage());
             }
         };
     }
@@ -256,7 +264,6 @@ public class VideoConversationActivity extends BaseActivity {
         return new ConversationListener() {
             @Override
             public void onParticipantConnected(Conversation conversation, Participant participant) {
-                Log.d(VC, "conversationListener : onParticipantConnected " + participant.getIdentity());
                 participant.setParticipantListener(participantListener());
                 if(username != null) {
                     conversationInfoSubject.onNext(String.format(getString(R.string.video_calls_connected), username));
@@ -267,19 +274,15 @@ public class VideoConversationActivity extends BaseActivity {
 
             @Override
             public void onFailedToConnectParticipant(Conversation conversation, Participant participant, TwilioConversationsException e) {
-                Log.d(VC, "conversationListener : onFailedToConnectParticipant " + participant.getIdentity());
             }
 
             @Override
             public void onParticipantDisconnected(Conversation conversation, Participant participant) {
-                Log.d(VC, "conversationListener : onParticipantDisconnected " + participant.getIdentity());
                 conversationInfoSubject.onNext(getString(R.string.video_calls_participant_disconected));
             }
 
             @Override
             public void onConversationEnded(Conversation conversation, TwilioConversationsException e) {
-                Log.d(VC, "conversationListener : onConversationEnded");
-                conversationInfoSubject.onNext(getString(R.string.video_calls_conversation_ended));
             }
         };
     }
@@ -288,14 +291,12 @@ public class VideoConversationActivity extends BaseActivity {
         return new ParticipantListener() {
             @Override
             public void onVideoTrackAdded(Conversation conversation, Participant participant, VideoTrack videoTrack) {
-                Log.i(VC, "participantListener : onVideoTrackAdded " + participant.getIdentity());
 
                 participantVideoRenderer = new VideoViewRenderer(VideoConversationActivity.this, participantWindow);
                 participantVideoRenderer.setObserver(new VideoRendererObserver() {
 
                     @Override
                     public void onFirstFrame() {
-                        Log.d(VC, "Participant onFirstFrame");
                     }
 
                     @Override
@@ -307,36 +308,37 @@ public class VideoConversationActivity extends BaseActivity {
 
             @Override
             public void onVideoTrackRemoved(Conversation conversation, Participant participant, VideoTrack videoTrack) {
-                Log.d(VC, "participantListener : onVideoTrackRemoved " + participant.getIdentity());
                 participantWindow.removeAllViews();
 
             }
 
             @Override
             public void onAudioTrackAdded(Conversation conversation, Participant participant, AudioTrack audioTrack) {
-                Log.d(VC, "participantListener : onAudioTrackAdded " + participant.getIdentity());
             }
 
             @Override
             public void onAudioTrackRemoved(Conversation conversation, Participant participant, AudioTrack audioTrack) {
-                Log.d(VC, "participantListener :  onAudioTrackRemoved " + participant.getIdentity());
             }
 
             @Override
             public void onTrackEnabled(Conversation conversation, Participant participant, MediaTrack mediaTrack) {
-                Log.i(VC, "participantListener : onTrackEnabled " + participant.getIdentity());
             }
 
             @Override
             public void onTrackDisabled(Conversation conversation, Participant participant, MediaTrack mediaTrack) {
-                Log.i(VC, "participantListener :  onTrackDisabled " + participant.getIdentity());
             }
         };
     }
 
     private void setupAudioVideo() {
-        cameraCapturer = CameraCapturerFactory.createCameraCapturer(VideoConversationActivity.this,
-                CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA, localVideoPreview, capturerErrorListener());
+
+        if (isFrontCameraAvailable()) {
+            cameraCapturer = CameraCapturerFactory.createCameraCapturer(VideoConversationActivity.this,
+                    CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA, localVideoPreview, capturerErrorListener());
+        }else{
+            cameraCapturer = CameraCapturerFactory.createCameraCapturer(VideoConversationActivity.this,
+                    CameraCapturer.CameraSource.CAMERA_SOURCE_BACK_CAMERA, localVideoPreview, capturerErrorListener());
+        }
         setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
         cameraCapturer.startPreview();
         conversationClient.setAudioOutput(AudioOutput.SPEAKERPHONE);
@@ -347,6 +349,20 @@ public class VideoConversationActivity extends BaseActivity {
         username = intent.getStringExtra(ARGS_USERNAME);
         conversationClient = ((App) getApplication()).getConversationsClient();
         invite = ((App) getApplication()).getInvite();
+        cameraManager = (CameraManager) getApplicationContext().getSystemService(CAMERA_SERVICE);
+    }
+
+    private boolean isFrontCameraAvailable(){
+        try {
+            for (final String cameraID : cameraManager.getCameraIdList()){
+                final CameraCharacteristics characteristics = cameraManager.getCameraCharacteristics(cameraID);
+                final int cameraOrientation = checkNotNull(characteristics.get(CameraCharacteristics.LENS_FACING));
+                if(cameraOrientation == CameraCharacteristics.LENS_FACING_FRONT) return true;
+            }
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     @Override

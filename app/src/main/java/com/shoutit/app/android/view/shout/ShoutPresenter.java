@@ -354,6 +354,7 @@ public class ShoutPresenter {
                 .observeOn(uiScheduler);
     }
 
+    @Nonnull
     public Observable<String> getUsernameObservable() {
         return usernameObservable;
     }

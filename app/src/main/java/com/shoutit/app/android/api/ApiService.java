@@ -281,4 +281,7 @@ public interface ApiService {
 
     @GET("twilio/video_identity")
     Observable<UserIdentity> getUserIdentity(@Query("profile") String username);
+
+    @GET("twilio/profile")
+    Observable<UserIdentity> getUserByIdentity(@Query("identity") String identity);
 }

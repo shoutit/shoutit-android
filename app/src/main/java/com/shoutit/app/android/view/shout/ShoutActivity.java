@@ -1,5 +1,6 @@
 package com.shoutit.app.android.view.shout;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
@@ -8,6 +9,7 @@ import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -31,6 +33,7 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.view.createshout.edit.EditShoutActivity;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.profile.tagprofile.TagProfileActivity;
@@ -53,6 +56,7 @@ import static com.appunite.rx.internal.Preconditions.checkNotNull;
 public class ShoutActivity extends BaseActivity {
 
     private static final String KEY_SHOUT_ID = "shout_id";
+    private static final int CAMERA_MIC_PERMISSION_REQUEST_CODE = 1;
 
     @Bind(R.id.shout_toolbar)
     Toolbar toolbar;
@@ -221,7 +225,7 @@ public class ShoutActivity extends BaseActivity {
                     public void onClick(View v) {
                         if (isUserShoutOwner) {
                             startActivity(EditShoutActivity.newIntent(mShoutId, ShoutActivity.this));
-                        } else {
+                        } else if (hasVideoPermission()){
                             startActivity(VideoConversationActivity.newIntent(shoutOwnerId, ShoutActivity.this));
                         }
                     }
@@ -244,6 +248,26 @@ public class ShoutActivity extends BaseActivity {
                 animator.start();
             }
         };
+    }
+
+    private boolean hasVideoPermission() {
+        return PermissionHelper.checkPermissions(this, CAMERA_MIC_PERMISSION_REQUEST_CODE,
+                ColoredSnackBar.contentView(this), R.string.video_calls_no_premissions,
+                new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA});
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == CAMERA_MIC_PERMISSION_REQUEST_CODE) {
+            final boolean permissionsGranted = PermissionHelper.arePermissionsGranted(grantResults);
+            if (permissionsGranted) {
+                ColoredSnackBar.success(findViewById(android.R.id.content), R.string.permission_granted, Snackbar.LENGTH_SHORT).show();
+            } else {
+                ColoredSnackBar.error(findViewById(android.R.id.content), R.string.permission_not_granted, Snackbar.LENGTH_SHORT);
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
     @OnClick(R.id.shout_bottom_bar_call_or_delete)

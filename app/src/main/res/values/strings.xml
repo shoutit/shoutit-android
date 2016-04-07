@@ -352,6 +352,8 @@
     <string name="video_calls_caller_name">Incoming Call from %s</string>
     <string name="video_calls_accept_call">Answer</string>
     <string name="video_calls_reject_call">Discard</string>
+    <string name="video_calls_participant_reject">Participant reject call</string>
+    <string name="video_calls_cannot_connect">Problem with connection. Try later</string>
     <string name="video_calls_conversation_ended">Conversation has ended</string>
     <string name="video_calls_connecting">Connecting…</string>
     <string name="video_calls_connected">Connected with %s</string>

@@ -55,22 +55,11 @@ public class UsersIdentityDao {
 
         public UserIdentityDao(@Nonnull String username) {
 
-            final Observable<Object> refreshWithCache = Observable
-                    .interval(1, TimeUnit.MINUTES, networkScheduler)
-                    .map(Functions1.toObject());
-
             userIdentityObservable = apiService.getUserIdentity(username)
                     .subscribeOn(networkScheduler)
                     .compose(ResponseOrError.<UserIdentity>toResponseOrErrorObservable())
-                    .compose(MoreOperators.<ResponseOrError<UserIdentity>>refresh(refreshWithCache))
                     .compose(MoreOperators.<ResponseOrError<UserIdentity>>cacheWithTimeout(networkScheduler))
                     .compose(ObservableExtensions.<ResponseOrError<UserIdentity>>behaviorRefCount());
         }
-
-        @Nonnull
-        public Observable<ResponseOrError<UserIdentity>> getUserIdentityObservable() {
-            return userIdentityObservable;
-        }
     }
-
 }
