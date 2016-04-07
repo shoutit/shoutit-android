@@ -104,7 +104,7 @@
                         android:src="@drawable/info" />
 
                     <com.shoutit.app.android.widget.StateSpinner
-
+                        android:layout_gravity="bottom"
                         android:id="@+id/edit_currency_spinner"
                         android:layout_width="130dp"
                         android:layout_height="43dp" />

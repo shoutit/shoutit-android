@@ -289,6 +289,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
 
     @Override
     public void finishActivity() {
+        setResult(RESULT_OK);
         finish();
     }
 

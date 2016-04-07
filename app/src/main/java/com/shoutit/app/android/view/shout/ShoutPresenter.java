@@ -79,6 +79,7 @@ public class ShoutPresenter {
     @Nonnull
     private final PublishSubject<Object> callOrDeleteSubject = PublishSubject.create();
     private final PublishSubject<String> sendReportObserver = PublishSubject.create();
+    private final PublishSubject<Object> refreshShoutsSubject = PublishSubject.create();
 
     @Inject
     public ShoutPresenter(@Nonnull final ShoutsDao shoutsDao,
@@ -278,7 +279,7 @@ public class ShoutPresenter {
                 .compose(ObservableExtensions.<Boolean>behaviorRefCount())
                 .first();
 
-        shoutsGlobalRefreshPresenter.getShoutsGlobalRefreshObservable()
+        Observable.merge(shoutsGlobalRefreshPresenter.getShoutsGlobalRefreshObservable(), refreshShoutsSubject)
                 .subscribe(shoutsDao.getShoutDao(shoutId).getRefreshObserver());
 
         /** Shout Owner Identity**/
@@ -460,6 +461,11 @@ public class ShoutPresenter {
     @Nonnull
     public Observable<Response<Object>> getReportShoutObservable() {
         return reportShoutObservable;
+    }
+
+    @Nonnull
+    public Observer<Object> refreshShoutsObserver() {
+        return refreshShoutsSubject;
     }
 }
 
