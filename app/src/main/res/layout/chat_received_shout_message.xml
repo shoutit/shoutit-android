@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="6dp"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:padding="4dp">
+
+        <ImageView
+            android:id="@+id/chats_received_avatar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginStart="12dp"
+            android:scaleType="centerCrop"
+            android:visibility="gone"
+            tools:src="@drawable/ca"/>
+
+        <ImageView
+            android:id="@+id/chats_received_shout_image_imageview"
+            android:layout_width="150dp"
+            android:layout_height="96dp"
+            android:layout_marginLeft="@dimen/chat_received_msg_item_margin_left"
+            android:layout_marginStart="@dimen/chat_received_msg_item_margin_left"
+            android:scaleType="centerCrop"
+            tools:src="@drawable/ca"/>
+
+        <TextView
+            android:id="@+id/chats_received_shout_date_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|top"
+            android:background="@drawable/chat_time_gradient"
+            android:textColor="@android:color/white"
+            tools:text="18:04"/>
+    </FrameLayout>
+
+    <RelativeLayout
+        android:layout_width="150dp"
+        android:layout_height="96dp"
+        android:layout_marginLeft="@dimen/chat_received_msg_item_margin_left"
+        android:layout_marginStart="@dimen/chat_received_msg_item_margin_left">
+
+        <TextView
+            android:id="@+id/chats_message_shout_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:lines="1"
+            tools:text="Cotton wool line with cap and other cool things like computers"/>
+
+        <TextView
+            android:id="@+id/chats_shout_author"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/chats_message_shout_description"
+            android:textColor="@color/black_38"
+            tools:text="John Smith"/>
+
+        <TextView
+            android:id="@+id/chats_shout_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/chats_message_shout_description"
+            android:textColor="@color/colorAccent"
+            tools:text="$44 USD"/>
+
+    </RelativeLayout>
+</LinearLayout>
+
+

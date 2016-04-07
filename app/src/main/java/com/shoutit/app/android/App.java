@@ -23,6 +23,7 @@ import com.shoutit.app.android.dagger.BaseModule;
 import com.shoutit.app.android.dagger.DaggerAppComponent;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.utils.LogHelper;
+import com.shoutit.app.android.utils.PusherHelper;
 import com.shoutit.app.android.view.videoconversation.DialogCallActivity;
 import com.shoutit.app.android.view.videoconversation.VideoConversationPresenter;
 import com.twilio.common.TwilioAccessManager;
@@ -70,6 +71,8 @@ public class App extends MultiDexApplication {
     @Inject
     LocationManager locationManager;
     @Inject
+    PusherHelper pusher;
+    @Inject
     VideoConversationPresenter presenter;
 
     @Override
@@ -89,7 +92,8 @@ public class App extends MultiDexApplication {
 
         initFfmpeg();
 
-        /** Video Conversations **/
+        initPusher();
+
         presenter.getTwilioRequirementObservable()
                 .subscribe(new Action1<String>() {
                     @Override
@@ -100,25 +104,45 @@ public class App extends MultiDexApplication {
                 });
     }
 
+    private void initPusher() {
+        if (userPreferences.isUserLoggedIn()) {
+            pusher.init(userPreferences.getAuthToken().get());
+            pusher.getPusher().connect();
+        } else {
+            userPreferences.getTokenObservable()
+                    .first()
+                    .subscribe(new Action1<String>() {
+                        @Override
+                        public void call(String token) {
+                            pusher.init(token);
+                            pusher.getPusher().connect();
+                        }
+                    });
+        }
+    }
+
     private void initFfmpeg() {
         FFmpeg ffmpeg = FFmpeg.getInstance(this);
         try {
             ffmpeg.loadBinary(new LoadBinaryResponseHandler() {
 
                 @Override
-                public void onStart() {}
+                public void onStart() {
+                }
 
                 @Override
-                public void onFailure() {}
+                public void onFailure() {
+                }
 
                 @Override
-                public void onSuccess() {}
+                public void onSuccess() {
+                }
 
                 @Override
-                public void onFinish() {}
+                public void onFinish() {
+                }
             });
         } catch (FFmpegNotSupportedException e) {
-            // Handle if FFmpeg is not supported by device
         }
     }
 

@@ -5,6 +5,7 @@ import android.content.Context;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.collect.ImmutableList;
+import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.UserLocation;
@@ -41,7 +42,7 @@ public class ShoutsPresenterTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        mBehaviorSubject = BehaviorSubject.create(ResponseOrError.fromData(new ShoutsResponse(0, "", "", ImmutableList.of(new Shout("", "", "", "", new UserLocation(0, 0, "", "", "", "", ""), "", "", 0L, 0, "", "", "", null, null, null, 0, null, null, 0)))));
+        mBehaviorSubject = BehaviorSubject.create(ResponseOrError.fromData(new ShoutsResponse(0, "", "", ImmutableList.of(new Shout("", "", "", "", new UserLocation(0, 0, "", "", "", "", ""), "", "", 0L, 0, "", "", "", null, null, null, 0, null, null, 0, ImmutableList.<Conversation>of())))));
         when(mDiscoverShoutsDao.getShoutsObservable(anyString())).thenReturn(mBehaviorSubject);
 
         mShoutsPresenter = new DiscoverShoutsPresenter(Schedulers.immediate(), Schedulers.immediate(), mDiscoverShoutsDao, "", "", mContext);
