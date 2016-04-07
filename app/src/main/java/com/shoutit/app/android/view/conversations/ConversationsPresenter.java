@@ -12,15 +12,26 @@ import com.appunite.rx.operators.OperatorMergeNextToken;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
+import com.google.gson.Gson;
+import com.pusher.client.channel.PresenceChannel;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.ConversationProfile;
 import com.shoutit.app.android.api.model.ConversationsResponse;
 import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessageAttachment;
+import com.shoutit.app.android.api.model.PusherMessage;
+import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.utils.PusherHelper;
+import com.shoutit.app.android.view.chats.PresenceChannelEventListenerAdapter;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -29,6 +40,7 @@ import javax.inject.Inject;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
+import rx.Subscriber;
 import rx.Subscription;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -76,6 +88,9 @@ public class ConversationsPresenter {
     private final Scheduler mNetworkScheduler;
     private final Scheduler mUiScheduler;
     private final Context mContext;
+    private final UserPreferences mUserPreferences;
+    private final PusherHelper mPusherHelper;
+    private final Gson mGson;
     private Listener mListener;
     private Subscription mSubscription;
     private final PublishSubject<Object> requestSubject = PublishSubject.create();
@@ -84,29 +99,101 @@ public class ConversationsPresenter {
     public ConversationsPresenter(@NonNull ApiService apiService,
                                   @NetworkScheduler Scheduler networkScheduler,
                                   @UiScheduler Scheduler uiScheduler,
-                                  @ForActivity Context context) {
+                                  @ForActivity Context context,
+                                  UserPreferences userPreferences,
+                                  PusherHelper pusherHelper,
+                                  Gson gson) {
         mApiService = apiService;
         mNetworkScheduler = networkScheduler;
         mUiScheduler = uiScheduler;
         mContext = context;
+        mUserPreferences = userPreferences;
+        mPusherHelper = pusherHelper;
+        mGson = gson;
     }
 
-    public void register(@NonNull Listener listener) {
+    public void register(@NonNull final Listener listener) {
+        final User user = mUserPreferences.getUser();
+        assert user != null;
+        final PresenceChannel userChannel = mPusherHelper.getPusher().subscribePresence(String.format("presence-u-%1$s", user.getId()));
+
+        final Observable<HashMap<String, Conversation>> mapObservable = Observable
+                .create(new Observable.OnSubscribe<PusherMessage>() {
+                    @Override
+                    public void call(final Subscriber<? super PusherMessage> subscriber) {
+                        userChannel.bind("new_message", new PresenceChannelEventListenerAdapter() {
+
+                            @Override
+                            public void onEvent(String channelName, String eventName, String data) {
+                                try {
+                                    final PusherMessage pusherMessage = mGson.getAdapter(PusherMessage.class).fromJson(data);
+                                    subscriber.onNext(pusherMessage);
+                                } catch (IOException e) {
+                                    subscriber.onError(e);
+                                }
+                            }
+                        });
+                    }
+                })
+                .flatMap(new Func1<PusherMessage, Observable<Conversation>>() {
+                    @Override
+                    public Observable<Conversation> call(PusherMessage pusherMessage) {
+                        return mApiService.getConversation(pusherMessage.getConversationId());
+                    }
+                })
+                .observeOn(mUiScheduler)
+                .scan(Maps.<String, Conversation>newHashMap(), new Func2<HashMap<String, Conversation>, Conversation, HashMap<String, Conversation>>() {
+                    @Override
+                    public HashMap<String, Conversation> call(HashMap<String, Conversation> map, Conversation pusherMessage) {
+                        map.put(pusherMessage.getId(), pusherMessage);
+                        return map;
+                    }
+                });
+
         mListener = listener;
 
         mListener.showProgress(true);
 
-        mSubscription = requestSubject
+        final Observable<List<Conversation>> listObservable = requestSubject
                 .startWith(new Object())
                 .lift(loadMoreOperator)
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
-                .subscribe(new Action1<ConversationsResponse>() {
+                .map(new Func1<ConversationsResponse, List<Conversation>>() {
                     @Override
-                    public void call(ConversationsResponse conversationsResponse) {
+                    public List<Conversation> call(ConversationsResponse conversationsResponse) {
+                        return conversationsResponse.getResults();
+                    }
+                });
+
+
+        mSubscription = Observable.combineLatest(listObservable, mapObservable,
+                new Func2<List<Conversation>, Map<String, Conversation>, List<Conversation>>() {
+                    @Override
+                    public List<Conversation> call(List<Conversation> conversations, Map<String, Conversation> map) {
+                        for (Conversation conversation : conversations) {
+                            final boolean containsKey = map.containsKey(conversation.getId());
+                            if (!containsKey) {
+                                // MAP IS HASHMAP
+                                map.put(conversation.getId(), conversation);
+                            }
+                        }
+
+                        return ImmutableList.copyOf(Iterables.transform(map.entrySet(), new Function<Map.Entry<String, Conversation>, Conversation>() {
+                            @Nullable
+                            @Override
+                            public Conversation apply(@Nullable Map.Entry<String, Conversation> input) {
+                                assert input != null;
+                                return input.getValue();
+                            }
+                        }));
+                    }
+                })
+                .subscribe(new Action1<List<Conversation>>() {
+                    @Override
+                    public void call(List<Conversation> conversations) {
                         mListener.showProgress(false);
 
-                        final List<Conversation> conversations = conversationsResponse.getResults();
                         if (conversations.isEmpty()) {
                             mListener.emptyList();
                         } else {
@@ -200,6 +287,7 @@ public class ConversationsPresenter {
     public void unregister() {
         mListener = null;
         mSubscription.unsubscribe();
+        mPusherHelper.getPusher().unsubscribe(String.format("presence-u-%1$s", mUserPreferences.getUser().getId()));
     }
 
     public interface Listener {

@@ -15,7 +15,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -140,7 +139,11 @@ public class ChatActivity extends BaseActivity implements Listener {
                 .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
                 .filter(LoadMoreHelper.needLoadMore((MyLayoutManager) mChatsRecyclerview.getLayoutManager(), chatsAdapter))
                 .subscribe(presenter.getRequestSubject());
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
         presenter.register(this);
     }
 
@@ -226,9 +229,9 @@ public class ChatActivity extends BaseActivity implements Listener {
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onPause() {
         presenter.unregister();
-        super.onDestroy();
+        super.onPause();
     }
 
     @OnClick(R.id.chats_attatchments_video)
