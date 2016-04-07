@@ -3,8 +3,8 @@ package com.shoutit.app.android.view.notifications;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
@@ -99,9 +98,11 @@ public class NotificationsAdapter extends BaseAdapter {
                     final BaseProfile profile = attachedObject.getMessage().getProfile();
                     imageUrl = profile.getImage();
 
-                    final SpannableString spannedText = getSpannedText(
-                            profile.getFirstName(),
-                            attachedObject.getMessage().getText());
+                    String text = attachedObject.getMessage().getText();
+                    if (TextUtils.isEmpty(text)) {
+                        text = context.getString(R.string.notifications_message_replacement);
+                    }
+                    final SpannableString spannedText = getSpannedText(profile.getFirstName(), text);
                     textTv.setText(spannedText);
                 } else if (notification.isListenNotification() && attachedObject.getProfile() != null) {
                     final BaseProfile profile = attachedObject.getProfile();
@@ -134,9 +135,9 @@ public class NotificationsAdapter extends BaseAdapter {
         @OnClick(R.id.notifications_root_view)
         public void onItemClicked() {
             if (item.getNotification().isListenNotification()) {
-                item.openProfile();
+                item.openProfileAndMarkAsRead();
             } else {
-                Toast.makeText(context, "Not implemented yet", Toast.LENGTH_SHORT).show();
+                item.markNotificationAsRead();
             }
         }
     }

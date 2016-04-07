@@ -374,6 +374,7 @@
     <string name="create_request_price">Price</string>
     <string name="edit_shout_add_pictures_label">Add pictures and videos</string>
     <string name="option_not_set">Not set</string>
+    <string name="notifications_message_replacement">sends you a message</string>
 
     <!-- Video Calls -->
     <string name="video_calls_no_premissions">Camera and Microphone permissions needed.</string>
