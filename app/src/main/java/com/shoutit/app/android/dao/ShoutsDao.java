@@ -392,7 +392,7 @@ public class ShoutsDao {
                     if (filtersToSubmit != null) {
                         return apiService.searchShouts(query, pageNumber, PAGE_SIZE,
                                 location.getCountry(), filtersToSubmit.getCity(), filtersToSubmit.getState(),
-                                filtersToSubmit.getMinPrice(), filtersToSubmit.getMaxPrice(),
+                                filtersToSubmit.getMinPriceInCents(), filtersToSubmit.getMaxPriceInCents(),
                                 filtersToSubmit.getDistance(), filtersToSubmit.getShoutType(),
                                 filtersToSubmit.getSortType().getType(), filtersToSubmit.getFiltersQueryMap());
                     } else {
@@ -406,7 +406,7 @@ public class ShoutsDao {
                     if (filtersToSubmit != null) {
                         return apiService.searchTagShouts(query, pageNumber, PAGE_SIZE, contextItemId,
                                 location.getCountry(), filtersToSubmit.getCity(), filtersToSubmit.getState(),
-                                filtersToSubmit.getMinPrice(), filtersToSubmit.getMaxPrice(),
+                                filtersToSubmit.getMinPriceInCents(), filtersToSubmit.getMaxPriceInCents(),
                                 filtersToSubmit.getDistance(), filtersToSubmit.getShoutType(),
                                 filtersToSubmit.getSortType().getType(), filtersToSubmit.getFiltersQueryMap());
                     } else {
@@ -417,7 +417,7 @@ public class ShoutsDao {
                 case DISCOVER:
                     if (filtersToSubmit != null) {
                         return apiService.searchDiscoverShouts(query, pageNumber, PAGE_SIZE, contextItemId,
-                                filtersToSubmit.getMinPrice(), filtersToSubmit.getMaxPrice(),
+                                filtersToSubmit.getMinPriceInCents(), filtersToSubmit.getMaxPriceInCents(),
                                 filtersToSubmit.getDistance(), filtersToSubmit.getShoutType(),
                                 filtersToSubmit.getSortType().getType(), filtersToSubmit.getFiltersQueryMap());
                     } else {
@@ -428,7 +428,7 @@ public class ShoutsDao {
                     if (filtersToSubmit != null) {
                         return apiService.shoutsForLocation(location.getCountry(), filtersToSubmit.getCity(),
                                 filtersToSubmit.getState(), pageNumber, PAGE_SIZE,
-                                filtersToSubmit.getMinPrice(), filtersToSubmit.getMaxPrice(),
+                                filtersToSubmit.getMinPriceInCents(), filtersToSubmit.getMaxPriceInCents(),
                                 filtersToSubmit.getDistance(), filtersToSubmit.getShoutType(),
                                 filtersToSubmit.getSortType().getType(), filtersToSubmit.getFiltersQueryMap());
                     } else {

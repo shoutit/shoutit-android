@@ -127,7 +127,7 @@
     </style>
 
     <style name="BlueRadioButtonTheme" parent="ThemeOverlay.AppCompat">
-        <item name="colorControlNormal">@color/accent_blue</item>
+        <item name="colorControlNormal">@color/black_54</item>
         <item name="colorControlActivated">@color/accent_blue</item>
         <item name="colorControlHighlight">@color/accent_blue</item>
     </style>

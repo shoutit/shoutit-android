@@ -2,6 +2,7 @@ package com.shoutit.app.android.view.filter;
 
 import android.content.Context;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -17,6 +18,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableMultimap;
 import com.jakewharton.rxbinding.view.RxView;
+import com.jakewharton.rxbinding.widget.RxCompoundButton;
 import com.jakewharton.rxbinding.widget.RxSeekBar;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.R;
@@ -683,6 +685,7 @@ public class FilterViewHolders {
             recycle();
 
             valueTv.setText(item.getFilterValue().getName());
+            filtersValueCheckbox.setClickable(false);
 
             runnable = new Runnable() {
                 @Override
