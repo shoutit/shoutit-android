@@ -170,6 +170,8 @@ public class FilterViewHolders {
         Spinner categorySpinner;
         @Bind(R.id.filters_category_item_root_view)
         View rootView;
+        @Bind(R.id.filters_blocking_view)
+        View blockingView;
 
         private final Picasso picasso;
         private final CategorySpinnerAdapter spinnerAdapter;
@@ -196,8 +198,9 @@ public class FilterViewHolders {
                 spinnerAdapter.bindData(item.getCategories().values());
             }
 
-            rootView.setClickable(item.shouldBlockCategories());
+            blockingView.setClickable(item.shouldBlockCategories());
             rootView.setAlpha(item.shouldBlockCategories() ? 0.5f : 1f);
+            categorySpinner.setAlpha(item.shouldBlockCategories() ? 0.5f : 1f);
 
             runnable = new Runnable() {
                 @Override
