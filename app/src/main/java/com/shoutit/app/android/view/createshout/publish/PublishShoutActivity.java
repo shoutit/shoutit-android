@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.view.createshout.edit.EditShoutActivity;
 import com.shoutit.app.android.view.createshout.request.CreateRequestActivity;
+import com.shoutit.app.android.view.media.RecordMediaActivity;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
 import butterknife.Bind;
@@ -25,8 +27,10 @@ public class PublishShoutActivity extends RxAppCompatActivity {
 
     private static final String ARGS_REQUEST = "args_request";
     private static final String ARGS_ID = "args_id";
+    private static final String ARGS_WEB_URL = "web_url";
     private boolean mRequest;
     private String mId;
+    private String mWebUrl;
 
     @Bind(R.id.publish_activity_toolbar)
     Toolbar mToolbar;
@@ -38,10 +42,11 @@ public class PublishShoutActivity extends RxAppCompatActivity {
     Button button;
 
     @NonNull
-    public static Intent newIntent(@NonNull Context context, @NonNull String id, boolean request) {
+    public static Intent newIntent(@NonNull Context context, @NonNull String id, @NonNull String webUrl, boolean request) {
         return new Intent(context, PublishShoutActivity.class)
                 .putExtra(ARGS_ID, id)
-                .putExtra(ARGS_REQUEST, request);
+                .putExtra(ARGS_REQUEST, request)
+                .putExtra(ARGS_WEB_URL, webUrl);
     }
 
     @Override
@@ -61,6 +66,25 @@ public class PublishShoutActivity extends RxAppCompatActivity {
 
         newDrawable.setColorFilter(getResources().getColor(R.color.black_54), PorterDuff.Mode.SRC_IN);
         mToolbar.getMenu().findItem(R.id.publish_share).setIcon(newDrawable);
+        mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                final int itemId = item.getItemId();
+                switch (itemId) {
+                    case R.id.publish_share: {
+                        Intent share = new Intent(android.content.Intent.ACTION_SEND);
+                        share.setType("text/plain");
+
+                        share.putExtra(Intent.EXTRA_TEXT, mWebUrl);
+
+                        startActivity(Intent.createChooser(share, "Share link!"));
+                        return true;
+                    }
+                    default:
+                        return false;
+                }
+            }
+        });
 
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,8 +95,10 @@ public class PublishShoutActivity extends RxAppCompatActivity {
 
         mToolbar.setTitle(null);
 
-        mRequest = getIntent().getExtras().getBoolean(ARGS_REQUEST);
-        mId = getIntent().getExtras().getString(ARGS_ID);
+        final Bundle extras = getIntent().getExtras();
+        mRequest = extras.getBoolean(ARGS_REQUEST);
+        mId = extras.getString(ARGS_ID);
+        mWebUrl = extras.getString(ARGS_WEB_URL);
 
         subHeader.setText(getString(R.string.published_extra_info,
                 getString(mRequest ? R.string.publish_request : R.string.publish_offer)));
@@ -85,7 +111,7 @@ public class PublishShoutActivity extends RxAppCompatActivity {
         if (mRequest) {
             startActivity(CreateRequestActivity.newIntent(this));
         } else {
-            // TODO start create shout
+            startActivity(RecordMediaActivity.newIntent(this, false));
         }
         finish();
     }

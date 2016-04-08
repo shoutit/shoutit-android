@@ -86,6 +86,7 @@ public class PublishMediaShoutFragment extends Fragment {
     private boolean mIsVideo;
 
     private String createdShoutOfferId;
+    private String mWebUrl;
 
     public static Fragment newInstance(@Nonnull String file, boolean isVideo) {
         final PublishMediaShoutFragment fragment = new PublishMediaShoutFragment();
@@ -181,6 +182,7 @@ public class PublishMediaShoutFragment extends Fragment {
                             @Override
                             public void call(CreateShoutResponse createShoutResponse) {
                                 createdShoutOfferId = createShoutResponse.getId();
+                                mWebUrl = createShoutResponse.getWebUrl();
                                 mCameraPublishedDone.setEnabled(true);
                             }
                         }, new Action1<Throwable>() {
@@ -298,7 +300,7 @@ public class PublishMediaShoutFragment extends Fragment {
                         @Override
                         public void call(CreateShoutResponse createShoutResponse) {
                             getActivity().finish();
-                            startActivity(PublishShoutActivity.newIntent(getActivity(), createdShoutOfferId, false));
+                            startActivity(PublishShoutActivity.newIntent(getActivity(), createdShoutOfferId, mWebUrl, false));
                         }
                     }, new Action1<Throwable>() {
                         @Override
@@ -313,7 +315,7 @@ public class PublishMediaShoutFragment extends Fragment {
                     });
         } else {
             getActivity().finish();
-            startActivity(PublishShoutActivity.newIntent(getActivity(), createdShoutOfferId, false));
+            startActivity(PublishShoutActivity.newIntent(getActivity(), createdShoutOfferId, mWebUrl,false));
         }
     }
 

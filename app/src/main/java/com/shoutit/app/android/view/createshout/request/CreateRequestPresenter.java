@@ -144,7 +144,7 @@ public class CreateRequestPresenter {
                     @Override
                     public void call(CreateShoutResponse responseBody) {
                         mListener.hideProgress();
-                        mListener.finishActivity(responseBody.getId());
+                        mListener.finishActivity(responseBody.getId(), responseBody.getWebUrl());
                         shoutsGlobalRefreshPresenter.refreshShouts();
                     }
                 }, new Action1<Throwable>() {
@@ -206,7 +206,7 @@ public class CreateRequestPresenter {
 
         void showTitleTooShortError(boolean show);
 
-        void finishActivity(String id);
+        void finishActivity(String id, String webUrl);
     }
 
 }
