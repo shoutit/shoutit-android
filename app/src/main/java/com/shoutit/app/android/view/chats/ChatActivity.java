@@ -165,6 +165,7 @@ public class ChatActivity extends BaseActivity implements Listener {
     @Override
     public void setData(@NonNull List<BaseAdapterItem> items) {
         chatsAdapter.call(items);
+        mChatsRecyclerview.scrollToPosition(items.size() - 1);
     }
 
     @Override

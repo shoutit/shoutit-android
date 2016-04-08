@@ -66,7 +66,7 @@ import rx.subscriptions.CompositeSubscription;
 public class ChatsFirstConversationPresenter {
 
     @SuppressLint("SimpleDateFormat")
-    private final SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("MMMMM dd, yyyy");
+    private final SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("MMMM dd, yyyy");
     @SuppressLint("SimpleDateFormat")
     private final SimpleDateFormat mSimpleTimeFormat = new SimpleDateFormat("hh:mm");
 

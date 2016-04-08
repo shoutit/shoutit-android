@@ -12,6 +12,7 @@
     <string name="facebook_app_id">353625811317277</string>
     <string name="exit_text">Press BACK again to exit</string>
     <string name="font_roboto_regular">sans-serif</string>
+    <string name="font_roboto_medium">sans-serif</string>
 
     <!-- Errors -->
     <string name="error_default">Ooops, something went wrong</string>
@@ -416,5 +417,6 @@
     <string name="filters_distance_entire_country">Entire Country</string>
     <string name="filters_sort_type_header">Sort By:</string>
     <string name="filters_price_header">Price</string>
+    <string name="chat_edit_text_hint">Type a message</string>
 
 </resources>
