@@ -235,6 +235,7 @@
     <string name="profile_stop_listening_label">Stop Listening</string>
     <string name="profile_report">Report</string>
     <string name="profile_user_shouts">%1$s SHOUTS</string>
+    <string name="profile_report_succes">Successfully reported</string>
 
     <!-- Request Shout -->
     <string name="request_activity_title">Create Request</string>
@@ -430,7 +431,10 @@
     <string name="filters_distance_entire_country">Entire Country</string>
     <string name="filters_sort_type_header">Sort By:</string>
     <string name="filters_price_header">Price</string>
-    <string name="profile_report_succes">Succesfully reported</string>
+    <string name="filters_not_set">Not set</string>
+
+
     <string name="select_shout_title">Select Shout</string>
+
 
 </resources>

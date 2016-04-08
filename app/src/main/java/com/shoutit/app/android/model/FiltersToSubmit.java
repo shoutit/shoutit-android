@@ -32,10 +32,14 @@ public class FiltersToSubmit {
     private final SortType sortType;
     @Nullable
     private final Multimap<String, CategoryFilter.FilterValue> selectedFilters;
+    @Nullable
+    private final String categorySlug;
 
     public FiltersToSubmit(@Nullable String minPriceInCents, @Nullable String maxPriceInCents, @Nonnull UserLocation userLocation, Integer distance,
-                           @Nonnull String shoutType, @Nonnull SortType sortType, @Nullable Multimap<String, CategoryFilter.FilterValue> selectedFilters) {
+                           @Nonnull String shoutType, @Nonnull SortType sortType, @Nullable Multimap<String, CategoryFilter.FilterValue> selectedFilters,
+                           @Nullable String categorySlug) {
         this.sortType = sortType;
+        this.categorySlug = categorySlug;
         this.minPriceInCents = priceToCents(Ints.tryParse(Strings.nullToEmpty(minPriceInCents)));
         this.maxPriceInCents = priceToCents(Ints.tryParse(Strings.nullToEmpty(maxPriceInCents)));
         this.userLocation = userLocation;
@@ -101,6 +105,11 @@ public class FiltersToSubmit {
         return sortType;
     }
 
+    @Nullable
+    public String getCategorySlug() {
+        return categorySlug;
+    }
+
     public boolean isEntireCountryDistance() {
         return distance == null;
     }
@@ -139,11 +148,12 @@ public class FiltersToSubmit {
                 Objects.equal(distance, that.distance) &&
                 Objects.equal(shoutType, that.shoutType) &&
                 Objects.equal(sortType, that.sortType) &&
-                Objects.equal(selectedFilters, that.selectedFilters);
+                Objects.equal(selectedFilters, that.selectedFilters) &&
+                Objects.equal(categorySlug, that.categorySlug);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(minPriceInCents, maxPriceInCents, userLocation, distance, shoutType, sortType, selectedFilters);
+        return Objects.hashCode(minPriceInCents, maxPriceInCents, userLocation, distance, shoutType, sortType, selectedFilters, categorySlug);
     }
 }

@@ -217,7 +217,7 @@ public class ShoutsDao {
                 return apiService
                         .shoutsForLocation(mLocationPointer.getCountryCode(),
                                 mLocationPointer.getCity(), null, pageNumber, PAGE_SIZE,
-                                null, null, null, null, null, null)
+                                null, null, null, null, null, null, null)
                         .subscribeOn(networkScheduler);
             }
         }
@@ -394,11 +394,12 @@ public class ShoutsDao {
                                 location.getCountry(), filtersToSubmit.getCity(), filtersToSubmit.getState(),
                                 filtersToSubmit.getMinPriceInCents(), filtersToSubmit.getMaxPriceInCents(),
                                 filtersToSubmit.getDistance(), filtersToSubmit.getShoutType(),
-                                filtersToSubmit.getSortType().getType(), filtersToSubmit.getFiltersQueryMap());
+                                filtersToSubmit.getSortType().getType(), filtersToSubmit.getCategorySlug(),
+                                filtersToSubmit.getFiltersQueryMap());
                     } else {
                         return apiService.searchShouts(query, pageNumber, PAGE_SIZE,
                                 location.getCountry(), location.getCity(), location.getState(),
-                                null, null, null, null, null, null);
+                                null, null, null, null, null, null, null);
                     }
                 case RELATED_SHOUTS:
                     return apiService.shoutsRelated(contextItemId, pageNumber, PAGE_SIZE);
@@ -408,21 +409,23 @@ public class ShoutsDao {
                                 location.getCountry(), filtersToSubmit.getCity(), filtersToSubmit.getState(),
                                 filtersToSubmit.getMinPriceInCents(), filtersToSubmit.getMaxPriceInCents(),
                                 filtersToSubmit.getDistance(), filtersToSubmit.getShoutType(),
-                                filtersToSubmit.getSortType().getType(), filtersToSubmit.getFiltersQueryMap());
+                                filtersToSubmit.getSortType().getType(), filtersToSubmit.getCategorySlug(),
+                                filtersToSubmit.getFiltersQueryMap());
                     } else {
                         return apiService.searchTagShouts(query, pageNumber, PAGE_SIZE, contextItemId,
                                 location.getCountry(), location.getCity(), location.getState(),
-                                null, null, null, null, null, null);
+                                null, null, null, null, null, null, null);
                     }
                 case DISCOVER:
                     if (filtersToSubmit != null) {
                         return apiService.searchDiscoverShouts(query, pageNumber, PAGE_SIZE, contextItemId,
                                 filtersToSubmit.getMinPriceInCents(), filtersToSubmit.getMaxPriceInCents(),
                                 filtersToSubmit.getDistance(), filtersToSubmit.getShoutType(),
-                                filtersToSubmit.getSortType().getType(), filtersToSubmit.getFiltersQueryMap());
+                                filtersToSubmit.getSortType().getType(), filtersToSubmit.getCategorySlug(),
+                                filtersToSubmit.getFiltersQueryMap());
                     } else {
                         return apiService.searchDiscoverShouts(query, pageNumber, PAGE_SIZE, contextItemId,
-                                null, null, null, null, null, null);
+                                null, null, null, null, null, null, null);
                     }
                 case BROWSE:
                     if (filtersToSubmit != null) {
@@ -430,10 +433,11 @@ public class ShoutsDao {
                                 filtersToSubmit.getState(), pageNumber, PAGE_SIZE,
                                 filtersToSubmit.getMinPriceInCents(), filtersToSubmit.getMaxPriceInCents(),
                                 filtersToSubmit.getDistance(), filtersToSubmit.getShoutType(),
-                                filtersToSubmit.getSortType().getType(), filtersToSubmit.getFiltersQueryMap());
+                                filtersToSubmit.getSortType().getType(), filtersToSubmit.getCategorySlug(),
+                                filtersToSubmit.getFiltersQueryMap());
                     } else {
                         return apiService.shoutsForLocation(location.getCountry(), location.getCity(),
-                                location.getState(), pageNumber, PAGE_SIZE, null, null, null, null, null, null);
+                                location.getState(), pageNumber, PAGE_SIZE, null, null, null, null, null, null, null);
                     }
                 default:
                     throw new RuntimeException("Unknwon profile type: " + SearchPresenter.SearchType.values()[searchType.ordinal()]);

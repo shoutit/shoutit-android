@@ -43,6 +43,7 @@ import rx.Scheduler;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.functions.Func7;
+import rx.functions.Func8;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
@@ -284,7 +285,8 @@ public class FiltersPresenter {
                 shoutTypeObservable,
                 sortTypeObservable,
                 selectedValuesMapObservable,
-                new Func7<String, String, UserLocation, Integer, String, SortType, Multimap<String, CategoryFilter.FilterValue>, FiltersToSubmit>() {
+                selectedCategoryObservable,
+                new Func8<String, String, UserLocation, Integer, String, SortType, Multimap<String, CategoryFilter.FilterValue>, Category, FiltersToSubmit>() {
                     @Override
                     public FiltersToSubmit call(String minPrice,
                                                 String maxPrice,
@@ -292,8 +294,10 @@ public class FiltersPresenter {
                                                 Integer distance,
                                                 String shoutType,
                                                 SortType sortType,
-                                                Multimap<String, CategoryFilter.FilterValue> selectedValues) {
-                        return new FiltersToSubmit(minPrice, maxPrice, userLocation, distance, shoutType, sortType, selectedValues);
+                                                Multimap<String, CategoryFilter.FilterValue> selectedValues,
+                                                Category category) {
+                        final String categorySlug = DEFAULT_CATEGORY_SLUG.equals(category.getSlug()) ? null : category.getSlug();
+                        return new FiltersToSubmit(minPrice, maxPrice, userLocation, distance, shoutType, sortType, selectedValues, categorySlug);
                     }
                 })
                 .lift(OperatorSampleWithLastWithObservable.<FiltersToSubmit>create(doneClickedSubject));

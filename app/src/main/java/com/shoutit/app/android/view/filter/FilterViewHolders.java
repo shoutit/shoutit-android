@@ -624,11 +624,11 @@ public class FilterViewHolders {
                                 @Override
                                 public void call(ImmutableMultimap<String, CategoryFilter.FilterValue> selectedValuesMap) {
                                     final ImmutableCollection<CategoryFilter.FilterValue> filterValues = selectedValuesMap.get(item.getFilterSlug());
-                                    if (filterValues != null) {
+                                    if (filterValues != null && !filterValues.isEmpty()) {
                                         final String selectedValues = item.getSelectedValues(filterValues);
                                         valuesTv.setText(selectedValues);
                                     } else {
-                                        valuesTv.setText(null);
+                                        valuesTv.setText(context.getString(R.string.filters_not_set));
                                     }
                                 }
                             });
