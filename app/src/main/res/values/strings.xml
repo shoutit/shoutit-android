@@ -206,6 +206,7 @@
     <string name="shout_visit_profile">VISIT %1$s\'s PROFILE</string>
     <string name="shout_bottom_bar_delete">Delete</string>
     <string name="shout_bottom_bar_edit">Edit</string>
+    <string name="shout_choose_video_app">Choose application</string>
 
     <!-- Account -->
     <string name="account_email_changed">Email successfully changed</string>
@@ -236,6 +237,7 @@
     <string name="profile_report">Report</string>
     <string name="profile_user_shouts">%1$s SHOUTS</string>
     <string name="profile_report_succes">Successfully reported</string>
+    <string name="profile_not_listening">This useer is not listening to you.</string>
 
     <!-- Request Shout -->
     <string name="request_activity_title">Create Request</string>
@@ -432,7 +434,6 @@
     <string name="filters_sort_type_header">Sort By:</string>
     <string name="filters_price_header">Price</string>
     <string name="filters_not_set">Not set</string>
-
 
     <string name="select_shout_title">Select Shout</string>
 

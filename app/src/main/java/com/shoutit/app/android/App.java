@@ -112,7 +112,7 @@ public class App extends MultiDexApplication {
                 .subscribe(new Action1<String>() {
                     @Override
                     public void call(String apiKey) {
-//                        initializeVideoCalls(apiKey);
+                        initializeVideoCalls(apiKey);
                         Log.d("TWILIO", "MY API KEY: " + apiKey);
                     }
                 });

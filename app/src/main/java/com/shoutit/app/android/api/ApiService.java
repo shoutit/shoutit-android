@@ -21,8 +21,8 @@ import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.GuestSignupRequest;
 import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessagesResponse;
-import com.shoutit.app.android.api.model.PostMessage;
 import com.shoutit.app.android.api.model.NotificationsResponse;
+import com.shoutit.app.android.api.model.PostMessage;
 import com.shoutit.app.android.api.model.RegisterDeviceRequest;
 import com.shoutit.app.android.api.model.RelatedTagsResponse;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
@@ -345,7 +345,12 @@ public interface ApiService {
     @POST("profiles/{id}/chat")
     Observable<Message> createChatConversation(@NonNull @Path("id") String userName, @NonNull @Body PostMessage message);
 
-    /** Notifications **/
+    @DELETE("conversations/{id}")
+    Observable<ResponseBody> deleteConversation(@Path("id") String conversationId);
+
+    /**
+     * Notifications
+     **/
     @GET("notifications")
     Observable<NotificationsResponse> notifications();
 
@@ -355,10 +360,13 @@ public interface ApiService {
     @POST("notifications/{id}/read")
     Observable<ResponseBody> markAsRead(@Path("id") String notificationId);
 
-    /** Twilio **/
+    /**
+     * Twilio
+     **/
     @POST("twilio/video_auth")
     Observable<TwilioResponse> getTokenAndIdentity();
 
     @GET("twilio/video_identity")
     Observable<UserIdentity> getUserIdentity(@Query("profile") String username);
+
 }

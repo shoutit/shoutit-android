@@ -36,6 +36,7 @@ import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.PusherHelper;
 import com.shoutit.app.android.view.chats.message_models.DateItem;
+import com.shoutit.app.android.view.chats.message_models.InfoItem;
 import com.shoutit.app.android.view.chats.message_models.ReceivedImageMessage;
 import com.shoutit.app.android.view.chats.message_models.ReceivedLocationMessage;
 import com.shoutit.app.android.view.chats.message_models.ReceivedShoutMessage;
@@ -58,6 +59,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
+import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
@@ -121,6 +123,7 @@ public class ChatsPresenter {
     private final PusherHelper mPusher;
     private final Gson mGson;
     private final AmazonHelper mAmazonHelper;
+    private final boolean mIsShoutConversation;
     private Listener mListener;
     private CompositeSubscription mSubscribe = new CompositeSubscription();
     private final PublishSubject<Object> requestSubject = PublishSubject.create();
@@ -136,7 +139,8 @@ public class ChatsPresenter {
                           @ForActivity Context context,
                           PusherHelper pusher,
                           Gson gson,
-                          AmazonHelper amazonHelper) {
+                          AmazonHelper amazonHelper,
+                          boolean isShoutConversation) {
         this.conversationId = conversationId;
         mApiService = apiService;
         mUiScheduler = uiScheduler;
@@ -147,6 +151,7 @@ public class ChatsPresenter {
         mPusher = pusher;
         mGson = gson;
         mAmazonHelper = amazonHelper;
+        mIsShoutConversation = isShoutConversation;
     }
 
     public void register(@NonNull Listener listener) {
@@ -241,27 +246,29 @@ public class ChatsPresenter {
                     }
                 }));
 
-        mSubscribe.add(mApiService.getConversation(conversationId)
-                .subscribeOn(mNetworkScheduler)
-                .observeOn(mUiScheduler)
-                .subscribe(new Action1<Conversation>() {
-                    @Override
-                    public void call(Conversation conversationResponse) {
-                        final AboutShout about = conversationResponse.getAbout();
-                        final String title = about.getTitle();
-                        final String thumbnail = Strings.emptyToNull(about.getThumbnail());
-                        final String type = about.getType().equals(Shout.TYPE_OFFER) ? "Offer" : "Request";
-                        final String price = PriceUtils.formatPriceWithCurrency(about.getPrice(), mResources, about.getCurrency());
-                        final String authorAndTime = about.getProfile().getName() + DateUtils.getRelativeTimeSpanString(mContext, about.getDatePublished() * 1000);
+        if (mIsShoutConversation) {
+            mSubscribe.add(mApiService.getConversation(conversationId)
+                    .subscribeOn(mNetworkScheduler)
+                    .observeOn(mUiScheduler)
+                    .subscribe(new Action1<Conversation>() {
+                        @Override
+                        public void call(Conversation conversationResponse) {
+                            final AboutShout about = conversationResponse.getAbout();
+                            final String title = about.getTitle();
+                            final String thumbnail = Strings.emptyToNull(about.getThumbnail());
+                            final String type = about.getType().equals(Shout.TYPE_OFFER) ? "Offer" : "Request";
+                            final String price = PriceUtils.formatPriceWithCurrency(about.getPrice(), mResources, about.getCurrency());
+                            final String authorAndTime = about.getProfile().getName() + DateUtils.getRelativeTimeSpanString(mContext, about.getDatePublished() * 1000);
 
-                        mListener.setAboutShoutData(title, thumbnail, type, price, authorAndTime);
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        mListener.error(throwable);
-                    }
-                }));
+                            mListener.setAboutShoutData(title, thumbnail, type, price, authorAndTime);
+                        }
+                    }, new Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable throwable) {
+                            mListener.error(throwable);
+                        }
+                    }));
+        }
     }
 
     @NonNull
@@ -355,7 +362,7 @@ public class ChatsPresenter {
                 return getReceivedItem(message, isFirst, time);
             }
         } else {
-            return null; // TODO handle special message
+            return new InfoItem(results.get(currentPosition).getText());
         }
     }
 
@@ -441,8 +448,8 @@ public class ChatsPresenter {
             try {
                 final File videoThumbnail = MediaUtils.createVideoThumbnail(mContext, Uri.parse(media));
                 final int videoLength = MediaUtils.getVideoLength(mContext, media);
-                final Observable<String> videoFileObservable = mAmazonHelper.uploadShoutMediaObservable(AmazonHelper.getfileFromPath(media));
-                final Observable<String> thumbFileObservable = mAmazonHelper.uploadShoutMediaObservable(AmazonHelper.getfileFromPath(videoThumbnail.getAbsolutePath()));
+                final Observable<String> videoFileObservable = mAmazonHelper.uploadShoutMediaVideoObservable(AmazonHelper.getfileFromPath(media));
+                final Observable<String> thumbFileObservable = mAmazonHelper.uploadShoutMediaImageObservable(AmazonHelper.getfileFromPath(videoThumbnail.getAbsolutePath()));
                 mSubscribe.add(Observable
                         .zip(videoFileObservable, thumbFileObservable, new Func2<String, String, Video>() {
                             @Override
@@ -477,7 +484,7 @@ public class ChatsPresenter {
                 mListener.error(e);
             }
         } else {
-            mSubscribe.add(mAmazonHelper.uploadShoutMediaObservable(AmazonHelper.getfileFromPath(media))
+            mSubscribe.add(mAmazonHelper.uploadShoutMediaImageObservable(AmazonHelper.getfileFromPath(media))
                     .flatMap(new Func1<String, Observable<Message>>() {
                         @Override
                         public Observable<Message> call(String url) {
@@ -525,6 +532,24 @@ public class ChatsPresenter {
                     @Override
                     public void call(Message message) {
                         postLocalMessage(message);
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        mListener.error(throwable);
+                    }
+                });
+    }
+
+
+    public void deleteShout() {
+        mApiService.deleteConversation(conversationId)
+                .observeOn(mUiScheduler)
+                .subscribeOn(mNetworkScheduler)
+                .subscribe(new Action1<ResponseBody>() {
+                    @Override
+                    public void call(ResponseBody responseBody) {
+                        mListener.conversationDeleted();
                     }
                 }, new Action1<Throwable>() {
                     @Override

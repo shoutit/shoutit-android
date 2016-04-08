@@ -25,7 +25,6 @@ import com.shoutit.app.android.dao.UsersIdentityDao;
 import com.shoutit.app.android.model.MobilePhoneResponse;
 import com.shoutit.app.android.model.RelatedShoutsPointer;
 import com.shoutit.app.android.model.UserShoutsPointer;
-import com.shoutit.app.android.utils.rx.RxMoreObservers;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
 import java.util.List;
@@ -80,6 +79,8 @@ public class ShoutPresenter {
     @Nonnull
     private final Scheduler uiScheduler;
     @Nonnull
+    private final UserPreferences mUserPreferences;
+    @Nonnull
     private final PublishSubject<Object> callOrDeleteSubject = PublishSubject.create();
     private final PublishSubject<String> sendReportObserver = PublishSubject.create();
 
@@ -92,6 +93,7 @@ public class ShoutPresenter {
                           @Nonnull UserPreferences userPreferences,
                           @Nonnull final UsersIdentityDao usersIdentityDao) {
         this.uiScheduler = uiScheduler;
+        mUserPreferences = userPreferences;
 
         /** Requests **/
         final Observable<ResponseOrError<Shout>> shoutResponse = shoutsDao.getShoutObservable(shoutId)
@@ -462,7 +464,7 @@ public class ShoutPresenter {
                             @Override
                             public BottomBarData call(Boolean isUserShoutOwner, List<Conversation> conversations) {
                                 final boolean hasConversation = conversations != null && !conversations.isEmpty();
-                                return new BottomBarData(isUserShoutOwner, hasConversation, hasConversation ? conversations.get(0).getId() : null);
+                                return new BottomBarData(isUserShoutOwner, hasConversation, hasConversation ? conversations.get(0).getId() : null, mUserPreferences.isUserLoggedIn());
                             }
                         });
                     }
@@ -519,11 +521,13 @@ public class ShoutPresenter {
         private final boolean isUserShoutOwner;
         private final boolean hasConversation;
         private final String conversationId;
+        private final boolean isLoggedIn;
 
-        public BottomBarData(boolean isUserShoutOwner, boolean hasConversation, String conversationId) {
+        public BottomBarData(boolean isUserShoutOwner, boolean hasConversation, String conversationId, boolean isLoggedIn) {
             this.isUserShoutOwner = isUserShoutOwner;
             this.hasConversation = hasConversation;
             this.conversationId = conversationId;
+            this.isLoggedIn = isLoggedIn;
         }
 
         public boolean isUserShoutOwner() {
@@ -536,6 +540,10 @@ public class ShoutPresenter {
 
         public String getConversationId() {
             return conversationId;
+        }
+
+        public boolean isLoggedIn() {
+            return isLoggedIn;
         }
     }
 }

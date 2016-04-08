@@ -62,7 +62,8 @@ public class ShoutMediaPresenterTest {
         when(Uri.parse(anyString())).thenReturn(uri);
         when(uri.getLastPathSegment()).thenReturn("video");
         when(MediaUtils.createVideoThumbnail(any(Context.class), any(Uri.class))).thenReturn(new File(""));
-        when(mAmazonHelper.uploadShoutMediaObservable(any(File.class))).thenReturn(Observable.just("test"));
+        when(mAmazonHelper.uploadShoutMediaImageObservable(any(File.class))).thenReturn(Observable.just("test"));
+        when(mAmazonHelper.uploadShoutMediaVideoObservable(any(File.class))).thenReturn(Observable.just("test"));
         mShoutMediaPresenter = new ShoutMediaPresenter(context, mAmazonHelper);
     }
 
