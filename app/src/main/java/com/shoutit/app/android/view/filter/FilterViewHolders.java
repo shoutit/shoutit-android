@@ -168,6 +168,8 @@ public class FilterViewHolders {
         ImageView categoryIcon;
         @Bind(R.id.filters_category_spinner)
         Spinner categorySpinner;
+        @Bind(R.id.filters_category_item_root_view)
+        View rootView;
 
         private final Picasso picasso;
         private final CategorySpinnerAdapter spinnerAdapter;
@@ -193,6 +195,9 @@ public class FilterViewHolders {
                 categorySpinner.setAdapter(spinnerAdapter);
                 spinnerAdapter.bindData(item.getCategories().values());
             }
+
+            rootView.setClickable(item.shouldBlockCategories());
+            rootView.setAlpha(item.shouldBlockCategories() ? 0.5f : 1f);
 
             runnable = new Runnable() {
                 @Override

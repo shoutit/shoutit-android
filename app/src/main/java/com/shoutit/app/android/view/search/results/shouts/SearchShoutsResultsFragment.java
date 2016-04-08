@@ -76,6 +76,7 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
     private ActionBarDrawerToggle drawerToggle;
     private SearchPresenter.SearchType searchType;
     private String searchQuery;
+    private String contextualItemId;
 
     public static Fragment newInstance(@Nullable String searchQuery,
                                        @Nullable String contextualItemId,
@@ -105,11 +106,12 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
         searchType = (SearchPresenter.SearchType)
                 checkNotNull(getArguments().getSerializable(SearchShoutsResultsActivity.KEY_SEARCH_TYPE));
         searchQuery = getArguments().getString(SearchShoutsResultsActivity.KEY_SEARCH_QUERY);
+        contextualItemId = getArguments().getString(SearchShoutsResultsActivity.KEY_CONTEXTUAL_ITEM_ID);
 
         if (savedInstanceState == null && shouldShowFilters()) {
             getChildFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.filter_drawer, FiltersFragment.newInstance())
+                    .replace(R.id.filter_drawer, FiltersFragment.newInstance(searchType, contextualItemId))
                     .commit();
         }
 
