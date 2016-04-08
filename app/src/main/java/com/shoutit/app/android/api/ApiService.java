@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.ChangePasswordRequest;
+import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.ConversationsResponse;
 import com.shoutit.app.android.api.model.CreateOfferShoutWithImageRequest;
 import com.shoutit.app.android.api.model.CreateRequestShoutRequest;
@@ -22,6 +23,7 @@ import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessagesResponse;
 import com.shoutit.app.android.api.model.PostMessage;
 import com.shoutit.app.android.api.model.NotificationsResponse;
+import com.shoutit.app.android.api.model.RegisterDeviceRequest;
 import com.shoutit.app.android.api.model.RelatedTagsResponse;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.api.model.SearchProfileResponse;
@@ -43,11 +45,14 @@ import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.login.EmailLoginRequest;
 import com.shoutit.app.android.api.model.login.FacebookLogin;
 import com.shoutit.app.android.api.model.login.GoogleLogin;
+import com.shoutit.app.android.model.MobilePhoneResponse;
+import com.shoutit.app.android.model.ReportBody;
 
 import java.util.List;
 import java.util.Map;
 
 import okhttp3.ResponseBody;
+import retrofit2.Response;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
@@ -214,6 +219,8 @@ public interface ApiService {
     @PATCH("profiles/me")
     Observable<User> updateUser(@Body UpdateUserRequest updateUserRequest);
 
+    @PATCH("profiles/me")
+    Observable<User> registerGcmToken(@Body RegisterDeviceRequest registerDeviceRequest);
 
     /**
      * Profile
@@ -252,6 +259,9 @@ public interface ApiService {
     @GET("misc/currencies")
     Observable<List<Currency>> getCurrencies();
 
+    @POST("misc/reports")
+    Observable<Response<Object>> report(@Body ReportBody reportShoutBody);
+
     /**
      * Auth
      **/
@@ -283,6 +293,12 @@ public interface ApiService {
     @GET("shouts/{id}")
     Observable<ShoutResponse> getShout(@Path("id") String id);
 
+    @DELETE("shouts/{id}")
+    Observable<Response<Object>> deleteShout(@Path("id") String id);
+
+    @GET("shouts/{id}/call")
+    Observable<MobilePhoneResponse> shoutCall(@Path("id") String id);
+
     /**
      * Tags
      **/
@@ -306,6 +322,9 @@ public interface ApiService {
 
     @GET("conversations")
     Observable<ConversationsResponse> getConversations(@NonNull @Query("after") String timestamp);
+
+    @GET("conversations/{id}")
+    Observable<Conversation> getConversation(@NonNull @Path("id") String id);
 
     @GET("conversations/{id}/messages")
     Observable<MessagesResponse> getMessages(@NonNull @Path("id") String conversationId);

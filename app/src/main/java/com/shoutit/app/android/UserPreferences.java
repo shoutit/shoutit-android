@@ -35,6 +35,7 @@ public class UserPreferences {
     private static final String IS_GUEST = "is_guest";
     private static final String KEY_LOCATION_TRACKING = "location_tracking";
     private static final String SHOULD_ASK_FOR_INTEREST = "is_first_run";
+    private static final String GCM_PUSH_TOKEN = "gcm_push_token";
     private static final String IS_CALL_REJECTED = "call_rejected";
 
     private final PublishSubject<Object> userRefreshSubject = PublishSubject.create();
@@ -156,6 +157,15 @@ public class UserPreferences {
 
     public void setShouldAskForInterestTrue() {
         mPreferences.edit().putBoolean(SHOULD_ASK_FOR_INTEREST, true).apply();
+    }
+
+    public void setGcmPushToken(String gcmPushToken) {
+        mPreferences.edit().putString(GCM_PUSH_TOKEN, gcmPushToken).apply();
+    }
+
+    @Nullable
+    public String getGcmPushToken() {
+        return mPreferences.getString(GCM_PUSH_TOKEN, null);
     }
 
     public boolean shouldAskForInterestAndSetToFalse() {

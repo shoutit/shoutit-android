@@ -5,11 +5,13 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.text.format.DateUtils;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.operators.OperatorMergeNextToken;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -17,6 +19,8 @@ import com.google.gson.Gson;
 import com.pusher.client.channel.PresenceChannel;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.AboutShout;
+import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.ConversationProfile;
 import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessageAttachment;
@@ -24,6 +28,7 @@ import com.shoutit.app.android.api.model.MessagesResponse;
 import com.shoutit.app.android.api.model.PostMessage;
 import com.shoutit.app.android.api.model.PusherMessage;
 import com.shoutit.app.android.api.model.Shout;
+import com.shoutit.app.android.api.model.ShoutResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ForActivity;
@@ -147,7 +152,7 @@ public class ChatsPresenter {
     public void register(@NonNull Listener listener) {
         final User user = mUserPreferences.getUser();
         assert user != null;
-        final PresenceChannel userChannel = mPusher.getPusher().subscribePresence(String.format("presence-u-%1$s", user.getId()));
+        final PresenceChannel userChannel = mPusher.getPusher().getPresenceChannel(String.format("presence-u-%1$s", user.getId()));
 
         final Observable<PusherMessage> pusherMessageObservable = Observable
                 .create(new Observable.OnSubscribe<PusherMessage>() {
@@ -232,6 +237,28 @@ public class ChatsPresenter {
                     @Override
                     public void call(Throwable throwable) {
                         mListener.showProgress(false);
+                        mListener.error(throwable);
+                    }
+                }));
+
+        mSubscribe.add(mApiService.getConversation(conversationId)
+                .subscribeOn(mNetworkScheduler)
+                .observeOn(mUiScheduler)
+                .subscribe(new Action1<Conversation>() {
+                    @Override
+                    public void call(Conversation conversationResponse) {
+                        final AboutShout about = conversationResponse.getAbout();
+                        final String title = about.getTitle();
+                        final String thumbnail = Strings.emptyToNull(about.getThumbnail());
+                        final String type = about.getType().equals(Shout.TYPE_OFFER) ? "Offer" : "Request";
+                        final String price = PriceUtils.formatPriceWithCurrency(about.getPrice(), mResources, about.getCurrency());
+                        final String authorAndTime = about.getProfile().getName() + " - "  + DateUtils.getRelativeTimeSpanString(mContext, about.getDatePublished() * 1000);
+
+                        mListener.setAboutShoutData(title, thumbnail, type, price, authorAndTime);
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
                         mListener.error(throwable);
                     }
                 }));
@@ -361,15 +388,15 @@ public class ChatsPresenter {
                 final MessageAttachment.MessageLocation location = messageAttachment.getLocation();
                 return new ReceivedLocationMessage(isFirst, time, avatarUrl, mListener, location.getLatitude(), location.getLongitude());
             } else if (MessageAttachment.ATTACHMENT_TYPE_SHOUT.equals(type)) {
-                final Shout shout = messageAttachment.getShout();
+                final MessageAttachment.AttachtmentShout shout = messageAttachment.getShout();
                 return new ReceivedShoutMessage(
                         isFirst,
                         shout.getThumbnail(),
                         time,
                         PriceUtils.formatPriceWithCurrency(shout.getPrice(), mResources, shout.getCurrency()),
                         shout.getText(),
-                        shout.getProfile().getName(),
-                        avatarUrl);
+                        shout.getUser().getName(),
+                        avatarUrl, mListener, shout.getId());
             } else {
                 throw new RuntimeException(type);
             }
@@ -395,8 +422,8 @@ public class ChatsPresenter {
                 final MessageAttachment.MessageLocation location = messageAttachment.getLocation();
                 return new SentLocationMessage(time, mListener, location.getLatitude(), location.getLongitude());
             } else if (MessageAttachment.ATTACHMENT_TYPE_SHOUT.equals(type)) {
-                final Shout shout = messageAttachment.getShout();
-                return new SentShoutMessage(shout.getThumbnail(), time, PriceUtils.formatPriceWithCurrency(shout.getPrice(), mResources, shout.getCurrency()), shout.getText(), shout.getProfile().getName());
+                final MessageAttachment.AttachtmentShout shout = messageAttachment.getShout();
+                return new SentShoutMessage(shout.getThumbnail(), time, PriceUtils.formatPriceWithCurrency(shout.getPrice(), mResources, shout.getCurrency()), shout.getText(), shout.getUser().getName(), mListener, shout.getId());
             } else {
                 throw new RuntimeException(type);
             }
@@ -406,8 +433,6 @@ public class ChatsPresenter {
     public void unregister() {
         mListener = null;
         mSubscribe.unsubscribe();
-        mPusher.getPusher().unsubscribe(String.format("presence-c-%1$s", conversationId));
-        mPusher.getPusher().unsubscribe(String.format("presence-u-%1$s", mUserPreferences.getUser().getId()));
     }
 
     public void addMedia(@NonNull String media, boolean isVideo) {
@@ -496,6 +521,42 @@ public class ChatsPresenter {
         mApiService.postMessage(conversationId, new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_LOCATION, new MessageAttachment.MessageLocation(latitude, longitude), null, null, null))))
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
+                .subscribe(new Action1<Message>() {
+                    @Override
+                    public void call(Message message) {
+                        postLocalMessage(message);
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        mListener.error(throwable);
+                    }
+                });
+    }
+
+    public void sendShout(final String shoutId) {
+        mApiService.getShout(shoutId)
+                .subscribeOn(mNetworkScheduler)
+                .observeOn(mUiScheduler)
+                .flatMap(new Func1<ShoutResponse, Observable<Message>>() {
+                    @Override
+                    public Observable<Message> call(ShoutResponse shoutResponse) {
+                        final List<String> images = shoutResponse.getImages();
+                        final List<Video> videos = shoutResponse.getVideos();
+                        String thumbnail = null;
+                        String videoUrl = null;
+                        if (videos != null && !videos.isEmpty()) {
+                            final Video video = videos.get(0);
+                            thumbnail = video.getThumbnailUrl();
+                            videoUrl = video.getUrl();
+                        } else if (images != null && !images.isEmpty()) {
+                            thumbnail = images.get(0);
+                        }
+                        return mApiService.postMessage(conversationId, new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_LOCATION, null, new MessageAttachment.AttachtmentShout(shoutId, null, null, shoutResponse.getType(), shoutResponse.getLocation(), shoutResponse.getTitle(), shoutResponse.getText(), shoutResponse.getPrice(), 0, shoutResponse.getCurrency(), thumbnail, videoUrl, shoutResponse.getProfile(), shoutResponse.getCategory(), shoutResponse.getDatePublished(), 0), null, null))))
+                                .subscribeOn(mNetworkScheduler)
+                                .observeOn(mUiScheduler);
+                    }
+                })
                 .subscribe(new Action1<Message>() {
                     @Override
                     public void call(Message message) {

@@ -11,9 +11,10 @@ public class EditShoutRequest {
     private final List<FilterValue> filters;
     private final List<String> images;
     private final List<Video> videos;
+    private final String mobile;
 
     public EditShoutRequest(String title, String text, UserLocationSimple location, String category,
-                            List<FilterValue> filters, List<String> images, List<Video> videos) {
+                            List<FilterValue> filters, List<String> images, List<Video> videos, String mobile) {
         this.title = title;
         this.text = text;
         this.location = location;
@@ -21,6 +22,7 @@ public class EditShoutRequest {
         this.filters = filters;
         this.images = images;
         this.videos = videos;
+        this.mobile = mobile;
     }
 
     public static class FilterValue {

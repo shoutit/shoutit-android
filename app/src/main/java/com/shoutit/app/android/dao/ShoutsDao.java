@@ -18,7 +18,9 @@ import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.constants.RequestsConstants;
 import com.shoutit.app.android.model.FiltersToSubmit;
 import com.shoutit.app.android.model.LocationPointer;
+import com.shoutit.app.android.model.MobilePhoneResponse;
 import com.shoutit.app.android.model.RelatedShoutsPointer;
+import com.shoutit.app.android.model.ReportBody;
 import com.shoutit.app.android.model.SearchShoutPointer;
 import com.shoutit.app.android.model.TagShoutsPointer;
 import com.shoutit.app.android.model.UserShoutsPointer;
@@ -28,9 +30,11 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
+import retrofit2.Response;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
+import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
 public class ShoutsDao {
@@ -143,6 +147,11 @@ public class ShoutsDao {
     }
 
     @Nonnull
+    public RelatedShoutsDao getRelatedShoutsDao(@Nonnull RelatedShoutsPointer pointer) {
+        return relatedShoutsCache.getUnchecked(pointer);
+    }
+
+    @Nonnull
     public Observable<ResponseOrError<ShoutsResponse>> getTagsShoutsObservable(@Nonnull TagShoutsPointer pointer) {
         return tagsShoutsCache.getUnchecked(pointer).getShoutsObservable();
     }
@@ -160,6 +169,31 @@ public class ShoutsDao {
     @Nonnull
     public Observer<Object> getHomeShoutsRefreshObserver(LocationPointer pointer) {
         return homeCache.getUnchecked(pointer).getRefreshObserver();
+    }
+
+    @Nonnull
+    public Observable<ResponseOrError<MobilePhoneResponse>> getShoutMobilePhoneObservable(@Nonnull String shoutId) {
+        return shoutCache.getUnchecked(shoutId).getShoutMobileObservable();
+    }
+
+    @Nonnull
+    public Observer<Object> getDeleteShoutObserver(@Nonnull String shoutId) {
+        return shoutCache.getUnchecked(shoutId).getDeleteShoutObserver();
+    }
+
+    @Nonnull
+    public Observable<Response<Object>> getDeleteShoutObservable(@Nonnull String shoutId) {
+        return shoutCache.getUnchecked(shoutId).getDeleteShoutResponseObservable();
+    }
+
+    @Nonnull
+    public Observer<String> getReportShoutObserver(String shoutId) {
+        return shoutCache.getUnchecked(shoutId).getReportShoutObserver();
+    }
+
+    @Nonnull
+    public Observable<Response<Object>> getReportShoutObservable(@Nonnull String shoutId) {
+        return shoutCache.getUnchecked(shoutId).getReportShoutResponseObservable();
     }
 
     public class HomeShoutsDao extends BaseShoutsDao {
@@ -193,11 +227,22 @@ public class ShoutsDao {
         @Nonnull
         private Observable<ResponseOrError<Shout>> shoutObservable;
         @Nonnull
+        private Observable<ResponseOrError<MobilePhoneResponse>> shoutMobileObservable;
+        @Nonnull
+        private final PublishSubject<Object> deleteShoutObserver = PublishSubject.create();
+        @Nonnull
+        private final Observable<Response<Object>> deleteShoutResponseObservable;
+        @Nonnull
+        private final PublishSubject<String> reportShoutObserver = PublishSubject.create();
+        @Nonnull
+        private final Observable<Response<Object>> reportShoutResponseObservable;
+
+        @Nonnull
         protected final PublishSubject<Object> refreshShoutsSubject = PublishSubject.create();
 
-        public ShoutDao(@Nonnull String shoutId) {
+        public ShoutDao(@Nonnull final String shoutId) {
             final Observable<Object> refreshWithCache = Observable
-                    .interval(2, TimeUnit.MINUTES, networkScheduler)
+                    .interval(5, TimeUnit.MINUTES, networkScheduler)
                     .map(Functions1.toObject());
 
             shoutObservable = apiService.shout(shoutId)
@@ -206,6 +251,30 @@ public class ShoutsDao {
                     .compose(ResponseOrError.<Shout>toResponseOrErrorObservable())
                     .compose(MoreOperators.<ResponseOrError<Shout>>refresh(refreshWithCache))
                     .compose(MoreOperators.<ResponseOrError<Shout>>cacheWithTimeout(networkScheduler));
+
+            shoutMobileObservable = apiService.shoutCall(shoutId)
+                    .subscribeOn(networkScheduler)
+                    .compose(MoreOperators.<MobilePhoneResponse>refresh(refreshShoutsSubject))
+                    .compose(ResponseOrError.<MobilePhoneResponse>toResponseOrErrorObservable())
+                    .compose(MoreOperators.<ResponseOrError<MobilePhoneResponse>>cacheWithTimeout(networkScheduler));
+
+            deleteShoutResponseObservable = deleteShoutObserver
+                    .flatMap(new Func1<Object, Observable<Response<Object>>>() {
+                        @Override
+                        public Observable<Response<Object>> call(Object o) {
+                            return apiService.deleteShout(shoutId)
+                                    .subscribeOn(networkScheduler);
+                        }
+                    });
+
+            reportShoutResponseObservable = reportShoutObserver
+                    .flatMap(new Func1<String, Observable<Response<Object>>>() {
+                        @Override
+                        public Observable<Response<Object>> call(String body) {
+                            return apiService.report(ReportBody.forShout(shoutId, body))
+                                    .subscribeOn(networkScheduler);
+                        }
+                    });
 
         }
 
@@ -217,6 +286,31 @@ public class ShoutsDao {
         @Nonnull
         public Observer<Object> getRefreshObserver() {
             return refreshShoutsSubject;
+        }
+
+        @Nonnull
+        public Observable<ResponseOrError<MobilePhoneResponse>> getShoutMobileObservable() {
+            return shoutMobileObservable;
+        }
+
+        @Nonnull
+        public Observer<Object> getDeleteShoutObserver() {
+            return deleteShoutObserver;
+        }
+
+        @Nonnull
+        public Observable<Response<Object>> getDeleteShoutResponseObservable() {
+            return deleteShoutResponseObservable;
+        }
+
+        @Nonnull
+        public Observable<Response<Object>> getReportShoutResponseObservable() {
+            return reportShoutResponseObservable;
+        }
+
+        @Nonnull
+        public PublishSubject<String> getReportShoutObserver() {
+            return reportShoutObserver;
         }
     }
 

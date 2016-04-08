@@ -98,6 +98,8 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     ImageView mEditCurrencyInfo;
     @Bind(R.id.edit_media_container)
     LinearLayout mEditMediaContainer;
+    @Bind(R.id.edit_shout_mobile)
+    EditText mobileEditText;
 
     @Inject
     EditShoutPresenter mEditShoutPresenter;
@@ -279,6 +281,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
         if (show) {
             mEditLayout.setErrorEnabled(true);
             mEditLayout.setError(getString(R.string.create_request_activity_title_too_short));
+            hideProgress();
         } else {
             mEditLayout.setErrorEnabled(false);
         }
@@ -394,6 +397,11 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     }
 
     @Override
+    public void setMobilePhone(@Nullable String mobileHint) {
+        mobileEditText.setText(mobileHint);
+    }
+
+    @Override
     public void setImages(@NonNull Map<Integer, ShoutMediaPresenter.Item> mediaElements) {
         mEditMediaContainer.removeAllViews();
 
@@ -445,13 +453,14 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     @SuppressWarnings("unchecked")
     @Override
     public void mediaEditionCompleted(@NonNull List<String> images, @NonNull List<Video> videos) {
+        final String mobile = mobileEditText.getText().toString();
         final EditShoutPresenter.RequestData requestData = new EditShoutPresenter.RequestData(
                 mTitle.getText().toString(),
                 mEditShoutDescription.getText().toString(),
                 mEditBudget.getText().toString(),
                 ((PriceUtils.SpinnerCurrency) mEditCurrencySpinner.getSelectedItem()).getCode(),
                 ((Pair<String, String>) mEditCategorySpinner.getSelectedItem()).first,
-                getSelectedOptions(), images, videos);
+                getSelectedOptions(), images, videos, (Strings.isNullOrEmpty(mobile) || mobile.endsWith(".")) ? null : mobile);
         mEditShoutPresenter.dataReady(requestData);
     }
 

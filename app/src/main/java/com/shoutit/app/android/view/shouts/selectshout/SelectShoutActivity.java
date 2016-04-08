@@ -1,0 +1,124 @@
+package com.shoutit.app.android.view.shouts.selectshout;
+
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.ProgressBar;
+
+import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.jakewharton.rxbinding.view.RxView;
+import com.shoutit.app.android.App;
+import com.shoutit.app.android.BaseActivity;
+import com.shoutit.app.android.BaseShoutsItemDecoration;
+import com.shoutit.app.android.R;
+import com.shoutit.app.android.dagger.ActivityModule;
+import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.LayoutManagerHelper;
+
+import java.util.List;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import rx.functions.Action1;
+
+public class SelectShoutActivity extends BaseActivity {
+
+    public static final String RESULT_SHOUT_ID = "extra_shout_id";
+
+    @Bind(R.id.shouts_activity_list)
+    RecyclerView mRecyclerView;
+
+    @Bind(R.id.shouts_progress)
+    ProgressBar mProgress;
+
+    @Bind(R.id.shouts_toolbar)
+    Toolbar mToolbar;
+
+    @Inject
+    SelectShoutsAdapter mShoutsAdapter;
+
+    @Inject
+    SelectShoutsPresenter mShoutsPresenter;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_select_shouts);
+
+        ButterKnife.bind(this);
+
+        mRecyclerView.addItemDecoration(new BaseShoutsItemDecoration(
+                getResources().getDimensionPixelSize(R.dimen.home_linear_side_spacing)));
+        setGridLayoutManager();
+
+        mRecyclerView.setAdapter(mShoutsAdapter);
+
+        mShoutsPresenter.getSuccessObservable()
+                .compose(this.<List<BaseAdapterItem>>bindToLifecycle())
+                .subscribe(mShoutsAdapter);
+
+        mShoutsPresenter.getFailObservable()
+                .compose(this.<Throwable>bindToLifecycle())
+                .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(this)));
+
+        mShoutsPresenter.getProgressVisible()
+                .compose(this.<Boolean>bindToLifecycle())
+                .subscribe(RxView.visibility(mProgress));
+
+        mShoutsPresenter.getShoutSelectedObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String shoutId) {
+                        setResult(RESULT_OK, new Intent().putExtra(RESULT_SHOUT_ID, shoutId));
+                        finish();
+                    }
+                });
+
+        setUpToolbar();
+    }
+
+    private void setUpToolbar() {
+        mToolbar.setTitle(getString(R.string.select_shout_title));
+        mToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+    }
+
+    @Nonnull
+    @Override
+    public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
+        final SelectShoutsActivityComponent activityComponent = DaggerSelectShoutsActivityComponent.builder()
+                .activityModule(new ActivityModule(this))
+                .appComponent(App.getAppComponent(getApplication()))
+                .build();
+        activityComponent.inject(this);
+        return activityComponent;
+    }
+
+    private void setLinearLayoutManager() {
+        LayoutManagerHelper.setLinearLayoutManager(this, mRecyclerView, mShoutsAdapter);
+    }
+
+    private void setGridLayoutManager() {
+        LayoutManagerHelper.setGridLayoutManager(this, mRecyclerView, mShoutsAdapter);
+    }
+
+    @NonNull
+    public static Intent newIntent(Context context) {
+        return new Intent(context, SelectShoutActivity.class);
+    }
+}

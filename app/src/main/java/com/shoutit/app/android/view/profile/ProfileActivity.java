@@ -15,10 +15,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.ImageView;
-import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.jakewharton.rxbinding.view.RxView;
@@ -73,7 +71,6 @@ public abstract class ProfileActivity extends BaseActivity {
 
     private final AccelerateInterpolator toolbarInterpolator = new AccelerateInterpolator();
     private int lastVerticalOffset;
-    private PopupMenu popupMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +79,6 @@ public abstract class ProfileActivity extends BaseActivity {
         ButterKnife.bind(this);
 
         setUpToolbar();
-        setUpPopupMenu();
         handleAppBarScrollAnimation();
         if (savedInstanceState != null) {
             // To scroll appbar after rotation
@@ -137,7 +133,8 @@ public abstract class ProfileActivity extends BaseActivity {
                 .subscribe(new Action1<String>() {
                     @Override
                     public void call(String shoutId) {
-                        startActivity(ShoutActivity.newIntent(ProfileActivity.this, shoutId));
+                        startActivityForResult(ShoutActivity.newIntent(ProfileActivity.this, shoutId),
+                                REQUEST_CODE_FROM_EDIT_PROFILE);
                     }
                 });
 
@@ -146,15 +143,6 @@ public abstract class ProfileActivity extends BaseActivity {
                 .subscribe(ColoredSnackBar.errorSnackBarAction(
                         ColoredSnackBar.contentView(ProfileActivity.this),
                         R.string.error_action_only_for_logged_in_user));
-
-        presenter.getMoreMenuOptionClickedSubject()
-                .compose(bindToLifecycle())
-                .subscribe(new Action1<Object>() {
-                    @Override
-                    public void call(Object ignore) {
-                        popupMenu.show();
-                    }
-                });
     }
 
     @DrawableRes
@@ -165,18 +153,6 @@ public abstract class ProfileActivity extends BaseActivity {
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(null);
-    }
-
-    private void setUpPopupMenu() {
-        popupMenu = new PopupMenu(this, popupAnchorView);
-        popupMenu.inflate(R.menu.menu_profile_popup);
-        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                Toast.makeText(ProfileActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
-                return true;
-            }
-        });
     }
 
     @Override
