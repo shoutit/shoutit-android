@@ -2,6 +2,7 @@ package com.shoutit.app.android.utils;
 
 import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
@@ -100,13 +101,15 @@ public class AmazonHelper {
     @SuppressLint("DefaultLocale")
     @Nonnull
     private String getImageFileName() {
-        return String.format("%1$d_%2$s%3$s", System.currentTimeMillis(), userId, JPEG);
+        final String format = String.format("%1$d_%2$s%3$s", System.nanoTime(), userId, JPEG);
+        Log.i("dupa", format);
+        return format;
     }
 
     @SuppressLint("DefaultLocale")
     @Nonnull
     private String getVideoFileName() {
-        return String.format("%1$d_%2$s%3$s", System.currentTimeMillis(), userId, MP4);
+        return String.format("%1$d_%2$s%3$s", System.nanoTime(), userId, MP4);
     }
 
     public static File getfileFromPath(@NonNull String path) {
