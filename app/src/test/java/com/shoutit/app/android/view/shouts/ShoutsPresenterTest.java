@@ -10,6 +10,7 @@ import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
+import com.shoutit.app.android.view.shouts.discover.DiscoverShoutsPresenter;
 
 import org.junit.Before;
 import org.junit.Test;

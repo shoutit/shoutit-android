@@ -16,8 +16,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -33,10 +34,12 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
-import com.shoutit.app.android.view.chats.ChatActivity;
 import com.shoutit.app.android.view.chats.Listener;
 import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
+import com.shoutit.app.android.view.shout.ShoutActivity;
+import com.shoutit.app.android.view.shouts.selectshout.SelectShoutActivity;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -53,9 +56,13 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
     private static final String ARGS_IS_SHOUT_CONVERSATION = "args_shout_conversation";
 
     private static final int REQUEST_ATTACHMENT = 0;
-
     private static final int REQUEST_LOCATION = 1;
+    private static final int SELECT_SHOUT_REQUEST_CODE = 2;
+
     private static final String TAG = ChatFirstConversationActivity.class.getCanonicalName();
+
+    @Inject
+    Picasso picasso;
 
     @Inject
     ChatsFirstConversationPresenter presenter;
@@ -65,17 +72,27 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
 
     @Bind(R.id.chats_toolbar)
     Toolbar mChatsToolbar;
-    @Bind(R.id.chats_shout_layout)
-    LinearLayout mChatsShoutLayout;
     @Bind(R.id.chats_recyclerview)
     RecyclerView mChatsRecyclerview;
     @Bind(R.id.chats_message_edittext)
     EditText mChatsMessageEdittext;
     @Bind(R.id.chats_progress)
     ProgressBar mChatsProgress;
-
     @Bind(R.id.chats_attatchments_layout)
     FrameLayout mChatsAttatchmentsLayout;
+
+    @Bind(R.id.chats_shout_layout)
+    View mChatsShoutLayout;
+    @Bind(R.id.chats_shout_image)
+    ImageView mChatsShoutImage;
+    @Bind(R.id.chats_shout_layout_title)
+    TextView mChatsShoutLayoutTitle;
+    @Bind(R.id.chats_shout_layout_author_date)
+    TextView mChatsShoutLayoutAuthorDate;
+    @Bind(R.id.chats_shout_layout_type)
+    TextView mChatsShoutLayoutType;
+    @Bind(R.id.chats_shout_layout_price)
+    TextView mChatsShoutLayoutPrice;
 
     public static Intent newIntent(@Nonnull Context context, boolean shoutConversation, @NonNull String idForCreation) {
         return new Intent(context, ChatFirstConversationActivity.class)
@@ -132,7 +149,10 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
         final Bundle extras = getIntent().getExtras();
         final boolean isShoutConversation = extras.getBoolean(ARGS_IS_SHOUT_CONVERSATION);
+
         final String idForCreation = extras.getString(ARGS_ID_FOR_CREATION);
+        Preconditions.checkNotNull(idForCreation);
+
         final ChatFirstConversationActivityComponent component = DaggerChatFirstConversationActivityComponent
                 .builder()
                 .activityModule(new ActivityModule(this))
@@ -200,6 +220,23 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
         finish();
     }
 
+    public void setAboutShoutData(String title, String thumbnail, String type, String price, String authorAndTime) {
+        mChatsShoutLayout.setVisibility(View.VISIBLE);
+        picasso.load(thumbnail)
+                .centerCrop()
+                .fit()
+                .into(mChatsShoutImage);
+        mChatsShoutLayoutType.setText(type);
+        mChatsShoutLayoutTitle.setText(title);
+        mChatsShoutLayoutPrice.setText(price);
+        mChatsShoutLayoutAuthorDate.setText(authorAndTime);
+    }
+
+    @Override
+    public void onShoutClicked(String shoutId) {
+        startActivity(ShoutActivity.newIntent(ChatFirstConversationActivity.this, shoutId));
+    }
+
     @Override
     protected void onDestroy() {
         presenter.unregister();
@@ -214,6 +251,11 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
     @OnClick(R.id.chats_attatchments_photo)
     void photoClicked() {
         startActivityForResult(RecordMediaActivity.newIntent(this, true, false), REQUEST_ATTACHMENT);
+    }
+
+    @OnClick(R.id.chats_attatchments_shout)
+    void shoutClicked() {
+        startActivityForResult(SelectShoutActivity.newIntent(ChatFirstConversationActivity.this), SELECT_SHOUT_REQUEST_CODE);
     }
 
     @OnClick(R.id.chats_attatchments_location)
@@ -256,6 +298,9 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
             final Place place = PlacePicker.getPlace(this, data);
             final LatLng latLng = place.getLatLng();
             presenter.sendLocation(latLng.latitude, latLng.longitude);
+        } else if (requestCode == SELECT_SHOUT_REQUEST_CODE && resultCode == RESULT_OK) {
+            final String shoutId = data.getStringExtra(SelectShoutActivity.RESULT_SHOUT_ID);
+            presenter.sendShout(shoutId);
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }

@@ -23,4 +23,8 @@ public interface Listener {
     void onImageClicked(String url);
 
     void conversationDeleted();
+
+    void setAboutShoutData(String title, String thumbnail, String type, String price, String authorAndTime);
+
+    void onShoutClicked(String shoutId);
 }
