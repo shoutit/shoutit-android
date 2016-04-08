@@ -10,6 +10,7 @@ import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.operators.OperatorMergeNextToken;
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
@@ -179,12 +180,18 @@ public class ConversationsPresenter {
                             }
                         }
 
-                        return ImmutableList.copyOf(Iterables.transform(map.entrySet(), new Function<Map.Entry<String, Conversation>, Conversation>() {
+                        return ImmutableList.copyOf(Iterables.filter(Iterables.transform(map.entrySet(), new Function<Map.Entry<String, Conversation>, Conversation>() {
                             @Nullable
                             @Override
                             public Conversation apply(@Nullable Map.Entry<String, Conversation> input) {
                                 assert input != null;
                                 return input.getValue();
+                            }
+                        }), new Predicate<Conversation>() {
+                            @Override
+                            public boolean apply(@Nullable Conversation input) {
+                                assert input != null;
+                                return input.getProfiles().size() > 1;
                             }
                         }));
                     }

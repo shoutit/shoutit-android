@@ -6,9 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.CheckedTextView;
 import android.widget.ProgressBar;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
@@ -21,7 +19,6 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LayoutManagerHelper;
-import com.shoutit.app.android.view.createshout.CreateShoutDialogFragment;
 
 import java.util.List;
 
@@ -31,7 +28,6 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import rx.functions.Action1;
 
 public class SelectShoutActivity extends BaseActivity {
@@ -43,9 +39,6 @@ public class SelectShoutActivity extends BaseActivity {
 
     @Bind(R.id.shouts_progress)
     ProgressBar mProgress;
-
-    @Bind(R.id.shouts_layout_btn)
-    CheckedTextView mShoutsCheckedTextView;
 
     @Bind(R.id.shouts_toolbar)
     Toolbar mToolbar;
@@ -59,7 +52,7 @@ public class SelectShoutActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.shouts_activity);
+        setContentView(R.layout.activity_select_shouts);
 
         ButterKnife.bind(this);
 
@@ -81,25 +74,6 @@ public class SelectShoutActivity extends BaseActivity {
                 .compose(this.<Boolean>bindToLifecycle())
                 .subscribe(RxView.visibility(mProgress));
 
-//        RxRecyclerView.scrollEvents(mRecyclerView)
-//                .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
-//                .filter(LoadMoreHelper.needLoadMore((MyLayoutManager) mRecyclerView.getLayoutManager(), mShoutsAdapter))
-//                .subscribe(mShoutsPresenter.getLoadMoreObserver());
-
-        mShoutsCheckedTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mShoutsCheckedTextView.setChecked(!mShoutsCheckedTextView.isChecked());
-                if (mShoutsCheckedTextView.isChecked()) {
-                    mShoutsCheckedTextView.setBackground(getResources().getDrawable(R.drawable.ic_grid_switch));
-                    setLinearLayoutManager();
-                } else {
-                    mShoutsCheckedTextView.setBackground(getResources().getDrawable(R.drawable.ic_list_switch));
-                    setGridLayoutManager();
-                }
-            }
-        });
-
         mShoutsPresenter.getShoutSelectedObservable()
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(new Action1<String>() {
@@ -109,27 +83,17 @@ public class SelectShoutActivity extends BaseActivity {
                         finish();
                     }
                 });
+
+        setUpToolbar();
     }
 
-    private void setUpToolbar(String name) {
-        mToolbar.setTitle(getString(R.string.discover_shouts_title, name));
-        mToolbar.inflateMenu(R.menu.shouts_menu);
+    private void setUpToolbar() {
+        mToolbar.setTitle(getString(R.string.select_shout_title));
         mToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finish();
-            }
-        });
-        mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.shouts_search:
-                        return true;
-                    default:
-                        return false;
-                }
             }
         });
     }
@@ -156,10 +120,5 @@ public class SelectShoutActivity extends BaseActivity {
     @NonNull
     public static Intent newIntent(Context context) {
         return new Intent(context, SelectShoutActivity.class);
-    }
-
-    @OnClick(R.id.discover_fab)
-    void onAddShoutClicked() {
-        CreateShoutDialogFragment.newInstance().show(getSupportFragmentManager(), null);
     }
 }
