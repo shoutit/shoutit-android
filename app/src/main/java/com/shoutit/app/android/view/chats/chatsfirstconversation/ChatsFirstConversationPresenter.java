@@ -37,6 +37,7 @@ import com.shoutit.app.android.utils.PusherHelper;
 import com.shoutit.app.android.view.chats.Listener;
 import com.shoutit.app.android.view.chats.PresenceChannelEventListenerAdapter;
 import com.shoutit.app.android.view.chats.message_models.DateItem;
+import com.shoutit.app.android.view.chats.message_models.InfoItem;
 import com.shoutit.app.android.view.chats.message_models.ReceivedImageMessage;
 import com.shoutit.app.android.view.chats.message_models.ReceivedLocationMessage;
 import com.shoutit.app.android.view.chats.message_models.ReceivedShoutMessage;
@@ -352,7 +353,7 @@ public class ChatsFirstConversationPresenter {
                 return getReceivedItem(message, isFirst, time);
             }
         } else {
-            return null; // TODO handle special message
+            return new InfoItem(results.get(currentPosition).getText());
         }
     }
 
