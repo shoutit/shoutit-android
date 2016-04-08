@@ -198,7 +198,7 @@ public class FilterViewHolders {
                 spinnerAdapter.bindData(item.getCategories().values());
             }
 
-            blockingView.setClickable(item.shouldBlockCategories());
+            blockingView.setVisibility(item.shouldBlockCategories() ? View.VISIBLE : View.GONE);
             rootView.setAlpha(item.shouldBlockCategories() ? 0.5f : 1f);
             categorySpinner.setAlpha(item.shouldBlockCategories() ? 0.5f : 1f);
 
