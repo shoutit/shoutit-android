@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
@@ -17,13 +18,59 @@
         android:layout_below="@+id/chats_toolbar"
         android:orientation="vertical">
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/chats_shout_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:visibility="gone">
-        </LinearLayout>
+            android:layout_height="60dp"
+            android:visibility="visible">
+
+            <ImageView
+                android:id="@+id/chats_shout_image"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginBottom="6dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="6dp"
+                tools:src="@drawable/ca"/>
+
+            <TextView
+                android:id="@+id/chats_shout_layout_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/chats_shout_image"
+                android:layout_toEndOf="@+id/chats_shout_image"
+                android:layout_toRightOf="@+id/chats_shout_image"
+                tools:text="Maerino Wool Text Long name Text"/>
+
+            <TextView
+                android:id="@+id/chats_shout_layout_author_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/chats_shout_image"
+                android:layout_toEndOf="@+id/chats_shout_image"
+                android:layout_toRightOf="@+id/chats_shout_image"
+                tools:text="John Smith - 2 hours ago"/>
+
+            <TextView
+                android:id="@+id/chats_shout_layout_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                tools:text="Offer"/>
+
+            <TextView
+                android:id="@+id/chats_shout_layout_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                tools:text="$44 USD"/>
+
+        </RelativeLayout>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/chats_recyclerview"

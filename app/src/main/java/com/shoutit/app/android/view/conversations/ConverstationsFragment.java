@@ -98,15 +98,24 @@ public class ConverstationsFragment extends BaseFragment implements Conversation
                 .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
                 .filter(LoadMoreHelper.needLoadMore((MyLayoutManager) mConversationRecyclerview.getLayoutManager(), adapter))
                 .subscribe(presenter.loadMoreObserver());
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
         presenter.register(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        presenter.unregister();
     }
 
     @SuppressWarnings("ConstantConditions")
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        presenter.unregister();
         mLogo.setVisibility(View.VISIBLE);
         final MainActivity activity = (MainActivity) getActivity();
         activity.getSupportActionBar().setTitle(null);

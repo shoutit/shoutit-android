@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.shouts;
+package com.shoutit.app.android.view.shouts.discover;
 
 import android.content.Context;
 import android.content.Intent;
@@ -22,7 +22,6 @@ import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.BaseShoutsItemDecoration;
 import com.shoutit.app.android.R;
-import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
@@ -70,9 +69,6 @@ public class DiscoverShoutsActivity extends BaseActivity {
 
     @Inject
     DiscoverShoutsPresenter mShoutsPresenter;
-
-    @Inject
-    UserPreferences mUserPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,7 +129,7 @@ public class DiscoverShoutsActivity extends BaseActivity {
                 });
 
         mShoutsPresenter.getSearchClickedObservable()
-                .compose(this.<BothParams<String,String>>bindToLifecycle())
+                .compose(this.<BothParams<String, String>>bindToLifecycle())
                 .subscribe(new Action1<BothParams<String, String>>() {
                     @Override
                     public void call(BothParams<String, String> discoverIdAndName) {

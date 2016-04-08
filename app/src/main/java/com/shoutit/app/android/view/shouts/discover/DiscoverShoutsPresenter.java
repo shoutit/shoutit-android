@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.shouts;
+package com.shoutit.app.android.view.shouts.discover;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -18,6 +18,7 @@ import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
+import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
 import java.util.List;
 

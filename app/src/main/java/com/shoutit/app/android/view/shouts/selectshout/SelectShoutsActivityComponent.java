@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.shouts;
+package com.shoutit.app.android.view.shouts.selectshout;
 
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.ActivityScope;
@@ -11,12 +11,11 @@ import dagger.Component;
 @Component(
         dependencies = AppComponent.class,
         modules = {
-                ActivityModule.class,
-                DiscoverShoutsActivityModule.class
+                ActivityModule.class
         }
 )
-public interface DiscoverShoutsActivityComponent extends BaseActivityComponent {
+public interface SelectShoutsActivityComponent extends BaseActivityComponent {
 
-    void inject(DiscoverShoutsActivity shoutsActivity);
+    void inject(SelectShoutActivity shoutsActivity);
 
 }

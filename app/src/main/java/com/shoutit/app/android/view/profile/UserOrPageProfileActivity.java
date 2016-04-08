@@ -81,7 +81,6 @@ public class UserOrPageProfileActivity extends ProfileActivity {
                         } else {
                             startActivity(ChatActivity.newIntent(UserOrPageProfileActivity.this, conversationId, false));
                         }
-                        Toast.makeText(UserOrPageProfileActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
                     }
                 });
 
