@@ -17,7 +17,7 @@ import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.CategoriesDao;
 import com.shoutit.app.android.view.search.SearchPresenter;
-import com.shoutit.app.android.view.search.subsearch.SubSearchActivity;
+import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsActivity;
 
 import java.util.List;
 
@@ -81,8 +81,8 @@ public class SearchCategoriesPresenter {
                 .map(new Func1<Category, Intent>() {
                     @Override
                     public Intent call(Category category) {
-                        return SubSearchActivity.newIntent(context, SearchPresenter.SearchType.TAG,
-                                category.getSlug(), category.getName());
+                        return SearchShoutsResultsActivity.newIntent(
+                                context, null, category.getSlug(), SearchPresenter.SearchType.TAG, category.getName());
                     }
                 });
 
