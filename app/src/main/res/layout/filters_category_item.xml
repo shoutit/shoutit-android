@@ -51,6 +51,7 @@
     <View
         android:id="@+id/filters_blocking_view"
         android:visibility="gone"
+        android:clickable="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
