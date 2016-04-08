@@ -56,7 +56,7 @@ public class ShoutImagesPagerAdapter extends PagerAdapter {
 
         String imageUrl = null;
 
-        if (!images.isEmpty() && position < images.size()) {
+        if (isImageItem(position)) {
             imageUrl = images.get(position);
             videoIconView.setVisibility(View.GONE);
         } else if (!videos.isEmpty()) {
@@ -79,6 +79,10 @@ public class ShoutImagesPagerAdapter extends PagerAdapter {
         container.addView(view);
 
         return view;
+    }
+
+    private boolean isImageItem(int position) {
+        return !images.isEmpty() && position < images.size();
     }
 
     public void loadThumbnail(@Nullable String thumbnailUrl, @Nonnull ImageView imageView) {

@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.provider.MediaStore;
 
+import com.amazonaws.services.s3.util.Mimetypes;
+
 import javax.annotation.Nonnull;
 
 public class IntentHelper {
@@ -18,6 +20,6 @@ public class IntentHelper {
 
     public static Intent videoIntent(@Nonnull String videoUrl) {
         return new Intent(Intent.ACTION_VIEW)
-                .setDataAndType(Uri.parse(videoUrl), "video/mp4");
+                .setDataAndType(Uri.parse(videoUrl), "video/*");
     }
 }
