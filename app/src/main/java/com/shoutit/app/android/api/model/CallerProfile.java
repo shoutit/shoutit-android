@@ -1,6 +1,7 @@
 package com.shoutit.app.android.api.model;
 
-import java.util.Objects;
+
+import com.google.common.base.Objects;
 
 public class CallerProfile {
 
@@ -98,27 +99,27 @@ public class CallerProfile {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        CallerProfile that = (CallerProfile) o;
-        return Objects.equals(isActivated, that.isActivated) &&
-                Objects.equals(id, that.id) &&
-                Objects.equals(type, that.type) &&
-                Objects.equals(apiUrl, that.apiUrl) &&
-                Objects.equals(webUrl, that.webUrl) &&
-                Objects.equals(username, that.username) &&
-                Objects.equals(name, that.name) &&
-                Objects.equals(firstName, that.firstName) &&
-                Objects.equals(lastName, that.lastName) &&
-                Objects.equals(imageUrl, that.imageUrl) &&
-                Objects.equals(cover, that.cover) &&
-                Objects.equals(isListening, that.isListening) &&
-                Objects.equals(listenersCount, that.listenersCount) &&
-                Objects.equals(isOwner, that.isOwner);
+        if (!(o instanceof CallerProfile)) return false;
+        final CallerProfile that = (CallerProfile) o;
+        return isActivated == that.isActivated &&
+                Objects.equal(id, that.id) &&
+                Objects.equal(type, that.type) &&
+                Objects.equal(apiUrl, that.apiUrl) &&
+                Objects.equal(webUrl, that.webUrl) &&
+                Objects.equal(username, that.username) &&
+                Objects.equal(name, that.name) &&
+                Objects.equal(firstName, that.firstName) &&
+                Objects.equal(lastName, that.lastName) &&
+                Objects.equal(imageUrl, that.imageUrl) &&
+                Objects.equal(cover, that.cover) &&
+                Objects.equal(isListening, that.isListening) &&
+                Objects.equal(listenersCount, that.listenersCount) &&
+                Objects.equal(isOwner, that.isOwner);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, type, apiUrl, webUrl, username, name, firstName,
-                lastName, isActivated, imageUrl, cover, isListening, listenersCount, isOwner);
+        return Objects.hashCode(id, type, apiUrl, webUrl, username, name,
+                firstName, lastName, isActivated, imageUrl, cover, isListening, listenersCount, isOwner);
     }
 }
