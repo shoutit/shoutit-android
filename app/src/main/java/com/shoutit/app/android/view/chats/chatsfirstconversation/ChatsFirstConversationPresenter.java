@@ -26,6 +26,8 @@ import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.ProfilesDao;
+import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.PusherHelper;
@@ -85,6 +87,8 @@ public class ChatsFirstConversationPresenter {
     private final Gson mGson;
     private final AmazonHelper mAmazonHelper;
     private final String mIdForCreation;
+    private final ShoutsDao mShoutsDao;
+    private final ProfilesDao mProfilesDao;
     private final boolean mIsShoutConversation;
     private Listener mListener;
     private final CompositeSubscription mSubscribe = new CompositeSubscription();
@@ -101,7 +105,9 @@ public class ChatsFirstConversationPresenter {
                                            PusherHelper pusher,
                                            Gson gson,
                                            AmazonHelper amazonHelper,
-                                           String idForCreation) {
+                                           String idForCreation,
+                                           ShoutsDao shoutsDao,
+                                           ProfilesDao profilesDao) {
         mIsShoutConversation = isShoutConversation;
         mApiService = apiService;
         mUiScheduler = uiScheduler;
@@ -113,6 +119,8 @@ public class ChatsFirstConversationPresenter {
         mGson = gson;
         mAmazonHelper = amazonHelper;
         mIdForCreation = idForCreation;
+        mShoutsDao = shoutsDao;
+        mProfilesDao = profilesDao;
     }
 
     public void register(@NonNull Listener listener) {
@@ -294,6 +302,11 @@ public class ChatsFirstConversationPresenter {
             public void call(Message message) {
                 conversationCreated = true;
                 conversationId = message.getConversationId();
+                if(mIsShoutConversation){
+                    mShoutsDao.getShoutDao(mIdForCreation).getRefreshObserver().onNext(new Object());
+                } else {
+                    mProfilesDao.getProfileDao(mIdForCreation).getRefreshSubject().onNext(new Object());
+                }
             }
         });
     }
