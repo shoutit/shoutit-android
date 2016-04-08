@@ -1,7 +1,6 @@
 package com.shoutit.app.android.view.shout;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
@@ -12,16 +11,18 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
-import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
+import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserIdentity;
 import com.shoutit.app.android.dagger.ForActivity;
-import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
+import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.dao.UsersIdentityDao;
+import com.shoutit.app.android.model.MobilePhoneResponse;
 import com.shoutit.app.android.model.RelatedShoutsPointer;
 import com.shoutit.app.android.model.UserShoutsPointer;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
@@ -32,10 +33,13 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
+import retrofit2.Response;
 import rx.Observable;
+import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.functions.Func3;
 import rx.subjects.PublishSubject;
 
@@ -53,10 +57,16 @@ public class ShoutPresenter {
     private final Observable<Boolean> isUserShoutOwnerObservable;
     private final Observable<ResponseOrError<UserIdentity>> userIdentityResponse;
     private final Observable<String> shoutOwnerNameObservable;
-    private Observable<String> identityUserObservable;
-
-    private Observable<UserIdentity> successUserIdentity;
-    private Observable<Throwable> failedUserIdentity;
+    private final Observable<ResponseOrError<MobilePhoneResponse>> callErrorObservable;
+    private final Observable<Boolean> hasMobilePhoneObservable;
+    private final Observable<Response<Object>> deleteShoutResponseObservable;
+    private final Observable<Boolean> showDeleteDialogObservable;
+    private final PublishSubject<Object> deleteShoutSubject = PublishSubject.create();
+    private final Observable<Response<Object>> reportShoutObservable;
+    private final Observable<List<Conversation>> conversationObservable;
+    private final Observable<Object> refreshUserShoutsObservable;
+    private final Observable<String> identityUserObservable;
+    private final Observable<UserIdentity> successUserIdentity;
 
     private PublishSubject<String> addToCartSubject = PublishSubject.create();
     private PublishSubject<String> onCategoryClickedSubject = PublishSubject.create();
@@ -67,6 +77,11 @@ public class ShoutPresenter {
 
     @Nonnull
     private final Scheduler uiScheduler;
+    @Nonnull
+    private final UserPreferences mUserPreferences;
+    @Nonnull
+    private final PublishSubject<Object> callOrDeleteSubject = PublishSubject.create();
+    private final PublishSubject<String> sendReportObserver = PublishSubject.create();
 
     @Inject
     public ShoutPresenter(@Nonnull final ShoutsDao shoutsDao,
@@ -74,9 +89,10 @@ public class ShoutPresenter {
                           @Nonnull @ForActivity final Context context,
                           @Nonnull @UiScheduler final Scheduler uiScheduler,
                           @Nonnull UserPreferences userPreferences,
-                          @Nonnull final UsersIdentityDao usersIdentityDao
-    ) {
+                          @Nonnull final ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
+                          @Nonnull final UsersIdentityDao usersIdentityDao) {
         this.uiScheduler = uiScheduler;
+        mUserPreferences = userPreferences;
 
         /** Requests **/
         final Observable<ResponseOrError<Shout>> shoutResponse = shoutsDao.getShoutObservable(shoutId)
@@ -102,6 +118,14 @@ public class ShoutPresenter {
                     }
                 });
 
+        hasMobilePhoneObservable = successShoutResponse
+                .map(new Func1<Shout, Boolean>() {
+                    @Override
+                    public Boolean call(Shout shout) {
+                        return shout.isMobileSet();
+                    }
+                });
+
         usernameObservable = successShoutResponse
                 .map(new Func1<Shout, String>() {
                     @Override
@@ -118,11 +142,28 @@ public class ShoutPresenter {
                     }
                 });
 
-        final Observable<ResponseOrError<ShoutsResponse>> userShoutsObservable = userNameObservable
-                .switchMap(new Func1<String, Observable<ResponseOrError<ShoutsResponse>>>() {
+        conversationObservable = successShoutResponse
+                .map(new Func1<Shout, List<Conversation>>() {
                     @Override
-                    public Observable<ResponseOrError<ShoutsResponse>> call(String userName) {
-                        return shoutsDao.getUserShoutObservable(new UserShoutsPointer(USER_SHOUTS_PAGE_SIZE, userName));
+                    public List<Conversation> call(Shout shout) {
+                        return shout.getConversations();
+                    }
+                });
+
+        final Observable<ShoutsDao.UserShoutsDao> userShoutDaoObservable = userNameObservable
+                .map(new Func1<String, ShoutsDao.UserShoutsDao>() {
+                    @Override
+                    public ShoutsDao.UserShoutsDao call(String userName) {
+                        return shoutsDao.getUserShoutsDao(new UserShoutsPointer(USER_SHOUTS_PAGE_SIZE, userName));
+                    }
+                })
+                .compose(ObservableExtensions.<ShoutsDao.UserShoutsDao>behaviorRefCount());
+
+        final Observable<ResponseOrError<ShoutsResponse>> userShoutsObservable = userShoutDaoObservable
+                .flatMap(new Func1<ShoutsDao.UserShoutsDao, Observable<ResponseOrError<ShoutsResponse>>>() {
+                    @Override
+                    public Observable<ResponseOrError<ShoutsResponse>> call(ShoutsDao.UserShoutsDao userShoutsDao) {
+                        return userShoutsDao.getShoutsObservable();
                     }
                 })
                 .compose(ObservableExtensions.<ResponseOrError<ShoutsResponse>>behaviorRefCount());
@@ -265,12 +306,7 @@ public class ShoutPresenter {
                 ResponseOrError.transform(shoutResponse),
                 ResponseOrError.transform(relatedShoutsObservable),
                 ResponseOrError.transform(userIdentityResponse)))
-                .filter(Functions1.isNotNull()).doOnNext(new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-
-                    }
-                })
+                .filter(Functions1.isNotNull())
                 .observeOn(uiScheduler);
 
         /** Progress **/
@@ -292,6 +328,76 @@ public class ShoutPresenter {
                 .compose(ObservableExtensions.<Boolean>behaviorRefCount())
                 .first();
 
+        /** Refresh shouts **/
+        shoutsGlobalRefreshPresenter.getShoutsGlobalRefreshObservable()
+                .subscribe(shoutsDao.getShoutDao(shoutId).getRefreshObserver());
+
+        refreshUserShoutsObservable = shoutsGlobalRefreshPresenter.getShoutsGlobalRefreshObservable()
+                .withLatestFrom(userShoutDaoObservable, new Func2<Object, ShoutsDao.UserShoutsDao, Object>() {
+                    @Override
+                    public Observer<Object> call(Object o, ShoutsDao.UserShoutsDao userShoutsDao) {
+                        userShoutsDao.getRefreshObserver().onNext(null);
+                        return null;
+                    }
+                });
+
+        shoutsGlobalRefreshPresenter.getShoutsGlobalRefreshObservable()
+                .map(new Func1<Object, Object>() {
+                    @Override
+                    public Object call(Object o) {
+                        shoutsDao.getRelatedShoutsDao(new RelatedShoutsPointer(shoutId, RELATED_SHOUTS_PAGE_SIZE))
+                                .getRefreshObserver().onNext(null);
+                        return null;
+                    }
+                })
+                .subscribe();
+
+        final Observable<Boolean> callOrEditObservable = Observable
+                .combineLatest(callOrDeleteSubject, isUserShoutOwnerObservable, new Func2<Object, Boolean, Boolean>() {
+                    @Override
+                    public Boolean call(Object o, Boolean isOwner) {
+                        return isOwner;
+                    }
+                });
+
+        final Observable<ResponseOrError<MobilePhoneResponse>> shoutMobilePhoneErrorObservable = shoutsDao
+                .getShoutMobilePhoneObservable(shoutId)
+                .compose(ObservableExtensions.<ResponseOrError<MobilePhoneResponse>>behaviorRefCount());
+
+        callErrorObservable = callOrEditObservable
+                .filter(Functions1.isFalse())
+                .flatMap(new Func1<Boolean, Observable<ResponseOrError<MobilePhoneResponse>>>() {
+                    @Override
+                    public Observable<ResponseOrError<MobilePhoneResponse>> call(Boolean aBoolean) {
+                        return shoutMobilePhoneErrorObservable;
+                    }
+                })
+                .observeOn(uiScheduler);
+
+        deleteShoutSubject.subscribe(shoutsDao.getDeleteShoutObserver(shoutId));
+
+        sendReportObserver.subscribe(shoutsDao.getReportShoutObserver(shoutId));
+
+        reportShoutObservable = shoutsDao.getReportShoutObservable(shoutId)
+                .observeOn(uiScheduler);
+
+        showDeleteDialogObservable = callOrEditObservable
+                .filter(Functions1.isTrue())
+                .observeOn(uiScheduler);
+
+        deleteShoutResponseObservable = shoutsDao.getDeleteShoutObservable(shoutId)
+                .observeOn(uiScheduler)
+                .doOnNext(new Action1<Response<Object>>() {
+                    @Override
+                    public void call(Response<Object> objectResponse) {
+                        shoutsGlobalRefreshPresenter.refreshShouts();
+                    }
+                });
+    }
+
+    @Nonnull
+    public Observable<Object> getRefreshUserShoutsObservable() {
+        return refreshUserShoutsObservable;
     }
 
     @Nonnull
@@ -351,13 +457,19 @@ public class ShoutPresenter {
     }
 
     @Nonnull
-    public Observable<Boolean> getIsUserShoutOwnerObservable() {
+    public Observable<BottomBarData> getIsUserShoutOwnerObservable() {
         return allAdapterItemsObservable
                 .first()
-                .flatMap(new Func1<List<BaseAdapterItem>, Observable<Boolean>>() {
+                .flatMap(new Func1<List<BaseAdapterItem>, Observable<BottomBarData>>() {
                     @Override
-                    public Observable<Boolean> call(List<BaseAdapterItem> baseAdapterItems) {
-                        return isUserShoutOwnerObservable;
+                    public Observable<BottomBarData> call(List<BaseAdapterItem> baseAdapterItems) {
+                        return isUserShoutOwnerObservable.zipWith(conversationObservable, new Func2<Boolean, List<Conversation>, BottomBarData>() {
+                            @Override
+                            public BottomBarData call(Boolean isUserShoutOwner, List<Conversation> conversations) {
+                                final boolean hasConversation = conversations != null && !conversations.isEmpty();
+                                return new BottomBarData(isUserShoutOwner, hasConversation, hasConversation ? conversations.get(0).getId() : null, mUserPreferences.isUserLoggedIn());
+                            }
+                        });
                     }
                 })
                 .observeOn(uiScheduler);
@@ -368,8 +480,80 @@ public class ShoutPresenter {
         return usernameObservable;
     }
 
+    @Nonnull
     public Observable<String> getShoutOwnerNameObservable() {
         return shoutOwnerNameObservable;
+    }
+
+    @Nonnull
+    public Observer<Object> callOrDeleteObserver() {
+        return callOrDeleteSubject;
+    }
+
+    @Nonnull
+    public Observable<ResponseOrError<MobilePhoneResponse>> getCallErrorObservable() {
+        return callErrorObservable;
+    }
+
+    @Nonnull
+    public Observable<Boolean> getHasMobilePhoneObservable() {
+        return hasMobilePhoneObservable;
+    }
+
+    @Nonnull
+    public Observable<Response<Object>> getDeleteShoutResponseObservable() {
+        return deleteShoutResponseObservable;
+    }
+
+    @Nonnull
+    public Observer<String> sendReportObserver() {
+        return sendReportObserver;
+    }
+
+    @Nonnull
+    public Observable<Boolean> getShowDeleteDialogObservable() {
+        return showDeleteDialogObservable;
+    }
+
+    @Nonnull
+    public Observer<Object> getDeleteShoutObserver() {
+        return deleteShoutSubject;
+    }
+
+    @Nonnull
+    public Observable<Response<Object>> getReportShoutObservable() {
+        return reportShoutObservable;
+    }
+
+    public static class BottomBarData {
+
+        private final boolean isUserShoutOwner;
+        private final boolean hasConversation;
+        private final String conversationId;
+        private final boolean isLoggedIn;
+
+        public BottomBarData(boolean isUserShoutOwner, boolean hasConversation, String conversationId, boolean isLoggedIn) {
+            this.isUserShoutOwner = isUserShoutOwner;
+            this.hasConversation = hasConversation;
+            this.conversationId = conversationId;
+            this.isLoggedIn = isLoggedIn;
+        }
+
+        public boolean isUserShoutOwner() {
+            return isUserShoutOwner;
+        }
+
+        public boolean isHasConversation() {
+            return hasConversation;
+        }
+
+        public String getConversationId() {
+            return conversationId;
+        }
+
+        public boolean isLoggedIn() {
+            return isLoggedIn;
+        }
     }
 }
 

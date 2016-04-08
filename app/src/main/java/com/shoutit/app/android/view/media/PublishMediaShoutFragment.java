@@ -6,6 +6,8 @@ import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -126,6 +128,24 @@ public class PublishMediaShoutFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mCameraPublishedCurrency.setAdapter(mCurrencyAdapter);
+        mCameraPublishedCurrency.setEnabled(false);
+
+        mCameraPublishedPrice.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                mCameraPublishedCurrency.setEnabled(s.length() != 0);
+            }
+        });
 
         downloadCurrencies();
 
@@ -177,7 +197,7 @@ public class PublishMediaShoutFragment extends Fragment {
     }
 
     private Observable<CreateShoutResponse> uploadImageObservable() {
-        return mAmazonHelper.uploadShoutMediaObservable(new File(mFile))
+        return mAmazonHelper.uploadShoutMediaImageObservable(new File(mFile))
                 .flatMap(new Func1<String, Observable<CreateShoutResponse>>() {
                     @Override
                     public Observable<CreateShoutResponse> call(String url) {
@@ -212,7 +232,7 @@ public class PublishMediaShoutFragment extends Fragment {
                 .flatMap(new Func1<File, Observable<String>>() {
                     @Override
                     public Observable<String> call(File file) {
-                        return mAmazonHelper.uploadShoutMediaObservable(file)
+                        return mAmazonHelper.uploadShoutMediaImageObservable(file)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(MyAndroidSchedulers.mainThread());
                     }
@@ -220,7 +240,7 @@ public class PublishMediaShoutFragment extends Fragment {
                 .flatMap(new Func1<String, Observable<BothParams<String, String>>>() {
                     @Override
                     public Observable<BothParams<String, String>> call(final String thumb) {
-                        return mAmazonHelper.uploadShoutMediaObservable(new File(mFile))
+                        return mAmazonHelper.uploadShoutMediaVideoObservable(new File(mFile))
                                 .map(new Func1<String, BothParams<String, String>>() {
                                     @Override
                                     public BothParams<String, String> call(String file) {

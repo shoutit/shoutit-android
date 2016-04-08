@@ -8,6 +8,7 @@ import android.support.multidex.MultiDexApplication;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.appunite.appunitegcm.AppuniteGcm;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
@@ -15,7 +16,9 @@ import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
 import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler;
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
 import com.karumi.dexter.Dexter;
+import com.pusher.client.Pusher;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.constants.UserVoiceConstants;
 import com.shoutit.app.android.dagger.AppComponent;
 import com.shoutit.app.android.dagger.AppModule;
@@ -23,6 +26,7 @@ import com.shoutit.app.android.dagger.BaseModule;
 import com.shoutit.app.android.dagger.DaggerAppComponent;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.utils.LogHelper;
+import com.shoutit.app.android.utils.PusherHelper;
 import com.shoutit.app.android.view.videoconversation.DialogCallActivity;
 import com.shoutit.app.android.view.videoconversation.VideoConversationPresenter;
 import com.twilio.common.TwilioAccessManager;
@@ -32,6 +36,7 @@ import com.twilio.conversations.AudioOutput;
 import com.twilio.conversations.ConversationsClient;
 import com.twilio.conversations.ConversationsClientListener;
 import com.twilio.conversations.IncomingInvite;
+import com.twilio.conversations.OutgoingInvite;
 import com.twilio.conversations.TwilioConversations;
 import com.twilio.conversations.TwilioConversationsException;
 import com.uservoice.uservoicesdk.Config;
@@ -40,7 +45,6 @@ import com.uservoice.uservoicesdk.UserVoice;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
-import rx.Observable;
 import io.fabric.sdk.android.Fabric;
 import rx.Scheduler;
 import rx.functions.Action1;
@@ -52,7 +56,12 @@ public class App extends MultiDexApplication {
     private static final String VC = "APP_TWILIO";
     private static final String TAG = App.class.getSimpleName();
 
+    private static final String GCM_TOKEN = "935842257865";
+
     private AppComponent component;
+    private String apiKey;
+
+    private OutgoingInvite outgoingInvite;
 
     private TwilioAccessManager accessManager;
     private ConversationsClient conversationsClient;
@@ -67,6 +76,8 @@ public class App extends MultiDexApplication {
     UserPreferences userPreferences;
     @Inject
     LocationManager locationManager;
+    @Inject
+    PusherHelper mPusherHelper;
     @Inject
     VideoConversationPresenter presenter;
 
@@ -87,7 +98,10 @@ public class App extends MultiDexApplication {
 
         initFfmpeg();
 
-        /** Video Conversations **/
+        initGcm();
+
+        initPusher();
+
         presenter.getTwilioRequirementObservable()
                 .subscribe(new Action1<String>() {
                     @Override
@@ -95,6 +109,7 @@ public class App extends MultiDexApplication {
                         initializeVideoCalls(apiKey);
                     }
                 });
+
         presenter.getErrorObservable()
                 .subscribe(new Action1<Throwable>() {
                     @Override
@@ -104,25 +119,50 @@ public class App extends MultiDexApplication {
                 });
     }
 
+    private void initGcm() {
+        AppuniteGcm.initialize(this, GCM_TOKEN)
+                .loggingEnabled(!BuildConfig.DEBUG)
+                .getPushBundleObservable()
+                .subscribe(NotificationHelper.sendNotificationAction(this));
+    }
+
+    private void initPusher() {
+        if (userPreferences.isNormalUser()) {
+            initPusher(userPreferences.getAuthToken().get());
+        }
+    }
+
+    private void initPusher(String token) {
+        mPusherHelper.init(token);
+        final Pusher pusher = mPusherHelper.getPusher();
+        pusher.connect();
+        final User user = userPreferences.getUser();
+        assert user != null;
+        pusher.subscribePresence(String.format("presence-u-%1$s", user.getId()));
+    }
+
     private void initFfmpeg() {
         FFmpeg ffmpeg = FFmpeg.getInstance(this);
         try {
             ffmpeg.loadBinary(new LoadBinaryResponseHandler() {
 
                 @Override
-                public void onStart() {}
+                public void onStart() {
+                }
 
                 @Override
-                public void onFailure() {}
+                public void onFailure() {
+                }
 
                 @Override
-                public void onSuccess() {}
+                public void onSuccess() {
+                }
 
                 @Override
-                public void onFinish() {}
+                public void onFinish() {
+                }
             });
         } catch (FFmpegNotSupportedException e) {
-            // Handle if FFmpeg is not supported by device
         }
     }
 
@@ -222,6 +262,7 @@ public class App extends MultiDexApplication {
             @Override
             public void onStopListeningForInvites(ConversationsClient conversationsClient) {
                 conversationsClient.listen();
+                Log.d(VC, "Stop listening for Conversations");
             }
 
             @Override
@@ -235,6 +276,7 @@ public class App extends MultiDexApplication {
                             }
                         });
                } conversationsClient.listen();
+                Log.d(VC, "Failed to listening for Conversations");
             }
 
             @Override
@@ -253,11 +295,11 @@ public class App extends MultiDexApplication {
                                 startActivity(intent);
                             }
                         });
-
             }
 
             @Override
             public void onIncomingInviteCancelled(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+                Log.d(VC, "Incoming call canceled");
                 conversationsClient.listen();
             }
         };
@@ -271,4 +313,10 @@ public class App extends MultiDexApplication {
     public ConversationsClient getConversationsClient(){
         return conversationsClient;
     }
+
+    public void setConversationsClient(ConversationsClient conversationsClient) {
+        this.conversationsClient = conversationsClient;
+        conversationsClient.listen();
+    }
+
 }

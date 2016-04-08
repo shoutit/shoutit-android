@@ -3,7 +3,6 @@ package com.shoutit.app.android.dao;
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
-import com.appunite.rx.functions.Functions1;
 import com.appunite.rx.operators.MoreOperators;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -12,14 +11,11 @@ import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.CallerProfile;
 import com.shoutit.app.android.api.model.UserIdentity;
 
-import java.util.concurrent.TimeUnit;
-
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Scheduler;
-import rx.subjects.BehaviorSubject;
 
 public class UsersIdentityDao {
 
@@ -94,4 +90,5 @@ public class UsersIdentityDao {
                     .compose(ObservableExtensions.<ResponseOrError<CallerProfile>>behaviorRefCount());
         }
     }
+
 }

@@ -49,7 +49,7 @@ public class PostLoginPresenter {
         mStringSelectionHelper = selectionHelper;
 
         final Observable<ResponseOrError<List<Category>>> listObservableResponseOrError = dao
-                .getListObservableResponseOrError()
+                .categoriesObservable()
                 .subscribeOn(networkScheduler)
                 .observeOn(uiScheduler);
         final Observable<List<Category>> success = listObservableResponseOrError.compose(ResponseOrError.<List<Category>>onlySuccess());
@@ -63,7 +63,7 @@ public class PostLoginPresenter {
                     @Nullable
                     @Override
                     public CategoryItem apply(Category input) {
-                        return new CategoryItem(input.getImage(), input.getName(), input.getSlug());
+                        return new CategoryItem(input.getIcon(), input.getName(), input.getSlug());
                     }
                 }));
             }

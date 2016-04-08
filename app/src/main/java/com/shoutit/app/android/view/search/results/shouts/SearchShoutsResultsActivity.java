@@ -14,6 +14,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.view.search.SearchPresenter;
+import com.shoutit.app.android.view.search.main.MainSearchActivity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -48,9 +49,10 @@ public class SearchShoutsResultsActivity extends BaseActivity {
         ButterKnife.bind(this);
 
         final Intent intent = checkNotNull(getIntent());
-        final String searchQuery = checkNotNull(intent.getStringExtra(KEY_SEARCH_QUERY));
+        final String searchQuery = intent.getStringExtra(KEY_SEARCH_QUERY);
         final String contextualItemId = intent.getStringExtra(KEY_CONTEXTUAL_ITEM_ID);
-        final SearchPresenter.SearchType searchType = (SearchPresenter.SearchType) checkNotNull(intent.getSerializableExtra(KEY_SEARCH_TYPE));
+        final SearchPresenter.SearchType searchType = (SearchPresenter.SearchType)
+                checkNotNull(intent.getSerializableExtra(KEY_SEARCH_TYPE));
 
         setUpToolbar(searchQuery);
 
@@ -61,6 +63,12 @@ public class SearchShoutsResultsActivity extends BaseActivity {
                             SearchShoutsResultsFragment.newInstance(searchQuery, contextualItemId, searchType))
                     .commit();
         }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Let fragment handle results
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @SuppressLint("PrivateResource")
@@ -79,7 +87,7 @@ public class SearchShoutsResultsActivity extends BaseActivity {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.search_results_menu_search:
-                        finish();
+                        startActivity(MainSearchActivity.newIntent(SearchShoutsResultsActivity.this));
                         return true;
                     default:
                         return false;

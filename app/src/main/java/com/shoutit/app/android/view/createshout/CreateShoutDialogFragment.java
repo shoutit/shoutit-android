@@ -71,8 +71,8 @@ public class CreateShoutDialogFragment extends DialogFragment {
                     MainActivity.REQUST_CODE_CAMERA_PERMISSION,
                     ColoredSnackBar.contentView(getActivity()),
                     R.string.permission_camera_explanation,
-                    new String[]{Manifest.permission.CAMERA})) {
-                startActivity(RecordMediaActivity.newIntent(getActivity()));
+                    new String[] {Manifest.permission.CAMERA})) {
+                startActivity(RecordMediaActivity.newIntent(getActivity(), false));
             }
         }
         dismiss();

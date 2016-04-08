@@ -9,6 +9,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.Category;
+import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.Discover;
 import com.shoutit.app.android.api.model.DiscoverChild;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
@@ -20,6 +21,7 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ShoutsDao;
+import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.model.LocationPointer;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
@@ -67,13 +69,16 @@ public class HomePresenterTest {
     private final TestSubject<Object> loadMoreShoutsSubject = TestSubject.create(scheduler);
     private final TestSubject<ResponseOrError<DiscoverResponse>> discoversSubject = TestSubject.create(scheduler);
     private final TestSubject<ResponseOrError<DiscoverItemDetailsResponse>> discoversDetailsSubject = TestSubject.create(scheduler);
+    private ShoutsGlobalRefreshPresenter globalRefreshPresenter;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
+        globalRefreshPresenter = new ShoutsGlobalRefreshPresenter();
+
         when(shoutsDao.getHomeShoutsObservable(any(LocationPointer.class))).thenReturn(shoutsSubject);
-        when(shoutsDao.getLoadMoreHomeShoutsObserver()).thenReturn(loadMoreShoutsSubject);
+        when(shoutsDao.getLoadMoreHomeShoutsObserver(any(LocationPointer.class))).thenReturn(loadMoreShoutsSubject);
 
         when(discoversDao.getDiscoverItemDao(anyString())).thenReturn(discoverItemDao);
         when(discoversDao.getDiscoverItemDao(anyString()).getDiscoverItemObservable()).thenReturn(discoversDetailsSubject);
@@ -82,7 +87,7 @@ public class HomePresenterTest {
         when(userPreferences.isUserLoggedIn()).thenReturn(true);
         when(userPreferences.getLocationObservable()).thenReturn(Observable.just(new UserLocation(0, 0, "zz", null, null, null, null)));
 
-        presenter = new HomePresenter(shoutsDao, discoversDao, userPreferences, context, Schedulers.immediate());
+        presenter = new HomePresenter(shoutsDao, discoversDao, userPreferences, context, Schedulers.immediate(), globalRefreshPresenter);
     }
 
     @Test
@@ -213,7 +218,7 @@ public class HomePresenterTest {
     private ResponseOrError<ShoutsResponse> shoutsResponse() {
         return ResponseOrError.fromData(new ShoutsResponse(1, "2", null, Lists.newArrayList(
                 new Shout("id", null, null, null, null, null, null, 2L, 2f, null, null, null,
-                        user, category, null, 2, null, null, 0))));
+                        user, category, null, 2, null, null, 0, ImmutableList.<Conversation>of(), true))));
     }
 
     @Nonnull

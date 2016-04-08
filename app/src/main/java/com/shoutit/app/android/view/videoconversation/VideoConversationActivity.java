@@ -249,7 +249,7 @@ public class VideoConversationActivity extends BaseActivity {
                 cameraCapturer.stopPreview();
                 localVideoRenderer = new VideoViewRenderer(VideoConversationActivity.this, localWindow);
                 localVideoTrack.addRenderer(localVideoRenderer);
-                conversationInfoSubject.onNext(String.format(getString(R.string.video_calls_connecting), callTaker));
+                conversationInfoSubject.onNext(getString(R.string.video_calls_connecting));
 
             }
 

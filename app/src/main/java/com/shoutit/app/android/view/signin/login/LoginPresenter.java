@@ -7,6 +7,7 @@ import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
@@ -63,6 +64,13 @@ public class LoginPresenter {
                         return location;
                     }
                 })
+                .filter(new Func1<UserLocation, Boolean>() {
+                    @Override
+                    public Boolean call(UserLocation userLocation) {
+                        return !Strings.isNullOrEmpty(mEmailSubject.getValue()) &&
+                                !Strings.isNullOrEmpty(mPasswordSubject.getValue());
+                    }
+                })
                 .switchMap(new Func1<UserLocation, Observable<EmailLoginRequest>>() {
                     @Override
                     public Observable<EmailLoginRequest> call(final UserLocation location) {
@@ -99,8 +107,8 @@ public class LoginPresenter {
                 .doOnNext(new Action1<SignResponse>() {
                     @Override
                     public void call(SignResponse signResponse) {
-                        userPreferences.setLoggedIn(signResponse.getAccessToken(), signResponse.getRefreshToken());
                         userPreferences.saveUserAsJson(signResponse.getUser());
+                        userPreferences.setLoggedIn(signResponse.getAccessToken(), signResponse.getRefreshToken());
                     }
                 });
 

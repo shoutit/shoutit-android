@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/chats_toolbar"
+        style="@style/AppTheme.BaseToolbarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/chats_send_layout"
+        android:layout_below="@+id/chats_toolbar"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/chats_shout_layout"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:visibility="visible">
+
+            <ImageView
+                android:id="@+id/chats_shout_image"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginBottom="6dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="6dp"
+                tools:src="@drawable/ca"/>
+
+            <TextView
+                android:id="@+id/chats_shout_layout_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/chats_shout_image"
+                android:layout_toEndOf="@+id/chats_shout_image"
+                android:layout_toRightOf="@+id/chats_shout_image"
+                tools:text="Maerino Wool Text Long name Text"/>
+
+            <TextView
+                android:id="@+id/chats_shout_layout_author_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/chats_shout_image"
+                android:layout_toEndOf="@+id/chats_shout_image"
+                android:layout_toRightOf="@+id/chats_shout_image"
+                tools:text="John Smith - 2 hours ago"/>
+
+            <TextView
+                android:id="@+id/chats_shout_layout_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                tools:text="Offer"/>
+
+            <TextView
+                android:id="@+id/chats_shout_layout_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                tools:text="$44 USD"/>
+
+        </RelativeLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/chats_recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/chats_send_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/chats_message_edittext"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="8"/>
+
+        <ImageButton
+            android:id="@+id/chats_message_send_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="2"
+            android:background="?selectableItemBackground"
+            android:src="@drawable/send"/>
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/chats_attatchments_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/chats_toolbar"
+        android:background="@android:color/white"
+        android:visibility="gone">
+
+        <GridLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:columnCount="2"
+            android:rowCount="2">
+
+            <LinearLayout
+                android:layout_marginEnd="6dp"
+                android:layout_marginRight="60dp"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical">
+
+                <ImageButton
+                    android:id="@+id/chats_attatchments_photo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?selectableItemBackground"
+                    android:src="@drawable/photo_attachment"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/chats_attatchments_photo"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_marginLeft="60dp"
+                android:layout_marginStart="60dp"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical">
+
+                <ImageButton
+                    android:id="@+id/chats_attatchments_video"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?selectableItemBackground"
+                    android:src="@drawable/video_attachment"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/chats_attatchments_video"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_marginBottom="20dp"
+                android:layout_marginEnd="60dp"
+                android:layout_marginRight="60dp"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical">
+
+                <ImageButton
+                    android:id="@+id/chats_attatchments_shout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?selectableItemBackground"
+                    android:src="@drawable/shout"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/chats_attatchments_shout"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_marginBottom="20dp"
+                android:layout_marginLeft="60dp"
+                android:layout_marginStart="60dp"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical">
+
+                <ImageButton
+                    android:id="@+id/chats_attatchments_location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?selectableItemBackground"
+                    android:src="@drawable/location_attachment"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/chats_attatchments_location"/>
+            </LinearLayout>
+
+        </GridLayout>
+
+    </FrameLayout>
+
+    <ProgressBar
+        android:id="@+id/chats_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"/>
+
+</RelativeLayout>

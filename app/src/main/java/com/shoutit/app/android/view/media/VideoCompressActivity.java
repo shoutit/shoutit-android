@@ -53,7 +53,7 @@ public class VideoCompressActivity extends Activity {
                 //First Copy file to our directory
                 oldCopyPath = copyFileToFolderDiffname(fileVideo.getAbsolutePath(), VideoUtils.getWorkingFolder() + File.separator);
                 if (BuildConfig.DEBUG) {
-                    Log.e("oldPath", oldCopyPath);
+                    Log.i("oldPath", oldCopyPath);
                 }
                 String mOutputPath = VideoUtils.getOutputPath(fileVideo.getName());
                 String[] complexCommand = {
@@ -131,7 +131,7 @@ public class VideoCompressActivity extends Activity {
 
                 @Override
                 public void onProgress(String message) {
-                    Log.e("onProgress", message);
+                    Log.i("onProgress", message);
                     Matcher matcher = FFMPEG_RESPONSE_PATTERN.matcher(message);
                     if (matcher.find()) {
                         String match = matcher.group(1);
@@ -156,7 +156,7 @@ public class VideoCompressActivity extends Activity {
 
                 @Override
                 public void onSuccess(String message) {
-                    Log.e("onSuccess", message);
+                    Log.i("onSuccess", message);
                     transcodingFinished();
                 }
 
@@ -187,7 +187,7 @@ public class VideoCompressActivity extends Activity {
         if (fDuplicateFile.exists()) {
             boolean mDeleted = fDuplicateFile.delete();
             if (BuildConfig.DEBUG) {
-                Log.e("Was the file deleted", "" + mDeleted);
+                Log.i("Was the file deleted", "" + mDeleted);
                 try {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                         Intent mediaScanIntent = new Intent(
@@ -217,7 +217,7 @@ public class VideoCompressActivity extends Activity {
             // send dataset back
             Intent intent = new Intent();
             if (BuildConfig.DEBUG) {
-                Log.e("paths ", new Gson().toJson(dataSet));
+                Log.i("paths ", new Gson().toJson(dataSet));
 
             }
             intent.putParcelableArrayListExtra(Constants.INTENT_EXTRA_IMAGES, dataSet);

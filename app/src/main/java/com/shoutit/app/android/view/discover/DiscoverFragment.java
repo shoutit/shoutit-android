@@ -20,7 +20,7 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.view.shout.ShoutActivity;
-import com.shoutit.app.android.view.shouts.DiscoverShoutsActivity;
+import com.shoutit.app.android.view.shouts.discover.DiscoverShoutsActivity;
 
 import java.util.List;
 
@@ -122,6 +122,10 @@ public class DiscoverFragment extends BaseFragment {
                         startActivity(intent);
                     }
                 });
+
+        presenter.getShoutsRefreshObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
     }
 
     @Override

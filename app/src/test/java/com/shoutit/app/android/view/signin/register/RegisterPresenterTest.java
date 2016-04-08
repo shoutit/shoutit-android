@@ -10,15 +10,23 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.UserLocationSimple;
 import com.shoutit.app.android.location.LocationManager;
+import com.shoutit.app.android.utils.LocationUtils;
+import com.shoutit.app.android.utils.PermissionHelper;
+import com.shoutit.app.android.utils.Validators;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import rx.Observable;
 import rx.observers.TestObserver;
+import rx.observers.TestSubscriber;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
@@ -28,6 +36,8 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(Validators.class)
 public class RegisterPresenterTest {
 
     private RegisterPresenter mRegisterPresenter;
@@ -57,6 +67,7 @@ public class RegisterPresenterTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
+        PowerMockito.mockStatic(Validators.class);
 
         when(location.getLatitude()).thenReturn(1d);
         when(location.getLongitude()).thenReturn(1d);
@@ -69,6 +80,9 @@ public class RegisterPresenterTest {
 
         when(mUserPreferences.getLocationObservable())
                 .thenReturn(Observable.just(location));
+
+        when(Validators.isEmailValid(anyString()))
+                .thenReturn(true);
 
         mRegisterPresenter = new RegisterPresenter(mApiService,
                 mUserPreferences, Schedulers.immediate(), Schedulers.immediate());
@@ -87,21 +101,21 @@ public class RegisterPresenterTest {
     }
 
     private void registerSuccessful() {
-        final TestObserver<Object> successObserver = new TestObserver<>();
-        final TestObserver<Object> failObserver = new TestObserver<>();
+        final TestSubscriber<Object> successObserver = new TestSubscriber<>();
+        final TestSubscriber<Object> failObserver = new TestSubscriber<>();
         mRegisterPresenter.successObservable().subscribe(successObserver);
         mRegisterPresenter.failObservable().subscribe(failObserver);
 
-        mRegisterPresenter.getEmailObserver().onNext("test");
+        mRegisterPresenter.getEmailObserver().onNext("test@test.com");
         mRegisterPresenter.getPasswordObserver().onNext("testtest");
         mRegisterPresenter.getNameObserver().onNext("test");
         mRegisterPresenter.getProceedObserver().onNext(new Object());
 
-        assert_().that(successObserver.getOnErrorEvents()).isEmpty();
-        assert_().that(successObserver.getOnNextEvents()).hasSize(1);
+        successObserver.assertNoErrors();
+        successObserver.assertValueCount(1);
 
-        assert_().that(failObserver.getOnNextEvents()).isEmpty();
-        assert_().that(failObserver.getOnNextEvents()).isEmpty();
+        failObserver.assertNoErrors();
+        failObserver.assertNoValues();
     }
 
     @Test
@@ -113,7 +127,7 @@ public class RegisterPresenterTest {
         mRegisterPresenter.successObservable().subscribe(successObserver);
         mRegisterPresenter.failObservable().subscribe(failObserver);
 
-        mRegisterPresenter.getEmailObserver().onNext("test");
+        mRegisterPresenter.getEmailObserver().onNext("test@z.com");
         mRegisterPresenter.getPasswordObserver().onNext("testtest");
         mRegisterPresenter.getNameObserver().onNext("test");
         mRegisterPresenter.getProceedObserver().onNext(new Object());
@@ -245,7 +259,7 @@ public class RegisterPresenterTest {
         mRegisterPresenter.successObservable().subscribe(successObserver);
         mRegisterPresenter.failObservable().subscribe(failObserver);
 
-        mRegisterPresenter.getEmailObserver().onNext("test");
+        mRegisterPresenter.getEmailObserver().onNext("test@z.com");
         mRegisterPresenter.getPasswordObserver().onNext("testtest");
         mRegisterPresenter.getNameObserver().onNext("test");
         mRegisterPresenter.getProceedObserver().onNext(new Object());

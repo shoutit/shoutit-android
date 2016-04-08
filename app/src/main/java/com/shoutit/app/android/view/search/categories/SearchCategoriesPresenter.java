@@ -29,7 +29,6 @@ import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Func1;
-import rx.functions.Func2;
 import rx.subjects.PublishSubject;
 
 public class SearchCategoriesPresenter {
@@ -47,7 +46,7 @@ public class SearchCategoriesPresenter {
                                      @ForActivity final Context context) {
 
         final Observable<ResponseOrError<List<Category>>> categoriesRequest = categoriesDao
-                .getListObservableResponseOrError()
+                .categoriesObservable()
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<List<Category>>>behaviorRefCount());
 

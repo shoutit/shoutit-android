@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
-import android.support.design.widget.TextInputLayout;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.util.Pair;
@@ -28,12 +27,14 @@ import android.widget.TextView;
 
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.CategoryFilter;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.Video;
@@ -46,6 +47,7 @@ import com.shoutit.app.android.view.createshout.ShoutMediaPresenter;
 import com.shoutit.app.android.view.createshout.location.LocationActivity;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
 import com.shoutit.app.android.widget.CurrencySpinnerAdapter;
+import com.shoutit.app.android.widget.ErrorTextInputLayout;
 import com.shoutit.app.android.widget.SimpleCurrencySpinnerAdapter;
 import com.shoutit.app.android.widget.SimpleSpinnerAdapter;
 import com.shoutit.app.android.widget.SpinnerAdapter;
@@ -75,7 +77,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     @Bind(R.id.edit_shout_title)
     EditText mTitle;
     @Bind(R.id.edit_description_layout)
-    TextInputLayout mEditLayout;
+    ErrorTextInputLayout mEditLayout;
     @Bind(R.id.edit_budget)
     EditText mEditBudget;
     @Bind(R.id.edit_currency_spinner)
@@ -96,6 +98,8 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     ImageView mEditCurrencyInfo;
     @Bind(R.id.edit_media_container)
     LinearLayout mEditMediaContainer;
+    @Bind(R.id.edit_shout_mobile)
+    EditText mobileEditText;
 
     @Inject
     EditShoutPresenter mEditShoutPresenter;
@@ -277,6 +281,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
         if (show) {
             mEditLayout.setErrorEnabled(true);
             mEditLayout.setError(getString(R.string.create_request_activity_title_too_short));
+            hideProgress();
         } else {
             mEditLayout.setErrorEnabled(false);
         }
@@ -299,6 +304,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
 
     @Override
     public void setOptions(@NonNull List<CategoryFilter> options) {
+        final boolean setStartSelection = mEditShoutContainer.getChildCount() == 0;
         mEditShoutContainer.removeAllViews();
         final LayoutInflater layoutInflater = getLayoutInflater();
 
@@ -322,7 +328,14 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
 
             final SpinnerAdapter adapter = new SimpleSpinnerAdapter(R.string.edit_shout_option, this);
             spinner.setAdapter(adapter);
-            adapter.setData(optionsPairs);
+
+            adapter.setData(ImmutableList.<Pair<String, String>>builder()
+                    .add(new Pair<>("", getString(R.string.option_not_set)))
+                    .addAll(optionsPairs)
+                    .build());
+            if (setStartSelection && categoryFilter.getSelectedValue() != null) {
+                spinner.setSelection(adapter.getPosition(categoryFilter.getSelectedValue().getSlug()));
+            }
 
             title.setText(name);
             view.setTag(categoryFilter.getSlug());
@@ -340,7 +353,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
             final StateSpinner spinner = (StateSpinner) view.findViewById(R.id.option_spinner);
 
             final Pair<String, String> selectedItem = (Pair<String, String>) spinner.getSelectedItem();
-            if (selectedItem != null) {
+            if (selectedItem != null && !Strings.isNullOrEmpty(selectedItem.first)) {
                 list.add(Pair.create((String) view.getTag(), selectedItem.first));
             }
         }
@@ -363,10 +376,14 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     }
 
     @Override
-    public void setCategoryImage(@Nullable String image) {
-        mPicasso.load(image)
-                .fit()
-                .into(mEditCategoryIcon);
+    public void setCategory(@Nullable Category category) {
+        if (category != null) {
+            mPicasso.load(category.getIcon())
+                    .fit()
+                    .into(mEditCategoryIcon);
+
+            mEditCategorySpinner.setSelection(mCategoryAdapter.getPosition(category.getSlug()));
+        }
     }
 
     @Override
@@ -377,6 +394,11 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     @Override
     public void setMedia(@NonNull List<String> images, @NonNull List<Video> videos) {
         mShoutMediaPresenter.addRemoteMedia(images, videos);
+    }
+
+    @Override
+    public void setMobilePhone(@Nullable String mobileHint) {
+        mobileEditText.setText(mobileHint);
     }
 
     @Override
@@ -431,13 +453,14 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     @SuppressWarnings("unchecked")
     @Override
     public void mediaEditionCompleted(@NonNull List<String> images, @NonNull List<Video> videos) {
+        final String mobile = mobileEditText.getText().toString();
         final EditShoutPresenter.RequestData requestData = new EditShoutPresenter.RequestData(
                 mTitle.getText().toString(),
                 mEditShoutDescription.getText().toString(),
                 mEditBudget.getText().toString(),
                 ((PriceUtils.SpinnerCurrency) mEditCurrencySpinner.getSelectedItem()).getCode(),
                 ((Pair<String, String>) mEditCategorySpinner.getSelectedItem()).first,
-                getSelectedOptions(), images, videos);
+                getSelectedOptions(), images, videos, (Strings.isNullOrEmpty(mobile) || mobile.endsWith(".")) ? null : mobile);
         mEditShoutPresenter.dataReady(requestData);
     }
 

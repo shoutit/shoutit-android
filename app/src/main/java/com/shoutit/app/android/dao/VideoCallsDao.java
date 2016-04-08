@@ -4,12 +4,8 @@ import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.operators.MoreOperators;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.TwilioResponse;
-import com.shoutit.app.android.api.model.UserIdentity;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -21,6 +17,9 @@ import rx.subjects.PublishSubject;
 public class VideoCallsDao {
     @Nonnull
     private Observable<ResponseOrError<TwilioResponse>> videoCallsObservable;
+    @Nonnull
+    private PublishSubject<Object> refreshSubject = PublishSubject.create();
+
     @Nonnull
     private final ApiService apiService;
     @Nonnull
@@ -42,5 +41,10 @@ public class VideoCallsDao {
     @Nonnull
     public Observable<ResponseOrError<TwilioResponse>> getVideoCallsObservable() {
         return videoCallsObservable;
+    }
+
+    @Nonnull
+    public PublishSubject<Object> getRefreshSubject() {
+        return refreshSubject;
     }
 }

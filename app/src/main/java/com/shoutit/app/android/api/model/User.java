@@ -12,6 +12,7 @@ public class User extends BaseProfile {
 
     private final String apiUrl;
     private final String webUrl;
+    // whever the profile is listening to you
     private final boolean isListener;
     private final boolean isPasswordSet;
     private final UserLocation location;
@@ -24,12 +25,13 @@ public class User extends BaseProfile {
     private final String about;
     private final String mobile;
     private final String website;
+    private final Conversation conversation;
 
     public User(String id, String type, String apiUrl, String webUrl, String username,
                 String name, String firstName, String lastName, boolean isActivated, String image,
                 String cover, boolean isListening, boolean isListener, boolean isPasswordSet, UserLocation location,
                 int listenersCount, List<Page> pages, List<Admin> admins, String bio, int dateJoined,
-                Listening listeningCount, boolean isOwner, String about, String mobile, String website) {
+                Listening listeningCount, boolean isOwner, String about, String mobile, String website, Conversation conversation) {
         super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount);
         this.apiUrl = apiUrl;
         this.webUrl = webUrl;
@@ -45,11 +47,12 @@ public class User extends BaseProfile {
         this.about = about;
         this.mobile = mobile;
         this.website = website;
+        this.conversation = conversation;
     }
 
     // TODO remove it when user will be handler by API
     public static User guestUser(UserLocation location) {
-        return new User(null, null, null, null ,null, null, null, null, false, null, null, false, false, false, location, 1, null, null, null, 0, null, false, null, null, null);
+        return new User(null, null, null, null ,null, null, null, null, false, null, null, false, false, false, location, 1, null, null, null, 0, null, false, null, null, null, null);
     }
 
     public User getListenedProfile() {
@@ -59,7 +62,7 @@ public class User extends BaseProfile {
                 firstName, lastName, isActivated, image, cover,
                 newIsListening, isListener, isPasswordSet, location,
                 newListenersCount, pages, admins, bio, dateJoined, listeningCount,
-                false, about, mobile, website);
+                false, about, mobile, website, conversation);
     }
 
     public static User userWithUpdatedPages(@Nonnull User user, List<Page> pages) {
@@ -67,7 +70,7 @@ public class User extends BaseProfile {
                 user.firstName, user.lastName, user.isActivated, user.image, user.cover,
                 user.isListening, user.isListener, user.isPasswordSet, user.location,
                 user.listenersCount, pages, user.admins, user.bio, user.dateJoined, user.listeningCount,
-                false, user.about, user.mobile, user.website);
+                false, user.about, user.mobile, user.website, user.conversation);
     }
 
     public static User userWithUpdatedAdmins(@Nonnull User user, List<Admin> updatedAdmins) {
@@ -75,7 +78,7 @@ public class User extends BaseProfile {
                 user.firstName, user.lastName, user.isActivated, user.image, user.cover,
                 user.isListening, user.isListener, user.isPasswordSet, user.location,
                 user.listenersCount, user.pages, updatedAdmins, user.bio, user.dateJoined, user.listeningCount,
-                false, user.about, user.mobile, user.website);
+                false, user.about, user.mobile, user.website, user.conversation);
     }
 
     public String getId() {
@@ -176,6 +179,10 @@ public class User extends BaseProfile {
 
     public String getWebsite() {
         return website;
+    }
+
+    public Conversation getConversation() {
+        return conversation;
     }
 
     @Override

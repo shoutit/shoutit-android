@@ -12,6 +12,7 @@ import com.shoutit.app.android.api.model.Admin;
 import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.view.profile.ChatInfo;
 import com.shoutit.app.android.view.profile.ProfileAdapterItems;
 import com.shoutit.app.android.view.profile.UserOrPageProfilePresenter;
 
@@ -36,7 +37,7 @@ public class UserProfileHalfPresenter {
     @Nonnull
     private final PublishSubject<Object> actionOnlyForLoggedInUserSubject = PublishSubject.create();
     @Nonnull
-    private final PublishSubject<String> onChatIconClickedSubject = PublishSubject.create();
+    private final PublishSubject<ChatInfo> onChatIconClickedSubject = PublishSubject.create();
     @Nonnull
     private final PublishSubject<User> onListenActionClickedSubject = PublishSubject.create();
     @Nonnull
@@ -195,7 +196,7 @@ public class UserProfileHalfPresenter {
     }
 
     @Nonnull
-    public PublishSubject<String> getOnChatIconClickedSubject() {
+    public PublishSubject<ChatInfo> getOnChatIconClickedSubject() {
         return onChatIconClickedSubject;
     }
 

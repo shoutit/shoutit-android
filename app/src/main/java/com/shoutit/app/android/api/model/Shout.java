@@ -10,8 +10,9 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 public class Shout {
-    private static final String TYPE_OFFER = "offer";
-    private static final String TYPE_REQUEST = "request";
+    public static final String TYPE_OFFER = "offer";
+    public static final String TYPE_REQUEST = "request";
+    public static final String TYPE_ALL = "all";
 
     @Nonnull
     private final String id;
@@ -33,11 +34,14 @@ public class Shout {
     private final List<Video> videos;
     private final List<Filter> filters;
     private final int availableCount;
+    private final Boolean isMobileSet;
+    private final List<Conversation> conversations;
 
     public Shout(@Nonnull String id, String apiUrl, String webUrl, String type,
                  UserLocation location, String title, String text, Long price, float number,
                  String currency, String thumbnail, String videoUrl, User profile,
-                 Category category, List<Filter> filters, long datePublished, List<String> images, List<Video> videos, int availableCount) {
+                 Category category, List<Filter> filters, long datePublished, List<String> images,
+                 List<Video> videos, int availableCount, List<Conversation> conversations, boolean isMobileSet) {
         this.id = id;
         this.apiUrl = apiUrl;
         this.webUrl = webUrl;
@@ -57,6 +61,8 @@ public class Shout {
         this.filters = filters;
         this.videos = videos;
         this.availableCount = availableCount;
+        this.isMobileSet = isMobileSet;
+        this.conversations = conversations;
     }
 
     @Nonnull
@@ -143,12 +149,22 @@ public class Shout {
         return filters;
     }
 
+    public Boolean isMobileSet() {
+        return isMobileSet;
+    }
+
+    public List<Conversation> getConversations() {
+        return conversations;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Shout)) return false;
         final Shout shout = (Shout) o;
         return Float.compare(shout.number, number) == 0 &&
+                datePublished == shout.datePublished &&
+                availableCount == shout.availableCount &&
                 Objects.equal(id, shout.id) &&
                 Objects.equal(apiUrl, shout.apiUrl) &&
                 Objects.equal(webUrl, shout.webUrl) &&
@@ -156,21 +172,23 @@ public class Shout {
                 Objects.equal(location, shout.location) &&
                 Objects.equal(title, shout.title) &&
                 Objects.equal(text, shout.text) &&
+                Objects.equal(price, shout.price) &&
                 Objects.equal(currency, shout.currency) &&
                 Objects.equal(thumbnail, shout.thumbnail) &&
                 Objects.equal(videoUrl, shout.videoUrl) &&
                 Objects.equal(profile, shout.profile) &&
                 Objects.equal(category, shout.category) &&
-                Objects.equal(datePublished, shout.datePublished) &&
-                Objects.equal(price, shout.price) &&
-                Objects.equal(availableCount, shout.availableCount) &&
+                Objects.equal(images, shout.images) &&
                 Objects.equal(videos, shout.videos) &&
-                Objects.equal(images, shout.images);
+                Objects.equal(filters, shout.filters) &&
+                Objects.equal(isMobileSet, shout.isMobileSet) &&
+                Objects.equal(conversations, shout.conversations);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id, apiUrl, webUrl, type, location, title, text, price,
-                number, currency, thumbnail, videoUrl, profile, category, datePublished, images, availableCount, videos);
+        return Objects.hashCode(id, apiUrl, webUrl, type, location, title, text, price, number,
+                currency, thumbnail, videoUrl, profile, category, datePublished, images, videos,
+                filters, availableCount, isMobileSet, conversations);
     }
 }

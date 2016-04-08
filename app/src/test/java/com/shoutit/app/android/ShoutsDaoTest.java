@@ -18,7 +18,9 @@ import rx.observers.TestSubscriber;
 import rx.schedulers.TestScheduler;
 
 import static com.google.common.truth.Truth.assert_;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -43,7 +45,8 @@ public class ShoutsDaoTest {
         locationPointer = new LocationPointer("GE", "Berlin");
 
         when(userPreferences.isUserLoggedIn()).thenReturn(true);
-        when(apiService.shoutsForLocation(anyString(), anyString(),anyString(), anyInt(), anyInt()))
+        when(apiService.shoutsForLocation(anyString(), anyString(),anyString(), anyInt(), anyInt(),
+                anyInt(), anyInt(), anyInt(), anyString(), anyString(), anyMap()))
                 .thenReturn(Observable.just(shoutsResponse()));
         when(apiService.home(anyString(), anyInt(), anyInt()))
                 .thenReturn(Observable.just(shoutsResponse()));
@@ -82,7 +85,7 @@ public class ShoutsDaoTest {
 
         shoutsDao.getHomeShoutsObservable(locationPointer).subscribe(subscriber);
         scheduler.triggerActions();
-        shoutsDao.getLoadMoreHomeShoutsObserver().onNext(null);
+        shoutsDao.getLoadMoreHomeShoutsObserver(locationPointer).onNext(null);
         scheduler.triggerActions();
 
         subscriber.assertNoErrors();
@@ -98,7 +101,7 @@ public class ShoutsDaoTest {
 
         shoutsDao.getHomeShoutsObservable(locationPointer).subscribe(subscriber);
         scheduler.triggerActions();
-        shoutsDao.getLoadMoreHomeShoutsObserver().onNext(null);
+        shoutsDao.getLoadMoreHomeShoutsObserver(locationPointer).onNext(null);
         scheduler.triggerActions();
 
         subscriber.assertNoErrors();
