@@ -41,7 +41,8 @@
                 android:maxLines="1"
                 android:textColor="@color/black_38"
                 android:textSize="12sp"
-                tools:text="Widnows, Linux" />
+                android:text="@string/filters_not_set"
+                 />
 
         </LinearLayout>
 

@@ -2,6 +2,7 @@ package com.shoutit.app.android.view.filter;
 
 import android.content.Context;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -17,6 +18,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableMultimap;
 import com.jakewharton.rxbinding.view.RxView;
+import com.jakewharton.rxbinding.widget.RxCompoundButton;
 import com.jakewharton.rxbinding.widget.RxSeekBar;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.R;
@@ -166,6 +168,10 @@ public class FilterViewHolders {
         ImageView categoryIcon;
         @Bind(R.id.filters_category_spinner)
         Spinner categorySpinner;
+        @Bind(R.id.filters_category_item_root_view)
+        View rootView;
+        @Bind(R.id.filters_blocking_view)
+        View blockingView;
 
         private final Picasso picasso;
         private final CategorySpinnerAdapter spinnerAdapter;
@@ -191,6 +197,10 @@ public class FilterViewHolders {
                 categorySpinner.setAdapter(spinnerAdapter);
                 spinnerAdapter.bindData(item.getCategories().values());
             }
+
+            blockingView.setVisibility(item.shouldBlockCategories() ? View.VISIBLE : View.GONE);
+            rootView.setAlpha(item.shouldBlockCategories() ? 0.5f : 1f);
+            categorySpinner.setAlpha(item.shouldBlockCategories() ? 0.5f : 1f);
 
             runnable = new Runnable() {
                 @Override
@@ -622,11 +632,11 @@ public class FilterViewHolders {
                                 @Override
                                 public void call(ImmutableMultimap<String, CategoryFilter.FilterValue> selectedValuesMap) {
                                     final ImmutableCollection<CategoryFilter.FilterValue> filterValues = selectedValuesMap.get(item.getFilterSlug());
-                                    if (filterValues != null) {
+                                    if (filterValues != null && !filterValues.isEmpty()) {
                                         final String selectedValues = item.getSelectedValues(filterValues);
                                         valuesTv.setText(selectedValues);
                                     } else {
-                                        valuesTv.setText(null);
+                                        valuesTv.setText(context.getString(R.string.filters_not_set));
                                     }
                                 }
                             });
@@ -683,6 +693,7 @@ public class FilterViewHolders {
             recycle();
 
             valueTv.setText(item.getFilterValue().getName());
+            filtersValueCheckbox.setClickable(false);
 
             runnable = new Runnable() {
                 @Override

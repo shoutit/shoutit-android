@@ -28,6 +28,7 @@ import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.db.RecentSearchesTable;
 import com.shoutit.app.android.model.FiltersToSubmit;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.utils.LayoutManagerHelper;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
@@ -75,6 +76,7 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
     private ActionBarDrawerToggle drawerToggle;
     private SearchPresenter.SearchType searchType;
     private String searchQuery;
+    private String contextualItemId;
 
     public static Fragment newInstance(@Nullable String searchQuery,
                                        @Nullable String contextualItemId,
@@ -104,11 +106,12 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
         searchType = (SearchPresenter.SearchType)
                 checkNotNull(getArguments().getSerializable(SearchShoutsResultsActivity.KEY_SEARCH_TYPE));
         searchQuery = getArguments().getString(SearchShoutsResultsActivity.KEY_SEARCH_QUERY);
+        contextualItemId = getArguments().getString(SearchShoutsResultsActivity.KEY_CONTEXTUAL_ITEM_ID);
 
         if (savedInstanceState == null && shouldShowFilters()) {
             getChildFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.filter_drawer, FiltersFragment.newInstance())
+                    .replace(R.id.filter_drawer, FiltersFragment.newInstance(searchType, contextualItemId))
                     .commit();
         }
 
@@ -193,7 +196,8 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
 
     private boolean shouldShowFilters() {
         return !(searchType.equals(SearchPresenter.SearchType.DISCOVER) ||
-                searchType.equals(SearchPresenter.SearchType.PROFILE));
+                searchType.equals(SearchPresenter.SearchType.PROFILE) ||
+                searchType.equals(SearchPresenter.SearchType.RELATED_SHOUTS));
     }
 
     private void initAdapter() {
@@ -221,6 +225,13 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
                 R.string.drawer_open, R.string.drawer_close);
         if (!shouldShowFilters()) {
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        } else {
+            drawerLayout.setDrawerListener(new DrawerLayout.SimpleDrawerListener() {
+                @Override
+                public void onDrawerClosed(View drawerView) {
+                    KeyboardHelper.hideSoftKeyboard(getActivity());
+                }
+            });
         }
     }
 

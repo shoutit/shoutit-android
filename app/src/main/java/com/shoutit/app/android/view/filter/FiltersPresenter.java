@@ -2,6 +2,7 @@ package com.shoutit.app.android.view.filter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
@@ -27,6 +28,7 @@ import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.CategoriesDao;
 import com.shoutit.app.android.dao.SortTypesDao;
 import com.shoutit.app.android.model.FiltersToSubmit;
+import com.shoutit.app.android.view.search.SearchPresenter;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -43,6 +45,7 @@ import rx.Scheduler;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.functions.Func7;
+import rx.functions.Func8;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
@@ -76,14 +79,21 @@ public class FiltersPresenter {
 
     @Nonnull
     private final Context context;
+    @Nonnull
+    private final SearchPresenter.SearchType searchType;
+    @Nullable
+    private final String initCategorySlug;
 
-    @Inject
     public FiltersPresenter(@Nonnull CategoriesDao categoriesDao,
                             @Nonnull SortTypesDao sortTypesDao,
                             @Nonnull @UiScheduler Scheduler uiScheduler,
                             @Nonnull @ForActivity Context context,
-                            @Nonnull UserPreferences userPreferences) {
+                            @Nonnull UserPreferences userPreferences,
+                            @Nonnull SearchPresenter.SearchType searchType,
+                            @Nullable final String initCategorySlug) {
         this.context = context;
+        this.searchType = searchType;
+        this.initCategorySlug = initCategorySlug;
 
         final Observable<String> shoutTypeObservable = shoutTypeSelectedSubject
                 .startWith(Shout.TYPE_ALL)
@@ -150,6 +160,19 @@ public class FiltersPresenter {
                 })
                 .compose(ObservableExtensions.<HashMap<String, Category>>behaviorRefCount());
 
+        final Observable<Category> initCategoryObservable = Observable.just(searchType)
+                .withLatestFrom(successCategoriesObservable,
+                        new Func2<SearchPresenter.SearchType, HashMap<String, Category>, Category>() {
+                            @Override
+                            public Category call(SearchPresenter.SearchType searchType, HashMap<String, Category> categoriesMap) {
+                                if (shouldBlockCategories()) {
+                                    return categoriesMap.get(initCategorySlug);
+                                } else {
+                                    return getDefaultCategory();
+                                }
+                            }
+                        });
+
         final Observable<Category> selectedCategoryObservable = selectedCategorySubject
                 .withLatestFrom(successCategoriesObservable,
                         new Func2<String, HashMap<String, Category>, Category>() {
@@ -158,7 +181,7 @@ public class FiltersPresenter {
                                 return categoriesMap.get(categorySlug);
                             }
                         })
-                .startWith(getDefaultCategory())
+                .startWith(initCategoryObservable)
                 .compose(MoreOperators.<Category>refresh(resetClickedSubject))
                 .compose(ObservableExtensions.<Category>behaviorRefCount());
 
@@ -251,7 +274,7 @@ public class FiltersPresenter {
                                 .add(new FiltersAdapterItems.HeaderAdapterItem(resetClickedSubject, doneClickedSubject))
                                 .add(new FiltersAdapterItems.ShoutTypeAdapterItem(shoutTypeSelectedSubject, shoutType))
                                 .add(new FiltersAdapterItems.SortAdapterItem(sortType, sortTypes, sortTypeSelectedSubject, sortTypeObservable, resetClickedSubject))
-                                .add(new FiltersAdapterItems.CategoryAdapterItem(category, categories, selectedCategorySubject, selectedCategoryObservable))
+                                .add(new FiltersAdapterItems.CategoryAdapterItem(category, categories, selectedCategorySubject, selectedCategoryObservable, shouldBlockCategories()))
                                 .add(new FiltersAdapterItems.PriceAdapterItem(minPriceSubject, maxPriceSubject, resetClickedSubject))
                                 .add(new FiltersAdapterItems.LocationAdapterItem(userLocation, locationChangeClickSubject))
                                 .add(new FiltersAdapterItems.DistanceAdapterItem(distanceValueNumberSubject, resetClickedSubject))
@@ -284,7 +307,8 @@ public class FiltersPresenter {
                 shoutTypeObservable,
                 sortTypeObservable,
                 selectedValuesMapObservable,
-                new Func7<String, String, UserLocation, Integer, String, SortType, Multimap<String, CategoryFilter.FilterValue>, FiltersToSubmit>() {
+                selectedCategoryObservable,
+                new Func8<String, String, UserLocation, Integer, String, SortType, Multimap<String, CategoryFilter.FilterValue>, Category, FiltersToSubmit>() {
                     @Override
                     public FiltersToSubmit call(String minPrice,
                                                 String maxPrice,
@@ -292,11 +316,17 @@ public class FiltersPresenter {
                                                 Integer distance,
                                                 String shoutType,
                                                 SortType sortType,
-                                                Multimap<String, CategoryFilter.FilterValue> selectedValues) {
-                        return new FiltersToSubmit(minPrice, maxPrice, userLocation, distance, shoutType, sortType, selectedValues);
+                                                Multimap<String, CategoryFilter.FilterValue> selectedValues,
+                                                Category category) {
+                        final String categorySlug = DEFAULT_CATEGORY_SLUG.equals(category.getSlug()) ? null : category.getSlug();
+                        return new FiltersToSubmit(minPrice, maxPrice, userLocation, distance, shoutType, sortType, selectedValues, categorySlug);
                     }
                 })
                 .lift(OperatorSampleWithLastWithObservable.<FiltersToSubmit>create(doneClickedSubject));
+    }
+
+    private boolean shouldBlockCategories() {
+        return SearchPresenter.SearchType.TAG.equals(searchType) && initCategorySlug != null;
     }
 
     @NonNull

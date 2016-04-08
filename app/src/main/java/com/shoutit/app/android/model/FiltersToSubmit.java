@@ -19,9 +19,9 @@ import javax.annotation.Nonnull;
 
 public class FiltersToSubmit {
     @Nullable
-    private final Integer minPrice;
+    private final Integer minPriceInCents;
     @Nullable
-    private final Integer maxPrice;
+    private final Integer maxPriceInCents;
     @Nonnull
     private final UserLocation userLocation;
     @Nullable
@@ -32,12 +32,16 @@ public class FiltersToSubmit {
     private final SortType sortType;
     @Nullable
     private final Multimap<String, CategoryFilter.FilterValue> selectedFilters;
+    @Nullable
+    private final String categorySlug;
 
-    public FiltersToSubmit(@Nullable String minPrice, @Nullable String maxPrice, @Nonnull UserLocation userLocation, Integer distance,
-                           @Nonnull String shoutType, @Nonnull SortType sortType, @Nullable Multimap<String, CategoryFilter.FilterValue> selectedFilters) {
+    public FiltersToSubmit(@Nullable String minPriceInCents, @Nullable String maxPriceInCents, @Nonnull UserLocation userLocation, Integer distance,
+                           @Nonnull String shoutType, @Nonnull SortType sortType, @Nullable Multimap<String, CategoryFilter.FilterValue> selectedFilters,
+                           @Nullable String categorySlug) {
         this.sortType = sortType;
-        this.minPrice = Ints.tryParse(Strings.nullToEmpty(minPrice));
-        this.maxPrice = Ints.tryParse(Strings.nullToEmpty(maxPrice));
+        this.categorySlug = categorySlug;
+        this.minPriceInCents = priceToCents(Ints.tryParse(Strings.nullToEmpty(minPriceInCents)));
+        this.maxPriceInCents = priceToCents(Ints.tryParse(Strings.nullToEmpty(maxPriceInCents)));
         this.userLocation = userLocation;
         this.distance = (distance == null || distance == 0) ? null : distance;
         this.shoutType = shoutType;
@@ -63,13 +67,22 @@ public class FiltersToSubmit {
     }
 
     @Nullable
-    public Integer getMinPrice() {
-        return minPrice;
+    private Integer priceToCents(@Nullable Integer price) {
+        if (price != null) {
+            return price * 100;
+        } else {
+            return null;
+        }
     }
 
     @Nullable
-    public Integer getMaxPrice() {
-        return maxPrice;
+    public Integer getMinPriceInCents() {
+        return minPriceInCents;
+    }
+
+    @Nullable
+    public Integer getMaxPriceInCents() {
+        return maxPriceInCents;
     }
 
     @Nonnull
@@ -82,7 +95,7 @@ public class FiltersToSubmit {
         return distance;
     }
 
-    @Nullable
+    @Nonnull
     public String getShoutType() {
         return shoutType;
     }
@@ -90,6 +103,11 @@ public class FiltersToSubmit {
     @Nonnull
     public SortType getSortType() {
         return sortType;
+    }
+
+    @Nullable
+    public String getCategorySlug() {
+        return categorySlug;
     }
 
     public boolean isEntireCountryDistance() {
@@ -124,17 +142,18 @@ public class FiltersToSubmit {
         if (this == o) return true;
         if (!(o instanceof FiltersToSubmit)) return false;
         final FiltersToSubmit that = (FiltersToSubmit) o;
-        return Objects.equal(minPrice, that.minPrice) &&
-                Objects.equal(maxPrice, that.maxPrice) &&
+        return Objects.equal(minPriceInCents, that.minPriceInCents) &&
+                Objects.equal(maxPriceInCents, that.maxPriceInCents) &&
                 Objects.equal(userLocation, that.userLocation) &&
                 Objects.equal(distance, that.distance) &&
                 Objects.equal(shoutType, that.shoutType) &&
                 Objects.equal(sortType, that.sortType) &&
-                Objects.equal(selectedFilters, that.selectedFilters);
+                Objects.equal(selectedFilters, that.selectedFilters) &&
+                Objects.equal(categorySlug, that.categorySlug);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(minPrice, maxPrice, userLocation, distance, shoutType, sortType, selectedFilters);
+        return Objects.hashCode(minPriceInCents, maxPriceInCents, userLocation, distance, shoutType, sortType, selectedFilters, categorySlug);
     }
 }

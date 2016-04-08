@@ -27,6 +27,7 @@
             android:id="@+id/filters_flag_iv"
             android:layout_width="18dp"
             android:layout_height="18dp"
+            android:layout_marginTop="1dp"
             tools:src="@drawable/pl" />
 
         <TextView
