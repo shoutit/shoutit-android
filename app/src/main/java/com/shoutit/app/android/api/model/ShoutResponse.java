@@ -16,10 +16,11 @@ public class ShoutResponse {
     private final List<CategoryFilter> filters;
     private final User profile;
     private final long datePublished;
+    private final String mobileHint;
 
     public ShoutResponse(Long price, String title, String text, String type, UserLocation location,
                          String currency, Category category, List<String> images, List<Video> videos,
-                         List<CategoryFilter> filters, User profile, long datePublished) {
+                         List<CategoryFilter> filters, User profile, long datePublished, String mobileHint) {
         this.price = price;
         this.title = title;
         this.text = text;
@@ -32,6 +33,11 @@ public class ShoutResponse {
         this.filters = filters;
         this.profile = profile;
         this.datePublished = datePublished;
+        this.mobileHint = mobileHint;
+    }
+
+    public String getMobileHint() {
+        return mobileHint;
     }
 
     public Long getPrice() {

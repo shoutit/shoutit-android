@@ -7,7 +7,9 @@ import android.support.annotation.NonNull;
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
+import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
@@ -15,6 +17,7 @@ import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
+import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
@@ -23,6 +26,7 @@ import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
+import com.shoutit.app.android.model.ReportBody;
 import com.shoutit.app.android.model.UserShoutsPointer;
 import com.shoutit.app.android.utils.PreferencesHelper;
 import com.shoutit.app.android.view.profile.myprofile.MyProfileHalfPresenter;
@@ -37,6 +41,8 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import okhttp3.ResponseBody;
+import retrofit2.Response;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
@@ -66,6 +72,8 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
     private Observable<String> shareObservable;
     @Nonnull
     private Observable<Intent> searchMenuItemClickObservable;
+    @Nonnull
+    private final Observable<Object> reportSuccessObservable;
 
     @Nonnull
     private final PublishSubject<String> showAllShoutsSubject = PublishSubject.create();
@@ -83,9 +91,12 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
     private final PublishSubject<String> webUrlClickedSubject = PublishSubject.create();
     @Nonnull
     private final PublishSubject<Object> searchMenuItemClickSubject = PublishSubject.create();
+    @Nonnull
+    private final PublishSubject<String> reportSubmitSubject = PublishSubject.create();
 
     @Nonnull
     private final String userName;
+    private ShoutsDao shoutsDao;
     @Nonnull
     private final Context context;
     @Nonnull
@@ -104,13 +115,16 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
                                       @Nonnull final ShoutsDao shoutsDao,
                                       @Nonnull @ForActivity final Context context,
                                       @Nonnull final UserPreferences userPreferences,
-                                      @Nonnull @UiScheduler Scheduler uiScheduler,
+                                      @Nonnull @UiScheduler final Scheduler uiScheduler,
+                                      @Nonnull @NetworkScheduler final Scheduler networkScheduler,
                                       @Nonnull ProfilesDao profilesDao,
                                       @Nonnull MyProfileHalfPresenter myProfilePresenter,
                                       @Nonnull UserProfileHalfPresenter userProfilePresenter,
                                       @Nonnull PreferencesHelper preferencesHelper,
-                                      @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter) {
+                                      @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
+                                      @Nonnull final ApiService apiService) {
         this.userName = userName;
+        this.shoutsDao = shoutsDao;
         this.context = context;
         this.profilesDao = profilesDao;
         this.myProfilePresenter = myProfilePresenter;
@@ -211,10 +225,37 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
                 shoutsSuccessResponse.startWith(ImmutableList.<List<BaseAdapterItem>>of()),
                 combineAdapterItems());
 
+        /** Report **/
+        final Observable<ResponseOrError<Response<Object>>> reportRequestObservable = reportSubmitSubject
+                .withLatestFrom(userSuccessObservable, new Func2<String, User, BothParams<String, String>>() {
+                    @Override
+                    public BothParams<String, String> call(String reportText, User user) {
+                        return new BothParams<>(user.getId(), reportText);
+                    }
+                })
+                .flatMap(new Func1<BothParams<String, String>, Observable<ResponseOrError<Response<Object>>>>() {
+                    @Override
+                    public Observable<ResponseOrError<Response<Object>>> call(BothParams<String, String> userIdWithReportText) {
+                        final String userId = userIdWithReportText.param1();
+                        final String reportText = userIdWithReportText.param2();
+
+                        return apiService.report(ReportBody.forProfile(userId, reportText))
+                                .compose(ResponseOrError.<Response<Object>>toResponseOrErrorObservable())
+                                .subscribeOn(networkScheduler)
+                                .observeOn(uiScheduler);
+                    }
+                })
+                .compose(ObservableExtensions.<ResponseOrError<Response<Object>>>behaviorRefCount());
+
+        reportSuccessObservable = reportRequestObservable
+                .compose(ResponseOrError.<Response<Object>>onlySuccess())
+                .map(Functions1.toObject());
+
 
         /** Errors **/
         errorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
                 ResponseOrError.transform(shoutsObservable),
+                ResponseOrError.transform(reportRequestObservable),
                 ResponseOrError.transform(userRequestObservable)))
                 .mergeWith(errorsSubject)
                 .mergeWith(userProfilePresenter.getErrorObservable())
@@ -249,6 +290,7 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
         shoutsGlobalRefreshPresenter
                 .getShoutsGlobalRefreshObservable()
                 .subscribe(shoutsDao.getUserShoutsDao(new UserShoutsPointer(SHOUTS_PAGE_SIZE, userName)).getRefreshObserver());
+
     }
 
     @NonNull
@@ -312,6 +354,11 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
             return new ProfileAdapterItems.ProfileSectionAdapterItem<>(false, false, user, items.get(position),
                     userProfilePresenter.getSectionItemListenObserver(), profileToOpenSubject, actionOnlyForLoggedInUserSubject, loggedInUserName, isUserLoggedIn, false);
         }
+    }
+
+    @Nonnull
+    public Observable<Object> getReportSuccessObservable() {
+        return reportSuccessObservable;
     }
 
     @Nonnull
@@ -425,9 +472,23 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
         return userProfilePresenter.getMoreMenuOptionClickedSubject();
     }
 
+    @Nonnull
+    @Override
+    public Observable<String> getSeeAllShoutsObservable() {
+        return showAllShoutsSubject;
+    }
+
     @Override
     public void refreshProfile() {
         profilesDao.getRefreshProfileObserver(userName).onNext(null);
+        shoutsDao.getUserShoutsDao(new UserShoutsPointer(SHOUTS_PAGE_SIZE, userName))
+                .getRefreshObserver().onNext(null);
+    }
+
+    @Nonnull
+    @Override
+    public Observer<String> sendReportObserver() {
+        return reportSubmitSubject;
     }
 
     public void onSearchMenuItemClicked() {

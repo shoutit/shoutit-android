@@ -28,6 +28,7 @@ import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogFragment;
 import com.shoutit.app.android.view.discover.DiscoverActivity;
 import com.shoutit.app.android.view.main.OnSeeAllDiscoversListener;
+import com.shoutit.app.android.view.postlogininterest.PostLoginInterestActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 
 import java.util.List;
@@ -151,6 +152,16 @@ public class HomeFragment extends BaseFragment {
         presenter.getLoadMoreObservable()
                 .compose(bindToLifecycle())
                 .subscribe();
+
+        presenter.openInterestsObservable()
+                .compose(bindToLifecycle())
+                .subscribe(new Action1<Object>() {
+                    @Override
+                    public void call(Object o) {
+                        startActivity(PostLoginInterestActivity.newIntent(getActivity()));
+                        getActivity().finish();
+                    }
+                });
 
     }
 

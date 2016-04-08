@@ -1,10 +1,16 @@
 package com.shoutit.app.android.view.profile;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.view.MenuItem;
+import android.widget.EditText;
+import android.widget.PopupMenu;
+import android.widget.Toast;
 
+import com.google.common.base.Strings;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
@@ -15,6 +21,8 @@ import com.shoutit.app.android.view.chats.ChatActivity;
 import com.shoutit.app.android.view.chats.chatsfirstconversation.ChatFirstConversationActivity;
 import com.shoutit.app.android.view.editprofile.EditProfileActivity;
 import com.shoutit.app.android.view.notifications.NotificationsActivity;
+import com.shoutit.app.android.view.search.SearchPresenter;
+import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsActivity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -26,6 +34,7 @@ import static com.appunite.rx.internal.Preconditions.checkNotNull;
 public class UserOrPageProfileActivity extends ProfileActivity {
 
     private UserOrPageProfilePresenter presenter;
+    private PopupMenu popupMenu;
 
     public static Intent newIntent(@Nonnull Context context, @Nonnull String userName) {
         return new Intent(context, UserOrPageProfileActivity.class)
@@ -37,6 +46,8 @@ public class UserOrPageProfileActivity extends ProfileActivity {
         super.onCreate(savedInstanceState);
 
         presenter = (UserOrPageProfilePresenter) ((ProfileActivityComponent) getActivityComponent()).getPresenter();
+
+        setUpPopupMenu();
 
         presenter.getWebUrlClickedObservable()
                 .compose(this.<String>bindToLifecycle())
@@ -70,6 +81,19 @@ public class UserOrPageProfileActivity extends ProfileActivity {
                         } else {
                             startActivity(ChatActivity.newIntent(UserOrPageProfileActivity.this, conversationId, false));
                         }
+                    }
+                });
+
+        presenter.getReportSuccessObservable()
+                .compose(this.bindToLifecycle())
+                .subscribe(ColoredSnackBar.successSnackBarAction(ColoredSnackBar.contentView(this), R.string.profile_report_succes));
+
+        presenter.getMoreMenuOptionClickedSubject()
+                .compose(bindToLifecycle())
+                .subscribe(new Action1<Object>() {
+                    @Override
+                    public void call(Object ignore) {
+                        popupMenu.show();
                     }
                 });
 
@@ -108,6 +132,16 @@ public class UserOrPageProfileActivity extends ProfileActivity {
                 .subscribe(ColoredSnackBar.errorSnackBarAction(
                         ColoredSnackBar.contentView(UserOrPageProfileActivity.this),
                         R.string.error_action_only_for_logged_in_user));
+
+        presenter.getSeeAllShoutsObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String userName) {
+                        startActivity(SearchShoutsResultsActivity.newIntent(
+                                UserOrPageProfileActivity.this, null, userName, SearchPresenter.SearchType.PROFILE));
+                    }
+                });
     }
 
     @Override
@@ -119,6 +153,41 @@ public class UserOrPageProfileActivity extends ProfileActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void setUpPopupMenu() {
+        popupMenu = new PopupMenu(this, popupAnchorView);
+        popupMenu.inflate(R.menu.menu_profile_popup);
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                final EditText editText = new EditText(UserOrPageProfileActivity.this);
+                editText.setHint(R.string.report_dialog_hint);
+
+                final int spacing = getResources().getDimensionPixelOffset(R.dimen.activity_horizontal_margin);
+                new AlertDialog.Builder(UserOrPageProfileActivity.this)
+                        .setTitle(R.string.shout_bottom_bar_report)
+                        .setView(editText, spacing, spacing / 2, spacing, spacing / 2)
+                        .setPositiveButton(getString(R.string.send_report_positive_button), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                final String reportBody = editText.getText().toString();
+                                if (Strings.isNullOrEmpty(reportBody)) {
+                                    editText.setError(getString(R.string.report_dialog_empty_error));
+                                    dialog.dismiss();
+                                    return;
+                                }
+
+                                presenter.sendReportObserver().onNext(reportBody);
+                                dialog.dismiss();
+                            }
+                        })
+                        .setNegativeButton(getString(R.string.dialog_cancel_button), null)
+                        .show();
+
+                return true;
+            }
+        });
     }
 
     @Override

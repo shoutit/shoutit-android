@@ -69,10 +69,8 @@
     <string name="register_email">Email</string>
     <string name="register_password">Password</string>
     <string name="register_login_text">Have an account? Log in</string>
-    <string name="register_empty_mail">Mail cannot be empty.</string>
-    <string name="register_empty_password">Password must have at least 6 and no more than 20
-        characters.
-    </string>
+    <string name="register_empty_mail">Email cannot be empty.</string>
+    <string name="register_empty_password">Password must have at least 6 and no more than 20 characters.</string>
     <string name="register_empty_name">Name cannot be empty</string>
     <string name="register_have_an_account">Have an account?</string>
     <string name="register_log_in">Log in</string>
@@ -147,7 +145,8 @@
     <string name="location_update_error">Sorry, cannot update your location. Please try again.
     </string>
     <string name="location_update_success">Location successfully changed</string>
-    <string name="home_no_shouts">No shouts to display</string>
+    <string name="home_no_shouts">No shouts in current location</string>
+    <string name="home_no_shouts_logged_in_user">Nothing in your feed click here to add some interests</string>
 
     <!-- Discover -->
     <string name="discover_shouts_header">Discover shouts</string>
@@ -164,6 +163,10 @@
     <!-- Discover Shouts -->
     <string name="discover_shouts_share">Share</string>
     <string name="discover_shouts_title">%s Shouts</string>
+    <plurals name="shouts_results_pluaral">
+        <item quantity="one">%1$d result</item>
+        <item quantity="other">%1$d results</item>
+    </plurals>
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>
@@ -330,6 +333,7 @@
     <string name="search_profiles_results">Results</string>
     <string name="search_shout_results_header_title">All Results for \'%1$s\'</string>
     <string name="search_shout_results_header_title_location">All Results for your location</string>
+    <string name="search_shout_results_all_results">All Results</string>
     <string name="search_shouts_results_header_count">%1$d Results</string>
     <string name="search_results_no_results">No results found</string>
 
@@ -368,6 +372,8 @@
     <string name="create_request_price">Price</string>
     <string name="edit_shout_add_pictures_label">Add pictures and videos</string>
     <string name="option_not_set">Not set</string>
+    <string name="edit_shout_mobile_hint">Mobile</string>
+    <string name="notifications_message_replacement">sends you a message</string>
 
     <!-- Video Calls -->
     <string name="video_calls_no_premissions">Camera and Microphone permissions needed.</string>
@@ -376,6 +382,20 @@
     <string name="video_calls_caller_name">Someone is calling to You!</string>
     <string name="video_calls_accept_call">Accept Call</string>
     <string name="video_calls_reject_call">Reject Call</string>
+    <string name="no_phone_number_error">Phone number is not currently available.</string>
+    <string name="call_dialog_positive_button">Call</string>
+    <string name="dialog_cancel_button">Cancel</string>
+    <string name="call_dialog_message">"Call %1$s ?"</string>
+    <string name="permission_call_phone_explanation">Permissions needed to start call.</string>
+    <string name="delete_shout_error">Currently, You can not delete this shoutit. Please try again later.</string>
+    <string name="delete_shout_success">Shout was deleted.</string>
+    <string name="send_report_positive_button">Send</string>
+    <string name="report_dialog_hint">Enter report</string>
+    <string name="report_dialog_empty_error">Body cannot be empty</string>
+    <string name="delete_shout_dialog_title">Delete shout</string>
+    <string name="delete_shout_dialog_message">Are You sure?</string>
+    <string name="delete_shout_dialog_button">Delete</string>
+    <string name="report_send_success">Report was send</string>
 
     <!-- Filters -->
     <string name="filters_filters">Filters</string>
@@ -410,5 +430,6 @@
     <string name="filters_distance_entire_country">Entire Country</string>
     <string name="filters_sort_type_header">Sort By:</string>
     <string name="filters_price_header">Price</string>
+    <string name="profile_report_succes">Succesfully reported</string>
 
 </resources>

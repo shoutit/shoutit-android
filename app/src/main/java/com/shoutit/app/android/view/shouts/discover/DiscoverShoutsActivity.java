@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckedTextView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.functions.BothParams;
@@ -55,7 +56,10 @@ public class DiscoverShoutsActivity extends BaseActivity {
     ProgressBar mProgress;
 
     @Bind(R.id.shouts_layout_btn)
-    CheckedTextView mShoutsCheckedTextView;
+    CheckedTextView layoutSwitchIcon;
+
+    @Bind(R.id.discover_shouts_title)
+    TextView countTv;
 
     @Bind(R.id.shouts_toolbar)
     Toolbar mToolbar;
@@ -69,7 +73,7 @@ public class DiscoverShoutsActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.shouts_activity);
+        setContentView(R.layout.activity_discover_shouts);
 
         ButterKnife.bind(this);
 
@@ -101,15 +105,15 @@ public class DiscoverShoutsActivity extends BaseActivity {
                 .filter(LoadMoreHelper.needLoadMore((MyLayoutManager) mRecyclerView.getLayoutManager(), mShoutsAdapter))
                 .subscribe(mShoutsPresenter.getLoadMoreObserver());
 
-        mShoutsCheckedTextView.setOnClickListener(new View.OnClickListener() {
+        layoutSwitchIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mShoutsCheckedTextView.setChecked(!mShoutsCheckedTextView.isChecked());
-                if (mShoutsCheckedTextView.isChecked()) {
-                    mShoutsCheckedTextView.setBackground(getResources().getDrawable(R.drawable.ic_grid_switch));
+                layoutSwitchIcon.setChecked(!layoutSwitchIcon.isChecked());
+                if (layoutSwitchIcon.isChecked()) {
+                    layoutSwitchIcon.setBackground(getResources().getDrawable(R.drawable.ic_grid_switch));
                     setLinearLayoutManager();
                 } else {
-                    mShoutsCheckedTextView.setBackground(getResources().getDrawable(R.drawable.ic_list_switch));
+                    layoutSwitchIcon.setBackground(getResources().getDrawable(R.drawable.ic_list_switch));
                     setGridLayoutManager();
                 }
             }
@@ -132,6 +136,16 @@ public class DiscoverShoutsActivity extends BaseActivity {
                         startActivity(SubSearchActivity.newIntent(
                                 DiscoverShoutsActivity.this, SearchPresenter.SearchType.DISCOVER,
                                 discoverIdAndName.param1(), discoverIdAndName.param2()));
+                    }
+                });
+
+        mShoutsPresenter.getCountObservable()
+                .compose(this.<Integer>bindToLifecycle())
+                .subscribe(new Action1<Integer>() {
+                    @Override
+                    public void call(Integer integer) {
+                        countTv.setText(getResources().
+                                getQuantityString(R.plurals.shouts_results_pluaral, integer, integer));
                     }
                 });
     }
