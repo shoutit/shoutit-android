@@ -53,6 +53,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
+import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
@@ -500,6 +501,23 @@ public class ChatsPresenter {
                     @Override
                     public void call(Message message) {
                         postLocalMessage(message);
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        mListener.error(throwable);
+                    }
+                });
+    }
+
+    public void deleteShout() {
+        mApiService.deleteConversation(conversationId)
+                .observeOn(mUiScheduler)
+                .subscribeOn(mNetworkScheduler)
+                .subscribe(new Action1<ResponseBody>() {
+                    @Override
+                    public void call(ResponseBody responseBody) {
+                        mListener.conversationDeleted();
                     }
                 }, new Action1<Throwable>() {
                     @Override

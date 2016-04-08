@@ -54,6 +54,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
+import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Scheduler;
 import rx.Subscriber;
@@ -485,5 +486,26 @@ public class ChatsFirstConversationPresenter {
                         mListener.error(throwable);
                     }
                 });
+    }
+
+    public void deleteShout() {
+        if (conversationCreated) {
+            mListener.conversationDeleted();
+        } else {
+            mApiService.deleteConversation(conversationId)
+                    .observeOn(mUiScheduler)
+                    .subscribeOn(mNetworkScheduler)
+                    .subscribe(new Action1<ResponseBody>() {
+                        @Override
+                        public void call(ResponseBody responseBody) {
+                            mListener.conversationDeleted();
+                        }
+                    }, new Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable throwable) {
+                            mListener.error(throwable);
+                        }
+                    });
+        }
     }
 }

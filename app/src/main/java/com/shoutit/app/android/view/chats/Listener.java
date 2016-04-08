@@ -21,4 +21,6 @@ public interface Listener {
     void onLocationClicked(double latitude, double longitude);
 
     void onImageClicked(String url);
+
+    void conversationDeleted();
 }
