@@ -39,7 +39,6 @@ import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
-import com.shoutit.app.android.view.chats.chatsfirstconversation.ChatFirstConversationActivity;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.shoutit.app.android.view.shouts.selectshout.SelectShoutActivity;
@@ -190,6 +189,7 @@ public class ChatActivity extends BaseActivity implements Listener {
     @Override
     public void setData(@NonNull List<BaseAdapterItem> items) {
         chatsAdapter.call(items);
+        mChatsRecyclerview.scrollToPosition(items.size() - 1);
     }
 
     @Override
@@ -230,6 +230,7 @@ public class ChatActivity extends BaseActivity implements Listener {
         mChatsShoutLayout.setVisibility(View.VISIBLE);
         picasso.load(thumbnail)
                 .centerCrop()
+                .error(R.drawable.ic_tag_placeholder)
                 .fit()
                 .into(mChatsShoutImage);
         mChatsShoutLayoutType.setText(type);

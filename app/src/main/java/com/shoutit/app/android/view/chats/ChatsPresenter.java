@@ -107,7 +107,7 @@ public class ChatsPresenter {
             });
 
     @SuppressLint("SimpleDateFormat")
-    private final SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("MMMMM dd, yyyy");
+    private final SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("MMMM dd, yyyy");
     @SuppressLint("SimpleDateFormat")
     private final SimpleDateFormat mSimpleTimeFormat = new SimpleDateFormat("hh:mm");
 
@@ -258,7 +258,7 @@ public class ChatsPresenter {
                             final String thumbnail = Strings.emptyToNull(about.getThumbnail());
                             final String type = about.getType().equals(Shout.TYPE_OFFER) ? "Offer" : "Request";
                             final String price = PriceUtils.formatPriceWithCurrency(about.getPrice(), mResources, about.getCurrency());
-                            final String authorAndTime = about.getProfile().getName() + DateUtils.getRelativeTimeSpanString(mContext, about.getDatePublished() * 1000);
+                            final String authorAndTime = about.getProfile().getName() + " - "  + DateUtils.getRelativeTimeSpanString(mContext, about.getDatePublished() * 1000);
 
                             mListener.setAboutShoutData(title, thumbnail, type, price, authorAndTime);
                         }

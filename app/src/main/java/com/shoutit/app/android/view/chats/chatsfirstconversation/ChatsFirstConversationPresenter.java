@@ -73,7 +73,7 @@ import rx.subscriptions.CompositeSubscription;
 public class ChatsFirstConversationPresenter {
 
     @SuppressLint("SimpleDateFormat")
-    private final SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("MMMMM dd, yyyy");
+    private final SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("MMMM dd, yyyy");
     @SuppressLint("SimpleDateFormat")
     private final SimpleDateFormat mSimpleTimeFormat = new SimpleDateFormat("hh:mm");
 
@@ -222,7 +222,7 @@ public class ChatsFirstConversationPresenter {
                             final String thumbnail = Strings.emptyToNull(about.getThumbnail());
                             final String type = about.getType().equals(Shout.TYPE_OFFER) ? "Offer" : "Request";
                             final String price = PriceUtils.formatPriceWithCurrency(about.getPrice(), mResources, about.getCurrency());
-                            final String authorAndTime = about.getProfile().getName() + DateUtils.getRelativeTimeSpanString(mContext, about.getDatePublishedInMillis());
+                            final String authorAndTime = about.getProfile().getName() + " - "  + DateUtils.getRelativeTimeSpanString(mContext, about.getDatePublishedInMillis());
 
                             mListener.setAboutShoutData(title, thumbnail, type, price, authorAndTime);
                         }

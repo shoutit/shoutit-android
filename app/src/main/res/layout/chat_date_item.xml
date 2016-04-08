@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:tools="http://schemas.android.com/tools"
+              android:layout_marginTop="6dp"
               android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:gravity="center"
-              android:orientation="vertical">
+              android:layout_height="match_parent">
 
     <TextView
-        android:padding="4dp"
+        android:layout_gravity="center"
         android:id="@+id/chate_date_item_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/chats_color_accent"
+        android:background="@drawable/chat_time_bg"
         android:textColor="@color/black_38"
+        android:paddingBottom="8dp"
+        android:paddingTop="8dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
         tools:text="December 14, 2015"/>
 
-</LinearLayout>
+</FrameLayout>
