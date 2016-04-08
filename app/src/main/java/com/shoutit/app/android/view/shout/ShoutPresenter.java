@@ -56,6 +56,7 @@ public class ShoutPresenter {
     private final Observable<String> usernameObservable;
     private final Observable<Boolean> isUserShoutOwnerObservable;
     private final Observable<ResponseOrError<UserIdentity>> userIdentityResponse;
+    private final Observable<String> shoutOwnerNameObservable;
     private final Observable<ResponseOrError<MobilePhoneResponse>> callErrorObservable;
     private final Observable<Boolean> hasMobilePhoneObservable;
     private final Observable<Response<Object>> deleteShoutResponseObservable;
@@ -64,10 +65,8 @@ public class ShoutPresenter {
     private final Observable<Response<Object>> reportShoutObservable;
     private final Observable<List<Conversation>> conversationObservable;
     private final Observable<Object> refreshUserShoutsObservable;
-    private Observable<String> identityUserObservable;
-
-    private Observable<UserIdentity> successUserIdentity;
-    private Observable<Throwable> failedUserIdentity;
+    private final Observable<String> identityUserObservable;
+    private final Observable<UserIdentity> successUserIdentity;
 
     private PublishSubject<String> addToCartSubject = PublishSubject.create();
     private PublishSubject<String> onCategoryClickedSubject = PublishSubject.create();
@@ -89,8 +88,8 @@ public class ShoutPresenter {
                           @Nonnull final String shoutId,
                           @Nonnull @ForActivity final Context context,
                           @Nonnull @UiScheduler final Scheduler uiScheduler,
-                          @Nonnull final ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
                           @Nonnull UserPreferences userPreferences,
+                          @Nonnull final ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
                           @Nonnull final UsersIdentityDao usersIdentityDao) {
         this.uiScheduler = uiScheduler;
         mUserPreferences = userPreferences;
@@ -132,6 +131,14 @@ public class ShoutPresenter {
                     @Override
                     public String call(Shout shout) {
                         return shout.getProfile().getUsername();
+                    }
+                });
+
+        shoutOwnerNameObservable = successShoutResponse
+                .map(new Func1<Shout, String>() {
+                    @Override
+                    public String call(Shout shout) {
+                        return shout.getProfile().getName();
                     }
                 });
 
@@ -236,6 +243,32 @@ public class ShoutPresenter {
                     }
                 });
 
+        /** Shout Owner Identity**/
+        userIdentityResponse = getUsernameObservable()
+                .filter(new Func1<String, Boolean>() {
+                    @Override
+                    public Boolean call(String s) {
+                        return s != null;
+                    }
+                })
+                .flatMap(new Func1<String, Observable<ResponseOrError<UserIdentity>>>() {
+                    @Override
+                    public Observable<ResponseOrError<UserIdentity>> call(String username) {
+                        return usersIdentityDao.getUserIdentityObservable(username);
+                    }
+                });
+
+        successUserIdentity = userIdentityResponse
+                .compose(ResponseOrError.<UserIdentity>onlySuccess());
+
+        identityUserObservable = successUserIdentity
+                .map(new Func1<UserIdentity, String>() {
+                    @Override
+                    public String call(UserIdentity userIdentity) {
+                        return userIdentity.getIdentity();
+                    }
+                }).observeOn(uiScheduler);
+
         allAdapterItemsObservable = Observable.combineLatest(
                 shoutItemObservable,
                 userShoutItemsObservable.startWith(ImmutableList.<BaseAdapterItem>of()),
@@ -271,7 +304,8 @@ public class ShoutPresenter {
         errorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
                 ResponseOrError.transform(userShoutsObservable),
                 ResponseOrError.transform(shoutResponse),
-                ResponseOrError.transform(relatedShoutsObservable)))
+                ResponseOrError.transform(relatedShoutsObservable),
+                ResponseOrError.transform(userIdentityResponse)))
                 .filter(Functions1.isNotNull())
                 .observeOn(uiScheduler);
 
@@ -317,37 +351,6 @@ public class ShoutPresenter {
                     }
                 })
                 .subscribe();
-
-        /** Shout Owner Identity**/
-
-        userIdentityResponse = getUsernameObservable()
-                .filter(new Func1<String, Boolean>() {
-                    @Override
-                    public Boolean call(String s) {
-                        return s != null;
-                    }
-                })
-                .flatMap(new Func1<String, Observable<ResponseOrError<UserIdentity>>>() {
-                    @Override
-                    public Observable<ResponseOrError<UserIdentity>> call(String username) {
-                        return usersIdentityDao.getUserIdentityObservable(username);
-                    }
-                });
-
-
-        successUserIdentity = userIdentityResponse
-                .compose(ResponseOrError.<UserIdentity>onlySuccess());
-
-        failedUserIdentity = userIdentityResponse
-                .compose(ResponseOrError.<UserIdentity>onlyError());
-
-        identityUserObservable = successUserIdentity
-                .map(new Func1<UserIdentity, String>() {
-                    @Override
-                    public String call(UserIdentity userIdentity) {
-                        return userIdentity.getIdentity();
-                    }
-                }).observeOn(uiScheduler);
 
         final Observable<Boolean> callOrEditObservable = Observable
                 .combineLatest(callOrDeleteSubject, isUserShoutOwnerObservable, new Func2<Object, Boolean, Boolean>() {
@@ -472,8 +475,14 @@ public class ShoutPresenter {
                 .observeOn(uiScheduler);
     }
 
+    @Nonnull
     public Observable<String> getUsernameObservable() {
         return usernameObservable;
+    }
+
+    @Nonnull
+    public Observable<String> getShoutOwnerNameObservable() {
+        return shoutOwnerNameObservable;
     }
 
     @Nonnull

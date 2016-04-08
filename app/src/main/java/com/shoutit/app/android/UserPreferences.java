@@ -35,6 +35,7 @@ public class UserPreferences {
     private static final String IS_GUEST = "is_guest";
     private static final String KEY_LOCATION_TRACKING = "location_tracking";
     private static final String SHOULD_ASK_FOR_INTEREST = "is_first_run";
+    private static final String SHOUT_OWNER_NAME = "shout_owner";
     private static final String GCM_PUSH_TOKEN = "gcm_push_token";
     private static final String IS_CALL_REJECTED = "call_rejected";
 
@@ -250,6 +251,13 @@ public class UserPreferences {
     }
 
     @SuppressLint("CommitPrefEdits")
+    public void setShoutOwnerName(String name) {
+        final SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putString(SHOUT_OWNER_NAME, name);
+        editor.commit();
+    }
+
+    @SuppressLint("CommitPrefEdits")
     public void setIsCallRejected(boolean isCallRejected) {
         final SharedPreferences.Editor editor = mPreferences.edit();
         editor.putBoolean(IS_CALL_REJECTED, isCallRejected);
@@ -257,8 +265,12 @@ public class UserPreferences {
     }
 
     @Nullable
+    public String getShoutOwnerName() {
+        return mPreferences.getString(SHOUT_OWNER_NAME, null);
+    }
+
+    @Nullable
     public boolean getIsCallRejected() {
         return mPreferences.getBoolean(IS_CALL_REJECTED, false);
     }
-
 }

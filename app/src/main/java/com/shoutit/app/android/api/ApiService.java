@@ -3,6 +3,7 @@ package com.shoutit.app.android.api;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.shoutit.app.android.api.model.CallerProfile;
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.ChangePasswordRequest;
 import com.shoutit.app.android.api.model.Conversation;
@@ -50,6 +51,8 @@ import com.shoutit.app.android.model.ReportBody;
 
 import java.util.List;
 import java.util.Map;
+
+import javax.annotation.Generated;
 
 import okhttp3.ResponseBody;
 import retrofit2.Response;
@@ -364,5 +367,8 @@ public interface ApiService {
 
     @GET("twilio/video_identity")
     Observable<UserIdentity> getUserIdentity(@Query("profile") String username);
+
+    @GET("twilio/profile")
+    Observable<CallerProfile> getUserByIdentity(@Query("identity") String identity);
 
 }

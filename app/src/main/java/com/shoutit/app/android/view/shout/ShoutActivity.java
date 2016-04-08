@@ -69,6 +69,7 @@ import static com.appunite.rx.internal.Preconditions.checkNotNull;
 public class ShoutActivity extends BaseActivity {
 
     private static final String KEY_SHOUT_ID = "shout_id";
+    private static final int CAMERA_MIC_PERMISSION_REQUEST_CODE = 1;
 
     @Bind(R.id.shout_toolbar)
     Toolbar toolbar;
@@ -198,6 +199,15 @@ public class ShoutActivity extends BaseActivity {
                     @Override
                     public void call(String shoutOwnerIdentity) {
                         shoutOwnerId = shoutOwnerIdentity;
+                    }
+                });
+
+        presenter.getShoutOwnerNameObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String name) {
+                        userPreferences.setShoutOwnerName(name);
                     }
                 });
 
@@ -383,7 +393,7 @@ public class ShoutActivity extends BaseActivity {
                         if (isUserShoutOwner) {
                             startActivity(EditShoutActivity.newIntent(mShoutId, ShoutActivity.this));
                         } else {
-                            startActivity(VideoConversationActivity.newIntent(shoutOwnerId, ShoutActivity.this));
+                            startActivity(VideoConversationActivity.newIntent(null, shoutOwnerId, ShoutActivity.this));
                         }
                     }
                 });

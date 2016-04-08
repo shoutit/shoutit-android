@@ -381,9 +381,16 @@
     <string name="video_calls_no_premissions">Camera and Microphone permissions needed.</string>
     <string name="video_calls_button_call">Call</string>
     <string name="video_calls_camera_issue">Problem with camera preview</string>
-    <string name="video_calls_caller_name">Someone is calling to You!</string>
-    <string name="video_calls_accept_call">Accept Call</string>
-    <string name="video_calls_reject_call">Reject Call</string>
+    <string name="video_calls_caller_name">Incoming Call from %s</string>
+    <string name="video_calls_accept_call">Answer</string>
+    <string name="video_calls_reject_call">Discard</string>
+    <string name="video_calls_participant_reject">Participant reject call</string>
+    <string name="video_calls_cannot_connect">Problem with connection. Try later</string>
+    <string name="video_calls_conversation_ended">Conversation has ended</string>
+    <string name="video_calls_connecting">Connecting…</string>
+    <string name="video_calls_connected">Connected with %s</string>
+    <string name="video_calls_participant_disconected">Participant ended conversation</string>
+
     <string name="no_phone_number_error">Phone number is not currently available.</string>
     <string name="call_dialog_positive_button">Call</string>
     <string name="dialog_cancel_button">Cancel</string>
