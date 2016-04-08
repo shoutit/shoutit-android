@@ -52,6 +52,7 @@ public class ShoutPresenter {
     private final Observable<String> usernameObservable;
     private final Observable<Boolean> isUserShoutOwnerObservable;
     private final Observable<ResponseOrError<UserIdentity>> userIdentityResponse;
+    private final Observable<String> shoutOwnerNameObservable;
     private Observable<String> identityUserObservable;
 
     private Observable<UserIdentity> successUserIdentity;
@@ -106,6 +107,14 @@ public class ShoutPresenter {
                     @Override
                     public String call(Shout shout) {
                         return shout.getProfile().getUsername();
+                    }
+                });
+
+        shoutOwnerNameObservable = successShoutResponse
+                .map(new Func1<Shout, String>() {
+                    @Override
+                    public String call(Shout shout) {
+                        return shout.getProfile().getName();
                     }
                 });
 
@@ -357,6 +366,10 @@ public class ShoutPresenter {
     @Nonnull
     public Observable<String> getUsernameObservable() {
         return usernameObservable;
+    }
+
+    public Observable<String> getShoutOwnerNameObservable() {
+        return shoutOwnerNameObservable;
     }
 }
 

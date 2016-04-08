@@ -9,6 +9,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.CallerProfile;
 import com.shoutit.app.android.api.model.UserIdentity;
 
 import java.util.concurrent.TimeUnit;
@@ -18,6 +19,7 @@ import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Scheduler;
+import rx.subjects.BehaviorSubject;
 
 public class UsersIdentityDao {
 
@@ -27,6 +29,8 @@ public class UsersIdentityDao {
     private final Scheduler networkScheduler;
     @Nonnull
     private final LoadingCache<String, UserIdentityDao> userIdentityCache;
+    @Nonnull
+    private final LoadingCache<String, UserByIdentityDao> userByIdentityCache;
 
     @Inject
     public UsersIdentityDao(@Nonnull final ApiService apiService,
@@ -41,11 +45,24 @@ public class UsersIdentityDao {
                         return new UserIdentityDao(username);
                     }
                 });
+
+        userByIdentityCache = CacheBuilder.newBuilder()
+                .build(new CacheLoader<String, UserByIdentityDao>() {
+                    @Override
+                    public UserByIdentityDao load(@Nonnull String identity) throws Exception {
+                        return new UserByIdentityDao(identity);
+                    }
+                });
     }
 
     @Nonnull
     public Observable<ResponseOrError<UserIdentity>> getUserIdentityObservable(@Nonnull String username) {
         return userIdentityCache.getUnchecked(username).userIdentityObservable;
+    }
+
+    @Nonnull
+    public Observable<ResponseOrError<CallerProfile>> getUserByIdentityObservable(@Nonnull String identity) {
+        return userByIdentityCache.getUnchecked(identity).userByIdentityObservable;
     }
 
     public class UserIdentityDao {
@@ -60,6 +77,21 @@ public class UsersIdentityDao {
                     .compose(ResponseOrError.<UserIdentity>toResponseOrErrorObservable())
                     .compose(MoreOperators.<ResponseOrError<UserIdentity>>cacheWithTimeout(networkScheduler))
                     .compose(ObservableExtensions.<ResponseOrError<UserIdentity>>behaviorRefCount());
+        }
+    }
+
+    public class UserByIdentityDao {
+
+        @Nonnull
+        private final Observable<ResponseOrError<CallerProfile>> userByIdentityObservable;
+
+        public UserByIdentityDao(@Nonnull String identity) {
+
+            userByIdentityObservable = apiService.getUserByIdentity(identity)
+                    .subscribeOn(networkScheduler)
+                    .compose(ResponseOrError.<CallerProfile>toResponseOrErrorObservable())
+                    .compose(MoreOperators.<ResponseOrError<CallerProfile>>cacheWithTimeout(networkScheduler))
+                    .compose(ObservableExtensions.<ResponseOrError<CallerProfile>>behaviorRefCount());
         }
     }
 }

@@ -1,14 +1,16 @@
 package com.shoutit.app.android.view.videoconversation;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -26,6 +28,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.PermissionHelper;
 import com.twilio.conversations.AudioOutput;
 import com.twilio.conversations.AudioTrack;
 import com.twilio.conversations.CameraCapturer;
@@ -69,9 +72,9 @@ import static com.appunite.rx.internal.Preconditions.checkNotNull;
 
 public class VideoConversationActivity extends BaseActivity {
 
-    private static final String VC = "VIDEO_CALL_TWILIO";
-    private static final String VC_ERROR ="VIDEO_CALL_ERROR";
-    private static final String ARGS_USERNAME = "args_username";
+    private static final String ARGS_ID = "args_username";
+    private static final String ARGS_CALLER = "args_caller";
+    private static final int CAMERA_MIC_PERMISSION_REQUEST_CODE = 1;
 
     private Conversation conversation;
     private OutgoingInvite outgoingInvite;
@@ -100,17 +103,18 @@ public class VideoConversationActivity extends BaseActivity {
     @Inject
     UserPreferences preferences;
 
-    private String username;
+    private String callTaker;
+    private String caller;
     private ConversationsClient conversationClient;
     private CameraManager cameraManager;
-
 
 
     private BehaviorSubject<String> conversationInfoSubject = BehaviorSubject.create();
     private BehaviorSubject<String> conversationErrorSubject = BehaviorSubject.create();
 
-    public static Intent newIntent(@Nullable String username, @Nonnull Context context) {
-        return new Intent(context, VideoConversationActivity.class).putExtra(ARGS_USERNAME, username);
+    public static Intent newIntent(@Nullable String callerName, @Nullable String id, @Nonnull Context context) {
+        return new Intent(context, VideoConversationActivity.class).putExtra(ARGS_ID, id).putExtra(ARGS_CALLER, callerName);
+
     }
 
     @Override
@@ -119,11 +123,18 @@ public class VideoConversationActivity extends BaseActivity {
         setContentView(R.layout.activity_video_conversation);
         ButterKnife.bind(this);
 
+        if (hasVideoCallPermissions()) {
+            initializeVideoConversations();
+        }
+    }
+
+    private void initializeVideoConversations() {
+
         conversationInfo.bringToFront();
         setupVariablesFromApp();
         setupAudioVideo();
 
-        if (username == null) {
+        if (callTaker == null) {
             AcceptIncomingCall();
         }
 
@@ -152,15 +163,13 @@ public class VideoConversationActivity extends BaseActivity {
                 .filter(Functions1.isNotNull());
 
         conversationInfoObservable
-                .compose(this.<String>bindToLifecycle())
                 .subscribe(RxTextView.text(conversationInfo));
 
         conversationErrorObservable
-                .compose(this.<String>bindToLifecycle())
                 .subscribe(new Action1<String>() {
                     @Override
                     public void call(String error) {
-                        ColoredSnackBar.colorSnackBar(videoCallView, error, Snackbar.LENGTH_LONG,R.color.snackbar_error).show();
+                        ColoredSnackBar.error(videoCallView, error, Snackbar.LENGTH_LONG).show();
                     }
                 });
     }
@@ -171,7 +180,7 @@ public class VideoConversationActivity extends BaseActivity {
             public void onError(CapturerException e) {
                 conversationErrorSubject.onNext(getString(R.string.video_calls_camera_issue));
 
-                if(cameraCapturer.isPreviewing()){
+                if (cameraCapturer.isPreviewing()) {
                     cameraCapturer.stopPreview();
                 }
                 cameraCapturer.startPreview();
@@ -208,11 +217,11 @@ public class VideoConversationActivity extends BaseActivity {
 
         callButton.setVisibility(View.GONE);
 
-        if (!username.isEmpty() && conversationClient != null) {
+        if (!callTaker.isEmpty() && conversationClient != null) {
             cameraCapturer.stopPreview();
 
             Set<String> participants = new HashSet<>();
-            participants.add(username);
+            participants.add(callTaker);
 
             outgoingInvite = conversationClient.sendConversationInvite(participants,
                     setupLocalMedia(), new ConversationCallback() {
@@ -222,9 +231,9 @@ public class VideoConversationActivity extends BaseActivity {
                                 VideoConversationActivity.this.conversation = conversation;
                                 conversation.setConversationListener(conversationListener());
                             } else {
-                                if(exception.getErrorCode() == 109){
+                                if (exception.getErrorCode() == 109) {
                                     conversationInfoSubject.onNext(getString(R.string.video_calls_participant_reject));
-                                }else {
+                                } else {
                                     conversationErrorSubject.onNext(exception.getMessage().substring(18, exception.getMessage().length()));
                                 }
                             }
@@ -240,7 +249,7 @@ public class VideoConversationActivity extends BaseActivity {
                 cameraCapturer.stopPreview();
                 localVideoRenderer = new VideoViewRenderer(VideoConversationActivity.this, localWindow);
                 localVideoTrack.addRenderer(localVideoRenderer);
-                conversationInfoSubject.onNext(String.format(getString(R.string.video_calls_connecting), username));
+                conversationInfoSubject.onNext(String.format(getString(R.string.video_calls_connecting), callTaker));
 
             }
 
@@ -265,10 +274,10 @@ public class VideoConversationActivity extends BaseActivity {
             @Override
             public void onParticipantConnected(Conversation conversation, Participant participant) {
                 participant.setParticipantListener(participantListener());
-                if(username != null) {
-                    conversationInfoSubject.onNext(String.format(getString(R.string.video_calls_connected), username));
-                }else{
-                    conversationInfoSubject.onNext(String.format(getString(R.string.video_calls_connected), invite.getParticipants().toString()));
+                if (callTaker != null) {
+                    conversationInfoSubject.onNext(String.format(getString(R.string.video_calls_connected), preferences.getShoutOwnerName()));
+                } else {
+                    conversationInfoSubject.onNext(String.format(getString(R.string.video_calls_connected), caller));
                 }
             }
 
@@ -309,7 +318,6 @@ public class VideoConversationActivity extends BaseActivity {
             @Override
             public void onVideoTrackRemoved(Conversation conversation, Participant participant, VideoTrack videoTrack) {
                 participantWindow.removeAllViews();
-
             }
 
             @Override
@@ -335,34 +343,63 @@ public class VideoConversationActivity extends BaseActivity {
         if (isFrontCameraAvailable()) {
             cameraCapturer = CameraCapturerFactory.createCameraCapturer(VideoConversationActivity.this,
                     CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA, localVideoPreview, capturerErrorListener());
-        }else{
+        } else {
             cameraCapturer = CameraCapturerFactory.createCameraCapturer(VideoConversationActivity.this,
                     CameraCapturer.CameraSource.CAMERA_SOURCE_BACK_CAMERA, localVideoPreview, capturerErrorListener());
         }
+        conversationClient.setAudioOutput(AudioOutput.SPEAKERPHONE);
         setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
         cameraCapturer.startPreview();
-        conversationClient.setAudioOutput(AudioOutput.SPEAKERPHONE);
+
     }
 
     private void setupVariablesFromApp() {
         final Intent intent = getIntent();
-        username = intent.getStringExtra(ARGS_USERNAME);
+        callTaker = intent.getStringExtra(ARGS_ID);
+        caller = intent.getStringExtra(ARGS_CALLER);
         conversationClient = ((App) getApplication()).getConversationsClient();
         invite = ((App) getApplication()).getInvite();
         cameraManager = (CameraManager) getApplicationContext().getSystemService(CAMERA_SERVICE);
     }
 
-    private boolean isFrontCameraAvailable(){
+    private boolean isFrontCameraAvailable() {
         try {
-            for (final String cameraID : cameraManager.getCameraIdList()){
+            for (final String cameraID : cameraManager.getCameraIdList()) {
                 final CameraCharacteristics characteristics = cameraManager.getCameraCharacteristics(cameraID);
                 final int cameraOrientation = checkNotNull(characteristics.get(CameraCharacteristics.LENS_FACING));
-                if(cameraOrientation == CameraCharacteristics.LENS_FACING_FRONT) return true;
+                if (cameraOrientation == CameraCharacteristics.LENS_FACING_FRONT) return true;
             }
         } catch (CameraAccessException e) {
-            e.printStackTrace();
+            conversationErrorSubject.onNext(e.toString());
         }
         return false;
+    }
+
+    private boolean hasVideoCallPermissions() {
+        return PermissionHelper.checkPermissions(this, CAMERA_MIC_PERMISSION_REQUEST_CODE,
+                ColoredSnackBar.contentView(this), R.string.video_calls_no_premissions,
+                new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA});
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == CAMERA_MIC_PERMISSION_REQUEST_CODE) {
+            final boolean permissionsGranted = PermissionHelper.arePermissionsGranted(grantResults);
+            if (permissionsGranted) {
+                ColoredSnackBar.success(findViewById(android.R.id.content), R.string.permission_granted, Snackbar.LENGTH_SHORT).show();
+
+                final PackageManager packageManager = getApplicationContext().getPackageManager();
+                if (packageManager.checkPermission(Manifest.permission.CAMERA, getApplicationContext().getPackageName()) == PackageManager.PERMISSION_GRANTED
+                        && packageManager.checkPermission(Manifest.permission.RECORD_AUDIO, getApplicationContext().getPackageName()) == PackageManager.PERMISSION_GRANTED) {
+                    initializeVideoConversations();
+                }
+            } else {
+                ColoredSnackBar.error(findViewById(android.R.id.content), R.string.permission_not_granted, Snackbar.LENGTH_SHORT);
+                finish();
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
     @Override
@@ -371,7 +408,9 @@ public class VideoConversationActivity extends BaseActivity {
         if (TwilioConversations.isInitialized() && conversationClient != null && !conversationClient.isListening()) {
             conversationClient.listen();
         }
+        if (cameraCapturer != null) {
             cameraCapturer.startPreview();
+        }
     }
 
     @Override
@@ -398,12 +437,20 @@ public class VideoConversationActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        cameraCapturer.stopPreview();
+        if (cameraCapturer != null) {
+            cameraCapturer.stopPreview();
+        }
     }
 
     private void closeConversation() {
         if (conversation != null) {
             conversation.disconnect();
+        }
+        if (invite != null) {
+            invite = null;
+        }
+        if (outgoingInvite != null) {
+            outgoingInvite = null;
         }
         cameraCapturer.stopPreview();
         ((App) getApplication()).getConversationsClient().listen();

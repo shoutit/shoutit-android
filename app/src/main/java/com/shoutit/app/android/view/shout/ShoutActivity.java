@@ -187,6 +187,15 @@ public class ShoutActivity extends BaseActivity {
                         shoutOwnerId = shoutOwnerIdentity;
                     }
                 });
+
+        presenter.getShoutOwnerNameObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String name) {
+                        userPreferences.setShoutOwnerName(name);
+                    }
+                });
     }
 
     @NonNull
@@ -225,8 +234,8 @@ public class ShoutActivity extends BaseActivity {
                     public void onClick(View v) {
                         if (isUserShoutOwner) {
                             startActivity(EditShoutActivity.newIntent(mShoutId, ShoutActivity.this));
-                        } else if (hasVideoPermission()){
-                            startActivity(VideoConversationActivity.newIntent(shoutOwnerId, ShoutActivity.this));
+                        } else {
+                            startActivity(VideoConversationActivity.newIntent(null, shoutOwnerId, ShoutActivity.this));
                         }
                     }
                 });
@@ -248,26 +257,6 @@ public class ShoutActivity extends BaseActivity {
                 animator.start();
             }
         };
-    }
-
-    private boolean hasVideoPermission() {
-        return PermissionHelper.checkPermissions(this, CAMERA_MIC_PERMISSION_REQUEST_CODE,
-                ColoredSnackBar.contentView(this), R.string.video_calls_no_premissions,
-                new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA});
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == CAMERA_MIC_PERMISSION_REQUEST_CODE) {
-            final boolean permissionsGranted = PermissionHelper.arePermissionsGranted(grantResults);
-            if (permissionsGranted) {
-                ColoredSnackBar.success(findViewById(android.R.id.content), R.string.permission_granted, Snackbar.LENGTH_SHORT).show();
-            } else {
-                ColoredSnackBar.error(findViewById(android.R.id.content), R.string.permission_not_granted, Snackbar.LENGTH_SHORT);
-            }
-        } else {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
     }
 
     @OnClick(R.id.shout_bottom_bar_call_or_delete)

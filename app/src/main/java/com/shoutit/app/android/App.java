@@ -40,6 +40,7 @@ import com.uservoice.uservoicesdk.UserVoice;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
+import rx.Observable;
 import io.fabric.sdk.android.Fabric;
 import rx.Scheduler;
 import rx.functions.Action1;
@@ -215,6 +216,7 @@ public class App extends MultiDexApplication {
         return new ConversationsClientListener() {
             @Override
             public void onStartListeningForInvites(ConversationsClient conversationsClient) {
+                Log.d("TWILIO", "LISTENING ** ** **");
             }
 
             @Override
@@ -238,9 +240,20 @@ public class App extends MultiDexApplication {
             @Override
             public void onIncomingInvite(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
                 invite = incomingInvite;
-                Intent intent = DialogCallActivity.newIntent(getApplicationContext());
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
+                String caller = String.valueOf(incomingInvite.getParticipants());
+
+                presenter.setCallerIdentity(caller.substring(1, caller.length() - 1));
+                presenter.getCallerNameObservable()
+                        .take(1)
+                        .subscribe(new Action1<String>() {
+                            @Override
+                            public void call(String callerName) {
+                                Intent intent = DialogCallActivity.newIntent(callerName, getApplicationContext());
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(intent);
+                            }
+                        });
+
             }
 
             @Override

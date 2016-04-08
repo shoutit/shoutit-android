@@ -25,7 +25,11 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import rx.functions.Action1;
 
+import static com.appunite.rx.internal.Preconditions.checkNotNull;
+
 public class DialogCallActivity extends BaseActivity {
+
+    private static final String CALLER_NAME = "caller_name";
 
     @Bind(R.id.dialog_call_accept)
     Button acceptButton;
@@ -37,8 +41,8 @@ public class DialogCallActivity extends BaseActivity {
     @Inject
     UserPreferences preferences;
 
-    public static Intent newIntent( @Nonnull final Context context) {
-        return new Intent(context, DialogCallActivity.class);
+    public static Intent newIntent(@Nonnull final String callerName, @Nonnull final Context context) {
+        return new Intent(context, DialogCallActivity.class).putExtra(CALLER_NAME, callerName);
     }
 
     @Override
@@ -47,17 +51,14 @@ public class DialogCallActivity extends BaseActivity {
         setContentView(R.layout.activity_dialog_call);
         ButterKnife.bind(this);
 
-        if (((App) getApplication()).getInvite() != null) {
-            callInfo.setText(String.format(getString(R.string.video_calls_caller_name), ((App) getApplication()).getInvite().getParticipants().toString()));
-        } else{
-            finish();
-        }
+        final String callerName = checkNotNull(getIntent().getStringExtra(CALLER_NAME));
+        callInfo.setText(String.format(getString(R.string.video_calls_caller_name), callerName));
 
         RxView.clicks(acceptButton)
                 .subscribe(new Action1<Void>() {
                     @Override
                     public void call(Void aVoid) {
-                        startActivity(VideoConversationActivity.newIntent(null , DialogCallActivity.this));
+                        startActivity(VideoConversationActivity.newIntent(callerName ,null, DialogCallActivity.this));
                         finish();
                     }
                 });

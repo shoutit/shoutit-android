@@ -3,6 +3,7 @@ package com.shoutit.app.android.api;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.shoutit.app.android.api.model.CallerProfile;
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.ChangePasswordRequest;
 import com.shoutit.app.android.api.model.CreateOfferShoutWithImageRequest;
@@ -283,5 +284,5 @@ public interface ApiService {
     Observable<UserIdentity> getUserIdentity(@Query("profile") String username);
 
     @GET("twilio/profile")
-    Observable<UserIdentity> getUserByIdentity(@Query("identity") String identity);
+    Observable<CallerProfile> getUserByIdentity(@Query("identity") String identity);
 }
