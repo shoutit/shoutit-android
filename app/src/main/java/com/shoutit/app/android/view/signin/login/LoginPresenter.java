@@ -107,8 +107,8 @@ public class LoginPresenter {
                 .doOnNext(new Action1<SignResponse>() {
                     @Override
                     public void call(SignResponse signResponse) {
-                        userPreferences.setLoggedIn(signResponse.getAccessToken(), signResponse.getRefreshToken());
                         userPreferences.saveUserAsJson(signResponse.getUser());
+                        userPreferences.setLoggedIn(signResponse.getAccessToken(), signResponse.getRefreshToken());
                     }
                 });
 
