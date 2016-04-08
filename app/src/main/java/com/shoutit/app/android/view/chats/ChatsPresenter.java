@@ -58,6 +58,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
+import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
@@ -441,8 +442,8 @@ public class ChatsPresenter {
             try {
                 final File videoThumbnail = MediaUtils.createVideoThumbnail(mContext, Uri.parse(media));
                 final int videoLength = MediaUtils.getVideoLength(mContext, media);
-                final Observable<String> videoFileObservable = mAmazonHelper.uploadShoutMediaObservable(AmazonHelper.getfileFromPath(media));
-                final Observable<String> thumbFileObservable = mAmazonHelper.uploadShoutMediaObservable(AmazonHelper.getfileFromPath(videoThumbnail.getAbsolutePath()));
+                final Observable<String> videoFileObservable = mAmazonHelper.uploadShoutMediaVideoObservable(AmazonHelper.getfileFromPath(media));
+                final Observable<String> thumbFileObservable = mAmazonHelper.uploadShoutMediaImageObservable(AmazonHelper.getfileFromPath(videoThumbnail.getAbsolutePath()));
                 mSubscribe.add(Observable
                         .zip(videoFileObservable, thumbFileObservable, new Func2<String, String, Video>() {
                             @Override
@@ -477,7 +478,7 @@ public class ChatsPresenter {
                 mListener.error(e);
             }
         } else {
-            mSubscribe.add(mAmazonHelper.uploadShoutMediaObservable(AmazonHelper.getfileFromPath(media))
+            mSubscribe.add(mAmazonHelper.uploadShoutMediaImageObservable(AmazonHelper.getfileFromPath(media))
                     .flatMap(new Func1<String, Observable<Message>>() {
                         @Override
                         public Observable<Message> call(String url) {
@@ -525,6 +526,24 @@ public class ChatsPresenter {
                     @Override
                     public void call(Message message) {
                         postLocalMessage(message);
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        mListener.error(throwable);
+                    }
+                });
+    }
+
+
+    public void deleteShout() {
+        mApiService.deleteConversation(conversationId)
+                .observeOn(mUiScheduler)
+                .subscribeOn(mNetworkScheduler)
+                .subscribe(new Action1<ResponseBody>() {
+                    @Override
+                    public void call(ResponseBody responseBody) {
+                        mListener.conversationDeleted();
                     }
                 }, new Action1<Throwable>() {
                     @Override

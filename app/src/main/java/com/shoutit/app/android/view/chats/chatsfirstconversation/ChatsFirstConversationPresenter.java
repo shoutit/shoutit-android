@@ -29,6 +29,8 @@ import com.shoutit.app.android.api.model.ShoutResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.ProfilesDao;
+import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.PusherHelper;
@@ -57,6 +59,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
+import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Scheduler;
 import rx.Subscriber;
@@ -87,6 +90,8 @@ public class ChatsFirstConversationPresenter {
     private final Gson mGson;
     private final AmazonHelper mAmazonHelper;
     private final String mIdForCreation;
+    private final ShoutsDao mShoutsDao;
+    private final ProfilesDao mProfilesDao;
     private final boolean mIsShoutConversation;
     private Listener mListener;
     private final CompositeSubscription mSubscribe = new CompositeSubscription();
@@ -103,7 +108,9 @@ public class ChatsFirstConversationPresenter {
                                            PusherHelper pusher,
                                            Gson gson,
                                            AmazonHelper amazonHelper,
-                                           String idForCreation) {
+                                           String idForCreation,
+                                           ShoutsDao shoutsDao,
+                                           ProfilesDao profilesDao) {
         mIsShoutConversation = isShoutConversation;
         mApiService = apiService;
         mUiScheduler = uiScheduler;
@@ -115,6 +122,8 @@ public class ChatsFirstConversationPresenter {
         mGson = gson;
         mAmazonHelper = amazonHelper;
         mIdForCreation = idForCreation;
+        mShoutsDao = shoutsDao;
+        mProfilesDao = profilesDao;
     }
 
     public void register(@NonNull Listener listener) {
@@ -319,6 +328,11 @@ public class ChatsFirstConversationPresenter {
             public void call(Message message) {
                 conversationCreated = true;
                 conversationId = message.getConversationId();
+                if(mIsShoutConversation){
+                    mShoutsDao.getShoutDao(mIdForCreation).getRefreshObserver().onNext(new Object());
+                } else {
+                    mProfilesDao.getProfileDao(mIdForCreation).getRefreshSubject().onNext(new Object());
+                }
             }
         });
     }
@@ -424,8 +438,8 @@ public class ChatsFirstConversationPresenter {
             try {
                 final File videoThumbnail = MediaUtils.createVideoThumbnail(mContext, Uri.parse(media));
                 final int videoLength = MediaUtils.getVideoLength(mContext, media);
-                final Observable<String> videoFileObservable = mAmazonHelper.uploadShoutMediaObservable(AmazonHelper.getfileFromPath(media));
-                final Observable<String> thumbFileObservable = mAmazonHelper.uploadShoutMediaObservable(AmazonHelper.getfileFromPath(videoThumbnail.getAbsolutePath()));
+                final Observable<String> videoFileObservable = mAmazonHelper.uploadShoutMediaVideoObservable(AmazonHelper.getfileFromPath(media));
+                final Observable<String> thumbFileObservable = mAmazonHelper.uploadShoutMediaImageObservable(AmazonHelper.getfileFromPath(videoThumbnail.getAbsolutePath()));
                 mSubscribe.add(Observable
                         .zip(videoFileObservable, thumbFileObservable, new Func2<String, String, Video>() {
                             @Override
@@ -459,7 +473,7 @@ public class ChatsFirstConversationPresenter {
                 mListener.error(e);
             }
         } else {
-            mSubscribe.add(mAmazonHelper.uploadShoutMediaObservable(AmazonHelper.getfileFromPath(media))
+            mSubscribe.add(mAmazonHelper.uploadShoutMediaImageObservable(AmazonHelper.getfileFromPath(media))
                     .flatMap(new Func1<String, Observable<Message>>() {
                         @Override
                         public Observable<Message> call(String url) {
@@ -509,6 +523,27 @@ public class ChatsFirstConversationPresenter {
                         mListener.error(throwable);
                     }
                 });
+    }
+
+    public void deleteShout() {
+        if (conversationCreated) {
+            mListener.conversationDeleted();
+        } else {
+            mApiService.deleteConversation(conversationId)
+                    .observeOn(mUiScheduler)
+                    .subscribeOn(mNetworkScheduler)
+                    .subscribe(new Action1<ResponseBody>() {
+                        @Override
+                        public void call(ResponseBody responseBody) {
+                            mListener.conversationDeleted();
+                        }
+                    }, new Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable throwable) {
+                            mListener.error(throwable);
+                        }
+                    });
+        }
     }
 
     public void sendShout(final String shoutId) {

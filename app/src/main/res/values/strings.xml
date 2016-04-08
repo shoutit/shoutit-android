@@ -431,6 +431,7 @@
     <string name="filters_sort_type_header">Sort By:</string>
     <string name="filters_price_header">Price</string>
     <string name="profile_report_succes">Succesfully reported</string>
+    <string name="profile_not_listening">This useer is not listening to you.</string>
     <string name="select_shout_title">Select Shout</string>
 
 </resources>

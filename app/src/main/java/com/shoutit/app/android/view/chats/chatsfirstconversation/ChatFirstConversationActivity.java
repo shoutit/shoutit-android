@@ -1,12 +1,14 @@
 package com.shoutit.app.android.view.chats.chatsfirstconversation;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -122,6 +124,10 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
                         mChatsAttatchmentsLayout.setVisibility(visibility);
                         return true;
                     }
+                    case R.id.chats_delete: {
+                        deleteConversation();
+                        return true;
+                    }
                     case R.id.chats_video_menu: {
 
                         return true;
@@ -210,6 +216,10 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
     }
 
     @Override
+    public void conversationDeleted() {
+        finish();
+    }
+
     public void setAboutShoutData(String title, String thumbnail, String type, String price, String authorAndTime) {
         mChatsShoutLayout.setVisibility(View.VISIBLE);
         picasso.load(thumbnail)
@@ -255,6 +265,25 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
         } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
             ColoredSnackBar.error(ColoredSnackBar.contentView(this), R.string.error_default, Snackbar.LENGTH_SHORT).show();
         }
+    }
+
+    private void deleteConversation(){
+        new AlertDialog.Builder(ChatFirstConversationActivity.this)
+                .setMessage("Do you want to delete this conversation?")
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        presenter.deleteShout();
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .show();
     }
 
     @Override

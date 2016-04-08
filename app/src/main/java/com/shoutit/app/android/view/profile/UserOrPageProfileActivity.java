@@ -76,10 +76,14 @@ public class UserOrPageProfileActivity extends ProfileActivity {
                     @Override
                     public void call(ChatInfo chatInfo) {
                         final String conversationId = chatInfo.getConversationId();
-                        if (conversationId == null) {
-                            startActivity(ChatFirstConversationActivity.newIntent(UserOrPageProfileActivity.this, false, chatInfo.getUsername()));
+                        if (chatInfo.isListening()) {
+                            if (conversationId == null) {
+                                startActivity(ChatFirstConversationActivity.newIntent(UserOrPageProfileActivity.this, false, chatInfo.getUsername()));
+                            } else {
+                                startActivity(ChatActivity.newIntent(UserOrPageProfileActivity.this, conversationId, false));
+                            }
                         } else {
-                            startActivity(ChatActivity.newIntent(UserOrPageProfileActivity.this, conversationId, false));
+                            Toast.makeText(UserOrPageProfileActivity.this, R.string.profile_not_listening, Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

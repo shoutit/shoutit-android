@@ -15,4 +15,21 @@
         android:title="@string/chat_video_call"
         app:showAsAction="ifRoom"/>
 
+    <item
+        android:id="@+id/chats_overflow"
+        android:icon="@drawable/abc_ic_menu_moreoverflow_mtrl_alpha"
+        android:title=""
+        app:showAsAction="always">
+
+        <menu>
+
+            <item
+                android:id="@+id/chats_delete"
+                android:title="Delete"
+                app:showAsAction="never"/>
+
+        </menu>
+
+    </item>
+
 </menu>
