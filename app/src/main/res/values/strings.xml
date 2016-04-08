@@ -206,6 +206,7 @@
     <string name="shout_visit_profile">VISIT %1$s\'s PROFILE</string>
     <string name="shout_bottom_bar_delete">Delete</string>
     <string name="shout_bottom_bar_edit">Edit</string>
+    <string name="shout_choose_video_app">Choose application</string>
 
     <!-- Account -->
     <string name="account_email_changed">Email successfully changed</string>
