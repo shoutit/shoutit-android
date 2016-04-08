@@ -13,6 +13,7 @@ import com.shoutit.app.android.api.model.SortType;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dao.CategoriesDao;
 import com.shoutit.app.android.dao.SortTypesDao;
+import com.shoutit.app.android.view.search.SearchPresenter;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -55,7 +56,7 @@ public class FiltersPresenterTest {
         when(userPreferences.getLocation())
                 .thenReturn(new UserLocation(2d, 3d, "PL", null, null, null, null));
 
-        presenter = new FiltersPresenter(categoriesDao, sortTypesDao, Schedulers.immediate(), context, userPreferences);
+        presenter = new FiltersPresenter(categoriesDao, sortTypesDao, Schedulers.immediate(), context, userPreferences, SearchPresenter.SearchType.BROWSE, "");
     }
 
     @Test

@@ -46,7 +46,7 @@ public class ShoutsDaoTest {
 
         when(userPreferences.isUserLoggedIn()).thenReturn(true);
         when(apiService.shoutsForLocation(anyString(), anyString(),anyString(), anyInt(), anyInt(),
-                anyInt(), anyInt(), anyInt(), anyString(), anyString(), anyMap()))
+                anyInt(), anyInt(), anyInt(), anyString(), anyString(), anyString(), anyMap()))
                 .thenReturn(Observable.just(shoutsResponse()));
         when(apiService.home(anyString(), anyInt(), anyInt()))
                 .thenReturn(Observable.just(shoutsResponse()));
