@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -75,14 +76,23 @@ public class UserOrPageProfileActivity extends ProfileActivity {
                 .subscribe(new Action1<ChatInfo>() {
                     @Override
                     public void call(ChatInfo chatInfo) {
-                        final String conversationId = chatInfo.getConversationId();
-                        if (conversationId == null) {
-                            startActivity(ChatFirstConversationActivity.newIntent(UserOrPageProfileActivity.this, false, chatInfo.getUsername()));
+                        if (chatInfo.isUserLoggedIn()) {
+                            final String conversationId = chatInfo.getConversationId();
+                            if (chatInfo.isListening()) {
+                                if (conversationId == null) {
+                                    startActivity(ChatFirstConversationActivity.newIntent(UserOrPageProfileActivity.this, false, chatInfo.getUsername()));
+                                } else {
+                                    startActivity(ChatActivity.newIntent(UserOrPageProfileActivity.this, conversationId, false));
+                                }
+                            } else {
+                                Toast.makeText(UserOrPageProfileActivity.this, R.string.profile_not_listening, Toast.LENGTH_SHORT).show();
+                            }
                         } else {
-                            startActivity(ChatActivity.newIntent(UserOrPageProfileActivity.this, conversationId, false));
+                            ColoredSnackBar.error(ColoredSnackBar.contentView(UserOrPageProfileActivity.this), R.string.error_action_only_for_logged_in_user, Snackbar.LENGTH_SHORT).show();
                         }
                     }
                 });
+
 
         presenter.getReportSuccessObservable()
                 .compose(this.bindToLifecycle())

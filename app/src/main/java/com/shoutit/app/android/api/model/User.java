@@ -12,6 +12,7 @@ public class User extends BaseProfile {
 
     private final String apiUrl;
     private final String webUrl;
+    // whever the profile is listening to you
     private final boolean isListener;
     private final boolean isPasswordSet;
     private final UserLocation location;
