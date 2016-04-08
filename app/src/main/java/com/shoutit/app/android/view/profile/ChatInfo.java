@@ -9,10 +9,12 @@ public class ChatInfo {
     private final String username;
     @Nullable
     private final String conversationId;
+    private final boolean isListening;
 
-    public ChatInfo(@NonNull String username, @Nullable String conversationId) {
+    public ChatInfo(@NonNull String username, @Nullable String conversationId, boolean isListening) {
         this.username = username;
         this.conversationId = conversationId;
+        this.isListening = isListening;
     }
 
     @NonNull
@@ -23,5 +25,9 @@ public class ChatInfo {
     @Nullable
     public String getConversationId() {
         return conversationId;
+    }
+
+    public boolean isListening() {
+        return isListening;
     }
 }
