@@ -10,6 +10,8 @@ import android.widget.Toast;
 
 import com.appunite.appunitegcm.AppuniteGcm;
 import com.appunite.rx.dagger.NetworkScheduler;
+import com.appunite.rx.functions.BothParams;
+import com.appunite.rx.functions.Functions1;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
 import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
@@ -46,8 +48,10 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import io.fabric.sdk.android.Fabric;
+import rx.Observable;
 import rx.Scheduler;
 import rx.functions.Action1;
+import rx.functions.Func2;
 import rx.plugins.RxJavaErrorHandler;
 import rx.plugins.RxJavaPlugins;
 
@@ -127,17 +131,27 @@ public class App extends MultiDexApplication {
     }
 
     private void initPusher() {
-        if (userPreferences.isNormalUser()) {
-            initPusher(userPreferences.getAuthToken().get());
-        }
+        Observable.zip(userPreferences.getTokenObservable().filter(Functions1.isNotNull()),
+                userPreferences.getUserObservable().filter(Functions1.isNotNull()),
+                new Func2<String, User, BothParams<String, User>>() {
+                    @Override
+                    public BothParams<String, User> call(String token, User user) {
+                        return new BothParams<>(token, user);
+                    }
+                })
+                .first()
+                .subscribe(new Action1<BothParams<String, User>>() {
+                    @Override
+                    public void call(BothParams<String, User> tokenAndUser) {
+                        initPusher(tokenAndUser.param1(), tokenAndUser.param2());
+                    }
+                });
     }
 
-    private void initPusher(String token) {
+    private void initPusher(@Nonnull String token, @Nonnull User user) {
         mPusherHelper.init(token);
         final Pusher pusher = mPusherHelper.getPusher();
         pusher.connect();
-        final User user = userPreferences.getUser();
-        assert user != null;
         pusher.subscribePresence(String.format("presence-u-%1$s", user.getId()));
     }
 
