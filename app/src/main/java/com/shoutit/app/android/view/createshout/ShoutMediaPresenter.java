@@ -271,8 +271,8 @@ public class ShoutMediaPresenter {
         for (Item item : mediaItems.values()) {
             if (item instanceof VideoItem) {
                 final VideoItem videoItem = (VideoItem) item;
-                final Observable<String> videoFileObservable = mAmazonHelper.uploadShoutMediaObservable(AmazonHelper.getfileFromPath(videoItem.getVideo()));
-                final Observable<String> thumbFileObservable = mAmazonHelper.uploadShoutMediaObservable(AmazonHelper.getfileFromPath(videoItem.getThumb()));
+                final Observable<String> videoFileObservable = mAmazonHelper.uploadShoutMediaVideoObservable(AmazonHelper.getfileFromPath(videoItem.getVideo()));
+                final Observable<String> thumbFileObservable = mAmazonHelper.uploadShoutMediaImageObservable(AmazonHelper.getfileFromPath(videoItem.getThumb()));
                 videoObservable = Observable.zip(videoFileObservable, thumbFileObservable, new Func2<String, String, Video>() {
                     @Override
                     public Video call(String video, String thumb) {
@@ -281,7 +281,7 @@ public class ShoutMediaPresenter {
                 });
             } else if (item instanceof ImageItem) {
                 final ImageItem imageItem = (ImageItem) item;
-                imageObservables.add(mAmazonHelper.uploadShoutMediaObservable(AmazonHelper.getfileFromPath(imageItem.getThumb())));
+                imageObservables.add(mAmazonHelper.uploadShoutMediaImageObservable(AmazonHelper.getfileFromPath(imageItem.getThumb())));
             }
         }
 
