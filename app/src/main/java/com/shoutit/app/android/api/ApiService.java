@@ -94,6 +94,7 @@ public interface ApiService {
                                                  @Query("within") Integer distance,
                                                  @Query("shout_type") String shoutType,
                                                  @Query("sort") String sortBy,
+                                                 @Query("category") String categorySlug,
                                                  @QueryMap Map<String, String> filtersMap);
 
     @GET("shouts")
@@ -129,6 +130,7 @@ public interface ApiService {
                                             @Query("within") Integer distance,
                                             @Query("shout_type") String shoutType,
                                             @Query("sort") String sortBy,
+                                            @Query("category") String categorySlug,
                                             @QueryMap Map<String, String> filtersMap);
 
     @GET("shouts")
@@ -150,6 +152,7 @@ public interface ApiService {
                                                @Query("within") Integer distance,
                                                @Query("shout_type") String shoutType,
                                                @Query("sort") String sortBy,
+                                               @Query("category") String categorySlug,
                                                @QueryMap Map<String, String> filtersMap);
 
     @GET("shouts")
@@ -162,6 +165,7 @@ public interface ApiService {
                                                     @Query("within") Integer distance,
                                                     @Query("shout_type") String shoutType,
                                                     @Query("sort") String sortBy,
+                                                    @Query("category") String categorySlug,
                                                     @QueryMap Map<String, String> filtersMap);
 
     @GET("shouts")

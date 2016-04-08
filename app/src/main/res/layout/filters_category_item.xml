@@ -1,44 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/filters_category_item_root_view"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/filters_category_header"
-        style="@style/FiltersHeader"
-        android:layout_marginBottom="8dp"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:text="@string/filters_ctegory_header"/>
-
-    <ImageView
-        android:id="@+id/filters_category_icon"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
-        tools:src="@drawable/ic_call_green"
-        android:layout_marginRight="24dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginTop="44dp"
-        />
-
-    <Spinner
-        android:id="@+id/filters_category_spinner"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_below="@+id/filters_category_header"
-        android:layout_toEndOf="@+id/filters_category_icon"
-        android:layout_toRightOf="@+id/filters_category_icon"/>
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/filters_category_header"
+            style="@style/FiltersHeader"
+            android:layout_marginBottom="8dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:text="@string/filters_ctegory_header" />
+
+        <ImageView
+            android:id="@+id/filters_category_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="44dp"
+            tools:src="@drawable/ic_call_green" />
+
+        <Spinner
+            android:id="@+id/filters_category_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/filters_category_header"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_toEndOf="@+id/filters_category_icon"
+            android:layout_toRightOf="@+id/filters_category_icon" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:layout_below="@+id/filters_category_spinner"
+            android:layout_marginTop="2dp"
+            android:background="@color/black_12" />
+
+    </RelativeLayout>
 
     <View
+        android:id="@+id/filters_blocking_view"
+        android:visibility="gone"
+        android:clickable="true"
         android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:layout_below="@+id/filters_category_spinner"
-        android:layout_marginTop="2dp"
-        android:background="@color/black_12"/>
+        android:layout_height="match_parent" />
 
-</RelativeLayout>
+</FrameLayout>

@@ -22,7 +22,9 @@ import com.shoutit.app.android.retainfragment.RetainFragmentHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.view.createshout.location.LocationActivity;
+import com.shoutit.app.android.view.search.SearchPresenter;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -32,7 +34,12 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import rx.functions.Action1;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class FiltersFragment extends BaseFragment {
+
+    private static final String KEY_SEARCH_TYPE = "key_search_type";
+    private static final String KEY_INIT_CATEGORY_SLUG = "key_init_category_slug";
 
     public interface OnFiltersSubmitListener {
         void onFiltersSubmit(@Nonnull FiltersToSubmit filtersToSubmit);
@@ -53,8 +60,16 @@ public class FiltersFragment extends BaseFragment {
     private FiltersPresenter presenter;
     private OnFiltersSubmitListener onFiltersSubmitListener;
 
-    public static Fragment newInstance() {
-        return new FiltersFragment();
+    public static Fragment newInstance(@Nonnull SearchPresenter.SearchType searchType,
+                                       @Nullable String initCategorySlug) {
+        final Bundle bundle = new Bundle();
+        bundle.putSerializable(KEY_SEARCH_TYPE, searchType);
+        bundle.putSerializable(KEY_INIT_CATEGORY_SLUG, initCategorySlug);
+
+        final FiltersFragment fragment = new FiltersFragment();
+        fragment.setArguments(bundle);
+
+        return fragment;
     }
 
     @Override
@@ -147,11 +162,16 @@ public class FiltersFragment extends BaseFragment {
     protected void injectComponent(@Nonnull BaseActivityComponent baseActivityComponent,
                                    @Nonnull FragmentModule fragmentModule,
                                    @Nullable Bundle savedInstanceState) {
-            DaggerFiltersFragmentComponent.builder()
-                    .baseActivityComponent(baseActivityComponent)
-                    .fragmentModule(fragmentModule)
-                    .build()
-                    .inject(this);
+        final SearchPresenter.SearchType searchType = (SearchPresenter.SearchType)
+                checkNotNull(getArguments().getSerializable(KEY_SEARCH_TYPE));
+        final String initCategorySlug = getArguments().getString(KEY_INIT_CATEGORY_SLUG);
+
+        DaggerFiltersFragmentComponent.builder()
+                .baseActivityComponent(baseActivityComponent)
+                .fragmentModule(fragmentModule)
+                .filtersFragmentModule(new FiltersFragmentModule(this, searchType, initCategorySlug))
+                .build()
+                .inject(this);
     }
 
 }

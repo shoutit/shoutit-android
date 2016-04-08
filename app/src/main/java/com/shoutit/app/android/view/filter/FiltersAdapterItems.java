@@ -244,15 +244,18 @@ public class FiltersAdapterItems {
         private final Observer<String> categorySelectedObserver;
         @Nonnull
         private final Observable<Category> categoryObservable;
+        private final boolean shouldBlockCategories;
 
         public CategoryAdapterItem(@Nonnull Category category,
                                    @Nonnull Map<String, Category> categories,
                                    @Nonnull Observer<String> categorySelectedObserver,
-                                   @Nonnull Observable<Category> categoryObservable) {
+                                   @Nonnull Observable<Category> categoryObservable,
+                                   boolean shouldBlockCategories) {
             this.category = category;
             this.categories = categories;
             this.categorySelectedObserver = categorySelectedObserver;
             this.categoryObservable = categoryObservable;
+            this.shouldBlockCategories = shouldBlockCategories;
         }
 
         @Override
@@ -283,6 +286,10 @@ public class FiltersAdapterItems {
         @Nonnull
         public Observable<Category> getCategoryObservable() {
             return categoryObservable;
+        }
+
+        public boolean shouldBlockCategories() {
+            return shouldBlockCategories;
         }
     }
 
