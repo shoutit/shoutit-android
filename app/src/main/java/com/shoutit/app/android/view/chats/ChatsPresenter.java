@@ -441,8 +441,8 @@ public class ChatsPresenter {
             try {
                 final File videoThumbnail = MediaUtils.createVideoThumbnail(mContext, Uri.parse(media));
                 final int videoLength = MediaUtils.getVideoLength(mContext, media);
-                final Observable<String> videoFileObservable = mAmazonHelper.uploadShoutMediaObservable(AmazonHelper.getfileFromPath(media));
-                final Observable<String> thumbFileObservable = mAmazonHelper.uploadShoutMediaObservable(AmazonHelper.getfileFromPath(videoThumbnail.getAbsolutePath()));
+                final Observable<String> videoFileObservable = mAmazonHelper.uploadShoutMediaVideoObservable(AmazonHelper.getfileFromPath(media));
+                final Observable<String> thumbFileObservable = mAmazonHelper.uploadShoutMediaImageObservable(AmazonHelper.getfileFromPath(videoThumbnail.getAbsolutePath()));
                 mSubscribe.add(Observable
                         .zip(videoFileObservable, thumbFileObservable, new Func2<String, String, Video>() {
                             @Override
@@ -477,7 +477,7 @@ public class ChatsPresenter {
                 mListener.error(e);
             }
         } else {
-            mSubscribe.add(mAmazonHelper.uploadShoutMediaObservable(AmazonHelper.getfileFromPath(media))
+            mSubscribe.add(mAmazonHelper.uploadShoutMediaImageObservable(AmazonHelper.getfileFromPath(media))
                     .flatMap(new Func1<String, Observable<Message>>() {
                         @Override
                         public Observable<Message> call(String url) {

@@ -22,6 +22,7 @@ import rx.Subscriber;
 public class AmazonHelper {
 
     public static final String JPEG = ".jpg";
+    public static final String MP4 = ".mp4";
 
     @Nonnull
     private final TransferUtility transferUtility;
@@ -51,18 +52,20 @@ public class AmazonHelper {
         userId = userPreferences.getUser().getId();
     }
 
-    public Observable<String> uploadShoutMediaObservable(@Nonnull final File fileToUpload) {
-        return uploadImageObservable(AmazonBucket.SHOUT, fileToUpload);
+    public Observable<String> uploadShoutMediaVideoObservable(@Nonnull final File fileToUpload) {
+        return uploadImageObservable(AmazonBucket.SHOUT, fileToUpload, getVideoFileName());
+    }
+
+    public Observable<String> uploadShoutMediaImageObservable(@Nonnull final File fileToUpload) {
+        return uploadImageObservable(AmazonBucket.SHOUT, fileToUpload, getImageFileName());
     }
 
     public Observable<String> uploadUserImageObservable(@Nonnull final File fileToUpload) {
-        return uploadImageObservable(AmazonBucket.USER, fileToUpload);
+        return uploadImageObservable(AmazonBucket.USER, fileToUpload, getImageFileName());
     }
 
     private Observable<String> uploadImageObservable(@Nonnull final AmazonBucket bucket,
-                                                     @Nonnull final File fileToUpload) {
-        final String fileName = getImageFileName();
-
+                                                     @Nonnull final File fileToUpload, final String fileName) {
         return Observable
                 .create(new Observable.OnSubscribe<String>() {
                     @Override
@@ -98,6 +101,12 @@ public class AmazonHelper {
     @Nonnull
     private String getImageFileName() {
         return String.format("%1$d_%2$s%3$s", System.currentTimeMillis(), userId, JPEG);
+    }
+
+    @SuppressLint("DefaultLocale")
+    @Nonnull
+    private String getVideoFileName() {
+        return String.format("%1$d_%2$s%3$s", System.currentTimeMillis(), userId, MP4);
     }
 
     public static File getfileFromPath(@NonNull String path) {
