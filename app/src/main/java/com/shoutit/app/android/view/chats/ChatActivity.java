@@ -39,6 +39,7 @@ import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
 import com.shoutit.app.android.view.chats.chatsfirstconversation.ChatFirstConversationActivity;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
+import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.shoutit.app.android.view.shouts.selectshout.SelectShoutActivity;
 import com.squareup.picasso.Picasso;
 
@@ -229,7 +230,7 @@ public class ChatActivity extends BaseActivity implements Listener {
 
     @Override
     public void onShoutClicked(String shoutId) {
-        startActivityForResult(SelectShoutActivity.newIntent(ChatActivity.this), SELECT_SHOUT_REQUEST_CODE);
+        startActivity(ShoutActivity.newIntent(ChatActivity.this, shoutId));
     }
 
     @Override
