@@ -20,16 +20,16 @@
             android:layout_marginBottom="10dp" />
 
         <ScrollView
-            android:overScrollMode="never"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:overScrollMode="never">
 
             <LinearLayout
-                android:gravity="start"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
+                android:gravity="start"
                 android:orientation="vertical">
 
                 <TextView
@@ -53,55 +53,49 @@
 
                 </HorizontalScrollView>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
-                    android:text="@string/request_activity_what_are_you_looking_for"
-                    android:textColor="#8a000000"
-                    android:textSize="12sp" />
-
-                <com.shoutit.app.android.widget.ErrorTextInputLayout
+                <android.support.design.widget.TextInputLayout
+                    android:layout_marginTop="6dp"
                     android:id="@+id/edit_description_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:hintTextAppearance="@style/BlueInputStyle">
 
                     <EditText
-                        android:gravity="start"
+                        android:singleLine="true"
                         android:id="@+id/edit_shout_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="-4dp"
                         android:layout_marginStart="-4dp"
+                        android:gravity="start"
                         android:hint="@string/edit_shout_title_hint"
                         android:theme="@style/BlueEditText" />
 
-                </com.shoutit.app.android.widget.ErrorTextInputLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
-                    android:text="@string/request_activity_budget"
-                    android:textColor="#8a000000"
-                    android:textSize="12sp" />
+                </android.support.design.widget.TextInputLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <EditText
-                        android:gravity="start"
-                        android:id="@+id/edit_budget"
+
+                    <android.support.design.widget.TextInputLayout
+                        android:layout_marginTop="6dp"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="-4dp"
                         android:layout_weight="1"
-                        android:hint="@string/create_request_price"
-                        android:inputType="numberDecimal"
-                        android:theme="@style/BlueEditText" />
+                        app:hintTextAppearance="@style/BlueInputStyle">
+
+                        <EditText
+                            android:id="@+id/edit_budget"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="-4dp"
+                            android:gravity="start"
+                            android:hint="@string/create_request_price"
+                            android:inputType="numberDecimal"
+                            android:theme="@style/BlueEditText" />
+                    </android.support.design.widget.TextInputLayout>
 
                     <ImageView
                         android:id="@+id/edit_currency_info"
@@ -111,19 +105,12 @@
                         android:src="@drawable/info" />
 
                     <com.shoutit.app.android.widget.StateSpinner
+                        android:layout_gravity="bottom"
                         android:id="@+id/edit_currency_spinner"
                         android:layout_width="130dp"
                         android:layout_height="43dp" />
 
                 </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
-                    android:text="@string/request_activity_when"
-                    android:textColor="#8a000000"
-                    android:textSize="12sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -145,22 +132,21 @@
 
                 </LinearLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
-                    android:text="@string/edit_shout_description_hint"
-                    android:textColor="#8a000000"
-                    android:textSize="12sp" />
-
-                <EditText
-                    android:gravity="start"
-                    android:id="@+id/edit_shout_description"
+                <android.support.design.widget.TextInputLayout
+                    android:layout_marginTop="6dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="-4dp"
-                    android:hint="@string/edit_shout_description_hint"
-                    android:theme="@style/BlueEditText" />
+                    app:hintTextAppearance="@style/BlueInputStyle">
+
+                    <EditText
+                        android:id="@+id/edit_shout_description"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="-4dp"
+                        android:gravity="start"
+                        android:hint="@string/edit_shout_description_hint"
+                        android:theme="@style/BlueEditText" />
+                </android.support.design.widget.TextInputLayout>
 
                 <LinearLayout
                     android:id="@+id/edit_shout_container"
@@ -205,22 +191,21 @@
 
                 </LinearLayout>
 
-                <TextView
+                <android.support.design.widget.TextInputLayout
+                    android:layout_marginTop="6dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
-                    android:text="@string/edit_shout_mobile_hint"
-                    android:textColor="#8a000000"
-                    android:textSize="12sp" />
+                    app:hintTextAppearance="@style/BlueInputStyle">
 
-                <EditText
-                    android:id="@+id/edit_shout_mobile"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="-4dp"
-                    android:inputType="phone"
-                    android:hint="@string/edit_shout_mobile_hint"
-                    android:theme="@style/BlueEditText" />
+                    <EditText
+                        android:id="@+id/edit_shout_mobile"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="-4dp"
+                        android:hint="@string/edit_shout_mobile_hint"
+                        android:inputType="phone"
+                        android:theme="@style/BlueEditText" />
+                </android.support.design.widget.TextInputLayout>
 
                 <View
                     android:layout_width="match_parent"
@@ -232,10 +217,10 @@
                     android:id="@+id/edit_confirm"
                     style="@style/BaseButtonStyle"
                     android:layout_width="match_parent"
+                    android:layout_marginBottom="16dp"
                     android:background="@drawable/selector_green_button_with_stroke"
                     android:text="@string/edit_done_btn"
-                    android:textColor="@android:color/white"
-                    android:layout_marginBottom="16dp"/>
+                    android:textColor="@android:color/white" />
 
             </LinearLayout>
 
