@@ -24,6 +24,7 @@ import com.shoutit.app.android.view.editprofile.EditProfileActivity;
 import com.shoutit.app.android.view.notifications.NotificationsActivity;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsActivity;
+import com.shoutit.app.android.view.verifyemail.VerifyEmailActivity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -104,6 +105,16 @@ public class UserOrPageProfileActivity extends ProfileActivity {
                     @Override
                     public void call(Object ignore) {
                         popupMenu.show();
+                    }
+                });
+
+        presenter.getMyProfilePresenter()
+                .getVerifyAccountClickObservable()
+                .compose(bindToLifecycle())
+                .subscribe(new Action1<Object>() {
+                    @Override
+                    public void call(Object o) {
+                        startActivity(VerifyEmailActivity.newIntent(UserOrPageProfileActivity.this));
                     }
                 });
 

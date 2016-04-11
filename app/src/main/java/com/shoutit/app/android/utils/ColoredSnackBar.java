@@ -88,4 +88,14 @@ public class ColoredSnackBar {
             }
         };
     }
+
+    @NonNull
+    public static Action1<String> successSnackBarAction(final View contentView) {
+        return new Action1<String>() {
+            @Override
+            public void call(String message) {
+                ColoredSnackBar.success(contentView, message, Snackbar.LENGTH_LONG).show();
+            }
+        };
+    }
 }

@@ -107,6 +107,12 @@
         <item name="android:textSize">16sp</item>
     </style>
 
+    <style name="VerifyHintStyle" parent="@style/TextAppearance.AppCompat">
+        <item name="android:textColorHint">@color/black_38</item>
+        <item name="android:textColor">@color/accent_blue</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
     <style name="BlueEditText" parent="ThemeOverlay.AppCompat">
         <item name="colorControlActivated">@color/accent_blue</item>
         <item name="colorControlHighlight">@color/accent_blue</item>

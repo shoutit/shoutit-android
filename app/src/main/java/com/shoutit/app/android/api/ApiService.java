@@ -43,6 +43,8 @@ import com.shoutit.app.android.api.model.UpdateUserRequest;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserIdentity;
 import com.shoutit.app.android.api.model.UserLocation;
+import com.shoutit.app.android.api.model.VerifyEmailRequest;
+import com.shoutit.app.android.api.model.VerifyEmailResponse;
 import com.shoutit.app.android.api.model.login.EmailLoginRequest;
 import com.shoutit.app.android.api.model.login.FacebookLogin;
 import com.shoutit.app.android.api.model.login.GoogleLogin;
@@ -196,14 +198,19 @@ public interface ApiService {
     @POST("oauth2/access_token")
     Observable<SignResponse> facebookLogin(@Body FacebookLogin request);
 
-    @POST("auth/reset_password")
-    Observable<ResponseBody> resetPassword(@Body ResetPasswordRequest request);
-
     @POST("oauth2/access_token")
     Observable<SignResponse> googleLogin(@Body GoogleLogin request);
 
-    @POST("tags/batch_listen")
-    Observable<Object> batchListen(@Body TagsRequest request);
+    /** Auth **/
+
+    @POST("auth/reset_password")
+    Observable<ResponseBody> resetPassword(@Body ResetPasswordRequest request);
+
+    @POST("auth/change_password")
+    Observable<ResponseBody> changePassword(@Body ChangePasswordRequest changePasswordRequest);
+
+    @POST("auth/verify_email")
+    Observable<VerifyEmailResponse> verifyEmail(@Body VerifyEmailRequest verifyEmailRequest);
 
 
     /**
@@ -269,12 +276,6 @@ public interface ApiService {
     @POST("misc/reports")
     Observable<Response<Object>> report(@Body ReportBody reportShoutBody);
 
-    /**
-     * Auth
-     **/
-    @POST("auth/change_password")
-    Observable<ResponseBody> changePassword(@Body ChangePasswordRequest changePasswordRequest);
-
 
     /**
      * create shout
@@ -320,6 +321,9 @@ public interface ApiService {
 
     @GET("tags/{name}/related")
     Observable<RelatedTagsResponse> relatedTags(@Path("name") String tagName);
+
+    @POST("tags/batch_listen")
+    Observable<Object> batchListen(@Body TagsRequest request);
 
     /**
      * Conversations
