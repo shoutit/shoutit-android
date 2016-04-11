@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -101,6 +102,9 @@ public class ChatActivity extends BaseActivity implements Listener {
     @Bind(R.id.chats_shout_layout_price)
     TextView mChatsShoutLayoutPrice;
 
+    @Bind(R.id.chats_main_layout)
+    View mMainLayout;
+
     public static Intent newIntent(@Nonnull Context context, @NonNull String conversationId, boolean shoutConversation) {
         return new Intent(context, ChatActivity.class)
                 .putExtra(ARGS_CONVERSATION_ID, conversationId)
@@ -164,6 +168,21 @@ public class ChatActivity extends BaseActivity implements Listener {
                         presenter.sendTyping();
                     }
                 });
+
+        mMainLayout.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                mChatsAttatchmentsLayout.setVisibility(View.GONE);
+                return false;
+            }
+        });
+        mChatsRecyclerview.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                mChatsAttatchmentsLayout.setVisibility(View.GONE);
+                return false;
+            }
+        });
     }
 
     @Nonnull

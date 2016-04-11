@@ -153,6 +153,7 @@
     </FrameLayout>
 
     <LinearLayout
+        android:id="@+id/chats_main_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/chats_send_layout"

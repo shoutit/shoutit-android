@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -98,6 +99,9 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
     @Bind(R.id.chats_shout_layout_price)
     TextView mChatsShoutLayoutPrice;
 
+    @Bind(R.id.chats_main_layout)
+    View mMainLayout;
+
     public static Intent newIntent(@Nonnull Context context, boolean shoutConversation, @NonNull String idForCreation) {
         return new Intent(context, ChatFirstConversationActivity.class)
                 .putExtra(ARGS_IS_SHOUT_CONVERSATION, shoutConversation)
@@ -156,6 +160,21 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
                         presenter.sendTyping();
                     }
                 });
+
+        mMainLayout.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                mChatsAttatchmentsLayout.setVisibility(View.GONE);
+                return false;
+            }
+        });
+        mChatsRecyclerview.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                mChatsAttatchmentsLayout.setVisibility(View.GONE);
+                return false;
+            }
+        });
     }
 
     @Nonnull
