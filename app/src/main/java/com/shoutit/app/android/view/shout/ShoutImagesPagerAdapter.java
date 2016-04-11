@@ -12,11 +12,15 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.google.common.collect.ImmutableList;
+import com.google.gson.Gson;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.IntentHelper;
+import com.shoutit.app.android.view.gallery.GalleryActivity;
 import com.squareup.picasso.Picasso;
+import com.veinhorn.scrollgalleryview.Constants;
+import com.veinhorn.scrollgalleryview.VideoPlayerActivity;
 
 import java.util.List;
 
@@ -29,6 +33,8 @@ public class ShoutImagesPagerAdapter extends PagerAdapter {
     @Nonnull
     private final Picasso picasso;
     @Nonnull
+    private final Gson gson;
+    @Nonnull
     private final LayoutInflater inflater;
     @Nonnull
     private List<String> images = ImmutableList.of();
@@ -36,9 +42,11 @@ public class ShoutImagesPagerAdapter extends PagerAdapter {
     private List<Video> videos = ImmutableList.of();
 
     @Inject
-    public ShoutImagesPagerAdapter(@ForActivity Context context, @Nonnull Picasso picasso) {
+    public ShoutImagesPagerAdapter(@ForActivity Context context, @Nonnull Picasso picasso,
+                                   @Nonnull Gson gson) {
         this.context = context;
         this.picasso = picasso;
+        this.gson = gson;
         this.inflater = LayoutInflater.from(context);
     }
 
@@ -49,7 +57,7 @@ public class ShoutImagesPagerAdapter extends PagerAdapter {
     }
 
     @Override
-    public Object instantiateItem(ViewGroup container, int position) {
+    public Object instantiateItem(ViewGroup container, final int position) {
         final View view = inflater.inflate(R.layout.shout_pager_image, container, false);
         final ImageView imageView = (ImageView) view.findViewById(R.id.shout_image_iv);
         final ImageView videoIconView = (ImageView) view.findViewById(R.id.shout_video_icon_iv);
@@ -59,6 +67,16 @@ public class ShoutImagesPagerAdapter extends PagerAdapter {
         if (isImageItem(position)) {
             imageUrl = images.get(position);
             videoIconView.setVisibility(View.GONE);
+
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final String imagesJson = gson.toJson(images);
+                    final String videosJson = gson.toJson(videos);
+                    context.startActivity(GalleryActivity.newIntent(context, imagesJson, videosJson, position));
+                }
+            });
+
         } else if (!videos.isEmpty()) {
             final int videoPosition = position - images.size();
             final Video video = videos.get(videoPosition);
@@ -68,8 +86,11 @@ public class ShoutImagesPagerAdapter extends PagerAdapter {
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    context.startActivity(Intent.createChooser(
-                            IntentHelper.videoIntent(video.getUrl()), context.getString(R.string.shout_choose_video_app)));
+                    Intent intent = new Intent(context, VideoPlayerActivity.class);
+                    intent.putExtra(Constants.URL, video.getUrl());
+                    context.startActivity(intent);
+               /*     context.startActivity(Intent.createChooser(
+                            IntentHelper.videoIntent(video.getUrl()), context.getString(R.string.shout_choose_video_app)));*/
                 }
             });
         }
