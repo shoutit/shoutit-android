@@ -361,32 +361,39 @@ public class ShoutActivity extends BaseActivity {
             public void call(final ShoutPresenter.BottomBarData bottomBarData) {
                 final boolean isUserShoutOwner = bottomBarData.isUserShoutOwner();
 
-                ImageHelper.setStartCompoundRelativeDrawable(showMoreIcon,
-                        isUserShoutOwner ? R.drawable.ic_more_disabled : R.drawable.ic_more_white);
+                if (isUserShoutOwner) {
+                    callOrDeleteTextView.setEnabled(true);
+                    callOrDeleteTextView.setAlpha(1f);
+                    callOrDeleteTextView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_delete_red, 0, 0, 0);
+                    callOrDeleteTextView.setText(R.string.shout_bottom_bar_delete);
 
-                if (!isUserShoutOwner) {
+                    chatOrChatsTextView.setText(R.string.shout_bottom_bar_chats);
+
+                    ImageHelper.setStartCompoundRelativeDrawable(showMoreIcon, R.drawable.ic_more_disabled);
+
+                    videoCallOrEditTextView.setCompoundDrawablesWithIntrinsicBounds(
+                            R.drawable.ic_edit_red, 0, 0, 0);
+                    videoCallOrEditTextView.setText(R.string.shout_bottom_bar_edit);
+                    showMoreIcon.setVisibility(View.GONE);
+                } else {
+                    callOrDeleteTextView.setText(R.string.shout_bottom_bar_call);
+                    callOrDeleteTextView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_call_green, 0, 0, 0);
+
+                    chatOrChatsTextView.setText(R.string.shout_bottom_bar_chat);
                     showMoreIcon.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             popupMenu.show();
                         }
                     });
+
+                    videoCallOrEditTextView.setCompoundDrawablesWithIntrinsicBounds(
+                            R.drawable.ic_video_chat_red, 0, 0, 0);
+                    videoCallOrEditTextView.setText(R.string.shout_bottom_bar_video_call);
+
+                    ImageHelper.setStartCompoundRelativeDrawable(showMoreIcon, R.drawable.ic_more_white);
                 }
 
-                callOrDeleteTextView.setCompoundDrawablesWithIntrinsicBounds(
-                        isUserShoutOwner ? R.drawable.ic_delete_red : R.drawable.ic_call_green, 0, 0, 0);
-                callOrDeleteTextView.setText(isUserShoutOwner ?
-                        R.string.shout_bottom_bar_delete : R.string.shout_bottom_bar_call);
-
-                if (isUserShoutOwner) {
-                    callOrDeleteTextView.setEnabled(true);
-                    callOrDeleteTextView.setAlpha(1f);
-                }
-
-                videoCallOrEditTextView.setCompoundDrawablesWithIntrinsicBounds(
-                        isUserShoutOwner ? R.drawable.ic_edit_red : R.drawable.ic_video_chat_red, 0, 0, 0);
-                videoCallOrEditTextView.setText(isUserShoutOwner ?
-                        R.string.shout_bottom_bar_edit : R.string.shout_bottom_bar_video_call);
                 videoCallOrEditTextView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -398,12 +405,11 @@ public class ShoutActivity extends BaseActivity {
                     }
                 });
 
-                chatOrChatsTextView.setText(isUserShoutOwner ?
-                        R.string.shout_bottom_bar_chats : R.string.shout_bottom_bar_chat);
+
                 chatOrChatsTextView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(bottomBarData.isLoggedIn()) {
+                        if (bottomBarData.isLoggedIn()) {
                             if (bottomBarData.isHasConversation()) {
                                 startActivity(ChatActivity.newIntent(ShoutActivity.this, bottomBarData.getConversationId(), true));
                             } else {
