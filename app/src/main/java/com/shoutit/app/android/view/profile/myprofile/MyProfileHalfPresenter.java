@@ -19,6 +19,8 @@ public class MyProfileHalfPresenter {
     private final PublishSubject<Object> editProfileClickObserver = PublishSubject.create();
     @Nonnull
     private final PublishSubject<Object> notificationsClickObserver = PublishSubject.create();
+    @Nonnull
+    private final PublishSubject<Object> verifyAccountClickObserver = PublishSubject.create();
     private final Context context;
 
     @Inject
@@ -27,7 +29,8 @@ public class MyProfileHalfPresenter {
     }
 
     public ProfileAdapterItems.NameAdapterItem getUserNameAdapterItem(@Nonnull User user) {
-        return new ProfileAdapterItems.MyUserNameAdapterItem(user, editProfileClickObserver, notificationsClickObserver);
+        return new ProfileAdapterItems.MyUserNameAdapterItem(user, editProfileClickObserver,
+                notificationsClickObserver, verifyAccountClickObserver);
     }
 
     public ProfileAdapterItems.MyUserThreeIconsAdapterItem getThreeIconsAdapterItem(@Nonnull User user) {
@@ -48,5 +51,8 @@ public class MyProfileHalfPresenter {
         return notificationsClickObserver;
     }
 
-
+    @Nonnull
+    public Observable<Object> getVerifyAccountClickObservable() {
+        return verifyAccountClickObserver;
+    }
 }

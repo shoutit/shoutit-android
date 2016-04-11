@@ -143,6 +143,8 @@ public class ProfileViewHolders {
         TextView userName;
         @Bind(R.id.profile_user_nick)
         TextView userNick;
+        @Bind(R.id.profile_verify_account)
+        TextView verifyAccountButton;
 
         private ProfileAdapterItems.MyUserNameAdapterItem item;
 
@@ -157,6 +159,12 @@ public class ProfileViewHolders {
             final User user = item.getUser();
             userName.setText(user.getName());
             userNick.setText(user.getUsername());
+
+            if (user.isOwner() && !user.isActivated()) {
+                verifyAccountButton.setVisibility(View.VISIBLE);
+            } else {
+                verifyAccountButton.setVisibility(View.GONE);
+            }
         }
 
         @OnClick(R.id.profile_notification_iv)
@@ -167,6 +175,11 @@ public class ProfileViewHolders {
         @OnClick(R.id.profile_edit_profile_iv)
         public void onEditProfileClick() {
             item.onEditProfileClicked();
+        }
+
+        @OnClick(R.id.profile_verify_account)
+        public void onVerifyAccountClick() {
+            item.onVerifyAccountClick();
         }
     }
 
