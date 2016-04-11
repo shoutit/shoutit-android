@@ -54,8 +54,6 @@ public interface AppComponent {
 
     Picasso getPicasso();
 
-    OkHttpClient getOkHttpClient();
-
     Gson gson();
 
     ApiService getApiService();

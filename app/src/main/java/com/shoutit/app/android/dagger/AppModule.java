@@ -12,17 +12,15 @@ import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.appunite.rx.android.NetworkObservableProviderImpl;
 import com.appunite.rx.dagger.NetworkScheduler;
+import com.appunite.rx.observables.NetworkObservableProvider;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.jakewharton.picasso.OkHttp3Downloader;
-import com.pusher.client.Pusher;
-import com.pusher.client.PusherOptions;
-import com.pusher.client.util.HttpAuthorizer;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BuildConfig;
 import com.shoutit.app.android.UserPreferences;
@@ -35,8 +33,8 @@ import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.NotificationsDao;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
-import com.shoutit.app.android.dao.SortTypesDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
+import com.shoutit.app.android.dao.SortTypesDao;
 import com.shoutit.app.android.dao.SuggestionsDao;
 import com.shoutit.app.android.dao.TagsDao;
 import com.shoutit.app.android.dao.UsersIdentityDao;
@@ -284,5 +282,11 @@ public final class AppModule {
     @Singleton
     PusherHelper providePusher() {
         return new PusherHelper();
+    }
+
+    @Provides
+    @Singleton
+    NetworkObservableProvider provideNetworkObservableProvider(@ForApplication Context context) {
+        return new NetworkObservableProviderImpl(context);
     }
 }

@@ -12,6 +12,7 @@ import com.appunite.appunitegcm.AppuniteGcm;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.functions.Functions1;
+import com.appunite.rx.observables.NetworkObservableProvider;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
 import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
@@ -19,6 +20,9 @@ import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler;
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
 import com.karumi.dexter.Dexter;
 import com.pusher.client.Pusher;
+import com.pusher.client.connection.ConnectionEventListener;
+import com.pusher.client.connection.ConnectionState;
+import com.pusher.client.connection.ConnectionStateChange;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.constants.UserVoiceConstants;
@@ -51,6 +55,7 @@ import io.fabric.sdk.android.Fabric;
 import rx.Observable;
 import rx.Scheduler;
 import rx.functions.Action1;
+import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.plugins.RxJavaErrorHandler;
 import rx.plugins.RxJavaPlugins;
@@ -70,6 +75,17 @@ public class App extends MultiDexApplication {
     private TwilioAccessManager accessManager;
     private ConversationsClient conversationsClient;
     private IncomingInvite invite;
+    private ConnectionEventListener mEventListener = new ConnectionEventListener() {
+        @Override
+        public void onConnectionStateChange(ConnectionStateChange connectionStateChange) {
+            Log.i(TAG, connectionStateChange.getCurrentState().name());
+        }
+
+        @Override
+        public void onError(String s, String s1, Exception e) {
+            Log.e(TAG, "pusher message", e);
+        }
+    };
 
     @Inject
     ApiService apiService;
@@ -84,6 +100,8 @@ public class App extends MultiDexApplication {
     PusherHelper mPusherHelper;
     @Inject
     VideoConversationPresenter presenter;
+    @Inject
+    NetworkObservableProvider mNetworkObservableProvider;
 
     @Override
     public void onCreate() {
@@ -151,8 +169,25 @@ public class App extends MultiDexApplication {
     private void initPusher(@Nonnull String token, @Nonnull User user) {
         mPusherHelper.init(token);
         final Pusher pusher = mPusherHelper.getPusher();
-        pusher.connect();
+        pusher.connect(mEventListener);
         pusher.subscribePresence(String.format("presence-u-%1$s", user.getId()));
+
+        mNetworkObservableProvider.networkObservable()
+                .filter(new Func1<NetworkObservableProvider.NetworkStatus, Boolean>() {
+                    @Override
+                    public Boolean call(NetworkObservableProvider.NetworkStatus networkStatus) {
+                        return networkStatus.isNetwork();
+                    }
+                })
+                .subscribe(new Action1<NetworkObservableProvider.NetworkStatus>() {
+                    @Override
+                    public void call(NetworkObservableProvider.NetworkStatus networkStatus) {
+                        final ConnectionState state = pusher.getConnection().getState();
+                        if (state != ConnectionState.CONNECTED && state != ConnectionState.CONNECTING) {
+                            pusher.connect(mEventListener);
+                        }
+                    }
+                });
     }
 
     private void initFfmpeg() {
@@ -224,11 +259,13 @@ public class App extends MultiDexApplication {
                 .subscribe();
     }
 
-    /** Initialize Video Conversations **/
-    private void initializeVideoCalls(@Nonnull final String apiKey){
+    /**
+     * Initialize Video Conversations
+     **/
+    private void initializeVideoCalls(@Nonnull final String apiKey) {
         TwilioConversations.setLogLevel(TwilioConversations.LogLevel.DEBUG);
 
-        if(!TwilioConversations.isInitialized()) {
+        if (!TwilioConversations.isInitialized()) {
             TwilioConversations.initialize(this, new TwilioConversations.InitListener() {
                 @Override
                 public void onInitialized() {
@@ -237,6 +274,7 @@ public class App extends MultiDexApplication {
                     conversationsClient.setAudioOutput(AudioOutput.SPEAKERPHONE);
                     conversationsClient.listen();
                 }
+
                 @Override
                 public void onError(Exception e) {
                     Toast.makeText(getApplicationContext(), "Failed to initialize the Twilio Conversations SDK", Toast.LENGTH_LONG).show();
@@ -245,7 +283,9 @@ public class App extends MultiDexApplication {
         }
     }
 
-    /** Check Token Status **/
+    /**
+     * Check Token Status
+     **/
     private TwilioAccessManagerListener accessManagerListener() {
         return new TwilioAccessManagerListener() {
             @Override
@@ -265,7 +305,9 @@ public class App extends MultiDexApplication {
         };
     }
 
-    /** Conversation Status **/
+    /**
+     * Conversation Status
+     **/
     private ConversationsClientListener conversationsClientListener() {
         return new ConversationsClientListener() {
             @Override
@@ -281,15 +323,16 @@ public class App extends MultiDexApplication {
 
             @Override
             public void onFailedToStartListening(ConversationsClient conversationsClient, TwilioConversationsException e) {
-               if (e != null){
-                presenter.getTwilioRequirementObservable()
-                        .subscribe(new Action1<String>() {
-                            @Override
-                            public void call(String apiKey) {
-                                initializeVideoCalls(apiKey);
-                            }
-                        });
-               } conversationsClient.listen();
+                if (e != null) {
+                    presenter.getTwilioRequirementObservable()
+                            .subscribe(new Action1<String>() {
+                                @Override
+                                public void call(String apiKey) {
+                                    initializeVideoCalls(apiKey);
+                                }
+                            });
+                }
+                conversationsClient.listen();
                 Log.d(VC, "Failed to listening for Conversations");
             }
 
@@ -324,7 +367,7 @@ public class App extends MultiDexApplication {
         return invite;
     }
 
-    public ConversationsClient getConversationsClient(){
+    public ConversationsClient getConversationsClient() {
         return conversationsClient;
     }
 
