@@ -98,7 +98,6 @@ public class VerifyEmailPresenter {
                 })
                 .filter(Functions1.isTrue())
                 .lift(MoreOperators.callOnNext(progressSubject))
-                .throttleFirst(1, TimeUnit.SECONDS)
                 .switchMap(new Func1<Object, Observable<ResponseOrError<VerifyEmailResponse>>>() {
                     @Override
                     public Observable<ResponseOrError<VerifyEmailResponse>> call(Object o) {
@@ -107,7 +106,8 @@ public class VerifyEmailPresenter {
                                 .subscribeOn(networkScheduler)
                                 .observeOn(uiScheduler);
                     }
-                });
+                })
+                .compose(ObservableExtensions.<ResponseOrError<VerifyEmailResponse>>behaviorRefCount());
 
         resendResponseMessage = resendObservable.compose(ResponseOrError.<VerifyEmailResponse>onlySuccess())
                 .map(new Func1<VerifyEmailResponse, String>() {
