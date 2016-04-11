@@ -507,6 +507,7 @@ public class ChatsFirstConversationPresenter {
                             public void call(Message messagesResponse) {
                                 postLocalMessage(messagesResponse);
                                 mListener.showProgress(false);
+                                mListener.hideAttatchentsMenu();
                             }
                         }, new Action1<Throwable>() {
                             @Override
@@ -562,6 +563,7 @@ public class ChatsFirstConversationPresenter {
                     @Override
                     public void call(Message message) {
                         postLocalMessage(message);
+                        mListener.hideAttatchentsMenu();
                     }
                 }, new Action1<Throwable>() {
                     @Override
@@ -619,6 +621,7 @@ public class ChatsFirstConversationPresenter {
                     @Override
                     public void call(Message message) {
                         postLocalMessage(message);
+                        mListener.hideAttatchentsMenu();
                     }
                 }, new Action1<Throwable>() {
                     @Override

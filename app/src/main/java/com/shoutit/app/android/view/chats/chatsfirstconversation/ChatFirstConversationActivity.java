@@ -258,6 +258,11 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
     }
 
     @Override
+    public void hideAttatchentsMenu() {
+        mChatsAttatchmentsLayout.setVisibility(View.GONE);
+    }
+
+    @Override
     protected void onDestroy() {
         presenter.unregister();
         super.onDestroy();

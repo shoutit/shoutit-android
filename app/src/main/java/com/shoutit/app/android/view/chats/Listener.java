@@ -27,4 +27,6 @@ public interface Listener {
     void setAboutShoutData(String title, String thumbnail, String type, String price, String authorAndTime, String id);
 
     void onShoutClicked(String shoutId);
+
+    void hideAttatchentsMenu();
 }

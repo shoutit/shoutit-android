@@ -265,6 +265,11 @@ public class ChatActivity extends BaseActivity implements Listener {
     }
 
     @Override
+    public void hideAttatchentsMenu() {
+        mChatsAttatchmentsLayout.setVisibility(View.GONE);
+    }
+
+    @Override
     protected void onDestroy() {
         presenter.unregister();
         super.onDestroy();

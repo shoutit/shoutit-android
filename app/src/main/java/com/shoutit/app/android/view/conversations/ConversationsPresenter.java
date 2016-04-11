@@ -13,6 +13,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.pusher.client.channel.PresenceChannel;
@@ -30,6 +31,9 @@ import com.shoutit.app.android.utils.PusherHelper;
 import com.shoutit.app.android.view.chats.PresenceChannelEventListenerAdapter;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -204,16 +208,24 @@ public class ConversationsPresenter {
                         if (conversations.isEmpty()) {
                             mListener.emptyList();
                         } else {
-                            final ImmutableList<BaseAdapterItem> items = ImmutableList.copyOf(Iterables.transform(
-                                    conversations,
-                                    new Function<Conversation, BaseAdapterItem>() {
-                                        @Nullable
-                                        @Override
-                                        public BaseAdapterItem apply(@Nullable Conversation input) {
-                                            assert input != null;
-                                            return getConversationItem(input);
-                                        }
-                                    }));
+                            final List<Conversation> list = Lists.newArrayList(conversations);
+                            Collections.sort(list, new Comparator<Conversation>() {
+                                @Override
+                                public int compare(Conversation lhs, Conversation rhs) {
+                                    return lhs.getLastMessage().getCreatedAt() >= rhs.getLastMessage().getCreatedAt() ? -1 : 1 ;
+                                }
+                            });
+                            final ImmutableList<BaseAdapterItem> items = ImmutableList.copyOf(
+                                    Iterables.transform(
+                                            list,
+                                            new Function<Conversation, BaseAdapterItem>() {
+                                                @Nullable
+                                                @Override
+                                                public BaseAdapterItem apply(@Nullable Conversation input) {
+                                                    assert input != null;
+                                                    return getConversationItem(input);
+                                                }
+                                            }));
 
                             mListener.setData(items);
                         }

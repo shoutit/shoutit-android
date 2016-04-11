@@ -504,6 +504,7 @@ public class ChatsPresenter {
                         .subscribe(new Action1<Message>() {
                             @Override
                             public void call(Message messagesResponse) {
+                                mListener.hideAttatchentsMenu();
                                 postLocalMessage(messagesResponse);
                                 mListener.showProgress(false);
                             }
@@ -566,6 +567,7 @@ public class ChatsPresenter {
                     @Override
                     public void call(Message message) {
                         postLocalMessage(message);
+                        mListener.hideAttatchentsMenu();
                     }
                 }, new Action1<Throwable>() {
                     @Override
@@ -620,6 +622,7 @@ public class ChatsPresenter {
                     @Override
                     public void call(Message message) {
                         postLocalMessage(message);
+                        mListener.hideAttatchentsMenu();
                     }
                 }, new Action1<Throwable>() {
                     @Override
