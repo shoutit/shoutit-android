@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.Toolbar;
@@ -33,7 +34,6 @@ import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.view.createshout.DialogsHelper;
 import com.shoutit.app.android.view.createshout.location.LocationActivity;
 import com.shoutit.app.android.view.createshout.publish.PublishShoutActivity;
-import com.shoutit.app.android.widget.ErrorTextInputLayout;
 import com.shoutit.app.android.widget.SimpleCurrencySpinnerAdapter;
 
 import java.util.List;
@@ -69,7 +69,7 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
     @Bind(R.id.request_activity_toolbar)
     Toolbar mRequestActivityToolbar;
     @Bind(R.id.request_activity_description_layout)
-    ErrorTextInputLayout mRequestActivityDescriptionLayout;
+    TextInputLayout mRequestActivityDescriptionLayout;
     @Bind(R.id.create_request_currency_info)
     ImageView mCreateCurrencyInfo;
 

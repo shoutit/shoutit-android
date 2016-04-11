@@ -48,7 +48,7 @@ public class ErrorHandler {
             return defaultMessage(context);
         }
 
-        if (apiErrors == null) {
+        if (apiErrors == null || apiErrors.getError() == null) {
             return defaultMessage(context);
         }
 

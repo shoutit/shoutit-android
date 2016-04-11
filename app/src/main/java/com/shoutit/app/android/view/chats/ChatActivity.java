@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -29,6 +30,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.common.base.Preconditions;
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
 import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
+import com.jakewharton.rxbinding.widget.RxTextView;
+import com.jakewharton.rxbinding.widget.TextViewAfterTextChangeEvent;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
@@ -45,6 +48,7 @@ import com.shoutit.app.android.view.shouts.selectshout.SelectShoutActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -52,6 +56,7 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.functions.Action1;
 
 public class ChatActivity extends BaseActivity implements Listener {
 
@@ -96,6 +101,9 @@ public class ChatActivity extends BaseActivity implements Listener {
     TextView mChatsShoutLayoutType;
     @Bind(R.id.chats_shout_layout_price)
     TextView mChatsShoutLayoutPrice;
+
+    @Bind(R.id.chats_main_layout)
+    View mMainLayout;
 
     public static Intent newIntent(@Nonnull Context context, @NonNull String conversationId, boolean shoutConversation) {
         return new Intent(context, ChatActivity.class)
@@ -150,6 +158,31 @@ public class ChatActivity extends BaseActivity implements Listener {
                 .subscribe(presenter.getRequestSubject());
 
         presenter.register(this);
+
+        RxTextView.afterTextChangeEvents(mChatsMessageEdittext)
+                .skip(1)
+                .throttleFirst(2, TimeUnit.SECONDS)
+                .subscribe(new Action1<TextViewAfterTextChangeEvent>() {
+                    @Override
+                    public void call(TextViewAfterTextChangeEvent textViewAfterTextChangeEvent) {
+                        presenter.sendTyping();
+                    }
+                });
+
+        mMainLayout.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                mChatsAttatchmentsLayout.setVisibility(View.GONE);
+                return false;
+            }
+        });
+        mChatsRecyclerview.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                mChatsAttatchmentsLayout.setVisibility(View.GONE);
+                return false;
+            }
+        });
     }
 
     @Nonnull
@@ -226,7 +259,7 @@ public class ChatActivity extends BaseActivity implements Listener {
         finish();
     }
 
-    public void setAboutShoutData(String title, String thumbnail, String type, String price, String authorAndTime) {
+    public void setAboutShoutData(String title, String thumbnail, String type, String price, String authorAndTime, final String id) {
         mChatsShoutLayout.setVisibility(View.VISIBLE);
         picasso.load(thumbnail)
                 .centerCrop()
@@ -237,11 +270,22 @@ public class ChatActivity extends BaseActivity implements Listener {
         mChatsShoutLayoutTitle.setText(title);
         mChatsShoutLayoutPrice.setText(price);
         mChatsShoutLayoutAuthorDate.setText(authorAndTime);
+        mChatsShoutLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(ShoutActivity.newIntent(ChatActivity.this, id));
+            }
+        });
     }
 
     @Override
     public void onShoutClicked(String shoutId) {
         startActivity(ShoutActivity.newIntent(ChatActivity.this, shoutId));
+    }
+
+    @Override
+    public void hideAttatchentsMenu() {
+        mChatsAttatchmentsLayout.setVisibility(View.GONE);
     }
 
     @Override
@@ -276,7 +320,7 @@ public class ChatActivity extends BaseActivity implements Listener {
 
     private void deleteConversation(){
         new AlertDialog.Builder(ChatActivity.this)
-                .setMessage("Do you want to delete this conversation?")
+                .setMessage(getString(R.string.chats_delete_conversatin))
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
