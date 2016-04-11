@@ -84,4 +84,5 @@ public interface AppComponent {
     ContentResolver contentResolver();
 
     DbHelper dbHelper();
+
 }

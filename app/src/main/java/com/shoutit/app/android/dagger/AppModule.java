@@ -22,6 +22,7 @@ import com.jakewharton.picasso.OkHttp3Downloader;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BuildConfig;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.VideoConversationsApplication;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.AuthInterceptor;
 import com.shoutit.app.android.constants.AmazonConstants;
@@ -57,9 +58,9 @@ import rx.Scheduler;
 @Module
 public final class AppModule {
 
-    private final App app;
+    private final VideoConversationsApplication app;
 
-    public AppModule(App app) {
+    public AppModule(VideoConversationsApplication app) {
         this.app = app;
     }
 

@@ -25,6 +25,7 @@ import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.VideoConversationsApplication;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
@@ -347,7 +348,6 @@ public class VideoConversationActivity extends BaseActivity {
             cameraCapturer = CameraCapturerFactory.createCameraCapturer(VideoConversationActivity.this,
                     CameraCapturer.CameraSource.CAMERA_SOURCE_BACK_CAMERA, localVideoPreview, capturerErrorListener());
         }
-        conversationClient.setAudioOutput(AudioOutput.SPEAKERPHONE);
         setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
         cameraCapturer.startPreview();
 
@@ -357,8 +357,8 @@ public class VideoConversationActivity extends BaseActivity {
         final Intent intent = getIntent();
         callTaker = intent.getStringExtra(ARGS_ID);
         caller = intent.getStringExtra(ARGS_CALLER);
-        conversationClient = ((App) getApplication()).getConversationsClient();
-        invite = ((App) getApplication()).getInvite();
+        conversationClient = ((VideoConversationsApplication) getApplicationContext()).getConversationsClient();
+        invite = ((VideoConversationsApplication) getApplicationContext()).getInvite();
         cameraManager = (CameraManager) getApplicationContext().getSystemService(CAMERA_SERVICE);
     }
 
@@ -453,7 +453,7 @@ public class VideoConversationActivity extends BaseActivity {
             outgoingInvite = null;
         }
         cameraCapturer.stopPreview();
-        ((App) getApplication()).getConversationsClient().listen();
+        ((VideoConversationsApplication) getApplication()).getConversationsClient().listen();
     }
 
     @Nonnull
