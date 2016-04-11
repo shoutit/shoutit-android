@@ -474,6 +474,7 @@ public class ChatsFirstConversationPresenter {
     public void unregister() {
         mListener = null;
         mSubscribe.unsubscribe();
+        mPusher.getPusher().unsubscribe(String.format("presence-v3-c-%1$s", conversationId));
     }
 
     public void addMedia(@NonNull String media, boolean isVideo) {
