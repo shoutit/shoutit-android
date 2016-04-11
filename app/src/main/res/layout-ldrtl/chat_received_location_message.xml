@@ -1,18 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_marginTop="6dp"
     android:padding="4dp">
 
+    <ImageView
+        android:id="@+id/chats_received_avatar"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="12dp"
+        android:layout_marginStart="12dp"
+        android:scaleType="centerCrop"
+        tools:src="@drawable/ca" />
+
     <FrameLayout
-        android:layout_gravity="right"
         android:layout_width="220dp"
         android:layout_height="50dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginEnd="20dp"
-        android:background="@drawable/chat_owner_first_bg">
+        android:layout_marginLeft="@dimen/chat_received_msg_item_margin_left"
+        android:layout_marginStart="@dimen/chat_received_msg_item_margin_left"
+        android:background="@drawable/message_background_other">
 
         <ImageView
             android:layout_width="200dp"
@@ -39,12 +47,12 @@
     </FrameLayout>
 
     <TextView
-        android:layout_marginRight="30dp"
-        android:layout_marginEnd="30dp"
-        android:id="@+id/chats_sent_location_date_textview"
+        android:id="@+id/chats_received_location_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end|bottom"
+        android:layout_gravity="end|top"
+        android:layout_marginEnd="12dp"
+        android:layout_marginTop="6dp"
         android:background="@drawable/chat_time_gradient"
         android:textColor="@android:color/white"
         tools:text="18:04" />
