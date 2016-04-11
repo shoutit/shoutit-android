@@ -27,6 +27,8 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.common.base.Preconditions;
+import com.jakewharton.rxbinding.widget.RxTextView;
+import com.jakewharton.rxbinding.widget.TextViewAfterTextChangeEvent;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
@@ -42,6 +44,7 @@ import com.shoutit.app.android.view.shouts.selectshout.SelectShoutActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -49,6 +52,7 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.functions.Action1;
 
 public class ChatFirstConversationActivity extends BaseActivity implements Listener {
 
@@ -142,6 +146,16 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
         mChatsRecyclerview.setLayoutManager(new MyLinearLayoutManager(this));
 
         presenter.register(this);
+
+        RxTextView.afterTextChangeEvents(mChatsMessageEdittext)
+                .skip(1)
+                .throttleFirst(2, TimeUnit.SECONDS)
+                .subscribe(new Action1<TextViewAfterTextChangeEvent>() {
+                    @Override
+                    public void call(TextViewAfterTextChangeEvent textViewAfterTextChangeEvent) {
+                        presenter.sendTyping();
+                    }
+                });
     }
 
     @Nonnull
