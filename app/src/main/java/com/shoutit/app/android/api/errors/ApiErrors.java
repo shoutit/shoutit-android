@@ -8,10 +8,12 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class ApiErrors {
-    @Nonnull
+
+    @SuppressWarnings("NullableProblems")
+    @Nullable
     private final Error error;
 
-    @Nonnull
+    @Nullable
     public Error getError() {
         return error;
     }
