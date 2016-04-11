@@ -29,6 +29,8 @@ import com.shoutit.app.android.view.search.categories.SearchCategoriesFragment;
 import com.shoutit.app.android.view.search.results.profiles.SearchProfilesResultsActivity;
 import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsActivity;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -86,6 +88,7 @@ public class MainSearchActivity extends BaseActivity implements SearchView.OnQue
         tabLayout.setupWithViewPager(viewPager);
 
         searchQueryPresenter.getQuerySubmittedObservable()
+                .throttleFirst(500, TimeUnit.MILLISECONDS)
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(new Action1<String>() {
                     @Override

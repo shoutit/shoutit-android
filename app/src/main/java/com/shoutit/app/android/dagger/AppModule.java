@@ -17,8 +17,12 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.jakewharton.picasso.OkHttp3Downloader;
+import com.pusher.client.Pusher;
+import com.pusher.client.PusherOptions;
+import com.pusher.client.util.HttpAuthorizer;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BuildConfig;
 import com.shoutit.app.android.UserPreferences;
@@ -31,6 +35,7 @@ import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.NotificationsDao;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
+import com.shoutit.app.android.dao.SortTypesDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.dao.SuggestionsDao;
 import com.shoutit.app.android.dao.TagsDao;
@@ -38,6 +43,7 @@ import com.shoutit.app.android.dao.UsersIdentityDao;
 import com.shoutit.app.android.dao.VideoCallsDao;
 import com.shoutit.app.android.db.DbHelper;
 import com.shoutit.app.android.location.LocationManager;
+import com.shoutit.app.android.utils.PusherHelper;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -264,7 +270,19 @@ public final class AppModule {
 
     @Provides
     @Singleton
+    SortTypesDao sortTypesDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
+        return new SortTypesDao(apiService, networkScheduler);
+    }
+
+    @Provides
+    @Singleton
     DbHelper dbHelper(@ForApplication Context context) {
         return new DbHelper(context);
+    }
+
+    @Provides
+    @Singleton
+    PusherHelper providePusher() {
+        return new PusherHelper();
     }
 }

@@ -151,6 +151,10 @@ public class RegisterFragment extends BaseFragment {
                     }
                 });
 
+        registerPresenter.getWrongEmailErrorObservable()
+                .compose(this.<Boolean>bindToLifecycle())
+                .subscribe(Actions1.showOrHideError(emailInputLayout, getString(R.string.account_wrong_email)));
+
         RxTextView.textChangeEvents(emailEdittext)
                 .debounce(100, TimeUnit.MILLISECONDS)
                 .map(MoreFunctions1.mapTextChangeEventToString())

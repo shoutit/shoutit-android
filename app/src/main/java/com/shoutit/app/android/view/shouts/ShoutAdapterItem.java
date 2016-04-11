@@ -4,12 +4,10 @@ import android.content.Context;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
-import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.ResourcesHelper;
@@ -17,7 +15,6 @@ import com.shoutit.app.android.utils.ResourcesHelper;
 import javax.annotation.Nonnull;
 
 import rx.Observer;
-import rx.subjects.PublishSubject;
 
 public class ShoutAdapterItem implements BaseAdapterItem {
 

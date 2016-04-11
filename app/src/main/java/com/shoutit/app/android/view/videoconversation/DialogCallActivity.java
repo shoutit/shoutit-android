@@ -3,8 +3,8 @@ package com.shoutit.app.android.view.videoconversation;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.App;
@@ -22,18 +22,24 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import rx.functions.Action1;
 
+import static com.appunite.rx.internal.Preconditions.checkNotNull;
+
 public class DialogCallActivity extends BaseActivity {
+
+    private static final String CALLER_NAME = "caller_name";
 
     @Bind(R.id.dialog_call_accept)
     Button acceptButton;
     @Bind(R.id.dialog_call_reject)
     Button rejectButton;
+    @Bind(R.id.dialog_call_info)
+    TextView callInfo;
 
     @Inject
     UserPreferences preferences;
 
-    public static Intent newIntent( @Nonnull Context context) {
-        return new Intent(context, DialogCallActivity.class);
+    public static Intent newIntent(@Nonnull final String callerName, @Nonnull final Context context) {
+        return new Intent(context, DialogCallActivity.class).putExtra(CALLER_NAME, callerName);
     }
 
     @Override
@@ -42,11 +48,14 @@ public class DialogCallActivity extends BaseActivity {
         setContentView(R.layout.activity_dialog_call);
         ButterKnife.bind(this);
 
+        final String callerName = checkNotNull(getIntent().getStringExtra(CALLER_NAME));
+        callInfo.setText(String.format(getString(R.string.video_calls_caller_name), callerName));
+
         RxView.clicks(acceptButton)
                 .subscribe(new Action1<Void>() {
                     @Override
                     public void call(Void aVoid) {
-                        startActivity(VideoConversationActivity.newIntent(null , DialogCallActivity.this));
+                        startActivity(VideoConversationActivity.newIntent(callerName ,null, DialogCallActivity.this));
                         finish();
                     }
                 });
@@ -56,7 +65,6 @@ public class DialogCallActivity extends BaseActivity {
                     @Override
                     public void call(Void aVoid) {
                         ((App) getApplication()).getInvite().reject();
-                        preferences.setIsCallRejected(true);
                         finish();
                     }
                 });

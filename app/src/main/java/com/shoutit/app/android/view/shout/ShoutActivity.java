@@ -39,12 +39,17 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.model.MobilePhoneResponse;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.ImageHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
+import com.shoutit.app.android.view.chats.ChatActivity;
+import com.shoutit.app.android.view.chats.chatsfirstconversation.ChatFirstConversationActivity;
 import com.shoutit.app.android.view.createshout.edit.EditShoutActivity;
 import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.profile.tagprofile.TagProfileActivity;
+import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.main.MainSearchActivity;
+import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsActivity;
 import com.shoutit.app.android.view.videoconversation.VideoConversationActivity;
 
 import java.util.List;
@@ -81,7 +86,7 @@ public class ShoutActivity extends BaseActivity {
     @Bind(R.id.shout_bottom_bar_chat_or_chats)
     TextView chatOrChatsTextView;
     @Bind(R.id.shout_bottom_bar_more)
-    View showMoreIcon;
+    TextView showMoreIcon;
 
     @Inject
     ShoutPresenter presenter;
@@ -109,7 +114,7 @@ public class ShoutActivity extends BaseActivity {
         setUpAdapter();
 
         presenter.getIsUserShoutOwnerObservable()
-                .compose(this.<Boolean>bindToLifecycle())
+                .compose(this.<ShoutPresenter.BottomBarData>bindToLifecycle())
                 .subscribe(setUpBottomBar());
 
         presenter.getAllAdapterItemsObservable()
@@ -138,7 +143,8 @@ public class ShoutActivity extends BaseActivity {
                 .subscribe(new Action1<String>() {
                     @Override
                     public void call(String shoutId) {
-                        Toast.makeText(ShoutActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
+                        startActivity(SearchShoutsResultsActivity.newIntent(
+                                ShoutActivity.this, null, shoutId, SearchPresenter.SearchType.RELATED_SHOUTS));
                     }
                 });
 
@@ -193,6 +199,15 @@ public class ShoutActivity extends BaseActivity {
                     @Override
                     public void call(String shoutOwnerIdentity) {
                         shoutOwnerId = shoutOwnerIdentity;
+                    }
+                });
+
+        presenter.getShoutOwnerNameObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String name) {
+                        userPreferences.setShoutOwnerName(name);
                     }
                 });
 
@@ -286,6 +301,10 @@ public class ShoutActivity extends BaseActivity {
                         }
                     }
                 }, ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(this)));
+
+        presenter.getRefreshUserShoutsObservable()
+                .compose(this.bindToLifecycle())
+                .subscribe();
     }
 
     private void startCall(String phoneNumber) {
@@ -302,7 +321,7 @@ public class ShoutActivity extends BaseActivity {
     }
 
     @NonNull
-    private Action1<Boolean> setUpBottomBar() {
+    private Action1<ShoutPresenter.BottomBarData> setUpBottomBar() {
         final PopupMenu popupMenu = new PopupMenu(toolbar.getContext(), showMoreIcon);
         popupMenu.inflate(R.menu.menu_shout_bottom_bar);
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -337,17 +356,22 @@ public class ShoutActivity extends BaseActivity {
             }
         });
 
-        showMoreIcon.setOnClickListener(new View.OnClickListener() {
+        return new Action1<ShoutPresenter.BottomBarData>() {
             @Override
-            public void onClick(View v) {
-                popupMenu.show();
-            }
-        });
+            public void call(final ShoutPresenter.BottomBarData bottomBarData) {
+                final boolean isUserShoutOwner = bottomBarData.isUserShoutOwner();
 
-        return new Action1<Boolean>() {
-            @Override
-            public void call(final Boolean isUserShoutOwner) {
-                showMoreIcon.setVisibility(isUserShoutOwner ? View.GONE : View.VISIBLE);
+                ImageHelper.setStartCompoundRelativeDrawable(showMoreIcon,
+                        isUserShoutOwner ? R.drawable.ic_more_disabled : R.drawable.ic_more_white);
+
+                if (!isUserShoutOwner) {
+                    showMoreIcon.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            popupMenu.show();
+                        }
+                    });
+                }
 
                 callOrDeleteTextView.setCompoundDrawablesWithIntrinsicBounds(
                         isUserShoutOwner ? R.drawable.ic_delete_red : R.drawable.ic_call_green, 0, 0, 0);
@@ -369,13 +393,27 @@ public class ShoutActivity extends BaseActivity {
                         if (isUserShoutOwner) {
                             startActivityForResult(EditShoutActivity.newIntent(mShoutId, ShoutActivity.this), EDIT_SHOUT_REQUEST_CODE);
                         } else {
-                            startActivity(VideoConversationActivity.newIntent(shoutOwnerId, ShoutActivity.this));
+                            startActivity(VideoConversationActivity.newIntent(null, shoutOwnerId, ShoutActivity.this));
                         }
                     }
                 });
 
                 chatOrChatsTextView.setText(isUserShoutOwner ?
                         R.string.shout_bottom_bar_chats : R.string.shout_bottom_bar_chat);
+                chatOrChatsTextView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(bottomBarData.isLoggedIn()) {
+                            if (bottomBarData.isHasConversation()) {
+                                startActivity(ChatActivity.newIntent(ShoutActivity.this, bottomBarData.getConversationId(), true));
+                            } else {
+                                startActivity(ChatFirstConversationActivity.newIntent(ShoutActivity.this, true, mShoutId));
+                            }
+                        } else {
+                            ColoredSnackBar.error(ColoredSnackBar.contentView(ShoutActivity.this), R.string.error_action_only_for_logged_in_user, Snackbar.LENGTH_SHORT).show();
+                        }
+                    }
+                });
 
                 final int bottomBarHeight = getResources().getDimensionPixelSize(R.dimen.shout_bottom_bar);
                 final ObjectAnimator animator = ObjectAnimator.ofFloat(bottomBar, "translationY", bottomBarHeight, 0);
@@ -396,11 +434,6 @@ public class ShoutActivity extends BaseActivity {
     @OnClick(R.id.shout_bottom_bar_call_or_delete)
     public void onCallOrDeleteClicked() {
         presenter.callOrDeleteObserver().onNext(null);
-    }
-
-    @OnClick(R.id.shout_bottom_bar_chat_or_chats)
-    public void onChatClicked() {
-        Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
     }
 
     private void setUpAdapter() {

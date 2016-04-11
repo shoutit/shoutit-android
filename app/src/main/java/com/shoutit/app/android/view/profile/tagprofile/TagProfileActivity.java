@@ -10,6 +10,8 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.view.profile.ProfileActivity;
+import com.shoutit.app.android.view.search.SearchPresenter;
+import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsActivity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -50,6 +52,16 @@ public class TagProfileActivity extends ProfileActivity {
                     @Override
                     public void call(Intent intent) {
                         startActivity(intent);
+                    }
+                });
+
+        presenter.getSeeAllShoutsObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String userName) {
+                        startActivity(SearchShoutsResultsActivity.newIntent(
+                                TagProfileActivity.this, null, userName, SearchPresenter.SearchType.TAG));
                     }
                 });
     }

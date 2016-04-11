@@ -193,7 +193,7 @@ public class NotificationsPresenter {
             return notification;
         }
 
-        public void openProfile() {
+        public void openProfileAndMarkAsRead() {
             final BaseProfile profile = notification.getAttachedObject().getProfile();
             if (profile == null) {
                 return;
@@ -201,11 +201,15 @@ public class NotificationsPresenter {
 
             if (ProfileType.USER.equals(profile.getType()) || ProfileType.PAGE.equals(profile.getType())) {
                 openUserOrPageProfileObserver.onNext(profile.getUsername());
-                markSingleAsReadSubject.onNext(notification.getId());
+                markNotificationAsRead();
             } else if (ProfileType.TAG.equals(profile.getType())) {
                 openTagProfileObserver.onNext(profile.getUsername());
-                markSingleAsReadSubject.onNext(notification.getId());
+                markNotificationAsRead();
             }
+        }
+
+        public void markNotificationAsRead() {
+            markSingleAsReadSubject.onNext(notification.getId());
         }
     }
 }

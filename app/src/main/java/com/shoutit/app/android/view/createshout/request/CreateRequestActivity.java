@@ -234,8 +234,8 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
     }
 
     @Override
-    public void finishActivity(String id) {
+    public void finishActivity(String id, String webUrl) {
         finish();
-        startActivity(PublishShoutActivity.newIntent(this, id, true));
+        startActivity(PublishShoutActivity.newIntent(this, id, webUrl, true));
     }
 }

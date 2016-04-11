@@ -21,22 +21,23 @@
 
         <Button
             android:id="@+id/video_conversation_button_call"
-            android:layout_width="180dp"
-            android:layout_height="60dp"
-            android:paddingLeft="40dp"
-            android:paddingRight="40dp"
+            android:layout_width="140dp"
+            android:layout_height="50dp"
+            android:paddingLeft="30dp"
+            android:paddingRight="30dp"
             android:background="@drawable/shape_call_button"
             android:drawableLeft="@drawable/ic_call"
             android:drawableStart="@drawable/ic_call"
             android:layout_marginBottom="15dp"
+            android:textAllCaps="false"
             android:textColor="@android:color/white"
-            android:textSize="18sp"
+            android:textSize="21sp"
             android:text="@string/video_calls_button_call"/>
 
         <ImageButton
             android:id="@+id/video_conversation_button_dismiss_call"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:src="@drawable/ic_call"
             android:background="@drawable/shape_dismiss_call_button"/>
 

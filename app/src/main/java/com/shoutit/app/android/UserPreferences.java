@@ -22,6 +22,7 @@ import javax.inject.Singleton;
 import rx.Observable;
 import rx.Scheduler;
 import rx.functions.Func0;
+import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
 @Singleton
@@ -34,13 +35,16 @@ public class UserPreferences {
     private static final String IS_GUEST = "is_guest";
     private static final String KEY_LOCATION_TRACKING = "location_tracking";
     private static final String SHOULD_ASK_FOR_INTEREST = "is_first_run";
+    private static final String SHOUT_OWNER_NAME = "shout_owner";
     private static final String GCM_PUSH_TOKEN = "gcm_push_token";
     private static final String IS_CALL_REJECTED = "call_rejected";
 
     private final PublishSubject<Object> userRefreshSubject = PublishSubject.create();
     private final PublishSubject<Object> locationRefreshSubject = PublishSubject.create();
+    private final PublishSubject<Object> tokenRefreshSubject = PublishSubject.create();
     private final Observable<User> userObservable;
     private final Observable<UserLocation> locationObservable;
+    private final Observable<String> tokenObservable;
 
     @SuppressLint("CommitPrefEdits")
     private final SharedPreferences mPreferences;
@@ -72,6 +76,28 @@ public class UserPreferences {
                 })
                 .compose(MoreOperators.<User>refresh(userRefreshSubject))
                 .observeOn(uiScheduler);
+
+        tokenObservable = Observable
+                .defer(new Func0<Observable<Optional<String>>>() {
+                    @Override
+                    public Observable<Optional<String>> call() {
+                        return Observable.just(getAuthToken());
+                    }
+                })
+                .filter(new Func1<Optional<String>, Boolean>() {
+                    @Override
+                    public Boolean call(Optional<String> stringOptional) {
+                        return stringOptional.isPresent();
+                    }
+                })
+                .map(new Func1<Optional<String>, String>() {
+                    @Override
+                    public String call(Optional<String> stringOptional) {
+                        return stringOptional.get();
+                    }
+                })
+                .compose(MoreOperators.<String>refresh(tokenRefreshSubject))
+                .observeOn(uiScheduler);
     }
 
     @SuppressLint("CommitPrefEdits")
@@ -82,6 +108,7 @@ public class UserPreferences {
                 .putString(REFRESH_TOKEN, refreshToken)
                 .putBoolean(IS_GUEST, false);
         editor.commit();
+        tokenRefreshSubject.onNext(new Object());
     }
 
     @SuppressLint("CommitPrefEdits")
@@ -92,6 +119,7 @@ public class UserPreferences {
                 .putString(REFRESH_TOKEN, refreshToken)
                 .putBoolean(IS_GUEST, true);
         editor.commit();
+        tokenRefreshSubject.onNext(new Object());
     }
 
     @SuppressLint("CommitPrefEdits")
@@ -136,6 +164,7 @@ public class UserPreferences {
         mPreferences.edit().putString(GCM_PUSH_TOKEN, gcmPushToken).apply();
     }
 
+    @Nullable
     public String getGcmPushToken() {
         return mPreferences.getString(GCM_PUSH_TOKEN, null);
     }
@@ -183,6 +212,10 @@ public class UserPreferences {
         return locationObservable;
     }
 
+    public Observable<String> getTokenObservable() {
+        return tokenObservable;
+    }
+
     public void saveLocation(@Nullable UserLocation location) {
         if (location == null) {
             return;
@@ -218,6 +251,13 @@ public class UserPreferences {
     }
 
     @SuppressLint("CommitPrefEdits")
+    public void setShoutOwnerName(String name) {
+        final SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putString(SHOUT_OWNER_NAME, name);
+        editor.commit();
+    }
+
+    @SuppressLint("CommitPrefEdits")
     public void setIsCallRejected(boolean isCallRejected) {
         final SharedPreferences.Editor editor = mPreferences.edit();
         editor.putBoolean(IS_CALL_REJECTED, isCallRejected);
@@ -225,8 +265,12 @@ public class UserPreferences {
     }
 
     @Nullable
+    public String getShoutOwnerName() {
+        return mPreferences.getString(SHOUT_OWNER_NAME, null);
+    }
+
+    @Nullable
     public boolean getIsCallRejected() {
         return mPreferences.getBoolean(IS_CALL_REJECTED, false);
     }
-
 }

@@ -13,6 +13,7 @@ import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
+import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
@@ -55,17 +56,17 @@ public class ShoutPresenter {
     private final Observable<String> usernameObservable;
     private final Observable<Boolean> isUserShoutOwnerObservable;
     private final Observable<ResponseOrError<UserIdentity>> userIdentityResponse;
+    private final Observable<String> shoutOwnerNameObservable;
     private final Observable<ResponseOrError<MobilePhoneResponse>> callErrorObservable;
     private final Observable<Boolean> hasMobilePhoneObservable;
     private final Observable<Response<Object>> deleteShoutResponseObservable;
     private final Observable<Boolean> showDeleteDialogObservable;
     private final PublishSubject<Object> deleteShoutSubject = PublishSubject.create();
     private final Observable<Response<Object>> reportShoutObservable;
-
-    private Observable<String> identityUserObservable;
-
-    private Observable<UserIdentity> successUserIdentity;
-    private Observable<Throwable> failedUserIdentity;
+    private final Observable<List<Conversation>> conversationObservable;
+    private final Observable<Object> refreshUserShoutsObservable;
+    private final Observable<String> identityUserObservable;
+    private final Observable<UserIdentity> successUserIdentity;
 
     private PublishSubject<String> addToCartSubject = PublishSubject.create();
     private PublishSubject<String> onCategoryClickedSubject = PublishSubject.create();
@@ -77,6 +78,8 @@ public class ShoutPresenter {
     @Nonnull
     private final Scheduler uiScheduler;
     @Nonnull
+    private final UserPreferences mUserPreferences;
+    @Nonnull
     private final PublishSubject<Object> callOrDeleteSubject = PublishSubject.create();
     private final PublishSubject<String> sendReportObserver = PublishSubject.create();
     private final PublishSubject<Object> refreshShoutsSubject = PublishSubject.create();
@@ -86,11 +89,11 @@ public class ShoutPresenter {
                           @Nonnull final String shoutId,
                           @Nonnull @ForActivity final Context context,
                           @Nonnull @UiScheduler final Scheduler uiScheduler,
-                          @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
                           @Nonnull UserPreferences userPreferences,
-                          @Nonnull final UsersIdentityDao usersIdentityDao
-    ) {
+                          @Nonnull final ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
+                          @Nonnull final UsersIdentityDao usersIdentityDao) {
         this.uiScheduler = uiScheduler;
+        mUserPreferences = userPreferences;
 
         /** Requests **/
         final Observable<ResponseOrError<Shout>> shoutResponse = shoutsDao.getShoutObservable(shoutId)
@@ -132,11 +135,36 @@ public class ShoutPresenter {
                     }
                 });
 
-        final Observable<ResponseOrError<ShoutsResponse>> userShoutsObservable = userNameObservable
-                .switchMap(new Func1<String, Observable<ResponseOrError<ShoutsResponse>>>() {
+        shoutOwnerNameObservable = successShoutResponse
+                .map(new Func1<Shout, String>() {
                     @Override
-                    public Observable<ResponseOrError<ShoutsResponse>> call(String userName) {
-                        return shoutsDao.getUserShoutObservable(new UserShoutsPointer(USER_SHOUTS_PAGE_SIZE, userName));
+                    public String call(Shout shout) {
+                        return shout.getProfile().getName();
+                    }
+                });
+
+        conversationObservable = successShoutResponse
+                .map(new Func1<Shout, List<Conversation>>() {
+                    @Override
+                    public List<Conversation> call(Shout shout) {
+                        return shout.getConversations();
+                    }
+                });
+
+        final Observable<ShoutsDao.UserShoutsDao> userShoutDaoObservable = userNameObservable
+                .map(new Func1<String, ShoutsDao.UserShoutsDao>() {
+                    @Override
+                    public ShoutsDao.UserShoutsDao call(String userName) {
+                        return shoutsDao.getUserShoutsDao(new UserShoutsPointer(USER_SHOUTS_PAGE_SIZE, userName));
+                    }
+                })
+                .compose(ObservableExtensions.<ShoutsDao.UserShoutsDao>behaviorRefCount());
+
+        final Observable<ResponseOrError<ShoutsResponse>> userShoutsObservable = userShoutDaoObservable
+                .flatMap(new Func1<ShoutsDao.UserShoutsDao, Observable<ResponseOrError<ShoutsResponse>>>() {
+                    @Override
+                    public Observable<ResponseOrError<ShoutsResponse>> call(ShoutsDao.UserShoutsDao userShoutsDao) {
+                        return userShoutsDao.getShoutsObservable();
                     }
                 })
                 .compose(ObservableExtensions.<ResponseOrError<ShoutsResponse>>behaviorRefCount());
@@ -216,6 +244,32 @@ public class ShoutPresenter {
                     }
                 });
 
+        /** Shout Owner Identity**/
+        userIdentityResponse = getUsernameObservable()
+                .filter(new Func1<String, Boolean>() {
+                    @Override
+                    public Boolean call(String s) {
+                        return s != null;
+                    }
+                })
+                .flatMap(new Func1<String, Observable<ResponseOrError<UserIdentity>>>() {
+                    @Override
+                    public Observable<ResponseOrError<UserIdentity>> call(String username) {
+                        return usersIdentityDao.getUserIdentityObservable(username);
+                    }
+                });
+
+        successUserIdentity = userIdentityResponse
+                .compose(ResponseOrError.<UserIdentity>onlySuccess());
+
+        identityUserObservable = successUserIdentity
+                .map(new Func1<UserIdentity, String>() {
+                    @Override
+                    public String call(UserIdentity userIdentity) {
+                        return userIdentity.getIdentity();
+                    }
+                }).observeOn(uiScheduler);
+
         allAdapterItemsObservable = Observable.combineLatest(
                 shoutItemObservable,
                 userShoutItemsObservable.startWith(ImmutableList.<BaseAdapterItem>of()),
@@ -251,13 +305,9 @@ public class ShoutPresenter {
         errorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
                 ResponseOrError.transform(userShoutsObservable),
                 ResponseOrError.transform(shoutResponse),
-                ResponseOrError.transform(relatedShoutsObservable)))
-                .filter(Functions1.isNotNull()).doOnNext(new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-
-                    }
-                })
+                ResponseOrError.transform(relatedShoutsObservable),
+                ResponseOrError.transform(userIdentityResponse)))
+                .filter(Functions1.isNotNull())
                 .observeOn(uiScheduler);
 
         /** Progress **/
@@ -279,39 +329,29 @@ public class ShoutPresenter {
                 .compose(ObservableExtensions.<Boolean>behaviorRefCount())
                 .first();
 
+        /** Refresh shouts **/
         Observable.merge(shoutsGlobalRefreshPresenter.getShoutsGlobalRefreshObservable(), refreshShoutsSubject)
                 .subscribe(shoutsDao.getShoutDao(shoutId).getRefreshObserver());
 
-        /** Shout Owner Identity**/
-
-        userIdentityResponse = getUsernameObservable()
-                .filter(new Func1<String, Boolean>() {
+        refreshUserShoutsObservable = shoutsGlobalRefreshPresenter.getShoutsGlobalRefreshObservable()
+                .withLatestFrom(userShoutDaoObservable, new Func2<Object, ShoutsDao.UserShoutsDao, Object>() {
                     @Override
-                    public Boolean call(String s) {
-                        return s != null;
-                    }
-                })
-                .flatMap(new Func1<String, Observable<ResponseOrError<UserIdentity>>>() {
-                    @Override
-                    public Observable<ResponseOrError<UserIdentity>> call(String username) {
-                        return usersIdentityDao.getUserIdentityObservable(username);
+                    public Observer<Object> call(Object o, ShoutsDao.UserShoutsDao userShoutsDao) {
+                        userShoutsDao.getRefreshObserver().onNext(null);
+                        return null;
                     }
                 });
 
-
-        successUserIdentity = userIdentityResponse
-                .compose(ResponseOrError.<UserIdentity>onlySuccess());
-
-        failedUserIdentity = userIdentityResponse
-                .compose(ResponseOrError.<UserIdentity>onlyError());
-
-        identityUserObservable = successUserIdentity
-                .map(new Func1<UserIdentity, String>() {
+        shoutsGlobalRefreshPresenter.getShoutsGlobalRefreshObservable()
+                .map(new Func1<Object, Object>() {
                     @Override
-                    public String call(UserIdentity userIdentity) {
-                        return userIdentity.getIdentity();
+                    public Object call(Object o) {
+                        shoutsDao.getRelatedShoutsDao(new RelatedShoutsPointer(shoutId, RELATED_SHOUTS_PAGE_SIZE))
+                                .getRefreshObserver().onNext(null);
+                        return null;
                     }
-                }).observeOn(uiScheduler);
+                })
+                .subscribe();
 
         final Observable<Boolean> callOrEditObservable = Observable
                 .combineLatest(callOrDeleteSubject, isUserShoutOwnerObservable, new Func2<Object, Boolean, Boolean>() {
@@ -347,7 +387,18 @@ public class ShoutPresenter {
                 .observeOn(uiScheduler);
 
         deleteShoutResponseObservable = shoutsDao.getDeleteShoutObservable(shoutId)
-                .observeOn(uiScheduler);
+                .observeOn(uiScheduler)
+                .doOnNext(new Action1<Response<Object>>() {
+                    @Override
+                    public void call(Response<Object> objectResponse) {
+                        shoutsGlobalRefreshPresenter.refreshShouts();
+                    }
+                });
+    }
+
+    @Nonnull
+    public Observable<Object> getRefreshUserShoutsObservable() {
+        return refreshUserShoutsObservable;
     }
 
     @Nonnull
@@ -407,20 +458,32 @@ public class ShoutPresenter {
     }
 
     @Nonnull
-    public Observable<Boolean> getIsUserShoutOwnerObservable() {
+    public Observable<BottomBarData> getIsUserShoutOwnerObservable() {
         return allAdapterItemsObservable
                 .first()
-                .flatMap(new Func1<List<BaseAdapterItem>, Observable<Boolean>>() {
+                .flatMap(new Func1<List<BaseAdapterItem>, Observable<BottomBarData>>() {
                     @Override
-                    public Observable<Boolean> call(List<BaseAdapterItem> baseAdapterItems) {
-                        return isUserShoutOwnerObservable;
+                    public Observable<BottomBarData> call(List<BaseAdapterItem> baseAdapterItems) {
+                        return isUserShoutOwnerObservable.zipWith(conversationObservable, new Func2<Boolean, List<Conversation>, BottomBarData>() {
+                            @Override
+                            public BottomBarData call(Boolean isUserShoutOwner, List<Conversation> conversations) {
+                                final boolean hasConversation = conversations != null && !conversations.isEmpty();
+                                return new BottomBarData(isUserShoutOwner, hasConversation, hasConversation ? conversations.get(0).getId() : null, mUserPreferences.isUserLoggedIn());
+                            }
+                        });
                     }
                 })
                 .observeOn(uiScheduler);
     }
 
+    @Nonnull
     public Observable<String> getUsernameObservable() {
         return usernameObservable;
+    }
+
+    @Nonnull
+    public Observable<String> getShoutOwnerNameObservable() {
+        return shoutOwnerNameObservable;
     }
 
     @Nonnull
@@ -466,6 +529,37 @@ public class ShoutPresenter {
     @Nonnull
     public Observer<Object> refreshShoutsObserver() {
         return refreshShoutsSubject;
+    }
+
+    public static class BottomBarData {
+
+        private final boolean isUserShoutOwner;
+        private final boolean hasConversation;
+        private final String conversationId;
+        private final boolean isLoggedIn;
+
+        public BottomBarData(boolean isUserShoutOwner, boolean hasConversation, String conversationId, boolean isLoggedIn) {
+            this.isUserShoutOwner = isUserShoutOwner;
+            this.hasConversation = hasConversation;
+            this.conversationId = conversationId;
+            this.isLoggedIn = isLoggedIn;
+        }
+
+        public boolean isUserShoutOwner() {
+            return isUserShoutOwner;
+        }
+
+        public boolean isHasConversation() {
+            return hasConversation;
+        }
+
+        public String getConversationId() {
+            return conversationId;
+        }
+
+        public boolean isLoggedIn() {
+            return isLoggedIn;
+        }
     }
 }
 

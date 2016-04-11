@@ -1,10 +1,9 @@
 package com.shoutit.app.android.dao;
 
-import android.util.Log;
-
 import com.appunite.appunitegcm.AppuniteGcm;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
+import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.operators.MoreOperators;
 import com.appunite.rx.operators.OperatorMergeNextToken;
 import com.google.common.cache.CacheBuilder;
@@ -16,11 +15,10 @@ import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.RegisterDeviceRequest;
 import com.shoutit.app.android.api.model.SearchProfileResponse;
 import com.shoutit.app.android.api.model.User;
-import com.shoutit.app.android.model.ReportBody;
+import com.shoutit.app.android.utils.LogHelper;
 
 import javax.annotation.Nonnull;
 
-import retrofit2.Response;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
@@ -95,7 +93,7 @@ public class ProfilesDao {
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        Log.d(AppuniteGcm.TAG, "error" ,throwable);
+                        LogHelper.logThrowableAndCrashlytics(AppuniteGcm.TAG, "Cannot register to gcm", throwable);
                     }
                 });
     }
@@ -108,12 +106,6 @@ public class ProfilesDao {
         @Nonnull
         private PublishSubject<ResponseOrError<User>> updatedProfileLocallySubject = PublishSubject.create();
 
-        @Nonnull
-        private final PublishSubject<String> reportProfileObserver = PublishSubject.create();
-        @Nonnull
-        private final Observable<Response<Object>> reportProfileResponseObservable;
-
-
         public ProfileDao(@Nonnull final String userName) {
             profileObservable = apiService.getProfile(userName)
                     .subscribeOn(networkScheduler)
@@ -121,16 +113,6 @@ public class ProfilesDao {
                     .compose(ResponseOrError.<User>toResponseOrErrorObservable())
                     .mergeWith(updatedProfileLocallySubject)
                     .compose(MoreOperators.<ResponseOrError<User>>cacheWithTimeout(networkScheduler));
-
-            reportProfileResponseObservable = reportProfileObserver
-                    .flatMap(new Func1<String, Observable<Response<Object>>>() {
-                        @Override
-                        public Observable<Response<Object>> call(String body) {
-                            // TODO: change userName to user id
-                            return apiService.reportShout(ReportBody.forProfile(userName, body))
-                                    .subscribeOn(networkScheduler);
-                        }
-                    });
         }
 
         @Nonnull
@@ -146,16 +128,6 @@ public class ProfilesDao {
         @Nonnull
         public Observer<ResponseOrError<User>> updatedProfileLocallyObserver() {
             return updatedProfileLocallySubject;
-        }
-
-        @Nonnull
-        public PublishSubject<String> getReportProfileObserver() {
-            return reportProfileObserver;
-        }
-
-        @Nonnull
-        public Observable<Response<Object>> getReportProfileResponseObservable() {
-            return reportProfileResponseObservable;
         }
     }
 

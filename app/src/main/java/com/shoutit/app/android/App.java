@@ -10,13 +10,17 @@ import android.widget.Toast;
 
 import com.appunite.appunitegcm.AppuniteGcm;
 import com.appunite.rx.dagger.NetworkScheduler;
+import com.appunite.rx.functions.BothParams;
+import com.appunite.rx.functions.Functions1;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
 import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
 import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler;
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
 import com.karumi.dexter.Dexter;
+import com.pusher.client.Pusher;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.constants.UserVoiceConstants;
 import com.shoutit.app.android.dagger.AppComponent;
 import com.shoutit.app.android.dagger.AppModule;
@@ -24,6 +28,7 @@ import com.shoutit.app.android.dagger.BaseModule;
 import com.shoutit.app.android.dagger.DaggerAppComponent;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.utils.LogHelper;
+import com.shoutit.app.android.utils.PusherHelper;
 import com.shoutit.app.android.view.videoconversation.DialogCallActivity;
 import com.shoutit.app.android.view.videoconversation.VideoConversationPresenter;
 import com.twilio.common.TwilioAccessManager;
@@ -43,14 +48,16 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import io.fabric.sdk.android.Fabric;
+import rx.Observable;
 import rx.Scheduler;
 import rx.functions.Action1;
+import rx.functions.Func2;
 import rx.plugins.RxJavaErrorHandler;
 import rx.plugins.RxJavaPlugins;
 
 public class App extends MultiDexApplication {
 
-    private static final String VC = "TWILIO";
+    private static final String VC = "APP_TWILIO";
     private static final String TAG = App.class.getSimpleName();
 
     private static final String GCM_TOKEN = "935842257865";
@@ -58,10 +65,11 @@ public class App extends MultiDexApplication {
     private AppComponent component;
     private String apiKey;
 
+    private OutgoingInvite outgoingInvite;
+
     private TwilioAccessManager accessManager;
     private ConversationsClient conversationsClient;
     private IncomingInvite invite;
-    private OutgoingInvite outgoingInvite;
 
     @Inject
     ApiService apiService;
@@ -72,6 +80,8 @@ public class App extends MultiDexApplication {
     UserPreferences userPreferences;
     @Inject
     LocationManager locationManager;
+    @Inject
+    PusherHelper mPusherHelper;
     @Inject
     VideoConversationPresenter presenter;
 
@@ -92,20 +102,57 @@ public class App extends MultiDexApplication {
 
         initFfmpeg();
 
-        AppuniteGcm.initialize(this, GCM_TOKEN)
-                .loggingEnabled(!BuildConfig.DEBUG)
-                .getPushBundleObservable()
-                .subscribe(NotificationHelper.sendNotificationAction(this));
+        initGcm();
 
-        /** Video Conversations **/
+        initPusher();
+
         presenter.getTwilioRequirementObservable()
                 .subscribe(new Action1<String>() {
                     @Override
                     public void call(String apiKey) {
                         initializeVideoCalls(apiKey);
-                        Log.d("TWILIO", "MY API KEY: " + apiKey);
                     }
                 });
+
+        presenter.getErrorObservable()
+                .subscribe(new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        Toast.makeText(getApplicationContext(), "Failed to fetch data: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void initGcm() {
+        AppuniteGcm.initialize(this, GCM_TOKEN)
+                .loggingEnabled(!BuildConfig.DEBUG)
+                .getPushBundleObservable()
+                .subscribe(NotificationHelper.sendNotificationAction(this));
+    }
+
+    private void initPusher() {
+        Observable.zip(userPreferences.getTokenObservable().filter(Functions1.isNotNull()),
+                userPreferences.getUserObservable().filter(Functions1.isNotNull()),
+                new Func2<String, User, BothParams<String, User>>() {
+                    @Override
+                    public BothParams<String, User> call(String token, User user) {
+                        return new BothParams<>(token, user);
+                    }
+                })
+                .first()
+                .subscribe(new Action1<BothParams<String, User>>() {
+                    @Override
+                    public void call(BothParams<String, User> tokenAndUser) {
+                        initPusher(tokenAndUser.param1(), tokenAndUser.param2());
+                    }
+                });
+    }
+
+    private void initPusher(@Nonnull String token, @Nonnull User user) {
+        mPusherHelper.init(token);
+        final Pusher pusher = mPusherHelper.getPusher();
+        pusher.connect();
+        pusher.subscribePresence(String.format("presence-u-%1$s", user.getId()));
     }
 
     private void initFfmpeg() {
@@ -114,19 +161,22 @@ public class App extends MultiDexApplication {
             ffmpeg.loadBinary(new LoadBinaryResponseHandler() {
 
                 @Override
-                public void onStart() {}
+                public void onStart() {
+                }
 
                 @Override
-                public void onFailure() {}
+                public void onFailure() {
+                }
 
                 @Override
-                public void onSuccess() {}
+                public void onSuccess() {
+                }
 
                 @Override
-                public void onFinish() {}
+                public void onFinish() {
+                }
             });
         } catch (FFmpegNotSupportedException e) {
-            // Handle if FFmpeg is not supported by device
         }
     }
 
@@ -200,19 +250,17 @@ public class App extends MultiDexApplication {
         return new TwilioAccessManagerListener() {
             @Override
             public void onAccessManagerTokenExpire(TwilioAccessManager twilioAccessManager) {
-                Log.d(VC,"Token Expired");
-
+                Log.d(VC, "accessManagerListener : Token Expired");
             }
 
             @Override
             public void onTokenUpdated(TwilioAccessManager twilioAccessManager) {
-                Log.d(VC, "Token Updated");
-
+                Log.d(VC, "accessManagerListener : Token Updated");
             }
 
             @Override
             public void onError(TwilioAccessManager twilioAccessManager, String s) {
-                Log.d(VC, "Error");
+                Log.d(VC, "accessManagerListener : Error on Token");
             }
         };
     }
@@ -222,26 +270,45 @@ public class App extends MultiDexApplication {
         return new ConversationsClientListener() {
             @Override
             public void onStartListeningForInvites(ConversationsClient conversationsClient) {
-                Log.d(VC, "Listen for Conversations");
+                Log.d("TWILIO", "LISTENING ** ** **");
             }
 
             @Override
             public void onStopListeningForInvites(ConversationsClient conversationsClient) {
+                conversationsClient.listen();
                 Log.d(VC, "Stop listening for Conversations");
             }
 
             @Override
             public void onFailedToStartListening(ConversationsClient conversationsClient, TwilioConversationsException e) {
+               if (e != null){
+                presenter.getTwilioRequirementObservable()
+                        .subscribe(new Action1<String>() {
+                            @Override
+                            public void call(String apiKey) {
+                                initializeVideoCalls(apiKey);
+                            }
+                        });
+               } conversationsClient.listen();
                 Log.d(VC, "Failed to listening for Conversations");
             }
 
             @Override
             public void onIncomingInvite(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
-                Log.d(VC, "Incoming call");
                 invite = incomingInvite;
-                Intent intent = new Intent(getApplicationContext(), DialogCallActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
+                String caller = String.valueOf(incomingInvite.getParticipants());
+
+                presenter.setCallerIdentity(caller.substring(1, caller.length() - 1));
+                presenter.getCallerNameObservable()
+                        .take(1)
+                        .subscribe(new Action1<String>() {
+                            @Override
+                            public void call(String callerName) {
+                                Intent intent = DialogCallActivity.newIntent(callerName, getApplicationContext());
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(intent);
+                            }
+                        });
             }
 
             @Override

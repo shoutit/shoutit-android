@@ -3,6 +3,7 @@ package com.shoutit.app.android.view.createshout;
 import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.appunite.rx.functions.BothParams;
 import com.google.common.base.Preconditions;
@@ -150,20 +151,19 @@ public class ShoutMediaPresenter {
         final Integer firstAvailablePosition = getFirstAvailablePosition();
         final Integer position = mediaItems.inverse().get(imageItem);
 
-        if (firstAvailablePosition == null || firstAvailablePosition - 1 == position) {
+        if (firstAvailablePosition == null) {
             mediaItems.forcePut(position, new AddImageItem());
         } else {
             for (int i = position + 1; i < firstAvailablePosition; i++) {
                 final Item item = mediaItems.get(i);
                 mediaItems.forcePut(i - 1, item);
             }
-            mediaItems.forcePut(mediaItems.size() - 1, new AddImageItem());
-        }
+            mediaItems.forcePut(firstAvailablePosition - 1, new AddImageItem());
 
-        if (position + 1 < mediaItems.values().size()) {
-            mediaItems.put(position + 1, new BlankItem());
+            for (int j = firstAvailablePosition; j < mediaItems.size(); j++) {
+                mediaItems.put(j, new BlankItem());
+            }
         }
-
         mMediaListener.setImages(mediaItems);
     }
 
@@ -271,8 +271,8 @@ public class ShoutMediaPresenter {
         for (Item item : mediaItems.values()) {
             if (item instanceof VideoItem) {
                 final VideoItem videoItem = (VideoItem) item;
-                final Observable<String> videoFileObservable = mAmazonHelper.uploadShoutMediaObservable(AmazonHelper.getfileFromPath(videoItem.getVideo()));
-                final Observable<String> thumbFileObservable = mAmazonHelper.uploadShoutMediaObservable(AmazonHelper.getfileFromPath(videoItem.getThumb()));
+                final Observable<String> videoFileObservable = mAmazonHelper.uploadShoutMediaVideoObservable(AmazonHelper.getfileFromPath(videoItem.getVideo()));
+                final Observable<String> thumbFileObservable = mAmazonHelper.uploadShoutMediaImageObservable(AmazonHelper.getfileFromPath(videoItem.getThumb()));
                 videoObservable = Observable.zip(videoFileObservable, thumbFileObservable, new Func2<String, String, Video>() {
                     @Override
                     public Video call(String video, String thumb) {
@@ -281,7 +281,7 @@ public class ShoutMediaPresenter {
                 });
             } else if (item instanceof ImageItem) {
                 final ImageItem imageItem = (ImageItem) item;
-                imageObservables.add(mAmazonHelper.uploadShoutMediaObservable(AmazonHelper.getfileFromPath(imageItem.getThumb())));
+                imageObservables.add(mAmazonHelper.uploadShoutMediaImageObservable(AmazonHelper.getfileFromPath(imageItem.getThumb())));
             }
         }
 

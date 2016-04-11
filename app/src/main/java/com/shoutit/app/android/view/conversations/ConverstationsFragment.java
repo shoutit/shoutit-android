@@ -27,6 +27,7 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
+import com.shoutit.app.android.view.chats.ChatActivity;
 import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.main.MainActivityComponent;
 
@@ -50,6 +51,7 @@ public class ConverstationsFragment extends BaseFragment implements Conversation
     ConversationsPresenter presenter;
     @Inject
     ConversationsAdapter adapter;
+
     private View mLogo;
     private List<MenuItem> mItems = Lists.newArrayList();
 
@@ -79,6 +81,7 @@ public class ConverstationsFragment extends BaseFragment implements Conversation
         setHasOptionsMenu(true);
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -95,14 +98,24 @@ public class ConverstationsFragment extends BaseFragment implements Conversation
                 .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
                 .filter(LoadMoreHelper.needLoadMore((MyLayoutManager) mConversationRecyclerview.getLayoutManager(), adapter))
                 .subscribe(presenter.loadMoreObserver());
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
         presenter.register(this);
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        presenter.unregister();
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
-        presenter.unregister();
         mLogo.setVisibility(View.VISIBLE);
         final MainActivity activity = (MainActivity) getActivity();
         activity.getSupportActionBar().setTitle(null);
@@ -140,5 +153,10 @@ public class ConverstationsFragment extends BaseFragment implements Conversation
     @Override
     public void error() {
         ColoredSnackBar.error(ColoredSnackBar.contentView(getActivity()), R.string.error_default, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onItemClicked(@NonNull String id, boolean shoutChat) {
+        startActivity(ChatActivity.newIntent(getActivity(), id, shoutChat));
     }
 }

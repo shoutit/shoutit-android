@@ -4,16 +4,19 @@ import android.content.Context;
 
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
+import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.dao.UsersIdentityDao;
+import com.shoutit.app.android.model.MobilePhoneResponse;
 import com.shoutit.app.android.model.RelatedShoutsPointer;
 import com.shoutit.app.android.model.UserShoutsPointer;
 
@@ -24,6 +27,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 
+import retrofit2.Response;
 import rx.Observable;
 import rx.observers.TestSubscriber;
 import rx.schedulers.Schedulers;
@@ -49,6 +53,10 @@ public class ShoutPresenterTest {
     ShoutsDao.ShoutDao shoutDao;
     @Mock
     UsersIdentityDao userIdentityDao;
+    @Mock
+    ShoutsDao.RelatedShoutsDao relatedShoutsDao;
+    @Mock
+    ShoutsDao.UserShoutsDao userShoutsDao;
 
     private ShoutPresenter presenter;
 
@@ -64,7 +72,7 @@ public class ShoutPresenterTest {
                 .thenReturn(Observable.just(ResponseOrError.fromData(new ShoutsResponse(1, "z", "z", Lists.newArrayList(getShout())))));
         when(userPreferences.getUserObservable())
                 .thenReturn(Observable.just(new User("z", null, null, null, null, null, null, null, false, null,
-                null, false, false, false, null, 1, null, null, null, 1, null, false, null, null, null)));
+                null, false, false, false, null, 1, null, null, null, 1, null, false, null, null, null, null)));
         when(userPreferences.isNormalUser())
                 .thenReturn(true);
         when(globalRefreshPresenter.getShoutsGlobalRefreshObservable())
@@ -73,11 +81,25 @@ public class ShoutPresenterTest {
                 .thenReturn(shoutDao);
         when(shoutsDao.getShoutDao(anyString()).getRefreshObserver())
                 .thenReturn(PublishSubject.create());
+        when(shoutsDao.getShoutMobilePhoneObservable(anyString()))
+                .thenReturn(Observable.just(ResponseOrError.fromData(new MobilePhoneResponse("123"))));
+        when(shoutsDao.getReportShoutObservable(anyString()))
+                .thenReturn(Observable.just(Response.success(new Object())));
+        when(shoutsDao.getDeleteShoutObservable(anyString()))
+                .thenReturn(Observable.just(Response.success(new Object())));
+        when(relatedShoutsDao.getRefreshObserver())
+                .thenReturn(PublishSubject.create());
+        when(shoutsDao.getRelatedShoutsDao(any(RelatedShoutsPointer.class)))
+                .thenReturn(relatedShoutsDao);
+        when(shoutsDao.getUserShoutsDao(any(UserShoutsPointer.class)))
+                .thenReturn(userShoutsDao);
+        when(userShoutsDao.getShoutsObservable())
+                .thenReturn(Observable.just(ResponseOrError.fromData(new ShoutsResponse(1, "z", "z", Lists.newArrayList(getShout())))));
 
         when(context.getString(anyInt(), anyString()))
                 .thenReturn("text");
 
-        presenter = new ShoutPresenter(shoutsDao, "zz", context, Schedulers.immediate(), globalRefreshPresenter, userPreferences, userIdentityDao);
+        presenter = new ShoutPresenter(shoutsDao, "zz", context, Schedulers.immediate(), userPreferences, globalRefreshPresenter, userIdentityDao);
     }
 
     @Test
@@ -97,7 +119,7 @@ public class ShoutPresenterTest {
 
     @Test
     public void testOnSubscribeWithoutUserShouts_correctItemsReturned() throws Exception {
-        when(shoutsDao.getUserShoutObservable(any(UserShoutsPointer.class)))
+        when(userShoutsDao.getShoutsObservable())
                 .thenReturn(Observable.<ResponseOrError<ShoutsResponse>>empty());
         final TestSubscriber<List<BaseAdapterItem>> subscriber = new TestSubscriber<>();
         presenter.getAllAdapterItemsObservable().subscribe(subscriber);
@@ -164,22 +186,23 @@ public class ShoutPresenterTest {
 
     @Test
     public void testOnFail_errorDisplayed() throws Exception {
-        when(shoutsDao.getUserShoutObservable(any(UserShoutsPointer.class)))
+        when(userShoutsDao.getShoutsObservable())
                 .thenReturn(Observable.just(ResponseOrError.<ShoutsResponse>fromError(new Throwable("error"))));
         final TestSubscriber<Throwable> subscriber = new TestSubscriber<>();
         presenter.getErrorObservable().subscribe(subscriber);
 
         subscriber.assertNoErrors();
-        subscriber.assertValueCount(2);
+        subscriber.assertValueCount(1);
     }
 
     private Shout getShout() {
-        return new Shout("id", null, null, null, null, null, null, 1L, 2, null, null, null, getUser(), null, null, 1, null, null, 0);
+        return new Shout("id", null, null, null, null, null, null, 1L, 2, null, null, null,
+                getUser(), null, null, 1, null, null, 0, ImmutableList.<Conversation>of(), true);
     }
 
     private User getUser() {
         return new User("z", null, null, null, null, null, null, null, false, null,
-                null, false, false, false, null, 1, null, null, null, 1, null, false, null, null, null);
+                null, false, false, false, null, 1, null, null, null, 1, null, false, null, null, null, null);
     }
 
 

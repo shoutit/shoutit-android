@@ -23,8 +23,7 @@
                 android:id="@+id/activity_intro_view_pager"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/activity_intro_pager_height"
-                android:layout_gravity="center_horizontal"
-                tools:layout_height="200dp"/>
+                android:layout_gravity="center_horizontal" />
 
             <com.viewpagerindicator.CirclePageIndicator
                 android:id="@+id/activity_intro_page_indicators"
@@ -45,16 +44,6 @@
                 android:textColor="@color/colorPrimary"
                 android:textSize="14sp"/>
 
-            <TextView
-                android:id="@+id/activity_intro_help"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="?selectableItemBackgroundBorderless"
-                android:padding="16dp"
-                android:text="@string/intro_help"
-                android:textColor="@android:color/white"
-                android:textSize="16sp"/>
-
         </LinearLayout>
 
     </ScrollView>
@@ -63,12 +52,26 @@
         android:id="@+id/activity_intro_skip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
         android:layout_marginTop="@dimen/status_bar_margin"
-        android:background="?selectableItemBackgroundBorderless"
+        android:background="?selectableItemBackground"
         android:padding="16dp"
         android:text="@string/intro_skip"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/activity_intro_help"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?selectableItemBackground"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:padding="16dp"
+        android:text="@string/intro_help"
         android:textColor="@android:color/white"
         android:textSize="16sp"/>
 

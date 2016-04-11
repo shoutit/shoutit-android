@@ -16,6 +16,7 @@ import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.constants.RequestsConstants;
+import com.shoutit.app.android.model.FiltersToSubmit;
 import com.shoutit.app.android.model.LocationPointer;
 import com.shoutit.app.android.model.MobilePhoneResponse;
 import com.shoutit.app.android.model.RelatedShoutsPointer;
@@ -146,6 +147,11 @@ public class ShoutsDao {
     }
 
     @Nonnull
+    public RelatedShoutsDao getRelatedShoutsDao(@Nonnull RelatedShoutsPointer pointer) {
+        return relatedShoutsCache.getUnchecked(pointer);
+    }
+
+    @Nonnull
     public Observable<ResponseOrError<ShoutsResponse>> getTagsShoutsObservable(@Nonnull TagShoutsPointer pointer) {
         return tagsShoutsCache.getUnchecked(pointer).getShoutsObservable();
     }
@@ -200,7 +206,6 @@ public class ShoutsDao {
             mLocationPointer = locationPointer;
         }
 
-        @NonNull
         @Nonnull
         @Override
         Observable<ShoutsResponse> getShoutsRequest(int pageNumber) {
@@ -211,7 +216,8 @@ public class ShoutsDao {
             } else {
                 return apiService
                         .shoutsForLocation(mLocationPointer.getCountryCode(),
-                                mLocationPointer.getCity(), null, pageNumber, PAGE_SIZE)
+                                mLocationPointer.getCity(), null, pageNumber, PAGE_SIZE,
+                                null, null, null, null, null, null, null)
                         .subscribeOn(networkScheduler);
             }
         }
@@ -236,7 +242,7 @@ public class ShoutsDao {
 
         public ShoutDao(@Nonnull final String shoutId) {
             final Observable<Object> refreshWithCache = Observable
-                    .interval(2, TimeUnit.MINUTES, networkScheduler)
+                    .interval(5, TimeUnit.MINUTES, networkScheduler)
                     .map(Functions1.toObject());
 
             shoutObservable = apiService.shout(shoutId)
@@ -250,7 +256,6 @@ public class ShoutsDao {
                     .subscribeOn(networkScheduler)
                     .compose(MoreOperators.<MobilePhoneResponse>refresh(refreshShoutsSubject))
                     .compose(ResponseOrError.<MobilePhoneResponse>toResponseOrErrorObservable())
-                    .compose(MoreOperators.<ResponseOrError<MobilePhoneResponse>>refresh(refreshWithCache))
                     .compose(MoreOperators.<ResponseOrError<MobilePhoneResponse>>cacheWithTimeout(networkScheduler));
 
             deleteShoutResponseObservable = deleteShoutObserver
@@ -266,7 +271,7 @@ public class ShoutsDao {
                     .flatMap(new Func1<String, Observable<Response<Object>>>() {
                         @Override
                         public Observable<Response<Object>> call(String body) {
-                            return apiService.reportShout(ReportBody.forShout(shoutId, body))
+                            return apiService.report(ReportBody.forShout(shoutId, body))
                                     .subscribeOn(networkScheduler);
                         }
                     });
@@ -378,21 +383,62 @@ public class ShoutsDao {
             final String query = pointer.getQuery();
             final String contextItemId = pointer.getContextItemId();
             final UserLocation location = pointer.getLocation();
+            final FiltersToSubmit filtersToSubmit = pointer.getFiltersToSubmit();
 
             switch (SearchPresenter.SearchType.values()[searchType.ordinal()]) {
                 case PROFILE:
                     return apiService.searchProfileShouts(query, pageNumber, PAGE_SIZE, contextItemId);
                 case SHOUTS:
-                    return apiService.searchShouts(query, pageNumber, PAGE_SIZE,
-                            location.getCountry(), location.getCity(), location.getState());
+                    if (filtersToSubmit != null) {
+                        return apiService.searchShouts(query, pageNumber, PAGE_SIZE,
+                                location.getCountry(), filtersToSubmit.getCity(), filtersToSubmit.getState(),
+                                filtersToSubmit.getMinPriceInCents(), filtersToSubmit.getMaxPriceInCents(),
+                                filtersToSubmit.getDistance(), filtersToSubmit.getShoutType(),
+                                filtersToSubmit.getSortType().getType(), filtersToSubmit.getCategorySlug(),
+                                filtersToSubmit.getFiltersQueryMap());
+                    } else {
+                        return apiService.searchShouts(query, pageNumber, PAGE_SIZE,
+                                location.getCountry(), location.getCity(), location.getState(),
+                                null, null, null, null, null, null, null);
+                    }
+                case RELATED_SHOUTS:
+                    return apiService.shoutsRelated(contextItemId, pageNumber, PAGE_SIZE);
                 case TAG:
-                    return apiService.searchTagShouts(query, pageNumber, PAGE_SIZE, contextItemId,
-                            location.getCountry(), location.getCity(), location.getState());
+                    if (filtersToSubmit != null) {
+                        return apiService.searchTagShouts(query, pageNumber, PAGE_SIZE, contextItemId,
+                                location.getCountry(), filtersToSubmit.getCity(), filtersToSubmit.getState(),
+                                filtersToSubmit.getMinPriceInCents(), filtersToSubmit.getMaxPriceInCents(),
+                                filtersToSubmit.getDistance(), filtersToSubmit.getShoutType(),
+                                filtersToSubmit.getSortType().getType(), filtersToSubmit.getCategorySlug(),
+                                filtersToSubmit.getFiltersQueryMap());
+                    } else {
+                        return apiService.searchTagShouts(query, pageNumber, PAGE_SIZE, contextItemId,
+                                location.getCountry(), location.getCity(), location.getState(),
+                                null, null, null, null, null, null, null);
+                    }
                 case DISCOVER:
-                    return apiService.searchDiscoverShouts(query, pageNumber, PAGE_SIZE, contextItemId);
+                    if (filtersToSubmit != null) {
+                        return apiService.searchDiscoverShouts(query, pageNumber, PAGE_SIZE, contextItemId,
+                                filtersToSubmit.getMinPriceInCents(), filtersToSubmit.getMaxPriceInCents(),
+                                filtersToSubmit.getDistance(), filtersToSubmit.getShoutType(),
+                                filtersToSubmit.getSortType().getType(), filtersToSubmit.getCategorySlug(),
+                                filtersToSubmit.getFiltersQueryMap());
+                    } else {
+                        return apiService.searchDiscoverShouts(query, pageNumber, PAGE_SIZE, contextItemId,
+                                null, null, null, null, null, null, null);
+                    }
                 case BROWSE:
-                    return apiService.shoutsForLocation(location.getCountry(), location.getCity(),
-                            location.getState(), pageNumber, PAGE_SIZE);
+                    if (filtersToSubmit != null) {
+                        return apiService.shoutsForLocation(location.getCountry(), filtersToSubmit.getCity(),
+                                filtersToSubmit.getState(), pageNumber, PAGE_SIZE,
+                                filtersToSubmit.getMinPriceInCents(), filtersToSubmit.getMaxPriceInCents(),
+                                filtersToSubmit.getDistance(), filtersToSubmit.getShoutType(),
+                                filtersToSubmit.getSortType().getType(), filtersToSubmit.getCategorySlug(),
+                                filtersToSubmit.getFiltersQueryMap());
+                    } else {
+                        return apiService.shoutsForLocation(location.getCountry(), location.getCity(),
+                                location.getState(), pageNumber, PAGE_SIZE, null, null, null, null, null, null, null);
+                    }
                 default:
                     throw new RuntimeException("Unknwon profile type: " + SearchPresenter.SearchType.values()[searchType.ordinal()]);
             }

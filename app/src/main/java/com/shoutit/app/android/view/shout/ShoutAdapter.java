@@ -156,8 +156,12 @@ public class ShoutAdapter extends BaseAdapter {
             }
 
             shoutViewPager.setAdapter(imagesPagerAdapter);
+
             pageIndicator.setViewPager(shoutViewPager);
-            imagesPagerAdapter.setData(shout.getImages());
+            boolean hasMoreThanOneItem = shout.getImages().size() + shout.getVideos().size() > 1;
+            pageIndicator.setVisibility(hasMoreThanOneItem ? View.VISIBLE : View.GONE);
+
+            imagesPagerAdapter.setData(shout.getImages(), shout.getVideos());
             boolean hasAnyMedia = !shout.getImages().isEmpty() || !shout.getVideos().isEmpty();
             viewPagerContainer.setVisibility(hasAnyMedia ? View.VISIBLE : View.GONE);
 
@@ -208,6 +212,11 @@ public class ShoutAdapter extends BaseAdapter {
             final boolean isLastElementLight = detailsContainer.getChildCount() % 2 != 0;
             locationContainer.setBackgroundColor(context.getResources().getColor(
                     isLastElementLight ? android.R.color.white : R.color.black_12));
+        }
+
+        @OnClick(R.id.shout_detail_category_row)
+        public void onCategoryClick() {
+            item.onCategoryClick(item.getShout().getCategory().getSlug());
         }
     }
 

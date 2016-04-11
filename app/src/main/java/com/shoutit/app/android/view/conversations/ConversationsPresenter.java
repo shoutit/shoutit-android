@@ -10,13 +10,29 @@ import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.operators.OperatorMergeNextToken;
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
+import com.google.gson.Gson;
+import com.pusher.client.channel.PresenceChannel;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.Conversation;
+import com.shoutit.app.android.api.model.ConversationProfile;
 import com.shoutit.app.android.api.model.ConversationsResponse;
+import com.shoutit.app.android.api.model.Message;
+import com.shoutit.app.android.api.model.MessageAttachment;
+import com.shoutit.app.android.api.model.PusherMessage;
+import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.utils.PusherHelper;
+import com.shoutit.app.android.view.chats.PresenceChannelEventListenerAdapter;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -25,6 +41,7 @@ import javax.inject.Inject;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
+import rx.Subscriber;
 import rx.Subscription;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -72,6 +89,9 @@ public class ConversationsPresenter {
     private final Scheduler mNetworkScheduler;
     private final Scheduler mUiScheduler;
     private final Context mContext;
+    private final UserPreferences mUserPreferences;
+    private final PusherHelper mPusherHelper;
+    private final Gson mGson;
     private Listener mListener;
     private Subscription mSubscription;
     private final PublishSubject<Object> requestSubject = PublishSubject.create();
@@ -80,38 +100,116 @@ public class ConversationsPresenter {
     public ConversationsPresenter(@NonNull ApiService apiService,
                                   @NetworkScheduler Scheduler networkScheduler,
                                   @UiScheduler Scheduler uiScheduler,
-                                  @ForActivity Context context) {
+                                  @ForActivity Context context,
+                                  UserPreferences userPreferences,
+                                  PusherHelper pusherHelper,
+                                  Gson gson) {
         mApiService = apiService;
         mNetworkScheduler = networkScheduler;
         mUiScheduler = uiScheduler;
         mContext = context;
+        mUserPreferences = userPreferences;
+        mPusherHelper = pusherHelper;
+        mGson = gson;
     }
 
-    public void register(@NonNull Listener listener) {
+    public void register(@NonNull final Listener listener) {
+        final User user = mUserPreferences.getUser();
+        assert user != null;
+        final PresenceChannel userChannel = mPusherHelper.getPusher().getPresenceChannel(String.format("presence-u-%1$s", user.getId()));
+
+        final Observable<HashMap<String, Conversation>> mapObservable = Observable
+                .create(new Observable.OnSubscribe<PusherMessage>() {
+                    @Override
+                    public void call(final Subscriber<? super PusherMessage> subscriber) {
+                        userChannel.bind("new_message", new PresenceChannelEventListenerAdapter() {
+
+                            @Override
+                            public void onEvent(String channelName, String eventName, String data) {
+                                try {
+                                    final PusherMessage pusherMessage = mGson.getAdapter(PusherMessage.class).fromJson(data);
+                                    subscriber.onNext(pusherMessage);
+                                } catch (IOException e) {
+                                    subscriber.onError(e);
+                                }
+                            }
+                        });
+                    }
+                })
+                .flatMap(new Func1<PusherMessage, Observable<Conversation>>() {
+                    @Override
+                    public Observable<Conversation> call(PusherMessage pusherMessage) {
+                        return mApiService.getConversation(pusherMessage.getConversationId());
+                    }
+                })
+                .observeOn(mUiScheduler)
+                .scan(Maps.<String, Conversation>newHashMap(), new Func2<HashMap<String, Conversation>, Conversation, HashMap<String, Conversation>>() {
+                    @Override
+                    public HashMap<String, Conversation> call(HashMap<String, Conversation> map, Conversation pusherMessage) {
+                        map.put(pusherMessage.getId(), pusherMessage);
+                        return map;
+                    }
+                });
+
         mListener = listener;
 
         mListener.showProgress(true);
 
-        mSubscription = requestSubject
+        final Observable<List<Conversation>> listObservable = requestSubject
                 .startWith(new Object())
                 .lift(loadMoreOperator)
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
-                .subscribe(new Action1<ConversationsResponse>() {
+                .map(new Func1<ConversationsResponse, List<Conversation>>() {
                     @Override
-                    public void call(ConversationsResponse conversationsResponse) {
+                    public List<Conversation> call(ConversationsResponse conversationsResponse) {
+                        return conversationsResponse.getResults();
+                    }
+                });
+
+
+        mSubscription = Observable.combineLatest(listObservable, mapObservable,
+                new Func2<List<Conversation>, Map<String, Conversation>, List<Conversation>>() {
+                    @Override
+                    public List<Conversation> call(List<Conversation> conversations, Map<String, Conversation> map) {
+                        for (Conversation conversation : conversations) {
+                            final boolean containsKey = map.containsKey(conversation.getId());
+                            if (!containsKey) {
+                                // MAP IS HASHMAP
+                                map.put(conversation.getId(), conversation);
+                            }
+                        }
+
+                        return ImmutableList.copyOf(Iterables.filter(Iterables.transform(map.entrySet(), new Function<Map.Entry<String, Conversation>, Conversation>() {
+                            @Nullable
+                            @Override
+                            public Conversation apply(@Nullable Map.Entry<String, Conversation> input) {
+                                assert input != null;
+                                return input.getValue();
+                            }
+                        }), new Predicate<Conversation>() {
+                            @Override
+                            public boolean apply(@Nullable Conversation input) {
+                                assert input != null;
+                                return input.getProfiles().size() > 1;
+                            }
+                        }));
+                    }
+                })
+                .subscribe(new Action1<List<Conversation>>() {
+                    @Override
+                    public void call(List<Conversation> conversations) {
                         mListener.showProgress(false);
 
-                        final List<ConversationsResponse.Conversation> conversations = conversationsResponse.getResults();
                         if (conversations.isEmpty()) {
                             mListener.emptyList();
                         } else {
                             final ImmutableList<BaseAdapterItem> items = ImmutableList.copyOf(Iterables.transform(
                                     conversations,
-                                    new Function<ConversationsResponse.Conversation, BaseAdapterItem>() {
+                                    new Function<Conversation, BaseAdapterItem>() {
                                         @Nullable
                                         @Override
-                                        public BaseAdapterItem apply(@Nullable ConversationsResponse.Conversation input) {
+                                        public BaseAdapterItem apply(@Nullable Conversation input) {
                                             assert input != null;
                                             return getConversationItem(input);
                                         }
@@ -130,37 +228,37 @@ public class ConversationsPresenter {
     }
 
     @NonNull
-    private BaseAdapterItem getConversationItem(@NonNull ConversationsResponse.Conversation input) {
-        final ConversationsResponse.Message lastMessage = input.getLastMessage();
-        final List<ConversationsResponse.ConversationProfile> profiles = input.getProfiles();
+    private BaseAdapterItem getConversationItem(@NonNull Conversation input) {
+        final Message lastMessage = input.getLastMessage();
+        final List<ConversationProfile> profiles = input.getProfiles();
 
         final String message = getMessageString(lastMessage);
         final String elapsedTime = DateUtils.getRelativeTimeSpanString(mContext, lastMessage.getCreatedAt() * 1000).toString();
         final String chatWith = getChatWithString(profiles);
         final String image = getImage(profiles);
 
-        if (ConversationsResponse.Conversation.ABOUT_SHOUT_TYPE.equals(input.getType())) {
+        if (Conversation.ABOUT_SHOUT_TYPE.equals(input.getType())) {
             return new ConversationShoutItem(input.getId(), input.getAbout().getTitle(), chatWith, message, elapsedTime, image);
-        } else if (ConversationsResponse.Conversation.CHAT_TYPE.equals(input.getType())) {
+        } else if (Conversation.CHAT_TYPE.equals(input.getType())) {
             return new ConversationChatItem(input.getId(), message, chatWith, elapsedTime, image);
         } else {
             throw new RuntimeException(input.getType() + " : unknown type");
         }
     }
 
-    private String getImage(List<ConversationsResponse.ConversationProfile> profiles) {
+    private String getImage(List<ConversationProfile> profiles) {
         return profiles.get(0).getImage();
     }
 
-    private String getChatWithString(List<ConversationsResponse.ConversationProfile> profiles) {
+    private String getChatWithString(List<ConversationProfile> profiles) {
         String chatWith;
         if (profiles.size() == 2) {
-            final ConversationsResponse.ConversationProfile conversationProfile = profiles.get(0);
+            final ConversationProfile conversationProfile = profiles.get(0);
             chatWith = conversationProfile.getUsername();
         } else {
             final StringBuilder nameBuilder = new StringBuilder();
-            for (final ConversationsResponse.ConversationProfile profile : profiles) {
-                if (profile.getType().equals(ConversationsResponse.ConversationProfile.TYPE_USER)) {
+            for (final ConversationProfile profile : profiles) {
+                if (profile.getType().equals(ConversationProfile.TYPE_USER)) {
                     nameBuilder.append(profile.getFirstName());
                 } else {
                     nameBuilder.append(profile.getUsername());
@@ -171,16 +269,18 @@ public class ConversationsPresenter {
         return chatWith;
     }
 
-    private String getMessageString(ConversationsResponse.Message lastMessage) {
-        final List<ConversationsResponse.MessageAttachment> attachments = lastMessage.getAttachments();
+    private String getMessageString(Message lastMessage) {
+        final List<MessageAttachment> attachments = lastMessage.getAttachments();
         if (attachments == null || attachments.isEmpty()) {
             return lastMessage.getText();
         } else {
-            final ConversationsResponse.MessageAttachment messageAttachment = attachments.get(0);
-            if (ConversationsResponse.MessageAttachment.ATTACHMENT_TYPE_LOCATION.equals(messageAttachment.getType())) {
+            final MessageAttachment messageAttachment = attachments.get(0);
+            if (MessageAttachment.ATTACHMENT_TYPE_LOCATION.equals(messageAttachment.getType())) {
                 return "Location";
-            } else if (ConversationsResponse.MessageAttachment.ATTACHMENT_TYPE_SHOUT.equals(messageAttachment.getType())) {
+            } else if (MessageAttachment.ATTACHMENT_TYPE_SHOUT.equals(messageAttachment.getType())) {
                 return "Shout";
+            } else if (MessageAttachment.ATTACHMENT_TYPE_MEDIA.equals(messageAttachment.getType())) {
+                return "Media";
             } else {
                 throw new RuntimeException(messageAttachment.getType() + " : unknown type");
             }
@@ -205,6 +305,8 @@ public class ConversationsPresenter {
         void setData(@NonNull List<BaseAdapterItem> items);
 
         void error();
+
+        void onItemClicked(@NonNull String id, boolean shoutChat);
     }
 
     public class ConversationChatItem implements BaseAdapterItem {
@@ -255,6 +357,10 @@ public class ConversationsPresenter {
 
         public String getImage() {
             return image;
+        }
+
+        public void click() {
+            mListener.onItemClicked(id, false);
         }
     }
 
@@ -312,6 +418,10 @@ public class ConversationsPresenter {
 
         public String getImage() {
             return image;
+        }
+
+        public void click() {
+            mListener.onItemClicked(id, true);
         }
     }
 
