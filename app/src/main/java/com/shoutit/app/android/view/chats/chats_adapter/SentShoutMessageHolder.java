@@ -43,8 +43,8 @@ public class SentShoutMessageHolder extends ViewHolderManager.BaseViewHolder<Bas
         final SentShoutMessage message = (SentShoutMessage) item;
 
         mPicasso.load(message.getShoutImageUrl())
+                .resizeDimen(R.dimen.chat_sent_shout_image_width, R.dimen.chat_sent_shout_image_height)
                 .centerCrop()
-                .fit()
                 .into(mChatsSentShoutImageImageview);
 
         mChatsSentShoutDateTextview.setText(message.getTime());
