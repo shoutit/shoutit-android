@@ -16,7 +16,9 @@ public class AboutShout {
 
     private final long datePublished;
 
-    public AboutShout(String title, Long price, String currency, String thumbnail, String type, User profile, long datePublished) {
+    private final String id;
+
+    public AboutShout(String title, Long price, String currency, String thumbnail, String type, User profile, long datePublished, String id) {
         this.title = title;
         this.price = price;
         this.currency = currency;
@@ -24,6 +26,7 @@ public class AboutShout {
         this.type = type;
         this.profile = profile;
         this.datePublished = datePublished;
+        this.id = id;
     }
 
     public String getTitle() {
@@ -52,5 +55,9 @@ public class AboutShout {
 
     public long getDatePublished() {
         return datePublished;
+    }
+
+    public String getId() {
+        return id;
     }
 }

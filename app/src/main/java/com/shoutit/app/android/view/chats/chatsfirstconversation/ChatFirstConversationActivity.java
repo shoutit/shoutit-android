@@ -234,7 +234,7 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
         finish();
     }
 
-    public void setAboutShoutData(String title, String thumbnail, String type, String price, String authorAndTime) {
+    public void setAboutShoutData(String title, String thumbnail, String type, String price, String authorAndTime, final String id) {
         mChatsShoutLayout.setVisibility(View.VISIBLE);
         picasso.load(thumbnail)
                 .centerCrop()
@@ -244,6 +244,12 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
         mChatsShoutLayoutTitle.setText(title);
         mChatsShoutLayoutPrice.setText(price);
         mChatsShoutLayoutAuthorDate.setText(authorAndTime);
+        mChatsShoutLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(ShoutActivity.newIntent(ChatFirstConversationActivity.this, id));
+            }
+        });
     }
 
     @Override
@@ -281,7 +287,7 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
         }
     }
 
-    private void deleteConversation(){
+    private void deleteConversation() {
         new AlertDialog.Builder(ChatFirstConversationActivity.this)
                 .setMessage("Do you want to delete this conversation?")
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {

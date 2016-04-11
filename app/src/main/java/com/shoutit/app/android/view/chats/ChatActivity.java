@@ -240,7 +240,7 @@ public class ChatActivity extends BaseActivity implements Listener {
         finish();
     }
 
-    public void setAboutShoutData(String title, String thumbnail, String type, String price, String authorAndTime) {
+    public void setAboutShoutData(String title, String thumbnail, String type, String price, String authorAndTime, final String id) {
         mChatsShoutLayout.setVisibility(View.VISIBLE);
         picasso.load(thumbnail)
                 .centerCrop()
@@ -251,6 +251,12 @@ public class ChatActivity extends BaseActivity implements Listener {
         mChatsShoutLayoutTitle.setText(title);
         mChatsShoutLayoutPrice.setText(price);
         mChatsShoutLayoutAuthorDate.setText(authorAndTime);
+        mChatsShoutLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(ShoutActivity.newIntent(ChatActivity.this, id));
+            }
+        });
     }
 
     @Override

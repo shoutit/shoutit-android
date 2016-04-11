@@ -265,8 +265,9 @@ public class ChatsFirstConversationPresenter {
                             final String type = about.getType().equals(Shout.TYPE_OFFER) ? "Offer" : "Request";
                             final String price = PriceUtils.formatPriceWithCurrency(about.getPrice(), mResources, about.getCurrency());
                             final String authorAndTime = about.getProfile().getName() + " - " + DateUtils.getRelativeTimeSpanString(mContext, about.getDatePublishedInMillis());
+                            final String id = about.getId();
 
-                            mListener.setAboutShoutData(title, thumbnail, type, price, authorAndTime);
+                            mListener.setAboutShoutData(title, thumbnail, type, price, authorAndTime, id);
                         }
                     }, new Action1<Throwable>() {
                         @Override
