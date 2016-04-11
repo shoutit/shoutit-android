@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent"
     tools:ignore="ContentDescription">
 
     <LinearLayout
@@ -17,81 +17,113 @@
             style="@style/AppTheme.BaseToolbarStyle"
             android:layout_width="match_parent"
             android:layout_height="?actionBarSize"
-            android:layout_marginBottom="10dp"/>
+            android:layout_marginBottom="10dp" />
 
         <ScrollView
+            android:overScrollMode="never"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <LinearLayout
+                android:gravity="start"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
                 android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/edit_shout_add_pictures_label"
+                    android:textColor="#8a000000"
+                    android:textSize="12sp" />
 
                 <HorizontalScrollView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:scrollbarSize="4dp">
 
                     <LinearLayout
                         android:id="@+id/edit_media_container"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"/>
+                        android:orientation="horizontal" />
 
                 </HorizontalScrollView>
 
-                <android.support.design.widget.TextInputLayout
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/request_activity_what_are_you_looking_for"
+                    android:textColor="#8a000000"
+                    android:textSize="12sp" />
+
+                <com.shoutit.app.android.widget.ErrorTextInputLayout
                     android:id="@+id/edit_description_layout"
-                    app:hintTextAppearance="@style/BlueInputStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="10dp">
+                    app:hintTextAppearance="@style/BlueInputStyle">
 
                     <EditText
+                        android:gravity="start"
                         android:id="@+id/edit_shout_title"
-                        android:theme="@style/BlueEditText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/edit_shout_title_hint"/>
+                        android:layout_marginLeft="-4dp"
+                        android:layout_marginStart="-4dp"
+                        android:hint="@string/edit_shout_title_hint"
+                        android:theme="@style/BlueEditText" />
 
-                </android.support.design.widget.TextInputLayout>
+                </com.shoutit.app.android.widget.ErrorTextInputLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/request_activity_budget"
+                    android:textColor="#8a000000"
+                    android:textSize="12sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
                     android:orientation="horizontal">
 
-                    <FrameLayout
+                    <EditText
+                        android:gravity="start"
+                        android:id="@+id/edit_budget"
                         android:layout_width="0dp"
-                        android:layout_height="54dp"
-                        android:layout_weight="0.5">
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="-4dp"
+                        android:layout_weight="1"
+                        android:hint="@string/create_request_price"
+                        android:inputType="numberDecimal"
+                        android:theme="@style/BlueEditText" />
 
-                        <EditText
-                            android:id="@+id/edit_budget"
-                            android:theme="@style/BlueEditText"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="@string/edit_shout_price_hint"
-                            android:inputType="numberDecimal"/>
-
-                        <ImageView
-                            android:id="@+id/edit_currency_info"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_gravity="end|center_vertical"
-                            android:layout_marginBottom="8dp"
-                            android:src="@drawable/info"/>
-
-                    </FrameLayout>
+                    <ImageView
+                        android:id="@+id/edit_currency_info"
+                        android:layout_width="24dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:src="@drawable/info" />
 
                     <com.shoutit.app.android.widget.StateSpinner
                         android:id="@+id/edit_currency_spinner"
-                        android:layout_width="0dp"
-                        android:layout_height="43dp"
-                        android:layout_weight="0.35"/>
+                        android:layout_width="130dp"
+                        android:layout_height="43dp" />
 
                 </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/request_activity_when"
+                    android:textColor="#8a000000"
+                    android:textSize="12sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -104,39 +136,49 @@
                         android:id="@+id/edit_request_category_icon"
                         android:layout_width="54dp"
                         android:layout_height="54dp"
-                        android:layout_marginLeft="6dp"
-                        android:layout_marginRight="6dp"/>
+                        android:layout_marginRight="8dp" />
 
                     <com.shoutit.app.android.widget.StateSpinner
                         android:id="@+id/edit_request_category_spinner"
                         android:layout_width="match_parent"
-                        android:layout_height="54dp"/>
+                        android:layout_height="54dp" />
 
                 </LinearLayout>
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/edit_shout_description_hint"
+                    android:textColor="#8a000000"
+                    android:textSize="12sp" />
+
                 <EditText
+                    android:gravity="start"
                     android:id="@+id/edit_shout_description"
-                    android:theme="@style/BlueEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/edit_shout_description_hint"/>
+                    android:layout_marginLeft="-4dp"
+                    android:hint="@string/edit_shout_description_hint"
+                    android:theme="@style/BlueEditText" />
 
                 <LinearLayout
                     android:id="@+id/edit_shout_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"/>
+                    android:orientation="vertical" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:text="@string/edit_shout_location"/>
+                    android:layout_marginTop="14dp"
+                    android:text="@string/edit_shout_location"
+                    android:textColor="#8a000000"
+                    android:textSize="12sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="6dp"
                     android:orientation="horizontal">
 
                     <TextView
@@ -147,10 +189,9 @@
                         android:drawablePadding="10dp"
                         android:gravity="center_vertical"
                         android:paddingLeft="6dp"
-                        android:paddingStart="6dp"
                         android:textColor="@android:color/black"
                         tools:drawableLeft="@drawable/ec"
-                        tools:text="Dubai, United Arab Emirates"/>
+                        tools:text="Dubai, United Arab Emirates" />
 
                     <Button
                         android:id="@+id/edit_location_btn"
@@ -159,24 +200,42 @@
                         android:layout_weight="0.25"
                         android:background="?selectableItemBackground"
                         android:text="@string/request_activity_change_location"
-                        android:textColor="@color/accent_blue"/>
+                        android:textColor="@color/accent_blue"
+                        android:textSize="12sp" />
 
                 </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/edit_shout_mobile_hint"
+                    android:textColor="#8a000000"
+                    android:textSize="12sp" />
+
+                <EditText
+                    android:id="@+id/edit_shout_mobile"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="-4dp"
+                    android:inputType="phone"
+                    android:hint="@string/edit_shout_mobile_hint"
+                    android:theme="@style/BlueEditText" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1px"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:background="@android:color/darker_gray"/>
+                    android:layout_marginBottom="10dp"
+                    android:background="@android:color/darker_gray" />
 
                 <Button
                     android:id="@+id/edit_confirm"
-                    style="@style/BaseButtonDefaultBackgroundStyle"
+                    style="@style/BaseButtonStyle"
                     android:layout_width="match_parent"
-                    android:layout_margin="6dp"
+                    android:background="@drawable/selector_green_button_with_stroke"
                     android:text="@string/edit_done_btn"
-                    android:textColor="@android:color/white"/>
+                    android:textColor="@android:color/white"
+                    android:layout_marginBottom="16dp"/>
 
             </LinearLayout>
 
@@ -195,7 +254,7 @@
         <ProgressBar
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center" />
 
     </FrameLayout>
 

@@ -256,6 +256,8 @@ public class ProfileViewHolders {
             this.item = item;
             final User user = item.getUser();
 
+
+
             firstIconValue.setText(TextHelper.formatListenersNumber(user.getListenersCount()));
             setListeningIcon(user.isListening());
         }
@@ -293,8 +295,6 @@ public class ProfileViewHolders {
         ImageView listenImageView;
         @Bind(R.id.profile_listen_tv)
         TextView listenTextView;
-        @Bind(R.id.profile_tag_icon_tv)
-        TextView tagIconTv;
 
         private ProfileAdapterItems.TagInfoAdapterItem item;
         private final Context context;

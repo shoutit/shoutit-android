@@ -6,10 +6,12 @@ import android.content.res.Resources;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.Discover;
 import com.shoutit.app.android.api.model.DiscoverChild;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
@@ -19,6 +21,7 @@ import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.dao.DiscoversDao;
+import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.model.LocationPointer;
 
 import org.junit.Before;
@@ -60,11 +63,13 @@ public class DiscoverPresenterTest {
 
     private final PublishSubject<ResponseOrError<DiscoverItemDetailsResponse>> discoverItemSubject = PublishSubject.create();
     private DiscoverPresenter presenter;
+    private ShoutsGlobalRefreshPresenter globalRefreshPresenter;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
+        globalRefreshPresenter = new ShoutsGlobalRefreshPresenter();
         when(userPreferences.getLocationObservable())
                 .thenReturn(Observable.just(new UserLocation(0, 0, "z", null, null, null, null)));
 
@@ -76,7 +81,7 @@ public class DiscoverPresenterTest {
                 .thenReturn(Observable.just(ResponseOrError.fromData(getShoutsResponse())));
 
         presenter = new DiscoverPresenter(userPreferences, discoversDao,
-                discoverShoutsDao, Optional.<String>absent(), Schedulers.immediate(), Schedulers.immediate(), mResources, context);
+                discoverShoutsDao, Optional.<String>absent(), Schedulers.immediate(), Schedulers.immediate(), mResources, context, globalRefreshPresenter);
     }
 
     @Test
@@ -167,7 +172,8 @@ public class DiscoverPresenterTest {
 
     private ShoutsResponse getShoutsResponse() {
         return new ShoutsResponse(0, "a", null,
-                Lists.newArrayList(new Shout("z", null, null, null, null, null, null, 0L, 0, null, null, null, null, null, null, 1L, null, null, 0)));
+                Lists.newArrayList(new Shout("z", null, null, null, null, null, null,
+                        0L, 0, null, null, null, null, null, null, 1L, null, null, 0, ImmutableList.<Conversation>of(), true)));
     }
 
     private DiscoverResponse getDiscoverResponse() {

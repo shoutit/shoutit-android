@@ -16,10 +16,10 @@ import rx.Scheduler;
 
 public class CategoriesDao {
 
-    private final Observable<ResponseOrError<List<Category>>> mListObservableResponseOrError;
+    private final Observable<ResponseOrError<List<Category>>> categoriesObservable;
 
     public CategoriesDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
-        mListObservableResponseOrError = apiService
+        categoriesObservable = apiService
                 .categories()
                 .mergeWith(Observable.<List<Category>>never())
                 .subscribeOn(networkScheduler)
@@ -28,7 +28,7 @@ public class CategoriesDao {
     }
 
     @NonNull
-    public Observable<ResponseOrError<List<Category>>> getListObservableResponseOrError() {
-        return mListObservableResponseOrError;
+    public Observable<ResponseOrError<List<Category>>> categoriesObservable() {
+        return categoriesObservable;
     }
 }

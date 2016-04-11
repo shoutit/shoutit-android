@@ -41,6 +41,7 @@ public class SearchPresenter {
 
     public enum SearchType {
         SHOUTS,
+        RELATED_SHOUTS,
         PROFILE,
         TAG,
         DISCOVER,

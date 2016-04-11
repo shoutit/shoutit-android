@@ -50,7 +50,7 @@ public class SearchProfilesResultsPresenterTest {
         when(apiService.searchProfiles(anyString(), anyInt(), anyInt()))
                 .thenReturn(Observable.just(getSearchResponse()));
 
-        profilesDao = new ProfilesDao(apiService, testScheduler);
+        profilesDao = new ProfilesDao(apiService, testScheduler, userPreferences);
         presenter = new SearchProfilesResultsPresenter(profilesDao, "zzz", apiService, testScheduler, testScheduler, userPreferences);
 
     }
@@ -141,6 +141,6 @@ public class SearchProfilesResultsPresenterTest {
     private SearchProfileResponse getSearchResponse() {
         return new SearchProfileResponse(1, "l", "z", Lists.newArrayList(
                 new User("1", null, null, null, "username", null, null, null, false, null, null,
-                        false, false, false, null, 1, null, null, null, 1, null, false, null, null, null)));
+                        false, false, false, null, 1, null, null, null, 1, null, false, null, null, null, null)));
     }
 }

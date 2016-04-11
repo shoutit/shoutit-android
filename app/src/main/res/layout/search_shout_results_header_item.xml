@@ -49,11 +49,12 @@
         android:layout_marginRight="24dp"
         android:src="@drawable/ic_filter" />
 
-    <ImageView
+    <CheckedTextView
         android:id="@+id/search_results_switch_iv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingBottom="2dp"
         android:layout_gravity="bottom"
-        android:src="@drawable/ic_list_switch" />
+        android:background="@drawable/ic_list_switch" />
 
 </LinearLayout>

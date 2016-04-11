@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="6dp"
+    android:padding="4dp">
+
+    <FrameLayout
+        android:layout_gravity="end"
+        android:layout_width="106dp"
+        android:layout_height="106dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginStart="20dp"
+        android:background="@drawable/message_background_owner">
+
+        <ImageView
+            android:id="@+id/cjats_sent_image_imageview"
+            android:layout_width="90dp"
+            android:layout_height="96dp"
+            android:layout_gravity="center"
+            android:scaleType="centerCrop"
+            tools:src="@drawable/ca" />
+
+        <TextView
+            android:id="@+id/cjats_sent_image_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:layout_marginBottom="4dp"
+            android:layout_marginRight="4dp"
+            android:background="@drawable/chat_time_gradient"
+            android:textColor="@android:color/white"
+            tools:text="18:04" />
+
+    </FrameLayout>
+</FrameLayout>

@@ -8,6 +8,7 @@ import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.base.Objects;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
+import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.api.model.RelatedTagsResponse;
 import com.shoutit.app.android.api.model.TagDetail;
@@ -366,13 +367,13 @@ public class ProfileAdapterItems {
         @Nonnull
         private final Observer<Object> actionOnlyForLoggedInUserObserver;
         @Nonnull
-        private final Observer<String> onChatIconClickedObserver;
+        private final Observer<ChatInfo> onChatIconClickedObserver;
         @Nonnull
         private final Observer<User> onListenActionClickedObserver;
 
         public UserThreeIconsAdapterItem(@Nonnull User user, boolean isUserLoggedIn,
                                          @Nonnull Observer<Object> actionOnlyForLoggedInUserObserver,
-                                         @Nonnull Observer<String> onChatIconClickedObserver,
+                                         @Nonnull Observer<ChatInfo> onChatIconClickedObserver,
                                          @Nonnull Observer<User> onListenActionClickedObserver) {
             super(user);
             this.isUserLoggedIn = isUserLoggedIn;
@@ -386,7 +387,8 @@ public class ProfileAdapterItems {
         }
 
         public void onChatActionClicked() {
-            onChatIconClickedObserver.onNext(user.getUsername());
+            final Conversation conversation = user.getConversation();
+            onChatIconClickedObserver.onNext(new ChatInfo(user.getUsername(), conversation != null ? conversation.getId() : null, user.isListening(), isUserLoggedIn));
         }
 
         public void onListenActionClicked() {

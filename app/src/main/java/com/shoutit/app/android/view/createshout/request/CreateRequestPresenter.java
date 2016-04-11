@@ -17,6 +17,7 @@ import com.shoutit.app.android.api.model.Currency;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.UserLocationSimple;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.ResourcesHelper;
 
@@ -53,6 +54,8 @@ public class CreateRequestPresenter {
     private final ApiService mApiService;
     private final Scheduler mNetworkScheduler;
     private final Scheduler mUiScheduler;
+    @NonNull
+    private final ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter;
     private Listener mListener;
     private UserLocation mUserLocation;
     private Subscription locationSubscription;
@@ -63,11 +66,13 @@ public class CreateRequestPresenter {
                                   @ForActivity Context context,
                                   ApiService apiService,
                                   @NetworkScheduler Scheduler networkScheduler,
-                                  @UiScheduler Scheduler uiScheduler) {
+                                  @UiScheduler Scheduler uiScheduler,
+                                  @NonNull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter) {
         mContext = context;
         mApiService = apiService;
         mNetworkScheduler = networkScheduler;
         mUiScheduler = uiScheduler;
+        this.shoutsGlobalRefreshPresenter = shoutsGlobalRefreshPresenter;
         mLocationObservable = userPreferences.getLocationObservable()
                 .compose(ObservableExtensions.<UserLocation>behaviorRefCount());
     }
@@ -139,7 +144,8 @@ public class CreateRequestPresenter {
                     @Override
                     public void call(CreateShoutResponse responseBody) {
                         mListener.hideProgress();
-                        mListener.finishActivity(responseBody.getId());
+                        mListener.finishActivity(responseBody.getId(), responseBody.getWebUrl());
+                        shoutsGlobalRefreshPresenter.refreshShouts();
                     }
                 }, new Action1<Throwable>() {
                     @Override
@@ -200,7 +206,7 @@ public class CreateRequestPresenter {
 
         void showTitleTooShortError(boolean show);
 
-        void finishActivity(String id);
+        void finishActivity(String id, String webUrl);
     }
 
 }

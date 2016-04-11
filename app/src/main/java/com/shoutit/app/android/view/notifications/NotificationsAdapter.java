@@ -1,14 +1,21 @@
 package com.shoutit.app.android.view.notifications;
 
 import android.content.Context;
+import android.graphics.Typeface;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
+import android.text.style.TypefaceSpan;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
+import com.google.common.base.Strings;
 import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
@@ -22,6 +29,7 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
@@ -49,8 +57,6 @@ public class NotificationsAdapter extends BaseAdapter {
         View rootView;
         @Bind(R.id.notifications_text_tv)
         TextView textTv;
-        @Bind(R.id.notifications_user_tv)
-        TextView userTv;
         @Bind(R.id.notifications_time_ago_tv)
         TextView timeAgoTextView;
         @Bind(R.id.notifications_avatar_iv)
@@ -58,10 +64,17 @@ public class NotificationsAdapter extends BaseAdapter {
 
         private NotificationsPresenter.NotificationAdapterItem item;
         private final Target target;
+        private final StyleSpan boldedName;
+        private final ForegroundColorSpan colorSpan;
+        private final TypefaceSpan typefaceSpan;
 
         public NotificationViewHolder(@Nonnull View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+
+            boldedName = new StyleSpan(Typeface.BOLD);
+            colorSpan = new ForegroundColorSpan(context.getResources().getColor(R.color.black_87));
+            typefaceSpan = new TypefaceSpan("sans-serif-medium");
 
             target = PicassoHelper.getRoundedBitmapTarget(context, avatarImageView,
                     context.getResources().getDimensionPixelSize(R.dimen.notifications_avatar_corners));
@@ -84,13 +97,21 @@ public class NotificationsAdapter extends BaseAdapter {
                 if (notification.isMessageNotification() && attachedObject.getMessage() != null) {
                     final BaseProfile profile = attachedObject.getMessage().getProfile();
                     imageUrl = profile.getImage();
-                    userTv.setText(profile.getFirstName());
-                    textTv.setText(attachedObject.getMessage().getText());
+
+                    String text = attachedObject.getMessage().getText();
+                    if (TextUtils.isEmpty(text)) {
+                        text = context.getString(R.string.notifications_message_replacement);
+                    }
+                    final SpannableString spannedText = getSpannedText(profile.getFirstName(), text);
+                    textTv.setText(spannedText);
                 } else if (notification.isListenNotification() && attachedObject.getProfile() != null) {
                     final BaseProfile profile = attachedObject.getProfile();
                     imageUrl = profile.getImage();
-                    userTv.setText(profile.getFirstName());
-                    textTv.setText(context.getString(R.string.notifications_listening_to_you));
+
+                    final SpannableString spannedText = getSpannedText(
+                            profile.getFirstName(),
+                            context.getString(R.string.notifications_listening_to_you));
+                    textTv.setText(spannedText);
                 }
 
                 picasso.load(imageUrl)
@@ -99,12 +120,24 @@ public class NotificationsAdapter extends BaseAdapter {
             }
         }
 
+        @Nonnull
+        private SpannableString getSpannedText(String name, @Nullable String message) {
+            final String text = name + "  " + Strings.nullToEmpty(message);
+            final SpannableString spannableString = new SpannableString(text);
+
+            spannableString.setSpan(boldedName, 0, name.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            spannableString.setSpan(typefaceSpan, 0, name.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            spannableString.setSpan(colorSpan, 0, name.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+
+            return spannableString;
+        }
+
         @OnClick(R.id.notifications_root_view)
         public void onItemClicked() {
             if (item.getNotification().isListenNotification()) {
-                item.openProfile();
+                item.openProfileAndMarkAsRead();
             } else {
-                Toast.makeText(context, "Not implemented yet", Toast.LENGTH_SHORT).show();
+                item.markNotificationAsRead();
             }
         }
     }

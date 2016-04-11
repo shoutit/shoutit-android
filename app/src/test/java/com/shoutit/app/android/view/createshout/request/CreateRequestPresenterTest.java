@@ -10,6 +10,7 @@ import com.shoutit.app.android.api.model.CreateRequestShoutWithPriceRequest;
 import com.shoutit.app.android.api.model.CreateShoutResponse;
 import com.shoutit.app.android.api.model.Currency;
 import com.shoutit.app.android.api.model.UserLocation;
+import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.utils.ResourcesHelper;
 
 import org.junit.Before;
@@ -54,6 +55,8 @@ public class CreateRequestPresenterTest {
     @Mock
     UserPreferences mUserPreferences;
 
+    ShoutsGlobalRefreshPresenter globalRefreshPresenter;
+
     @Mock
     ApiService mApiService;
 
@@ -62,12 +65,13 @@ public class CreateRequestPresenterTest {
         MockitoAnnotations.initMocks(this);
         PowerMockito.mockStatic(ResourcesHelper.class);
 
+        globalRefreshPresenter = new ShoutsGlobalRefreshPresenter();
         when(mApiService.getCurrencies()).thenReturn(Observable.just(currencyList()));
         when(ResourcesHelper.getResourceIdForName(anyString(), any(Context.class))).thenReturn(1);
         when(mUserPreferences.getLocationObservable()).thenReturn(Observable.just(getUserLocation()));
         when(mListener.getRequestData()).thenReturn(new CreateRequestPresenter.RequestData("123456", "5", "a"));
 
-        mCreateRequestPresenter = new CreateRequestPresenter(mUserPreferences, mContext, mApiService, Schedulers.immediate(), Schedulers.immediate());
+        mCreateRequestPresenter = new CreateRequestPresenter(mUserPreferences, mContext, mApiService, Schedulers.immediate(), Schedulers.immediate(), globalRefreshPresenter);
     }
 
     @NonNull
@@ -76,7 +80,7 @@ public class CreateRequestPresenterTest {
     }
 
     private CreateShoutResponse emptyCreateShoutResponse() {
-        return new CreateShoutResponse("");
+        return new CreateShoutResponse("", "");
     }
 
     @NonNull

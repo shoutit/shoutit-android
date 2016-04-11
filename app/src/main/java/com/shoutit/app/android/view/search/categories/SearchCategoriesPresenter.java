@@ -17,7 +17,7 @@ import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.CategoriesDao;
 import com.shoutit.app.android.view.search.SearchPresenter;
-import com.shoutit.app.android.view.search.subsearch.SubSearchActivity;
+import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsActivity;
 
 import java.util.List;
 
@@ -29,7 +29,6 @@ import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Func1;
-import rx.functions.Func2;
 import rx.subjects.PublishSubject;
 
 public class SearchCategoriesPresenter {
@@ -47,7 +46,7 @@ public class SearchCategoriesPresenter {
                                      @ForActivity final Context context) {
 
         final Observable<ResponseOrError<List<Category>>> categoriesRequest = categoriesDao
-                .getListObservableResponseOrError()
+                .categoriesObservable()
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<List<Category>>>behaviorRefCount());
 
@@ -82,8 +81,8 @@ public class SearchCategoriesPresenter {
                 .map(new Func1<Category, Intent>() {
                     @Override
                     public Intent call(Category category) {
-                        return SubSearchActivity.newIntent(context, SearchPresenter.SearchType.TAG,
-                                category.getSlug(), category.getName());
+                        return SearchShoutsResultsActivity.newIntent(
+                                context, null, category.getSlug(), SearchPresenter.SearchType.TAG, category.getName());
                     }
                 });
 

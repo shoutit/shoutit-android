@@ -5,7 +5,7 @@ buildscript {
         maven { url "https://jitpack.io" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.0.0-beta6'
+        classpath 'com.android.tools.build:gradle:2.0.0-rc3'
         classpath 'io.fabric.tools:gradle:1.21.2'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
         classpath 'com.google.gms:google-services:2.0.0-alpha9'
@@ -16,6 +16,7 @@ repositories {
     jcenter()
     maven { url "https://s3.amazonaws.com/repo.commonsware.com" }
     maven { url 'https://maven.fabric.io/public' }
+    maven { url 'http://clojars.org/repo' }
 }
 
 apply plugin: 'com.android.application'
@@ -200,6 +201,7 @@ dependencies {
         exclude group: 'com.google.code.findbugs', module: 'annotations'
     }
     compile project(":FFmpegAndroid")
+    compile project(":appuniteGcm")
     compile 'com.karumi:dexter:2.1.0'
 
     // other
@@ -210,6 +212,8 @@ dependencies {
         transitive = true;
     }
     compile 'com.commonsware.cwac:cam2:0.5.3'
+    compile 'com.pusher:pusher-java-client:1.1.2'
+
 
     // Tests
     testCompile 'junit:junit:4.12'

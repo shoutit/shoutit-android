@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -14,6 +15,8 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.view.search.SearchPresenter;
+import com.shoutit.app.android.view.search.main.MainSearchActivity;
+import com.shoutit.app.android.view.search.subsearch.SubSearchActivity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -28,14 +31,31 @@ public class SearchShoutsResultsActivity extends BaseActivity {
     public static final String KEY_SEARCH_QUERY = "query_to_save";
     public static final String KEY_CONTEXTUAL_ITEM_ID = "contextual_item_id";
     public static final String KEY_SEARCH_TYPE = "search_type";
+    public static final String KEY_CATEGORY_NAME_FOR_SUB_SEARCH = "category_name";
 
     @Bind(R.id.search_shouts_results_toolbar)
     Toolbar toolbar;
 
-    public static Intent newIntent(Context context, @Nullable String queryToSave,
+    private SearchPresenter.SearchType searchType;
+    private String contextualItemId;
+    private String categoryName;
+
+    public static Intent newIntent(@Nonnull Context context, @Nullable String queryToSave,
                                    @Nullable String contextualItemId,
                                    @Nonnull SearchPresenter.SearchType searchType) {
         return new Intent(context, SearchShoutsResultsActivity.class)
+                .putExtra(KEY_SEARCH_QUERY, queryToSave)
+                .putExtra(KEY_CONTEXTUAL_ITEM_ID, contextualItemId)
+                .putExtra(KEY_SEARCH_TYPE, searchType);
+    }
+
+    public static Intent newIntent(@Nonnull Context context,
+                                   @Nullable String queryToSave,
+                                   @Nonnull String contextualItemId,
+                                   @Nonnull SearchPresenter.SearchType searchType,
+                                   @Nonnull String categoryName) {
+        return new Intent(context, SearchShoutsResultsActivity.class)
+                .putExtra(KEY_CATEGORY_NAME_FOR_SUB_SEARCH, categoryName)
                 .putExtra(KEY_SEARCH_QUERY, queryToSave)
                 .putExtra(KEY_CONTEXTUAL_ITEM_ID, contextualItemId)
                 .putExtra(KEY_SEARCH_TYPE, searchType);
@@ -48,11 +68,14 @@ public class SearchShoutsResultsActivity extends BaseActivity {
         ButterKnife.bind(this);
 
         final Intent intent = checkNotNull(getIntent());
-        final String searchQuery = checkNotNull(intent.getStringExtra(KEY_SEARCH_QUERY));
-        final String contextualItemId = intent.getStringExtra(KEY_CONTEXTUAL_ITEM_ID);
-        final SearchPresenter.SearchType searchType = (SearchPresenter.SearchType) checkNotNull(intent.getSerializableExtra(KEY_SEARCH_TYPE));
+        String searchQuery = intent.getStringExtra(KEY_SEARCH_QUERY);
+        contextualItemId = intent.getStringExtra(KEY_CONTEXTUAL_ITEM_ID);
+        searchType = (SearchPresenter.SearchType)
+                checkNotNull(intent.getSerializableExtra(KEY_SEARCH_TYPE));
+        categoryName = intent.getStringExtra(KEY_CATEGORY_NAME_FOR_SUB_SEARCH);
 
-        setUpToolbar(searchQuery);
+        final String toolbarTitle = searchQuery == null ? categoryName : searchQuery;
+        setUpToolbar(toolbarTitle );
 
         if (savedInstanceState == null) {
             getSupportFragmentManager()
@@ -61,6 +84,12 @@ public class SearchShoutsResultsActivity extends BaseActivity {
                             SearchShoutsResultsFragment.newInstance(searchQuery, contextualItemId, searchType))
                     .commit();
         }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Let fragment handle results
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @SuppressLint("PrivateResource")
@@ -79,13 +108,23 @@ public class SearchShoutsResultsActivity extends BaseActivity {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.search_results_menu_search:
-                        finish();
+                        if (isFromSearchCategories()) {
+                            startActivity(SubSearchActivity.newIntent(
+                                    SearchShoutsResultsActivity.this, searchType,
+                                    contextualItemId, categoryName));
+                        } else {
+                            startActivity(MainSearchActivity.newIntent(SearchShoutsResultsActivity.this));
+                        }
                         return true;
                     default:
                         return false;
                 }
             }
         });
+    }
+
+    private boolean isFromSearchCategories() {
+        return searchType.equals(SearchPresenter.SearchType.TAG) && !TextUtils.isEmpty(categoryName);
     }
 
     @Nonnull

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/filter_value_root_view"
+    android:layout_width="match_parent"
+    android:layout_height="40dp"
+    android:background="@color/black_12"
+    android:gravity="center_vertical"
+    android:paddingRight="10dp"
+    android:paddingEnd="10dp"
+    android:clickable="true"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/filters_value_tv"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black_54"
+        android:layout_marginLeft="56dp"
+        android:layout_marginStart="56dp"
+        android:textSize="12sp"
+        tools:text="4 GB" />
+
+    <CheckBox
+        android:id="@+id/filters_value_checkbox"
+        android:theme="@style/BlueCheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

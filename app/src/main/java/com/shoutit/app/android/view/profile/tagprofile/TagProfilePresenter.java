@@ -21,7 +21,6 @@ import com.shoutit.app.android.api.model.RelatedTagsResponse;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.TagDetail;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ShoutsDao;
@@ -41,12 +40,14 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import okhttp3.ResponseBody;
+import retrofit2.Response;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.functions.Func3;
+import rx.observers.Observers;
 import rx.subjects.PublishSubject;
 
 public class TagProfilePresenter implements ProfilePresenter {
@@ -446,10 +447,22 @@ public class TagProfilePresenter implements ProfilePresenter {
         return moreMenuOptionClickedSubject;
     }
 
+    @Nonnull
+    @Override
+    public Observable<String> getSeeAllShoutsObservable() {
+        return showAllShoutsSubject;
+    }
+
     @Override
     public void refreshProfile() {
         tagsDao.refreshRelatedTags(tagName);
         tagsDao.refreshTag(tagName);
+    }
+
+    @Nonnull
+    @Override
+    public Observer<String> sendReportObserver() {
+        return Observers.empty();
     }
 
     @NonNull

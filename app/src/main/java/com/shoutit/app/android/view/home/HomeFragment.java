@@ -21,12 +21,14 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dagger.FragmentModule;
+import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LayoutManagerHelper;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogFragment;
 import com.shoutit.app.android.view.discover.DiscoverActivity;
 import com.shoutit.app.android.view.main.OnSeeAllDiscoversListener;
+import com.shoutit.app.android.view.postlogininterest.PostLoginInterestActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 
 import java.util.List;
@@ -114,13 +116,7 @@ public class HomeFragment extends BaseFragment {
 
         presenter.getErrorObservable()
                 .compose(this.<Throwable>bindToLifecycle())
-                .subscribe(new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        // TODO handle error
-                        Toast.makeText(context, "Error: " + throwable.getMessage(), Toast.LENGTH_LONG).show();
-                    }
-                });
+                .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(getActivity())));
 
         presenter.getShowAllDiscoversObservable()
                 .compose(this.bindToLifecycle())
@@ -146,6 +142,24 @@ public class HomeFragment extends BaseFragment {
                     @Override
                     public void call(String shoutId) {
                         startActivity(ShoutActivity.newIntent(context, shoutId));
+                    }
+                });
+
+        presenter.getRefreshShoutsObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
+
+        presenter.getLoadMoreObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
+
+        presenter.openInterestsObservable()
+                .compose(bindToLifecycle())
+                .subscribe(new Action1<Object>() {
+                    @Override
+                    public void call(Object o) {
+                        startActivity(PostLoginInterestActivity.newIntent(getActivity()));
+                        getActivity().finish();
                     }
                 });
 

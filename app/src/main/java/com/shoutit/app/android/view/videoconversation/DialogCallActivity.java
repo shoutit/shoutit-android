@@ -3,7 +3,6 @@ package com.shoutit.app.android.view.videoconversation;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -14,8 +13,6 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
-import com.shoutit.app.android.utils.ColoredSnackBar;
-import com.twilio.conversations.IncomingInvite;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

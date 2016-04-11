@@ -60,6 +60,8 @@
     <!-- Shout detail -->
     <dimen name="edit_shout_media_item_size">72dp</dimen>
     <dimen name="edit_shout_media_item_padding">8dp</dimen>
+    <dimen name="chat_received_msg_item_margin_left">58dp</dimen>
+    <dimen name="chat_sent_msg_item_margin_left">52dp</dimen>
 
     <!-- Notifications -->
     <dimen name="notifications_avatar_corners">4dp</dimen>
@@ -67,5 +69,8 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
+    <dimen name="post_login_logo_margin">50dp</dimen>
+    <dimen name="chat_sent_shout_image_width">150dp</dimen>
+    <dimen name="chat_sent_shout_image_height">96dp</dimen>
 
 </resources>

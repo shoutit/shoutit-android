@@ -20,16 +20,19 @@ import com.shoutit.app.android.api.model.CreateShoutResponse;
 import com.shoutit.app.android.api.model.Currency;
 import com.shoutit.app.android.api.model.EditShoutRequest;
 import com.shoutit.app.android.api.model.EditShoutRequestWithPrice;
+import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutResponse;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.UserLocationSimple;
 import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.ResourcesHelper;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
@@ -40,6 +43,8 @@ import rx.functions.Func3;
 import rx.subscriptions.CompositeSubscription;
 
 public class EditShoutPresenter {
+
+    private String shoutType;
 
     public static class RequestData {
 
@@ -59,6 +64,8 @@ public class EditShoutPresenter {
         private final List<String> mImages;
         @NonNull
         private final List<Video> mVideos;
+        @Nonnull
+        private final String mMobile;
 
         public RequestData(@NonNull String title,
                            @NonNull String description,
@@ -67,7 +74,8 @@ public class EditShoutPresenter {
                            @Nullable String categoryId,
                            @Nullable List<Pair<String, String>> optionsIdValue,
                            @NonNull List<String> images,
-                           @NonNull List<Video> videos) {
+                           @NonNull List<Video> videos,
+                           @Nullable String mobile) {
             mTitle = title;
             mDescription = description;
             mBudget = budget;
@@ -76,6 +84,7 @@ public class EditShoutPresenter {
             mOptionsIdValue = optionsIdValue;
             mImages = images;
             mVideos = videos;
+            mMobile = mobile;
         }
     }
 
@@ -99,6 +108,8 @@ public class EditShoutPresenter {
     private final Scheduler mNetworkScheduler;
     private final Scheduler mUiScheduler;
     private final String mShoutId;
+    @NonNull
+    private final ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter;
     private List<Category> mCategories;
     private Listener mListener;
     private UserLocation mUserLocation;
@@ -109,12 +120,14 @@ public class EditShoutPresenter {
                               ApiService apiService,
                               @NetworkScheduler Scheduler networkScheduler,
                               @UiScheduler Scheduler uiScheduler,
-                              @NonNull String shoutId) {
+                              @NonNull String shoutId,
+                              @NonNull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter) {
         mContext = context;
         mApiService = apiService;
         mNetworkScheduler = networkScheduler;
         mUiScheduler = uiScheduler;
         mShoutId = shoutId;
+        this.shoutsGlobalRefreshPresenter = shoutsGlobalRefreshPresenter;
     }
 
     public void registerListener(@NonNull Listener listener) {
@@ -153,12 +166,13 @@ public class EditShoutPresenter {
                             mListener.showCategoriesError();
                         }
 
+                        final ShoutResponse shoutResponse = responseData.mShoutResponse;
                         if (responseData.mCurrencies != null) {
                             currencySuccess(responseData.mCurrencies);
-                            if (responseData.mShoutResponse != null) {
+                            if (shoutResponse != null) {
                                 for (int i = 0; i < responseData.mCurrencies.size(); i++) {
                                     final Currency currency = responseData.mCurrencies.get(i);
-                                    if (currency.getCode().equals(responseData.mShoutResponse.getCurrency())) {
+                                    if (currency.getCode().equals(shoutResponse.getCurrency())) {
                                         mListener.setSelectedCurrency(i);
                                     }
                                 }
@@ -166,19 +180,20 @@ public class EditShoutPresenter {
                         } else {
                             mListener.showCurrenciesError();
                         }
-
-                        if (responseData.mShoutResponse != null) {
-                            mListener.setActionbarTitle(mContext.getString(R.string.edit_shout_title, capitalize(responseData.mShoutResponse.getType())));
-                            mListener.setTitle(responseData.mShoutResponse.getTitle());
+                        if (shoutResponse != null) {
+                            mListener.setActionbarTitle(mContext.getString(R.string.edit_shout_title, capitalize(shoutResponse.getType())));
+                            mListener.setTitle(shoutResponse.getTitle());
                             mListener.setPrice(PriceUtils.formatPrice(
-                                    responseData.mShoutResponse.getPrice(),
+                                    shoutResponse.getPrice(),
                                     mContext.getResources()));
-                            mListener.setDescription(responseData.mShoutResponse.getText());
-                            mUserLocation = responseData.mShoutResponse.getLocation();
+                            mListener.setDescription(shoutResponse.getText());
+                            mUserLocation = shoutResponse.getLocation();
                             mListener.setLocation(
                                     ResourcesHelper.getResourceIdForName(mUserLocation.getCountry(), mContext),
                                     mUserLocation.getCity());
-                            mListener.setMedia(responseData.mShoutResponse.getImages(), responseData.mShoutResponse.getVideos());
+                            mListener.setMobilePhone(shoutResponse.getMobileHint());
+                            mListener.setMedia(shoutResponse.getImages(), shoutResponse.getVideos());
+                            changeCategoryWithSelectedOptions(shoutResponse.getCategory().getSlug(), shoutResponse.getFilters());
                         } else {
                             mListener.showBodyError();
                         }
@@ -227,10 +242,16 @@ public class EditShoutPresenter {
     }
 
     private boolean checkValidity(@NonNull RequestData requestData) {
-        final boolean erroredTitle = requestData.mTitle.length() < 6;
-        mListener.showTitleTooShortError(erroredTitle);
+        final boolean isTitleError;
+        if (Shout.TYPE_OFFER.equals(shoutType)) {
+            isTitleError = requestData.mTitle.length() > 0 && requestData.mTitle.length() < 6;
+        } else {
+            isTitleError = requestData.mTitle.length() < 6;
+        }
 
-        return !erroredTitle;
+        mListener.showTitleTooShortError(isTitleError);
+
+        return !isTitleError;
     }
 
     public void updateLocation(@NonNull UserLocation userLocation) {
@@ -246,7 +267,7 @@ public class EditShoutPresenter {
         changeCategory(id);
     }
 
-    private void changeCategory(@NonNull final String id) {
+    private void changeCategoryWithSelectedOptions(@NonNull final String id, @Nullable List<CategoryFilter> selectedOptions) {
         if (mCategories != null) {
             final Iterable<Category> filters = Iterables.filter(mCategories, new Predicate<Category>() {
                 @Override
@@ -257,10 +278,24 @@ public class EditShoutPresenter {
             });
             final Category category = filters.iterator().next();
 
-
-            mListener.setOptions(category.getFilters());
-            mListener.setCategoryImage(category.getIcon());
+            final List<CategoryFilter> categoryFilters = category.getFilters();
+            if (selectedOptions != null) {
+                for (CategoryFilter selectedOption : selectedOptions) {
+                    for (CategoryFilter categoryFilter : categoryFilters) {
+                        if (categoryFilter.getSlug().equals(selectedOption.getSlug())) {
+                            categoryFilter.setSelectedValue(selectedOption.getSelectedValue());
+                        }
+                    }
+                }
+            } else {
+                mListener.setOptions(categoryFilters);
+            }
+            mListener.setCategory(category);
         }
+    }
+
+    private void changeCategory(@NonNull final String id) {
+        changeCategoryWithSelectedOptions(id, null);
     }
 
     public void onBudgetChanged(String budget) {
@@ -278,7 +313,7 @@ public class EditShoutPresenter {
                         requestData.mDescription,
                         new UserLocationSimple(mUserLocation.getLatitude(), mUserLocation.getLongitude()),
                         requestData.mCategoryId,
-                        getFilters(requestData.mOptionsIdValue), requestData.mImages, requestData.mVideos)) :
+                        getFilters(requestData.mOptionsIdValue), requestData.mImages, requestData.mVideos, requestData.mMobile)) :
                 mApiService.editShout(mShoutId, new EditShoutRequestWithPrice(
                         requestData.mTitle,
                         requestData.mDescription,
@@ -286,7 +321,7 @@ public class EditShoutPresenter {
                         PriceUtils.getPriceInCents(requestData.mBudget),
                         requestData.mCurrencyId,
                         requestData.mCategoryId,
-                        getFilters(requestData.mOptionsIdValue), requestData.mImages, requestData.mVideos));
+                        getFilters(requestData.mOptionsIdValue), requestData.mImages, requestData.mVideos, requestData.mMobile));
 
         pendingSubscriptions.add(observable
                 .subscribeOn(mNetworkScheduler)
@@ -294,6 +329,7 @@ public class EditShoutPresenter {
                 .subscribe(new Action1<CreateShoutResponse>() {
                     @Override
                     public void call(CreateShoutResponse responseBody) {
+                        shoutsGlobalRefreshPresenter.refreshShouts();
                         mListener.hideProgress();
                         mListener.finishActivity();
                     }
@@ -342,11 +378,13 @@ public class EditShoutPresenter {
 
         void setPrice(@NonNull String price);
 
-        void setCategoryImage(@Nullable String image);
+        void setCategory(@Nullable Category category);
 
         void setActionbarTitle(@NonNull String title);
 
         void setMedia(@NonNull List<String> images, @NonNull List<Video> videos);
+
+        void setMobilePhone(@Nullable String mobileHint);
     }
 
 }

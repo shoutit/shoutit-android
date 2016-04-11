@@ -17,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.appunite.appunitegcm.AppuniteGcm;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
@@ -33,9 +34,7 @@ import com.shoutit.app.android.view.discover.OnNewDiscoverSelectedListener;
 import com.shoutit.app.android.view.home.HomeFragment;
 import com.shoutit.app.android.view.intro.IntroActivity;
 import com.shoutit.app.android.view.postlogininterest.PostLoginInterestActivity;
-import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.main.MainSearchActivity;
-import com.shoutit.app.android.view.search.subsearch.SubSearchActivity;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -49,6 +48,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
     private static final String MENU_SELECT_ITEM = "args_menu_item";
     public static final int REQUST_CODE_CAMERA_PERMISSION = 1;
+    public static final int REQUST_CODE_CALL_PHONE_PERMISSION = 2;
 
     public static Intent newIntent(@Nonnull Context context) {
         return new Intent(context, MainActivity.class);
@@ -107,6 +107,12 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
         } else {
             final int selectedItem = savedInstanceState.getInt(MENU_SELECT_ITEM);
             menuHandler.initMenu(drawerLayout, selectedItem);
+        }
+
+
+        if (mUserPreferences.getGcmPushToken() == null) {
+            profilesDao.registerToGcmAction(AppuniteGcm.getInstance()
+                    .getPushToken());
         }
     }
 
@@ -207,8 +213,6 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
             fragment = MenuHandler.getFragmentForTag(fragmentTag);
         }
 
-        fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-
         fragmentManager.beginTransaction()
                 .replace(R.id.activity_main_fragment_container, fragment, fragmentTag)
                 .commit();
@@ -239,7 +243,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == REQUST_CODE_CAMERA_PERMISSION) {
+        if (requestCode == REQUST_CODE_CAMERA_PERMISSION || requestCode == REQUST_CODE_CALL_PHONE_PERMISSION) {
             final boolean permissionsGranted = PermissionHelper.arePermissionsGranted(grantResults);
             if (permissionsGranted) {
                 ColoredSnackBar.success(findViewById(android.R.id.content), R.string.permission_granted, Snackbar.LENGTH_SHORT).show();

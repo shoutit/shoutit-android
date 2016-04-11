@@ -7,10 +7,12 @@
     <string name="shout_type_offer">Offer</string>
     <string name="shout_type_request">Request</string>
     <string name="terms_of_service">Terms of Service</string>
-    <string name="google_api_key" translatable="false">AIzaSyBWHadI_MPYQgDLqI4RXhymEs42YEtgTEE</string>
+    <string name="google_api_key" translatable="false">AIzaSyBWHadI_MPYQgDLqI4RXhymEs42YEtgTEE
+    </string>
     <string name="facebook_app_id">353625811317277</string>
     <string name="exit_text">Press BACK again to exit</string>
     <string name="font_roboto_regular">sans-serif</string>
+    <string name="font_roboto_medium">sans-serif</string>
 
     <!-- Errors -->
     <string name="error_default">Ooops, something went wrong</string>
@@ -21,7 +23,9 @@
     <string name="error_image_upload">Sorry, cannot upload image. Please try again</string>
 
     <!-- Permissions -->
-    <string name="permission_location_explanation">We need your location to prepare appropriate content</string>
+    <string name="permission_location_explanation">We need your location to prepare appropriate
+        content
+    </string>
     <string name="permission_camera_explanation">Permissions needed to get your photos</string>
     <string name="permission_granted">Permissions have been granted</string>
     <string name="permission_not_granted">Permissions not granted</string>
@@ -66,7 +70,7 @@
     <string name="register_email">Email</string>
     <string name="register_password">Password</string>
     <string name="register_login_text">Have an account? Log in</string>
-    <string name="register_empty_mail">Mail cannot be empty.</string>
+    <string name="register_empty_mail">Email cannot be empty.</string>
     <string name="register_empty_password">Password must have at least 6 and no more than 20 characters.</string>
     <string name="register_empty_name">Name cannot be empty</string>
     <string name="register_have_an_account">Have an account?</string>
@@ -81,7 +85,9 @@
 
     <!-- Login Intro -->
     <string name="login_intro_join">Join Now!</string>
-    <string name="login_intro_text">Login and discover what others are\n selling in your neighborhood or start\n selling in seconds</string>
+    <string name="login_intro_text">Login and discover what others are\n selling in your
+        neighborhood or start\n selling in seconds
+    </string>
     <string name="login_intro_facebook">Log in with Facebook</string>
     <string name="login_intro_google">Log in with Google+</string>
     <string name="login_intro_signup">Sign up / Log in with E-mail</string>
@@ -137,9 +143,11 @@
     <string name="post_login_next">next</string>
     <string name="post_login_activity_title">Listen to your Interest!</string>
     <string name="location_fetching_error">Sorry, cannot get locations</string>
-    <string name="location_update_error">Sorry, cannot update your location. Please try again.</string>
+    <string name="location_update_error">Sorry, cannot update your location. Please try again.
+    </string>
     <string name="location_update_success">Location successfully changed</string>
-    <string name="home_no_shouts">No shouts to display</string>
+    <string name="home_no_shouts">No shouts in current location</string>
+    <string name="home_no_shouts_logged_in_user">Nothing in your feed click here to add some interests</string>
 
     <!-- Discover -->
     <string name="discover_shouts_header">Discover shouts</string>
@@ -156,6 +164,10 @@
     <!-- Discover Shouts -->
     <string name="discover_shouts_share">Share</string>
     <string name="discover_shouts_title">%s Shouts</string>
+    <plurals name="shouts_results_pluaral">
+        <item quantity="one">%1$d result</item>
+        <item quantity="other">%1$d results</item>
+    </plurals>
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>
@@ -195,6 +207,7 @@
     <string name="shout_visit_profile">VISIT %1$s\'s PROFILE</string>
     <string name="shout_bottom_bar_delete">Delete</string>
     <string name="shout_bottom_bar_edit">Edit</string>
+    <string name="shout_choose_video_app">Choose application</string>
 
     <!-- Account -->
     <string name="account_email_changed">Email successfully changed</string>
@@ -224,6 +237,8 @@
     <string name="profile_stop_listening_label">Stop Listening</string>
     <string name="profile_report">Report</string>
     <string name="profile_user_shouts">%1$s SHOUTS</string>
+    <string name="profile_report_succes">Successfully reported</string>
+    <string name="profile_not_listening">This useer is not listening to you.</string>
 
     <!-- Request Shout -->
     <string name="request_activity_title">Create Request</string>
@@ -236,7 +251,9 @@
     <string name="request_activity_currency">Currency</string>
     <string name="request_acitvity_currency_error">Failed to load currencies</string>
     <string name="request_acitvity_post_error">Failed to post request</string>
-    <string name="create_request_activity_title_too_short">Title must be at least 6 characters long</string>
+    <string name="create_request_activity_title_too_short">Title must be at least 6 characters
+        long
+    </string>
     <string name="create_request_activity_price_empty">Price cannot be empty</string>
 
     <!-- Edit Shout -->
@@ -320,6 +337,7 @@
     <string name="search_profiles_results">Results</string>
     <string name="search_shout_results_header_title">All Results for \'%1$s\'</string>
     <string name="search_shout_results_header_title_location">All Results for your location</string>
+    <string name="search_shout_results_all_results">All Results</string>
     <string name="search_shouts_results_header_count">%1$d Results</string>
     <string name="search_results_no_results">No results found</string>
 
@@ -338,12 +356,28 @@
     <string name="publish_sub_header">Want to add a price?</string>
     <string name="publish_price_hint">Negotiable</string>
     <string name="publish_done">Done</string>
+    <string name="conversation_title">Chats</string>
+
+    <!-- Chats -->
+    <string name="chat_show_map">Show Map</string>
+    <string name="chat_attatchment">Attatchment</string>
+    <string name="chat_video_call">Video Call</string>
+    <string name="chats_attatchments_photo">Photo</string>
+    <string name="chats_attatchments_video">Video</string>
+    <string name="chats_attatchments_shout">Shout</string>
+    <string name="chats_attatchments_location">Location</string>
 
     <!-- Notifications -->
     <string name="notifications_title">Notifications</string>
     <string name="notifications_menu_mark">Mark all as read</string>
     <string name="notifications_menu_settings">Notifications Settings</string>
     <string name="notifications_listening_to_you">started listening to you</string>
+    <string name="create_request_description">Title</string>
+    <string name="create_request_price">Price</string>
+    <string name="edit_shout_add_pictures_label">Add pictures and videos</string>
+    <string name="option_not_set">Not set</string>
+    <string name="edit_shout_mobile_hint">Mobile</string>
+    <string name="notifications_message_replacement">sends you a message</string>
 
     <!-- Video Calls -->
     <string name="video_calls_no_premissions">Camera and Microphone permissions needed.</string>
@@ -358,5 +392,61 @@
     <string name="video_calls_connecting">Connecting…</string>
     <string name="video_calls_connected">Connected with %s</string>
     <string name="video_calls_participant_disconected">Participant ended conversation</string>
+
+    <string name="no_phone_number_error">Phone number is not currently available.</string>
+    <string name="call_dialog_positive_button">Call</string>
+    <string name="dialog_cancel_button">Cancel</string>
+    <string name="call_dialog_message">"Call %1$s ?"</string>
+    <string name="permission_call_phone_explanation">Permissions needed to start call.</string>
+    <string name="delete_shout_error">Currently, You can not delete this shoutit. Please try again later.</string>
+    <string name="delete_shout_success">Shout was deleted.</string>
+    <string name="send_report_positive_button">Send</string>
+    <string name="report_dialog_hint">Enter report</string>
+    <string name="report_dialog_empty_error">Body cannot be empty</string>
+    <string name="delete_shout_dialog_title">Delete shout</string>
+    <string name="delete_shout_dialog_message">Are You sure?</string>
+    <string name="delete_shout_dialog_button">Delete</string>
+    <string name="report_send_success">Report was send</string>
+
+    <!-- Filters -->
+    <string name="filters_filters">Filters</string>
+    <string name="filters_reset">Reset</string>
+    <string name="filters_done">Done</string>
+    <string name="filters_type_all">All</string>
+    <string name="filters_type_offers">Offers</string>
+    <string name="filters_type_requests">Requests</string>
+    <string name="filters_shout_type">Shout type</string>
+    <string name="filters_ctegory_header">Category</string>
+    <string name="filters_price_from">From</string>
+    <string name="filters_price_to">To</string>
+    <string name="filters_location_header">Location</string>
+    <string name="filters_search_within">Search within:</string>
+    <string name="filters_search_init_distance">"0 KM</string>
+    <string name="filters_default_category_name">All Categories</string>
+    <string name="filters_distance_1KM">1KM</string>
+    <string name="filters_distance_2KM">2KM</string>
+    <string name="filters_distance_3KM">3KM</string>
+    <string name="filters_distance_5KM">5KM</string>
+    <string name="filters_distance_7KM">7KM</string>
+    <string name="filters_distance_10KM">10KM</string>
+    <string name="filters_distance_15KM">15KM</string>
+    <string name="filters_distance_20KM">20KM</string>
+    <string name="filters_distance_30KM">30KM</string>
+    <string name="filters_distance_60KM">60KM</string>
+    <string name="filters_distance_100KM">100KM</string>
+    <string name="filters_distance_200KM">200KM</string>
+    <string name="filters_distance_300KM">300KM</string>
+    <string name="filters_distance_400KM">400KM</string>
+    <string name="filters_distance_500KM">500KM</string>
+    <string name="filters_distance_entire_country">Entire Country</string>
+    <string name="filters_sort_type_header">Sort By:</string>
+    <string name="filters_price_header">Price</string>
+
+    <string name="chat_edit_text_hint">Type a message</string>
+
+    <string name="filters_not_set">Not set</string>
+
+    <string name="select_shout_title">Select Shout</string>
+
 
 </resources>
