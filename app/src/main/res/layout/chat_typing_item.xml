@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+
+    <TextView
+        android:layout_marginLeft="@dimen/chat_received_msg_item_margin_left"
+        android:layout_marginStart="@dimen/chat_received_msg_item_margin_left"
+        android:background="@drawable/chat_other_first_bg"
+        android:paddingEnd="12dp"
+        android:paddingRight="12dp"
+        android:paddingBottom="6dp"
+        android:text="@string/chat_typing"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>

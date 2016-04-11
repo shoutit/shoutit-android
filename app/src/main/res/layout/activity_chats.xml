@@ -153,6 +153,7 @@
     </FrameLayout>
 
     <LinearLayout
+        android:id="@+id/chats_main_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/chats_send_layout"
@@ -167,7 +168,7 @@
             android:elevation="4dp"
             android:gravity="center"
             android:orientation="horizontal"
-            android:visibility="visible">
+            android:visibility="gone">
 
             <ImageView
                 android:id="@+id/chats_shout_image"
@@ -253,6 +254,7 @@
     </LinearLayout>
 
     <ProgressBar
+        android:visibility="gone"
         android:id="@+id/chats_progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

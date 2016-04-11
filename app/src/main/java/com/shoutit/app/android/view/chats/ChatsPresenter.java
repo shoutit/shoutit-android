@@ -10,6 +10,7 @@ import android.text.format.DateUtils;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
+import com.appunite.rx.functions.Functions1;
 import com.appunite.rx.operators.OperatorMergeNextToken;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
@@ -47,6 +48,7 @@ import com.shoutit.app.android.view.chats.message_models.SentLocationMessage;
 import com.shoutit.app.android.view.chats.message_models.SentShoutMessage;
 import com.shoutit.app.android.view.chats.message_models.SentTextMessage;
 import com.shoutit.app.android.view.chats.message_models.SentVideoMessage;
+import com.shoutit.app.android.view.chats.message_models.TypingItem;
 import com.shoutit.app.android.view.media.MediaUtils;
 
 import java.io.File;
@@ -55,6 +57,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -67,6 +70,7 @@ import rx.Subscriber;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
+import rx.functions.Func3;
 import rx.subjects.PublishSubject;
 import rx.subscriptions.CompositeSubscription;
 
@@ -128,6 +132,7 @@ public class ChatsPresenter {
     private CompositeSubscription mSubscribe = new CompositeSubscription();
     private final PublishSubject<Object> requestSubject = PublishSubject.create();
     private final PublishSubject<PusherMessage> newMessagesSubject = PublishSubject.create();
+    private final User mUser;
 
     @Inject
     public ChatsPresenter(@NonNull String conversationId,
@@ -152,12 +157,14 @@ public class ChatsPresenter {
         mGson = gson;
         mAmazonHelper = amazonHelper;
         mIsShoutConversation = isShoutConversation;
+        mUser = mUserPreferences.getUser();
     }
 
     public void register(@NonNull Listener listener) {
         final User user = mUserPreferences.getUser();
         assert user != null;
-        final PresenceChannel userChannel = mPusher.getPusher().getPresenceChannel(String.format("presence-u-%1$s", user.getId()));
+        final PresenceChannel userChannel = mPusher.getPusher().getPresenceChannel(String.format("presence-v3-u-%1$s", user.getId()));
+        final PresenceChannel conversationChannel = mPusher.getPusher().subscribePresence(String.format("presence-v3-c-%1$s", conversationId));
 
         final Observable<PusherMessage> pusherMessageObservable = Observable
                 .create(new Observable.OnSubscribe<PusherMessage>() {
@@ -181,13 +188,28 @@ public class ChatsPresenter {
                 })
                 .observeOn(mUiScheduler);
 
-        userChannel.bind("client-is_typing", new PresenceChannelEventListenerAdapter() {
+        final Observable<Boolean> isTyping = Observable
+                .create(new Observable.OnSubscribe<Boolean>() {
+                    @Override
+                    public void call(final Subscriber<? super Boolean> subscriber) {
+                        conversationChannel.bind("client-is_typing", new PresenceChannelEventListenerAdapter() {
 
-            @Override
-            public void onEvent(String channelName, String eventName, String data) {
-                // TODO
-            }
-        });
+                            @Override
+                            public void onEvent(String channelName, String eventName, String data) {
+                                subscriber.onNext(true);
+                            }
+                        });
+                    }
+                })
+                .switchMap(new Func1<Boolean, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> call(Boolean aBoolean) {
+                        return Observable.timer(3, TimeUnit.SECONDS).map(Functions1.returnFalse())
+                                .startWith(true);
+                    }
+                })
+                .observeOn(mUiScheduler)
+                .startWith(false);
 
         final Observable<MessagesResponse> apiMessages = requestSubject
                 .startWith(new Object())
@@ -208,10 +230,10 @@ public class ChatsPresenter {
 
         mListener = listener;
         mListener.showProgress(true);
-        mSubscribe.add(Observable.combineLatest(apiMessages, localAndPusherMessages.startWith((List<PusherMessage>) null),
-                new Func2<MessagesResponse, List<PusherMessage>, List<BaseAdapterItem>>() {
+        mSubscribe.add(Observable.combineLatest(apiMessages, localAndPusherMessages.startWith((List<PusherMessage>) null), isTyping,
+                new Func3<MessagesResponse, List<PusherMessage>, Boolean, List<BaseAdapterItem>>() {
                     @Override
-                    public List<BaseAdapterItem> call(MessagesResponse messagesResponse, List<PusherMessage> pusherMessage) {
+                    public List<BaseAdapterItem> call(MessagesResponse messagesResponse, List<PusherMessage> pusherMessage, Boolean isTyping) {
                         final ImmutableList.Builder<Message> builder = ImmutableList.<Message>builder()
                                 .addAll(messagesResponse.getResults());
 
@@ -225,7 +247,17 @@ public class ChatsPresenter {
                                         message.getCreatedAt()));
                             }
                         }
-                        return transform(builder.build());
+
+                        final List<BaseAdapterItem> baseAdapterItemList = transform(builder.build());
+
+                        if (isTyping) {
+                            return ImmutableList.<BaseAdapterItem>builder()
+                                    .addAll(baseAdapterItemList)
+                                    .add(new TypingItem())
+                                    .build();
+                        } else {
+                            return baseAdapterItemList;
+                        }
                     }
                 })
                 .subscribe(new Action1<List<BaseAdapterItem>>() {
@@ -258,9 +290,10 @@ public class ChatsPresenter {
                             final String thumbnail = Strings.emptyToNull(about.getThumbnail());
                             final String type = about.getType().equals(Shout.TYPE_OFFER) ? "Offer" : "Request";
                             final String price = PriceUtils.formatPriceWithCurrency(about.getPrice(), mResources, about.getCurrency());
-                            final String authorAndTime = about.getProfile().getName() + " - "  + DateUtils.getRelativeTimeSpanString(mContext, about.getDatePublished() * 1000);
+                            final String authorAndTime = about.getProfile().getName() + " - " + DateUtils.getRelativeTimeSpanString(mContext, about.getDatePublished() * 1000);
+                            final String id = about.getId();
 
-                            mListener.setAboutShoutData(title, thumbnail, type, price, authorAndTime);
+                            mListener.setAboutShoutData(title, thumbnail, type, price, authorAndTime, id);
                         }
                     }, new Action1<Throwable>() {
                         @Override
@@ -440,6 +473,7 @@ public class ChatsPresenter {
     public void unregister() {
         mListener = null;
         mSubscribe.unsubscribe();
+        mPusher.getPusher().unsubscribe(String.format("presence-v3-c-%1$s", conversationId));
     }
 
     public void addMedia(@NonNull String media, boolean isVideo) {
@@ -470,6 +504,7 @@ public class ChatsPresenter {
                         .subscribe(new Action1<Message>() {
                             @Override
                             public void call(Message messagesResponse) {
+                                mListener.hideAttatchentsMenu();
                                 postLocalMessage(messagesResponse);
                                 mListener.showProgress(false);
                             }
@@ -532,6 +567,7 @@ public class ChatsPresenter {
                     @Override
                     public void call(Message message) {
                         postLocalMessage(message);
+                        mListener.hideAttatchentsMenu();
                     }
                 }, new Action1<Throwable>() {
                     @Override
@@ -586,6 +622,7 @@ public class ChatsPresenter {
                     @Override
                     public void call(Message message) {
                         postLocalMessage(message);
+                        mListener.hideAttatchentsMenu();
                     }
                 }, new Action1<Throwable>() {
                     @Override
@@ -593,5 +630,9 @@ public class ChatsPresenter {
                         mListener.error(throwable);
                     }
                 });
+    }
+
+    public void sendTyping() {
+        mPusher.getPusher().getPresenceChannel(String.format("presence-v3-c-%1$s", conversationId)).trigger("client-is_typing", mGson.toJson(mUser));
     }
 }
