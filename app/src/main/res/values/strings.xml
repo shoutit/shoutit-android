@@ -350,6 +350,7 @@
     <string name="camera_header">What are you offering?</string>
     <string name="camera_video">video</string>
     <string name="camera_photo">photo</string>
+    <string name="camera_send">Send</string>
 
     <!-- Media Published -->
     <string name="publish_header">Shout published. Congrats!</string>
