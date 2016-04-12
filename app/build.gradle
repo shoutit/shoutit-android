@@ -126,7 +126,7 @@ android {
         if (variant.buildType.name.equals('release') && variant.getFlavors().get(0).name.equals('dev')) {
             variant.setIgnore(true);
         }
-        if (variant.buildType.name.equals('release') && variant.getFlavors().get(0).name.equals('dev')) {
+        if (variant.buildType.name.equals('debug') && variant.getFlavors().get(0).name.equals('prod')) {
             variant.setIgnore(true);
         }
     }
