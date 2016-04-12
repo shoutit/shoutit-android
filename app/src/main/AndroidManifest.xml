@@ -141,7 +141,6 @@
             android:screenOrientation="portrait"
             android:theme="@style/TranslucentBackground"/>
 
-        <application android:name="VideoConversations"/>
     </application>
 
 

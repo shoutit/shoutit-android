@@ -2,6 +2,7 @@ package com.shoutit.app.android;
 
 import android.app.Application;
 import android.support.multidex.MultiDex;
+import android.support.multidex.MultiDexApplication;
 import android.util.Log;
 
 import com.appunite.appunitegcm.AppuniteGcm;
@@ -29,7 +30,7 @@ import com.shoutit.app.android.dagger.DaggerAppComponent;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.PusherHelper;
-import com.shoutit.app.android.view.videoconversation.VideoConversationPresenter;
+import com.shoutit.app.android.view.videoconversation.VideoConversationManager;
 import com.uservoice.uservoicesdk.Config;
 import com.uservoice.uservoicesdk.UserVoice;
 
@@ -46,7 +47,7 @@ import rx.plugins.RxJavaErrorHandler;
 import rx.plugins.RxJavaPlugins;
 
 
-public class App extends VideoConversationsApplication {
+public class App extends MultiDexApplication {
 
     private static final String TAG = App.class.getSimpleName();
 
@@ -79,9 +80,9 @@ public class App extends VideoConversationsApplication {
     @Inject
     PusherHelper mPusherHelper;
     @Inject
-    VideoConversationPresenter presenter;
-    @Inject
     NetworkObservableProvider mNetworkObservableProvider;
+    @Inject
+    VideoConversationManager videoConversationManager;
 
 
     @Override
@@ -106,7 +107,7 @@ public class App extends VideoConversationsApplication {
         initPusher();
 
         if (userPreferences.isNormalUser()) {
-            initializeVideoConversations();
+            videoConversationManager.initializeVideoConversations();
         }
     }
 

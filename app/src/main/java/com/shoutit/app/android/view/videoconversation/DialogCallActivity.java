@@ -11,7 +11,6 @@ import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
-import com.shoutit.app.android.VideoConversationsApplication;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 
@@ -38,6 +37,8 @@ public class DialogCallActivity extends BaseActivity {
 
     @Inject
     UserPreferences preferences;
+    @Inject
+    VideoConversationManager videoConversationManager;
 
     public static Intent newIntent(@Nonnull final String callerName, @Nonnull final Context context) {
         return new Intent(context, DialogCallActivity.class).putExtra(CALLER_NAME, callerName);
@@ -65,7 +66,7 @@ public class DialogCallActivity extends BaseActivity {
                 .subscribe(new Action1<Void>() {
                     @Override
                     public void call(Void aVoid) {
-                        ((App) getApplication()).getInvite().reject();
+                        videoConversationManager.getInvite().reject();
                         finish();
                     }
                 });
@@ -74,7 +75,7 @@ public class DialogCallActivity extends BaseActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        ((App) getApplication()).getInvite().reject();
+        videoConversationManager.getInvite().reject();
     }
 
     @Nonnull

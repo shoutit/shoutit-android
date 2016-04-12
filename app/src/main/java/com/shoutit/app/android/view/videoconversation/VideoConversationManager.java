@@ -1,11 +1,11 @@
-package com.shoutit.app.android;
+package com.shoutit.app.android.view.videoconversation;
 
+import android.content.Context;
 import android.content.Intent;
-import android.support.multidex.MultiDexApplication;
 import android.widget.Toast;
 
-import com.shoutit.app.android.view.videoconversation.DialogCallActivity;
-import com.shoutit.app.android.view.videoconversation.VideoConversationPresenter;
+import com.shoutit.app.android.dagger.ForApplication;
+import com.shoutit.app.android.utils.LogHelper;
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.common.TwilioAccessManagerFactory;
 import com.twilio.common.TwilioAccessManagerListener;
@@ -17,26 +17,26 @@ import com.twilio.conversations.TwilioConversations;
 import com.twilio.conversations.TwilioConversationsException;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
 
 import rx.functions.Action1;
 
-public class VideoConversationsApplication extends MultiDexApplication{
+public class VideoConversationManager {
+    private static final String TAG = VideoConversationManager.class.getSimpleName();
 
     private TwilioAccessManager accessManager;
     private ConversationsClient conversationsClient;
     private IncomingInvite invite;
+    private final VideoConversationPresenter presenter;
+    @Nonnull
+    private final Context context;
 
-    @Inject
-    VideoConversationPresenter presenter;
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
+    public VideoConversationManager(@Nonnull VideoConversationPresenter presenter,
+                                    @Nonnull @ForApplication Context context) {
+        this.presenter = presenter;
+        this.context = context;
     }
 
-
-    protected void initializeVideoConversations(){
+    public void initializeVideoConversations(){
         presenter.getTwilioRequirementObservable()
                 .subscribe(new Action1<String>() {
                     @Override
@@ -50,7 +50,7 @@ public class VideoConversationsApplication extends MultiDexApplication{
         TwilioConversations.setLogLevel(TwilioConversations.LogLevel.DEBUG);
 
         if (!TwilioConversations.isInitialized()) {
-            TwilioConversations.initialize(this, new TwilioConversations.InitListener() {
+            TwilioConversations.initialize(context, new TwilioConversations.InitListener() {
                 @Override
                 public void onInitialized() {
                     accessManager = TwilioAccessManagerFactory.createAccessManager(apiKey, accessManagerListener());
@@ -60,7 +60,7 @@ public class VideoConversationsApplication extends MultiDexApplication{
                 }
                 @Override
                 public void onError(Exception e) {
-                    Toast.makeText(getApplicationContext(), "Failed to initialize the Twilio Conversations SDK", Toast.LENGTH_LONG).show();
+                    LogHelper.logThrowableAndCrashlytics(TAG, "Failed to initialize the Twilio Conversations SDK with error: ", e);
                 }
             });
         }
@@ -116,9 +116,9 @@ public class VideoConversationsApplication extends MultiDexApplication{
                         .subscribe(new Action1<String>() {
                             @Override
                             public void call(String callerName) {
-                                Intent intent = DialogCallActivity.newIntent(callerName, getApplicationContext());
+                                Intent intent = DialogCallActivity.newIntent(callerName, context);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(intent);
+                                context.startActivity(intent);
                             }
                         });
             }

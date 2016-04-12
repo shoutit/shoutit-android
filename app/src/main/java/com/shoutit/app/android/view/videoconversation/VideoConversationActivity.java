@@ -109,6 +109,8 @@ public class VideoConversationActivity extends BaseActivity {
     VideoConversationPresenter presenter;
     @Inject
     UserPreferences preferences;
+    @Inject
+    VideoConversationManager videoConversationManager;
 
     private String shoutOnwerId;
     private String caller;
@@ -223,9 +225,9 @@ public class VideoConversationActivity extends BaseActivity {
 
     private void makeOutgoingCall() {
 
-        callButton.setVisibility(View.GONE);
-
         if (shoutOnwerId != null && conversationClient != null) {
+            callButton.setVisibility(View.GONE);
+
             stopPreview();
 
             Set<String> participants = new HashSet<>();
@@ -245,6 +247,8 @@ public class VideoConversationActivity extends BaseActivity {
                                 }
                             }
                     });
+        } else {
+            ColoredSnackBar.error(ColoredSnackBar.contentView(this), R.string.video_calls_cannot_start_conversation, Snackbar.LENGTH_SHORT).show();
         }
     }
 
@@ -358,8 +362,8 @@ public class VideoConversationActivity extends BaseActivity {
         final Intent intent = getIntent();
         shoutOnwerId = intent.getStringExtra(ARGS_USERNAME);
         caller = intent.getStringExtra(ARGS_CALLER);
-        conversationClient = ((App) getApplicationContext()).getConversationsClient();
-        invite = ((App) getApplicationContext()).getInvite();
+        conversationClient = videoConversationManager.getConversationsClient();
+        invite = videoConversationManager.getInvite();
         cameraManager = (CameraManager) getApplicationContext().getSystemService(CAMERA_SERVICE);
     }
 
