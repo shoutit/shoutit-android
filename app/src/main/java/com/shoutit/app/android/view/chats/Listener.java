@@ -29,4 +29,8 @@ public interface Listener {
     void onShoutClicked(String shoutId);
 
     void hideAttatchentsMenu();
+
+    void setShoutToolbarInfo(String title, String chatWithString);
+
+    void setChatToolbatInfo(String chatWithString);
 }

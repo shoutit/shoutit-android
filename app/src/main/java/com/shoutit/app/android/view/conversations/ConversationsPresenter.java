@@ -246,7 +246,7 @@ public class ConversationsPresenter {
 
         final String message = getMessageString(lastMessage);
         final String elapsedTime = DateUtils.getRelativeTimeSpanString(mContext, lastMessage.getCreatedAt() * 1000).toString();
-        final String chatWith = getChatWithString(profiles);
+        final String chatWith = ConversationsUtils.getChatWithString(profiles);
         final String image = getImage(profiles);
 
         if (Conversation.ABOUT_SHOUT_TYPE.equals(input.getType())) {
@@ -260,25 +260,6 @@ public class ConversationsPresenter {
 
     private String getImage(List<ConversationProfile> profiles) {
         return profiles.get(0).getImage();
-    }
-
-    private String getChatWithString(List<ConversationProfile> profiles) {
-        String chatWith;
-        if (profiles.size() == 2) {
-            final ConversationProfile conversationProfile = profiles.get(0);
-            chatWith = conversationProfile.getUsername();
-        } else {
-            final StringBuilder nameBuilder = new StringBuilder();
-            for (final ConversationProfile profile : profiles) {
-                if (profile.getType().equals(ConversationProfile.TYPE_USER)) {
-                    nameBuilder.append(profile.getFirstName());
-                } else {
-                    nameBuilder.append(profile.getUsername());
-                }
-            }
-            chatWith = nameBuilder.toString();
-        }
-        return chatWith;
     }
 
     private String getMessageString(Message lastMessage) {

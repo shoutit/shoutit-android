@@ -50,6 +50,7 @@ import com.shoutit.app.android.view.chats.message_models.SentShoutMessage;
 import com.shoutit.app.android.view.chats.message_models.SentTextMessage;
 import com.shoutit.app.android.view.chats.message_models.SentVideoMessage;
 import com.shoutit.app.android.view.chats.message_models.TypingItem;
+import com.shoutit.app.android.view.conversations.ConversationsUtils;
 import com.shoutit.app.android.view.media.MediaUtils;
 
 import java.io.File;
@@ -264,19 +265,47 @@ public class ChatsFirstConversationPresenter {
                             final String thumbnail = Strings.emptyToNull(about.getThumbnail());
                             final String type = about.getType().equals(Shout.TYPE_OFFER) ? "Offer" : "Request";
                             final String price = PriceUtils.formatPriceWithCurrency(about.getPrice(), mResources, about.getCurrency());
-                            final String authorAndTime = about.getProfile().getName() + " - " + DateUtils.getRelativeTimeSpanString(mContext, about.getDatePublishedInMillis());
+                            final User profile = about.getProfile();
+                            final String authorAndTime = profile.getName() + " - " + DateUtils.getRelativeTimeSpanString(mContext, about.getDatePublishedInMillis());
                             final String id = about.getId();
 
                             mListener.setAboutShoutData(title, thumbnail, type, price, authorAndTime, id);
+                            mListener.setShoutToolbarInfo(title, ConversationsUtils.getChatWithString(
+                                    ImmutableList.of(new ConversationProfile(
+                                            profile.getId(),
+                                            profile.getFirstName(),
+                                            profile.getUsername(),
+                                            profile.getType(),
+                                            profile.getImage()))));
                         }
-                    }, new Action1<Throwable>() {
+                    }, getOnError()));
+        } else {
+            mSubscribe.add(mApiService.getUser(mIdForCreation)
+                    .subscribeOn(mNetworkScheduler)
+                    .observeOn(mUiScheduler)
+                    .subscribe(new Action1<User>() {
                         @Override
-                        public void call(Throwable throwable) {
-                            mListener.error(throwable);
+                        public void call(User user) {
+                            mListener.setChatToolbatInfo(ConversationsUtils.getChatWithString(
+                                    ImmutableList.of(new ConversationProfile(
+                                            user.getId(),
+                                            user.getFirstName(),
+                                            user.getUsername(),
+                                            user.getType(),
+                                            user.getImage()))));
                         }
-                    }));
+                    }, getOnError()));
         }
+    }
 
+    @NonNull
+    private Action1<Throwable> getOnError() {
+        return new Action1<Throwable>() {
+            @Override
+            public void call(Throwable throwable) {
+                mListener.error(throwable);
+            }
+        };
     }
 
     @NonNull
@@ -341,12 +370,7 @@ public class ChatsFirstConversationPresenter {
                     public void call(Message messagesResponse) {
                         postLocalMessage(messagesResponse);
                     }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        mListener.error(throwable);
-                    }
-                });
+                }, getOnError());
         ;
     }
 
@@ -565,12 +589,7 @@ public class ChatsFirstConversationPresenter {
                         postLocalMessage(message);
                         mListener.hideAttatchentsMenu();
                     }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        mListener.error(throwable);
-                    }
-                });
+                }, getOnError());
     }
 
     public void deleteShout() {
@@ -585,12 +604,7 @@ public class ChatsFirstConversationPresenter {
                         public void call(ResponseBody responseBody) {
                             mListener.conversationDeleted();
                         }
-                    }, new Action1<Throwable>() {
-                        @Override
-                        public void call(Throwable throwable) {
-                            mListener.error(throwable);
-                        }
-                    });
+                    }, getOnError());
         }
     }
 
@@ -623,17 +637,12 @@ public class ChatsFirstConversationPresenter {
                         postLocalMessage(message);
                         mListener.hideAttatchentsMenu();
                     }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        mListener.error(throwable);
-                    }
-                });
+                }, getOnError());
     }
 
     public void sendTyping() {
         final PresenceChannel presenceChannel = mPusher.getPusher().getPresenceChannel(String.format("presence-v3-c-%1$s", conversationId));
-        if(presenceChannel != null) {
+        if (presenceChannel != null) {
             presenceChannel.trigger("client-is_typing", mGson.toJson(mUser));
         }
     }

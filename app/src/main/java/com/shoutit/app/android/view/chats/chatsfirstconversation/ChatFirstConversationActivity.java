@@ -282,6 +282,17 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
     }
 
     @Override
+    public void setShoutToolbarInfo(String title, String chatWithString) {
+        mChatsToolbar.setTitle(title);
+        mChatsToolbar.setSubtitle(chatWithString);
+    }
+
+    @Override
+    public void setChatToolbatInfo(String chatWithString) {
+        mChatsToolbar.setTitle(chatWithString);
+    }
+
+    @Override
     protected void onDestroy() {
         presenter.unregister();
         super.onDestroy();
