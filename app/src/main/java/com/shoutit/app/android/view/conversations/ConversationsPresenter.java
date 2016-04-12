@@ -13,6 +13,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.pusher.client.channel.PresenceChannel;
@@ -30,6 +31,9 @@ import com.shoutit.app.android.utils.PusherHelper;
 import com.shoutit.app.android.view.chats.PresenceChannelEventListenerAdapter;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -116,7 +120,7 @@ public class ConversationsPresenter {
     public void register(@NonNull final Listener listener) {
         final User user = mUserPreferences.getUser();
         assert user != null;
-        final PresenceChannel userChannel = mPusherHelper.getPusher().getPresenceChannel(String.format("presence-u-%1$s", user.getId()));
+        final PresenceChannel userChannel = mPusherHelper.getPusher().getPresenceChannel(String.format("presence-v3-u-%1$s", user.getId()));
 
         final Observable<HashMap<String, Conversation>> mapObservable = Observable
                 .create(new Observable.OnSubscribe<PusherMessage>() {
@@ -204,16 +208,24 @@ public class ConversationsPresenter {
                         if (conversations.isEmpty()) {
                             mListener.emptyList();
                         } else {
-                            final ImmutableList<BaseAdapterItem> items = ImmutableList.copyOf(Iterables.transform(
-                                    conversations,
-                                    new Function<Conversation, BaseAdapterItem>() {
-                                        @Nullable
-                                        @Override
-                                        public BaseAdapterItem apply(@Nullable Conversation input) {
-                                            assert input != null;
-                                            return getConversationItem(input);
-                                        }
-                                    }));
+                            final List<Conversation> list = Lists.newArrayList(conversations);
+                            Collections.sort(list, new Comparator<Conversation>() {
+                                @Override
+                                public int compare(Conversation lhs, Conversation rhs) {
+                                    return lhs.getLastMessage().getCreatedAt() >= rhs.getLastMessage().getCreatedAt() ? -1 : 1 ;
+                                }
+                            });
+                            final ImmutableList<BaseAdapterItem> items = ImmutableList.copyOf(
+                                    Iterables.transform(
+                                            list,
+                                            new Function<Conversation, BaseAdapterItem>() {
+                                                @Nullable
+                                                @Override
+                                                public BaseAdapterItem apply(@Nullable Conversation input) {
+                                                    assert input != null;
+                                                    return getConversationItem(input);
+                                                }
+                                            }));
 
                             mListener.setData(items);
                         }
@@ -234,7 +246,7 @@ public class ConversationsPresenter {
 
         final String message = getMessageString(lastMessage);
         final String elapsedTime = DateUtils.getRelativeTimeSpanString(mContext, lastMessage.getCreatedAt() * 1000).toString();
-        final String chatWith = getChatWithString(profiles);
+        final String chatWith = ConversationsUtils.getChatWithString(profiles);
         final String image = getImage(profiles);
 
         if (Conversation.ABOUT_SHOUT_TYPE.equals(input.getType())) {
@@ -248,25 +260,6 @@ public class ConversationsPresenter {
 
     private String getImage(List<ConversationProfile> profiles) {
         return profiles.get(0).getImage();
-    }
-
-    private String getChatWithString(List<ConversationProfile> profiles) {
-        String chatWith;
-        if (profiles.size() == 2) {
-            final ConversationProfile conversationProfile = profiles.get(0);
-            chatWith = conversationProfile.getUsername();
-        } else {
-            final StringBuilder nameBuilder = new StringBuilder();
-            for (final ConversationProfile profile : profiles) {
-                if (profile.getType().equals(ConversationProfile.TYPE_USER)) {
-                    nameBuilder.append(profile.getFirstName());
-                } else {
-                    nameBuilder.append(profile.getUsername());
-                }
-            }
-            chatWith = nameBuilder.toString();
-        }
-        return chatWith;
     }
 
     private String getMessageString(Message lastMessage) {

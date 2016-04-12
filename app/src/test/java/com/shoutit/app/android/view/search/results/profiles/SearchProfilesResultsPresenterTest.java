@@ -141,6 +141,6 @@ public class SearchProfilesResultsPresenterTest {
     private SearchProfileResponse getSearchResponse() {
         return new SearchProfileResponse(1, "l", "z", Lists.newArrayList(
                 new User("1", null, null, null, "username", null, null, null, false, null, null,
-                        false, false, false, null, 1, null, null, null, 1, null, false, null, null, null, null)));
+                        false, false, false, null, 1, null, null, null, 1, null, false, null, null, null, null, null)));
     }
 }

@@ -111,6 +111,7 @@
         <activity android:name=".view.videoconversation.VideoConversationActivity"
             android:screenOrientation="portrait"/>
         <activity android:name=".view.gallery.GalleryActivity"/>
+        <activity android:name=".view.verifyemail.VerifyEmailActivity"/>
 
         <!-- Facebook -->
         <meta-data

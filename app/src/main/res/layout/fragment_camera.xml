@@ -66,7 +66,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="16dp"
-                android:text="@string/camera_header"
+                tools:text="@string/camera_header"
                 android:textColor="@android:color/white"/>
 
             <TextView
@@ -195,7 +195,7 @@
                 android:layout_marginStart="40dp"
                 android:background="?selectableItemBackground"
                 android:fontFamily="sans-serif"
-                android:text="@string/camera_publish"
+                tools:text="@string/camera_publish"
                 android:textAllCaps="true"
                 android:textColor="@android:color/white"/>
 

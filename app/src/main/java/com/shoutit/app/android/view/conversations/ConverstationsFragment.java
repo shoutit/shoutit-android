@@ -131,7 +131,6 @@ public class ConverstationsFragment extends BaseFragment implements Conversation
             item.setVisible(false);
             mItems.add(item);
         }
-        inflater.inflate(R.menu.conversations_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 

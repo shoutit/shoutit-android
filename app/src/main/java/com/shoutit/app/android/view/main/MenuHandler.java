@@ -38,6 +38,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -201,6 +202,10 @@ public class MenuHandler {
 
     private void showLoginActivity() {
         rxActivity.startActivity(LoginIntroActivity.newIntent(rxActivity));
+    }
+
+    public void selectChats() {
+        selectItem(R.id.menu_chat);
     }
 
     private void selectItem(@IdRes int id) {

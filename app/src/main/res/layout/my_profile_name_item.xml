@@ -5,13 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@android:color/white"
-    android:paddingLeft="80dp"
-    android:paddingStart="80dp"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingLeft="80dp"
+        android:paddingStart="80dp"
         android:orientation="horizontal">
 
         <TextView
@@ -61,8 +61,27 @@
         android:id="@+id/profile_user_nick"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingLeft="80dp"
+        android:paddingStart="80dp"
         android:textColor="@color/black_54"
         android:textSize="12sp"
         tools:text="Doris90" />
+
+    <TextView
+        android:id="@+id/profile_verify_account"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:textAllCaps="true"
+        android:layout_marginTop="14dp"
+        android:gravity="center"
+        android:background="@drawable/selector_verify_account"
+        android:textColor="@color/profile_verify"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="14sp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:text="@string/profile_verify_account"/>
 
 </LinearLayout>

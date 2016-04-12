@@ -1,6 +1,7 @@
 package com.shoutit.app.android;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.multidex.MultiDex;
@@ -170,7 +171,7 @@ public class App extends MultiDexApplication {
         mPusherHelper.init(token);
         final Pusher pusher = mPusherHelper.getPusher();
         pusher.connect(mEventListener);
-        pusher.subscribePresence(String.format("presence-u-%1$s", user.getId()));
+        pusher.subscribePresence(String.format("presence-v3-u-%1$s", user.getId()));
 
         mNetworkObservableProvider.networkObservable()
                 .filter(new Func1<NetworkObservableProvider.NetworkStatus, Boolean>() {

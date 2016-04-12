@@ -160,18 +160,17 @@ public class FiltersPresenter {
                 })
                 .compose(ObservableExtensions.<HashMap<String, Category>>behaviorRefCount());
 
-        final Observable<Category> initCategoryObservable = Observable.just(searchType)
-                .withLatestFrom(successCategoriesObservable,
-                        new Func2<SearchPresenter.SearchType, HashMap<String, Category>, Category>() {
-                            @Override
-                            public Category call(SearchPresenter.SearchType searchType, HashMap<String, Category> categoriesMap) {
-                                if (shouldBlockCategories()) {
-                                    return categoriesMap.get(initCategorySlug);
-                                } else {
-                                    return getDefaultCategory();
-                                }
-                            }
-                        });
+        final Observable<Category> initCategoryObservable = successCategoriesObservable
+                .map(new Func1<HashMap<String, Category>, Category>() {
+                    @Override
+                    public Category call(HashMap<String, Category> categoriesMap) {
+                        if (shouldBlockCategories()) {
+                            return categoriesMap.get(initCategorySlug);
+                        } else {
+                            return getDefaultCategory();
+                        }
+                    }
+                });
 
         final Observable<Category> selectedCategoryObservable = selectedCategorySubject
                 .withLatestFrom(successCategoriesObservable,
@@ -261,7 +260,7 @@ public class FiltersPresenter {
                 successSortTypes.take(1),
                 shoutTypeObservable,
                 sortTypeObservable.take(1),
-                selectedCategoryObservable.startWith((Category) null),
+                selectedCategoryObservable,
                 locationObservable,
                 filterAdapterItems.startWith(ImmutableList.<BaseAdapterItem>of()),
                 new Func7<Map<String, Category>, List<SortType>, String, SortType, Category, UserLocation, List<BaseAdapterItem>, List<BaseAdapterItem>>() {

@@ -24,7 +24,13 @@ public interface Listener {
 
     void conversationDeleted();
 
-    void setAboutShoutData(String title, String thumbnail, String type, String price, String authorAndTime);
+    void setAboutShoutData(String title, String thumbnail, String type, String price, String authorAndTime, String id);
 
     void onShoutClicked(String shoutId);
+
+    void hideAttatchentsMenu();
+
+    void setShoutToolbarInfo(String title, String chatWithString);
+
+    void setChatToolbatInfo(String chatWithString);
 }
