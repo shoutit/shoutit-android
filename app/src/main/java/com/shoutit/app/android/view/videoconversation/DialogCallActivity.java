@@ -13,6 +13,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.twilio.Twilio;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -37,6 +38,8 @@ public class DialogCallActivity extends BaseActivity {
 
     @Inject
     UserPreferences preferences;
+    @Inject
+    Twilio mTwilio;
 
     public static Intent newIntent(@Nonnull final String callerName, @Nonnull final Context context) {
         return new Intent(context, DialogCallActivity.class).putExtra(CALLER_NAME, callerName);
@@ -55,7 +58,7 @@ public class DialogCallActivity extends BaseActivity {
                 .subscribe(new Action1<Void>() {
                     @Override
                     public void call(Void aVoid) {
-                        startActivity(VideoConversationActivity.newIntent(callerName ,null, DialogCallActivity.this));
+                        startActivity(VideoConversationActivity.newIntent(callerName, null, DialogCallActivity.this));
                         finish();
                     }
                 });
@@ -64,7 +67,7 @@ public class DialogCallActivity extends BaseActivity {
                 .subscribe(new Action1<Void>() {
                     @Override
                     public void call(Void aVoid) {
-                        ((App) getApplication()).getInvite().reject();
+                        mTwilio.getInvite().reject();
                         finish();
                     }
                 });

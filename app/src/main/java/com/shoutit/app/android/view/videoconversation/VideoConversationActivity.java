@@ -30,6 +30,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.VersionUtils;
@@ -103,9 +104,9 @@ public class VideoConversationActivity extends BaseActivity {
     TextView conversationInfo;
 
     @Inject
-    VideoConversationPresenter presenter;
-    @Inject
     UserPreferences preferences;
+    @Inject
+    Twilio mTwilio;
 
     private String callTaker;
     private String caller;
@@ -361,8 +362,8 @@ public class VideoConversationActivity extends BaseActivity {
         final Intent intent = getIntent();
         callTaker = intent.getStringExtra(ARGS_ID);
         caller = intent.getStringExtra(ARGS_CALLER);
-        conversationClient = ((App) getApplication()).getConversationsClient();
-        invite = ((App) getApplication()).getInvite();
+        conversationClient = mTwilio.getConversationsClient();
+        invite = mTwilio.getInvite();
         cameraManager = (CameraManager) getApplicationContext().getSystemService(CAMERA_SERVICE);
     }
 
@@ -479,7 +480,7 @@ public class VideoConversationActivity extends BaseActivity {
             outgoingInvite = null;
         }
         cameraCapturer.stopPreview();
-        ((App) getApplication()).getConversationsClient().listen();
+        conversationClient.listen();
     }
 
     @Nonnull
