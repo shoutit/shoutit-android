@@ -21,6 +21,7 @@ import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.dao.SortTypesDao;
 import com.shoutit.app.android.dao.SuggestionsDao;
 import com.shoutit.app.android.dao.TagsDao;
+import com.shoutit.app.android.dao.VideoCallsDao;
 import com.shoutit.app.android.db.DbHelper;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.utils.PusherHelper;
@@ -91,4 +92,6 @@ public interface AppComponent {
     DbHelper dbHelper();
 
     PusherHelper pusher();
+
+    VideoCallsDao videoCallsDao();
 }
