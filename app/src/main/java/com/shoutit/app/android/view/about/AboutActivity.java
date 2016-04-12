@@ -33,7 +33,7 @@ public class AboutActivity extends AppCompatActivity {
         setUpActionBar();
 
         if (savedInstanceState == null) {
-            getFragmentManager()
+            getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.activity_about_root_view, AboutFragment.newInstance())
                     .commit();
