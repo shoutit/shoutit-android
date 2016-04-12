@@ -20,6 +20,7 @@ import com.shoutit.app.android.view.chats.message_models.SentLocationMessage;
 import com.shoutit.app.android.view.chats.message_models.SentShoutMessage;
 import com.shoutit.app.android.view.chats.message_models.SentTextMessage;
 import com.shoutit.app.android.view.chats.message_models.SentVideoMessage;
+import com.shoutit.app.android.view.chats.message_models.TypingItem;
 import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;
@@ -39,6 +40,7 @@ public class ChatsAdapter extends BaseAdapter {
     private static final int SENT_VIDEO = 9;
     private static final int SENT_SHOUT = 10;
     private static final int INFO_ITEM = 11;
+    private static final int TYPING_ITEM = 12;
 
     @NonNull
     private final Picasso mPicasso;
@@ -75,7 +77,9 @@ public class ChatsAdapter extends BaseAdapter {
             case SENT_VIDEO:
                 return SentVideoMessageHolder.create(layoutInflater.inflate(SentVideoMessageHolder.getLayoutRes(), parent, false), mPicasso);
             case INFO_ITEM:
-                return InformationItemHolder.create(layoutInflater.inflate(SentVideoMessageHolder.getLayoutRes(), parent, false));
+                return InformationItemHolder.create(layoutInflater.inflate(InformationItemHolder.getLayoutRes(), parent, false));
+            case TYPING_ITEM:
+                return TypingItemHolder.create(layoutInflater.inflate(TypingItemHolder.getLayoutRes(), parent, false));
             default:
                 throw new RuntimeException();
         }
@@ -114,6 +118,8 @@ public class ChatsAdapter extends BaseAdapter {
             return SENT_SHOUT;
         } else if (baseAdapterItem instanceof InfoItem) {
             return INFO_ITEM;
+        } else if (baseAdapterItem instanceof TypingItem) {
+            return TYPING_ITEM;
         } else {
             throw new RuntimeException();
         }

@@ -69,6 +69,7 @@ import static com.appunite.rx.internal.Preconditions.checkNotNull;
 public class ShoutActivity extends BaseActivity {
 
     private static final String KEY_SHOUT_ID = "shout_id";
+    private static final int EDIT_SHOUT_REQUEST_CODE = 3001;
 
     @Bind(R.id.shout_toolbar)
     Toolbar toolbar;
@@ -382,26 +383,37 @@ public class ShoutActivity extends BaseActivity {
             public void call(final ShoutPresenter.BottomBarData bottomBarData) {
                 final boolean isUserShoutOwner = bottomBarData.isUserShoutOwner();
 
-                ImageHelper.setStartCompoundRelativeDrawable(showMoreIcon,
-                        isUserShoutOwner ? R.drawable.ic_more_disabled : R.drawable.ic_more_white);
+                if (isUserShoutOwner) {
+                    callOrDeleteTextView.setEnabled(true);
+                    callOrDeleteTextView.setAlpha(1f);
+                    callOrDeleteTextView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_delete_red, 0, 0, 0);
+                    callOrDeleteTextView.setText(R.string.shout_bottom_bar_delete);
 
-                if (!isUserShoutOwner) {
+                    chatOrChatsTextView.setText(R.string.shout_bottom_bar_chats);
+
+                    ImageHelper.setStartCompoundRelativeDrawable(showMoreIcon, R.drawable.ic_more_disabled);
+
+                    videoCallOrEditTextView.setCompoundDrawablesWithIntrinsicBounds(
+                            R.drawable.ic_edit_red, 0, 0, 0);
+                    videoCallOrEditTextView.setText(R.string.shout_bottom_bar_edit);
+                    showMoreIcon.setVisibility(View.GONE);
+                } else {
+                    callOrDeleteTextView.setText(R.string.shout_bottom_bar_call);
+                    callOrDeleteTextView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_call_green, 0, 0, 0);
+
+                    chatOrChatsTextView.setText(R.string.shout_bottom_bar_chat);
                     showMoreIcon.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             popupMenu.show();
                         }
                     });
-                }
 
-                callOrDeleteTextView.setCompoundDrawablesWithIntrinsicBounds(
-                        isUserShoutOwner ? R.drawable.ic_delete_red : R.drawable.ic_call_green, 0, 0, 0);
-                callOrDeleteTextView.setText(isUserShoutOwner ?
-                        R.string.shout_bottom_bar_delete : R.string.shout_bottom_bar_call);
+                    videoCallOrEditTextView.setCompoundDrawablesWithIntrinsicBounds(
+                            R.drawable.ic_video_chat_red, 0, 0, 0);
+                    videoCallOrEditTextView.setText(R.string.shout_bottom_bar_video_call);
 
-                if (isUserShoutOwner) {
-                    callOrDeleteTextView.setEnabled(true);
-                    callOrDeleteTextView.setAlpha(1f);
+                    ImageHelper.setStartCompoundRelativeDrawable(showMoreIcon, R.drawable.ic_more_white);
                 }
 
                 videoCallOrEditTextView.setCompoundDrawablesWithIntrinsicBounds(
@@ -409,8 +421,6 @@ public class ShoutActivity extends BaseActivity {
                 videoCallOrEditTextView.setText(isUserShoutOwner ?
                         R.string.shout_bottom_bar_edit : R.string.shout_bottom_bar_video_call);
 
-                chatOrChatsTextView.setText(isUserShoutOwner ?
-                        R.string.shout_bottom_bar_chats : R.string.shout_bottom_bar_chat);
                 chatOrChatsTextView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -509,6 +519,7 @@ public class ShoutActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
+                setResult(RESULT_OK);
                 finish();
                 return true;
             case R.id.shouts_search:
@@ -517,6 +528,20 @@ public class ShoutActivity extends BaseActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        setResult(RESULT_OK);
+        super.onBackPressed();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == EDIT_SHOUT_REQUEST_CODE && resultCode == RESULT_OK) {
+            presenter.refreshShoutsObserver().onNext(null);
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Nonnull

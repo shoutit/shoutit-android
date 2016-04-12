@@ -12,7 +12,9 @@ import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.appunite.rx.android.NetworkObservableProviderImpl;
 import com.appunite.rx.dagger.NetworkScheduler;
+import com.appunite.rx.observables.NetworkObservableProvider;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
@@ -280,5 +282,11 @@ public final class AppModule {
     @Singleton
     PusherHelper providePusher() {
         return new PusherHelper();
+    }
+
+    @Provides
+    @Singleton
+    NetworkObservableProvider provideNetworkObservableProvider(@ForApplication Context context) {
+        return new NetworkObservableProviderImpl(context);
     }
 }

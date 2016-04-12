@@ -22,7 +22,6 @@ public class VideoCallsDao {
     @Nonnull
     private final Scheduler networkScheduler;
 
-    @Inject
     public VideoCallsDao(@Nonnull final ApiService apiService,
                          @Nonnull @NetworkScheduler final Scheduler networkScheduler) {
         this.apiService = apiService;

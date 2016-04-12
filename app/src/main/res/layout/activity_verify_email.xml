@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/default_bg_color"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/verify_email_toolbar"
+        style="@style/AppTheme.BaseToolbarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/verify_email_text1"
+                    android:textColor="@color/black_87"
+                    android:textSize="12sp" />
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/verify_email_text_input"
+                    style="@style/BlueInputStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="34dp"
+                    android:layout_marginLeft="-3dp"
+                    android:layout_marginStart="-3dp"
+                    app:hintTextAppearance="@style/VerifyHintStyle">
+
+                    <EditText
+                        android:id="@+id/verify_email_edittext"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/verify_email_hint"
+                        android:inputType="textEmailAddress"
+                        android:textSize="16sp"
+                        android:theme="@style/BlueEditText" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/verify_bottom_text"
+                    android:textColor="@color/black_54"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/verify_resend_btn"
+                style="@style/ButtonWithStroke"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:background="@drawable/selector_blue_button_with_stroke"
+                android:text="@string/verify_email_resend"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="16dp"
+                android:textColor="@android:color/white" />
+
+            <Button
+                android:id="@+id/verify_verify_btn"
+                style="@style/ButtonWithStroke"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/selector_green_button_with_stroke"
+                android:text="@string/verify_email_verify"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="16dp"
+                android:textColor="@android:color/white" />
+
+            <include layout="@layout/base_progress"/>
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+</LinearLayout>

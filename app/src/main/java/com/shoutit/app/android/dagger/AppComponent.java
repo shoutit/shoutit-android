@@ -21,6 +21,7 @@ import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.dao.SortTypesDao;
 import com.shoutit.app.android.dao.SuggestionsDao;
 import com.shoutit.app.android.dao.TagsDao;
+import com.shoutit.app.android.dao.VideoCallsDao;
 import com.shoutit.app.android.db.DbHelper;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.utils.PusherHelper;
@@ -53,8 +54,6 @@ public interface AppComponent {
     Context getContext();
 
     Picasso getPicasso();
-
-    OkHttpClient getOkHttpClient();
 
     Gson gson();
 
@@ -94,4 +93,5 @@ public interface AppComponent {
 
     PusherHelper pusher();
 
+    VideoCallsDao videoCallsDao();
 }

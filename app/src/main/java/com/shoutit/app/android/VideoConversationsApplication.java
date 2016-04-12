@@ -36,7 +36,7 @@ public class VideoConversationsApplication extends MultiDexApplication{
     }
 
 
-    protected void InitializeVideoConversations(){
+    protected void initializeVideoConversations(){
         presenter.getTwilioRequirementObservable()
                 .subscribe(new Action1<String>() {
                     @Override
@@ -49,7 +49,7 @@ public class VideoConversationsApplication extends MultiDexApplication{
     private void initTwillio(@Nonnull final String apiKey){
         TwilioConversations.setLogLevel(TwilioConversations.LogLevel.DEBUG);
 
-        if(!TwilioConversations.isInitialized()) {
+        if (!TwilioConversations.isInitialized()) {
             TwilioConversations.initialize(this, new TwilioConversations.InitListener() {
                 @Override
                 public void onInitialized() {

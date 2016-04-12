@@ -25,13 +25,14 @@ public class User extends BaseProfile {
     private final String about;
     private final String mobile;
     private final String website;
+    private final String email;
     private final Conversation conversation;
 
     public User(String id, String type, String apiUrl, String webUrl, String username,
                 String name, String firstName, String lastName, boolean isActivated, String image,
                 String cover, boolean isListening, boolean isListener, boolean isPasswordSet, UserLocation location,
                 int listenersCount, List<Page> pages, List<Admin> admins, String bio, int dateJoined,
-                Listening listeningCount, boolean isOwner, String about, String mobile, String website, Conversation conversation) {
+                Listening listeningCount, boolean isOwner, String about, String mobile, String website, String email, Conversation conversation) {
         super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount);
         this.apiUrl = apiUrl;
         this.webUrl = webUrl;
@@ -47,12 +48,8 @@ public class User extends BaseProfile {
         this.about = about;
         this.mobile = mobile;
         this.website = website;
+        this.email = email;
         this.conversation = conversation;
-    }
-
-    // TODO remove it when user will be handler by API
-    public static User guestUser(UserLocation location) {
-        return new User(null, null, null, null ,null, null, null, null, false, null, null, false, false, false, location, 1, null, null, null, 0, null, false, null, null, null, null);
     }
 
     public User getListenedProfile() {
@@ -62,7 +59,7 @@ public class User extends BaseProfile {
                 firstName, lastName, isActivated, image, cover,
                 newIsListening, isListener, isPasswordSet, location,
                 newListenersCount, pages, admins, bio, dateJoined, listeningCount,
-                false, about, mobile, website, conversation);
+                false, about, mobile, website, email, conversation);
     }
 
     public static User userWithUpdatedPages(@Nonnull User user, List<Page> pages) {
@@ -70,7 +67,7 @@ public class User extends BaseProfile {
                 user.firstName, user.lastName, user.isActivated, user.image, user.cover,
                 user.isListening, user.isListener, user.isPasswordSet, user.location,
                 user.listenersCount, pages, user.admins, user.bio, user.dateJoined, user.listeningCount,
-                false, user.about, user.mobile, user.website, user.conversation);
+                false, user.about, user.mobile, user.website, user.email, user.conversation);
     }
 
     public static User userWithUpdatedAdmins(@Nonnull User user, List<Admin> updatedAdmins) {
@@ -78,7 +75,7 @@ public class User extends BaseProfile {
                 user.firstName, user.lastName, user.isActivated, user.image, user.cover,
                 user.isListening, user.isListener, user.isPasswordSet, user.location,
                 user.listenersCount, user.pages, updatedAdmins, user.bio, user.dateJoined, user.listeningCount,
-                false, user.about, user.mobile, user.website, user.conversation);
+                false, user.about, user.mobile, user.website, user.email, user.conversation);
     }
 
     public String getId() {
@@ -185,6 +182,10 @@ public class User extends BaseProfile {
         return conversation;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -212,6 +213,7 @@ public class User extends BaseProfile {
                 Objects.equal(admins, user.admins) &&
                 Objects.equal(bio, user.bio) &&
                 Objects.equal(isListener, user.isListener) &&
+                Objects.equal(email, user.email) &&
                 Objects.equal(listeningCount, user.listeningCount);
     }
 
@@ -219,6 +221,6 @@ public class User extends BaseProfile {
     public int hashCode() {
         return Objects.hashCode(id, type, apiUrl, webUrl, username, name, firstName, lastName,
                 isActivated, image, cover, isListening, isPasswordSet, location, listenersCount,
-                pages, bio, dateJoined, listeningCount, isListener, admins, isOwner, website);
+                pages, bio, dateJoined, listeningCount, isListener, admins, isOwner, website, email);
     }
 }

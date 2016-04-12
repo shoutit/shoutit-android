@@ -2,11 +2,13 @@ package com.shoutit.app.android;
 
 import android.app.Application;
 import android.support.multidex.MultiDex;
+import android.util.Log;
 
 import com.appunite.appunitegcm.AppuniteGcm;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.functions.Functions1;
+import com.appunite.rx.observables.NetworkObservableProvider;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
 import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
@@ -14,6 +16,9 @@ import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler;
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
 import com.karumi.dexter.Dexter;
 import com.pusher.client.Pusher;
+import com.pusher.client.connection.ConnectionEventListener;
+import com.pusher.client.connection.ConnectionState;
+import com.pusher.client.connection.ConnectionStateChange;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.constants.UserVoiceConstants;
@@ -35,6 +40,7 @@ import io.fabric.sdk.android.Fabric;
 import rx.Observable;
 import rx.Scheduler;
 import rx.functions.Action1;
+import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.plugins.RxJavaErrorHandler;
 import rx.plugins.RxJavaPlugins;
@@ -47,6 +53,19 @@ public class App extends VideoConversationsApplication {
     private static final String GCM_TOKEN = "935842257865";
 
     private AppComponent component;
+
+    private ConnectionEventListener mEventListener = new ConnectionEventListener() {
+        @Override
+        public void onConnectionStateChange(ConnectionStateChange connectionStateChange) {
+            Log.i(TAG, connectionStateChange.getCurrentState().name());
+        }
+
+        @Override
+        public void onError(String s, String s1, Exception e) {
+            Log.e(TAG, "pusher message", e);
+        }
+    };
+
 
     @Inject
     ApiService apiService;
@@ -61,6 +80,8 @@ public class App extends VideoConversationsApplication {
     PusherHelper mPusherHelper;
     @Inject
     VideoConversationPresenter presenter;
+    @Inject
+    NetworkObservableProvider mNetworkObservableProvider;
 
 
     @Override
@@ -84,8 +105,8 @@ public class App extends VideoConversationsApplication {
 
         initPusher();
 
-        if(userPreferences.isNormalUser()) {
-            InitializeVideoConversations();
+        if (userPreferences.isNormalUser()) {
+            initializeVideoConversations();
         }
     }
 
@@ -117,8 +138,25 @@ public class App extends VideoConversationsApplication {
     private void initPusher(@Nonnull String token, @Nonnull User user) {
         mPusherHelper.init(token);
         final Pusher pusher = mPusherHelper.getPusher();
-        pusher.connect();
-        pusher.subscribePresence(String.format("presence-u-%1$s", user.getId()));
+        pusher.connect(mEventListener);
+        pusher.subscribePresence(String.format("presence-v3-u-%1$s", user.getId()));
+
+        mNetworkObservableProvider.networkObservable()
+                .filter(new Func1<NetworkObservableProvider.NetworkStatus, Boolean>() {
+                    @Override
+                    public Boolean call(NetworkObservableProvider.NetworkStatus networkStatus) {
+                        return networkStatus.isNetwork();
+                    }
+                })
+                .subscribe(new Action1<NetworkObservableProvider.NetworkStatus>() {
+                    @Override
+                    public void call(NetworkObservableProvider.NetworkStatus networkStatus) {
+                        final ConnectionState state = pusher.getConnection().getState();
+                        if (state != ConnectionState.CONNECTED && state != ConnectionState.CONNECTING) {
+                            pusher.connect(mEventListener);
+                        }
+                    }
+                });
     }
 
     private void initFfmpeg() {

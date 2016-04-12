@@ -18,10 +18,9 @@
         tools:visibility="visible" />
 
     <LinearLayout
-        android:layout_marginStart="8dp"
-        android:layout_width="160dp"
-        android:background="@drawable/message_background_other"
-        android:paddingLeft="2dp"
+        android:layout_width="wrap_content"
+        android:background="@drawable/chat_other_first_bg"
+        android:paddingLeft="12dp"
         android:paddingRight="2dp"
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
@@ -31,7 +30,8 @@
 
         <FrameLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:padding="4dp">
 
             <ImageView
                 android:id="@+id/chats_received_shout_image_imageview"
