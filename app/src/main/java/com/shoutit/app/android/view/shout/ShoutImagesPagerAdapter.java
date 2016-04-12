@@ -71,9 +71,7 @@ public class ShoutImagesPagerAdapter extends PagerAdapter {
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    final String imagesJson = gson.toJson(images);
-                    final String videosJson = gson.toJson(videos);
-                    context.startActivity(GalleryActivity.newIntent(context, imagesJson, videosJson, position));
+                    openGallery(position);
                 }
             });
 
@@ -86,11 +84,7 @@ public class ShoutImagesPagerAdapter extends PagerAdapter {
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(context, VideoPlayerActivity.class);
-                    intent.putExtra(Constants.URL, video.getUrl());
-                    context.startActivity(intent);
-               /*     context.startActivity(Intent.createChooser(
-                            IntentHelper.videoIntent(video.getUrl()), context.getString(R.string.shout_choose_video_app)));*/
+                    playVideo(video);
                 }
             });
         }
@@ -100,6 +94,18 @@ public class ShoutImagesPagerAdapter extends PagerAdapter {
         container.addView(view);
 
         return view;
+    }
+
+    private void playVideo(@Nonnull Video video) {
+        final Intent intent = new Intent(context, VideoPlayerActivity.class);
+        intent.putExtra(Constants.URL, video.getUrl());
+        context.startActivity(intent);
+    }
+
+    private void openGallery(int initPosition) {
+        final String imagesJson = gson.toJson(images);
+        final String videosJson = gson.toJson(videos);
+        context.startActivity(GalleryActivity.newIntent(context, imagesJson, videosJson, initPosition));
     }
 
     private boolean isImageItem(int position) {
