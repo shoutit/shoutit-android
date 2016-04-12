@@ -164,7 +164,7 @@ public class ChatsPresenter {
     public void register(@NonNull Listener listener) {
         final User user = mUserPreferences.getUser();
         assert user != null;
-        final PresenceChannel userChannel = mPusher.getPusher().getPresenceChannel(String.format("presence-v3-u-%1$s", user.getId()));
+        final PresenceChannel userChannel = mPusher.getPusher().getPresenceChannel(String.format("presence-u-%1$s", user.getId()));
         final PresenceChannel conversationChannel = mPusher.getPusher().subscribePresence(String.format("presence-v3-c-%1$s", conversationId));
 
         final Observable<PusherMessage> pusherMessageObservable = Observable
