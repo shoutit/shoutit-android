@@ -449,4 +449,15 @@
 
     <string name="select_shout_title">Select Shout</string>
 
+    <!-- Verify email -->
+    <string name="verify_email_text1">We have sent you a verification link on this email. Please check your inbox and click on it to verify your account.\n\nYou can also change the email and click “Resend” for us to send you the verification link again.</string>
+    <string name="verify_email_hint">Email</string>
+    <string name="verify_bottom_text">If you have already clicked on the link that was sent to you, you may click “Verify” now.</string>
+    <string name="verify_email_verify">Verify</string>
+    <string name="verify_email_resend">Resend</string>
+    <string name="verify_verified">Your account has been successfully verified</string>
+    <string name="verify_not_verified">Your account isn\'t verified yet</string>
+    <string name="profile_verify_account">Verify your account</string>
+    <string name="verify_email_title">Email Verification</string>
+
 </resources>

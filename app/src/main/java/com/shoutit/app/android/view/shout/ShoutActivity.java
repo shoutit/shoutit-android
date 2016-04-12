@@ -69,7 +69,7 @@ import static com.appunite.rx.internal.Preconditions.checkNotNull;
 public class ShoutActivity extends BaseActivity {
 
     private static final String KEY_SHOUT_ID = "shout_id";
-    private static final int CAMERA_MIC_PERMISSION_REQUEST_CODE = 1;
+    private static final int EDIT_SHOUT_REQUEST_CODE = 3001;
 
     @Bind(R.id.shout_toolbar)
     Toolbar toolbar;
@@ -398,7 +398,7 @@ public class ShoutActivity extends BaseActivity {
                     @Override
                     public void onClick(View v) {
                         if (isUserShoutOwner) {
-                            startActivity(EditShoutActivity.newIntent(mShoutId, ShoutActivity.this));
+                            startActivityForResult(EditShoutActivity.newIntent(mShoutId, ShoutActivity.this), EDIT_SHOUT_REQUEST_CODE);
                         } else {
                             startActivity(VideoConversationActivity.newIntent(null, shoutOwnerId, ShoutActivity.this));
                         }
@@ -504,6 +504,7 @@ public class ShoutActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
+                setResult(RESULT_OK);
                 finish();
                 return true;
             case R.id.shouts_search:
@@ -512,6 +513,20 @@ public class ShoutActivity extends BaseActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        setResult(RESULT_OK);
+        super.onBackPressed();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == EDIT_SHOUT_REQUEST_CODE && resultCode == RESULT_OK) {
+            presenter.refreshShoutsObserver().onNext(null);
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Nonnull

@@ -265,12 +265,16 @@ public class ProfileAdapterItems {
         private final Observer<Object> editProfileClickObserver;
         @Nonnull
         private final Observer<Object> notificationsClickObserver;
+        @Nonnull
+        private final Observer<Object> verifyAccountClickObserver;
 
         public MyUserNameAdapterItem(@Nonnull User user, @NonNull Observer<Object> editProfileClickObserver,
-                                     @Nonnull Observer<Object> notificationsClickObserver) {
+                                     @Nonnull Observer<Object> notificationsClickObserver,
+                                     @Nonnull Observer<Object> verifyAccountClickObserver) {
             super(user);
             this.editProfileClickObserver = editProfileClickObserver;
             this.notificationsClickObserver = notificationsClickObserver;
+            this.verifyAccountClickObserver = verifyAccountClickObserver;
         }
 
         @Override
@@ -294,6 +298,10 @@ public class ProfileAdapterItems {
 
         public void onShowNotificationClicked() {
             notificationsClickObserver.onNext(null);
+        }
+
+        public void onVerifyAccountClick() {
+            verifyAccountClickObserver.onNext(null);
         }
     }
 

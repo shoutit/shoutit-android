@@ -60,7 +60,6 @@ public class ChangeEmailPresenter {
                 })
                 .compose(ObservableExtensions.<Boolean>behaviorRefCount());
 
-
         final Observable<ResponseOrError<User>> requestObservable = confirmClickSubject
                 .withLatestFrom(isEmailCorrectObservable, new Func2<Object, Boolean, Boolean>() {
                     @Override
