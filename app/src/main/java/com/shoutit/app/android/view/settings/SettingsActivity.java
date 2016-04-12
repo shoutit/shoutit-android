@@ -18,6 +18,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.view.about.AboutActivity;
 import com.shoutit.app.android.view.settings.account.AccountActivity;
 
@@ -81,7 +82,7 @@ public class SettingsActivity extends BaseActivity {
 
     @OnClick(R.id.settings_notifications)
     public void onNotificationsClick() {
-        Toast.makeText(this, "Not implemented yet", Toast.LENGTH_SHORT).show();
+        startActivity(IntentHelper.getAppSettingsIntent(this));
     }
 
     @OnClick(R.id.settings_account)

@@ -14,10 +14,4 @@
         android:title="@string/home_menu_search"
         app:showAsAction="ifRoom" />
 
-    <item
-        android:id="@+id/profile_menu_cart"
-        android:icon="@drawable/ic_ab_cart"
-        android:title="@string/home_menu_cart"
-        app:showAsAction="ifRoom" />
-
 </menu>
