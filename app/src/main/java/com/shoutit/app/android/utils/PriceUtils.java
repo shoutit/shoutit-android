@@ -8,6 +8,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.google.common.primitives.Doubles;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.Currency;
 
@@ -43,8 +44,13 @@ public class PriceUtils {
     }
 
     public static long getPriceInCents(String price) {
-        final double doublePrice = Double.parseDouble(price.replace(",", "."));
-        final double centsPrice = doublePrice * 100;
+        final Double doublePrice = Doubles.tryParse(price.replace(",", "."));
+
+        double centsPrice = 0;
+        if (doublePrice != null) {
+            centsPrice = doublePrice * 100;
+        }
+
         return (long) centsPrice;
     }
 
