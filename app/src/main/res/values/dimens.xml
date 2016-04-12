@@ -70,5 +70,6 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <dimen name="post_login_logo_margin">50dp</dimen>
+    <dimen name="gallery_thumbnail_size">70dp</dimen>
 
 </resources>

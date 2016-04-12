@@ -213,6 +213,7 @@ dependencies {
     }
     compile 'com.commonsware.cwac:cam2:0.5.3'
     compile 'com.pusher:pusher-java-client:1.1.2'
+    compile 'com.veinhorn.scrollgalleryview:library:1.0.5'
 
 
     // Tests
