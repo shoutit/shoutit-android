@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.CheckedTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.common.collect.ImmutableList;
 import com.jakewharton.rxbinding.widget.RxTextView;
@@ -38,7 +37,6 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -50,9 +48,6 @@ public class MenuHandler {
     public static final String FRAGMENT_DISCOVER = "fragment_discover";
     public static final String FRAGMENT_BROWSE = "fragment_browse";
     public static final String FRAGMENT_CHATS = "fragment_chats";
-    public static final String FRAGMENT_ORDERS = "fragment_orders";
-    public static final String FRAGMENT_HELP = "fragment_help";
-    public static final String FRAGMENT_INVITE_FRIENDS = "fragment_invite_friends";
 
     @Bind(R.id.menu_user_name_tv)
     TextView userNameTextView;
@@ -75,8 +70,6 @@ public class MenuHandler {
     CheckedTextView browseItem;
     @Bind(R.id.menu_chat)
     CheckedTextView chatItem;
-    @Bind(R.id.menu_orders)
-    CheckedTextView orderItems;
 
     @Inject
     MenuHandlerPresenter presenter;
@@ -109,7 +102,7 @@ public class MenuHandler {
 
     public void initMenu(@Nonnull View view, @IdRes int id) {
         ButterKnife.bind(this, view);
-        selectableItems = ImmutableList.of(homeItem, discoverItem, browseItem, chatItem, orderItems);
+        selectableItems = ImmutableList.of(homeItem, discoverItem, browseItem, chatItem);
         setData(id);
     }
 
@@ -154,7 +147,7 @@ public class MenuHandler {
     }
 
     @OnClick({R.id.menu_home, R.id.menu_discover, R.id.menu_browse, R.id.menu_chat,
-            R.id.menu_orders, R.id.menu_settings, R.id.menu_help, R.id.menu_invite_frirends})
+             R.id.menu_settings, R.id.menu_help})
     public void onMenuItemSelected(View view) {
         switch (view.getId()) {
             case R.id.menu_home:
@@ -177,23 +170,11 @@ public class MenuHandler {
                     showLoginActivity();
                 }
                 break;
-            case R.id.menu_orders:
-                if (userPreferences.isNormalUser()) {
-                    onMenuItemSelectedListener.onMenuItemSelected(FRAGMENT_ORDERS);
-                    selectItem(view.getId());
-                    Toast.makeText(rxActivity, "Not implemented yet", Toast.LENGTH_SHORT).show();
-                } else {
-                    showLoginActivity();
-                }
-                break;
             case R.id.menu_settings:
                 rxActivity.startActivity(SettingsActivity.newIntent(rxActivity));
                 break;
             case R.id.menu_help:
                 UserVoice.launchUserVoice(rxActivity);
-                break;
-            case R.id.menu_invite_frirends:
-                onMenuItemSelectedListener.onMenuItemSelected(FRAGMENT_INVITE_FRIENDS);
                 break;
         }
 
@@ -299,10 +280,6 @@ public class MenuHandler {
                 return SearchShoutsResultsFragment.newInstance(null, null, SearchPresenter.SearchType.BROWSE);
             case FRAGMENT_CHATS:
                 return ConverstationsFragment.newInstance();
-            case FRAGMENT_ORDERS:
-            case FRAGMENT_HELP:
-            case FRAGMENT_INVITE_FRIENDS:
-                return new Fragment();
             default:
                 throw new RuntimeException("Unknown fragment tag");
 
