@@ -27,18 +27,8 @@ public class VideoConversationsApplication extends MultiDexApplication{
     private ConversationsClient conversationsClient;
     private IncomingInvite invite;
 
-    private static VideoConversationsApplication instance;
-
     @Inject
     VideoConversationPresenter presenter;
-
-    @Inject
-    public static VideoConversationsApplication getInstance() {
-        if (instance == null) {
-            instance = new VideoConversationsApplication();
-        }
-        return instance;
-    }
 
     @Override
     public void onCreate() {
@@ -52,14 +42,6 @@ public class VideoConversationsApplication extends MultiDexApplication{
                     @Override
                     public void call(String apiKey) {
                         initTwillio(apiKey);
-                    }
-                });
-
-        presenter.getErrorObservable()
-                .subscribe(new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        Toast.makeText(getApplicationContext(), "Failed to fetch data: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -143,7 +125,6 @@ public class VideoConversationsApplication extends MultiDexApplication{
 
             @Override
             public void onIncomingInviteCancelled(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
-//                conversationsClient.listen();
             }
         };
     }

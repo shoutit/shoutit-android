@@ -69,7 +69,6 @@ import static com.appunite.rx.internal.Preconditions.checkNotNull;
 public class ShoutActivity extends BaseActivity {
 
     private static final String KEY_SHOUT_ID = "shout_id";
-    private static final int CAMERA_MIC_PERMISSION_REQUEST_CODE = 1;
 
     @Bind(R.id.shout_toolbar)
     Toolbar toolbar;
@@ -96,7 +95,6 @@ public class ShoutActivity extends BaseActivity {
     UserPreferences userPreferences;
 
     private String mShoutId;
-    private String shoutOwnerId;
 
     public static Intent newIntent(@Nonnull Context context, @Nonnull String shoutId) {
         return new Intent(context, ShoutActivity.class)
@@ -190,15 +188,6 @@ public class ShoutActivity extends BaseActivity {
                     @Override
                     public void call(String categorySlug) {
                         startActivity(TagProfileActivity.newIntent(ShoutActivity.this, categorySlug));
-                    }
-                });
-
-        presenter.getIdentityUserObservable()
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String shoutOwnerIdentity) {
-                        shoutOwnerId = shoutOwnerIdentity;
                     }
                 });
 
@@ -305,6 +294,38 @@ public class ShoutActivity extends BaseActivity {
         presenter.getRefreshUserShoutsObservable()
                 .compose(this.bindToLifecycle())
                 .subscribe();
+
+        RxView.clicks(videoCallOrEditTextView)
+                .compose(bindToLifecycle())
+                .subscribe(presenter.getVideoOrEditClickSubject());
+
+        presenter.getVideoCallClickedObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String userId) {
+                        startActivity(VideoConversationActivity.newIntent(null, userId, ShoutActivity.this));
+                    }
+                });
+
+        presenter.getEditShoutClickedObservable()
+                .compose(this.<Boolean>bindToLifecycle())
+                .subscribe(new Action1<Boolean>() {
+                    @Override
+                    public void call(Boolean aBoolean) {
+                        startActivity(EditShoutActivity.newIntent(mShoutId, ShoutActivity.this));
+                    }
+                });
+
+        presenter.getOnlyForLoggedInUserObservable()
+                .compose(this.bindToLifecycle())
+                .subscribe(new Action1<Object>() {
+                    @Override
+                    public void call(Object o) {
+                        ColoredSnackBar.error(ColoredSnackBar.contentView(ShoutActivity.this), R.string.error_action_only_for_logged_in_user, Snackbar.LENGTH_SHORT).show();
+                    }
+                });
+
     }
 
     private void startCall(String phoneNumber) {
@@ -387,23 +408,13 @@ public class ShoutActivity extends BaseActivity {
                         isUserShoutOwner ? R.drawable.ic_edit_red : R.drawable.ic_video_chat_red, 0, 0, 0);
                 videoCallOrEditTextView.setText(isUserShoutOwner ?
                         R.string.shout_bottom_bar_edit : R.string.shout_bottom_bar_video_call);
-                videoCallOrEditTextView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (isUserShoutOwner) {
-                            startActivity(EditShoutActivity.newIntent(mShoutId, ShoutActivity.this));
-                        } else {
-                            startActivity(VideoConversationActivity.newIntent(null, shoutOwnerId, ShoutActivity.this));
-                        }
-                    }
-                });
 
                 chatOrChatsTextView.setText(isUserShoutOwner ?
                         R.string.shout_bottom_bar_chats : R.string.shout_bottom_bar_chat);
                 chatOrChatsTextView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(bottomBarData.isLoggedIn()) {
+                        if (bottomBarData.isNormalUser()) {
                             if (bottomBarData.isHasConversation()) {
                                 startActivity(ChatActivity.newIntent(ShoutActivity.this, bottomBarData.getConversationId(), true));
                             } else {

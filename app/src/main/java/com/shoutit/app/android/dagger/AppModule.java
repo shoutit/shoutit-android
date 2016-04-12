@@ -17,16 +17,11 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.jakewharton.picasso.OkHttp3Downloader;
-import com.pusher.client.Pusher;
-import com.pusher.client.PusherOptions;
-import com.pusher.client.util.HttpAuthorizer;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BuildConfig;
 import com.shoutit.app.android.UserPreferences;
-import com.shoutit.app.android.VideoConversationsApplication;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.AuthInterceptor;
 import com.shoutit.app.android.constants.AmazonConstants;
@@ -36,8 +31,8 @@ import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.NotificationsDao;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
-import com.shoutit.app.android.dao.SortTypesDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
+import com.shoutit.app.android.dao.SortTypesDao;
 import com.shoutit.app.android.dao.SuggestionsDao;
 import com.shoutit.app.android.dao.TagsDao;
 import com.shoutit.app.android.dao.UsersIdentityDao;
@@ -65,9 +60,9 @@ import rx.Scheduler;
 @Module
 public final class AppModule {
 
-    private final VideoConversationsApplication app;
+    private final App app;
 
-    public AppModule(VideoConversationsApplication app) {
+    public AppModule(App app) {
         this.app = app;
     }
 

@@ -257,20 +257,9 @@ public class UserPreferences {
         editor.commit();
     }
 
-    @SuppressLint("CommitPrefEdits")
-    public void setIsCallRejected(boolean isCallRejected) {
-        final SharedPreferences.Editor editor = mPreferences.edit();
-        editor.putBoolean(IS_CALL_REJECTED, isCallRejected);
-        editor.commit();
-    }
-
     @Nullable
     public String getShoutOwnerName() {
         return mPreferences.getString(SHOUT_OWNER_NAME, null);
     }
 
-    @Nullable
-    public boolean getIsCallRejected() {
-        return mPreferences.getBoolean(IS_CALL_REJECTED, false);
-    }
 }

@@ -12,13 +12,10 @@ import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Scheduler;
-import rx.subjects.PublishSubject;
 
 public class VideoCallsDao {
     @Nonnull
     private Observable<ResponseOrError<TwilioResponse>> videoCallsObservable;
-    @Nonnull
-    private PublishSubject<Object> refreshSubject = PublishSubject.create();
 
     @Nonnull
     private final ApiService apiService;
@@ -43,8 +40,4 @@ public class VideoCallsDao {
         return videoCallsObservable;
     }
 
-    @Nonnull
-    public PublishSubject<Object> getRefreshSubject() {
-        return refreshSubject;
-    }
 }

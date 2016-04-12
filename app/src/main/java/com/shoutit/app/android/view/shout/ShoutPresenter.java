@@ -6,8 +6,10 @@ import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.UiScheduler;
+import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
+import com.google.common.base.Functions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
@@ -25,6 +27,7 @@ import com.shoutit.app.android.dao.UsersIdentityDao;
 import com.shoutit.app.android.model.MobilePhoneResponse;
 import com.shoutit.app.android.model.RelatedShoutsPointer;
 import com.shoutit.app.android.model.UserShoutsPointer;
+import com.shoutit.app.android.utils.rx.RxMoreObservers;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
 import java.util.List;
@@ -67,6 +70,9 @@ public class ShoutPresenter {
     private final Observable<Object> refreshUserShoutsObservable;
     private final Observable<String> identityUserObservable;
     private final Observable<UserIdentity> successUserIdentity;
+    private final Observable<String> videoCallClickedObservable;
+    private final Observable<Boolean> editShoutClickedObservable;
+    private final Observable<Object> onlyForLoggedInUserObservable;
 
     private PublishSubject<String> addToCartSubject = PublishSubject.create();
     private PublishSubject<String> onCategoryClickedSubject = PublishSubject.create();
@@ -74,6 +80,7 @@ public class ShoutPresenter {
     private PublishSubject<String> relatedShoutSelectedSubject = PublishSubject.create();
     private PublishSubject<String> seeAllRelatedShoutSubject = PublishSubject.create();
     private PublishSubject<User> visitProfileSubject = PublishSubject.create();
+    private PublishSubject<Object> onVideoOrEditClickSubject = PublishSubject.create();
 
     @Nonnull
     private final Scheduler uiScheduler;
@@ -88,7 +95,7 @@ public class ShoutPresenter {
                           @Nonnull final String shoutId,
                           @Nonnull @ForActivity final Context context,
                           @Nonnull @UiScheduler final Scheduler uiScheduler,
-                          @Nonnull UserPreferences userPreferences,
+                          @Nonnull final UserPreferences userPreferences,
                           @Nonnull final ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
                           @Nonnull final UsersIdentityDao usersIdentityDao) {
         this.uiScheduler = uiScheduler;
@@ -393,8 +400,84 @@ public class ShoutPresenter {
                         shoutsGlobalRefreshPresenter.refreshShouts();
                     }
                 });
-    }
 
+        videoCallClickedObservable = onVideoOrEditClickSubject
+                .withLatestFrom(Observable.combineLatest(isUserShoutOwnerObservable, identityUserObservable, new Func2<Boolean, String, BothParams<Boolean, String>>() {
+                            @Override
+                            public BothParams<Boolean, String> call(Boolean isOwner, String id) {
+                                return BothParams.of(isOwner, id);
+                            }
+                        }), new Func2<Object, BothParams<Boolean,String>, BothParams<Boolean, String>>() {
+                            @Override
+                            public BothParams<Boolean, String> call(Object o, BothParams<Boolean, String> isOwnerAndIdentity) {
+                                return isOwnerAndIdentity;
+                            }
+                        }
+                )
+                .filter(new Func1<BothParams<Boolean, String>, Boolean>() {
+                    @Override
+                    public Boolean call(BothParams<Boolean, String> isOwnerAndIdentity) {
+                        return !isOwnerAndIdentity.param1();
+                    }
+                })
+                .filter(new Func1<BothParams<Boolean, String>, Boolean>() {
+                    @Override
+                    public Boolean call(BothParams<Boolean, String> booleanStringBothParams) {
+                        return !userPreferences.isGuest();
+                    }
+                })
+                .map(new Func1<BothParams<Boolean, String>, String>() {
+                    @Override
+                    public String call(BothParams<Boolean, String> isOwnerAndIdentity) {
+                        return isOwnerAndIdentity.param2();
+                    }
+                });
+
+
+        editShoutClickedObservable = onVideoOrEditClickSubject
+                .withLatestFrom(isUserShoutOwnerObservable, new Func2<Object, Boolean, Boolean>() {
+                    @Override
+                    public Boolean call(Object o, Boolean isOwner) {
+                        return isOwner;
+                    }
+                })
+                .filter(new Func1<Boolean, Boolean>() {
+                    @Override
+                    public Boolean call(Boolean isOwner) {
+                        return isOwner;
+                    }
+                })
+                .filter(new Func1<Boolean, Boolean>() {
+                    @Override
+                    public Boolean call(Boolean aBoolean) {
+                        return !userPreferences.isGuest();
+                    }
+                });
+
+        onlyForLoggedInUserObservable = onVideoOrEditClickSubject
+                .filter(new Func1<Object, Boolean>() {
+                    @Override
+                    public Boolean call(Object o) {
+                        return userPreferences.isGuest();
+                    }
+                });
+    }
+    @Nonnull
+    public Observable<Boolean> getEditShoutClickedObservable() {
+        return editShoutClickedObservable;
+    }
+    @Nonnull
+    public Observable<Object> getOnlyForLoggedInUserObservable() {
+        return onlyForLoggedInUserObservable;
+    }
+    @Nonnull
+    public Observable<String> getVideoCallClickedObservable() {
+        return videoCallClickedObservable;
+    }
+    @Nonnull
+    public Observer<Object> getVideoOrEditClickSubject() {
+        return RxMoreObservers.ignoreCompleted(onVideoOrEditClickSubject);
+    }
     @Nonnull
     public Observable<Object> getRefreshUserShoutsObservable() {
         return refreshUserShoutsObservable;
@@ -404,7 +487,6 @@ public class ShoutPresenter {
     public Observable<String> getIdentityUserObservable() {
         return identityUserObservable;
     }
-
     @Nonnull
     public Observable<String> getOnCategoryClickedObservable() {
         return onCategoryClickedSubject;
@@ -467,7 +549,7 @@ public class ShoutPresenter {
                             @Override
                             public BottomBarData call(Boolean isUserShoutOwner, List<Conversation> conversations) {
                                 final boolean hasConversation = conversations != null && !conversations.isEmpty();
-                                return new BottomBarData(isUserShoutOwner, hasConversation, hasConversation ? conversations.get(0).getId() : null, mUserPreferences.isUserLoggedIn());
+                                return new BottomBarData(isUserShoutOwner, hasConversation, hasConversation ? conversations.get(0).getId() : null, mUserPreferences.isNormalUser());
                             }
                         });
                     }
@@ -530,13 +612,13 @@ public class ShoutPresenter {
         private final boolean isUserShoutOwner;
         private final boolean hasConversation;
         private final String conversationId;
-        private final boolean isLoggedIn;
+        private final boolean isNormalUser;
 
-        public BottomBarData(boolean isUserShoutOwner, boolean hasConversation, String conversationId, boolean isLoggedIn) {
+        public BottomBarData(boolean isUserShoutOwner, boolean hasConversation, String conversationId, boolean isNormalUser) {
             this.isUserShoutOwner = isUserShoutOwner;
             this.hasConversation = hasConversation;
             this.conversationId = conversationId;
-            this.isLoggedIn = isLoggedIn;
+            this.isNormalUser = isNormalUser;
         }
 
         public boolean isUserShoutOwner() {
@@ -551,8 +633,8 @@ public class ShoutPresenter {
             return conversationId;
         }
 
-        public boolean isLoggedIn() {
-            return isLoggedIn;
+        public boolean isNormalUser() {
+            return isNormalUser;
         }
     }
 }

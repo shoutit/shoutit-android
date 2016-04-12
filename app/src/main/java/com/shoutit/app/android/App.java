@@ -84,8 +84,9 @@ public class App extends VideoConversationsApplication {
 
         initPusher();
 
-        InitializeVideoConversations();
-
+        if(userPreferences.isNormalUser()) {
+            InitializeVideoConversations();
+        }
     }
 
     private void initGcm() {

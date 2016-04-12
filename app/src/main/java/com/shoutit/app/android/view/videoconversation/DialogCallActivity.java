@@ -11,6 +11,7 @@ import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.VideoConversationsApplication;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 
@@ -68,6 +69,12 @@ public class DialogCallActivity extends BaseActivity {
                         finish();
                     }
                 });
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        ((App) getApplication()).getInvite().reject();
     }
 
     @Nonnull

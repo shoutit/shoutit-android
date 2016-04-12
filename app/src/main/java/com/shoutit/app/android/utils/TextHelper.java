@@ -11,4 +11,8 @@ public class TextHelper {
             return String.valueOf(number);
         }
     }
+
+    public static String formatErrorMessage(String errorMessage){
+        return errorMessage.substring(18, errorMessage.length());
+    }
 }
