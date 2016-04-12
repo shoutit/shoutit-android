@@ -29,6 +29,7 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PermissionHelper;
+import com.shoutit.app.android.view.conversations.ConverstationsFragment;
 import com.shoutit.app.android.view.discover.DiscoverActivity;
 import com.shoutit.app.android.view.discover.OnNewDiscoverSelectedListener;
 import com.shoutit.app.android.view.home.HomeFragment;
@@ -137,6 +138,12 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
         switch (item.getItemId()) {
             case R.id.base_menu_search:
                 return showMainSearchActivityOrLetFragmentsHandleIt();
+            case R.id.base_menu_chat:
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.activity_main_fragment_container, ConverstationsFragment.newInstance(), MenuHandler.FRAGMENT_CHATS)
+                        .commit();
+                menuHandler.selectChats();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
