@@ -14,6 +14,8 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.utils.PicassoHelper;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.veinhorn.scrollgalleryview.Constants;
 import com.veinhorn.scrollgalleryview.MediaInfo;
@@ -70,7 +72,7 @@ public class GalleryActivity extends BaseActivity {
         final List<String> imagesList = gson.fromJson(imagesJson, new TypeToken<List<String>>() {}.getType());
         final List<Video> videosList = gson.fromJson(videosJson, new TypeToken<List<Video>>() {}.getType());
 
-        galleryView.setThumbnailSize(R.dimen.gallery_thumbnail_size)
+        galleryView.setThumbnailSize(getResources().getDimensionPixelSize(R.dimen.gallery_thumbnail_size))
                 .setZoom(true)
                 .setFragmentManager(getSupportFragmentManager());
 
@@ -83,7 +85,6 @@ public class GalleryActivity extends BaseActivity {
         }
 
         galleryView.setCurrentItem(position);
-
     }
 
     class ImagesLoader implements MediaLoader {
@@ -100,16 +101,32 @@ public class GalleryActivity extends BaseActivity {
         }
 
         @Override
-        public void loadMedia(Context context, ImageView imageView, SuccessCallback callback) {
+        public void loadMedia(Context context, ImageView imageView, final SuccessCallback callback) {
             picasso.load(imageUrl)
-                    .into(imageView);
+                    .into(imageView, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            callback.onSuccess();
+                        }
+
+                        @Override
+                        public void onError() {}
+                    });
         }
 
         @Override
-        public void loadThumbnail(Context context, ImageView thumbnailView, SuccessCallback callback) {
+        public void loadThumbnail(Context context, ImageView thumbnailView, final SuccessCallback callback) {
             picasso.load(imageUrl)
                     .resizeDimen(R.dimen.gallery_thumbnail_size, R.dimen.gallery_thumbnail_size)
-                    .into(thumbnailView);
+                    .into(thumbnailView, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            callback.onSuccess();
+                        }
+
+                        @Override
+                        public void onError() {}
+                    });
         }
     }
 
@@ -132,6 +149,7 @@ public class GalleryActivity extends BaseActivity {
 
         @Override
         public void loadMedia(final Context context, ImageView imageView, SuccessCallback callback) {
+            imageView.setImageResource(R.drawable.ic_play_circle_outline_white_48dp);
             imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -141,14 +159,22 @@ public class GalleryActivity extends BaseActivity {
         }
 
         @Override
-        public void loadThumbnail(Context context, ImageView thumbnailView, SuccessCallback callback) {
+        public void loadThumbnail(Context context, ImageView thumbnailView, final SuccessCallback callback) {
             picasso.load(thumbnailUrl)
                     .resizeDimen(R.dimen.gallery_thumbnail_size, R.dimen.gallery_thumbnail_size)
-                    .into(thumbnailView);
+                    .into(thumbnailView, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            callback.onSuccess();
+                        }
+
+                        @Override
+                        public void onError() {}
+                    });
         }
 
         private void displayVideo(Context context, String url) {
-            Intent intent = new Intent(context, VideoPlayerActivity.class);
+            final Intent intent = new Intent(context, VideoPlayerActivity.class);
             intent.putExtra(Constants.URL, url);
             context.startActivity(intent);
         }
