@@ -49,6 +49,7 @@ import com.shoutit.app.android.view.chats.message_models.SentShoutMessage;
 import com.shoutit.app.android.view.chats.message_models.SentTextMessage;
 import com.shoutit.app.android.view.chats.message_models.SentVideoMessage;
 import com.shoutit.app.android.view.chats.message_models.TypingItem;
+import com.shoutit.app.android.view.conversations.ConversationsUtils;
 import com.shoutit.app.android.view.media.MediaUtils;
 
 import java.io.File;
@@ -278,13 +279,14 @@ public class ChatsPresenter {
                     }
                 }));
 
-        if (mIsShoutConversation) {
-            mSubscribe.add(mApiService.getConversation(conversationId)
-                    .subscribeOn(mNetworkScheduler)
-                    .observeOn(mUiScheduler)
-                    .subscribe(new Action1<Conversation>() {
-                        @Override
-                        public void call(Conversation conversationResponse) {
+
+        mSubscribe.add(mApiService.getConversation(conversationId)
+                .subscribeOn(mNetworkScheduler)
+                .observeOn(mUiScheduler)
+                .subscribe(new Action1<Conversation>() {
+                    @Override
+                    public void call(Conversation conversationResponse) {
+                        if (mIsShoutConversation) {
                             final AboutShout about = conversationResponse.getAbout();
                             final String title = about.getTitle();
                             final String thumbnail = Strings.emptyToNull(about.getThumbnail());
@@ -294,14 +296,22 @@ public class ChatsPresenter {
                             final String id = about.getId();
 
                             mListener.setAboutShoutData(title, thumbnail, type, price, authorAndTime, id);
+                            mListener.setShoutToolbarInfo(title, ConversationsUtils.getChatWithString(conversationResponse.getProfiles()));
+                        } else {
+                            mListener.setChatToolbatInfo(ConversationsUtils.getChatWithString(conversationResponse.getProfiles()));
                         }
-                    }, new Action1<Throwable>() {
-                        @Override
-                        public void call(Throwable throwable) {
-                            mListener.error(throwable);
-                        }
-                    }));
-        }
+                    }
+                }, getOnError()));
+    }
+
+    @NonNull
+    private Action1<Throwable> getOnError() {
+        return new Action1<Throwable>() {
+            @Override
+            public void call(Throwable throwable) {
+                mListener.error(throwable);
+            }
+        };
     }
 
     @NonNull
@@ -372,12 +382,7 @@ public class ChatsPresenter {
                     public void call(Message messagesResponse) {
                         postLocalMessage(messagesResponse);
                     }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        mListener.error(throwable);
-                    }
-                });
+                }, getOnError());
     }
 
     private BaseAdapterItem getItem(@NonNull List<Message> results, String userId, int currentPosition) {
@@ -569,12 +574,7 @@ public class ChatsPresenter {
                         postLocalMessage(message);
                         mListener.hideAttatchentsMenu();
                     }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        mListener.error(throwable);
-                    }
-                });
+                }, getOnError());
     }
 
 
@@ -587,12 +587,7 @@ public class ChatsPresenter {
                     public void call(ResponseBody responseBody) {
                         mListener.conversationDeleted();
                     }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        mListener.error(throwable);
-                    }
-                });
+                }, getOnError());
     }
 
     public void sendShout(final String shoutId) {
@@ -624,12 +619,7 @@ public class ChatsPresenter {
                         postLocalMessage(message);
                         mListener.hideAttatchentsMenu();
                     }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        mListener.error(throwable);
-                    }
-                });
+                }, getOnError());
     }
 
     public void sendTyping() {

@@ -13,7 +13,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -168,21 +167,6 @@ public class ChatActivity extends BaseActivity implements Listener {
                         presenter.sendTyping();
                     }
                 });
-
-        mMainLayout.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                mChatsAttatchmentsLayout.setVisibility(View.GONE);
-                return false;
-            }
-        });
-        mChatsRecyclerview.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                mChatsAttatchmentsLayout.setVisibility(View.GONE);
-                return false;
-            }
-        });
     }
 
     @Nonnull
@@ -229,6 +213,17 @@ public class ChatActivity extends BaseActivity implements Listener {
     public void error(Throwable throwable) {
         Log.e(TAG, "error", throwable);
         ColoredSnackBar.error(ColoredSnackBar.contentView(this), R.string.error_default, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void setShoutToolbarInfo(String title, String chatWithString) {
+        mChatsToolbar.setTitle(title);
+        mChatsToolbar.setSubtitle(chatWithString);
+    }
+
+    @Override
+    public void setChatToolbatInfo(String chatWithString) {
+        mChatsToolbar.setTitle(chatWithString);
     }
 
     @Override
@@ -318,7 +313,7 @@ public class ChatActivity extends BaseActivity implements Listener {
         }
     }
 
-    private void deleteConversation(){
+    private void deleteConversation() {
         new AlertDialog.Builder(ChatActivity.this)
                 .setMessage(getString(R.string.chats_delete_conversatin))
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
