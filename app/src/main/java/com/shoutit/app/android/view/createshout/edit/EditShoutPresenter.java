@@ -243,11 +243,7 @@ public class EditShoutPresenter {
 
     private boolean checkValidity(@NonNull RequestData requestData) {
         final boolean isTitleError;
-        if (Shout.TYPE_OFFER.equals(shoutType)) {
-            isTitleError = requestData.mTitle.length() > 0 && requestData.mTitle.length() < 6;
-        } else {
-            isTitleError = requestData.mTitle.length() < 6;
-        }
+        isTitleError = requestData.mTitle.length() > 0 && requestData.mTitle.length() < 6;
 
         mListener.showTitleTooShortError(isTitleError);
 
