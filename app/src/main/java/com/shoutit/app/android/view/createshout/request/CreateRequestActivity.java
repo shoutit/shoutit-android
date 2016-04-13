@@ -49,6 +49,7 @@ import butterknife.OnClick;
 public class CreateRequestActivity extends BaseActivity implements CreateRequestPresenter.Listener {
 
     private static final int LOCATION_REQUEST = 0;
+    private static final String KEY_LOCATION = "key_location";
 
     private SimpleCurrencySpinnerAdapter mAdapter;
 
@@ -75,6 +76,8 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
 
     @Inject
     CreateRequestPresenter mCreateRequestPresenter;
+
+    private UserLocation changedLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,6 +122,13 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
                 DialogsHelper.showCurrencyDialog(CreateRequestActivity.this);
             }
         });
+
+        if (savedInstanceState != null) {
+            changedLocation = (UserLocation) savedInstanceState.getSerializable(KEY_LOCATION);
+            if (changedLocation != null) {
+                mCreateRequestPresenter.updateLocation(changedLocation);
+            }
+        }
     }
 
     @Override
@@ -153,6 +163,7 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
         if (requestCode == LOCATION_REQUEST && resultCode == Activity.RESULT_OK) {
             final UserLocation userLocation = (UserLocation) data.getSerializableExtra(LocationActivity.EXTRAS_USER_LOCATION);
             mCreateRequestPresenter.updateLocation(userLocation);
+            changedLocation = userLocation;
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
@@ -237,5 +248,11 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
     public void finishActivity(String id, String webUrl) {
         finish();
         startActivity(PublishShoutActivity.newIntent(this, id, webUrl, true));
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putSerializable(KEY_LOCATION, changedLocation);
+        super.onSaveInstanceState(outState);
     }
 }

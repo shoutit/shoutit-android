@@ -68,13 +68,11 @@
     </style>
 
     <style name="LoginBottomButtons">
-        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_height">30dp</item>
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_weight">1</item>
         <item name="android:textSize">14sp</item>
-        <item name="android:padding">8dp</item>
         <item name="android:textColor">@color/black_54</item>
-        <item name="android:gravity">center</item>
         <item name="android:background">?selectableItemBackgroundBorderless</item>
     </style>
 
