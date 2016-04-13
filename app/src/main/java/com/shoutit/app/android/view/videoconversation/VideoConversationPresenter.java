@@ -86,13 +86,8 @@ public class VideoConversationPresenter {
         errorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
                 ResponseOrError.transform(twilioResponse),
                 ResponseOrError.transform(callerProfileResponse)))
-                    .filter(Functions1.isNotNull()).doOnNext(new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-
-                    }
-                })
-                    .observeOn(uiScheduler);
+                .filter(Functions1.isNotNull())
+                .observeOn(uiScheduler);
 
     }
 

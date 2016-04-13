@@ -30,6 +30,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.TextHelper;
@@ -106,11 +107,9 @@ public class VideoConversationActivity extends BaseActivity {
     TextView conversationInfo;
 
     @Inject
-    VideoConversationPresenter presenter;
-    @Inject
     UserPreferences preferences;
     @Inject
-    VideoConversationManager videoConversationManager;
+    Twilio mTwilio;
 
     private String shoutOnwerId;
     private String caller;
@@ -203,9 +202,10 @@ public class VideoConversationActivity extends BaseActivity {
 
     private void acceptIncomingCall() {
 
-        callButton.setVisibility(View.GONE);
-
         if (invite != null) {
+
+            callButton.setVisibility(View.GONE);
+
             invite.accept(setupLocalMedia(), new ConversationCallback() {
                 @Override
                 public void onConversation(Conversation conversation, TwilioConversationsException exception) {
@@ -220,6 +220,8 @@ public class VideoConversationActivity extends BaseActivity {
                     }
                 }
             });
+        } else {
+            ColoredSnackBar.error(ColoredSnackBar.contentView(this), R.string.video_call_error, Snackbar.LENGTH_SHORT).show();
         }
     }
 
@@ -362,8 +364,8 @@ public class VideoConversationActivity extends BaseActivity {
         final Intent intent = getIntent();
         shoutOnwerId = intent.getStringExtra(ARGS_USERNAME);
         caller = intent.getStringExtra(ARGS_CALLER);
-        conversationClient = videoConversationManager.getConversationsClient();
-        invite = videoConversationManager.getInvite();
+        conversationClient = mTwilio.getConversationsClient();
+        invite = mTwilio.getInvite();
         cameraManager = (CameraManager) getApplicationContext().getSystemService(CAMERA_SERVICE);
     }
 
@@ -480,12 +482,13 @@ public class VideoConversationActivity extends BaseActivity {
         if (outgoingInvite != null) {
             outgoingInvite = null;
         }
-        if(conversationClient != null) {
+        if (conversationClient != null) {
             conversationClient.listen();
         }
         cameraCapturer.stopPreview();
         localVideoRenderer = null;
         participantVideoRenderer = null;
+        conversationClient.listen();
     }
 
     @Nonnull

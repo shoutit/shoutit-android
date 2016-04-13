@@ -8,7 +8,6 @@ import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.TwilioResponse;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Scheduler;
@@ -17,15 +16,8 @@ public class VideoCallsDao {
     @Nonnull
     private Observable<ResponseOrError<TwilioResponse>> videoCallsObservable;
 
-    @Nonnull
-    private final ApiService apiService;
-    @Nonnull
-    private final Scheduler networkScheduler;
-
     public VideoCallsDao(@Nonnull final ApiService apiService,
                          @Nonnull @NetworkScheduler final Scheduler networkScheduler) {
-        this.apiService = apiService;
-        this.networkScheduler = networkScheduler;
 
         videoCallsObservable = apiService.getTokenAndIdentity()
                 .subscribeOn(networkScheduler)
@@ -38,5 +30,4 @@ public class VideoCallsDao {
     public Observable<ResponseOrError<TwilioResponse>> getVideoCallsObservable() {
         return videoCallsObservable;
     }
-
 }

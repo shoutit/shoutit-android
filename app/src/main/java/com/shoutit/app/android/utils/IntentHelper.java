@@ -1,8 +1,10 @@
 package com.shoutit.app.android.utils;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.provider.Settings;
 
 import com.amazonaws.services.s3.util.Mimetypes;
 
@@ -21,5 +23,10 @@ public class IntentHelper {
     public static Intent videoIntent(@Nonnull String videoUrl) {
         return new Intent(Intent.ACTION_VIEW)
                 .setDataAndType(Uri.parse(videoUrl), "video/*");
+    }
+
+    public static Intent getAppSettingsIntent(Context context) {
+        return new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                .setData(Uri.parse("package:" + context.getPackageName()));
     }
 }

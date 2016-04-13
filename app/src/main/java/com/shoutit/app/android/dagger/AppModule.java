@@ -24,7 +24,6 @@ import com.jakewharton.picasso.OkHttp3Downloader;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BuildConfig;
 import com.shoutit.app.android.UserPreferences;
-import com.shoutit.app.android.view.videoconversation.VideoConversationManager;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.AuthInterceptor;
 import com.shoutit.app.android.constants.AmazonConstants;
@@ -290,12 +289,5 @@ public final class AppModule {
     @Singleton
     NetworkObservableProvider provideNetworkObservableProvider(@ForApplication Context context) {
         return new NetworkObservableProviderImpl(context);
-    }
-
-    @Provides
-    @Singleton
-    VideoConversationManager providesVideoConversationsInitializer(VideoConversationPresenter presenter,
-                                                                   @ForApplication Context context) {
-        return new VideoConversationManager(presenter, context);
     }
 }

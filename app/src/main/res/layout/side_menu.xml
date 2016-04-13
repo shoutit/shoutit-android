@@ -102,15 +102,6 @@
             android:drawableLeft="@drawable/ic_menu_chat"
             android:text="@string/menu_item_chats" />
 
-        <CheckedTextView
-            android:id="@+id/menu_orders"
-            style="@style/SideMenuItem"
-            android:paddingLeft="16dp"
-            android:paddingStart="16dp"
-            android:drawableStart="@drawable/ic_menu_orders"
-            android:drawableLeft="@drawable/ic_menu_orders"
-            android:text="@string/menu_item_orders" />
-
         <View
             android:layout_width="match_parent"
             android:layout_height="0.5dp"
@@ -130,13 +121,6 @@
             android:paddingLeft="16dp"
             android:paddingStart="16dp"
             android:text="@string/menu_item_help" />
-
-        <CheckedTextView
-            android:id="@+id/menu_invite_frirends"
-            style="@style/SideMenuItem"
-            android:paddingLeft="16dp"
-            android:paddingStart="16dp"
-            android:text="@string/menu_item_invite_friends" />
 
         <View
             android:layout_width="wrap_content"

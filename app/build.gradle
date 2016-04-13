@@ -126,7 +126,7 @@ android {
         if (variant.buildType.name.equals('release') && variant.getFlavors().get(0).name.equals('dev')) {
             variant.setIgnore(true);
         }
-        if (variant.buildType.name.equals('release') && variant.getFlavors().get(0).name.equals('dev')) {
+        if (variant.buildType.name.equals('debug') && variant.getFlavors().get(0).name.equals('prod')) {
             variant.setIgnore(true);
         }
     }
@@ -213,6 +213,7 @@ dependencies {
     }
     compile 'com.commonsware.cwac:cam2:0.5.3'
     compile 'com.pusher:pusher-java-client:1.1.2'
+    compile 'com.veinhorn.scrollgalleryview:library:1.0.5'
 
 
     // Tests

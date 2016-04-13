@@ -24,14 +24,13 @@ import com.shoutit.app.android.dao.TagsDao;
 import com.shoutit.app.android.dao.VideoCallsDao;
 import com.shoutit.app.android.db.DbHelper;
 import com.shoutit.app.android.location.LocationManager;
+import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.PusherHelper;
-import com.shoutit.app.android.view.videoconversation.VideoConversationManager;
 import com.squareup.picasso.Picasso;
 
 import javax.inject.Singleton;
 
 import dagger.Component;
-import okhttp3.OkHttpClient;
 import rx.Scheduler;
 
 @Singleton
@@ -96,5 +95,5 @@ public interface AppComponent {
 
     VideoCallsDao videoCallsDao();
 
-    VideoConversationManager videoConversationManager();
+    Twilio twilio();
 }
