@@ -3,9 +3,9 @@ package com.shoutit.app.android.view.createshout;
 import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.appunite.rx.functions.BothParams;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.BiMap;
@@ -148,21 +148,17 @@ public class ShoutMediaPresenter {
     }
 
     private void removeItem(@NonNull Item imageItem) {
-        final Integer firstAvailablePosition = getFirstAvailablePosition();
+        final Integer firstAvailablePosition = MoreObjects.firstNonNull(getFirstAvailablePosition(), mediaItems.values().size());
         final Integer position = mediaItems.inverse().get(imageItem);
 
-        if (firstAvailablePosition == null) {
-            mediaItems.forcePut(position, new AddImageItem());
-        } else {
-            for (int i = position + 1; i < firstAvailablePosition; i++) {
-                final Item item = mediaItems.get(i);
-                mediaItems.forcePut(i - 1, item);
-            }
-            mediaItems.forcePut(firstAvailablePosition - 1, new AddImageItem());
+        for (int i = position + 1; i < firstAvailablePosition; i++) {
+            final Item item = mediaItems.get(i);
+            mediaItems.forcePut(i - 1, item);
+        }
+        mediaItems.forcePut(firstAvailablePosition - 1, new AddImageItem());
 
-            for (int j = firstAvailablePosition; j < mediaItems.size(); j++) {
-                mediaItems.put(j, new BlankItem());
-            }
+        for (int j = firstAvailablePosition; j < mediaItems.size(); j++) {
+            mediaItems.put(j, new BlankItem());
         }
         mMediaListener.setImages(mediaItems);
     }
