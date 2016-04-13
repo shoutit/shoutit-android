@@ -3,6 +3,7 @@ package com.shoutit.app.android.api.model;
 import android.support.annotation.StringRes;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 import com.shoutit.app.android.R;
 
 import java.util.List;
@@ -160,6 +161,10 @@ public class MessageAttachment {
 
         public String getThumbnail() {
             return thumbnail;
+        }
+
+        public String getThumbnailOrNull() {
+            return Strings.emptyToNull(thumbnail);
         }
 
         public String getVideoUrl() {
