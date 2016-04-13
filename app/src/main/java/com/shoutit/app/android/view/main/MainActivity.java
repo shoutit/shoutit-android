@@ -36,6 +36,7 @@ import com.shoutit.app.android.view.home.HomeFragment;
 import com.shoutit.app.android.view.intro.IntroActivity;
 import com.shoutit.app.android.view.postlogininterest.PostLoginInterestActivity;
 import com.shoutit.app.android.view.search.main.MainSearchActivity;
+import com.shoutit.app.android.view.signin.LoginActivity;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -139,10 +140,14 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
             case R.id.base_menu_search:
                 return showMainSearchActivityOrLetFragmentsHandleIt();
             case R.id.base_menu_chat:
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.activity_main_fragment_container, ConverstationsFragment.newInstance(), MenuHandler.FRAGMENT_CHATS)
-                        .commit();
-                menuHandler.selectChats();
+                if (mUserPreferences.isNormalUser()) {
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.activity_main_fragment_container, ConverstationsFragment.newInstance(), MenuHandler.FRAGMENT_CHATS)
+                            .commit();
+                    menuHandler.selectChats();
+                } else {
+                    startActivity(LoginActivity.newIntent(this));
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
