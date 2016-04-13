@@ -405,21 +405,25 @@ public class ShoutActivity extends BaseActivity {
                     }
                 });
 
-
-                chatOrChatsTextView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (bottomBarData.isLoggedIn()) {
-                            if (bottomBarData.isHasConversation()) {
-                                startActivity(ChatActivity.newIntent(ShoutActivity.this, bottomBarData.getConversationId(), true));
+                if (!isUserShoutOwner) {
+                    chatOrChatsTextView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (bottomBarData.isLoggedIn()) {
+                                if (bottomBarData.isHasConversation()) {
+                                    startActivity(ChatActivity.newIntent(ShoutActivity.this, bottomBarData.getConversationId(), true));
+                                } else {
+                                    startActivity(ChatFirstConversationActivity.newIntent(ShoutActivity.this, true, mShoutId));
+                                }
                             } else {
-                                startActivity(ChatFirstConversationActivity.newIntent(ShoutActivity.this, true, mShoutId));
+                                ColoredSnackBar.error(ColoredSnackBar.contentView(ShoutActivity.this), R.string.error_action_only_for_logged_in_user, Snackbar.LENGTH_SHORT).show();
                             }
-                        } else {
-                            ColoredSnackBar.error(ColoredSnackBar.contentView(ShoutActivity.this), R.string.error_action_only_for_logged_in_user, Snackbar.LENGTH_SHORT).show();
                         }
-                    }
-                });
+                    });
+                } else {
+                    chatOrChatsTextView.setAlpha(.5f);
+                    chatOrChatsTextView.setEnabled(false);
+                }
 
                 final int bottomBarHeight = getResources().getDimensionPixelSize(R.dimen.shout_bottom_bar);
                 final ObjectAnimator animator = ObjectAnimator.ofFloat(bottomBar, "translationY", bottomBarHeight, 0);
