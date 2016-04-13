@@ -29,12 +29,15 @@ import com.twilio.conversations.IncomingInvite;
 import com.twilio.conversations.TwilioConversations;
 import com.twilio.conversations.TwilioConversationsException;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import rx.Observable;
 import rx.Scheduler;
+import rx.Subscription;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.subjects.BehaviorSubject;
@@ -149,19 +152,18 @@ public class Twilio {
     private TwilioAccessManagerListener accessManagerListener() {
         return new TwilioAccessManagerListener() {
             @Override
-            public void onAccessManagerTokenExpire(TwilioAccessManager twilioAccessManager) {
-                Log.d(TAG, "accessManagerListener : Token Expired");
+            public void onTokenExpired(TwilioAccessManager twilioAccessManager) {
+
             }
 
             @Override
             public void onTokenUpdated(TwilioAccessManager twilioAccessManager) {
-                Log.d(TAG, "accessManagerListener : Token Updated");
+
             }
 
             @Override
             public void onError(TwilioAccessManager twilioAccessManager, String s) {
                 LogHelper.logThrowableAndCrashlytics(TAG, "accessManagerListener : Error on Token: " + s, new Throwable());
-                Log.d(TAG, "accessManagerListener : Error on Token");
             }
         };
     }
@@ -169,7 +171,8 @@ public class Twilio {
     private ConversationsClientListener conversationsClientListener() {
         return new ConversationsClientListener() {
             @Override
-            public void onStartListeningForInvites(ConversationsClient conversationsClient) {}
+            public void onStartListeningForInvites(ConversationsClient conversationsClient) {
+            }
 
             @Override
             public void onStopListeningForInvites(ConversationsClient conversationsClient) {
@@ -187,7 +190,6 @@ public class Twilio {
                                 }
                             });
                 }
-                conversationsClient.listen();
             }
 
             @Override
@@ -197,7 +199,7 @@ public class Twilio {
 
                 callerIdentitySubject.onNext(caller.substring(1, caller.length() - 1));
                 callerNameObservable
-                        .take(1)
+                        .distinctUntilChanged()
                         .subscribe(new Action1<String>() {
                             @Override
                             public void call(String callerName) {
@@ -210,6 +212,7 @@ public class Twilio {
 
             @Override
             public void onIncomingInviteCancelled(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+                conversationsClient.listen();
             }
         };
     }
