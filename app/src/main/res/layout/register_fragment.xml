@@ -8,6 +8,7 @@
     android:focusableInTouchMode="true">
 
     <ScrollView
+        android:id="@+id/register_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true">
@@ -163,7 +164,9 @@
 
             <include
                 android:id="@+id/login_bottom_actions_container"
-                layout="@layout/login_bottom_actions"/>
+                layout="@layout/login_bottom_actions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 
