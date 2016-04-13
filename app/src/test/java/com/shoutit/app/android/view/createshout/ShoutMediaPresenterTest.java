@@ -253,4 +253,27 @@ public class ShoutMediaPresenterTest {
         assert_().that(videoCaptor.getValue()).hasSize(1);
         assert_().that(imagesCaptor.getValue()).hasSize(2);
     }
+
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testWhenAllMediaAddedAndFirstRemoved_addAtLastItem() throws Exception {
+        ArgumentCaptor<Map> argumentCaptor = ArgumentCaptor.forClass(Map.class);
+
+        mShoutMediaPresenter.register(mMediaListener);
+
+        mShoutMediaPresenter.addMediaItem("test", false);
+        mShoutMediaPresenter.addMediaItem("test", false);
+        mShoutMediaPresenter.addMediaItem("test", false);
+        mShoutMediaPresenter.addMediaItem("test", false);
+        mShoutMediaPresenter.addMediaItem("test", false);
+
+        verify(mMediaListener, times(6)).setImages(argumentCaptor.capture());
+
+        final ShoutMediaPresenter.MediaItem target = (ShoutMediaPresenter.MediaItem) argumentCaptor.getValue().get(0);
+        target.click();
+
+        verify(mMediaListener, times(7)).setImages(argumentCaptor.capture());
+        assert_().that(argumentCaptor.getValue().get(4)).isInstanceOf(ShoutMediaPresenter.AddImageItem.class);
+    }
 }

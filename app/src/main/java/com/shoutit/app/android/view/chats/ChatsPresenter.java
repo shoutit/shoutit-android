@@ -18,6 +18,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.pusher.client.channel.PresenceChannel;
+import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.AboutShout;
@@ -164,7 +165,7 @@ public class ChatsPresenter {
     public void register(@NonNull Listener listener) {
         final User user = mUserPreferences.getUser();
         assert user != null;
-        final PresenceChannel userChannel = mPusher.getPusher().getPresenceChannel(String.format("presence-u-%1$s", user.getId()));
+        final PresenceChannel userChannel = mPusher.getPusher().getPresenceChannel(String.format("presence-v3-p-%1$s", user.getId()));
         final PresenceChannel conversationChannel = mPusher.getPusher().subscribePresence(String.format("presence-v3-c-%1$s", conversationId));
 
         final Observable<PusherMessage> pusherMessageObservable = Observable
@@ -241,7 +242,7 @@ public class ChatsPresenter {
                         if (pusherMessage != null) {
                             for (PusherMessage message : pusherMessage) {
                                 builder.add(new Message(
-                                        conversationId, message.getUser(),
+                                        conversationId, message.getProfile(),
                                         message.getId(),
                                         message.getText(),
                                         message.getAttachments(),
@@ -290,13 +291,17 @@ public class ChatsPresenter {
                             final AboutShout about = conversationResponse.getAbout();
                             final String title = about.getTitle();
                             final String thumbnail = Strings.emptyToNull(about.getThumbnail());
-                            final String type = about.getType().equals(Shout.TYPE_OFFER) ? "Offer" : "Request";
+                            final String type = about.getType().equals(Shout.TYPE_OFFER) ? mContext.getString(R.string.chat_offer) : mContext.getString(R.string.chat_request);
                             final String price = PriceUtils.formatPriceWithCurrency(about.getPrice(), mResources, about.getCurrency());
                             final String authorAndTime = about.getProfile().getName() + " - " + DateUtils.getRelativeTimeSpanString(mContext, about.getDatePublished() * 1000);
                             final String id = about.getId();
 
-                            mListener.setAboutShoutData(title, thumbnail, type, price, authorAndTime, id);
-                            mListener.setShoutToolbarInfo(title, ConversationsUtils.getChatWithString(conversationResponse.getProfiles()));
+                            if (!Strings.isNullOrEmpty(id)) {
+                                mListener.setAboutShoutData(title, thumbnail, type, price, authorAndTime, id);
+                                mListener.setShoutToolbarInfo(title, ConversationsUtils.getChatWithString(conversationResponse.getProfiles()));
+                            } else {
+                                mListener.setShoutToolbarInfo(mContext.getString(R.string.chat_shout_chat), ConversationsUtils.getChatWithString(conversationResponse.getProfiles()));
+                            }
                         } else {
                             mListener.setChatToolbatInfo(ConversationsUtils.getChatWithString(conversationResponse.getProfiles()));
                         }
@@ -436,7 +441,7 @@ public class ChatsPresenter {
                 final MessageAttachment.AttachtmentShout shout = messageAttachment.getShout();
                 return new ReceivedShoutMessage(
                         isFirst,
-                        shout.getThumbnail(),
+                        shout.getThumbnailOrNull(),
                         time,
                         PriceUtils.formatPriceWithCurrency(shout.getPrice(), mResources, shout.getCurrency()),
                         shout.getText(),
@@ -468,7 +473,7 @@ public class ChatsPresenter {
                 return new SentLocationMessage(time, mListener, location.getLatitude(), location.getLongitude());
             } else if (MessageAttachment.ATTACHMENT_TYPE_SHOUT.equals(type)) {
                 final MessageAttachment.AttachtmentShout shout = messageAttachment.getShout();
-                return new SentShoutMessage(shout.getThumbnail(), time, PriceUtils.formatPriceWithCurrency(shout.getPrice(), mResources, shout.getCurrency()), shout.getText(), shout.getUser().getName(), mListener, shout.getId());
+                return new SentShoutMessage(shout.getThumbnailOrNull(), time, PriceUtils.formatPriceWithCurrency(shout.getPrice(), mResources, shout.getCurrency()), shout.getText(), shout.getUser().getName(), mListener, shout.getId());
             } else {
                 throw new RuntimeException(type);
             }

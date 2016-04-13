@@ -4,7 +4,7 @@ import java.util.List;
 
 public class PusherMessage {
 
-    private final ConversationProfile user;
+    private final ConversationProfile profile;
     private final String conversationId;
     private final String id;
     private final String text;
@@ -13,7 +13,7 @@ public class PusherMessage {
 
 
     public PusherMessage(ConversationProfile profile, String conversationId, String id, String text, List<MessageAttachment> attachments, long createdAt) {
-        this.user = profile;
+        this.profile = profile;
         this.conversationId = conversationId;
         this.id = id;
         this.text = text;
@@ -37,8 +37,8 @@ public class PusherMessage {
         return createdAt;
     }
 
-    public ConversationProfile getUser() {
-        return user;
+    public ConversationProfile getProfile() {
+        return profile;
     }
 
     public String getConversationId() {
