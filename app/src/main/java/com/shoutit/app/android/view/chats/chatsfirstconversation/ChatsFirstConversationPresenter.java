@@ -137,7 +137,7 @@ public class ChatsFirstConversationPresenter {
     public void register(@NonNull Listener listener) {
         final User user = mUserPreferences.getUser();
         assert user != null;
-        final PresenceChannel userChannel = mPusher.getPusher().getPresenceChannel(String.format("presence-u-%1$s", user.getId()));
+        final PresenceChannel userChannel = mPusher.getPusher().getPresenceChannel(String.format("presence-v3-p-%1$s", user.getId()));
 
         final Observable<PusherMessage> pusherMessageObservable = Observable
                 .create(new Observable.OnSubscribe<PusherMessage>() {
@@ -211,7 +211,7 @@ public class ChatsFirstConversationPresenter {
                             public Message apply(@Nullable PusherMessage message) {
                                 assert message != null;
                                 return new Message(
-                                        conversationId, message.getUser(),
+                                        conversationId, message.getProfile(),
                                         message.getId(),
                                         message.getText(),
                                         message.getAttachments(),

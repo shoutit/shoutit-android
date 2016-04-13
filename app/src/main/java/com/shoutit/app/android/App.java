@@ -153,7 +153,7 @@ public class App extends MultiDexApplication {
         mPusherHelper.init(token);
         final Pusher pusher = mPusherHelper.getPusher();
         pusher.connect(mEventListener);
-        pusher.subscribePresence(String.format("presence-u-%1$s", user.getId()));
+        pusher.subscribePresence(String.format("presence-v3-p-%1$s", user.getId()));
 
         mNetworkObservableProvider.networkObservable()
                 .filter(new Func1<NetworkObservableProvider.NetworkStatus, Boolean>() {

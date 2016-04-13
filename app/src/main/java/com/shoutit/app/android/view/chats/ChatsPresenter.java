@@ -6,6 +6,7 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.text.format.DateUtils;
+import android.util.Log;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.NetworkScheduler;
@@ -164,7 +165,7 @@ public class ChatsPresenter {
     public void register(@NonNull Listener listener) {
         final User user = mUserPreferences.getUser();
         assert user != null;
-        final PresenceChannel userChannel = mPusher.getPusher().getPresenceChannel(String.format("presence-u-%1$s", user.getId()));
+        final PresenceChannel userChannel = mPusher.getPusher().getPresenceChannel(String.format("presence-v3-p-%1$s", user.getId()));
         final PresenceChannel conversationChannel = mPusher.getPusher().subscribePresence(String.format("presence-v3-c-%1$s", conversationId));
 
         final Observable<PusherMessage> pusherMessageObservable = Observable
@@ -241,7 +242,7 @@ public class ChatsPresenter {
                         if (pusherMessage != null) {
                             for (PusherMessage message : pusherMessage) {
                                 builder.add(new Message(
-                                        conversationId, message.getUser(),
+                                        conversationId, message.getProfile(),
                                         message.getId(),
                                         message.getText(),
                                         message.getAttachments(),
