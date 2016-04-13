@@ -18,6 +18,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.pusher.client.channel.PresenceChannel;
+import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.ConversationProfile;
@@ -263,20 +264,30 @@ public class ChatsFirstConversationPresenter {
                         public void call(Shout about) {
                             final String title = about.getTitle();
                             final String thumbnail = Strings.emptyToNull(about.getThumbnail());
-                            final String type = about.getType().equals(Shout.TYPE_OFFER) ? "Offer" : "Request";
+                            final String type = about.getType().equals(Shout.TYPE_OFFER) ? mContext.getString(R.string.chat_offer) : mContext.getString(R.string.chat_request);
                             final String price = PriceUtils.formatPriceWithCurrency(about.getPrice(), mResources, about.getCurrency());
                             final User profile = about.getProfile();
                             final String authorAndTime = profile.getName() + " - " + DateUtils.getRelativeTimeSpanString(mContext, about.getDatePublishedInMillis());
                             final String id = about.getId();
 
-                            mListener.setAboutShoutData(title, thumbnail, type, price, authorAndTime, id);
-                            mListener.setShoutToolbarInfo(title, ConversationsUtils.getChatWithString(
-                                    ImmutableList.of(new ConversationProfile(
-                                            profile.getId(),
-                                            profile.getFirstName(),
-                                            profile.getUsername(),
-                                            profile.getType(),
-                                            profile.getImage()))));
+                            if (!Strings.isNullOrEmpty(id)) {
+                                mListener.setAboutShoutData(title, thumbnail, type, price, authorAndTime, id);
+                                mListener.setShoutToolbarInfo(title, ConversationsUtils.getChatWithString(
+                                        ImmutableList.of(new ConversationProfile(
+                                                profile.getId(),
+                                                profile.getFirstName(),
+                                                profile.getUsername(),
+                                                profile.getType(),
+                                                profile.getImage()))));
+                            } else {
+                                mListener.setShoutToolbarInfo(mContext.getString(R.string.chat_shout_chat), ConversationsUtils.getChatWithString(
+                                        ImmutableList.of(new ConversationProfile(
+                                                profile.getId(),
+                                                profile.getFirstName(),
+                                                profile.getUsername(),
+                                                profile.getType(),
+                                                profile.getImage()))));
+                            }
                         }
                     }, getOnError()));
         } else {
