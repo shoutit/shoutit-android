@@ -67,10 +67,20 @@ public class DialogCallActivity extends BaseActivity {
                 .subscribe(new Action1<Void>() {
                     @Override
                     public void call(Void aVoid) {
-                        mTwilio.getInvite().reject();
-                        finish();
+                        if (mTwilio.getInvite() != null) {
+                            mTwilio.getInvite().reject();
+                            finish();
+                        }
                     }
                 });
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (mTwilio.getInvite() != null) {
+            mTwilio.getInvite().reject();
+        }
     }
 
     @Nonnull

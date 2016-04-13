@@ -394,6 +394,7 @@
     <string name="video_calls_connecting">Connecting…</string>
     <string name="video_calls_connected">Connected with %s</string>
     <string name="video_calls_participant_disconected">Participant ended conversation</string>
+    <string name="video_call_error">Sorry, cannot start conversation. Try again later.</string>
 
     <string name="no_phone_number_error">Phone number is not currently available.</string>
     <string name="call_dialog_positive_button">Call</string>
@@ -457,5 +458,6 @@
     <string name="verify_not_verified">Your account isn\'t verified yet</string>
     <string name="profile_verify_account">Verify your account</string>
     <string name="verify_email_title">Email Verification</string>
+    <string name="video_calls_cannot_start_conversation">Sorry, cannot start this video call. Please try again later.</string>
 
 </resources>

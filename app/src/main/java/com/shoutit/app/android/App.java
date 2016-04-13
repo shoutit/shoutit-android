@@ -46,6 +46,7 @@ import rx.functions.Func2;
 import rx.plugins.RxJavaErrorHandler;
 import rx.plugins.RxJavaPlugins;
 
+
 public class App extends MultiDexApplication {
 
     private static final String TAG = App.class.getSimpleName();
@@ -65,6 +66,7 @@ public class App extends MultiDexApplication {
             Log.e(TAG, "pusher message", e);
         }
     };
+
 
     @Inject
     ApiService apiService;

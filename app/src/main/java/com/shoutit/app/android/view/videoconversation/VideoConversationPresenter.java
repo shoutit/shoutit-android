@@ -33,9 +33,6 @@ public class VideoConversationPresenter {
     @Nonnull
     private Observable<Throwable> errorObservable;
     @Nonnull
-    private Observable<Throwable> errorOnCallerObservable;
-
-    @Nonnull
     private BehaviorSubject<String> callerIdentitySubject = BehaviorSubject.create();
 
     @Inject
@@ -106,11 +103,6 @@ public class VideoConversationPresenter {
     @Nonnull
     public Observable<Throwable> getErrorObservable() {
         return errorObservable;
-    }
-
-    @Nonnull
-    public Observable<Throwable> getErrorOnCallerObservable() {
-        return errorOnCallerObservable;
     }
 
     @Nonnull

@@ -31,7 +31,6 @@ import com.squareup.picasso.Picasso;
 import javax.inject.Singleton;
 
 import dagger.Component;
-import okhttp3.OkHttpClient;
 import rx.Scheduler;
 
 @Singleton

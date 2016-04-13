@@ -96,7 +96,6 @@ public class ShoutActivity extends BaseActivity {
     UserPreferences userPreferences;
 
     private String mShoutId;
-    private String shoutOwnerId;
 
     public static Intent newIntent(@Nonnull Context context, @Nonnull String shoutId) {
         return new Intent(context, ShoutActivity.class)
@@ -190,15 +189,6 @@ public class ShoutActivity extends BaseActivity {
                     @Override
                     public void call(String categorySlug) {
                         startActivity(TagProfileActivity.newIntent(ShoutActivity.this, categorySlug));
-                    }
-                });
-
-        presenter.getIdentityUserObservable()
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String shoutOwnerIdentity) {
-                        shoutOwnerId = shoutOwnerIdentity;
                     }
                 });
 
@@ -305,6 +295,38 @@ public class ShoutActivity extends BaseActivity {
         presenter.getRefreshUserShoutsObservable()
                 .compose(this.bindToLifecycle())
                 .subscribe();
+
+        RxView.clicks(videoCallOrEditTextView)
+                .compose(bindToLifecycle())
+                .subscribe(presenter.getVideoOrEditClickSubject());
+
+        presenter.getVideoCallClickedObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String userId) {
+                        startActivity(VideoConversationActivity.newIntent(null, userId, ShoutActivity.this));
+                    }
+                });
+
+        presenter.getEditShoutClickedObservable()
+                .compose(this.<Boolean>bindToLifecycle())
+                .subscribe(new Action1<Boolean>() {
+                    @Override
+                    public void call(Boolean aBoolean) {
+                        startActivityForResult(EditShoutActivity.newIntent(mShoutId, ShoutActivity.this), EDIT_SHOUT_REQUEST_CODE);
+                    }
+                });
+
+        presenter.getOnlyForLoggedInUserObservable()
+                .compose(this.bindToLifecycle())
+                .subscribe(new Action1<Object>() {
+                    @Override
+                    public void call(Object o) {
+                        ColoredSnackBar.error(ColoredSnackBar.contentView(ShoutActivity.this), R.string.error_action_only_for_logged_in_user, Snackbar.LENGTH_SHORT).show();
+                    }
+                });
+
     }
 
     private void startCall(String phoneNumber) {
@@ -370,14 +392,15 @@ public class ShoutActivity extends BaseActivity {
                     chatOrChatsTextView.setText(R.string.shout_bottom_bar_chats);
 
                     ImageHelper.setStartCompoundRelativeDrawable(showMoreIcon, R.drawable.ic_more_disabled);
+                    ImageHelper.setStartCompoundRelativeDrawable(videoCallOrEditTextView, R.drawable.ic_edit_red);
 
-                    videoCallOrEditTextView.setCompoundDrawablesWithIntrinsicBounds(
-                            R.drawable.ic_edit_red, 0, 0, 0);
                     videoCallOrEditTextView.setText(R.string.shout_bottom_bar_edit);
                     showMoreIcon.setVisibility(View.GONE);
+
+                    chatOrChatsTextView.setAlpha(.5f);
+                    chatOrChatsTextView.setEnabled(false);
                 } else {
                     callOrDeleteTextView.setText(R.string.shout_bottom_bar_call);
-                    callOrDeleteTextView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_call_green, 0, 0, 0);
 
                     chatOrChatsTextView.setText(R.string.shout_bottom_bar_chat);
                     showMoreIcon.setOnClickListener(new View.OnClickListener() {
@@ -387,29 +410,16 @@ public class ShoutActivity extends BaseActivity {
                         }
                     });
 
-                    videoCallOrEditTextView.setCompoundDrawablesWithIntrinsicBounds(
-                            R.drawable.ic_video_chat_red, 0, 0, 0);
+                    ImageHelper.setStartCompoundRelativeDrawable(callOrDeleteTextView, R.drawable.ic_call_green);
+                    ImageHelper.setStartCompoundRelativeDrawable(videoCallOrEditTextView, R.drawable.ic_video_chat_red);
+                    ImageHelper.setStartCompoundRelativeDrawable(showMoreIcon, R.drawable.ic_more_white);
+
                     videoCallOrEditTextView.setText(R.string.shout_bottom_bar_video_call);
 
-                    ImageHelper.setStartCompoundRelativeDrawable(showMoreIcon, R.drawable.ic_more_white);
-                }
-
-                videoCallOrEditTextView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (isUserShoutOwner) {
-                            startActivityForResult(EditShoutActivity.newIntent(mShoutId, ShoutActivity.this), EDIT_SHOUT_REQUEST_CODE);
-                        } else {
-                            startActivity(VideoConversationActivity.newIntent(null, shoutOwnerId, ShoutActivity.this));
-                        }
-                    }
-                });
-
-                if (!isUserShoutOwner) {
                     chatOrChatsTextView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            if (bottomBarData.isLoggedIn()) {
+                            if (bottomBarData.isNormalUser()) {
                                 if (bottomBarData.isHasConversation()) {
                                     startActivity(ChatActivity.newIntent(ShoutActivity.this, bottomBarData.getConversationId(), true));
                                 } else {
@@ -420,9 +430,6 @@ public class ShoutActivity extends BaseActivity {
                             }
                         }
                     });
-                } else {
-                    chatOrChatsTextView.setAlpha(.5f);
-                    chatOrChatsTextView.setEnabled(false);
                 }
 
                 final int bottomBarHeight = getResources().getDimensionPixelSize(R.dimen.shout_bottom_bar);

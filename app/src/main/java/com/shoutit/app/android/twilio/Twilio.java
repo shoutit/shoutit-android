@@ -11,11 +11,13 @@ import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.collect.ImmutableList;
+import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.CallerProfile;
 import com.shoutit.app.android.api.model.TwilioResponse;
 import com.shoutit.app.android.dagger.ForApplication;
 import com.shoutit.app.android.dao.UsersIdentityDao;
 import com.shoutit.app.android.dao.VideoCallsDao;
+import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.view.videoconversation.DialogCallActivity;
 import com.twilio.common.TwilioAccessManager;
 import com.twilio.common.TwilioAccessManagerFactory;
@@ -41,6 +43,7 @@ import rx.subjects.BehaviorSubject;
 public class Twilio {
 
     private static final String TAG = Twilio.class.getCanonicalName();
+
     private final Context mContext;
     private TwilioAccessManager accessManager;
     private ConversationsClient conversationsClient;
@@ -100,12 +103,7 @@ public class Twilio {
         errorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
                 ResponseOrError.transform(twilioResponse),
                 ResponseOrError.transform(callerProfileResponse)))
-                .filter(Functions1.isNotNull()).doOnNext(new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-
-                    }
-                })
+                .filter(Functions1.isNotNull())
                 .observeOn(uiScheduler);
     }
 
@@ -122,7 +120,7 @@ public class Twilio {
                 .subscribe(new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        Toast.makeText(mContext, "Failed to fetch data: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, R.string.error_default, Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -142,7 +140,7 @@ public class Twilio {
 
                 @Override
                 public void onError(Exception e) {
-                    Toast.makeText(mContext, "Failed to initialize the Twilio Conversations SDK", Toast.LENGTH_LONG).show();
+                    LogHelper.logThrowableAndCrashlytics(TAG, "Failed to initialize the Twilio Conversations SDK with error: ", e);
                 }
             });
         }
@@ -162,6 +160,7 @@ public class Twilio {
 
             @Override
             public void onError(TwilioAccessManager twilioAccessManager, String s) {
+                LogHelper.logThrowableAndCrashlytics(TAG, "accessManagerListener : Error on Token: " + s, new Throwable());
                 Log.d(TAG, "accessManagerListener : Error on Token");
             }
         };
@@ -170,14 +169,11 @@ public class Twilio {
     private ConversationsClientListener conversationsClientListener() {
         return new ConversationsClientListener() {
             @Override
-            public void onStartListeningForInvites(ConversationsClient conversationsClient) {
-                Log.d("TWILIO", "LISTENING ** ** **");
-            }
+            public void onStartListeningForInvites(ConversationsClient conversationsClient) {}
 
             @Override
             public void onStopListeningForInvites(ConversationsClient conversationsClient) {
                 conversationsClient.listen();
-                Log.d(TAG, "Stop listening for Conversations");
             }
 
             @Override
@@ -192,7 +188,6 @@ public class Twilio {
                             });
                 }
                 conversationsClient.listen();
-                Log.d(TAG, "Failed to listening for Conversations");
             }
 
             @Override
@@ -215,8 +210,6 @@ public class Twilio {
 
             @Override
             public void onIncomingInviteCancelled(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
-                Log.d(TAG, "Incoming call canceled");
-                conversationsClient.listen();
             }
         };
     }
