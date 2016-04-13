@@ -43,6 +43,7 @@ import com.shoutit.app.android.utils.ImageHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.view.chats.ChatActivity;
 import com.shoutit.app.android.view.chats.chatsfirstconversation.ChatFirstConversationActivity;
+import com.shoutit.app.android.view.conversations.ConversationsActivity;
 import com.shoutit.app.android.view.createshout.edit.EditShoutActivity;
 import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
@@ -389,16 +390,20 @@ public class ShoutActivity extends BaseActivity {
                     callOrDeleteTextView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_delete_red, 0, 0, 0);
                     callOrDeleteTextView.setText(R.string.shout_bottom_bar_delete);
 
-                    chatOrChatsTextView.setText(R.string.shout_bottom_bar_chats);
-
                     ImageHelper.setStartCompoundRelativeDrawable(showMoreIcon, R.drawable.ic_more_disabled);
                     ImageHelper.setStartCompoundRelativeDrawable(videoCallOrEditTextView, R.drawable.ic_edit_red);
 
                     videoCallOrEditTextView.setText(R.string.shout_bottom_bar_edit);
                     showMoreIcon.setVisibility(View.GONE);
 
-                    chatOrChatsTextView.setAlpha(.5f);
-                    chatOrChatsTextView.setEnabled(false);
+                    chatOrChatsTextView.setText(R.string.shout_bottom_bar_chats);
+                    chatOrChatsTextView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            startActivity(ConversationsActivity.newIntent(ShoutActivity.this));
+                        }
+                    });
+
                 } else {
                     callOrDeleteTextView.setText(R.string.shout_bottom_bar_call);
 
