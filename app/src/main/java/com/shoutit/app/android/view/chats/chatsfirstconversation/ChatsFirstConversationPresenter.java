@@ -653,7 +653,7 @@ public class ChatsFirstConversationPresenter {
 
     public void sendTyping() {
         final PresenceChannel presenceChannel = mPusher.getPusher().getPresenceChannel(String.format("presence-v3-c-%1$s", conversationId));
-        if (presenceChannel != null) {
+        if (presenceChannel != null && presenceChannel.isSubscribed()) {
             presenceChannel.trigger("client-is_typing", mGson.toJson(mUser));
         }
     }
