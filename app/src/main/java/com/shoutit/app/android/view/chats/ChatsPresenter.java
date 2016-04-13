@@ -6,7 +6,6 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.text.format.DateUtils;
-import android.util.Log;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.NetworkScheduler;
@@ -19,6 +18,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.pusher.client.channel.PresenceChannel;
+import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.AboutShout;
@@ -291,13 +291,17 @@ public class ChatsPresenter {
                             final AboutShout about = conversationResponse.getAbout();
                             final String title = about.getTitle();
                             final String thumbnail = Strings.emptyToNull(about.getThumbnail());
-                            final String type = about.getType().equals(Shout.TYPE_OFFER) ? "Offer" : "Request";
+                            final String type = about.getType().equals(Shout.TYPE_OFFER) ? mContext.getString(R.string.chat_offer) : mContext.getString(R.string.chat_request);
                             final String price = PriceUtils.formatPriceWithCurrency(about.getPrice(), mResources, about.getCurrency());
                             final String authorAndTime = about.getProfile().getName() + " - " + DateUtils.getRelativeTimeSpanString(mContext, about.getDatePublished() * 1000);
                             final String id = about.getId();
 
-                            mListener.setAboutShoutData(title, thumbnail, type, price, authorAndTime, id);
-                            mListener.setShoutToolbarInfo(title, ConversationsUtils.getChatWithString(conversationResponse.getProfiles()));
+                            if (!Strings.isNullOrEmpty(id)) {
+                                mListener.setAboutShoutData(title, thumbnail, type, price, authorAndTime, id);
+                                mListener.setShoutToolbarInfo(title, ConversationsUtils.getChatWithString(conversationResponse.getProfiles()));
+                            } else {
+                                mListener.setShoutToolbarInfo(mContext.getString(R.string.chat_shout_chat), ConversationsUtils.getChatWithString(conversationResponse.getProfiles()));
+                            }
                         } else {
                             mListener.setChatToolbatInfo(ConversationsUtils.getChatWithString(conversationResponse.getProfiles()));
                         }
