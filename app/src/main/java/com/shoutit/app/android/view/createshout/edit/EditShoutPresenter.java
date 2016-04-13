@@ -191,7 +191,7 @@ public class EditShoutPresenter {
                             mListener.setLocation(
                                     ResourcesHelper.getResourceIdForName(mUserLocation.getCountry(), mContext),
                                     mUserLocation.getCity());
-                            mListener.setMobilePhone(shoutResponse.getMobileHint());
+                            mListener.setMobilePhone(shoutResponse.getMobile());
                             mListener.setMedia(shoutResponse.getImages(), shoutResponse.getVideos());
                             changeCategoryWithSelectedOptions(shoutResponse.getCategory().getSlug(), shoutResponse.getFilters());
                         } else {
