@@ -27,6 +27,7 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dao.ProfilesDao;
+import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.view.conversations.ConverstationsFragment;
@@ -36,6 +37,7 @@ import com.shoutit.app.android.view.home.HomeFragment;
 import com.shoutit.app.android.view.intro.IntroActivity;
 import com.shoutit.app.android.view.postlogininterest.PostLoginInterestActivity;
 import com.shoutit.app.android.view.search.main.MainSearchActivity;
+import com.twilio.conversations.TwilioConversations;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -66,6 +68,8 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
     UserPreferences mUserPreferences;
     @Inject
     ProfilesDao profilesDao;
+    @Inject
+    Twilio twilio;
 
     private ActionBarDrawerToggle drawerToggle;
     private boolean doubleBackToExitPressedOnce;
@@ -82,6 +86,10 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        if(!TwilioConversations.isInitialized() && !mUserPreferences.isGuest()){
+            twilio.init();
+        }
 
         if (!mUserPreferences.isUserLoggedIn() && !mUserPreferences.isGuest()) {
             finish();

@@ -40,7 +40,9 @@ import rx.Scheduler;
 import rx.Subscription;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.subjects.BehaviorSubject;
+import rx.subjects.PublishSubject;
 
 @Singleton
 public class Twilio {
@@ -55,12 +57,11 @@ public class Twilio {
     @Nonnull
     private Observable<String> twilioRequirementObservable;
     @Nonnull
-    private Observable<String> callerNameObservable;
-    @Nonnull
     private Observable<Throwable> errorObservable;
 
     @Nonnull
-    private BehaviorSubject<String> callerIdentitySubject = BehaviorSubject.create();
+    private final BehaviorSubject<String> callerIdentitySubject = BehaviorSubject.create();
+    private final PublishSubject<Object> profileRefreshSubject = PublishSubject.create();
 
     @Inject
     public Twilio(@ForApplication Context context,
@@ -72,8 +73,15 @@ public class Twilio {
         final Observable<ResponseOrError<TwilioResponse>> twilioResponse = videoCallsDao.getVideoCallsObservable()
                 .compose(ObservableExtensions.<ResponseOrError<TwilioResponse>>behaviorRefCount());
 
-        Observable<ResponseOrError<CallerProfile>> callerProfileResponse = callerIdentitySubject
-                .flatMap(new Func1<String, Observable<ResponseOrError<CallerProfile>>>() {
+        final Observable<ResponseOrError<CallerProfile>> callerProfileResponse = profileRefreshSubject
+                .withLatestFrom(callerIdentitySubject,
+                        new Func2<Object, String, String>() {
+                            @Override
+                            public String call(Object o, String identity) {
+                                return identity;
+                            }
+                        })
+                .switchMap(new Func1<String, Observable<ResponseOrError<CallerProfile>>>() {
                     @Override
                     public Observable<ResponseOrError<CallerProfile>> call(String callerName) {
                         return usersIdentityDao.getUserByIdentityObservable(callerName);
@@ -92,7 +100,7 @@ public class Twilio {
                 .filter(Functions1.isNotNull());
 
 
-        callerNameObservable = callerProfileResponse
+        final Observable<String> callerNameObservable = callerProfileResponse
                 .compose(ResponseOrError.<CallerProfile>onlySuccess())
                 .filter(Functions1.isNotNull())
                 .map(new Func1<CallerProfile, String>() {
@@ -101,6 +109,16 @@ public class Twilio {
                         return callerProfile.getName();
                     }
                 }).observeOn(uiScheduler);
+
+        callerNameObservable
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String callerName) {
+                        Intent intent = DialogCallActivity.newIntent(callerName, mContext);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        mContext.startActivity(intent);
+                    }
+                });
 
         /** Errors **/
         errorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
@@ -198,16 +216,8 @@ public class Twilio {
                 String caller = String.valueOf(incomingInvite.getParticipants());
 
                 callerIdentitySubject.onNext(caller.substring(1, caller.length() - 1));
-                callerNameObservable
-                        .distinctUntilChanged()
-                        .subscribe(new Action1<String>() {
-                            @Override
-                            public void call(String callerName) {
-                                Intent intent = DialogCallActivity.newIntent(callerName, mContext);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                mContext.startActivity(intent);
-                            }
-                        });
+                profileRefreshSubject.onNext(null);
+
             }
 
             @Override
@@ -215,6 +225,11 @@ public class Twilio {
                 conversationsClient.listen();
             }
         };
+    }
+
+    public void unregisterTwillio(){
+        if (TwilioConversations.isInitialized())
+            TwilioConversations.destroy();
     }
 
     @Nullable

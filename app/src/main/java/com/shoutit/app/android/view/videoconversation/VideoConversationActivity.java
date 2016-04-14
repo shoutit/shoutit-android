@@ -159,8 +159,6 @@ public class VideoConversationActivity extends BaseActivity {
                     @Override
                     public void call(Void aVoid) {
                         closeConversation();
-
-
                         finish();
                     }
                 });
@@ -190,8 +188,9 @@ public class VideoConversationActivity extends BaseActivity {
             @Override
             public void onError(CapturerException e) {
                 conversationErrorSubject.onNext(getString(R.string.video_calls_camera_issue));
-                stopPreview();
-                startPreview();
+                if (cameraCapturer != null) {
+                    cameraCapturer.startPreview();
+                }
             }
         };
     }
@@ -220,7 +219,6 @@ public class VideoConversationActivity extends BaseActivity {
                                 .setConversationListener(conversationListener());
                     } else {
                         conversationErrorSubject.onNext(TextHelper.formatErrorMessage(exception.getMessage()));
-                        cameraCapturer.stopPreview();
                     }
                 }
             });
@@ -234,8 +232,6 @@ public class VideoConversationActivity extends BaseActivity {
         if (shoutOnwerId != null && conversationClient != null) {
             callButton.setVisibility(View.GONE);
 
-            stopPreview();
-
             Set<String> participants = new HashSet<>();
             participants.add(shoutOnwerId);
 
@@ -247,13 +243,11 @@ public class VideoConversationActivity extends BaseActivity {
                                 VideoConversationActivity.this.conversation = conversation;
                                 conversation.setConversationListener(conversationListener());
                             } else if (exception.getErrorCode() == 109) {
-                                    conversationInfoSubject.onNext(getString(R.string.video_calls_participant_reject));
-                                    cameraCapturer.stopPreview();
-                                } else {
-                                    conversationErrorSubject.onNext(TextHelper.formatErrorMessage(exception.getMessage()));
-                                    cameraCapturer.stopPreview();
-                                }
+                                conversationInfoSubject.onNext(getString(R.string.video_calls_participant_reject));
+                            } else {
+                                conversationErrorSubject.onNext(TextHelper.formatErrorMessage(exception.getMessage()));
                             }
+                        }
                     });
         } else {
             ColoredSnackBar.error(ColoredSnackBar.contentView(this), R.string.video_calls_cannot_start_conversation, Snackbar.LENGTH_SHORT).show();
@@ -265,8 +259,6 @@ public class VideoConversationActivity extends BaseActivity {
             @Override
             public void onLocalVideoTrackAdded(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
                 conversationInfoSubject.onNext(getString(R.string.video_calls_connecting));
-                stopPreview();
-
                 localVideoRenderer = new VideoViewRenderer(VideoConversationActivity.this, localWindow);
                 localVideoTrack.addRenderer(localVideoRenderer);
             }
@@ -274,7 +266,6 @@ public class VideoConversationActivity extends BaseActivity {
             @Override
             public void onLocalVideoTrackRemoved(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
                 localWindow.removeAllViews();
-                participantWindow.removeAllViews();
             }
 
             @Override
@@ -307,7 +298,7 @@ public class VideoConversationActivity extends BaseActivity {
             @Override
             public void onConversationEnded(Conversation conversation, TwilioConversationsException e) {
                 if (conversation != null) {
-                    conversation = null;
+                    conversation.disconnect();
                 }
             }
         };
@@ -335,6 +326,7 @@ public class VideoConversationActivity extends BaseActivity {
             @Override
             public void onVideoTrackRemoved(Conversation conversation, Participant participant, VideoTrack videoTrack) {
                 participantWindow.removeAllViews();
+                videoTrack.removeRenderer(participantVideoRenderer);
             }
 
             @Override
@@ -365,7 +357,7 @@ public class VideoConversationActivity extends BaseActivity {
                     CameraCapturer.CameraSource.CAMERA_SOURCE_BACK_CAMERA, localVideoPreview, capturerErrorListener());
         }
         setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
-        startPreview();
+        cameraCapturer.startPreview();
     }
 
     private void setupVariablesFromApp() {
@@ -441,10 +433,12 @@ public class VideoConversationActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (TwilioConversations.isInitialized() && conversationClient != null && !conversationClient.isListening()) {
+        if (TwilioConversations.isInitialized() && conversationClient != null) {
             conversationClient.listen();
         }
-        startPreview();
+        if (cameraCapturer != null) {
+            cameraCapturer.startPreview();
+        }
     }
 
     @Override
@@ -453,44 +447,38 @@ public class VideoConversationActivity extends BaseActivity {
         if (TwilioConversations.isInitialized() && conversationClient != null && conversation == null) {
             conversationClient.unlisten();
         }
-        cameraCapturer.stopPreview();
-        cameraCapturer = null;
+        if (cameraCapturer != null) {
+            cameraCapturer.stopPreview();
+        }
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        cameraCapturer.stopPreview();
-        cameraCapturer = null;
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    private void stopPreview() {
+        if (cameraCapturer != null) {
             cameraCapturer.stopPreview();
-    }
-
-    private void startPreview() {
-            cameraCapturer.startPreview();
+        }
     }
 
     private void closeConversation() {
+
+        localWindow.removeAllViews();
+        participantWindow.removeAllViews();
+        localVideoRenderer = null;
+        participantVideoRenderer = null;
+
         cameraCapturer.stopPreview();
 
         if (conversation != null) {
             conversation.disconnect();
         }
         if (invite != null) {
-            invite = null;
+            invite.reject();
         }
         if (outgoingInvite != null) {
-            outgoingInvite = null;
+            outgoingInvite.cancel();
         }
-        localWindow.removeAllViews();
-        participantWindow.removeAllViews();
+
     }
 
     @Nonnull
