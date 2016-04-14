@@ -63,8 +63,7 @@ public class PriceUtils {
                             public SpinnerCurrency apply(Currency input) {
                                 return new SpinnerCurrency(
                                         input.getCode(),
-                                        input.getCountry(),
-                                        String.format("%s (%s)", input.getName(), input.getCountry()));
+                                        String.format("%s (%s)", input.getName(), input.getCode()));
                             }
                         }));
     }
@@ -72,23 +71,16 @@ public class PriceUtils {
     public static class SpinnerCurrency {
 
         private final String code;
-        private final String country;
         private final String name;
 
-        public SpinnerCurrency(@NonNull String code, @NonNull String country, @NonNull String name) {
+        public SpinnerCurrency(@NonNull String code, @NonNull String name) {
             this.code = code;
-            this.country = country;
             this.name = name;
         }
 
         @NonNull
         public String getCode() {
             return code;
-        }
-
-        @NonNull
-        public String getCountry() {
-            return country;
         }
 
         @NonNull
