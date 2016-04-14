@@ -12,10 +12,10 @@ public class ChatInfo {
     private final boolean isListening;
     private final boolean mIsUserLoggedIn;
 
-    public ChatInfo(@NonNull String username, @Nullable String conversationId, boolean isListening, boolean isUserLoggedIn) {
+    public ChatInfo(@NonNull String username, @Nullable String conversationId, boolean isListener, boolean isUserLoggedIn) {
         this.username = username;
         this.conversationId = conversationId;
-        this.isListening = isListening;
+        this.isListening = isListener;
         mIsUserLoggedIn = isUserLoggedIn;
     }
 
@@ -29,7 +29,7 @@ public class ChatInfo {
         return conversationId;
     }
 
-    public boolean isListening() {
+    public boolean isListener() {
         return isListening;
     }
 

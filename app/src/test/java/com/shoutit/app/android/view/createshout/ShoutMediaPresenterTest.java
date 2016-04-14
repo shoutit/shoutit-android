@@ -27,6 +27,7 @@ import rx.Observable;
 
 import static com.google.common.truth.Truth.assert_;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -99,7 +100,7 @@ public class ShoutMediaPresenterTest {
         final ShoutMediaPresenter.Item item = value.get(0);
         item.click();
 
-        verify(mMediaListener).openSelectMediaActivity();
+        verify(mMediaListener).openSelectMediaActivity(anyBoolean());
     }
 
     @SuppressWarnings("unchecked")
