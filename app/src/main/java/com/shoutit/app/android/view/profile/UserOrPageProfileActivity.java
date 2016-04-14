@@ -79,7 +79,7 @@ public class UserOrPageProfileActivity extends ProfileActivity {
                     public void call(ChatInfo chatInfo) {
                         if (chatInfo.isUserLoggedIn()) {
                             final String conversationId = chatInfo.getConversationId();
-                            if (chatInfo.isListening()) {
+                            if (chatInfo.isListener()) {
                                 if (conversationId == null) {
                                     startActivity(ChatFirstConversationActivity.newIntent(UserOrPageProfileActivity.this, false, chatInfo.getUsername()));
                                 } else {
