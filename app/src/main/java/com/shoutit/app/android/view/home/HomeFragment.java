@@ -176,7 +176,6 @@ public class HomeFragment extends BaseFragment {
     @OnClick(R.id.fragment_home_fab)
     void onAddShoutClicked() {
         startActivity(new Intent(context, CreateShoutDialogActivity.class));
-//        CreateShoutDialogFragment.newInstance().show(getFragmentManager(), null);
     }
 
     @Override
