@@ -28,7 +28,7 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LayoutManagerHelper;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
-import com.shoutit.app.android.view.createshout.CreateShoutDialogFragment;
+import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.subsearch.SubSearchActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
@@ -206,6 +206,6 @@ public class DiscoverShoutsActivity extends BaseActivity {
 
     @OnClick(R.id.discover_fab)
     void onAddShoutClicked() {
-        CreateShoutDialogFragment.newInstance().show(getSupportFragmentManager(), null);
+        startActivity(CreateShoutDialogActivity.getIntent(this));
     }
 }
