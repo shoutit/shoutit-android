@@ -371,7 +371,7 @@ public class ProfileAdapterItems {
 
     public static class UserThreeIconsAdapterItem extends ProfileAdapterItems.ThreeIconsAdapterItem {
 
-        private final boolean isUserLoggedIn;
+        private final boolean isNormalUser;
         @Nonnull
         private final Observer<Object> actionOnlyForLoggedInUserObserver;
         @Nonnull
@@ -379,24 +379,24 @@ public class ProfileAdapterItems {
         @Nonnull
         private final Observer<User> onListenActionClickedObserver;
 
-        public UserThreeIconsAdapterItem(@Nonnull User user, boolean isUserLoggedIn,
+        public UserThreeIconsAdapterItem(@Nonnull User user, boolean isNormalUser,
                                          @Nonnull Observer<Object> actionOnlyForLoggedInUserObserver,
                                          @Nonnull Observer<ChatInfo> onChatIconClickedObserver,
                                          @Nonnull Observer<User> onListenActionClickedObserver) {
             super(user);
-            this.isUserLoggedIn = isUserLoggedIn;
+            this.isNormalUser = isNormalUser;
             this.actionOnlyForLoggedInUserObserver = actionOnlyForLoggedInUserObserver;
             this.onChatIconClickedObserver = onChatIconClickedObserver;
             this.onListenActionClickedObserver = onListenActionClickedObserver;
         }
 
-        public boolean isUserLoggedIn() {
-            return isUserLoggedIn;
+        public boolean isNormalUser() {
+            return isNormalUser;
         }
 
         public void onChatActionClicked() {
             final Conversation conversation = user.getConversation();
-            onChatIconClickedObserver.onNext(new ChatInfo(user.getUsername(), conversation != null ? conversation.getId() : null, user.isListener(), isUserLoggedIn));
+            onChatIconClickedObserver.onNext(new ChatInfo(user.getUsername(), conversation != null ? conversation.getId() : null, user.isListening(), isNormalUser));
         }
 
         public void onListenActionClicked() {

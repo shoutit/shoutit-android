@@ -199,8 +199,8 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
     }
 
     @Override
-    public void showError() {
-        ColoredSnackBar.error(ColoredSnackBar.contentView(this), getString(R.string.request_acitvity_post_error), Snackbar.LENGTH_SHORT).show();
+    public void showApiError(Throwable throwable) {
+        ColoredSnackBar.error(ColoredSnackBar.contentView(this), throwable, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override

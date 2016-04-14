@@ -338,7 +338,7 @@ public class ShoutActivity extends BaseActivity {
                 MainActivity.REQUST_CODE_CALL_PHONE_PERMISSION,
                 ColoredSnackBar.contentView(this),
                 R.string.permission_call_phone_explanation,
-                new String[]{Manifest.permission.CAMERA})) {
+                new String[]{Manifest.permission.CALL_PHONE})) {
             startActivity(callIntent);
         }
     }
@@ -387,9 +387,9 @@ public class ShoutActivity extends BaseActivity {
                 if (isUserShoutOwner) {
                     callOrDeleteTextView.setEnabled(true);
                     callOrDeleteTextView.setAlpha(1f);
-                    callOrDeleteTextView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_delete_red, 0, 0, 0);
                     callOrDeleteTextView.setText(R.string.shout_bottom_bar_delete);
 
+                    ImageHelper.setStartCompoundRelativeDrawable(callOrDeleteTextView, R.drawable.ic_delete_red);
                     ImageHelper.setStartCompoundRelativeDrawable(showMoreIcon, R.drawable.ic_more_disabled);
                     ImageHelper.setStartCompoundRelativeDrawable(videoCallOrEditTextView, R.drawable.ic_edit_red);
 
