@@ -125,6 +125,8 @@
         <activity android:name=".view.gallery.GalleryActivity"/>
         <activity android:name=".view.verifyemail.VerifyEmailActivity"/>
         <activity android:name=".view.conversations.ConversationsActivity"/>
+        <activity android:name=".view.createshout.CreateShoutDialogActivity"
+            android:theme="@style/AppTheme.DialogActivity"/>
 
         <!-- Facebook -->
         <meta-data
