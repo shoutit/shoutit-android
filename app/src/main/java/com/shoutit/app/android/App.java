@@ -146,7 +146,7 @@ public class App extends MultiDexApplication {
                 .subscribe(new Action1<BothParams<String, User>>() {
                     @Override
                     public void call(BothParams<String, User> tokenAndUser) {
-                        mTwilio.init();
+//                        mTwilio.init();
                     }
                 });
     }
