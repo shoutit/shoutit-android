@@ -249,7 +249,6 @@ public class VideoConversationActivity extends BaseActivity {
             @Override
             public void onLocalVideoTrackAdded(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
                 conversationInfoSubject.onNext(getString(R.string.video_calls_connecting));
-//                stopPreview();
 
                 localVideoRenderer = new VideoViewRenderer(VideoConversationActivity.this, localWindow);
                 localVideoTrack.addRenderer(localVideoRenderer);
@@ -434,12 +433,6 @@ public class VideoConversationActivity extends BaseActivity {
         if (TwilioConversations.isInitialized() && conversationClient != null && conversation == null) {
             conversationClient.unlisten();
         }
-        stopPreview();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
         stopPreview();
     }
 
