@@ -124,7 +124,7 @@ public class ShoutMediaPresenter {
 
         @Override
         public void click() {
-            mMediaListener.openSelectMediaActivity();
+            mMediaListener.openSelectMediaActivity(getFirstAvailablePositionAndCheck() == 0);
         }
     }
 
@@ -375,7 +375,7 @@ public class ShoutMediaPresenter {
 
         void setImages(@NonNull Map<Integer, Item> mediaElements);
 
-        void openSelectMediaActivity();
+        void openSelectMediaActivity(boolean isFirst);
 
         void onlyOneVideoAllowedAlert();
 

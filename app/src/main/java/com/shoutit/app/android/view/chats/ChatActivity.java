@@ -307,12 +307,12 @@ public class ChatActivity extends BaseActivity implements Listener {
 
     @OnClick(R.id.chats_attatchments_video)
     void videoClicked() {
-        startActivityForResult(RecordMediaActivity.newIntent(this, true, true, true), REQUEST_ATTACHMENT);
+        startActivityForResult(RecordMediaActivity.newIntent(this, true, true, true, false), REQUEST_ATTACHMENT);
     }
 
     @OnClick(R.id.chats_attatchments_photo)
     void photoClicked() {
-        startActivityForResult(RecordMediaActivity.newIntent(this, true, false, true), REQUEST_ATTACHMENT);
+        startActivityForResult(RecordMediaActivity.newIntent(this, true, false, true, false), REQUEST_ATTACHMENT);
     }
 
     @OnClick(R.id.chats_attatchments_shout)
