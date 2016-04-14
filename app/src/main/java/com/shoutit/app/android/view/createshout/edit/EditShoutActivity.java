@@ -437,8 +437,8 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     }
 
     @Override
-    public void openSelectMediaActivity() {
-        startActivityForResult(RecordMediaActivity.newIntent(this, true, false, false), MEDIA_REQUEST_CODE);
+    public void openSelectMediaActivity(boolean isFirst) {
+        startActivityForResult(RecordMediaActivity.newIntent(this, true, false, false, isFirst), MEDIA_REQUEST_CODE);
     }
 
     @Override

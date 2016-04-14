@@ -66,6 +66,7 @@ public class CameraFragment extends Fragment {
 
     private static final String ARGS_VIDEO_FIRST = "arg_video_first";
     private static final String ARGS_CHAT_MEDIA = "arg_is_chat";
+    private static final String ARGS_FIRST_MEDIA = "arg_first_media";
 
     private static final String TAG = CameraFragment.class.getCanonicalName();
 
@@ -94,6 +95,7 @@ public class CameraFragment extends Fragment {
     private CameraFragmentListener cameraFragmentListener;
     private boolean isMFfcEnabled = false;
     private boolean chatMedia;
+    private boolean firstMedia;
 
     @Bind(R.id.fragment_camera_preview_stack)
     ViewGroup previewStack;
@@ -128,10 +130,11 @@ public class CameraFragment extends Fragment {
     @Bind(R.id.camera_text_header)
     TextView cameraTextHeader;
 
-    public static CameraFragment newInstance(boolean videoFirst, boolean chatMedia) {
+    public static CameraFragment newInstance(boolean videoFirst, boolean chatMedia, boolean firstMedia) {
         final Bundle args = new Bundle();
         args.putBoolean(ARGS_VIDEO_FIRST, videoFirst);
         args.putBoolean(ARGS_CHAT_MEDIA, chatMedia);
+        args.putBoolean(ARGS_FIRST_MEDIA, firstMedia);
         final CameraFragment cameraFragment = new CameraFragment();
         cameraFragment.setArguments(args);
         return cameraFragment;
@@ -157,6 +160,7 @@ public class CameraFragment extends Fragment {
 
         isVideoMode = getArguments().getBoolean(ARGS_VIDEO_FIRST);
         chatMedia = getArguments().getBoolean(ARGS_CHAT_MEDIA);
+        firstMedia = getArguments().getBoolean(ARGS_FIRST_MEDIA);
 
         if (hasCameras()) {
             cameraFragmentListener.onInitializationFailed(
@@ -184,9 +188,12 @@ public class CameraFragment extends Fragment {
         if (chatMedia) {
             buttonConfirm.setText(R.string.camera_send);
             cameraTextHeader.setText(null);
-        } else {
+        } else if (firstMedia) {
             buttonConfirm.setText(R.string.camera_publish);
             cameraTextHeader.setText(R.string.camera_header);
+        } else {
+            buttonConfirm.setText(R.string.camera_publish);
+            cameraTextHeader.setText(null);
         }
 
         closeButton.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
@@ -768,7 +775,7 @@ public class CameraFragment extends Fragment {
         video.setVisibility(View.VISIBLE);
         picture.setVisibility(View.GONE);
 
-        if (chatMedia) {
+        if (chatMedia || !firstMedia) {
             cameraText.setText(null);
         } else {
             cameraText.setText(getString(R.string.camera_sub_header, getString(R.string.camera_photo)));
@@ -787,7 +794,7 @@ public class CameraFragment extends Fragment {
         video.setVisibility(View.GONE);
         picture.setVisibility(View.VISIBLE);
 
-        if (chatMedia) {
+        if (chatMedia || !firstMedia) {
             cameraText.setText(null);
         } else {
             cameraText.setText(getString(R.string.camera_sub_header, getString(R.string.camera_video)));
