@@ -34,6 +34,8 @@ import rx.functions.FuncN;
 
 public class ShoutMediaPresenter {
 
+    private boolean mIsOffer;
+
     public abstract class Item {
 
         public abstract void click();
@@ -124,7 +126,7 @@ public class ShoutMediaPresenter {
 
         @Override
         public void click() {
-            mMediaListener.openSelectMediaActivity(getFirstAvailablePositionAndCheck() == 0);
+            mMediaListener.openSelectMediaActivity(getFirstAvailablePositionAndCheck() == 0, mIsOffer);
         }
     }
 
@@ -163,7 +165,8 @@ public class ShoutMediaPresenter {
         mMediaListener.setImages(mediaItems);
     }
 
-    public void addRemoteMedia(List<String> images, List<Video> videos) {
+    public void setUp(List<String> images, List<Video> videos, boolean isOffer) {
+        mIsOffer = isOffer;
         for (String image : images) {
             addImageItem(image, true);
         }
@@ -375,7 +378,7 @@ public class ShoutMediaPresenter {
 
         void setImages(@NonNull Map<Integer, Item> mediaElements);
 
-        void openSelectMediaActivity(boolean isFirst);
+        void openSelectMediaActivity(boolean isFirst, boolean isOffer);
 
         void onlyOneVideoAllowedAlert();
 

@@ -393,8 +393,8 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     }
 
     @Override
-    public void setMedia(@NonNull List<String> images, @NonNull List<Video> videos) {
-        mShoutMediaPresenter.addRemoteMedia(images, videos);
+    public void setMediaData(@NonNull List<String> images, @NonNull List<Video> videos, boolean isOffer) {
+        mShoutMediaPresenter.setUp(images, videos, isOffer);
     }
 
     @Override
@@ -437,8 +437,8 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     }
 
     @Override
-    public void openSelectMediaActivity(boolean isFirst) {
-        startActivityForResult(RecordMediaActivity.newIntent(this, true, false, false, isFirst), MEDIA_REQUEST_CODE);
+    public void openSelectMediaActivity(boolean isFirst, boolean isOffer) {
+        startActivityForResult(RecordMediaActivity.newIntent(this, true, false, false, isFirst && isOffer), MEDIA_REQUEST_CODE);
     }
 
     @Override
