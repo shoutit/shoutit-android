@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -109,7 +110,7 @@ public class ChatActivity extends BaseActivity implements Listener {
     View mMainLayout;
 
     @Bind(R.id.chats_message_send_button)
-    Button sendButton;
+    ImageButton sendButton;
 
     public static Intent newIntent(@Nonnull Context context, @NonNull String conversationId, boolean shoutConversation) {
         return new Intent(context, ChatActivity.class)
