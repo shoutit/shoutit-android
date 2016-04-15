@@ -20,6 +20,7 @@ import com.shoutit.app.android.api.model.CreateShoutResponse;
 import com.shoutit.app.android.api.model.Currency;
 import com.shoutit.app.android.api.model.EditShoutRequest;
 import com.shoutit.app.android.api.model.EditShoutRequestWithPrice;
+import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutResponse;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.UserLocationSimple;
@@ -191,7 +192,7 @@ public class EditShoutPresenter {
                                     ResourcesHelper.getResourceIdForName(mUserLocation.getCountry(), mContext),
                                     mUserLocation.getCity());
                             mListener.setMobilePhone(shoutResponse.getMobile());
-                            mListener.setMedia(shoutResponse.getImages(), shoutResponse.getVideos());
+                            mListener.setMediaData(shoutResponse.getImages(), shoutResponse.getVideos(), shoutResponse.getType().equals(Shout.TYPE_OFFER));
                             changeCategoryWithSelectedOptions(shoutResponse.getCategory().getSlug(), shoutResponse.getFilters());
                         } else {
                             mListener.showBodyError();
@@ -377,7 +378,7 @@ public class EditShoutPresenter {
 
         void setActionbarTitle(@NonNull String title);
 
-        void setMedia(@NonNull List<String> images, @NonNull List<Video> videos);
+        void setMediaData(@NonNull List<String> images, @NonNull List<Video> videos, boolean b);
 
         void setMobilePhone(@Nullable String mobileHint);
     }
