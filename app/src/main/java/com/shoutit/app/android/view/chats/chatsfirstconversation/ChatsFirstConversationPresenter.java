@@ -278,7 +278,7 @@ public class ChatsFirstConversationPresenter {
                                                 profile.getFirstName(),
                                                 profile.getUsername(),
                                                 profile.getType(),
-                                                profile.getImage()))));
+                                                profile.getImage())), user.getId()));
                             } else {
                                 mListener.setShoutToolbarInfo(mContext.getString(R.string.chat_shout_chat), ConversationsUtils.getChatWithString(
                                         ImmutableList.of(new ConversationProfile(
@@ -286,7 +286,7 @@ public class ChatsFirstConversationPresenter {
                                                 profile.getFirstName(),
                                                 profile.getUsername(),
                                                 profile.getType(),
-                                                profile.getImage()))));
+                                                profile.getImage())), user.getId()));
                             }
                         }
                     }, getOnError()));
@@ -303,7 +303,7 @@ public class ChatsFirstConversationPresenter {
                                             user.getFirstName(),
                                             user.getUsername(),
                                             user.getType(),
-                                            user.getImage()))));
+                                            user.getImage())), user.getId()));
                         }
                     }, getOnError()));
         }
@@ -375,13 +375,13 @@ public class ChatsFirstConversationPresenter {
 
     public void postTextMessage(@NonNull String text) {
         final PostMessage message = new PostMessage(text, ImmutableList.<MessageAttachment>of());
-        sendMessage(message)
+        mSubscribe.add(sendMessage(message)
                 .subscribe(new Action1<Message>() {
                     @Override
                     public void call(Message messagesResponse) {
                         postLocalMessage(messagesResponse);
                     }
-                }, getOnError());
+                }, getOnError()));
         ;
     }
 
@@ -593,21 +593,21 @@ public class ChatsFirstConversationPresenter {
 
     public void sendLocation(double latitude, double longitude) {
         final PostMessage message = new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_LOCATION, new MessageAttachment.MessageLocation(latitude, longitude), null, null, null)));
-        sendMessage(message)
+        mSubscribe.add(sendMessage(message)
                 .subscribe(new Action1<Message>() {
                     @Override
                     public void call(Message message) {
                         postLocalMessage(message);
                         mListener.hideAttatchentsMenu();
                     }
-                }, getOnError());
+                }, getOnError()));
     }
 
     public void deleteShout() {
         if (conversationCreated) {
             mListener.conversationDeleted();
         } else {
-            mApiService.deleteConversation(conversationId)
+            mSubscribe.add(mApiService.deleteConversation(conversationId)
                     .observeOn(mUiScheduler)
                     .subscribeOn(mNetworkScheduler)
                     .subscribe(new Action1<ResponseBody>() {
@@ -615,12 +615,12 @@ public class ChatsFirstConversationPresenter {
                         public void call(ResponseBody responseBody) {
                             mListener.conversationDeleted();
                         }
-                    }, getOnError());
+                    }, getOnError()));
         }
     }
 
     public void sendShout(final String shoutId) {
-        mApiService.getShout(shoutId)
+        mSubscribe.add(mApiService.getShout(shoutId)
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
                 .flatMap(new Func1<ShoutResponse, Observable<Message>>() {
@@ -648,7 +648,7 @@ public class ChatsFirstConversationPresenter {
                         postLocalMessage(message);
                         mListener.hideAttatchentsMenu();
                     }
-                }, getOnError());
+                }, getOnError()));
     }
 
     public void sendTyping() {

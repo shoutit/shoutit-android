@@ -298,12 +298,12 @@ public class ChatsPresenter {
 
                             if (!Strings.isNullOrEmpty(id)) {
                                 mListener.setAboutShoutData(title, thumbnail, type, price, authorAndTime, id);
-                                mListener.setShoutToolbarInfo(title, ConversationsUtils.getChatWithString(conversationResponse.getProfiles()));
+                                mListener.setShoutToolbarInfo(title, ConversationsUtils.getChatWithString(conversationResponse.getProfiles(), user.getId()));
                             } else {
-                                mListener.setShoutToolbarInfo(mContext.getString(R.string.chat_shout_chat), ConversationsUtils.getChatWithString(conversationResponse.getProfiles()));
+                                mListener.setShoutToolbarInfo(mContext.getString(R.string.chat_shout_chat), ConversationsUtils.getChatWithString(conversationResponse.getProfiles(), user.getId()));
                             }
                         } else {
-                            mListener.setChatToolbatInfo(ConversationsUtils.getChatWithString(conversationResponse.getProfiles()));
+                            mListener.setChatToolbatInfo(ConversationsUtils.getChatWithString(conversationResponse.getProfiles(), user.getId()));
                         }
                     }
                 }, getOnError()));
@@ -379,7 +379,7 @@ public class ChatsPresenter {
     }
 
     public void postTextMessage(@NonNull String text) {
-        mApiService.postMessage(conversationId, new PostMessage(text, ImmutableList.<MessageAttachment>of()))
+        mSubscribe.add(mApiService.postMessage(conversationId, new PostMessage(text, ImmutableList.<MessageAttachment>of()))
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
                 .subscribe(new Action1<Message>() {
@@ -387,7 +387,7 @@ public class ChatsPresenter {
                     public void call(Message messagesResponse) {
                         postLocalMessage(messagesResponse);
                     }
-                }, getOnError());
+                }, getOnError()));
     }
 
     private BaseAdapterItem getItem(@NonNull List<Message> results, String userId, int currentPosition) {
@@ -570,7 +570,7 @@ public class ChatsPresenter {
     }
 
     public void sendLocation(double latitude, double longitude) {
-        mApiService.postMessage(conversationId, new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_LOCATION, new MessageAttachment.MessageLocation(latitude, longitude), null, null, null))))
+        mSubscribe.add(mApiService.postMessage(conversationId, new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_LOCATION, new MessageAttachment.MessageLocation(latitude, longitude), null, null, null))))
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
                 .subscribe(new Action1<Message>() {
@@ -579,12 +579,12 @@ public class ChatsPresenter {
                         postLocalMessage(message);
                         mListener.hideAttatchentsMenu();
                     }
-                }, getOnError());
+                }, getOnError()));
     }
 
 
     public void deleteShout() {
-        mApiService.deleteConversation(conversationId)
+        mSubscribe.add(mApiService.deleteConversation(conversationId)
                 .observeOn(mUiScheduler)
                 .subscribeOn(mNetworkScheduler)
                 .subscribe(new Action1<ResponseBody>() {
@@ -592,11 +592,11 @@ public class ChatsPresenter {
                     public void call(ResponseBody responseBody) {
                         mListener.conversationDeleted();
                     }
-                }, getOnError());
+                }, getOnError()));
     }
 
     public void sendShout(final String shoutId) {
-        mApiService.getShout(shoutId)
+        mSubscribe.add(mApiService.getShout(shoutId)
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
                 .flatMap(new Func1<ShoutResponse, Observable<Message>>() {
@@ -624,7 +624,7 @@ public class ChatsPresenter {
                         postLocalMessage(message);
                         mListener.hideAttatchentsMenu();
                     }
-                }, getOnError());
+                }, getOnError()));
     }
 
     public void sendTyping() {

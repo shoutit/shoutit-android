@@ -219,7 +219,7 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
 
     @Override
     public void emptyList() {
-
+        mChatsRecyclerview.setVisibility(View.GONE);
     }
 
     @Override
@@ -229,6 +229,7 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
 
     @Override
     public void setData(@NonNull List<BaseAdapterItem> items) {
+        mChatsRecyclerview.setVisibility(View.VISIBLE);
         chatsAdapter.call(items);
     }
 
