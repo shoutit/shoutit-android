@@ -225,7 +225,7 @@ public class ChatActivity extends BaseActivity implements Listener {
 
     @Override
     public void emptyList() {
-
+        mChatsRecyclerview.setVisibility(View.GONE);
     }
 
     @Override
@@ -235,6 +235,7 @@ public class ChatActivity extends BaseActivity implements Listener {
 
     @Override
     public void setData(@NonNull List<BaseAdapterItem> items) {
+        mChatsRecyclerview.setVisibility(View.VISIBLE);
         chatsAdapter.call(items);
         mChatsRecyclerview.scrollToPosition(items.size() - 1);
     }
