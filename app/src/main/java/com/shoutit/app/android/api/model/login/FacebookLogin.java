@@ -11,8 +11,10 @@ public class FacebookLogin extends BaseLoginRequest {
     @NonNull
     private final String facebookAccessToken;
 
-    public FacebookLogin(@NonNull String token, @Nullable LoginUser loginUser) {
-        super(FACEBOOK_SIGNIN, loginUser);
+    public FacebookLogin(@NonNull String token,
+                         @Nullable LoginUser loginUser,
+                         @NonNull String mixpanelDistinctId) {
+        super(mixpanelDistinctId, FACEBOOK_SIGNIN, loginUser);
         this.facebookAccessToken = token;
     }
 }

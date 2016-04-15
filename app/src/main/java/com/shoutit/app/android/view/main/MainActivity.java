@@ -27,6 +27,7 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dao.ProfilesDao;
+import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.view.conversations.ConverstationsFragment;
@@ -66,6 +67,8 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
     UserPreferences mUserPreferences;
     @Inject
     ProfilesDao profilesDao;
+    @Inject
+    MixPanel mixPanel;
 
     private ActionBarDrawerToggle drawerToggle;
     private boolean doubleBackToExitPressedOnce;
@@ -248,6 +251,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
     @Override
     protected void onDestroy() {
+        mixPanel.flush();
         super.onDestroy();
         backButtonHandler.removeCallbacks(backButtonRunnable);
     }

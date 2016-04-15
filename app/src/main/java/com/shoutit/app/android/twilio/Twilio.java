@@ -10,6 +10,7 @@ import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
+import com.appunite.rx.operators.MoreOperators;
 import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.CallerProfile;
@@ -37,7 +38,9 @@ import rx.Observable;
 import rx.Scheduler;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.subjects.BehaviorSubject;
+import rx.subjects.PublishSubject;
 
 @Singleton
 public class Twilio {
@@ -58,6 +61,7 @@ public class Twilio {
 
     @Nonnull
     private BehaviorSubject<String> callerIdentitySubject = BehaviorSubject.create();
+    private final PublishSubject<Object> profileRefreshSubject = PublishSubject.create();
 
     @Inject
     public Twilio(@ForApplication Context context,
@@ -69,8 +73,15 @@ public class Twilio {
         final Observable<ResponseOrError<TwilioResponse>> twilioResponse = videoCallsDao.getVideoCallsObservable()
                 .compose(ObservableExtensions.<ResponseOrError<TwilioResponse>>behaviorRefCount());
 
-        Observable<ResponseOrError<CallerProfile>> callerProfileResponse = callerIdentitySubject
-                .flatMap(new Func1<String, Observable<ResponseOrError<CallerProfile>>>() {
+        final Observable<ResponseOrError<CallerProfile>> callerProfileResponse = profileRefreshSubject
+                .withLatestFrom(callerIdentitySubject,
+                        new Func2<Object, String, String>() {
+                            @Override
+                            public String call(Object o, String identity) {
+                                return identity;
+                            }
+                        })
+                .switchMap(new Func1<String, Observable<ResponseOrError<CallerProfile>>>() {
                     @Override
                     public Observable<ResponseOrError<CallerProfile>> call(String callerName) {
                         return usersIdentityDao.getUserByIdentityObservable(callerName);
@@ -98,6 +109,16 @@ public class Twilio {
                         return callerProfile.getName();
                     }
                 }).observeOn(uiScheduler);
+
+        callerNameObservable
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String callerName) {
+                        Intent intent = DialogCallActivity.newIntent(callerName, mContext);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        mContext.startActivity(intent);
+                    }
+                });
 
         /** Errors **/
         errorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
@@ -196,16 +217,7 @@ public class Twilio {
                 String caller = String.valueOf(incomingInvite.getParticipants());
 
                 callerIdentitySubject.onNext(caller.substring(1, caller.length() - 1));
-                callerNameObservable
-                        .take(1)
-                        .subscribe(new Action1<String>() {
-                            @Override
-                            public void call(String callerName) {
-                                Intent intent = DialogCallActivity.newIntent(callerName, mContext);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                mContext.startActivity(intent);
-                            }
-                        });
+                profileRefreshSubject.onNext(null);
             }
 
             @Override
