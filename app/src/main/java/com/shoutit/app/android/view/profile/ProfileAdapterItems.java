@@ -396,7 +396,7 @@ public class ProfileAdapterItems {
 
         public void onChatActionClicked() {
             final Conversation conversation = user.getConversation();
-            onChatIconClickedObserver.onNext(new ChatInfo(user.getUsername(), conversation != null ? conversation.getId() : null, user.isListening(), isNormalUser));
+            onChatIconClickedObserver.onNext(new ChatInfo(user.getUsername(), conversation != null ? conversation.getId() : null, user.isListener(), isNormalUser));
         }
 
         public void onListenActionClicked() {
