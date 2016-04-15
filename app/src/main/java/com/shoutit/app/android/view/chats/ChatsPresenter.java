@@ -624,7 +624,7 @@ public class ChatsPresenter {
                         postLocalMessage(message);
                         mListener.hideAttatchentsMenu();
                     }
-                }, getOnError());
+                }, getOnError()));
     }
 
     public void sendTyping() {
