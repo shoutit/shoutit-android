@@ -20,6 +20,14 @@ public class IntentHelper {
         return new Intent(Intent.ACTION_VIEW, Uri.parse(url));
     }
 
+    public static Intent getShareIntent(@Nonnull String shareUrl) {
+        final Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_TEXT, shareUrl);
+
+        return intent;
+    }
+
     public static Intent videoIntent(@Nonnull String videoUrl) {
         return new Intent(Intent.ACTION_VIEW)
                 .setDataAndType(Uri.parse(videoUrl), "video/*");

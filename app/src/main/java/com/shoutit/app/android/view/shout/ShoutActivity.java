@@ -40,6 +40,7 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.model.MobilePhoneResponse;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.ImageHelper;
+import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.view.chats.ChatActivity;
 import com.shoutit.app.android.view.chats.chatsfirstconversation.ChatFirstConversationActivity;
@@ -328,6 +329,17 @@ public class ShoutActivity extends BaseActivity {
                     }
                 });
 
+        presenter.getShareObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String shareUrl) {
+                        startActivity(Intent.createChooser(
+                                IntentHelper.getShareIntent(shareUrl),
+                                getString(R.string.shout_share)));
+                    }
+                });
+
     }
 
     private void startCall(String phoneNumber) {
@@ -526,6 +538,8 @@ public class ShoutActivity extends BaseActivity {
             case R.id.shouts_search:
                 startActivity(MainSearchActivity.newIntent(this));
                 return true;
+            case R.id.shouts_share:
+                presenter.onShareClicked();
             default:
                 return super.onOptionsItemSelected(item);
         }
