@@ -100,7 +100,7 @@ public class ShoutMediaPresenterTest {
         final ShoutMediaPresenter.Item item = value.get(0);
         item.click();
 
-        verify(mMediaListener).openSelectMediaActivity(anyBoolean());
+        verify(mMediaListener).openSelectMediaActivity(anyBoolean(), anyBoolean());
     }
 
     @SuppressWarnings("unchecked")
@@ -170,7 +170,7 @@ public class ShoutMediaPresenterTest {
     @Test
     public void whenVideoAddedAndRemoteVideoAlreadySet_DisplayAlert() {
         mShoutMediaPresenter.register(mMediaListener);
-        mShoutMediaPresenter.setUp(ImmutableList.<String>of(), ImmutableList.of(Video.createVideo("", "", 1)));
+        mShoutMediaPresenter.setUp(ImmutableList.<String>of(), ImmutableList.of(Video.createVideo("", "", 1)), anyBoolean());
 
         mShoutMediaPresenter.addMediaItem("test", true);
 
@@ -244,7 +244,7 @@ public class ShoutMediaPresenterTest {
         ArgumentCaptor<List> imagesCaptor = ArgumentCaptor.forClass(List.class);
         ArgumentCaptor<List> videoCaptor = ArgumentCaptor.forClass(List.class);
         mShoutMediaPresenter.register(mMediaListener);
-        mShoutMediaPresenter.setUp(ImmutableList.of("a"), ImmutableList.of(Video.createVideo("a", "a", 1)));
+        mShoutMediaPresenter.setUp(ImmutableList.of("a"), ImmutableList.of(Video.createVideo("a", "a", 1)), anyBoolean());
 
         mShoutMediaPresenter.addMediaItem("test", false);
 
