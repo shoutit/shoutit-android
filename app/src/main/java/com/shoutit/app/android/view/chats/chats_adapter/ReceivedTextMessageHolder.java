@@ -9,7 +9,7 @@ import android.widget.TextView;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.shoutit.app.android.R;
-import com.shoutit.app.android.view.chats.message_models.ReceivedTextMessage;
+import com.shoutit.app.android.view.chats.models.ReceivedTextMessage;
 import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;

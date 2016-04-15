@@ -1,19 +1,19 @@
-package com.shoutit.app.android.view.chats.message_models;
+package com.shoutit.app.android.view.chats.models;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 
 import javax.annotation.Nonnull;
 
-public class InfoItem implements BaseAdapterItem {
+public class DateItem implements BaseAdapterItem {
 
-    private final String info;
+    private final String date;
 
-    public InfoItem(String info) {
-        this.info = info;
+    public DateItem(String date) {
+        this.date = date;
     }
 
-    public String getInfo() {
-        return info;
+    public String getDate() {
+        return date;
     }
 
     @Override

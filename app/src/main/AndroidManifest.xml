@@ -71,10 +71,10 @@
         <activity android:name=".view.location.LocationActivity"/>
         <activity android:name=".view.discover.DiscoverActivity"/>
         <activity
-            android:name=".view.chats.ChatActivity"
+            android:name=".view.chats.chats_next_conversation.ChatActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"/>
         <activity
-            android:name=".view.chats.chatsfirstconversation.ChatFirstConversationActivity"
+            android:name=".view.chats.chats_first_conversation.ChatFirstConversationActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"/>
         <activity android:name=".view.shouts.selectshout.SelectShoutActivity"/>
         <activity android:name=".view.shouts.discover.DiscoverShoutsActivity"/>

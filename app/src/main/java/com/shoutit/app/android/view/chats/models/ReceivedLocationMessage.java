@@ -1,26 +1,23 @@
-package com.shoutit.app.android.view.chats.message_models;
+package com.shoutit.app.android.view.chats.models;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.shoutit.app.android.view.chats.Listener;
 
 import javax.annotation.Nonnull;
 
-public class SentVideoMessage implements BaseAdapterItem {
+public class ReceivedLocationMessage extends ReceivedMessage {
 
-    private final String videoThumbnail;
     private final String time;
     private final Listener mListener;
-    private final String url;
+    private final double latitude;
+    private final double longitude;
 
-    public SentVideoMessage(String videoThumbnail, String time, Listener listener, String url) {
-        this.videoThumbnail = videoThumbnail;
+    public ReceivedLocationMessage(boolean isFirst, String time, String avatarUrl, Listener listener, double latitude, double longitude) {
+        super(isFirst, avatarUrl);
         this.time = time;
         mListener = listener;
-        this.url = url;
-    }
-
-    public String getVideoThumbnail() {
-        return videoThumbnail;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     public String getTime() {
@@ -43,6 +40,6 @@ public class SentVideoMessage implements BaseAdapterItem {
     }
 
     public void click() {
-        mListener.onVideoClicked(url);
+        mListener.onLocationClicked(latitude, longitude);
     }
 }

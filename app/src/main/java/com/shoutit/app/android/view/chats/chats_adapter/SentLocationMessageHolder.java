@@ -8,9 +8,7 @@ import android.widget.TextView;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.shoutit.app.android.R;
-import com.shoutit.app.android.view.chats.message_models.ReceivedLocationMessage;
-import com.shoutit.app.android.view.chats.message_models.SentLocationMessage;
-import com.shoutit.app.android.view.conversations.ConversationsPresenter;
+import com.shoutit.app.android.view.chats.models.SentLocationMessage;
 
 import javax.annotation.Nonnull;
 

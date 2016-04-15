@@ -1,10 +1,20 @@
-package com.shoutit.app.android.view.chats.message_models;
+package com.shoutit.app.android.view.chats.models;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 
 import javax.annotation.Nonnull;
 
-public class TypingItem implements BaseAdapterItem {
+public class InfoItem implements BaseAdapterItem {
+
+    private final String info;
+
+    public InfoItem(String info) {
+        this.info = info;
+    }
+
+    public String getInfo() {
+        return info;
+    }
 
     @Override
     public long adapterId() {

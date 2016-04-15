@@ -8,7 +8,7 @@ import android.widget.TextView;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.shoutit.app.android.R;
-import com.shoutit.app.android.view.chats.message_models.InfoItem;
+import com.shoutit.app.android.view.chats.models.InfoItem;
 
 import javax.annotation.Nonnull;
 

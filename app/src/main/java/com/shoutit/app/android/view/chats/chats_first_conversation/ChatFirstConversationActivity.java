@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.chats.chatsfirstconversation;
+package com.shoutit.app.android.view.chats.chats_first_conversation;
 
 import android.content.Context;
 import android.content.DialogInterface;

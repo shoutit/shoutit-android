@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.chats;
+package com.shoutit.app.android.view.chats.chats_next_conversation;
 
 import android.support.annotation.NonNull;
 

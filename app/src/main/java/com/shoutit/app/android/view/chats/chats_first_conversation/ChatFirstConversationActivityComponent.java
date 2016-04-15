@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.chats;
+package com.shoutit.app.android.view.chats.chats_first_conversation;
 
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.ActivityScope;
@@ -12,12 +12,12 @@ import dagger.Component;
         dependencies = AppComponent.class,
         modules = {
                 ActivityModule.class,
-                ChatsActivityModule.class
+                ChatsFirstConversationActivityModule.class
         }
 )
-public interface ChatActivityComponent extends BaseActivityComponent {
+public interface ChatFirstConversationActivityComponent extends BaseActivityComponent {
 
-    void inject(ChatActivity activity);
+    void inject(ChatFirstConversationActivity activity);
 
 }
 

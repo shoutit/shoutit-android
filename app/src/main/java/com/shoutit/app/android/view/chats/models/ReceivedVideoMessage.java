@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.chats.message_models;
+package com.shoutit.app.android.view.chats.models;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.shoutit.app.android.view.chats.Listener;

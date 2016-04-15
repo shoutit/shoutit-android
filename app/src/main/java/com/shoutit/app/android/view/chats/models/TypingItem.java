@@ -1,20 +1,10 @@
-package com.shoutit.app.android.view.chats.message_models;
+package com.shoutit.app.android.view.chats.models;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 
 import javax.annotation.Nonnull;
 
-public class DateItem implements BaseAdapterItem {
-
-    private final String date;
-
-    public DateItem(String date) {
-        this.date = date;
-    }
-
-    public String getDate() {
-        return date;
-    }
+public class TypingItem implements BaseAdapterItem {
 
     @Override
     public long adapterId() {

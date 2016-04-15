@@ -28,7 +28,7 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
-import com.shoutit.app.android.view.chats.ChatActivity;
+import com.shoutit.app.android.view.chats.chats_next_conversation.ChatActivity;
 
 import java.util.List;
 

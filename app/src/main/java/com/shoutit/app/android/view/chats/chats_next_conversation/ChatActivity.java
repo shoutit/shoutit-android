@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.chats;
+package com.shoutit.app.android.view.chats.chats_next_conversation;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -44,6 +44,7 @@ import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.utils.TextWatcherAdapter;
+import com.shoutit.app.android.view.chats.Listener;
 import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;

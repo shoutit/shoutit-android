@@ -1,32 +1,27 @@
-package com.shoutit.app.android.view.chats.message_models;
+package com.shoutit.app.android.view.chats.models;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.shoutit.app.android.view.chats.Listener;
 
 import javax.annotation.Nonnull;
 
-public class ReceivedImageMessage extends ReceivedMessage {
+public class SentLocationMessage implements BaseAdapterItem {
 
     private final String time;
-    private final String url;
     private final Listener mListener;
+    private final double latitude;
+    private final double longitude;
 
-    public ReceivedImageMessage(boolean isFirst, String time, String url, String avatarUrl, Listener listener) {
-        super(isFirst, avatarUrl);
+    public SentLocationMessage(String time, Listener listener, double latitude, double longitude) {
         this.time = time;
-        this.url = url;
         mListener = listener;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     public String getTime() {
         return time;
     }
-
-    public String getUrl() {
-        return url;
-    }
-
-
 
     @Override
     public long adapterId() {
@@ -44,6 +39,6 @@ public class ReceivedImageMessage extends ReceivedMessage {
     }
 
     public void click() {
-        mListener.onImageClicked(url);
+        mListener.onLocationClicked(latitude, longitude);
     }
 }

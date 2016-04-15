@@ -9,7 +9,7 @@ import android.widget.TextView;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.shoutit.app.android.R;
-import com.shoutit.app.android.view.chats.message_models.ReceivedVideoMessage;
+import com.shoutit.app.android.view.chats.models.ReceivedVideoMessage;
 import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;
