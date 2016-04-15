@@ -49,6 +49,8 @@ public class ConversationsAdapter extends BaseAdapter {
         public void bind(@Nonnull BaseAdapterItem item) {
             final ConversationsPresenter.ConversationChatItem conversationChatItem = (ConversationsPresenter.ConversationChatItem) item;
             mPicasso.load(conversationChatItem.getImage())
+                    .placeholder(R.drawable.ic_rect_avatar_placeholder)
+                    .error(R.drawable.ic_rect_avatar_placeholder)
                     .into(mConversationChatItemImage);
             mConversationChatItemName.setText(conversationChatItem.getUser());
             mConversationChatItemMessage.setText(conversationChatItem.getMessage());
@@ -96,6 +98,8 @@ public class ConversationsAdapter extends BaseAdapter {
             final ConversationsPresenter.ConversationShoutItem conversationShoutItem = (ConversationsPresenter.ConversationShoutItem) item;
 
             mPicasso.load(conversationShoutItem.getImage())
+                    .placeholder(R.drawable.ic_rect_avatar_placeholder)
+                    .error(R.drawable.ic_rect_avatar_placeholder)
                     .into(mConversationShoutItemImage);
             final String shoutDescription = conversationShoutItem.getShoutDescription();
             if(Strings.isNullOrEmpty(shoutDescription)){

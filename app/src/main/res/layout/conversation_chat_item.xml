@@ -37,7 +37,9 @@
             android:id="@+id/conversation_chat_item_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:text="This is a sample message."/>
+            android:lines="1"
+            android:ellipsize="end"
+            tools:text="This is a sample message. This is a sample message. This is a sample message. This is a sample message. This is a sample message. This is a sample message. This is a sample message. "/>
 
     </LinearLayout>
 
