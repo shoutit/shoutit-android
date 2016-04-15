@@ -17,6 +17,7 @@ import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler;
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
 import com.karumi.dexter.Dexter;
 import com.pusher.client.Pusher;
+import com.pusher.client.channel.PresenceChannel;
 import com.pusher.client.connection.ConnectionEventListener;
 import com.pusher.client.connection.ConnectionState;
 import com.pusher.client.connection.ConnectionStateChange;
@@ -124,11 +125,12 @@ public class App extends MultiDexApplication {
                         return new BothParams<>(token, user);
                     }
                 })
-                .first()
                 .subscribe(new Action1<BothParams<String, User>>() {
                     @Override
                     public void call(BothParams<String, User> tokenAndUser) {
-                        initPusher(tokenAndUser.param1(), tokenAndUser.param2());
+                        final User user = userPreferences.getUser();
+                        assert user != null;
+                        initPusher(tokenAndUser.param1(), user);
                     }
                 });
     }
@@ -146,7 +148,7 @@ public class App extends MultiDexApplication {
                 .subscribe(new Action1<BothParams<String, User>>() {
                     @Override
                     public void call(BothParams<String, User> tokenAndUser) {
-                        mTwilio.init();
+//                        mTwilio.init();
                     }
                 });
     }
@@ -154,25 +156,24 @@ public class App extends MultiDexApplication {
     private void initPusher(@Nonnull String token, @Nonnull User user) {
         mPusherHelper.init(token);
         final Pusher pusher = mPusherHelper.getPusher();
-        pusher.connect(mEventListener);
-        pusher.subscribePresence(String.format("presence-v3-p-%1$s", user.getId()));
 
-        mNetworkObservableProvider.networkObservable()
-                .filter(new Func1<NetworkObservableProvider.NetworkStatus, Boolean>() {
-                    @Override
-                    public Boolean call(NetworkObservableProvider.NetworkStatus networkStatus) {
-                        return networkStatus.isNetwork();
-                    }
-                })
-                .subscribe(new Action1<NetworkObservableProvider.NetworkStatus>() {
-                    @Override
-                    public void call(NetworkObservableProvider.NetworkStatus networkStatus) {
-                        final ConnectionState state = pusher.getConnection().getState();
-                        if (state != ConnectionState.CONNECTED && state != ConnectionState.CONNECTING) {
+        if (pusher.getConnection().getState() != ConnectionState.CONNECTING && pusher.getConnection().getState() != ConnectionState.CONNECTED) {
+            pusher.connect();
+            pusher.subscribePresence(String.format("presence-v3-p-%1$s", user.getId()));
+            mNetworkObservableProvider.networkObservable()
+                    .filter(new Func1<NetworkObservableProvider.NetworkStatus, Boolean>() {
+                        @Override
+                        public Boolean call(NetworkObservableProvider.NetworkStatus networkStatus) {
+                            return networkStatus.isNetwork();
+                        }
+                    })
+                    .subscribe(new Action1<NetworkObservableProvider.NetworkStatus>() {
+                        @Override
+                        public void call(NetworkObservableProvider.NetworkStatus networkStatus) {
                             pusher.connect(mEventListener);
                         }
-                    }
-                });
+                    });
+        }
     }
 
     private void initFfmpeg() {
