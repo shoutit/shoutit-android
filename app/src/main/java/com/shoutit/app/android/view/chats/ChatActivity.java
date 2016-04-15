@@ -11,10 +11,12 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -41,6 +43,7 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
+import com.shoutit.app.android.utils.TextWatcherAdapter;
 import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
@@ -105,6 +108,9 @@ public class ChatActivity extends BaseActivity implements Listener {
     @Bind(R.id.chats_main_layout)
     View mMainLayout;
 
+    @Bind(R.id.chats_message_send_button)
+    Button sendButton;
+
     public static Intent newIntent(@Nonnull Context context, @NonNull String conversationId, boolean shoutConversation) {
         return new Intent(context, ChatActivity.class)
                 .putExtra(ARGS_CONVERSATION_ID, conversationId)
@@ -168,6 +174,13 @@ public class ChatActivity extends BaseActivity implements Listener {
                         presenter.sendTyping();
                     }
                 });
+
+        mChatsMessageEdittext.addTextChangedListener(new TextWatcherAdapter() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                sendButton.setEnabled(s.length() != 0);
+            }
+        });
 
         mMainLayout.setOnTouchListener(new View.OnTouchListener() {
             @Override
