@@ -42,7 +42,6 @@ import com.shoutit.app.android.dao.VideoCallsDao;
 import com.shoutit.app.android.db.DbHelper;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.utils.PusherHelper;
-import com.shoutit.app.android.view.videoconversation.VideoConversationPresenter;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;

@@ -96,8 +96,9 @@ public class Twilio {
                     public String call(TwilioResponse twilioResponse) {
                         return twilioResponse.getToken();
                     }
-                }).observeOn(uiScheduler)
-                .filter(Functions1.isNotNull());
+                })
+                .filter(Functions1.isNotNull())
+                .observeOn(uiScheduler);
 
 
         final Observable<String> callerNameObservable = callerProfileResponse
@@ -108,7 +109,8 @@ public class Twilio {
                     public String call(CallerProfile callerProfile) {
                         return callerProfile.getName();
                     }
-                }).observeOn(uiScheduler);
+                })
+                .observeOn(uiScheduler);
 
         callerNameObservable
                 .subscribe(new Action1<String>() {
@@ -228,8 +230,9 @@ public class Twilio {
     }
 
     public void unregisterTwillio(){
-        if (TwilioConversations.isInitialized())
+        if (TwilioConversations.isInitialized()) {
             TwilioConversations.destroy();
+        }
     }
 
     @Nullable

@@ -87,7 +87,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        if(!TwilioConversations.isInitialized() && !mUserPreferences.isGuest()){
+        if(!TwilioConversations.isInitialized() && mUserPreferences.isNormalUser()){
             twilio.init();
         }
 

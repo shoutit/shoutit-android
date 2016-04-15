@@ -142,7 +142,7 @@ public class App extends MultiDexApplication {
                         return new BothParams<>(token, user);
                     }
                 })
-                .first()
+                .distinctUntilChanged()
                 .subscribe(new Action1<BothParams<String, User>>() {
                     @Override
                     public void call(BothParams<String, User> tokenAndUser) {

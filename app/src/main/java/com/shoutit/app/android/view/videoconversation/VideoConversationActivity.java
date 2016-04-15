@@ -188,9 +188,7 @@ public class VideoConversationActivity extends BaseActivity {
             @Override
             public void onError(CapturerException e) {
                 conversationErrorSubject.onNext(getString(R.string.video_calls_camera_issue));
-                if (cameraCapturer != null) {
-                    cameraCapturer.startPreview();
-                }
+                cameraCapturer.startPreview();
             }
         };
     }
@@ -266,10 +264,12 @@ public class VideoConversationActivity extends BaseActivity {
             @Override
             public void onLocalVideoTrackRemoved(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
                 localWindow.removeAllViews();
+                localVideoTrack.removeRenderer(localVideoRenderer);
             }
 
             @Override
             public void onLocalVideoTrackError(LocalMedia localMedia, LocalVideoTrack localVideoTrack, TwilioConversationsException e) {
+                localVideoTrack.removeRenderer(localVideoRenderer);
             }
         };
     }
@@ -436,9 +436,7 @@ public class VideoConversationActivity extends BaseActivity {
         if (TwilioConversations.isInitialized() && conversationClient != null) {
             conversationClient.listen();
         }
-        if (cameraCapturer != null) {
             cameraCapturer.startPreview();
-        }
     }
 
     @Override
@@ -447,17 +445,7 @@ public class VideoConversationActivity extends BaseActivity {
         if (TwilioConversations.isInitialized() && conversationClient != null && conversation == null) {
             conversationClient.unlisten();
         }
-        if (cameraCapturer != null) {
             cameraCapturer.stopPreview();
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        if (cameraCapturer != null) {
-            cameraCapturer.stopPreview();
-        }
     }
 
     private void closeConversation() {
@@ -466,8 +454,6 @@ public class VideoConversationActivity extends BaseActivity {
         participantWindow.removeAllViews();
         localVideoRenderer = null;
         participantVideoRenderer = null;
-
-        cameraCapturer.stopPreview();
 
         if (conversation != null) {
             conversation.disconnect();
