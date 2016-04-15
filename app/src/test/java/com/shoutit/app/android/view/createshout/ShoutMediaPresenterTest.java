@@ -6,6 +6,7 @@ import android.net.Uri;
 import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.utils.AmazonHelper;
+import com.shoutit.app.android.utils.SystemUIUtils;
 import com.shoutit.app.android.view.media.MediaUtils;
 
 import org.junit.Before;

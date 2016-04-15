@@ -69,6 +69,7 @@ public class CameraFragment extends Fragment {
     private static final String ARGS_FIRST_MEDIA = "arg_first_media";
 
     private static final String TAG = CameraFragment.class.getCanonicalName();
+    public static final int MAX_SIZE = 2048;
 
     public interface CameraFragmentListener {
         void onInitializationFailed(Exception cause);
@@ -571,7 +572,18 @@ public class CameraFragment extends Fragment {
         }
 
         if (ei != null) {
-            Bitmap imageBitmap = BitmapFactory.decodeFile(imageOutput);
+            final BitmapFactory.Options opts = new BitmapFactory.Options();
+            opts.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(imageOutput, opts);
+
+            final int inWidth = opts.outWidth;
+            final int inHeight = opts.outHeight;
+
+            final BitmapFactory.Options newOpts = new BitmapFactory.Options();
+            if(Math.max(inHeight, inWidth) > MAX_SIZE) {
+                newOpts.inSampleSize = (int) Math.ceil(Math.max(inWidth / MAX_SIZE, inHeight / MAX_SIZE));
+            }
+            Bitmap scaledBitmap = BitmapFactory.decodeFile(imageOutput, newOpts);
 
             int orientation =
                     ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
@@ -579,19 +591,15 @@ public class CameraFragment extends Fragment {
 
             switch (orientation) {
                 case ExifInterface.ORIENTATION_ROTATE_90:
-                    imageBitmap = rotateBitmap(imageBitmap, 90);
-                    Log.d("IMAGE", "Image needs rotation 90");
+                    scaledBitmap = rotateBitmap(scaledBitmap, 90);
                     break;
                 case ExifInterface.ORIENTATION_ROTATE_180:
-                    imageBitmap = rotateBitmap(imageBitmap, 180);
-                    Log.d("IMAGE", "Image needs rotation 180");
+                    scaledBitmap = rotateBitmap(scaledBitmap, 180);
                     break;
                 case ExifInterface.ORIENTATION_ROTATE_270:
-                    imageBitmap = rotateBitmap(imageBitmap, -90);
-                    Log.d("IMAGE", "Image needs rotation 270");
+                    scaledBitmap = rotateBitmap(scaledBitmap, -90);
                     break;
                 default:
-                    Log.d("IMAGE", "Image needs no rotation");
                     break;
             }
 
@@ -601,18 +609,18 @@ public class CameraFragment extends Fragment {
                 Matrix matrixMirrorY = new Matrix();
                 matrixMirrorY.setValues(mirrorY);
                 matrix.postConcat(matrixMirrorY);
-                imageBitmap = Bitmap.createBitmap(imageBitmap, 0, 0, imageBitmap.getWidth(),
-                        imageBitmap.getHeight(), matrix, true);
+                scaledBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(),
+                        scaledBitmap.getHeight(), matrix, true);
             }
 
-            saveBitmapToFile(imageBitmap, imageOutput);
-            imageBitmap.recycle();
+            saveBitmapToFile(scaledBitmap, imageOutput);
+            scaledBitmap.recycle();
         }
 
         getActivity().getFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragment_camera_layout_preview_overlay,
-                        ImageFragment.newInstance(imageOutput, null)).setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                        ImageFragment.newInstance(imageOutput, null))
                 .commit();
     }
 
