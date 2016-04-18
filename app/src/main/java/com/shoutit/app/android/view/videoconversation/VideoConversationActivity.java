@@ -51,6 +51,7 @@ import com.twilio.conversations.LocalMediaListener;
 import com.twilio.conversations.LocalVideoTrack;
 import com.twilio.conversations.LocalVideoTrackFactory;
 import com.twilio.conversations.MediaTrack;
+import com.twilio.conversations.OutgoingInvite;
 import com.twilio.conversations.Participant;
 import com.twilio.conversations.ParticipantListener;
 import com.twilio.conversations.TwilioConversations;
@@ -80,6 +81,7 @@ public class VideoConversationActivity extends BaseActivity {
     private static final String ARGS_CALLER = "args_caller";
     private static final int CAMERA_MIC_PERMISSION_REQUEST_CODE = 1;
 
+
     private VideoViewRenderer participantVideoRenderer;
     private VideoViewRenderer localVideoRenderer;
     private ConversationsClient conversationClient;
@@ -87,6 +89,7 @@ public class VideoConversationActivity extends BaseActivity {
     private CameraManager cameraManager;
     private Conversation conversation;
 
+    private OutgoingInvite outgoingInvite;
     private IncomingInvite invite;
     @Bind(R.id.video_conversation_layout)
     View videoCallView;
@@ -185,8 +188,7 @@ public class VideoConversationActivity extends BaseActivity {
             @Override
             public void onError(CapturerException e) {
                 conversationErrorSubject.onNext(getString(R.string.video_calls_camera_issue));
-                stopPreview();
-                startPreview();
+                cameraCapturer.startPreview();
             }
         };
     }
@@ -199,22 +201,28 @@ public class VideoConversationActivity extends BaseActivity {
     }
 
     private void acceptIncomingCall() {
-        callButton.setVisibility(View.GONE);
 
-        invite.accept(setupLocalMedia(), new ConversationCallback() {
-            @Override
-            public void onConversation(Conversation conversation, TwilioConversationsException exception) {
-                if (exception == null) {
-                    VideoConversationActivity
-                            .this
-                            .conversation = conversation;
-                    conversation
-                            .setConversationListener(conversationListener());
-                } else {
-                    conversationErrorSubject.onNext(TextHelper.formatErrorMessage(exception.getMessage()));
+        if (invite != null) {
+
+            callButton.setVisibility(View.GONE);
+
+            invite.accept(setupLocalMedia(), new ConversationCallback() {
+                @Override
+                public void onConversation(Conversation conversation, TwilioConversationsException exception) {
+                    if (exception == null) {
+                        VideoConversationActivity
+                                .this
+                                .conversation = conversation;
+                        conversation
+                                .setConversationListener(conversationListener());
+                    } else {
+                        conversationErrorSubject.onNext(TextHelper.formatErrorMessage(exception.getMessage()));
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            ColoredSnackBar.error(ColoredSnackBar.contentView(this), R.string.video_call_error, Snackbar.LENGTH_SHORT).show();
+        }
     }
 
     private void makeOutgoingCall() {
@@ -225,7 +233,7 @@ public class VideoConversationActivity extends BaseActivity {
             Set<String> participants = new HashSet<>();
             participants.add(shoutOnwerId);
 
-            conversationClient
+            outgoingInvite = conversationClient
                     .sendConversationInvite(participants, setupLocalMedia(), new ConversationCallback() {
                         @Override
                         public void onConversation(Conversation conversation, TwilioConversationsException exception) {
@@ -249,7 +257,6 @@ public class VideoConversationActivity extends BaseActivity {
             @Override
             public void onLocalVideoTrackAdded(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
                 conversationInfoSubject.onNext(getString(R.string.video_calls_connecting));
-
                 localVideoRenderer = new VideoViewRenderer(VideoConversationActivity.this, localWindow);
                 localVideoTrack.addRenderer(localVideoRenderer);
             }
@@ -257,11 +264,12 @@ public class VideoConversationActivity extends BaseActivity {
             @Override
             public void onLocalVideoTrackRemoved(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
                 localWindow.removeAllViews();
-                participantWindow.removeAllViews();
+                localVideoTrack.removeRenderer(localVideoRenderer);
             }
 
             @Override
             public void onLocalVideoTrackError(LocalMedia localMedia, LocalVideoTrack localVideoTrack, TwilioConversationsException e) {
+                localVideoTrack.removeRenderer(localVideoRenderer);
             }
         };
     }
@@ -289,6 +297,9 @@ public class VideoConversationActivity extends BaseActivity {
 
             @Override
             public void onConversationEnded(Conversation conversation, TwilioConversationsException e) {
+                if (conversation != null) {
+                    conversation.disconnect();
+                }
             }
         };
     }
@@ -315,6 +326,7 @@ public class VideoConversationActivity extends BaseActivity {
             @Override
             public void onVideoTrackRemoved(Conversation conversation, Participant participant, VideoTrack videoTrack) {
                 participantWindow.removeAllViews();
+                videoTrack.removeRenderer(participantVideoRenderer);
             }
 
             @Override
@@ -345,7 +357,7 @@ public class VideoConversationActivity extends BaseActivity {
                     CameraCapturer.CameraSource.CAMERA_SOURCE_BACK_CAMERA, localVideoPreview, capturerErrorListener());
         }
         setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
-        startPreview();
+        cameraCapturer.startPreview();
     }
 
     private void setupVariablesFromApp() {
@@ -421,10 +433,12 @@ public class VideoConversationActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (TwilioConversations.isInitialized() && conversationClient != null && !conversationClient.isListening()) {
+        if (TwilioConversations.isInitialized() && conversationClient != null) {
             conversationClient.listen();
         }
-        startPreview();
+        if (cameraCapturer != null) {
+            cameraCapturer.startPreview();
+        }
     }
 
     @Override
@@ -433,24 +447,29 @@ public class VideoConversationActivity extends BaseActivity {
         if (TwilioConversations.isInitialized() && conversationClient != null && conversation == null) {
             conversationClient.unlisten();
         }
-        stopPreview();
-    }
 
-    private void stopPreview() {
-        cameraCapturer.stopPreview();
-    }
-
-    private void startPreview() {
-        cameraCapturer.startPreview();
+        if (cameraCapturer != null) {
+            cameraCapturer.stopPreview();
+        }
     }
 
     private void closeConversation() {
+
+        localWindow.removeAllViews();
+        participantWindow.removeAllViews();
+        localVideoRenderer = null;
+        participantVideoRenderer = null;
+
         if (conversation != null) {
             conversation.disconnect();
         }
-        if (conversationClient != null) {
-            conversationClient.listen();
+        if (invite != null) {
+            invite.reject();
         }
+        if (outgoingInvite != null) {
+            outgoingInvite.cancel();
+        }
+
     }
 
     @Nonnull

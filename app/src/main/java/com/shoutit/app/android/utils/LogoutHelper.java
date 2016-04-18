@@ -4,6 +4,7 @@ import com.pusher.client.Pusher;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.db.RecentSearchesTable;
+import com.shoutit.app.android.twilio.Twilio;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -17,6 +18,9 @@ public class LogoutHelper {
     private final PusherHelper mPusherHelper;
 
     @Inject
+    Twilio twilio;
+
+    @Inject
     public LogoutHelper(@Nonnull UserPreferences userPreferences,
                         @Nonnull RecentSearchesTable recentSearchesTable,
                         PusherHelper pusherHelper) {
@@ -26,6 +30,8 @@ public class LogoutHelper {
     }
 
     public void logout() {
+        twilio.unregisterTwillio();
+
         final Pusher pusher = mPusherHelper.getPusher();
         final User user = userPreferences.getUser();
         assert user != null;

@@ -47,6 +47,7 @@ import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.shoutit.app.android.view.shouts.selectshout.SelectShoutActivity;
+import com.shoutit.app.android.view.videoconversation.VideoConversationActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -58,6 +59,7 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Subscription;
 import rx.functions.Action1;
 
 public class ChatActivity extends BaseActivity implements Listener {
@@ -144,7 +146,13 @@ public class ChatActivity extends BaseActivity implements Listener {
                         return true;
                     }
                     case R.id.chats_video_menu: {
-
+                       presenter.getChatParticipantIdentityObservable()
+                                .subscribe(new Action1<String>() {
+                                    @Override
+                                    public void call(String identity) {
+                                        startActivity(VideoConversationActivity.newIntent(null, identity, ChatActivity.this));
+                                    }
+                                });
                         return true;
                     }
                     case R.id.chats_delete: {
