@@ -14,7 +14,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -109,6 +108,9 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
     @Bind(R.id.chats_message_send_button)
     ImageButton sendButton;
 
+    @Bind(R.id.conversations_empty)
+    View emptyList;
+
     public static Intent newIntent(@Nonnull Context context, boolean shoutConversation, @NonNull String idForCreation) {
         return new Intent(context, ChatFirstConversationActivity.class)
                 .putExtra(ARGS_IS_SHOUT_CONVERSATION, shoutConversation)
@@ -168,6 +170,7 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
                     }
                 });
 
+        sendButton.setEnabled(false);
         mChatsMessageEdittext.addTextChangedListener(new TextWatcherAdapter() {
             @Override
             public void afterTextChanged(Editable s) {
@@ -210,11 +213,13 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
     @Override
     public void emptyList() {
         mChatsRecyclerview.setVisibility(View.GONE);
+        emptyList.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void showProgress(boolean show) {
         mChatsProgress.setVisibility(show ? View.VISIBLE : View.GONE);
+        emptyList.setVisibility(View.GONE);
     }
 
     @Override
