@@ -13,11 +13,11 @@ public class TypingItem implements BaseAdapterItem {
 
     @Override
     public boolean matches(@Nonnull BaseAdapterItem item) {
-        return false;
+        return item instanceof TypingItem;
     }
 
     @Override
     public boolean same(@Nonnull BaseAdapterItem item) {
-        return false;
+        return item instanceof TypingItem;
     }
 }

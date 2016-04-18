@@ -14,9 +14,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -183,20 +181,9 @@ public class ChatActivity extends BaseActivity implements Listener {
             }
         });
 
-        mMainLayout.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                mChatsAttatchmentsLayout.setVisibility(View.GONE);
-                return false;
-            }
-        });
-        mChatsRecyclerview.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                mChatsAttatchmentsLayout.setVisibility(View.GONE);
-                return false;
-            }
-        });
+        ChatsHelper.setOnClickHideListener(mMainLayout, mChatsAttatchmentsLayout);
+        ChatsHelper.setOnClickHideListener(mChatsRecyclerview, mChatsAttatchmentsLayout);
+        ChatsHelper.setOnClickHideListener(mChatsMessageEdittext, mChatsAttatchmentsLayout);
     }
 
     @Nonnull

@@ -13,6 +13,7 @@ import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.view.conversations.ConversationsActivity;
 
 import javax.annotation.Nonnull;
 
@@ -76,6 +77,8 @@ public class DiscoverActivity extends BaseActivity implements OnNewDiscoverSelec
                 return true;
             case R.id.base_menu_search:
                 return false;
+            case R.id.base_menu_chat:
+                startActivity(ConversationsActivity.newIntent(DiscoverActivity.this));
             default:
                 return super.onOptionsItemSelected(item);
         }

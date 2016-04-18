@@ -22,12 +22,28 @@ public class DateItem implements BaseAdapterItem {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        final DateItem dateItem = (DateItem) o;
+
+        return date != null ? date.equals(dateItem.date) : dateItem.date == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return date != null ? date.hashCode() : 0;
+    }
+
+    @Override
     public boolean matches(@Nonnull BaseAdapterItem item) {
-        return false;
+        return item instanceof DateItem && item.equals(this);
     }
 
     @Override
     public boolean same(@Nonnull BaseAdapterItem item) {
-        return false;
+        return item instanceof DateItem && item.equals(this);
     }
 }
