@@ -303,7 +303,7 @@ public class ChatsFirstConversationPresenter {
                                             user.getFirstName(),
                                             user.getUsername(),
                                             user.getType(),
-                                            user.getImage())), user.getId()));
+                                            user.getImage())), mUserPreferences.getUser().getId()));
                         }
                     }, getOnError()));
         }
