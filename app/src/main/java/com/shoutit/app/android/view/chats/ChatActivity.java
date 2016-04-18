@@ -110,6 +110,9 @@ public class ChatActivity extends BaseActivity implements Listener {
     @Bind(R.id.chats_message_send_button)
     ImageButton sendButton;
 
+    @Bind(R.id.conversations_empty)
+    View emptyList;
+
     public static Intent newIntent(@Nonnull Context context, @NonNull String conversationId, boolean shoutConversation) {
         return new Intent(context, ChatActivity.class)
                 .putExtra(ARGS_CONVERSATION_ID, conversationId)
@@ -174,6 +177,7 @@ public class ChatActivity extends BaseActivity implements Listener {
                     }
                 });
 
+        sendButton.setEnabled(false);
         mChatsMessageEdittext.addTextChangedListener(new TextWatcherAdapter() {
             @Override
             public void afterTextChanged(Editable s) {
@@ -213,11 +217,13 @@ public class ChatActivity extends BaseActivity implements Listener {
     @Override
     public void emptyList() {
         mChatsRecyclerview.setVisibility(View.GONE);
+        emptyList.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void showProgress(boolean show) {
         mChatsProgress.setVisibility(show ? View.VISIBLE : View.GONE);
+        emptyList.setVisibility(View.GONE);
     }
 
     @Override
@@ -275,8 +281,9 @@ public class ChatActivity extends BaseActivity implements Listener {
     public void setAboutShoutData(String title, String thumbnail, String type, String price, String authorAndTime, final String id) {
         mChatsShoutLayout.setVisibility(View.VISIBLE);
         picasso.load(thumbnail)
-                .centerCrop()
+                .placeholder(R.drawable.ic_tag_placeholder)
                 .error(R.drawable.ic_tag_placeholder)
+                .centerCrop()
                 .fit()
                 .into(mChatsShoutImage);
         mChatsShoutLayoutType.setText(type);
