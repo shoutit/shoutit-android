@@ -11,9 +11,9 @@ import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
-import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.functions.Functions1;
 import com.appunite.rx.operators.OperatorMergeNextToken;
+import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -26,7 +26,6 @@ import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.AboutShout;
 import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.ConversationProfile;
-import com.shoutit.app.android.api.model.ConversationsResponse;
 import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessageAttachment;
 import com.shoutit.app.android.api.model.MessagesResponse;
@@ -64,7 +63,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -179,7 +177,7 @@ public class ChatsPresenter {
                 .filter(new Func1<String, Boolean>() {
                     @Override
                     public Boolean call(String participantUsername) {
-                        return !Objects.equals(userPreferences.getUser().getUsername(), participantUsername);
+                        return !Objects.equal(userPreferences.getUser().getUsername(), participantUsername);
                     }
                 })
                 .flatMap(new Func1<String, Observable<ResponseOrError<UserIdentity>>>() {
