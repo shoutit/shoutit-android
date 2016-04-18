@@ -76,13 +76,15 @@ public class MixPanel {
     }
 
     public void trackAppOpen() {
-        final boolean isNormalUser = userPreferences.isNormalUser();
+        final boolean isLoggedIn = userPreferences.isUserLoggedIn();
         final boolean isGuest = userPreferences.isGuest();
 
         final JSONObject properties = new JSONObject();
         try {
-            properties.put(PROPERTY_SIGNED_USER, isNormalUser);
-            properties.put(PROPERTY_IS_GUEST, isGuest);
+            properties.put(PROPERTY_SIGNED_USER, isLoggedIn);
+            if (isLoggedIn) {
+                properties.put(PROPERTY_IS_GUEST, isGuest);
+            }
             properties.put(PROPERTY_API_CLIENT, API_CLIENT);
         } catch (JSONException e) {
             logError(e);
