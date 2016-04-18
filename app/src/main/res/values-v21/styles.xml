@@ -6,6 +6,11 @@
         <item name="android:statusBarColor">@color/intro_status_bar</item>
     </style>
 
+    <style name="TransparentStatusBar" parent="AppTheme">
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
     <style name="AppTheme.WithDrawer">
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
@@ -32,6 +37,23 @@
 
     <style name="BaseToolbarNoElevation" parent="AppTheme.BaseToolbarStyle">
         <item name="android:elevation">0dp</item>
+    </style>
+
+    <style name="AppTheme.DialogActivity">
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:alertDialogStyle">@style/ShoutitAlertDialogStyle</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
 </resources>

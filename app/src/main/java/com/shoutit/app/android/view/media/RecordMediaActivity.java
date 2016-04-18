@@ -24,6 +24,7 @@ import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.utils.SystemUIUtils;
 
 import java.util.List;
 

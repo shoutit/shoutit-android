@@ -4,4 +4,7 @@
 
     <!-- Intro -->
     <dimen name="activity_intro_pager_height">420dp</dimen>
+
+    <!-- Publish Media -->
+    <dimen name="publsh_media_padding">100dp</dimen>
 </resources>

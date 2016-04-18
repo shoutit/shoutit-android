@@ -20,7 +20,7 @@
         android:clickable="true"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:paddingTop="70dp">
+        android:paddingTop="@dimen/publsh_media_padding">
 
         <ImageView
             android:id="@+id/camera_cool_icon"
@@ -90,9 +90,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|left"
-        android:layout_marginLeft="10dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:layout_marginTop="@dimen/status_bar_margin"
         android:background="?selectableItemBackground"
         android:src="@drawable/close"/>
 
