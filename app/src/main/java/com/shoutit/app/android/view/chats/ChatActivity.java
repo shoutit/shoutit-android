@@ -275,8 +275,9 @@ public class ChatActivity extends BaseActivity implements Listener {
     public void setAboutShoutData(String title, String thumbnail, String type, String price, String authorAndTime, final String id) {
         mChatsShoutLayout.setVisibility(View.VISIBLE);
         picasso.load(thumbnail)
-                .centerCrop()
+                .placeholder(R.drawable.ic_tag_placeholder)
                 .error(R.drawable.ic_tag_placeholder)
+                .centerCrop()
                 .fit()
                 .into(mChatsShoutImage);
         mChatsShoutLayoutType.setText(type);

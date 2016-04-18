@@ -260,6 +260,8 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
     public void setAboutShoutData(String title, String thumbnail, String type, String price, String authorAndTime, final String id) {
         mChatsShoutLayout.setVisibility(View.VISIBLE);
         picasso.load(thumbnail)
+                .placeholder(R.drawable.ic_tag_placeholder)
+                .error(R.drawable.ic_tag_placeholder)
                 .centerCrop()
                 .fit()
                 .into(mChatsShoutImage);
