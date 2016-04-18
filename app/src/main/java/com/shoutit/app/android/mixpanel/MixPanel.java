@@ -27,9 +27,12 @@ public class MixPanel {
     private static final String DEVELOPMENT = "d2de0109a8de7237dede66874c7b8951";
     private static final String API_CLIENT = "shoutit-android";
 
+    /** EVENTS **/
     private static final String EVENT_APP_OPEN = "app_open";
 
+    /** PROPERTIES **/
     private static final String PROPERTY_SIGNED_USER = "signed_user";
+    private static final String PROPERTY_IS_GUEST = "is_guest";
     private static final String PROPERTY_API_CLIENT = "api_client";
 
     @Nonnull
@@ -74,9 +77,12 @@ public class MixPanel {
 
     public void trackAppOpen() {
         final boolean isNormalUser = userPreferences.isNormalUser();
+        final boolean isGuest = userPreferences.isGuest();
+
         final JSONObject properties = new JSONObject();
         try {
             properties.put(PROPERTY_SIGNED_USER, isNormalUser);
+            properties.put(PROPERTY_IS_GUEST, isGuest);
             properties.put(PROPERTY_API_CLIENT, API_CLIENT);
         } catch (JSONException e) {
             logError(e);
