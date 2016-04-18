@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
@@ -68,7 +69,7 @@ public class AccountFragment extends BaseFragment {
                                    @Nonnull FragmentModule fragmentModule,
                                    @javax.annotation.Nullable Bundle savedInstanceState) {
         DaggerAccountFragmentComponent.builder()
-                .baseActivityComponent(baseActivityComponent)
+                .appComponent(App.getAppComponent(getActivity().getApplication()))
                 .fragmentModule(fragmentModule)
                 .build()
                 .inject(this);

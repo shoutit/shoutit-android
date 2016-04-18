@@ -7,9 +7,11 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.text.format.DateUtils;
 
+import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
+import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.functions.Functions1;
 import com.appunite.rx.operators.OperatorMergeNextToken;
 import com.google.common.base.Strings;
@@ -24,6 +26,7 @@ import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.AboutShout;
 import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.ConversationProfile;
+import com.shoutit.app.android.api.model.ConversationsResponse;
 import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessageAttachment;
 import com.shoutit.app.android.api.model.MessagesResponse;
@@ -32,8 +35,10 @@ import com.shoutit.app.android.api.model.PusherMessage;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutResponse;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.api.model.UserIdentity;
 import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.UsersIdentityDao;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.PusherHelper;
@@ -59,8 +64,10 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
@@ -73,6 +80,7 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.functions.Func3;
+import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 import rx.subscriptions.CompositeSubscription;
 
@@ -135,15 +143,20 @@ public class ChatsPresenter {
     private final PublishSubject<Object> requestSubject = PublishSubject.create();
     private final PublishSubject<PusherMessage> newMessagesSubject = PublishSubject.create();
     private final User mUser;
+    private final BehaviorSubject<String> chatParticipantUsernameSubject= BehaviorSubject.create();
+    private final Observable<String> chatParticipantIdentityObservable;
+
+
 
     @Inject
     public ChatsPresenter(@NonNull String conversationId,
                           @NonNull ApiService apiService,
                           @UiScheduler Scheduler uiScheduler,
                           @NetworkScheduler Scheduler networkScheduler,
-                          UserPreferences userPreferences,
+                          final UserPreferences userPreferences,
                           @ForActivity Resources resources,
                           @ForActivity Context context,
+                          @Nonnull final UsersIdentityDao usersIdentityDao,
                           PusherHelper pusher,
                           Gson gson,
                           AmazonHelper amazonHelper,
@@ -160,6 +173,41 @@ public class ChatsPresenter {
         mAmazonHelper = amazonHelper;
         mIsShoutConversation = isShoutConversation;
         mUser = mUserPreferences.getUser();
+
+        final Observable<ResponseOrError<UserIdentity>> userIdentityResponse = chatParticipantUsernameSubject
+                .filter(Functions1.isNotNull())
+                .filter(new Func1<String, Boolean>() {
+                    @Override
+                    public Boolean call(String participantUsername) {
+                        return !Objects.equals(userPreferences.getUser().getUsername(), participantUsername);
+                    }
+                })
+                .flatMap(new Func1<String, Observable<ResponseOrError<UserIdentity>>>() {
+                    @Override
+                    public Observable<ResponseOrError<UserIdentity>> call(String username) {
+                        return usersIdentityDao.getUserIdentityObservable(username);
+                    }
+                });
+
+        Observable<UserIdentity> successIdentityResponse = userIdentityResponse
+                .compose(ResponseOrError.<UserIdentity>onlySuccess());
+
+        chatParticipantIdentityObservable = successIdentityResponse
+                .map(new Func1<UserIdentity, String>() {
+                    @Override
+                    public String call(UserIdentity userIdentity) {
+                        return userIdentity.getIdentity();
+                    }
+                })
+                .filter(Functions1.isNotNull())
+                .filter(new Func1<String, Boolean>() {
+                    @Override
+                    public Boolean call(String s) {
+                        return !userPreferences.isGuest();
+                    }
+                })
+                .observeOn(uiScheduler);
+
     }
 
     public void register(@NonNull Listener listener) {
@@ -287,6 +335,10 @@ public class ChatsPresenter {
                 .subscribe(new Action1<Conversation>() {
                     @Override
                     public void call(Conversation conversationResponse) {
+
+                        chatParticipantUsernameSubject.onNext(conversationResponse.getAbout().getProfile().getUsername());
+                        mUserPreferences.setShoutOwnerName(conversationResponse.getAbout().getProfile().getName());
+
                         if (mIsShoutConversation) {
                             final AboutShout about = conversationResponse.getAbout();
                             final String title = about.getTitle();
@@ -295,6 +347,7 @@ public class ChatsPresenter {
                             final String price = PriceUtils.formatPriceWithCurrency(about.getPrice(), mResources, about.getCurrency());
                             final String authorAndTime = about.getProfile().getName() + " - " + DateUtils.getRelativeTimeSpanString(mContext, about.getDatePublished() * 1000);
                             final String id = about.getId();
+
 
                             if (!Strings.isNullOrEmpty(id)) {
                                 mListener.setAboutShoutData(title, thumbnail, type, price, authorAndTime, id);
@@ -307,6 +360,8 @@ public class ChatsPresenter {
                         }
                     }
                 }, getOnError()));
+
+
     }
 
     @NonNull
@@ -633,4 +688,9 @@ public class ChatsPresenter {
             presenceChannel.trigger("client-is_typing", mGson.toJson(mUser));
         }
     }
+
+    public Observable<String> getChatParticipantIdentityObservable() {
+        return chatParticipantIdentityObservable;
+    }
+
 }

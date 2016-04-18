@@ -26,6 +26,7 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dao.ProfilesDao;
+import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.BackPressedHelper;
 import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.utils.ColoredSnackBar;
@@ -38,6 +39,7 @@ import com.shoutit.app.android.view.intro.IntroActivity;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.postlogininterest.PostLoginInterestActivity;
 import com.shoutit.app.android.view.search.main.MainSearchActivity;
+import com.twilio.conversations.TwilioConversations;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -68,6 +70,8 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
     UserPreferences mUserPreferences;
     @Inject
     ProfilesDao profilesDao;
+    @Inject
+    Twilio twilio;
     @Inject
     MixPanel mixPanel;
 

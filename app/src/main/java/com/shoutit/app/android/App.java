@@ -123,8 +123,8 @@ public class App extends MultiDexApplication {
     }
 
     private void initPusher() {
-        Observable.zip(userPreferences.getTokenObservable().filter(Functions1.isNotNull()),
-                userPreferences.getUserObservable().filter(Functions1.isNotNull()),
+        Observable.zip(userPreferences.getTokenObservable().filter(Functions1.isNotNull()).distinctUntilChanged(),
+                userPreferences.getUserObservable().filter(Functions1.isNotNull()).distinctUntilChanged(),
                 new Func2<String, User, BothParams<String, User>>() {
                     @Override
                     public BothParams<String, User> call(String token, User user) {
@@ -142,15 +142,15 @@ public class App extends MultiDexApplication {
     }
 
     private void initTwilio() {
-        Observable.zip(userPreferences.getTokenObservable().filter(Functions1.isNotNull()),
-                userPreferences.getUserObservable().filter(Functions1.isNotNull()),
+        Observable.zip(userPreferences.getTokenObservable().filter(Functions1.isNotNull()).distinctUntilChanged(),
+                userPreferences.getUserObservable().filter(Functions1.isNotNull()).distinctUntilChanged(),
                 new Func2<String, User, BothParams<String, User>>() {
                     @Override
                     public BothParams<String, User> call(String token, User user) {
                         return new BothParams<>(token, user);
                     }
                 })
-                .first()
+                .distinctUntilChanged()
                 .subscribe(new Action1<BothParams<String, User>>() {
                     @Override
                     public void call(BothParams<String, User> tokenAndUser) {
