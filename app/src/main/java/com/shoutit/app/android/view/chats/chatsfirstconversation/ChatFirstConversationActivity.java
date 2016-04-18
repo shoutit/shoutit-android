@@ -11,12 +11,14 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -37,6 +39,8 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
+import com.shoutit.app.android.utils.TextWatcherAdapter;
+import com.shoutit.app.android.view.chats.ChatsHelper;
 import com.shoutit.app.android.view.chats.Listener;
 import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
@@ -105,6 +109,9 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
     View mMainLayout;
     private Subscription subscription;
 
+    @Bind(R.id.chats_message_send_button)
+    ImageButton sendButton;
+
     public static Intent newIntent(@Nonnull Context context, boolean shoutConversation, @NonNull String idForCreation) {
         return new Intent(context, ChatFirstConversationActivity.class)
                 .putExtra(ARGS_IS_SHOUT_CONVERSATION, shoutConversation)
@@ -170,20 +177,16 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
                     }
                 });
 
-        mMainLayout.setOnTouchListener(new View.OnTouchListener() {
+        mChatsMessageEdittext.addTextChangedListener(new TextWatcherAdapter() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                mChatsAttatchmentsLayout.setVisibility(View.GONE);
-                return false;
+            public void afterTextChanged(Editable s) {
+                sendButton.setEnabled(s.length() != 0);
             }
         });
-        mChatsRecyclerview.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                mChatsAttatchmentsLayout.setVisibility(View.GONE);
-                return false;
-            }
-        });
+
+        ChatsHelper.setOnClickHideListener(mMainLayout, mChatsAttatchmentsLayout);
+        ChatsHelper.setOnClickHideListener(mChatsRecyclerview, mChatsAttatchmentsLayout);
+        ChatsHelper.setOnClickHideListener(mChatsMessageEdittext, mChatsAttatchmentsLayout);
     }
 
     @Nonnull
@@ -215,7 +218,7 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
 
     @Override
     public void emptyList() {
-
+        mChatsRecyclerview.setVisibility(View.GONE);
     }
 
     @Override
@@ -225,6 +228,7 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
 
     @Override
     public void setData(@NonNull List<BaseAdapterItem> items) {
+        mChatsRecyclerview.setVisibility(View.VISIBLE);
         chatsAdapter.call(items);
     }
 
@@ -309,12 +313,12 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
 
     @OnClick(R.id.chats_attatchments_video)
     void videoClicked() {
-        startActivityForResult(RecordMediaActivity.newIntent(this, true, true, true), REQUEST_ATTACHMENT);
+        startActivityForResult(RecordMediaActivity.newIntent(this, true, true, true, false), REQUEST_ATTACHMENT);
     }
 
     @OnClick(R.id.chats_attatchments_photo) 
     void photoClicked() {
-        startActivityForResult(RecordMediaActivity.newIntent(this, true, false, true), REQUEST_ATTACHMENT);
+        startActivityForResult(RecordMediaActivity.newIntent(this, true, false, true, false), REQUEST_ATTACHMENT);
     }
 
     @OnClick(R.id.chats_attatchments_shout)

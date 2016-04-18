@@ -19,6 +19,7 @@ import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.collect.Lists;
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
 import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
+import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
@@ -28,8 +29,6 @@ import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.chats.ChatActivity;
-import com.shoutit.app.android.view.main.MainActivity;
-import com.shoutit.app.android.view.main.MainActivityComponent;
 
 import java.util.List;
 
@@ -52,6 +51,7 @@ public class ConverstationsFragment extends BaseFragment implements Conversation
     @Inject
     ConversationsAdapter adapter;
 
+    @Nullable
     private View mLogo;
     private List<MenuItem> mItems = Lists.newArrayList();
 
@@ -62,15 +62,17 @@ public class ConverstationsFragment extends BaseFragment implements Conversation
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.activity_conversations, container, false);
+        return inflater.inflate(R.layout.fragment_conversations, container, false);
     }
 
     @Override
-    protected void injectComponent(@Nonnull BaseActivityComponent baseActivityComponent, @Nonnull FragmentModule fragmentModule, @javax.annotation.Nullable Bundle savedInstanceState) {
-        final ConversationsActivityComponent component = DaggerConversationsActivityComponent
+    protected void injectComponent(@Nonnull BaseActivityComponent baseActivityComponent,
+                                   @Nonnull FragmentModule fragmentModule,
+                                   @Nullable Bundle savedInstanceState) {
+        final ConversationsFragmentComponent component = DaggerConversationsFragmentComponent
                 .builder()
                 .fragmentModule(new FragmentModule(this))
-                .mainActivityComponent((MainActivityComponent) baseActivityComponent)
+                .baseActivityComponent(baseActivityComponent)
                 .build();
         component.inject(this);
     }
@@ -89,10 +91,12 @@ public class ConverstationsFragment extends BaseFragment implements Conversation
         mConversationRecyclerview.setAdapter(adapter);
         mConversationRecyclerview.setLayoutManager(new MyLinearLayoutManager(getActivity()));
 
-        final MainActivity activity = (MainActivity) getActivity();
+        final BaseActivity activity = (BaseActivity) getActivity();
         activity.getSupportActionBar().setTitle(R.string.conversation_title);
         mLogo = activity.findViewById(R.id.activity_main_logo);
-        mLogo.setVisibility(View.GONE);
+        if (mLogo != null) {
+            mLogo.setVisibility(View.GONE);
+        }
 
         RxRecyclerView.scrollEvents(mConversationRecyclerview)
                 .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
@@ -116,8 +120,10 @@ public class ConverstationsFragment extends BaseFragment implements Conversation
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        mLogo.setVisibility(View.VISIBLE);
-        final MainActivity activity = (MainActivity) getActivity();
+        if (mLogo != null) {
+            mLogo.setVisibility(View.VISIBLE);
+        }
+        final BaseActivity activity = (BaseActivity) getActivity();
         activity.getSupportActionBar().setTitle(null);
         for (MenuItem item : mItems) {
             item.setVisible(true);
@@ -136,6 +142,7 @@ public class ConverstationsFragment extends BaseFragment implements Conversation
 
     @Override
     public void emptyList() {
+        mConversationRecyclerview.setVisibility(View.GONE);
         mConversationEmptyText.setVisibility(View.VISIBLE);
     }
 
@@ -146,6 +153,7 @@ public class ConverstationsFragment extends BaseFragment implements Conversation
 
     @Override
     public void setData(@NonNull List<BaseAdapterItem> items) {
+        mConversationRecyclerview.setVisibility(View.VISIBLE);
         adapter.call(items);
     }
 

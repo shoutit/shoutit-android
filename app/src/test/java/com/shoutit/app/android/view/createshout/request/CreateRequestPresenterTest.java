@@ -133,7 +133,7 @@ public class CreateRequestPresenterTest {
 
         verify(mListener, times(2)).showProgress();
         verify(mListener, times(2)).hideProgress();
-        verify(mListener).showError();
+        verify(mListener).showApiError(any(Throwable.class));
     }
 
     @Test

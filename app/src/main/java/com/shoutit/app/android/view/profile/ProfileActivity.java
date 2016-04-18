@@ -24,6 +24,7 @@ import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.squareup.picasso.Picasso;
@@ -242,10 +243,8 @@ public abstract class ProfileActivity extends BaseActivity {
         return new Action1<String>() {
             @Override
             public void call(String shareUrl) {
-                final Intent intent = new Intent(Intent.ACTION_SEND);
-                intent.setType("text/plain");
-                intent.putExtra(Intent.EXTRA_TEXT, shareUrl);
-                startActivity(Intent.createChooser(intent, getString(R.string.profile_share_profile_title)));
+                startActivity(Intent.createChooser(IntentHelper.getShareIntent(shareUrl),
+                        getString(R.string.profile_share_profile_title)));
             }
         };
     }

@@ -24,6 +24,7 @@ import com.shoutit.app.android.api.model.login.LoginUser;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.location.LocationManager;
+import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.SystemUIUtils;
@@ -65,6 +66,9 @@ public class IntroActivity extends BaseActivity {
     LocationManager locationManager;
     @Inject
     ApiService mApiService;
+    @Inject
+    MixPanel mixPanel;
+
     private Observable<UserLocation> mLocationObservable;
 
     public static Intent newIntent(Context context) {
@@ -112,7 +116,7 @@ public class IntroActivity extends BaseActivity {
                 .flatMap(new Func1<UserLocation, Observable<SignResponse>>() {
                     @Override
                     public Observable<SignResponse> call(UserLocation location) {
-                        return mApiService.loginGuest(new GuestSignupRequest(LoginUser.loginUser(location)))
+                        return mApiService.loginGuest(new GuestSignupRequest(LoginUser.loginUser(location), mixPanel.getDistinctId()))
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(MyAndroidSchedulers.mainThread());
                     }

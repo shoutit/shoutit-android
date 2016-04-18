@@ -11,17 +11,18 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
-import com.appunite.rx.functions.BothParams;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
@@ -41,6 +42,7 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
+import com.shoutit.app.android.utils.TextWatcherAdapter;
 import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
@@ -59,9 +61,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Subscription;
 import rx.functions.Action1;
-import rx.functions.Func1;
-import rx.functions.Func2;
-import rx.subjects.PublishSubject;
 
 public class ChatActivity extends BaseActivity implements Listener {
 
@@ -73,8 +72,6 @@ public class ChatActivity extends BaseActivity implements Listener {
     private static final int SELECT_SHOUT_REQUEST_CODE = 2;
 
     private static final String TAG = ChatActivity.class.getCanonicalName();
-
-    private Subscription subscription;
 
     @Inject
     Picasso picasso;
@@ -111,6 +108,9 @@ public class ChatActivity extends BaseActivity implements Listener {
 
     @Bind(R.id.chats_main_layout)
     View mMainLayout;
+
+    @Bind(R.id.chats_message_send_button)
+    ImageButton sendButton;
 
     public static Intent newIntent(@Nonnull Context context, @NonNull String conversationId, boolean shoutConversation) {
         return new Intent(context, ChatActivity.class)
@@ -182,6 +182,16 @@ public class ChatActivity extends BaseActivity implements Listener {
                     }
                 });
 
+        mChatsMessageEdittext.addTextChangedListener(new TextWatcherAdapter() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                sendButton.setEnabled(s.length() != 0);
+            }
+        });
+
+        ChatsHelper.setOnClickHideListener(mMainLayout, mChatsAttatchmentsLayout);
+        ChatsHelper.setOnClickHideListener(mChatsRecyclerview, mChatsAttatchmentsLayout);
+        ChatsHelper.setOnClickHideListener(mChatsMessageEdittext, mChatsAttatchmentsLayout);
     }
 
     @Nonnull
@@ -210,7 +220,7 @@ public class ChatActivity extends BaseActivity implements Listener {
 
     @Override
     public void emptyList() {
-
+        mChatsRecyclerview.setVisibility(View.GONE);
     }
 
     @Override
@@ -220,6 +230,7 @@ public class ChatActivity extends BaseActivity implements Listener {
 
     @Override
     public void setData(@NonNull List<BaseAdapterItem> items) {
+        mChatsRecyclerview.setVisibility(View.VISIBLE);
         chatsAdapter.call(items);
         mChatsRecyclerview.scrollToPosition(items.size() - 1);
     }
@@ -306,12 +317,12 @@ public class ChatActivity extends BaseActivity implements Listener {
 
     @OnClick(R.id.chats_attatchments_video)
     void videoClicked() {
-        startActivityForResult(RecordMediaActivity.newIntent(this, true, true, true), REQUEST_ATTACHMENT);
+        startActivityForResult(RecordMediaActivity.newIntent(this, true, true, true, false), REQUEST_ATTACHMENT);
     }
 
     @OnClick(R.id.chats_attatchments_photo)
     void photoClicked() {
-        startActivityForResult(RecordMediaActivity.newIntent(this, true, false, true), REQUEST_ATTACHMENT);
+        startActivityForResult(RecordMediaActivity.newIntent(this, true, false, true, false), REQUEST_ATTACHMENT);
     }
 
     @OnClick(R.id.chats_attatchments_shout)

@@ -1,13 +1,13 @@
 package com.shoutit.app.android.view.home;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.github.clans.fab.FloatingActionButton;
@@ -25,7 +25,7 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LayoutManagerHelper;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
-import com.shoutit.app.android.view.createshout.CreateShoutDialogFragment;
+import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
 import com.shoutit.app.android.view.discover.DiscoverActivity;
 import com.shoutit.app.android.view.main.OnSeeAllDiscoversListener;
 import com.shoutit.app.android.view.postlogininterest.PostLoginInterestActivity;
@@ -175,7 +175,7 @@ public class HomeFragment extends BaseFragment {
 
     @OnClick(R.id.fragment_home_fab)
     void onAddShoutClicked() {
-        CreateShoutDialogFragment.newInstance().show(getFragmentManager(), null);
+        startActivity(new Intent(context, CreateShoutDialogActivity.class));
     }
 
     @Override

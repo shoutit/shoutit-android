@@ -151,7 +151,7 @@ public class CreateRequestPresenter {
                     @Override
                     public void call(Throwable throwable) {
                         mListener.hideProgress();
-                        mListener.showError();
+                        mListener.showApiError(throwable);
                     }
                 }));
     }
@@ -192,7 +192,7 @@ public class CreateRequestPresenter {
 
         void hideProgress();
 
-        void showError();
+        void showApiError(Throwable throwable);
 
         void setCurrencies(@NonNull List<PriceUtils.SpinnerCurrency> list);
 

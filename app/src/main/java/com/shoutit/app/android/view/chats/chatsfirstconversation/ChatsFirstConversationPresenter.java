@@ -19,6 +19,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.pusher.client.channel.PresenceChannel;
+import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.ConversationProfile;
@@ -109,7 +110,7 @@ public class ChatsFirstConversationPresenter {
     private final PublishSubject<PusherMessage> newMessagesSubject = PublishSubject.create();
     private final PublishSubject<Object> mRefreshTypingObservable = PublishSubject.create();
     private final User mUser;
-    private final BehaviorSubject<String> chatParticipantUsernameSubject= BehaviorSubject.create();
+    private final BehaviorSubject<String> chatParticipantUsernameSubject = BehaviorSubject.create();
     private final Observable<String> chatParticipantIdentityObservable;
 
     @Inject
@@ -181,7 +182,7 @@ public class ChatsFirstConversationPresenter {
     public void register(@NonNull Listener listener) {
         final User user = mUserPreferences.getUser();
         assert user != null;
-        final PresenceChannel userChannel = mPusher.getPusher().getPresenceChannel(String.format("presence-u-%1$s", user.getId()));
+        final PresenceChannel userChannel = mPusher.getPusher().getPresenceChannel(String.format("presence-v3-p-%1$s", user.getId()));
 
         final Observable<PusherMessage> pusherMessageObservable = Observable
                 .create(new Observable.OnSubscribe<PusherMessage>() {
@@ -255,7 +256,7 @@ public class ChatsFirstConversationPresenter {
                             public Message apply(@Nullable PusherMessage message) {
                                 assert message != null;
                                 return new Message(
-                                        conversationId, message.getUser(),
+                                        conversationId, message.getProfile(),
                                         message.getId(),
                                         message.getText(),
                                         message.getAttachments(),
@@ -308,23 +309,30 @@ public class ChatsFirstConversationPresenter {
 
                             final String title = about.getTitle();
                             final String thumbnail = Strings.emptyToNull(about.getThumbnail());
-                            final String type = about.getType().equals(Shout.TYPE_OFFER) ? "Offer" : "Request";
+                            final String type = about.getType().equals(Shout.TYPE_OFFER) ? mContext.getString(R.string.chat_offer) : mContext.getString(R.string.chat_request);
                             final String price = PriceUtils.formatPriceWithCurrency(about.getPrice(), mResources, about.getCurrency());
                             final User profile = about.getProfile();
                             final String authorAndTime = profile.getName() + " - " + DateUtils.getRelativeTimeSpanString(mContext, about.getDatePublishedInMillis());
                             final String id = about.getId();
 
-                            chatParticipantUsernameSubject.onNext(profile.getUsername());
-                            mUserPreferences.setShoutOwnerName(profile.getName());
-
-                            mListener.setAboutShoutData(title, thumbnail, type, price, authorAndTime, id);
-                            mListener.setShoutToolbarInfo(title, ConversationsUtils.getChatWithString(
-                                    ImmutableList.of(new ConversationProfile(
-                                            profile.getId(),
-                                            profile.getFirstName(),
-                                            profile.getUsername(),
-                                            profile.getType(),
-                                            profile.getImage()))));
+                            if (!Strings.isNullOrEmpty(id)) {
+                                mListener.setAboutShoutData(title, thumbnail, type, price, authorAndTime, id);
+                                mListener.setShoutToolbarInfo(title, ConversationsUtils.getChatWithString(
+                                        ImmutableList.of(new ConversationProfile(
+                                                profile.getId(),
+                                                profile.getFirstName(),
+                                                profile.getUsername(),
+                                                profile.getType(),
+                                                profile.getImage())), user.getId()));
+                            } else {
+                                mListener.setShoutToolbarInfo(mContext.getString(R.string.chat_shout_chat), ConversationsUtils.getChatWithString(
+                                        ImmutableList.of(new ConversationProfile(
+                                                profile.getId(),
+                                                profile.getFirstName(),
+                                                profile.getUsername(),
+                                                profile.getType(),
+                                                profile.getImage())), user.getId()));
+                            }
                         }
                     }, getOnError()));
         } else {
@@ -340,7 +348,7 @@ public class ChatsFirstConversationPresenter {
                                             user.getFirstName(),
                                             user.getUsername(),
                                             user.getType(),
-                                            user.getImage()))));
+                                            user.getImage())), user.getId()));
                         }
                     }, getOnError()));
         }
@@ -412,13 +420,13 @@ public class ChatsFirstConversationPresenter {
 
     public void postTextMessage(@NonNull String text) {
         final PostMessage message = new PostMessage(text, ImmutableList.<MessageAttachment>of());
-        sendMessage(message)
+        mSubscribe.add(sendMessage(message)
                 .subscribe(new Action1<Message>() {
                     @Override
                     public void call(Message messagesResponse) {
                         postLocalMessage(messagesResponse);
                     }
-                }, getOnError());
+                }, getOnError()));
         ;
     }
 
@@ -505,7 +513,7 @@ public class ChatsFirstConversationPresenter {
                 final MessageAttachment.AttachtmentShout shout = messageAttachment.getShout();
                 return new ReceivedShoutMessage(
                         isFirst,
-                        shout.getThumbnail(),
+                        shout.getThumbnailOrNull(),
                         time,
                         PriceUtils.formatPriceWithCurrency(shout.getPrice(), mResources, shout.getCurrency()),
                         shout.getText(),
@@ -537,7 +545,7 @@ public class ChatsFirstConversationPresenter {
                 return new SentLocationMessage(time, mListener, location.getLatitude(), location.getLongitude());
             } else if (MessageAttachment.ATTACHMENT_TYPE_SHOUT.equals(type)) {
                 final MessageAttachment.AttachtmentShout shout = messageAttachment.getShout();
-                return new SentShoutMessage(shout.getThumbnail(), time, PriceUtils.formatPriceWithCurrency(shout.getPrice(), mResources, shout.getCurrency()), shout.getText(), shout.getUser().getName(), mListener, shout.getId());
+                return new SentShoutMessage(shout.getThumbnailOrNull(), time, PriceUtils.formatPriceWithCurrency(shout.getPrice(), mResources, shout.getCurrency()), shout.getText(), shout.getUser().getName(), mListener, shout.getId());
             } else {
                 throw new RuntimeException(type);
             }
@@ -630,21 +638,21 @@ public class ChatsFirstConversationPresenter {
 
     public void sendLocation(double latitude, double longitude) {
         final PostMessage message = new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_LOCATION, new MessageAttachment.MessageLocation(latitude, longitude), null, null, null)));
-        sendMessage(message)
+        mSubscribe.add(sendMessage(message)
                 .subscribe(new Action1<Message>() {
                     @Override
                     public void call(Message message) {
                         postLocalMessage(message);
                         mListener.hideAttatchentsMenu();
                     }
-                }, getOnError());
+                }, getOnError()));
     }
 
     public void deleteShout() {
         if (conversationCreated) {
             mListener.conversationDeleted();
         } else {
-            mApiService.deleteConversation(conversationId)
+            mSubscribe.add(mApiService.deleteConversation(conversationId)
                     .observeOn(mUiScheduler)
                     .subscribeOn(mNetworkScheduler)
                     .subscribe(new Action1<ResponseBody>() {
@@ -652,12 +660,12 @@ public class ChatsFirstConversationPresenter {
                         public void call(ResponseBody responseBody) {
                             mListener.conversationDeleted();
                         }
-                    }, getOnError());
+                    }, getOnError()));
         }
     }
 
     public void sendShout(final String shoutId) {
-        mApiService.getShout(shoutId)
+        mSubscribe.add(mApiService.getShout(shoutId)
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
                 .flatMap(new Func1<ShoutResponse, Observable<Message>>() {
@@ -685,12 +693,12 @@ public class ChatsFirstConversationPresenter {
                         postLocalMessage(message);
                         mListener.hideAttatchentsMenu();
                     }
-                }, getOnError());
+                }, getOnError()));
     }
 
     public void sendTyping() {
         final PresenceChannel presenceChannel = mPusher.getPusher().getPresenceChannel(String.format("presence-v3-c-%1$s", conversationId));
-        if (presenceChannel != null) {
+        if (presenceChannel != null && presenceChannel.isSubscribed()) {
             presenceChannel.trigger("client-is_typing", mGson.toJson(mUser));
         }
     }

@@ -26,6 +26,26 @@ public class SentImageMessage implements BaseAdapterItem {
         return url;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        final SentImageMessage that = (SentImageMessage) o;
+
+        if (time != null ? !time.equals(that.time) : that.time != null) return false;
+        if (url != null ? !url.equals(that.url) : that.url != null) return false;
+        return mListener != null ? mListener.equals(that.mListener) : that.mListener == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = time != null ? time.hashCode() : 0;
+        result = 31 * result + (url != null ? url.hashCode() : 0);
+        result = 31 * result + (mListener != null ? mListener.hashCode() : 0);
+        return result;
+    }
 
     @Override
     public long adapterId() {
@@ -34,12 +54,12 @@ public class SentImageMessage implements BaseAdapterItem {
 
     @Override
     public boolean matches(@Nonnull BaseAdapterItem item) {
-        return false;
+        return item instanceof SentImageMessage && time.equals(((SentImageMessage) item).time);
     }
 
     @Override
     public boolean same(@Nonnull BaseAdapterItem item) {
-        return false;
+        return item instanceof SentImageMessage && this.equals(item);
     }
 
     public void click() {

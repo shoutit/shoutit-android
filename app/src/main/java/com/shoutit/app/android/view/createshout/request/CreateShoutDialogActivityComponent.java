@@ -4,7 +4,7 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.ActivityScope;
 import com.shoutit.app.android.dagger.AppComponent;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
-import com.shoutit.app.android.view.createshout.CreateShoutDialogFragment;
+import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
 
 import dagger.Component;
 
@@ -15,8 +15,8 @@ import dagger.Component;
                 ActivityModule.class,
         }
 )
-public interface CreateShoutDialogComponent extends BaseActivityComponent {
+public interface CreateShoutDialogActivityComponent extends BaseActivityComponent {
 
-    void inject(CreateShoutDialogFragment activity);
+    void inject(CreateShoutDialogActivity activity);
 
 }

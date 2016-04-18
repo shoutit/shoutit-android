@@ -8,6 +8,7 @@
     android:focusableInTouchMode="true">
 
     <ScrollView
+        android:id="@+id/register_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true">
@@ -106,6 +107,7 @@
                 android:layout_width="match_parent"
                 android:layout_marginTop="14dp"
                 android:background="@drawable/selector_green_button_with_stroke"
+                android:textAllCaps="false"
                 android:text="@string/register_sign_up_btn_text"
                 android:textColor="@android:color/white"/>
 
@@ -163,7 +165,9 @@
 
             <include
                 android:id="@+id/login_bottom_actions_container"
-                layout="@layout/login_bottom_actions"/>
+                layout="@layout/login_bottom_actions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 

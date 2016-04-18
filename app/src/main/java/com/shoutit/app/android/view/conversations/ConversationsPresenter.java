@@ -31,7 +31,6 @@ import com.shoutit.app.android.utils.PusherHelper;
 import com.shoutit.app.android.view.chats.PresenceChannelEventListenerAdapter;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -120,7 +119,7 @@ public class ConversationsPresenter {
     public void register(@NonNull final Listener listener) {
         final User user = mUserPreferences.getUser();
         assert user != null;
-        final PresenceChannel userChannel = mPusherHelper.getPusher().getPresenceChannel(String.format("presence-u-%1$s", user.getId()));
+        final PresenceChannel userChannel = mPusherHelper.getPusher().getPresenceChannel(String.format("presence-v3-p-%1$s", user.getId()));
 
         final Observable<HashMap<String, Conversation>> mapObservable = Observable
                 .create(new Observable.OnSubscribe<PusherMessage>() {
@@ -212,7 +211,7 @@ public class ConversationsPresenter {
                             Collections.sort(list, new Comparator<Conversation>() {
                                 @Override
                                 public int compare(Conversation lhs, Conversation rhs) {
-                                    return lhs.getLastMessage().getCreatedAt() >= rhs.getLastMessage().getCreatedAt() ? -1 : 1 ;
+                                    return lhs.getLastMessage().getCreatedAt() >= rhs.getLastMessage().getCreatedAt() ? -1 : 1;
                                 }
                             });
                             final ImmutableList<BaseAdapterItem> items = ImmutableList.copyOf(
@@ -246,7 +245,9 @@ public class ConversationsPresenter {
 
         final String message = getMessageString(lastMessage);
         final String elapsedTime = DateUtils.getRelativeTimeSpanString(mContext, lastMessage.getCreatedAt() * 1000).toString();
-        final String chatWith = ConversationsUtils.getChatWithString(profiles);
+        final User user = mUserPreferences.getUser();
+        assert user != null;
+        final String chatWith = ConversationsUtils.getChatWithString(profiles, user.getId());
         final String image = getImage(profiles);
 
         if (Conversation.ABOUT_SHOUT_TYPE.equals(input.getType())) {
@@ -259,7 +260,15 @@ public class ConversationsPresenter {
     }
 
     private String getImage(List<ConversationProfile> profiles) {
-        return profiles.get(0).getImage();
+        final User user = mUserPreferences.getUser();
+        assert user != null;
+        final String id = user.getId();
+        for (ConversationProfile profile : profiles) {
+            if (!profile.getId().equals(id)) {
+                return profile.getImage();
+            }
+        }
+        return null;
     }
 
     private String getMessageString(Message lastMessage) {

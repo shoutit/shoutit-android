@@ -247,8 +247,8 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     }
 
     @Override
-    public void showPostError() {
-        ColoredSnackBar.error(ColoredSnackBar.contentView(this), getString(R.string.request_acitvity_post_error), Snackbar.LENGTH_SHORT).show();
+    public void showEditShoutApiError(Throwable throwable) {
+        ColoredSnackBar.error(ColoredSnackBar.contentView(this), throwable, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
@@ -393,8 +393,8 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     }
 
     @Override
-    public void setMedia(@NonNull List<String> images, @NonNull List<Video> videos) {
-        mShoutMediaPresenter.addRemoteMedia(images, videos);
+    public void setMediaData(@NonNull List<String> images, @NonNull List<Video> videos, boolean isOffer) {
+        mShoutMediaPresenter.setUp(images, videos, isOffer);
     }
 
     @Override
@@ -437,8 +437,8 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     }
 
     @Override
-    public void openSelectMediaActivity() {
-        startActivityForResult(RecordMediaActivity.newIntent(this, true, false, false), MEDIA_REQUEST_CODE);
+    public void openSelectMediaActivity(boolean isFirst, boolean isOffer) {
+        startActivityForResult(RecordMediaActivity.newIntent(this, true, false, false, isFirst && isOffer), MEDIA_REQUEST_CODE);
     }
 
     @Override

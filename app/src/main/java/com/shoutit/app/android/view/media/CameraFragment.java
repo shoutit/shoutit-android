@@ -66,8 +66,10 @@ public class CameraFragment extends Fragment {
 
     private static final String ARGS_VIDEO_FIRST = "arg_video_first";
     private static final String ARGS_CHAT_MEDIA = "arg_is_chat";
+    private static final String ARGS_FIRST_MEDIA = "arg_first_media";
 
     private static final String TAG = CameraFragment.class.getCanonicalName();
+    public static final int MAX_SIZE = 2048;
 
     public interface CameraFragmentListener {
         void onInitializationFailed(Exception cause);
@@ -94,6 +96,7 @@ public class CameraFragment extends Fragment {
     private CameraFragmentListener cameraFragmentListener;
     private boolean isMFfcEnabled = false;
     private boolean chatMedia;
+    private boolean firstMedia;
 
     @Bind(R.id.fragment_camera_preview_stack)
     ViewGroup previewStack;
@@ -128,10 +131,11 @@ public class CameraFragment extends Fragment {
     @Bind(R.id.camera_text_header)
     TextView cameraTextHeader;
 
-    public static CameraFragment newInstance(boolean videoFirst, boolean chatMedia) {
+    public static CameraFragment newInstance(boolean videoFirst, boolean chatMedia, boolean firstMedia) {
         final Bundle args = new Bundle();
         args.putBoolean(ARGS_VIDEO_FIRST, videoFirst);
         args.putBoolean(ARGS_CHAT_MEDIA, chatMedia);
+        args.putBoolean(ARGS_FIRST_MEDIA, firstMedia);
         final CameraFragment cameraFragment = new CameraFragment();
         cameraFragment.setArguments(args);
         return cameraFragment;
@@ -157,6 +161,7 @@ public class CameraFragment extends Fragment {
 
         isVideoMode = getArguments().getBoolean(ARGS_VIDEO_FIRST);
         chatMedia = getArguments().getBoolean(ARGS_CHAT_MEDIA);
+        firstMedia = getArguments().getBoolean(ARGS_FIRST_MEDIA);
 
         if (hasCameras()) {
             cameraFragmentListener.onInitializationFailed(
@@ -184,9 +189,12 @@ public class CameraFragment extends Fragment {
         if (chatMedia) {
             buttonConfirm.setText(R.string.camera_send);
             cameraTextHeader.setText(null);
-        } else {
+        } else if (firstMedia) {
             buttonConfirm.setText(R.string.camera_publish);
             cameraTextHeader.setText(R.string.camera_header);
+        } else {
+            buttonConfirm.setText(R.string.camera_publish);
+            cameraTextHeader.setText(null);
         }
 
         closeButton.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
@@ -564,7 +572,7 @@ public class CameraFragment extends Fragment {
         }
 
         if (ei != null) {
-            Bitmap imageBitmap = BitmapFactory.decodeFile(imageOutput);
+            Bitmap scaledBitmap = getScaledBitmap();
 
             int orientation =
                     ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
@@ -572,19 +580,15 @@ public class CameraFragment extends Fragment {
 
             switch (orientation) {
                 case ExifInterface.ORIENTATION_ROTATE_90:
-                    imageBitmap = rotateBitmap(imageBitmap, 90);
-                    Log.d("IMAGE", "Image needs rotation 90");
+                    scaledBitmap = rotateBitmap(scaledBitmap, 90);
                     break;
                 case ExifInterface.ORIENTATION_ROTATE_180:
-                    imageBitmap = rotateBitmap(imageBitmap, 180);
-                    Log.d("IMAGE", "Image needs rotation 180");
+                    scaledBitmap = rotateBitmap(scaledBitmap, 180);
                     break;
                 case ExifInterface.ORIENTATION_ROTATE_270:
-                    imageBitmap = rotateBitmap(imageBitmap, -90);
-                    Log.d("IMAGE", "Image needs rotation 270");
+                    scaledBitmap = rotateBitmap(scaledBitmap, -90);
                     break;
                 default:
-                    Log.d("IMAGE", "Image needs no rotation");
                     break;
             }
 
@@ -594,19 +598,34 @@ public class CameraFragment extends Fragment {
                 Matrix matrixMirrorY = new Matrix();
                 matrixMirrorY.setValues(mirrorY);
                 matrix.postConcat(matrixMirrorY);
-                imageBitmap = Bitmap.createBitmap(imageBitmap, 0, 0, imageBitmap.getWidth(),
-                        imageBitmap.getHeight(), matrix, true);
+                scaledBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(),
+                        scaledBitmap.getHeight(), matrix, true);
             }
 
-            saveBitmapToFile(imageBitmap, imageOutput);
-            imageBitmap.recycle();
+            saveBitmapToFile(scaledBitmap, imageOutput);
+            scaledBitmap.recycle();
         }
 
         getActivity().getFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragment_camera_layout_preview_overlay,
-                        ImageFragment.newInstance(imageOutput, null)).setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                        ImageFragment.newInstance(imageOutput, null))
                 .commit();
+    }
+
+    private Bitmap getScaledBitmap() {
+        final BitmapFactory.Options opts = new BitmapFactory.Options();
+        opts.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(imageOutput, opts);
+
+        final int inWidth = opts.outWidth;
+        final int inHeight = opts.outHeight;
+
+        final BitmapFactory.Options newOpts = new BitmapFactory.Options();
+        if (Math.max(inHeight, inWidth) > MAX_SIZE) {
+            newOpts.inSampleSize = (int) Math.ceil(Math.max(inWidth / MAX_SIZE, inHeight / MAX_SIZE));
+        }
+        return BitmapFactory.decodeFile(imageOutput, newOpts);
     }
 
     private void saveBitmapToFile(Bitmap bitmap, String outputFilePath) {
@@ -686,18 +705,14 @@ public class CameraFragment extends Fragment {
 
                 if (!imageFile.exists()) return null;
 
-                try {
-                    Bitmap imageBitmap = CameraUtils.getResizedImage(imageFile, 1280);
+                Bitmap imageBitmap = CameraUtils.getScaledBitmapFromFile(imageFile.getAbsolutePath(), MAX_SIZE);
 
-                    Log.d("tag", String.format("  > %s x %s", imageBitmap.getWidth(), imageBitmap.getHeight()));
+                Log.d("tag", String.format("  > %s x %s", imageBitmap.getWidth(), imageBitmap.getHeight()));
 
-                    if (CameraUtils.bitmapToFile(imageBitmap, imageFile, Bitmap.CompressFormat.JPEG, DEFAULT_IMAGE_QUALITY)) {
-                        Log.d("tag", String.format("  > new JPEG file size: %s bytes", imageFile.length()));
-                        return new String[]{EXTRA_IMAGE_URI, "file://" + imageOutput};
-                    } else {
-                        return null;
-                    }
-                } catch (IOException e) {
+                if (CameraUtils.bitmapToFile(imageBitmap, imageFile, Bitmap.CompressFormat.JPEG, DEFAULT_IMAGE_QUALITY)) {
+                    Log.d("tag", String.format("  > new JPEG file size: %s bytes", imageFile.length()));
+                    return new String[]{EXTRA_IMAGE_URI, "file://" + imageOutput};
+                } else {
                     return null;
                 }
             }
@@ -768,7 +783,7 @@ public class CameraFragment extends Fragment {
         video.setVisibility(View.VISIBLE);
         picture.setVisibility(View.GONE);
 
-        if (chatMedia) {
+        if (chatMedia || !firstMedia) {
             cameraText.setText(null);
         } else {
             cameraText.setText(getString(R.string.camera_sub_header, getString(R.string.camera_photo)));
@@ -787,7 +802,7 @@ public class CameraFragment extends Fragment {
         video.setVisibility(View.GONE);
         picture.setVisibility(View.VISIBLE);
 
-        if (chatMedia) {
+        if (chatMedia || !firstMedia) {
             cameraText.setText(null);
         } else {
             cameraText.setText(getString(R.string.camera_sub_header, getString(R.string.camera_video)));

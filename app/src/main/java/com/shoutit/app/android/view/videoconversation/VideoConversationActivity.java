@@ -436,7 +436,9 @@ public class VideoConversationActivity extends BaseActivity {
         if (TwilioConversations.isInitialized() && conversationClient != null) {
             conversationClient.listen();
         }
+        if (cameraCapturer != null) {
             cameraCapturer.startPreview();
+        }
     }
 
     @Override
@@ -445,7 +447,10 @@ public class VideoConversationActivity extends BaseActivity {
         if (TwilioConversations.isInitialized() && conversationClient != null && conversation == null) {
             conversationClient.unlisten();
         }
+
+        if (cameraCapturer != null) {
             cameraCapturer.stopPreview();
+        }
     }
 
     private void closeConversation() {

@@ -27,6 +27,7 @@ import rx.Observable;
 
 import static com.google.common.truth.Truth.assert_;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -99,7 +100,7 @@ public class ShoutMediaPresenterTest {
         final ShoutMediaPresenter.Item item = value.get(0);
         item.click();
 
-        verify(mMediaListener).openSelectMediaActivity();
+        verify(mMediaListener).openSelectMediaActivity(anyBoolean(), anyBoolean());
     }
 
     @SuppressWarnings("unchecked")
@@ -169,7 +170,7 @@ public class ShoutMediaPresenterTest {
     @Test
     public void whenVideoAddedAndRemoteVideoAlreadySet_DisplayAlert() {
         mShoutMediaPresenter.register(mMediaListener);
-        mShoutMediaPresenter.addRemoteMedia(ImmutableList.<String>of(), ImmutableList.of(Video.createVideo("", "", 1)));
+        mShoutMediaPresenter.setUp(ImmutableList.<String>of(), ImmutableList.of(Video.createVideo("", "", 1)), anyBoolean());
 
         mShoutMediaPresenter.addMediaItem("test", true);
 
@@ -243,7 +244,7 @@ public class ShoutMediaPresenterTest {
         ArgumentCaptor<List> imagesCaptor = ArgumentCaptor.forClass(List.class);
         ArgumentCaptor<List> videoCaptor = ArgumentCaptor.forClass(List.class);
         mShoutMediaPresenter.register(mMediaListener);
-        mShoutMediaPresenter.addRemoteMedia(ImmutableList.of("a"), ImmutableList.of(Video.createVideo("a", "a", 1)));
+        mShoutMediaPresenter.setUp(ImmutableList.of("a"), ImmutableList.of(Video.createVideo("a", "a", 1)), anyBoolean());
 
         mShoutMediaPresenter.addMediaItem("test", false);
 
@@ -252,5 +253,28 @@ public class ShoutMediaPresenterTest {
         verify(mMediaListener).mediaEditionCompleted(imagesCaptor.capture(), videoCaptor.capture());
         assert_().that(videoCaptor.getValue()).hasSize(1);
         assert_().that(imagesCaptor.getValue()).hasSize(2);
+    }
+
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testWhenAllMediaAddedAndFirstRemoved_addAtLastItem() throws Exception {
+        ArgumentCaptor<Map> argumentCaptor = ArgumentCaptor.forClass(Map.class);
+
+        mShoutMediaPresenter.register(mMediaListener);
+
+        mShoutMediaPresenter.addMediaItem("test", false);
+        mShoutMediaPresenter.addMediaItem("test", false);
+        mShoutMediaPresenter.addMediaItem("test", false);
+        mShoutMediaPresenter.addMediaItem("test", false);
+        mShoutMediaPresenter.addMediaItem("test", false);
+
+        verify(mMediaListener, times(6)).setImages(argumentCaptor.capture());
+
+        final ShoutMediaPresenter.MediaItem target = (ShoutMediaPresenter.MediaItem) argumentCaptor.getValue().get(0);
+        target.click();
+
+        verify(mMediaListener, times(7)).setImages(argumentCaptor.capture());
+        assert_().that(argumentCaptor.getValue().get(4)).isInstanceOf(ShoutMediaPresenter.AddImageItem.class);
     }
 }

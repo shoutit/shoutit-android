@@ -41,7 +41,6 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import okhttp3.ResponseBody;
 import retrofit2.Response;
 import rx.Observable;
 import rx.Observer;
@@ -109,7 +108,7 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
     private final PreferencesHelper preferencesHelper;
     @Nullable
     private String loggedInUserName;
-    private boolean isUserLoggedIn;
+    private boolean isNormalUser;
 
     public UserOrPageProfilePresenter(@Nonnull final String userName,
                                       @Nonnull final ShoutsDao shoutsDao,
@@ -130,7 +129,7 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
         this.myProfilePresenter = myProfilePresenter;
         this.userProfilePresenter = userProfilePresenter;
         this.preferencesHelper = preferencesHelper;
-        this.isUserLoggedIn = userPreferences.isNormalUser();
+        this.isNormalUser = userPreferences.isNormalUser();
 
         final User loggedInUser = userPreferences.getUser();
         if (loggedInUser != null) {
@@ -305,7 +304,7 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
                             .add(myProfilePresenter.getThreeIconsAdapterItem(user));
                 } else {
                     builder.add(userProfilePresenter.getUserNameAdapterItem(user))
-                            .add(userProfilePresenter.getThreeIconsAdapterItem(user, isUserLoggedIn));
+                            .add(userProfilePresenter.getThreeIconsAdapterItem(user, isNormalUser));
                 }
 
                 builder.add(new ProfileAdapterItems.UserInfoAdapterItem(user, webUrlClickedSubject));
@@ -346,13 +345,13 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
     private <T extends ProfileType> ProfileAdapterItems.ProfileSectionAdapterItem getSectionAdapterItemForPosition(int position, User user, List<T> items, @Nullable String loggedInUserName) {
         if (position == 0) {
             return new ProfileAdapterItems.ProfileSectionAdapterItem<>(true, false, user, items.get(position),
-                    userProfilePresenter.getSectionItemListenObserver(), profileToOpenSubject, actionOnlyForLoggedInUserSubject, loggedInUserName, isUserLoggedIn, items.size() == 1);
+                    userProfilePresenter.getSectionItemListenObserver(), profileToOpenSubject, actionOnlyForLoggedInUserSubject, loggedInUserName, isNormalUser, items.size() == 1);
         } else if (position == items.size() - 1) {
             return new ProfileAdapterItems.ProfileSectionAdapterItem<>(false, true, user, items.get(position),
-                    userProfilePresenter.getSectionItemListenObserver(), profileToOpenSubject, actionOnlyForLoggedInUserSubject, loggedInUserName, isUserLoggedIn, false);
+                    userProfilePresenter.getSectionItemListenObserver(), profileToOpenSubject, actionOnlyForLoggedInUserSubject, loggedInUserName, isNormalUser, false);
         } else {
             return new ProfileAdapterItems.ProfileSectionAdapterItem<>(false, false, user, items.get(position),
-                    userProfilePresenter.getSectionItemListenObserver(), profileToOpenSubject, actionOnlyForLoggedInUserSubject, loggedInUserName, isUserLoggedIn, false);
+                    userProfilePresenter.getSectionItemListenObserver(), profileToOpenSubject, actionOnlyForLoggedInUserSubject, loggedInUserName, isNormalUser, false);
         }
     }
 

@@ -24,6 +24,7 @@ import com.shoutit.app.android.dao.TagsDao;
 import com.shoutit.app.android.dao.VideoCallsDao;
 import com.shoutit.app.android.db.DbHelper;
 import com.shoutit.app.android.location.LocationManager;
+import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.PusherHelper;
 import com.squareup.picasso.Picasso;
@@ -96,4 +97,6 @@ public interface AppComponent {
     VideoCallsDao videoCallsDao();
 
     Twilio twilio();
+
+    MixPanel mixPanel();
 }

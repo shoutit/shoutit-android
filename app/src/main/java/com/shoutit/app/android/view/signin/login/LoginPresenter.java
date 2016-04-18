@@ -15,6 +15,7 @@ import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.login.EmailLoginRequest;
 import com.shoutit.app.android.api.model.login.LoginUser;
+import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
 
@@ -50,7 +51,8 @@ public class LoginPresenter {
     public LoginPresenter(@NonNull final ApiService apiService,
                           @NonNull final UserPreferences userPreferences,
                           @NonNull @NetworkScheduler final Scheduler networkScheduler,
-                          @NonNull @UiScheduler final Scheduler uiScheduler) {
+                          @NonNull @UiScheduler final Scheduler uiScheduler,
+                          @Nonnull final MixPanel mixPanel) {
 
         mLocationObservable = userPreferences.getLocationObservable()
                 .startWith((UserLocation) null)
@@ -78,7 +80,7 @@ public class LoginPresenter {
                                 .zip(mEmailSubject.filter(getNotEmptyFunc1()), mPasswordSubject.filter(getNotEmptyFunc1()), new Func2<String, String, EmailLoginRequest>() {
                                     @Override
                                     public EmailLoginRequest call(String email, String password) {
-                                        return new EmailLoginRequest(email, password, LoginUser.loginUser(location));
+                                        return new EmailLoginRequest(email, password, LoginUser.loginUser(location), mixPanel.getDistinctId());
                                     }
                                 })
                                 .first();

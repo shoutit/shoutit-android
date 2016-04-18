@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#F4F4F4"
-    android:orientation="vertical">
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#F4F4F4"
+                android:orientation="vertical">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/chats_toolbar"
         style="@style/AppTheme.BaseToolbarStyle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"/>
 
     <LinearLayout
         android:id="@+id/chats_send_layout"
@@ -33,7 +33,7 @@
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:layout_weight="1"
-            android:hint="@string/chat_edit_text_hint" />
+            android:hint="@string/chat_edit_text_hint"/>
 
         <ImageButton
             android:id="@+id/chats_message_send_button"
@@ -42,7 +42,7 @@
             android:layout_gravity="center_vertical"
             android:background="?selectableItemBackground"
             android:padding="12dp"
-            android:src="@drawable/send" />
+            android:src="@drawable/send"/>
 
     </LinearLayout>
 
@@ -73,14 +73,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="?selectableItemBackgroundBorderless"
-                    android:src="@drawable/photo_attachment" />
+                    android:src="@drawable/photo_attachment"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="2dp"
-                    android:text="@string/chats_attatchments_photo" />
+                    android:text="@string/chats_attatchments_photo"/>
             </LinearLayout>
 
             <LinearLayout
@@ -94,14 +94,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="?selectableItemBackgroundBorderless"
-                    android:src="@drawable/video_attachment" />
+                    android:src="@drawable/video_attachment"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="2dp"
-                    android:text="@string/chats_attatchments_video" />
+                    android:text="@string/chats_attatchments_video"/>
             </LinearLayout>
 
             <LinearLayout
@@ -116,14 +116,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="?selectableItemBackgroundBorderless"
-                    android:src="@drawable/shout" />
+                    android:src="@drawable/shout"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="2dp"
-                    android:text="@string/chats_attatchments_shout" />
+                    android:text="@string/chats_attatchments_shout"/>
             </LinearLayout>
 
             <LinearLayout
@@ -138,14 +138,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="?selectableItemBackgroundBorderless"
-                    android:src="@drawable/location_attachment" />
+                    android:src="@drawable/location_attachment"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="2dp"
-                    android:text="@string/chats_attatchments_location" />
+                    android:text="@string/chats_attatchments_location"/>
             </LinearLayout>
 
         </GridLayout>
@@ -178,7 +178,7 @@
                 android:layout_marginLeft="16dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="6dp"
-                android:src="@drawable/ic_tag_placeholder" />
+                android:src="@drawable/ic_tag_placeholder"/>
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -195,12 +195,12 @@
                     android:ellipsize="end"
                     android:textColor="@color/black_54"
                     android:textSize="12sp"
-                    tools:text="Maerino Wool Text Long name Text " />
+                    tools:text="Maerino Wool Text Long name Text "/>
 
                 <View
                     android:layout_width="1dp"
                     android:layout_height="0dp"
-                    android:layout_weight="1" />
+                    android:layout_weight="1"/>
 
                 <TextView
                     android:id="@+id/chats_shout_layout_author_date"
@@ -209,7 +209,7 @@
                     android:ellipsize="end"
                     android:textColor="@color/black_38"
                     android:textSize="12sp"
-                    tools:text="John Smith - 2 hours ago" />
+                    tools:text="John Smith - 2 hours ago"/>
             </LinearLayout>
 
             <LinearLayout
@@ -228,12 +228,12 @@
                     android:paddingRight="6dp"
                     android:textColor="@color/black_54"
                     android:textSize="12sp"
-                    tools:text="Offer" />
+                    tools:text="Offer"/>
 
                 <View
                     android:layout_width="1dp"
                     android:layout_height="0dp"
-                    android:layout_weight="1" />
+                    android:layout_weight="1"/>
 
                 <TextView
                     android:id="@+id/chats_shout_layout_price"
@@ -241,7 +241,7 @@
                     android:layout_height="wrap_content"
                     android:textColor="#4CAF50"
                     android:textSize="12sp"
-                    tools:text="$44 USD" />
+                    tools:text="$44 USD"/>
 
             </LinearLayout>
 
@@ -250,14 +250,21 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/chats_recyclerview"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"/>
     </LinearLayout>
 
     <ProgressBar
-        android:visibility="gone"
         android:id="@+id/chats_progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true" />
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/conversations_empty"
+        android:text="@string/conversations_empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"/>
 
 </RelativeLayout>

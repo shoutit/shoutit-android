@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -28,6 +27,8 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.twilio.Twilio;
+import com.shoutit.app.android.utils.BackPressedHelper;
+import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.view.conversations.ConverstationsFragment;
@@ -35,6 +36,7 @@ import com.shoutit.app.android.view.discover.DiscoverActivity;
 import com.shoutit.app.android.view.discover.OnNewDiscoverSelectedListener;
 import com.shoutit.app.android.view.home.HomeFragment;
 import com.shoutit.app.android.view.intro.IntroActivity;
+import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.postlogininterest.PostLoginInterestActivity;
 import com.shoutit.app.android.view.search.main.MainSearchActivity;
 import com.twilio.conversations.TwilioConversations;
@@ -70,16 +72,11 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
     ProfilesDao profilesDao;
     @Inject
     Twilio twilio;
+    @Inject
+    MixPanel mixPanel;
 
     private ActionBarDrawerToggle drawerToggle;
-    private boolean doubleBackToExitPressedOnce;
-    private final Handler backButtonHandler = new Handler();
-    private final Runnable backButtonRunnable = new Runnable() {
-        @Override
-        public void run() {
-            doubleBackToExitPressedOnce = false;
-        }
-    };
+    private BackPressedHelper mBackPressedHelper;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -87,9 +84,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        if(!TwilioConversations.isInitialized() && mUserPreferences.isNormalUser()){
-            twilio.init();
-        }
+        mBackPressedHelper = new BackPressedHelper(this);
 
         if (!mUserPreferences.isUserLoggedIn() && !mUserPreferences.isGuest()) {
             finish();
@@ -147,10 +142,14 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
             case R.id.base_menu_search:
                 return showMainSearchActivityOrLetFragmentsHandleIt();
             case R.id.base_menu_chat:
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.activity_main_fragment_container, ConverstationsFragment.newInstance(), MenuHandler.FRAGMENT_CHATS)
-                        .commit();
-                menuHandler.selectChats();
+                if (mUserPreferences.isNormalUser()) {
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.activity_main_fragment_container, ConverstationsFragment.newInstance(), MenuHandler.FRAGMENT_CHATS)
+                            .commit();
+                    menuHandler.selectChats();
+                } else {
+                    startActivity(LoginIntroActivity.newIntent(this));
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -252,8 +251,9 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
     @Override
     protected void onDestroy() {
+        mixPanel.flush();
         super.onDestroy();
-        backButtonHandler.removeCallbacks(backButtonRunnable);
+        mBackPressedHelper.removeCallbacks();
     }
 
     @Override
@@ -272,14 +272,8 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
     @Override
     public void onBackPressed() {
-        if (doubleBackToExitPressedOnce || getSupportFragmentManager().getBackStackEntryCount() != 0) {
+        if (!mBackPressedHelper.onBackPressed()) {
             super.onBackPressed();
-            return;
         }
-
-        doubleBackToExitPressedOnce = true;
-        Snackbar.make(findViewById(android.R.id.content), R.string.exit_text, Snackbar.LENGTH_SHORT).show();
-
-        backButtonHandler.postDelayed(backButtonRunnable, 2000);
     }
 }

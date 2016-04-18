@@ -18,7 +18,7 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.utils.BlurTransform;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.view.conversations.ConverstationsFragment;
-import com.shoutit.app.android.view.createshout.CreateShoutDialogFragment;
+import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
 import com.shoutit.app.android.view.discover.DiscoverFragment;
 import com.shoutit.app.android.view.home.HomeFragment;
 import com.shoutit.app.android.view.location.LocationActivity;
@@ -220,7 +220,7 @@ public class MenuHandler {
     @OnClick(R.id.menu_new_shout_btn)
     public void newShoutClick() {
         if (userPreferences.isNormalUser()) {
-            CreateShoutDialogFragment.newInstance().show(rxActivity.getSupportFragmentManager(), null);
+            rxActivity.startActivity(CreateShoutDialogActivity.getIntent(rxActivity));
         } else {
             showLoginActivity();
         }

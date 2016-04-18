@@ -166,8 +166,8 @@ public class UserProfileHalfPresenter {
         return new ProfileAdapterItems.UserNameAdapterItem(user, moreMenuOptionClickedSubject);
     }
 
-    public ProfileAdapterItems.ThreeIconsAdapterItem getThreeIconsAdapterItem(@Nonnull User user, boolean isUserLoggedIn) {
-        return new ProfileAdapterItems.UserThreeIconsAdapterItem(user, isUserLoggedIn,
+    public ProfileAdapterItems.ThreeIconsAdapterItem getThreeIconsAdapterItem(@Nonnull User user, boolean isNormalUser) {
+        return new ProfileAdapterItems.UserThreeIconsAdapterItem(user, isNormalUser,
                 actionOnlyForLoggedInUserSubject, onChatIconClickedSubject, onListenActionClickedSubject);
     }
 

@@ -191,8 +191,8 @@ public class EditShoutPresenter {
                             mListener.setLocation(
                                     ResourcesHelper.getResourceIdForName(mUserLocation.getCountry(), mContext),
                                     mUserLocation.getCity());
-                            mListener.setMobilePhone(shoutResponse.getMobileHint());
-                            mListener.setMedia(shoutResponse.getImages(), shoutResponse.getVideos());
+                            mListener.setMobilePhone(shoutResponse.getMobile());
+                            mListener.setMediaData(shoutResponse.getImages(), shoutResponse.getVideos(), shoutResponse.getType().equals(Shout.TYPE_OFFER));
                             changeCategoryWithSelectedOptions(shoutResponse.getCategory().getSlug(), shoutResponse.getFilters());
                         } else {
                             mListener.showBodyError();
@@ -303,7 +303,7 @@ public class EditShoutPresenter {
 
         mListener.showProgress();
 
-        Observable<CreateShoutResponse> observable = Strings.isNullOrEmpty(requestData.mBudget) ?
+        Observable<CreateShoutResponse> editShoutObservable = Strings.isNullOrEmpty(requestData.mBudget) ?
                 mApiService.editShout(mShoutId, new EditShoutRequest(
                         requestData.mTitle,
                         requestData.mDescription,
@@ -319,7 +319,7 @@ public class EditShoutPresenter {
                         requestData.mCategoryId,
                         getFilters(requestData.mOptionsIdValue), requestData.mImages, requestData.mVideos, requestData.mMobile));
 
-        pendingSubscriptions.add(observable
+        pendingSubscriptions.add(editShoutObservable
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
                 .subscribe(new Action1<CreateShoutResponse>() {
@@ -333,7 +333,7 @@ public class EditShoutPresenter {
                     @Override
                     public void call(Throwable throwable) {
                         mListener.hideProgress();
-                        mListener.showPostError();
+                        mListener.showEditShoutApiError(throwable);
                     }
                 }));
     }
@@ -346,7 +346,7 @@ public class EditShoutPresenter {
 
         void hideProgress();
 
-        void showPostError();
+        void showEditShoutApiError(Throwable throwable);
 
         void showCategoriesError();
 
@@ -378,7 +378,7 @@ public class EditShoutPresenter {
 
         void setActionbarTitle(@NonNull String title);
 
-        void setMedia(@NonNull List<String> images, @NonNull List<Video> videos);
+        void setMediaData(@NonNull List<String> images, @NonNull List<Video> videos, boolean b);
 
         void setMobilePhone(@Nullable String mobileHint);
     }

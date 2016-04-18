@@ -14,7 +14,6 @@ import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
@@ -29,8 +28,10 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.utils.BackPressedHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PriceUtils;
+import com.shoutit.app.android.utils.TextWatcherAdapter;
 import com.shoutit.app.android.view.createshout.DialogsHelper;
 import com.shoutit.app.android.view.createshout.location.LocationActivity;
 import com.shoutit.app.android.view.createshout.publish.PublishShoutActivity;
@@ -49,6 +50,7 @@ import butterknife.OnClick;
 public class CreateRequestActivity extends BaseActivity implements CreateRequestPresenter.Listener {
 
     private static final int LOCATION_REQUEST = 0;
+    private static final String KEY_LOCATION = "key_location";
 
     private SimpleCurrencySpinnerAdapter mAdapter;
 
@@ -76,23 +78,16 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
     @Inject
     CreateRequestPresenter mCreateRequestPresenter;
 
+    private UserLocation changedLocation;
+    private BackPressedHelper mBackPressedHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.request_activity);
         ButterKnife.bind(this);
 
-        mCreateRequestBudget.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
+        mCreateRequestBudget.addTextChangedListener(new TextWatcherAdapter() {
             @Override
             public void afterTextChanged(Editable s) {
                 mCreateRequestPresenter.onBudgetChanged(s.toString());
@@ -119,11 +114,21 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
                 DialogsHelper.showCurrencyDialog(CreateRequestActivity.this);
             }
         });
+
+        if (savedInstanceState != null) {
+            changedLocation = (UserLocation) savedInstanceState.getSerializable(KEY_LOCATION);
+            if (changedLocation != null) {
+                mCreateRequestPresenter.updateLocation(changedLocation);
+            }
+        }
+
+        mBackPressedHelper = new BackPressedHelper(this);
     }
 
     @Override
     protected void onDestroy() {
         mCreateRequestPresenter.unregister();
+        mBackPressedHelper.removeCallbacks();
         super.onDestroy();
     }
 
@@ -153,6 +158,7 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
         if (requestCode == LOCATION_REQUEST && resultCode == Activity.RESULT_OK) {
             final UserLocation userLocation = (UserLocation) data.getSerializableExtra(LocationActivity.EXTRAS_USER_LOCATION);
             mCreateRequestPresenter.updateLocation(userLocation);
+            changedLocation = userLocation;
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
@@ -188,8 +194,8 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
     }
 
     @Override
-    public void showError() {
-        ColoredSnackBar.error(ColoredSnackBar.contentView(this), getString(R.string.request_acitvity_post_error), Snackbar.LENGTH_SHORT).show();
+    public void showApiError(Throwable throwable) {
+        ColoredSnackBar.error(ColoredSnackBar.contentView(this), throwable, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
@@ -237,5 +243,18 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
     public void finishActivity(String id, String webUrl) {
         finish();
         startActivity(PublishShoutActivity.newIntent(this, id, webUrl, true));
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putSerializable(KEY_LOCATION, changedLocation);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!mBackPressedHelper.onBackPressed()) {
+            super.onBackPressed();
+        }
     }
 }

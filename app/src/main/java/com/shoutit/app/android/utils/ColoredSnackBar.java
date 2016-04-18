@@ -55,6 +55,11 @@ public class ColoredSnackBar {
     }
 
     @Nonnull
+    public static Snackbar error(@Nonnull View view, @Nonnull Throwable throwable, int length) {
+        return colorSnackBar(view, ErrorHandler.getErrorMessage(throwable, view.getContext()), length, view.getResources().getColor(R.color.snackbar_error));
+    }
+
+    @Nonnull
     public static View contentView(@Nonnull Activity activity) {
         return activity.getWindow().getDecorView().findViewById(android.R.id.content);
     }

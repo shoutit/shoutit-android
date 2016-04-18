@@ -110,6 +110,6 @@ public class ShoutsDaoTest {
     }
 
     private ShoutsResponse shoutsResponse() {
-        return new ShoutsResponse(1, "z", null, Lists.newArrayList(shout));
+        return new ShoutsResponse(1, "z", null, Lists.newArrayList(shout), null);
     }
 }

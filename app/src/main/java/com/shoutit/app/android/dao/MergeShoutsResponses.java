@@ -14,6 +14,6 @@ public class MergeShoutsResponses implements Func2<ShoutsResponse, ShoutsRespons
                     .addAll(newData.getShouts())
                     .build();
 
-            return new ShoutsResponse(newData.getCount(), newData.getNext(), newData.getPrevious(), allItems);
+            return new ShoutsResponse(newData.getCount(), newData.getNext(), newData.getPrevious(), allItems, newData.getWebUrl());
         }
     }

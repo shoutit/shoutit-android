@@ -25,10 +25,11 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.LayoutManagerHelper;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
-import com.shoutit.app.android.view.createshout.CreateShoutDialogFragment;
+import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.subsearch.SubSearchActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
@@ -148,6 +149,17 @@ public class DiscoverShoutsActivity extends BaseActivity {
                                 getQuantityString(R.plurals.shouts_results_pluaral, integer, integer));
                     }
                 });
+
+        mShoutsPresenter.getShareClickedObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String shareUrl) {
+                        startActivity(Intent.createChooser(
+                                IntentHelper.getShareIntent(shareUrl),
+                                getString(R.string.search_share_results)));
+                    }
+                });
     }
 
     private void setUpToolbar(String name) {
@@ -166,6 +178,9 @@ public class DiscoverShoutsActivity extends BaseActivity {
                 switch (item.getItemId()) {
                     case R.id.shouts_search:
                         mShoutsPresenter.onSearchClicked();
+                        return true;
+                    case R.id.shouts_share:
+                        mShoutsPresenter.onShareClicked();
                         return true;
                     default:
                         return false;
@@ -206,6 +221,6 @@ public class DiscoverShoutsActivity extends BaseActivity {
 
     @OnClick(R.id.discover_fab)
     void onAddShoutClicked() {
-        CreateShoutDialogFragment.newInstance().show(getSupportFragmentManager(), null);
+        startActivity(CreateShoutDialogActivity.getIntent(this));
     }
 }

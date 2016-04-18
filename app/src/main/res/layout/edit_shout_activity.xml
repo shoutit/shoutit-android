@@ -207,16 +207,11 @@
                         android:theme="@style/BlueEditText" />
                 </android.support.design.widget.TextInputLayout>
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1px"
-                    android:layout_marginBottom="10dp"
-                    android:background="@android:color/darker_gray" />
-
                 <Button
                     android:id="@+id/edit_confirm"
                     style="@style/BaseButtonStyle"
                     android:layout_width="match_parent"
+                    android:layout_marginTop="16dp"
                     android:layout_marginBottom="16dp"
                     android:background="@drawable/selector_green_button_with_stroke"
                     android:text="@string/edit_done_btn"

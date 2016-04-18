@@ -284,7 +284,7 @@ public class ProfileViewHolders {
 
         @OnClick(R.id.profile_listen_action_container)
         public void onListenActionClicked() {
-            if (item.isUserLoggedIn()) {
+            if (item.isNormalUser()) {
                 setListeningIcon(!item.getUser().isListening());
                 item.onListenActionClicked();
             } else {
@@ -294,7 +294,11 @@ public class ProfileViewHolders {
 
         @OnClick(R.id.profile_second_icon_text_tv)
         public void onChatActionClicked() {
-            item.onChatActionClicked();
+            if (item.isNormalUser()) {
+                item.onChatActionClicked();
+            } else {
+                item.onActionOnlyForLoggedInUser();
+            }
         }
     }
 

@@ -3,7 +3,6 @@ package com.shoutit.app.android.twilio;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.appunite.rx.ObservableExtensions;
@@ -29,15 +28,12 @@ import com.twilio.conversations.IncomingInvite;
 import com.twilio.conversations.TwilioConversations;
 import com.twilio.conversations.TwilioConversationsException;
 
-import java.util.concurrent.TimeUnit;
-
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import rx.Observable;
 import rx.Scheduler;
-import rx.Subscription;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
@@ -111,6 +107,16 @@ public class Twilio {
                     }
                 })
                 .observeOn(uiScheduler);
+
+        callerNameObservable
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String callerName) {
+                        Intent intent = DialogCallActivity.newIntent(callerName, mContext);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        mContext.startActivity(intent);
+                    }
+                });
 
         callerNameObservable
                 .subscribe(new Action1<String>() {
@@ -219,7 +225,6 @@ public class Twilio {
 
                 callerIdentitySubject.onNext(caller.substring(1, caller.length() - 1));
                 profileRefreshSubject.onNext(null);
-
             }
 
             @Override
