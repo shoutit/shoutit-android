@@ -16,6 +16,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.utils.BlurTransform;
+import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.view.conversations.ConverstationsFragment;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
@@ -178,6 +179,7 @@ public class MenuHandler {
                 break;
         }
 
+        KeyboardHelper.hideSoftKeyboard(rxActivity);
         selectItem(view.getId());
     }
 
