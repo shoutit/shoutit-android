@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -96,31 +97,36 @@ public class SearchShoutsResultsActivity extends BaseActivity {
     private void setUpToolbar(String title) {
         toolbar.setTitle(title);
         toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        setSupportActionBar(toolbar);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_search_shouts_results, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
                 finish();
-            }
-        });
-        toolbar.inflateMenu(R.menu.menh_search_shouts_results);
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.search_results_menu_search:
-                        if (isFromSearchCategories()) {
-                            startActivity(SubSearchActivity.newIntent(
-                                    SearchShoutsResultsActivity.this, searchType,
-                                    contextualItemId, categoryName));
-                        } else {
-                            startActivity(MainSearchActivity.newIntent(SearchShoutsResultsActivity.this));
-                        }
-                        return true;
-                    default:
-                        return false;
+                return true;
+            case R.id.search_results_menu_search:
+                if (isFromSearchCategories()) {
+                    startActivity(SubSearchActivity.newIntent(
+                            SearchShoutsResultsActivity.this, searchType,
+                            contextualItemId, categoryName));
+                } else {
+                    startActivity(MainSearchActivity.newIntent(SearchShoutsResultsActivity.this));
                 }
-            }
-        });
+                return true;
+            case R.id.search_results_menu_share:
+                return false;
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
     }
 
     private boolean isFromSearchCategories() {
