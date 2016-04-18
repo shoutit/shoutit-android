@@ -40,11 +40,13 @@ public class SearchShoutsResultsPresenter {
     private final PublishSubject<String> shoutSelectedSubject = PublishSubject.create();
     private final PublishSubject<Object> loadMoreSubject = PublishSubject.create();
     private final PublishSubject<FiltersToSubmit> filtersSelectedSubject = PublishSubject.create();
+    private final PublishSubject<Object> shareClickSubject = PublishSubject.create();
 
     private final Observable<List<BaseAdapterItem>> adapterItems;
     private final Observable<Boolean> progressObservable;
     private final Observable<Throwable> errorObservable;
     private final Observable<Integer> countObservable;
+    private final Observable<String> shareClickedObservable;
 
     public SearchShoutsResultsPresenter(@Nonnull final ShoutsDao dao,
                                         @Nullable final String searchQuery,
@@ -87,8 +89,11 @@ public class SearchShoutsResultsPresenter {
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<ShoutsResponse>>behaviorRefCount());
 
-        countObservable = shoutsRequest
+        final Observable<ShoutsResponse> successShoutsResponse = shoutsRequest
                 .compose(ResponseOrError.<ShoutsResponse>onlySuccess())
+                .compose(ObservableExtensions.<ShoutsResponse>behaviorRefCount());
+
+        countObservable = successShoutsResponse
                 .map(new Func1<ShoutsResponse, Integer>() {
                     @Override
                     public Integer call(ShoutsResponse shoutsResponse) {
@@ -96,8 +101,7 @@ public class SearchShoutsResultsPresenter {
                     }
                 });
 
-        adapterItems = shoutsRequest
-                .compose(ResponseOrError.<ShoutsResponse>onlySuccess())
+        adapterItems = successShoutsResponse
                 .map(new Func1<ShoutsResponse, List<BaseAdapterItem>>() {
                     @Override
                     public List<BaseAdapterItem> call(ShoutsResponse shoutsResponse) {
@@ -135,6 +139,18 @@ public class SearchShoutsResultsPresenter {
                         loadMoreObserver.onNext(null);
                     }
                 });
+
+        shareClickedObservable = shareClickSubject.withLatestFrom(successShoutsResponse,
+                new Func2<Object, ShoutsResponse, String>() {
+                    @Override
+                    public String call(Object o, ShoutsResponse shoutsResponse) {
+                        return shoutsResponse.getWebUrl();
+                    }
+                });
+    }
+
+    public Observable<String> getShareClickedObservable() {
+        return shareClickedObservable;
     }
 
     public Observable<List<BaseAdapterItem>> getAdapterItems() {
@@ -163,5 +179,9 @@ public class SearchShoutsResultsPresenter {
 
     public Observable<Integer> getCountObservable() {
         return countObservable;
+    }
+
+    public void onShareClicked() {
+        shareClickSubject.onNext(null);
     }
 }

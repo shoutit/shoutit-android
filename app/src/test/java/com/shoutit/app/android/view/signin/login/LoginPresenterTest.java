@@ -10,6 +10,7 @@ import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.login.EmailLoginRequest;
 import com.shoutit.app.android.location.LocationManager;
+import com.shoutit.app.android.mixpanel.MixPanel;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -52,6 +53,9 @@ public class LoginPresenterTest {
     @Mock
     User user;
 
+    @Mock
+    MixPanel mixPanel;
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -65,8 +69,11 @@ public class LoginPresenterTest {
         when(mUserPreferences.getLocationObservable())
                 .thenReturn(Observable.just(new UserLocation(1, 2, "z", null, null, null, null)));
 
+        when(mixPanel.getDistinctId())
+                .thenReturn("id");
+
         mLoginPresenter = new LoginPresenter(mApiService, mUserPreferences,
-                Schedulers.immediate(), Schedulers.immediate());
+                Schedulers.immediate(), Schedulers.immediate(), mixPanel);
     }
 
     @Test

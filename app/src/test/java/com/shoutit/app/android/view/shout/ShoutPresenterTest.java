@@ -67,9 +67,9 @@ public class ShoutPresenterTest {
         when(shoutsDao.getShoutObservable(anyString()))
                 .thenReturn(Observable.just(ResponseOrError.fromData(getShout())));
         when(shoutsDao.getUserShoutObservable(any(UserShoutsPointer.class)))
-                .thenReturn(Observable.just(ResponseOrError.fromData(new ShoutsResponse(1, "z", "z", Lists.newArrayList(getShout())))));
+                .thenReturn(Observable.just(ResponseOrError.fromData(new ShoutsResponse(1, "z", "z", Lists.newArrayList(getShout()), null))));
         when(shoutsDao.getRelatedShoutsObservable(any(RelatedShoutsPointer.class)))
-                .thenReturn(Observable.just(ResponseOrError.fromData(new ShoutsResponse(1, "z", "z", Lists.newArrayList(getShout())))));
+                .thenReturn(Observable.just(ResponseOrError.fromData(new ShoutsResponse(1, "z", "z", Lists.newArrayList(getShout()), null))));
         when(userPreferences.getUserObservable())
                 .thenReturn(Observable.just(new User("z", null, null, null, null, null, null, null, false, null,
                 null, false, false, false, null, 1, null, null, null, 1, null, false, null, null, null, null, null)));
@@ -94,7 +94,7 @@ public class ShoutPresenterTest {
         when(shoutsDao.getUserShoutsDao(any(UserShoutsPointer.class)))
                 .thenReturn(userShoutsDao);
         when(userShoutsDao.getShoutsObservable())
-                .thenReturn(Observable.just(ResponseOrError.fromData(new ShoutsResponse(1, "z", "z", Lists.newArrayList(getShout())))));
+                .thenReturn(Observable.just(ResponseOrError.fromData(new ShoutsResponse(1, "z", "z", Lists.newArrayList(getShout()), null))));
 
         when(context.getString(anyInt(), anyString()))
                 .thenReturn("text");

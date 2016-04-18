@@ -155,6 +155,7 @@
     <string name="shout_location">Location</string>
     <string name="shout_model">Model</string>
     <string name="shout_color">Color</string>
+    <string name="shout_share">Share shout</string>
 
     <!-- Discover Shouts -->
     <string name="discover_shouts_share">Share</string>
@@ -335,6 +336,7 @@
     <string name="search_shout_results_all_results">All Results</string>
     <string name="search_shouts_results_header_count">%1$d Results</string>
     <string name="search_results_no_results">No results found</string>
+    <string name="search_share_results">Share results</string>
 
     <!-- Camera -->
     <string name="camera_publish_currency">Currency</string>

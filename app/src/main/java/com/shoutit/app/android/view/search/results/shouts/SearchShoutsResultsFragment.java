@@ -9,6 +9,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckedTextView;
@@ -28,6 +29,7 @@ import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.db.RecentSearchesTable;
 import com.shoutit.app.android.model.FiltersToSubmit;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.utils.LayoutManagerHelper;
 import com.shoutit.app.android.utils.LoadMoreHelper;
@@ -76,7 +78,6 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
     private ActionBarDrawerToggle drawerToggle;
     private SearchPresenter.SearchType searchType;
     private String searchQuery;
-    private String contextualItemId;
 
     public static Fragment newInstance(@Nullable String searchQuery,
                                        @Nullable String contextualItemId,
@@ -90,6 +91,12 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
         fragment.setArguments(bundle);
 
         return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -106,7 +113,7 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
         searchType = (SearchPresenter.SearchType)
                 checkNotNull(getArguments().getSerializable(SearchShoutsResultsActivity.KEY_SEARCH_TYPE));
         searchQuery = getArguments().getString(SearchShoutsResultsActivity.KEY_SEARCH_QUERY);
-        contextualItemId = getArguments().getString(SearchShoutsResultsActivity.KEY_CONTEXTUAL_ITEM_ID);
+        final String contextualItemId = getArguments().getString(SearchShoutsResultsActivity.KEY_CONTEXTUAL_ITEM_ID);
 
         if (savedInstanceState == null && shouldShowFilters()) {
             getChildFragmentManager()
@@ -157,6 +164,17 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
                     }
                 });
 
+        presenter.getShareClickedObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String shareUrl) {
+                        startActivity(Intent.createChooser(
+                                IntentHelper.getShareIntent(shareUrl),
+                                getString(R.string.search_share_results)));
+                    }
+                });
+
         filterIv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -179,6 +197,17 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
                 }
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.search_results_menu_share:
+                presenter.onShareClicked();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void setupHeader() {

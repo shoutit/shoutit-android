@@ -73,6 +73,7 @@ public class ShoutPresenter {
     private final Observable<String> videoCallClickedObservable;
     private final Observable<Boolean> editShoutClickedObservable;
     private final Observable<Object> onlyForLoggedInUserObservable;
+    private final Observable<String> shareObservable;
 
     private PublishSubject<String> addToCartSubject = PublishSubject.create();
     private PublishSubject<String> onCategoryClickedSubject = PublishSubject.create();
@@ -81,6 +82,7 @@ public class ShoutPresenter {
     private PublishSubject<String> seeAllRelatedShoutSubject = PublishSubject.create();
     private PublishSubject<User> visitProfileSubject = PublishSubject.create();
     private PublishSubject<Object> onVideoOrEditClickSubject = PublishSubject.create();
+    private PublishSubject<Object> shareSubject = PublishSubject.create();
 
     @Nonnull
     private final Scheduler uiScheduler;
@@ -462,7 +464,21 @@ public class ShoutPresenter {
                         return userPreferences.isGuest();
                     }
                 });
+
+        shareObservable = shareSubject
+                .withLatestFrom(successShoutResponse, new Func2<Object, Shout, String>() {
+                    @Override
+                    public String call(Object o, Shout shout) {
+                        return shout.getWebUrl();
+                    }
+                });
     }
+
+    @Nonnull
+    public Observable<String> getShareObservable() {
+        return shareObservable;
+    }
+
     @Nonnull
     public Observable<Boolean> getEditShoutClickedObservable() {
         return editShoutClickedObservable;
@@ -611,6 +627,10 @@ public class ShoutPresenter {
     @Nonnull
     public Observer<Object> refreshShoutsObserver() {
         return refreshShoutsSubject;
+    }
+
+    public void onShareClicked() {
+        shareSubject.onNext(null);
     }
 
     public static class BottomBarData {
