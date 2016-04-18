@@ -42,6 +42,7 @@ import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.shoutit.app.android.view.shouts.selectshout.SelectShoutActivity;
+import com.shoutit.app.android.view.videoconversation.VideoConversationActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -53,6 +54,7 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Subscription;
 import rx.functions.Action1;
 
 public class ChatFirstConversationActivity extends BaseActivity implements Listener {
@@ -101,6 +103,7 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
 
     @Bind(R.id.chats_main_layout)
     View mMainLayout;
+    private Subscription subscription;
 
     public static Intent newIntent(@Nonnull Context context, boolean shoutConversation, @NonNull String idForCreation) {
         return new Intent(context, ChatFirstConversationActivity.class)
@@ -137,7 +140,13 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
                         return true;
                     }
                     case R.id.chats_video_menu: {
-
+                        presenter.getChatParticipantIdentityObservable()
+                                .subscribe(new Action1<String>() {
+                                    @Override
+                                    public void call(String identity) {
+                                        startActivity(VideoConversationActivity.newIntent(null, identity, ChatFirstConversationActivity.this));
+                                    }
+                                });
                         return true;
                     }
                     default:
@@ -303,7 +312,7 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
         startActivityForResult(RecordMediaActivity.newIntent(this, true, true, true), REQUEST_ATTACHMENT);
     }
 
-    @OnClick(R.id.chats_attatchments_photo)
+    @OnClick(R.id.chats_attatchments_photo) 
     void photoClicked() {
         startActivityForResult(RecordMediaActivity.newIntent(this, true, false, true), REQUEST_ATTACHMENT);
     }

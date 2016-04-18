@@ -21,6 +21,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.appunite.rx.functions.BothParams;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
@@ -44,6 +45,7 @@ import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.shoutit.app.android.view.shouts.selectshout.SelectShoutActivity;
+import com.shoutit.app.android.view.videoconversation.VideoConversationActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -55,7 +57,11 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Subscription;
 import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.functions.Func2;
+import rx.subjects.PublishSubject;
 
 public class ChatActivity extends BaseActivity implements Listener {
 
@@ -67,6 +73,8 @@ public class ChatActivity extends BaseActivity implements Listener {
     private static final int SELECT_SHOUT_REQUEST_CODE = 2;
 
     private static final String TAG = ChatActivity.class.getCanonicalName();
+
+    private Subscription subscription;
 
     @Inject
     Picasso picasso;
@@ -135,7 +143,13 @@ public class ChatActivity extends BaseActivity implements Listener {
                         return true;
                     }
                     case R.id.chats_video_menu: {
-
+                       presenter.getChatParticipantIdentityObservable()
+                                .subscribe(new Action1<String>() {
+                                    @Override
+                                    public void call(String identity) {
+                                        startActivity(VideoConversationActivity.newIntent(null, identity, ChatActivity.this));
+                                    }
+                                });
                         return true;
                     }
                     case R.id.chats_delete: {
@@ -167,6 +181,7 @@ public class ChatActivity extends BaseActivity implements Listener {
                         presenter.sendTyping();
                     }
                 });
+
     }
 
     @Nonnull
