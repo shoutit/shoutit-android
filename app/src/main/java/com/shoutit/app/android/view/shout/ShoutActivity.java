@@ -540,6 +540,7 @@ public class ShoutActivity extends BaseActivity {
                 return true;
             case R.id.shouts_share:
                 presenter.onShareClicked();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
