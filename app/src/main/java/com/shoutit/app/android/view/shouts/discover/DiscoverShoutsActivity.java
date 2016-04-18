@@ -28,6 +28,7 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LayoutManagerHelper;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
+import com.shoutit.app.android.view.conversations.ConversationsActivity;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.subsearch.SubSearchActivity;
@@ -166,6 +167,9 @@ public class DiscoverShoutsActivity extends BaseActivity {
                 switch (item.getItemId()) {
                     case R.id.shouts_search:
                         mShoutsPresenter.onSearchClicked();
+                        return true;
+                    case R.id.shouts_chat:
+                        startActivity(ConversationsActivity.newIntent(DiscoverShoutsActivity.this));
                         return true;
                     default:
                         return false;
