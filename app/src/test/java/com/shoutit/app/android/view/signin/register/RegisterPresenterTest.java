@@ -10,6 +10,7 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.UserLocationSimple;
 import com.shoutit.app.android.location.LocationManager;
+import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.utils.LocationUtils;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.Validators;
@@ -64,6 +65,9 @@ public class RegisterPresenterTest {
     @Mock
     LocationManager locationManager;
 
+    @Mock
+    MixPanel mixPanel;
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -84,8 +88,11 @@ public class RegisterPresenterTest {
         when(Validators.isEmailValid(anyString()))
                 .thenReturn(true);
 
+        when(mixPanel.getDistinctId())
+                .thenReturn("id");
+
         mRegisterPresenter = new RegisterPresenter(mApiService,
-                mUserPreferences, Schedulers.immediate(), Schedulers.immediate());
+                mUserPreferences, Schedulers.immediate(), Schedulers.immediate(), mixPanel);
     }
 
     @Test
