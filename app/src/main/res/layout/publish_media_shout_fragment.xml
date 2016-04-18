@@ -75,9 +75,9 @@
         <Button
             android:enabled="false"
             android:id="@+id/camera_published_done"
-            android:layout_width="240dp"
+            android:layout_width="246dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="20dp"
             android:fontFamily="sans-serif"
             android:padding="22dp"
             android:text="@string/publish_done"
