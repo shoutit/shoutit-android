@@ -29,6 +29,7 @@ import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.subjects.PublishSubject;
 
 public class DiscoverShoutsPresenter {
@@ -37,6 +38,7 @@ public class DiscoverShoutsPresenter {
     private final Observable<Throwable> mThrowableObservable;
     private final Observable<Boolean> mProgressObservable;
     private final Observable<BothParams<String, String>> searchClickedObservable;
+    private final Observable<String> shareClickedObservable;
     private final Observable<Integer> countObservable;
     private final DiscoverShoutsDao mDiscoverShoutsDao;
     private final String discoverId;
@@ -45,6 +47,8 @@ public class DiscoverShoutsPresenter {
     private final PublishSubject<String> shoutSelectedObserver = PublishSubject.create();
     @Nonnull
     private final PublishSubject<Object> searchMenuItemClicked = PublishSubject.create();
+    @Nonnull
+    private final PublishSubject<Object> shareMenuItemClicked = PublishSubject.create();
 
     public DiscoverShoutsPresenter(@NetworkScheduler Scheduler networkScheduler,
                                    @UiScheduler Scheduler uiScheduler,
@@ -54,12 +58,18 @@ public class DiscoverShoutsPresenter {
                                    @ForActivity final Context context) {
         mDiscoverShoutsDao = discoverShoutsDao;
         this.discoverId = discoverId;
-        final Observable<ResponseOrError<ShoutsResponse>> observable = discoverShoutsDao.getShoutsObservable(discoverId)
+
+        final Observable<ResponseOrError<ShoutsResponse>> shoutsObservable = discoverShoutsDao
+                .getShoutsObservable(discoverId)
                 .compose(ObservableExtensions.<ResponseOrError<ShoutsResponse>>behaviorRefCount())
                 .subscribeOn(networkScheduler)
                 .observeOn(uiScheduler);
 
-        mListObservable = observable.compose(ResponseOrError.<ShoutsResponse>onlySuccess())
+        final Observable<ShoutsResponse> successShoutsObservable = shoutsObservable
+                .compose(ResponseOrError.<ShoutsResponse>onlySuccess())
+                .compose(ObservableExtensions.<ShoutsResponse>behaviorRefCount());
+
+        mListObservable = successShoutsObservable
                 .map(new Func1<ShoutsResponse, List<BaseAdapterItem>>() {
                     @Override
                     public List<BaseAdapterItem> call(ShoutsResponse shoutsResponse) {
@@ -73,7 +83,7 @@ public class DiscoverShoutsPresenter {
                     }
                 });
 
-        countObservable = observable.compose(ResponseOrError.<ShoutsResponse>onlySuccess())
+        countObservable = shoutsObservable.compose(ResponseOrError.<ShoutsResponse>onlySuccess())
                 .map(new Func1<ShoutsResponse, Integer>() {
                     @Override
                     public Integer call(ShoutsResponse shoutsResponse) {
@@ -82,8 +92,8 @@ public class DiscoverShoutsPresenter {
                 });
 
 
-        mThrowableObservable = observable.compose(ResponseOrError.<ShoutsResponse>onlyError());
-        mProgressObservable = observable.map(Functions1.returnFalse()).startWith(true);
+        mThrowableObservable = shoutsObservable.compose(ResponseOrError.<ShoutsResponse>onlyError());
+        mProgressObservable = shoutsObservable.map(Functions1.returnFalse()).startWith(true);
 
         searchClickedObservable = searchMenuItemClicked
                 .map(new Func1<Object, BothParams<String, String>>() {
@@ -92,6 +102,19 @@ public class DiscoverShoutsPresenter {
                         return new BothParams<>(discoverId, discoverName);
                     }
                 });
+
+        shareClickedObservable = shareMenuItemClicked.withLatestFrom(successShoutsObservable,
+                new Func2<Object, ShoutsResponse, String>() {
+                    @Override
+                    public String call(Object o, ShoutsResponse shoutsResponse) {
+                        return shoutsResponse.getWebUrl();
+                    }
+                });
+    }
+
+    @Nonnull
+    public Observable<String> getShareClickedObservable() {
+        return shareClickedObservable;
     }
 
     @Nonnull
@@ -131,5 +154,9 @@ public class DiscoverShoutsPresenter {
 
     public void onSearchClicked() {
         searchMenuItemClicked.onNext(null);
+    }
+
+    public void onShareClicked() {
+        shareMenuItemClicked.onNext(null);
     }
 }
