@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Observer;
@@ -180,7 +179,7 @@ public class FiltersPresenter {
                                 return categoriesMap.get(categorySlug);
                             }
                         })
-                .startWith(initCategoryObservable)
+                .startWith(initCategoryObservable.first())
                 .compose(MoreOperators.<Category>refresh(resetClickedSubject))
                 .compose(ObservableExtensions.<Category>behaviorRefCount());
 

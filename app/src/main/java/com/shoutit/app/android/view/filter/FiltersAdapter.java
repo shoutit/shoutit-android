@@ -39,7 +39,7 @@ public class FiltersAdapter extends BaseAdapter {
             case VIEW_TYPE_HEADER:
                 return new FilterViewHolders.HeaderViewHolder(layoutInflater.inflate(R.layout.filters_header_item, parent, false));
             case VIEW_TYPE_SHOUT_TYPE:
-                return new FilterViewHolders.ShoutTypeViewHolder(layoutInflater.inflate(R.layout.filters_shout_type_item, parent, false));
+                return new FilterViewHolders.ShoutTypeViewHolder(layoutInflater.inflate(R.layout.filters_shout_type_item, parent, false), context);
             case VIEW_TYPE_CATEGORY:
                 return new FilterViewHolders.CategoryViewHolder(layoutInflater.inflate(R.layout.filters_category_item, parent, false), picasso, context);
             case VIEW_TYPE_PRICE:
