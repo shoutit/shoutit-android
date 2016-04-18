@@ -148,6 +148,9 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_api_key"/>
 
+        <meta-data android:name="com.mixpanel.android.MPConfig.ResourcePackageName"
+            android:value="com.shoutit.app.android" />
+
         <service
             android:name="com.amazonaws.mobileconnectors.s3.transferutility.TransferService"
             android:enabled="true"/>

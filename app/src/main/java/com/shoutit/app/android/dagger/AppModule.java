@@ -290,4 +290,5 @@ public final class AppModule {
     NetworkObservableProvider provideNetworkObservableProvider(@ForApplication Context context) {
         return new NetworkObservableProviderImpl(context);
     }
+
 }

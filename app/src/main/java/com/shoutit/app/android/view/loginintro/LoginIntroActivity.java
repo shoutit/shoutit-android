@@ -33,6 +33,7 @@ import com.shoutit.app.android.api.model.login.GoogleLogin;
 import com.shoutit.app.android.api.model.login.LoginUser;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.view.about.AboutActivity;
 import com.shoutit.app.android.view.main.MainActivity;
@@ -66,6 +67,8 @@ public class LoginIntroActivity extends BaseActivity {
     ApiService mApiService;
     @Inject
     UserPreferences mUserPreferences;
+    @Inject
+    MixPanel mixPanel;
 
     private CallbackManager mCallbackManager;
     private Observable<UserLocation> mObservable;
@@ -171,7 +174,7 @@ public class LoginIntroActivity extends BaseActivity {
         return new Func1<BothParams<String, UserLocation>, Observable<SignResponse>>() {
             @Override
             public Observable<SignResponse> call(BothParams<String, UserLocation> bothParams) {
-                return mApiService.googleLogin(new GoogleLogin(bothParams.param1(), LoginUser.loginUser(bothParams.param2())))
+                return mApiService.googleLogin(new GoogleLogin(bothParams.param1(), LoginUser.loginUser(bothParams.param2()), mixPanel.getDistinctId()))
                         .subscribeOn(Schedulers.io())
                         .observeOn(MyAndroidSchedulers.mainThread());
             }
@@ -183,7 +186,7 @@ public class LoginIntroActivity extends BaseActivity {
         return new Func1<BothParams<String, UserLocation>, Observable<SignResponse>>() {
             @Override
             public Observable<SignResponse> call(BothParams<String, UserLocation> bothParams) {
-                return mApiService.facebookLogin(new FacebookLogin(bothParams.param1(), LoginUser.loginUser(bothParams.param2())))
+                return mApiService.facebookLogin(new FacebookLogin(bothParams.param1(), LoginUser.loginUser(bothParams.param2()), mixPanel.getDistinctId()))
                         .subscribeOn(Schedulers.io())
                         .observeOn(MyAndroidSchedulers.mainThread());
             }

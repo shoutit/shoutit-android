@@ -29,6 +29,7 @@ import com.shoutit.app.android.dagger.AppModule;
 import com.shoutit.app.android.dagger.BaseModule;
 import com.shoutit.app.android.dagger.DaggerAppComponent;
 import com.shoutit.app.android.location.LocationManager;
+import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.PusherHelper;
@@ -84,6 +85,8 @@ public class App extends MultiDexApplication {
     NetworkObservableProvider mNetworkObservableProvider;
     @Inject
     Twilio mTwilio;
+    @Inject
+    MixPanel mixPanel;
 
     @Override
     public void onCreate() {
@@ -99,6 +102,9 @@ public class App extends MultiDexApplication {
         fetchLocation();
 
         Dexter.initialize(this);
+
+        mixPanel.initMixPanel();
+        mixPanel.trackAppOpen();
 
         initFfmpeg();
 
