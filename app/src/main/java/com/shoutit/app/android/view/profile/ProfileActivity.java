@@ -207,6 +207,8 @@ public abstract class ProfileActivity extends BaseActivity {
 
                 final int viewType = parent.getAdapter().getItemViewType(position);
                 if (viewType == ProfileAdapter.VIEW_TYPE_USER_NAME ||
+                        viewType == ProfileAdapter.VIEW_TYPE_MY_PROFILE_USER_NAME ||
+                        viewType == ProfileAdapter.VIEW_TYPE_MY_PROFILE_THREE_ICONS ||
                         viewType == ProfileAdapter.VIEW_TYPE_USER_INFO ||
                         viewType == ProfileAdapter.VIEW_TYPE_TAG_INFO ||
                         viewType == ProfileAdapter.VIEW_TYPE_THREE_ICONS) {

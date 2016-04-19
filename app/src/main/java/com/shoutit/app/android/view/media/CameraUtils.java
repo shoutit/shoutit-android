@@ -6,7 +6,6 @@ import android.hardware.Camera;
 import android.util.Log;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -15,29 +14,19 @@ import java.util.List;
 @SuppressWarnings("deprecation")
 public class CameraUtils {
 
-    public static Bitmap getResizedImage(File imageFile, int maxSize) throws IOException {
-        FileInputStream fis = new FileInputStream(imageFile);
-        Bitmap imageBitmap = BitmapFactory.decodeStream(fis);
-        fis.close();
+    public static Bitmap getScaledBitmapFromFile(String path, int maxSize) {
+        final BitmapFactory.Options opts = new BitmapFactory.Options();
+        opts.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(path, opts);
 
-        return getResizedBitmap(imageBitmap, maxSize);
-    }
+        final int inWidth = opts.outWidth;
+        final int inHeight = opts.outHeight;
 
-    public static Bitmap getResizedBitmap(Bitmap image, int maxSize) {
-        int width = image.getWidth();
-        int height = image.getHeight();
-
-        float bitmapRatio = (float) width / (float) height;
-
-        if (bitmapRatio > 1) {
-            width = maxSize;
-            height = (int) (width / bitmapRatio);
-        } else {
-            height = maxSize;
-            width = (int) (height * bitmapRatio);
+        final BitmapFactory.Options newOpts = new BitmapFactory.Options();
+        if (Math.max(inHeight, inWidth) > maxSize) {
+            newOpts.inSampleSize = (int) Math.ceil(Math.max(inWidth / maxSize, inHeight / maxSize));
         }
-
-        return Bitmap.createScaledBitmap(image, width, height, true);
+        return BitmapFactory.decodeFile(path, newOpts);
     }
 
     @SuppressWarnings("unused")

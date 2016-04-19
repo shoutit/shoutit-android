@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:minHeight="64dp"
@@ -18,52 +16,18 @@
         android:textColor="@color/black_54"
         android:textSize="14sp" />
 
-    <RadioGroup
-        android:id="@+id/filters_radio_group"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+    <Spinner
+        android:id="@+id/filters_shout_type_spinner"
         android:layout_marginBottom="10dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="10dp"
-        android:orientation="horizontal"
         android:paddingEnd="8dp"
         android:paddingLeft="6dp"
         android:paddingRight="8dp"
-        android:paddingStart="6dp">
-
-        <RadioButton
-            android:id="@+id/filter_all_rb"
-            style="@style/BlueRadioButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/filters_type_all"
-            android:textColor="@drawable/filters_radio_btn_text_selector"
-            tools:checked="true" />
-
-        <RadioButton
-            android:id="@+id/filter_offers_rb"
-            style="@style/BlueRadioButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/filters_type_offers"
-            android:textColor="@drawable/filters_radio_btn_text_selector"
-            tools:text="lalalalallalalallalalala" />
-
-        <RadioButton
-            android:id="@+id/filter_requests_rb"
-            style="@style/BlueRadioButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/filters_type_requests"
-            android:textColor="@drawable/filters_radio_btn_text_selector"
-            tools:text="lalalalallalalallalalala" />
-
-
-    </RadioGroup>
+        android:paddingStart="6dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
     <View
         android:layout_width="match_parent"

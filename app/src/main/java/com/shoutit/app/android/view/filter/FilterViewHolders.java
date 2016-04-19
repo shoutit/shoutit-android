@@ -2,8 +2,10 @@ package com.shoutit.app.android.view.filter;
 
 import android.content.Context;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -75,22 +77,30 @@ public class FilterViewHolders {
     }
 
     public static class ShoutTypeViewHolder extends ViewHolderManager.BaseViewHolder<FiltersAdapterItems.ShoutTypeAdapterItem> {
+        private static final int ALL_POSITION = 0;
+        private static final int OFFER_POSITION = 1;
+        private static final int REQUEST_POSITION = 2;
 
-        @Bind(R.id.filter_all_rb)
-        RadioButton allButton;
-        @Bind(R.id.filter_offers_rb)
-        RadioButton offersButton;
-        @Bind(R.id.filter_requests_rb)
-        RadioButton requestButton;
+        @Bind(R.id.filters_shout_type_spinner)
+        Spinner shoutTypeSpinner;
 
         private CompositeSubscription subscription;
         private Handler handler;
         private Runnable runnable;
+        private final ArrayAdapter<String> spinnerAdapter;
 
-        public ShoutTypeViewHolder(@Nonnull View itemView) {
+        public ShoutTypeViewHolder(@Nonnull View itemView, @Nonnull Context context) {
             super(itemView);
             ButterKnife.bind(this, itemView);
             handler = new Handler();
+
+            final String[] items = new String[]{
+                    context.getString(R.string.filters_type_all),
+                    context.getString(R.string.filters_type_offers),
+                    context.getString(R.string.filters_type_requests)};
+
+            spinnerAdapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, items);
+            shoutTypeSpinner.setAdapter(spinnerAdapter);
         }
 
         @Override
@@ -99,13 +109,13 @@ public class FilterViewHolders {
 
             switch (item.getShoutTypeSelected()) {
                 case Shout.TYPE_ALL:
-                    allButton.setChecked(true);
+                    shoutTypeSpinner.setSelection(ALL_POSITION);
                     break;
                 case Shout.TYPE_OFFER:
-                    offersButton.setChecked(true);
+                    shoutTypeSpinner.setSelection(OFFER_POSITION);
                     break;
-                default:
-                    requestButton.setChecked(true);
+                case Shout.TYPE_REQUEST:
+                    shoutTypeSpinner.setSelection(REQUEST_POSITION);
                     break;
             }
 
@@ -114,27 +124,23 @@ public class FilterViewHolders {
                 public void run() {
                     subscription = new CompositeSubscription(
 
-                            RxView.clicks(allButton)
-                                    .subscribe(new Action1<Void>() {
+                            RxUtils.spinnerItemClicks(shoutTypeSpinner)
+                                    .distinctUntilChanged()
+                                    .subscribe(new Action1<OnItemClickEvent>() {
                                         @Override
-                                        public void call(Void aVoid) {
-                                            item.onTypeSelected(Shout.TYPE_ALL);
-                                        }
-                                    }),
+                                        public void call(OnItemClickEvent onItemClickEvent) {
+                                            final int position = onItemClickEvent.position;
+                                            if (position < 0) {
+                                                return;
+                                            }
 
-                            RxView.clicks(offersButton)
-                                    .subscribe(new Action1<Void>() {
-                                        @Override
-                                        public void call(Void aVoid) {
-                                            item.onTypeSelected(Shout.TYPE_OFFER);
-                                        }
-                                    }),
-
-                            RxView.clicks(requestButton)
-                                    .subscribe(new Action1<Void>() {
-                                        @Override
-                                        public void call(Void aVoid) {
-                                            item.onTypeSelected(Shout.TYPE_REQUEST);
+                                            if (position == ALL_POSITION) {
+                                                item.onTypeSelected(Shout.TYPE_ALL);
+                                            } else if (position == OFFER_POSITION) {
+                                                item.onTypeSelected(Shout.TYPE_OFFER);
+                                            } else if ( position == REQUEST_POSITION) {
+                                                item.onTypeSelected(Shout.TYPE_REQUEST);
+                                            }
                                         }
                                     })
                     );
@@ -225,7 +231,6 @@ public class FilterViewHolders {
                                     }),
 
                             item.getCategoryObservable()
-                                    .first()
                                     .subscribe(new Action1<Category>() {
                                         @Override
                                         public void call(Category category) {
@@ -241,10 +246,15 @@ public class FilterViewHolders {
         }
 
         public void loadImage(@Nullable String imageUrl) {
-            picasso.load(imageUrl)
-                    .fit()
-                    .centerInside()
-                    .into(categoryIcon);
+            if (TextUtils.isEmpty(imageUrl)) {
+                categoryIcon.setVisibility(View.GONE);
+            } else {
+                categoryIcon.setVisibility(View.VISIBLE);
+                picasso.load(imageUrl)
+                        .fit()
+                        .centerInside()
+                        .into(categoryIcon);
+            }
         }
 
         @Override

@@ -41,9 +41,10 @@ import com.shoutit.app.android.dao.UsersIdentityDao;
 import com.shoutit.app.android.dao.VideoCallsDao;
 import com.shoutit.app.android.db.DbHelper;
 import com.shoutit.app.android.location.LocationManager;
+import com.shoutit.app.android.utils.AmazonRequestTransfomer;
 import com.shoutit.app.android.utils.PusherHelper;
-import com.shoutit.app.android.view.videoconversation.VideoConversationPresenter;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Request;
 
 import java.io.File;
 
@@ -89,6 +90,7 @@ public final class AppModule {
         return new Picasso.Builder(context)
                 .indicatorsEnabled(BuildConfig.DEBUG)
                 .loggingEnabled(BuildConfig.DEBUG)
+                .requestTransformer(new AmazonRequestTransfomer())
                 .listener(new Picasso.Listener() {
                     @Override
                     public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
@@ -290,4 +292,5 @@ public final class AppModule {
     NetworkObservableProvider provideNetworkObservableProvider(@ForApplication Context context) {
         return new NetworkObservableProviderImpl(context);
     }
+
 }

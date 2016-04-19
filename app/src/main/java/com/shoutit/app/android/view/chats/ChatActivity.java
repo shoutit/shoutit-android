@@ -14,9 +14,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -49,6 +47,7 @@ import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.shoutit.app.android.view.shouts.selectshout.SelectShoutActivity;
+import com.shoutit.app.android.view.videoconversation.VideoConversationActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -60,6 +59,7 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Subscription;
 import rx.functions.Action1;
 
 public class ChatActivity extends BaseActivity implements Listener {
@@ -112,6 +112,9 @@ public class ChatActivity extends BaseActivity implements Listener {
     @Bind(R.id.chats_message_send_button)
     ImageButton sendButton;
 
+    @Bind(R.id.conversations_empty)
+    View emptyList;
+
     public static Intent newIntent(@Nonnull Context context, @NonNull String conversationId, boolean shoutConversation) {
         return new Intent(context, ChatActivity.class)
                 .putExtra(ARGS_CONVERSATION_ID, conversationId)
@@ -143,7 +146,13 @@ public class ChatActivity extends BaseActivity implements Listener {
                         return true;
                     }
                     case R.id.chats_video_menu: {
-
+                       presenter.getChatParticipantIdentityObservable()
+                                .subscribe(new Action1<String>() {
+                                    @Override
+                                    public void call(String identity) {
+                                        startActivity(VideoConversationActivity.newIntent(null, identity, ChatActivity.this));
+                                    }
+                                });
                         return true;
                     }
                     case R.id.chats_delete: {
@@ -176,6 +185,7 @@ public class ChatActivity extends BaseActivity implements Listener {
                     }
                 });
 
+        sendButton.setEnabled(false);
         mChatsMessageEdittext.addTextChangedListener(new TextWatcherAdapter() {
             @Override
             public void afterTextChanged(Editable s) {
@@ -183,20 +193,9 @@ public class ChatActivity extends BaseActivity implements Listener {
             }
         });
 
-        mMainLayout.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                mChatsAttatchmentsLayout.setVisibility(View.GONE);
-                return false;
-            }
-        });
-        mChatsRecyclerview.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                mChatsAttatchmentsLayout.setVisibility(View.GONE);
-                return false;
-            }
-        });
+        ChatsHelper.setOnClickHideListener(mMainLayout, mChatsAttatchmentsLayout);
+        ChatsHelper.setOnClickHideListener(mChatsRecyclerview, mChatsAttatchmentsLayout);
+        ChatsHelper.setOnClickHideListener(mChatsMessageEdittext, mChatsAttatchmentsLayout);
     }
 
     @Nonnull
@@ -226,11 +225,13 @@ public class ChatActivity extends BaseActivity implements Listener {
     @Override
     public void emptyList() {
         mChatsRecyclerview.setVisibility(View.GONE);
+        emptyList.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void showProgress(boolean show) {
         mChatsProgress.setVisibility(show ? View.VISIBLE : View.GONE);
+        emptyList.setVisibility(View.GONE);
     }
 
     @Override
@@ -288,8 +289,9 @@ public class ChatActivity extends BaseActivity implements Listener {
     public void setAboutShoutData(String title, String thumbnail, String type, String price, String authorAndTime, final String id) {
         mChatsShoutLayout.setVisibility(View.VISIBLE);
         picasso.load(thumbnail)
-                .centerCrop()
+                .placeholder(R.drawable.ic_tag_placeholder)
                 .error(R.drawable.ic_tag_placeholder)
+                .centerCrop()
                 .fit()
                 .into(mChatsShoutImage);
         mChatsShoutLayoutType.setText(type);

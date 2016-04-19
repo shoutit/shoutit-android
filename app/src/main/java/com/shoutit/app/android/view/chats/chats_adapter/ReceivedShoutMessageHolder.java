@@ -19,6 +19,8 @@ import butterknife.ButterKnife;
 
 public class ReceivedShoutMessageHolder extends ViewHolderManager.BaseViewHolder<BaseAdapterItem> {
 
+    @Nonnull
+    private final View mItemView;
     private final Picasso mPicasso;
     @Bind(R.id.chats_received_avatar)
     ImageView mChatsReceivedAvatar;
@@ -35,6 +37,7 @@ public class ReceivedShoutMessageHolder extends ViewHolderManager.BaseViewHolder
 
     public ReceivedShoutMessageHolder(@Nonnull View itemView, Picasso picasso) {
         super(itemView);
+        mItemView = itemView;
         mPicasso = picasso;
         ButterKnife.bind(this, itemView);
     }
@@ -53,8 +56,14 @@ public class ReceivedShoutMessageHolder extends ViewHolderManager.BaseViewHolder
         mChatsShoutAuthor.setText(message.getAuthor());
         mChatsShoutPrice.setText(message.getPrice());
 
-
         AvatarHelper.setAvatar(message.isFirst(), message.getAvatarUrl(), mPicasso, mChatsReceivedAvatar);
+
+        mItemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                message.click();
+            }
+        });
     }
 
     public static ViewHolderManager.BaseViewHolder create(@NonNull View view, Picasso picasso) {

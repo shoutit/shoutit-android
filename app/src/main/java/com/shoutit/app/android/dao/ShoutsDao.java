@@ -385,35 +385,52 @@ public class ShoutsDao {
             final UserLocation location = pointer.getLocation();
             final FiltersToSubmit filtersToSubmit = pointer.getFiltersToSubmit();
 
+            final String country = location != null ? location.getCountry() : null;
+            final String city = location != null ? location.getCity() : null;
+            final String state = location != null ? location.getState() : null;
+
             switch (SearchPresenter.SearchType.values()[searchType.ordinal()]) {
                 case PROFILE:
                     return apiService.searchProfileShouts(query, pageNumber, PAGE_SIZE, contextItemId);
                 case SHOUTS:
                     if (filtersToSubmit != null) {
                         return apiService.searchShouts(query, pageNumber, PAGE_SIZE,
-                                location.getCountry(), filtersToSubmit.getCity(), filtersToSubmit.getState(),
+                                country, filtersToSubmit.getCity(), filtersToSubmit.getState(),
                                 filtersToSubmit.getMinPriceInCents(), filtersToSubmit.getMaxPriceInCents(),
                                 filtersToSubmit.getDistance(), filtersToSubmit.getShoutType(),
                                 filtersToSubmit.getSortType().getType(), filtersToSubmit.getCategorySlug(),
                                 filtersToSubmit.getFiltersQueryMap());
                     } else {
                         return apiService.searchShouts(query, pageNumber, PAGE_SIZE,
-                                location.getCountry(), location.getCity(), location.getState(),
+                                country, city, state,
                                 null, null, null, null, null, null, null);
                     }
                 case RELATED_SHOUTS:
                     return apiService.shoutsRelated(contextItemId, pageNumber, PAGE_SIZE);
-                case TAG:
+                case TAG_PROFILE:
                     if (filtersToSubmit != null) {
                         return apiService.searchTagShouts(query, pageNumber, PAGE_SIZE, contextItemId,
-                                location.getCountry(), filtersToSubmit.getCity(), filtersToSubmit.getState(),
+                                country, filtersToSubmit.getCity(), filtersToSubmit.getState(),
                                 filtersToSubmit.getMinPriceInCents(), filtersToSubmit.getMaxPriceInCents(),
                                 filtersToSubmit.getDistance(), filtersToSubmit.getShoutType(),
                                 filtersToSubmit.getSortType().getType(), filtersToSubmit.getCategorySlug(),
                                 filtersToSubmit.getFiltersQueryMap());
                     } else {
                         return apiService.searchTagShouts(query, pageNumber, PAGE_SIZE, contextItemId,
-                                location.getCountry(), location.getCity(), location.getState(),
+                                country, city, state,
+                                null, null, null, null, null, null, null);
+                    }
+                case CATEGORY:
+                    if (filtersToSubmit != null) {
+                        return apiService.searchCategoriesShouts(query, pageNumber, PAGE_SIZE, contextItemId,
+                                country, filtersToSubmit.getCity(), filtersToSubmit.getState(),
+                                filtersToSubmit.getMinPriceInCents(), filtersToSubmit.getMaxPriceInCents(),
+                                filtersToSubmit.getDistance(), filtersToSubmit.getShoutType(),
+                                filtersToSubmit.getSortType().getType(), filtersToSubmit.getCategorySlug(),
+                                filtersToSubmit.getFiltersQueryMap());
+                    } else {
+                        return apiService.searchCategoriesShouts(query, pageNumber, PAGE_SIZE, contextItemId,
+                                country, city, state,
                                 null, null, null, null, null, null, null);
                     }
                 case DISCOVER:
@@ -429,15 +446,14 @@ public class ShoutsDao {
                     }
                 case BROWSE:
                     if (filtersToSubmit != null) {
-                        return apiService.shoutsForLocation(location.getCountry(), filtersToSubmit.getCity(),
+                        return apiService.shoutsForLocation(country, filtersToSubmit.getCity(),
                                 filtersToSubmit.getState(), pageNumber, PAGE_SIZE,
                                 filtersToSubmit.getMinPriceInCents(), filtersToSubmit.getMaxPriceInCents(),
                                 filtersToSubmit.getDistance(), filtersToSubmit.getShoutType(),
                                 filtersToSubmit.getSortType().getType(), filtersToSubmit.getCategorySlug(),
                                 filtersToSubmit.getFiltersQueryMap());
                     } else {
-                        return apiService.shoutsForLocation(location.getCountry(), location.getCity(),
-                                location.getState(), pageNumber, PAGE_SIZE, null, null, null, null, null, null, null);
+                        return apiService.shoutsForLocation(country, city, state, pageNumber, PAGE_SIZE, null, null, null, null, null, null, null);
                     }
                 default:
                     throw new RuntimeException("Unknwon profile type: " + SearchPresenter.SearchType.values()[searchType.ordinal()]);

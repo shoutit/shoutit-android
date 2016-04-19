@@ -29,6 +29,7 @@ import com.shoutit.app.android.dagger.AppModule;
 import com.shoutit.app.android.dagger.BaseModule;
 import com.shoutit.app.android.dagger.DaggerAppComponent;
 import com.shoutit.app.android.location.LocationManager;
+import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.PusherHelper;
@@ -84,6 +85,8 @@ public class App extends MultiDexApplication {
     NetworkObservableProvider mNetworkObservableProvider;
     @Inject
     Twilio mTwilio;
+    @Inject
+    MixPanel mixPanel;
 
     @Override
     public void onCreate() {
@@ -99,6 +102,9 @@ public class App extends MultiDexApplication {
         fetchLocation();
 
         Dexter.initialize(this);
+
+        mixPanel.initMixPanel();
+        mixPanel.trackAppOpen();
 
         initFfmpeg();
 
@@ -117,8 +123,8 @@ public class App extends MultiDexApplication {
     }
 
     private void initPusher() {
-        Observable.zip(userPreferences.getTokenObservable().filter(Functions1.isNotNull()),
-                userPreferences.getUserObservable().filter(Functions1.isNotNull()),
+        Observable.zip(userPreferences.getTokenObservable().filter(Functions1.isNotNull()).distinctUntilChanged(),
+                userPreferences.getUserObservable().filter(Functions1.isNotNull()).distinctUntilChanged(),
                 new Func2<String, User, BothParams<String, User>>() {
                     @Override
                     public BothParams<String, User> call(String token, User user) {
@@ -129,22 +135,23 @@ public class App extends MultiDexApplication {
                     @Override
                     public void call(BothParams<String, User> tokenAndUser) {
                         final User user = userPreferences.getUser();
-                        assert user != null;
-                        initPusher(tokenAndUser.param1(), user);
+                        if(user != null) {
+                            initPusher(tokenAndUser.param1(), user);
+                        }
                     }
                 });
     }
 
     private void initTwilio() {
-        Observable.zip(userPreferences.getTokenObservable().filter(Functions1.isNotNull()),
-                userPreferences.getUserObservable().filter(Functions1.isNotNull()),
+        Observable.zip(userPreferences.getTokenObservable().filter(Functions1.isNotNull()).distinctUntilChanged(),
+                userPreferences.getUserObservable().filter(Functions1.isNotNull()).distinctUntilChanged(),
                 new Func2<String, User, BothParams<String, User>>() {
                     @Override
                     public BothParams<String, User> call(String token, User user) {
                         return new BothParams<>(token, user);
                     }
                 })
-                .first()
+                .distinctUntilChanged()
                 .subscribe(new Action1<BothParams<String, User>>() {
                     @Override
                     public void call(BothParams<String, User> tokenAndUser) {

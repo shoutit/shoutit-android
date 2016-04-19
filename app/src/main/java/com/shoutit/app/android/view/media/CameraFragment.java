@@ -572,18 +572,7 @@ public class CameraFragment extends Fragment {
         }
 
         if (ei != null) {
-            final BitmapFactory.Options opts = new BitmapFactory.Options();
-            opts.inJustDecodeBounds = true;
-            BitmapFactory.decodeFile(imageOutput, opts);
-
-            final int inWidth = opts.outWidth;
-            final int inHeight = opts.outHeight;
-
-            final BitmapFactory.Options newOpts = new BitmapFactory.Options();
-            if(Math.max(inHeight, inWidth) > MAX_SIZE) {
-                newOpts.inSampleSize = (int) Math.ceil(Math.max(inWidth / MAX_SIZE, inHeight / MAX_SIZE));
-            }
-            Bitmap scaledBitmap = BitmapFactory.decodeFile(imageOutput, newOpts);
+            Bitmap scaledBitmap = getScaledBitmap();
 
             int orientation =
                     ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
@@ -622,6 +611,21 @@ public class CameraFragment extends Fragment {
                 .replace(R.id.fragment_camera_layout_preview_overlay,
                         ImageFragment.newInstance(imageOutput, null))
                 .commit();
+    }
+
+    private Bitmap getScaledBitmap() {
+        final BitmapFactory.Options opts = new BitmapFactory.Options();
+        opts.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(imageOutput, opts);
+
+        final int inWidth = opts.outWidth;
+        final int inHeight = opts.outHeight;
+
+        final BitmapFactory.Options newOpts = new BitmapFactory.Options();
+        if (Math.max(inHeight, inWidth) > MAX_SIZE) {
+            newOpts.inSampleSize = (int) Math.ceil(Math.max(inWidth / MAX_SIZE, inHeight / MAX_SIZE));
+        }
+        return BitmapFactory.decodeFile(imageOutput, newOpts);
     }
 
     private void saveBitmapToFile(Bitmap bitmap, String outputFilePath) {
@@ -701,18 +705,14 @@ public class CameraFragment extends Fragment {
 
                 if (!imageFile.exists()) return null;
 
-                try {
-                    Bitmap imageBitmap = CameraUtils.getResizedImage(imageFile, 1280);
+                Bitmap imageBitmap = CameraUtils.getScaledBitmapFromFile(imageFile.getAbsolutePath(), MAX_SIZE);
 
-                    Log.d("tag", String.format("  > %s x %s", imageBitmap.getWidth(), imageBitmap.getHeight()));
+                Log.d("tag", String.format("  > %s x %s", imageBitmap.getWidth(), imageBitmap.getHeight()));
 
-                    if (CameraUtils.bitmapToFile(imageBitmap, imageFile, Bitmap.CompressFormat.JPEG, DEFAULT_IMAGE_QUALITY)) {
-                        Log.d("tag", String.format("  > new JPEG file size: %s bytes", imageFile.length()));
-                        return new String[]{EXTRA_IMAGE_URI, "file://" + imageOutput};
-                    } else {
-                        return null;
-                    }
-                } catch (IOException e) {
+                if (CameraUtils.bitmapToFile(imageBitmap, imageFile, Bitmap.CompressFormat.JPEG, DEFAULT_IMAGE_QUALITY)) {
+                    Log.d("tag", String.format("  > new JPEG file size: %s bytes", imageFile.length()));
+                    return new String[]{EXTRA_IMAGE_URI, "file://" + imageOutput};
+                } else {
                     return null;
                 }
             }

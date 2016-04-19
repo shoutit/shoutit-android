@@ -22,12 +22,27 @@ public class InfoItem implements BaseAdapterItem {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        final InfoItem infoItem = (InfoItem) o;
+
+        return info != null ? info.equals(infoItem.info) : infoItem.info == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return info != null ? info.hashCode() : 0;
+    }
+
+    @Override
     public boolean matches(@Nonnull BaseAdapterItem item) {
-        return false;
+        return item instanceof InfoItem && this.equals(item);
     }
 
     @Override
     public boolean same(@Nonnull BaseAdapterItem item) {
-        return false;
+        return item instanceof InfoItem && this.equals(item);
     }
 }

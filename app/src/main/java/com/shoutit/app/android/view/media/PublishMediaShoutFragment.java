@@ -300,7 +300,7 @@ public class PublishMediaShoutFragment extends Fragment {
                         @Override
                         public void call(CreateShoutResponse createShoutResponse) {
                             getActivity().finish();
-                            startActivity(PublishShoutActivity.newIntent(getActivity(), createdShoutOfferId, mWebUrl, false));
+                            startActivity(PublishShoutActivity.newIntent(getActivity(), createdShoutOfferId, mWebUrl, false, null));
                         }
                     }, new Action1<Throwable>() {
                         @Override
@@ -315,7 +315,7 @@ public class PublishMediaShoutFragment extends Fragment {
                     });
         } else {
             getActivity().finish();
-            startActivity(PublishShoutActivity.newIntent(getActivity(), createdShoutOfferId, mWebUrl,false));
+            startActivity(PublishShoutActivity.newIntent(getActivity(), createdShoutOfferId, mWebUrl, false, null));
         }
     }
 

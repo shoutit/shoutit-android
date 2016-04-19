@@ -7,11 +7,13 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.text.format.DateUtils;
 
+import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
+import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -29,10 +31,12 @@ import com.shoutit.app.android.api.model.PusherMessage;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutResponse;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.api.model.UserIdentity;
 import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
+import com.shoutit.app.android.dao.UsersIdentityDao;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.PusherHelper;
@@ -62,6 +66,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
@@ -72,6 +77,7 @@ import rx.Subscriber;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
+import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 import rx.subscriptions.CompositeSubscription;
 
@@ -99,18 +105,21 @@ public class ChatsFirstConversationPresenter {
     private final ShoutsDao mShoutsDao;
     private final ProfilesDao mProfilesDao;
     private final boolean mIsShoutConversation;
-    private Listener mListener;
+    private FirstConversationListener mListener;
     private final CompositeSubscription mSubscribe = new CompositeSubscription();
     private final PublishSubject<PusherMessage> newMessagesSubject = PublishSubject.create();
     private final PublishSubject<Object> mRefreshTypingObservable = PublishSubject.create();
     private final User mUser;
+    private final BehaviorSubject<String> chatParticipantUsernameSubject = BehaviorSubject.create();
+    private final Observable<String> chatParticipantIdentityObservable;
 
     @Inject
     public ChatsFirstConversationPresenter(boolean isShoutConversation,
                                            @NonNull ApiService apiService,
                                            @UiScheduler Scheduler uiScheduler,
                                            @NetworkScheduler Scheduler networkScheduler,
-                                           UserPreferences userPreferences,
+                                           final UserPreferences userPreferences,
+                                           @Nonnull final UsersIdentityDao usersIdentityDao,
                                            @ForActivity Resources resources,
                                            @ForActivity Context context,
                                            PusherHelper pusher,
@@ -133,12 +142,49 @@ public class ChatsFirstConversationPresenter {
         mShoutsDao = shoutsDao;
         mProfilesDao = profilesDao;
         mUser = mUserPreferences.getUser();
+
+        final Observable<ResponseOrError<UserIdentity>> userIdentityResponse = chatParticipantUsernameSubject
+                .filter(Functions1.isNotNull())
+                .filter(new Func1<String, Boolean>() {
+                    @Override
+                    public Boolean call(String participantUsername) {
+                        return !Objects.equal(userPreferences.getUser().getUsername(), participantUsername);
+                    }
+                })
+                .flatMap(new Func1<String, Observable<ResponseOrError<UserIdentity>>>() {
+                    @Override
+                    public Observable<ResponseOrError<UserIdentity>> call(String username) {
+                        return usersIdentityDao.getUserIdentityObservable(username);
+                    }
+                });
+
+        Observable<UserIdentity> successIdentityResponse = userIdentityResponse
+                .compose(ResponseOrError.<UserIdentity>onlySuccess());
+
+        chatParticipantIdentityObservable = successIdentityResponse
+                .map(new Func1<UserIdentity, String>() {
+                    @Override
+                    public String call(UserIdentity userIdentity) {
+                        return userIdentity.getIdentity();
+                    }
+                })
+                .filter(Functions1.isNotNull())
+                .filter(new Func1<String, Boolean>() {
+                    @Override
+                    public Boolean call(String s) {
+                        return !userPreferences.isGuest();
+                    }
+                })
+                .observeOn(uiScheduler);
+
     }
 
-    public void register(@NonNull Listener listener) {
+    public void register(@NonNull FirstConversationListener listener) {
         final User user = mUserPreferences.getUser();
         assert user != null;
         final PresenceChannel userChannel = mPusher.getPusher().getPresenceChannel(String.format("presence-v3-p-%1$s", user.getId()));
+        mListener = listener;
+        mListener.showDeleteMenu(false);
 
         final Observable<PusherMessage> pusherMessageObservable = Observable
                 .create(new Observable.OnSubscribe<PusherMessage>() {
@@ -201,7 +247,6 @@ public class ChatsFirstConversationPresenter {
                     }
                 });
 
-        mListener = listener;
         mSubscribe.add(Observable.combineLatest(
                 localAndPusherMessages.map(new Func1<List<PusherMessage>, List<BaseAdapterItem>>() {
                     @Override
@@ -262,6 +307,7 @@ public class ChatsFirstConversationPresenter {
                     .subscribe(new Action1<Shout>() {
                         @Override
                         public void call(Shout about) {
+
                             final String title = about.getTitle();
                             final String thumbnail = Strings.emptyToNull(about.getThumbnail());
                             final String type = about.getType().equals(Shout.TYPE_OFFER) ? mContext.getString(R.string.chat_offer) : mContext.getString(R.string.chat_request);
@@ -303,7 +349,7 @@ public class ChatsFirstConversationPresenter {
                                             user.getFirstName(),
                                             user.getUsername(),
                                             user.getType(),
-                                            user.getImage())), user.getId()));
+                                            user.getImage())), mUserPreferences.getUser().getId()));
                         }
                     }, getOnError()));
         }
@@ -405,6 +451,7 @@ public class ChatsFirstConversationPresenter {
         return observable.doOnNext(new Action1<Message>() {
             @Override
             public void call(Message message) {
+                mListener.showDeleteMenu(true);
                 conversationCreated = true;
                 conversationId = message.getConversationId();
                 if (mIsShoutConversation) {
@@ -656,5 +703,9 @@ public class ChatsFirstConversationPresenter {
         if (presenceChannel != null && presenceChannel.isSubscribed()) {
             presenceChannel.trigger("client-is_typing", mGson.toJson(mUser));
         }
+    }
+
+    public Observable<String> getChatParticipantIdentityObservable() {
+        return chatParticipantIdentityObservable;
     }
 }

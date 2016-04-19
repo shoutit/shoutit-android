@@ -15,6 +15,7 @@ import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.login.LoginUser;
+import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.utils.Validators;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
@@ -52,7 +53,8 @@ public class RegisterPresenter {
     public RegisterPresenter(@NonNull final ApiService apiService,
                              @NonNull final UserPreferences userPreferences,
                              @NonNull @NetworkScheduler final Scheduler networkScheduler,
-                             @NonNull @UiScheduler final Scheduler uiScheduler) {
+                             @NonNull @UiScheduler final Scheduler uiScheduler,
+                             @Nonnull final MixPanel mixPanel) {
 
         mLocationObservable = userPreferences
                 .getLocationObservable()
@@ -80,7 +82,7 @@ public class RegisterPresenter {
                                 new Func3<String, String, String, EmailSignupRequest>() {
                                     @Override
                                     public EmailSignupRequest call(String name, String email, String password) {
-                                        return new EmailSignupRequest(name, email, password, LoginUser.loginUser(location));
+                                        return new EmailSignupRequest(name, email, password, LoginUser.loginUser(location), mixPanel.getDistinctId());
                                     }
                                 })
                                 .first();

@@ -205,7 +205,7 @@ dependencies {
     compile 'com.karumi:dexter:2.1.0'
 
     // other
-    compile 'com.twilio:conversations-android:0.8.1'
+    compile 'com.twilio:conversations-android:0.9.0'
     compile 'com.uservoice:uservoice-android-sdk:1.2.4'
     compile 'fr.avianey.com.viewpagerindicator:library:2.4.1@aar'
     compile('com.crashlytics.sdk.android:crashlytics:2.5.1@aar') {
@@ -214,6 +214,7 @@ dependencies {
     compile 'com.commonsware.cwac:cam2:0.5.3'
     compile 'com.pusher:pusher-java-client:1.1.2'
     compile 'com.veinhorn.scrollgalleryview:library:1.0.5'
+    compile "com.mixpanel.android:mixpanel-android:4.8.5"
 
 
     // Tests

@@ -14,7 +14,6 @@ import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
@@ -29,8 +28,10 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.utils.BackPressedHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PriceUtils;
+import com.shoutit.app.android.utils.TextWatcherAdapter;
 import com.shoutit.app.android.view.createshout.DialogsHelper;
 import com.shoutit.app.android.view.createshout.location.LocationActivity;
 import com.shoutit.app.android.view.createshout.publish.PublishShoutActivity;
@@ -78,6 +79,7 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
     CreateRequestPresenter mCreateRequestPresenter;
 
     private UserLocation changedLocation;
+    private BackPressedHelper mBackPressedHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,17 +87,7 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
         setContentView(R.layout.request_activity);
         ButterKnife.bind(this);
 
-        mCreateRequestBudget.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
+        mCreateRequestBudget.addTextChangedListener(new TextWatcherAdapter() {
             @Override
             public void afterTextChanged(Editable s) {
                 mCreateRequestPresenter.onBudgetChanged(s.toString());
@@ -129,11 +121,14 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
                 mCreateRequestPresenter.updateLocation(changedLocation);
             }
         }
+
+        mBackPressedHelper = new BackPressedHelper(this);
     }
 
     @Override
     protected void onDestroy() {
         mCreateRequestPresenter.unregister();
+        mBackPressedHelper.removeCallbacks();
         super.onDestroy();
     }
 
@@ -245,14 +240,21 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
     }
 
     @Override
-    public void finishActivity(String id, String webUrl) {
+    public void finishActivity(String id, String webUrl, String title) {
         finish();
-        startActivity(PublishShoutActivity.newIntent(this, id, webUrl, true));
+        startActivity(PublishShoutActivity.newIntent(this, id, webUrl, true, title));
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putSerializable(KEY_LOCATION, changedLocation);
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!mBackPressedHelper.onBackPressed()) {
+            super.onBackPressed();
+        }
     }
 }

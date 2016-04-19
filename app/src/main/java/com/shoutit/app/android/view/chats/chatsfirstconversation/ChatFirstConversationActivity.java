@@ -14,7 +14,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -40,11 +39,12 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.utils.TextWatcherAdapter;
-import com.shoutit.app.android.view.chats.Listener;
+import com.shoutit.app.android.view.chats.ChatsHelper;
 import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.shoutit.app.android.view.shouts.selectshout.SelectShoutActivity;
+import com.shoutit.app.android.view.videoconversation.VideoConversationActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -58,7 +58,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.functions.Action1;
 
-public class ChatFirstConversationActivity extends BaseActivity implements Listener {
+public class ChatFirstConversationActivity extends BaseActivity implements FirstConversationListener {
 
     private static final String ARGS_ID_FOR_CREATION = "args_id_for_creation";
     private static final String ARGS_IS_SHOUT_CONVERSATION = "args_shout_conversation";
@@ -108,6 +108,9 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
     @Bind(R.id.chats_message_send_button)
     ImageButton sendButton;
 
+    @Bind(R.id.conversations_empty)
+    View emptyList;
+
     public static Intent newIntent(@Nonnull Context context, boolean shoutConversation, @NonNull String idForCreation) {
         return new Intent(context, ChatFirstConversationActivity.class)
                 .putExtra(ARGS_IS_SHOUT_CONVERSATION, shoutConversation)
@@ -143,7 +146,13 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
                         return true;
                     }
                     case R.id.chats_video_menu: {
-
+                        presenter.getChatParticipantIdentityObservable()
+                                .subscribe(new Action1<String>() {
+                                    @Override
+                                    public void call(String identity) {
+                                        startActivity(VideoConversationActivity.newIntent(null, identity, ChatFirstConversationActivity.this));
+                                    }
+                                });
                         return true;
                     }
                     default:
@@ -167,6 +176,7 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
                     }
                 });
 
+        sendButton.setEnabled(false);
         mChatsMessageEdittext.addTextChangedListener(new TextWatcherAdapter() {
             @Override
             public void afterTextChanged(Editable s) {
@@ -174,20 +184,9 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
             }
         });
 
-        mMainLayout.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                mChatsAttatchmentsLayout.setVisibility(View.GONE);
-                return false;
-            }
-        });
-        mChatsRecyclerview.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                mChatsAttatchmentsLayout.setVisibility(View.GONE);
-                return false;
-            }
-        });
+        ChatsHelper.setOnClickHideListener(mMainLayout, mChatsAttatchmentsLayout);
+        ChatsHelper.setOnClickHideListener(mChatsRecyclerview, mChatsAttatchmentsLayout);
+        ChatsHelper.setOnClickHideListener(mChatsMessageEdittext, mChatsAttatchmentsLayout);
     }
 
     @Nonnull
@@ -220,11 +219,13 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
     @Override
     public void emptyList() {
         mChatsRecyclerview.setVisibility(View.GONE);
+        emptyList.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void showProgress(boolean show) {
         mChatsProgress.setVisibility(show ? View.VISIBLE : View.GONE);
+        emptyList.setVisibility(View.GONE);
     }
 
     @Override
@@ -270,6 +271,8 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
     public void setAboutShoutData(String title, String thumbnail, String type, String price, String authorAndTime, final String id) {
         mChatsShoutLayout.setVisibility(View.VISIBLE);
         picasso.load(thumbnail)
+                .placeholder(R.drawable.ic_tag_placeholder)
+                .error(R.drawable.ic_tag_placeholder)
                 .centerCrop()
                 .fit()
                 .into(mChatsShoutImage);
@@ -373,5 +376,10 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    @Override
+    public void showDeleteMenu(boolean show) {
+        mChatsToolbar.getMenu().findItem(R.id.chats_overflow).setVisible(show);
     }
 }

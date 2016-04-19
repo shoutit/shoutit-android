@@ -218,6 +218,11 @@ public class ShoutAdapter extends BaseAdapter {
         public void onCategoryClick() {
             item.onCategoryClick(item.getShout().getCategory().getSlug());
         }
+
+        @OnClick(R.id.shout_user_header)
+        public void onHeaderClick() {
+            item.onHeaderClick();
+        }
     }
 
     public class UserShoutViewHolder extends ViewHolderManager.BaseViewHolder<ShoutAdapterItems.UserShoutAdapterItem> implements View.OnClickListener {

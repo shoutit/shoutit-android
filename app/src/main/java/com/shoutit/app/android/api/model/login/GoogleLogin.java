@@ -10,8 +10,10 @@ public class GoogleLogin extends BaseLoginRequest {
 
     private final String gplusCode;
 
-    public GoogleLogin(@NonNull String token, @Nullable LoginUser loginUser) {
-        super(GOOGLE_LOGIN, loginUser);
+    public GoogleLogin(@NonNull String token,
+                       @Nullable LoginUser loginUser,
+                       @NonNull String mixpanelDistinctId) {
+        super(mixpanelDistinctId, GOOGLE_LOGIN, loginUser);
         this.gplusCode = token;
     }
 }
