@@ -19,6 +19,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.RtlUtils;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.shoutit.app.android.view.shouts.discover.DiscoverShoutsActivity;
 
@@ -172,6 +173,8 @@ public class DiscoverFragment extends BaseFragment {
         });
 
         final int spacing = getResources().getDimensionPixelSize(R.dimen.discover_grid_spacing);
+
+        final boolean rtlEnable = RtlUtils.isRtlEnable(getActivity());
         recyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
@@ -186,7 +189,7 @@ public class DiscoverFragment extends BaseFragment {
                     return;
                 }
 
-                if (position % 2 == 0) {
+                if (rtlEnable ? position % 2 == 1 : position % 2 == 0) {
                     outRect.right = spacing;
                 } else {
                     outRect.left = spacing;

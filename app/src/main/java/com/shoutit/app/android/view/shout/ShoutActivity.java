@@ -42,6 +42,7 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.ImageHelper;
 import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
+import com.shoutit.app.android.utils.RtlUtils;
 import com.shoutit.app.android.view.chats.ChatActivity;
 import com.shoutit.app.android.view.chats.chatsfirstconversation.ChatFirstConversationActivity;
 import com.shoutit.app.android.view.conversations.ConversationsActivity;
@@ -483,6 +484,7 @@ public class ShoutActivity extends BaseActivity {
             }
         });
 
+        final boolean rtlEnable = RtlUtils.isRtlEnable(this);
         final int spacing = getResources().getDimensionPixelSize(R.dimen.shout_item_padding);
         final int bottomSpacing = getResources().getDimensionPixelSize(R.dimen.shout_bottom_bar);
         recyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
@@ -500,7 +502,7 @@ public class ShoutActivity extends BaseActivity {
 
                 final int viewType = parent.getAdapter().getItemViewType(position);
                 if (viewType == ShoutAdapter.VIEW_TYPE_USER_SHOUTS) {
-                    if (position % 2 == 0) {
+                    if (rtlEnable ? position % 2 == 1 : position % 2 == 0) {
                         outRect.left = spacing;
                     } else {
                         outRect.right = spacing;

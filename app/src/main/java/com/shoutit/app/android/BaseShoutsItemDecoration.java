@@ -1,5 +1,6 @@
 package com.shoutit.app.android;
 
+import android.content.Context;
 import android.graphics.Rect;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -8,16 +9,19 @@ import android.view.View;
 import com.shoutit.app.android.adapters.ChangeableLayoutManagerAdapter;
 import com.shoutit.app.android.utils.MyGridLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
+import com.shoutit.app.android.utils.RtlUtils;
 
 
 public class BaseShoutsItemDecoration extends RecyclerView.ItemDecoration {
 
     private final int spacing;
+    private final boolean rtlEnable;
     private int firstGridPosition = -1;
     private boolean isFirstGridPositionEven;
 
-    public BaseShoutsItemDecoration(int spacingInPx) {
+    public BaseShoutsItemDecoration(int spacingInPx, Context context) {
         this.spacing = spacingInPx;
+        rtlEnable = RtlUtils.isRtlEnable(context);
     }
 
     @Override
@@ -45,7 +49,7 @@ public class BaseShoutsItemDecoration extends RecyclerView.ItemDecoration {
                 isFirstGridPositionEven = firstGridPosition % 2 == 0;
             }
 
-            boolean isCurrentPositionEven = position % 2 == 0;
+            boolean isCurrentPositionEven = rtlEnable ? position % 2 == 1 : position % 2 == 0;
             if (isFirstGridPositionEven) {
                 if (isCurrentPositionEven) {
                     outRect.left = spacing;

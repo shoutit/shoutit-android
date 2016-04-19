@@ -84,7 +84,7 @@ public class DiscoverShoutsActivity extends BaseActivity {
         setUpToolbar(name);
 
         mRecyclerView.addItemDecoration(new BaseShoutsItemDecoration(
-                getResources().getDimensionPixelSize(R.dimen.home_linear_side_spacing)));
+                getResources().getDimensionPixelSize(R.dimen.home_linear_side_spacing), this));
         setGridLayoutManager();
 
         mRecyclerView.setAdapter(mShoutsAdapter);
