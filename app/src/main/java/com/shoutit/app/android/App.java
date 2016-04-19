@@ -135,8 +135,9 @@ public class App extends MultiDexApplication {
                     @Override
                     public void call(BothParams<String, User> tokenAndUser) {
                         final User user = userPreferences.getUser();
-                        assert user != null;
-                        initPusher(tokenAndUser.param1(), user);
+                        if(user != null) {
+                            initPusher(tokenAndUser.param1(), user);
+                        }
                     }
                 });
     }
