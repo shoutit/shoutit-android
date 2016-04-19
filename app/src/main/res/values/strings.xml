@@ -42,6 +42,14 @@
     <string name="intro_skip">Skip</string>
     <string name="intro_help">Help</string>
     <string name="intro_fail_login">Failed to create guest account</string>
+    <string name="intro_search">Search</string>
+    <string name="intro_search_text">Find what you need in your Community or anywhere in the World.</string>
+    <string name="intro_shout">Shout</string>
+    <string name="intro_shout_text">List anything for FREE. Include Photos and Videos to appeal to Buyers.</string>
+    <string name="intro_chat">Chat</string>
+    <string name="intro_chat_text">Connect with Buyers and Sellers. Send Photos, Videos and Shouts.</string>
+    <string name="intro_video">Video Chat</string>
+    <string name="intro_video_text">Video is worth a thousand pictures! see what you want to buy live before buying it.</string>
 
     <!-- Home -->
     <string name="home_menu_chat">Chat</string>
