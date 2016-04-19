@@ -132,7 +132,7 @@
                         android:layout_height="wrap_content"
                         android:theme="@style/BlueEditText"
                         app:counterEnabled="true"
-                        app:counterMaxLength="50"
+                        app:counterMaxLength="150"
                         app:errorEnabled="true"
                         app:hintTextAppearance="@style/ProfileInputStyle">
 
@@ -142,8 +142,8 @@
                             android:layout_height="wrap_content"
                             android:hint="@string/edit_profile_hint_bio"
                             android:imeOptions="actionDone"
-                            android:maxLines="2"
-                            android:maxLength="50"
+                            android:maxLines="5"
+                            android:maxLength="150"
                             android:inputType="textMultiLine"
                             android:nextFocusDown="@+id/edit_profile_website_et"
                             android:textSize="16sp" />
