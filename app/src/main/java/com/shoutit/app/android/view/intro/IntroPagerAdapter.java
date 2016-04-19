@@ -20,12 +20,15 @@ public class IntroPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-            case 5:
                 return new FirstIntroPageFragment();
+            case 1:
+                return new SecondIntroPageFragment();
+            case 2:
+                return new ThirdIntroPageFragment();
+            case 3:
+                return new FourthIntroPageFragment();
+            case 4:
+                return new FifthIntroPageFragment();
             default:
                 throw new RuntimeException("Unknown page number");
         }

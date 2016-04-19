@@ -29,6 +29,7 @@
                 android:id="@+id/activity_intro_page_indicators"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:padding="2dp"
                 android:layout_gravity="center_horizontal"
                 app:fillColor="@android:color/white"/>
 

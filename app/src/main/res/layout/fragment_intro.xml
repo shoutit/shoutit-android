@@ -6,6 +6,8 @@
     android:gravity="center_horizontal"
     tools:background="@drawable/gradient_intro"
     tools:context=".view.intro.IntroActivity"
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp"
     android:orientation="vertical">
 
     <ImageView
@@ -20,7 +22,7 @@
         android:id="@+id/activity_intro_first_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="80dp"
         android:gravity="center"
         android:fontFamily="sans-serif-medium"
         tools:text="@string/intro_welcome"
