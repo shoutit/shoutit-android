@@ -80,7 +80,7 @@ public class CreateRequestPresenterTest {
     }
 
     private CreateShoutResponse emptyCreateShoutResponse() {
-        return new CreateShoutResponse("", "");
+        return new CreateShoutResponse("", "", title);
     }
 
     @NonNull

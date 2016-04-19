@@ -6,10 +6,12 @@ public class CreateShoutResponse {
 
     private final String id;
     private final String webUrl;
+    private final String title;
 
-    public CreateShoutResponse(@NonNull String id, String webUrl) {
+    public CreateShoutResponse(@NonNull String id, String webUrl, String title) {
         this.id = id;
         this.webUrl = webUrl;
+        this.title = title;
     }
 
     @NonNull
@@ -20,5 +22,10 @@ public class CreateShoutResponse {
     @NonNull
     public String getWebUrl() {
         return webUrl;
+    }
+
+    @NonNull
+    public String getTitle() {
+        return title;
     }
 }

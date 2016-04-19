@@ -6,6 +6,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.common.base.Strings;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.view.createshout.edit.EditShoutActivity;
 import com.shoutit.app.android.view.createshout.request.CreateRequestActivity;
@@ -28,6 +30,8 @@ public class PublishShoutActivity extends RxAppCompatActivity {
     private static final String ARGS_REQUEST = "args_request";
     private static final String ARGS_ID = "args_id";
     private static final String ARGS_WEB_URL = "web_url";
+    private static final String ARGS_TITLE = "args_title";
+
     private boolean mRequest;
     private String mId;
     private String mWebUrl;
@@ -42,10 +46,11 @@ public class PublishShoutActivity extends RxAppCompatActivity {
     Button button;
 
     @NonNull
-    public static Intent newIntent(@NonNull Context context, @NonNull String id, @NonNull String webUrl, boolean request) {
+    public static Intent newIntent(@NonNull Context context, @NonNull String id, @NonNull String webUrl, boolean request, @Nullable String title) {
         return new Intent(context, PublishShoutActivity.class)
                 .putExtra(ARGS_ID, id)
                 .putExtra(ARGS_REQUEST, request)
+                .putExtra(ARGS_TITLE, title)
                 .putExtra(ARGS_WEB_URL, webUrl);
     }
 
@@ -58,7 +63,6 @@ public class PublishShoutActivity extends RxAppCompatActivity {
 
         mToolbar.inflateMenu(R.menu.publish_shout_menu);
         mToolbar.setNavigationIcon(R.drawable.close);
-
 
         final Drawable drawable = ContextCompat.getDrawable(this, R.drawable.ic_share);
         assert drawable != null;
@@ -100,8 +104,15 @@ public class PublishShoutActivity extends RxAppCompatActivity {
         mId = extras.getString(ARGS_ID);
         mWebUrl = extras.getString(ARGS_WEB_URL);
 
-        subHeader.setText(getString(R.string.published_extra_info,
-                getString(mRequest ? R.string.publish_request : R.string.publish_offer)));
+        final String title = extras.getString(ARGS_TITLE);
+        if (Strings.isNullOrEmpty(title)) {
+            subHeader.setText(getString(R.string.published_extra_info,
+                    getString(mRequest ? R.string.publish_request : R.string.publish_offer)));
+        } else {
+            subHeader.setText(getString(R.string.published_extra_info_with_title,
+                    getString(mRequest ? R.string.publish_request : R.string.publish_offer), title));
+        }
+
         button.setText(getString(R.string.published_create_another_shout,
                 getString(mRequest ? R.string.publish_request_capitalized : R.string.publish_offer_capitalized)));
     }
