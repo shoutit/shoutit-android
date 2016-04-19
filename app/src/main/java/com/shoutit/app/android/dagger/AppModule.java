@@ -125,7 +125,6 @@ public final class AppModule {
         }
 
         okHttpClient.interceptors().add(authInterceptor);
-        okHttpClient.interceptors().add(authInterceptor);
 
         final HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
         okHttpClient.interceptors().add(loggingInterceptor);
