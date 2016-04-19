@@ -42,8 +42,9 @@ public class SearchPresenter {
     public enum SearchType {
         SHOUTS,
         RELATED_SHOUTS,
+        CATEGORY,
         PROFILE,
-        TAG,
+        TAG_PROFILE,
         DISCOVER,
         BROWSE
     }
@@ -83,7 +84,7 @@ public class SearchPresenter {
                 .switchMap(new Func1<String, Observable<ResponseOrError<List<Suggestion>>>>() {
                     @Override
                     public Observable<ResponseOrError<List<Suggestion>>> call(String query) {
-                        final String categorySlug = searchType == SearchType.TAG ? contextItemId : null;
+                        final String categorySlug = searchType == SearchType.CATEGORY ? contextItemId : null;
                         final String country = userLocation == null ? null : userLocation.getCountry();
                         return apiService.searchSuggestions(query, categorySlug, country)
                                 .subscribeOn(networkScheduler)

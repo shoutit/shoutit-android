@@ -324,7 +324,7 @@ public class FiltersPresenter {
     }
 
     private boolean shouldBlockCategories() {
-        return SearchPresenter.SearchType.TAG.equals(searchType) && initCategorySlug != null;
+        return SearchPresenter.SearchType.CATEGORY.equals(searchType) && initCategorySlug != null;
     }
 
     @NonNull
