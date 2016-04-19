@@ -192,7 +192,10 @@
                     android:id="@+id/chats_shout_layout_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginRight="4dp"
                     android:ellipsize="end"
+                    android:lines="1"
                     android:textColor="@color/black_54"
                     android:textSize="12sp"
                     tools:text="Maerino Wool Text Long name Text "/>
@@ -206,7 +209,10 @@
                     android:id="@+id/chats_shout_layout_author_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginRight="4dp"
                     android:ellipsize="end"
+                    android:lines="1"
                     android:textColor="@color/black_38"
                     android:textSize="12sp"
                     tools:text="John Smith - 2 hours ago"/>
@@ -262,9 +268,9 @@
 
     <TextView
         android:id="@+id/conversations_empty"
-        android:text="@string/chats_empty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"/>
+        android:layout_centerInParent="true"
+        android:text="@string/chats_empty"/>
 
 </RelativeLayout>
