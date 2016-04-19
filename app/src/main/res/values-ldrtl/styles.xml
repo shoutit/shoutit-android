@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="ShoutCardSectionText">
+        <item name="android:textDirection">rtl</item>
+        <item name="android:textColor">@color/black_54</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">2</item>
+        <item name="android:layout_marginLeft">6dp</item>
+        <item name="android:layout_marginStart" tools:ignore="NewApi">6dp</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="ShoutitRtlTextStyle">
+        <item name="android:textDirection">rtl</item>
+        </style>
+</resources>

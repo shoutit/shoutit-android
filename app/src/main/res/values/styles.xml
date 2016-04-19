@@ -81,6 +81,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="android:background">@android:color/white</item>
         <item name="colorControlActivated">@color/accent_blue</item> <!-- Cursor color -->
+        <item name="android:textColorSecondary">@color/accent_blue</item>
     </style>
 
     <style name="SideMenuItem">
@@ -300,5 +301,7 @@
         <item name="android:bottomMedium">@android:color/transparent</item>
         <item name="android:centerMedium">@android:color/transparent</item>
     </style>
+
+    <style name="ShoutitRtlTextStyle" />
 
 </resources>

@@ -26,6 +26,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
+import com.shoutit.app.android.utils.RtlUtils;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.squareup.picasso.Picasso;
 
@@ -177,6 +178,7 @@ public abstract class ProfileActivity extends BaseActivity {
     }
 
     private void setUpAdapter() {
+        final boolean rtlEnable = RtlUtils.isRtlEnable(this);
         final GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
         gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
@@ -216,6 +218,9 @@ public abstract class ProfileActivity extends BaseActivity {
 
                     boolean isFirstPositionEven = firstShoutPosition % 2 == 0;
                     boolean isCurrentPositionEven = position % 2 == 0;
+                    if (rtlEnable) {
+                        isCurrentPositionEven = !isCurrentPositionEven;
+                    }
                     if (isFirstPositionEven) {
                         if (isCurrentPositionEven) {
                             outRect.right = sideSpacing;

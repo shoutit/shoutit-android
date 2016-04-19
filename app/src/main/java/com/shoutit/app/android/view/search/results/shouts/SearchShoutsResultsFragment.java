@@ -231,7 +231,7 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
 
     private void initAdapter() {
         recyclerView.addItemDecoration(new BaseShoutsItemDecoration(
-                getResources().getDimensionPixelSize(R.dimen.shouts_search_results_side_spacing)));
+                getResources().getDimensionPixelSize(R.dimen.shouts_search_results_side_spacing), getActivity()));
         setGridLayoutManager();
     }
 
