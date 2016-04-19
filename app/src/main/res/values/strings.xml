@@ -370,6 +370,7 @@
     <string name="chat_shout_chat">Shout Chat</string>
     <string name="chat_offer">Offer</string>
     <string name="chat_request">Request</string>
+    <string name="chats_empty">No messages.</string>
 
     <!-- Notifications -->
     <string name="notifications_title">Notifications</string>

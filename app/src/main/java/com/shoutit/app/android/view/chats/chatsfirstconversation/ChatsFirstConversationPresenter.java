@@ -105,7 +105,7 @@ public class ChatsFirstConversationPresenter {
     private final ShoutsDao mShoutsDao;
     private final ProfilesDao mProfilesDao;
     private final boolean mIsShoutConversation;
-    private Listener mListener;
+    private FirstConversationListener mListener;
     private final CompositeSubscription mSubscribe = new CompositeSubscription();
     private final PublishSubject<PusherMessage> newMessagesSubject = PublishSubject.create();
     private final PublishSubject<Object> mRefreshTypingObservable = PublishSubject.create();
@@ -179,10 +179,12 @@ public class ChatsFirstConversationPresenter {
 
     }
 
-    public void register(@NonNull Listener listener) {
+    public void register(@NonNull FirstConversationListener listener) {
         final User user = mUserPreferences.getUser();
         assert user != null;
         final PresenceChannel userChannel = mPusher.getPusher().getPresenceChannel(String.format("presence-v3-p-%1$s", user.getId()));
+        mListener = listener;
+        mListener.showDeleteMenu(false);
 
         final Observable<PusherMessage> pusherMessageObservable = Observable
                 .create(new Observable.OnSubscribe<PusherMessage>() {
@@ -245,7 +247,6 @@ public class ChatsFirstConversationPresenter {
                     }
                 });
 
-        mListener = listener;
         mSubscribe.add(Observable.combineLatest(
                 localAndPusherMessages.map(new Func1<List<PusherMessage>, List<BaseAdapterItem>>() {
                     @Override
@@ -450,6 +451,7 @@ public class ChatsFirstConversationPresenter {
         return observable.doOnNext(new Action1<Message>() {
             @Override
             public void call(Message message) {
+                mListener.showDeleteMenu(true);
                 conversationCreated = true;
                 conversationId = message.getConversationId();
                 if (mIsShoutConversation) {
