@@ -209,7 +209,8 @@ public class ShoutPresenter {
                 successShoutResponse.map(new Func1<Shout, ShoutAdapterItems.MainShoutAdapterItem>() {
                     @Override
                     public ShoutAdapterItems.MainShoutAdapterItem call(Shout shout) {
-                        return new ShoutAdapterItems.MainShoutAdapterItem(addToCartSubject, onCategoryClickedSubject, shout, context.getResources());
+                        return new ShoutAdapterItems.MainShoutAdapterItem(addToCartSubject, onCategoryClickedSubject,
+                                visitProfileSubject, shout, context.getResources());
                     }
                 });
 
