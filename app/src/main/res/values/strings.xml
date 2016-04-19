@@ -289,6 +289,7 @@
     <!-- Published -->
     <string name="published_congratulations">Congratulations!</string>
     <string name="published_extra_info">Your %1$s will appear on Shoutit soon.</string>
+    <string name="published_extra_info_with_title">Your %1$s \"%2$s\" will appear on Shoutit soon.</string>
     <string name="published_add_details">Add more details</string>
     <string name="published_create_another_shout">Create another %1$s</string>
     <string name="published_or_label">or</string>
