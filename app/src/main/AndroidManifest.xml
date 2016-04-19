@@ -31,13 +31,16 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".view.media.RecordMediaActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/TransparentStatusBar"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"/>
         <activity
             android:name=".view.media.VideoCompressActivity"
+            android:screenOrientation="portrait"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"/>
         <activity
             android:name=".view.main.MainActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.WithDrawer">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -47,20 +50,26 @@
         </activity>
         <activity
             android:name=".view.intro.IntroActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/IntroActivityTheme"/>
         <activity
             android:name=".view.signin.LoginActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/LoginActivityTheme"/>
         <activity
             android:name="com.facebook.FacebookActivity"
+            android:screenOrientation="portrait"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
-        <activity android:name=".view.loginintro.LoginIntroActivity"/>
-        <activity android:name=".view.webview.HtmlAssetViewerActivity"/>
+        <activity android:name=".view.loginintro.LoginIntroActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".view.webview.HtmlAssetViewerActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".view.about.AboutActivity"
-            android:theme="@style/PreferenceStyle"/>
+            android:theme="@style/PreferenceStyle"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".view.postlogininterest.PostLoginInterestActivity"
             android:screenOrientation="portrait"/>
@@ -69,24 +78,36 @@
             android:screenOrientation="portrait"
             android:theme="@style/TranslucentStatusBar"
             />
-        <activity android:name=".view.location.LocationActivity"/>
-        <activity android:name=".view.discover.DiscoverActivity"/>
+        <activity android:name=".view.location.LocationActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".view.discover.DiscoverActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".view.chats.ChatActivity"
+            android:screenOrientation="portrait"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"/>
         <activity
             android:name=".view.chats.chatsfirstconversation.ChatFirstConversationActivity"
+            android:screenOrientation="portrait"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"/>
-        <activity android:name=".view.shouts.selectshout.SelectShoutActivity"/>
-        <activity android:name=".view.shouts.discover.DiscoverShoutsActivity"/>
-        <activity android:name=".view.settings.SettingsActivity"/>
-        <activity android:name=".view.createshout.request.CreateRequestActivity"/>
-        <activity android:name=".view.createshout.location.LocationActivity"/>
+        <activity android:name=".view.shouts.selectshout.SelectShoutActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".view.shouts.discover.DiscoverShoutsActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".view.settings.SettingsActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".view.createshout.request.CreateRequestActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".view.createshout.location.LocationActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".view.createshout.edit.EditShoutActivity"
-            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"/>
-        <activity android:name=".view.createshout.publish.PublishShoutActivity"/>
-        <activity android:name=".view.signin.forgotpassword.ForgotPasswordActivity"/>
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".view.createshout.publish.PublishShoutActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".view.signin.forgotpassword.ForgotPasswordActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".view.search.main.MainSearchActivity"
             android:launchMode="singleTask"
@@ -104,30 +125,46 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable"/>
         </activity>
-        <activity android:name=".view.search.results.shouts.SearchShoutsResultsActivity"/>
-        <activity android:name=".view.search.results.profiles.SearchProfilesResultsActivity"/>
+        <activity android:name=".view.search.results.shouts.SearchShoutsResultsActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".view.search.results.profiles.SearchProfilesResultsActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".view.settings.account.AccountActivity"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize"/>
-        <activity android:name=".view.shout.ShoutActivity"/>
+        <activity android:name=".view.shout.ShoutActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".view.profile.UserOrPageProfileActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/TranslucentStatusBar"/>
         <activity
             android:name=".view.profile.tagprofile.TagProfileActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/TranslucentStatusBar"/>
         <activity
             android:name=".view.editprofile.EditProfileActivity"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden"/>
-        <activity android:name=".view.notifications.NotificationsActivity"/>
+        <activity android:name=".view.notifications.NotificationsActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".view.videoconversation.VideoConversationActivity"
             android:screenOrientation="portrait"/>
         <activity android:name=".view.gallery.GalleryActivity"/>
-        <activity android:name=".view.verifyemail.VerifyEmailActivity"/>
-        <activity android:name=".view.conversations.ConversationsActivity"/>
+        <activity android:name=".view.verifyemail.VerifyEmailActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".view.conversations.ConversationsActivity"
+            android:screenOrientation="portrait"/>
         <activity android:name=".view.createshout.CreateShoutDialogActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.DialogActivity"/>
+
+        <activity
+            android:name=".view.videoconversation.DialogCallActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/TranslucentBackground"/>
 
         <!-- Facebook -->
         <meta-data
@@ -155,11 +192,6 @@
         <service
             android:name="com.amazonaws.mobileconnectors.s3.transferutility.TransferService"
             android:enabled="true"/>
-
-        <activity
-            android:name=".view.videoconversation.DialogCallActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/TranslucentBackground"/>
 
     </application>
 
