@@ -40,7 +40,6 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.utils.TextWatcherAdapter;
 import com.shoutit.app.android.view.chats.ChatsHelper;
-import com.shoutit.app.android.view.chats.Listener;
 import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
@@ -57,10 +56,9 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import rx.Subscription;
 import rx.functions.Action1;
 
-public class ChatFirstConversationActivity extends BaseActivity implements Listener {
+public class ChatFirstConversationActivity extends BaseActivity implements FirstConversationListener {
 
     private static final String ARGS_ID_FOR_CREATION = "args_id_for_creation";
     private static final String ARGS_IS_SHOUT_CONVERSATION = "args_shout_conversation";
@@ -106,7 +104,6 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
 
     @Bind(R.id.chats_main_layout)
     View mMainLayout;
-    private Subscription subscription;
 
     @Bind(R.id.chats_message_send_button)
     ImageButton sendButton;
@@ -323,7 +320,7 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
         startActivityForResult(RecordMediaActivity.newIntent(this, true, true, true, false), REQUEST_ATTACHMENT);
     }
 
-    @OnClick(R.id.chats_attatchments_photo) 
+    @OnClick(R.id.chats_attatchments_photo)
     void photoClicked() {
         startActivityForResult(RecordMediaActivity.newIntent(this, true, false, true, false), REQUEST_ATTACHMENT);
     }
@@ -379,5 +376,10 @@ public class ChatFirstConversationActivity extends BaseActivity implements Liste
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    @Override
+    public void showDeleteMenu(boolean show) {
+        mChatsToolbar.getMenu().findItem(R.id.chats_overflow).setVisible(show);
     }
 }
