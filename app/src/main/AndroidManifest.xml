@@ -154,6 +154,7 @@
             android:screenOrientation="portrait"/>
         <activity android:name=".view.gallery.GalleryActivity"/>
         <activity android:name=".view.verifyemail.VerifyEmailActivity"
+            android:windowSoftInputMode="adjustResize"
             android:screenOrientation="portrait"/>
         <activity android:name=".view.conversations.ConversationsActivity"
             android:screenOrientation="portrait"/>
