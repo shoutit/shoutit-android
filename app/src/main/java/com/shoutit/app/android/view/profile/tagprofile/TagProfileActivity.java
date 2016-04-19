@@ -59,9 +59,9 @@ public class TagProfileActivity extends ProfileActivity {
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(new Action1<String>() {
                     @Override
-                    public void call(String userName) {
+                    public void call(String tagProfileName) {
                         startActivity(SearchShoutsResultsActivity.newIntent(
-                                TagProfileActivity.this, null, userName, SearchPresenter.SearchType.TAG));
+                                TagProfileActivity.this, null, tagProfileName, SearchPresenter.SearchType.TAG_PROFILE));
                     }
                 });
     }

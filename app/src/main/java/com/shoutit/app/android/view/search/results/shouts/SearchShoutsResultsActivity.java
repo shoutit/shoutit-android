@@ -8,7 +8,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
@@ -113,7 +112,7 @@ public class SearchShoutsResultsActivity extends BaseActivity {
                 finish();
                 return true;
             case R.id.search_results_menu_search:
-                if (isFromSearchCategories()) {
+                if (isFromSearchCategoriesOrTagProfile()) {
                     startActivity(SubSearchActivity.newIntent(
                             SearchShoutsResultsActivity.this, searchType,
                             contextualItemId, categoryName));
@@ -125,12 +124,12 @@ public class SearchShoutsResultsActivity extends BaseActivity {
                 return false;
             default:
                 return super.onOptionsItemSelected(item);
-
         }
     }
 
-    private boolean isFromSearchCategories() {
-        return searchType.equals(SearchPresenter.SearchType.TAG) && !TextUtils.isEmpty(categoryName);
+    private boolean isFromSearchCategoriesOrTagProfile() {
+        return (searchType.equals(SearchPresenter.SearchType.CATEGORY) || searchType.equals(SearchPresenter.SearchType.TAG_PROFILE))
+                && !TextUtils.isEmpty(categoryName);
     }
 
     @Nonnull

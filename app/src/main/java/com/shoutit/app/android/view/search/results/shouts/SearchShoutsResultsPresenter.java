@@ -52,9 +52,12 @@ public class SearchShoutsResultsPresenter {
                                         @Nullable final String searchQuery,
                                         @Nonnull final SearchPresenter.SearchType searchType,
                                         @Nullable final String contextualItemId,
-                                        @Nonnull UserPreferences userPreferences,
+                                        @Nonnull final UserPreferences userPreferences,
                                         @Nonnull @ForActivity final Context context,
                                         @UiScheduler Scheduler uiScheduler) {
+
+        final boolean initWithUserLocation = searchType != SearchPresenter.SearchType.PROFILE &&
+                searchType != SearchPresenter.SearchType.TAG_PROFILE;
 
         final Observable<ShoutsDao.SearchShoutsDao> daoWithFilters = filtersSelectedSubject
                 .map(new Func1<FiltersToSubmit, ShoutsDao.SearchShoutsDao>() {
@@ -65,10 +68,19 @@ public class SearchShoutsResultsPresenter {
                     }
                 });
 
-        final Observable<ShoutsDao.SearchShoutsDao> daoObservable = userPreferences.getLocationObservable()
-                .filter(Functions1.isNotNull())
-                .first()
-                .distinctUntilChanged()
+        final Observable<ShoutsDao.SearchShoutsDao> daoObservable = Observable.just(initWithUserLocation)
+                .flatMap(new Func1<Boolean, Observable<UserLocation>>() {
+                    @Override
+                    public Observable<UserLocation> call(Boolean initWithUserLocation) {
+                        if (initWithUserLocation) {
+                            return userPreferences.getLocationObservable()
+                                    .filter(Functions1.isNotNull())
+                                    .first();
+                        } else {
+                            return Observable.just(null);
+                        }
+                    }
+                })
                 .map(new Func1<UserLocation, ShoutsDao.SearchShoutsDao>() {
                     @Override
                     public ShoutsDao.SearchShoutsDao call(UserLocation userLocation) {

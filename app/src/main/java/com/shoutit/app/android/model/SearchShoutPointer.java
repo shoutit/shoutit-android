@@ -14,7 +14,7 @@ public class SearchShoutPointer {
     private final String query;
     @Nonnull
     private final SearchPresenter.SearchType searchType;
-    @Nonnull
+    @Nullable
     private final UserLocation location;
     @Nullable
     private final String contextItemId;
@@ -51,7 +51,7 @@ public class SearchShoutPointer {
         return searchType;
     }
 
-    @Nonnull
+    @Nullable
     public UserLocation getLocation() {
         return location;
     }

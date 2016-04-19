@@ -40,7 +40,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import okhttp3.ResponseBody;
-import retrofit2.Response;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
@@ -333,7 +332,7 @@ public class TagProfilePresenter implements ProfilePresenter {
                     @Override
                     public Intent call(Object o, TagDetail tagDetail) {
                         return SubSearchActivity.newIntent(context,
-                                SearchPresenter.SearchType.TAG, tagDetail.getUsername(),
+                                SearchPresenter.SearchType.TAG_PROFILE, tagDetail.getUsername(),
                                 tagDetail.getName());
                     }
                 });
