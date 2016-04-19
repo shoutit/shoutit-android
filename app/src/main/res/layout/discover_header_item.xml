@@ -15,11 +15,6 @@
         android:scaleType="centerCrop"
         android:src="@drawable/discover_header_bg"/>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/discover_header_white_dim"/>
-
     <TextView
         android:id="@+id/discover_header_title"
         android:layout_width="wrap_content"
