@@ -2,16 +2,16 @@
     <string name="app_name">Shoutit</string>
 
     <!-- Global strings -->
-    <string name="price_with_currency">%1$s %2$s</string>
+    <string name="price_with_currency" translatable="false">%1$s %2$s</string>
     <string name="price_free">FREE</string>
     <string name="shout_type_offer">Offer</string>
     <string name="shout_type_request">Request</string>
     <string name="terms_of_service">Terms of Service</string>
     <string name="google_api_key" translatable="false">AIzaSyBWHadI_MPYQgDLqI4RXhymEs42YEtgTEE
     </string>
-    <string name="facebook_app_id">353625811317277</string>
+    <string name="facebook_app_id" translatable="false">353625811317277</string>
     <string name="exit_text">Press BACK again to exit</string>
-    <string name="font_roboto_regular">sans-serif</string>
+    <string name="font_roboto_regular" translatable="false">sans-serif</string>
     <string name="font_roboto_medium">sans-serif</string>
 
     <!-- Errors -->
@@ -58,7 +58,7 @@
     <string name="home_shouts_header_logged">MY FEED</string>
     <string name="home_shouts_header_guest">SHOUTS IN %1$s</string>
     <string name="home_discover_header">DISCOVER %1$s</string>
-    <string name="home_user_and_date">%1$s - %2$s</string>
+    <string name="home_user_and_date" translatable="false">%1$s - %2$s</string>
 
     <!-- Login -->
     <string name="login_email_hint">Email or Username</string>
@@ -124,7 +124,7 @@
     <string name="location_search_hint">Type an address</string>
     <string name="location_header">My current location (automatic updates)</string>
     <string name="location_header_selected_location">Current location</string>
-    <string name="location_location">%1$s, %2$s</string>
+    <string name="location_location" translatable="false">%1$s, %2$s</string>
 
     <!-- Side Menu -->
     <string name="menu_create_shout">Create Shout</string>
@@ -200,7 +200,7 @@
     <string name="shout_header_description">DESCRIPTION</string>
     <string name="shout_header_details">Details</string>
     <string name="shout_user_shouts_header">OTHER SHOUTS FROM %1$s</string>
-    <string name="shout_user_location">%1$s, %2$s</string>
+    <string name="shout_user_location" translatable="false">%1$s, %2$s</string>
     <string name="shout_only_available">Only %1$d available</string>
     <string name="shout_available">%1$d available</string>
     <string name="shout_bottom_bar_call">Call</string>
@@ -287,7 +287,7 @@
     <string name="edit_profile_hint_website">Website</string>
     <string name="edit_profile_menu_save">Save</string>
     <string name="edit_profile_toolbar_title">Edit Profile</string>
-    <string name="edit_profile_country">%1$s, %2$s</string>
+    <string name="edit_profile_country" translatable="false">%1$s, %2$s</string>
     <string name="edit_profile_success">Profile successfully updated</string>
     <string name="edit_profile_hint_first_name">First Name</string>
     <string name="edit_profile_hint_last_name">Last Name</string>
@@ -367,7 +367,7 @@
 
     <!-- Chats -->
     <string name="chat_show_map">Show Map</string>
-    <string name="chat_attatchment">Attatchment</string>
+    <string name="chat_attatchment">Attachment</string>
     <string name="chat_video_call">Video Call</string>
     <string name="chats_attatchments_photo">Photo</string>
     <string name="chats_attatchments_video">Video</string>
