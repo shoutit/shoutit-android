@@ -334,20 +334,20 @@ public class ChatsPresenter {
                     @Override
                     public void call(Conversation conversationResponse) {
 
-                        chatParticipantUsernameSubject.onNext(conversationResponse.getAbout().getProfile().getUsername());
-                        mUserPreferences.setShoutOwnerName(conversationResponse.getAbout().getProfile().getName());
-
                         if (mIsShoutConversation) {
                             final AboutShout about = conversationResponse.getAbout();
-                            final String title = about.getTitle();
-                            final String thumbnail = Strings.emptyToNull(about.getThumbnail());
-                            final String type = about.getType().equals(Shout.TYPE_OFFER) ? mContext.getString(R.string.chat_offer) : mContext.getString(R.string.chat_request);
-                            final String price = PriceUtils.formatPriceWithCurrency(about.getPrice(), mResources, about.getCurrency());
-                            final String authorAndTime = about.getProfile().getName() + " - " + DateUtils.getRelativeTimeSpanString(mContext, about.getDatePublished() * 1000);
+
                             final String id = about.getId();
 
-
                             if (!Strings.isNullOrEmpty(id)) {
+                                chatParticipantUsernameSubject.onNext(about.getProfile().getUsername());
+                                mUserPreferences.setShoutOwnerName(about.getProfile().getName());
+
+                                final String title = about.getTitle();
+                                final String thumbnail = Strings.emptyToNull(about.getThumbnail());
+                                final String type = about.getType().equals(Shout.TYPE_OFFER) ? mContext.getString(R.string.chat_offer) : mContext.getString(R.string.chat_request);
+                                final String price = PriceUtils.formatPriceWithCurrency(about.getPrice(), mResources, about.getCurrency());
+                                final String authorAndTime = about.getProfile().getName() + " - " + DateUtils.getRelativeTimeSpanString(mContext, about.getDatePublished() * 1000);
                                 mListener.setAboutShoutData(title, thumbnail, type, price, authorAndTime, id);
                                 mListener.setShoutToolbarInfo(title, ConversationsUtils.getChatWithString(conversationResponse.getProfiles(), user.getId()));
                             } else {
