@@ -190,6 +190,7 @@ public class ChatActivity extends BaseActivity implements Listener {
             @Override
             public void afterTextChanged(Editable s) {
                 sendButton.setEnabled(s.length() != 0);
+                mChatsAttatchmentsLayout.setVisibility(View.GONE);
             }
         });
 
