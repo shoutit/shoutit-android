@@ -77,7 +77,7 @@ import static com.appunite.rx.internal.Preconditions.checkNotNull;
 
 public class VideoConversationActivity extends BaseActivity {
 
-    private static final String ARGS_USERNAME = "args_username";
+    private static final String ARGS_TWILIO_IDENTITY = "args_TWILIO_IDENTITY";
     private static final String ARGS_CALLER = "args_caller";
     private static final int CAMERA_MIC_PERMISSION_REQUEST_CODE = 1;
 
@@ -112,15 +112,18 @@ public class VideoConversationActivity extends BaseActivity {
     @Inject
     Twilio mTwilio;
 
-    private String shoutOnwerId;
+    private String twilioIdentity;
     private String caller;
 
     private BehaviorSubject<String> conversationInfoSubject = BehaviorSubject.create();
     private BehaviorSubject<String> conversationErrorSubject = BehaviorSubject.create();
 
-    public static Intent newIntent(@Nullable String callerName, @Nullable String id, @Nonnull Context context) {
-        return new Intent(context, VideoConversationActivity.class).putExtra(ARGS_USERNAME, id).putExtra(ARGS_CALLER, callerName);
-
+    public static Intent newIntent(@Nullable String callerName,
+                                   @Nullable String twilioIdentity,
+                                   @Nonnull Context context) {
+        return new Intent(context, VideoConversationActivity.class)
+                .putExtra(ARGS_TWILIO_IDENTITY, twilioIdentity)
+                .putExtra(ARGS_CALLER, callerName);
     }
 
     @Override
@@ -140,7 +143,7 @@ public class VideoConversationActivity extends BaseActivity {
         setupVariablesFromApp();
         setupAudioVideo();
 
-        if (shoutOnwerId == null) {
+        if (twilioIdentity == null) {
             acceptIncomingCall();
         }
 
@@ -227,11 +230,11 @@ public class VideoConversationActivity extends BaseActivity {
 
     private void makeOutgoingCall() {
 
-        if (shoutOnwerId != null && conversationClient != null) {
+        if (twilioIdentity != null && conversationClient != null) {
             callButton.setVisibility(View.GONE);
 
             Set<String> participants = new HashSet<>();
-            participants.add(shoutOnwerId);
+            participants.add(twilioIdentity);
 
             outgoingInvite = conversationClient
                     .sendConversationInvite(participants, setupLocalMedia(), new ConversationCallback() {
@@ -242,8 +245,10 @@ public class VideoConversationActivity extends BaseActivity {
                                 conversation.setConversationListener(conversationListener());
                             } else if (exception.getErrorCode() == 109) {
                                 conversationInfoSubject.onNext(getString(R.string.video_calls_participant_reject));
+                                mTwilio.rejectCall(twilioIdentity);
                             } else {
                                 conversationErrorSubject.onNext(TextHelper.formatErrorMessage(exception.getMessage()));
+                                mTwilio.rejectCall(twilioIdentity);
                             }
                         }
                     });
@@ -279,7 +284,7 @@ public class VideoConversationActivity extends BaseActivity {
             @Override
             public void onParticipantConnected(Conversation conversation, Participant participant) {
                 participant.setParticipantListener(participantListener());
-                if (shoutOnwerId != null) {
+                if (twilioIdentity != null) {
                     conversationInfoSubject.onNext(String.format(getString(R.string.video_calls_connected), preferences.getShoutOwnerName()));
                 } else {
                     conversationInfoSubject.onNext(String.format(getString(R.string.video_calls_connected), caller));
@@ -362,7 +367,7 @@ public class VideoConversationActivity extends BaseActivity {
 
     private void setupVariablesFromApp() {
         final Intent intent = getIntent();
-        shoutOnwerId = intent.getStringExtra(ARGS_USERNAME);
+        twilioIdentity = intent.getStringExtra(ARGS_TWILIO_IDENTITY);
         caller = intent.getStringExtra(ARGS_CALLER);
         conversationClient = mTwilio.getConversationsClient();
         invite = mTwilio.getInvite();
