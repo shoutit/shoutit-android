@@ -13,6 +13,8 @@
     <string name="exit_text">Press BACK again to exit</string>
     <string name="font_roboto_regular">sans-serif</string>
     <string name="font_roboto_medium">sans-serif</string>
+    <string name="listen_success">You have successfully started listening to %1$s</string>
+    <string name="unlisten_success">You have successfully stopped listening to %1$s</string>
 
     <!-- Errors -->
     <string name="error_default">Ooops, something went wrong</string>

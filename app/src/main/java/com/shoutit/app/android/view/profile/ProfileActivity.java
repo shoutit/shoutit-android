@@ -27,6 +27,7 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.RtlUtils;
+import com.shoutit.app.android.utils.rx.RxUtils;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.squareup.picasso.Picasso;
 
@@ -145,6 +146,15 @@ public abstract class ProfileActivity extends BaseActivity {
                 .subscribe(ColoredSnackBar.errorSnackBarAction(
                         ColoredSnackBar.contentView(ProfileActivity.this),
                         R.string.error_action_only_for_logged_in_user));
+
+        presenter.getListenSuccessObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(RxUtils.listenMessageAction(this));
+
+        presenter.getUnListenSuccessObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(RxUtils.unListenMessageAction(this));
+
     }
 
     @DrawableRes
