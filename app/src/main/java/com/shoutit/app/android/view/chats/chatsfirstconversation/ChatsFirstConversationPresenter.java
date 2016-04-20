@@ -40,7 +40,6 @@ import com.shoutit.app.android.dao.UsersIdentityDao;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.PusherHelper;
-import com.shoutit.app.android.view.chats.Listener;
 import com.shoutit.app.android.view.chats.PresenceChannelEventListenerAdapter;
 import com.shoutit.app.android.view.chats.message_models.DateItem;
 import com.shoutit.app.android.view.chats.message_models.InfoItem;
@@ -182,30 +181,10 @@ public class ChatsFirstConversationPresenter {
     public void register(@NonNull FirstConversationListener listener) {
         final User user = mUserPreferences.getUser();
         assert user != null;
-        final PresenceChannel userChannel = mPusher.getPusher().getPresenceChannel(String.format("presence-v3-p-%1$s", user.getId()));
         mListener = listener;
         mListener.showDeleteMenu(false);
 
-        final Observable<PusherMessage> pusherMessageObservable = Observable
-                .create(new Observable.OnSubscribe<PusherMessage>() {
-                    @Override
-                    public void call(final Subscriber<? super PusherMessage> subscriber) {
-                        userChannel.bind("new_message", new PresenceChannelEventListenerAdapter() {
-
-                            @Override
-                            public void onEvent(String channelName, String eventName, String data) {
-                                try {
-                                    final PusherMessage pusherMessage = mGson.getAdapter(PusherMessage.class).fromJson(data);
-                                    if (pusherMessage.getConversationId().equals(conversationId)) {
-                                        subscriber.onNext(pusherMessage);
-                                    }
-                                } catch (IOException e) {
-                                    subscriber.onError(e);
-                                }
-                            }
-                        });
-                    }
-                })
+        final Observable<PusherMessage> pusherMessageObservable = mPusher.getNewMessageObservable(conversationId)
                 .observeOn(mUiScheduler);
 
         final Observable<Boolean> isTyping = Observable

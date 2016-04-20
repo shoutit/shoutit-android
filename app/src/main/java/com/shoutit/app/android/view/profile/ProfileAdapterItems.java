@@ -17,6 +17,7 @@ import com.shoutit.app.android.view.profile.tagprofile.TagProfilePresenter;
 
 import javax.annotation.Nonnull;
 
+import rx.Observable;
 import rx.Observer;
 
 public class ProfileAdapterItems {
@@ -267,14 +268,18 @@ public class ProfileAdapterItems {
         private final Observer<Object> notificationsClickObserver;
         @Nonnull
         private final Observer<Object> verifyAccountClickObserver;
+        @Nonnull
+        private final Observable<Integer> notificationsUnreadObservable;
 
         public MyUserNameAdapterItem(@Nonnull User user, @NonNull Observer<Object> editProfileClickObserver,
                                      @Nonnull Observer<Object> notificationsClickObserver,
-                                     @Nonnull Observer<Object> verifyAccountClickObserver) {
+                                     @Nonnull Observer<Object> verifyAccountClickObserver,
+                                     @Nonnull Observable<Integer> notificationsUnreadObservable) {
             super(user);
             this.editProfileClickObserver = editProfileClickObserver;
             this.notificationsClickObserver = notificationsClickObserver;
             this.verifyAccountClickObserver = verifyAccountClickObserver;
+            this.notificationsUnreadObservable = notificationsUnreadObservable;
         }
 
         @Override
@@ -285,6 +290,11 @@ public class ProfileAdapterItems {
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
             return item instanceof ProfileAdapterItems.NameAdapterItem && user.equals(item);
+        }
+
+        @Nonnull
+        public Observable<Integer> getNotificationsUnreadObservable() {
+            return notificationsUnreadObservable;
         }
 
         @Nonnull

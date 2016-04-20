@@ -26,9 +26,11 @@ import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
+import com.shoutit.app.android.model.Stats;
 import com.shoutit.app.android.model.ReportBody;
 import com.shoutit.app.android.model.UserShoutsPointer;
 import com.shoutit.app.android.utils.PreferencesHelper;
+import com.shoutit.app.android.utils.PusherHelper;
 import com.shoutit.app.android.view.profile.myprofile.MyProfileHalfPresenter;
 import com.shoutit.app.android.view.profile.userprofile.UserProfileHalfPresenter;
 import com.shoutit.app.android.view.search.SearchPresenter;
@@ -73,6 +75,8 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
     private Observable<Intent> searchMenuItemClickObservable;
     @Nonnull
     private final Observable<Object> reportSuccessObservable;
+    @Nonnull
+    private final Observable<Integer> notificationsUnreadObservable;
 
     @Nonnull
     private final PublishSubject<String> showAllShoutsSubject = PublishSubject.create();
@@ -121,7 +125,8 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
                                       @Nonnull UserProfileHalfPresenter userProfilePresenter,
                                       @Nonnull PreferencesHelper preferencesHelper,
                                       @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
-                                      @Nonnull final ApiService apiService) {
+                                      @Nonnull final ApiService apiService,
+                                      @NonNull PusherHelper pusherHelper) {
         this.userName = userName;
         this.shoutsDao = shoutsDao;
         this.context = context;
@@ -290,6 +295,21 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
                 .getShoutsGlobalRefreshObservable()
                 .subscribe(shoutsDao.getUserShoutsDao(new UserShoutsPointer(SHOUTS_PAGE_SIZE, userName)).getRefreshObserver());
 
+        notificationsUnreadObservable = userPreferences.getUserObservable()
+                .filter(Functions1.isNotNull())
+                .map(new Func1<User, Integer>() {
+                    @Override
+                    public Integer call(User user) {
+                        return user.getUnreadNotificationsCount();
+                    }
+                })
+                .mergeWith(pusherHelper.getStatsObservable()
+                        .map(new Func1<Stats, Integer>() {
+                            @Override
+                            public Integer call(Stats pusherStats) {
+                                return pusherStats.getUnreadNotifications();
+                            }
+                        }));
     }
 
     @NonNull
@@ -300,7 +320,7 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
                 final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
 
                 if (user.isOwner()) {
-                    builder.add(myProfilePresenter.getUserNameAdapterItem(user))
+                    builder.add(myProfilePresenter.getUserNameAdapterItem(user, notificationsUnreadObservable))
                             .add(myProfilePresenter.getThreeIconsAdapterItem(user));
                 } else {
                     builder.add(userProfilePresenter.getUserNameAdapterItem(user))
