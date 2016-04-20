@@ -183,9 +183,7 @@ public class EditShoutPresenter {
                         if (shoutResponse != null) {
                             mListener.setActionbarTitle(mContext.getString(R.string.edit_shout_title, capitalize(shoutResponse.getType())));
                             mListener.setTitle(shoutResponse.getTitle());
-                            mListener.setPrice(PriceUtils.formatPrice(
-                                    shoutResponse.getPrice(),
-                                    mContext.getResources()));
+                            mListener.setPrice(PriceUtils.formatPriceToEdit(shoutResponse.getPrice()));
                             mListener.setDescription(shoutResponse.getText());
                             mUserLocation = shoutResponse.getLocation();
                             mListener.setLocation(
