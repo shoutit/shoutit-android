@@ -18,6 +18,7 @@
         tools:visibility="visible" />
 
     <LinearLayout
+        android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
         android:layout_width="160dp"
         android:background="@drawable/message_background_other"
