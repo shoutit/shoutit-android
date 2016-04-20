@@ -44,6 +44,7 @@ import com.shoutit.app.android.view.intro.IntroActivity;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.postlogininterest.PostLoginInterestActivity;
 import com.shoutit.app.android.view.search.main.MainSearchActivity;
+import com.shoutit.app.android.view.signin.LoginActivity;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -256,6 +257,10 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
     @Override
     public void onMenuItemSelected(@Nonnull String fragmentTag) {
+        if (MenuHandler.FRAGMENT_CHATS.equals(fragmentTag) && !mUserPreferences.isNormalUser()) {
+            startActivity(LoginActivity.newIntent(MainActivity.this));
+        }
+
         final FragmentManager fragmentManager = getSupportFragmentManager();
         Fragment fragment = fragmentManager.findFragmentByTag(fragmentTag);
 

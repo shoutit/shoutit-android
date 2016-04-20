@@ -22,6 +22,7 @@ import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.BaseShoutsItemDecoration;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
@@ -29,10 +30,12 @@ import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.LayoutManagerHelper;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
+import com.shoutit.app.android.view.conversations.ConversationsActivity;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.subsearch.SubSearchActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
+import com.shoutit.app.android.view.signin.LoginActivity;
 
 import java.util.List;
 
@@ -70,6 +73,9 @@ public class DiscoverShoutsActivity extends BaseActivity {
 
     @Inject
     DiscoverShoutsPresenter mShoutsPresenter;
+
+    @Inject
+    UserPreferences mUserPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -181,6 +187,13 @@ public class DiscoverShoutsActivity extends BaseActivity {
                         return true;
                     case R.id.shouts_share:
                         mShoutsPresenter.onShareClicked();
+                        return true;
+                    case R.id.shouts_chats:
+                        if (mUserPreferences.isNormalUser()) {
+                            startActivity(ConversationsActivity.newIntent(DiscoverShoutsActivity.this));
+                        } else {
+                            startActivity(LoginActivity.newIntent(DiscoverShoutsActivity.this));
+                        }
                         return true;
                     default:
                         return false;
