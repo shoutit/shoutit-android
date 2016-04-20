@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">Shoutit Staging</string>
-    <string name="facebook_app_id">1151546964858487</string>
+    <string name="facebook_app_id" translatable="false">1151546964858487</string>
 </resources>
