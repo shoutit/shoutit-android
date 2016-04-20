@@ -118,16 +118,6 @@ public class Twilio {
                     }
                 });
 
-        callerNameObservable
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String callerName) {
-                        Intent intent = DialogCallActivity.newIntent(callerName, mContext);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        mContext.startActivity(intent);
-                    }
-                });
-
         /** Errors **/
         errorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
                 ResponseOrError.transform(twilioResponse),
