@@ -15,7 +15,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.gson.Gson;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.Conversation;
@@ -90,9 +89,10 @@ public class ConversationsPresenter {
     private final Context mContext;
     private final UserPreferences mUserPreferences;
     private final PusherHelper mPusherHelper;
+    private final PublishSubject<Object> requestSubject = PublishSubject.create();
     private Listener mListener;
     private Subscription mSubscription;
-    private final PublishSubject<Object> requestSubject = PublishSubject.create();
+    private boolean showProgress;
 
     @Inject
     public ConversationsPresenter(@NonNull ApiService apiService,
@@ -128,7 +128,7 @@ public class ConversationsPresenter {
 
         mListener = listener;
 
-        mListener.showProgress(true);
+        mListener.showProgress(showProgress);
 
         final Observable<List<Conversation>> listObservable = requestSubject
                 .startWith(new Object())
@@ -174,6 +174,7 @@ public class ConversationsPresenter {
                 .subscribe(new Action1<List<Conversation>>() {
                     @Override
                     public void call(List<Conversation> conversations) {
+                        showProgress = false;
                         mListener.showProgress(false);
 
                         if (conversations.isEmpty()) {
