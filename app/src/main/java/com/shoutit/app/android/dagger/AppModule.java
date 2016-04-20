@@ -44,7 +44,6 @@ import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.utils.AmazonRequestTransfomer;
 import com.shoutit.app.android.utils.PusherHelper;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Request;
 
 import java.io.File;
 
@@ -283,8 +282,8 @@ public final class AppModule {
 
     @Provides
     @Singleton
-    PusherHelper providePusher() {
-        return new PusherHelper();
+    PusherHelper providePusher(Gson gson, UserPreferences userPreferences) {
+        return new PusherHelper(gson, userPreferences);
     }
 
     @Provides

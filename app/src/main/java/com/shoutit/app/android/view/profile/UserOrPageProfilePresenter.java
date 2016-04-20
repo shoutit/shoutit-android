@@ -26,9 +26,11 @@ import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
+import com.shoutit.app.android.model.Stats;
 import com.shoutit.app.android.model.ReportBody;
 import com.shoutit.app.android.model.UserShoutsPointer;
 import com.shoutit.app.android.utils.PreferencesHelper;
+import com.shoutit.app.android.utils.PusherHelper;
 import com.shoutit.app.android.view.profile.myprofile.MyProfileHalfPresenter;
 import com.shoutit.app.android.view.profile.userprofile.UserProfileHalfPresenter;
 import com.shoutit.app.android.view.search.SearchPresenter;
@@ -109,6 +111,7 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
     @Nullable
     private String loggedInUserName;
     private boolean isNormalUser;
+    private final Observable<Integer> mNotificationsUnreadObservable;
 
     public UserOrPageProfilePresenter(@Nonnull final String userName,
                                       @Nonnull final ShoutsDao shoutsDao,
@@ -121,7 +124,8 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
                                       @Nonnull UserProfileHalfPresenter userProfilePresenter,
                                       @Nonnull PreferencesHelper preferencesHelper,
                                       @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
-                                      @Nonnull final ApiService apiService) {
+                                      @Nonnull final ApiService apiService,
+                                      @NonNull PusherHelper pusherHelper) {
         this.userName = userName;
         this.shoutsDao = shoutsDao;
         this.context = context;
@@ -290,6 +294,13 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
                 .getShoutsGlobalRefreshObservable()
                 .subscribe(shoutsDao.getUserShoutsDao(new UserShoutsPointer(SHOUTS_PAGE_SIZE, userName)).getRefreshObserver());
 
+        mNotificationsUnreadObservable = pusherHelper.getStatsObservable()
+                .map(new Func1<Stats, Integer>() {
+                    @Override
+                    public Integer call(Stats pusherStats) {
+                        return pusherStats.getUnreadNotificationsCount();
+                    }
+                });
     }
 
     @NonNull
@@ -488,6 +499,11 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
     @Override
     public Observer<String> sendReportObserver() {
         return reportSubmitSubject;
+    }
+
+    @NonNull
+    public Observable<Integer> getNotificationsUnreadObservable() {
+        return mNotificationsUnreadObservable;
     }
 
     public void onSearchMenuItemClicked() {

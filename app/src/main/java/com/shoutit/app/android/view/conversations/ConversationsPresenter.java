@@ -16,7 +16,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
-import com.pusher.client.channel.PresenceChannel;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.Conversation;
@@ -28,9 +27,7 @@ import com.shoutit.app.android.api.model.PusherMessage;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.PusherHelper;
-import com.shoutit.app.android.view.chats.PresenceChannelEventListenerAdapter;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -44,7 +41,6 @@ import javax.inject.Inject;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
-import rx.Subscriber;
 import rx.Subscription;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -94,7 +90,6 @@ public class ConversationsPresenter {
     private final Context mContext;
     private final UserPreferences mUserPreferences;
     private final PusherHelper mPusherHelper;
-    private final Gson mGson;
     private Listener mListener;
     private Subscription mSubscription;
     private final PublishSubject<Object> requestSubject = PublishSubject.create();
@@ -105,40 +100,17 @@ public class ConversationsPresenter {
                                   @UiScheduler Scheduler uiScheduler,
                                   @ForActivity Context context,
                                   UserPreferences userPreferences,
-                                  PusherHelper pusherHelper,
-                                  Gson gson) {
+                                  PusherHelper pusherHelper) {
         mApiService = apiService;
         mNetworkScheduler = networkScheduler;
         mUiScheduler = uiScheduler;
         mContext = context;
         mUserPreferences = userPreferences;
         mPusherHelper = pusherHelper;
-        mGson = gson;
     }
 
     public void register(@NonNull final Listener listener) {
-        final User user = mUserPreferences.getUser();
-        assert user != null;
-        final PresenceChannel userChannel = mPusherHelper.getPusher().getPresenceChannel(String.format("presence-v3-p-%1$s", user.getId()));
-
-        final Observable<HashMap<String, Conversation>> mapObservable = Observable
-                .create(new Observable.OnSubscribe<PusherMessage>() {
-                    @Override
-                    public void call(final Subscriber<? super PusherMessage> subscriber) {
-                        userChannel.bind("new_message", new PresenceChannelEventListenerAdapter() {
-
-                            @Override
-                            public void onEvent(String channelName, String eventName, String data) {
-                                try {
-                                    final PusherMessage pusherMessage = mGson.getAdapter(PusherMessage.class).fromJson(data);
-                                    subscriber.onNext(pusherMessage);
-                                } catch (IOException e) {
-                                    subscriber.onError(e);
-                                }
-                            }
-                        });
-                    }
-                })
+        final Observable<HashMap<String, Conversation>> mapObservable = mPusherHelper.getNewMessagesObservable()
                 .flatMap(new Func1<PusherMessage, Observable<Conversation>>() {
                     @Override
                     public Observable<Conversation> call(PusherMessage pusherMessage) {

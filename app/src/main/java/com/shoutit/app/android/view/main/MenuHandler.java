@@ -288,6 +288,10 @@ public class MenuHandler {
         }
     }
 
+    public void setStats(int messageCount, int notificationsCount){
+        // TODO
+    }
+
     public void setDiscoverMenuItem() {
         onMenuItemSelected(discoverItem);
     }

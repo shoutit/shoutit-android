@@ -29,9 +29,14 @@ public class NotificationHelper {
 
     public static void sendNotification(@NonNull Bundle bundle,
                                         @NonNull Context context) {
-
         final String message = bundle.getString(GCM_MESSAGE_FIELD);
 
+
+
+        sendMessageNotificatin(context, message);
+    }
+
+    private static void sendMessageNotificatin(@NonNull Context context, String message) {
         final Intent intent = new Intent(context, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         final PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent,

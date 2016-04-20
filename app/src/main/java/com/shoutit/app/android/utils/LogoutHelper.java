@@ -35,7 +35,7 @@ public class LogoutHelper {
         final Pusher pusher = mPusherHelper.getPusher();
         final User user = userPreferences.getUser();
         assert user != null;
-        pusher.unsubscribe(String.format("presence-v3-p-%1$s", user.getId()));
+        pusher.unsubscribe(PusherHelper.getProfileChannelName(user.getId()));
         pusher.disconnect();
 
         userPreferences.logout();

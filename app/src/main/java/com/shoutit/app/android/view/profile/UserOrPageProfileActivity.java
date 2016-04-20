@@ -163,6 +163,15 @@ public class UserOrPageProfileActivity extends ProfileActivity {
                                 UserOrPageProfileActivity.this, null, userName, SearchPresenter.SearchType.PROFILE));
                     }
                 });
+
+        presenter.getNotificationsUnreadObservable()
+                .compose(this.<Integer>bindToLifecycle())
+                .subscribe(new Action1<Integer>() {
+                    @Override
+                    public void call(Integer notificationsUnread) {
+                        // TODO
+                    }
+                });
     }
 
     @Override
