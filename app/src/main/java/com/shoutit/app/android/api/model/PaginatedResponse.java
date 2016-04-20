@@ -3,6 +3,7 @@ package com.shoutit.app.android.api.model;
 import android.support.annotation.Nullable;
 
 public class PaginatedResponse {
+
     private final int count;
     @Nullable
     private final String next;

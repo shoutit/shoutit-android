@@ -33,6 +33,7 @@ import com.shoutit.app.android.model.Stats;
 import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.BackPressedHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.PusherHelper;
@@ -171,6 +172,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (drawerToggle.onOptionsItemSelected(item)) {
+            KeyboardHelper.hideSoftKeyboard(rxActivity);
             return true;
         }
 
