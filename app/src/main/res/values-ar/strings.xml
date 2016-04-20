@@ -3,17 +3,11 @@
 <string name="app_name">"شاوت ات"</string>
 
 <!-- Global strings -->
-<string name="price_with_currency">"%1$s %2$s"</string>
 <string name="price_free">"مجاناً"</string>
 <string name="shout_type_offer">"عرض"</string>
 <string name="shout_type_request">"طلب"</string>
 <string name="terms_of_service">"شروط الخدمة"</string>
-<string name="google_api_key">"AIzaSyBWHadI_MPYQgDLqI4RXhymEs42YEtgTEE
-    "</string>
-<string name="facebook_app_id">"353625811317277"</string>
 <string name="exit_text">"اضغط رجوع مرة أخرى للخروج"</string>
-<string name="font_roboto_regular">"sans-serif"</string>
-<string name="font_roboto_medium">"sans-serif"</string>
 
 <!-- Errors -->
 <string name="error_default">"عذراً, حدث خطأ"</string>
@@ -58,7 +52,6 @@
 <string name="home_shouts_header_logged">"مستجداتي"</string>
 <string name="home_shouts_header_guest">"الإعلانات في %1$s"</string>
 <string name="home_discover_header">"إكتشف %1$s"</string>
-<string name="home_user_and_date">"%1$s - %2$s"</string>
 
 <!-- Login -->
 <string name="login_email_hint">"إسم المستخدم أو البريد الإلكتروني"</string>
@@ -123,7 +116,6 @@
 <string name="location_search_hint">"أدخل عنوان"</string>
 <string name="location_header">"موقعي الحالي ( تحديث تلقائي )"</string>
 <string name="location_header_selected_location">"الموقع الحالي"</string>
-<string name="location_location">"%1$s, %2$s"</string>
 
 <!-- Side Menu -->
 <string name="menu_create_shout">"إنشاء إعلان"</string>
@@ -202,7 +194,6 @@
 <string name="shout_header_description">"التفاصيل"</string>
 <string name="shout_header_details">"المواصفات"</string>
 <string name="shout_user_shouts_header">"إعلانات اخرى من %1$s"</string>
-<string name="shout_user_location">"%1$s, %2$s"</string>
 <string name="shout_only_available">"فقط %1$d متوفر"</string>
 <string name="shout_available">"%1$d متوفر"</string>
 <string name="shout_bottom_bar_call">"مكالمة"</string>
@@ -287,7 +278,6 @@
 <string name="edit_profile_hint_website">"الموقع الإلكتروني"</string>
 <string name="edit_profile_menu_save">"حفظ"</string>
 <string name="edit_profile_toolbar_title">"تعديل الصفحة الشخصية"</string>
-<string name="edit_profile_country">"%1$s, %2$s"</string>
 <string name="edit_profile_success">"تم تعديل الصفحة الشخصية بنجاح"</string>
 <string name="edit_profile_hint_first_name">"الإسم الأول"</string>
 <string name="edit_profile_hint_last_name">"الإسم الأخير"</string>
