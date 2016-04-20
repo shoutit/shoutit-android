@@ -7,6 +7,7 @@ import com.shoutit.app.android.model.Stats;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class User extends BaseProfile {
     public static final String ME = "me";
@@ -28,13 +29,14 @@ public class User extends BaseProfile {
     private final String website;
     private final String email;
     private final Conversation conversation;
+    @Nullable
     private final Stats stats;
 
     public User(String id, String type, String apiUrl, String webUrl, String username,
                 String name, String firstName, String lastName, boolean isActivated, String image,
                 String cover, boolean isListening, boolean isListener, boolean isPasswordSet, UserLocation location,
                 int listenersCount, List<Page> pages, List<Admin> admins, String bio, int dateJoined,
-                Listening listeningCount, boolean isOwner, String about, String mobile, String website, String email, Conversation conversation, Stats stats) {
+                Listening listeningCount, boolean isOwner, String about, String mobile, String website, String email, Conversation conversation, @Nullable Stats stats) {
         super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount);
         this.apiUrl = apiUrl;
         this.webUrl = webUrl;
@@ -189,8 +191,25 @@ public class User extends BaseProfile {
         return email;
     }
 
+    @Nullable
     public Stats getStats() {
         return stats;
+    }
+
+    public int getUnreadConversationsCount() {
+        if (stats == null) {
+            return 0;
+        } else {
+            return stats.getUnreadConversationsCount();
+        }
+    }
+
+    public int getUnreadNotificationsCount() {
+        if (stats == null) {
+            return 0;
+        } else {
+            return stats.getUnreadNotifications();
+        }
     }
 
     @Override

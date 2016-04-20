@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.appunite.appunitegcm.AppuniteGcm;
+import com.appunite.rx.functions.Functions1;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
@@ -137,15 +138,15 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
                 .subscribe(new Action1<Stats>() {
                     @Override
                     public void call(Stats pusherStats) {
-                        menuHandler.setStats(pusherStats.getUnreadConversationsCount(), pusherStats.getUnreadNotificationsCount());
+                        menuHandler.setStats(pusherStats.getUnreadConversationsCount(), pusherStats.getUnreadNotifications());
                     }
                 }));
-        mStatsSubscription.add(apiService.getMyUser()
+        mStatsSubscription.add(mUserPreferences.getUserObservable()
+                .filter(Functions1.isNotNull())
                 .subscribe(new Action1<User>() {
                     @Override
                     public void call(User user) {
-                        final Stats stats = user.getStats();
-                        menuHandler.setStats(stats.getUnreadConversationsCount(), stats.getUnreadNotificationsCount());
+                        menuHandler.setStats(user.getUnreadConversationsCount(), user.getUnreadNotificationsCount());
                     }
                 }, new Action1<Throwable>() {
                     @Override

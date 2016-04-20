@@ -181,7 +181,6 @@ public class ChatsFirstConversationPresenter {
     public void register(@NonNull FirstConversationListener listener) {
         final User user = mUserPreferences.getUser();
         assert user != null;
-        final PresenceChannel userChannel = mPusher.getProfileChannel();
         mListener = listener;
         mListener.showDeleteMenu(false);
 

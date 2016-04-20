@@ -2,6 +2,8 @@ package com.shoutit.app.android.utils;
 
 import android.support.annotation.NonNull;
 
+import com.appunite.rx.dagger.UiScheduler;
+import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
@@ -19,7 +21,9 @@ import com.shoutit.app.android.view.chats.PresenceChannelEventListenerAdapter;
 import java.io.IOException;
 
 import rx.Observable;
+import rx.Scheduler;
 import rx.Subscriber;
+import rx.functions.Func1;
 
 public class PusherHelper {
 
@@ -34,10 +38,14 @@ public class PusherHelper {
     private Pusher mPusher;
     private final Gson mGson;
     private final UserPreferences mUserPreferences;
+    private final Scheduler uiScheduler;
 
-    public PusherHelper(@NonNull Gson gson, UserPreferences userPreferences) {
+    public PusherHelper(@NonNull Gson gson,
+                        @NonNull UserPreferences userPreferences,
+                        @NonNull @UiScheduler Scheduler uiScheduler) {
         mGson = gson;
         mUserPreferences = userPreferences;
+        this.uiScheduler = uiScheduler;
     }
 
     public void init(@NonNull String token) {
@@ -101,24 +109,33 @@ public class PusherHelper {
     }
 
     public Observable<Stats> getStatsObservable() {
-        return Observable
-                .create(new Observable.OnSubscribe<Stats>() {
+        return mUserPreferences.getUserObservable()
+                .filter(Functions1.isNotNull())
+                .first()
+                .flatMap(new Func1<User, Observable<Stats>>() {
                     @Override
-                    public void call(final Subscriber<? super Stats> subscriber) {
-                        getProfileChannel().bind(STATS_UPDATE, new PresenceChannelEventListenerAdapter() {
+                    public Observable<Stats> call(User user) {
+                        return Observable
+                                .create(new Observable.OnSubscribe<Stats>() {
+                                    @Override
+                                    public void call(final Subscriber<? super Stats> subscriber) {
+                                        getProfileChannel().bind(STATS_UPDATE, new PresenceChannelEventListenerAdapter() {
 
-                            @Override
-                            public void onEvent(String channelName, String eventName, String data) {
-                                try {
-                                    final Stats pusherStats = mGson.getAdapter(Stats.class).fromJson(data);
-                                    subscriber.onNext(pusherStats);
-                                } catch (IOException e) {
-                                    subscriber.onError(e);
-                                }
-                            }
-                        });
+                                            @Override
+                                            public void onEvent(String channelName, String eventName, String data) {
+                                                try {
+                                                    final Stats pusherStats = mGson.getAdapter(Stats.class).fromJson(data);
+                                                    subscriber.onNext(pusherStats);
+                                                } catch (IOException e) {
+                                                    subscriber.onError(e);
+                                                }
+                                            }
+                                        });
+                                    }
+                                });
                     }
-                });
+                })
+                .observeOn(uiScheduler);
     }
 
     public PresenceChannel getProfileChannel() {

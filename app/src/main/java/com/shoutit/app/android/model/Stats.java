@@ -1,5 +1,6 @@
 package com.shoutit.app.android.model;
 
+
 public class Stats {
 
     private final Integer unreadConversationsCount;
@@ -10,11 +11,19 @@ public class Stats {
         this.unreadNotificationsCount = unreadNotificationsCount;
     }
 
-    public Integer getUnreadConversationsCount() {
-        return unreadConversationsCount;
+    public int getUnreadConversationsCount() {
+        if (unreadConversationsCount == null) {
+            return 0;
+        } else {
+            return unreadConversationsCount;
+        }
     }
 
-    public Integer getUnreadNotificationsCount() {
-        return unreadNotificationsCount;
+    public int getUnreadNotifications() {
+        if (unreadNotificationsCount == null) {
+            return 0;
+        } else {
+            return unreadNotificationsCount;
+        }
     }
 }

@@ -14,6 +14,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.appunite.rx.android.NetworkObservableProviderImpl;
 import com.appunite.rx.dagger.NetworkScheduler;
+import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.observables.NetworkObservableProvider;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -282,8 +283,8 @@ public final class AppModule {
 
     @Provides
     @Singleton
-    PusherHelper providePusher(Gson gson, UserPreferences userPreferences) {
-        return new PusherHelper(gson, userPreferences);
+    PusherHelper providePusher(Gson gson, UserPreferences userPreferences, @UiScheduler Scheduler uiScheduler) {
+        return new PusherHelper(gson, userPreferences, uiScheduler);
     }
 
     @Provides

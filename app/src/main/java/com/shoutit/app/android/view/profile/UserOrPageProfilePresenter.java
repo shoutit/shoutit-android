@@ -75,6 +75,8 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
     private Observable<Intent> searchMenuItemClickObservable;
     @Nonnull
     private final Observable<Object> reportSuccessObservable;
+    @Nonnull
+    private final Observable<Integer> notificationsUnreadObservable;
 
     @Nonnull
     private final PublishSubject<String> showAllShoutsSubject = PublishSubject.create();
@@ -111,7 +113,6 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
     @Nullable
     private String loggedInUserName;
     private boolean isNormalUser;
-    private final Observable<Integer> mNotificationsUnreadObservable;
 
     public UserOrPageProfilePresenter(@Nonnull final String userName,
                                       @Nonnull final ShoutsDao shoutsDao,
@@ -294,13 +295,21 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
                 .getShoutsGlobalRefreshObservable()
                 .subscribe(shoutsDao.getUserShoutsDao(new UserShoutsPointer(SHOUTS_PAGE_SIZE, userName)).getRefreshObserver());
 
-        mNotificationsUnreadObservable = pusherHelper.getStatsObservable()
-                .map(new Func1<Stats, Integer>() {
+        notificationsUnreadObservable = userPreferences.getUserObservable()
+                .filter(Functions1.isNotNull())
+                .map(new Func1<User, Integer>() {
                     @Override
-                    public Integer call(Stats pusherStats) {
-                        return pusherStats.getUnreadNotificationsCount();
+                    public Integer call(User user) {
+                        return user.getUnreadNotificationsCount();
                     }
-                });
+                })
+                .mergeWith(pusherHelper.getStatsObservable()
+                        .map(new Func1<Stats, Integer>() {
+                            @Override
+                            public Integer call(Stats pusherStats) {
+                                return pusherStats.getUnreadNotifications();
+                            }
+                        }));
     }
 
     @NonNull
@@ -311,7 +320,7 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
                 final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
 
                 if (user.isOwner()) {
-                    builder.add(myProfilePresenter.getUserNameAdapterItem(user))
+                    builder.add(myProfilePresenter.getUserNameAdapterItem(user, notificationsUnreadObservable))
                             .add(myProfilePresenter.getThreeIconsAdapterItem(user));
                 } else {
                     builder.add(userProfilePresenter.getUserNameAdapterItem(user))
@@ -499,11 +508,6 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
     @Override
     public Observer<String> sendReportObserver() {
         return reportSubmitSubject;
-    }
-
-    @NonNull
-    public Observable<Integer> getNotificationsUnreadObservable() {
-        return mNotificationsUnreadObservable;
     }
 
     public void onSearchMenuItemClicked() {
