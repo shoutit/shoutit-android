@@ -45,6 +45,7 @@ import com.twilio.conversations.ConversationCallback;
 import com.twilio.conversations.ConversationListener;
 import com.twilio.conversations.ConversationsClient;
 import com.twilio.conversations.IncomingInvite;
+import com.twilio.conversations.InviteStatus;
 import com.twilio.conversations.LocalMedia;
 import com.twilio.conversations.LocalMediaFactory;
 import com.twilio.conversations.LocalMediaListener;
@@ -202,7 +203,7 @@ public class VideoConversationActivity extends BaseActivity {
 
     private void acceptIncomingCall() {
 
-        if (invite != null) {
+        if (invite != null && invite.getInviteStatus().equals(InviteStatus.PENDING)) {
 
             callButton.setVisibility(View.GONE);
 
