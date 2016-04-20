@@ -154,6 +154,22 @@ public interface ApiService {
                                                @Query("within") Integer distance,
                                                @Query("shout_type") String shoutType,
                                                @Query("sort") String sortBy,
+                                               @Query("tags") String tagsNames,
+                                               @QueryMap Map<String, String> filtersMap);
+
+    @GET("shouts")
+    Observable<ShoutsResponse> searchCategoriesShouts(@Query("search") String query,
+                                               @Query("page") Integer page,
+                                               @Query("page_size") Integer pageSize,
+                                               @Query("tags") String tagNameOrCategorySlug,
+                                               @Query("country") String countryCode,
+                                               @Query("city") String city,
+                                               @Query("state") String state,
+                                               @Query("min_price") Integer minPrice,
+                                               @Query("max_price") Integer maxPrice,
+                                               @Query("within") Integer distance,
+                                               @Query("shout_type") String shoutType,
+                                               @Query("sort") String sortBy,
                                                @Query("category") String categorySlug,
                                                @QueryMap Map<String, String> filtersMap);
 

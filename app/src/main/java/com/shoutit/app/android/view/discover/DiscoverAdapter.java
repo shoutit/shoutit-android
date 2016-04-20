@@ -47,13 +47,30 @@ public class DiscoverAdapter extends BaseAdapter {
         @Bind(R.id.discover_header_iv)
         ImageView cardImageView;
 
+        private final int shadowYOffset;
+        private final int shadowRadius;
+        private final int shadowXOffset;
+
         public HeaderViewHolder(@Nonnull View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+
+            shadowRadius = context.getResources().getDimensionPixelSize(R.dimen.discover_shadow_radius);
+            shadowYOffset = context.getResources().getDimensionPixelSize(R.dimen.discover_shadow_y_offset);
+            shadowXOffset = context.getResources().getDimensionPixelSize(R.dimen.discover_shadow_x_offset);
         }
 
         @Override
         public void bind(@Nonnull DiscoverPresenter.HeaderAdapterItem item) {
+
+            if (TextUtils.isEmpty(item.getImage())) {
+                titleTextView.setTextColor(context.getResources().getColor(R.color.black_54));
+                titleTextView.setShadowLayer(0, 0, 0, context.getResources().getColor(R.color.black_87));
+            } else {
+                titleTextView.setTextColor(context.getResources().getColor(android.R.color.white));
+                titleTextView.setShadowLayer(shadowRadius, shadowXOffset, shadowYOffset, context.getResources().getColor(R.color.black_87));
+            }
+
             picasso.load(Strings.emptyToNull(item.getImage()))
                     .placeholder(R.drawable.discover_header_bg)
                     .error(R.drawable.discover_header_bg)

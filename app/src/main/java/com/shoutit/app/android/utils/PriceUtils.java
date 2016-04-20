@@ -20,7 +20,7 @@ import javax.annotation.Nonnull;
 public class PriceUtils {
 
     @Nonnull
-    public static String formatPrice(@Nullable Long price, @Nonnull Resources resources) {
+    public static String formatPriceToDisplay(@Nullable Long price, @Nonnull Resources resources) {
         if (price == null) {
             return "";
         } else if (price == 0) {
@@ -32,10 +32,20 @@ public class PriceUtils {
     }
 
     @Nonnull
+    public static String formatPriceToEdit(@Nullable Long price) {
+        if (price == null) {
+            return "";
+        } else {
+            final float formattedPrice = (float) price / 100;
+            return new DecimalFormat("#.##").format(formattedPrice);
+        }
+    }
+
+    @Nonnull
     public static String formatPriceWithCurrency(@Nullable Long price,
                                                  @Nonnull Resources resources,
                                                  @Nullable String currency) {
-        final String formattedPrice = formatPrice(price, resources);
+        final String formattedPrice = formatPriceToDisplay(price, resources);
         if (price == null || price == 0) {
             return formattedPrice;
         } else {

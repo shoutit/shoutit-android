@@ -109,7 +109,6 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
         searchType = (SearchPresenter.SearchType)
                 checkNotNull(getArguments().getSerializable(SearchShoutsResultsActivity.KEY_SEARCH_TYPE));
         searchQuery = getArguments().getString(SearchShoutsResultsActivity.KEY_SEARCH_QUERY);
@@ -226,12 +225,13 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
     private boolean shouldShowFilters() {
         return !(searchType.equals(SearchPresenter.SearchType.DISCOVER) ||
                 searchType.equals(SearchPresenter.SearchType.PROFILE) ||
+                searchType.equals(SearchPresenter.SearchType.TAG_PROFILE) ||
                 searchType.equals(SearchPresenter.SearchType.RELATED_SHOUTS));
     }
 
     private void initAdapter() {
         recyclerView.addItemDecoration(new BaseShoutsItemDecoration(
-                getResources().getDimensionPixelSize(R.dimen.shouts_search_results_side_spacing)));
+                getResources().getDimensionPixelSize(R.dimen.shouts_search_results_side_spacing), getActivity()));
         setGridLayoutManager();
     }
 

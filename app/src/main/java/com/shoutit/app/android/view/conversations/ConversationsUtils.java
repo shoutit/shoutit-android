@@ -13,18 +13,14 @@ public class ConversationsUtils {
         if (profiles.size() == 2) {
             for (final ConversationProfile profile : profiles) {
                 if (!profile.getId().equals(userId)) {
-                    chatWith = profile.getUsername();
+                    chatWith = profile.getName();
                 }
             }
         } else {
             final StringBuilder nameBuilder = new StringBuilder();
             for (final ConversationProfile profile : profiles) {
                 if (!profile.getId().equals(userId)) {
-                    if (profile.getType().equals(ConversationProfile.TYPE_USER)) {
-                        nameBuilder.append(profile.getFirstName());
-                    } else {
-                        nameBuilder.append(profile.getUsername());
-                    }
+                    nameBuilder.append(profile.getName());
                 }
             }
             chatWith = nameBuilder.toString();

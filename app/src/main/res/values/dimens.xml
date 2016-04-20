@@ -31,6 +31,9 @@
     <dimen name="discover_image_height">126dp</dimen>
     <dimen name="discover_grid_spacing">1dp</dimen>
     <dimen name="discover_header_height">130dp</dimen>
+    <dimen name="discover_shadow_radius">4dp</dimen>
+    <dimen name="discover_shadow_y_offset">2dp</dimen>
+    <dimen name="discover_shadow_x_offset">-1dp</dimen>
 
     <!-- Shout detail -->
     <dimen name="shout_related_width">120dp</dimen>

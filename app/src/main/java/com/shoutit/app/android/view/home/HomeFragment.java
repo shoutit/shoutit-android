@@ -79,7 +79,7 @@ public class HomeFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
 
         recyclerView.addItemDecoration(new BaseShoutsItemDecoration(
-                getResources().getDimensionPixelSize(R.dimen.home_linear_side_spacing)));
+                getResources().getDimensionPixelSize(R.dimen.home_linear_side_spacing), context));
         setGridLayoutManager();
         recyclerView.setAdapter(adapter);
 

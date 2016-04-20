@@ -82,7 +82,7 @@ public class SearchCategoriesPresenter {
                     @Override
                     public Intent call(Category category) {
                         return SearchShoutsResultsActivity.newIntent(
-                                context, null, category.getSlug(), SearchPresenter.SearchType.TAG, category.getName());
+                                context, null, category.getSlug(), SearchPresenter.SearchType.CATEGORY, category.getName());
                     }
                 });
 

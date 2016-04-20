@@ -64,7 +64,7 @@ public class FiltersFragment extends BaseFragment {
                                        @Nullable String initCategorySlug) {
         final Bundle bundle = new Bundle();
         bundle.putSerializable(KEY_SEARCH_TYPE, searchType);
-        bundle.putSerializable(KEY_INIT_CATEGORY_SLUG, initCategorySlug);
+        bundle.putString(KEY_INIT_CATEGORY_SLUG, initCategorySlug);
 
         final FiltersFragment fragment = new FiltersFragment();
         fragment.setArguments(bundle);

@@ -57,7 +57,7 @@ public class SelectShoutActivity extends BaseActivity {
         ButterKnife.bind(this);
 
         mRecyclerView.addItemDecoration(new BaseShoutsItemDecoration(
-                getResources().getDimensionPixelSize(R.dimen.home_linear_side_spacing)));
+                getResources().getDimensionPixelSize(R.dimen.home_linear_side_spacing), this));
         setGridLayoutManager();
 
         mRecyclerView.setAdapter(mShoutsAdapter);

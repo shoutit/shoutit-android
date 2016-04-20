@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
@@ -23,6 +24,7 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.KeyboardHelper;
+import com.shoutit.app.android.utils.RtlUtils;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.SearchQueryPresenter;
 import com.shoutit.app.android.view.search.categories.SearchCategoriesFragment;
@@ -123,7 +125,7 @@ public class MainSearchActivity extends BaseActivity implements SearchView.OnQue
     }
 
     private void setUpToolbar() {
-        toolbar.setNavigationIcon(R.drawable.ic_blue_arrow);
+        toolbar.setNavigationIcon(RtlUtils.isRtlEnable(this) ? R.drawable.ic_blue_arrow_rtl : R.drawable.ic_blue_arrow);
         toolbar.setTitle(null);
         setSupportActionBar(toolbar);
     }
