@@ -181,6 +181,7 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
             @Override
             public void afterTextChanged(Editable s) {
                 sendButton.setEnabled(s.length() != 0);
+                mChatsAttatchmentsLayout.setVisibility(View.GONE);
             }
         });
 
