@@ -321,7 +321,7 @@ public class ChatsFirstConversationPresenter {
                                 mListener.setShoutToolbarInfo(title, ConversationsUtils.getChatWithString(
                                         ImmutableList.of(new ConversationProfile(
                                                 profile.getId(),
-                                                profile.getFirstName(),
+                                                profile.getName(),
                                                 profile.getUsername(),
                                                 profile.getType(),
                                                 profile.getImage())), user.getId()));
@@ -329,7 +329,7 @@ public class ChatsFirstConversationPresenter {
                                 mListener.setShoutToolbarInfo(mContext.getString(R.string.chat_shout_chat), ConversationsUtils.getChatWithString(
                                         ImmutableList.of(new ConversationProfile(
                                                 profile.getId(),
-                                                profile.getFirstName(),
+                                                profile.getName(),
                                                 profile.getUsername(),
                                                 profile.getType(),
                                                 profile.getImage())), user.getId()));
@@ -346,7 +346,7 @@ public class ChatsFirstConversationPresenter {
                             mListener.setChatToolbatInfo(ConversationsUtils.getChatWithString(
                                     ImmutableList.of(new ConversationProfile(
                                             user.getId(),
-                                            user.getFirstName(),
+                                            user.getName(),
                                             user.getUsername(),
                                             user.getType(),
                                             user.getImage())), mUserPreferences.getUser().getId()));
