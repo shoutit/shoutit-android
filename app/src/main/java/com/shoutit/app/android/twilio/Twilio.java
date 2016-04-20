@@ -7,12 +7,16 @@ import android.widget.Toast;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
+import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.CallerProfile;
 import com.shoutit.app.android.api.model.TwilioResponse;
+import com.shoutit.app.android.api.model.TwillioRejectCallRequest;
+import com.shoutit.app.android.api.model.UserIdentity;
 import com.shoutit.app.android.dagger.ForApplication;
 import com.shoutit.app.android.dao.UsersIdentityDao;
 import com.shoutit.app.android.dao.VideoCallsDao;
@@ -32,6 +36,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Scheduler;
 import rx.functions.Action1;
@@ -58,11 +63,15 @@ public class Twilio {
     @Nonnull
     private final BehaviorSubject<String> callerIdentitySubject = BehaviorSubject.create();
     private final PublishSubject<Object> profileRefreshSubject = PublishSubject.create();
+    @Nonnull
+    private final PublishSubject<String> rejectCallSubject = PublishSubject.create();
 
     @Inject
     public Twilio(@ForApplication Context context,
                   @Nonnull final VideoCallsDao videoCallsDao,
                   @Nonnull final UsersIdentityDao usersIdentityDao,
+                  @Nonnull final ApiService apiService,
+                  @Nonnull @NetworkScheduler final Scheduler networkScheduler,
                   @Nonnull @UiScheduler final Scheduler uiScheduler) {
         mContext = context;
 
@@ -115,6 +124,27 @@ public class Twilio {
                         Intent intent = DialogCallActivity.newIntent(callerName, mContext);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         mContext.startActivity(intent);
+                    }
+                });
+
+        rejectCallSubject
+                .filter(Functions1.isNotNull())
+                .switchMap(new Func1<String, Observable<ResponseBody>>() {
+                    @Override
+                    public Observable<ResponseBody> call(String calledIdentity) {
+                        return apiService.rejectRequest(new TwillioRejectCallRequest(calledIdentity, true))
+                                .subscribeOn(networkScheduler);
+                    }
+                })
+                .subscribe(new Action1<ResponseBody>() {
+                    @Override
+                    public void call(ResponseBody responseBody) {
+
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        LogHelper.logThrowable(TAG, "Cannot reject call", throwable);
                     }
                 });
 
@@ -239,4 +269,7 @@ public class Twilio {
         return conversationsClient;
     }
 
+    public void rejectCall(@Nonnull String twilioIdentity) {
+        rejectCallSubject.onNext(twilioIdentity);
+    }
 }

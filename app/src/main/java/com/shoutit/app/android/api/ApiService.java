@@ -38,6 +38,7 @@ import com.shoutit.app.android.api.model.SuggestionsResponse;
 import com.shoutit.app.android.api.model.TagDetail;
 import com.shoutit.app.android.api.model.TagsRequest;
 import com.shoutit.app.android.api.model.TwilioResponse;
+import com.shoutit.app.android.api.model.TwillioRejectCallRequest;
 import com.shoutit.app.android.api.model.UpdateLocationRequest;
 import com.shoutit.app.android.api.model.UpdateUserRequest;
 import com.shoutit.app.android.api.model.User;
@@ -395,4 +396,7 @@ public interface ApiService {
     @GET("twilio/profile")
     Observable<CallerProfile> getUserByIdentity(@Query("identity") String identity);
 
+
+    @POST("twilio/video_call")
+    Observable<ResponseBody> rejectRequest(@Body TwillioRejectCallRequest rejectRequest);
 }
