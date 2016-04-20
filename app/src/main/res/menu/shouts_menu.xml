@@ -14,10 +14,4 @@
         android:title="@string/home_menu_search"
         app:showAsAction="ifRoom"/>
 
-    <item
-        android:id="@+id/shouts_chats"
-        android:icon="@drawable/ic_chat_white"
-        android:title="@string/home_menu_search"
-        app:showAsAction="ifRoom"/>
-
 </menu>
