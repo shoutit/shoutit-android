@@ -95,9 +95,10 @@ public class ConversationsPresenter {
     private final UserPreferences mUserPreferences;
     private final PusherHelper mPusherHelper;
     private final Gson mGson;
+    private final PublishSubject<Object> requestSubject = PublishSubject.create();
     private Listener mListener;
     private Subscription mSubscription;
-    private final PublishSubject<Object> requestSubject = PublishSubject.create();
+    private boolean showProgress;
 
     @Inject
     public ConversationsPresenter(@NonNull ApiService apiService,
@@ -156,7 +157,7 @@ public class ConversationsPresenter {
 
         mListener = listener;
 
-        mListener.showProgress(true);
+        mListener.showProgress(showProgress);
 
         final Observable<List<Conversation>> listObservable = requestSubject
                 .startWith(new Object())
@@ -202,6 +203,7 @@ public class ConversationsPresenter {
                 .subscribe(new Action1<List<Conversation>>() {
                     @Override
                     public void call(List<Conversation> conversations) {
+                        showProgress = false;
                         mListener.showProgress(false);
 
                         if (conversations.isEmpty()) {
