@@ -27,6 +27,7 @@ import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
@@ -44,6 +45,10 @@ public class UserProfileHalfPresenter {
     protected final PublishSubject<UserOrPageProfilePresenter.UserWithItemToListen> sectionItemListenSubject = PublishSubject.create();
     @Nonnull
     protected final PublishSubject<Throwable> errorSubject = PublishSubject.create();
+    @Nonnull
+    private final PublishSubject<String> listenSuccess = PublishSubject.create();
+    @Nonnull
+    private final PublishSubject<String> unListenSuccess = PublishSubject.create();
 
     @Nonnull
     private final Observable<ResponseOrError<User>> userUpdatesObservable;
@@ -70,11 +75,23 @@ public class UserProfileHalfPresenter {
                             listenRequestObservable = apiService.unlistenProfile(userName)
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
+                                    .doOnNext(new Action1<ResponseBody>() {
+                                        @Override
+                                        public void call(ResponseBody responseBody) {
+                                            unListenSuccess.onNext(userWithItemToListen.getProfileToListen().getName());
+                                        }
+                                    })
                                     .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
                         } else {
                             listenRequestObservable = apiService.listenProfile(userName)
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
+                                    .doOnNext(new Action1<ResponseBody>() {
+                                        @Override
+                                        public void call(ResponseBody responseBody) {
+                                            listenSuccess.onNext(userWithItemToListen.getProfileToListen().getName());
+                                        }
+                                    })
                                     .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
                         }
 
@@ -105,11 +122,23 @@ public class UserProfileHalfPresenter {
                              request = apiService.unlistenProfile(user.getUsername())
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
+                                     .doOnNext(new Action1<ResponseBody>() {
+                                         @Override
+                                         public void call(ResponseBody responseBody) {
+                                             unListenSuccess.onNext(user.getName());
+                                         }
+                                     })
                                     .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
                         } else {
                             request = apiService.listenProfile(user.getUsername())
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
+                                    .doOnNext(new Action1<ResponseBody>() {
+                                        @Override
+                                        public void call(ResponseBody responseBody) {
+                                            listenSuccess.onNext(user.getName());
+                                        }
+                                    })
                                     .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
                         }
 
@@ -131,6 +160,16 @@ public class UserProfileHalfPresenter {
         userUpdatesObservable = Observable.merge(
                 userWithUpdatedSectionItems,
                 updatedUserWithListeningToProfile);
+    }
+
+    @Nonnull
+    public Observable<String> getListenSuccessObservable() {
+        return listenSuccess;
+    }
+
+    @Nonnull
+    public Observable<String> getUnListenSuccessObservable() {
+        return unListenSuccess;
     }
 
     @Nonnull

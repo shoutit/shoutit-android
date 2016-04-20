@@ -510,6 +510,18 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
         return reportSubmitSubject;
     }
 
+    @Nonnull
+    @Override
+    public Observable<String> getListenSuccessObservable() {
+        return userProfilePresenter.getListenSuccessObservable();
+    }
+
+    @Nonnull
+    @Override
+    public Observable<String> getUnListenSuccessObservable() {
+        return userProfilePresenter.getUnListenSuccessObservable();
+    }
+
     public void onSearchMenuItemClicked() {
         searchMenuItemClickSubject.onNext(null);
     }

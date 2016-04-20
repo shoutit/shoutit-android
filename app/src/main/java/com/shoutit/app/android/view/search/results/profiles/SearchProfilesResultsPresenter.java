@@ -32,6 +32,7 @@ import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
@@ -45,6 +46,10 @@ public class SearchProfilesResultsPresenter {
     private final PublishSubject<ProfileToListenWithLastResponse> profileListenedSubject = PublishSubject.create();
     private final PublishSubject<String> profileToOpenSubject = PublishSubject.create();
     private final PublishSubject<Object> actionOnlyForLoggedInUserSubject = PublishSubject.create();
+    @Nonnull
+    private final PublishSubject<String> listenSuccess = PublishSubject.create();
+    @Nonnull
+    private final PublishSubject<String> unListenSuccess = PublishSubject.create();
 
     private final ProfilesDao dao;
     @Nonnull
@@ -110,11 +115,23 @@ public class SearchProfilesResultsPresenter {
                             listenRequestObservable = apiService.unlistenProfile(userName)
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
+                                    .doOnNext(new Action1<ResponseBody>() {
+                                        @Override
+                                        public void call(ResponseBody responseBody) {
+                                            unListenSuccess.onNext(profileToListenWithLastResponse.getProfile().getName());
+                                        }
+                                    })
                                     .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
                         } else {
                             listenRequestObservable = apiService.listenProfile(userName)
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
+                                    .doOnNext(new Action1<ResponseBody>() {
+                                        @Override
+                                        public void call(ResponseBody responseBody) {
+                                            listenSuccess.onNext(profileToListenWithLastResponse.getProfile().getName());
+                                        }
+                                    })
                                     .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
                         }
 
@@ -134,6 +151,16 @@ public class SearchProfilesResultsPresenter {
                     }
                 })
                 .subscribe(dao.getSearchProfilesDao(searchQuery).updatedProfileLocallyObserver());
+    }
+
+    @Nonnull
+    public Observable<String> getListenSuccessObservable() {
+        return listenSuccess;
+    }
+
+    @Nonnull
+    public Observable<String> getUnListenSuccessObservable() {
+        return unListenSuccess;
     }
 
     public Observer<Object> getLoadMoreObserver() {

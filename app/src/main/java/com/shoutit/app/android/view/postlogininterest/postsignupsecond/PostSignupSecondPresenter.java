@@ -9,6 +9,7 @@ import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.functions.Functions1;
+import com.appunite.rx.operators.MoreOperators;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -30,6 +31,7 @@ import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.subjects.PublishSubject;
@@ -43,6 +45,8 @@ public class PostSignupSecondPresenter {
 
     private final PublishSubject<Throwable> errorSubject = PublishSubject.create();
     private final PublishSubject<BaseProfile> itemListenedSubject = PublishSubject.create();
+    private final PublishSubject<String> listenSuccess = PublishSubject.create();
+    private final PublishSubject<String> unListenSuccess = PublishSubject.create();
     private final Observable<Boolean> progressObservable;
 
     public PostSignupSecondPresenter(@Nonnull SuggestionsDao suggestionsDao,
@@ -101,11 +105,23 @@ public class PostSignupSecondPresenter {
                             listenRequestObservable = apiService.unlistenProfile(baseProfile.getUsername())
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
+                                    .doOnNext(new Action1<ResponseBody>() {
+                                        @Override
+                                        public void call(ResponseBody responseBody) {
+                                            unListenSuccess.onNext(baseProfile.getName());
+                                        }
+                                    })
                                     .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
                         } else {
                             listenRequestObservable = apiService.listenProfile(baseProfile.getUsername())
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
+                                    .doOnNext(new Action1<ResponseBody>() {
+                                        @Override
+                                        public void call(ResponseBody responseBody) {
+                                            listenSuccess.onNext(baseProfile.getName());
+                                        }
+                                    })
                                     .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
                         }
 
@@ -137,6 +153,16 @@ public class PostSignupSecondPresenter {
         progressObservable = suggestionsRequestObservable.map(Functions1.returnFalse())
                 .startWith(true);
 
+    }
+
+    @Nonnull
+    public Observable<String> getListenSuccessObservable() {
+        return listenSuccess;
+    }
+
+    @Nonnull
+    public Observable<String> getUnListenSuccessObservable() {
+        return unListenSuccess;
     }
 
     @NonNull

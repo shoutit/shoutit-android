@@ -63,4 +63,10 @@ public interface ProfilePresenter {
 
     @Nonnull
     Observer<String> sendReportObserver();
+
+    @Nonnull
+    Observable<String> getListenSuccessObservable();
+
+    @Nonnull
+    Observable<String> getUnListenSuccessObservable();
 }
