@@ -258,8 +258,8 @@ public class ShoutPresenter {
         userIdentityResponse = getUsernameObservable()
                 .filter(new Func1<String, Boolean>() {
                     @Override
-                    public Boolean call(String s) {
-                        return s != null;
+                    public Boolean call(String userName) {
+                        return userName != null && !userName.equals(userPreferences.getUser().getUsername());
                     }
                 })
                 .flatMap(new Func1<String, Observable<ResponseOrError<UserIdentity>>>() {
