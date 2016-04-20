@@ -141,9 +141,8 @@ public class ChatsPresenter {
     private final PublishSubject<Object> requestSubject = PublishSubject.create();
     private final PublishSubject<PusherMessage> newMessagesSubject = PublishSubject.create();
     private final User mUser;
-    private final BehaviorSubject<String> chatParticipantUsernameSubject= BehaviorSubject.create();
+    private final BehaviorSubject<String> chatParticipantUsernameSubject = BehaviorSubject.create();
     private final Observable<String> chatParticipantIdentityObservable;
-
 
 
     @Inject
@@ -211,29 +210,9 @@ public class ChatsPresenter {
     public void register(@NonNull Listener listener) {
         final User user = mUserPreferences.getUser();
         assert user != null;
-        final PresenceChannel userChannel = mPusher.getPusher().getPresenceChannel(String.format("presence-v3-p-%1$s", user.getId()));
         final PresenceChannel conversationChannel = mPusher.getPusher().subscribePresence(String.format("presence-v3-c-%1$s", conversationId));
 
-        final Observable<PusherMessage> pusherMessageObservable = Observable
-                .create(new Observable.OnSubscribe<PusherMessage>() {
-                    @Override
-                    public void call(final Subscriber<? super PusherMessage> subscriber) {
-                        userChannel.bind("new_message", new PresenceChannelEventListenerAdapter() {
-
-                            @Override
-                            public void onEvent(String channelName, String eventName, String data) {
-                                try {
-                                    final PusherMessage pusherMessage = mGson.getAdapter(PusherMessage.class).fromJson(data);
-                                    if (pusherMessage.getConversationId().equals(conversationId)) {
-                                        subscriber.onNext(pusherMessage);
-                                    }
-                                } catch (IOException e) {
-                                    subscriber.onError(e);
-                                }
-                            }
-                        });
-                    }
-                })
+        final Observable<PusherMessage> pusherMessageObservable = mPusher.getNewMessageObservable(conversationId)
                 .observeOn(mUiScheduler);
 
         final Observable<Boolean> isTyping = Observable
@@ -334,20 +313,20 @@ public class ChatsPresenter {
                     @Override
                     public void call(Conversation conversationResponse) {
 
-                        chatParticipantUsernameSubject.onNext(conversationResponse.getAbout().getProfile().getUsername());
-                        mUserPreferences.setShoutOwnerName(conversationResponse.getAbout().getProfile().getName());
-
                         if (mIsShoutConversation) {
                             final AboutShout about = conversationResponse.getAbout();
-                            final String title = about.getTitle();
-                            final String thumbnail = Strings.emptyToNull(about.getThumbnail());
-                            final String type = about.getType().equals(Shout.TYPE_OFFER) ? mContext.getString(R.string.chat_offer) : mContext.getString(R.string.chat_request);
-                            final String price = PriceUtils.formatPriceWithCurrency(about.getPrice(), mResources, about.getCurrency());
-                            final String authorAndTime = about.getProfile().getName() + " - " + DateUtils.getRelativeTimeSpanString(mContext, about.getDatePublished() * 1000);
+
                             final String id = about.getId();
 
-
                             if (!Strings.isNullOrEmpty(id)) {
+                                chatParticipantUsernameSubject.onNext(about.getProfile().getUsername());
+                                mUserPreferences.setShoutOwnerName(about.getProfile().getName());
+
+                                final String title = about.getTitle();
+                                final String thumbnail = Strings.emptyToNull(about.getThumbnail());
+                                final String type = about.getType().equals(Shout.TYPE_OFFER) ? mContext.getString(R.string.chat_offer) : mContext.getString(R.string.chat_request);
+                                final String price = PriceUtils.formatPriceWithCurrency(about.getPrice(), mResources, about.getCurrency());
+                                final String authorAndTime = about.getProfile().getName() + " - " + DateUtils.getRelativeTimeSpanString(mContext, about.getDatePublished() * 1000);
                                 mListener.setAboutShoutData(title, thumbnail, type, price, authorAndTime, id);
                                 mListener.setShoutToolbarInfo(title, ConversationsUtils.getChatWithString(conversationResponse.getProfiles(), user.getId()));
                             } else {

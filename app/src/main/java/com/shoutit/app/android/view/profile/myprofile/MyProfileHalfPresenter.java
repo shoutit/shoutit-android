@@ -28,9 +28,10 @@ public class MyProfileHalfPresenter {
         this.context = context;
     }
 
-    public ProfileAdapterItems.NameAdapterItem getUserNameAdapterItem(@Nonnull User user) {
+    public ProfileAdapterItems.NameAdapterItem getUserNameAdapterItem(@Nonnull User user,
+                                                                      @Nonnull Observable<Integer> notificationsUnreadObservable) {
         return new ProfileAdapterItems.MyUserNameAdapterItem(user, editProfileClickObserver,
-                notificationsClickObserver, verifyAccountClickObserver);
+                notificationsClickObserver, verifyAccountClickObserver, notificationsUnreadObservable);
     }
 
     public ProfileAdapterItems.MyUserThreeIconsAdapterItem getThreeIconsAdapterItem(@Nonnull User user) {

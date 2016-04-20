@@ -19,6 +19,7 @@
     <color name="progress_dim">#17000000</color>
     <color name="button_stroke">#1e000000</color>
     <color name="base_item_selected_color">#0f000000</color>
+    <color name="accent_red">#ff5252</color>
 
     <!-- Intro -->
     <color name="intro_gradient_start">#43cea2</color>

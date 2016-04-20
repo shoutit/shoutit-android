@@ -22,6 +22,7 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
+import com.shoutit.app.android.utils.rx.RxUtils;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 
 import java.util.List;
@@ -97,6 +98,14 @@ public class SearchProfilesResultsActivity extends BaseActivity {
                                 REQUEST_PROFILE_OPENED);
                     }
                 });
+
+        presenter.getListenSuccessObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(RxUtils.listenMessageAction(this));
+
+        presenter.getUnListenSuccessObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(RxUtils.unListenMessageAction(this));
 
         RxRecyclerView.scrollEvents(recyclerView)
                 .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())

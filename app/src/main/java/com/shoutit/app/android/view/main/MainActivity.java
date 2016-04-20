@@ -17,20 +17,25 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.appunite.appunitegcm.AppuniteGcm;
+import com.appunite.rx.functions.Functions1;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dao.ProfilesDao;
+import com.shoutit.app.android.mixpanel.MixPanel;
+import com.shoutit.app.android.model.Stats;
 import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.BackPressedHelper;
-import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
+import com.shoutit.app.android.utils.PusherHelper;
 import com.shoutit.app.android.view.conversations.ConverstationsFragment;
 import com.shoutit.app.android.view.discover.DiscoverActivity;
 import com.shoutit.app.android.view.discover.OnNewDiscoverSelectedListener;
@@ -39,7 +44,7 @@ import com.shoutit.app.android.view.intro.IntroActivity;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.postlogininterest.PostLoginInterestActivity;
 import com.shoutit.app.android.view.search.main.MainSearchActivity;
-import com.twilio.conversations.TwilioConversations;
+import com.shoutit.app.android.view.signin.LoginActivity;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -47,11 +52,14 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import rx.functions.Action1;
+import rx.subscriptions.CompositeSubscription;
 
 public class MainActivity extends BaseActivity implements OnMenuItemSelectedListener,
         OnNewDiscoverSelectedListener, OnSeeAllDiscoversListener {
 
     private static final String MENU_SELECT_ITEM = "args_menu_item";
+    private static final String TAG = MainActivity.class.getCanonicalName();
+
     public static final int REQUST_CODE_CAMERA_PERMISSION = 1;
     public static final int REQUST_CODE_CALL_PHONE_PERMISSION = 2;
 
@@ -74,9 +82,14 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
     Twilio twilio;
     @Inject
     MixPanel mixPanel;
+    @Inject
+    PusherHelper mPusherHelper;
+    @Inject
+    ApiService apiService;
 
     private ActionBarDrawerToggle drawerToggle;
     private BackPressedHelper mBackPressedHelper;
+    private final CompositeSubscription mStatsSubscription = new CompositeSubscription();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -113,11 +126,35 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
             menuHandler.initMenu(drawerLayout, selectedItem);
         }
 
-
         if (mUserPreferences.getGcmPushToken() == null) {
             profilesDao.registerToGcmAction(AppuniteGcm.getInstance()
                     .getPushToken());
         }
+
+        subscribeToStats();
+    }
+
+    private void subscribeToStats() {
+        mStatsSubscription.add(mPusherHelper.getStatsObservable()
+                .subscribe(new Action1<Stats>() {
+                    @Override
+                    public void call(Stats pusherStats) {
+                        menuHandler.setStats(pusherStats.getUnreadConversationsCount(), pusherStats.getUnreadNotifications());
+                    }
+                }));
+        mStatsSubscription.add(mUserPreferences.getUserObservable()
+                .filter(Functions1.isNotNull())
+                .subscribe(new Action1<User>() {
+                    @Override
+                    public void call(User user) {
+                        menuHandler.setStats(user.getUnreadConversationsCount(), user.getUnreadNotificationsCount());
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        LogHelper.logThrowable(TAG, "error", throwable);
+                    }
+                }));
     }
 
     private void setUpDrawer() {
@@ -220,6 +257,10 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
     @Override
     public void onMenuItemSelected(@Nonnull String fragmentTag) {
+        if (MenuHandler.FRAGMENT_CHATS.equals(fragmentTag) && !mUserPreferences.isNormalUser()) {
+            startActivity(LoginActivity.newIntent(MainActivity.this));
+        }
+
         final FragmentManager fragmentManager = getSupportFragmentManager();
         Fragment fragment = fragmentManager.findFragmentByTag(fragmentTag);
 
@@ -252,6 +293,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
     @Override
     protected void onDestroy() {
         mixPanel.flush();
+        mStatsSubscription.unsubscribe();
         super.onDestroy();
         mBackPressedHelper.removeCallbacks();
     }

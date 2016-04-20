@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="6dp"
+    android:paddingEnd="20dp"
+    android:paddingRight="20dp">
+
+    <TextView
+        android:id="@+id/chats_sent_message_message_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:background="@drawable/message_background_owner"
+        android:paddingBottom="26dp"
+        android:paddingRight="40dp"
+        android:paddingEnd="40dp"
+        android:paddingStart="8dp"
+        android:paddingLeft="8dp"
+        android:textDirection="rtl"
+        android:paddingTop="8dp"
+        android:textSize="16sp"
+        tools:text="Lorem ipsum" />
+
+    <TextView
+        android:id="@+id/chats_sent_message_date_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_marginBottom="4dp"
+        android:paddingLeft="8dp"
+        android:paddingStart="8dp"
+        android:textSize="12sp"
+        tools:text="18:04" />
+
+</FrameLayout>

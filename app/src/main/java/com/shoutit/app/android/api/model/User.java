@@ -2,10 +2,12 @@ package com.shoutit.app.android.api.model;
 
 
 import com.google.common.base.Objects;
+import com.shoutit.app.android.model.Stats;
 
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class User extends BaseProfile {
     public static final String ME = "me";
@@ -27,12 +29,14 @@ public class User extends BaseProfile {
     private final String website;
     private final String email;
     private final Conversation conversation;
+    @Nullable
+    private final Stats stats;
 
     public User(String id, String type, String apiUrl, String webUrl, String username,
                 String name, String firstName, String lastName, boolean isActivated, String image,
                 String cover, boolean isListening, boolean isListener, boolean isPasswordSet, UserLocation location,
                 int listenersCount, List<Page> pages, List<Admin> admins, String bio, int dateJoined,
-                Listening listeningCount, boolean isOwner, String about, String mobile, String website, String email, Conversation conversation) {
+                Listening listeningCount, boolean isOwner, String about, String mobile, String website, String email, Conversation conversation, @Nullable Stats stats) {
         super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount);
         this.apiUrl = apiUrl;
         this.webUrl = webUrl;
@@ -50,6 +54,7 @@ public class User extends BaseProfile {
         this.website = website;
         this.email = email;
         this.conversation = conversation;
+        this.stats = stats;
     }
 
     public User getListenedProfile() {
@@ -59,7 +64,7 @@ public class User extends BaseProfile {
                 firstName, lastName, isActivated, image, cover,
                 newIsListening, isListener, isPasswordSet, location,
                 newListenersCount, pages, admins, bio, dateJoined, listeningCount,
-                false, about, mobile, website, email, conversation);
+                false, about, mobile, website, email, conversation, stats);
     }
 
     public static User userWithUpdatedPages(@Nonnull User user, List<Page> pages) {
@@ -67,7 +72,7 @@ public class User extends BaseProfile {
                 user.firstName, user.lastName, user.isActivated, user.image, user.cover,
                 user.isListening, user.isListener, user.isPasswordSet, user.location,
                 user.listenersCount, pages, user.admins, user.bio, user.dateJoined, user.listeningCount,
-                false, user.about, user.mobile, user.website, user.email, user.conversation);
+                false, user.about, user.mobile, user.website, user.email, user.conversation, user.stats);
     }
 
     public static User userWithUpdatedAdmins(@Nonnull User user, List<Admin> updatedAdmins) {
@@ -75,7 +80,7 @@ public class User extends BaseProfile {
                 user.firstName, user.lastName, user.isActivated, user.image, user.cover,
                 user.isListening, user.isListener, user.isPasswordSet, user.location,
                 user.listenersCount, user.pages, updatedAdmins, user.bio, user.dateJoined, user.listeningCount,
-                false, user.about, user.mobile, user.website, user.email, user.conversation);
+                false, user.about, user.mobile, user.website, user.email, user.conversation, user.stats);
     }
 
     public String getId() {
@@ -184,6 +189,27 @@ public class User extends BaseProfile {
 
     public String getEmail() {
         return email;
+    }
+
+    @Nullable
+    public Stats getStats() {
+        return stats;
+    }
+
+    public int getUnreadConversationsCount() {
+        if (stats == null) {
+            return 0;
+        } else {
+            return stats.getUnreadConversationsCount();
+        }
+    }
+
+    public int getUnreadNotificationsCount() {
+        if (stats == null) {
+            return 0;
+        } else {
+            return stats.getUnreadNotifications();
+        }
     }
 
     @Override

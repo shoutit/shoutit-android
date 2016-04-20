@@ -17,7 +17,6 @@ import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler;
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
 import com.karumi.dexter.Dexter;
 import com.pusher.client.Pusher;
-import com.pusher.client.channel.PresenceChannel;
 import com.pusher.client.connection.ConnectionEventListener;
 import com.pusher.client.connection.ConnectionState;
 import com.pusher.client.connection.ConnectionStateChange;
@@ -166,7 +165,7 @@ public class App extends MultiDexApplication {
 
         if (pusher.getConnection().getState() != ConnectionState.CONNECTING && pusher.getConnection().getState() != ConnectionState.CONNECTED) {
             pusher.connect();
-            pusher.subscribePresence(String.format("presence-v3-p-%1$s", user.getId()));
+            pusher.subscribePresence(PusherHelper.getProfileChannelName(user.getId()));
             mNetworkObservableProvider.networkObservable()
                     .filter(new Func1<NetworkObservableProvider.NetworkStatus, Boolean>() {
                         @Override

@@ -43,6 +43,7 @@ import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.functions.Func3;
@@ -63,6 +64,8 @@ public class TagProfilePresenter implements ProfilePresenter {
     private final PublishSubject<String> showAllShoutsSubject = PublishSubject.create();
     private final PublishSubject<Object> shareInitSubject = PublishSubject.create();
     private final PublishSubject<Object> searchMenuItemClickSubject = PublishSubject.create();
+    private final PublishSubject<String> listenSuccess = PublishSubject.create();
+    private final PublishSubject<String> unListenSuccess = PublishSubject.create();
 
     private final Observable<String> shareObservable;
     private final Observable<String> avatarObservable;
@@ -103,11 +106,23 @@ public class TagProfilePresenter implements ProfilePresenter {
                             request = apiService.unlistenTag(tagDetail.getName())
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
+                                    .doOnNext(new Action1<ResponseBody>() {
+                                        @Override
+                                        public void call(ResponseBody responseBody) {
+                                            unListenSuccess.onNext(tagDetail.getName());
+                                        }
+                                    })
                                     .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
                         } else {
                             request = apiService.listenTag(tagDetail.getName())
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
+                                    .doOnNext(new Action1<ResponseBody>() {
+                                        @Override
+                                        public void call(ResponseBody responseBody) {
+                                            listenSuccess.onNext(tagDetail.getName());
+                                        }
+                                    })
                                     .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
                         }
 
@@ -247,11 +262,23 @@ public class TagProfilePresenter implements ProfilePresenter {
                             request = apiService.unlistenTag(tagDetail.getName())
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
+                                    .doOnNext(new Action1<ResponseBody>() {
+                                        @Override
+                                        public void call(ResponseBody responseBody) {
+                                            unListenSuccess.onNext(tagDetail.getName());
+                                        }
+                                    })
                                     .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
                         } else {
                             request = apiService.listenTag(tagDetail.getName())
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
+                                    .doOnNext(new Action1<ResponseBody>() {
+                                        @Override
+                                        public void call(ResponseBody responseBody) {
+                                            listenSuccess.onNext(tagDetail.getName());
+                                        }
+                                    })
                                     .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
                         }
 
@@ -462,6 +489,18 @@ public class TagProfilePresenter implements ProfilePresenter {
     @Override
     public Observer<String> sendReportObserver() {
         return Observers.empty();
+    }
+
+    @Nonnull
+    @Override
+    public Observable<String> getListenSuccessObservable() {
+        return listenSuccess;
+    }
+
+    @Nonnull
+    @Override
+    public Observable<String> getUnListenSuccessObservable() {
+        return unListenSuccess;
     }
 
     @NonNull

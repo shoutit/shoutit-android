@@ -2,7 +2,11 @@ package com.shoutit.app.android.view.videoconversation;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -51,6 +55,8 @@ public class DialogCallActivity extends BaseActivity {
         setContentView(R.layout.activity_dialog_call);
         ButterKnife.bind(this);
 
+        playRingtone(this);
+
         final String callerName = checkNotNull(getIntent().getStringExtra(CALLER_NAME));
         callInfo.setText(String.format(getString(R.string.video_calls_caller_name), callerName));
 
@@ -73,6 +79,19 @@ public class DialogCallActivity extends BaseActivity {
                         }
                     }
                 });
+    }
+
+    private void playRingtone(Context context) {
+        try {
+            final Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            final Ringtone ringtone = RingtoneManager.getRingtone(context, notification);
+
+            final Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+
+            ringtone.play();
+            vibrator.vibrate(1000);
+        } catch (Exception ignore) {
+        }
     }
 
     @Override
