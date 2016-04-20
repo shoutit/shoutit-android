@@ -62,6 +62,10 @@ public class MenuHandler {
     ImageView flagImageView;
     @Bind(R.id.menu_version_name)
     TextView versionNameTextView;
+    @Bind(R.id.menu_profile_badge)
+    TextView notificationsBadgeTv;
+    @Bind(R.id.menu_chat_badge)
+    TextView chatsBadgeTv;
 
     @Bind(R.id.menu_home)
     CheckedTextView homeItem;
@@ -286,6 +290,14 @@ public class MenuHandler {
                 throw new RuntimeException("Unknown fragment tag");
 
         }
+    }
+
+    public void setStats(int messageCount, int notificationsCount){
+        chatsBadgeTv.setVisibility(messageCount > 0 ? View.VISIBLE : View.GONE);
+        chatsBadgeTv.setText(String.valueOf(messageCount));
+
+        notificationsBadgeTv.setVisibility(notificationsCount > 0 ? View.VISIBLE : View.GONE);
+        notificationsBadgeTv.setText(String.valueOf(notificationsCount));
     }
 
     public void setDiscoverMenuItem() {

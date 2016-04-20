@@ -28,6 +28,8 @@ import javax.annotation.Nonnull;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Subscription;
+import rx.functions.Action1;
 
 public class ProfileViewHolders {
 
@@ -145,8 +147,11 @@ public class ProfileViewHolders {
         TextView userNick;
         @Bind(R.id.profile_verify_account)
         TextView verifyAccountButton;
+        @Bind(R.id.profile_notification_badge_tv)
+        TextView notificationsBadgeTv;
 
         private ProfileAdapterItems.MyUserNameAdapterItem item;
+        private Subscription subscription;
 
         public MyProfileUserNameViewHolder(@Nonnull View itemView) {
             super(itemView);
@@ -155,6 +160,8 @@ public class ProfileViewHolders {
 
         @Override
         public void bind(@Nonnull ProfileAdapterItems.MyUserNameAdapterItem item) {
+            recycle();
+
             this.item = item;
             final User user = item.getUser();
             userName.setText(user.getName());
@@ -165,9 +172,18 @@ public class ProfileViewHolders {
             } else {
                 verifyAccountButton.setVisibility(View.GONE);
             }
+
+            subscription = item.getNotificationsUnreadObservable()
+                    .subscribe(new Action1<Integer>() {
+                        @Override
+                        public void call(Integer notificationsCount) {
+                            notificationsBadgeTv.setVisibility(notificationsCount > 0 ? View.VISIBLE : View.GONE);
+                            notificationsBadgeTv.setText(String.valueOf(notificationsCount));
+                        }
+                    });
         }
 
-        @OnClick(R.id.profile_notification_iv)
+        @OnClick({R.id.profile_notification_badge_tv, R.id.profile_notification_iv})
         public void onNotificationClick() {
             item.onShowNotificationClicked();
         }
@@ -180,6 +196,19 @@ public class ProfileViewHolders {
         @OnClick(R.id.profile_verify_account)
         public void onVerifyAccountClick() {
             item.onVerifyAccountClick();
+        }
+
+        @Override
+        public void onViewRecycled() {
+            recycle();
+            super.onViewRecycled();
+        }
+
+        private void recycle() {
+            if (subscription != null) {
+                subscription.unsubscribe();
+                subscription = null;
+            }
         }
     }
 
