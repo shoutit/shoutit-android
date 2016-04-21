@@ -1,6 +1,8 @@
 package com.shoutit.app.android.api.model;
 
 
+import com.google.common.base.Objects;
+
 public class BaseProfile implements ProfileType {
     protected final String id;
     protected final String type;
@@ -90,5 +92,29 @@ public class BaseProfile implements ProfileType {
         int newListenersCount = newIsListening ? listenersCount + 1 : listenersCount - 1;
         return new BaseProfile(id, type, username, name, firstName, lastName, isActivated,
                 image, cover, newIsListening, newListenersCount);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof BaseProfile)) return false;
+        final BaseProfile profile = (BaseProfile) o;
+        return isActivated == profile.isActivated &&
+                isListening == profile.isListening &&
+                listenersCount == profile.listenersCount &&
+                Objects.equal(id, profile.id) &&
+                Objects.equal(type, profile.type) &&
+                Objects.equal(username, profile.username) &&
+                Objects.equal(name, profile.name) &&
+                Objects.equal(firstName, profile.firstName) &&
+                Objects.equal(lastName, profile.lastName) &&
+                Objects.equal(image, profile.image) &&
+                Objects.equal(cover, profile.cover);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id, type, username, name, firstName, lastName,
+                isActivated, image, cover, isListening, listenersCount);
     }
 }

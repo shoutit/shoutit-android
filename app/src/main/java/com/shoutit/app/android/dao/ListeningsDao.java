@@ -10,11 +10,14 @@ import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.ListeningResponse;
 import com.shoutit.app.android.api.model.Page;
+import com.shoutit.app.android.api.model.SearchProfileResponse;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.Tag;
 import com.shoutit.app.android.api.model.User;
 
 import java.util.List;
+
+import javax.annotation.Nonnull;
 
 import rx.Observable;
 import rx.Observer;
@@ -25,8 +28,12 @@ import rx.subjects.PublishSubject;
 
 public class ListeningsDao {
 
+    @Nonnull
     private final Observable<ResponseOrError<ListeningResponse>> listeningObservable;
+    @Nonnull
     private final PublishSubject<Object> loadMoreSubject = PublishSubject.create();
+    @Nonnull
+    private final PublishSubject<Object> refreshSubject = PublishSubject.create();
 
     public ListeningsDao(final ApiService apiService, @NetworkScheduler final Scheduler networkScheduler) {
 
@@ -60,17 +67,23 @@ public class ListeningsDao {
         listeningObservable = loadMoreSubject.startWith((Object) null)
                 .lift(loadMoreOperator)
                 .compose(ResponseOrError.<ListeningResponse>toResponseOrErrorObservable())
+                .compose(MoreOperators.<ResponseOrError<ListeningResponse>>refresh(refreshSubject))
                 .compose(MoreOperators.<ResponseOrError<ListeningResponse>>cacheWithTimeout(networkScheduler));
     }
 
     @NonNull
-    public Observable<ResponseOrError<ListeningResponse>> lgetLsteningObservable() {
+    public Observable<ResponseOrError<ListeningResponse>> getLsteningObservable() {
         return listeningObservable;
     }
 
     @NonNull
     public Observer<Object> getLoadMoreObserver() {
         return loadMoreSubject;
+    }
+
+    @Nonnull
+    public Observer<Object> getRefreshSubject() {
+        return refreshSubject;
     }
 
     private class MergeListeningResponses implements Func2<ListeningResponse, ListeningResponse, ListeningResponse> {
