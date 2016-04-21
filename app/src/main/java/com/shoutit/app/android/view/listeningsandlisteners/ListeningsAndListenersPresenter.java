@@ -17,7 +17,6 @@ import com.shoutit.app.android.api.model.User;
 import java.util.List;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Observer;
@@ -27,15 +26,18 @@ import rx.subjects.PublishSubject;
 
 public abstract class ListeningsAndListenersPresenter {
 
-    private final Observable<List<BaseAdapterItem>> adapterItemsObservable;
-    private final Observable<Boolean> progressObservable;
-    private final Observable<Throwable> errorObservable;
+    private Observable<List<BaseAdapterItem>> adapterItemsObservable;
+    private Observable<Boolean> progressObservable;
+    private Observable<Throwable> errorObservable;
 
     private final PublishSubject<String> openProfileSubject = PublishSubject.create();
+    private final Scheduler uiScheduler;
 
-    @Inject
     public ListeningsAndListenersPresenter(@UiScheduler final Scheduler uiScheduler) {
+        this.uiScheduler = uiScheduler;
+    }
 
+    public void initPresenter() {
         final Observable<ResponseOrError<ListeningResponse>> profilesAndTagsObservable = getRequestObservable()
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<ListeningResponse>>behaviorRefCount());

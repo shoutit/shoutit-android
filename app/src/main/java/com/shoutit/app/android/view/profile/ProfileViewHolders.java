@@ -17,6 +17,8 @@ import com.shoutit.app.android.utils.ImageHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.utils.TextHelper;
+import com.shoutit.app.android.view.listeningsandlisteners.ListenersActivity;
+import com.shoutit.app.android.view.listeningsandlisteners.ListeningsActivity;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -243,6 +245,16 @@ public class ProfileViewHolders {
             ImageHelper.setStartCompoundRelativeDrawable(thirdIconValue, R.drawable.ic_tags);
             thirdIconText.setText(context.getString(R.string.profile_interests_label));
         }
+
+        @OnClick(R.id.profile_fragment_listening)
+        public void onListengsClick() {
+            context.startActivity(ListeningsActivity.newIntent(context));
+        }
+
+        @OnClick(R.id.my_profile_listeners)
+        public void onListenersClick() {
+            context.startActivity(ListenersActivity.newIntent(context, User.ME));
+        }
     }
 
     public static class UserProfileUserNameViewHolder extends ViewHolderManager.BaseViewHolder<ProfileAdapterItems.UserNameAdapterItem> {
@@ -328,6 +340,11 @@ public class ProfileViewHolders {
             } else {
                 item.onActionOnlyForLoggedInUser();
             }
+        }
+
+        @OnClick(R.id.my_profile_listeners)
+        public void onListenersClick() {
+            context.startActivity(ListenersActivity.newIntent(context, item.getUser().getUsername()));
         }
     }
 

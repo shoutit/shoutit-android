@@ -1,5 +1,7 @@
 package com.shoutit.app.android.view.listeningsandlisteners;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.shoutit.app.android.App;
@@ -12,6 +14,13 @@ import javax.annotation.Nullable;
 
 public class ListenersActivity extends ListeningsAndListenersActivity {
 
+    private static final String EXTRA_USER_NAME = "user_name";
+
+    public static Intent newIntent(Context context, @Nonnull String userName) {
+        return new Intent(context, ListenersActivity.class)
+                .putExtra(EXTRA_USER_NAME, userName);
+    }
+
     @Override
     String getToolbarTitle() {
         return getString(R.string.listers_ab_title);
@@ -20,10 +29,12 @@ public class ListenersActivity extends ListeningsAndListenersActivity {
     @Nonnull
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
-        final ListeningsActivityComponent component = DaggerListeningsActivityComponent
+        final String userName = getIntent().getStringExtra(EXTRA_USER_NAME);
+
+        final ListenersActivityComponent component = DaggerListenersActivityComponent
                 .builder()
                 .activityModule(new ActivityModule(this))
-                .listeningsActivityModule(new ListenersActivityModule())
+                .listenersActivityModule(new ListenersActivityModule(userName))
                 .appComponent(App.getAppComponent(getApplication()))
                 .build();
         component.inject(this);

@@ -14,10 +14,16 @@ import rx.Scheduler;
 @Module
 public class ListenersActivityModule {
 
+    @Nonnull
+    private final String userName;
+
+    public ListenersActivityModule(@Nonnull String userName) {
+        this.userName = userName;
+    }
+
     @Provides
     @ActivityScope
-    public ListenersPresenter providePresenter(@Nonnull String userName,
-                                               ListenersDaos listenersDao,
+    public ListeningsAndListenersPresenter providePresenter(ListenersDaos listenersDao,
                                                @UiScheduler Scheduler uiScheduler) {
         return new ListenersPresenter(userName, listenersDao, uiScheduler);
     }

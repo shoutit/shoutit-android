@@ -20,6 +20,8 @@ import rx.subjects.PublishSubject;
 
 public class ListeningsDao {
 
+    private static final int PAGE_SIZE = 20;
+
     @Nonnull
     private final Observable<ResponseOrError<ListeningResponse>> listeningObservable;
     @Nonnull
@@ -42,7 +44,7 @@ public class ListeningsDao {
                             ++pageNumber;
 
                             final Observable<ListeningResponse> apiRequest = apiService
-                                    .listenings()
+                                    .listenings(pageNumber, PAGE_SIZE)
                                     .subscribeOn(networkScheduler);
 
                             if (previousResponse == null) {
@@ -59,8 +61,7 @@ public class ListeningsDao {
         listeningObservable = loadMoreSubject.startWith((Object) null)
                 .lift(loadMoreOperator)
                 .compose(ResponseOrError.<ListeningResponse>toResponseOrErrorObservable())
-                .compose(MoreOperators.<ResponseOrError<ListeningResponse>>refresh(refreshSubject))
-                .compose(MoreOperators.<ResponseOrError<ListeningResponse>>cacheWithTimeout(networkScheduler));
+                .compose(MoreOperators.<ResponseOrError<ListeningResponse>>refresh(refreshSubject));
     }
 
     @NonNull

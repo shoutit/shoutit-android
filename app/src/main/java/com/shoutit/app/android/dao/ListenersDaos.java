@@ -23,6 +23,8 @@ import rx.subjects.PublishSubject;
 
 public class ListenersDaos {
 
+    private static final Integer PAGE_SIZE = 20;
+
     private final LoadingCache<String, ListenersDao> daoCache;
 
     public ListenersDaos(@Nonnull final ApiService apiService,
@@ -67,7 +69,7 @@ public class ListenersDaos {
                                 ++pageNumber;
 
                                 final Observable<ListeningResponse> apiRequest = apiService
-                                        .listeners(userName)
+                                        .listeners(userName, pageNumber, PAGE_SIZE)
                                         .subscribeOn(networkScheduler);
 
                                 if (previousResponse == null) {
@@ -84,8 +86,7 @@ public class ListenersDaos {
             listeningObservable = loadMoreSubject.startWith((Object) null)
                     .lift(loadMoreOperator)
                     .compose(ResponseOrError.<ListeningResponse>toResponseOrErrorObservable())
-                    .compose(MoreOperators.<ResponseOrError<ListeningResponse>>refresh(refreshSubject))
-                    .compose(MoreOperators.<ResponseOrError<ListeningResponse>>cacheWithTimeout(networkScheduler));
+                    .compose(MoreOperators.<ResponseOrError<ListeningResponse>>refresh(refreshSubject));
         }
 
         @NonNull

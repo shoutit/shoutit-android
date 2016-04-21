@@ -56,6 +56,8 @@ public abstract class ListeningsAndListenersActivity extends BaseActivity {
 
         setupToolbar();
 
+        presenter.initPresenter();
+
         recyclerView.setLayoutManager(new MyLinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 

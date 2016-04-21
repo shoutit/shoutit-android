@@ -1,5 +1,7 @@
 package com.shoutit.app.android.view.listeningsandlisteners;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.shoutit.app.android.App;
@@ -11,6 +13,10 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class ListeningsActivity extends ListeningsAndListenersActivity {
+
+    public static Intent newIntent(Context context) {
+        return new Intent(context, ListeningsActivity.class);
+    }
 
     @Override
     String getToolbarTitle() {
