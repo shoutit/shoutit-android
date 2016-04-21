@@ -40,8 +40,8 @@
                 android:layout_marginEnd="12dp"
                 android:layout_marginRight="12dp"
                 android:background="?selectableItemBackground"
-                android:paddingLeft="10dp"
-                android:paddingStart="10dp"
+                android:paddingLeft="9dp"
+                android:paddingStart="9dp"
                 android:paddingRight="6dp"
                 android:paddingEnd="6dp"
                 android:paddingTop="2dp"
@@ -50,17 +50,12 @@
                 android:src="@drawable/ic_notifications" />
 
             <TextView
+                style="@style/RedBadgeStyle"
                 android:id="@+id/profile_notification_badge_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
                 tools:text="12"
                 android:visibility="gone"
-                tools:visibility="visible"
-                android:fontFamily="sans-serif-medium"
-                android:layout_marginTop="2dp"
-                android:textSize="12sp"
-                android:textColor="@android:color/white"
-                android:background="@drawable/shape_badge"/>
+                tools:visibility="visible" />
 
         </FrameLayout>
 

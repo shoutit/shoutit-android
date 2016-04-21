@@ -1,6 +1,8 @@
 package com.shoutit.app.android.model;
 
 
+import com.google.common.base.Objects;
+
 public class Stats {
 
     private final Integer unreadConversationsCount;
@@ -25,5 +27,19 @@ public class Stats {
         } else {
             return unreadNotificationsCount;
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Stats)) return false;
+        final Stats stats = (Stats) o;
+        return Objects.equal(unreadConversationsCount, stats.unreadConversationsCount) &&
+                Objects.equal(unreadNotificationsCount, stats.unreadNotificationsCount);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(unreadConversationsCount, unreadNotificationsCount);
     }
 }

@@ -306,4 +306,15 @@
 
     <style name="ShoutitRtlTextStyle" />
 
+    <style name="RedBadgeStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:minWidth">18dp</item>
+        <item name="android:layout_height">18dp</item>
+        <item name="android:background">@drawable/shape_badge</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
 </resources>

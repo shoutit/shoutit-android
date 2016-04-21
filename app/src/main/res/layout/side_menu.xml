@@ -118,16 +118,11 @@
                 android:text="@string/menu_item_chats" />
 
             <TextView
+                style="@style/RedBadgeStyle"
                 android:id="@+id/menu_chat_badge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="122"
+                tools:text="12"
                 android:visibility="gone"
-                tools:visibility="visible"
-                android:fontFamily="sans-serif-medium"
-                android:textSize="12sp"
-                android:textColor="@android:color/white"
-                android:background="@drawable/shape_badge"/>
+                tools:visibility="visible" />
 
         </LinearLayout>
 
@@ -141,7 +136,6 @@
             android:paddingLeft="16dp"
             android:paddingStart="16dp"
             style="@style/SideMenuItem"
-
             android:text="@string/menu_item_settings" />
 
         <CheckedTextView

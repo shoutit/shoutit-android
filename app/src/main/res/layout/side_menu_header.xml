@@ -35,16 +35,11 @@
             android:layout_centerHorizontal="true">
 
             <TextView
+                style="@style/RedBadgeStyle"
                 android:id="@+id/menu_profile_badge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="1"
+                tools:text="12"
                 android:visibility="gone"
-                tools:visibility="visible"
-                android:fontFamily="sans-serif-medium"
-                android:textSize="12sp"
-                android:textColor="@android:color/white"
-                android:background="@drawable/shape_badge"/>
+                tools:visibility="visible" />
 
         </LinearLayout>
 
