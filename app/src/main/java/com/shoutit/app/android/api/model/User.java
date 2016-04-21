@@ -240,6 +240,7 @@ public class User extends BaseProfile {
                 Objects.equal(bio, user.bio) &&
                 Objects.equal(isListener, user.isListener) &&
                 Objects.equal(email, user.email) &&
+                Objects.equal(stats, user.stats) &&
                 Objects.equal(listeningCount, user.listeningCount);
     }
 
@@ -247,6 +248,6 @@ public class User extends BaseProfile {
     public int hashCode() {
         return Objects.hashCode(id, type, apiUrl, webUrl, username, name, firstName, lastName,
                 isActivated, image, cover, isListening, isPasswordSet, location, listenersCount,
-                pages, bio, dateJoined, listeningCount, isListener, admins, isOwner, website, email);
+                pages, bio, dateJoined, listeningCount, isListener, admins, isOwner, website, email, stats);
     }
 }
