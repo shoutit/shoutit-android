@@ -268,6 +268,9 @@ public interface ApiService {
     @GET("profiles/me/listening")
     Observable<ListeningResponse> listenings();
 
+    @GET("profiles/{user_name}/listeners")
+    Observable<ListeningResponse> listeners(@Path("user_name") String userName);
+
 
     /**
      * Misc

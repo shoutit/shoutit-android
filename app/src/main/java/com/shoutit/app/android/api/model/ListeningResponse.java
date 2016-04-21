@@ -11,11 +11,11 @@ public class ListeningResponse extends PaginatedResponse {
     @Nullable
     private final List<Page> pages;
     @Nullable
-    private final List<Tag> tags;
+    private final List<TagDetail> tags;
 
     public ListeningResponse(int count, @Nullable String next, @Nullable String previous,
                              @Nullable List<User> users, @Nullable List<Page> pages,
-                             @Nullable List<Tag> tags) {
+                             @Nullable List<TagDetail> tags) {
         super(count, next, previous);
         this.users = users;
         this.pages = pages;
@@ -33,7 +33,7 @@ public class ListeningResponse extends PaginatedResponse {
     }
 
     @Nullable
-    public List<Tag> getTags() {
+    public List<TagDetail> getTags() {
         return tags;
     }
 }

@@ -163,6 +163,10 @@
         <activity android:name=".view.createshout.CreateShoutDialogActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.DialogActivity"/>
+        <activity android:name=".view.listeningsandlisteners.ListenersActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".view.listeningsandlisteners.ListeningsActivity"
+            android:screenOrientation="portrait"/>
 
         <activity
             android:name=".view.videoconversation.DialogCallActivity"

@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.listenings;
+package com.shoutit.app.android.view.listeningsandlisteners;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
@@ -8,13 +8,11 @@ import com.appunite.rx.functions.Functions1;
 import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
 import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
-import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.ListeningResponse;
 import com.shoutit.app.android.api.model.Page;
-import com.shoutit.app.android.api.model.Tag;
+import com.shoutit.app.android.api.model.ProfileType;
+import com.shoutit.app.android.api.model.TagDetail;
 import com.shoutit.app.android.api.model.User;
-import com.shoutit.app.android.dao.ListeningsDao;
-import com.shoutit.app.android.utils.rx.RxMoreObservers;
 
 import java.util.List;
 
@@ -27,26 +25,18 @@ import rx.Scheduler;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
-public class ListeningsPresenter {
+public abstract class ListeningsAndListenersPresenter {
 
     private final Observable<List<BaseAdapterItem>> adapterItemsObservable;
     private final Observable<Boolean> progressObservable;
     private final Observable<Throwable> errorObservable;
 
     private final PublishSubject<String> openProfileSubject = PublishSubject.create();
-    private final PublishSubject<String> listenSuccess = PublishSubject.create();
-    private final PublishSubject<String> unListenSuccess = PublishSubject.create();
-
-    @Nonnull
-    private final ListeningsDao listeningsDao;
 
     @Inject
-    public ListeningsPresenter(@UiScheduler final Scheduler uiScheduler,
-                               @Nonnull ListeningsDao listeningsDao) {
-        this.listeningsDao = listeningsDao;
+    public ListeningsAndListenersPresenter(@UiScheduler final Scheduler uiScheduler) {
 
-        final Observable<ResponseOrError<ListeningResponse>> profilesAndTagsObservable = listeningsDao
-                .getLsteningObservable()
+        final Observable<ResponseOrError<ListeningResponse>> profilesAndTagsObservable = getRequestObservable()
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<ListeningResponse>>behaviorRefCount());
 
@@ -72,8 +62,8 @@ public class ListeningsPresenter {
                         }
 
                         if (listeningResponse.getTags() != null) {
-                            for (Tag tag : listeningResponse.getTags()) {
-                                builder.add(new TagAdapterItem(tag, openProfileSubject));
+                            for (TagDetail tag : listeningResponse.getTags()) {
+                                builder.add(new ProfileAdapterItem(tag, openProfileSubject));
                             }
                         }
 
@@ -92,20 +82,6 @@ public class ListeningsPresenter {
         errorObservable = profilesAndTagsObservable.compose(ResponseOrError.<ListeningResponse>onlyError());
     }
 
-    @Nonnull
-    public Observable<String> getListenSuccessObservable() {
-        return listenSuccess;
-    }
-
-    @Nonnull
-    public Observable<String> getUnListenSuccessObservable() {
-        return unListenSuccess;
-    }
-
-    public Observer<Object> getLoadMoreObserver() {
-        return RxMoreObservers.ignoreCompleted(listeningsDao.getLoadMoreObserver());
-    }
-
     public Observable<Boolean> getProgressObservable() {
         return progressObservable;
     }
@@ -122,77 +98,44 @@ public class ListeningsPresenter {
         return openProfileSubject;
     }
 
-    public void refreshData() {
-        listeningsDao.getRefreshSubject().onNext(null);
-    }
+    public abstract void refreshData();
 
-    class ProfileAdapterItem extends BaseNoIDAdapterItem {
+    public abstract Observable<ResponseOrError<ListeningResponse>> getRequestObservable();
+
+    public abstract Observer<Object> getLoadMoreObserver();
+
+    public class ProfileAdapterItem extends BaseNoIDAdapterItem {
 
         @Nonnull
-        private final BaseProfile baseProfile;
+        private final ProfileType profile;
         @Nonnull
         private final Observer<String> openProfileObserver;
 
-        public ProfileAdapterItem(@Nonnull BaseProfile baseProfile,
+        public ProfileAdapterItem(@Nonnull ProfileType profile,
                                   @Nonnull Observer<String> openProfileObserver) {
-            this.baseProfile = baseProfile;
+            this.profile = profile;
             this.openProfileObserver = openProfileObserver;
         }
 
-        public void onProfileOpen() {
-            openProfileObserver.onNext(baseProfile.getUsername());
+        public void openProfile() {
+            openProfileObserver.onNext(profile.getUsername());
         }
 
         @Nonnull
-        public BaseProfile getProfile() {
-            return baseProfile;
+        public ProfileType getProfile() {
+            return profile;
         }
 
         @Override
         public boolean matches(@Nonnull BaseAdapterItem item) {
             return item instanceof ProfileAdapterItem &&
-                    baseProfile.getUsername().equals(((ProfileAdapterItem) item).baseProfile.getUsername());
+                    profile.getUsername().equals(((ProfileAdapterItem) item).profile.getUsername());
         }
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
             return item instanceof ProfileAdapterItem &&
-                    baseProfile.equals(((ProfileAdapterItem) item).baseProfile);
-        }
-    }
-
-    class TagAdapterItem extends BaseNoIDAdapterItem {
-
-        @Nonnull
-        private final Tag tag;
-        @Nonnull
-        private final Observer<String> openProfileObserver;
-
-        public TagAdapterItem(@Nonnull Tag tag,
-                              @Nonnull Observer<String> openProfileObserver) {
-            this.tag = tag;
-            this.openProfileObserver = openProfileObserver;
-        }
-
-        public void onProfileOpen() {
-            openProfileObserver.onNext(tag.getName());
-        }
-
-        @Nonnull
-        public Tag getTag() {
-            return tag;
-        }
-
-        @Override
-        public boolean matches(@Nonnull BaseAdapterItem item) {
-            return item instanceof TagAdapterItem &&
-                    tag.getName().equals(((TagAdapterItem) item).tag.getName());
-        }
-
-        @Override
-        public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof TagAdapterItem &&
-                    tag.equals(((TagAdapterItem) item).tag);
+                    profile.equals(((ProfileAdapterItem) item).profile);
         }
     }
 }

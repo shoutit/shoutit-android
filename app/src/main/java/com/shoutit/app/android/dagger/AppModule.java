@@ -31,6 +31,8 @@ import com.shoutit.app.android.constants.AmazonConstants;
 import com.shoutit.app.android.dao.CategoriesDao;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.dao.DiscoversDao;
+import com.shoutit.app.android.dao.ListenersDaos;
+import com.shoutit.app.android.dao.ListeningsDao;
 import com.shoutit.app.android.dao.NotificationsDao;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
@@ -255,6 +257,18 @@ public final class AppModule {
     @Singleton
     CategoriesDao categoriesDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
         return new CategoriesDao(apiService, networkScheduler);
+    }
+
+    @Provides
+    @Singleton
+    ListenersDaos listenersDaos(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
+        return new ListenersDaos(apiService, networkScheduler);
+    }
+
+    @Provides
+    @Singleton
+    ListeningsDao listeningsDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
+        return new ListeningsDao(apiService, networkScheduler);
     }
 
     @Singleton

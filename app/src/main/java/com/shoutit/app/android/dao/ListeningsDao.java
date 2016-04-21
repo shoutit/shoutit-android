@@ -6,16 +6,9 @@ import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.operators.MoreOperators;
 import com.appunite.rx.operators.OperatorMergeNextToken;
-import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.ListeningResponse;
-import com.shoutit.app.android.api.model.Page;
-import com.shoutit.app.android.api.model.SearchProfileResponse;
-import com.shoutit.app.android.api.model.ShoutsResponse;
-import com.shoutit.app.android.api.model.Tag;
-import com.shoutit.app.android.api.model.User;
-
-import java.util.List;
+import com.shoutit.app.android.model.MergeListeningResponses;
 
 import javax.annotation.Nonnull;
 
@@ -23,7 +16,6 @@ import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Func1;
-import rx.functions.Func2;
 import rx.subjects.PublishSubject;
 
 public class ListeningsDao {
@@ -86,27 +78,5 @@ public class ListeningsDao {
         return refreshSubject;
     }
 
-    private class MergeListeningResponses implements Func2<ListeningResponse, ListeningResponse, ListeningResponse> {
-        @Override
-        public ListeningResponse call(ListeningResponse previousResponses, ListeningResponse lastResponse) {
-            final List<User> user = previousResponses.getUsers();
-            final List<Page> pages = previousResponses.getPages();
-            final List<Tag> tags = previousResponses.getTags();
 
-            if (user != null && lastResponse.getUsers() != null) {
-                user.addAll(lastResponse.getUsers());
-            }
-
-            if (pages != null && lastResponse.getPages() != null) {
-                pages.addAll(lastResponse.getPages());
-            }
-
-            if (tags != null && lastResponse.getTags() != null) {
-                tags.addAll(lastResponse.getTags());
-            }
-
-            return new ListeningResponse(lastResponse.getCount(), lastResponse.getNext(),
-                    lastResponse.getPrevious(), user, pages, tags);
-        }
-    }
 }
