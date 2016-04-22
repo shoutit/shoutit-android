@@ -84,31 +84,34 @@ import rx.subscriptions.CompositeSubscription;
 
 public class ChatsPresenter {
 
+    private static final int PAGE_SIZE = 20;
+
     final OperatorMergeNextToken<MessagesResponse, Object> loadMoreOperator =
             OperatorMergeNextToken.create(new Func1<MessagesResponse, Observable<MessagesResponse>>() {
 
                 @Override
                 public Observable<MessagesResponse> call(MessagesResponse conversationsResponse) {
-                    if (conversationsResponse == null || conversationsResponse.getNext() != null) {
+                    if (conversationsResponse == null || conversationsResponse.getPrevious() != null) {
                         if (conversationsResponse == null) {
-                            return mApiService.getMessages(conversationId)
+                            return mApiService.getMessages(conversationId, PAGE_SIZE)
                                     .subscribeOn(mNetworkScheduler)
                                     .observeOn(mUiScheduler);
                         } else {
-                            final String after = Uri.parse(conversationsResponse.getNext()).getQueryParameter("after");
+                            final String before = Uri.parse(conversationsResponse.getPrevious()).getQueryParameter("before");
                             return Observable.just(
                                     conversationsResponse)
                                     .zipWith(
-                                            mApiService.getMessages(conversationId, after)
+                                            mApiService.getMessages(conversationId, before, PAGE_SIZE)
                                                     .subscribeOn(mNetworkScheduler)
                                                     .observeOn(mUiScheduler),
                                             new Func2<MessagesResponse, MessagesResponse, MessagesResponse>() {
                                                 @Override
-                                                public MessagesResponse call(MessagesResponse conversationsResponse, MessagesResponse newResponse) {
+                                                public MessagesResponse call(MessagesResponse previousResponses, MessagesResponse newResponse) {
                                                     return new MessagesResponse(newResponse.getNext(),
+                                                            newResponse.getPrevious(),
                                                             ImmutableList.copyOf(Iterables.concat(
-                                                                    conversationsResponse.getResults(),
-                                                                    newResponse.getResults())));
+                                                                    newResponse.getResults(),
+                                                                    previousResponses.getResults())));
                                                 }
                                             });
                         }
