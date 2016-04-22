@@ -146,11 +146,11 @@ public class ChatActivity extends BaseActivity implements Listener {
                         return true;
                     }
                     case R.id.chats_video_menu: {
-                       presenter.getChatParticipantIdentityObservable()
+                       presenter.getCalledPersonNameObservable()
                                 .subscribe(new Action1<String>() {
                                     @Override
-                                    public void call(String identity) {
-                                        startActivity(VideoConversationActivity.newIntent(null, identity, ChatActivity.this));
+                                    public void call(String calledUserUserName) {
+                                        startActivity(VideoConversationActivity.newIntent(null, calledUserUserName, ChatActivity.this));
                                     }
                                 });
                         return true;

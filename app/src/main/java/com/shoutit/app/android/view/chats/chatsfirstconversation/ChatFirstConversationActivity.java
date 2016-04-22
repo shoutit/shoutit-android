@@ -146,11 +146,11 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
                         return true;
                     }
                     case R.id.chats_video_menu: {
-                        presenter.getChatParticipantIdentityObservable()
+                        presenter.calledPersonUsernameObservable()
                                 .subscribe(new Action1<String>() {
                                     @Override
-                                    public void call(String identity) {
-                                        startActivity(VideoConversationActivity.newIntent(null, identity, ChatFirstConversationActivity.this));
+                                    public void call(String calledUserUsername) {
+                                        startActivity(VideoConversationActivity.newIntent(null, calledUserUsername, ChatFirstConversationActivity.this));
                                     }
                                 });
                         return true;
