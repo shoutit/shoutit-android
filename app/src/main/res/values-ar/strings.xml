@@ -7,7 +7,6 @@
 <string name="shout_type_offer">"عرض"</string>
 <string name="shout_type_request">"طلب"</string>
 <string name="terms_of_service">"شروط الخدمة"</string>
-<string name="facebook_app_id">"353625811317277"</string>
 <string name="exit_text">"اضغط رجوع مرة أخرى للخروج"</string>
 
 <!-- Errors -->
@@ -462,17 +461,4 @@
 <string name="verify_email_title">"التحقق من البريد الإلكتروني"</string>
 <string name="video_calls_cannot_start_conversation">"عذراً, لايمكن بدء مكالمة فيديو حالياً. يرجى المحاولة لاحقاً"</string>
 <string name="conversations_empty">"لا توجد محادثات"</string>
-
-<!-- Global strings -->
-<string name="price_with_currency">"%1$s %2$s"</string>
-<string name="google_api_key">"AIzaSyBWHadI_MPYQgDLqI4RXhymEs42YEtgTEE
-    "</string>
-<string name="font_roboto_regular">"sans-serif"</string>
-<string name="font_roboto_medium">"sans-serif"</string>
-<string name="listen_success">"You have successfully started listening to %1$s"</string>
-<string name="unlisten_success">"You have successfully stopped listening to %1$s"</string>
-<string name="home_user_and_date">"%1$s - %2$s"</string>
-<string name="location_location">"%1$s, %2$s"</string>
-<string name="shout_user_location">"%1$s, %2$s"</string>
-<string name="edit_profile_country">"%1$s, %2$s"</string>
 </resources>
