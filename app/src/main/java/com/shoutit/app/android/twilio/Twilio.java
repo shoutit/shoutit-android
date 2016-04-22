@@ -55,14 +55,17 @@ public class Twilio {
     private ConversationsClient conversationsClient;
     private IncomingInvite invite;
 
-    @Nonnull
-    private Observable<String> twilioRequirementObservable;
-    @Nonnull
-    private Observable<Throwable> errorObservable;
+    private final Observable<String> twilioRequirementObservable;
+    private final Observable<Throwable> errorObservable;
+    private final Observable<String> successCalledPersonIdentity;
+    private final Observable<Throwable> errorCalledPersonIdentity;
 
     @Nonnull
     private final BehaviorSubject<String> callerIdentitySubject = BehaviorSubject.create();
+    @Nonnull
     private final PublishSubject<Object> profileRefreshSubject = PublishSubject.create();
+    @Nonnull
+    private final PublishSubject<String> initCalledPersonIdentityRequestSubject = PublishSubject.create();
     @Nonnull
     private final PublishSubject<String> rejectCallSubject = PublishSubject.create();
 
@@ -147,6 +150,28 @@ public class Twilio {
                         LogHelper.logThrowable(TAG, "Cannot reject call", throwable);
                     }
                 });
+
+        final Observable<ResponseOrError<UserIdentity>> calledPersonIdentityResponse = initCalledPersonIdentityRequestSubject
+                .switchMap(new Func1<String, Observable<ResponseOrError<UserIdentity>>>() {
+                    @Override
+                    public Observable<ResponseOrError<UserIdentity>> call(String username) {
+                        return usersIdentityDao.getUserIdentityObservable(username)
+                                .observeOn(uiScheduler);
+                    }
+                })
+                .compose(ObservableExtensions.<ResponseOrError<UserIdentity>>behaviorRefCount());
+
+        successCalledPersonIdentity = calledPersonIdentityResponse
+                .compose(ResponseOrError.<UserIdentity>onlySuccess())
+                .map(new Func1<UserIdentity, String>() {
+                    @Override
+                    public String call(UserIdentity userIdentity) {
+                        return userIdentity.getIdentity();
+                    }
+                });
+
+        errorCalledPersonIdentity = calledPersonIdentityResponse
+                .compose(ResponseOrError.<UserIdentity>onlyError());
 
         /** Errors **/
         errorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
@@ -271,5 +296,17 @@ public class Twilio {
 
     public void rejectCall(@Nonnull String twilioIdentity) {
         rejectCallSubject.onNext(twilioIdentity);
+    }
+
+    public void initCalledPersonTwilioIdentityRequest(@Nonnull String personToCallUserName) {
+        initCalledPersonIdentityRequestSubject.onNext(personToCallUserName);
+    }
+
+    public Observable<String> getSuccessCalledPersonIdentity() {
+        return successCalledPersonIdentity;
+    }
+
+    public Observable<Throwable> getErrorCalledPersonIdentity() {
+        return errorCalledPersonIdentity;
     }
 }

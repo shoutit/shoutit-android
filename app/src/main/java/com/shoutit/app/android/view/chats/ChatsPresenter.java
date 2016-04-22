@@ -142,7 +142,7 @@ public class ChatsPresenter {
     private final PublishSubject<PusherMessage> newMessagesSubject = PublishSubject.create();
     private final User mUser;
     private final BehaviorSubject<String> chatParticipantUsernameSubject = BehaviorSubject.create();
-    private final Observable<String> chatParticipantIdentityObservable;
+    private final Observable<String> calledPersonUsernameObservable;
 
 
     @Inject
@@ -153,7 +153,6 @@ public class ChatsPresenter {
                           final UserPreferences userPreferences,
                           @ForActivity Resources resources,
                           @ForActivity Context context,
-                          @Nonnull final UsersIdentityDao usersIdentityDao,
                           PusherHelper pusher,
                           Gson gson,
                           AmazonHelper amazonHelper,
@@ -171,40 +170,14 @@ public class ChatsPresenter {
         mIsShoutConversation = isShoutConversation;
         mUser = mUserPreferences.getUser();
 
-        final Observable<ResponseOrError<UserIdentity>> userIdentityResponse = chatParticipantUsernameSubject
+        calledPersonUsernameObservable = chatParticipantUsernameSubject
                 .filter(Functions1.isNotNull())
                 .filter(new Func1<String, Boolean>() {
                     @Override
                     public Boolean call(String participantUsername) {
                         return !Objects.equal(userPreferences.getUser().getUsername(), participantUsername);
                     }
-                })
-                .flatMap(new Func1<String, Observable<ResponseOrError<UserIdentity>>>() {
-                    @Override
-                    public Observable<ResponseOrError<UserIdentity>> call(String username) {
-                        return usersIdentityDao.getUserIdentityObservable(username);
-                    }
                 });
-
-        Observable<UserIdentity> successIdentityResponse = userIdentityResponse
-                .compose(ResponseOrError.<UserIdentity>onlySuccess());
-
-        chatParticipantIdentityObservable = successIdentityResponse
-                .map(new Func1<UserIdentity, String>() {
-                    @Override
-                    public String call(UserIdentity userIdentity) {
-                        return userIdentity.getIdentity();
-                    }
-                })
-                .filter(Functions1.isNotNull())
-                .filter(new Func1<String, Boolean>() {
-                    @Override
-                    public Boolean call(String s) {
-                        return !userPreferences.isGuest();
-                    }
-                })
-                .observeOn(uiScheduler);
-
     }
 
     public void register(@NonNull Listener listener) {
@@ -666,8 +639,8 @@ public class ChatsPresenter {
         }
     }
 
-    public Observable<String> getChatParticipantIdentityObservable() {
-        return chatParticipantIdentityObservable;
+    public Observable<String> getCalledPersonNameObservable() {
+        return calledPersonUsernameObservable;
     }
 
 }
