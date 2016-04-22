@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.search.categories;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -18,6 +19,7 @@ import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -32,7 +34,7 @@ public class SearchCategoriesAdapter extends BaseAdapter {
 
     @Inject
     public SearchCategoriesAdapter(@ForActivity @Nonnull Context context,
-                                   @Nonnull Picasso picasso) {
+                                   @NonNull @Named("NoAmazonTransformer") Picasso picasso) {
         super(context);
         this.picasso = picasso;
     }

@@ -30,6 +30,8 @@ import com.shoutit.app.android.utils.PusherHelper;
 import com.squareup.picasso.Picasso;
 
 
+import javax.inject.Named;
+
 import dagger.Component;
 import rx.Scheduler;
 
@@ -58,6 +60,9 @@ public interface BaseActivityComponent {
     Context getAppContext();
 
     Picasso getPicasso();
+
+    @Named("NoAmazonTransformer")
+    Picasso getNoAmazonTransformPicasso();
 
     LayoutInflater getLayoutInflater();
 

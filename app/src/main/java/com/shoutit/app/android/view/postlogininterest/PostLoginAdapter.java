@@ -18,6 +18,7 @@ import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -31,7 +32,8 @@ public class PostLoginAdapter extends BaseAdapter {
     private final Picasso mPicasso;
 
     @Inject
-    public PostLoginAdapter(@ForActivity Context context, LayoutInflater inflater, Picasso picasso) {
+    public PostLoginAdapter(@ForActivity Context context, LayoutInflater inflater,
+                            @Named("NoAmazonTransformer") Picasso picasso) {
         super(context);
         mInflater = inflater;
         mPicasso = picasso;

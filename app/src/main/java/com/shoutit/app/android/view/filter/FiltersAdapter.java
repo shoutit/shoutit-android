@@ -12,6 +12,7 @@ import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 public class FiltersAdapter extends BaseAdapter {
     private final int VIEW_TYPE_HEADER = 1;
@@ -26,11 +27,15 @@ public class FiltersAdapter extends BaseAdapter {
 
     @Nonnull
     private final Picasso picasso;
+    private final Picasso picassoNoTransformer;
 
     @Inject
-    public FiltersAdapter(@ForActivity Context context, @Nonnull Picasso picasso) {
+    public FiltersAdapter(@ForActivity Context context,
+                          @Nonnull Picasso picasso,
+                          @Named("NoAmazonTransformer") Picasso picassoNoTransformer) {
         super(context);
         this.picasso = picasso;
+        this.picassoNoTransformer = picassoNoTransformer;
     }
 
     @Override
@@ -41,7 +46,7 @@ public class FiltersAdapter extends BaseAdapter {
             case VIEW_TYPE_SHOUT_TYPE:
                 return new FilterViewHolders.ShoutTypeViewHolder(layoutInflater.inflate(R.layout.filters_shout_type_item, parent, false), context);
             case VIEW_TYPE_CATEGORY:
-                return new FilterViewHolders.CategoryViewHolder(layoutInflater.inflate(R.layout.filters_category_item, parent, false), picasso, context);
+                return new FilterViewHolders.CategoryViewHolder(layoutInflater.inflate(R.layout.filters_category_item, parent, false), picassoNoTransformer, context);
             case VIEW_TYPE_PRICE:
                 return new FilterViewHolders.PriceViewHolder(layoutInflater.inflate(R.layout.filters_price_item, parent, false));
             case VIEW_TYPE_LOCATION:

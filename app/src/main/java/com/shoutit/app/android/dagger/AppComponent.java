@@ -29,6 +29,7 @@ import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.PusherHelper;
 import com.squareup.picasso.Picasso;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Component;
@@ -55,6 +56,9 @@ public interface AppComponent {
     Context getContext();
 
     Picasso getPicasso();
+
+    @Named("NoAmazonTransformer")
+    Picasso getNoAmazonTransformPicasso();
 
     Gson gson();
 
