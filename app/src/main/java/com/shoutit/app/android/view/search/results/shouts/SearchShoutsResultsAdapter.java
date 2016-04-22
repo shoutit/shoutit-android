@@ -17,16 +17,21 @@ import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 public class SearchShoutsResultsAdapter extends ChangeableLayoutManagerAdapter {
     public static final int VIEW_TYPE_NO_RESULTS = 3;
 
     private final Picasso picasso;
+    private final Picasso picassoNoTransformer;
 
     @Inject
-    public SearchShoutsResultsAdapter(@ForActivity @Nonnull Context context, Picasso picasso) {
+    public SearchShoutsResultsAdapter(@ForActivity @Nonnull Context context,
+                                      Picasso picasso,
+                                      @Named("NoAmazonTransformer") Picasso picassoNoTransformer) {
         super(context);
         this.picasso = picasso;
+        this.picassoNoTransformer = picassoNoTransformer;
     }
 
 
@@ -35,7 +40,7 @@ public class SearchShoutsResultsAdapter extends ChangeableLayoutManagerAdapter {
         switch (viewType) {
             case VIEW_TYPE_SHOUT:
                 return isLinearLayoutManager ?
-                        new ShoutLinerViewHolder(layoutInflater.inflate(R.layout.home_feed_item_linear, parent, false), context, picasso) :
+                        new ShoutLinerViewHolder(layoutInflater.inflate(R.layout.home_feed_item_linear, parent, false), context, picasso, picassoNoTransformer) :
                         new ShoutGridViewHolder(layoutInflater.inflate(R.layout.shout_item_grid, parent, false), picasso);
             case VIEW_TYPE_NO_RESULTS:
                 return new NoDataViewHolder(layoutInflater.inflate(R.layout.search_shouts_results_no_results, parent, false));

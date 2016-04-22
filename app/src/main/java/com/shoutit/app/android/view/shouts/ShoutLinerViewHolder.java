@@ -18,6 +18,8 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -45,12 +47,15 @@ public class ShoutLinerViewHolder extends ViewHolderManager.BaseViewHolder<Shout
     private CompositeSubscription subscription;
     private final Context context;
     private final Picasso picasso;
+    private final Picasso picassoNoTransformer;
     private ShoutAdapterItem item;
 
-    public ShoutLinerViewHolder(@Nonnull View itemView, Context context, Picasso picasso) {
+    public ShoutLinerViewHolder(@Nonnull View itemView, Context context, Picasso picasso,
+                                @Named("NoAmazonTransformer") Picasso picassoNoTransformer) {
         super(itemView);
         this.context = context;
         this.picasso = picasso;
+        this.picassoNoTransformer = picassoNoTransformer;
         ButterKnife.bind(this, itemView);
         itemView.setOnClickListener(this);
     }
@@ -79,7 +84,7 @@ public class ShoutLinerViewHolder extends ViewHolderManager.BaseViewHolder<Shout
                 .centerCrop()
                 .into(cardImageView);
 
-        picasso.load(item.getCategoryIconUrl())
+        picassoNoTransformer.load(item.getCategoryIconUrl())
                 .fit()
                 .centerInside()
                 .into(itemCategoryImageView);
