@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.text.format.DateUtils;
 
-import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
@@ -34,10 +33,8 @@ import com.shoutit.app.android.api.model.PusherMessage;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutResponse;
 import com.shoutit.app.android.api.model.User;
-import com.shoutit.app.android.api.model.UserIdentity;
 import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ForActivity;
-import com.shoutit.app.android.dao.UsersIdentityDao;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.PusherHelper;
@@ -291,13 +288,9 @@ public class ChatsPresenter {
 
                         if (mIsShoutConversation) {
                             final AboutShout about = conversationResponse.getAbout();
-
                             final String id = about.getId();
 
                             if (!Strings.isNullOrEmpty(id)) {
-                                chatParticipantUsernameSubject.onNext(about.getProfile().getUsername());
-                                mUserPreferences.setShoutOwnerName(about.getProfile().getName());
-
                                 final String title = about.getTitle();
                                 final String thumbnail = Strings.emptyToNull(about.getThumbnail());
                                 final String type = about.getType().equals(Shout.TYPE_OFFER) ? mContext.getString(R.string.chat_offer) : mContext.getString(R.string.chat_request);
@@ -305,16 +298,34 @@ public class ChatsPresenter {
                                 final String authorAndTime = about.getProfile().getName() + " - " + DateUtils.getRelativeTimeSpanString(mContext, about.getDatePublished() * 1000);
                                 mListener.setAboutShoutData(title, thumbnail, type, price, authorAndTime, id);
                                 mListener.setShoutToolbarInfo(title, ConversationsUtils.getChatWithString(conversationResponse.getProfiles(), user.getId()));
+                                mListener.showVideoChatIcon();
                             } else {
                                 mListener.setShoutToolbarInfo(mContext.getString(R.string.chat_shout_chat), ConversationsUtils.getChatWithString(conversationResponse.getProfiles(), user.getId()));
                             }
                         } else {
                             mListener.setChatToolbatInfo(ConversationsUtils.getChatWithString(conversationResponse.getProfiles(), user.getId()));
                         }
+                        setupUserForVideoChat(conversationResponse.getProfiles());
                     }
                 }, getOnError()));
 
 
+    }
+
+    private void setupUserForVideoChat(@Nonnull List<ConversationProfile> profiles) {
+        if (profiles.size() == 2) {
+            final ConversationProfile participant;
+            if (profiles.get(0).getUsername()
+                    .equals(mUserPreferences.getUser().getUsername())) {
+                participant = profiles.get(1);
+            } else {
+                participant = profiles.get(0);
+            }
+
+            chatParticipantUsernameSubject.onNext(participant.getUsername());
+            mUserPreferences.setShoutOwnerName(participant.getName());
+            mListener.showVideoChatIcon();
+        }
     }
 
     @NonNull
