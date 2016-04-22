@@ -376,7 +376,8 @@ public interface ApiService {
      * Notifications
      **/
     @GET("notifications")
-    Observable<NotificationsResponse> notifications();
+    Observable<NotificationsResponse> notifications(@Query("before") Integer beforeTimestamp,
+                                                    @Query("page_size") Integer pageSize);
 
     @POST("notifications/reset")
     Observable<ResponseBody> markAllAsRead();
