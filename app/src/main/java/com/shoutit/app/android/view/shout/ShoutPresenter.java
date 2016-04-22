@@ -58,7 +58,6 @@ public class ShoutPresenter {
     private final Observable<String> titleObservable;
     private final Observable<String> usernameObservable;
     private final Observable<Boolean> isUserShoutOwnerObservable;
-    private final Observable<ResponseOrError<UserIdentity>> userIdentityResponse;
     private final Observable<String> shoutOwnerNameObservable;
     private final Observable<ResponseOrError<MobilePhoneResponse>> callErrorObservable;
     private final Observable<Boolean> hasMobilePhoneObservable;
@@ -68,8 +67,6 @@ public class ShoutPresenter {
     private final Observable<Response<Object>> reportShoutObservable;
     private final Observable<List<Conversation>> conversationObservable;
     private final Observable<Object> refreshUserShoutsObservable;
-    private final Observable<String> identityUserObservable;
-    private final Observable<UserIdentity> successUserIdentity;
     private final Observable<String> videoCallClickedObservable;
     private final Observable<Boolean> editShoutClickedObservable;
     private final Observable<Object> onlyForLoggedInUserObservable;
@@ -99,8 +96,7 @@ public class ShoutPresenter {
                           @Nonnull @ForActivity final Context context,
                           @Nonnull @UiScheduler final Scheduler uiScheduler,
                           @Nonnull final UserPreferences userPreferences,
-                          @Nonnull final ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
-                          @Nonnull final UsersIdentityDao usersIdentityDao) {
+                          @Nonnull final ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter) {
         this.uiScheduler = uiScheduler;
         mUserPreferences = userPreferences;
 
@@ -254,32 +250,6 @@ public class ShoutPresenter {
                     }
                 });
 
-        /** Shout Owner Identity**/
-        userIdentityResponse = getUsernameObservable()
-                .filter(new Func1<String, Boolean>() {
-                    @Override
-                    public Boolean call(String userName) {
-                        return userName != null && !userName.equals(userPreferences.getUser().getUsername());
-                    }
-                })
-                .flatMap(new Func1<String, Observable<ResponseOrError<UserIdentity>>>() {
-                    @Override
-                    public Observable<ResponseOrError<UserIdentity>> call(String username) {
-                        return usersIdentityDao.getUserIdentityObservable(username);
-                    }
-                });
-
-        successUserIdentity = userIdentityResponse
-                .compose(ResponseOrError.<UserIdentity>onlySuccess());
-
-        identityUserObservable = successUserIdentity
-                .map(new Func1<UserIdentity, String>() {
-                    @Override
-                    public String call(UserIdentity userIdentity) {
-                        return userIdentity.getIdentity();
-                    }
-                }).observeOn(uiScheduler);
-
         allAdapterItemsObservable = Observable.combineLatest(
                 shoutItemObservable,
                 userShoutItemsObservable.startWith(ImmutableList.<BaseAdapterItem>of()),
@@ -315,8 +285,7 @@ public class ShoutPresenter {
         errorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
                 ResponseOrError.transform(userShoutsObservable),
                 ResponseOrError.transform(shoutResponse),
-                ResponseOrError.transform(relatedShoutsObservable),
-                ResponseOrError.transform(userIdentityResponse)))
+                ResponseOrError.transform(relatedShoutsObservable)))
                 .filter(Functions1.isNotNull())
                 .observeOn(uiScheduler);
 
@@ -406,37 +375,25 @@ public class ShoutPresenter {
                 });
 
         videoCallClickedObservable = onVideoOrEditClickSubject
-                .withLatestFrom(Observable.combineLatest(isUserShoutOwnerObservable, identityUserObservable, new Func2<Boolean, String, BothParams<Boolean, String>>() {
-                            @Override
-                            public BothParams<Boolean, String> call(Boolean isOwner, String id) {
-                                return BothParams.of(isOwner, id);
-                            }
-                        }), new Func2<Object, BothParams<Boolean,String>, BothParams<Boolean, String>>() {
-                            @Override
-                            public BothParams<Boolean, String> call(Object o, BothParams<Boolean, String> isOwnerAndIdentity) {
-                                return isOwnerAndIdentity;
-                            }
-                        }
-                )
-                .filter(new Func1<BothParams<Boolean, String>, Boolean>() {
+                .withLatestFrom(isUserShoutOwnerObservable, new Func2<Object, Boolean, Boolean>() {
                     @Override
-                    public Boolean call(BothParams<Boolean, String> isOwnerAndIdentity) {
-                        return !isOwnerAndIdentity.param1();
+                    public Boolean call(Object o, Boolean isShoutOwner) {
+                        return isShoutOwner;
                     }
                 })
-                .filter(new Func1<BothParams<Boolean, String>, Boolean>() {
+                .filter(Functions1.isFalse())
+                .filter(new Func1<Boolean, Boolean>() {
                     @Override
-                    public Boolean call(BothParams<Boolean, String> booleanStringBothParams) {
+                    public Boolean call(Boolean aBoolean) {
                         return !userPreferences.isGuest();
                     }
                 })
-                .map(new Func1<BothParams<Boolean, String>, String>() {
+                .flatMap(new Func1<Boolean, Observable<String>>() {
                     @Override
-                    public String call(BothParams<Boolean, String> isOwnerAndIdentity) {
-                        return isOwnerAndIdentity.param2();
+                    public Observable<String> call(Boolean aBoolean) {
+                        return usernameObservable;
                     }
                 });
-
 
         editShoutClickedObservable = onVideoOrEditClickSubject
                 .withLatestFrom(isUserShoutOwnerObservable, new Func2<Object, Boolean, Boolean>() {
@@ -501,10 +458,6 @@ public class ShoutPresenter {
         return refreshUserShoutsObservable;
     }
 
-    @Nonnull
-    public Observable<String> getIdentityUserObservable() {
-        return identityUserObservable;
-    }
     @Nonnull
     public Observable<String> getOnCategoryClickedObservable() {
         return onCategoryClickedSubject;
@@ -573,11 +526,6 @@ public class ShoutPresenter {
                     }
                 })
                 .observeOn(uiScheduler);
-    }
-
-    @Nonnull
-    public Observable<String> getUsernameObservable() {
-        return usernameObservable;
     }
 
     @Nonnull

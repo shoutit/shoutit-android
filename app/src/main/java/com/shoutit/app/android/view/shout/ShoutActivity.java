@@ -307,8 +307,8 @@ public class ShoutActivity extends BaseActivity {
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(new Action1<String>() {
                     @Override
-                    public void call(String userId) {
-                        startActivity(VideoConversationActivity.newIntent(null, userId, ShoutActivity.this));
+                    public void call(String calledUserName) {
+                        startActivity(VideoConversationActivity.newIntent(null, calledUserName, ShoutActivity.this));
                     }
                 });
 
