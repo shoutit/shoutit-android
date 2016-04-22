@@ -346,19 +346,23 @@ public interface ApiService {
      * Conversations
      */
     @GET("conversations")
-    Observable<ConversationsResponse> getConversations();
+    Observable<ConversationsResponse> getConversations(@Query("page_size") Integer pageSize);
 
     @GET("conversations")
-    Observable<ConversationsResponse> getConversations(@NonNull @Query("after") String timestamp);
+    Observable<ConversationsResponse> getConversations(@NonNull @Query("before") String timestamp,
+                                                       @Query("page_size") Integer pageSize);
 
     @GET("conversations/{id}")
     Observable<Conversation> getConversation(@NonNull @Path("id") String id);
 
     @GET("conversations/{id}/messages")
-    Observable<MessagesResponse> getMessages(@NonNull @Path("id") String conversationId);
+    Observable<MessagesResponse> getMessages(@NonNull @Path("id") String conversationId,
+                                             @Query("page_size") Integer pageSize);
 
     @GET("conversations/{id}/messages")
-    Observable<MessagesResponse> getMessages(@NonNull @Path("id") String conversationId, @NonNull @Query("after") String timestamp);
+    Observable<MessagesResponse> getMessages(@NonNull @Path("id") String conversationId,
+                                             @NonNull @Query("before") String timestamp,
+                                             @Query("page_size") Integer pageSize);
 
     @POST("conversations/{id}/reply")
     Observable<Message> postMessage(@NonNull @Path("id") String conversationId, @NonNull @Body PostMessage message);

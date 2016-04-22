@@ -48,29 +48,31 @@ import rx.subjects.PublishSubject;
 
 public class ConversationsPresenter {
 
+    private static final int PAGE_SIZE = 20;
+
     final OperatorMergeNextToken<ConversationsResponse, Object> loadMoreOperator =
             OperatorMergeNextToken.create(new Func1<ConversationsResponse, Observable<ConversationsResponse>>() {
 
                 @Override
                 public Observable<ConversationsResponse> call(ConversationsResponse conversationsResponse) {
-                    if (conversationsResponse == null || conversationsResponse.getNext() != null) {
+                    if (conversationsResponse == null || conversationsResponse.getPrevious() != null) {
                         if (conversationsResponse == null) {
-                            return mApiService.getConversations()
+                            return mApiService.getConversations(PAGE_SIZE)
                                     .subscribeOn(mNetworkScheduler)
                                     .observeOn(mUiScheduler);
                         } else {
-                            final String after = Uri.parse(conversationsResponse.getNext()).getQueryParameter("after");
+                            final String after = Uri.parse(conversationsResponse.getPrevious()).getQueryParameter("before");
                             return Observable.just(
                                     conversationsResponse)
                                     .zipWith(
-                                            mApiService.getConversations(after)
+                                            mApiService.getConversations(after, PAGE_SIZE)
                                                     .subscribeOn(mNetworkScheduler)
                                                     .observeOn(mUiScheduler),
                                             new Func2<ConversationsResponse, ConversationsResponse, ConversationsResponse>() {
                                                 @Override
                                                 public ConversationsResponse call(ConversationsResponse conversationsResponse, ConversationsResponse newResponse) {
                                                     return new ConversationsResponse(newResponse.getNext(),
-                                                            ImmutableList.copyOf(Iterables.concat(
+                                                            newResponse.getPrevious(), ImmutableList.copyOf(Iterables.concat(
                                                                     conversationsResponse.getResults(),
                                                                     newResponse.getResults())));
                                                 }
