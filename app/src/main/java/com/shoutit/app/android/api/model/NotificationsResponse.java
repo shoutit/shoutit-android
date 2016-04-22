@@ -60,6 +60,10 @@ public class NotificationsResponse extends PaginatedResponse {
             return createdAt * 1000L;
         }
 
+        public int getCreatedAt() {
+            return createdAt;
+        }
+
         public boolean isRead() {
             return isRead;
         }

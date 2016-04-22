@@ -16,6 +16,7 @@ import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.NotificationsResponse;
 import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.dao.NotificationsDao;
+import com.shoutit.app.android.utils.rx.RxMoreObservers;
 
 import java.util.List;
 
@@ -46,12 +47,15 @@ public class NotificationsPresenter {
     private final PublishSubject<Object> markAllAsReadSubject = PublishSubject.create();
     @Nonnull
     private final PublishSubject<String> markSingleAsReadSubject = PublishSubject.create();
+    @Nonnull
+    private final NotificationsDao dao;
 
     @Inject
     public NotificationsPresenter(@Nonnull NotificationsDao dao,
                                   @Nonnull @UiScheduler final Scheduler uiScheduler,
                                   @Nonnull @NetworkScheduler final Scheduler networkScheduler,
                                   @Nonnull final ApiService apiService) {
+        this.dao = dao;
 
         final Observable<ResponseOrError<NotificationsResponse>> notificationsObservable = dao
                 .getNotificationsObservable()
@@ -124,6 +128,11 @@ public class NotificationsPresenter {
                 markAllAsReadSubject.map(Functions1.returnTrue()),
                 errorObservable.map(Functions1.returnFalse()))
                 .startWith(true);
+    }
+
+    @Nonnull
+    public Observer<Object> loadMoreObserver() {
+        return RxMoreObservers.ignoreCompleted(dao.getLoadMoreObserver());
     }
 
     @Nonnull

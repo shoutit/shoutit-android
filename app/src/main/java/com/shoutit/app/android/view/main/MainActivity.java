@@ -145,7 +145,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
                 }));
         mStatsSubscription.add(mUserPreferences.getUserObservable()
                 .filter(Functions1.isNotNull())
-                .first()
+                .distinctUntilChanged()
                 .subscribe(new Action1<User>() {
                     @Override
                     public void call(User user) {
