@@ -33,4 +33,6 @@ public interface Listener {
     void setShoutToolbarInfo(String title, String chatWithString);
 
     void setChatToolbatInfo(String chatWithString);
+
+    void showVideoChatIcon();
 }

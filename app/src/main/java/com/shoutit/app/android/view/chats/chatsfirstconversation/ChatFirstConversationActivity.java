@@ -311,6 +311,11 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
     }
 
     @Override
+    public void showVideoChatIcon() {
+
+    }
+
+    @Override
     protected void onDestroy() {
         presenter.unregister();
         super.onDestroy();

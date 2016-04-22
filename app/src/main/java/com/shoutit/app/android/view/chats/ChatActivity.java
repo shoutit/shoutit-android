@@ -146,7 +146,8 @@ public class ChatActivity extends BaseActivity implements Listener {
                         return true;
                     }
                     case R.id.chats_video_menu: {
-                       presenter.getCalledPersonNameObservable()
+                        presenter.getCalledPersonNameObservable()
+                                .compose(ChatActivity.this.<String>bindToLifecycle())
                                 .subscribe(new Action1<String>() {
                                     @Override
                                     public void call(String calledUserUserName) {
@@ -198,6 +199,8 @@ public class ChatActivity extends BaseActivity implements Listener {
         ChatsHelper.setOnClickHideListener(mChatsRecyclerview, mChatsAttatchmentsLayout);
         ChatsHelper.setOnClickHideListener(mChatsMessageEdittext, mChatsAttatchmentsLayout);
     }
+
+
 
     @Nonnull
     @Override
@@ -257,6 +260,14 @@ public class ChatActivity extends BaseActivity implements Listener {
     @Override
     public void setChatToolbatInfo(String chatWithString) {
         mChatsToolbar.setTitle(chatWithString);
+    }
+
+    @Override
+    public void showVideoChatIcon() {
+        final MenuItem item = mChatsToolbar.getMenu().findItem(R.id.chats_video_menu);
+        if (item != null) {
+            item.setVisible(true);
+        }
     }
 
     @Override
