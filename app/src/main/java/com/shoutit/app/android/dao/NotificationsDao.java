@@ -37,7 +37,7 @@ public class NotificationsDao {
 
                     @Override
                     public Observable<NotificationsResponse> call(NotificationsResponse previousResponse) {
-                        if (previousResponse == null || previousResponse.getNext() != null) {
+                        if (previousResponse == null || previousResponse.getPrevious() != null) {
                             if (previousResponse == null) {
                                 beforeTimestamp = null;
                             } else {
