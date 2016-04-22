@@ -461,4 +461,6 @@
 <string name="verify_email_title">"التحقق من البريد الإلكتروني"</string>
 <string name="video_calls_cannot_start_conversation">"عذراً, لايمكن بدء مكالمة فيديو حالياً. يرجى المحاولة لاحقاً"</string>
 <string name="conversations_empty">"لا توجد محادثات"</string>
+<string name="listen_success">"لقد بدأت بالاستماع إلى %1$s بنجاح"</string>
+<string name="unlisten_success">"لقد توقفت عن الاستماع إلى %1$s بنجاح"</string>
 </resources>
