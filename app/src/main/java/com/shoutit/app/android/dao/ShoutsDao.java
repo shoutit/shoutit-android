@@ -368,6 +368,9 @@ public class ShoutsDao {
     }
 
     public class SearchShoutsDao extends BaseShoutsDao {
+
+        private static final int DEFAULT_SEARCH_DISTANCE = 20;
+
         @Nonnull
         private final SearchShoutPointer pointer;
 
@@ -403,7 +406,7 @@ public class ShoutsDao {
                     } else {
                         return apiService.searchShouts(query, pageNumber, PAGE_SIZE,
                                 country, city, state,
-                                null, null, null, null, null, null, null);
+                                null, null, DEFAULT_SEARCH_DISTANCE, null, null, null, null);
                     }
                 case RELATED_SHOUTS:
                     return apiService.shoutsRelated(contextItemId, pageNumber, PAGE_SIZE);
@@ -418,7 +421,7 @@ public class ShoutsDao {
                     } else {
                         return apiService.searchTagShouts(query, pageNumber, PAGE_SIZE, contextItemId,
                                 country, city, state,
-                                null, null, null, null, null, null, null);
+                                null, null, DEFAULT_SEARCH_DISTANCE, null, null, null, null);
                     }
                 case CATEGORY:
                     if (filtersToSubmit != null) {
@@ -431,7 +434,7 @@ public class ShoutsDao {
                     } else {
                         return apiService.searchCategoriesShouts(query, pageNumber, PAGE_SIZE, contextItemId,
                                 country, city, state,
-                                null, null, null, null, null, null, null);
+                                null, null, DEFAULT_SEARCH_DISTANCE, null, null, null, null);
                     }
                 case DISCOVER:
                     if (filtersToSubmit != null) {
@@ -442,7 +445,7 @@ public class ShoutsDao {
                                 filtersToSubmit.getFiltersQueryMap());
                     } else {
                         return apiService.searchDiscoverShouts(query, pageNumber, PAGE_SIZE, contextItemId,
-                                null, null, null, null, null, null, null);
+                                null, null, DEFAULT_SEARCH_DISTANCE, null, null, null, null);
                     }
                 case BROWSE:
                     if (filtersToSubmit != null) {
@@ -453,7 +456,8 @@ public class ShoutsDao {
                                 filtersToSubmit.getSortType().getType(), filtersToSubmit.getCategorySlug(),
                                 filtersToSubmit.getFiltersQueryMap());
                     } else {
-                        return apiService.shoutsForLocation(country, city, state, pageNumber, PAGE_SIZE, null, null, null, null, null, null, null);
+                        return apiService.shoutsForLocation(country, city, state, pageNumber, PAGE_SIZE,
+                                null, null, DEFAULT_SEARCH_DISTANCE, null, null, null, null);
                     }
                 default:
                     throw new RuntimeException("Unknwon profile type: " + SearchPresenter.SearchType.values()[searchType.ordinal()]);

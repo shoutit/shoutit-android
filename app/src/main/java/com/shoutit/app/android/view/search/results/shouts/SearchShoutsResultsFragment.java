@@ -40,6 +40,7 @@ import com.shoutit.app.android.view.filter.FiltersFragment;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Nonnull;
