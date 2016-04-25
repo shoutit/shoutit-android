@@ -24,7 +24,8 @@ import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LayoutManagerHelper;
 import com.shoutit.app.android.utils.LoadMoreHelper;
-import com.shoutit.app.android.utils.MyLayoutManager;
+import com.shoutit.app.android.utils.MyGridLayoutManager;
+import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
 import com.shoutit.app.android.view.discover.DiscoverActivity;
 import com.shoutit.app.android.view.main.OnSeeAllDiscoversListener;
@@ -66,6 +67,9 @@ public class HomeFragment extends BaseFragment {
     @Inject
     OnSeeAllDiscoversListener onSeeAllDiscoversListener;
 
+    private MyGridLayoutManager gridLayoutManager;
+    private MyLinearLayoutManager linearLayoutManager;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -77,6 +81,9 @@ public class HomeFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        gridLayoutManager = new MyGridLayoutManager(context, 2);
+        linearLayoutManager = new MyLinearLayoutManager(context);
 
         recyclerView.addItemDecoration(new BaseShoutsItemDecoration(
                 getResources().getDimensionPixelSize(R.dimen.home_linear_side_spacing), context));
@@ -107,7 +114,12 @@ public class HomeFragment extends BaseFragment {
 
         RxRecyclerView.scrollEvents(recyclerView)
                 .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
-                .filter(LoadMoreHelper.needLoadMore((MyLayoutManager) recyclerView.getLayoutManager(), adapter))
+                .filter(LoadMoreHelper.needLoadMore(gridLayoutManager, adapter))
+                .subscribe(presenter.getLoadMoreShouts());
+
+        RxRecyclerView.scrollEvents(recyclerView)
+                .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
+                .filter(LoadMoreHelper.needLoadMore(linearLayoutManager, adapter))
                 .subscribe(presenter.getLoadMoreShouts());
 
         presenter.getProgressObservable()
@@ -166,11 +178,11 @@ public class HomeFragment extends BaseFragment {
     }
 
     private void setLinearLayoutManager() {
-        LayoutManagerHelper.setLinearLayoutManager(context, recyclerView, adapter);
+        LayoutManagerHelper.setLinearLayoutManager(recyclerView, adapter, linearLayoutManager);
     }
 
     private void setGridLayoutManager() {
-        LayoutManagerHelper.setGridLayoutManager(context, recyclerView, adapter);
+        LayoutManagerHelper.setGridLayoutManager(recyclerView, adapter, gridLayoutManager);
     }
 
     @OnClick(R.id.fragment_home_fab)
