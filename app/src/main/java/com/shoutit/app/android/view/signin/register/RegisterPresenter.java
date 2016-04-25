@@ -72,7 +72,7 @@ public class RegisterPresenter {
                 .switchMap(new Func1<Boolean, Observable<UserLocation>>() {
                     @Override
                     public Observable<UserLocation> call(Boolean aBoolean) {
-                        return mLocationObservable.filter(Functions1.isNotNull());
+                        return mLocationObservable.filter(Functions1.isNotNull()).first();
                     }
                 })
                 .switchMap(new Func1<UserLocation, Observable<EmailSignupRequest>>() {
