@@ -1,6 +1,7 @@
 package com.shoutit.app.android.utils;
 
 import android.net.Uri;
+import android.support.annotation.NonNull;
 
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Request;
@@ -22,15 +23,7 @@ public class AmazonRequestTransfomer implements Picasso.RequestTransformer {
     public Request transformRequest(Request request) {
         final Uri uri = request.uri;
         if (uri != null && uri.getHost().contains(IMAGE_URL)) {
-            final int maxDimen = Math.max(request.targetWidth, request.targetHeight);
-            final String variation;
-            if (maxDimen < SMALL_SIZE) {
-                variation = SMALL;
-            } else if (maxDimen < MEDIUM_SIZE) {
-                variation = MEDIUM;
-            } else {
-                variation = LARGE;
-            }
+            final String variation = getVariation(request.targetWidth, request.targetHeight);
 
             final String newPath = transformUrl(uri.getPath(), uri.getLastPathSegment(), variation);
 
@@ -40,16 +33,33 @@ public class AmazonRequestTransfomer implements Picasso.RequestTransformer {
                             .path(newPath)
                             .build())
                     .build();
-
         } else {
             return request;
         }
     }
 
+    @NonNull
+    private String getVariation(int targetWidth, int targetHeight) {
+        final int maxDimen = Math.max(targetWidth, targetHeight);
+        final String variation;
+        if (maxDimen < SMALL_SIZE) {
+            variation = SMALL;
+        } else if (maxDimen < MEDIUM_SIZE) {
+            variation = MEDIUM;
+        } else {
+            variation = LARGE;
+        }
+        return variation;
+    }
+
     @Nonnull
     String transformUrl(@Nonnull String path, @Nonnull String lastPathSegment, @Nonnull String variation) {
         final String[] split = lastPathSegment.split("\\.");
-        final String newLastPath = String.format("%1$s_%2$s.%3$s", split[0], variation, split[1]);
-        return path.replace(lastPathSegment, newLastPath);
+        if (split.length > 1) {
+            final String newLastPath = String.format("%1$s_%2$s.%3$s", split[0], variation, split[1]);
+            return path.replace(lastPathSegment, newLastPath);
+        } else {
+            return String.format("%1$s_%2$s", lastPathSegment, variation);
+        }
     }
 }
