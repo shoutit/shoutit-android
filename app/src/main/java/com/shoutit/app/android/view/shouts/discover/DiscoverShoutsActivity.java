@@ -29,7 +29,9 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.LayoutManagerHelper;
 import com.shoutit.app.android.utils.LoadMoreHelper;
+import com.shoutit.app.android.utils.MyGridLayoutManager;
 import com.shoutit.app.android.utils.MyLayoutManager;
+import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.conversations.ConversationsActivity;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
 import com.shoutit.app.android.view.search.SearchPresenter;
@@ -77,10 +79,16 @@ public class DiscoverShoutsActivity extends BaseActivity {
     @Inject
     UserPreferences mUserPreferences;
 
+    private MyGridLayoutManager gridLayoutManager;
+    private MyLinearLayoutManager linearLayoutManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_discover_shouts);
+
+        gridLayoutManager = new MyGridLayoutManager(this, 2);
+        linearLayoutManager = new MyLinearLayoutManager(this);
 
         ButterKnife.bind(this);
 
@@ -109,7 +117,12 @@ public class DiscoverShoutsActivity extends BaseActivity {
 
         RxRecyclerView.scrollEvents(mRecyclerView)
                 .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
-                .filter(LoadMoreHelper.needLoadMore((MyLayoutManager) mRecyclerView.getLayoutManager(), mShoutsAdapter))
+                .filter(LoadMoreHelper.needLoadMore(linearLayoutManager, mShoutsAdapter))
+                .subscribe(mShoutsPresenter.getLoadMoreObserver());
+
+        RxRecyclerView.scrollEvents(mRecyclerView)
+                .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
+                .filter(LoadMoreHelper.needLoadMore(gridLayoutManager, mShoutsAdapter))
                 .subscribe(mShoutsPresenter.getLoadMoreObserver());
 
         layoutSwitchIcon.setOnClickListener(new View.OnClickListener() {
@@ -218,11 +231,11 @@ public class DiscoverShoutsActivity extends BaseActivity {
     }
 
     private void setLinearLayoutManager() {
-        LayoutManagerHelper.setLinearLayoutManager(this, mRecyclerView, mShoutsAdapter);
+        LayoutManagerHelper.setLinearLayoutManager(mRecyclerView, mShoutsAdapter, linearLayoutManager);
     }
 
     private void setGridLayoutManager() {
-        LayoutManagerHelper.setGridLayoutManager(this, mRecyclerView, mShoutsAdapter);
+        LayoutManagerHelper.setGridLayoutManager(mRecyclerView, mShoutsAdapter, gridLayoutManager);
     }
 
     @NonNull
