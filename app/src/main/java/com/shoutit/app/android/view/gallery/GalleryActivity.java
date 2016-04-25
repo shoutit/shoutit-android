@@ -16,6 +16,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.utils.AmazonRequestTransfomer;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.veinhorn.scrollgalleryview.Constants;
@@ -29,6 +30,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -44,6 +46,9 @@ public class GalleryActivity extends BaseActivity {
     @Bind(R.id.gallery_view)
     ScrollGalleryView galleryView;
 
+    @Inject
+    @Named("NoAmazonTransformer")
+    Picasso picassoWithoutAmazonTransformer;
     @Inject
     Picasso picasso;
     @Inject
@@ -105,7 +110,7 @@ public class GalleryActivity extends BaseActivity {
 
         @Override
         public void loadMedia(Context context, ImageView imageView, final SuccessCallback callback) {
-            picasso.load(imageUrl)
+            picassoWithoutAmazonTransformer.load(AmazonRequestTransfomer.transformUrl(imageUrl, AmazonRequestTransfomer.LARGE))
                     .placeholder(new BitmapDrawable(getResources(), Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)))
                     .into(imageView, new Callback() {
                         @Override
