@@ -114,7 +114,6 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
         setUpActionBar();
         setUpDrawer();
-        updateUser();
 
         if (savedInstanceState == null) {
             getSupportFragmentManager()
@@ -204,21 +203,6 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
             startActivity(MainSearchActivity.newIntent(this));
             return true;
         }
-    }
-
-    private void updateUser() {
-        if (!mUserPreferences.isNormalUser()) {
-            return;
-        }
-
-        profilesDao.updateUser()
-                .compose(this.<User>bindToLifecycle())
-                .subscribe(new Action1<User>() {
-                    @Override
-                    public void call(User user) {
-                        mUserPreferences.saveUserAsJson(user);
-                    }
-                });
     }
 
     private void setUpActionBar() {
