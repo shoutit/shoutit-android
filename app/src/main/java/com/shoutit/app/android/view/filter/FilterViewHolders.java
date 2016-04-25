@@ -511,6 +511,7 @@ public class FilterViewHolders {
                 public void run() {
                     subscription = new CompositeSubscription(
                             RxSeekBar.userChanges(distanceSeekbar)
+                                    .startWith(distanceSeekbar.getProgress())
                                     .subscribe(new Action1<Integer>() {
                                         @Override
                                         public void call(Integer progress) {
