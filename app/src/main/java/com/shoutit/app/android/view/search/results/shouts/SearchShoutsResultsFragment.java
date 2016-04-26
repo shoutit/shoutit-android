@@ -33,11 +33,14 @@ import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.utils.LayoutManagerHelper;
 import com.shoutit.app.android.utils.LoadMoreHelper;
+import com.shoutit.app.android.utils.MyGridLayoutManager;
 import com.shoutit.app.android.utils.MyLayoutManager;
+import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.filter.FiltersFragment;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -78,6 +81,8 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
     private ActionBarDrawerToggle drawerToggle;
     private SearchPresenter.SearchType searchType;
     private String searchQuery;
+    private MyGridLayoutManager gridLayoutManager;
+    private MyLinearLayoutManager linearLayoutManager;
 
     public static Fragment newInstance(@Nullable String searchQuery,
                                        @Nullable String contextualItemId,
@@ -108,6 +113,9 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        gridLayoutManager = new MyGridLayoutManager(getActivity(), 2);
+        linearLayoutManager = new MyLinearLayoutManager(getActivity());
 
         searchType = (SearchPresenter.SearchType)
                 checkNotNull(getArguments().getSerializable(SearchShoutsResultsActivity.KEY_SEARCH_TYPE));
@@ -150,7 +158,12 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
 
         RxRecyclerView.scrollEvents(recyclerView)
                 .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
-                .filter(LoadMoreHelper.needLoadMore((MyLayoutManager) recyclerView.getLayoutManager(), adapter))
+                .filter(LoadMoreHelper.needLoadMore(linearLayoutManager, adapter))
+                .subscribe(presenter.getLoadMoreObserver());
+
+        RxRecyclerView.scrollEvents(recyclerView)
+                .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
+                .filter(LoadMoreHelper.needLoadMore(gridLayoutManager, adapter))
                 .subscribe(presenter.getLoadMoreObserver());
 
         presenter.getCountObservable()
@@ -242,11 +255,11 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
     }
 
     private void setLinearLayoutManager() {
-        LayoutManagerHelper.setLinearLayoutManager(getActivity(), recyclerView, adapter);
+        LayoutManagerHelper.setLinearLayoutManager(recyclerView, adapter, linearLayoutManager);
     }
 
     private void setGridLayoutManager() {
-        LayoutManagerHelper.setGridLayoutManager(getActivity(), recyclerView, adapter);
+        LayoutManagerHelper.setGridLayoutManager(recyclerView, adapter, gridLayoutManager);
     }
 
     private void initFiltersDrawer() {

@@ -59,7 +59,7 @@ public class PusherHelper {
             final HttpAuthorizer authorizer = new HttpAuthorizer(BuildConfig.API_URL + "pusher/auth");
             authorizer.setHeaders(ImmutableMap.of("Authorization", "Bearer " + token));
             final PusherOptions options = new PusherOptions().setAuthorizer(authorizer);
-            mPusher = new Pusher(PRODUCTION_KEY, options);
+            mPusher = new Pusher(BuildConfig.DEBUG ? DEBUG_KEY : PRODUCTION_KEY, options);
         }
     }
 

@@ -14,7 +14,6 @@ import com.shoutit.app.android.api.model.NotificationsResponse;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
-import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.subjects.PublishSubject;
 
@@ -28,15 +27,22 @@ public class NotificationsDao {
     @NonNull
     private final PublishSubject<Object> refreshSubject = PublishSubject.create();
     @NonNull
-    private final PublishSubject<Object> loadMoreSubject = PublishSubject.create();
+    private final PublishSubject<NotificationsResponse> loadMoreSubject = PublishSubject.create();
 
     public NotificationsDao(final ApiService apiService, @NetworkScheduler final Scheduler networkScheduler) {
-        final OperatorMergeNextToken<NotificationsResponse, Object> loadMoreOperator =
-                OperatorMergeNextToken.create(new Func1<NotificationsResponse, Observable<NotificationsResponse>>() {
+
+        final OperatorMergeNextToken<NotificationsResponse, NotificationsResponse> loadMoreOperator = OperatorMergeNextToken
+                .create(new Func2<NotificationsResponse, NotificationsResponse, Observable<NotificationsResponse>>() {
+
                     private Integer beforeTimestamp = null;
 
                     @Override
-                    public Observable<NotificationsResponse> call(NotificationsResponse previousResponse) {
+                    public Observable<NotificationsResponse> call(NotificationsResponse previousResponse,
+                                                                  NotificationsResponse responseUpdatedLocally) {
+                        if (responseUpdatedLocally != null) {
+                            return Observable.just(responseUpdatedLocally);
+                        }
+
                         if (previousResponse == null || previousResponse.getPrevious() != null) {
                             if (previousResponse == null) {
                                 beforeTimestamp = null;
@@ -60,11 +66,10 @@ public class NotificationsDao {
                     }
                 });
 
-        notificationsObservable = loadMoreSubject.startWith((Object) null)
+        notificationsObservable = loadMoreSubject.startWith((NotificationsResponse) null)
                 .lift(loadMoreOperator)
                 .compose(ResponseOrError.<NotificationsResponse>toResponseOrErrorObservable())
-                .compose(MoreOperators.<ResponseOrError<NotificationsResponse>>refresh(refreshSubject))
-                .compose(MoreOperators.<ResponseOrError<NotificationsResponse>>cacheWithTimeout(networkScheduler));
+                .compose(MoreOperators.<ResponseOrError<NotificationsResponse>>refresh(refreshSubject));
     }
 
     @NonNull
@@ -73,7 +78,7 @@ public class NotificationsDao {
     }
 
     @NonNull
-    public Observer<Object> getLoadMoreObserver() {
+    public Observer<NotificationsResponse> getLoadMoreObserver() {
         return loadMoreSubject;
     }
 

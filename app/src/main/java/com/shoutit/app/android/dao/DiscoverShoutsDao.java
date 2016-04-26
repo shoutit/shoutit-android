@@ -13,14 +13,10 @@ import javax.annotation.Nonnull;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
-import rx.subjects.PublishSubject;
 
 public class DiscoverShoutsDao {
 
     private final static int PAGE_SIZE = 20;
-
-    @Nonnull
-    private final PublishSubject<Object> loadMoreShoutsSubject = PublishSubject.create();
 
     private final LoadingCache<String, ShoutsDao> shoutsCache;
     @Nonnull

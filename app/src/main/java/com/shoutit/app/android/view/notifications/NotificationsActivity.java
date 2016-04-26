@@ -19,6 +19,7 @@ import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.NotificationsResponse;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
@@ -39,6 +40,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import rx.Subscription;
 import rx.functions.Action1;
+import rx.functions.Func1;
 
 public class NotificationsActivity extends BaseActivity {
 
@@ -103,6 +105,12 @@ public class NotificationsActivity extends BaseActivity {
         RxRecyclerView.scrollEvents(recyclerView)
                 .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
                 .filter(LoadMoreHelper.needLoadMore((MyLayoutManager) recyclerView.getLayoutManager(), adapter))
+                .map(new Func1<RecyclerViewScrollEvent, NotificationsResponse>() {
+                    @Override
+                    public NotificationsResponse call(RecyclerViewScrollEvent recyclerViewScrollEvent) {
+                        return null;
+                    }
+                })
                 .subscribe(presenter.loadMoreObserver());
     }
 

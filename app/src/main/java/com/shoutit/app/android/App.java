@@ -24,6 +24,7 @@ import com.shoutit.app.android.dagger.AppComponent;
 import com.shoutit.app.android.dagger.AppModule;
 import com.shoutit.app.android.dagger.BaseModule;
 import com.shoutit.app.android.dagger.DaggerAppComponent;
+import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.twilio.Twilio;
@@ -71,6 +72,8 @@ public class App extends MultiDexApplication {
     MixPanel mixPanel;
     @Inject
     StackCounterManager mStackCounterManager;
+    @Inject
+    ProfilesDao profilesDao;
 
     @Override
     public void onCreate() {
@@ -84,6 +87,7 @@ public class App extends MultiDexApplication {
         setupGraph();
 
         fetchLocation();
+        refreshUser();
 
         Dexter.initialize(this);
 
@@ -106,12 +110,25 @@ public class App extends MultiDexApplication {
 
                         if (pusher != null) {
                             if (foreground && mPusherHelper.shouldConnect()) {
-                                Log.i("pusherhelper", "true");
                                 pusher.connect(mPusherHelper.getEventListener());
                             } else if (!foreground) {
                                 pusher.disconnect();
                             }
                         }
+                    }
+                });
+    }
+
+    private void refreshUser() {
+        if (!userPreferences.isNormalUser()) {
+            return;
+        }
+
+        profilesDao.updateUser()
+                .subscribe(new Action1<User>() {
+                    @Override
+                    public void call(User user) {
+                        userPreferences.saveUserAsJson(user);
                     }
                 });
     }
