@@ -55,7 +55,7 @@ public class AmazonRequestTransfomer implements Picasso.RequestTransformer {
     }
 
     @Nonnull
-    private static String transformUrl(@Nonnull String path, @Nonnull String lastPathSegment, @Nonnull String variation) {
+    static String transformUrl(@Nonnull String path, @Nonnull String lastPathSegment, @Nonnull String variation) {
         final String[] split = lastPathSegment.split("\\.");
         if (split.length > 1) {
             final String newLastPath = String.format("%1$s_%2$s.%3$s", split[0], variation, split[1]);
