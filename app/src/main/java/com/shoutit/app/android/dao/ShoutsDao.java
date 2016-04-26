@@ -241,15 +241,12 @@ public class ShoutsDao {
         protected final PublishSubject<Object> refreshShoutsSubject = PublishSubject.create();
 
         public ShoutDao(@Nonnull final String shoutId) {
-            final Observable<Object> refreshWithCache = Observable
-                    .interval(5, TimeUnit.MINUTES, networkScheduler)
-                    .map(Functions1.toObject());
 
             shoutObservable = apiService.shout(shoutId)
                     .subscribeOn(networkScheduler)
+                    .mergeWith(Observable.<Shout>never())
                     .compose(MoreOperators.<Shout>refresh(refreshShoutsSubject))
                     .compose(ResponseOrError.<Shout>toResponseOrErrorObservable())
-                    .compose(MoreOperators.<ResponseOrError<Shout>>refresh(refreshWithCache))
                     .compose(MoreOperators.<ResponseOrError<Shout>>cacheWithTimeout(networkScheduler));
 
             shoutMobileObservable = apiService.shoutCall(shoutId)
