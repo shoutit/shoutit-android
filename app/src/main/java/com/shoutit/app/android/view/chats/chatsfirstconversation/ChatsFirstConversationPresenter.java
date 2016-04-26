@@ -118,7 +118,6 @@ public class ChatsFirstConversationPresenter {
                                            @UiScheduler Scheduler uiScheduler,
                                            @NetworkScheduler Scheduler networkScheduler,
                                            final UserPreferences userPreferences,
-                                           @Nonnull final UsersIdentityDao usersIdentityDao,
                                            @ForActivity Resources resources,
                                            @ForActivity Context context,
                                            PusherHelper pusher,
@@ -255,9 +254,9 @@ public class ChatsFirstConversationPresenter {
                     }
                 }));
         if (mIsShoutConversation) {
-            mSubscribe.add(mApiService.shout(mIdForCreation)
-                    .subscribeOn(mNetworkScheduler)
+            mSubscribe.add(mShoutsDao.getShoutObservable(mIdForCreation)
                     .observeOn(mUiScheduler)
+                    .compose(ResponseOrError.<Shout>onlySuccess())
                     .subscribe(new Action1<Shout>() {
                         @Override
                         public void call(Shout about) {
