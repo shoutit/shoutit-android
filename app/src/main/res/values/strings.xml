@@ -477,7 +477,9 @@
 
     <!-- Listenings -->
     <string name="listenings_empty">You have no items here yet.</string>
-    <string name="listenings_ab_title">Listening</string>
+    <string name="listenings_ab_title">Listenings</string>
     <string name="listers_ab_title">Listeners</string>
+    <string name="listening_tab_user">Users</string>
+    <string name="listening_tab_pages">Pages</string>
 
 </resources>

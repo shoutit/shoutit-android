@@ -1,5 +1,8 @@
 package com.shoutit.app.android.dagger;
 
+import android.content.Context;
+
+import com.shoutit.app.android.dao.ListeningsDao;
 import com.shoutit.app.android.db.DbHelper;
 
 import dagger.Component;
@@ -14,4 +17,7 @@ import dagger.Component;
 public interface BaseFragmentComponent {
 
         DbHelper dbHelper();
+
+        ListeningsDao listeningsDao();
+
 }

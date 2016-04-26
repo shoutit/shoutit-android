@@ -16,6 +16,7 @@ import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.dao.CategoriesDao;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.dao.DiscoversDao;
+import com.shoutit.app.android.dao.ListeningsDao;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.SortTypesDao;
@@ -81,6 +82,8 @@ public interface BaseActivityComponent {
     CategoriesDao caregoriesDao();
 
     SuggestionsDao suggestionsDao();
+
+    ListeningsDao listeningsDao();
 
     GoogleApiClient googleApiClient();
 

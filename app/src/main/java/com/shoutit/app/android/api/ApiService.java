@@ -266,9 +266,17 @@ public interface ApiService {
                                                      @Query("page") Integer page,
                                                      @Query("page_size") Integer pageSize);
 
-    @GET("profiles/me/listening")
-    Observable<ListeningResponse> listenings(@Query("page") Integer page,
+    @GET("profiles/me/listening?type=users")
+    Observable<ListeningResponse> usersListenings(@Query("page") Integer page,
                                              @Query("page_size") Integer pageSize);
+
+    @GET("profiles/me/listening?type=pages")
+    Observable<ListeningResponse> pagesListenings(@Query("page") Integer page,
+                                                  @Query("page_size") Integer pageSize);
+
+    @GET("profiles/me/listening?type=tags")
+    Observable<ListeningResponse> tagsListenings(@Query("page") Integer page,
+                                                  @Query("page_size") Integer pageSize);
 
     @GET("profiles/{user_name}/listeners")
     Observable<ListeningResponse> listeners(@Path("user_name") String userName,

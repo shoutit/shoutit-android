@@ -17,8 +17,7 @@ import com.shoutit.app.android.utils.ImageHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.utils.TextHelper;
-import com.shoutit.app.android.view.listeningsandlisteners.ListenersActivity;
-import com.shoutit.app.android.view.listeningsandlisteners.ListeningsActivity;
+import com.shoutit.app.android.view.listenings.ListeningsActivity;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -248,12 +247,17 @@ public class ProfileViewHolders {
 
         @OnClick(R.id.profile_fragment_listening)
         public void onListengsClick() {
-            context.startActivity(ListeningsActivity.newIntent(context));
+            context.startActivity(ListeningsActivity.newIntent(context, false));
         }
 
         @OnClick(R.id.my_profile_listeners)
         public void onListenersClick() {
-            context.startActivity(ListenersActivity.newIntent(context, User.ME));
+            // TODO add listeners
+        }
+
+        @OnClick(R.id.my_profile_interests)
+        public void onInterestsClick() {
+            context.startActivity(ListeningsActivity.newIntent(context, true));
         }
     }
 
@@ -340,11 +344,6 @@ public class ProfileViewHolders {
             } else {
                 item.onActionOnlyForLoggedInUser();
             }
-        }
-
-        @OnClick(R.id.my_profile_listeners)
-        public void onListenersClick() {
-            context.startActivity(ListenersActivity.newIntent(context, item.getUser().getUsername()));
         }
     }
 

@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.listeningsandlisteners;
+package com.shoutit.app.android.view.listenings;
 
 import android.content.Context;
 import android.view.View;
@@ -25,7 +25,7 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class ListeningsAdapter extends BaseAdapter {
+public class ProfilesListAdapter extends BaseAdapter {
 
     private static final int VIEW_TYPE_PROFILE = 1;
     private static final int VIEW_TYPE_EMPTY = 2;
@@ -33,14 +33,14 @@ public class ListeningsAdapter extends BaseAdapter {
     private final Picasso picasso;
 
     @Inject
-    public ListeningsAdapter(@ForActivity @Nonnull Context context,
-                             Picasso picasso) {
+    public ProfilesListAdapter(@ForActivity Context context,
+                               Picasso picasso) {
         super(context);
         this.picasso = picasso;
     }
 
 
-    public class ProfileViewHolder extends ViewHolderManager.BaseViewHolder<ListeningsAndListenersPresenter.ProfileAdapterItem> implements View.OnClickListener {
+    public class ProfileViewHolder extends ViewHolderManager.BaseViewHolder<ProfileAdapterItem> implements View.OnClickListener {
 
         @Bind(R.id.profile_avatar_iv)
         ImageView avatarImageView;
@@ -50,7 +50,7 @@ public class ListeningsAdapter extends BaseAdapter {
         TextView listenerTextView;
 
         private final Target target;
-        private ListeningsAndListenersPresenter.ProfileAdapterItem item;
+        private ProfileAdapterItem item;
 
         public ProfileViewHolder(@Nonnull View itemView) {
             super(itemView);
@@ -61,7 +61,7 @@ public class ListeningsAdapter extends BaseAdapter {
         }
 
         @Override
-        public void bind(@Nonnull ListeningsAndListenersPresenter.ProfileAdapterItem item) {
+        public void bind(@Nonnull ProfileAdapterItem item) {
             this.item = item;
             final ProfileType profile = item.getProfile();
 
@@ -85,7 +85,7 @@ public class ListeningsAdapter extends BaseAdapter {
     public ViewHolderManager.BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         switch (viewType) {
             case VIEW_TYPE_PROFILE:
-                return new ProfileViewHolder(layoutInflater.inflate(R.layout.profile_or_tag_item, parent, false));
+                return new ProfileViewHolder(layoutInflater.inflate(R.layout.search_results_profile_item, parent, false));
             case VIEW_TYPE_EMPTY:
                 return new NoDataViewHolder(layoutInflater.inflate(R.layout.listenings_empty, parent, false));
             default:
@@ -96,7 +96,7 @@ public class ListeningsAdapter extends BaseAdapter {
     @Override
     public int getItemViewType(int position) {
         final BaseAdapterItem item = items.get(position);
-        if (item instanceof ListeningsAndListenersPresenter.ProfileAdapterItem) {
+        if (item instanceof ProfileAdapterItem) {
             return VIEW_TYPE_PROFILE;
         } else if (item instanceof NoDataAdapterItem) {
             return VIEW_TYPE_EMPTY;

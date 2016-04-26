@@ -47,6 +47,9 @@
         android:layout_marginLeft="60dp"
         android:layout_marginRight="60dp"
         android:paddingTop="16dp"
+        android:paddingLeft="2dp"
+        android:paddingRight="2dp"
+        android:paddingBottom="2dp"
         android:gravity="center"
         android:background="?android:selectableItemBackground"
         android:orientation="vertical">
@@ -76,6 +79,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/my_profile_interests"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toEndOf="@+id/profile_fragment_listening"

@@ -49,6 +49,14 @@
         tools:text="20k Listeners" />
 
     <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignStart="@+id/profile_listeners_tv"
+        android:layout_alignLeft="@+id/profile_listeners_tv"
+        android:layout_alignParentBottom="true"
+        android:background="@color/black_12"/>
+
+    <View
         android:id="@+id/profile_section_selector"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
