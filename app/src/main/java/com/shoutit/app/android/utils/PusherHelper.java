@@ -1,6 +1,7 @@
 package com.shoutit.app.android.utils;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
@@ -10,6 +11,9 @@ import com.google.gson.Gson;
 import com.pusher.client.Pusher;
 import com.pusher.client.PusherOptions;
 import com.pusher.client.channel.PresenceChannel;
+import com.pusher.client.connection.ConnectionEventListener;
+import com.pusher.client.connection.ConnectionState;
+import com.pusher.client.connection.ConnectionStateChange;
 import com.pusher.client.util.HttpAuthorizer;
 import com.shoutit.app.android.BuildConfig;
 import com.shoutit.app.android.UserPreferences;
@@ -35,6 +39,8 @@ public class PusherHelper {
 
     private static final String PROFILE_CHANNEL = "presence-v3-p-%1$s";
 
+    private static final String TAG = PusherHelper.class.getCanonicalName();
+
     private Pusher mPusher;
     private final Gson mGson;
     private final UserPreferences mUserPreferences;
@@ -49,10 +55,12 @@ public class PusherHelper {
     }
 
     public void init(@NonNull String token) {
-        final HttpAuthorizer authorizer = new HttpAuthorizer(BuildConfig.API_URL + "pusher/auth");
-        authorizer.setHeaders(ImmutableMap.of("Authorization", "Bearer " + token));
-        final PusherOptions options = new PusherOptions().setAuthorizer(authorizer);
-        mPusher = new Pusher(BuildConfig.DEBUG ? DEBUG_KEY : PRODUCTION_KEY, options);
+        if (mPusher == null) {
+            final HttpAuthorizer authorizer = new HttpAuthorizer(BuildConfig.API_URL + "pusher/auth");
+            authorizer.setHeaders(ImmutableMap.of("Authorization", "Bearer " + token));
+            final PusherOptions options = new PusherOptions().setAuthorizer(authorizer);
+            mPusher = new Pusher(BuildConfig.DEBUG ? DEBUG_KEY : PRODUCTION_KEY, options);
+        }
     }
 
     public Pusher getPusher() {
@@ -142,5 +150,23 @@ public class PusherHelper {
         final User user = mUserPreferences.getUser();
         assert user != null;
         return mPusher.getPresenceChannel(PusherHelper.getProfileChannelName(user.getId()));
+    }
+
+    public boolean shouldConnect() {
+        return mPusher.getConnection().getState() != ConnectionState.CONNECTING && mPusher.getConnection().getState() != ConnectionState.CONNECTED;
+    }
+
+    public ConnectionEventListener getEventListener() {
+        return new ConnectionEventListener() {
+            @Override
+            public void onConnectionStateChange(ConnectionStateChange connectionStateChange) {
+                Log.i(TAG, connectionStateChange.getCurrentState().name());
+            }
+
+            @Override
+            public void onError(String s, String s1, Exception e) {
+                Log.e(TAG, "pusher message", e);
+            }
+        };
     }
 }

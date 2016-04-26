@@ -3,7 +3,6 @@ package com.shoutit.app.android;
 import android.app.Application;
 import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
-import android.util.Log;
 
 import com.appunite.appunitegcm.AppuniteGcm;
 import com.appunite.rx.dagger.NetworkScheduler;
@@ -17,9 +16,6 @@ import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler;
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
 import com.karumi.dexter.Dexter;
 import com.pusher.client.Pusher;
-import com.pusher.client.connection.ConnectionEventListener;
-import com.pusher.client.connection.ConnectionState;
-import com.pusher.client.connection.ConnectionStateChange;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.constants.UserVoiceConstants;
@@ -33,6 +29,7 @@ import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.PusherHelper;
+import com.shoutit.app.android.utils.stackcounter.StackCounterManager;
 import com.uservoice.uservoicesdk.Config;
 import com.uservoice.uservoicesdk.UserVoice;
 
@@ -51,24 +48,9 @@ import rx.plugins.RxJavaPlugins;
 
 public class App extends MultiDexApplication {
 
-    private static final String TAG = App.class.getSimpleName();
-
     private static final String GCM_TOKEN = "935842257865";
 
     private AppComponent component;
-
-    private ConnectionEventListener mEventListener = new ConnectionEventListener() {
-        @Override
-        public void onConnectionStateChange(ConnectionStateChange connectionStateChange) {
-            Log.i(TAG, connectionStateChange.getCurrentState().name());
-        }
-
-        @Override
-        public void onError(String s, String s1, Exception e) {
-            Log.e(TAG, "pusher message", e);
-        }
-    };
-
 
     @Inject
     ApiService apiService;
@@ -87,6 +69,8 @@ public class App extends MultiDexApplication {
     Twilio mTwilio;
     @Inject
     MixPanel mixPanel;
+    @Inject
+    StackCounterManager mStackCounterManager;
     @Inject
     ProfilesDao profilesDao;
 
@@ -116,6 +100,23 @@ public class App extends MultiDexApplication {
         initPusher();
 
         initTwilio();
+
+        mStackCounterManager.register(this)
+                .subscribe(new Action1<Boolean>() {
+                    @Override
+                    public void call(Boolean foreground) {
+                        if (userPreferences.isNormalUser()) {
+                            final Pusher pusher = mPusherHelper.getPusher();
+                            if (pusher != null) {
+                                if (foreground && mPusherHelper.shouldConnect()) {
+                                    pusher.connect(mPusherHelper.getEventListener());
+                                } else if (!foreground) {
+                                    pusher.disconnect();
+                                }
+                            }
+                        }
+                    }
+                });
     }
 
     private void refreshUser() {
@@ -140,8 +141,8 @@ public class App extends MultiDexApplication {
     }
 
     private void initPusher() {
-        Observable.zip(userPreferences.getTokenObservable().filter(Functions1.isNotNull()).distinctUntilChanged(),
-                userPreferences.getUserObservable().filter(Functions1.isNotNull()).distinctUntilChanged(),
+        Observable.zip(userPreferences.getTokenObservable().filter(Functions1.isNotNull()),
+                userPreferences.getUserObservable().filter(Functions1.isNotNull()),
                 new Func2<String, User, BothParams<String, User>>() {
                     @Override
                     public BothParams<String, User> call(String token, User user) {
@@ -152,7 +153,7 @@ public class App extends MultiDexApplication {
                     @Override
                     public void call(BothParams<String, User> tokenAndUser) {
                         final User user = userPreferences.getUser();
-                        if(user != null) {
+                        if (user != null) {
                             initPusher(tokenAndUser.param1(), user);
                         }
                     }
@@ -181,7 +182,7 @@ public class App extends MultiDexApplication {
         mPusherHelper.init(token);
         final Pusher pusher = mPusherHelper.getPusher();
 
-        if (pusher.getConnection().getState() != ConnectionState.CONNECTING && pusher.getConnection().getState() != ConnectionState.CONNECTED) {
+        if (mPusherHelper.shouldConnect()) {
             pusher.connect();
             pusher.subscribePresence(PusherHelper.getProfileChannelName(user.getId()));
             mNetworkObservableProvider.networkObservable()
@@ -194,7 +195,7 @@ public class App extends MultiDexApplication {
                     .subscribe(new Action1<NetworkObservableProvider.NetworkStatus>() {
                         @Override
                         public void call(NetworkObservableProvider.NetworkStatus networkStatus) {
-                            pusher.connect(mEventListener);
+                            pusher.connect(mPusherHelper.getEventListener());
                         }
                     });
         }
@@ -234,7 +235,7 @@ public class App extends MultiDexApplication {
     }
 
     private void initFabric() {
-        if (BuildConfig.enableCrashlytics == true) {
+        if (BuildConfig.enableCrashlytics) {
             Fabric.with(this, new CrashlyticsCore.Builder().build(), new Crashlytics());
         }
     }
