@@ -3,7 +3,6 @@ package com.shoutit.app.android;
 import android.app.Application;
 import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
-import android.util.Log;
 
 import com.appunite.appunitegcm.AppuniteGcm;
 import com.appunite.rx.dagger.NetworkScheduler;
@@ -106,13 +105,14 @@ public class App extends MultiDexApplication {
                 .subscribe(new Action1<Boolean>() {
                     @Override
                     public void call(Boolean foreground) {
-                        final Pusher pusher = mPusherHelper.getPusher();
-
-                        if (pusher != null) {
-                            if (foreground && mPusherHelper.shouldConnect()) {
-                                pusher.connect(mPusherHelper.getEventListener());
-                            } else if (!foreground) {
-                                pusher.disconnect();
+                        if (userPreferences.isNormalUser()) {
+                            final Pusher pusher = mPusherHelper.getPusher();
+                            if (pusher != null) {
+                                if (foreground && mPusherHelper.shouldConnect()) {
+                                    pusher.connect(mPusherHelper.getEventListener());
+                                } else if (!foreground) {
+                                    pusher.disconnect();
+                                }
                             }
                         }
                     }
@@ -141,8 +141,8 @@ public class App extends MultiDexApplication {
     }
 
     private void initPusher() {
-        Observable.zip(userPreferences.getTokenObservable().filter(Functions1.isNotNull()).distinctUntilChanged(),
-                userPreferences.getUserObservable().filter(Functions1.isNotNull()).distinctUntilChanged(),
+        Observable.zip(userPreferences.getTokenObservable().filter(Functions1.isNotNull()),
+                userPreferences.getUserObservable().filter(Functions1.isNotNull()),
                 new Func2<String, User, BothParams<String, User>>() {
                     @Override
                     public BothParams<String, User> call(String token, User user) {
