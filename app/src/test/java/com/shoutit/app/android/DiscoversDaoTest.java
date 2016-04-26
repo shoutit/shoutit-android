@@ -42,7 +42,7 @@ public class DiscoversDaoTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        locationPointer = new LocationPointer("GE", "Berlin");
+        locationPointer = new LocationPointer("GE", "Berlin", null);
 
         when(userPreferences.getUserCountryCode()).thenReturn("GE");
         when(apiService.discovers(anyString(), anyInt(), anyInt()))

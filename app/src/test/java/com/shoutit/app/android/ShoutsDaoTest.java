@@ -42,7 +42,7 @@ public class ShoutsDaoTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        locationPointer = new LocationPointer("GE", "Berlin");
+        locationPointer = new LocationPointer("GE", "Berlin", null);
 
         when(userPreferences.isUserLoggedIn()).thenReturn(true);
         when(apiService.shoutsForLocation(anyString(), anyString(),anyString(), anyInt(), anyInt(),

@@ -82,7 +82,7 @@ public class UserLocation implements Serializable {
 
     @Nonnull
     public LocationPointer getLocationPointer() {
-        return new LocationPointer(country, city);
+        return new LocationPointer(country, city, state);
     }
 
     @Override
