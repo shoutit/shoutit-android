@@ -12,10 +12,13 @@ public class LocationPointer {
     private final String countryCode;
     @Nonnull
     private final String city;
+    @Nullable
+    private final String state;
 
-    public LocationPointer(@Nullable String countryCode, @Nonnull String city) {
+    public LocationPointer(@Nullable String countryCode, @Nonnull String city, String state) {
         this.countryCode = countryCode;
         this.city = city;
+        this.state = state;
     }
 
     @Nullable
@@ -28,17 +31,23 @@ public class LocationPointer {
         return city;
     }
 
+    @Nullable
+    public String getState() {
+        return state;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof LocationPointer)) return false;
         final LocationPointer that = (LocationPointer) o;
         return Objects.equal(countryCode, that.countryCode) &&
+                Objects.equal(state, that.state) &&
                 Objects.equal(city, that.city);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(countryCode, city);
+        return Objects.hashCode(countryCode, city, state);
     }
 }

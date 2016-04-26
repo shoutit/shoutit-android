@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
-import com.appunite.rx.functions.Functions1;
 import com.appunite.rx.operators.MoreOperators;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -25,8 +24,6 @@ import com.shoutit.app.android.model.SearchShoutPointer;
 import com.shoutit.app.android.model.TagShoutsPointer;
 import com.shoutit.app.android.model.UserShoutsPointer;
 import com.shoutit.app.android.view.search.SearchPresenter;
-
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
@@ -216,7 +213,7 @@ public class ShoutsDao {
             } else {
                 return apiService
                         .shoutsForLocation(mLocationPointer.getCountryCode(),
-                                mLocationPointer.getCity(), null, pageNumber, PAGE_SIZE,
+                                mLocationPointer.getCity(), mLocationPointer.getState(), pageNumber, PAGE_SIZE,
                                 null, null, null, null, null, null, null)
                         .subscribeOn(networkScheduler);
             }
