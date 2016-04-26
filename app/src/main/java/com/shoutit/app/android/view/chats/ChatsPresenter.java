@@ -133,7 +133,6 @@ public class ChatsPresenter {
     private final Resources mResources;
     private final Context mContext;
     private final PusherHelper mPusher;
-    private final Gson mGson;
     private final AmazonHelper mAmazonHelper;
     private final boolean mIsShoutConversation;
     private Listener mListener;
@@ -154,7 +153,6 @@ public class ChatsPresenter {
                           @ForActivity Resources resources,
                           @ForActivity Context context,
                           PusherHelper pusher,
-                          Gson gson,
                           AmazonHelper amazonHelper,
                           boolean isShoutConversation) {
         this.conversationId = conversationId;
@@ -165,7 +163,6 @@ public class ChatsPresenter {
         mResources = resources;
         mContext = context;
         mPusher = pusher;
-        mGson = gson;
         mAmazonHelper = amazonHelper;
         mIsShoutConversation = isShoutConversation;
         mUser = mUserPreferences.getUser();
@@ -647,10 +644,7 @@ public class ChatsPresenter {
     }
 
     public void sendTyping() {
-        final PresenceChannel presenceChannel = mPusher.getPusher().getPresenceChannel(String.format("presence-v3-c-%1$s", conversationId));
-        if (presenceChannel != null && presenceChannel.isSubscribed()) {
-            presenceChannel.trigger("client-is_typing", mGson.toJson(mUser));
-        }
+        mPusher.sendTyping(conversationId, mUser.getId(), mUser.getUsername());
     }
 
     public Observable<String> getCalledPersonNameObservable() {
