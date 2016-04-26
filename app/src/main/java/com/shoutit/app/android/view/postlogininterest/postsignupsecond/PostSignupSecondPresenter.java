@@ -9,6 +9,7 @@ import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.functions.Functions1;
+import com.appunite.rx.functions.ThreeParams;
 import com.appunite.rx.operators.MoreOperators;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
@@ -22,6 +23,7 @@ import com.shoutit.app.android.api.model.SuggestionsResponse;
 import com.shoutit.app.android.dao.SuggestionsDao;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -55,6 +57,8 @@ public class PostSignupSecondPresenter {
                                      @NetworkScheduler final Scheduler networkScheduler,
                                      @UiScheduler final Scheduler uiScheduler) {
 
+
+
         final SuggestionsDao.SuggestionsPointer suggestionsPointer =
                 new SuggestionsDao.SuggestionsPointer(PAGE_SIZE, userPreferences.getLocation());
 
@@ -85,14 +89,13 @@ public class PostSignupSecondPresenter {
                 .map(toAdapterItems());
 
         itemListenedSubject
-                .throttleFirst(1, TimeUnit.SECONDS)
-                .withLatestFrom(successSuggestionsObservable, new Func2<BaseProfile, SuggestionsResponse, BothParams<BaseProfile, SuggestionsResponse>>() {
+                .zipWith(successSuggestionsObservable, new Func2<BaseProfile, SuggestionsResponse, BothParams<BaseProfile, SuggestionsResponse>>() {
                     @Override
                     public BothParams<BaseProfile, SuggestionsResponse> call(BaseProfile baseProfile, SuggestionsResponse suggestionsResponse) {
                         return BothParams.of(baseProfile, suggestionsResponse);
                     }
                 })
-                .switchMap(new Func1<BothParams<BaseProfile, SuggestionsResponse>, Observable<ResponseOrError<SuggestionsResponse>>>() {
+                .flatMap(new Func1<BothParams<BaseProfile, SuggestionsResponse>, Observable<ResponseOrError<SuggestionsResponse>>>() {
                     @Override
                     public Observable<ResponseOrError<SuggestionsResponse>> call(BothParams<BaseProfile, SuggestionsResponse> bothParams) {
                         final BaseProfile baseProfile = bothParams.param1();
