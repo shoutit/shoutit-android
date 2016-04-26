@@ -16,7 +16,9 @@ import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.NotificationsResponse;
 import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.dao.NotificationsDao;
+import com.shoutit.app.android.utils.rx.RxMoreObservers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -26,7 +28,9 @@ import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
+import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.subjects.PublishSubject;
 
 public class NotificationsPresenter {
@@ -46,20 +50,29 @@ public class NotificationsPresenter {
     private final PublishSubject<Object> markAllAsReadSubject = PublishSubject.create();
     @Nonnull
     private final PublishSubject<String> markSingleAsReadSubject = PublishSubject.create();
+    @Nonnull
+    private final PublishSubject<String> markNotificationAsReadSubject = PublishSubject.create();
+    @Nonnull
+    private final PublishSubject<Throwable> errorSubject = PublishSubject.create();
+    @Nonnull
+    private final NotificationsDao dao;
 
     @Inject
     public NotificationsPresenter(@Nonnull NotificationsDao dao,
                                   @Nonnull @UiScheduler final Scheduler uiScheduler,
                                   @Nonnull @NetworkScheduler final Scheduler networkScheduler,
                                   @Nonnull final ApiService apiService) {
+        this.dao = dao;
 
         final Observable<ResponseOrError<NotificationsResponse>> notificationsObservable = dao
                 .getNotificationsObservable()
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<NotificationsResponse>>behaviorRefCount());
 
-        adapterItemsObservable = notificationsObservable
-                .compose(ResponseOrError.<NotificationsResponse>onlySuccess())
+        final Observable<NotificationsResponse> successNotificationsObservable =
+                notificationsObservable.compose(ResponseOrError.<NotificationsResponse>onlySuccess());
+
+        adapterItemsObservable = successNotificationsObservable
                 .map(new Func1<NotificationsResponse, List<BaseAdapterItem>>() {
                     @Override
                     public List<BaseAdapterItem> call(NotificationsResponse notificationsResponse) {
@@ -81,7 +94,7 @@ public class NotificationsPresenter {
                     }
                 });
 
-        final Observable<ResponseOrError<ResponseBody>> markAsReadObservable = markAllAsReadSubject
+        final Observable<ResponseOrError<ResponseBody>> markAllAsReadObservable = markAllAsReadSubject
                 .switchMap(new Func1<Object, Observable<ResponseOrError<ResponseBody>>>() {
                     @Override
                     public Observable<ResponseOrError<ResponseBody>> call(Object o) {
@@ -93,30 +106,56 @@ public class NotificationsPresenter {
                 })
                 .compose(ObservableExtensions.<ResponseOrError<ResponseBody>>behaviorRefCount());
 
-        markAsReadObservable.compose(ResponseOrError.<ResponseBody>onlySuccess())
+        markAllAsReadObservable.compose(ResponseOrError.<ResponseBody>onlySuccess())
                 .subscribe(dao.getRefreshObserver());
 
-        final Observable<ResponseOrError<ResponseBody>> markSingleAsReadObservable = markSingleAsReadSubject
+        markSingleAsReadSubject
                 .switchMap(new Func1<String, Observable<ResponseOrError<ResponseBody>>>() {
                     @Override
-                    public Observable<ResponseOrError<ResponseBody>> call(String notificationId) {
+                    public Observable<ResponseOrError<ResponseBody>> call(final String notificationId) {
                         return apiService.markAsRead(notificationId)
                                 .subscribeOn(networkScheduler)
                                 .observeOn(uiScheduler)
-                                .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
+                                .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable())
+                                .doOnNext(new Action1<ResponseOrError<ResponseBody>>() {
+                                    @Override
+                                    public void call(ResponseOrError<ResponseBody> responseOrError) {
+                                        if (responseOrError.isData()) {
+                                            markNotificationAsReadSubject.onNext(notificationId);
+                                        } else {
+                                            errorSubject.onNext(responseOrError.error());
+                                        }
+                                    }
+                                });
                     }
                 })
-                .compose(ObservableExtensions.<ResponseOrError<ResponseBody>>behaviorRefCount());
+                .subscribe();
 
-        markSingleAsReadObservable
-                .compose(ResponseOrError.<ResponseBody>onlySuccess())
-                .subscribe(dao.getRefreshObserver());
+        markNotificationAsReadSubject
+                .withLatestFrom(successNotificationsObservable, new Func2<String, NotificationsResponse, NotificationsResponse>() {
+                    @Override
+                    public NotificationsResponse call(String notificationId, NotificationsResponse lastResponse) {
+                        final List<NotificationsResponse.Notification> updatedList = new ArrayList<>(lastResponse.getResults());
+
+                        for (int i = 0; i < lastResponse.getResults().size(); i++) {
+                            if (lastResponse.getResults().get(i).getId().equals(notificationId)) {
+                                updatedList.set(i, lastResponse.getResults().get(i).markAsRead());
+                                break;
+                            }
+                        }
+
+                        return new NotificationsResponse(lastResponse.getCount(),
+                                lastResponse.getNext(), lastResponse.getPrevious(), updatedList);
+                    }
+                })
+                .subscribe(dao.getLoadMoreObserver());
 
         errorObservable = ResponseOrError.combineErrorsObservable(
                 ImmutableList.of(
                         ResponseOrError.transform(notificationsObservable),
-                        ResponseOrError.transform(markAsReadObservable)
+                        ResponseOrError.transform(markAllAsReadObservable)
                 ))
+                .mergeWith(errorSubject)
                 .filter(Functions1.isNotNull());
 
         progressObservable = Observable.merge(
@@ -124,6 +163,11 @@ public class NotificationsPresenter {
                 markAllAsReadSubject.map(Functions1.returnTrue()),
                 errorObservable.map(Functions1.returnFalse()))
                 .startWith(true);
+    }
+
+    @Nonnull
+    public Observer<NotificationsResponse> loadMoreObserver() {
+        return RxMoreObservers.ignoreCompleted(dao.getLoadMoreObserver());
     }
 
     @Nonnull
@@ -209,7 +253,9 @@ public class NotificationsPresenter {
         }
 
         public void markNotificationAsRead() {
-            markSingleAsReadSubject.onNext(notification.getId());
+            if (!notification.isRead()) {
+                markSingleAsReadSubject.onNext(notification.getId());
+            }
         }
     }
 }

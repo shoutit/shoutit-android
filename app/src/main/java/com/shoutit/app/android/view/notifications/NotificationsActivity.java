@@ -13,14 +13,20 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
+import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.NotificationsResponse;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.IntentHelper;
+import com.shoutit.app.android.utils.LoadMoreHelper;
+import com.shoutit.app.android.utils.MyLayoutManager;
+import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.profile.tagprofile.TagProfileActivity;
 
@@ -34,6 +40,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import rx.Subscription;
 import rx.functions.Action1;
+import rx.functions.Func1;
 
 public class NotificationsActivity extends BaseActivity {
 
@@ -63,7 +70,7 @@ public class NotificationsActivity extends BaseActivity {
 
         setUpToolbar();
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(new MyLinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
         subscription = presenter.getAdapterItemsObservable()
@@ -94,6 +101,17 @@ public class NotificationsActivity extends BaseActivity {
                         startActivity(TagProfileActivity.newIntent(NotificationsActivity.this, userName));
                     }
                 });
+
+        RxRecyclerView.scrollEvents(recyclerView)
+                .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
+                .filter(LoadMoreHelper.needLoadMore((MyLayoutManager) recyclerView.getLayoutManager(), adapter))
+                .map(new Func1<RecyclerViewScrollEvent, NotificationsResponse>() {
+                    @Override
+                    public NotificationsResponse call(RecyclerViewScrollEvent recyclerViewScrollEvent) {
+                        return null;
+                    }
+                })
+                .subscribe(presenter.loadMoreObserver());
     }
 
     private void setUpToolbar() {

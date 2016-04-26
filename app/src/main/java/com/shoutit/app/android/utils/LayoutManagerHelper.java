@@ -1,6 +1,5 @@
 package com.shoutit.app.android.utils;
 
-import android.content.Context;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
@@ -10,18 +9,17 @@ import javax.annotation.Nonnull;
 
 public class LayoutManagerHelper {
 
-    public static void setLinearLayoutManager(@Nonnull Context context,
-                                              @Nonnull RecyclerView recyclerView,
-                                              @Nonnull ChangeableLayoutManagerAdapter adapter) {
-        recyclerView.setLayoutManager(new MyLinearLayoutManager(context));
+    public static void setLinearLayoutManager(@Nonnull RecyclerView recyclerView,
+                                              @Nonnull ChangeableLayoutManagerAdapter adapter,
+                                              @Nonnull MyLinearLayoutManager linearLayoutManager) {
+        recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(adapter);
         adapter.switchLayoutManager(true);
     }
 
-    public static void setGridLayoutManager(@Nonnull Context context,
-                                            @Nonnull RecyclerView recyclerView,
-                                            @Nonnull final ChangeableLayoutManagerAdapter adapter) {
-        final MyGridLayoutManager gridLayoutManager = new MyGridLayoutManager(context, 2);
+    public static void setGridLayoutManager(@Nonnull RecyclerView recyclerView,
+                                            @Nonnull final ChangeableLayoutManagerAdapter adapter,
+                                            @Nonnull final MyGridLayoutManager gridLayoutManager) {
         gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {

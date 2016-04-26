@@ -19,6 +19,8 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LayoutManagerHelper;
+import com.shoutit.app.android.utils.MyGridLayoutManager;
+import com.shoutit.app.android.utils.MyLinearLayoutManager;
 
 import java.util.List;
 
@@ -49,10 +51,16 @@ public class SelectShoutActivity extends BaseActivity {
     @Inject
     SelectShoutsPresenter mShoutsPresenter;
 
+    private MyGridLayoutManager gridLayoutManager;
+    private MyLinearLayoutManager linearLayoutManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_shouts);
+
+        gridLayoutManager = new MyGridLayoutManager(this, 2);
+        linearLayoutManager = new MyLinearLayoutManager(this);
 
         ButterKnife.bind(this);
 
@@ -110,11 +118,11 @@ public class SelectShoutActivity extends BaseActivity {
     }
 
     private void setLinearLayoutManager() {
-        LayoutManagerHelper.setLinearLayoutManager(this, mRecyclerView, mShoutsAdapter);
+        LayoutManagerHelper.setLinearLayoutManager(mRecyclerView, mShoutsAdapter, linearLayoutManager);
     }
 
     private void setGridLayoutManager() {
-        LayoutManagerHelper.setGridLayoutManager(this, mRecyclerView, mShoutsAdapter);
+        LayoutManagerHelper.setGridLayoutManager(mRecyclerView, mShoutsAdapter, gridLayoutManager);
     }
 
     @NonNull

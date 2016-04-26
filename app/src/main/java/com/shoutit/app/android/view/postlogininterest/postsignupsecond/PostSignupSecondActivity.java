@@ -60,21 +60,13 @@ public class PostSignupSecondActivity extends BaseActivity {
         viewPager.setAdapter(pagerAdapter);
         circlePageIndicator.setViewPager(viewPager);
 
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 if (position == 1) {
                     doneButton.setVisibility(View.VISIBLE);
                     nextButton.setVisibility(View.GONE);
                 }
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
             }
         });
 

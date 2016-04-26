@@ -39,6 +39,7 @@ import com.shoutit.app.android.api.model.SuggestionsResponse;
 import com.shoutit.app.android.api.model.TagDetail;
 import com.shoutit.app.android.api.model.TagsRequest;
 import com.shoutit.app.android.api.model.TwilioResponse;
+import com.shoutit.app.android.api.model.TwillioRejectCallRequest;
 import com.shoutit.app.android.api.model.UpdateLocationRequest;
 import com.shoutit.app.android.api.model.UpdateUserRequest;
 import com.shoutit.app.android.api.model.User;
@@ -350,19 +351,23 @@ public interface ApiService {
      * Conversations
      */
     @GET("conversations")
-    Observable<ConversationsResponse> getConversations();
+    Observable<ConversationsResponse> getConversations(@Query("page_size") Integer pageSize);
 
     @GET("conversations")
-    Observable<ConversationsResponse> getConversations(@NonNull @Query("after") String timestamp);
+    Observable<ConversationsResponse> getConversations(@NonNull @Query("before") String timestamp,
+                                                       @Query("page_size") Integer pageSize);
 
     @GET("conversations/{id}")
     Observable<Conversation> getConversation(@NonNull @Path("id") String id);
 
     @GET("conversations/{id}/messages")
-    Observable<MessagesResponse> getMessages(@NonNull @Path("id") String conversationId);
+    Observable<MessagesResponse> getMessages(@NonNull @Path("id") String conversationId,
+                                             @Query("page_size") Integer pageSize);
 
     @GET("conversations/{id}/messages")
-    Observable<MessagesResponse> getMessages(@NonNull @Path("id") String conversationId, @NonNull @Query("after") String timestamp);
+    Observable<MessagesResponse> getMessages(@NonNull @Path("id") String conversationId,
+                                             @NonNull @Query("before") String timestamp,
+                                             @Query("page_size") Integer pageSize);
 
     @POST("conversations/{id}/reply")
     Observable<Message> postMessage(@NonNull @Path("id") String conversationId, @NonNull @Body PostMessage message);
@@ -380,7 +385,8 @@ public interface ApiService {
      * Notifications
      **/
     @GET("notifications")
-    Observable<NotificationsResponse> notifications();
+    Observable<NotificationsResponse> notifications(@Query("before") Integer beforeTimestamp,
+                                                    @Query("page_size") Integer pageSize);
 
     @POST("notifications/reset")
     Observable<ResponseBody> markAllAsRead();
@@ -400,4 +406,7 @@ public interface ApiService {
     @GET("twilio/profile")
     Observable<CallerProfile> getUserByIdentity(@Query("identity") String identity);
 
+
+    @POST("twilio/video_call")
+    Observable<ResponseBody> rejectRequest(@Body TwillioRejectCallRequest rejectRequest);
 }

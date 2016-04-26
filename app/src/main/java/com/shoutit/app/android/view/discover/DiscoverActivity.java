@@ -11,11 +11,14 @@ import android.view.MenuItem;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.view.conversations.ConversationsActivity;
+import com.shoutit.app.android.view.signin.LoginActivity;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -27,6 +30,9 @@ public class DiscoverActivity extends BaseActivity implements OnNewDiscoverSelec
 
     @Bind(R.id.activity_discover_toolbar)
     Toolbar toolbar;
+
+    @Inject
+    UserPreferences mUserPreferences;
 
     public static Intent newIntent(@Nonnull Context context, @Nonnull String discoverId) {
         return new Intent(context, DiscoverActivity.class)
@@ -78,7 +84,11 @@ public class DiscoverActivity extends BaseActivity implements OnNewDiscoverSelec
             case R.id.base_menu_search:
                 return false;
             case R.id.base_menu_chat:
-                startActivity(ConversationsActivity.newIntent(DiscoverActivity.this));
+                if (mUserPreferences.isNormalUser()) {
+                    startActivity(ConversationsActivity.newIntent(DiscoverActivity.this));
+                } else {
+                    startActivity(LoginActivity.newIntent(DiscoverActivity.this));
+                }
             default:
                 return super.onOptionsItemSelected(item);
         }

@@ -99,7 +99,7 @@ public class ShoutPresenterTest {
         when(context.getString(anyInt(), anyString()))
                 .thenReturn("text");
 
-        presenter = new ShoutPresenter(shoutsDao, "zz", context, Schedulers.immediate(), userPreferences, globalRefreshPresenter, userIdentityDao);
+        presenter = new ShoutPresenter(shoutsDao, "zz", context, Schedulers.immediate(), userPreferences, globalRefreshPresenter);
     }
 
     @Test
@@ -192,12 +192,12 @@ public class ShoutPresenterTest {
         presenter.getErrorObservable().subscribe(subscriber);
 
         subscriber.assertNoErrors();
-        subscriber.assertValueCount(1);
+        subscriber.assertValueCount(2);
     }
 
     private Shout getShout() {
         return new Shout("id", null, null, null, null, null, null, 1L, 2, null, null, null,
-                getUser(), null, null, 1, null, null, 0, ImmutableList.<Conversation>of(), true);
+                getUser(), null, null, 1, null, null, 0, ImmutableList.<Conversation>of(), true, null, null);
     }
 
     private User getUser() {

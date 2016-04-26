@@ -307,8 +307,8 @@ public class ShoutActivity extends BaseActivity {
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(new Action1<String>() {
                     @Override
-                    public void call(String userId) {
-                        startActivity(VideoConversationActivity.newIntent(null, userId, ShoutActivity.this));
+                    public void call(String calledUserName) {
+                        startActivity(VideoConversationActivity.newIntent(null, calledUserName, ShoutActivity.this));
                     }
                 });
 
@@ -528,6 +528,12 @@ public class ShoutActivity extends BaseActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.shouts_menu, menu);
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.shouts_chats).setVisible(false);
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override

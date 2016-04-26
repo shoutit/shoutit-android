@@ -12,21 +12,25 @@ import com.shoutit.app.android.view.shouts.ShoutLinerViewHolder;
 import com.squareup.picasso.Picasso;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 public class SelectShoutsAdapter extends ChangeableLayoutManagerAdapter {
 
     private final Picasso mPicasso;
+    private final Picasso picassoNoTransformer;
 
     @Inject
-    public SelectShoutsAdapter(@ForActivity Context context, Picasso picasso) {
+    public SelectShoutsAdapter(@ForActivity Context context, Picasso picasso,
+                               @Named("NoAmazonTransformer") Picasso picassoNoTransformer) {
         super(context);
         mPicasso = picasso;
+        this.picassoNoTransformer = picassoNoTransformer;
     }
 
     @Override
     public ViewHolderManager.BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return isLinearLayoutManager ?
-                new ShoutLinerViewHolder(layoutInflater.inflate(R.layout.home_feed_item_linear, parent, false), context, mPicasso) :
+                new ShoutLinerViewHolder(layoutInflater.inflate(R.layout.home_feed_item_linear, parent, false), context, mPicasso, picassoNoTransformer) :
                 new ShoutGridViewHolder(layoutInflater.inflate(R.layout.shout_item_grid, parent, false), mPicasso);
     }
 

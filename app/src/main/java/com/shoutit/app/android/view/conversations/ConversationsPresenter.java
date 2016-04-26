@@ -15,7 +15,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.gson.Gson;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.Conversation;
@@ -49,29 +48,31 @@ import rx.subjects.PublishSubject;
 
 public class ConversationsPresenter {
 
+    private static final int PAGE_SIZE = 20;
+
     final OperatorMergeNextToken<ConversationsResponse, Object> loadMoreOperator =
             OperatorMergeNextToken.create(new Func1<ConversationsResponse, Observable<ConversationsResponse>>() {
 
                 @Override
                 public Observable<ConversationsResponse> call(ConversationsResponse conversationsResponse) {
-                    if (conversationsResponse == null || conversationsResponse.getNext() != null) {
+                    if (conversationsResponse == null || conversationsResponse.getPrevious() != null) {
                         if (conversationsResponse == null) {
-                            return mApiService.getConversations()
+                            return mApiService.getConversations(PAGE_SIZE)
                                     .subscribeOn(mNetworkScheduler)
                                     .observeOn(mUiScheduler);
                         } else {
-                            final String after = Uri.parse(conversationsResponse.getNext()).getQueryParameter("after");
+                            final String after = Uri.parse(conversationsResponse.getPrevious()).getQueryParameter("before");
                             return Observable.just(
                                     conversationsResponse)
                                     .zipWith(
-                                            mApiService.getConversations(after)
+                                            mApiService.getConversations(after, PAGE_SIZE)
                                                     .subscribeOn(mNetworkScheduler)
                                                     .observeOn(mUiScheduler),
                                             new Func2<ConversationsResponse, ConversationsResponse, ConversationsResponse>() {
                                                 @Override
                                                 public ConversationsResponse call(ConversationsResponse conversationsResponse, ConversationsResponse newResponse) {
                                                     return new ConversationsResponse(newResponse.getNext(),
-                                                            ImmutableList.copyOf(Iterables.concat(
+                                                            newResponse.getPrevious(), ImmutableList.copyOf(Iterables.concat(
                                                                     conversationsResponse.getResults(),
                                                                     newResponse.getResults())));
                                                 }
@@ -90,9 +91,10 @@ public class ConversationsPresenter {
     private final Context mContext;
     private final UserPreferences mUserPreferences;
     private final PusherHelper mPusherHelper;
+    private final PublishSubject<Object> requestSubject = PublishSubject.create();
     private Listener mListener;
     private Subscription mSubscription;
-    private final PublishSubject<Object> requestSubject = PublishSubject.create();
+    private boolean showProgress;
 
     @Inject
     public ConversationsPresenter(@NonNull ApiService apiService,
@@ -128,7 +130,7 @@ public class ConversationsPresenter {
 
         mListener = listener;
 
-        mListener.showProgress(true);
+        mListener.showProgress(showProgress);
 
         final Observable<List<Conversation>> listObservable = requestSubject
                 .startWith(new Object())
@@ -174,6 +176,7 @@ public class ConversationsPresenter {
                 .subscribe(new Action1<List<Conversation>>() {
                     @Override
                     public void call(List<Conversation> conversations) {
+                        showProgress = false;
                         mListener.showProgress(false);
 
                         if (conversations.isEmpty()) {

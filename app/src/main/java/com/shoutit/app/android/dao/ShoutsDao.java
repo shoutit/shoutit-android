@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
-import com.appunite.rx.functions.Functions1;
 import com.appunite.rx.operators.MoreOperators;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -25,8 +24,6 @@ import com.shoutit.app.android.model.SearchShoutPointer;
 import com.shoutit.app.android.model.TagShoutsPointer;
 import com.shoutit.app.android.model.UserShoutsPointer;
 import com.shoutit.app.android.view.search.SearchPresenter;
-
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
@@ -216,7 +213,7 @@ public class ShoutsDao {
             } else {
                 return apiService
                         .shoutsForLocation(mLocationPointer.getCountryCode(),
-                                mLocationPointer.getCity(), null, pageNumber, PAGE_SIZE,
+                                mLocationPointer.getCity(), mLocationPointer.getState(), pageNumber, PAGE_SIZE,
                                 null, null, null, null, null, null, null)
                         .subscribeOn(networkScheduler);
             }
@@ -241,15 +238,12 @@ public class ShoutsDao {
         protected final PublishSubject<Object> refreshShoutsSubject = PublishSubject.create();
 
         public ShoutDao(@Nonnull final String shoutId) {
-            final Observable<Object> refreshWithCache = Observable
-                    .interval(5, TimeUnit.MINUTES, networkScheduler)
-                    .map(Functions1.toObject());
 
             shoutObservable = apiService.shout(shoutId)
                     .subscribeOn(networkScheduler)
+                    .mergeWith(Observable.<Shout>never())
                     .compose(MoreOperators.<Shout>refresh(refreshShoutsSubject))
                     .compose(ResponseOrError.<Shout>toResponseOrErrorObservable())
-                    .compose(MoreOperators.<ResponseOrError<Shout>>refresh(refreshWithCache))
                     .compose(MoreOperators.<ResponseOrError<Shout>>cacheWithTimeout(networkScheduler));
 
             shoutMobileObservable = apiService.shoutCall(shoutId)
@@ -368,6 +362,9 @@ public class ShoutsDao {
     }
 
     public class SearchShoutsDao extends BaseShoutsDao {
+
+        private static final int DEFAULT_SEARCH_DISTANCE = 20;
+
         @Nonnull
         private final SearchShoutPointer pointer;
 
@@ -403,7 +400,7 @@ public class ShoutsDao {
                     } else {
                         return apiService.searchShouts(query, pageNumber, PAGE_SIZE,
                                 country, city, state,
-                                null, null, null, null, null, null, null);
+                                null, null, DEFAULT_SEARCH_DISTANCE, null, null, null, null);
                     }
                 case RELATED_SHOUTS:
                     return apiService.shoutsRelated(contextItemId, pageNumber, PAGE_SIZE);
@@ -418,7 +415,7 @@ public class ShoutsDao {
                     } else {
                         return apiService.searchTagShouts(query, pageNumber, PAGE_SIZE, contextItemId,
                                 country, city, state,
-                                null, null, null, null, null, null, null);
+                                null, null, DEFAULT_SEARCH_DISTANCE, null, null, null, null);
                     }
                 case CATEGORY:
                     if (filtersToSubmit != null) {
@@ -431,7 +428,7 @@ public class ShoutsDao {
                     } else {
                         return apiService.searchCategoriesShouts(query, pageNumber, PAGE_SIZE, contextItemId,
                                 country, city, state,
-                                null, null, null, null, null, null, null);
+                                null, null, DEFAULT_SEARCH_DISTANCE, null, null, null, null);
                     }
                 case DISCOVER:
                     if (filtersToSubmit != null) {
@@ -442,7 +439,7 @@ public class ShoutsDao {
                                 filtersToSubmit.getFiltersQueryMap());
                     } else {
                         return apiService.searchDiscoverShouts(query, pageNumber, PAGE_SIZE, contextItemId,
-                                null, null, null, null, null, null, null);
+                                null, null, DEFAULT_SEARCH_DISTANCE, null, null, null, null);
                     }
                 case BROWSE:
                     if (filtersToSubmit != null) {
@@ -453,7 +450,8 @@ public class ShoutsDao {
                                 filtersToSubmit.getSortType().getType(), filtersToSubmit.getCategorySlug(),
                                 filtersToSubmit.getFiltersQueryMap());
                     } else {
-                        return apiService.shoutsForLocation(country, city, state, pageNumber, PAGE_SIZE, null, null, null, null, null, null, null);
+                        return apiService.shoutsForLocation(country, city, state, pageNumber, PAGE_SIZE,
+                                null, null, DEFAULT_SEARCH_DISTANCE, null, null, null, null);
                     }
                 default:
                     throw new RuntimeException("Unknwon profile type: " + SearchPresenter.SearchType.values()[searchType.ordinal()]);

@@ -93,7 +93,7 @@ public class DiscoverPresenter {
                 .map(new Func1<UserLocation, LocationPointer>() {
                     @Override
                     public LocationPointer call(UserLocation userLocation) {
-                        return new LocationPointer(userLocation.getCountry(), userLocation.getCity());
+                        return new LocationPointer(userLocation.getCountry(), userLocation.getCity(), userLocation.getState());
                     }
                 })
                 .compose(ObservableExtensions.<LocationPointer>behaviorRefCount());

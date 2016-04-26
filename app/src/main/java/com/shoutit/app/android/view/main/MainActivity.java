@@ -33,6 +33,7 @@ import com.shoutit.app.android.model.Stats;
 import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.BackPressedHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.PusherHelper;
@@ -44,6 +45,7 @@ import com.shoutit.app.android.view.intro.IntroActivity;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.postlogininterest.PostLoginInterestActivity;
 import com.shoutit.app.android.view.search.main.MainSearchActivity;
+import com.shoutit.app.android.view.signin.LoginActivity;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -112,7 +114,6 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
         setUpActionBar();
         setUpDrawer();
-        updateUser();
 
         if (savedInstanceState == null) {
             getSupportFragmentManager()
@@ -143,6 +144,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
                 }));
         mStatsSubscription.add(mUserPreferences.getUserObservable()
                 .filter(Functions1.isNotNull())
+                .distinctUntilChanged()
                 .subscribe(new Action1<User>() {
                     @Override
                     public void call(User user) {
@@ -171,6 +173,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (drawerToggle.onOptionsItemSelected(item)) {
+            KeyboardHelper.hideSoftKeyboard(this);
             return true;
         }
 
@@ -200,21 +203,6 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
             startActivity(MainSearchActivity.newIntent(this));
             return true;
         }
-    }
-
-    private void updateUser() {
-        if (!mUserPreferences.isNormalUser()) {
-            return;
-        }
-
-        profilesDao.updateUser()
-                .compose(this.<User>bindToLifecycle())
-                .subscribe(new Action1<User>() {
-                    @Override
-                    public void call(User user) {
-                        mUserPreferences.saveUserAsJson(user);
-                    }
-                });
     }
 
     private void setUpActionBar() {
@@ -256,6 +244,10 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
     @Override
     public void onMenuItemSelected(@Nonnull String fragmentTag) {
+        if (MenuHandler.FRAGMENT_CHATS.equals(fragmentTag) && !mUserPreferences.isNormalUser()) {
+            startActivity(LoginActivity.newIntent(MainActivity.this));
+        }
+
         final FragmentManager fragmentManager = getSupportFragmentManager();
         Fragment fragment = fragmentManager.findFragmentByTag(fragmentTag);
 

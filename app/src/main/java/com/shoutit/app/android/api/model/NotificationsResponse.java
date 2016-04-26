@@ -43,6 +43,10 @@ public class NotificationsResponse extends PaginatedResponse {
             this.attachedObject = attachedObject;
         }
 
+        public Notification markAsRead() {
+            return new Notification(id, type, createdAt, true, attachedObject);
+        }
+
         public boolean isListenNotification() {
             return NOTIFICATION_LISTEN.equals(type);
         }
@@ -58,6 +62,10 @@ public class NotificationsResponse extends PaginatedResponse {
 
         public long getCreatedAtInMillis() {
             return createdAt * 1000L;
+        }
+
+        public int getCreatedAt() {
+            return createdAt;
         }
 
         public boolean isRead() {

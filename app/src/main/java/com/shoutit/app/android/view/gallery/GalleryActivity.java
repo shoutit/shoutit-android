@@ -2,6 +2,8 @@ package com.shoutit.app.android.view.gallery;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -14,7 +16,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
-import com.shoutit.app.android.utils.PicassoHelper;
+import com.shoutit.app.android.utils.AmazonRequestTransfomer;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.veinhorn.scrollgalleryview.Constants;
@@ -28,6 +30,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -43,6 +46,9 @@ public class GalleryActivity extends BaseActivity {
     @Bind(R.id.gallery_view)
     ScrollGalleryView galleryView;
 
+    @Inject
+    @Named("NoAmazonTransformer")
+    Picasso picassoWithoutAmazonTransformer;
     @Inject
     Picasso picasso;
     @Inject
@@ -69,8 +75,10 @@ public class GalleryActivity extends BaseActivity {
         final String videosJson = intent.getStringExtra(KEY_VIDEOS_JSON);
         final int position = intent.getIntExtra(KEY_POSITION, 0);
 
-        final List<String> imagesList = gson.fromJson(imagesJson, new TypeToken<List<String>>() {}.getType());
-        final List<Video> videosList = gson.fromJson(videosJson, new TypeToken<List<Video>>() {}.getType());
+        final List<String> imagesList = gson.fromJson(imagesJson, new TypeToken<List<String>>() {
+        }.getType());
+        final List<Video> videosList = gson.fromJson(videosJson, new TypeToken<List<Video>>() {
+        }.getType());
 
         galleryView.setThumbnailSize(getResources().getDimensionPixelSize(R.dimen.gallery_thumbnail_size))
                 .setZoom(true)
@@ -102,7 +110,8 @@ public class GalleryActivity extends BaseActivity {
 
         @Override
         public void loadMedia(Context context, ImageView imageView, final SuccessCallback callback) {
-            picasso.load(imageUrl)
+            picassoWithoutAmazonTransformer.load(AmazonRequestTransfomer.transformUrl(imageUrl, AmazonRequestTransfomer.LARGE))
+                    .placeholder(new BitmapDrawable(getResources(), Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)))
                     .into(imageView, new Callback() {
                         @Override
                         public void onSuccess() {
@@ -110,13 +119,15 @@ public class GalleryActivity extends BaseActivity {
                         }
 
                         @Override
-                        public void onError() {}
+                        public void onError() {
+                        }
                     });
         }
 
         @Override
         public void loadThumbnail(Context context, ImageView thumbnailView, final SuccessCallback callback) {
             picasso.load(imageUrl)
+                    .placeholder(new BitmapDrawable(getResources(), Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)))
                     .resizeDimen(R.dimen.gallery_thumbnail_size, R.dimen.gallery_thumbnail_size)
                     .into(thumbnailView, new Callback() {
                         @Override
@@ -125,7 +136,8 @@ public class GalleryActivity extends BaseActivity {
                         }
 
                         @Override
-                        public void onError() {}
+                        public void onError() {
+                        }
                     });
         }
     }
@@ -169,7 +181,8 @@ public class GalleryActivity extends BaseActivity {
                         }
 
                         @Override
-                        public void onError() {}
+                        public void onError() {
+                        }
                     });
         }
 

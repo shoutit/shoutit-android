@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.text.format.DateUtils;
 
-import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
@@ -18,7 +17,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
 import com.pusher.client.channel.PresenceChannel;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
@@ -31,12 +29,10 @@ import com.shoutit.app.android.api.model.PusherMessage;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutResponse;
 import com.shoutit.app.android.api.model.User;
-import com.shoutit.app.android.api.model.UserIdentity;
 import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
-import com.shoutit.app.android.dao.UsersIdentityDao;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.PusherHelper;
@@ -65,7 +61,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
@@ -98,7 +93,6 @@ public class ChatsFirstConversationPresenter {
     private final Resources mResources;
     private final Context mContext;
     private final PusherHelper mPusher;
-    private final Gson mGson;
     private final AmazonHelper mAmazonHelper;
     private final String mIdForCreation;
     private final ShoutsDao mShoutsDao;
@@ -110,7 +104,7 @@ public class ChatsFirstConversationPresenter {
     private final PublishSubject<Object> mRefreshTypingObservable = PublishSubject.create();
     private final User mUser;
     private final BehaviorSubject<String> chatParticipantUsernameSubject = BehaviorSubject.create();
-    private final Observable<String> chatParticipantIdentityObservable;
+    private final Observable<String> calledPersonUsernameObservable;
 
     @Inject
     public ChatsFirstConversationPresenter(boolean isShoutConversation,
@@ -118,11 +112,9 @@ public class ChatsFirstConversationPresenter {
                                            @UiScheduler Scheduler uiScheduler,
                                            @NetworkScheduler Scheduler networkScheduler,
                                            final UserPreferences userPreferences,
-                                           @Nonnull final UsersIdentityDao usersIdentityDao,
                                            @ForActivity Resources resources,
                                            @ForActivity Context context,
                                            PusherHelper pusher,
-                                           Gson gson,
                                            AmazonHelper amazonHelper,
                                            String idForCreation,
                                            ShoutsDao shoutsDao,
@@ -135,46 +127,20 @@ public class ChatsFirstConversationPresenter {
         mResources = resources;
         mContext = context;
         mPusher = pusher;
-        mGson = gson;
         mAmazonHelper = amazonHelper;
         mIdForCreation = idForCreation;
         mShoutsDao = shoutsDao;
         mProfilesDao = profilesDao;
         mUser = mUserPreferences.getUser();
 
-        final Observable<ResponseOrError<UserIdentity>> userIdentityResponse = chatParticipantUsernameSubject
+        calledPersonUsernameObservable = chatParticipantUsernameSubject
                 .filter(Functions1.isNotNull())
                 .filter(new Func1<String, Boolean>() {
                     @Override
                     public Boolean call(String participantUsername) {
                         return !Objects.equal(userPreferences.getUser().getUsername(), participantUsername);
                     }
-                })
-                .flatMap(new Func1<String, Observable<ResponseOrError<UserIdentity>>>() {
-                    @Override
-                    public Observable<ResponseOrError<UserIdentity>> call(String username) {
-                        return usersIdentityDao.getUserIdentityObservable(username);
-                    }
                 });
-
-        Observable<UserIdentity> successIdentityResponse = userIdentityResponse
-                .compose(ResponseOrError.<UserIdentity>onlySuccess());
-
-        chatParticipantIdentityObservable = successIdentityResponse
-                .map(new Func1<UserIdentity, String>() {
-                    @Override
-                    public String call(UserIdentity userIdentity) {
-                        return userIdentity.getIdentity();
-                    }
-                })
-                .filter(Functions1.isNotNull())
-                .filter(new Func1<String, Boolean>() {
-                    @Override
-                    public Boolean call(String s) {
-                        return !userPreferences.isGuest();
-                    }
-                })
-                .observeOn(uiScheduler);
 
     }
 
@@ -280,9 +246,9 @@ public class ChatsFirstConversationPresenter {
                     }
                 }));
         if (mIsShoutConversation) {
-            mSubscribe.add(mApiService.shout(mIdForCreation)
-                    .subscribeOn(mNetworkScheduler)
+            mSubscribe.add(mShoutsDao.getShoutObservable(mIdForCreation)
                     .observeOn(mUiScheduler)
+                    .compose(ResponseOrError.<Shout>onlySuccess())
                     .subscribe(new Action1<Shout>() {
                         @Override
                         public void call(Shout about) {
@@ -678,13 +644,10 @@ public class ChatsFirstConversationPresenter {
     }
 
     public void sendTyping() {
-        final PresenceChannel presenceChannel = mPusher.getPusher().getPresenceChannel(String.format("presence-v3-c-%1$s", conversationId));
-        if (presenceChannel != null && presenceChannel.isSubscribed()) {
-            presenceChannel.trigger("client-is_typing", mGson.toJson(mUser));
-        }
+        mPusher.sendTyping(conversationId, mUser.getId(), mUser.getUsername());
     }
 
-    public Observable<String> getChatParticipantIdentityObservable() {
-        return chatParticipantIdentityObservable;
+    public Observable<String> calledPersonUsernameObservable() {
+        return calledPersonUsernameObservable;
     }
 }

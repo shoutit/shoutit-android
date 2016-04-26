@@ -22,17 +22,22 @@ import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.BaseShoutsItemDecoration;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.LayoutManagerHelper;
 import com.shoutit.app.android.utils.LoadMoreHelper;
+import com.shoutit.app.android.utils.MyGridLayoutManager;
 import com.shoutit.app.android.utils.MyLayoutManager;
+import com.shoutit.app.android.utils.MyLinearLayoutManager;
+import com.shoutit.app.android.view.conversations.ConversationsActivity;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.subsearch.SubSearchActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
+import com.shoutit.app.android.view.signin.LoginActivity;
 
 import java.util.List;
 
@@ -71,10 +76,19 @@ public class DiscoverShoutsActivity extends BaseActivity {
     @Inject
     DiscoverShoutsPresenter mShoutsPresenter;
 
+    @Inject
+    UserPreferences mUserPreferences;
+
+    private MyGridLayoutManager gridLayoutManager;
+    private MyLinearLayoutManager linearLayoutManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_discover_shouts);
+
+        gridLayoutManager = new MyGridLayoutManager(this, 2);
+        linearLayoutManager = new MyLinearLayoutManager(this);
 
         ButterKnife.bind(this);
 
@@ -103,7 +117,12 @@ public class DiscoverShoutsActivity extends BaseActivity {
 
         RxRecyclerView.scrollEvents(mRecyclerView)
                 .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
-                .filter(LoadMoreHelper.needLoadMore((MyLayoutManager) mRecyclerView.getLayoutManager(), mShoutsAdapter))
+                .filter(LoadMoreHelper.needLoadMore(linearLayoutManager, mShoutsAdapter))
+                .subscribe(mShoutsPresenter.getLoadMoreObserver());
+
+        RxRecyclerView.scrollEvents(mRecyclerView)
+                .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
+                .filter(LoadMoreHelper.needLoadMore(gridLayoutManager, mShoutsAdapter))
                 .subscribe(mShoutsPresenter.getLoadMoreObserver());
 
         layoutSwitchIcon.setOnClickListener(new View.OnClickListener() {
@@ -182,6 +201,13 @@ public class DiscoverShoutsActivity extends BaseActivity {
                     case R.id.shouts_share:
                         mShoutsPresenter.onShareClicked();
                         return true;
+                    case R.id.shouts_chats:
+                        if (mUserPreferences.isNormalUser()) {
+                            startActivity(ConversationsActivity.newIntent(DiscoverShoutsActivity.this));
+                        } else {
+                            startActivity(LoginActivity.newIntent(DiscoverShoutsActivity.this));
+                        }
+                        return true;
                     default:
                         return false;
                 }
@@ -205,11 +231,11 @@ public class DiscoverShoutsActivity extends BaseActivity {
     }
 
     private void setLinearLayoutManager() {
-        LayoutManagerHelper.setLinearLayoutManager(this, mRecyclerView, mShoutsAdapter);
+        LayoutManagerHelper.setLinearLayoutManager(mRecyclerView, mShoutsAdapter, linearLayoutManager);
     }
 
     private void setGridLayoutManager() {
-        LayoutManagerHelper.setGridLayoutManager(this, mRecyclerView, mShoutsAdapter);
+        LayoutManagerHelper.setGridLayoutManager(mRecyclerView, mShoutsAdapter, gridLayoutManager);
     }
 
     @NonNull

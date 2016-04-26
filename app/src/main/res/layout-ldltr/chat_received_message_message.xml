@@ -19,7 +19,7 @@
     <FrameLayout
         android:layout_marginLeft="@dimen/chat_received_msg_item_margin_left"
         android:layout_marginStart="@dimen/chat_received_msg_item_margin_left"
-        android:background="@drawable/chat_other_first_bg"
+        android:background="@drawable/message_background_other"
         android:paddingLeft="16dp"
         android:paddingRight="8dp"
         android:paddingBottom="8dp"

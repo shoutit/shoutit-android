@@ -2,6 +2,7 @@ package com.shoutit.app.android.view.home;
 
 import android.content.Context;
 import android.graphics.Rect;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -24,6 +25,7 @@ import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -46,16 +48,20 @@ public class HomeAdapter extends ChangeableLayoutManagerAdapter {
     @Nonnull
     private final Picasso picasso;
     @Nonnull
+    private final Picasso picassoNoTransformer;
+    @Nonnull
     private final Scheduler uiScheduler;
 
     @Inject
     public HomeAdapter(@ForActivity @Nonnull Context context,
                        @Nonnull HomeDiscoversAdapter homeDiscoversAdapter,
                        @Nonnull Picasso picasso,
+                       @NonNull @Named("NoAmazonTransformer") Picasso picassoNoTransformer,
                        @Nonnull @UiScheduler Scheduler uiScheduler) {
         super(context);
         this.homeDiscoversAdapter = homeDiscoversAdapter;
         this.picasso = picasso;
+        this.picassoNoTransformer = picassoNoTransformer;
         this.uiScheduler = uiScheduler;
     }
 
@@ -208,7 +214,7 @@ public class HomeAdapter extends ChangeableLayoutManagerAdapter {
                 return new ShoutHeaderViewHolder(layoutInflater.inflate(R.layout.home_feed_header_item, parent, false));
             case VIEW_TYPE_SHOUT:
                 return isLinearLayoutManager ?
-                        new ShoutLinerViewHolder(layoutInflater.inflate(R.layout.home_feed_item_linear, parent, false), context, picasso) :
+                        new ShoutLinerViewHolder(layoutInflater.inflate(R.layout.home_feed_item_linear, parent, false), context, picasso, picassoNoTransformer) :
                         new ShoutGridViewHolder(layoutInflater.inflate(R.layout.shout_item_grid, parent, false), picasso);
             case VIEW_TYPE_EMPTY_SHOUTS_ITEM:
                 return new ShoutEmptyViewHolder(layoutInflater.inflate(R.layout.home_shouts_empty, parent, false));

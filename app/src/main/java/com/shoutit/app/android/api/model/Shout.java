@@ -36,12 +36,15 @@ public class Shout {
     private final int availableCount;
     private final Boolean isMobileSet;
     private final List<Conversation> conversations;
+    private final String mobileHint;
+    private final String mobile;
 
     public Shout(@Nonnull String id, String apiUrl, String webUrl, String type,
                  UserLocation location, String title, String text, Long price, float number,
                  String currency, String thumbnail, String videoUrl, User profile,
                  Category category, List<Filter> filters, long datePublished, List<String> images,
-                 List<Video> videos, int availableCount, List<Conversation> conversations, boolean isMobileSet) {
+                 List<Video> videos, int availableCount, List<Conversation> conversations, boolean isMobileSet,
+                 String mobileHint, String mobile) {
         this.id = id;
         this.apiUrl = apiUrl;
         this.webUrl = webUrl;
@@ -63,6 +66,8 @@ public class Shout {
         this.availableCount = availableCount;
         this.isMobileSet = isMobileSet;
         this.conversations = conversations;
+        this.mobileHint = mobileHint;
+        this.mobile = mobile;
     }
 
     @Nonnull
@@ -157,6 +162,22 @@ public class Shout {
         return conversations;
     }
 
+    public long getDatePublished() {
+        return datePublished;
+    }
+
+    public Boolean getMobileSet() {
+        return isMobileSet;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public String getMobileHint() {
+        return mobileHint;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -182,6 +203,8 @@ public class Shout {
                 Objects.equal(videos, shout.videos) &&
                 Objects.equal(filters, shout.filters) &&
                 Objects.equal(isMobileSet, shout.isMobileSet) &&
+                Objects.equal(mobile, shout.mobile) &&
+                Objects.equal(mobileHint, shout.mobileHint) &&
                 Objects.equal(conversations, shout.conversations);
     }
 
@@ -189,6 +212,6 @@ public class Shout {
     public int hashCode() {
         return Objects.hashCode(id, apiUrl, webUrl, type, location, title, text, price, number,
                 currency, thumbnail, videoUrl, profile, category, datePublished, images, videos,
-                filters, availableCount, isMobileSet, conversations);
+                filters, availableCount, isMobileSet, conversations, mobile, mobileHint);
     }
 }

@@ -60,6 +60,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -107,6 +108,9 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     ShoutMediaPresenter mShoutMediaPresenter;
     @Inject
     Picasso mPicasso;
+    @Inject
+    @Named("NoAmazonTransformer")
+    Picasso mPicassoNoTransformer;
 
     private CurrencySpinnerAdapter mCurrencyAdapter;
     private SpinnerAdapter mCategoryAdapter;
@@ -379,7 +383,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     @Override
     public void setCategory(@Nullable Category category) {
         if (category != null) {
-            mPicasso.load(category.getIcon())
+            mPicassoNoTransformer.load(category.getIcon())
                     .fit()
                     .into(mEditCategoryIcon);
 

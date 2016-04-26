@@ -105,6 +105,26 @@ public final class AppModule {
                 .build();
     }
 
+    @Provides
+    @Singleton
+    @Named("NoAmazonTransformer")
+    Picasso providePicassoWithNoAmazonTransformer(@ForApplication Context context,
+                           @Named("picasso") OkHttpClient okHttpClient) {
+        return new Picasso.Builder(context)
+                .indicatorsEnabled(BuildConfig.DEBUG)
+                .loggingEnabled(BuildConfig.DEBUG)
+                .listener(new Picasso.Listener() {
+                    @Override
+                    public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
+                        if (BuildConfig.DEBUG) {
+                            Log.e("picasso", "error", exception);
+                        }
+                    }
+                })
+                .downloader(new OkHttp3Downloader(okHttpClient))
+                .build();
+    }
+
     @Named("picasso")
     @Provides
     @Singleton

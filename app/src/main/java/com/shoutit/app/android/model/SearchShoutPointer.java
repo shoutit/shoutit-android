@@ -10,7 +10,7 @@ import javax.annotation.Nullable;
 
 public class SearchShoutPointer {
 
-    @Nullable // Browse search does not requires query
+    @Nullable
     private final String query;
     @Nonnull
     private final SearchPresenter.SearchType searchType;
