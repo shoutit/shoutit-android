@@ -169,4 +169,21 @@ public class PusherHelper {
             }
         };
     }
+
+    public void sendTyping(@NonNull String conversationId, @NonNull String userId, @NonNull String userName) {
+        final PresenceChannel presenceChannel = mPusher.getPresenceChannel(String.format("presence-v3-c-%1$s", conversationId));
+        if (presenceChannel != null && presenceChannel.isSubscribed()) {
+            presenceChannel.trigger("client-is_typing", mGson.toJson(new TypingInfo(userId, userName)));
+        }
+    }
+
+    private static class TypingInfo {
+        private final String id;
+        private final String username;
+
+        public TypingInfo(@NonNull String id, @NonNull String username) {
+            this.id = id;
+            this.username = username;
+        }
+    }
 }
