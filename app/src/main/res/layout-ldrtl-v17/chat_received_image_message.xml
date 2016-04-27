@@ -4,8 +4,9 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_marginTop="6dp"
-    android:layout_gravity="start"
+    android:layout_gravity="left"
     android:orientation="horizontal"
+    android:layoutDirection="ltr"
     android:padding="4dp">
 
     <ImageView
@@ -13,7 +14,6 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginLeft="12dp"
-        android:layout_marginStart="12dp"
         android:scaleType="centerCrop"
         android:visibility="gone"
         tools:src="@drawable/ca"
@@ -21,9 +21,9 @@
 
     <FrameLayout
         android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
         android:layout_width="106dp"
         android:layout_height="106dp"
+        android:layoutDirection="locale"
         android:background="@drawable/message_background_other">
 
         <ImageView
@@ -38,7 +38,7 @@
             android:id="@+id/cjats_received_image_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end|bottom"
+            android:layout_gravity="start|bottom"
             android:background="@drawable/chat_time_gradient"
             android:textColor="@android:color/white"
             tools:text="18:04" />
