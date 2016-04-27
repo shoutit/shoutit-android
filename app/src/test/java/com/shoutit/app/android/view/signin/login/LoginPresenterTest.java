@@ -85,7 +85,7 @@ public class LoginPresenterTest {
     public void testLoginSuccessfulAndTokenSet() {
         loginSuccessful();
 
-        verify(mUserPreferences).setLoggedIn(anyString(), anyString());
+        verify(mUserPreferences).setLoggedIn(anyString(), anyString(), any(User.class));
     }
 
     private void loginSuccessful() {
