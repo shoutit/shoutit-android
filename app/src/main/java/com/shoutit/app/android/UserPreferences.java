@@ -37,7 +37,6 @@ public class UserPreferences {
     private static final String SHOULD_ASK_FOR_INTEREST = "is_first_run";
     private static final String SHOUT_OWNER_NAME = "shout_owner";
     private static final String GCM_PUSH_TOKEN = "gcm_push_token";
-    private static final String IS_CALL_REJECTED = "call_rejected";
 
     private final PublishSubject<Object> userRefreshSubject = PublishSubject.create();
     private final PublishSubject<Object> locationRefreshSubject = PublishSubject.create();
@@ -101,14 +100,21 @@ public class UserPreferences {
     }
 
     @SuppressLint("CommitPrefEdits")
-    public void setLoggedIn(@NonNull String authToken, @NonNull String refreshToken) {
+    public void setLoggedIn(@NonNull String authToken,
+                            @NonNull String refreshToken,
+                            @Nonnull User user) {
         final SharedPreferences.Editor editor = mPreferences.edit();
         editor
                 .putString(AUTH_TOKEN, authToken)
                 .putString(REFRESH_TOKEN, refreshToken)
+                .putString(KEY_USER, gson.toJson(user))
                 .putBoolean(IS_GUEST, false);
         editor.commit();
         tokenRefreshSubject.onNext(new Object());
+        refreshUser();
+        if (user.getLocation() != null) {
+            saveLocation(user.getLocation());
+        }
     }
 
     @SuppressLint("CommitPrefEdits")
