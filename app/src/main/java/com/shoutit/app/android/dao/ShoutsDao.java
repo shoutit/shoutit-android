@@ -426,9 +426,9 @@ public class ShoutsDao {
                                 filtersToSubmit.getSortType().getType(), filtersToSubmit.getCategorySlug(),
                                 filtersToSubmit.getFiltersQueryMap());
                     } else {
-                        return apiService.searchCategoriesShouts(query, pageNumber, PAGE_SIZE, contextItemId,
+                        return apiService.searchCategoriesShouts(query, pageNumber, PAGE_SIZE, null,
                                 country, city, state,
-                                null, null, DEFAULT_SEARCH_DISTANCE, null, null, null, null);
+                                null, null, DEFAULT_SEARCH_DISTANCE, null, null, contextItemId, null);
                     }
                 case DISCOVER:
                     if (filtersToSubmit != null) {
