@@ -32,7 +32,7 @@
 <string name="intro_welcome">"أهلا بكم في شاوت ات"</string>
 <string name="intro_buy">"بيع و اشتري وأنت تدردش!"</string>
 <string name="intro_login">"تسجيل الدخول"</string>
-<string name="intro_skip">"إلغاء"</string>
+<string name="intro_skip">"تخطي التسجيل"</string>
 <string name="intro_help">"المساعدة"</string>
 <string name="intro_fail_login">"لايمكن إنشاء حساب ضيف"</string>
 <string name="intro_search">"ابحث"</string>
@@ -302,7 +302,7 @@
 
 <!-- Post Signup Second -->
 <string name="post_signup_next">"التالي"</string>
-<string name="post_signup_skip">"تخطي التسجيل"</string>
+<string name="post_signup_skip">"تخطي"</string>
 <string name="post_signup_suggested_users">"مستخدمون مقترحون"</string>
 <string name="post_signup_suggested_pages">"صفحات مقترحة"</string>
 <string name="post_signup_done">"تم"</string>
