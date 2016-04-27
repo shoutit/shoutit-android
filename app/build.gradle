@@ -97,6 +97,19 @@ android {
             buildConfigField 'Boolean', 'enableCrashlytics', 'true'
         }
 
+        local {
+            signingConfig signingConfigs.debug
+            debuggable true
+            minifyEnabled false
+            ext.enableCrashlytics = true
+            ext.betaDistributionGroupAliases = "android-internal-testers, internal-tests"
+            ext.betaDistributionNotifications = false
+            applicationIdSuffix '.local'
+            versionNameSuffix "-local"
+            buildConfigField "String", "API_URL", local_api_url
+            buildConfigField 'Boolean', 'enableCrashlytics', 'true'
+        }
+
         release {
             debuggable false
             minifyEnabled false
