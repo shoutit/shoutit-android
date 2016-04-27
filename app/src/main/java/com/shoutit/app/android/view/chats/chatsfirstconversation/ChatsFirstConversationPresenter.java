@@ -152,6 +152,18 @@ public class ChatsFirstConversationPresenter {
         mListener.showDeleteMenu(false);
 
         final Observable<PusherMessage> pusherMessageObservable = mPusher.getNewMessageObservable(conversationId)
+                .flatMap(new Func1<PusherMessage, Observable<PusherMessage>>() {
+                    @Override
+                    public Observable<PusherMessage> call(final PusherMessage pusherMessage) {
+                        return mApiService.readMessage(pusherMessage.getId())
+                                .map(new Func1<ResponseBody, PusherMessage>() {
+                                    @Override
+                                    public PusherMessage call(ResponseBody responseBody) {
+                                        return pusherMessage;
+                                    }
+                                });
+                    }
+                })
                 .observeOn(mUiScheduler);
 
         final Observable<Boolean> isTyping = Observable

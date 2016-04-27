@@ -1,6 +1,8 @@
 package com.shoutit.app.android.view.conversations;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +30,7 @@ public class ConversationsAdapter extends BaseAdapter {
         @Nonnull
         private final View mItemView;
         private final Picasso mPicasso;
+        private final Resources mResources;
 
         @Bind(R.id.conversation_chat_item_image)
         ImageView mConversationChatItemImage;
@@ -38,10 +41,11 @@ public class ConversationsAdapter extends BaseAdapter {
         @Bind(R.id.conversation_chat_item_time)
         TextView mConversationShoutItemTime;
 
-        public ConversationChatItemHolder(@Nonnull View itemView, Picasso picasso) {
+        public ConversationChatItemHolder(@Nonnull View itemView, Picasso picasso, Resources resources) {
             super(itemView);
             mItemView = itemView;
             mPicasso = picasso;
+            mResources = resources;
             ButterKnife.bind(this, itemView);
         }
 
@@ -62,10 +66,12 @@ public class ConversationsAdapter extends BaseAdapter {
                     conversationChatItem.click();
                 }
             });
+
+            mItemView.setBackgroundColor(conversationChatItem.isUnread() ? mResources.getColor(R.color.conversation_not_read) : Color.WHITE);
         }
 
-        private static ViewHolderManager.BaseViewHolder create(@NonNull View view, Picasso picasso) {
-            return new ConversationChatItemHolder(view, picasso);
+        private static ViewHolderManager.BaseViewHolder create(@NonNull View view, Picasso picasso, Resources resources) {
+            return new ConversationChatItemHolder(view, picasso, resources);
         }
     }
 
@@ -74,6 +80,7 @@ public class ConversationsAdapter extends BaseAdapter {
         @Nonnull
         private final View mItemView;
         private final Picasso mPicasso;
+        private final Resources mResources;
 
         @Bind(R.id.conversation_shout_item_image)
         ImageView mConversationShoutItemImage;
@@ -86,10 +93,11 @@ public class ConversationsAdapter extends BaseAdapter {
         @Bind(R.id.conversation_shout_item_time)
         TextView mConversationShoutItemTime;
 
-        public ConversationShoutItemHolder(@Nonnull View itemView, Picasso picasso) {
+        public ConversationShoutItemHolder(@Nonnull View itemView, Picasso picasso, Resources resources) {
             super(itemView);
             mItemView = itemView;
             mPicasso = picasso;
+            mResources = resources;
             ButterKnife.bind(this, itemView);
         }
 
@@ -112,6 +120,8 @@ public class ConversationsAdapter extends BaseAdapter {
             mConversationShoutItemMessage.setText(conversationShoutItem.getMessage());
             mConversationShoutItemTime.setText(conversationShoutItem.getTime());
 
+            mItemView.setBackgroundColor(conversationShoutItem.isUnread() ? mResources.getColor(R.color.conversation_not_read) : Color.WHITE);
+
             mItemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -120,8 +130,8 @@ public class ConversationsAdapter extends BaseAdapter {
             });
         }
 
-        private static ViewHolderManager.BaseViewHolder create(@NonNull View view, Picasso picasso) {
-            return new ConversationShoutItemHolder(view, picasso);
+        private static ViewHolderManager.BaseViewHolder create(@NonNull View view, Picasso picasso, Resources resources) {
+            return new ConversationShoutItemHolder(view, picasso, resources);
         }
     }
 
@@ -141,9 +151,9 @@ public class ConversationsAdapter extends BaseAdapter {
     public ViewHolderManager.BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         switch (viewType) {
             case CONVERSATION_CHAT_TYPE:
-                return ConversationChatItemHolder.create(layoutInflater.inflate(R.layout.conversation_chat_item, parent, false), mPicasso);
+                return ConversationChatItemHolder.create(layoutInflater.inflate(R.layout.conversation_chat_item, parent, false), mPicasso, context.getResources());
             case CONVERSATION_SHOUT_TYPE:
-                return ConversationShoutItemHolder.create(layoutInflater.inflate(R.layout.conversation_shout_item, parent, false), mPicasso);
+                return ConversationShoutItemHolder.create(layoutInflater.inflate(R.layout.conversation_shout_item, parent, false), mPicasso, context.getResources());
             default:
                 throw new RuntimeException();
         }

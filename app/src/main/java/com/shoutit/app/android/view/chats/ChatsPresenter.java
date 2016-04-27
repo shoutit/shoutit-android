@@ -183,6 +183,18 @@ public class ChatsPresenter {
         final PresenceChannel conversationChannel = mPusher.getPusher().subscribePresence(String.format("presence-v3-c-%1$s", conversationId));
 
         final Observable<PusherMessage> pusherMessageObservable = mPusher.getNewMessageObservable(conversationId)
+                .flatMap(new Func1<PusherMessage, Observable<PusherMessage>>() {
+                    @Override
+                    public Observable<PusherMessage> call(final PusherMessage pusherMessage) {
+                        return mApiService.readMessage(pusherMessage.getId())
+                                .map(new Func1<ResponseBody, PusherMessage>() {
+                                    @Override
+                                    public PusherMessage call(ResponseBody responseBody) {
+                                        return pusherMessage;
+                                    }
+                                });
+                    }
+                })
                 .observeOn(mUiScheduler);
 
         final Observable<Boolean> isTyping = Observable

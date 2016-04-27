@@ -376,6 +376,9 @@ public interface ApiService {
     @DELETE("conversations/{id}")
     Observable<ResponseBody> deleteConversation(@Path("id") String conversationId);
 
+    @POST("messages/{id}/read")
+    Observable<ResponseBody> readMessage(@Path("id") String messageId);
+
     /**
      * Notifications
      **/
