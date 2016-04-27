@@ -35,6 +35,7 @@ public class PusherHelper {
     private static final String STATS_UPDATE = "stats_update";
 
     private static final String DEBUG_KEY = "7bee1e468fabb6287fc5";
+    private static final String LOCAL_KEY = "d6a98f27e49289344791";
     private static final String PRODUCTION_KEY = "86d676926d4afda44089";
 
     private static final String PROFILE_CHANNEL = "presence-v3-p-%1$s";
@@ -59,7 +60,19 @@ public class PusherHelper {
             final HttpAuthorizer authorizer = new HttpAuthorizer(BuildConfig.API_URL + "pusher/auth");
             authorizer.setHeaders(ImmutableMap.of("Authorization", "Bearer " + token));
             final PusherOptions options = new PusherOptions().setAuthorizer(authorizer);
-            mPusher = new Pusher(BuildConfig.DEBUG ? DEBUG_KEY : PRODUCTION_KEY, options);
+            mPusher = new Pusher(getKey(), options);
+        }
+    }
+
+    private String getKey() {
+        if (BuildTypeUtils.isStagingOrDebug()) {
+            return DEBUG_KEY;
+        } else if (BuildTypeUtils.isLocal()) {
+            return LOCAL_KEY;
+        } else if (BuildTypeUtils.isRelease()) {
+            return PRODUCTION_KEY;
+        } else {
+            throw BuildTypeUtils.unknownTypeException();
         }
     }
 
@@ -173,7 +186,8 @@ public class PusherHelper {
     public void sendTyping(@NonNull String conversationId, @NonNull String userId, @NonNull String userName) {
         final PresenceChannel presenceChannel = mPusher.getPresenceChannel(String.format("presence-v3-c-%1$s", conversationId));
         if (presenceChannel != null && presenceChannel.isSubscribed()) {
-            presenceChannel.trigger("client-is_typing", mGson.toJson(new TypingInfo(userId, userName)));
+            final String typing = mGson.toJson(new TypingInfo(userId, userName));
+            presenceChannel.trigger("client-is_typing", typing);
         }
     }
 
