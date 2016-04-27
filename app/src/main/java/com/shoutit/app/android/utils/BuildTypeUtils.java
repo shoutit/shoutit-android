@@ -29,7 +29,7 @@ public class BuildTypeUtils {
         return BuildConfig.BUILD_TYPE.equals(RELEASE);
     }
 
-    public static void throwUnknownException() {
-        throw new RuntimeException("unknown type : " + BuildConfig.BUILD_TYPE);
+    public static RuntimeException unknownTypeException() {
+        return new RuntimeException("unknown type : " + BuildConfig.BUILD_TYPE);
     }
 }

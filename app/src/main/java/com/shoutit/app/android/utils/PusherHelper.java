@@ -72,7 +72,7 @@ public class PusherHelper {
         } else if (BuildTypeUtils.isRelease()) {
             return PRODUCTION_KEY;
         } else {
-            BuildTypeUtils.throwUnknownException();
+            throw BuildTypeUtils.unknownTypeException();
         }
     }
 

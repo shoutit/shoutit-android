@@ -69,7 +69,7 @@ public class MixPanel {
         } else if (BuildTypeUtils.isLocal()) {
             return LOCAL;
         } else {
-            BuildTypeUtils.throwUnknownException();
+            throw BuildTypeUtils.unknownTypeException();
         }
     }
 
