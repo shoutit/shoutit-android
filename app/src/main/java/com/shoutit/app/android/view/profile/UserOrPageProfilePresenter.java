@@ -157,7 +157,8 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
                             userPreferences.saveUserAsJson(user);
                         }
                     }
-                });
+                })
+                .compose(ObservableExtensions.<User>behaviorRefCount());
 
         /** Header Data **/
         avatarObservable = userSuccessObservable
