@@ -91,7 +91,7 @@ public class PusherHelper {
         return String.format(CONVERSATION_CHANNEL, conversationId);
     }
 
-    public Observable<PusherMessage> getNewMessageObservable(final PresenceChannel conversationChannel, final String userId) {
+    public Observable<PusherMessage> getNewMessageObservable(final PresenceChannel conversationChannel) {
         return Observable
                 .create(new Observable.OnSubscribe<PusherMessage>() {
                     @Override
@@ -102,9 +102,7 @@ public class PusherHelper {
                             public void onEvent(String channelName, String eventName, String data) {
                                 try {
                                     final PusherMessage pusherMessage = mGson.getAdapter(PusherMessage.class).fromJson(data);
-                                    if (!userId.equals(pusherMessage.getProfile().getId())) {
-                                        subscriber.onNext(pusherMessage);
-                                    }
+                                    subscriber.onNext(pusherMessage);
                                 } catch (IOException e) {
                                     subscriber.onError(e);
                                 }

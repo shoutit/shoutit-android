@@ -181,17 +181,22 @@ public class ChatsPresenter {
 
         final PresenceChannel conversationChannel = mPusher.subscribeConversationChannel(conversationId);
 
-        final Observable<PusherMessage> pusherMessageObservable = mPusher.getNewMessageObservable(conversationChannel, user.getId())
+        final Observable<PusherMessage> pusherMessageObservable = mPusher.getNewMessageObservable(conversationChannel)
                 .flatMap(new Func1<PusherMessage, Observable<PusherMessage>>() {
                     @Override
                     public Observable<PusherMessage> call(final PusherMessage pusherMessage) {
-                        return mApiService.readMessage(pusherMessage.getId())
-                                .map(new Func1<ResponseBody, PusherMessage>() {
-                                    @Override
-                                    public PusherMessage call(ResponseBody responseBody) {
-                                        return pusherMessage;
-                                    }
-                                });
+                        final String id = pusherMessage.getId();
+                        if (user.getId().equals(id)) {
+                            return Observable.just(pusherMessage);
+                        } else {
+                            return mApiService.readMessage(id)
+                                    .map(new Func1<ResponseBody, PusherMessage>() {
+                                        @Override
+                                        public PusherMessage call(ResponseBody responseBody) {
+                                            return pusherMessage;
+                                        }
+                                    });
+                        }
                     }
                 })
                 .observeOn(mUiScheduler);
@@ -217,10 +222,14 @@ public class ChatsPresenter {
                 .scan(ImmutableList.<PusherMessage>of(), new Func2<List<PusherMessage>, PusherMessage, List<PusherMessage>>() {
                     @Override
                     public List<PusherMessage> call(List<PusherMessage> pusherMessages, PusherMessage pusherMessage) {
-                        return ImmutableList.<PusherMessage>builder()
-                                .addAll(pusherMessages)
-                                .add(pusherMessage)
-                                .build();
+                        if(pusherMessages.contains(pusherMessage)){
+                            return pusherMessages;
+                        } else {
+                            return ImmutableList.<PusherMessage>builder()
+                                    .addAll(pusherMessages)
+                                    .add(pusherMessage)
+                                    .build();
+                        }
                     }
                 });
 
