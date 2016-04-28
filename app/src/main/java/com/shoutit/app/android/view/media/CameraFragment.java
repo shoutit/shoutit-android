@@ -34,6 +34,7 @@ import android.widget.Toast;
 
 import com.appunite.rx.internal.Preconditions;
 import com.commonsware.cwac.cam2.CameraController;
+import com.commonsware.cwac.cam2.CameraDescriptor;
 import com.commonsware.cwac.cam2.CameraEngine;
 import com.commonsware.cwac.cam2.CameraView;
 import com.commonsware.cwac.cam2.PictureTransaction;
@@ -328,10 +329,16 @@ public class CameraFragment extends Fragment {
 
     @SuppressWarnings("unused")
     public void onEventMainThread(CameraEngine.OpenedEvent event) {
+        switchCameraButton.setEnabled(true);
         if (event.exception != null) {
             Toast.makeText(getActivity(), "error", Toast.LENGTH_LONG).show();
             getActivity().finish();
         }
+    }
+
+    @SuppressWarnings("unused")
+    public void onEventMainThread(CameraEngine.ClosedEvent event) {
+        switchCameraButton.setEnabled(false);
     }
 
     @Override
