@@ -151,7 +151,7 @@
           "client_id": "935842257865-51kapkp3csmirueslfk81ki575bfcktk.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.shoutit.app.android.debug",
+            "package_name": "com.shoutit.app.android.local",
             "certificate_hash": "5B230F90B5F806B084D5D566F3E314472C7F4BEF"
           }
         },
