@@ -4,21 +4,19 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="6dp"
-    android:paddingEnd="20dp"
-    android:paddingRight="20dp">
+    android:layoutDirection="ltr"
+    android:paddingEnd="20dp">
 
     <ImageView
         android:id="@+id/chats_received_avatar"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginLeft="12dp"
-        android:layout_marginStart="12dp"
         android:scaleType="centerCrop"
         tools:src="@drawable/ca" />
 
     <FrameLayout
         android:layout_marginLeft="@dimen/chat_received_msg_item_margin_left"
-        android:layout_marginStart="@dimen/chat_received_msg_item_margin_left"
         android:background="@drawable/message_background_other"
         android:paddingLeft="16dp"
         android:paddingRight="8dp"
@@ -31,17 +29,16 @@
             android:id="@+id/chats_received_message_message_textview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingEnd="12dp"
-            android:paddingRight="12dp"
             android:paddingBottom="20dp"
             android:textSize="16sp"
+            android:textDirection="rtl"
             tools:text="This is a one liner message This is a one liner message This is a one liner message This is a one liner message This is a one liner message This is a one liner message This is a one liner message" />
 
         <TextView
             android:id="@+id/chats_received_message_date_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end|bottom"
+            android:layout_gravity="start|bottom"
             android:textSize="12sp"
             tools:text="18:04" />
 

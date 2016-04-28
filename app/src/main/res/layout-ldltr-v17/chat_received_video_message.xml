@@ -4,6 +4,8 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_marginTop="6dp"
+    android:layoutDirection="ltr"
+    android:layout_gravity="left"
     android:padding="4dp">
 
     <ImageView
@@ -13,47 +15,47 @@
         android:layout_marginLeft="12dp"
         android:layout_marginStart="12dp"
         android:scaleType="centerCrop"
+        android:visibility="visible"
         tools:src="@drawable/ca" />
 
     <FrameLayout
-        android:layout_width="220dp"
-        android:layout_height="50dp"
+        android:layout_width="110dp"
+        android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/chat_received_msg_item_margin_left"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingBottom="8dp"
+        android:paddingTop="12dp"
         android:layout_marginStart="@dimen/chat_received_msg_item_margin_left"
         android:background="@drawable/message_background_other">
 
         <ImageView
-            android:layout_width="200dp"
-            android:layout_height="40dp"
-            android:layout_gravity="center"
+            android:id="@+id/chats_received_video_imageview"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/map" />
+            tools:src="@drawable/ca" />
+
+        <View
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:background="@color/black_38" />
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="14dp"
-            android:layout_marginStart="14dp"
-            android:src="@drawable/location" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="@string/chat_show_map"
-            android:textSize="18sp" />
+            android:src="@drawable/chats_video_play" />
 
     </FrameLayout>
 
     <TextView
-        android:id="@+id/chats_received_location_textview"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
+        android:id="@+id/chats_received_video_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end|top"
-        android:layout_marginRight="12dp"
-        android:layout_marginEnd="12dp"
-        android:layout_marginTop="6dp"
+        android:layout_gravity="end|bottom"
         android:background="@drawable/chat_time_gradient"
         android:textColor="@android:color/white"
         tools:text="18:04" />
