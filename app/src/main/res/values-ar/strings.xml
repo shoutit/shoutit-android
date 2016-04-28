@@ -121,7 +121,7 @@
 <string name="menu_create_shout">"إنشاء إعلان"</string>
 <string name="menu_item_home">"الرئيسية"</string>
 <string name="menu_item_discover">"إكتشف"</string>
-<string name="menu_item_browse">"تصفح"</string>
+<string name="menu_item_browse">"إستعرض"</string>
 <string name="menu_item_chats">"المحادثات"</string>
 <string name="menu_item_settings">"الإعدادات"</string>
 <string name="menu_item_help">"المساعدة"</string>
@@ -324,7 +324,7 @@
 <string name="search_hint">"ابحث في إعلانات %1$s"</string>
 
 <!-- Create Shout Dialog -->
-<string name="create_shout_dialog_header">"ماذا تريد أن تنشر؟"</string>
+<string name="create_shout_dialog_header">"ما هو نوع الإعلان؟"</string>
 <string name="create_shout_dialog_offer">"عرض"</string>
 <string name="create_shout_dialog_request">"طلب"</string>
 
