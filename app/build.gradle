@@ -146,6 +146,10 @@ android {
         abortOnError true
         disable 'InvalidPackage','MissingTranslation','StringFormatInvalid'
     }
+
+    dexOptions{
+        javaMaxHeapSize "4g"
+    }
 }
 
 configurations.all {

@@ -10,8 +10,8 @@
         android:layout_gravity="end"
         android:layout_width="220dp"
         android:layout_height="50dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginEnd="20dp"
+        android:layout_marginRight="12dp"
+        android:layout_marginEnd="12dp"
         android:background="@drawable/message_background_owner">
 
         <ImageView

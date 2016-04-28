@@ -1,25 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="6dp"
     android:layoutDirection="ltr"
-    android:layout_gravity="left"
+    android:gravity="left"
     android:padding="4dp">
 
     <ImageView
         android:id="@+id/chats_received_avatar"
         android:layout_width="40dp"
         android:layout_height="40dp"
+        android:layout_alignParentLeft="true"
         android:layout_marginLeft="12dp"
         android:scaleType="centerCrop"
         tools:src="@drawable/ca" />
 
     <FrameLayout
+        android:id="@+id/chat_map_container"
         android:layout_width="220dp"
         android:layout_height="50dp"
-        android:layout_marginLeft="@dimen/chat_received_msg_item_margin_left"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@+id/chats_received_avatar"
         android:background="@drawable/message_background_other">
 
         <ImageView
@@ -54,8 +57,9 @@
         android:layout_marginRight="12dp"
         android:layout_marginEnd="12dp"
         android:layout_marginTop="6dp"
+        android:layout_alignEnd="@+id/chat_map_container"
         android:background="@drawable/chat_time_gradient"
         android:textColor="@android:color/white"
         tools:text="18:04" />
 
-</FrameLayout>
+</RelativeLayout>

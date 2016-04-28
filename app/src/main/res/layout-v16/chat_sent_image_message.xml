@@ -10,8 +10,8 @@
         android:layout_gravity="end"
         android:layout_width="106dp"
         android:layout_height="106dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginStart="20dp"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
         android:background="@drawable/message_background_owner">
 
         <ImageView
@@ -26,7 +26,7 @@
             android:id="@+id/cjats_sent_image_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end|bottom"
+            android:layout_gravity="end|right|bottom"
             android:layout_marginBottom="4dp"
             android:layout_marginRight="4dp"
             android:background="@drawable/chat_time_gradient"
