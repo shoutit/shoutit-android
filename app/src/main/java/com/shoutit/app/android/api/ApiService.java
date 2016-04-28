@@ -162,7 +162,6 @@ public interface ApiService {
     Observable<ShoutsResponse> searchCategoriesShouts(@Query("search") String query,
                                                @Query("page") Integer page,
                                                @Query("page_size") Integer pageSize,
-                                               @Query("tags") String tagNameOrCategorySlug,
                                                @Query("country") String countryCode,
                                                @Query("city") String city,
                                                @Query("state") String state,
