@@ -44,4 +44,32 @@ public class PusherMessage {
     public String getConversationId() {
         return conversationId;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        final PusherMessage that = (PusherMessage) o;
+
+        if (createdAt != that.createdAt) return false;
+        if (profile != null ? !profile.equals(that.profile) : that.profile != null) return false;
+        if (conversationId != null ? !conversationId.equals(that.conversationId) : that.conversationId != null)
+            return false;
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        if (text != null ? !text.equals(that.text) : that.text != null) return false;
+        return attachments != null ? attachments.equals(that.attachments) : that.attachments == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = profile != null ? profile.hashCode() : 0;
+        result = 31 * result + (conversationId != null ? conversationId.hashCode() : 0);
+        result = 31 * result + (id != null ? id.hashCode() : 0);
+        result = 31 * result + (text != null ? text.hashCode() : 0);
+        result = 31 * result + (attachments != null ? attachments.hashCode() : 0);
+        result = 31 * result + (int) (createdAt ^ (createdAt >>> 32));
+        return result;
+    }
 }
