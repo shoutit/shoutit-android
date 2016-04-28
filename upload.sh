@@ -1,4 +1,4 @@
 set -e -x
 ./gradlew --parallel \
 --stacktrace \
-crashlyticsUploadDistributionProdRelease crashlyticsUploadDistributionProdStaging
+crashlyticsUploadDistributionProdRelease crashlyticsUploadDistributionProdStaging crashlyticsUploadDistributionProdLocal
