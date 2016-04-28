@@ -56,6 +56,9 @@ public class SearchShoutsResultsPresenter {
                                         @Nonnull @ForActivity final Context context,
                                         @UiScheduler Scheduler uiScheduler) {
 
+        final boolean isNormalUser = userPreferences.isNormalUser();
+        final String userName = userPreferences.getUser().getUsername();
+
         final boolean initWithUserLocation = searchType != SearchPresenter.SearchType.PROFILE &&
                 searchType != SearchPresenter.SearchType.TAG_PROFILE;
 
@@ -124,8 +127,9 @@ public class SearchShoutsResultsPresenter {
                             builder.addAll(Lists.transform(shoutsResponse.getShouts(), new Function<Shout, BaseAdapterItem>() {
                                 @Nullable
                                 @Override
-                                public BaseAdapterItem apply(Shout input) {
-                                    return new ShoutAdapterItem(input, context, shoutSelectedSubject);
+                                public BaseAdapterItem apply(Shout shout) {
+                                    final boolean isShoutOwner = shout.getProfile().getUsername().equals(userName);
+                                    return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context, shoutSelectedSubject);
                                 }
                             }));
                             return builder.build();

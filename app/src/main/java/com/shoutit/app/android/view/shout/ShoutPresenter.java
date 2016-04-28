@@ -6,10 +6,8 @@ import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.UiScheduler;
-import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
-import com.google.common.base.Functions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
@@ -19,11 +17,9 @@ import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
-import com.shoutit.app.android.api.model.UserIdentity;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
-import com.shoutit.app.android.dao.UsersIdentityDao;
 import com.shoutit.app.android.model.MobilePhoneResponse;
 import com.shoutit.app.android.model.RelatedShoutsPointer;
 import com.shoutit.app.android.model.UserShoutsPointer;
@@ -99,6 +95,9 @@ public class ShoutPresenter {
                           @Nonnull final ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter) {
         this.uiScheduler = uiScheduler;
         mUserPreferences = userPreferences;
+
+        final boolean isNormalUser = userPreferences.isNormalUser();
+        final String currentUserName = userPreferences.getUser().getUsername();
 
         /** Requests **/
         final Observable<ResponseOrError<Shout>> shoutResponse = shoutsDao.getShoutObservable(shoutId)
@@ -235,8 +234,9 @@ public class ShoutPresenter {
                                 Lists.transform(shouts, new Function<Shout, BaseAdapterItem>() {
                                     @Nullable
                                     @Override
-                                    public ShoutAdapterItem apply(@Nullable Shout input) {
-                                        return new ShoutAdapterItem(input, context, relatedShoutSelectedSubject);
+                                    public ShoutAdapterItem apply(@Nullable Shout shout) {
+                                        final boolean isShoutOwner = shout.getProfile().getUsername().equals(currentUserName);
+                                        return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context, relatedShoutSelectedSubject);
                                     }
                                 });
 

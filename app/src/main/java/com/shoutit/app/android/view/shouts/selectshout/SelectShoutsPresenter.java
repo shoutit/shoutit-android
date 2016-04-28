@@ -62,7 +62,7 @@ public class SelectShoutsPresenter {
                             @Nullable
                             @Override
                             public BaseAdapterItem apply(Shout input) {
-                                return new ShoutAdapterItem(input, context, shoutSelectedObserver);
+                                return new ShoutAdapterItem(input, false, false, context, shoutSelectedObserver);
                             }
                         }));
                     }

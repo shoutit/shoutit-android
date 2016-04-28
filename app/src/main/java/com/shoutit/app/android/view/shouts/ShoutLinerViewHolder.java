@@ -4,21 +4,24 @@ import android.content.Context;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.google.common.base.Strings;
 import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.utils.DateTimeUtils;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.PriceUtils;
+import com.shoutit.app.android.view.chats.ChatActivity;
+import com.shoutit.app.android.view.chats.chatsfirstconversation.ChatFirstConversationActivity;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
+import java.util.List;
+
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import butterknife.Bind;
@@ -61,7 +64,7 @@ public class ShoutLinerViewHolder extends ViewHolderManager.BaseViewHolder<Shout
     }
 
     @Override
-    public void bind(@Nonnull ShoutAdapterItem item) {
+    public void bind(@Nonnull final ShoutAdapterItem item) {
         this.item = item;
         recycle();
 
@@ -98,12 +101,22 @@ public class ShoutLinerViewHolder extends ViewHolderManager.BaseViewHolder<Shout
                     .into(target);
         }
 
+        final List<Conversation> conversations = shout.getConversations();
+        final boolean enableChatIcon = !item.isShoutOwner();
+        chatIcon.setEnabled(enableChatIcon);
+        chatIcon.setAlpha(enableChatIcon ? 1f : 0.5f);
+
         subscription = new CompositeSubscription(
                 RxView.clicks(chatIcon)
                         .subscribe(new Action1<Void>() {
                             @Override
                             public void call(Void aVoid) {
-                                Toast.makeText(context, "Not implemented yet", Toast.LENGTH_LONG).show();
+                                final boolean hasConversation = conversations != null && !conversations.isEmpty();
+                                if (hasConversation) {
+                                    context.startActivity(ChatActivity.newIntent(context, conversations.get(0).getId(), true));
+                                } else {
+                                    context.startActivity(ChatFirstConversationActivity.newIntent(context, true, item.getShout().getId()));
+                                }
                             }
                         })
         );

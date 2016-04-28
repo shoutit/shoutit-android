@@ -7,6 +7,7 @@ import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.shoutit.app.android.TestUtils;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
 import com.shoutit.app.android.api.model.Conversation;
@@ -67,9 +68,9 @@ public class ShoutPresenterTest {
         when(shoutsDao.getShoutObservable(anyString()))
                 .thenReturn(Observable.just(ResponseOrError.fromData(getShout())));
         when(shoutsDao.getUserShoutObservable(any(UserShoutsPointer.class)))
-                .thenReturn(Observable.just(ResponseOrError.fromData(new ShoutsResponse(1, "z", "z", Lists.newArrayList(getShout()), null))));
+                .thenReturn(Observable.just(ResponseOrError.fromData(new ShoutsResponse(1, "z", "z", Lists.newArrayList(TestUtils.getShout()), null))));
         when(shoutsDao.getRelatedShoutsObservable(any(RelatedShoutsPointer.class)))
-                .thenReturn(Observable.just(ResponseOrError.fromData(new ShoutsResponse(1, "z", "z", Lists.newArrayList(getShout()), null))));
+                .thenReturn(Observable.just(ResponseOrError.fromData(new ShoutsResponse(1, "z", "z", Lists.newArrayList(TestUtils.getShout()), null))));
         when(userPreferences.getUserObservable())
                 .thenReturn(Observable.just(new User("z", null, null, null, null, null, null, null, false, null,
                 null, false, false, false, null, 1, null, null, null, 1, null, false, null, null, null, null, null, null)));
@@ -94,10 +95,13 @@ public class ShoutPresenterTest {
         when(shoutsDao.getUserShoutsDao(any(UserShoutsPointer.class)))
                 .thenReturn(userShoutsDao);
         when(userShoutsDao.getShoutsObservable())
-                .thenReturn(Observable.just(ResponseOrError.fromData(new ShoutsResponse(1, "z", "z", Lists.newArrayList(getShout()), null))));
+                .thenReturn(Observable.just(ResponseOrError.fromData(new ShoutsResponse(1, "z", "z", Lists.newArrayList(TestUtils.getShout()), null))));
 
         when(context.getString(anyInt(), anyString()))
                 .thenReturn("text");
+
+        when(userPreferences.isNormalUser()).thenReturn(true);
+        when(userPreferences.getUser()).thenReturn(TestUtils.getUser());
 
         presenter = new ShoutPresenter(shoutsDao, "zz", context, Schedulers.immediate(), userPreferences, globalRefreshPresenter);
     }
