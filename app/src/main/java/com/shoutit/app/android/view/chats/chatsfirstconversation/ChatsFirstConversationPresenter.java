@@ -37,7 +37,6 @@ import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.PusherHelper;
-import com.shoutit.app.android.view.chats.PresenceChannelEventListenerAdapter;
 import com.shoutit.app.android.view.chats.message_models.DateItem;
 import com.shoutit.app.android.view.chats.message_models.InfoItem;
 import com.shoutit.app.android.view.chats.message_models.ReceivedImageMessage;
@@ -68,7 +67,6 @@ import javax.inject.Inject;
 import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Scheduler;
-import rx.Subscriber;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
@@ -106,6 +104,7 @@ public class ChatsFirstConversationPresenter {
     private final User mUser;
     private final BehaviorSubject<String> chatParticipantUsernameSubject = BehaviorSubject.create();
     private final Observable<String> calledPersonUsernameObservable;
+    private PublishSubject<Object> mLocalAndPusherMessagesSubject;
 
     @Inject
     public ChatsFirstConversationPresenter(boolean isShoutConversation,
@@ -151,27 +150,23 @@ public class ChatsFirstConversationPresenter {
         mListener = listener;
         mListener.showDeleteMenu(false);
 
-        final Observable<PusherMessage> pusherMessageObservable = mPusher.getNewMessageObservable(conversationId)
-                .observeOn(mUiScheduler);
-
-        final Observable<Boolean> isTyping = Observable
-                .create(new Observable.OnSubscribe<Boolean>() {
+        final PresenceChannel presenceChannel = mPusher.subscribeConversationChannel(conversationId);
+        final Observable<PusherMessage> pusherMessageObservable = mPusher.getNewMessageObservable(presenceChannel, user.getId())
+                .flatMap(new Func1<PusherMessage, Observable<PusherMessage>>() {
                     @Override
-                    public void call(final Subscriber<? super Boolean> subscriber) {
-                        PresenceChannel conversationChannel = mPusher.getPusher().getPresenceChannel(String.format("presence-v3-c-%1$s", conversationId));
-                        if (conversationChannel == null) {
-                            conversationChannel = mPusher.getPusher().subscribePresence(String.format("presence-v3-c-%1$s", conversationId));
-                        }
-
-                        conversationChannel.bind("client-is_typing", new PresenceChannelEventListenerAdapter() {
-
-                            @Override
-                            public void onEvent(String channelName, String eventName, String data) {
-                                subscriber.onNext(true);
-                            }
-                        });
+                    public Observable<PusherMessage> call(final PusherMessage pusherMessage) {
+                        return mApiService.readMessage(pusherMessage.getId())
+                                .map(new Func1<ResponseBody, PusherMessage>() {
+                                    @Override
+                                    public PusherMessage call(ResponseBody responseBody) {
+                                        return pusherMessage;
+                                    }
+                                });
                     }
                 })
+                .observeOn(mUiScheduler);
+
+        final Observable<Boolean> isTyping = mPusher.getIsTypingObservable(presenceChannel)
                 .switchMap(new Func1<Boolean, Observable<Boolean>>() {
                     @Override
                     public Observable<Boolean> call(Boolean aBoolean) {
@@ -182,7 +177,15 @@ public class ChatsFirstConversationPresenter {
                 .observeOn(mUiScheduler)
                 .startWith(false);
 
-        final Observable<List<PusherMessage>> localAndPusherMessages = pusherMessageObservable.mergeWith(newMessagesSubject)
+        mLocalAndPusherMessagesSubject = PublishSubject.create();
+
+        final Observable<List<PusherMessage>> localAndPusherMessages = mLocalAndPusherMessagesSubject.switchMap(
+                new Func1<Object, Observable<PusherMessage>>() {
+                    @Override
+                    public Observable<PusherMessage> call(Object o) {
+                        return pusherMessageObservable.mergeWith(newMessagesSubject);
+                    }
+                })
                 .scan(ImmutableList.<PusherMessage>of(), new Func2<List<PusherMessage>, PusherMessage, List<PusherMessage>>() {
                     @Override
                     public List<PusherMessage> call(List<PusherMessage> pusherMessages, PusherMessage pusherMessage) {
@@ -406,6 +409,7 @@ public class ChatsFirstConversationPresenter {
                     mProfilesDao.getProfileDao(mIdForCreation).getRefreshSubject().onNext(new Object());
                 }
                 mRefreshTypingObservable.onNext(new Object());
+                mLocalAndPusherMessagesSubject.onNext(new Object());
             }
         });
     }
@@ -503,7 +507,7 @@ public class ChatsFirstConversationPresenter {
     public void unregister() {
         mListener = null;
         mSubscribe.unsubscribe();
-        mPusher.getPusher().unsubscribe(String.format("presence-v3-c-%1$s", conversationId));
+        mPusher.unsubscribeConversationChannel(conversationId);
     }
 
     public void addMedia(@NonNull String media, boolean isVideo) {

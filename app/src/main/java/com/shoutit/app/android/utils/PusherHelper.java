@@ -33,12 +33,14 @@ public class PusherHelper {
 
     private static final String NEW_MESSAGE = "new_message";
     private static final String STATS_UPDATE = "stats_update";
+    private static final String CLIENT_IS_TYPING = "client-is_typing";
 
     private static final String DEBUG_KEY = "7bee1e468fabb6287fc5";
     private static final String LOCAL_KEY = "d6a98f27e49289344791";
     private static final String PRODUCTION_KEY = "86d676926d4afda44089";
 
     private static final String PROFILE_CHANNEL = "presence-v3-p-%1$s";
+    private static final String CONVERSATION_CHANNEL = "presence-v3-c-%1$s";
 
     private static final String TAG = PusherHelper.class.getCanonicalName();
 
@@ -85,18 +87,22 @@ public class PusherHelper {
         return String.format(PROFILE_CHANNEL, userId);
     }
 
-    public Observable<PusherMessage> getNewMessageObservable(final String conversationId) {
+    public static String getConversationChannelName(@NonNull String conversationId) {
+        return String.format(CONVERSATION_CHANNEL, conversationId);
+    }
+
+    public Observable<PusherMessage> getNewMessageObservable(final PresenceChannel conversationChannel, final String userId) {
         return Observable
                 .create(new Observable.OnSubscribe<PusherMessage>() {
                     @Override
                     public void call(final Subscriber<? super PusherMessage> subscriber) {
-                        getProfileChannel().bind(NEW_MESSAGE, new PresenceChannelEventListenerAdapter() {
+                        conversationChannel.bind(NEW_MESSAGE, new PresenceChannelEventListenerAdapter() {
 
                             @Override
                             public void onEvent(String channelName, String eventName, String data) {
                                 try {
                                     final PusherMessage pusherMessage = mGson.getAdapter(PusherMessage.class).fromJson(data);
-                                    if (pusherMessage.getConversationId().equals(conversationId)) {
+                                    if (!userId.equals(pusherMessage.getProfile().getId())) {
                                         subscriber.onNext(pusherMessage);
                                     }
                                 } catch (IOException e) {
@@ -165,6 +171,30 @@ public class PusherHelper {
         return mPusher.getPresenceChannel(PusherHelper.getProfileChannelName(user.getId()));
     }
 
+    public Observable<Boolean> getIsTypingObservable(@NonNull final PresenceChannel conversationChannel) {
+        return Observable
+                .create(new Observable.OnSubscribe<Boolean>() {
+                    @Override
+                    public void call(final Subscriber<? super Boolean> subscriber) {
+                        conversationChannel.bind(CLIENT_IS_TYPING, new PresenceChannelEventListenerAdapter() {
+
+                            @Override
+                            public void onEvent(String channelName, String eventName, String data) {
+                                subscriber.onNext(true);
+                            }
+                        });
+                    }
+                });
+    }
+
+    public void unsubscribeConversationChannel(@NonNull String conversationId) {
+        mPusher.unsubscribe(getConversationChannelName(conversationId));
+    }
+
+    public PresenceChannel subscribeConversationChannel(@NonNull String conversationId) {
+        return mPusher.subscribePresence(PusherHelper.getConversationChannelName(conversationId));
+    }
+
     public boolean shouldConnect() {
         return mPusher.getConnection().getState() != ConnectionState.CONNECTING && mPusher.getConnection().getState() != ConnectionState.CONNECTED;
     }
@@ -184,7 +214,7 @@ public class PusherHelper {
     }
 
     public void sendTyping(@NonNull String conversationId, @NonNull String userId, @NonNull String userName) {
-        final PresenceChannel presenceChannel = mPusher.getPresenceChannel(String.format("presence-v3-c-%1$s", conversationId));
+        final PresenceChannel presenceChannel = mPusher.getPresenceChannel(getConversationChannelName(conversationId));
         if (presenceChannel != null && presenceChannel.isSubscribed()) {
             final String typing = mGson.toJson(new TypingInfo(userId, userName));
             presenceChannel.trigger("client-is_typing", typing);

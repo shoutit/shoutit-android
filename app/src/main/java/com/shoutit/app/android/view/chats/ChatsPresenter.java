@@ -17,7 +17,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
 import com.pusher.client.channel.PresenceChannel;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
@@ -70,7 +69,6 @@ import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
-import rx.Subscriber;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
@@ -180,24 +178,25 @@ public class ChatsPresenter {
     public void register(@NonNull Listener listener) {
         final User user = mUserPreferences.getUser();
         assert user != null;
-        final PresenceChannel conversationChannel = mPusher.getPusher().subscribePresence(String.format("presence-v3-c-%1$s", conversationId));
 
-        final Observable<PusherMessage> pusherMessageObservable = mPusher.getNewMessageObservable(conversationId)
-                .observeOn(mUiScheduler);
+        final PresenceChannel conversationChannel = mPusher.subscribeConversationChannel(conversationId);
 
-        final Observable<Boolean> isTyping = Observable
-                .create(new Observable.OnSubscribe<Boolean>() {
+        final Observable<PusherMessage> pusherMessageObservable = mPusher.getNewMessageObservable(conversationChannel, user.getId())
+                .flatMap(new Func1<PusherMessage, Observable<PusherMessage>>() {
                     @Override
-                    public void call(final Subscriber<? super Boolean> subscriber) {
-                        conversationChannel.bind("client-is_typing", new PresenceChannelEventListenerAdapter() {
-
-                            @Override
-                            public void onEvent(String channelName, String eventName, String data) {
-                                subscriber.onNext(true);
-                            }
-                        });
+                    public Observable<PusherMessage> call(final PusherMessage pusherMessage) {
+                        return mApiService.readMessage(pusherMessage.getId())
+                                .map(new Func1<ResponseBody, PusherMessage>() {
+                                    @Override
+                                    public PusherMessage call(ResponseBody responseBody) {
+                                        return pusherMessage;
+                                    }
+                                });
                     }
                 })
+                .observeOn(mUiScheduler);
+
+        final Observable<Boolean> isTyping = mPusher.getIsTypingObservable(conversationChannel)
                 .switchMap(new Func1<Boolean, Observable<Boolean>>() {
                     @Override
                     public Observable<Boolean> call(Boolean aBoolean) {
@@ -499,7 +498,7 @@ public class ChatsPresenter {
     public void unregister() {
         mListener = null;
         mSubscribe.unsubscribe();
-        mPusher.getPusher().unsubscribe(String.format("presence-v3-c-%1$s", conversationId));
+        mPusher.unsubscribeConversationChannel(conversationId);
     }
 
     public void addMedia(@NonNull String media, boolean isVideo) {

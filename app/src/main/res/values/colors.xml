@@ -83,8 +83,11 @@
     <color name="search_bg_color">#f4f4f4</color>
 
     <!-- Chats -->
-    <color name="chats_color_accent">#80D8FF</color>
     <color name="chats_sent_message_color">#C8E6C9</color>
+    <color name="chats_color_accent">#80D8FF</color>
+
+    <!-- Conversation -->
+    <color name="conversation_not_read">#C8E6C9</color>
 
     <!-- Notifications -->
     <color name="notification_read_selector_normal">#c8e6c9</color>

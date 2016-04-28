@@ -225,10 +225,11 @@ public class ConversationsPresenter {
         final String chatWith = ConversationsUtils.getChatWithString(profiles, user.getId());
         final String image = getImage(profiles);
 
+        final boolean isUnread = input.getUnreadMessagesCount() > 0;
         if (Conversation.ABOUT_SHOUT_TYPE.equals(input.getType())) {
-            return new ConversationShoutItem(input.getId(), input.getAbout().getTitle(), chatWith, message, elapsedTime, image);
+            return new ConversationShoutItem(input.getId(), input.getAbout().getTitle(), chatWith, message, elapsedTime, image, isUnread);
         } else if (Conversation.CHAT_TYPE.equals(input.getType())) {
-            return new ConversationChatItem(input.getId(), message, chatWith, elapsedTime, image);
+            return new ConversationChatItem(input.getId(), message, chatWith, elapsedTime, image, isUnread);
         } else {
             throw new RuntimeException(input.getType() + " : unknown type");
         }
@@ -292,13 +293,15 @@ public class ConversationsPresenter {
         private final String user;
         private final String time;
         private final String image;
+        private final boolean mIsUnread;
 
-        public ConversationChatItem(String id, String message, String user, String time, String image) {
+        public ConversationChatItem(String id, String message, String user, String time, String image, boolean isUnread) {
             this.id = id;
             this.message = message;
             this.user = user;
             this.time = time;
             this.image = image;
+            mIsUnread = isUnread;
         }
 
         @Override
@@ -336,6 +339,10 @@ public class ConversationsPresenter {
             return image;
         }
 
+        public boolean isUnread() {
+            return mIsUnread;
+        }
+
         public void click() {
             mListener.onItemClicked(id, false);
         }
@@ -348,14 +355,22 @@ public class ConversationsPresenter {
         private final String message;
         private final String time;
         private final String image;
+        private final boolean mIsUnread;
 
-        public ConversationShoutItem(String id, String shoutDescription, String userNames, String message, String time, String image) {
+        public ConversationShoutItem(String id,
+                                     String shoutDescription,
+                                     String userNames,
+                                     String message,
+                                     String time,
+                                     String image,
+                                     boolean isUnread) {
             this.id = id;
             this.shoutDescription = shoutDescription;
             this.userNames = userNames;
             this.message = message;
             this.time = time;
             this.image = image;
+            mIsUnread = isUnread;
         }
 
         @Override
@@ -395,6 +410,10 @@ public class ConversationsPresenter {
 
         public String getImage() {
             return image;
+        }
+
+        public boolean isUnread() {
+            return mIsUnread;
         }
 
         public void click() {
