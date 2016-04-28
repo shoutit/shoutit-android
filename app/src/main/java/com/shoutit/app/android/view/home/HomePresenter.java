@@ -87,6 +87,7 @@ public class HomePresenter {
         this.uiScheduler = uiScheduler;
 
         final boolean isNormalUser = userPreferences.isNormalUser();
+        final String userName = userPreferences.getUser().getUsername();
 
         Observable<LocationPointer> locationObservable = userPreferences.getLocationObservable()
                 .map(new Func1<UserLocation, LocationPointer>() {
@@ -123,9 +124,10 @@ public class HomePresenter {
                                         .transform(data.getShouts(), new Function<Shout, BaseAdapterItem>() {
                                             @javax.annotation.Nullable
                                             @Override
-                                            public BaseAdapterItem apply(@Nullable Shout input) {
-                                                assert input != null;
-                                                return new ShoutAdapterItem(input, context, shoutSelectedObserver);
+                                            public BaseAdapterItem apply(@Nullable Shout shout) {
+                                                assert shout != null;
+                                                final boolean isShoutOwner = shout.getProfile().getUsername().equals(userName);
+                                                return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context, shoutSelectedObserver);
                                             }
                                         });
 

@@ -7,6 +7,7 @@ import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.shoutit.app.android.TestUtils;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.Conversation;
@@ -17,7 +18,6 @@ import com.shoutit.app.android.api.model.DiscoverResponse;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.Tag;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ShoutsDao;
@@ -53,8 +53,6 @@ public class HomePresenterTest {
     @Mock
     DiscoversDao.DiscoverItemDao discoverItemDao;
     @Mock
-    User user;
-    @Mock
     Category category;
     @Mock
     Tag tag;
@@ -86,6 +84,8 @@ public class HomePresenterTest {
 
         when(userPreferences.isUserLoggedIn()).thenReturn(true);
         when(userPreferences.getLocationObservable()).thenReturn(Observable.just(new UserLocation(0, 0, "zz", null, null, null, null)));
+        when(userPreferences.isNormalUser()).thenReturn(true);
+        when(userPreferences.getUser()).thenReturn(TestUtils.getUser());
 
         presenter = new HomePresenter(shoutsDao, discoversDao, userPreferences, context, Schedulers.immediate(), globalRefreshPresenter);
     }
@@ -218,7 +218,7 @@ public class HomePresenterTest {
     private ResponseOrError<ShoutsResponse> shoutsResponse() {
         return ResponseOrError.fromData(new ShoutsResponse(1, "2", null, Lists.newArrayList(
                 new Shout("id", null, null, null, null, null, null, 2L, 2f, null, null, null,
-                        user, category, null, 2, null, null, 0, ImmutableList.<Conversation>of(), true, null, null)), null));
+                        TestUtils.getUser(), category, null, 2, null, null, 0, ImmutableList.<Conversation>of(), true, null, null)), null));
     }
 
     @Nonnull

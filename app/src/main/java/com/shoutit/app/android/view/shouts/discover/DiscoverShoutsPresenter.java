@@ -13,6 +13,7 @@ import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.dagger.ForActivity;
@@ -55,9 +56,13 @@ public class DiscoverShoutsPresenter {
                                    DiscoverShoutsDao discoverShoutsDao,
                                    final String discoverId,
                                    final String discoverName,
+                                   UserPreferences userPreferences,
                                    @ForActivity final Context context) {
         mDiscoverShoutsDao = discoverShoutsDao;
         this.discoverId = discoverId;
+
+        final boolean isNormalUser = userPreferences.isNormalUser();
+        final String currentUserName = userPreferences.getUser().getUsername();
 
         final Observable<ResponseOrError<ShoutsResponse>> shoutsObservable = discoverShoutsDao
                 .getShoutsObservable(discoverId)
@@ -76,8 +81,9 @@ public class DiscoverShoutsPresenter {
                         return ImmutableList.copyOf(Iterables.transform(shoutsResponse.getShouts(), new Function<Shout, BaseAdapterItem>() {
                             @Nullable
                             @Override
-                            public BaseAdapterItem apply(Shout input) {
-                                return new ShoutAdapterItem(input, context, shoutSelectedObserver);
+                            public BaseAdapterItem apply(Shout shout) {
+                                final boolean isShoutOwner = currentUserName.equals(shout.getProfile().getUsername());
+                                return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context, shoutSelectedObserver);
                             }
                         }));
                     }
