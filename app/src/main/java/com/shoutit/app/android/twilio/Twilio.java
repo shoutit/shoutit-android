@@ -206,7 +206,7 @@ public class Twilio {
             TwilioConversations.initialize(mContext, new TwilioConversations.InitListener() {
                 @Override
                 public void onInitialized() {
-                    accessManager = TwilioAccessManagerFactory.createAccessManager(apiKey, accessManagerListener());
+                    accessManager = TwilioAccessManagerFactory.createAccessManager(mContext, apiKey, accessManagerListener());
                     conversationsClient = TwilioConversations.createConversationsClient(accessManager, conversationsClientListener());
                     conversationsClient.setAudioOutput(AudioOutput.SPEAKERPHONE);
                     conversationsClient.listen();
