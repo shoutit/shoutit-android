@@ -194,7 +194,7 @@ public class ChatsFirstConversationPresenter {
                 .scan(ImmutableList.<PusherMessage>of(), new Func2<List<PusherMessage>, PusherMessage, List<PusherMessage>>() {
                     @Override
                     public List<PusherMessage> call(List<PusherMessage> pusherMessages, PusherMessage pusherMessage) {
-                        if(pusherMessages.contains(pusherMessage)){
+                        if (containsMessage(pusherMessages, pusherMessage)) {
                             return pusherMessages;
                         } else {
                             return ImmutableList.<PusherMessage>builder()
@@ -311,6 +311,13 @@ public class ChatsFirstConversationPresenter {
                         }
                     }, getOnError()));
         }
+    }
+
+    private boolean containsMessage(@NonNull List<PusherMessage> pusherMessages, @NonNull PusherMessage pusherMessage) {
+        for (PusherMessage listPusherMessage : pusherMessages) {
+            if (listPusherMessage.getId().equals(pusherMessage.getId())) return true;
+        }
+        return false;
     }
 
     @NonNull
