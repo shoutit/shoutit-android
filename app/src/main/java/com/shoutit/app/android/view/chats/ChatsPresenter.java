@@ -222,7 +222,7 @@ public class ChatsPresenter {
                 .scan(ImmutableList.<PusherMessage>of(), new Func2<List<PusherMessage>, PusherMessage, List<PusherMessage>>() {
                     @Override
                     public List<PusherMessage> call(List<PusherMessage> pusherMessages, PusherMessage pusherMessage) {
-                        if(pusherMessages.contains(pusherMessage)){
+                        if (containsMessage(pusherMessages, pusherMessage)) {
                             return pusherMessages;
                         } else {
                             return ImmutableList.<PusherMessage>builder()
@@ -315,6 +315,13 @@ public class ChatsPresenter {
                 }, getOnError()));
 
 
+    }
+
+    private boolean containsMessage(List<PusherMessage> pusherMessages, PusherMessage pusherMessage) {
+        for (PusherMessage listPusherMessage : pusherMessages) {
+            if (listPusherMessage.getId().equals(pusherMessage.getId())) return true;
+        }
+        return false;
     }
 
     private void setupUserForVideoChat(@Nonnull List<ConversationProfile> profiles) {
