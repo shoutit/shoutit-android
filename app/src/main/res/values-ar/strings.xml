@@ -49,7 +49,7 @@
 <string name="home_menu_chat">"المحادثات"</string>
 <string name="home_menu_search">"البحث"</string>
 <string name="home_see_all">"اظهار الكل"</string>
-<string name="home_shouts_header_logged">"مستجداتي"</string>
+<string name="home_shouts_header_logged">"مستجدات"</string>
 <string name="home_shouts_header_guest">"الإعلانات في %1$s"</string>
 <string name="home_discover_header">"إكتشف %1$s"</string>
 
@@ -216,7 +216,7 @@
 <string name="profile_my_shouts_header">"إعلاناتي"</string>
 <string name="profile_listening_label">"استماعات"</string>
 <string name="profile_interests_label">"اهتمامات"</string>
-<string name="profile_subtitle">"%1$d مستمعين"</string>
+<string name="profile_subtitle">"%1$d مستمعون"</string>
 <string name="profile_empty_field">"---"</string>
 <string name="profile_share_profile_title">"مشاركة الصفحة الشخصية"</string>
 <string name="profile_joined_date">"مسجل من %1$s"</string>
@@ -225,13 +225,13 @@
 <string name="profile_my_shouts">"إعلاناتي"</string>
 <string name="profile_user_pages">"%1$s صفحات"</string>
 <string name="profile_page_admins">"%1$s مدراء"</string>
-<string name="profile_listeners">"%1$s مستمعين"</string>
-<string name="profile_listeners_label">"مستمعين"</string>
+<string name="profile_listeners">"%1$s مستمعون"</string>
+<string name="profile_listeners_label">"مستمعون"</string>
 <string name="profile_see_all_shouts">"رؤية كافة الإعلانات"</string>
 <string name="profile_user_shouts_header">"%1$s إعلانات"</string>
 <string name="profile_chat_label">"محادثة"</string>
 <string name="profile_listen_label">"استماع"</string>
-<string name="profile_stop_listening_label">"الغاء استماع"</string>
+<string name="profile_stop_listening_label">"الغاء الإستماع"</string>
 <string name="profile_report">"تبليغ"</string>
 <string name="profile_user_shouts">"%1$s إعلانات"</string>
 <string name="profile_report_succes">"تم ارسال التبليغ بنجاح"</string>
@@ -415,7 +415,7 @@
 <string name="filters_filters">"فرز"</string>
 <string name="filters_reset">"إعادة ضبط"</string>
 <string name="filters_done">"تم"</string>
-<string name="filters_type_all">"الكل"</string>
+<string name="filters_type_all">"عروض وطلبات "</string>
 <string name="filters_type_offers">"عروض"</string>
 <string name="filters_type_requests">"طلبات"</string>
 <string name="filters_shout_type">"نوع الإعلان"</string>
@@ -425,7 +425,7 @@
 <string name="filters_location_header">"الموقع"</string>
 <string name="filters_search_within">"بحث ضمن:"</string>
 <string name="filters_search_init_distance">"0 كم"</string>
-<string name="filters_default_category_name">"جميع التصانيف"</string>
+<string name="filters_default_category_name">"جميع التصنيفات"</string>
 <string name="filters_distance_1KM">"1 كم"</string>
 <string name="filters_distance_2KM">"2 كم"</string>
 <string name="filters_distance_3KM">"3 كم"</string>
