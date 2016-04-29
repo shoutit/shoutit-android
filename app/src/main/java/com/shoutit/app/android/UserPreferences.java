@@ -42,6 +42,7 @@ public class UserPreferences {
     private final PublishSubject<Object> locationRefreshSubject = PublishSubject.create();
     private final PublishSubject<Object> tokenRefreshSubject = PublishSubject.create();
     private final Observable<User> userObservable;
+    // locationObservable should be used instead userObservable to get location as there is no user for guest
     private final Observable<UserLocation> locationObservable;
     private final Observable<String> tokenObservable;
 
@@ -148,11 +149,14 @@ public class UserPreferences {
     }
 
     @SuppressLint("CommitPrefEdits")
-    public void saveUserAsJson(User user) {
-        mPreferences.edit()
-                .putString(KEY_USER, gson.toJson(user))
-                .commit();
-        refreshUser();
+    public void updateUserJson(User user) {
+        if (isNormalUser()) {
+            mPreferences.edit()
+                    .putString(KEY_USER, gson.toJson(user))
+                    .commit();
+            refreshUser();
+        }
+
         if (user.getLocation() != null) {
             saveLocation(user.getLocation());
         }
