@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.shouts;
 
 import android.content.Context;
+import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -11,6 +12,7 @@ import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.Shout;
+import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.DateTimeUtils;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.PriceUtils;
@@ -102,7 +104,7 @@ public class ShoutLinerViewHolder extends ViewHolderManager.BaseViewHolder<Shout
         }
 
         final List<Conversation> conversations = shout.getConversations();
-        final boolean enableChatIcon = !item.isShoutOwner();
+        final boolean enableChatIcon = !item.isShoutOwner() && item.isNormalUser();
         chatIcon.setEnabled(enableChatIcon);
         chatIcon.setAlpha(enableChatIcon ? 1f : 0.5f);
 
@@ -111,6 +113,10 @@ public class ShoutLinerViewHolder extends ViewHolderManager.BaseViewHolder<Shout
                         .subscribe(new Action1<Void>() {
                             @Override
                             public void call(Void aVoid) {
+                                if (!item.isNormalUser()) {
+                                    return;
+                                }
+
                                 final boolean hasConversation = conversations != null && !conversations.isEmpty();
                                 if (hasConversation) {
                                     context.startActivity(ChatActivity.newIntent(context, conversations.get(0).getId(), true));

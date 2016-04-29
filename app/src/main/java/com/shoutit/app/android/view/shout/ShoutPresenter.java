@@ -97,7 +97,8 @@ public class ShoutPresenter {
         mUserPreferences = userPreferences;
 
         final boolean isNormalUser = userPreferences.isNormalUser();
-        final String currentUserName = userPreferences.getUser().getUsername();
+        final User currentUser = userPreferences.getUser();
+        final String currentUserName = currentUser != null ? currentUser.getUsername() : null;
 
         /** Requests **/
         final Observable<ResponseOrError<Shout>> shoutResponse = shoutsDao.getShoutObservable(shoutId)
@@ -215,9 +216,8 @@ public class ShoutPresenter {
                     public List<BaseAdapterItem> call(List<Shout> shouts) {
                         final List<BaseAdapterItem> items =
                                 Lists.transform(shouts, new Function<Shout, BaseAdapterItem>() {
-                                    @Nullable
                                     @Override
-                                    public ShoutAdapterItems.UserShoutAdapterItem apply(@Nullable Shout input) {
+                                    public ShoutAdapterItems.UserShoutAdapterItem apply(Shout input) {
                                         return new ShoutAdapterItems.UserShoutAdapterItem(input, userShoutSelectedSubject, context.getResources());
                                     }
                                 });
@@ -232,9 +232,8 @@ public class ShoutPresenter {
                     public List<BaseAdapterItem> call(List<Shout> shouts) {
                         final List<BaseAdapterItem> items =
                                 Lists.transform(shouts, new Function<Shout, BaseAdapterItem>() {
-                                    @Nullable
                                     @Override
-                                    public ShoutAdapterItem apply(@Nullable Shout shout) {
+                                    public ShoutAdapterItem apply(Shout shout) {
                                         final boolean isShoutOwner = shout.getProfile().getUsername().equals(currentUserName);
                                         return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context, relatedShoutSelectedSubject);
                                     }
