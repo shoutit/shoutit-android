@@ -19,6 +19,7 @@ import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
+import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.DiscoversDao;
@@ -87,9 +88,10 @@ public class HomePresenter {
         this.uiScheduler = uiScheduler;
 
         final boolean isNormalUser = userPreferences.isNormalUser();
-        final String userName = userPreferences.getUser().getUsername();
+        final User currentUser = userPreferences.getUser();
+        final String currentUserName = currentUser != null ? currentUser.getUsername() : null;
 
-        Observable<LocationPointer> locationObservable = userPreferences.getLocationObservable()
+        final Observable<LocationPointer> locationObservable = userPreferences.getLocationObservable()
                 .map(new Func1<UserLocation, LocationPointer>() {
                     @Override
                     public LocationPointer call(UserLocation userLocation) {
@@ -126,7 +128,7 @@ public class HomePresenter {
                                             @Override
                                             public BaseAdapterItem apply(@Nullable Shout shout) {
                                                 assert shout != null;
-                                                final boolean isShoutOwner = shout.getProfile().getUsername().equals(userName);
+                                                final boolean isShoutOwner = shout.getProfile().getUsername().equals(currentUserName);
                                                 return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context, shoutSelectedObserver);
                                             }
                                         });
