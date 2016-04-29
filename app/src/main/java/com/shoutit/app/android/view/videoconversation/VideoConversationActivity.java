@@ -210,7 +210,7 @@ public class VideoConversationActivity extends BaseActivity {
             @Override
             public void onError(CapturerException e) {
                 conversationErrorSubject.onNext(getString(R.string.video_calls_camera_issue));
-                cameraCapturer.startPreview();
+                cameraCapturer.startPreview(localVideoPreview);
             }
         };
     }
@@ -374,13 +374,13 @@ public class VideoConversationActivity extends BaseActivity {
 
         if (isFrontCameraAvailable()) {
             cameraCapturer = CameraCapturerFactory.createCameraCapturer(VideoConversationActivity.this,
-                    CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA, localVideoPreview, capturerErrorListener());
+                    CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA, capturerErrorListener());
         } else {
             cameraCapturer = CameraCapturerFactory.createCameraCapturer(VideoConversationActivity.this,
-                    CameraCapturer.CameraSource.CAMERA_SOURCE_BACK_CAMERA, localVideoPreview, capturerErrorListener());
+                    CameraCapturer.CameraSource.CAMERA_SOURCE_BACK_CAMERA, capturerErrorListener());
         }
         setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
-        cameraCapturer.startPreview();
+        cameraCapturer.startPreview(localVideoPreview);
     }
 
     private void setupVariablesFromApp() {
@@ -430,7 +430,7 @@ public class VideoConversationActivity extends BaseActivity {
             conversationClient.listen();
         }
         if (cameraCapturer != null) {
-            cameraCapturer.startPreview();
+            cameraCapturer.startPreview(localVideoPreview);
         }
     }
 
