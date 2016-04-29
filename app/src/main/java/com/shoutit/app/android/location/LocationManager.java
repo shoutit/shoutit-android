@@ -139,10 +139,7 @@ public class LocationManager {
                         .doOnNext(new Action1<User>() {
                             @Override
                             public void call(User user) {
-                                userPreferences.saveUserAsJson(user);
-                                if (user.getLocation() != null) {
-                                    userPreferences.saveLocation(user.getLocation());
-                                }
+                                userPreferences.updateUserJson(user);
                             }
                         });
             }

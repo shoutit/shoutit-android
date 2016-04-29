@@ -328,7 +328,7 @@ public class LocationPresenter {
         return new Action1<User>() {
             @Override
             public void call(User user) {
-                userPreferences.saveUserAsJson(user);
+                userPreferences.updateUserJson(user);
             }
         };
     }

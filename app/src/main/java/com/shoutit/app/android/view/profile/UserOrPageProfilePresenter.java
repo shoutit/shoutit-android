@@ -154,7 +154,7 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
                     @Override
                     public void call(User user) {
                         if (User.ME.equals(userName)) {
-                            userPreferences.saveUserAsJson(user);
+                            userPreferences.updateUserJson(user);
                         }
                     }
                 })

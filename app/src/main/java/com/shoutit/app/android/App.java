@@ -6,8 +6,6 @@ import android.support.multidex.MultiDexApplication;
 
 import com.appunite.appunitegcm.AppuniteGcm;
 import com.appunite.rx.dagger.NetworkScheduler;
-import com.appunite.rx.functions.BothParams;
-import com.appunite.rx.functions.Functions1;
 import com.appunite.rx.observables.NetworkObservableProvider;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
@@ -37,11 +35,9 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import io.fabric.sdk.android.Fabric;
-import rx.Observable;
 import rx.Scheduler;
 import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.functions.Func2;
 import rx.plugins.RxJavaErrorHandler;
 import rx.plugins.RxJavaPlugins;
 
@@ -128,7 +124,7 @@ public class App extends MultiDexApplication {
                 .subscribe(new Action1<User>() {
                     @Override
                     public void call(User user) {
-                        userPreferences.saveUserAsJson(user);
+                        userPreferences.updateUserJson(user);
                     }
                 });
     }

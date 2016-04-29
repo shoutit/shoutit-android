@@ -280,7 +280,7 @@ public class EditProfilePresenter {
                 .map(new Func1<User, Object>() {
                     @Override
                     public Object call(User user) {
-                        userPreferences.saveUserAsJson(user);
+                        userPreferences.updateUserJson(user);
                         return null;
                     }
                 })
