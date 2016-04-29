@@ -187,6 +187,10 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
                     }
                 });
 
+        presenter.getRefreshShoutsObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
+
         filterIv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
