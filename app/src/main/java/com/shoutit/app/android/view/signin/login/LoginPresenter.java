@@ -1,5 +1,6 @@
 package com.shoutit.app.android.view.signin.login;
 
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 
 import com.appunite.rx.ObservableExtensions;
@@ -52,7 +53,8 @@ public class LoginPresenter {
                           @NonNull final UserPreferences userPreferences,
                           @NonNull @NetworkScheduler final Scheduler networkScheduler,
                           @NonNull @UiScheduler final Scheduler uiScheduler,
-                          @Nonnull final MixPanel mixPanel) {
+                          @Nonnull final MixPanel mixPanel,
+                          @NonNull final SharedPreferences defaultPrefs) {
 
         mLocationObservable = userPreferences.getLocationObservable()
                 .startWith((UserLocation) null)
@@ -111,6 +113,7 @@ public class LoginPresenter {
                     public void call(SignResponse signResponse) {
                         userPreferences.setLoggedIn(signResponse.getAccessToken(),
                                 signResponse.getRefreshToken(), signResponse.getUser());
+                        defaultPrefs.edit().clear().apply();
                     }
                 });
 

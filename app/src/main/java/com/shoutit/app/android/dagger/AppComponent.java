@@ -2,6 +2,7 @@ package com.shoutit.app.android.dagger;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.appunite.rx.dagger.NetworkScheduler;
@@ -106,4 +107,6 @@ public interface AppComponent {
     MixPanel mixPanel();
 
     CameraTool cameraTool();
+
+    SharedPreferences sharedPreferences();
 }

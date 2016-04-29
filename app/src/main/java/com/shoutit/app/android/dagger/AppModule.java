@@ -3,7 +3,9 @@ package com.shoutit.app.android.dagger;
 import android.app.Application;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -113,7 +115,7 @@ public final class AppModule {
     @Singleton
     @Named("NoAmazonTransformer")
     Picasso providePicassoWithNoAmazonTransformer(@ForApplication Context context,
-                           @Named("picasso") OkHttpClient okHttpClient) {
+                                                  @Named("picasso") OkHttpClient okHttpClient) {
         return new Picasso.Builder(context)
                 .indicatorsEnabled(BuildConfig.DEBUG)
                 .loggingEnabled(BuildConfig.DEBUG)
@@ -328,4 +330,8 @@ public final class AppModule {
         }
     }
 
+    @Provides
+    SharedPreferences provideSharedPrefs(@ForApplication Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context);
+    }
 }
