@@ -167,17 +167,25 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="10dp"
+                        android:layout_marginStart="6dp"
+                        android:layout_gravity="center_vertical"
+                        tools:src="@drawable/ec"/>
+
                     <TextView
                         android:id="@+id/edit_location"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.75"
-                        android:drawablePadding="10dp"
-                        android:gravity="center_vertical"
+                        android:gravity="start"
+                        android:paddingStart="6dp"
                         android:paddingLeft="6dp"
+                        android:textDirection="rtl"
                         android:textColor="@android:color/black"
-                        tools:drawableLeft="@drawable/ec"
-                        tools:text="Dubai, United Arab Emirates" />
+                        tools:text="Dubai" />
 
                     <Button
                         android:id="@+id/edit_location_btn"
