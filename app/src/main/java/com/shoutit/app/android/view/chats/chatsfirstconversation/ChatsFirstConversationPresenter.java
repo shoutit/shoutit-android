@@ -15,7 +15,6 @@ import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import com.pusher.client.channel.PresenceChannel;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
@@ -191,19 +190,13 @@ public class ChatsFirstConversationPresenter {
     }
 
     private void subscribeToMessages() {
-        final PresenceChannel presenceChannel = mChatsDelegate.getConversationChannel(conversationId);
-
-        final Observable<PusherMessage> pusherMessageObservable = mChatsDelegate.getPusherMessageObservable(presenceChannel);
-
-        final Observable<Boolean> isTyping = mChatsDelegate.getTypingObservable(presenceChannel);
-
         mLocalAndPusherMessagesSubject = PublishSubject.create();
 
         final Observable<List<PusherMessage>> localAndPusherMessages = mLocalAndPusherMessagesSubject.switchMap(
                 new Func1<Object, Observable<PusherMessage>>() {
                     @Override
                     public Observable<PusherMessage> call(Object o) {
-                        return pusherMessageObservable.mergeWith(newMessagesSubject);
+                        return mChatsDelegate.getPusherMessageObservable(mChatsDelegate.getConversationChannel(conversationId)).mergeWith(newMessagesSubject);
                     }
                 })
                 .compose(mChatsDelegate.transformToScan());
@@ -229,7 +222,7 @@ public class ChatsFirstConversationPresenter {
                 }), mRefreshTypingObservable.switchMap(new Func1<Object, Observable<Boolean>>() {
                     @Override
                     public Observable<Boolean> call(Object o) {
-                        return isTyping;
+                        return mChatsDelegate.getTypingObservable(mChatsDelegate.getConversationChannel(conversationId));
                     }
                 }), new Func2<List<BaseAdapterItem>, Boolean, List<BaseAdapterItem>>() {
                     @Override
