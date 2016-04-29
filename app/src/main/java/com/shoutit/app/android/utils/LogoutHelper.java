@@ -3,6 +3,7 @@ package com.shoutit.app.android.utils;
 import com.pusher.client.Pusher;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.db.RecentSearchesTable;
 import com.shoutit.app.android.twilio.Twilio;
 
@@ -16,6 +17,7 @@ public class LogoutHelper {
     @Nonnull
     private final RecentSearchesTable recentSearchesTable;
     private final PusherHelper mPusherHelper;
+    private final ProfilesDao mProfilesDao;
 
     @Inject
     Twilio twilio;
@@ -23,10 +25,12 @@ public class LogoutHelper {
     @Inject
     public LogoutHelper(@Nonnull UserPreferences userPreferences,
                         @Nonnull RecentSearchesTable recentSearchesTable,
-                        PusherHelper pusherHelper) {
+                        PusherHelper pusherHelper,
+                        ProfilesDao profilesDao) {
         this.userPreferences = userPreferences;
         this.recentSearchesTable = recentSearchesTable;
         mPusherHelper = pusherHelper;
+        mProfilesDao = profilesDao;
     }
 
     public void logout() {
@@ -40,5 +44,6 @@ public class LogoutHelper {
 
         userPreferences.logout();
         recentSearchesTable.clearRecentSearches();
+        mProfilesDao.registerToGcmAction(null);
     }
 }

@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.signin.login;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
@@ -56,6 +57,12 @@ public class LoginPresenterTest {
     @Mock
     MixPanel mixPanel;
 
+    @Mock
+    SharedPreferences sharedPreferences;
+
+    @Mock
+    SharedPreferences.Editor editor;
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -72,8 +79,14 @@ public class LoginPresenterTest {
         when(mixPanel.getDistinctId())
                 .thenReturn("id");
 
+        when(sharedPreferences.edit())
+                .thenReturn(editor);
+
+        when(editor.clear())
+                .thenReturn(editor);
+
         mLoginPresenter = new LoginPresenter(mApiService, mUserPreferences,
-                Schedulers.immediate(), Schedulers.immediate(), mixPanel);
+                Schedulers.immediate(), Schedulers.immediate(), mixPanel, sharedPreferences);
     }
 
     @Test
