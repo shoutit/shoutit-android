@@ -58,9 +58,6 @@ public class LoginPresenterTest {
     MixPanel mixPanel;
 
     @Mock
-    SharedPreferences sharedPreferences;
-
-    @Mock
     SharedPreferences.Editor editor;
 
     @Before
@@ -79,14 +76,11 @@ public class LoginPresenterTest {
         when(mixPanel.getDistinctId())
                 .thenReturn("id");
 
-        when(sharedPreferences.edit())
-                .thenReturn(editor);
-
         when(editor.clear())
                 .thenReturn(editor);
 
         mLoginPresenter = new LoginPresenter(mApiService, mUserPreferences,
-                Schedulers.immediate(), Schedulers.immediate(), mixPanel, sharedPreferences);
+                Schedulers.immediate(), Schedulers.immediate(), mixPanel);
     }
 
     @Test
