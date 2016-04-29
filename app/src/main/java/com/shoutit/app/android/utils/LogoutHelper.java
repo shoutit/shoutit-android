@@ -36,6 +36,8 @@ public class LogoutHelper {
     public void logout() {
         twilio.unregisterTwillio();
 
+        mProfilesDao.registerToGcmAction(null);
+
         final Pusher pusher = mPusherHelper.getPusher();
         final User user = userPreferences.getUser();
         assert user != null;
@@ -44,6 +46,5 @@ public class LogoutHelper {
 
         userPreferences.logout();
         recentSearchesTable.clearRecentSearches();
-        mProfilesDao.registerToGcmAction(null);
     }
 }
