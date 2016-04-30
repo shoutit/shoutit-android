@@ -352,7 +352,7 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-                        presenter.deleteConversation();
+                        presenter.deleteShout();
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
