@@ -12,6 +12,7 @@ import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.utils.RtlUtils;
 import com.shoutit.app.android.view.about.AboutActivity;
 import com.shoutit.app.android.view.signin.register.RegisterFragment;
 import com.uservoice.uservoicesdk.UserVoice;
@@ -50,7 +51,8 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void setUpActionBar() {
-        toolbar.setNavigationIcon(R.drawable.ic_blue_arrow);
+        toolbar.setNavigationIcon(RtlUtils.isRtlEnable(this) ?
+                R.drawable.ic_blue_arrow_rtl : R.drawable.ic_blue_arrow);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(null);
     }

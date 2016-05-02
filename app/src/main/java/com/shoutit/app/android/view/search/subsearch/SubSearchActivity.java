@@ -23,6 +23,8 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.KeyboardHelper;
+import com.shoutit.app.android.utils.RtlUtils;
+import com.shoutit.app.android.utils.rx.RxUtils;
 import com.shoutit.app.android.view.search.SearchAdapter;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.SearchQueryPresenter;
@@ -119,7 +121,8 @@ public class SubSearchActivity extends BaseActivity implements SearchView.OnQuer
     }
 
     private void setUpToolbar() {
-        toolbar.setNavigationIcon(R.drawable.ic_blue_arrow);
+        toolbar.setNavigationIcon(RtlUtils.isRtlEnable(this) ?
+                R.drawable.ic_blue_arrow_rtl : R.drawable.ic_blue_arrow);
         toolbar.setTitle(null);
         setSupportActionBar(toolbar);
     }

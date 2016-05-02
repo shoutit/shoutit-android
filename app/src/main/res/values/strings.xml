@@ -382,6 +382,7 @@
     <string name="chat_offer">Offer</string>
     <string name="chat_request">Request</string>
     <string name="chats_empty">No messages.</string>
+    <string name="chat_menu_delete">Delete Conversation</string>
 
     <!-- Notifications -->
     <string name="notifications_title">Notifications</string>

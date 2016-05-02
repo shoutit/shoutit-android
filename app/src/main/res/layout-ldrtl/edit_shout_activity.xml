@@ -166,6 +166,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
+                    android:textDirection="rtl"
                     android:orientation="horizontal">
 
                     <ImageView
@@ -185,6 +186,7 @@
                         android:layout_weight="1"
                         android:paddingStart="6dp"
                         android:paddingLeft="6dp"
+                        android:textDirection="rtl"
                         android:textColor="@android:color/black"
                         tools:text="Dubai" />
 
