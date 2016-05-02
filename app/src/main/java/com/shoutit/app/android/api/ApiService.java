@@ -161,7 +161,6 @@ public interface ApiService {
     Observable<ShoutsResponse> searchCategoriesShouts(@Query("search") String query,
                                                @Query("page") Integer page,
                                                @Query("page_size") Integer pageSize,
-                                               @Query("tags") String tagNameOrCategorySlug,
                                                @Query("country") String countryCode,
                                                @Query("city") String city,
                                                @Query("state") String state,
@@ -388,6 +387,9 @@ public interface ApiService {
 
     @DELETE("conversations/{id}")
     Observable<ResponseBody> deleteConversation(@Path("id") String conversationId);
+
+    @POST("messages/{id}/read")
+    Observable<ResponseBody> readMessage(@Path("id") String messageId);
 
     /**
      * Notifications

@@ -1,16 +1,10 @@
 package com.shoutit.app.android.view.videoconversation;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.hardware.Camera;
-import android.hardware.camera2.CameraAccessException;
-import android.hardware.camera2.CameraCharacteristics;
-import android.hardware.camera2.CameraManager;
 import android.media.AudioManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -34,7 +28,6 @@ import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.TextHelper;
-import com.shoutit.app.android.utils.VersionUtils;
 import com.twilio.conversations.AudioTrack;
 import com.twilio.conversations.CameraCapturer;
 import com.twilio.conversations.CameraCapturerFactory;
@@ -71,7 +64,6 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.subjects.BehaviorSubject;
@@ -89,7 +81,6 @@ public class VideoConversationActivity extends BaseActivity {
     private VideoViewRenderer localVideoRenderer;
     private ConversationsClient conversationClient;
     private CameraCapturer cameraCapturer;
-    private CameraManager cameraManager;
     private Conversation conversation;
 
     private OutgoingInvite outgoingInvite;
@@ -114,6 +105,8 @@ public class VideoConversationActivity extends BaseActivity {
     UserPreferences preferences;
     @Inject
     Twilio mTwilio;
+    @Inject
+    CameraTool cameraTool;
 
     private String calledUserUsername;
     private String calledUserTwilioIdentity;
@@ -217,7 +210,7 @@ public class VideoConversationActivity extends BaseActivity {
             @Override
             public void onError(CapturerException e) {
                 conversationErrorSubject.onNext(getString(R.string.video_calls_camera_issue));
-                cameraCapturer.startPreview();
+                cameraCapturer.startPreview(localVideoPreview);
             }
         };
     }
@@ -381,53 +374,26 @@ public class VideoConversationActivity extends BaseActivity {
 
         if (isFrontCameraAvailable()) {
             cameraCapturer = CameraCapturerFactory.createCameraCapturer(VideoConversationActivity.this,
-                    CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA, localVideoPreview, capturerErrorListener());
+                    CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA, capturerErrorListener());
         } else {
             cameraCapturer = CameraCapturerFactory.createCameraCapturer(VideoConversationActivity.this,
-                    CameraCapturer.CameraSource.CAMERA_SOURCE_BACK_CAMERA, localVideoPreview, capturerErrorListener());
+                    CameraCapturer.CameraSource.CAMERA_SOURCE_BACK_CAMERA, capturerErrorListener());
         }
         setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
-        cameraCapturer.startPreview();
+        cameraCapturer.startPreview(localVideoPreview);
     }
 
     private void setupVariablesFromApp() {
         conversationClient = mTwilio.getConversationsClient();
         invite = mTwilio.getInvite();
-        cameraManager = (CameraManager) getApplicationContext().getSystemService(CAMERA_SERVICE);
-    }
-
-    @SuppressWarnings("deprecation")
-    private boolean isFrontCameraAvailableBelowLollipop() {
-        int numCameras = Camera.getNumberOfCameras();
-        for (int i = 0; i < numCameras; i++) {
-            final Camera.CameraInfo info = new Camera.CameraInfo();
-            Camera.getCameraInfo(i, info);
-            if (Camera.CameraInfo.CAMERA_FACING_FRONT == info.facing) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private boolean isFrontCameraAvailableAboveLollipop() {
-        try {
-            for (final String cameraID : cameraManager.getCameraIdList()) {
-                final CameraCharacteristics characteristics = cameraManager.getCameraCharacteristics(cameraID);
-                final int cameraOrientation = checkNotNull(characteristics.get(CameraCharacteristics.LENS_FACING));
-                if (cameraOrientation == CameraCharacteristics.LENS_FACING_FRONT) return true;
-            }
-        } catch (CameraAccessException e) {
-            conversationErrorSubject.onNext(e.toString());
-        }
-        return false;
     }
 
     private boolean isFrontCameraAvailable() {
-        if (VersionUtils.isAtLeastL()) {
-            return isFrontCameraAvailableAboveLollipop();
-        } else {
-            return isFrontCameraAvailableBelowLollipop();
+        try {
+            return cameraTool.isFrontCameraAvailable();
+        } catch (CameraTool.CameraException e) {
+            conversationErrorSubject.onNext(e.toString());
+            return false;
         }
     }
 
@@ -464,7 +430,7 @@ public class VideoConversationActivity extends BaseActivity {
             conversationClient.listen();
         }
         if (cameraCapturer != null) {
-            cameraCapturer.startPreview();
+            cameraCapturer.startPreview(localVideoPreview);
         }
     }
 

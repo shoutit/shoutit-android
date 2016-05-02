@@ -3,7 +3,9 @@ package com.shoutit.app.android.dagger;
 import android.app.Application;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -46,13 +48,19 @@ import com.shoutit.app.android.db.DbHelper;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.utils.AmazonRequestTransfomer;
 import com.shoutit.app.android.utils.PusherHelper;
+import com.shoutit.app.android.utils.VersionUtils;
+import com.shoutit.app.android.view.videoconversation.CameraTool;
+import com.shoutit.app.android.view.videoconversation.CameraToolImpl;
+import com.shoutit.app.android.view.videoconversation.CameraToolImplLollipop;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
 
+import javax.annotation.Nonnull;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import dagger.Lazy;
 import dagger.Module;
 import dagger.Provides;
 import okhttp3.Cache;
@@ -109,7 +117,7 @@ public final class AppModule {
     @Singleton
     @Named("NoAmazonTransformer")
     Picasso providePicassoWithNoAmazonTransformer(@ForApplication Context context,
-                           @Named("picasso") OkHttpClient okHttpClient) {
+                                                  @Named("picasso") OkHttpClient okHttpClient) {
         return new Picasso.Builder(context)
                 .indicatorsEnabled(BuildConfig.DEBUG)
                 .loggingEnabled(BuildConfig.DEBUG)
@@ -327,4 +335,17 @@ public final class AppModule {
         return new NetworkObservableProviderImpl(context);
     }
 
+    @Provides
+    CameraTool provideCameraTool(@Nonnull Lazy<CameraToolImpl> old, @Nonnull Lazy<CameraToolImplLollipop> lollipop) {
+        if (VersionUtils.isAtLeastLollipop()) {
+            return lollipop.get();
+        } else {
+            return old.get();
+        }
+    }
+
+    @Provides
+    SharedPreferences provideSharedPrefs(@ForApplication Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context);
+    }
 }

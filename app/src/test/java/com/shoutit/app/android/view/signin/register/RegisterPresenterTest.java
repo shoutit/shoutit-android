@@ -104,7 +104,7 @@ public class RegisterPresenterTest {
     public void testRegisterSuccessfulAndTokenSet() {
         registerSuccessful();
 
-        verify(mUserPreferences).setLoggedIn(anyString(), anyString());
+        verify(mUserPreferences).setLoggedIn(anyString(), anyString(), any(User.class));
     }
 
     private void registerSuccessful() {

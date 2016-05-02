@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
 
@@ -26,7 +27,8 @@ public class DiscoverShoutsActivityModule {
     public DiscoverShoutsPresenter provideDiscoverShoutsPresenter(@NetworkScheduler Scheduler networkScheduler,
                                                                   @UiScheduler Scheduler uiScheduler,
                                                                   DiscoverShoutsDao dao,
-                                                                  @ForActivity Context context) {
-        return new DiscoverShoutsPresenter(networkScheduler, uiScheduler, dao, discoveryId, name, context);
+                                                                  @ForActivity Context context,
+                                                                  UserPreferences userPreferences) {
+        return new DiscoverShoutsPresenter(networkScheduler, uiScheduler, dao, discoveryId, name, userPreferences, context);
     }
 }

@@ -154,10 +154,11 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
                     @Override
                     public void call(User user) {
                         if (User.ME.equals(userName)) {
-                            userPreferences.saveUserAsJson(user);
+                            userPreferences.updateUserJson(user);
                         }
                     }
-                });
+                })
+                .compose(ObservableExtensions.<User>behaviorRefCount());
 
         /** Header Data **/
         avatarObservable = userSuccessObservable
@@ -215,7 +216,7 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
                             @Nullable
                             @Override
                             public BaseAdapterItem apply(@Nullable Shout shout) {
-                                return new ShoutAdapterItem(shout, context, shoutSelectedSubject);
+                                return new ShoutAdapterItem(shout, false, false, context, shoutSelectedSubject);
                             }
                         });
 

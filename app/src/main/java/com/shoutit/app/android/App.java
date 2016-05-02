@@ -6,8 +6,6 @@ import android.support.multidex.MultiDexApplication;
 
 import com.appunite.appunitegcm.AppuniteGcm;
 import com.appunite.rx.dagger.NetworkScheduler;
-import com.appunite.rx.functions.BothParams;
-import com.appunite.rx.functions.Functions1;
 import com.appunite.rx.observables.NetworkObservableProvider;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
@@ -37,11 +35,9 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import io.fabric.sdk.android.Fabric;
-import rx.Observable;
 import rx.Scheduler;
 import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.functions.Func2;
 import rx.plugins.RxJavaErrorHandler;
 import rx.plugins.RxJavaPlugins;
 
@@ -128,7 +124,7 @@ public class App extends MultiDexApplication {
                 .subscribe(new Action1<User>() {
                     @Override
                     public void call(User user) {
-                        userPreferences.saveUserAsJson(user);
+                        userPreferences.updateUserJson(user);
                     }
                 });
     }
@@ -141,38 +137,35 @@ public class App extends MultiDexApplication {
     }
 
     private void initPusher() {
-        Observable.zip(userPreferences.getTokenObservable().filter(Functions1.isNotNull()),
-                userPreferences.getUserObservable().filter(Functions1.isNotNull()),
-                new Func2<String, User, BothParams<String, User>>() {
+        userPreferences.getTokenObservable()
+                .filter(new Func1<String, Boolean>() {
                     @Override
-                    public BothParams<String, User> call(String token, User user) {
-                        return new BothParams<>(token, user);
+                    public Boolean call(String token) {
+                        return token != null && !userPreferences.isGuest();
                     }
                 })
-                .subscribe(new Action1<BothParams<String, User>>() {
+                .subscribe(new Action1<String>() {
                     @Override
-                    public void call(BothParams<String, User> tokenAndUser) {
+                    public void call(String token) {
                         final User user = userPreferences.getUser();
                         if (user != null) {
-                            initPusher(tokenAndUser.param1(), user);
+                            initPusher(token, user);
                         }
                     }
                 });
     }
 
     private void initTwilio() {
-        Observable.zip(userPreferences.getTokenObservable().filter(Functions1.isNotNull()).distinctUntilChanged(),
-                userPreferences.getUserObservable().filter(Functions1.isNotNull()).distinctUntilChanged(),
-                new Func2<String, User, BothParams<String, User>>() {
+        userPreferences.getTokenObservable()
+                .filter(new Func1<String, Boolean>() {
                     @Override
-                    public BothParams<String, User> call(String token, User user) {
-                        return new BothParams<>(token, user);
+                    public Boolean call(String token) {
+                        return token != null && !userPreferences.isGuest();
                     }
                 })
-                .distinctUntilChanged()
-                .subscribe(new Action1<BothParams<String, User>>() {
+                .subscribe(new Action1<String>() {
                     @Override
-                    public void call(BothParams<String, User> tokenAndUser) {
+                    public void call(String token) {
                         mTwilio.init();
                     }
                 });

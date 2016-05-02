@@ -136,6 +136,50 @@
           "status": 1
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:935842257865:android:99255d74bd22cd44",
+        "client_id": "android:com.shoutit.app.android.local",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "com.shoutit.app.android.local"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "935842257865-51kapkp3csmirueslfk81ki575bfcktk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.shoutit.app.android.local",
+            "certificate_hash": "5B230F90B5F806B084D5D566F3E314472C7F4BEF"
+          }
+        },
+        {
+          "client_id": "935842257865-s6069gqjq4bvpi4rcbjtdtn2kggrvi06.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 2,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 2
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
     }
   ],
   "client_info": [],

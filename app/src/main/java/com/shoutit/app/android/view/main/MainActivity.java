@@ -126,10 +126,8 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
             menuHandler.initMenu(drawerLayout, selectedItem);
         }
 
-        if (mUserPreferences.getGcmPushToken() == null) {
-            profilesDao.registerToGcmAction(AppuniteGcm.getInstance()
-                    .getPushToken());
-        }
+        profilesDao.registerToGcmAction(AppuniteGcm.getInstance()
+                .getPushToken());
 
         subscribeToStats();
     }

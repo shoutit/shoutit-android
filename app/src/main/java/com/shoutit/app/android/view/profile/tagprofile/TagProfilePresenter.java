@@ -217,7 +217,7 @@ public class TagProfilePresenter implements ProfilePresenter {
                             @Nullable
                             @Override
                             public BaseAdapterItem apply(@Nullable Shout shout) {
-                                return new ShoutAdapterItem(shout, context, shoutSelectedSubject);
+                                return new ShoutAdapterItem(shout, false,  false, context, shoutSelectedSubject);
                             }
                         });
 

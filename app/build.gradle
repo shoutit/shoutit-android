@@ -29,9 +29,9 @@ if (keystoreProperties.exists()) {
     props.load(new FileInputStream(keystoreProperties))
 }
 
-def baseVersionName = "2.0.0"
+def baseVersionName = "2.0.3"
 
-project.ext.versionCode = 69
+project.ext.versionCode = 72
 
 if (project.hasProperty("versionSuffix")) {
     project.ext.versionChangeSuffix = project.versionSuffix
@@ -97,6 +97,19 @@ android {
             buildConfigField 'Boolean', 'enableCrashlytics', 'true'
         }
 
+        local {
+            signingConfig signingConfigs.debug
+            debuggable true
+            minifyEnabled false
+            ext.enableCrashlytics = true
+            ext.betaDistributionGroupAliases = "android-internal-testers, internal-tests"
+            ext.betaDistributionNotifications = false
+            applicationIdSuffix '.local'
+            versionNameSuffix "-local"
+            buildConfigField "String", "API_URL", local_api_url
+            buildConfigField 'Boolean', 'enableCrashlytics', 'true'
+        }
+
         release {
             debuggable false
             minifyEnabled false
@@ -127,6 +140,9 @@ android {
             variant.setIgnore(true);
         }
         if (variant.buildType.name.equals('debug') && variant.getFlavors().get(0).name.equals('prod')) {
+            variant.setIgnore(true);
+        }
+        if (variant.buildType.name.equals('local') && variant.getFlavors().get(0).name.equals('dev')) {
             variant.setIgnore(true);
         }
     }
@@ -205,7 +221,7 @@ dependencies {
     compile 'com.karumi:dexter:2.1.0'
 
     // other
-    compile 'com.twilio:conversations-android:0.9.0'
+    compile 'com.twilio:conversations-android:0.10.0'
     compile 'com.uservoice:uservoice-android-sdk:1.2.4'
     compile 'fr.avianey.com.viewpagerindicator:library:2.4.1@aar'
     compile('com.crashlytics.sdk.android:crashlytics:2.5.1@aar') {

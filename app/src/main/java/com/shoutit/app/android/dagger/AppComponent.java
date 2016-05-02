@@ -2,6 +2,7 @@ package com.shoutit.app.android.dagger;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.appunite.rx.dagger.NetworkScheduler;
@@ -29,6 +30,7 @@ import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.PusherHelper;
+import com.shoutit.app.android.view.videoconversation.CameraTool;
 import com.squareup.picasso.Picasso;
 
 import javax.inject.Named;
@@ -109,4 +111,8 @@ public interface AppComponent {
     Twilio twilio();
 
     MixPanel mixPanel();
+
+    CameraTool cameraTool();
+
+    SharedPreferences sharedPreferences();
 }

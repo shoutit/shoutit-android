@@ -5,9 +5,12 @@ import android.content.Context;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.collect.ImmutableList;
+import com.shoutit.app.android.TestUtils;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
+import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.view.shouts.discover.DiscoverShoutsPresenter;
@@ -37,6 +40,9 @@ public class ShoutsPresenterTest {
     @Mock
     Context mContext;
 
+    @Mock
+    UserPreferences userPreferences;
+
     private BehaviorSubject<ResponseOrError<ShoutsResponse>> mBehaviorSubject;
 
     @Before
@@ -44,12 +50,13 @@ public class ShoutsPresenterTest {
         MockitoAnnotations.initMocks(this);
 
         mBehaviorSubject = BehaviorSubject.create(ResponseOrError.fromData(
-                new ShoutsResponse(0, "", "", ImmutableList.of(
-                        new Shout("", "", "", "", new UserLocation(
-                                0, 0, "", "", "", "", ""), "", "", 0L, 0, "", "", "", null, null, null, 0, null, null, 0, ImmutableList.<Conversation>of(), true, null, null)), null)));
+                new ShoutsResponse(0, "", "", ImmutableList.of(TestUtils.getShout()), null)));
         when(mDiscoverShoutsDao.getShoutsObservable(anyString())).thenReturn(mBehaviorSubject);
 
-        mShoutsPresenter = new DiscoverShoutsPresenter(Schedulers.immediate(), Schedulers.immediate(), mDiscoverShoutsDao, "", "", mContext);
+        when(userPreferences.isNormalUser()).thenReturn(true);
+        when(userPreferences.getUser()).thenReturn(TestUtils.getUser());
+
+        mShoutsPresenter = new DiscoverShoutsPresenter(Schedulers.immediate(), Schedulers.immediate(), mDiscoverShoutsDao, "", "", userPreferences, mContext);
     }
 
     @Test

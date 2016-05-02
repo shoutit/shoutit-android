@@ -14,6 +14,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
+import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ShoutsDao;
@@ -55,6 +56,10 @@ public class SearchShoutsResultsPresenter {
                                         @Nonnull final UserPreferences userPreferences,
                                         @Nonnull @ForActivity final Context context,
                                         @UiScheduler Scheduler uiScheduler) {
+
+        final boolean isNormalUser = userPreferences.isNormalUser();
+        final User currentUser = userPreferences.getUser();
+        final String currentUserName = currentUser != null ? currentUser.getUsername() : null;
 
         final boolean initWithUserLocation = searchType != SearchPresenter.SearchType.PROFILE &&
                 searchType != SearchPresenter.SearchType.TAG_PROFILE;
@@ -124,8 +129,9 @@ public class SearchShoutsResultsPresenter {
                             builder.addAll(Lists.transform(shoutsResponse.getShouts(), new Function<Shout, BaseAdapterItem>() {
                                 @Nullable
                                 @Override
-                                public BaseAdapterItem apply(Shout input) {
-                                    return new ShoutAdapterItem(input, context, shoutSelectedSubject);
+                                public BaseAdapterItem apply(Shout shout) {
+                                    final boolean isShoutOwner = shout.getProfile().getUsername().equals(currentUserName);
+                                    return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context, shoutSelectedSubject);
                                 }
                             }));
                             return builder.build();

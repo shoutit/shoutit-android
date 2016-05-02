@@ -419,16 +419,16 @@ public class ShoutsDao {
                     }
                 case CATEGORY:
                     if (filtersToSubmit != null) {
-                        return apiService.searchCategoriesShouts(query, pageNumber, PAGE_SIZE, contextItemId,
+                        return apiService.searchCategoriesShouts(query, pageNumber, PAGE_SIZE,
                                 country, filtersToSubmit.getCity(), filtersToSubmit.getState(),
                                 filtersToSubmit.getMinPriceInCents(), filtersToSubmit.getMaxPriceInCents(),
                                 filtersToSubmit.getDistance(), filtersToSubmit.getShoutType(),
                                 filtersToSubmit.getSortType().getType(), filtersToSubmit.getCategorySlug(),
                                 filtersToSubmit.getFiltersQueryMap());
                     } else {
-                        return apiService.searchCategoriesShouts(query, pageNumber, PAGE_SIZE, contextItemId,
+                        return apiService.searchCategoriesShouts(query, pageNumber, PAGE_SIZE,
                                 country, city, state,
-                                null, null, DEFAULT_SEARCH_DISTANCE, null, null, null, null);
+                                null, null, DEFAULT_SEARCH_DISTANCE, null, null, contextItemId, null);
                     }
                 case DISCOVER:
                     if (filtersToSubmit != null) {

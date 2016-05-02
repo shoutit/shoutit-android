@@ -113,8 +113,8 @@ public class RegisterPresenter {
                 .doOnNext(new Action1<SignResponse>() {
                     @Override
                     public void call(SignResponse signResponse) {
-                        userPreferences.setLoggedIn(signResponse.getAccessToken(), signResponse.getRefreshToken());
-                        userPreferences.saveUserAsJson(signResponse.getUser());
+                        userPreferences.setLoggedIn(signResponse.getAccessToken(),
+                                signResponse.getRefreshToken(), signResponse.getUser());
                         userPreferences.setShouldAskForInterestTrue();
                     }
                 });

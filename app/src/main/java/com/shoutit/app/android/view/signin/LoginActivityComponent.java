@@ -1,5 +1,7 @@
 package com.shoutit.app.android.view.signin;
 
+import android.content.SharedPreferences;
+
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.ActivityScope;
 import com.shoutit.app.android.dagger.AppComponent;
@@ -18,5 +20,7 @@ import dagger.Component;
 public interface LoginActivityComponent extends BaseActivityComponent {
 
     void inject(LoginActivity loginActivity);
+
+    SharedPreferences sharedPreferences();
 
 }

@@ -20,15 +20,19 @@ public class ShoutAdapterItem implements BaseAdapterItem {
 
     @Nonnull
     private final Shout shout;
+    private final boolean isShoutOwner;
+    private final boolean isNormalUser;
     @Nonnull
     private final Context context;
     @Nonnull
     private final Observer<String> shoutSelectedObserver;
 
-    public ShoutAdapterItem(@Nonnull Shout shout,
-                            @Nonnull Context context,
+    public ShoutAdapterItem(@Nonnull Shout shout, boolean isShoutOwner,
+                            boolean isNormalUser, @Nonnull Context context,
                             @Nonnull Observer<String> shoutSelectedObserver) {
         this.shout = shout;
+        this.isShoutOwner = isShoutOwner;
+        this.isNormalUser = isNormalUser;
         this.context = context;
         this.shoutSelectedObserver = shoutSelectedObserver;
     }
@@ -42,6 +46,14 @@ public class ShoutAdapterItem implements BaseAdapterItem {
     public boolean matches(@Nonnull BaseAdapterItem item) {
         return item instanceof ShoutAdapterItem &&
                 shout.getId().equals(((ShoutAdapterItem) item).shout.getId());
+    }
+
+    public boolean isShoutOwner() {
+        return isShoutOwner;
+    }
+
+    public boolean isNormalUser() {
+        return isNormalUser;
     }
 
     @Override
