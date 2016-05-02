@@ -369,6 +369,7 @@
 <string name="chat_offer">"عرض"</string>
 <string name="chat_request">"طلب"</string>
 <string name="chats_empty">"لا توجد رسائل"</string>
+ <string name="chat_menu_delete">حذف</string>
 
 <!-- Notifications -->
 <string name="notifications_title">"الإشعارات"</string>
