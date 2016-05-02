@@ -18,6 +18,8 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.utils.LogHelper;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.inject.Named;
 
 import rx.Observable;
 import rx.Observer;
@@ -35,13 +37,19 @@ public class ProfilesDao {
     private final LoadingCache<String, SearchProfilesDao> searchProfilesCache;
     @Nonnull
     private final ApiService apiService;
+    @Nonnull
+    private final ApiService serializeNullsApiService;
+    @Nonnull
     private final Scheduler networkScheduler;
+    @Nonnull
     private UserPreferences userPreferences;
 
     public ProfilesDao(@Nonnull ApiService apiService,
-                       @NetworkScheduler Scheduler networkScheduler,
+                       @Nonnull @Named("SerializeNulls") ApiService serializeNullsApiService,
+                       @Nonnull @NetworkScheduler Scheduler networkScheduler,
                        @Nonnull UserPreferences userPreferences) {
         this.apiService = apiService;
+        this.serializeNullsApiService = serializeNullsApiService;
         this.networkScheduler = networkScheduler;
         this.userPreferences = userPreferences;
 
@@ -82,8 +90,8 @@ public class ProfilesDao {
         return profilesCache.getUnchecked(userName);
     }
 
-    public void registerToGcmAction(final String token) {
-        apiService.registerGcmToken(new RegisterDeviceRequest(token))
+    public void registerToGcmAction(@Nullable final String token) {
+        serializeNullsApiService.registerGcmToken(new RegisterDeviceRequest(token))
                 .subscribeOn(networkScheduler)
                 .subscribe(new Action1<User>() {
                     @Override
