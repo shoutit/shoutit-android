@@ -42,35 +42,42 @@
                 tools:text="18:04" />
         </FrameLayout>
 
-        <RelativeLayout
-            android:layout_width="150dp"
-            android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/chats_message_shout_description"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:lines="1"
-                tools:text="Cotton wool line with cap and other cool things like computers" />
+        <TextView
+            android:id="@+id/chats_message_shout_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:lines="1"
+            android:paddingLeft="2dp"
+            android:paddingRight="2dp"
+            tools:text="Cotton wool line with cap and other cool things like computers" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingLeft="2dp"
+            android:paddingRight="2dp">
 
             <TextView
                 android:id="@+id/chats_shout_author"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/chats_message_shout_description"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:layout_marginEnd="2dp"
                 android:textColor="@color/black_38"
-                tools:text="John Smith" />
+                tools:text="John Smith sdfdsfsdfsdf" />
 
             <TextView
                 android:id="@+id/chats_shout_price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_below="@+id/chats_message_shout_description"
                 android:textColor="@color/colorAccent"
                 tools:text="$44 USD" />
 
-        </RelativeLayout>
+        </LinearLayout>
+
     </LinearLayout>
 </FrameLayout>
