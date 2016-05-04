@@ -34,7 +34,6 @@ import android.widget.Toast;
 
 import com.appunite.rx.internal.Preconditions;
 import com.commonsware.cwac.cam2.CameraController;
-import com.commonsware.cwac.cam2.CameraDescriptor;
 import com.commonsware.cwac.cam2.CameraEngine;
 import com.commonsware.cwac.cam2.CameraView;
 import com.commonsware.cwac.cam2.PictureTransaction;
@@ -65,12 +64,13 @@ public class CameraFragment extends Fragment {
     private static final int REQUEST_GALLERY_VIDEO_CODE = 1;
     private static final int VIDEO_LENGTH = 60_000;
 
+    private static final int MAX_SIZE = 1024;
+
     private static final String ARGS_VIDEO_FIRST = "arg_video_first";
     private static final String ARGS_CHAT_MEDIA = "arg_is_chat";
     private static final String ARGS_FIRST_MEDIA = "arg_first_media";
 
     private static final String TAG = CameraFragment.class.getCanonicalName();
-    public static final int MAX_SIZE = 2048;
 
     public interface CameraFragmentListener {
         void onInitializationFailed(Exception cause);
@@ -708,33 +708,27 @@ public class CameraFragment extends Fragment {
             @Override
             protected String[] doInBackground(Void... params) {
                 if (imageOutput == null) return null;
-                File imageFile = new File(imageOutput);
 
+                final File imageFile = new File(imageOutput);
                 if (!imageFile.exists()) return null;
 
-                Bitmap imageBitmap = CameraUtils.getScaledBitmapFromFile(imageFile.getAbsolutePath(), MAX_SIZE);
+                final Bitmap imageBitmap = CameraUtils.getScaledBitmapFromFile(imageFile.getAbsolutePath(), MAX_SIZE);
 
-                Log.d("tag", String.format("  > %s x %s", imageBitmap.getWidth(), imageBitmap.getHeight()));
-
-                if (CameraUtils.bitmapToFile(imageBitmap, imageFile, Bitmap.CompressFormat.JPEG, DEFAULT_IMAGE_QUALITY)) {
-                    Log.d("tag", String.format("  > new JPEG file size: %s bytes", imageFile.length()));
-                    return new String[]{EXTRA_IMAGE_URI, "file://" + imageOutput};
-                } else {
-                    return null;
-                }
+                CameraUtils.bitmapToFile(imageBitmap, imageFile, Bitmap.CompressFormat.JPEG, DEFAULT_IMAGE_QUALITY);
+                return new String[]{EXTRA_IMAGE_URI, "file://" + imageOutput};
             }
 
             @Override
             protected void onPostExecute(String[] keyValue) {
                 if (keyValue != null) {
-                    Intent returnIntent = new Intent();
+                    final Intent returnIntent = new Intent();
                     returnIntent.putExtra(EXTRA_EXISTING_MEDIA, false);
 
                     if (isVideoMode) {
                         returnIntent.putExtra(keyValue[0], keyValue[1]);
                     } else {
                         returnIntent.putExtra(keyValue[0], Uri.parse(keyValue[1]));
-                        returnIntent.putExtra(IS_IMAGE_LIST, false); //to define that there is only single image
+                        returnIntent.putExtra(IS_IMAGE_LIST, false);
                     }
                     returnIntent.putExtra(EXTRA_IS_VIDEO, isVideoMode);
 
