@@ -2,7 +2,6 @@ package com.shoutit.app.android.dao;
 
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
-import com.appunite.rx.operators.MoreOperators;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.TwilioResponse;
 
@@ -20,8 +19,8 @@ public class VideoCallsDao {
 
         videoCallsObservable = apiService.getTokenAndIdentity()
                 .subscribeOn(networkScheduler)
-                .compose(ResponseOrError.<TwilioResponse>toResponseOrErrorObservable())
-                .compose(MoreOperators.<ResponseOrError<TwilioResponse>>cacheWithTimeout(networkScheduler));
+                .mergeWith(Observable.<TwilioResponse>never())
+                .compose(ResponseOrError.<TwilioResponse>toResponseOrErrorObservable());
     }
 
     @Nonnull

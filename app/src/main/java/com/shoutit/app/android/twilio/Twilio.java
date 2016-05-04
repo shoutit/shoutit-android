@@ -49,6 +49,7 @@ import rx.subjects.PublishSubject;
 public class Twilio {
 
     private static final String TAG = Twilio.class.getCanonicalName();
+    private static final int TOKEN_ERROR_MAX_RETRIES = 3;
 
     private final Context mContext;
     @Nonnull
@@ -56,6 +57,7 @@ public class Twilio {
     private TwilioAccessManager accessManager;
     private ConversationsClient conversationsClient;
     private IncomingInvite invite;
+    private int tokenErrorRetries;
 
     private final Observable<String> successTwilioTokenRequestObservable;
     private final Observable<String> successCalledPersonIdentity;
@@ -100,10 +102,7 @@ public class Twilio {
                 .filter(Functions1.isNotNull())
                 .observeOn(uiScheduler);
 
-        final Observable<String> userLoggedInObservable = userPreferences.getTokenObservable()
-                .filter(Functions1.isNotNull());
-
-        Observable.merge(initTwilioSubject, userLoggedInObservable)
+        initTwilioSubject
                 .filter(new Func1<Object, Boolean>() {
                     @Override
                     public Boolean call(Object o) {
@@ -228,6 +227,7 @@ public class Twilio {
     }
 
     public void initTwilio() {
+        unregisterTwillio();
         initTwilioSubject.onNext(null);
     }
 
@@ -262,11 +262,17 @@ public class Twilio {
 
             @Override
             public void onTokenUpdated(TwilioAccessManager twilioAccessManager) {
-
+                userPreferences.setTwilioToken(twilioAccessManager.getToken());
             }
 
             @Override
             public void onError(TwilioAccessManager twilioAccessManager, String s) {
+                if (tokenErrorRetries <= TOKEN_ERROR_MAX_RETRIES) {
+                    userPreferences.setTwilioToken(null);
+                    initTwilio();
+                } else {
+                    tokenErrorRetries = 0;
+                }
                 LogHelper.logThrowableAndCrashlytics(TAG, "accessManagerListener : Error on Token: " + s, new Throwable());
             }
         };
@@ -285,7 +291,7 @@ public class Twilio {
 
             @Override
             public void onFailedToStartListening(ConversationsClient conversationsClient, TwilioConversationsException e) {
-                if (e != null) {
+                if (e != null && e.getErrorCode() == 100) {
                     initTwilio();
                 }
             }

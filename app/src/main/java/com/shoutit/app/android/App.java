@@ -6,6 +6,7 @@ import android.support.multidex.MultiDexApplication;
 
 import com.appunite.appunitegcm.AppuniteGcm;
 import com.appunite.rx.dagger.NetworkScheduler;
+import com.appunite.rx.functions.Functions1;
 import com.appunite.rx.observables.NetworkObservableProvider;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
@@ -95,7 +96,7 @@ public class App extends MultiDexApplication {
 
         initPusher();
 
-        mTwilio.initTwilio();
+        initTwilio();
 
         mStackCounterManager.register(this)
                 .subscribe(new Action1<Boolean>() {
@@ -111,6 +112,22 @@ public class App extends MultiDexApplication {
                                 }
                             }
                         }
+                    }
+                });
+    }
+
+    private void initTwilio() {
+        userPreferences.getTokenObservable()
+                .filter(new Func1<String, Boolean>() {
+                    @Override
+                    public Boolean call(String userToken) {
+                        return userToken != null && !userPreferences.isGuest();
+                    }
+                })
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String ignore) {
+                        mTwilio.initTwilio();
                     }
                 });
     }
