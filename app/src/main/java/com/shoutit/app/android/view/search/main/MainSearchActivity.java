@@ -125,7 +125,7 @@ public class MainSearchActivity extends BaseActivity implements SearchView.OnQue
     }
 
     private void setUpToolbar() {
-        toolbar.setNavigationIcon(RtlUtils.isRtlEnable(this) ? R.drawable.ic_blue_arrow_rtl : R.drawable.ic_blue_arrow);
+        toolbar.setNavigationIcon(RtlUtils.isRtlEnabled(this) ? R.drawable.ic_blue_arrow_rtl : R.drawable.ic_blue_arrow);
         toolbar.setTitle(null);
         setSupportActionBar(toolbar);
     }
