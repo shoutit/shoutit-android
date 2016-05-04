@@ -13,7 +13,7 @@ import javax.annotation.Nonnull;
 public class RtlUtils {
 
     public static boolean isRtlEnabled(Context context) {
-        if (Build.VERSION.SDK_INT >= 17) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             return context.getResources().getConfiguration().getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
         } else {
             return isRTL(context);
@@ -38,6 +38,8 @@ public class RtlUtils {
     }
 
     public static void setTextDirection(@Nonnull Context context, @Nonnull TextView textView) {
-        textView.setTextDirection(isRtlEnabled(context) ? View.TEXT_DIRECTION_RTL : View.TEXT_DIRECTION_LTR);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            textView.setTextDirection(isRtlEnabled(context) ? View.TEXT_DIRECTION_RTL : View.TEXT_DIRECTION_LTR);
+        }
     }
 }
