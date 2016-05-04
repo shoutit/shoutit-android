@@ -233,6 +233,7 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
     public void setData(@NonNull List<BaseAdapterItem> items) {
         mChatsRecyclerview.setVisibility(View.VISIBLE);
         chatsAdapter.call(items);
+        mChatsRecyclerview.scrollToPosition(items.size() - 1);
     }
 
     @Override

@@ -199,8 +199,6 @@ public class ChatActivity extends BaseActivity implements Listener {
         ChatsHelper.setOnClickHideListener(mChatsMessageEdittext, mChatsAttatchmentsLayout);
     }
 
-
-
     @Nonnull
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {

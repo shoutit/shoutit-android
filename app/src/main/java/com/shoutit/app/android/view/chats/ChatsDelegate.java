@@ -75,10 +75,10 @@ public class ChatsDelegate {
     private final AmazonHelper mAmazonHelper;
     private Listener mListener;
     private final User mUser;
-    private final PublishSubject<PusherMessage> newMessagesSubject = PublishSubject.create();
+    private final PublishSubject<PusherMessage> newMessagesSubject;
 
 
-    public ChatsDelegate(PusherHelper pusher, Scheduler uiScheduler, Scheduler networkScheduler, ApiService apiService, Resources resources, UserPreferences userPreferences, Context context, AmazonHelper amazonHelper) {
+    public ChatsDelegate(PusherHelper pusher, Scheduler uiScheduler, Scheduler networkScheduler, ApiService apiService, Resources resources, UserPreferences userPreferences, Context context, AmazonHelper amazonHelper, PublishSubject<PusherMessage> newMessagesSubject) {
         mPusher = pusher;
         mUiScheduler = uiScheduler;
         mNetworkScheduler = networkScheduler;
@@ -87,6 +87,7 @@ public class ChatsDelegate {
         mResources = resources;
         mContext = context;
         mAmazonHelper = amazonHelper;
+        this.newMessagesSubject = newMessagesSubject;
         mUser = mUserPreferences.getUser();
     }
 

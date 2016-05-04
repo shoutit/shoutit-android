@@ -15,6 +15,7 @@ import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.pusher.client.channel.PresenceChannel;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
@@ -45,6 +46,7 @@ import javax.inject.Inject;
 import rx.Observable;
 import rx.Scheduler;
 import rx.functions.Action1;
+import rx.functions.Func0;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.subjects.BehaviorSubject;
@@ -111,7 +113,7 @@ public class ChatsFirstConversationPresenter {
                     }
                 });
 
-        mChatsDelegate = new ChatsDelegate(pusher, uiScheduler, networkScheduler, apiService, resources, userPreferences, context, amazonHelper);
+        mChatsDelegate = new ChatsDelegate(pusher, uiScheduler, networkScheduler, apiService, resources, userPreferences, context, amazonHelper, newMessagesSubject);
     }
 
     public void register(@NonNull FirstConversationListener listener) {
@@ -192,11 +194,26 @@ public class ChatsFirstConversationPresenter {
     private void subscribeToMessages() {
         mLocalAndPusherMessagesSubject = PublishSubject.create();
 
+        final Observable<PresenceChannel> channelObservable = Observable
+                .defer(new Func0<Observable<PresenceChannel>>() {
+                    @Override
+                    public Observable<PresenceChannel> call() {
+
+                        return Observable.just(mChatsDelegate.getConversationChannel(conversationId));
+                    }
+                })
+                .cache();
+
         final Observable<List<PusherMessage>> localAndPusherMessages = mLocalAndPusherMessagesSubject.switchMap(
                 new Func1<Object, Observable<PusherMessage>>() {
                     @Override
                     public Observable<PusherMessage> call(Object o) {
-                        return mChatsDelegate.getPusherMessageObservable(mChatsDelegate.getConversationChannel(conversationId)).mergeWith(newMessagesSubject);
+                        return channelObservable.flatMap(new Func1<PresenceChannel, Observable<PusherMessage>>() {
+                            @Override
+                            public Observable<PusherMessage> call(PresenceChannel presenceChannel) {
+                                return mChatsDelegate.getPusherMessageObservable(presenceChannel).mergeWith(newMessagesSubject);
+                            }
+                        });
                     }
                 })
                 .compose(mChatsDelegate.transformToScan());
@@ -222,7 +239,12 @@ public class ChatsFirstConversationPresenter {
                 }), mRefreshTypingObservable.switchMap(new Func1<Object, Observable<Boolean>>() {
                     @Override
                     public Observable<Boolean> call(Object o) {
-                        return mChatsDelegate.getTypingObservable(mChatsDelegate.getConversationChannel(conversationId));
+                        return channelObservable.flatMap(new Func1<PresenceChannel, Observable<Boolean>>() {
+                            @Override
+                            public Observable<Boolean> call(PresenceChannel presenceChannel) {
+                                return mChatsDelegate.getTypingObservable(presenceChannel);
+                            }
+                        });
                     }
                 }), new Func2<List<BaseAdapterItem>, Boolean, List<BaseAdapterItem>>() {
                     @Override
@@ -266,6 +288,7 @@ public class ChatsFirstConversationPresenter {
                 .subscribe(new Action1<Message>() {
                     @Override
                     public void call(Message messagesResponse) {
+
                         mChatsDelegate.postLocalMessage(messagesResponse, conversationId);
                     }
                 }, getOnError()));
@@ -273,12 +296,12 @@ public class ChatsFirstConversationPresenter {
     }
 
     private Observable<Message> sendMessage(PostMessage message) {
-        Observable<Message> observable;
         if (conversationCreated) {
-            observable = mApiService.postMessage(conversationId, message)
+            return mApiService.postMessage(conversationId, message)
                     .subscribeOn(mNetworkScheduler)
                     .observeOn(mUiScheduler);
         } else {
+            Observable<Message> observable;
             if (mIsShoutConversation) {
                 observable = mApiService.createShoutConversation(mIdForCreation, message)
                         .subscribeOn(mNetworkScheduler)
@@ -288,22 +311,22 @@ public class ChatsFirstConversationPresenter {
                         .subscribeOn(mNetworkScheduler)
                         .observeOn(mUiScheduler);
             }
-        }
-        return observable.doOnNext(new Action1<Message>() {
-            @Override
-            public void call(Message message) {
-                mListener.showDeleteMenu(true);
-                conversationCreated = true;
-                conversationId = message.getConversationId();
-                if (mIsShoutConversation) {
-                    mShoutsDao.getShoutDao(mIdForCreation).getRefreshObserver().onNext(new Object());
-                } else {
-                    mProfilesDao.getProfileDao(mIdForCreation).getRefreshSubject().onNext(new Object());
+            return observable.doOnNext(new Action1<Message>() {
+                @Override
+                public void call(Message message) {
+                    mListener.showDeleteMenu(true);
+                    conversationCreated = true;
+                    conversationId = message.getConversationId();
+                    if (mIsShoutConversation) {
+                        mShoutsDao.getShoutDao(mIdForCreation).getRefreshObserver().onNext(new Object());
+                    } else {
+                        mProfilesDao.getProfileDao(mIdForCreation).getRefreshSubject().onNext(new Object());
+                    }
+                    mRefreshTypingObservable.onNext(new Object());
+                    mLocalAndPusherMessagesSubject.onNext(new Object());
                 }
-                mRefreshTypingObservable.onNext(new Object());
-                mLocalAndPusherMessagesSubject.onNext(new Object());
-            }
-        });
+            });
+        }
     }
 
     public void unregister() {

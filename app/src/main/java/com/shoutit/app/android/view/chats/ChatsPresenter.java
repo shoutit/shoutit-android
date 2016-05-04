@@ -142,7 +142,7 @@ public class ChatsPresenter {
                     }
                 });
 
-        mChatsDelegate = new ChatsDelegate(pusher, uiScheduler, networkScheduler, apiService, resources, userPreferences, context, amazonHelper);
+        mChatsDelegate = new ChatsDelegate(pusher, uiScheduler, networkScheduler, apiService, resources, userPreferences, context, amazonHelper, newMessagesSubject);
     }
 
     public void register(@NonNull Listener listener) {
