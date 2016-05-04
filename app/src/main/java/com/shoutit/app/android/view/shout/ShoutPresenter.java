@@ -304,8 +304,8 @@ public class ShoutPresenter {
                         return isNormalUser && user != null && user.getUsername().equals(shoutUser);
                     }
                 })
-                .compose(ObservableExtensions.<Boolean>behaviorRefCount())
-                .first();
+                .take(1)
+                .compose(ObservableExtensions.<Boolean>behaviorRefCount());
 
         /** Refresh shouts **/
         Observable.merge(shoutsGlobalRefreshPresenter.getShoutsGlobalRefreshObservable(), refreshShoutsSubject)
