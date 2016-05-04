@@ -61,7 +61,6 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import rx.Subscription;
 import rx.functions.Action1;
 
 public class ChatActivity extends BaseActivity implements Listener {
@@ -208,8 +207,6 @@ public class ChatActivity extends BaseActivity implements Listener {
         ChatsHelper.setOnClickHideListener(mChatsRecyclerview, mChatsAttatchmentsLayout);
         ChatsHelper.setOnClickHideListener(mChatsMessageEdittext, mChatsAttatchmentsLayout);
     }
-
-
 
     @Nonnull
     @Override
@@ -374,7 +371,7 @@ public class ChatActivity extends BaseActivity implements Listener {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-                        presenter.deleteShout();
+                        presenter.deleteConversation();
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {

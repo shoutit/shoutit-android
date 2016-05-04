@@ -233,6 +233,7 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
     public void setData(@NonNull List<BaseAdapterItem> items) {
         mChatsRecyclerview.setVisibility(View.VISIBLE);
         chatsAdapter.call(items);
+        mChatsRecyclerview.scrollToPosition(items.size() - 1);
     }
 
     @Override
@@ -352,7 +353,7 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-                        presenter.deleteShout();
+                        presenter.deleteConversation();
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
