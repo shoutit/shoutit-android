@@ -95,7 +95,7 @@ public class App extends MultiDexApplication {
 
         initPusher();
 
-        initTwilio();
+        mTwilio.initTwilio();
 
         mStackCounterManager.register(this)
                 .subscribe(new Action1<Boolean>() {
@@ -151,22 +151,6 @@ public class App extends MultiDexApplication {
                         if (user != null) {
                             initPusher(token, user);
                         }
-                    }
-                });
-    }
-
-    private void initTwilio() {
-        userPreferences.getTokenObservable()
-                .filter(new Func1<String, Boolean>() {
-                    @Override
-                    public Boolean call(String token) {
-                        return token != null && !userPreferences.isGuest();
-                    }
-                })
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String token) {
-                        mTwilio.init();
                     }
                 });
     }

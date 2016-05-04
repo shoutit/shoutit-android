@@ -3,7 +3,7 @@ package com.shoutit.app.android.twilio;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.Nullable;
-import android.widget.Toast;
+import android.text.TextUtils;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
@@ -11,7 +11,7 @@ import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.collect.ImmutableList;
-import com.shoutit.app.android.R;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.CallerProfile;
 import com.shoutit.app.android.api.model.TwilioResponse;
@@ -51,12 +51,13 @@ public class Twilio {
     private static final String TAG = Twilio.class.getCanonicalName();
 
     private final Context mContext;
+    @Nonnull
+    private final UserPreferences userPreferences;
     private TwilioAccessManager accessManager;
     private ConversationsClient conversationsClient;
     private IncomingInvite invite;
 
-    private final Observable<String> twilioRequirementObservable;
-    private final Observable<Throwable> errorObservable;
+    private final Observable<String> successTwilioTokenRequestObservable;
     private final Observable<String> successCalledPersonIdentity;
     private final Observable<Throwable> errorCalledPersonIdentity;
 
@@ -68,18 +69,69 @@ public class Twilio {
     private final PublishSubject<String> initCalledPersonIdentityRequestSubject = PublishSubject.create();
     @Nonnull
     private final PublishSubject<String> rejectCallSubject = PublishSubject.create();
+    @Nonnull
+    private final PublishSubject<Object> initTwilioSubject = PublishSubject.create();
+    @Nonnull
+    private final PublishSubject<Throwable> errorSubject = PublishSubject.create();
 
     @Inject
     public Twilio(@ForApplication Context context,
                   @Nonnull final VideoCallsDao videoCallsDao,
                   @Nonnull final UsersIdentityDao usersIdentityDao,
                   @Nonnull final ApiService apiService,
-                  @Nonnull @NetworkScheduler final Scheduler networkScheduler,
+                  @Nonnull final UserPreferences userPreferences,
+                  @Nonnull@NetworkScheduler final Scheduler networkScheduler,
                   @Nonnull @UiScheduler final Scheduler uiScheduler) {
         mContext = context;
+        this.userPreferences = userPreferences;
 
-        final Observable<ResponseOrError<TwilioResponse>> twilioResponse = videoCallsDao.getVideoCallsObservable()
-                .compose(ObservableExtensions.<ResponseOrError<TwilioResponse>>behaviorRefCount());
+        successTwilioTokenRequestObservable = videoCallsDao.getVideoCallsObservable()
+                .map(new Func1<ResponseOrError<TwilioResponse>, String>() {
+                    @Override
+                    public String call(ResponseOrError<TwilioResponse> twilioResponse) {
+                        if (twilioResponse.isData()) {
+                            return twilioResponse.data().getToken();
+                        } else {
+                            errorSubject.onNext(twilioResponse.error());
+                            return null;
+                        }
+                    }
+                })
+                .filter(Functions1.isNotNull())
+                .observeOn(uiScheduler);
+
+        final Observable<String> userLoggedInObservable = userPreferences.getTokenObservable()
+                .filter(Functions1.isNotNull());
+
+        Observable.merge(initTwilioSubject, userLoggedInObservable)
+                .filter(new Func1<Object, Boolean>() {
+                    @Override
+                    public Boolean call(Object o) {
+                        return !userPreferences.isGuest();
+                    }
+                })
+                .switchMap(new Func1<Object, Observable<String>>() {
+                    @Override
+                    public Observable<String> call(Object ignore) {
+                        return Observable.just(userPreferences.getTwilioToken());
+                    }
+                })
+                .switchMap(new Func1<String, Observable<String>>() {
+                    @Override
+                    public Observable<String> call(String twilioToken) {
+                        if (TextUtils.isEmpty(twilioToken)) {
+                            return successTwilioTokenRequestObservable;
+                        } else {
+                            return Observable.just(twilioToken);
+                        }
+                    }
+                })
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String token) {
+                        initializeTwilio(token);
+                    }
+                });
 
         final Observable<ResponseOrError<CallerProfile>> callerProfileResponse = profileRefreshSubject
                 .withLatestFrom(callerIdentitySubject,
@@ -96,18 +148,6 @@ public class Twilio {
                     }
                 })
                 .compose(ObservableExtensions.<ResponseOrError<CallerProfile>>behaviorRefCount());
-
-        twilioRequirementObservable = twilioResponse
-                .compose(ResponseOrError.<TwilioResponse>onlySuccess())
-                .map(new Func1<TwilioResponse, String>() {
-                    @Override
-                    public String call(TwilioResponse twilioResponse) {
-                        return twilioResponse.getToken();
-                    }
-                })
-                .filter(Functions1.isNotNull())
-                .observeOn(uiScheduler);
-
 
         final Observable<String> callerNameObservable = callerProfileResponse
                 .compose(ResponseOrError.<CallerProfile>onlySuccess())
@@ -174,39 +214,31 @@ public class Twilio {
                 .compose(ResponseOrError.<UserIdentity>onlyError());
 
         /** Errors **/
-        errorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
-                ResponseOrError.transform(twilioResponse),
+        ResponseOrError.combineErrorsObservable(ImmutableList.of(
                 ResponseOrError.transform(callerProfileResponse)))
+                .mergeWith(errorSubject)
                 .filter(Functions1.isNotNull())
-                .observeOn(uiScheduler);
-    }
-
-    public void init() {
-        twilioRequirementObservable
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String apiKey) {
-                        initializeVideoCalls(apiKey);
-                    }
-                });
-
-        errorObservable
+                .observeOn(uiScheduler)
                 .subscribe(new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        Toast.makeText(mContext, R.string.error_default, Toast.LENGTH_SHORT).show();
+                        LogHelper.logThrowableAndCrashlytics(TAG, "Twilio error: ", throwable);
                     }
                 });
     }
 
-    private void initializeVideoCalls(@Nonnull final String apiKey) {
+    public void initTwilio() {
+        initTwilioSubject.onNext(null);
+    }
+
+    private void initializeTwilio(@Nonnull final String accessToken) {
         TwilioConversations.setLogLevel(TwilioConversations.LogLevel.DEBUG);
 
         if (!TwilioConversations.isInitialized()) {
             TwilioConversations.initialize(mContext, new TwilioConversations.InitListener() {
                 @Override
                 public void onInitialized() {
-                    accessManager = TwilioAccessManagerFactory.createAccessManager(mContext, apiKey, accessManagerListener());
+                    accessManager = TwilioAccessManagerFactory.createAccessManager(mContext, accessToken, accessManagerListener());
                     conversationsClient = TwilioConversations.createConversationsClient(accessManager, conversationsClientListener());
                     conversationsClient.setAudioOutput(AudioOutput.SPEAKERPHONE);
                     conversationsClient.listen();
@@ -224,7 +256,8 @@ public class Twilio {
         return new TwilioAccessManagerListener() {
             @Override
             public void onTokenExpired(TwilioAccessManager twilioAccessManager) {
-
+                userPreferences.setTwilioToken(null);
+                initTwilio();
             }
 
             @Override
@@ -253,13 +286,7 @@ public class Twilio {
             @Override
             public void onFailedToStartListening(ConversationsClient conversationsClient, TwilioConversationsException e) {
                 if (e != null) {
-                    twilioRequirementObservable
-                            .subscribe(new Action1<String>() {
-                                @Override
-                                public void call(String apiKey) {
-                                    initializeVideoCalls(apiKey);
-                                }
-                            });
+                    initTwilio();
                 }
             }
 
