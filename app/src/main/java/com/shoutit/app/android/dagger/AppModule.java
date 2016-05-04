@@ -176,19 +176,6 @@ public final class AppModule {
 
     @Provides
     @Singleton
-    @Named("SerializeNulls")
-    ApiService provideSerializeNullsApiService(@Named("SerializeNulls") Gson gson, OkHttpClient client) {
-        return new Retrofit.Builder()
-                .baseUrl(BuildConfig.API_URL)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .client(client)
-                .build()
-                .create(ApiService.class);
-    }
-
-    @Provides
-    @Singleton
     Optional<Cache> provideCache(@ForApplication Context context) {
         final File httpCacheDir = new File(context.getCacheDir(), "cache");
         final long httpCacheSize = 100 * 1024 * 1024; // 100 MiB
@@ -245,10 +232,9 @@ public final class AppModule {
     @Singleton
     @Provides
     public ProfilesDao provideProfilesDao(ApiService apiService,
-                                          @Named("SerializeNulls") ApiService serializedNullsApiservice,
                                           @NetworkScheduler Scheduler networkScheduler,
                                           UserPreferences userPreferences) {
-        return new ProfilesDao(apiService, serializedNullsApiservice, networkScheduler, userPreferences);
+        return new ProfilesDao(apiService, networkScheduler, userPreferences);
     }
 
     @Singleton
