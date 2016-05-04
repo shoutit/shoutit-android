@@ -27,16 +27,6 @@ public final class BaseModule {
     }
 
     @Provides
-    @Singleton
-    @Named("SerializeNulls")
-    public Gson provideSerializeNullsGson() {
-        return new GsonBuilder()
-                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                .serializeNulls()
-                .create();
-    }
-
-    @Provides
     @UiScheduler
     Scheduler provideUiScheduler() {
         return MyAndroidSchedulers.mainThread();

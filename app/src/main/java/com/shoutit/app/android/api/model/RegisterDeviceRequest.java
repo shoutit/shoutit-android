@@ -4,6 +4,12 @@ import javax.annotation.Nullable;
 
 public class RegisterDeviceRequest {
 
+    public static final String EMPTY_PUSHTOKEN = "{" +
+            "\"push_tokens\" : {" +
+            "\"gcm\" : null" +
+            "}" +
+            "}";
+
     private final PushTokens pushTokens;
 
     public RegisterDeviceRequest(@Nullable String token) {

@@ -3,9 +3,9 @@ package com.shoutit.app.android.dao;
 import com.appunite.appunitegcm.AppuniteGcm;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
-import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.operators.MoreOperators;
 import com.appunite.rx.operators.OperatorMergeNextToken;
+import com.google.common.base.Strings;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -19,8 +19,9 @@ import com.shoutit.app.android.utils.LogHelper;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Named;
 
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
@@ -38,18 +39,14 @@ public class ProfilesDao {
     @Nonnull
     private final ApiService apiService;
     @Nonnull
-    private final ApiService serializeNullsApiService;
-    @Nonnull
     private final Scheduler networkScheduler;
     @Nonnull
     private UserPreferences userPreferences;
 
     public ProfilesDao(@Nonnull ApiService apiService,
-                       @Nonnull @Named("SerializeNulls") ApiService serializeNullsApiService,
                        @Nonnull @NetworkScheduler Scheduler networkScheduler,
                        @Nonnull UserPreferences userPreferences) {
         this.apiService = apiService;
-        this.serializeNullsApiService = serializeNullsApiService;
         this.networkScheduler = networkScheduler;
         this.userPreferences = userPreferences;
 
@@ -91,7 +88,14 @@ public class ProfilesDao {
     }
 
     public void registerToGcmAction(@Nullable final String token) {
-        serializeNullsApiService.registerGcmToken(new RegisterDeviceRequest(token))
+        final Observable<User> user;
+        if (Strings.isNullOrEmpty(token)) {
+            user = apiService.unregisterGcmToken(RequestBody.create(MediaType.parse("application/json"), RegisterDeviceRequest.EMPTY_PUSHTOKEN));
+        } else {
+            user = apiService.registerGcmToken(new RegisterDeviceRequest(token));
+        }
+
+        user
                 .subscribeOn(networkScheduler)
                 .subscribe(new Action1<User>() {
                     @Override
