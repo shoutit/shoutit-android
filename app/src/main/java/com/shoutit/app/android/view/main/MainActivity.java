@@ -112,6 +112,10 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
             return;
         }
 
+        if (mUserPreferences.isNormalUser()) {
+            subscribeToStats();
+        }
+
         setUpActionBar();
         setUpDrawer();
 
@@ -128,8 +132,6 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
         profilesDao.registerToGcmAction(AppuniteGcm.getInstance()
                 .getPushToken());
-
-        subscribeToStats();
     }
 
     private void subscribeToStats() {
