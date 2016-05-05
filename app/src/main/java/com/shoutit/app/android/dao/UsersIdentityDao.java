@@ -70,6 +70,7 @@ public class UsersIdentityDao {
 
             userIdentityObservable = apiService.getUserIdentity(username)
                     .subscribeOn(networkScheduler)
+                    .mergeWith(Observable.<UserIdentity>never())
                     .compose(ResponseOrError.<UserIdentity>toResponseOrErrorObservable())
                     .compose(MoreOperators.<ResponseOrError<UserIdentity>>cacheWithTimeout(networkScheduler));
         }
