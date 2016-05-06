@@ -15,6 +15,8 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForApplication;
 
+import java.util.concurrent.Callable;
+
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -37,6 +39,7 @@ public class UserPreferences {
     private static final String SHOULD_ASK_FOR_INTEREST = "is_first_run";
     private static final String SHOUT_OWNER_NAME = "shout_owner";
     private static final String GCM_PUSH_TOKEN = "gcm_push_token";
+    private static final String TWILIO_TOKEN = "twilio_token";
 
     private final PublishSubject<Object> userRefreshSubject = PublishSubject.create();
     private final PublishSubject<Object> locationRefreshSubject = PublishSubject.create();
@@ -272,4 +275,15 @@ public class UserPreferences {
         return mPreferences.getString(SHOUT_OWNER_NAME, null);
     }
 
+    @SuppressLint("CommitPrefEdits")
+    public void setTwilioToken(@Nullable String twilioToken) {
+        mPreferences.edit()
+                .putString(TWILIO_TOKEN, twilioToken)
+                .commit();
+    }
+
+    @Nullable
+    public String getTwilioToken() {
+        return mPreferences.getString(TWILIO_TOKEN, null);
+    }
 }

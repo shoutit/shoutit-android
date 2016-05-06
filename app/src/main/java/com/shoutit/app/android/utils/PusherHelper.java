@@ -24,6 +24,8 @@ import com.shoutit.app.android.view.chats.PresenceChannelEventListenerAdapter;
 
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+
 import rx.Observable;
 import rx.Scheduler;
 import rx.Subscriber;
@@ -189,8 +191,15 @@ public class PusherHelper {
         mPusher.unsubscribe(getConversationChannelName(conversationId));
     }
 
+    @Nonnull
     public PresenceChannel subscribeConversationChannel(@NonNull String conversationId) {
-        return mPusher.subscribePresence(PusherHelper.getConversationChannelName(conversationId));
+        final PresenceChannel presenceChannel = mPusher.getPresenceChannel(PusherHelper.getConversationChannelName(conversationId));
+
+        if (presenceChannel == null || !presenceChannel.isSubscribed()) {
+            return mPusher.subscribePresence(PusherHelper.getConversationChannelName(conversationId));
+        } else {
+            return presenceChannel;
+        }
     }
 
     public boolean shouldConnect() {

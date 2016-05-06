@@ -120,6 +120,10 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
             return;
         }
 
+        if (mUserPreferences.isNormalUser()) {
+            subscribeToStats();
+        }
+
         setUpActionBar();
         setUpDrawer();
 
@@ -135,7 +139,8 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
             menuHandler.initMenu(drawerLayout, selectedItem);
         }
 
-        subscribeToStats();
+        profilesDao.registerToGcmAction(AppuniteGcm.getInstance()
+                .getPushToken());
     }
 
     private void registerToGcm() {

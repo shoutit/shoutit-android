@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/notifications_root_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/white_selector"
+    android:minHeight="72dp"
+    android:orientation="horizontal"
+    android:paddingBottom="12dp"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="12dp">
+
+    <ImageView
+        android:id="@+id/notifications_avatar_iv"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_rect_avatar_placeholder" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="2dp">
+
+        <TextView
+            android:id="@+id/notifications_text_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="4"
+            android:layout_marginLeft="1dp"
+            android:textDirection="rtl"
+            android:textColor="@color/black_54"
+            android:textSize="14sp"
+            tools:text="started listetning to dnbfvssdf dsfdsfdsfdsfdsfdsfdsfdsfdsfdsfdsfdsfdsfdsfsdfdsfdsfdsfdfssdfdsfdsfsdfdsfdsfdsfdsfsdfsdfsdfdsfdsfdsfdsfdsfdsfdsfdsfsdf" />
+
+        <TextView
+            android:id="@+id/notifications_time_ago_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:drawableLeft="@drawable/ic_clock"
+            android:drawableStart="@drawable/ic_clock"
+            android:drawablePadding="4dp"
+            android:gravity="center_vertical"
+            android:paddingBottom="2dp"
+            android:textColor="@color/black_38"
+            android:textSize="12sp"
+            tools:text="21 hours ago" />
+
+    </LinearLayout>
+
+</LinearLayout>

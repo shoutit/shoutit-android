@@ -1,6 +1,5 @@
 package com.shoutit.app.android.view.chats;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.net.Uri;
@@ -16,7 +15,6 @@ import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.pusher.client.channel.PresenceChannel;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
@@ -37,35 +35,14 @@ import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.PusherHelper;
-import com.shoutit.app.android.view.chats.message_models.DateItem;
-import com.shoutit.app.android.view.chats.message_models.InfoItem;
-import com.shoutit.app.android.view.chats.message_models.ReceivedImageMessage;
-import com.shoutit.app.android.view.chats.message_models.ReceivedLocationMessage;
-import com.shoutit.app.android.view.chats.message_models.ReceivedShoutMessage;
-import com.shoutit.app.android.view.chats.message_models.ReceivedTextMessage;
-import com.shoutit.app.android.view.chats.message_models.ReceivedVideoMessage;
-import com.shoutit.app.android.view.chats.message_models.SentImageMessage;
-import com.shoutit.app.android.view.chats.message_models.SentLocationMessage;
-import com.shoutit.app.android.view.chats.message_models.SentShoutMessage;
-import com.shoutit.app.android.view.chats.message_models.SentTextMessage;
-import com.shoutit.app.android.view.chats.message_models.SentVideoMessage;
 import com.shoutit.app.android.view.chats.message_models.TypingItem;
 import com.shoutit.app.android.view.conversations.ConversationsUtils;
-import com.shoutit.app.android.view.media.MediaUtils;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 
-import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
@@ -116,11 +93,6 @@ public class ChatsPresenter {
                 }
             });
 
-    @SuppressLint("SimpleDateFormat")
-    private final SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("MMMM dd, yyyy");
-    @SuppressLint("SimpleDateFormat")
-    private final SimpleDateFormat mSimpleTimeFormat = new SimpleDateFormat("hh:mm");
-
     @NonNull
     private final String conversationId;
     @NonNull
@@ -131,16 +103,14 @@ public class ChatsPresenter {
     private final Resources mResources;
     private final Context mContext;
     private final PusherHelper mPusher;
-    private final AmazonHelper mAmazonHelper;
     private final boolean mIsShoutConversation;
     private Listener mListener;
     private CompositeSubscription mSubscribe = new CompositeSubscription();
     private final PublishSubject<Object> requestSubject = PublishSubject.create();
     private final PublishSubject<PusherMessage> newMessagesSubject = PublishSubject.create();
-    private final User mUser;
     private final BehaviorSubject<String> chatParticipantUsernameSubject = BehaviorSubject.create();
     private final Observable<String> calledPersonUsernameObservable;
-
+    private final ChatsDelegate mChatsDelegate;
 
     @Inject
     public ChatsPresenter(@NonNull String conversationId,
@@ -150,8 +120,8 @@ public class ChatsPresenter {
                           final UserPreferences userPreferences,
                           @ForActivity Resources resources,
                           @ForActivity Context context,
-                          PusherHelper pusher,
                           AmazonHelper amazonHelper,
+                          PusherHelper pusher,
                           boolean isShoutConversation) {
         this.conversationId = conversationId;
         mApiService = apiService;
@@ -161,9 +131,7 @@ public class ChatsPresenter {
         mResources = resources;
         mContext = context;
         mPusher = pusher;
-        mAmazonHelper = amazonHelper;
         mIsShoutConversation = isShoutConversation;
-        mUser = mUserPreferences.getUser();
 
         calledPersonUsernameObservable = chatParticipantUsernameSubject
                 .filter(Functions1.isNotNull())
@@ -173,124 +141,30 @@ public class ChatsPresenter {
                         return !Objects.equal(userPreferences.getUser().getUsername(), participantUsername);
                     }
                 });
+
+        mChatsDelegate = new ChatsDelegate(pusher, uiScheduler, networkScheduler, apiService, resources, userPreferences, context, amazonHelper, newMessagesSubject);
     }
 
     public void register(@NonNull Listener listener) {
         final User user = mUserPreferences.getUser();
         assert user != null;
 
-        final PresenceChannel conversationChannel = mPusher.subscribeConversationChannel(conversationId);
-
-        final Observable<PusherMessage> pusherMessageObservable = mPusher.getNewMessageObservable(conversationChannel)
-                .flatMap(new Func1<PusherMessage, Observable<PusherMessage>>() {
-                    @Override
-                    public Observable<PusherMessage> call(final PusherMessage pusherMessage) {
-                        final String id = pusherMessage.getId();
-                        if (user.getId().equals(id)) {
-                            return Observable.just(pusherMessage);
-                        } else {
-                            return mApiService.readMessage(id)
-                                    .map(new Func1<ResponseBody, PusherMessage>() {
-                                        @Override
-                                        public PusherMessage call(ResponseBody responseBody) {
-                                            return pusherMessage;
-                                        }
-                                    });
-                        }
-                    }
-                })
-                .observeOn(mUiScheduler);
-
-        final Observable<Boolean> isTyping = mPusher.getIsTypingObservable(conversationChannel)
-                .switchMap(new Func1<Boolean, Observable<Boolean>>() {
-                    @Override
-                    public Observable<Boolean> call(Boolean aBoolean) {
-                        return Observable.timer(3, TimeUnit.SECONDS).map(Functions1.returnFalse())
-                                .startWith(true);
-                    }
-                })
-                .observeOn(mUiScheduler)
-                .startWith(false);
-
-        final Observable<MessagesResponse> apiMessages = requestSubject
-                .startWith(new Object())
-                .lift(loadMoreOperator)
-                .subscribeOn(mNetworkScheduler)
-                .observeOn(mUiScheduler);
-
-        final Observable<List<PusherMessage>> localAndPusherMessages = pusherMessageObservable.mergeWith(newMessagesSubject)
-                .scan(ImmutableList.<PusherMessage>of(), new Func2<List<PusherMessage>, PusherMessage, List<PusherMessage>>() {
-                    @Override
-                    public List<PusherMessage> call(List<PusherMessage> pusherMessages, PusherMessage pusherMessage) {
-                        if (containsMessage(pusherMessages, pusherMessage)) {
-                            return pusherMessages;
-                        } else {
-                            return ImmutableList.<PusherMessage>builder()
-                                    .addAll(pusherMessages)
-                                    .add(pusherMessage)
-                                    .build();
-                        }
-                    }
-                });
-
         mListener = listener;
         mListener.showProgress(true);
-        mSubscribe.add(Observable.combineLatest(apiMessages, localAndPusherMessages.startWith((List<PusherMessage>) null), isTyping,
-                new Func3<MessagesResponse, List<PusherMessage>, Boolean, List<BaseAdapterItem>>() {
-                    @Override
-                    public List<BaseAdapterItem> call(MessagesResponse messagesResponse, List<PusherMessage> pusherMessage, Boolean isTyping) {
-                        final ImmutableList.Builder<Message> builder = ImmutableList.<Message>builder()
-                                .addAll(messagesResponse.getResults());
+        mChatsDelegate.setListener(listener);
 
-                        if (pusherMessage != null) {
-                            for (PusherMessage message : pusherMessage) {
-                                builder.add(new Message(
-                                        conversationId, message.getProfile(),
-                                        message.getId(),
-                                        message.getText(),
-                                        message.getAttachments(),
-                                        message.getCreatedAt()));
-                            }
-                        }
+        subscribeToMessages();
 
-                        final List<BaseAdapterItem> baseAdapterItemList = transform(builder.build());
+        getConversation(user);
+    }
 
-                        if (isTyping) {
-                            return ImmutableList.<BaseAdapterItem>builder()
-                                    .addAll(baseAdapterItemList)
-                                    .add(new TypingItem())
-                                    .build();
-                        } else {
-                            return baseAdapterItemList;
-                        }
-                    }
-                })
-                .subscribe(new Action1<List<BaseAdapterItem>>() {
-                    @Override
-                    public void call(@NonNull List<BaseAdapterItem> baseAdapterItems) {
-                        mListener.showProgress(false);
-                        if (baseAdapterItems.isEmpty()) {
-                            mListener.emptyList();
-                        } else {
-                            mListener.setData(baseAdapterItems);
-                        }
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        mListener.showProgress(false);
-                        mListener.error(throwable);
-                    }
-                }));
-
-
+    private void getConversation(final User user) {
         mSubscribe.add(mApiService.getConversation(conversationId)
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
                 .subscribe(new Action1<Conversation>() {
                     @Override
                     public void call(Conversation conversationResponse) {
-
                         if (mIsShoutConversation) {
                             final AboutShout about = conversationResponse.getAbout();
                             final String id = about.getId();
@@ -313,15 +187,65 @@ public class ChatsPresenter {
                         setupUserForVideoChat(conversationResponse.getProfiles());
                     }
                 }, getOnError()));
-
-
     }
 
-    private boolean containsMessage(List<PusherMessage> pusherMessages, PusherMessage pusherMessage) {
-        for (PusherMessage listPusherMessage : pusherMessages) {
-            if (listPusherMessage.getId().equals(pusherMessage.getId())) return true;
-        }
-        return false;
+    private void subscribeToMessages() {
+        final PresenceChannel presenceChannel = mChatsDelegate.getConversationChannel(conversationId);
+
+        final Observable<PusherMessage> pusherMessageObservable = mChatsDelegate.getPusherMessageObservable(presenceChannel);
+
+        final Observable<Boolean> isTyping = mChatsDelegate.getTypingObservable(presenceChannel);
+
+        final Observable<MessagesResponse> apiMessages = requestSubject
+                .startWith(new Object())
+                .lift(loadMoreOperator)
+                .subscribeOn(mNetworkScheduler)
+                .observeOn(mUiScheduler);
+
+        final Observable<List<PusherMessage>> localAndPusherMessages = pusherMessageObservable.mergeWith(newMessagesSubject)
+                .compose(mChatsDelegate.transformToScan());
+
+        mSubscribe.add(Observable.combineLatest(apiMessages, localAndPusherMessages.startWith((List<PusherMessage>) null), isTyping,
+                new Func3<MessagesResponse, List<PusherMessage>, Boolean, List<BaseAdapterItem>>() {
+                    @Override
+                    public List<BaseAdapterItem> call(MessagesResponse messagesResponse, List<PusherMessage> pusherMessage, Boolean isTyping) {
+                        final ImmutableList.Builder<Message> builder = ImmutableList.<Message>builder()
+                                .addAll(messagesResponse.getResults());
+
+                        if (pusherMessage != null) {
+                            for (PusherMessage message : pusherMessage) {
+                                builder.add(new Message(
+                                        conversationId, message.getProfile(),
+                                        message.getId(),
+                                        message.getText(),
+                                        message.getAttachments(),
+                                        message.getCreatedAt()));
+                            }
+                        }
+
+                        final List<BaseAdapterItem> baseAdapterItemList = mChatsDelegate.transform(builder.build());
+
+                        if (isTyping) {
+                            return ImmutableList.<BaseAdapterItem>builder()
+                                    .addAll(baseAdapterItemList)
+                                    .add(new TypingItem())
+                                    .build();
+                        } else {
+                            return baseAdapterItemList;
+                        }
+                    }
+                })
+                .subscribe(new Action1<List<BaseAdapterItem>>() {
+                    @Override
+                    public void call(@NonNull List<BaseAdapterItem> baseAdapterItems) {
+                        mChatsDelegate.messagesSuccess(baseAdapterItems, mListener);
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        mChatsDelegate.messagesError(throwable, mListener);
+                    }
+                }));
     }
 
     private void setupUserForVideoChat(@Nonnull List<ConversationProfile> profiles) {
@@ -355,60 +279,6 @@ public class ChatsPresenter {
         return requestSubject;
     }
 
-    @NonNull
-    private List<BaseAdapterItem> transform(@NonNull List<Message> results) {
-        final User user = mUserPreferences.getUser();
-        assert user != null;
-        final String userId = user.getId();
-
-        final List<BaseAdapterItem> objects = Lists.newArrayList();
-        for (int i = 0; i < results.size(); i++) {
-
-            final DateItem dateItem = getDateItem(results, i);
-            if (dateItem != null) {
-                objects.add(dateItem);
-            }
-
-            final BaseAdapterItem item = getItem(results, userId, i);
-            if (item != null) {
-                objects.add(item);
-            }
-        }
-
-        return ImmutableList.copyOf(objects);
-    }
-
-    @Nullable
-    private DateItem getDateItem(@NonNull List<Message> results, int currentPosition) {
-        final Message currentMessage = results.get(currentPosition);
-        if (currentPosition == 0) {
-            final String date = mSimpleDateFormat.format(new Date(currentMessage.getCreatedAt() * 1000));
-            return new DateItem(date);
-        } else {
-            final long currentCreatedAt = currentMessage.getCreatedAt();
-            final long previousCreatedAt = results.get(currentPosition - 1).getCreatedAt();
-
-            final Calendar currentCalendar = Calendar.getInstance();
-            final Calendar previousCalendar = Calendar.getInstance();
-
-            currentCalendar.setTimeInMillis(currentCreatedAt * 1000);
-            previousCalendar.setTimeInMillis(previousCreatedAt * 1000);
-
-            final int currentDayOfTheYear = currentCalendar.get(Calendar.DAY_OF_YEAR);
-            final int currentYear = currentCalendar.get(Calendar.YEAR);
-
-            final int previousDayOfTheYear = previousCalendar.get(Calendar.DAY_OF_YEAR);
-            final int previousYear = previousCalendar.get(Calendar.YEAR);
-
-            if (currentYear != previousYear || currentDayOfTheYear != previousDayOfTheYear) {
-                final String date = mSimpleDateFormat.format(new Date(currentMessage.getCreatedAt() * 1000));
-                return new DateItem(date);
-            } else {
-                return null;
-            }
-        }
-    }
-
     public void postTextMessage(@NonNull String text) {
         mSubscribe.add(mApiService.postMessage(conversationId, new PostMessage(text, ImmutableList.<MessageAttachment>of()))
                 .subscribeOn(mNetworkScheduler)
@@ -416,214 +286,54 @@ public class ChatsPresenter {
                 .subscribe(new Action1<Message>() {
                     @Override
                     public void call(Message messagesResponse) {
-                        postLocalMessage(messagesResponse);
+                        mChatsDelegate.postLocalMessage(messagesResponse, conversationId);
                     }
                 }, getOnError()));
-    }
-
-    private BaseAdapterItem getItem(@NonNull List<Message> results, String userId, int currentPosition) {
-        final Message message = results.get(currentPosition);
-
-        final ConversationProfile profile = message.getProfile();
-        if (profile != null) {
-            final String messageProfileId = profile.getId();
-
-            final String time = mSimpleTimeFormat.format(new Date(message.getCreatedAt() * 1000));
-            if (messageProfileId.equals(userId)) {
-                return getSentItem(message, time);
-            } else {
-                final boolean isFirst = isFirst(currentPosition, results, messageProfileId);
-                return getReceivedItem(message, isFirst, time);
-            }
-        } else {
-            return new InfoItem(results.get(currentPosition).getText());
-        }
-    }
-
-    private boolean isFirst(int position, @NonNull List<Message> results, @NonNull String currentMessageUserId) {
-        if (position == 0) {
-            return true;
-        } else {
-            final Message prevMessage = results.get(position - 1);
-            return !prevMessage.getProfile().getId().equals(currentMessageUserId);
-        }
-    }
-
-    private BaseAdapterItem getReceivedItem(Message message, boolean isFirst, String time) {
-        final List<MessageAttachment> attachments = message.getAttachments();
-        final String avatarUrl = message.getProfile().getImage();
-        if (attachments.isEmpty()) {
-            return new ReceivedTextMessage(isFirst, time, message.getText(), avatarUrl);
-        } else {
-            final MessageAttachment messageAttachment = attachments.get(0);
-            final String type = messageAttachment.getType();
-            if (MessageAttachment.ATTACHMENT_TYPE_MEDIA.equals(type)) {
-                final List<String> images = messageAttachment.getImages();
-                if (images != null && !images.isEmpty()) {
-                    return new ReceivedImageMessage(isFirst, time, images.get(0), avatarUrl, mListener);
-                } else {
-                    final Video video = messageAttachment.getVideos().get(0);
-                    return new ReceivedVideoMessage(isFirst, video.getThumbnailUrl(), time, avatarUrl, mListener, video.getUrl());
-                }
-            } else if (MessageAttachment.ATTACHMENT_TYPE_LOCATION.equals(type)) {
-                final MessageAttachment.MessageLocation location = messageAttachment.getLocation();
-                return new ReceivedLocationMessage(isFirst, time, avatarUrl, mListener, location.getLatitude(), location.getLongitude());
-            } else if (MessageAttachment.ATTACHMENT_TYPE_SHOUT.equals(type)) {
-                final MessageAttachment.AttachtmentShout shout = messageAttachment.getShout();
-                return new ReceivedShoutMessage(
-                        isFirst,
-                        shout.getThumbnailOrNull(),
-                        time,
-                        PriceUtils.formatPriceWithCurrency(shout.getPrice(), mResources, shout.getCurrency()),
-                        shout.getText(),
-                        shout.getUser().getName(),
-                        avatarUrl, mListener, shout.getId());
-            } else {
-                throw new RuntimeException(type);
-            }
-        }
-    }
-
-    private BaseAdapterItem getSentItem(Message message, String time) {
-        final List<MessageAttachment> attachments = message.getAttachments();
-        if (attachments.isEmpty()) {
-            return new SentTextMessage(time, message.getText());
-        } else {
-            final MessageAttachment messageAttachment = attachments.get(0);
-            final String type = messageAttachment.getType();
-            if (MessageAttachment.ATTACHMENT_TYPE_MEDIA.equals(type)) {
-                final List<String> images = messageAttachment.getImages();
-                if (images != null && !images.isEmpty()) {
-                    return new SentImageMessage(time, images.get(0), mListener);
-                } else {
-                    final Video video = messageAttachment.getVideos().get(0);
-                    return new SentVideoMessage(video.getThumbnailUrl(), time, mListener, video.getUrl());
-                }
-            } else if (MessageAttachment.ATTACHMENT_TYPE_LOCATION.equals(type)) {
-                final MessageAttachment.MessageLocation location = messageAttachment.getLocation();
-                return new SentLocationMessage(time, mListener, location.getLatitude(), location.getLongitude());
-            } else if (MessageAttachment.ATTACHMENT_TYPE_SHOUT.equals(type)) {
-                final MessageAttachment.AttachtmentShout shout = messageAttachment.getShout();
-                return new SentShoutMessage(shout.getThumbnailOrNull(), time, PriceUtils.formatPriceWithCurrency(shout.getPrice(), mResources, shout.getCurrency()), shout.getText(), shout.getUser().getName(), mListener, shout.getId());
-            } else {
-                throw new RuntimeException(type);
-            }
-        }
     }
 
     public void unregister() {
         mListener = null;
         mSubscribe.unsubscribe();
         mPusher.unsubscribeConversationChannel(conversationId);
+        mChatsDelegate.removeListener();
     }
 
     public void addMedia(@NonNull String media, boolean isVideo) {
-        mListener.showProgress(true);
-        if (isVideo) {
-            try {
-                final File videoThumbnail = MediaUtils.createVideoThumbnail(mContext, Uri.parse(media));
-                final int videoLength = MediaUtils.getVideoLength(mContext, media);
-                final Observable<String> videoFileObservable = mAmazonHelper.uploadShoutMediaVideoObservable(AmazonHelper.getfileFromPath(media));
-                final Observable<String> thumbFileObservable = mAmazonHelper.uploadShoutMediaImageObservable(AmazonHelper.getfileFromPath(videoThumbnail.getAbsolutePath()));
-                mSubscribe.add(Observable
-                        .zip(videoFileObservable, thumbFileObservable, new Func2<String, String, Video>() {
-                            @Override
-                            public Video call(String video, String thumb) {
-                                return Video.createVideo(video, thumb, videoLength);
-                            }
-                        })
-                        .flatMap(new Func1<Video, Observable<Message>>() {
-                            @Override
-                            public Observable<Message> call(Video video) {
-                                return mApiService.postMessage(conversationId, new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_MEDIA, null, null, null, ImmutableList.of(video)))))
-                                        .subscribeOn(mNetworkScheduler)
-                                        .observeOn(mUiScheduler);
-                            }
-                        })
+        mSubscribe.add(mChatsDelegate.addMedia(media, isVideo, new Func1<Video, Observable<Message>>() {
+            @Override
+            public Observable<Message> call(Video video) {
+                return mApiService.postMessage(conversationId, new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_MEDIA, null, null, null, ImmutableList.of(video)))))
                         .subscribeOn(mNetworkScheduler)
-                        .observeOn(mUiScheduler)
-                        .subscribe(new Action1<Message>() {
-                            @Override
-                            public void call(Message messagesResponse) {
-                                mListener.hideAttatchentsMenu();
-                                postLocalMessage(messagesResponse);
-                                mListener.showProgress(false);
-                            }
-                        }, new Action1<Throwable>() {
-                            @Override
-                            public void call(Throwable throwable) {
-                                mListener.showProgress(false);
-                                mListener.error(throwable);
-                            }
-                        }));
-            } catch (IOException e) {
-                mListener.error(e);
+                        .observeOn(mUiScheduler);
             }
-        } else {
-            mSubscribe.add(mAmazonHelper.uploadShoutMediaImageObservable(AmazonHelper.getfileFromPath(media))
-                    .flatMap(new Func1<String, Observable<Message>>() {
-                        @Override
-                        public Observable<Message> call(String url) {
-                            return mApiService.postMessage(
-                                    conversationId,
-                                    new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_MEDIA, null, null, ImmutableList.of(url), null))))
-                                    .subscribeOn(mNetworkScheduler)
-                                    .observeOn(mUiScheduler);
-
-                        }
-                    })
-                    .subscribeOn(mNetworkScheduler)
-                    .observeOn(mUiScheduler)
-                    .subscribe(new Action1<Message>() {
-                        @Override
-                        public void call(Message messagesResponse) {
-                            postLocalMessage(messagesResponse);
-                            mListener.showProgress(false);
-                        }
-                    }, new Action1<Throwable>() {
-                        @Override
-                        public void call(Throwable throwable) {
-                            mListener.showProgress(false);
-                            mListener.error(throwable);
-                        }
-                    }));
-        }
-    }
-
-    private void postLocalMessage(Message messagesResponse) {
-        newMessagesSubject.onNext(new PusherMessage(
-                messagesResponse.getProfile(),
-                conversationId,
-                messagesResponse.getId(),
-                messagesResponse.getText(),
-                messagesResponse.getAttachments(),
-                messagesResponse.getCreatedAt()));
+        }, new Func1<String, Observable<Message>>() {
+            @Override
+            public Observable<Message> call(String url) {
+                return mApiService.postMessage(
+                        conversationId,
+                        new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_MEDIA, null, null, ImmutableList.of(url), null))))
+                        .subscribeOn(mNetworkScheduler)
+                        .observeOn(mUiScheduler);
+            }
+        }, conversationId));
     }
 
     public void sendLocation(double latitude, double longitude) {
-        mSubscribe.add(mApiService.postMessage(conversationId, new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_LOCATION, new MessageAttachment.MessageLocation(latitude, longitude), null, null, null))))
+        mSubscribe.add(mApiService.postMessage(conversationId, mChatsDelegate.getLocationMessage(latitude, longitude))
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
                 .subscribe(new Action1<Message>() {
                     @Override
                     public void call(Message message) {
-                        postLocalMessage(message);
+                        mChatsDelegate.postLocalMessage(message, conversationId);
                         mListener.hideAttatchentsMenu();
                     }
                 }, getOnError()));
     }
 
 
-    public void deleteShout() {
-        mSubscribe.add(mApiService.deleteConversation(conversationId)
-                .observeOn(mUiScheduler)
-                .subscribeOn(mNetworkScheduler)
-                .subscribe(new Action1<ResponseBody>() {
-                    @Override
-                    public void call(ResponseBody responseBody) {
-                        mListener.conversationDeleted();
-                    }
-                }, getOnError()));
+    public void deleteConversation() {
+        mSubscribe.add(mChatsDelegate.deleteConversation(conversationId));
     }
 
     public void sendShout(final String shoutId) {
@@ -633,18 +343,7 @@ public class ChatsPresenter {
                 .flatMap(new Func1<ShoutResponse, Observable<Message>>() {
                     @Override
                     public Observable<Message> call(ShoutResponse shoutResponse) {
-                        final List<String> images = shoutResponse.getImages();
-                        final List<Video> videos = shoutResponse.getVideos();
-                        String thumbnail = null;
-                        String videoUrl = null;
-                        if (videos != null && !videos.isEmpty()) {
-                            final Video video = videos.get(0);
-                            thumbnail = video.getThumbnailUrl();
-                            videoUrl = video.getUrl();
-                        } else if (images != null && !images.isEmpty()) {
-                            thumbnail = images.get(0);
-                        }
-                        return mApiService.postMessage(conversationId, new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_LOCATION, null, new MessageAttachment.AttachtmentShout(shoutId, null, null, shoutResponse.getType(), shoutResponse.getLocation(), shoutResponse.getTitle(), shoutResponse.getText(), shoutResponse.getPrice(), 0, shoutResponse.getCurrency(), thumbnail, videoUrl, shoutResponse.getProfile(), shoutResponse.getCategory(), shoutResponse.getDatePublished(), 0), null, null))))
+                        return mApiService.postMessage(conversationId, mChatsDelegate.getShoutMessage(shoutResponse, shoutId))
                                 .subscribeOn(mNetworkScheduler)
                                 .observeOn(mUiScheduler);
                     }
@@ -652,14 +351,14 @@ public class ChatsPresenter {
                 .subscribe(new Action1<Message>() {
                     @Override
                     public void call(Message message) {
-                        postLocalMessage(message);
+                        mChatsDelegate.postLocalMessage(message, conversationId);
                         mListener.hideAttatchentsMenu();
                     }
                 }, getOnError()));
     }
 
     public void sendTyping() {
-        mPusher.sendTyping(conversationId, mUser.getId(), mUser.getUsername());
+        mChatsDelegate.sendTyping(conversationId);
     }
 
     public Observable<String> getCalledPersonNameObservable() {
