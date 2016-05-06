@@ -304,8 +304,8 @@ public class ShoutPresenter {
                         return isNormalUser && user != null && user.getUsername().equals(shoutUser);
                     }
                 })
-                .compose(ObservableExtensions.<Boolean>behaviorRefCount())
-                .first();
+                .take(1)
+                .compose(ObservableExtensions.<Boolean>behaviorRefCount());
 
         /** Refresh shouts **/
         Observable.merge(shoutsGlobalRefreshPresenter.getShoutsGlobalRefreshObservable(), refreshShoutsSubject)
@@ -387,10 +387,10 @@ public class ShoutPresenter {
                         return !userPreferences.isGuest();
                     }
                 })
-                .flatMap(new Func1<Boolean, Observable<String>>() {
+                .withLatestFrom(userNameObservable, new Func2<Boolean, String, String>() {
                     @Override
-                    public Observable<String> call(Boolean aBoolean) {
-                        return usernameObservable;
+                    public String call(Boolean aBoolean, String username) {
+                        return username;
                     }
                 });
 

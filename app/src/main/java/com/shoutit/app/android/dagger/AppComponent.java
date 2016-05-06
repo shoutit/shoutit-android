@@ -66,9 +66,6 @@ public interface AppComponent {
 
     ApiService getApiService();
 
-    @Named("SerializeNulls")
-    ApiService getSerializeNullsApiService();
-
     ShoutsDao shoutsDao();
 
     TagsDao tagsDao();

@@ -18,6 +18,7 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.utils.BlurTransform;
 import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
+import com.shoutit.app.android.utils.RtlUtils;
 import com.shoutit.app.android.view.conversations.ConverstationsFragment;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
 import com.shoutit.app.android.view.discover.DiscoverFragment;
@@ -113,6 +114,8 @@ public class MenuHandler {
 
     public void setData(@IdRes int id) {
         selectItem(id);
+
+        RtlUtils.setTextDirection(rxActivity, locationTextView);
 
         presenter.getNameObservable()
                 .compose(rxActivity.<String>bindToLifecycle())

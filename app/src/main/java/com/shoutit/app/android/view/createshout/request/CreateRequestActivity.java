@@ -30,7 +30,10 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.BackPressedHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.ImageHelper;
 import com.shoutit.app.android.utils.PriceUtils;
+import com.shoutit.app.android.utils.RtlUtils;
+import com.shoutit.app.android.utils.TextHelper;
 import com.shoutit.app.android.utils.TextWatcherAdapter;
 import com.shoutit.app.android.view.createshout.DialogsHelper;
 import com.shoutit.app.android.view.createshout.location.LocationActivity;
@@ -87,6 +90,7 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
         setContentView(R.layout.request_activity);
         ButterKnife.bind(this);
 
+        RtlUtils.setTextDirection(this, mCreateRequestLocation);
         mCreateRequestBudget.addTextChangedListener(new TextWatcherAdapter() {
             @Override
             public void afterTextChanged(Editable s) {
@@ -179,7 +183,7 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
         final RoundedBitmapDrawable drawable = RoundedBitmapDrawableFactory.create(getResources(), bitmap);
         drawable.setCircular(true);
 
-        mCreateRequestLocation.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
+        ImageHelper.setStartCompoundRelativeDrawable(mCreateRequestLocation, drawable);
         mCreateRequestLocation.setText(name);
     }
 

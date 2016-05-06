@@ -61,7 +61,7 @@ public class ForgotPasswordActivity extends BaseActivity {
         setContentView(R.layout.forgot_password_activity);
         ButterKnife.bind(this);
 
-        mForgotPasswordToolbar.setNavigationIcon(RtlUtils.isRtlEnable(this) ?
+        mForgotPasswordToolbar.setNavigationIcon(RtlUtils.isRtlEnabled(this) ?
                 R.drawable.ic_blue_arrow_rtl : R.drawable.ic_blue_arrow);
         mForgotPasswordToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
