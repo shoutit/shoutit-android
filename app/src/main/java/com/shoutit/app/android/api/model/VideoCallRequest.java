@@ -1,11 +1,11 @@
 package com.shoutit.app.android.api.model;
 
-public class TwillioRejectCallRequest {
+public class VideoCallRequest {
 
     private final String identity;
     private final boolean missed;
 
-    public TwillioRejectCallRequest(String identity, boolean missed) {
+    public VideoCallRequest(String identity, boolean missed) {
         this.identity = identity;
         this.missed = missed;
     }

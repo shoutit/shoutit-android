@@ -15,7 +15,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.CallerProfile;
 import com.shoutit.app.android.api.model.TwilioResponse;
-import com.shoutit.app.android.api.model.TwillioRejectCallRequest;
+import com.shoutit.app.android.api.model.VideoCallRequest;
 import com.shoutit.app.android.api.model.UserIdentity;
 import com.shoutit.app.android.dagger.ForApplication;
 import com.shoutit.app.android.dao.UsersIdentityDao;
@@ -50,6 +50,9 @@ public class Twilio {
 
     private static final String TAG = Twilio.class.getCanonicalName();
     private static final int TOKEN_ERROR_MAX_RETRIES = 3;
+
+    public static final int ERROR_PARTICIPANT_UNAVAILABLE = 106;
+    public static final int ERROR_PARTICIPANT_REJECTED_CALL = 107;
 
     private final Context mContext;
     @Nonnull
@@ -171,19 +174,16 @@ public class Twilio {
 
         rejectCallSubject
                 .filter(Functions1.isNotNull())
-                .switchMap(new Func1<String, Observable<ResponseBody>>() {
+                .switchMap(new Func1<String, Observable<Throwable>>() {
                     @Override
-                    public Observable<ResponseBody> call(String calledIdentity) {
-                        return apiService.rejectRequest(new TwillioRejectCallRequest(calledIdentity, true))
-                                .subscribeOn(networkScheduler);
+                    public Observable<Throwable> call(String calledIdentity) {
+                        return apiService.videoCall(new VideoCallRequest(calledIdentity, true))
+                                .subscribeOn(networkScheduler)
+                                .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable())
+                                .compose(ResponseOrError.<ResponseBody>onlyError());
                     }
                 })
-                .subscribe(new Action1<ResponseBody>() {
-                    @Override
-                    public void call(ResponseBody responseBody) {
-
-                    }
-                }, new Action1<Throwable>() {
+                .subscribe(new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
                         LogHelper.logThrowable(TAG, "Cannot reject call", throwable);
