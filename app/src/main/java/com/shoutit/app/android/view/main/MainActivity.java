@@ -1,5 +1,6 @@
 package com.shoutit.app.android.view.main;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -18,6 +19,9 @@ import android.view.MenuItem;
 
 import com.appunite.appunitegcm.AppuniteGcm;
 import com.appunite.rx.functions.Functions1;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
@@ -36,6 +40,7 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
+import com.shoutit.app.android.utils.PlayServicesHelper;
 import com.shoutit.app.android.utils.PusherHelper;
 import com.shoutit.app.android.view.conversations.ConverstationsFragment;
 import com.shoutit.app.android.view.discover.DiscoverActivity;
@@ -46,6 +51,8 @@ import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.postlogininterest.PostLoginInterestActivity;
 import com.shoutit.app.android.view.search.main.MainSearchActivity;
 import com.shoutit.app.android.view.signin.LoginActivity;
+
+import java.util.SortedMap;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -63,6 +70,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
     public static final int REQUST_CODE_CAMERA_PERMISSION = 1;
     public static final int REQUST_CODE_CALL_PHONE_PERMISSION = 2;
+    public static final int REQUST_CODE_PLAY_SERVICES_CHECK = 3;
 
     public static Intent newIntent(@Nonnull Context context) {
         return new Intent(context, MainActivity.class);
@@ -125,6 +133,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
                     .replace(R.id.activity_main_fragment_container, HomeFragment.newInstance())
                     .commit();
             menuHandler.initMenu(drawerLayout);
+            registerToGcm();
         } else {
             final int selectedItem = savedInstanceState.getInt(MENU_SELECT_ITEM);
             menuHandler.initMenu(drawerLayout, selectedItem);
@@ -132,6 +141,13 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
         profilesDao.registerToGcmAction(AppuniteGcm.getInstance()
                 .getPushToken());
+    }
+
+    private void registerToGcm() {
+        if (PlayServicesHelper.checkPlayServices(this, REQUST_CODE_PLAY_SERVICES_CHECK)) {
+            profilesDao.registerToGcmAction(AppuniteGcm.getInstance()
+                    .getPushToken());
+        }
     }
 
     private void subscribeToStats() {
@@ -283,6 +299,15 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
         mStatsSubscription.unsubscribe();
         super.onDestroy();
         mBackPressedHelper.removeCallbacks();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK && requestCode == REQUST_CODE_PLAY_SERVICES_CHECK) {
+            registerToGcm();
+        } else if (requestCode == Activity.RESULT_OK) {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     @Override
