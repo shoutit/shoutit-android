@@ -3,6 +3,7 @@ package com.shoutit.app.android.utils;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.os.Build;
 import android.support.annotation.DrawableRes;
@@ -26,6 +27,14 @@ public class ImageHelper {
             textView.setCompoundDrawablesRelativeWithIntrinsicBounds(drawableId, 0, 0, 0);
         } else {
             textView.setCompoundDrawablesWithIntrinsicBounds(drawableId, 0, 0, 0);
+        }
+    }
+
+    public static void setStartCompoundRelativeDrawable(@Nonnull TextView textView, Drawable drawable) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            textView.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, null, null, null);
+        } else {
+            textView.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
         }
     }
 

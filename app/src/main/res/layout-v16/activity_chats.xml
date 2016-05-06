@@ -30,6 +30,7 @@
             android:id="@+id/chats_message_edittext"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:maxLines="6"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:layout_weight="1"

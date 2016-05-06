@@ -174,7 +174,7 @@ public class DiscoverFragment extends BaseFragment {
 
         final int spacing = getResources().getDimensionPixelSize(R.dimen.discover_grid_spacing);
 
-        final boolean rtlEnable = RtlUtils.isRtlEnable(getActivity());
+        final boolean rtlEnable = RtlUtils.isRtlEnabled(getActivity());
         recyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {

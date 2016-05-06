@@ -42,7 +42,9 @@ import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.ImageHelper;
 import com.shoutit.app.android.utils.PriceUtils;
+import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.view.createshout.DialogsHelper;
 import com.shoutit.app.android.view.createshout.ShoutMediaPresenter;
 import com.shoutit.app.android.view.createshout.location.LocationActivity;
@@ -236,7 +238,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
         final RoundedBitmapDrawable drawable = RoundedBitmapDrawableFactory.create(getResources(), bitmap);
         drawable.setCircular(true);
 
-        mEditLocation.setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
+        ImageHelper.setStartCompoundRelativeDrawable(mEditLocation, drawable);
         mEditLocation.setText(name);
     }
 

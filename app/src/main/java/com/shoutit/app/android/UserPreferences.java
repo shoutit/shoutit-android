@@ -174,12 +174,12 @@ public class UserPreferences {
     }
 
     public void setGcmPushToken(String gcmPushToken) {
-        mPreferences.edit().putString(TWILIO_TOKEN, gcmPushToken).apply();
+        mPreferences.edit().putString(GCM_PUSH_TOKEN, gcmPushToken).apply();
     }
 
     @Nullable
     public String getGcmPushToken() {
-        return mPreferences.getString(TWILIO_TOKEN, null);
+        return mPreferences.getString(GCM_PUSH_TOKEN, null);
     }
 
     public boolean shouldAskForInterestAndSetToFalse() {

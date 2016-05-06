@@ -1,8 +1,6 @@
 package com.shoutit.app.android.utils;
 
-import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
@@ -13,6 +11,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.constants.AmazonConstants;
 
 import java.io.File;
+import java.util.Locale;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -98,18 +97,18 @@ public class AmazonHelper {
                 });
     }
 
-    @SuppressLint("DefaultLocale")
     @Nonnull
     private String getImageFileName() {
-        final String format = String.format("%1$d_%2$s%3$s", System.nanoTime(), userId, JPEG);
-        Log.i("dupa", format);
-        return format;
+        return getFileName(userId, JPEG);
     }
 
-    @SuppressLint("DefaultLocale")
     @Nonnull
     private String getVideoFileName() {
-        return String.format("%1$d_%2$s%3$s", System.nanoTime(), userId, MP4);
+        return getFileName(userId, MP4);
+    }
+
+    String getFileName(String userId, String format) {
+        return String.format(Locale.ENGLISH, "%1$d_%2$s%3$s", System.nanoTime(), userId, format);
     }
 
     public static File getfileFromPath(@NonNull String path) {
