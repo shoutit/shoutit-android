@@ -136,6 +136,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
     private void subscribeToStats() {
         mStatsSubscription.add(mPusherHelper.getStatsObservable()
+                .compose(this.<Stats>bindToLifecycle())
                 .subscribe(new Action1<Stats>() {
                     @Override
                     public void call(Stats pusherStats) {
@@ -145,6 +146,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
         mStatsSubscription.add(mUserPreferences.getUserObservable()
                 .filter(Functions1.isNotNull())
                 .distinctUntilChanged()
+                .compose(this.<User>bindToLifecycle())
                 .subscribe(new Action1<User>() {
                     @Override
                     public void call(User user) {
