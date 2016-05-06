@@ -18,7 +18,6 @@ import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
-import rx.functions.Action0;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.subjects.BehaviorSubject;
@@ -30,7 +29,7 @@ public class VideoConversationActivityPresenter {
     private final BehaviorSubject<Set<String>> participantsSubject = BehaviorSubject.create();
     private final BehaviorSubject<String> calledUserTwilioIdentitySubject = BehaviorSubject.create();
     private final PublishSubject<Object> makeOutgoingCallSubject = PublishSubject.create();
-    private final PublishSubject<Object> finishConnectionRetriesSubject = PublishSubject.create();
+    private final PublishSubject<Object> finishCallRetriesSubject = PublishSubject.create();
     private final PublishSubject<Object> rejectCallObserver = PublishSubject.create();
 
     @Nonnull
@@ -42,22 +41,29 @@ public class VideoConversationActivityPresenter {
                                               @UiScheduler final Scheduler uiScheduler) {
 
         makeCallObservable = makeOutgoingCallSubject
-                .switchMap(new Func1<Object, Observable<Integer>>() {
+                .scan(-1, new Func2<Integer, Object, Integer>() {
                     @Override
-                    public Observable<Integer> call(Object o) {
-                        return Observable.range(0, MAX_CALL_RETRIES)
-                                .delay(new Func1<Integer, Observable<Object>>() {
-                                    @Override
-                                    public Observable<Object> call(Integer retryNumber) {
-                                        final int delay = retryNumber * 6;
-                                        return Observable.just(null)
-                                                .delay(delay, TimeUnit.SECONDS);
-                                    }
-                                });
+                    public Integer call(Integer integer, Object o) {
+                        return ++integer;
                     }
                 })
-                .takeUntil(finishConnectionRetriesSubject)
-                .compose(LogTransformer.<Integer>transformer("lol", "retrybservable"))
+                .skip(1)
+                .delay(new Func1<Integer, Observable<Object>>() {
+                    @Override
+                    public Observable<Object> call(Integer retryNumber) {
+                        final int delay = retryNumber * 4;
+                        return Observable.just(null)
+                                .delay(delay, TimeUnit.SECONDS);
+                    }
+                })
+                .filter(new Func1<Integer, Boolean>() {
+                    @Override
+                    public Boolean call(Integer retryNumber) {
+                        return retryNumber < MAX_CALL_RETRIES;
+                    }
+                })
+                .takeUntil(finishCallRetriesSubject)
+                .compose(LogTransformer.<Integer>transformer("lol", "retry observable"))
                 .withLatestFrom(calledUserTwilioIdentitySubject, new Func2<Integer, String, BothParams<String, Integer>>() {
                     @Override
                     public BothParams<String, Integer> call(Integer retryNumber, String twilioIdentity) {
@@ -94,10 +100,6 @@ public class VideoConversationActivityPresenter {
         return rejectCallObserver;
     }
 
-    public Observer<Object> finishConnectionRetriesObserver() {
-        return finishConnectionRetriesSubject;
-    }
-
     public Observer<Object> getMakeOutgoingCallObserver() {
         return makeOutgoingCallSubject;
     }
@@ -108,5 +110,13 @@ public class VideoConversationActivityPresenter {
 
     public Observer<Set<String>> getParticipantsObserver() {
         return participantsSubject;
+    }
+
+    public void retryCall() {
+        makeOutgoingCallSubject.onNext(null);
+    }
+
+    public void finishRetries() {
+        finishCallRetriesSubject.onNext(null);
     }
 }

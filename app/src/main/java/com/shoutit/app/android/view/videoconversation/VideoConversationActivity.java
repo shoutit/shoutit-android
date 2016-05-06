@@ -296,7 +296,7 @@ public class VideoConversationActivity extends BaseActivity {
                             @Override
                             public void onConversation(Conversation conversation, TwilioConversationsException exception) {
                                 if (exception == null) {
-                                    presenter.finishConnectionRetriesObserver().onNext(null);
+                                    presenter.finishRetries();
                                     VideoConversationActivity.this.conversation = conversation;
                                     conversation.setConversationListener(conversationListener());
                                     Log.d(TAG, "Succesfully connected");
@@ -306,11 +306,11 @@ public class VideoConversationActivity extends BaseActivity {
                                     Log.d(TAG, "Failed on last retry with code: " + exception.getErrorCode() + " and message: " + exception.getMessage());
                                 } else if (exception.getErrorCode() == Twilio.ERROR_PARTICIPANT_UNAVAILABLE) {
                                     Log.d(TAG, "Participant unavailable? with code: " + exception.getErrorCode() + " and message: " + exception.getMessage());
-                                    return;
+                                    presenter.retryCall();
                                 } else {
                                     Log.d(TAG, "Error? with code: " + exception.getErrorCode() + " and message: " + exception.getMessage());
                                     handleTwilioError(exception);
-                                    presenter.finishConnectionRetriesObserver().onNext(null);
+                                    presenter.finishRetries();
                                     mTwilio.rejectCall(calledUserTwilioIdentity);
                                 }
                             }
