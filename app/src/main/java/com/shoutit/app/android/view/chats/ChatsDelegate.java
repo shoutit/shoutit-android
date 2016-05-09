@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
-import com.appunite.rx.functions.Functions1;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.pusher.client.channel.PresenceChannel;
@@ -23,7 +22,8 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.PriceUtils;
-import com.shoutit.app.android.utils.PusherHelper;
+import com.shoutit.app.android.utils.pusher.PusherHelper;
+import com.shoutit.app.android.utils.pusher.TypingInfo;
 import com.shoutit.app.android.view.chats.message_models.DateItem;
 import com.shoutit.app.android.view.chats.message_models.InfoItem;
 import com.shoutit.app.android.view.chats.message_models.ReceivedImageMessage;
@@ -125,17 +125,23 @@ public class ChatsDelegate {
                 .observeOn(mUiScheduler);
     }
 
-    public Observable<Boolean> getTypingObservable(PresenceChannel presenceChannel) {
+    public Observable<TypingInfo> getTypingObservable(PresenceChannel presenceChannel) {
         return mPusher.getIsTypingObservable(presenceChannel)
-                .switchMap(new Func1<Boolean, Observable<Boolean>>() {
+                .switchMap(new Func1<TypingInfo, Observable<TypingInfo>>() {
                     @Override
-                    public Observable<Boolean> call(Boolean aBoolean) {
-                        return Observable.timer(3, TimeUnit.SECONDS).map(Functions1.returnFalse())
-                                .startWith(true);
+                    public Observable<TypingInfo> call(TypingInfo typingInfo) {
+                        return Observable.timer(3, TimeUnit.SECONDS)
+                                .map(new Func1<Long, TypingInfo>() {
+                                    @Override
+                                    public TypingInfo call(Long aLong) {
+                                        return TypingInfo.notTyping();
+                                    }
+                                })
+                                .startWith(typingInfo);
                     }
                 })
                 .observeOn(mUiScheduler)
-                .startWith(false);
+                .startWith(TypingInfo.notTyping());
     }
 
     public Observable.Transformer<PusherMessage, List<PusherMessage>> transformToScan() {

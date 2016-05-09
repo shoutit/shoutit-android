@@ -33,7 +33,8 @@ import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.PriceUtils;
-import com.shoutit.app.android.utils.PusherHelper;
+import com.shoutit.app.android.utils.pusher.PusherHelper;
+import com.shoutit.app.android.utils.pusher.TypingInfo;
 import com.shoutit.app.android.view.chats.ChatsDelegate;
 import com.shoutit.app.android.view.chats.message_models.TypingItem;
 import com.shoutit.app.android.view.conversations.ConversationsUtils;
@@ -236,23 +237,23 @@ public class ChatsFirstConversationPresenter {
                             }
                         })));
                     }
-                }), mRefreshTypingObservable.switchMap(new Func1<Object, Observable<Boolean>>() {
+                }), mRefreshTypingObservable.switchMap(new Func1<Object, Observable<TypingInfo>>() {
                     @Override
-                    public Observable<Boolean> call(Object o) {
-                        return channelObservable.flatMap(new Func1<PresenceChannel, Observable<Boolean>>() {
+                    public Observable<TypingInfo> call(Object o) {
+                        return channelObservable.flatMap(new Func1<PresenceChannel, Observable<TypingInfo>>() {
                             @Override
-                            public Observable<Boolean> call(PresenceChannel presenceChannel) {
+                            public Observable<TypingInfo> call(PresenceChannel presenceChannel) {
                                 return mChatsDelegate.getTypingObservable(presenceChannel);
                             }
                         });
                     }
-                }), new Func2<List<BaseAdapterItem>, Boolean, List<BaseAdapterItem>>() {
+                }), new Func2<List<BaseAdapterItem>, TypingInfo, List<BaseAdapterItem>>() {
                     @Override
-                    public List<BaseAdapterItem> call(List<BaseAdapterItem> baseAdapterItems, Boolean isTyping) {
-                        if (isTyping) {
+                    public List<BaseAdapterItem> call(List<BaseAdapterItem> baseAdapterItems, TypingInfo isTyping) {
+                        if (isTyping.isTyping()) {
                             return ImmutableList.<BaseAdapterItem>builder()
                                     .addAll(baseAdapterItems)
-                                    .add(new TypingItem())
+                                    .add(new TypingItem(isTyping.getUsername()))
                                     .build();
                         } else {
                             return baseAdapterItems;

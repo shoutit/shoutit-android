@@ -6,7 +6,6 @@ import android.support.multidex.MultiDexApplication;
 
 import com.appunite.appunitegcm.AppuniteGcm;
 import com.appunite.rx.dagger.NetworkScheduler;
-import com.appunite.rx.functions.Functions1;
 import com.appunite.rx.observables.NetworkObservableProvider;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
@@ -27,7 +26,7 @@ import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.LogHelper;
-import com.shoutit.app.android.utils.PusherHelper;
+import com.shoutit.app.android.utils.pusher.PusherHelper;
 import com.shoutit.app.android.utils.stackcounter.StackCounterManager;
 import com.uservoice.uservoicesdk.Config;
 import com.uservoice.uservoicesdk.UserVoice;

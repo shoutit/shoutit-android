@@ -30,7 +30,7 @@ import com.shoutit.app.android.model.Stats;
 import com.shoutit.app.android.model.ReportBody;
 import com.shoutit.app.android.model.UserShoutsPointer;
 import com.shoutit.app.android.utils.PreferencesHelper;
-import com.shoutit.app.android.utils.PusherHelper;
+import com.shoutit.app.android.utils.pusher.PusherHelper;
 import com.shoutit.app.android.view.profile.myprofile.MyProfileHalfPresenter;
 import com.shoutit.app.android.view.profile.userprofile.UserProfileHalfPresenter;
 import com.shoutit.app.android.view.search.SearchPresenter;

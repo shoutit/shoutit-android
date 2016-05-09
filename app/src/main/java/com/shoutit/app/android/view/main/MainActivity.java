@@ -19,9 +19,6 @@ import android.view.MenuItem;
 
 import com.appunite.appunitegcm.AppuniteGcm;
 import com.appunite.rx.functions.Functions1;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
@@ -41,7 +38,7 @@ import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.PlayServicesHelper;
-import com.shoutit.app.android.utils.PusherHelper;
+import com.shoutit.app.android.utils.pusher.PusherHelper;
 import com.shoutit.app.android.view.conversations.ConverstationsFragment;
 import com.shoutit.app.android.view.discover.DiscoverActivity;
 import com.shoutit.app.android.view.discover.OnNewDiscoverSelectedListener;
@@ -51,8 +48,6 @@ import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.postlogininterest.PostLoginInterestActivity;
 import com.shoutit.app.android.view.search.main.MainSearchActivity;
 import com.shoutit.app.android.view.signin.LoginActivity;
-
-import java.util.SortedMap;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;

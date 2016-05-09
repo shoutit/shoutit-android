@@ -34,7 +34,8 @@ import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.PriceUtils;
-import com.shoutit.app.android.utils.PusherHelper;
+import com.shoutit.app.android.utils.pusher.PusherHelper;
+import com.shoutit.app.android.utils.pusher.TypingInfo;
 import com.shoutit.app.android.view.chats.message_models.TypingItem;
 import com.shoutit.app.android.view.conversations.ConversationsUtils;
 
@@ -194,7 +195,7 @@ public class ChatsPresenter {
 
         final Observable<PusherMessage> pusherMessageObservable = mChatsDelegate.getPusherMessageObservable(presenceChannel);
 
-        final Observable<Boolean> isTyping = mChatsDelegate.getTypingObservable(presenceChannel);
+        final Observable<TypingInfo> isTyping = mChatsDelegate.getTypingObservable(presenceChannel);
 
         final Observable<MessagesResponse> apiMessages = requestSubject
                 .startWith(new Object())
@@ -206,9 +207,9 @@ public class ChatsPresenter {
                 .compose(mChatsDelegate.transformToScan());
 
         mSubscribe.add(Observable.combineLatest(apiMessages, localAndPusherMessages.startWith((List<PusherMessage>) null), isTyping,
-                new Func3<MessagesResponse, List<PusherMessage>, Boolean, List<BaseAdapterItem>>() {
+                new Func3<MessagesResponse, List<PusherMessage>, TypingInfo, List<BaseAdapterItem>>() {
                     @Override
-                    public List<BaseAdapterItem> call(MessagesResponse messagesResponse, List<PusherMessage> pusherMessage, Boolean isTyping) {
+                    public List<BaseAdapterItem> call(MessagesResponse messagesResponse, List<PusherMessage> pusherMessage, TypingInfo isTyping) {
                         final ImmutableList.Builder<Message> builder = ImmutableList.<Message>builder()
                                 .addAll(messagesResponse.getResults());
 
@@ -225,10 +226,10 @@ public class ChatsPresenter {
 
                         final List<BaseAdapterItem> baseAdapterItemList = mChatsDelegate.transform(builder.build());
 
-                        if (isTyping) {
+                        if (isTyping.isTyping()) {
                             return ImmutableList.<BaseAdapterItem>builder()
                                     .addAll(baseAdapterItemList)
-                                    .add(new TypingItem())
+                                    .add(new TypingItem(isTyping.getUsername()))
                                     .build();
                         } else {
                             return baseAdapterItemList;
