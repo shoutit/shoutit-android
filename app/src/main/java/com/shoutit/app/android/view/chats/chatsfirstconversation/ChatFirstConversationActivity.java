@@ -156,6 +156,7 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
                     }
                     case R.id.chats_video_menu: {
                         presenter.calledPersonUsernameObservable()
+                                .compose(ChatFirstConversationActivity.this.<String>bindToLifecycle())
                                 .subscribe(new Action1<String>() {
                                     @Override
                                     public void call(String calledUserUsername) {
@@ -316,13 +317,16 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
     }
 
     @Override
-    public void setChatToolbatInfo(String chatWithString) {
+    public void setChatToolbarInfo(String chatWithString) {
         mChatsToolbar.setTitle(chatWithString);
     }
 
     @Override
     public void showVideoChatIcon() {
-
+        final MenuItem item = mChatsToolbar.getMenu().findItem(R.id.chats_video_menu);
+        if (item != null) {
+            item.setVisible(true);
+        }
     }
 
     @Override
