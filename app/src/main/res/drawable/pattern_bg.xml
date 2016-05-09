@@ -10,7 +10,7 @@
 
     <item>
         <bitmap xmlns:android="http://schemas.android.com/apk/res/android"
-            android:src="@drawable/ic_pattern_translucent"
+            android:src="@drawable/ic_pattern_translucent_small"
             android:tileMode="repeat" />
     </item>
 
