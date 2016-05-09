@@ -183,7 +183,7 @@ public class ChatsPresenter {
                                 mListener.setShoutToolbarInfo(mContext.getString(R.string.chat_shout_chat), ConversationsUtils.getChatWithString(conversationResponse.getProfiles(), user.getId()));
                             }
                         } else {
-                            mListener.setChatToolbatInfo(ConversationsUtils.getChatWithString(conversationResponse.getProfiles(), user.getId()));
+                            mListener.setChatToolbarInfo(ConversationsUtils.getChatWithString(conversationResponse.getProfiles(), user.getId()));
                         }
                         setupUserForVideoChat(conversationResponse.getProfiles());
                     }

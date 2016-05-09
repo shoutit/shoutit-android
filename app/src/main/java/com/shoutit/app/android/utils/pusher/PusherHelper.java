@@ -225,7 +225,7 @@ public class PusherHelper {
 
     public void sendTyping(@NonNull String conversationId, @NonNull String userId, @NonNull String userName) {
         final PresenceChannel presenceChannel = mPusher.getPresenceChannel(getConversationChannelName(conversationId));
-        if (presenceChannel != null && presenceChannel.isSubscribed()) {
+        if (presenceChannel != null && presenceChannel.isSubscribed() && mPusher.getConnection().getState() != ConnectionState.CONNECTING) {
             final String typing = mGson.toJson(new TypingPusherModel(userId, userName));
             presenceChannel.trigger("client-is_typing", typing);
         }

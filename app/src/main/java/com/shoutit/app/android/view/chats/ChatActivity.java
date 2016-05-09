@@ -264,7 +264,7 @@ public class ChatActivity extends BaseActivity implements Listener {
     }
 
     @Override
-    public void setChatToolbatInfo(String chatWithString) {
+    public void setChatToolbarInfo(String chatWithString) {
         mChatsToolbar.setTitle(chatWithString);
     }
 
