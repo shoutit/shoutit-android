@@ -52,6 +52,7 @@ import rx.functions.Action1;
 import rx.functions.Func0;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 
 public class PublishMediaShoutFragment extends Fragment {
 
@@ -87,6 +88,8 @@ public class PublishMediaShoutFragment extends Fragment {
 
     private String createdShoutOfferId;
     private String mWebUrl;
+
+    private final CompositeSubscription mCompositeSubscription = new CompositeSubscription();
 
     public static Fragment newInstance(@Nonnull String file, boolean isVideo) {
         final PublishMediaShoutFragment fragment = new PublishMediaShoutFragment();
@@ -168,7 +171,7 @@ public class PublishMediaShoutFragment extends Fragment {
         } else {
             observable = uploadImageObservable();
         }
-        observable
+        mCompositeSubscription.add(observable
                 .subscribeOn(Schedulers.io())
                 .observeOn(MyAndroidSchedulers.mainThread())
                 .doOnTerminate(new Action0() {
@@ -195,7 +198,7 @@ public class PublishMediaShoutFragment extends Fragment {
                                         Snackbar.LENGTH_SHORT)
                                         .show();
                             }
-                        });
+                        }));
     }
 
     private Observable<CreateShoutResponse> uploadImageObservable() {
@@ -262,7 +265,7 @@ public class PublishMediaShoutFragment extends Fragment {
     }
 
     private void downloadCurrencies() {
-        mApiService.getCurrencies()
+        mCompositeSubscription.add(mApiService.getCurrencies()
                 .subscribeOn(Schedulers.io())
                 .observeOn(MyAndroidSchedulers.mainThread())
                 .subscribe(
@@ -281,7 +284,7 @@ public class PublishMediaShoutFragment extends Fragment {
                                         Snackbar.LENGTH_SHORT)
                                         .show();
                             }
-                        });
+                        }));
     }
 
     @SuppressWarnings("unchecked")
@@ -291,9 +294,10 @@ public class PublishMediaShoutFragment extends Fragment {
 
         final String price = mCameraPublishedPrice.getText().toString();
         if (!Strings.isNullOrEmpty(price)) {
+            progress.setVisibility(View.VISIBLE);
             final long priceInCents = PriceUtils.getPriceInCents(price);
             final PriceUtils.SpinnerCurrency selectedItem = (PriceUtils.SpinnerCurrency) mCameraPublishedCurrency.getSelectedItem();
-            mApiService.editShoutPrice(createdShoutOfferId, new EditShoutPriceRequest(priceInCents, selectedItem.getCode()))
+            mCompositeSubscription.add(mApiService.editShoutPrice(createdShoutOfferId, new EditShoutPriceRequest(priceInCents, selectedItem.getCode()))
                     .subscribeOn(Schedulers.io())
                     .observeOn(MyAndroidSchedulers.mainThread())
                     .subscribe(new Action1<CreateShoutResponse>() {
@@ -306,13 +310,14 @@ public class PublishMediaShoutFragment extends Fragment {
                         @Override
                         public void call(Throwable throwable) {
                             Log.e(TAG, "error", throwable);
+                            progress.setVisibility(View.GONE);
                             ColoredSnackBar.error(
                                     ColoredSnackBar.contentView(getActivity()),
                                     R.string.error_default,
                                     Snackbar.LENGTH_SHORT)
                                     .show();
                         }
-                    });
+                    }));
         } else {
             getActivity().finish();
             startActivity(PublishShoutActivity.newIntent(getActivity(), createdShoutOfferId, mWebUrl, false, null));
