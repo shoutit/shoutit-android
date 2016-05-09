@@ -6,6 +6,7 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.db.RecentSearchesTable;
 import com.shoutit.app.android.twilio.Twilio;
+import com.shoutit.app.android.utils.pusher.PusherHelper;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;

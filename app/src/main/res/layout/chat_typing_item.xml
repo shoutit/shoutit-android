@@ -5,6 +5,7 @@
               android:orientation="vertical">
 
     <TextView
+        android:id="@+id/chats_typing"
         android:layout_marginLeft="@dimen/chat_received_msg_item_margin_left"
         android:layout_marginStart="@dimen/chat_received_msg_item_margin_left"
         android:background="@drawable/chat_other_first_bg"

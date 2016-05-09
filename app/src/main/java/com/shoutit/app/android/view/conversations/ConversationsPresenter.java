@@ -25,7 +25,7 @@ import com.shoutit.app.android.api.model.MessageAttachment;
 import com.shoutit.app.android.api.model.PusherMessage;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
-import com.shoutit.app.android.utils.PusherHelper;
+import com.shoutit.app.android.utils.pusher.PusherHelper;
 
 import java.util.Collections;
 import java.util.Comparator;

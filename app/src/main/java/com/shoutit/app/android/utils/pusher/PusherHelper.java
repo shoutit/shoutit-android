@@ -1,4 +1,4 @@
-package com.shoutit.app.android.utils;
+package com.shoutit.app.android.utils.pusher;
 
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -20,6 +20,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.PusherMessage;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.model.Stats;
+import com.shoutit.app.android.utils.BuildTypeUtils;
 import com.shoutit.app.android.view.chats.PresenceChannelEventListenerAdapter;
 
 import java.io.IOException;
@@ -171,16 +172,18 @@ public class PusherHelper {
         return mPusher.getPresenceChannel(PusherHelper.getProfileChannelName(user.getId()));
     }
 
-    public Observable<Boolean> getIsTypingObservable(@NonNull final PresenceChannel conversationChannel) {
+    public Observable<TypingInfo> getIsTypingObservable(@NonNull final PresenceChannel conversationChannel) {
         return Observable
-                .create(new Observable.OnSubscribe<Boolean>() {
+                .create(new Observable.OnSubscribe<TypingInfo>() {
                     @Override
-                    public void call(final Subscriber<? super Boolean> subscriber) {
+                    public void call(final Subscriber<? super TypingInfo> subscriber) {
                         conversationChannel.bind(CLIENT_IS_TYPING, new PresenceChannelEventListenerAdapter() {
 
                             @Override
                             public void onEvent(String channelName, String eventName, String data) {
-                                subscriber.onNext(true);
+                                final TypingPusherModel typingPusherModel = mGson.fromJson(data, TypingPusherModel.class);
+
+                                subscriber.onNext(TypingInfo.typing(typingPusherModel.username));
                             }
                         });
                     }
@@ -223,16 +226,16 @@ public class PusherHelper {
     public void sendTyping(@NonNull String conversationId, @NonNull String userId, @NonNull String userName) {
         final PresenceChannel presenceChannel = mPusher.getPresenceChannel(getConversationChannelName(conversationId));
         if (presenceChannel != null && presenceChannel.isSubscribed()) {
-            final String typing = mGson.toJson(new TypingInfo(userId, userName));
+            final String typing = mGson.toJson(new TypingPusherModel(userId, userName));
             presenceChannel.trigger("client-is_typing", typing);
         }
     }
 
-    private static class TypingInfo {
+    private static class TypingPusherModel {
         private final String id;
         private final String username;
 
-        public TypingInfo(@NonNull String id, @NonNull String username) {
+        public TypingPusherModel(@NonNull String id, @NonNull String username) {
             this.id = id;
             this.username = username;
         }
