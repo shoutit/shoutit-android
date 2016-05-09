@@ -79,7 +79,7 @@ public class ChatsAdapter extends BaseAdapter {
             case INFO_ITEM:
                 return InformationItemHolder.create(layoutInflater.inflate(InformationItemHolder.getLayoutRes(), parent, false));
             case TYPING_ITEM:
-                return TypingItemHolder.create(layoutInflater.inflate(TypingItemHolder.getLayoutRes(), parent, false));
+                return TypingItemHolder.create(layoutInflater.inflate(TypingItemHolder.getLayoutRes(), parent, false), context.getResources());
             default:
                 throw new RuntimeException();
         }

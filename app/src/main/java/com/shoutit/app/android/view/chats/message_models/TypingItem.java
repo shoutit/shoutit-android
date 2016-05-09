@@ -12,7 +12,7 @@ public class TypingItem implements BaseAdapterItem {
         this.username = username;
     }
 
-    private String getUsername() {
+    public String getUsername() {
         return username;
     }
 
@@ -46,4 +46,6 @@ public class TypingItem implements BaseAdapterItem {
     public boolean same(@Nonnull BaseAdapterItem item) {
         return item instanceof TypingItem && equals(item);
     }
+
+
 }
