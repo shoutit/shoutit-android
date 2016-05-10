@@ -56,10 +56,7 @@ import com.shoutit.app.android.model.ReportBody;
 import java.util.List;
 import java.util.Map;
 
-<<<<<<< HEAD
-=======
 import okhttp3.RequestBody;
->>>>>>> develop
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 import retrofit2.http.Body;
@@ -257,15 +254,9 @@ public interface ApiService {
     @PATCH("profiles/me")
     Observable<User> registerGcmToken(@Body RegisterDeviceRequest registerDeviceRequest);
 
-<<<<<<< HEAD
-=======
     @PATCH("profiles/me")
     Observable<User> unregisterGcmToken(@Body RequestBody registerDeviceRequest);
 
-    /**
-     * Profile
-     **/
->>>>>>> develop
     @POST("profiles/{username}/listen")
     Observable<ResponseBody> listenProfile(@Path("username") String username);
 
