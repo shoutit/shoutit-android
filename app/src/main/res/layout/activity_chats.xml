@@ -23,6 +23,7 @@
         android:background="@drawable/chat_edit_text_bg"
         android:gravity="center"
         android:orientation="horizontal"
+        android:layoutDirection="ltr"
         android:paddingBottom="4dp"
         android:paddingTop="4dp">
 
@@ -32,6 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
+            android:maxLines="6"
             android:layout_weight="1"
             android:hint="@string/chat_edit_text_hint"/>
 

@@ -201,7 +201,7 @@ public abstract class ProfileActivity extends BaseActivity {
     }
 
     private void setUpAdapter() {
-        final boolean rtlEnable = RtlUtils.isRtlEnable(this);
+        final boolean rtlEnable = RtlUtils.isRtlEnabled(this);
         final GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
         gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override

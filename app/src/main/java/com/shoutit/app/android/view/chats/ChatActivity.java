@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -19,6 +20,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -59,7 +61,6 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import rx.Subscription;
 import rx.functions.Action1;
 
 public class ChatActivity extends BaseActivity implements Listener {
@@ -92,6 +93,8 @@ public class ChatActivity extends BaseActivity implements Listener {
     EditText mChatsMessageEdittext;
     @Bind(R.id.chats_progress)
     ProgressBar mChatsProgress;
+    @Bind(R.id.chats_send_layout)
+    LinearLayout inputContainer;
 
     @Bind(R.id.chats_shout_layout)
     View mChatsShoutLayout;
@@ -126,6 +129,11 @@ public class ChatActivity extends BaseActivity implements Listener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chats);
         ButterKnife.bind(this);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            // It doesn't work from xml
+            inputContainer.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
+        }
 
         mChatsToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
         mChatsToolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -200,8 +208,6 @@ public class ChatActivity extends BaseActivity implements Listener {
         ChatsHelper.setOnClickHideListener(mChatsMessageEdittext, mChatsAttatchmentsLayout);
     }
 
-
-
     @Nonnull
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
@@ -258,7 +264,7 @@ public class ChatActivity extends BaseActivity implements Listener {
     }
 
     @Override
-    public void setChatToolbatInfo(String chatWithString) {
+    public void setChatToolbarInfo(String chatWithString) {
         mChatsToolbar.setTitle(chatWithString);
     }
 
@@ -365,7 +371,7 @@ public class ChatActivity extends BaseActivity implements Listener {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-                        presenter.deleteShout();
+                        presenter.deleteConversation();
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {

@@ -6,6 +6,7 @@ import com.appunite.rx.dagger.UiScheduler;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ShoutsDao;
+import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.view.search.SearchPresenter;
 
 import javax.annotation.Nonnull;
@@ -36,8 +37,9 @@ public class SearchShoutsResultsFragmentModule {
     @Provides
     SearchShoutsResultsPresenter provideSearchShoutsResultsPresenter(ShoutsDao dao, @ForActivity Context context,
                                                                      @UiScheduler Scheduler uiScheduler,
-                                                                     UserPreferences userPreferences) {
-        return new SearchShoutsResultsPresenter(dao, searchQuery, searchType, contextualItemId, userPreferences, context, uiScheduler);
+                                                                     UserPreferences userPreferences,
+                                                                     ShoutsGlobalRefreshPresenter globalRefreshPresenter) {
+        return new SearchShoutsResultsPresenter(dao, searchQuery, searchType, contextualItemId, userPreferences, context, uiScheduler, globalRefreshPresenter);
     }
 }
 

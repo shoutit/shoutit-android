@@ -26,7 +26,7 @@ import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.LogHelper;
-import com.shoutit.app.android.utils.PusherHelper;
+import com.shoutit.app.android.utils.pusher.PusherHelper;
 import com.shoutit.app.android.utils.stackcounter.StackCounterManager;
 import com.uservoice.uservoicesdk.Config;
 import com.uservoice.uservoicesdk.UserVoice;
@@ -115,6 +115,22 @@ public class App extends MultiDexApplication {
                 });
     }
 
+    private void initTwilio() {
+        userPreferences.getTokenObservable()
+                .filter(new Func1<String, Boolean>() {
+                    @Override
+                    public Boolean call(String userToken) {
+                        return userToken != null && !userPreferences.isGuest();
+                    }
+                })
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String ignore) {
+                        mTwilio.initTwilio();
+                    }
+                });
+    }
+
     private void refreshUser() {
         if (!userPreferences.isNormalUser()) {
             return;
@@ -151,22 +167,6 @@ public class App extends MultiDexApplication {
                         if (user != null) {
                             initPusher(token, user);
                         }
-                    }
-                });
-    }
-
-    private void initTwilio() {
-        userPreferences.getTokenObservable()
-                .filter(new Func1<String, Boolean>() {
-                    @Override
-                    public Boolean call(String token) {
-                        return token != null && !userPreferences.isGuest();
-                    }
-                })
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String token) {
-                        mTwilio.init();
                     }
                 });
     }

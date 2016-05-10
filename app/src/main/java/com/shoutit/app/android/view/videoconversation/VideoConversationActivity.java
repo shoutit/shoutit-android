@@ -8,6 +8,7 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -15,6 +16,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.functions.Functions1;
 import com.jakewharton.rxbinding.view.RxView;
 import com.jakewharton.rxbinding.widget.RxTextView;
@@ -72,9 +74,11 @@ import static com.appunite.rx.internal.Preconditions.checkNotNull;
 
 public class VideoConversationActivity extends BaseActivity {
 
+
     private static final String ARGS_CALLED_USER_USERNAME = "args_person_to_call_username";
     private static final String ARGS_CALLER = "args_caller";
     private static final int CAMERA_MIC_PERMISSION_REQUEST_CODE = 1;
+    private static final String TAG = VideoConversationActivity.class.getSimpleName();
 
 
     private VideoViewRenderer participantVideoRenderer;
@@ -107,6 +111,8 @@ public class VideoConversationActivity extends BaseActivity {
     Twilio mTwilio;
     @Inject
     CameraTool cameraTool;
+    @Inject
+    VideoConversationActivityPresenter presenter;
 
     private String calledUserUsername;
     private String calledUserTwilioIdentity;
@@ -170,7 +176,8 @@ public class VideoConversationActivity extends BaseActivity {
                     @Override
                     public void call(String calledUserIdentity) {
                         calledUserTwilioIdentity = calledUserIdentity;
-                        makeOutgoingCall();
+                        presenter.getCalledUserTwilioIdentityObserver().onNext(calledUserIdentity);
+                        initOutgoingCall();
                     }
                 });
 
@@ -203,6 +210,19 @@ public class VideoConversationActivity extends BaseActivity {
         mTwilio.getErrorCalledPersonIdentity()
                 .compose(this.<Throwable>bindToLifecycle())
                 .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(this)));
+
+        presenter.getMakeCallObservable()
+                .compose(this.<BothParams<Set<String>, Boolean>>bindToLifecycle())
+                .subscribe(makeOutgoingCall());
+
+        presenter.getRejectCallObservable()
+                .compose(bindToLifecycle())
+                .subscribe(new Action1<Object>() {
+                    @Override
+                    public void call(Object o) {
+                        mTwilio.rejectCall(calledUserTwilioIdentity);
+                    }
+                });
     }
 
     private CapturerErrorListener capturerErrorListener() {
@@ -210,7 +230,9 @@ public class VideoConversationActivity extends BaseActivity {
             @Override
             public void onError(CapturerException e) {
                 conversationErrorSubject.onNext(getString(R.string.video_calls_camera_issue));
-                cameraCapturer.startPreview(localVideoPreview);
+                if (!cameraCapturer.isPreviewing()) {
+                    cameraCapturer.startPreview(localVideoPreview);
+                }
             }
         };
     }
@@ -246,32 +268,62 @@ public class VideoConversationActivity extends BaseActivity {
         }
     }
 
-    private void makeOutgoingCall() {
+    private void initOutgoingCall() {
 
         if (calledUserTwilioIdentity != null && conversationClient != null) {
             callButton.setVisibility(View.GONE);
 
-            Set<String> participants = new HashSet<>();
+            final Set<String> participants = new HashSet<>();
             participants.add(calledUserTwilioIdentity);
 
-            outgoingInvite = conversationClient
-                    .sendConversationInvite(participants, setupLocalMedia(), new ConversationCallback() {
-                        @Override
-                        public void onConversation(Conversation conversation, TwilioConversationsException exception) {
-                            if (exception == null) {
-                                VideoConversationActivity.this.conversation = conversation;
-                                conversation.setConversationListener(conversationListener());
-                            } else if (exception.getErrorCode() == 109) {
-                                conversationInfoSubject.onNext(getString(R.string.video_calls_participant_reject));
-                                mTwilio.rejectCall(calledUserTwilioIdentity);
-                            } else {
-                                conversationErrorSubject.onNext(TextHelper.formatErrorMessage(exception.getMessage()));
-                                mTwilio.rejectCall(calledUserTwilioIdentity);
-                            }
-                        }
-                    });
+            presenter.getParticipantsObserver().onNext(participants);
+            presenter.getMakeOutgoingCallObserver().onNext(null);
         } else {
             ColoredSnackBar.error(ColoredSnackBar.contentView(this), R.string.video_calls_cannot_start_conversation, Snackbar.LENGTH_SHORT).show();
+        }
+    }
+
+    @NonNull
+    private Action1<BothParams<Set<String>, Boolean>> makeOutgoingCall() {
+        return new Action1<BothParams<Set<String>, Boolean>>() {
+            @Override
+            public void call(BothParams<Set<String>, Boolean> participantsWithIsLastRetry) {
+                final Set<String> participants = participantsWithIsLastRetry.param1();
+                final Boolean isLastRetry = participantsWithIsLastRetry.param2();
+
+                outgoingInvite = conversationClient
+                        .sendConversationInvite(participants, setupLocalMedia(), new ConversationCallback() {
+                            @Override
+                            public void onConversation(Conversation conversation, TwilioConversationsException exception) {
+                                if (exception == null) {
+                                    presenter.finishRetries();
+                                    VideoConversationActivity.this.conversation = conversation;
+                                    conversation.setConversationListener(conversationListener());
+                                    Log.d(TAG, "Succesfully connected");
+                                } else if (isLastRetry) {
+                                    handleTwilioError(exception);
+                                    mTwilio.rejectCall(calledUserTwilioIdentity);
+                                    Log.d(TAG, "Failed on last retry with code: " + exception.getErrorCode() + " and message: " + exception.getMessage());
+                                } else if (exception.getErrorCode() == Twilio.ERROR_PARTICIPANT_UNAVAILABLE) {
+                                    Log.d(TAG, "Participant unavailable? with code: " + exception.getErrorCode() + " and message: " + exception.getMessage());
+                                    presenter.retryCall();
+                                } else {
+                                    Log.d(TAG, "Error? with code: " + exception.getErrorCode() + " and message: " + exception.getMessage());
+                                    handleTwilioError(exception);
+                                    presenter.finishRetries();
+                                    mTwilio.rejectCall(calledUserTwilioIdentity);
+                                }
+                            }
+                        });
+            }
+        };
+    }
+
+    private void handleTwilioError(TwilioConversationsException exception) {
+        if (exception.getErrorCode() == Twilio.ERROR_PARTICIPANT_REJECTED_CALL) {
+            conversationInfoSubject.onNext(getString(R.string.video_calls_participant_reject));
+        } else {
+            conversationInfoSubject.onNext(TextHelper.formatErrorMessage(exception.getMessage()));
         }
     }
 
@@ -426,10 +478,14 @@ public class VideoConversationActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (TwilioConversations.isInitialized() && conversationClient != null) {
+
+        if (TwilioConversations.isInitialized() &&
+                conversationClient != null &&
+                !conversationClient.isListening()) {
             conversationClient.listen();
         }
-        if (cameraCapturer != null) {
+
+        if (cameraCapturer != null && !cameraCapturer.isPreviewing()) {
             cameraCapturer.startPreview(localVideoPreview);
         }
     }
@@ -437,11 +493,14 @@ public class VideoConversationActivity extends BaseActivity {
     @Override
     public void onPause() {
         super.onPause();
-        if (TwilioConversations.isInitialized() && conversationClient != null && conversation == null) {
+        if (TwilioConversations.isInitialized() &&
+                conversationClient != null  &&
+                conversationClient.isListening() &&
+                conversation == null) {
             conversationClient.unlisten();
         }
 
-        if (cameraCapturer != null) {
+        if (cameraCapturer != null && cameraCapturer.isPreviewing()) {
             cameraCapturer.stopPreview();
         }
     }

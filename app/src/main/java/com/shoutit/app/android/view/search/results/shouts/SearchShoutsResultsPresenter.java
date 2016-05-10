@@ -18,6 +18,7 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ShoutsDao;
+import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.model.FiltersToSubmit;
 import com.shoutit.app.android.model.SearchShoutPointer;
 import com.shoutit.app.android.view.search.SearchPresenter;
@@ -48,6 +49,7 @@ public class SearchShoutsResultsPresenter {
     private final Observable<Throwable> errorObservable;
     private final Observable<Integer> countObservable;
     private final Observable<String> shareClickedObservable;
+    private final Observable<Object> refreshShoutsObservable;
 
     public SearchShoutsResultsPresenter(@Nonnull final ShoutsDao dao,
                                         @Nullable final String searchQuery,
@@ -55,7 +57,8 @@ public class SearchShoutsResultsPresenter {
                                         @Nullable final String contextualItemId,
                                         @Nonnull final UserPreferences userPreferences,
                                         @Nonnull @ForActivity final Context context,
-                                        @UiScheduler Scheduler uiScheduler) {
+                                        @UiScheduler Scheduler uiScheduler,
+                                        @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter) {
 
         final boolean isNormalUser = userPreferences.isNormalUser();
         final User currentUser = userPreferences.getUser();
@@ -165,6 +168,19 @@ public class SearchShoutsResultsPresenter {
                         return shoutsResponse.getWebUrl();
                     }
                 });
+
+        refreshShoutsObservable = shoutsGlobalRefreshPresenter.getShoutsGlobalRefreshObservable()
+                .withLatestFrom(daoObservable, new Func2<Object, ShoutsDao.SearchShoutsDao, Object>() {
+                    @Override
+                    public Object call(Object o, ShoutsDao.SearchShoutsDao searchShoutsDao) {
+                        searchShoutsDao.getRefreshObserver().onNext(null);
+                        return null;
+                    }
+                });
+    }
+
+    public Observable<Object> getRefreshShoutsObservable() {
+        return refreshShoutsObservable;
     }
 
     public Observable<String> getShareClickedObservable() {

@@ -39,7 +39,7 @@ import com.shoutit.app.android.api.model.SuggestionsResponse;
 import com.shoutit.app.android.api.model.TagDetail;
 import com.shoutit.app.android.api.model.TagsRequest;
 import com.shoutit.app.android.api.model.TwilioResponse;
-import com.shoutit.app.android.api.model.TwillioRejectCallRequest;
+import com.shoutit.app.android.api.model.VideoCallRequest;
 import com.shoutit.app.android.api.model.UpdateLocationRequest;
 import com.shoutit.app.android.api.model.UpdateUserRequest;
 import com.shoutit.app.android.api.model.User;
@@ -56,6 +56,10 @@ import com.shoutit.app.android.model.ReportBody;
 import java.util.List;
 import java.util.Map;
 
+<<<<<<< HEAD
+=======
+import okhttp3.RequestBody;
+>>>>>>> develop
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 import retrofit2.http.Body;
@@ -159,18 +163,18 @@ public interface ApiService {
 
     @GET("shouts")
     Observable<ShoutsResponse> searchCategoriesShouts(@Query("search") String query,
-                                               @Query("page") Integer page,
-                                               @Query("page_size") Integer pageSize,
-                                               @Query("country") String countryCode,
-                                               @Query("city") String city,
-                                               @Query("state") String state,
-                                               @Query("min_price") Integer minPrice,
-                                               @Query("max_price") Integer maxPrice,
-                                               @Query("within") Integer distance,
-                                               @Query("shout_type") String shoutType,
-                                               @Query("sort") String sortBy,
-                                               @Query("category") String categorySlug,
-                                               @QueryMap Map<String, String> filtersMap);
+                                                      @Query("page") Integer page,
+                                                      @Query("page_size") Integer pageSize,
+                                                      @Query("country") String countryCode,
+                                                      @Query("city") String city,
+                                                      @Query("state") String state,
+                                                      @Query("min_price") Integer minPrice,
+                                                      @Query("max_price") Integer maxPrice,
+                                                      @Query("within") Integer distance,
+                                                      @Query("shout_type") String shoutType,
+                                                      @Query("sort") String sortBy,
+                                                      @Query("category") String categorySlug,
+                                                      @QueryMap Map<String, String> filtersMap);
 
     @GET("shouts")
     Observable<ShoutsResponse> searchDiscoverShouts(@Query("search") String query,
@@ -216,7 +220,9 @@ public interface ApiService {
     @POST("oauth2/access_token")
     Observable<SignResponse> googleLogin(@Body GoogleLogin request);
 
-    /** Auth **/
+    /**
+     * Auth
+     **/
 
     @POST("auth/reset_password")
     Observable<ResponseBody> resetPassword(@Body ResetPasswordRequest request);
@@ -251,6 +257,15 @@ public interface ApiService {
     @PATCH("profiles/me")
     Observable<User> registerGcmToken(@Body RegisterDeviceRequest registerDeviceRequest);
 
+<<<<<<< HEAD
+=======
+    @PATCH("profiles/me")
+    Observable<User> unregisterGcmToken(@Body RequestBody registerDeviceRequest);
+
+    /**
+     * Profile
+     **/
+>>>>>>> develop
     @POST("profiles/{username}/listen")
     Observable<ResponseBody> listenProfile(@Path("username") String username);
 
@@ -277,7 +292,6 @@ public interface ApiService {
     Observable<ListeningResponse> listeners(@Path("user_name") String userName,
                                             @Query("page") Integer page,
                                             @Query("page_size") Integer pageSize);
-
 
     /**
      * Misc
@@ -414,5 +428,5 @@ public interface ApiService {
 
 
     @POST("twilio/video_call")
-    Observable<ResponseBody> rejectRequest(@Body TwillioRejectCallRequest rejectRequest);
+    Observable<ResponseBody> videoCall(@Body VideoCallRequest rejectRequest);
 }

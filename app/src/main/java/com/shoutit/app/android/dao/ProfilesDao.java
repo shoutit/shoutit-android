@@ -3,9 +3,9 @@ package com.shoutit.app.android.dao;
 import com.appunite.appunitegcm.AppuniteGcm;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
-import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.operators.MoreOperators;
 import com.appunite.rx.operators.OperatorMergeNextToken;
+import com.google.common.base.Strings;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -18,7 +18,10 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.utils.LogHelper;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
@@ -35,11 +38,13 @@ public class ProfilesDao {
     private final LoadingCache<String, SearchProfilesDao> searchProfilesCache;
     @Nonnull
     private final ApiService apiService;
+    @Nonnull
     private final Scheduler networkScheduler;
+    @Nonnull
     private UserPreferences userPreferences;
 
     public ProfilesDao(@Nonnull ApiService apiService,
-                       @NetworkScheduler Scheduler networkScheduler,
+                       @Nonnull @NetworkScheduler Scheduler networkScheduler,
                        @Nonnull UserPreferences userPreferences) {
         this.apiService = apiService;
         this.networkScheduler = networkScheduler;
@@ -82,8 +87,15 @@ public class ProfilesDao {
         return profilesCache.getUnchecked(userName);
     }
 
-    public void registerToGcmAction(final String token) {
-        apiService.registerGcmToken(new RegisterDeviceRequest(token))
+    public void registerToGcmAction(@Nullable final String token) {
+        final Observable<User> user;
+        if (Strings.isNullOrEmpty(token)) {
+            user = apiService.unregisterGcmToken(RequestBody.create(MediaType.parse("application/json"), RegisterDeviceRequest.EMPTY_PUSHTOKEN));
+        } else {
+            user = apiService.registerGcmToken(new RegisterDeviceRequest(token));
+        }
+
+        user
                 .subscribeOn(networkScheduler)
                 .subscribe(new Action1<User>() {
                     @Override

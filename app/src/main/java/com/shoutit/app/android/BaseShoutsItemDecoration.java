@@ -21,7 +21,7 @@ public class BaseShoutsItemDecoration extends RecyclerView.ItemDecoration {
 
     public BaseShoutsItemDecoration(int spacingInPx, Context context) {
         this.spacing = spacingInPx;
-        rtlEnable = RtlUtils.isRtlEnable(context);
+        rtlEnable = RtlUtils.isRtlEnabled(context);
     }
 
     @Override

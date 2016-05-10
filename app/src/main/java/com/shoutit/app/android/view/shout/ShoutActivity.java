@@ -484,7 +484,7 @@ public class ShoutActivity extends BaseActivity {
             }
         });
 
-        final boolean rtlEnable = RtlUtils.isRtlEnable(this);
+        final boolean rtlEnable = RtlUtils.isRtlEnabled(this);
         final int spacing = getResources().getDimensionPixelSize(R.dimen.shout_item_padding);
         final int bottomSpacing = getResources().getDimensionPixelSize(R.dimen.shout_bottom_bar);
         recyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {

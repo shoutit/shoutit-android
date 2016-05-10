@@ -165,25 +165,26 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/edit_location"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="0.75"
-                        android:drawablePadding="10dp"
-                        android:gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:paddingStart="6dp"
                         android:paddingLeft="6dp"
+                        android:drawablePadding="16dp"
+                        android:gravity="center_vertical"
+                        tools:drawableStart="@drawable/ec"
                         android:textColor="@android:color/black"
-                        tools:drawableLeft="@drawable/ec"
-                        tools:text="Dubai, United Arab Emirates" />
+                        tools:text="Dubai" />
 
                     <Button
                         android:id="@+id/edit_location_btn"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="0.25"
                         android:background="?selectableItemBackground"
                         android:text="@string/request_activity_change_location"
                         android:textColor="@color/accent_blue"

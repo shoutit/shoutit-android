@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -19,6 +20,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -101,6 +103,8 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
     TextView mChatsShoutLayoutType;
     @Bind(R.id.chats_shout_layout_price)
     TextView mChatsShoutLayoutPrice;
+    @Bind(R.id.chats_send_layout)
+    LinearLayout inputContainer;
 
     @Bind(R.id.chats_main_layout)
     View mMainLayout;
@@ -122,6 +126,11 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chats);
         ButterKnife.bind(this);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            // It doesn't work from xml
+            inputContainer.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
+        }
 
         mChatsToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
         mChatsToolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -147,6 +156,7 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
                     }
                     case R.id.chats_video_menu: {
                         presenter.calledPersonUsernameObservable()
+                                .compose(ChatFirstConversationActivity.this.<String>bindToLifecycle())
                                 .subscribe(new Action1<String>() {
                                     @Override
                                     public void call(String calledUserUsername) {
@@ -233,6 +243,7 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
     public void setData(@NonNull List<BaseAdapterItem> items) {
         mChatsRecyclerview.setVisibility(View.VISIBLE);
         chatsAdapter.call(items);
+        mChatsRecyclerview.scrollToPosition(items.size() - 1);
     }
 
     @Override
@@ -306,13 +317,16 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
     }
 
     @Override
-    public void setChatToolbatInfo(String chatWithString) {
+    public void setChatToolbarInfo(String chatWithString) {
         mChatsToolbar.setTitle(chatWithString);
     }
 
     @Override
     public void showVideoChatIcon() {
-
+        final MenuItem item = mChatsToolbar.getMenu().findItem(R.id.chats_video_menu);
+        if (item != null) {
+            item.setVisible(true);
+        }
     }
 
     @Override
@@ -352,7 +366,7 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-                        presenter.deleteShout();
+                        presenter.deleteConversation();
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {

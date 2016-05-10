@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
+import android.text.TextUtils;
 
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
@@ -29,6 +30,7 @@ import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.ResourcesHelper;
+import com.shoutit.app.android.utils.TextHelper;
 
 import java.util.List;
 
@@ -181,7 +183,8 @@ public class EditShoutPresenter {
                             mListener.showCurrenciesError();
                         }
                         if (shoutResponse != null) {
-                            mListener.setActionbarTitle(mContext.getString(R.string.edit_shout_title, capitalize(shoutResponse.getType())));
+                            final String shoutTypeText = capitalize(TextHelper.getShoutTypeText(mContext, shoutResponse.getType()));
+                            mListener.setActionbarTitle(mContext.getString(R.string.edit_shout_title, shoutTypeText));
                             mListener.setTitle(shoutResponse.getTitle());
                             mListener.setPrice(PriceUtils.formatPriceToEdit(shoutResponse.getPrice()));
                             mListener.setDescription(shoutResponse.getText());
@@ -199,7 +202,11 @@ public class EditShoutPresenter {
                 }));
     }
 
-    private String capitalize(@NonNull final String line) {
+    @Nonnull
+    private String capitalize(@Nullable final String line) {
+        if (TextUtils.isEmpty(line)) {
+            return "";
+        }
         return Character.toUpperCase(line.charAt(0)) + line.substring(1);
     }
 

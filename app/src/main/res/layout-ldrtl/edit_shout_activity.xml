@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="ContentDescription">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:background="@android:color/white">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/edit_toolbar"
+            style="@style/AppTheme.BaseToolbarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize"
+            android:layout_marginBottom="10dp" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:overScrollMode="never">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:gravity="start"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/edit_shout_add_pictures_label"
+                    android:textColor="#8a000000"
+                    android:textSize="12sp" />
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbarSize="4dp">
+
+                    <LinearLayout
+                        android:id="@+id/edit_media_container"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal" />
+
+                </HorizontalScrollView>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_marginTop="6dp"
+                    android:id="@+id/edit_description_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:hintTextAppearance="@style/BlueInputStyle">
+
+                    <EditText
+                        android:singleLine="true"
+                        android:id="@+id/edit_shout_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="-4dp"
+                        android:layout_marginStart="-4dp"
+                        android:gravity="start"
+                        android:hint="@string/edit_shout_title_hint"
+                        android:theme="@style/BlueEditText" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+
+                    <android.support.design.widget.TextInputLayout
+                        android:layout_marginTop="6dp"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        app:hintTextAppearance="@style/BlueInputStyle">
+
+                        <EditText
+                            android:id="@+id/edit_budget"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="-4dp"
+                            android:gravity="start"
+                            android:hint="@string/create_request_price"
+                            android:inputType="numberDecimal"
+                            android:theme="@style/BlueEditText" />
+                    </android.support.design.widget.TextInputLayout>
+
+                    <ImageView
+                        android:id="@+id/edit_currency_info"
+                        android:layout_width="24dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:src="@drawable/info" />
+
+                    <com.shoutit.app.android.widget.StateSpinner
+                        android:layout_gravity="bottom"
+                        android:id="@+id/edit_currency_spinner"
+                        android:layout_width="130dp"
+                        android:layout_height="43dp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="6dp"
+                    android:layout_marginTop="6dp"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/edit_request_category_icon"
+                        android:layout_width="54dp"
+                        android:layout_height="54dp"
+                        android:layout_marginRight="8dp" />
+
+                    <com.shoutit.app.android.widget.StateSpinner
+                        android:id="@+id/edit_request_category_spinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp" />
+
+                </LinearLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_marginTop="6dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:hintTextAppearance="@style/BlueInputStyle">
+
+                    <EditText
+                        android:id="@+id/edit_shout_description"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="-4dp"
+                        android:gravity="start"
+                        android:hint="@string/edit_shout_description_hint"
+                        android:theme="@style/BlueEditText" />
+                </android.support.design.widget.TextInputLayout>
+
+                <LinearLayout
+                    android:id="@+id/edit_shout_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/edit_shout_location"
+                    android:textColor="#8a000000"
+                    android:textSize="12sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/edit_location"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:paddingStart="6dp"
+                        android:paddingLeft="6dp"
+                        android:textDirection="rtl"
+                        android:drawablePadding="20dp"
+                        android:gravity="center_vertical"
+                        tools:drawableStart="@drawable/ec"
+                        android:textColor="@android:color/black"
+                        tools:text="Dubai" />
+
+                    <Button
+                        android:id="@+id/edit_location_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="?selectableItemBackground"
+                        android:text="@string/request_activity_change_location"
+                        android:textColor="@color/accent_blue"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_marginTop="6dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:hintTextAppearance="@style/BlueInputStyle">
+
+                    <EditText
+                        android:id="@+id/edit_shout_mobile"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="-4dp"
+                        android:hint="@string/edit_shout_mobile_hint"
+                        android:inputType="phone"
+                        android:theme="@style/BlueEditText" />
+                </android.support.design.widget.TextInputLayout>
+
+                <Button
+                    android:id="@+id/edit_confirm"
+                    style="@style/BaseButtonStyle"
+                    android:layout_width="match_parent"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/selector_green_button_with_stroke"
+                    android:text="@string/edit_done_btn"
+                    android:textColor="@android:color/white" />
+
+            </LinearLayout>
+
+        </ScrollView>
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/edit_progress"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black_20"
+        android:clickable="true"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+
+    </FrameLayout>
+
+</FrameLayout>
