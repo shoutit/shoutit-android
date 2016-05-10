@@ -372,10 +372,26 @@ public class ProfileAdapterItems {
         }
     }
 
-    public static class MyUserThreeIconsAdapterItem extends ProfileAdapterItems.ThreeIconsAdapterItem {
+    public static class MyProfileThreeIconsAdapterItem extends ProfileAdapterItems.ThreeIconsAdapterItem {
 
-        public MyUserThreeIconsAdapterItem(@Nonnull User user) {
+        @Nonnull
+        private final Observer<Object> listeningsClickObserver;
+        @Nonnull
+        private final Observer<Object> interestsClickObserver;
+
+        public MyProfileThreeIconsAdapterItem(@Nonnull User user, @Nonnull Observer<Object> listeningsClickObserver,
+                                              @Nonnull Observer<Object> interestsClickObserver) {
             super(user);
+            this.listeningsClickObserver = listeningsClickObserver;
+            this.interestsClickObserver = interestsClickObserver;
+        }
+
+        public void onListengsClick() {
+            listeningsClickObserver.onNext(null);
+        }
+
+        public void onInterestsClick() {
+            interestsClickObserver.onNext(null);
         }
     }
 

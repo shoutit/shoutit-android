@@ -40,7 +40,7 @@ public class ProfilesListAdapter extends BaseAdapter {
         this.picasso = picasso;
     }
 
-    public class ProfileViewHolder extends ViewHolderManager.BaseViewHolder<ProfileAdapterItem> {
+    public class ProfileViewHolder extends ViewHolderManager.BaseViewHolder<ListeningsProfileAdapterItem> {
 
         @Bind(R.id.profile_section_iv)
         ImageView avatarImageView;
@@ -52,7 +52,7 @@ public class ProfilesListAdapter extends BaseAdapter {
         ImageView listenImageView;
 
         private final Target target;
-        private ProfileAdapterItem item;
+        private ListeningsProfileAdapterItem item;
 
         public ProfileViewHolder(@Nonnull View itemView) {
             super(itemView);
@@ -62,7 +62,7 @@ public class ProfilesListAdapter extends BaseAdapter {
         }
 
         @Override
-        public void bind(@Nonnull ProfileAdapterItem item) {
+        public void bind(@Nonnull ListeningsProfileAdapterItem item) {
             this.item = item;
             final BaseProfile profile = item.getProfile();
 
@@ -110,7 +110,7 @@ public class ProfilesListAdapter extends BaseAdapter {
     @Override
     public int getItemViewType(int position) {
         final BaseAdapterItem item = items.get(position);
-        if (item instanceof ProfileAdapterItem) {
+        if (item instanceof ListeningsProfileAdapterItem) {
             return VIEW_TYPE_PROFILE;
         } else if (item instanceof NoDataAdapterItem) {
             return VIEW_TYPE_EMPTY;

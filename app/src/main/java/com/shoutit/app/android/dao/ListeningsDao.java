@@ -11,6 +11,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.ListeningResponse;
+import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.model.MergeListeningResponses;
 import com.shoutit.app.android.view.listenings.ListeningsPresenter;
 
@@ -19,6 +20,7 @@ import javax.annotation.Nonnull;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
@@ -93,16 +95,30 @@ public class ListeningsDao {
 
             listeningObservable = loadMoreSubject.startWith((Object) null)
                     .lift(loadMoreOperator)
+                    .compose(MoreOperators.<ListeningResponse>refresh(refreshSubject))
                     .compose(ResponseOrError.<ListeningResponse>toResponseOrErrorObservable())
+                    .doOnNext(new Action1<ResponseOrError<ListeningResponse>>() {
+                        @Override
+                        public void call(ResponseOrError<ListeningResponse> listeningResponseResponseOrError) {
+
+                        }
+                    })
+                    .doOnError(new Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable throwable) {
+
+                        }
+                    })
                     .mergeWith(updatedProfileLocallySubject)
-                    .compose(MoreOperators.<ResponseOrError<ListeningResponse>>refresh(refreshSubject));
+                    .mergeWith(Observable.<ResponseOrError<ListeningResponse>>never());
+
         }
 
         @Nonnull
         private Observable<ListeningResponse> getRequest(int page) {
             switch (ListeningsPresenter.ListeningsType.values()[listeningsType.ordinal()]) {
                 case USERS_AND_PAGES:
-                    return apiService.usersListenings(page, PAGE_SIZE);
+                    return apiService.profilesListenings(page, PAGE_SIZE);
                 case INTERESTS:
                     return apiService.tagsListenings(page, PAGE_SIZE);
                 default:

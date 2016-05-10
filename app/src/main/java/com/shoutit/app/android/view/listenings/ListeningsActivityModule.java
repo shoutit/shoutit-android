@@ -5,8 +5,6 @@ import com.appunite.rx.dagger.UiScheduler;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.dao.ListeningsDao;
 
-import javax.annotation.Nonnull;
-
 import dagger.Module;
 import dagger.Provides;
 import rx.Scheduler;
@@ -17,8 +15,7 @@ public class ListeningsActivityModule {
 
     private final ListeningsPresenter.ListeningsType listeningsType;
 
-    public ListeningsActivityModule(@Nonnull ListeningsActivity activity,
-                                    ListeningsPresenter.ListeningsType listeningsType) {
+    public ListeningsActivityModule(ListeningsPresenter.ListeningsType listeningsType) {
         this.listeningsType = listeningsType;
     }
 

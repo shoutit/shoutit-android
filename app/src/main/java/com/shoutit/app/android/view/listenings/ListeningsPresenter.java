@@ -25,6 +25,7 @@ import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.subjects.PublishSubject;
 
 public class ListeningsPresenter {
@@ -39,7 +40,7 @@ public class ListeningsPresenter {
 
     private final PublishSubject<String> openProfileSubject = PublishSubject.create();
     private final PublishSubject<Throwable> errorSubject = PublishSubject.create();
-    private final PublishSubject<ProfileToListenWithLastResponse> profileListenedSubject = PublishSubject.create();
+    private final PublishSubject<BaseProfile> profileListenedSubject = PublishSubject.create();
     private final PublishSubject<String> listenSuccess = PublishSubject.create();
     private final PublishSubject<String> unListenSuccess = PublishSubject.create();
     
@@ -52,7 +53,7 @@ public class ListeningsPresenter {
 
     public ListeningsPresenter(@UiScheduler final Scheduler uiScheduler,
                                @Nonnull final ListeningsDao listeningsDao,
-                               @Nonnull ListeningsType listeningsType,
+                               @Nonnull final ListeningsType listeningsType,
                                @Nonnull @NetworkScheduler final Scheduler networkScheduler,
                                @Nonnull final ApiService apiService) {
         this.listeningsDao = listeningsDao;
@@ -75,7 +76,8 @@ public class ListeningsPresenter {
                         final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
 
                         for (BaseProfile profile : listeningResponse.getProfiles()) {
-                            builder.add(new ProfileAdapterItem(profile, openProfileSubject, profileListenedSubject, listeningResponse));
+                            builder.add(new ListeningsProfileAdapterItem(
+                                    profile, openProfileSubject, profileListenedSubject, listeningsType));
                         }
 
                         final ImmutableList<BaseAdapterItem> items = builder.build();
@@ -88,15 +90,28 @@ public class ListeningsPresenter {
                 });
 
         profileListenedSubject
+                .withLatestFrom(successProfilesAndTagsObservable, new Func2<BaseProfile, ListeningResponse, ProfileToListenWithLastResponse>() {
+                    @Override
+                    public ProfileToListenWithLastResponse call(BaseProfile profileToListen, ListeningResponse listeningResponse) {
+                        return new ProfileToListenWithLastResponse(profileToListen, listeningResponse);
+                    }
+                })
                 .switchMap(new Func1<ProfileToListenWithLastResponse, Observable<ResponseOrError<ListeningResponse>>>() {
                     @Override
                     public Observable<ResponseOrError<ListeningResponse>> call(final ProfileToListenWithLastResponse profileToListenWithLastResponse) {
-                        final String userName = profileToListenWithLastResponse.getProfile().getUsername();
+
+                        final String profileId;
+                        if (listeningsType.equals(ListeningsType.INTERESTS)) {
+                            profileId = profileToListenWithLastResponse.getProfile().getName();
+                        } else {
+                            profileId = profileToListenWithLastResponse.getProfile().getUsername();
+                        }
+
                         final boolean isListeningToProfile = profileToListenWithLastResponse.getProfile().isListening();
 
                         Observable<ResponseOrError<ResponseBody>> listenRequestObservable;
                         if (isListeningToProfile) {
-                            listenRequestObservable = getUnlistenRequest(userName)
+                            listenRequestObservable = getUnlistenRequest(profileId)
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
                                     .doOnNext(new Action1<ResponseBody>() {
@@ -107,7 +122,7 @@ public class ListeningsPresenter {
                                     })
                                     .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
                         } else {
-                            listenRequestObservable = getListenRequest(userName)
+                            listenRequestObservable = getListenRequest(profileId)
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
                                     .doOnNext(new Action1<ResponseBody>() {
@@ -154,11 +169,11 @@ public class ListeningsPresenter {
     }
 
     @Nonnull
-    public Observable<ResponseBody> getListenRequest(@Nonnull String userOrTagName) {
+    public Observable<ResponseBody> getListenRequest(@Nonnull String userNameOrTagName) {
         if (listeningsType.equals(ListeningsType.INTERESTS)) {
-            return apiService.listenTag(userOrTagName);
+            return apiService.listenTag(userNameOrTagName);
         } else {
-            return apiService.listenProfile(userOrTagName);
+            return apiService.listenProfile(userNameOrTagName);
         }
     }
 
@@ -175,10 +190,10 @@ public class ListeningsPresenter {
         final ListeningResponse response = profileToListenWithLastResponse.getResponse();
 
         final List<BaseProfile> profiles = response.getProfiles();
-        final String profileToUpdateUserName = profileToListenWithLastResponse.getProfile().getUsername();
+        final String profileToUpdateId = getProfileId(profileToListenWithLastResponse.getProfile());
 
         for (int i = 0; i < profiles.size(); i++) {
-            if (profiles.get(i).getUsername().equals(profileToUpdateUserName)) {
+            if (getProfileId(profiles.get(i)).equals(profileToUpdateId)) {
                 final BaseProfile profileToUpdate = profiles.get(i);
                 final BaseProfile updatedProfile = profileToUpdate.getListenedProfile();
 
@@ -191,6 +206,14 @@ public class ListeningsPresenter {
         }
 
         return response;
+    }
+
+    public String getProfileId(BaseProfile profile) {
+        if (listeningsType.equals(ListeningsType.INTERESTS)) {
+            return profile.getName();
+        } else {
+            return profile.getUsername();
+        }
     }
 
     public Observable<Boolean> getProgressObservable() {

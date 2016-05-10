@@ -213,8 +213,8 @@ public class ProfileViewHolders {
         }
     }
 
-    public static class MyProfileThreeIconsViewHolder extends ViewHolderManager.BaseViewHolder<ProfileAdapterItems.ThreeIconsAdapterItem> {
-        private final Context context;
+    public static class MyProfileThreeIconsViewHolder extends ViewHolderManager.BaseViewHolder<ProfileAdapterItems.MyProfileThreeIconsAdapterItem> {
+
         @Bind(R.id.profile_first_icon_value_tv)
         TextView firstIconValue;
         @Bind(R.id.profile_second_icon_value_tv)
@@ -226,6 +226,9 @@ public class ProfileViewHolders {
         @Bind(R.id.profile_third_icon_text_tv)
         TextView thirdIconText;
 
+        private final Context context;
+        private ProfileAdapterItems.MyProfileThreeIconsAdapterItem item;
+
         public MyProfileThreeIconsViewHolder(@Nonnull View itemView, Context context) {
             super(itemView);
             this.context = context;
@@ -233,7 +236,8 @@ public class ProfileViewHolders {
         }
 
         @Override
-        public void bind(@Nonnull ProfileAdapterItems.ThreeIconsAdapterItem item) {
+        public void bind(@Nonnull ProfileAdapterItems.MyProfileThreeIconsAdapterItem item) {
+            this.item = item;
             final User user = item.getUser();
 
             firstIconValue.setText(TextHelper.formatListenersNumber(user.getListenersCount()));
@@ -247,7 +251,7 @@ public class ProfileViewHolders {
 
         @OnClick(R.id.profile_fragment_listening)
         public void onListengsClick() {
-            context.startActivity(ListeningsActivity.newIntent(context, false));
+            item.onListengsClick();
         }
 
         @OnClick(R.id.my_profile_listeners)
@@ -257,7 +261,7 @@ public class ProfileViewHolders {
 
         @OnClick(R.id.my_profile_interests)
         public void onInterestsClick() {
-            context.startActivity(ListeningsActivity.newIntent(context, true));
+            item.onInterestsClick();
         }
     }
 

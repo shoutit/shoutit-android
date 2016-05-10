@@ -45,6 +45,7 @@ public abstract class ProfileActivity extends BaseActivity {
     private static final String KEY_OFFSET = "key_offset";
     protected static final int REQUEST_PROFILE_OPENED_FROM_PROFILE = 1;
     protected static final int REQUEST_CODE_FROM_EDIT_PROFILE = 2;
+    protected static final int REQUEST_CODE_PROFILE_UPDATED_FROM_LISTENINGS = 3;
 
     @Bind(R.id.profile_progress_bar)
     ProgressBar progressBar;
@@ -337,7 +338,10 @@ public abstract class ProfileActivity extends BaseActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK && (requestCode == REQUEST_PROFILE_OPENED_FROM_PROFILE || requestCode == REQUEST_CODE_FROM_EDIT_PROFILE)) {
+        if (resultCode == RESULT_OK &&
+                (requestCode == REQUEST_PROFILE_OPENED_FROM_PROFILE ||
+                        requestCode == REQUEST_CODE_FROM_EDIT_PROFILE ||
+                requestCode == REQUEST_CODE_PROFILE_UPDATED_FROM_LISTENINGS)) {
             // Need to refresh profile if returned from other profile to refresh related data.
             // And need to refresh profile if one was just edited
             presenter.refreshProfile();

@@ -24,6 +24,7 @@ import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.utils.rx.RxUtils;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
+import com.shoutit.app.android.view.profile.tagprofile.TagProfileActivity;
 
 import java.util.List;
 
@@ -65,10 +66,12 @@ public class ListeningsActivity extends BaseActivity {
         setContentView(R.layout.activity_listenings);
         ButterKnife.bind(this);
 
+        final boolean areInterests = checkNotNull(getIntent().getBooleanExtra(KEY_ARE_INTERESTS, false));
+
         recyclerView.setLayoutManager(new MyLinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
-        setUpToolbar();
+        setUpToolbar(areInterests);
 
         presenter.getAdapterItemsObservable()
                 .compose(this.<List<BaseAdapterItem>>bindToLifecycle())
@@ -87,18 +90,36 @@ public class ListeningsActivity extends BaseActivity {
                 .subscribe(new Action1<String>() {
                     @Override
                     public void call(String userName) {
-                        startActivityForResult(
-                                UserOrPageProfileActivity.newIntent(ListeningsActivity.this, userName),
-                                REQUEST_OPENED_PROFILE_WAS_LISTENED);
+                        if (areInterests) {
+                            startActivityForResult(
+                                    TagProfileActivity.newIntent(ListeningsActivity.this, userName),
+                                    REQUEST_OPENED_PROFILE_WAS_LISTENED);
+                        } else {
+                            startActivityForResult(
+                                    UserOrPageProfileActivity.newIntent(ListeningsActivity.this, userName),
+                                    REQUEST_OPENED_PROFILE_WAS_LISTENED);
+                        }
                     }
                 });
 
         presenter.getListenSuccessObservable()
                 .compose(this.<String>bindToLifecycle())
+                .doOnNext(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        setResult(RESULT_OK);
+                    }
+                })
                 .subscribe(RxUtils.listenMessageAction(this));
 
         presenter.getUnListenSuccessObservable()
                 .compose(this.<String>bindToLifecycle())
+                .doOnNext(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        setResult(RESULT_OK);
+                    }
+                })
                 .subscribe(RxUtils.unListenMessageAction(this));
 
         RxRecyclerView.scrollEvents(recyclerView)
@@ -107,11 +128,12 @@ public class ListeningsActivity extends BaseActivity {
                 .subscribe(presenter.getLoadMoreObserver());
     }
 
-    private void setUpToolbar() {
+    private void setUpToolbar(boolean areInterests) {
         setSupportActionBar(toolbar);
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle(R.string.listenings_ab_title);
+        actionBar.setTitle(areInterests ?
+                R.string.listenings_interests_ab_title : R.string.listenings_ab_title);
     }
 
     @Override
@@ -146,7 +168,7 @@ public class ListeningsActivity extends BaseActivity {
         final ListeningsActivityComponent component = DaggerListeningsActivityComponent
                 .builder()
                 .activityModule(new ActivityModule(this))
-                .listeningsActivityModule(new ListeningsActivityModule(this, listeningsType))
+                .listeningsActivityModule(new ListeningsActivityModule(listeningsType))
                 .appComponent(App.getAppComponent(getApplication()))
                 .build();
         component.inject(this);
