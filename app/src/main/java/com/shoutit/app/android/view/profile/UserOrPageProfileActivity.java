@@ -21,6 +21,7 @@ import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.view.chats.ChatActivity;
 import com.shoutit.app.android.view.chats.chatsfirstconversation.ChatFirstConversationActivity;
 import com.shoutit.app.android.view.editprofile.EditProfileActivity;
+import com.shoutit.app.android.view.listenings.ListeningsActivity;
 import com.shoutit.app.android.view.notifications.NotificationsActivity;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsActivity;
@@ -127,6 +128,28 @@ public class UserOrPageProfileActivity extends ProfileActivity {
                         startActivityForResult(
                                 EditProfileActivity.newIntent(UserOrPageProfileActivity.this),
                                 REQUEST_CODE_FROM_EDIT_PROFILE);
+                    }
+                });
+
+        presenter.getMyProfilePresenter()
+                .getListeningsClickObservable()
+                .compose(bindToLifecycle())
+                .subscribe(new Action1<Object>() {
+                    @Override
+                    public void call(Object o) {
+                        startActivityForResult(ListeningsActivity.newIntent(UserOrPageProfileActivity.this, false),
+                                REQUEST_CODE_PROFILE_UPDATED_FROM_LISTENINGS);
+                    }
+                });
+
+        presenter.getMyProfilePresenter()
+                .getInterestsClickObservable()
+                .compose(bindToLifecycle())
+                .subscribe(new Action1<Object>() {
+                    @Override
+                    public void call(Object o) {
+                        startActivityForResult(ListeningsActivity.newIntent(UserOrPageProfileActivity.this, true),
+                                REQUEST_CODE_PROFILE_UPDATED_FROM_LISTENINGS);
                     }
                 });
 

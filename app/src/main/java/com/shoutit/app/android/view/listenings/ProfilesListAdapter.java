@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.search.results.profiles;
+package com.shoutit.app.android.view.listenings;
 
 import android.content.Context;
 import android.view.View;
@@ -11,7 +11,7 @@ import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
-import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.TextHelper;
@@ -26,19 +26,21 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class SearchProfilesResultsAdapter extends BaseAdapter {
-    public static final int VIEW_TYPE_PROFILE = 1;
-    public static final int VIEW_TYPE_NO_RESULTS = 2;
+public class ProfilesListAdapter extends BaseAdapter {
+
+    private static final int VIEW_TYPE_PROFILE = 1;
+    private static final int VIEW_TYPE_EMPTY = 2;
 
     private final Picasso picasso;
 
     @Inject
-    public SearchProfilesResultsAdapter(@ForActivity @Nonnull Context context, Picasso picasso) {
+    public ProfilesListAdapter(@ForActivity Context context,
+                               Picasso picasso) {
         super(context);
         this.picasso = picasso;
     }
 
-    public class ProfileViewHolder extends ViewHolderManager.BaseViewHolder<SearchProfilesResultsPresenter.ProfileAdapterItem> {
+    public class ProfileViewHolder extends ViewHolderManager.BaseViewHolder<ListeningsProfileAdapterItem> {
 
         @Bind(R.id.profile_section_iv)
         ImageView avatarImageView;
@@ -47,10 +49,10 @@ public class SearchProfilesResultsAdapter extends BaseAdapter {
         @Bind(R.id.profile_section_listeners_tv)
         TextView listenerTextView;
         @Bind(R.id.profile_section_listening_iv)
-        ImageView listeningImageView;
+        ImageView listenImageView;
 
         private final Target target;
-        private SearchProfilesResultsPresenter.ProfileAdapterItem item;
+        private ListeningsProfileAdapterItem item;
 
         public ProfileViewHolder(@Nonnull View itemView) {
             super(itemView);
@@ -60,43 +62,36 @@ public class SearchProfilesResultsAdapter extends BaseAdapter {
         }
 
         @Override
-        public void bind(@Nonnull SearchProfilesResultsPresenter.ProfileAdapterItem item) {
+        public void bind(@Nonnull ListeningsProfileAdapterItem item) {
             this.item = item;
-            final User profile = item.getProfile();
+            final BaseProfile profile = item.getProfile();
 
             picasso.load(profile.getImage())
                     .placeholder(R.drawable.ic_rect_avatar_placeholder)
                     .into(target);
 
             nameTextView.setText(profile.getName());
+
             listenerTextView.setText(context.getString(R.string.profile_listeners,
                     TextHelper.formatListenersNumber(profile.getListenersCount())));
             setListeningIcon(profile.isListening());
         }
 
         private void setListeningIcon(boolean isListening) {
-            if (item.isProfileMine()) {
-                listeningImageView.setVisibility(View.GONE);
-            } else {
-                listeningImageView.setVisibility(View.VISIBLE);
-                listeningImageView.setImageDrawable(context.getResources().getDrawable(
-                        isListening ? R.drawable.ic_listening_on : R.drawable.ic_listening_off));
-            }
+            listenImageView.setVisibility(View.VISIBLE);
+            listenImageView.setImageDrawable(context.getResources().getDrawable(
+                    isListening ? R.drawable.ic_listening_on : R.drawable.ic_listening_off));
         }
 
         @OnClick(R.id.profile_section_listening_iv)
         public void onListenClicked() {
-            if (item.isUserLoggedIn()) {
-                setListeningIcon(!item.getProfile().isListening());
-                item.onProfileListened();
-            } else {
-                item.onActionOnlyForLoggedInUser();
-            }
+            setListeningIcon(!item.getProfile().isListening());
+            item.onProfileListened();
         }
 
         @OnClick(R.id.profile_section_container)
         public void onSectionItemSelected() {
-            item.onProfileItemSelected();
+            item.openProfile();
         }
     }
 
@@ -105,22 +100,22 @@ public class SearchProfilesResultsAdapter extends BaseAdapter {
         switch (viewType) {
             case VIEW_TYPE_PROFILE:
                 return new ProfileViewHolder(layoutInflater.inflate(R.layout.search_results_profile_item, parent, false));
-            case VIEW_TYPE_NO_RESULTS:
-                return new NoDataViewHolder(layoutInflater.inflate(R.layout.search_shouts_results_no_results, parent, false));
+            case VIEW_TYPE_EMPTY:
+                return new NoDataViewHolder(layoutInflater.inflate(R.layout.listenings_empty, parent, false));
             default:
-                throw new RuntimeException("Unknown view type: " + viewType);
+                throw new RuntimeException("Invalid view type: " + viewType);
         }
     }
 
     @Override
     public int getItemViewType(int position) {
         final BaseAdapterItem item = items.get(position);
-        if (item instanceof SearchProfilesResultsPresenter.ProfileAdapterItem) {
+        if (item instanceof ListeningsProfileAdapterItem) {
             return VIEW_TYPE_PROFILE;
         } else if (item instanceof NoDataAdapterItem) {
-            return VIEW_TYPE_NO_RESULTS;
+            return VIEW_TYPE_EMPTY;
         } else {
-            throw new RuntimeException("Unknown view type: " + item.getClass().getSimpleName());
+            throw new RuntimeException("Invalid view type: " + item.getClass().getSimpleName());
         }
     }
 }

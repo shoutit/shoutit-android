@@ -93,7 +93,7 @@ public class ProfileSectionViewHolder extends ViewHolderManager.BaseViewHolder<P
         }
     }
 
-    @OnClick(R.id.profile_section_selector)
+    @OnClick(R.id.profile_section_container)
     public void onSectionItemSelected() {
         item.onSectionItemSelected();
     }

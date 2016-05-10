@@ -17,6 +17,7 @@ import com.shoutit.app.android.utils.ImageHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.utils.TextHelper;
+import com.shoutit.app.android.view.listenings.ListeningsActivity;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -212,8 +213,8 @@ public class ProfileViewHolders {
         }
     }
 
-    public static class MyProfileThreeIconsViewHolder extends ViewHolderManager.BaseViewHolder<ProfileAdapterItems.ThreeIconsAdapterItem> {
-        private final Context context;
+    public static class MyProfileThreeIconsViewHolder extends ViewHolderManager.BaseViewHolder<ProfileAdapterItems.MyProfileThreeIconsAdapterItem> {
+
         @Bind(R.id.profile_first_icon_value_tv)
         TextView firstIconValue;
         @Bind(R.id.profile_second_icon_value_tv)
@@ -225,6 +226,9 @@ public class ProfileViewHolders {
         @Bind(R.id.profile_third_icon_text_tv)
         TextView thirdIconText;
 
+        private final Context context;
+        private ProfileAdapterItems.MyProfileThreeIconsAdapterItem item;
+
         public MyProfileThreeIconsViewHolder(@Nonnull View itemView, Context context) {
             super(itemView);
             this.context = context;
@@ -232,7 +236,8 @@ public class ProfileViewHolders {
         }
 
         @Override
-        public void bind(@Nonnull ProfileAdapterItems.ThreeIconsAdapterItem item) {
+        public void bind(@Nonnull ProfileAdapterItems.MyProfileThreeIconsAdapterItem item) {
+            this.item = item;
             final User user = item.getUser();
 
             firstIconValue.setText(TextHelper.formatListenersNumber(user.getListenersCount()));
@@ -242,6 +247,21 @@ public class ProfileViewHolders {
             thirdIconValue.setText(TextHelper.formatListenersNumber(user.getListeningCount().getTags()));
             ImageHelper.setStartCompoundRelativeDrawable(thirdIconValue, R.drawable.ic_tags);
             thirdIconText.setText(context.getString(R.string.profile_interests_label));
+        }
+
+        @OnClick(R.id.profile_fragment_listening)
+        public void onListengsClick() {
+            item.onListengsClick();
+        }
+
+        @OnClick(R.id.my_profile_listeners)
+        public void onListenersClick() {
+            // TODO add listeners
+        }
+
+        @OnClick(R.id.my_profile_interests)
+        public void onInterestsClick() {
+            item.onInterestsClick();
         }
     }
 

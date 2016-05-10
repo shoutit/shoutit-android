@@ -476,4 +476,12 @@
     <string name="video_calls_cannot_start_conversation">Sorry, cannot start this video call. Please try again later.</string>
     <string name="conversations_empty">No conversations</string>
 
+    <!-- Listenings -->
+    <string name="listenings_empty">You have no items here yet.</string>
+    <string name="listenings_ab_title">Listenings</string>
+    <string name="listers_ab_title">Listeners</string>
+    <string name="listening_tab_user">Users</string>
+    <string name="listening_tab_pages">Pages</string>
+    <string name="listenings_interests_ab_title">Interests</string>
+
 </resources>
