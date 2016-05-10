@@ -57,6 +57,8 @@ public class ListeningsDao {
         private final PublishSubject<Object> loadMoreSubject = PublishSubject.create();
         @Nonnull
         private final PublishSubject<Object> refreshSubject = PublishSubject.create();
+        @Nonnull
+        private PublishSubject<ResponseOrError<ListeningResponse>> updatedProfileLocallySubject = PublishSubject.create();
 
         private final ListeningsPresenter.ListeningsType listeningsType;
 
@@ -92,17 +94,16 @@ public class ListeningsDao {
             listeningObservable = loadMoreSubject.startWith((Object) null)
                     .lift(loadMoreOperator)
                     .compose(ResponseOrError.<ListeningResponse>toResponseOrErrorObservable())
+                    .mergeWith(updatedProfileLocallySubject)
                     .compose(MoreOperators.<ResponseOrError<ListeningResponse>>refresh(refreshSubject));
         }
 
         @Nonnull
         private Observable<ListeningResponse> getRequest(int page) {
             switch (ListeningsPresenter.ListeningsType.values()[listeningsType.ordinal()]) {
-                case USERS:
+                case USERS_AND_PAGES:
                     return apiService.usersListenings(page, PAGE_SIZE);
-                case PAGES:
-                    return apiService.pagesListenings(page, PAGE_SIZE);
-                case TAGS:
+                case INTERESTS:
                     return apiService.tagsListenings(page, PAGE_SIZE);
                 default:
                     throw new RuntimeException("Unknown listening type");
@@ -122,6 +123,11 @@ public class ListeningsDao {
         @Nonnull
         public Observer<Object> getRefreshSubject() {
             return refreshSubject;
+        }
+
+        @Nonnull
+        public Observer<ResponseOrError<ListeningResponse>> updatedResponseLocallyObserver() {
+            return updatedProfileLocallySubject;
         }
     }
 

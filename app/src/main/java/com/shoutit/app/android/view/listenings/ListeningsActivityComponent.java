@@ -13,6 +13,7 @@ import dagger.Component;
         dependencies = AppComponent.class,
         modules = {
                 ActivityModule.class,
+                ListeningsActivityModule.class
         }
 )
 public interface ListeningsActivityComponent extends BaseActivityComponent {

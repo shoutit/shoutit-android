@@ -11,7 +11,7 @@ import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
-import com.shoutit.app.android.api.model.ProfileType;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.TextHelper;
@@ -24,6 +24,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class ProfilesListAdapter extends BaseAdapter {
 
@@ -39,15 +40,16 @@ public class ProfilesListAdapter extends BaseAdapter {
         this.picasso = picasso;
     }
 
+    public class ProfileViewHolder extends ViewHolderManager.BaseViewHolder<ProfileAdapterItem> {
 
-    public class ProfileViewHolder extends ViewHolderManager.BaseViewHolder<ProfileAdapterItem> implements View.OnClickListener {
-
-        @Bind(R.id.profile_avatar_iv)
+        @Bind(R.id.profile_section_iv)
         ImageView avatarImageView;
-        @Bind(R.id.profile_name_tv)
+        @Bind(R.id.profile_section_name_tv)
         TextView nameTextView;
-        @Bind(R.id.profile_listeners_tv)
+        @Bind(R.id.profile_section_listeners_tv)
         TextView listenerTextView;
+        @Bind(R.id.profile_section_listening_iv)
+        ImageView listenImageView;
 
         private final Target target;
         private ProfileAdapterItem item;
@@ -57,13 +59,12 @@ public class ProfilesListAdapter extends BaseAdapter {
             ButterKnife.bind(this, itemView);
             target = PicassoHelper.getRoundedBitmapTarget(context, avatarImageView,
                     context.getResources().getDimensionPixelSize(R.dimen.profile_section_avatar_corners));
-            itemView.setOnClickListener(this);
         }
 
         @Override
         public void bind(@Nonnull ProfileAdapterItem item) {
             this.item = item;
-            final ProfileType profile = item.getProfile();
+            final BaseProfile profile = item.getProfile();
 
             picasso.load(profile.getImage())
                     .placeholder(R.drawable.ic_rect_avatar_placeholder)
@@ -73,10 +74,23 @@ public class ProfilesListAdapter extends BaseAdapter {
 
             listenerTextView.setText(context.getString(R.string.profile_listeners,
                     TextHelper.formatListenersNumber(profile.getListenersCount())));
+            setListeningIcon(profile.isListening());
         }
 
-        @Override
-        public void onClick(View v) {
+        private void setListeningIcon(boolean isListening) {
+            listenImageView.setVisibility(View.VISIBLE);
+            listenImageView.setImageDrawable(context.getResources().getDrawable(
+                    isListening ? R.drawable.ic_listening_on : R.drawable.ic_listening_off));
+        }
+
+        @OnClick(R.id.profile_section_listening_iv)
+        public void onListenClicked() {
+            setListeningIcon(!item.getProfile().isListening());
+            item.onProfileListened();
+        }
+
+        @OnClick(R.id.profile_section_container)
+        public void onSectionItemSelected() {
             item.openProfile();
         }
     }

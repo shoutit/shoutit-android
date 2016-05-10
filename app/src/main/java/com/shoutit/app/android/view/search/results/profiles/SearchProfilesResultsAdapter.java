@@ -94,7 +94,7 @@ public class SearchProfilesResultsAdapter extends BaseAdapter {
             }
         }
 
-        @OnClick(R.id.profile_section_selector)
+        @OnClick(R.id.profile_section_container)
         public void onSectionItemSelected() {
             item.onProfileItemSelected();
         }

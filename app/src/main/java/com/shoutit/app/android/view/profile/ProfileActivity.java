@@ -149,10 +149,22 @@ public abstract class ProfileActivity extends BaseActivity {
 
         presenter.getListenSuccessObservable()
                 .compose(this.<String>bindToLifecycle())
+                .doOnNext(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        setResult(RESULT_OK, null);
+                    }
+                })
                 .subscribe(RxUtils.listenMessageAction(this));
 
         presenter.getUnListenSuccessObservable()
                 .compose(this.<String>bindToLifecycle())
+                .doOnNext(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        setResult(RESULT_OK, null);
+                    }
+                })
                 .subscribe(RxUtils.unListenMessageAction(this));
 
     }
@@ -321,12 +333,6 @@ public abstract class ProfileActivity extends BaseActivity {
                 }
             }
         });
-    }
-
-    @Override
-    public void finish() {
-        setResult(RESULT_OK, null);
-        super.finish();
     }
 
     @Override
