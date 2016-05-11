@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.net.Uri;
 
 import com.google.common.base.Optional;
+import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.CreatePublicChatRequest;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.utils.ImageCaptureHelper;
 import com.shoutit.app.android.utils.ResourcesHelper;
@@ -19,6 +21,11 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import okhttp3.MediaType;
+import okhttp3.ResponseBody;
+import rx.Observable;
+import rx.schedulers.Schedulers;
+
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
@@ -31,6 +38,8 @@ public class CreatePublicChatPresenterTest {
 
     @Mock
     CreatePublicChatPresenter.CreatePublicChatView listener;
+    @Mock
+    ApiService mApiService;
     @Mock
     Intent intent;
     @Mock
@@ -47,7 +56,7 @@ public class CreatePublicChatPresenterTest {
         MockitoAnnotations.initMocks(this);
         PowerMockito.mockStatic(LocationResultHelper.class);
         PowerMockito.mockStatic(ResourcesHelper.class);
-        mCreatePublicChatPresenter = new CreatePublicChatPresenter(imageCaptureHelper, mContext);
+        mCreatePublicChatPresenter = new CreatePublicChatPresenter(imageCaptureHelper, mContext, mApiService, Schedulers.immediate(), Schedulers.immediate());
     }
 
     @Test
@@ -117,5 +126,61 @@ public class CreatePublicChatPresenterTest {
 
         //then
         verify(listener).setLocation(anyInt(), anyString());
+    }
+
+    @Test
+    public void whenConfirmClickedAndSubjectEmpty_showError() {
+        //given
+        mCreatePublicChatPresenter.register(listener);
+        when(listener.getData()).thenReturn(new CreatePublicChatPresenter.CreatePublicChatData(null, false, false));
+
+        //when
+        mCreatePublicChatPresenter.createClicked();
+
+        //then
+        verify(listener).subjectEmptyError();
+    }
+
+    @Test
+    public void whenConfirmClickedAndDataCorrect_showProgress() {
+        //given
+        mCreatePublicChatPresenter.register(listener);
+        when(mApiService.createPublicChat(any(CreatePublicChatRequest.class))).thenReturn(Observable.<ResponseBody>error(new RuntimeException("")));
+        when(listener.getData()).thenReturn(new CreatePublicChatPresenter.CreatePublicChatData("subject", false, false));
+
+        //when
+        mCreatePublicChatPresenter.createClicked();
+
+        //then
+        verify(listener).showProgress(true);
+    }
+
+    @Test
+    public void whenConfirmClickedAndDataCorrectAndCreatingSuccesful_finishActivity() {
+        //given
+        mCreatePublicChatPresenter.register(listener);
+        when(listener.getData()).thenReturn(new CreatePublicChatPresenter.CreatePublicChatData("subject", false, false));
+        when(mApiService.createPublicChat(any(CreatePublicChatRequest.class))).thenReturn(Observable.just(ResponseBody.create(MediaType.parse("*/*"), "")));
+
+        //when
+        mCreatePublicChatPresenter.createClicked();
+
+        //then
+        verify(listener).finish();
+    }
+
+    @Test
+    public void whenConfirmClickedAndDataCorrectAndCreatingFailed_showErrror() {
+        //given
+        mCreatePublicChatPresenter.register(listener);
+        when(listener.getData()).thenReturn(new CreatePublicChatPresenter.CreatePublicChatData("subject", false, false));
+        when(mApiService.createPublicChat(any(CreatePublicChatRequest.class))).thenReturn(Observable.<ResponseBody>error(new RuntimeException("")));
+
+        //when
+        mCreatePublicChatPresenter.createClicked();
+
+        //then
+        verify(listener).createRequestError();
+        verify(listener).showProgress(false);
     }
 }

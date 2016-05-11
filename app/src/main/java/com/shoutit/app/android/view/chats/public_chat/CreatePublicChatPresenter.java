@@ -7,12 +7,21 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.appunite.rx.dagger.NetworkScheduler;
+import com.appunite.rx.dagger.UiScheduler;
 import com.google.common.base.Optional;
+import com.google.common.base.Strings;
+import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.CreatePublicChatRequest;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.ImageCaptureHelper;
 import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.view.createshout.location.LocationResultHelper;
+
+import okhttp3.ResponseBody;
+import rx.Scheduler;
+import rx.functions.Action1;
 
 public class CreatePublicChatPresenter {
 
@@ -23,10 +32,21 @@ public class CreatePublicChatPresenter {
 
     private final ImageCaptureHelper mImageCaptureHelper;
     private final Context mContext;
+    @NonNull
+    private final ApiService mApiService;
+    private final Scheduler mNetworkScheduler;
+    private final Scheduler mUiScheduler;
 
-    public CreatePublicChatPresenter(@NonNull ImageCaptureHelper imageCaptureHelper, @ForActivity Context context) {
+    public CreatePublicChatPresenter(@NonNull ImageCaptureHelper imageCaptureHelper,
+                                     @NonNull @ForActivity Context context,
+                                     @NonNull ApiService apiService,
+                                     @NetworkScheduler Scheduler networkScheduler,
+                                     @UiScheduler Scheduler uiScheduler) {
         mImageCaptureHelper = imageCaptureHelper;
         mContext = context;
+        mApiService = apiService;
+        mNetworkScheduler = networkScheduler;
+        mUiScheduler = uiScheduler;
     }
 
     public void selectImageClicked() {
@@ -43,7 +63,31 @@ public class CreatePublicChatPresenter {
     }
 
     public void createClicked() {
-        // TODO
+        final CreatePublicChatData data = listener.getData();
+        if (!isDataCorrect(data)) {
+            listener.subjectEmptyError();
+        } else {
+            listener.showProgress(true);
+            mApiService.createPublicChat(new CreatePublicChatRequest(data.subject))
+                    .subscribeOn(mNetworkScheduler)
+                    .observeOn(mUiScheduler)
+                    .subscribe(new Action1<ResponseBody>() {
+                        @Override
+                        public void call(ResponseBody responseBody) {
+                            listener.finish();
+                        }
+                    }, new Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable throwable) {
+                            listener.createRequestError();
+                            listener.showProgress(false);
+                        }
+                    });
+        }
+    }
+
+    private boolean isDataCorrect(CreatePublicChatData data) {
+        return !Strings.isNullOrEmpty(data.subject);
     }
 
     public void register(@NonNull CreatePublicChatView listener) {
@@ -81,20 +125,16 @@ public class CreatePublicChatPresenter {
         }
     }
 
-    private static class CreatePublicChatData {
+    public static class CreatePublicChatData {
 
         private final String subject;
-        private final String photoUrl;
         private final boolean facebook;
         private final boolean twitter;
-        private final UserLocation location;
 
-        public CreatePublicChatData(String subject, String photoUrl, boolean facebook, boolean twitter, UserLocation location) {
+        public CreatePublicChatData(String subject, boolean facebook, boolean twitter) {
             this.subject = subject;
-            this.photoUrl = photoUrl;
             this.facebook = facebook;
             this.twitter = twitter;
-            this.location = location;
         }
     }
 
@@ -110,5 +150,12 @@ public class CreatePublicChatPresenter {
 
         void startSelectImageActivity();
 
+        void subjectEmptyError();
+
+        CreatePublicChatData getData();
+
+        void finish();
+
+        void createRequestError();
     }
 }
