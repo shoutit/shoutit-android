@@ -38,6 +38,7 @@ import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.utils.rx.Actions1;
 import com.shoutit.app.android.view.createshout.location.LocationActivity;
+import com.shoutit.app.android.view.createshout.location.LocationResultHelper;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -400,7 +401,7 @@ public class EditProfileActivity extends BaseActivity {
                 }
                 break;
             case REQUEST_CODE_LOCATION:
-                final UserLocation userLocation = (UserLocation) data.getSerializableExtra(LocationActivity.EXTRAS_USER_LOCATION);
+                final UserLocation userLocation = LocationResultHelper.getLocationFromIntent(data);
                 presenter.onLocationChanged(userLocation);
                 break;
             default:

@@ -48,6 +48,7 @@ import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.view.createshout.DialogsHelper;
 import com.shoutit.app.android.view.createshout.ShoutMediaPresenter;
 import com.shoutit.app.android.view.createshout.location.LocationActivity;
+import com.shoutit.app.android.view.createshout.location.LocationResultHelper;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
 import com.shoutit.app.android.widget.CurrencySpinnerAdapter;
 import com.shoutit.app.android.widget.SimpleCurrencySpinnerAdapter;
@@ -219,7 +220,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == LOCATION_REQUEST && resultCode == RESULT_OK) {
-            final UserLocation userLocation = (UserLocation) data.getSerializableExtra(LocationActivity.EXTRAS_USER_LOCATION);
+            final UserLocation userLocation = LocationResultHelper.getLocationFromIntent(data);
             mEditShoutPresenter.updateLocation(userLocation);
         } else if (requestCode == MEDIA_REQUEST_CODE && resultCode == RESULT_OK) {
             final Bundle extras = data.getExtras();

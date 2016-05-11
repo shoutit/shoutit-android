@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.chats.public_chat;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -8,17 +9,24 @@ import android.support.annotation.Nullable;
 
 import com.google.common.base.Optional;
 import com.shoutit.app.android.api.model.UserLocation;
+import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.ImageCaptureHelper;
+import com.shoutit.app.android.utils.ResourcesHelper;
+import com.shoutit.app.android.view.createshout.location.LocationResultHelper;
 
 public class CreatePublicChatPresenter {
+
+    public static final int RESULT_OK = -1;
 
     private State state = State.empty();
     private CreatePublicChatView listener;
 
     private final ImageCaptureHelper mImageCaptureHelper;
+    private final Context mContext;
 
-    public CreatePublicChatPresenter(ImageCaptureHelper imageCaptureHelper) {
+    public CreatePublicChatPresenter(@NonNull ImageCaptureHelper imageCaptureHelper, @ForActivity Context context) {
         mImageCaptureHelper = imageCaptureHelper;
+        mContext = context;
     }
 
     public void selectImageClicked() {
@@ -31,12 +39,7 @@ public class CreatePublicChatPresenter {
     }
 
     public void selectLocationClicked() {
-        if (state.location == null) {
-            listener.startSelectLocationActivity();
-        } else {
-            state = new State(state.url, null);
-            listener.setLocation(null);
-        }
+        listener.startSelectLocationActivity();
     }
 
     public void createClicked() {
@@ -57,22 +60,11 @@ public class CreatePublicChatPresenter {
     }
 
     public void onLocationActivityFinished(int resultCode, Intent data) {
-        final Optional<UserLocation> uriOptional = getLocation(resultCode, data);
-        if (uriOptional.isPresent()) {
-            final UserLocation userLocation = uriOptional.get();
-            state = new State(state.url, userLocation);
-            listener.setLocation(formatLocation(userLocation));
+        if (resultCode == RESULT_OK) {
+            final UserLocation location = LocationResultHelper.getLocationFromIntent(data);
+            state = new State(state.url, location);
+            listener.setLocation(ResourcesHelper.getResourceIdForName(location.getCountry(), mContext), location.getCity());
         }
-    }
-
-    @NonNull
-    private String formatLocation(UserLocation userLocation) {
-        return null; // TODO
-    }
-
-    @NonNull
-    private Optional<UserLocation> getLocation(int resultCode, Intent data) {
-        return null; // TODO
     }
 
     private static class State {
@@ -110,7 +102,7 @@ public class CreatePublicChatPresenter {
 
         void showProgress(boolean show);
 
-        void setLocation(@Nullable String location);
+        void setLocation(int flag, @Nullable String location);
 
         void setImage(@Nullable Uri imageUrl);
 
