@@ -10,6 +10,7 @@ import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.adapteritems.BaseProfileAdapterItem;
 import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.dagger.ForActivity;
@@ -40,7 +41,7 @@ public class ProfilesListAdapter extends BaseAdapter {
         this.picasso = picasso;
     }
 
-    public class ProfileViewHolder extends ViewHolderManager.BaseViewHolder<ListeningsProfileAdapterItem> {
+    public class ProfileViewHolder extends ViewHolderManager.BaseViewHolder<BaseProfileAdapterItem> {
 
         @Bind(R.id.profile_section_iv)
         ImageView avatarImageView;
@@ -52,7 +53,7 @@ public class ProfilesListAdapter extends BaseAdapter {
         ImageView listenImageView;
 
         private final Target target;
-        private ListeningsProfileAdapterItem item;
+        private BaseProfileAdapterItem item;
 
         public ProfileViewHolder(@Nonnull View itemView) {
             super(itemView);
@@ -62,7 +63,7 @@ public class ProfilesListAdapter extends BaseAdapter {
         }
 
         @Override
-        public void bind(@Nonnull ListeningsProfileAdapterItem item) {
+        public void bind(@Nonnull BaseProfileAdapterItem item) {
             this.item = item;
             final BaseProfile profile = item.getProfile();
 
@@ -110,7 +111,7 @@ public class ProfilesListAdapter extends BaseAdapter {
     @Override
     public int getItemViewType(int position) {
         final BaseAdapterItem item = items.get(position);
-        if (item instanceof ListeningsProfileAdapterItem) {
+        if (item instanceof BaseProfileAdapterItem) {
             return VIEW_TYPE_PROFILE;
         } else if (item instanceof NoDataAdapterItem) {
             return VIEW_TYPE_EMPTY;

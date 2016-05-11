@@ -8,6 +8,7 @@ import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
+import com.shoutit.app.android.adapteritems.BaseProfileAdapterItem;
 import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.BaseProfile;
@@ -169,18 +170,32 @@ public class ListenersPresenter {
         return response;
     }
 
+    @Nonnull
     public Observable<Boolean> getProgressObservable() {
         return progressObservable;
     }
 
+    @Nonnull
     public Observable<Throwable> getErrorObservable() {
         return errorObservable;
     }
 
+    @Nonnull
     public Observable<List<BaseAdapterItem>> getAdapterItemsObservable() {
         return adapterItemsObservable;
     }
 
+    @Nonnull
+    public Observable<String> getListenSuccessObservable() {
+        return listenSuccess;
+    }
+
+    @Nonnull
+    public Observable<String> getUnListenSuccessObservable() {
+        return unListenSuccess;
+    }
+
+    @Nonnull
     public Observable<String> getProfileToOpenObservable() {
         return openProfileSubject;
     }
@@ -196,7 +211,7 @@ public class ListenersPresenter {
                 .getLoadMoreObserver());
     }
 
-    public static class ListenersAdapterItem extends BaseNoIDAdapterItem {
+    public static class ListenersAdapterItem extends BaseProfileAdapterItem {
 
         @Nonnull
         private final BaseProfile profile;
@@ -209,26 +224,19 @@ public class ListenersPresenter {
         public ListenersAdapterItem(@Nonnull BaseProfile profile,
                                     @Nonnull Observer<String> openProfileObserver,
                                     @Nonnull Observer<BaseProfile> profileListenedObserver) {
+            super(profile, openProfileObserver, profileListenedObserver);
             this.profile = profile;
             this.openProfileObserver = openProfileObserver;
             this.profileListenedObserver = profileListenedObserver;
         }
 
+        @Override
         public void openProfile() {
             openProfileObserver.onNext(profile.getUsername());
         }
 
         public void onProfileListened() {
             profileListenedObserver.onNext(profile);
-        }
-
-        private String getProfileId() {
-            return profile.getUsername();
-        }
-
-        @Nonnull
-        public BaseProfile getProfile() {
-            return profile;
         }
 
         @Override

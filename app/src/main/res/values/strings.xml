@@ -484,4 +484,7 @@
     <string name="listening_tab_pages">Pages</string>
     <string name="listenings_interests_ab_title">Interests</string>
 
+    <!-- Listeners -->
+    <string name="listeners_ab_title">Listeners</string>
+
 </resources>

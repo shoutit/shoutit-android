@@ -26,6 +26,8 @@ public class MyProfileHalfPresenter {
     private final PublishSubject<Object> listeningsClickObserver = PublishSubject.create();
     @Nonnull
     private final PublishSubject<Object> interestsClickObserver = PublishSubject.create();
+    @Nonnull
+    private final PublishSubject<Object> listenersClickObserver = PublishSubject.create();
 
     @Inject
     public MyProfileHalfPresenter(@ForActivity Context context) {
@@ -39,7 +41,8 @@ public class MyProfileHalfPresenter {
     }
 
     public ProfileAdapterItems.MyProfileThreeIconsAdapterItem getThreeIconsAdapterItem(@Nonnull User user) {
-        return new ProfileAdapterItems.MyProfileThreeIconsAdapterItem(user, listeningsClickObserver, interestsClickObserver);
+        return new ProfileAdapterItems.MyProfileThreeIconsAdapterItem(
+                user, listeningsClickObserver, interestsClickObserver, listenersClickObserver);
     }
 
     public String getShoutsHeaderTitle() {
@@ -69,5 +72,10 @@ public class MyProfileHalfPresenter {
     @Nonnull
     public Observable<Object> getInterestsClickObservable() {
         return interestsClickObserver;
+    }
+
+    @Nonnull
+    public Observable<Object> getListenersClickObservable() {
+        return listenersClickObserver;
     }
 }
