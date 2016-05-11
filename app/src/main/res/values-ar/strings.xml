@@ -358,8 +358,7 @@
 <string name="chat_show_map">"إظهار الخريطة"</string>
 <string name="chat_attatchment">"المرفقات"</string>
 <string name="chat_video_call">"مكالمة فيديو"</string>
-<string name="chats_attatchments_photo">"صورة"</string>
-<string name="chats_attatchments_video">"فيديو"</string>
+<string name="chats_attatchments_media">"صورة"</string>
 <string name="chats_attatchments_shout">"إعلان"</string>
 <string name="chats_attatchments_location">"الموقع"</string>
 <string name="chat_edit_text_hint">"اكتب رسالة"</string>

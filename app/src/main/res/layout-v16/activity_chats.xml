@@ -164,7 +164,7 @@
         android:background="@color/white97"
         android:elevation="4dp"
         android:clickable="true"
-        tools:visibility="gone"
+        tools:visibility="visible"
         android:visibility="gone">
 
         <GridLayout
@@ -181,7 +181,7 @@
                 android:orientation="vertical">
 
                 <ImageButton
-                    android:id="@+id/chats_attatchments_photo"
+                    android:id="@+id/chats_attatchments_media"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="?selectableItemBackgroundBorderless"
@@ -192,7 +192,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="2dp"
-                    android:text="@string/chats_attatchments_photo"/>
+                    android:text="@string/chats_attatchments_media"/>
             </LinearLayout>
 
             <LinearLayout
@@ -202,7 +202,7 @@
                 android:orientation="vertical">
 
                 <ImageButton
-                    android:id="@+id/chats_attatchments_video"
+                    android:id="@+id/chats_attatchments_profile"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="?selectableItemBackgroundBorderless"
@@ -213,7 +213,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="2dp"
-                    android:text="@string/chats_attatchments_video"/>
+                    android:text="@string/chats_attatchments_profile"/>
             </LinearLayout>
 
             <LinearLayout

@@ -340,14 +340,14 @@ public class ChatActivity extends BaseActivity implements Listener {
         super.onDestroy();
     }
 
-    @OnClick(R.id.chats_attatchments_video)
-    void videoClicked() {
-        startActivityForResult(RecordMediaActivity.newIntent(this, true, true, true, false), REQUEST_ATTACHMENT);
+    @OnClick(R.id.chats_attatchments_profile)
+    void onProfileClicked() {
+        // TODO
     }
 
-    @OnClick(R.id.chats_attatchments_photo)
-    void photoClicked() {
-        startActivityForResult(RecordMediaActivity.newIntent(this, true, false, true, false), REQUEST_ATTACHMENT);
+    @OnClick(R.id.chats_attatchments_media)
+    void onMediaClicked() {
+        startActivityForResult(RecordMediaActivity.newIntent(this, true, true, true, false), REQUEST_ATTACHMENT);
     }
 
     @OnClick(R.id.chats_attatchments_shout)
