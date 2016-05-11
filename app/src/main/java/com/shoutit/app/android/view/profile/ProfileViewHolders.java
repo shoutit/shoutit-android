@@ -256,7 +256,7 @@ public class ProfileViewHolders {
 
         @OnClick(R.id.my_profile_listeners)
         public void onListenersClick() {
-            // TODO add listeners
+            item.onListenersClick();
         }
 
         @OnClick(R.id.my_profile_interests)

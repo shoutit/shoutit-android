@@ -84,6 +84,10 @@
         android:layout_height="wrap_content"
         android:layout_toEndOf="@+id/profile_fragment_listening"
         android:layout_toRightOf="@+id/profile_fragment_listening"
+        android:paddingLeft="2dp"
+        android:paddingRight="2dp"
+        android:paddingBottom="2dp"
+        android:background="?android:selectableItemBackground"
         android:paddingTop="16dp"
         android:gravity="center"
         android:orientation="vertical">
