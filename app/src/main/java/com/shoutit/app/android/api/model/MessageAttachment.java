@@ -15,19 +15,32 @@ public class MessageAttachment {
     public static final String ATTACHMENT_TYPE_SHOUT = "shout";
     public static final String ATTACHMENT_TYPE_LOCATION = "location";
     public static final String ATTACHMENT_TYPE_MEDIA = "media";
+    public static final String ATTACHMENT_TYPE_PROFILE = "profile";
 
     private final String type;
     private final MessageLocation location;
     private final AttachtmentShout shout;
     private final List<String> images;
     private final List<Video> videos;
+    private final MessageProfile profile;
 
-    public MessageAttachment(String type, MessageLocation location, AttachtmentShout shout, List<String> image, List<Video> video) {
+    public MessageAttachment(String type, MessageLocation location, AttachtmentShout shout,
+                             List<String> image, List<Video> video, MessageProfile profile) {
         this.type = type;
         this.location = location;
         this.shout = shout;
         this.images = image;
         this.videos = video;
+        this.profile = profile;
+    }
+
+    public static class MessageProfile {
+        @Nonnull
+        private final String id;
+
+        public MessageProfile(@Nonnull String id) {
+            this.id = id;
+        }
     }
 
     public static class MessageLocation {

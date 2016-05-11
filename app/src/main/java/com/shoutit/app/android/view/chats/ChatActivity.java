@@ -71,6 +71,7 @@ public class ChatActivity extends BaseActivity implements Listener {
     private static final int REQUEST_ATTACHMENT = 0;
     private static final int REQUEST_LOCATION = 1;
     private static final int SELECT_SHOUT_REQUEST_CODE = 2;
+    private static final int SELECT_PROFILE_REQUEST_CODE = 3;
 
     private static final String TAG = ChatActivity.class.getCanonicalName();
 
@@ -398,6 +399,9 @@ public class ChatActivity extends BaseActivity implements Listener {
         } else if (requestCode == SELECT_SHOUT_REQUEST_CODE && resultCode == RESULT_OK) {
             final String shoutId = data.getStringExtra(SelectShoutActivity.RESULT_SHOUT_ID);
             presenter.sendShout(shoutId);
+        } else if (requestCode == SELECT_PROFILE_REQUEST_CODE && resultCode == RESULT_OK) {
+            final String profileId = data.getStringExtra(SelectProfileActivity.RESULT_PROFILE_ID);
+            presenter.sendProfile(profileId);
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }

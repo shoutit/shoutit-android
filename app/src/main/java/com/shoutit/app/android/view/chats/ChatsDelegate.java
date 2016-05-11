@@ -346,7 +346,16 @@ public class ChatsDelegate {
         } else if (images != null && !images.isEmpty()) {
             thumbnail = images.get(0);
         }
-        return new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_LOCATION, null, new MessageAttachment.AttachtmentShout(shoutId, null, null, shoutResponse.getType(), shoutResponse.getLocation(), shoutResponse.getTitle(), shoutResponse.getText(), shoutResponse.getPrice(), 0, shoutResponse.getCurrency(), thumbnail, videoUrl, shoutResponse.getProfile(), shoutResponse.getCategory(), shoutResponse.getDatePublished(), 0), null, null)));
+        return new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_SHOUT, null,
+                new MessageAttachment.AttachtmentShout(shoutId, null, null, shoutResponse.getType(),
+                        shoutResponse.getLocation(), shoutResponse.getTitle(), shoutResponse.getText(),
+                        shoutResponse.getPrice(), 0, shoutResponse.getCurrency(), thumbnail, videoUrl,
+                        shoutResponse.getProfile(), shoutResponse.getCategory(), shoutResponse.getDatePublished(), 0), null, null, null)));
+    }
+
+    public PostMessage getProfileMessage(String profileId) {
+        return new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_PROFILE,
+                null, null, null, null, new MessageAttachment.MessageProfile(profileId))));
     }
 
     public Subscription deleteConversation(String conversationId) {
@@ -372,7 +381,8 @@ public class ChatsDelegate {
     }
 
     public PostMessage getLocationMessage(double latitude, double longitude) {
-        return new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_LOCATION, new MessageAttachment.MessageLocation(latitude, longitude), null, null, null)));
+        return new PostMessage(null, ImmutableList.of(new MessageAttachment(
+                MessageAttachment.ATTACHMENT_TYPE_LOCATION, new MessageAttachment.MessageLocation(latitude, longitude), null, null, null, null)));
     }
 
     public Subscription addMedia(@NonNull String media, boolean isVideo, Func1<Video, Observable<Message>> videoToMessageFunc, Func1<String, Observable<Message>> photoToMessageFunc, final String conversationId) {
