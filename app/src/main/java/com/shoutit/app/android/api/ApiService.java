@@ -20,6 +20,7 @@ import com.shoutit.app.android.api.model.EditShoutRequest;
 import com.shoutit.app.android.api.model.EditShoutRequestWithPrice;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.GuestSignupRequest;
+import com.shoutit.app.android.api.model.ListenersResponse;
 import com.shoutit.app.android.api.model.ListeningResponse;
 import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessagesResponse;
@@ -280,7 +281,7 @@ public interface ApiService {
                                                   @Query("page_size") Integer pageSize);
 
     @GET("profiles/{user_name}/listeners")
-    Observable<ListeningResponse> listeners(@Path("user_name") String userName,
+    Observable<ListenersResponse> listeners(@Path("user_name") String userName,
                                             @Query("page") Integer page,
                                             @Query("page_size") Integer pageSize);
 

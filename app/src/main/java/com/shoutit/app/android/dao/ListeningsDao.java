@@ -97,18 +97,6 @@ public class ListeningsDao {
                     .lift(loadMoreOperator)
                     .compose(MoreOperators.<ListeningResponse>refresh(refreshSubject))
                     .compose(ResponseOrError.<ListeningResponse>toResponseOrErrorObservable())
-                    .doOnNext(new Action1<ResponseOrError<ListeningResponse>>() {
-                        @Override
-                        public void call(ResponseOrError<ListeningResponse> listeningResponseResponseOrError) {
-
-                        }
-                    })
-                    .doOnError(new Action1<Throwable>() {
-                        @Override
-                        public void call(Throwable throwable) {
-
-                        }
-                    })
                     .mergeWith(updatedProfileLocallySubject)
                     .mergeWith(Observable.<ResponseOrError<ListeningResponse>>never());
 
