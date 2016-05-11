@@ -303,7 +303,8 @@ public class ChatsPresenter {
         mSubscribe.add(mChatsDelegate.addMedia(media, isVideo, new Func1<Video, Observable<Message>>() {
             @Override
             public Observable<Message> call(Video video) {
-                return mApiService.postMessage(conversationId, new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_MEDIA, null, null, null, ImmutableList.of(video)))))
+                return mApiService.postMessage(conversationId, new PostMessage(null, ImmutableList.of(
+                        new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_MEDIA, null, null, null, ImmutableList.of(video), null))))
                         .subscribeOn(mNetworkScheduler)
                         .observeOn(mUiScheduler);
             }
@@ -312,7 +313,8 @@ public class ChatsPresenter {
             public Observable<Message> call(String url) {
                 return mApiService.postMessage(
                         conversationId,
-                        new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_MEDIA, null, null, ImmutableList.of(url), null))))
+                        new PostMessage(null, ImmutableList.of(new MessageAttachment(
+                                MessageAttachment.ATTACHMENT_TYPE_MEDIA, null, null, ImmutableList.of(url), null, null))))
                         .subscribeOn(mNetworkScheduler)
                         .observeOn(mUiScheduler);
             }

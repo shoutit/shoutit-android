@@ -352,13 +352,15 @@ public class ChatsFirstConversationPresenter {
         mSubscribe.add(mChatsDelegate.addMedia(media, isVideo, new Func1<Video, Observable<Message>>() {
             @Override
             public Observable<Message> call(Video video) {
-                final PostMessage message = new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_MEDIA, null, null, null, ImmutableList.of(video))));
+                final PostMessage message = new PostMessage(null, ImmutableList.of(
+                        new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_MEDIA, null, null, null, ImmutableList.of(video), null)));
                 return sendMessage(message);
             }
         }, new Func1<String, Observable<Message>>() {
             @Override
             public Observable<Message> call(String url) {
-                final PostMessage message = new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_MEDIA, null, null, ImmutableList.of(url), null)));
+                final PostMessage message = new PostMessage(null, ImmutableList.of(
+                        new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_MEDIA, null, null, ImmutableList.of(url), null, null)));
                 return sendMessage(message);
             }
         }, conversationId));
@@ -384,13 +386,16 @@ public class ChatsFirstConversationPresenter {
     }
 
     public void sendShout(final String shoutId) {
+        // TODO check if needs to get shout
         mSubscribe.add(mApiService.getShout(shoutId)
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
                 .flatMap(new Func1<ShoutResponse, Observable<Message>>() {
                     @Override
                     public Observable<Message> call(ShoutResponse shoutResponse) {
-                        return sendMessage(mChatsDelegate.getShoutMessage(shoutResponse, shoutId));
+                        return sendMessage(mChatsDelegate.getShoutMessage(shoutResponse, shoutId))
+                                .subscribeOn(mNetworkScheduler)
+                                .observeOn(mUiScheduler);
                     }
                 })
                 .subscribe(new Action1<Message>() {
@@ -400,6 +405,21 @@ public class ChatsFirstConversationPresenter {
                         mListener.hideAttatchentsMenu();
                     }
                 }, getOnError()));
+    }
+
+    public void sendProfile(@Nonnull String profileId) {
+        mSubscribe.add(
+                mApiService.postMessage(conversationId, mChatsDelegate.getProfileMessage(profileId))
+                        .subscribeOn(mNetworkScheduler)
+                        .observeOn(mUiScheduler)
+                        .subscribe(new Action1<Message>() {
+                            @Override
+                            public void call(Message message) {
+                                mChatsDelegate.postLocalMessage(message, conversationId);
+                                mListener.hideAttatchentsMenu();
+                            }
+                        }, getOnError())
+        );
     }
 
     public void sendTyping() {

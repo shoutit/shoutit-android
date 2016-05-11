@@ -19,7 +19,7 @@ public class ListenersProfileAdapterItem extends BaseProfileAdapterItem {
     public ListenersProfileAdapterItem(@Nonnull BaseProfile profile,
                                        @Nonnull Observer<String> openProfileObserver,
                                        @Nonnull Observer<BaseProfile> profileListenedObserver) {
-        super(profile, openProfileObserver, profileListenedObserver);
+        super(profile, profileListenedObserver);
         this.profile = profile;
         this.openProfileObserver = openProfileObserver;
     }

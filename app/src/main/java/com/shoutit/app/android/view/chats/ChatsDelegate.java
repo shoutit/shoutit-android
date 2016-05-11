@@ -324,6 +324,9 @@ public class ChatsDelegate {
             } else if (MessageAttachment.ATTACHMENT_TYPE_SHOUT.equals(type)) {
                 final MessageAttachment.AttachtmentShout shout = messageAttachment.getShout();
                 return new SentShoutMessage(shout.getThumbnailOrNull(), time, PriceUtils.formatPriceWithCurrency(shout.getPrice(), mResources, shout.getCurrency()), shout.getText(), shout.getUser().getName(), mListener, shout.getId());
+            } else if (MessageAttachment.ATTACHMENT_TYPE_PROFILE.equals(type)) {
+                // TODO finished here !!
+                final MessageAttachment.MessageProfile profile = messageAttachment.getProfile();
             } else {
                 throw new RuntimeException(type);
             }

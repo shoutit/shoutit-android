@@ -11,15 +11,11 @@ public abstract class BaseProfileAdapterItem extends BaseNoIDAdapterItem {
     @Nonnull
     private final BaseProfile profile;
     @Nonnull
-    private final Observer<String> openProfileObserver;
-    @Nonnull
     private final Observer<BaseProfile> profileListenedObserver;
 
     public BaseProfileAdapterItem(@Nonnull BaseProfile profile,
-                                        @Nonnull Observer<String> openProfileObserver,
                                         @Nonnull Observer<BaseProfile> profileListenedObserver) {
         this.profile = profile;
-        this.openProfileObserver = openProfileObserver;
         this.profileListenedObserver = profileListenedObserver;
     }
 

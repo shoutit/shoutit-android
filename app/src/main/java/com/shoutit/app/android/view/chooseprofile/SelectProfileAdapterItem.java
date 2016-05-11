@@ -8,17 +8,22 @@ import javax.annotation.Nonnull;
 
 import rx.Observer;
 
-public class SelectProfileAdpaterItem extends BaseNoIDAdapterItem {
+public class SelectProfileAdapterItem extends BaseNoIDAdapterItem {
 
     @Nonnull
     private final Observer<String> profileSelectedObserver;
     @Nonnull
     private final BaseProfile baseProfile;
 
-    public SelectProfileAdpaterItem(@Nonnull Observer<String> profileSelectedObserver,
+    public SelectProfileAdapterItem(@Nonnull Observer<String> profileSelectedObserver,
                                     @Nonnull BaseProfile baseProfile) {
         this.profileSelectedObserver = profileSelectedObserver;
         this.baseProfile = baseProfile;
+    }
+
+    @Nonnull
+    public BaseProfile getProfile() {
+        return baseProfile;
     }
 
     public void onProfileSelected() {
@@ -27,12 +32,12 @@ public class SelectProfileAdpaterItem extends BaseNoIDAdapterItem {
 
     @Override
     public boolean matches(@Nonnull BaseAdapterItem item) {
-        return item instanceof SelectProfileAdpaterItem &&
-                baseProfile.getId().equals(((SelectProfileAdpaterItem) item).baseProfile.getId());
+        return item instanceof SelectProfileAdapterItem &&
+                baseProfile.getId().equals(((SelectProfileAdapterItem) item).baseProfile.getId());
     }
 
     @Override
     public boolean same(@Nonnull BaseAdapterItem item) {
-        return baseProfile.equals(((SelectProfileAdpaterItem) item).baseProfile);
+        return baseProfile.equals(((SelectProfileAdapterItem) item).baseProfile);
     }
 }

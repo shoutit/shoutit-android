@@ -43,6 +43,7 @@ import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.utils.TextWatcherAdapter;
 import com.shoutit.app.android.view.chats.ChatsHelper;
 import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
+import com.shoutit.app.android.view.chooseprofile.SelectProfileActivity;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.shoutit.app.android.view.shouts.selectshout.SelectShoutActivity;
@@ -68,6 +69,7 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
     private static final int REQUEST_ATTACHMENT = 0;
     private static final int REQUEST_LOCATION = 1;
     private static final int SELECT_SHOUT_REQUEST_CODE = 2;
+    private static final int SELECT_PROFILE_REQUEST_CODE = 3;
 
     private static final String TAG = ChatFirstConversationActivity.class.getCanonicalName();
 
@@ -336,13 +338,13 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
     }
 
     @OnClick(R.id.chats_attatchments_profile)
-    void videoClicked() {
-        startActivityForResult(RecordMediaActivity.newIntent(this, true, true, true, false), REQUEST_ATTACHMENT);
+    void profileClicked() {
+        startActivityForResult(SelectProfileActivity.newIntent(this), SELECT_PROFILE_REQUEST_CODE);
     }
 
     @OnClick(R.id.chats_attatchments_media)
-    void photoClicked() {
-        startActivityForResult(RecordMediaActivity.newIntent(this, true, false, true, false), REQUEST_ATTACHMENT);
+    void mediaClicked() {
+        startActivityForResult(RecordMediaActivity.newIntent(this, true, true, true, false), REQUEST_ATTACHMENT);
     }
 
     @OnClick(R.id.chats_attatchments_shout)
@@ -393,6 +395,9 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
         } else if (requestCode == SELECT_SHOUT_REQUEST_CODE && resultCode == RESULT_OK) {
             final String shoutId = data.getStringExtra(SelectShoutActivity.RESULT_SHOUT_ID);
             presenter.sendShout(shoutId);
+        } else if (requestCode == SELECT_PROFILE_REQUEST_CODE && resultCode == RESULT_OK) {
+            final String profileId = data.getStringExtra(SelectProfileActivity.RESULT_PROFILE_ID);
+            presenter.sendProfile(profileId);
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }

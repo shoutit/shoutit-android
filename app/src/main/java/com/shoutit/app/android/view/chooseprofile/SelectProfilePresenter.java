@@ -20,7 +20,6 @@ import com.shoutit.app.android.view.listenings.ListeningsPresenter;
 import java.util.List;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Observer;
@@ -43,7 +42,6 @@ public class SelectProfilePresenter {
     private PublishSubject<Object> loadMoreListenings = PublishSubject.create();
     private PublishSubject<Object> loadMoreListeners = PublishSubject.create();
 
-    @Inject
     public SelectProfilePresenter(@Nonnull ListeningsDao listeningsDao,
                                   @Nonnull ListenersDaos listenersDao,
                                   @UiScheduler Scheduler uiScheduler) {
@@ -51,13 +49,13 @@ public class SelectProfilePresenter {
         final Observable<ResponseOrError<ListeningResponse>> listeningsObservable = listeningsDao
                 .getDao(ListeningsPresenter.ListeningsType.USERS_AND_PAGES)
                 .getListeningObservable()
-                .subscribeOn(uiScheduler)
+                .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<ListeningResponse>>behaviorRefCount());
 
         final Observable<ResponseOrError<ListenersResponse>> listenersObservable = listenersDao
                 .getDao(User.ME)
                 .getLstenersObservable()
-                .subscribeOn(uiScheduler)
+                .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<ListenersResponse>>behaviorRefCount());
 
         listeningsAdapterItems = listeningsObservable
@@ -91,11 +89,35 @@ public class SelectProfilePresenter {
 
     }
 
-    public Observer<Object> getLoadMoreListeners() {
+    public Observer<Object> getLoadMoreListenersObserver() {
         return loadMoreListeners;
     }
 
-    public Observer<Object> getLoadMoreListenings() {
+    @Nonnull
+    public Observable<List<BaseAdapterItem>> getListeningsAdapterItems() {
+        return listeningsAdapterItems;
+    }
+
+    @Nonnull
+    public Observable<List<BaseAdapterItem>> getListenersAdapterItems() {
+        return listenersAdapterItems;
+    }
+
+    @Nonnull
+    public Observable<Boolean> getProgressObservable() {
+        return progressObservable;
+    }
+
+    @Nonnull
+    public Observable<Throwable> getErrorObservable() {
+        return errorObservable;
+    }
+
+    public Observable<String> getProfileSelectedObservable() {
+        return profileSelectedSubject;
+    }
+
+    public Observer<Object> getLoadMoreListeningsObserver() {
         return loadMoreListenings;
     }
 
@@ -105,8 +127,8 @@ public class SelectProfilePresenter {
         } else {
             return Lists.transform(items, new Function<BaseProfile, BaseAdapterItem>() {
                 @Override
-                public SelectProfileAdpaterItem apply(BaseProfile input) {
-                    return new SelectProfileAdpaterItem(profileSelectedSubject, input);
+                public SelectProfileAdapterItem apply(BaseProfile input) {
+                    return new SelectProfileAdapterItem(profileSelectedSubject, input);
                 }
             });
         }

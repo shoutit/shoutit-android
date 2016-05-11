@@ -22,7 +22,7 @@ public class ListeningsProfileAdapterItem extends BaseProfileAdapterItem {
                                         @Nonnull Observer<String> openProfileObserver,
                                         @Nonnull Observer<BaseProfile> profileListenedObserver,
                                         @Nonnull ListeningsPresenter.ListeningsType listeningsType) {
-        super(profile, openProfileObserver, profileListenedObserver);
+        super(profile, profileListenedObserver);
         this.profile = profile;
         this.openProfileObserver = openProfileObserver;
         this.listeningsType = listeningsType;

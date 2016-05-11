@@ -73,6 +73,10 @@ public class MessageAttachment {
         return shout;
     }
 
+    public MessageProfile getProfile() {
+        return profile;
+    }
+
     public List<String> getImages() {
         return images;
     }

@@ -46,6 +46,7 @@ import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.utils.TextWatcherAdapter;
 import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
+import com.shoutit.app.android.view.chooseprofile.SelectProfileActivity;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.shoutit.app.android.view.shouts.selectshout.SelectShoutActivity;
@@ -343,7 +344,7 @@ public class ChatActivity extends BaseActivity implements Listener {
 
     @OnClick(R.id.chats_attatchments_profile)
     void onProfileClicked() {
-        // TODO
+        startActivityForResult(SelectProfileActivity.newIntent(this), SELECT_PROFILE_REQUEST_CODE);
     }
 
     @OnClick(R.id.chats_attatchments_media)
