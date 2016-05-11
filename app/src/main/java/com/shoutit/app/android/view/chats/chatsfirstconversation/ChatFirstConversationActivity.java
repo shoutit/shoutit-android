@@ -335,12 +335,12 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
         super.onDestroy();
     }
 
-    @OnClick(R.id.chats_attatchments_video)
+    @OnClick(R.id.chats_attatchments_profile)
     void videoClicked() {
         startActivityForResult(RecordMediaActivity.newIntent(this, true, true, true, false), REQUEST_ATTACHMENT);
     }
 
-    @OnClick(R.id.chats_attatchments_photo)
+    @OnClick(R.id.chats_attatchments_media)
     void photoClicked() {
         startActivityForResult(RecordMediaActivity.newIntent(this, true, false, true, false), REQUEST_ATTACHMENT);
     }
