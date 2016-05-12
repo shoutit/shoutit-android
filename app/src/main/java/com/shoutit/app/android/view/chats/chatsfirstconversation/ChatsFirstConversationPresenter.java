@@ -25,7 +25,6 @@ import com.shoutit.app.android.api.model.MessageAttachment;
 import com.shoutit.app.android.api.model.PostMessage;
 import com.shoutit.app.android.api.model.PusherMessage;
 import com.shoutit.app.android.api.model.Shout;
-import com.shoutit.app.android.api.model.ShoutResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ForActivity;
@@ -386,25 +385,17 @@ public class ChatsFirstConversationPresenter {
     }
 
     public void sendShout(final String shoutId) {
-        // TODO check if needs to get shout
-        mSubscribe.add(mApiService.getShout(shoutId)
-                .subscribeOn(mNetworkScheduler)
-                .observeOn(mUiScheduler)
-                .flatMap(new Func1<ShoutResponse, Observable<Message>>() {
-                    @Override
-                    public Observable<Message> call(ShoutResponse shoutResponse) {
-                        return sendMessage(mChatsDelegate.getShoutMessage(shoutResponse, shoutId))
-                                .subscribeOn(mNetworkScheduler)
-                                .observeOn(mUiScheduler);
-                    }
-                })
-                .subscribe(new Action1<Message>() {
-                    @Override
-                    public void call(Message message) {
-                        mChatsDelegate.postLocalMessage(message, conversationId);
-                        mListener.hideAttatchentsMenu();
-                    }
-                }, getOnError()));
+        mSubscribe.add(
+                sendMessage(mChatsDelegate.getShoutMessage(shoutId))
+                        .subscribeOn(mNetworkScheduler)
+                        .observeOn(mUiScheduler)
+                        .subscribe(new Action1<Message>() {
+                            @Override
+                            public void call(Message message) {
+                                mChatsDelegate.postLocalMessage(message, conversationId);
+                                mListener.hideAttatchentsMenu();
+                            }
+                        }, getOnError()));
     }
 
     public void sendProfile(@Nonnull String profileId) {

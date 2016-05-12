@@ -172,6 +172,11 @@ public class MessageAttachment {
             this.availableCount = availableCount;
         }
 
+        public static AttachtmentShout messageToSend(@Nonnull String shoutId) {
+            return new AttachtmentShout(shoutId, null, null, null, null, null, null, 0L, 0, null,
+                    null, null, null, null, 0L, 0);
+        }
+
         @Nonnull
         public String getId() {
             return id;

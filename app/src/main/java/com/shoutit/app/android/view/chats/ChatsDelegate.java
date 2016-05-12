@@ -48,6 +48,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import okhttp3.ResponseBody;
@@ -346,23 +347,9 @@ public class ChatsDelegate {
         mPusher.sendTyping(conversationId, mUser.getId(), mUser.getUsername());
     }
 
-    public PostMessage getShoutMessage(ShoutResponse shoutResponse, String shoutId) {
-        final List<String> images = shoutResponse.getImages();
-        final List<Video> videos = shoutResponse.getVideos();
-        String thumbnail = null;
-        String videoUrl = null;
-        if (videos != null && !videos.isEmpty()) {
-            final Video video = videos.get(0);
-            thumbnail = video.getThumbnailUrl();
-            videoUrl = video.getUrl();
-        } else if (images != null && !images.isEmpty()) {
-            thumbnail = images.get(0);
-        }
+    public PostMessage getShoutMessage(@Nonnull String shoutId) {
         return new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_SHOUT, null,
-                new MessageAttachment.AttachtmentShout(shoutId, null, null, shoutResponse.getType(),
-                        shoutResponse.getLocation(), shoutResponse.getTitle(), shoutResponse.getText(),
-                        shoutResponse.getPrice(), 0, shoutResponse.getCurrency(), thumbnail, videoUrl,
-                        shoutResponse.getProfile(), shoutResponse.getCategory(), shoutResponse.getDatePublished(), 0), null, null, null)));
+                MessageAttachment.AttachtmentShout.messageToSend(shoutId), null, null, null)));
     }
 
     public PostMessage getProfileMessage(String profileId) {
