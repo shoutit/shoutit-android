@@ -19,6 +19,7 @@
         android:background="@color/colorPrimary"
         app:tabTextColor="@color/green_tab_text_color"
         app:tabSelectedTextColor="@android:color/white"
+        app:tabIndicatorColor="@android:color/white"
         app:tabMode="fixed"
         app:tabMaxWidth="0dp"
         />

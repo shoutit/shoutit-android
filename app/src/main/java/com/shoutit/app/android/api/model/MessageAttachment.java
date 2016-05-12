@@ -37,9 +37,49 @@ public class MessageAttachment {
     public static class MessageProfile {
         @Nonnull
         private final String id;
+        private final String username;
+        private final String name;
+        private final int listenersCount;
+        private final String image;
+        private final String cover;
 
-        public MessageProfile(@Nonnull String id) {
+        public static MessageProfile messageToSend(@Nonnull String profileId) {
+            return new MessageProfile(profileId, null, null, 0, null, null);
+        }
+
+        public MessageProfile(@Nonnull String id, String username, String name,
+                              int listenersCount, String image, String cover) {
             this.id = id;
+            this.username = username;
+            this.name = name;
+            this.listenersCount = listenersCount;
+            this.image = image;
+            this.cover = cover;
+        }
+
+        @Nonnull
+        public String getId() {
+            return id;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public int getListenersCount() {
+            return listenersCount;
+        }
+
+        public String getImage() {
+            return image;
+        }
+
+        public String getCover() {
+            return cover;
+        }
+
+        public String getName() {
+            return name;
         }
     }
 

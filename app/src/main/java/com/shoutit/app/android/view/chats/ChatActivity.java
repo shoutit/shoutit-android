@@ -48,6 +48,7 @@ import com.shoutit.app.android.utils.TextWatcherAdapter;
 import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
 import com.shoutit.app.android.view.chooseprofile.SelectProfileActivity;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
+import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.shoutit.app.android.view.shouts.selectshout.SelectShoutActivity;
 import com.shoutit.app.android.view.videoconversation.VideoConversationActivity;
@@ -329,6 +330,11 @@ public class ChatActivity extends BaseActivity implements Listener {
     @Override
     public void onShoutClicked(String shoutId) {
         startActivity(ShoutActivity.newIntent(ChatActivity.this, shoutId));
+    }
+
+    @Override
+    public void onProfileClicked(String userName) {
+        startActivity(UserOrPageProfileActivity.newIntent(this, userName));
     }
 
     @Override

@@ -45,6 +45,7 @@ import com.shoutit.app.android.view.chats.ChatsHelper;
 import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
 import com.shoutit.app.android.view.chooseprofile.SelectProfileActivity;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
+import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.shoutit.app.android.view.shouts.selectshout.SelectShoutActivity;
 import com.shoutit.app.android.view.videoconversation.VideoConversationActivity;
@@ -305,6 +306,11 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
     @Override
     public void onShoutClicked(String shoutId) {
         startActivity(ShoutActivity.newIntent(ChatFirstConversationActivity.this, shoutId));
+    }
+
+    @Override
+    public void onProfileClicked(String userName) {
+        startActivity(UserOrPageProfileActivity.newIntent(this, userName));
     }
 
     @Override

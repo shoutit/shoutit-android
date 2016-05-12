@@ -28,9 +28,11 @@ import com.shoutit.app.android.view.chats.message_models.DateItem;
 import com.shoutit.app.android.view.chats.message_models.InfoItem;
 import com.shoutit.app.android.view.chats.message_models.ReceivedImageMessage;
 import com.shoutit.app.android.view.chats.message_models.ReceivedLocationMessage;
+import com.shoutit.app.android.view.chats.message_models.ReceivedProfileMessage;
 import com.shoutit.app.android.view.chats.message_models.ReceivedShoutMessage;
 import com.shoutit.app.android.view.chats.message_models.ReceivedTextMessage;
 import com.shoutit.app.android.view.chats.message_models.ReceivedVideoMessage;
+import com.shoutit.app.android.view.chats.message_models.SentProfileMessage;
 import com.shoutit.app.android.view.chats.message_models.SentImageMessage;
 import com.shoutit.app.android.view.chats.message_models.SentLocationMessage;
 import com.shoutit.app.android.view.chats.message_models.SentShoutMessage;
@@ -297,6 +299,12 @@ public class ChatsDelegate {
                         shout.getText(),
                         shout.getUser().getName(),
                         avatarUrl, mListener, shout.getId());
+            } else if (MessageAttachment.ATTACHMENT_TYPE_PROFILE.equals(type)) {
+                final MessageAttachment.MessageProfile profile = messageAttachment.getProfile();
+
+                return new ReceivedProfileMessage(isFirst, time, avatarUrl, profile.getId(),
+                        profile.getUsername(), profile.getName(),
+                        profile.getImage(), profile.getCover(), profile.getListenersCount(), mListener);
             } else {
                 throw new RuntimeException(type);
             }
@@ -325,8 +333,9 @@ public class ChatsDelegate {
                 final MessageAttachment.AttachtmentShout shout = messageAttachment.getShout();
                 return new SentShoutMessage(shout.getThumbnailOrNull(), time, PriceUtils.formatPriceWithCurrency(shout.getPrice(), mResources, shout.getCurrency()), shout.getText(), shout.getUser().getName(), mListener, shout.getId());
             } else if (MessageAttachment.ATTACHMENT_TYPE_PROFILE.equals(type)) {
-                // TODO finished here !!
                 final MessageAttachment.MessageProfile profile = messageAttachment.getProfile();
+                return new SentProfileMessage(time, profile.getId(), profile.getUsername(), profile.getName(),
+                        profile.getImage(), profile.getCover(), profile.getListenersCount(), mListener);
             } else {
                 throw new RuntimeException(type);
             }
@@ -358,7 +367,7 @@ public class ChatsDelegate {
 
     public PostMessage getProfileMessage(String profileId) {
         return new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_PROFILE,
-                null, null, null, null, new MessageAttachment.MessageProfile(profileId))));
+                null, null, null, null, MessageAttachment.MessageProfile.messageToSend(profileId))));
     }
 
     public Subscription deleteConversation(String conversationId) {

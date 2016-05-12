@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/message_background_owner"
+        android:orientation="vertical"
+        android:paddingBottom="8dp"
+        android:paddingLeft="2dp"
+        android:paddingRight="2dp"
+        android:paddingTop="8dp">
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="4dp">
+
+            <ImageView
+                android:id="@+id/chats_sent_profile_image_imageview"
+                android:layout_width="@dimen/chat_sent_shout_image_width"
+                android:layout_height="@dimen/chat_sent_shout_image_height"
+                android:scaleType="centerCrop"
+                tools:src="@drawable/ic_rect_avatar_placeholder" />
+
+            <TextView
+                android:id="@+id/chats_sent_profile_date_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|top"
+                android:background="@drawable/chat_time_gradient"
+                android:textColor="@android:color/white"
+                tools:text="18:04" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/chats_message_profile_name"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:lines="1"
+            android:paddingLeft="2dp"
+            android:paddingRight="2dp"
+            tools:text="John Cena sdfsdfds fdsfdsfadsfad sfadsfasfasdfasdfsadfadsfdsfes" />
+
+        <TextView
+            android:id="@+id/chats_profile_listeners"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="2dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:paddingLeft="2dp"
+            android:paddingRight="2dp"
+            android:textColor="@color/black_38"
+            tools:text="128 Listeners sdfdsfdsfadsf fsdsfdsf" />
+
+    </LinearLayout>
+</FrameLayout>
