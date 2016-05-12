@@ -23,6 +23,7 @@
         android:layout_width="160dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
         android:background="@drawable/message_background_other"
         android:gravity="center"
         android:orientation="vertical"
@@ -41,7 +42,7 @@
                 android:layout_width="150dp"
                 android:layout_height="96dp"
                 android:scaleType="centerCrop"
-                tools:src="@drawable/ca" />
+                android:src="@drawable/pattern_placeholder" />
 
             <TextView
                 android:id="@+id/chats_received_profile_date_textview"
@@ -73,6 +74,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="2dp"
+                android:layout_marginRight="2dp"
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:textDirection="locale"

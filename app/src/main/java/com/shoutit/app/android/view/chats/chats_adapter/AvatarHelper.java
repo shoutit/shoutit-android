@@ -24,7 +24,7 @@ public class AvatarHelper {
                     .centerCrop()
                     .into(view);
         } else {
-            view.setVisibility(View.GONE);
+            view.setVisibility(View.INVISIBLE);
         }
     }
 }

@@ -95,7 +95,7 @@ public class ConversationsPresenter {
     private final PublishSubject<Object> requestSubject = PublishSubject.create();
     private Listener mListener;
     private Subscription mSubscription;
-    private boolean showProgress;
+    private boolean showProgress = true;
 
     @Inject
     public ConversationsPresenter(@NonNull ApiService apiService,

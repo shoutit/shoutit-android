@@ -48,6 +48,8 @@ public class SentProfileMessageHolder extends ViewHolderManager.BaseViewHolder<B
         final SentProfileMessage message = (SentProfileMessage) item;
 
         mPicasso.load(message.getImage())
+                .placeholder(R.drawable.pattern_placeholder)
+                .error(R.drawable.pattern_placeholder)
                 .resizeDimen(R.dimen.chat_sent_shout_image_width, R.dimen.chat_sent_shout_image_height)
                 .centerCrop()
                 .into(profileAvatarIv);

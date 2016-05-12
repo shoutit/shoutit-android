@@ -3,6 +3,7 @@ package com.shoutit.app.android.view.chats.chats_adapter;
 import android.content.Context;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
+import android.util.LayoutDirection;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.utils.RtlUtils;
 import com.shoutit.app.android.utils.TextHelper;
 import com.shoutit.app.android.view.chats.message_models.ReceivedProfileMessage;
 import com.squareup.picasso.Picasso;
@@ -26,6 +28,8 @@ public class ReceivedProfileMessageHolder extends ViewHolderManager.BaseViewHold
     private final Picasso mPicasso;
     private final Context context;
 
+    @Bind(R.id.chats_received_profile_root_view)
+    View rootView;
     @Bind(R.id.chats_received_avatar)
     ImageView mAvatarIv;
     @Bind(R.id.chats_received_profile_image_imageview)
@@ -49,7 +53,11 @@ public class ReceivedProfileMessageHolder extends ViewHolderManager.BaseViewHold
     public void bind(@Nonnull BaseAdapterItem item) {
         final ReceivedProfileMessage message = (ReceivedProfileMessage) item;
 
+        RtlUtils.setLayoutDirection(rootView, LayoutDirection.LTR);
+
         mPicasso.load(message.getImage())
+                .placeholder(R.drawable.pattern_placeholder)
+                .error(R.drawable.pattern_placeholder)
                 .resizeDimen(R.dimen.chat_sent_shout_image_width, R.dimen.chat_sent_shout_image_height)
                 .centerCrop()
                 .into(profileAvatarIv);
