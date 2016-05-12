@@ -4,6 +4,7 @@ package com.shoutit.app.android.view.chats.public_chat;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -13,15 +14,22 @@ import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.CreatePublicChatRequest;
+import com.shoutit.app.android.api.model.UpdateLocationRequest;
+import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.ImageCaptureHelper;
 import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.view.createshout.location.LocationResultHelper;
 
+import java.io.File;
+
 import okhttp3.ResponseBody;
+import rx.Observable;
 import rx.Scheduler;
 import rx.functions.Action1;
+import rx.functions.Func1;
 
 public class CreatePublicChatPresenter {
 
@@ -32,21 +40,23 @@ public class CreatePublicChatPresenter {
 
     private final ImageCaptureHelper mImageCaptureHelper;
     private final Context mContext;
-    @NonNull
     private final ApiService mApiService;
     private final Scheduler mNetworkScheduler;
     private final Scheduler mUiScheduler;
+    private final AmazonHelper mAmazonHelper;
 
     public CreatePublicChatPresenter(@NonNull ImageCaptureHelper imageCaptureHelper,
                                      @NonNull @ForActivity Context context,
                                      @NonNull ApiService apiService,
                                      @NetworkScheduler Scheduler networkScheduler,
-                                     @UiScheduler Scheduler uiScheduler) {
+                                     @UiScheduler Scheduler uiScheduler,
+                                     AmazonHelper amazonHelper) {
         mImageCaptureHelper = imageCaptureHelper;
         mContext = context;
         mApiService = apiService;
         mNetworkScheduler = networkScheduler;
         mUiScheduler = uiScheduler;
+        mAmazonHelper = amazonHelper;
     }
 
     public void selectImageClicked() {
@@ -68,9 +78,29 @@ public class CreatePublicChatPresenter {
             listener.subjectEmptyError();
         } else {
             listener.showProgress(true);
-            mApiService.createPublicChat(new CreatePublicChatRequest(data.subject))
+            mApiService.updateUserLocation(new UpdateLocationRequest(state.location))
                     .subscribeOn(mNetworkScheduler)
                     .observeOn(mUiScheduler)
+                    .flatMap(new Func1<User, Observable<?>>() {
+                        @Override
+                        public Observable<?> call(User user) {
+                            if (state.url != null) {
+                                return mAmazonHelper.uploadGroupChatObservable(new File(state.url.toString()))
+                                        .subscribeOn(mNetworkScheduler)
+                                        .observeOn(mUiScheduler);
+                            } else {
+                                return Observable.just(new Object());
+                            }
+                        }
+                    })
+                    .flatMap(new Func1<Object, Observable<ResponseBody>>() {
+                        @Override
+                        public Observable<ResponseBody> call(Object user) {
+                            return mApiService.createPublicChat(new CreatePublicChatRequest(data.subject))
+                                    .subscribeOn(mNetworkScheduler)
+                                    .observeOn(mUiScheduler);
+                        }
+                    })
                     .subscribe(new Action1<ResponseBody>() {
                         @Override
                         public void call(ResponseBody responseBody) {
@@ -142,7 +172,7 @@ public class CreatePublicChatPresenter {
 
         void showProgress(boolean show);
 
-        void setLocation(int flag, @Nullable String location);
+        void setLocation(@DrawableRes int flag, @NonNull String location);
 
         void setImage(@Nullable Uri imageUrl);
 
