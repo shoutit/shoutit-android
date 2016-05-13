@@ -119,16 +119,6 @@ public class UserOrPageProfileActivity extends ProfileActivity {
                     }
                 });
 
-        presenter.getMyProfilePresenter()
-                .getVerifyAccountClickObservable()
-                .compose(bindToLifecycle())
-                .subscribe(new Action1<Object>() {
-                    @Override
-                    public void call(Object o) {
-                        startActivity(VerifyEmailActivity.newIntent(UserOrPageProfileActivity.this));
-                    }
-                });
-
         // My Profile specific subscriptions
         presenter.getMyProfilePresenter().getEditProfileClickObservable()
                 .compose(bindToLifecycle())
@@ -138,6 +128,16 @@ public class UserOrPageProfileActivity extends ProfileActivity {
                         startActivityForResult(
                                 EditProfileActivity.newIntent(UserOrPageProfileActivity.this),
                                 REQUEST_CODE_FROM_EDIT_PROFILE);
+                    }
+                });
+
+        presenter.getMyProfilePresenter()
+                .getVerifyAccountClickObservable()
+                .compose(bindToLifecycle())
+                .subscribe(new Action1<Object>() {
+                    @Override
+                    public void call(Object o) {
+                        startActivity(VerifyEmailActivity.newIntent(UserOrPageProfileActivity.this));
                     }
                 });
 
