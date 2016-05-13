@@ -16,7 +16,6 @@ import com.shoutit.app.android.utils.pusher.PusherHelper;
 import com.shoutit.app.android.view.profile.myprofile.MyProfileHalfPresenter;
 import com.shoutit.app.android.view.profile.userprofile.UserProfileHalfPresenter;
 
-import java.lang.ref.WeakReference;
 
 import javax.annotation.Nonnull;
 
@@ -36,7 +35,7 @@ public class ProfileActivityModule {
 
     @Provides
     @ActivityScope
-    public ProfilePresenter provideProfilePresenter(ShoutsDao shoutsDao, ProfilesDao profilesDao, WeakReference<Context> context,
+    public ProfilePresenter provideProfilePresenter(ShoutsDao shoutsDao, ProfilesDao profilesDao, @ForActivity Context context,
                                                     UserPreferences preferences, @UiScheduler Scheduler uiScheduler,
                                                     @NetworkScheduler Scheduler networkScheduler, ApiService apiService,
                                                     PreferencesHelper preferencesHelper, UserProfileHalfPresenter userProfilePresenter,
@@ -46,8 +45,4 @@ public class ProfileActivityModule {
                 profilesDao, myProfilePresenter, userProfilePresenter, preferencesHelper, shoutsGlobalRefreshPresenter, apiService, pusherHelper);
     }
 
-    @Provides
-    WeakReference<Context> provideContextweakReference(@ForActivity Context context) {
-        return new WeakReference<>(context);
-    }
 }
