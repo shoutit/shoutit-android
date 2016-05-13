@@ -1,8 +1,8 @@
 package com.shoutit.app.android.view.chats.message_models;
 
-import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
 
-public abstract class ReceivedMessage implements BaseAdapterItem {
+public abstract class ReceivedMessage extends BaseNoIDAdapterItem {
 
     private final boolean isFirst;
     private final String mAvatarUrl;

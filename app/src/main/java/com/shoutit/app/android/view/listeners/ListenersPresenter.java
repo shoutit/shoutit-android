@@ -224,7 +224,7 @@ public class ListenersPresenter {
         public ListenersAdapterItem(@Nonnull BaseProfile profile,
                                     @Nonnull Observer<String> openProfileObserver,
                                     @Nonnull Observer<BaseProfile> profileListenedObserver) {
-            super(profile, openProfileObserver, profileListenedObserver);
+            super(profile, profileListenedObserver);
             this.profile = profile;
             this.openProfileObserver = openProfileObserver;
             this.profileListenedObserver = profileListenedObserver;

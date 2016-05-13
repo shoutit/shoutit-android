@@ -28,9 +28,11 @@ import com.shoutit.app.android.view.chats.message_models.DateItem;
 import com.shoutit.app.android.view.chats.message_models.InfoItem;
 import com.shoutit.app.android.view.chats.message_models.ReceivedImageMessage;
 import com.shoutit.app.android.view.chats.message_models.ReceivedLocationMessage;
+import com.shoutit.app.android.view.chats.message_models.ReceivedProfileMessage;
 import com.shoutit.app.android.view.chats.message_models.ReceivedShoutMessage;
 import com.shoutit.app.android.view.chats.message_models.ReceivedTextMessage;
 import com.shoutit.app.android.view.chats.message_models.ReceivedVideoMessage;
+import com.shoutit.app.android.view.chats.message_models.SentProfileMessage;
 import com.shoutit.app.android.view.chats.message_models.SentImageMessage;
 import com.shoutit.app.android.view.chats.message_models.SentLocationMessage;
 import com.shoutit.app.android.view.chats.message_models.SentShoutMessage;
@@ -46,6 +48,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import okhttp3.ResponseBody;
@@ -297,6 +300,12 @@ public class ChatsDelegate {
                         shout.getText(),
                         shout.getUser().getName(),
                         avatarUrl, mListener, shout.getId());
+            } else if (MessageAttachment.ATTACHMENT_TYPE_PROFILE.equals(type)) {
+                final MessageAttachment.MessageProfile profile = messageAttachment.getProfile();
+
+                return new ReceivedProfileMessage(isFirst, time, avatarUrl, profile.getId(),
+                        profile.getUsername(), profile.getName(),
+                        profile.getImage(), profile.getCover(), profile.getListenersCount(), mListener);
             } else {
                 throw new RuntimeException(type);
             }
@@ -324,6 +333,10 @@ public class ChatsDelegate {
             } else if (MessageAttachment.ATTACHMENT_TYPE_SHOUT.equals(type)) {
                 final MessageAttachment.AttachtmentShout shout = messageAttachment.getShout();
                 return new SentShoutMessage(shout.getThumbnailOrNull(), time, PriceUtils.formatPriceWithCurrency(shout.getPrice(), mResources, shout.getCurrency()), shout.getText(), shout.getUser().getName(), mListener, shout.getId());
+            } else if (MessageAttachment.ATTACHMENT_TYPE_PROFILE.equals(type)) {
+                final MessageAttachment.MessageProfile profile = messageAttachment.getProfile();
+                return new SentProfileMessage(time, profile.getId(), profile.getUsername(), profile.getName(),
+                        profile.getImage(), profile.getCover(), profile.getListenersCount(), mListener);
             } else {
                 throw new RuntimeException(type);
             }
@@ -334,19 +347,14 @@ public class ChatsDelegate {
         mPusher.sendTyping(conversationId, mUser.getId(), mUser.getUsername());
     }
 
-    public PostMessage getShoutMessage(ShoutResponse shoutResponse, String shoutId) {
-        final List<String> images = shoutResponse.getImages();
-        final List<Video> videos = shoutResponse.getVideos();
-        String thumbnail = null;
-        String videoUrl = null;
-        if (videos != null && !videos.isEmpty()) {
-            final Video video = videos.get(0);
-            thumbnail = video.getThumbnailUrl();
-            videoUrl = video.getUrl();
-        } else if (images != null && !images.isEmpty()) {
-            thumbnail = images.get(0);
-        }
-        return new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_LOCATION, null, new MessageAttachment.AttachtmentShout(shoutId, null, null, shoutResponse.getType(), shoutResponse.getLocation(), shoutResponse.getTitle(), shoutResponse.getText(), shoutResponse.getPrice(), 0, shoutResponse.getCurrency(), thumbnail, videoUrl, shoutResponse.getProfile(), shoutResponse.getCategory(), shoutResponse.getDatePublished(), 0), null, null)));
+    public PostMessage getShoutMessage(@Nonnull String shoutId) {
+        return new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_SHOUT, null,
+                MessageAttachment.AttachtmentShout.messageToSend(shoutId), null, null, null)));
+    }
+
+    public PostMessage getProfileMessage(String profileId) {
+        return new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_PROFILE,
+                null, null, null, null, MessageAttachment.MessageProfile.messageToSend(profileId))));
     }
 
     public Subscription deleteConversation(String conversationId) {
@@ -372,7 +380,8 @@ public class ChatsDelegate {
     }
 
     public PostMessage getLocationMessage(double latitude, double longitude) {
-        return new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_LOCATION, new MessageAttachment.MessageLocation(latitude, longitude), null, null, null)));
+        return new PostMessage(null, ImmutableList.of(new MessageAttachment(
+                MessageAttachment.ATTACHMENT_TYPE_LOCATION, new MessageAttachment.MessageLocation(latitude, longitude), null, null, null, null)));
     }
 
     public Subscription addMedia(@NonNull String media, boolean isVideo, Func1<Video, Observable<Message>> videoToMessageFunc, Func1<String, Observable<Message>> photoToMessageFunc, final String conversationId) {

@@ -15,6 +15,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.Conversation;
@@ -94,7 +95,7 @@ public class ConversationsPresenter {
     private final PublishSubject<Object> requestSubject = PublishSubject.create();
     private Listener mListener;
     private Subscription mSubscription;
-    private boolean showProgress;
+    private boolean showProgress = true;
 
     @Inject
     public ConversationsPresenter(@NonNull ApiService apiService,
@@ -254,11 +255,13 @@ public class ConversationsPresenter {
         } else {
             final MessageAttachment messageAttachment = attachments.get(0);
             if (MessageAttachment.ATTACHMENT_TYPE_LOCATION.equals(messageAttachment.getType())) {
-                return "Location";
+                return mContext.getString(R.string.chats_attatchments_location);
             } else if (MessageAttachment.ATTACHMENT_TYPE_SHOUT.equals(messageAttachment.getType())) {
-                return "Shout";
+                return mContext.getString(R.string.chats_attatchments_shout);
             } else if (MessageAttachment.ATTACHMENT_TYPE_MEDIA.equals(messageAttachment.getType())) {
-                return "Media";
+                return mContext.getString(R.string.chats_attatchments_media);
+            } else if (MessageAttachment.ATTACHMENT_TYPE_PROFILE.equals(messageAttachment.getType())) {
+                return mContext.getString(R.string.chats_attatchments_profile);
             } else {
                 throw new RuntimeException(messageAttachment.getType() + " : unknown type");
             }

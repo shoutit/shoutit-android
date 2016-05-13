@@ -42,4 +42,10 @@ public class RtlUtils {
             textView.setTextDirection(isRtlEnabled(context) ? View.TEXT_DIRECTION_RTL : View.TEXT_DIRECTION_LTR);
         }
     }
+
+    public static void setLayoutDirection(View view, int layoutDirection) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            view.setLayoutDirection(layoutDirection);
+        }
+    }
 }

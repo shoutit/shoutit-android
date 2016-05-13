@@ -487,4 +487,9 @@
     <!-- Listeners -->
     <string name="listeners_ab_title">Listeners</string>
 
+    <!-- Select profile -->
+    <string name="select_profile_ab_title">Select profile</string>
+    <string name="select_profile_tab_listenings">Listenings</string>
+    <string name="select_profile_tab_listeners">Listeners</string>
+
 </resources>
