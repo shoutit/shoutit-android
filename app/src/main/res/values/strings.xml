@@ -474,6 +474,9 @@
     <string name="profile_verify_account">Verify your account</string>
     <string name="verify_email_title">Email Verification</string>
     <string name="video_calls_cannot_start_conversation">Sorry, cannot start this video call. Please try again later.</string>
+
+    <!-- Conversations -->
     <string name="conversations_empty">No conversations</string>
+    <string name="conversations_create_public_chat">Create public chat</string>
 
 </resources>

@@ -1,5 +1,6 @@
 package com.shoutit.app.android.view.chats.public_chat;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -7,15 +8,16 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.common.base.Optional;
+import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.ImageCaptureHelper;
@@ -28,6 +30,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class CreatePublicChatActivity extends BaseActivity implements CreatePublicChatPresenter.CreatePublicChatView {
 
@@ -43,15 +46,17 @@ public class CreatePublicChatActivity extends BaseActivity implements CreatePubl
     ImageView mCreateChatLocationFlag;
     @Bind(R.id.create_chat_location_name)
     TextView mCreateChatLocationName;
-    @Bind(R.id.create_chat_location_change)
-    Button mCreateChatLocationChange;
-    @Bind(R.id.create_chat_location_create)
-    Button mCreateChatLocationCreate;
 
     @Inject
     Picasso picasso;
     @Inject
     ImageCaptureHelper mImageCaptureHelper;
+    @Inject
+    CreatePublicChatPresenter mCreatePublicChatPresenter;
+
+    public static Intent newIntent(Context context){
+        return new Intent(context, CreatePublicChatActivity.class);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +68,10 @@ public class CreatePublicChatActivity extends BaseActivity implements CreatePubl
     @Nonnull
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
-        return null;
+        return DaggerCreatePublicChatActivityComponent.builder()
+                .activityModule(new ActivityModule(this))
+                .appComponent(App.getAppComponent(getApplication()))
+                .build();
     }
 
     @Override
@@ -74,6 +82,7 @@ public class CreatePublicChatActivity extends BaseActivity implements CreatePubl
     @Override
     public void setLocation(@DrawableRes int flag, @NonNull String location) {
         mCreateChatLocationFlag.setImageResource(flag);
+        mCreateChatLocationName.setText(location);
     }
 
     @Override
@@ -94,6 +103,8 @@ public class CreatePublicChatActivity extends BaseActivity implements CreatePubl
         final Optional<Intent> selectOrCaptureImageIntent = mImageCaptureHelper.createSelectOrCaptureImageIntent();
         if (selectOrCaptureImageIntent.isPresent()) {
             startActivityForResult(selectOrCaptureImageIntent.get(), REQUEST_LOCATION);
+        } else {
+            ColoredSnackBar.error(ColoredSnackBar.contentView(this), "Error", Snackbar.LENGTH_SHORT).show();
         }
     }
 
@@ -110,5 +121,15 @@ public class CreatePublicChatActivity extends BaseActivity implements CreatePubl
     @Override
     public void createRequestError() {
         ColoredSnackBar.error(ColoredSnackBar.contentView(this), "Error", Snackbar.LENGTH_SHORT).show();
+    }
+
+    @OnClick(R.id.create_chat_location_change)
+    void changeLocation() {
+        mCreatePublicChatPresenter.selectLocationClicked();
+    }
+
+    @OnClick(R.id.create_chat_create)
+    void createChat() {
+        mCreatePublicChatPresenter.createClicked();
     }
 }

@@ -85,7 +85,7 @@
             </LinearLayout>
 
             <Button
-                android:id="@+id/create_chat_location_create"
+                android:id="@+id/create_chat_create"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/colorPrimary"

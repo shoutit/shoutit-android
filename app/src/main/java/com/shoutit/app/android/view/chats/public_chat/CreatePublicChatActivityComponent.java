@@ -6,6 +6,7 @@ import com.shoutit.app.android.dagger.AppComponent;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.view.chats.ChatActivity;
 import com.shoutit.app.android.view.chats.ChatsActivityModule;
+import com.shoutit.app.android.view.createshout.request.CreateRequestActivity;
 
 import dagger.Component;
 
@@ -13,13 +14,12 @@ import dagger.Component;
 @Component(
         dependencies = AppComponent.class,
         modules = {
-                ActivityModule.class,
-                ChatsActivityModule.class
+                ActivityModule.class
         }
 )
 public interface CreatePublicChatActivityComponent extends BaseActivityComponent {
 
-    void inject(ChatActivity activity);
+    void inject(CreateRequestActivity activity);
 
 }
 
