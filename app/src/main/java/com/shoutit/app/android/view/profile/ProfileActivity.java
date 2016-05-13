@@ -149,23 +149,23 @@ public abstract class ProfileActivity extends BaseActivity {
                         R.string.error_action_only_for_logged_in_user));
 
         presenter.getListenSuccessObservable()
-                .compose(this.<String>bindToLifecycle())
                 .doOnNext(new Action1<String>() {
                     @Override
                     public void call(String s) {
                         setResult(RESULT_OK, null);
                     }
                 })
+                .compose(this.<String>bindToLifecycle())
                 .subscribe(RxUtils.listenMessageAction(this));
 
         presenter.getUnListenSuccessObservable()
-                .compose(this.<String>bindToLifecycle())
                 .doOnNext(new Action1<String>() {
                     @Override
                     public void call(String s) {
                         setResult(RESULT_OK, null);
                     }
                 })
+                .compose(this.<String>bindToLifecycle())
                 .subscribe(RxUtils.unListenMessageAction(this));
 
     }
