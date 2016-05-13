@@ -7,6 +7,7 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.view.profile.ProfileAdapterItems;
 
+
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 

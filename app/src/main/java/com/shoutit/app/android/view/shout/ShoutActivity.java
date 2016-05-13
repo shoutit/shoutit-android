@@ -295,7 +295,7 @@ public class ShoutActivity extends BaseActivity {
                     }
                 }, ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(this)));
 
-        presenter.getRefreshUserShoutsObservable()
+        presenter.getRefreshShoutsObservable()
                 .compose(this.bindToLifecycle())
                 .subscribe();
 
@@ -577,7 +577,7 @@ public class ShoutActivity extends BaseActivity {
         final ShoutActivityComponent component = DaggerShoutActivityComponent
                 .builder()
                 .activityModule(new ActivityModule(this))
-                .shoutActivityModule(new ShoutActivityModule(this, mShoutId))
+                .shoutActivityModule(new ShoutActivityModule(mShoutId))
                 .appComponent(App.getAppComponent(getApplication()))
                 .build();
         component.inject(this);
