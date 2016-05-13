@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 import retrofit2.Response;
@@ -103,7 +104,7 @@ public class ShoutPresenterTest {
         when(userPreferences.isNormalUser()).thenReturn(true);
         when(userPreferences.getUser()).thenReturn(TestUtils.getUser());
 
-        presenter = new ShoutPresenter(shoutsDao, "zz", context, Schedulers.immediate(), userPreferences, globalRefreshPresenter);
+        presenter = new ShoutPresenter(shoutsDao, "zz", new WeakReference<Context>(context), Schedulers.immediate(), userPreferences, globalRefreshPresenter);
     }
 
     @Test

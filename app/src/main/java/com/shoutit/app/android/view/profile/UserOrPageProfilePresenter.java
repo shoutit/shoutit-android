@@ -77,6 +77,10 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
     private final Observable<Object> reportSuccessObservable;
     @Nonnull
     private final Observable<Integer> notificationsUnreadObservable;
+    @Nonnull
+    private final Observable<Object> refreshUserShoutsObservable;
+    @Nonnull
+    private final Observable<Object> userUpdatesObservable;
 
     @Nonnull
     private final PublishSubject<String> showAllShoutsSubject = PublishSubject.create();
@@ -86,8 +90,6 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
     private final PublishSubject<String> shoutSelectedSubject = PublishSubject.create();
     @Nonnull
     private final PublishSubject<String> profileToOpenSubject = PublishSubject.create();
-    @Nonnull
-    private final PublishSubject<Throwable> errorsSubject = PublishSubject.create();
     @Nonnull
     private final PublishSubject<Object> actionOnlyForLoggedInUserSubject = PublishSubject.create();
     @Nonnull
@@ -120,7 +122,7 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
                                       @Nonnull final UserPreferences userPreferences,
                                       @Nonnull @UiScheduler final Scheduler uiScheduler,
                                       @Nonnull @NetworkScheduler final Scheduler networkScheduler,
-                                      @Nonnull ProfilesDao profilesDao,
+                                      @Nonnull final ProfilesDao profilesDao,
                                       @Nonnull MyProfileHalfPresenter myProfilePresenter,
                                       @Nonnull UserProfileHalfPresenter userProfilePresenter,
                                       @Nonnull PreferencesHelper preferencesHelper,
@@ -146,8 +148,16 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<User>>behaviorRefCount());
 
-        userProfilePresenter.getUserUpdatesObservable()
-                .subscribe(profilesDao.getProfileDao(userName).updatedProfileLocallyObserver());
+        userUpdatesObservable = userProfilePresenter.getUserUpdatesObservable()
+                .map(new Func1<ResponseOrError<User>, Object>() {
+                    @Override
+                    public Object call(ResponseOrError<User> userResponseOrError) {
+                        profilesDao.getProfileDao(userName)
+                                .updatedProfileLocallyObserver()
+                                .onNext(null);
+                        return null;
+                    }
+                });
 
         final Observable<User> userSuccessObservable = userRequestObservable.compose(ResponseOrError.<User>onlySuccess())
                 .doOnNext(new Action1<User>() {
@@ -215,7 +225,7 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
                         final List<BaseAdapterItem> items = Lists.transform(shouts, new Function<Shout, BaseAdapterItem>() {
                             @Nullable
                             @Override
-                            public BaseAdapterItem apply(@Nullable Shout shout) {
+                            public BaseAdapterItem apply(Shout shout) {
                                 return new ShoutAdapterItem(shout, false, false, context, shoutSelectedSubject);
                             }
                         });
@@ -262,7 +272,6 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
                 ResponseOrError.transform(shoutsObservable),
                 ResponseOrError.transform(reportRequestObservable),
                 ResponseOrError.transform(userRequestObservable)))
-                .mergeWith(errorsSubject)
                 .mergeWith(userProfilePresenter.getErrorObservable())
                 .filter(Functions1.isNotNull())
                 .observeOn(uiScheduler);
@@ -292,9 +301,17 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
                     }
                 });
 
-        shoutsGlobalRefreshPresenter
+        refreshUserShoutsObservable = shoutsGlobalRefreshPresenter
                 .getShoutsGlobalRefreshObservable()
-                .subscribe(shoutsDao.getUserShoutsDao(new UserShoutsPointer(SHOUTS_PAGE_SIZE, userName)).getRefreshObserver());
+                .map(new Func1<Object, Object>() {
+                    @Override
+                    public Object call(Object o) {
+                        shoutsDao.getUserShoutsDao(new UserShoutsPointer(SHOUTS_PAGE_SIZE, userName))
+                                .getRefreshObserver()
+                                .onNext(null);
+                        return null;
+                    }
+                });
 
         notificationsUnreadObservable = userPreferences.getUserObservable()
                 .filter(Functions1.isNotNull())
@@ -518,9 +535,19 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
     }
 
     @Nonnull
+    public Observable<Object> getRefreshUserShoutsObservable() {
+        return refreshUserShoutsObservable;
+    }
+
+    @Nonnull
     @Override
     public Observable<String> getUnListenSuccessObservable() {
         return userProfilePresenter.getUnListenSuccessObservable();
+    }
+
+    @Nonnull
+    public Observable<Object> getUserUpdatesObservable() {
+        return userUpdatesObservable;
     }
 
     public void onSearchMenuItemClicked() {

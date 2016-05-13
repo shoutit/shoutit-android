@@ -62,7 +62,7 @@ public class ShoutPresenter {
     private final PublishSubject<Object> deleteShoutSubject = PublishSubject.create();
     private final Observable<Response<Object>> reportShoutObservable;
     private final Observable<List<Conversation>> conversationObservable;
-    private final Observable<Object> refreshUserShoutsObservable;
+    private final Observable<Object> refreshShoutsObservable;
     private final Observable<String> videoCallClickedObservable;
     private final Observable<Boolean> editShoutClickedObservable;
     private final Observable<Object> onlyForLoggedInUserObservable;
@@ -308,10 +308,18 @@ public class ShoutPresenter {
                 .compose(ObservableExtensions.<Boolean>behaviorRefCount());
 
         /** Refresh shouts **/
-        Observable.merge(shoutsGlobalRefreshPresenter.getShoutsGlobalRefreshObservable(), refreshShoutsSubject)
-                .subscribe(shoutsDao.getShoutDao(shoutId).getRefreshObserver());
+        final Observable<Object> refreshShout = Observable
+                .merge(shoutsGlobalRefreshPresenter.getShoutsGlobalRefreshObservable(), refreshShoutsSubject)
+                .map(new Func1<Object, Object>() {
+                    @Override
+                    public Object call(Object o) {
+                        shoutsDao.getShoutDao(shoutId)
+                                .getRefreshObserver().onNext(null);
+                        return null;
+                    }
+                });
 
-        refreshUserShoutsObservable = shoutsGlobalRefreshPresenter.getShoutsGlobalRefreshObservable()
+        final Observable<Object> refreshUserShouts = shoutsGlobalRefreshPresenter.getShoutsGlobalRefreshObservable()
                 .withLatestFrom(userShoutDaoObservable, new Func2<Object, ShoutsDao.UserShoutsDao, Object>() {
                     @Override
                     public Observer<Object> call(Object o, ShoutsDao.UserShoutsDao userShoutsDao) {
@@ -320,7 +328,7 @@ public class ShoutPresenter {
                     }
                 });
 
-        shoutsGlobalRefreshPresenter.getShoutsGlobalRefreshObservable()
+        final Observable<Object> refreshRelatedShouts= shoutsGlobalRefreshPresenter.getShoutsGlobalRefreshObservable()
                 .map(new Func1<Object, Object>() {
                     @Override
                     public Object call(Object o) {
@@ -328,8 +336,10 @@ public class ShoutPresenter {
                                 .getRefreshObserver().onNext(null);
                         return null;
                     }
-                })
-                .subscribe();
+                });
+
+        refreshShoutsObservable = Observable.merge(refreshUserShouts, refreshRelatedShouts, refreshShout);
+        /** **/
 
         final Observable<Boolean> callOrEditObservable = Observable
                 .combineLatest(callOrDeleteSubject, isUserShoutOwnerObservable, new Func2<Object, Boolean, Boolean>() {
@@ -453,8 +463,8 @@ public class ShoutPresenter {
         return RxMoreObservers.ignoreCompleted(onVideoOrEditClickSubject);
     }
     @Nonnull
-    public Observable<Object> getRefreshUserShoutsObservable() {
-        return refreshUserShoutsObservable;
+    public Observable<Object> getRefreshShoutsObservable() {
+        return refreshShoutsObservable;
     }
 
     @Nonnull

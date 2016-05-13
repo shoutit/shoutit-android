@@ -28,6 +28,7 @@ import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
 import com.shoutit.app.android.utils.stackcounter.StackCounterManager;
+import com.squareup.leakcanary.LeakCanary;
 import com.uservoice.uservoicesdk.Config;
 import com.uservoice.uservoicesdk.UserVoice;
 
@@ -78,6 +79,10 @@ public class App extends MultiDexApplication {
         initFabric();
         initUserVoice();
         logRxJavaErrors();
+
+        if (BuildConfig.BUILD_TYPE.contains("debug")) {
+            LeakCanary.install(this);
+        }
 
         setupGraph();
 

@@ -71,6 +71,14 @@ public class UserOrPageProfileActivity extends ProfileActivity {
                     }
                 });
 
+        presenter.getRefreshUserShoutsObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
+
+        presenter.getUserUpdatesObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
+
         // User Profile specific subscriptions
         presenter.getUserProfilePresenter().getOnChatIconClickedSubject()
                 .compose(this.<ChatInfo>bindToLifecycle())

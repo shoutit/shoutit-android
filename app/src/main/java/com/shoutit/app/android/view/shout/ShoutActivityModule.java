@@ -11,7 +11,7 @@ public class ShoutActivityModule {
     @Nonnull
     private final String shoutId;
 
-    public ShoutActivityModule(ShoutActivity shoutActivity, @Nonnull String shoutId) {
+    public ShoutActivityModule(@Nonnull String shoutId) {
         this.shoutId = shoutId;
 
     }
