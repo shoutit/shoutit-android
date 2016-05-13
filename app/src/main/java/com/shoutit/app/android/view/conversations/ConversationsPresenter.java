@@ -217,35 +217,23 @@ public class ConversationsPresenter {
     @NonNull
     private BaseAdapterItem getConversationItem(@NonNull Conversation input) {
         final Message lastMessage = input.getLastMessage();
-        final List<ConversationProfile> profiles = input.getProfiles();
+        final Conversation.DisplayData displayData = input.getDisplay();
 
         final String message = getMessageString(lastMessage);
         final String elapsedTime = DateUtils.getRelativeTimeSpanString(mContext, lastMessage.getCreatedAt() * 1000).toString();
         final User user = mUserPreferences.getUser();
         assert user != null;
-        final String chatWith = ConversationsUtils.getChatWithString(profiles, user.getId());
-        final String image = getImage(profiles);
 
         final boolean isUnread = input.getUnreadMessagesCount() > 0;
         if (Conversation.ABOUT_SHOUT_TYPE.equals(input.getType())) {
-            return new ConversationShoutItem(input.getId(), input.getAbout().getTitle(), chatWith, message, elapsedTime, image, isUnread);
+            return new ConversationShoutItem(input.getId(), displayData.getTitle(),
+                    displayData.getSubTitle(), message, elapsedTime, displayData.getImage(), isUnread);
         } else if (Conversation.CHAT_TYPE.equals(input.getType())) {
-            return new ConversationChatItem(input.getId(), message, chatWith, elapsedTime, image, isUnread);
+            return new ConversationChatItem(input.getId(), message, displayData.getSubTitle(),
+                    elapsedTime, displayData.getImage(), isUnread);
         } else {
             throw new RuntimeException(input.getType() + " : unknown type");
         }
-    }
-
-    private String getImage(List<ConversationProfile> profiles) {
-        final User user = mUserPreferences.getUser();
-        assert user != null;
-        final String id = user.getId();
-        for (ConversationProfile profile : profiles) {
-            if (!profile.getId().equals(id)) {
-                return profile.getImage();
-            }
-        }
-        return null;
     }
 
     private String getMessageString(Message lastMessage) {

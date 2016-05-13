@@ -394,6 +394,12 @@ public interface ApiService {
     Observable<ResponseBody> readMessage(@Path("id") String messageId);
 
     /**
+     * Public Chats
+     */
+    @GET("public_chats")
+    Observable<ConversationsResponse> publicChats();
+
+    /**
      * Notifications
      **/
     @GET("notifications")

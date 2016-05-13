@@ -52,7 +52,7 @@ public class ConversationsAdapter extends BaseAdapter {
         @Override
         public void bind(@Nonnull BaseAdapterItem item) {
             final ConversationsPresenter.ConversationChatItem conversationChatItem = (ConversationsPresenter.ConversationChatItem) item;
-            mPicasso.load(conversationChatItem.getImage())
+            mPicasso.load(Strings.emptyToNull(conversationChatItem.getImage()))
                     .placeholder(R.drawable.ic_rect_avatar_placeholder)
                     .error(R.drawable.ic_rect_avatar_placeholder)
                     .into(mConversationChatItemImage);
