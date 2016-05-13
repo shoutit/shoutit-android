@@ -19,7 +19,6 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.Conversation;
-import com.shoutit.app.android.api.model.ConversationProfile;
 import com.shoutit.app.android.api.model.ConversationsResponse;
 import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessageAttachment;
@@ -58,7 +57,7 @@ public class ConversationsPresenter {
                 public Observable<ConversationsResponse> call(ConversationsResponse conversationsResponse) {
                     if (conversationsResponse == null || conversationsResponse.getPrevious() != null) {
                         if (conversationsResponse == null) {
-                            return mApiService.getConversations(PAGE_SIZE)
+                            return getConversationsRequest()
                                     .subscribeOn(mNetworkScheduler)
                                     .observeOn(mUiScheduler);
                         } else {
@@ -92,6 +91,7 @@ public class ConversationsPresenter {
     private final Context mContext;
     private final UserPreferences mUserPreferences;
     private final PusherHelper mPusherHelper;
+    private final boolean isMyConversationsList;
     private final PublishSubject<Object> requestSubject = PublishSubject.create();
     private Listener mListener;
     private Subscription mSubscription;
@@ -103,13 +103,23 @@ public class ConversationsPresenter {
                                   @UiScheduler Scheduler uiScheduler,
                                   @ForActivity Context context,
                                   UserPreferences userPreferences,
-                                  PusherHelper pusherHelper) {
+                                  PusherHelper pusherHelper,
+                                  boolean isMyConversationsList) {
         mApiService = apiService;
         mNetworkScheduler = networkScheduler;
         mUiScheduler = uiScheduler;
         mContext = context;
         mUserPreferences = userPreferences;
         mPusherHelper = pusherHelper;
+        this.isMyConversationsList = isMyConversationsList;
+    }
+
+    private Observable<ConversationsResponse> getConversationsRequest() {
+        if (isMyConversationsList) {
+            return mApiService.getConversations(PAGE_SIZE);
+        } else {
+            return mApiService.publicChats(PAGE_SIZE);
+        }
     }
 
     public void register(@NonNull final Listener listener) {

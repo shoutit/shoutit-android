@@ -19,7 +19,7 @@ import com.shoutit.app.android.utils.BlurTransform;
 import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.RtlUtils;
-import com.shoutit.app.android.view.conversations.ConverstationsFragment;
+import com.shoutit.app.android.view.conversations.ConversationsPagerFragment;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
 import com.shoutit.app.android.view.discover.DiscoverFragment;
 import com.shoutit.app.android.view.home.HomeFragment;
@@ -288,7 +288,7 @@ public class MenuHandler {
             case FRAGMENT_BROWSE:
                 return SearchShoutsResultsFragment.newInstance(null, null, SearchPresenter.SearchType.BROWSE);
             case FRAGMENT_CHATS:
-                return ConverstationsFragment.newInstance();
+                return ConversationsPagerFragment.newInstance();
             default:
                 throw new RuntimeException("Unknown fragment tag");
 

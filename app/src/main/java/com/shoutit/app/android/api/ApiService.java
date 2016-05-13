@@ -397,7 +397,7 @@ public interface ApiService {
      * Public Chats
      */
     @GET("public_chats")
-    Observable<ConversationsResponse> publicChats();
+    Observable<ConversationsResponse> publicChats(@Query("page_size") Integer pageSize);
 
     /**
      * Notifications

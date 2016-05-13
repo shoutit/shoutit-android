@@ -365,7 +365,12 @@
     <string name="publish_sub_header">Want to add a price?</string>
     <string name="publish_price_hint">Negotiable</string>
     <string name="publish_done">Done</string>
+
+
+    <!-- Conversations -->
     <string name="conversation_title">Chats</string>
+    <string name="conversations_my_ab_title">My chats</string>
+    <string name="conversations_public_ab_title">Public chats</string>
 
     <!-- Chats -->
     <string name="chat_show_map">Show Map</string>

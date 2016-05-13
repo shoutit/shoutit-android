@@ -37,7 +37,9 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 
-public class ConverstationsFragment extends BaseFragment implements ConversationsPresenter.Listener {
+public class ConversationsFragment extends BaseFragment implements ConversationsPresenter.Listener {
+
+    private static final String KEY_IS_MY_CONVERSATIONS = "is_my_conversations";
 
     @Bind(R.id.conversation_recyclerview)
     RecyclerView mConversationRecyclerview;
@@ -55,8 +57,14 @@ public class ConverstationsFragment extends BaseFragment implements Conversation
     private View mLogo;
     private List<MenuItem> mItems = Lists.newArrayList();
 
-    public static Fragment newInstance() {
-        return new ConverstationsFragment();
+    public static Fragment newInstance(final boolean isMyConversations) {
+        final Bundle bundle = new Bundle();
+        bundle.putBoolean(KEY_IS_MY_CONVERSATIONS, isMyConversations);
+
+        final ConversationsFragment fragment = new ConversationsFragment();
+        fragment.setArguments(bundle);
+
+        return fragment;
     }
 
     @Nullable
@@ -69,9 +77,13 @@ public class ConverstationsFragment extends BaseFragment implements Conversation
     protected void injectComponent(@Nonnull BaseActivityComponent baseActivityComponent,
                                    @Nonnull FragmentModule fragmentModule,
                                    @Nullable Bundle savedInstanceState) {
+
+        final boolean isMyConversations = getArguments().getBoolean(KEY_IS_MY_CONVERSATIONS);
+
         final ConversationsFragmentComponent component = DaggerConversationsFragmentComponent
                 .builder()
                 .fragmentModule(new FragmentModule(this))
+                .converstationsFragmentModule(new ConverstationsFragmentModule(isMyConversations))
                 .baseActivityComponent(baseActivityComponent)
                 .build();
         component.inject(this);
