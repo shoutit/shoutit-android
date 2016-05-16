@@ -9,13 +9,15 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ForActivity;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 public class ConversationsPagerAdapter extends FragmentPagerAdapter {
 
     private final Context context;
 
     @Inject
-    public ConversationsPagerAdapter(FragmentManager fm, @ForActivity Context context) {
+    public ConversationsPagerAdapter(@Named("childFragmentManager") FragmentManager fm,
+                                     @ForActivity Context context) {
         super(fm);
         this.context = context;
     }

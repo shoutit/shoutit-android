@@ -17,6 +17,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.ConversationsResponse;
@@ -57,15 +58,15 @@ public class ConversationsPresenter {
                 public Observable<ConversationsResponse> call(ConversationsResponse conversationsResponse) {
                     if (conversationsResponse == null || conversationsResponse.getPrevious() != null) {
                         if (conversationsResponse == null) {
-                            return getConversationsRequest()
+                            return getConversationsRequest(null)
                                     .subscribeOn(mNetworkScheduler)
                                     .observeOn(mUiScheduler);
                         } else {
-                            final String after = Uri.parse(conversationsResponse.getPrevious()).getQueryParameter("before");
+                            final String before = Uri.parse(conversationsResponse.getPrevious()).getQueryParameter("before");
                             return Observable.just(
                                     conversationsResponse)
                                     .zipWith(
-                                            mApiService.getConversations(after, PAGE_SIZE)
+                                            getConversationsRequest(before)
                                                     .subscribeOn(mNetworkScheduler)
                                                     .observeOn(mUiScheduler),
                                             new Func2<ConversationsResponse, ConversationsResponse, ConversationsResponse>() {
@@ -114,11 +115,11 @@ public class ConversationsPresenter {
         this.isMyConversationsList = isMyConversationsList;
     }
 
-    private Observable<ConversationsResponse> getConversationsRequest() {
+    private Observable<ConversationsResponse> getConversationsRequest(@Nullable String before) {
         if (isMyConversationsList) {
-            return mApiService.getConversations(PAGE_SIZE);
+            return mApiService.getConversations(before, PAGE_SIZE);
         } else {
-            return mApiService.publicChats(PAGE_SIZE);
+            return mApiService.publicChats(before, PAGE_SIZE);
         }
     }
 
@@ -131,6 +132,16 @@ public class ConversationsPresenter {
                     }
                 })
                 .observeOn(mUiScheduler)
+                .filter(new Func1<Conversation, Boolean>() {
+                    @Override
+                    public Boolean call(Conversation conversation) {
+                        if (isMyConversationsList) {
+                            return !Conversation.PUBLIC_CHAT_TYPE.equals(conversation.getType());
+                        } else {
+                            return Conversation.PUBLIC_CHAT_TYPE.equals(conversation.getType());
+                        }
+                    }
+                })
                 .scan(Maps.<String, Conversation>newHashMap(), new Func2<HashMap<String, Conversation>, Conversation, HashMap<String, Conversation>>() {
                     @Override
                     public HashMap<String, Conversation> call(HashMap<String, Conversation> map, Conversation pusherMessage) {
@@ -179,7 +190,7 @@ public class ConversationsPresenter {
                             @Override
                             public boolean apply(@Nullable Conversation input) {
                                 assert input != null;
-                                return input.getProfiles().size() > 1;
+                                return !isMyConversationsList || input.getProfiles().size() > 1;
                             }
                         }));
                     }
@@ -239,8 +250,11 @@ public class ConversationsPresenter {
             return new ConversationShoutItem(input.getId(), displayData.getTitle(),
                     displayData.getSubTitle(), message, elapsedTime, displayData.getImage(), isUnread);
         } else if (Conversation.CHAT_TYPE.equals(input.getType())) {
+            return new ConversationChatItem(input.getId(), message, displayData.getTitle(),
+                    elapsedTime, displayData.getImage(), isUnread, false);
+        } else if (Conversation.PUBLIC_CHAT_TYPE.equals(input.getType())) {
             return new ConversationChatItem(input.getId(), message, displayData.getSubTitle(),
-                    elapsedTime, displayData.getImage(), isUnread);
+                    elapsedTime, displayData.getImage(), isUnread, true);
         } else {
             throw new RuntimeException(input.getType() + " : unknown type");
         }
@@ -285,24 +299,27 @@ public class ConversationsPresenter {
 
         void error();
 
-        void onItemClicked(@NonNull String id, boolean shoutChat);
+        void onItemClicked(@NonNull String id, boolean shoutChat, boolean isPublicChat);
     }
 
-    public class ConversationChatItem implements BaseAdapterItem {
+    public class ConversationChatItem extends BaseNoIDAdapterItem {
         private final String id;
         private final String message;
         private final String user;
         private final String time;
         private final String image;
         private final boolean mIsUnread;
+        private final boolean isPublicChat;
 
-        public ConversationChatItem(String id, String message, String user, String time, String image, boolean isUnread) {
+        public ConversationChatItem(String id, String message, String user, String time,
+                                    String image, boolean isUnread, boolean isPublicChat) {
             this.id = id;
             this.message = message;
             this.user = user;
             this.time = time;
             this.image = image;
             mIsUnread = isUnread;
+            this.isPublicChat = isPublicChat;
         }
 
         @Override
@@ -313,11 +330,6 @@ public class ConversationsPresenter {
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
             return false;
-        }
-
-        @Override
-        public long adapterId() {
-            return 0;
         }
 
         public String getId() {
@@ -345,7 +357,7 @@ public class ConversationsPresenter {
         }
 
         public void click() {
-            mListener.onItemClicked(id, false);
+            mListener.onItemClicked(id, false, isPublicChat);
         }
     }
 
@@ -418,7 +430,7 @@ public class ConversationsPresenter {
         }
 
         public void click() {
-            mListener.onItemClicked(id, true);
+            mListener.onItemClicked(id, true, false);
         }
     }
 

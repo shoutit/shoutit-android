@@ -53,10 +53,6 @@ public class ConversationsFragment extends BaseFragment implements Conversations
     @Inject
     ConversationsAdapter adapter;
 
-    @Nullable
-    private View mLogo;
-    private List<MenuItem> mItems = Lists.newArrayList();
-
     public static Fragment newInstance(final boolean isMyConversations) {
         final Bundle bundle = new Bundle();
         bundle.putBoolean(KEY_IS_MY_CONVERSATIONS, isMyConversations);
@@ -103,13 +99,6 @@ public class ConversationsFragment extends BaseFragment implements Conversations
         mConversationRecyclerview.setAdapter(adapter);
         mConversationRecyclerview.setLayoutManager(new MyLinearLayoutManager(getActivity()));
 
-        final BaseActivity activity = (BaseActivity) getActivity();
-        activity.getSupportActionBar().setTitle(R.string.conversation_title);
-        mLogo = activity.findViewById(R.id.activity_main_logo);
-        if (mLogo != null) {
-            mLogo.setVisibility(View.GONE);
-        }
-
         RxRecyclerView.scrollEvents(mConversationRecyclerview)
                 .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
                 .filter(LoadMoreHelper.needLoadMore((MyLayoutManager) mConversationRecyclerview.getLayoutManager(), adapter))
@@ -126,30 +115,6 @@ public class ConversationsFragment extends BaseFragment implements Conversations
     public void onPause() {
         super.onPause();
         presenter.unregister();
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (mLogo != null) {
-            mLogo.setVisibility(View.VISIBLE);
-        }
-        final BaseActivity activity = (BaseActivity) getActivity();
-        activity.getSupportActionBar().setTitle(null);
-        for (MenuItem item : mItems) {
-            item.setVisible(true);
-        }
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        for (int i = 0; i < menu.size(); i++) {
-            final MenuItem item = menu.getItem(i);
-            item.setVisible(false);
-            mItems.add(item);
-        }
-        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -175,7 +140,11 @@ public class ConversationsFragment extends BaseFragment implements Conversations
     }
 
     @Override
-    public void onItemClicked(@NonNull String id, boolean shoutChat) {
-        startActivity(ChatActivity.newIntent(getActivity(), id, shoutChat));
+    public void onItemClicked(@NonNull String id, boolean shoutChat, boolean isPublicChat) {
+        if (isPublicChat) {
+            // TODO Piotrek
+        } else {
+            startActivity(ChatActivity.newIntent(getActivity(), id, shoutChat));
+        }
     }
 }

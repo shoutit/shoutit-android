@@ -200,6 +200,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
                                     ConversationsPagerFragment.newInstance(), MenuHandler.FRAGMENT_CHATS)
                             .commit();
                     menuHandler.selectChats();
+                    menuHandler.setToolbarElevation(false);
                 } else {
                     startActivity(LoginIntroActivity.newIntent(this));
                 }
@@ -208,6 +209,8 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
                 return super.onOptionsItemSelected(item);
         }
     }
+
+
 
     private boolean showMainSearchActivityOrLetFragmentsHandleIt() {
         final Fragment fragment = Iterables.getLast(getSupportFragmentManager().getFragments());

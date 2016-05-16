@@ -6,6 +6,7 @@ public class Conversation {
 
     public static final String ABOUT_SHOUT_TYPE = "about_shout";
     public static final String CHAT_TYPE = "chat";
+    public static final String PUBLIC_CHAT_TYPE = "public_chat";
 
 
     private final String id;

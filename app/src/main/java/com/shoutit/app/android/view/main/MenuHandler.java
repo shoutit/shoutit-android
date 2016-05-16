@@ -5,6 +5,7 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
 import android.view.View;
 import android.widget.CheckedTextView;
 import android.widget.ImageView;
@@ -187,7 +188,17 @@ public class MenuHandler {
         }
 
         KeyboardHelper.hideSoftKeyboard(rxActivity);
-        selectItem(view.getId());
+        setToolbarElevation(view.getId() != R.id.menu_chat);
+    }
+
+    public void setToolbarElevation(boolean enable) {
+        final ActionBar actionBar = rxActivity.getSupportActionBar();
+        if (actionBar == null) {
+            return;
+        }
+
+        actionBar.setElevation(enable ?
+                rxActivity.getResources().getDimensionPixelSize(R.dimen.toolbar_elevation) : 0f);
     }
 
     private void showLoginActivity() {

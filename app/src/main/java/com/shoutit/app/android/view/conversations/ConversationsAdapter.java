@@ -83,15 +83,15 @@ public class ConversationsAdapter extends BaseAdapter {
         private final Resources mResources;
 
         @Bind(R.id.conversation_shout_item_image)
-        ImageView mConversationShoutItemImage;
+        ImageView mImageIv;
         @Bind(R.id.conversation_shout_item_shout_title)
-        TextView mConversationShoutItemShoutTitle;
+        TextView mTitleTv;
         @Bind(R.id.conversation_shout_item_name)
-        TextView mConversationShoutItemName;
+        TextView mSubtitleTv;
         @Bind(R.id.conversation_shout_item_message)
-        TextView mConversationShoutItemMessage;
+        TextView mLastMessageTv;
         @Bind(R.id.conversation_shout_item_time)
-        TextView mConversationShoutItemTime;
+        TextView mTimeTv;
 
         public ConversationShoutItemHolder(@Nonnull View itemView, Picasso picasso, Resources resources) {
             super(itemView);
@@ -108,17 +108,17 @@ public class ConversationsAdapter extends BaseAdapter {
             mPicasso.load(conversationShoutItem.getImage())
                     .placeholder(R.drawable.ic_rect_avatar_placeholder)
                     .error(R.drawable.ic_rect_avatar_placeholder)
-                    .into(mConversationShoutItemImage);
+                    .into(mImageIv);
             final String shoutDescription = conversationShoutItem.getShoutDescription();
             if(Strings.isNullOrEmpty(shoutDescription)){
-                mConversationShoutItemShoutTitle.setVisibility(View.GONE);
+                mTitleTv.setVisibility(View.GONE);
             } else {
-                mConversationShoutItemShoutTitle.setVisibility(View.VISIBLE);
-                mConversationShoutItemShoutTitle.setText(shoutDescription);
+                mTitleTv.setVisibility(View.VISIBLE);
+                mTitleTv.setText(shoutDescription);
             }
-            mConversationShoutItemName.setText(conversationShoutItem.getUserNames());
-            mConversationShoutItemMessage.setText(conversationShoutItem.getMessage());
-            mConversationShoutItemTime.setText(conversationShoutItem.getTime());
+            mSubtitleTv.setText(conversationShoutItem.getUserNames());
+            mLastMessageTv.setText(conversationShoutItem.getMessage());
+            mTimeTv.setText(conversationShoutItem.getTime());
 
             mItemView.setBackgroundColor(conversationShoutItem.isUnread() ? mResources.getColor(R.color.conversation_not_read) : Color.WHITE);
 
