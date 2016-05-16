@@ -154,7 +154,7 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
                     public Object call(ResponseOrError<User> userResponseOrError) {
                         profilesDao.getProfileDao(userName)
                                 .updatedProfileLocallyObserver()
-                                .onNext(null);
+                                .onNext(userResponseOrError);
                         return null;
                     }
                 });
