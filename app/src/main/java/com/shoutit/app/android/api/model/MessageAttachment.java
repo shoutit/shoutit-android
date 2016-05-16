@@ -15,19 +15,72 @@ public class MessageAttachment {
     public static final String ATTACHMENT_TYPE_SHOUT = "shout";
     public static final String ATTACHMENT_TYPE_LOCATION = "location";
     public static final String ATTACHMENT_TYPE_MEDIA = "media";
+    public static final String ATTACHMENT_TYPE_PROFILE = "profile";
 
     private final String type;
     private final MessageLocation location;
     private final AttachtmentShout shout;
     private final List<String> images;
     private final List<Video> videos;
+    private final MessageProfile profile;
 
-    public MessageAttachment(String type, MessageLocation location, AttachtmentShout shout, List<String> image, List<Video> video) {
+    public MessageAttachment(String type, MessageLocation location, AttachtmentShout shout,
+                             List<String> image, List<Video> video, MessageProfile profile) {
         this.type = type;
         this.location = location;
         this.shout = shout;
         this.images = image;
         this.videos = video;
+        this.profile = profile;
+    }
+
+    public static class MessageProfile {
+        @Nonnull
+        private final String id;
+        private final String username;
+        private final String name;
+        private final int listenersCount;
+        private final String image;
+        private final String cover;
+
+        public static MessageProfile messageToSend(@Nonnull String profileId) {
+            return new MessageProfile(profileId, null, null, 0, null, null);
+        }
+
+        public MessageProfile(@Nonnull String id, String username, String name,
+                              int listenersCount, String image, String cover) {
+            this.id = id;
+            this.username = username;
+            this.name = name;
+            this.listenersCount = listenersCount;
+            this.image = image;
+            this.cover = cover;
+        }
+
+        @Nonnull
+        public String getId() {
+            return id;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public int getListenersCount() {
+            return listenersCount;
+        }
+
+        public String getImage() {
+            return image;
+        }
+
+        public String getCover() {
+            return cover;
+        }
+
+        public String getName() {
+            return name;
+        }
     }
 
     public static class MessageLocation {
@@ -58,6 +111,10 @@ public class MessageAttachment {
 
     public AttachtmentShout getShout() {
         return shout;
+    }
+
+    public MessageProfile getProfile() {
+        return profile;
     }
 
     public List<String> getImages() {
@@ -113,6 +170,11 @@ public class MessageAttachment {
             this.category = category;
             this.datePublished = datePublished;
             this.availableCount = availableCount;
+        }
+
+        public static AttachtmentShout messageToSend(@Nonnull String shoutId) {
+            return new AttachtmentShout(shoutId, null, null, null, null, null, null, 0L, 0, null,
+                    null, null, null, null, 0L, 0);
         }
 
         @Nonnull

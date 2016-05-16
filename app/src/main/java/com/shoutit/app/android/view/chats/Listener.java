@@ -28,11 +28,13 @@ public interface Listener {
 
     void onShoutClicked(String shoutId);
 
+    void onProfileClicked(String userName);
+
     void hideAttatchentsMenu();
 
     void setShoutToolbarInfo(String title, String chatWithString);
 
-    void setChatToolbatInfo(String chatWithString);
+    void setChatToolbarInfo(String chatWithString);
 
     void showVideoChatIcon();
 }

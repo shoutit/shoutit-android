@@ -21,6 +21,8 @@ import com.shoutit.app.android.api.model.EditShoutRequest;
 import com.shoutit.app.android.api.model.EditShoutRequestWithPrice;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.GuestSignupRequest;
+import com.shoutit.app.android.api.model.ListenersResponse;
+import com.shoutit.app.android.api.model.ListeningResponse;
 import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessagesResponse;
 import com.shoutit.app.android.api.model.NotificationsResponse;
@@ -232,7 +234,7 @@ public interface ApiService {
 
 
     /**
-     * User
+     * Profile
      **/
     @GET("profiles/{user_name}")
     Observable<User> getUser(@Path("user_name") String userName);
@@ -257,9 +259,6 @@ public interface ApiService {
     @PATCH("profiles/me")
     Observable<User> unregisterGcmToken(@Body RequestBody registerDeviceRequest);
 
-    /**
-     * Profile
-     **/
     @POST("profiles/{username}/listen")
     Observable<ResponseBody> listenProfile(@Path("username") String username);
 
@@ -273,6 +272,19 @@ public interface ApiService {
     Observable<SearchProfileResponse> searchProfiles(@Query("search") String searchQuery,
                                                      @Query("page") Integer page,
                                                      @Query("page_size") Integer pageSize);
+
+    @GET("profiles/me/listening")
+    Observable<ListeningResponse> profilesListenings(@Query("page") Integer page,
+                                                     @Query("page_size") Integer pageSize);
+
+    @GET("profiles/me/interests")
+    Observable<ListeningResponse> tagsListenings(@Query("page") Integer page,
+                                                  @Query("page_size") Integer pageSize);
+
+    @GET("profiles/{user_name}/listeners")
+    Observable<ListenersResponse> listeners(@Path("user_name") String userName,
+                                            @Query("page") Integer page,
+                                            @Query("page_size") Integer pageSize);
 
     /**
      * Misc

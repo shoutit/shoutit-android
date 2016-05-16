@@ -12,11 +12,13 @@ import com.shoutit.app.android.view.chats.message_models.DateItem;
 import com.shoutit.app.android.view.chats.message_models.InfoItem;
 import com.shoutit.app.android.view.chats.message_models.ReceivedImageMessage;
 import com.shoutit.app.android.view.chats.message_models.ReceivedLocationMessage;
+import com.shoutit.app.android.view.chats.message_models.ReceivedProfileMessage;
 import com.shoutit.app.android.view.chats.message_models.ReceivedShoutMessage;
 import com.shoutit.app.android.view.chats.message_models.ReceivedTextMessage;
 import com.shoutit.app.android.view.chats.message_models.ReceivedVideoMessage;
 import com.shoutit.app.android.view.chats.message_models.SentImageMessage;
 import com.shoutit.app.android.view.chats.message_models.SentLocationMessage;
+import com.shoutit.app.android.view.chats.message_models.SentProfileMessage;
 import com.shoutit.app.android.view.chats.message_models.SentShoutMessage;
 import com.shoutit.app.android.view.chats.message_models.SentTextMessage;
 import com.shoutit.app.android.view.chats.message_models.SentVideoMessage;
@@ -31,9 +33,9 @@ public class ChatsAdapter extends BaseAdapter {
     private static final int DATE_ITEM = 0;
     private static final int RECEIVER_IMAGE = 1;
     private static final int RECEIVER_LOCATION = 2;
-    private static final int RECEIVER_VIDEO = 3;
+    private static final int RECEIVED_VIDEO = 3;
     private static final int RECEIVED_SHOUT = 4;
-    private static final int RECEIVER_TEXT = 5;
+    private static final int RECEIVED_TEXT = 5;
     private static final int SENT_IMAGE = 6;
     private static final int SENT_TEXT = 7;
     private static final int SENT_LOCATION = 8;
@@ -41,6 +43,8 @@ public class ChatsAdapter extends BaseAdapter {
     private static final int SENT_SHOUT = 10;
     private static final int INFO_ITEM = 11;
     private static final int TYPING_ITEM = 12;
+    private static final int SENT_PROFILE = 13;
+    private static final int RECEIVED_PROFILE = 14;
 
     @NonNull
     private final Picasso mPicasso;
@@ -60,11 +64,11 @@ public class ChatsAdapter extends BaseAdapter {
                 return ReceivedImageMessageHolder.create(layoutInflater.inflate(ReceivedImageMessageHolder.getLayoutRes(), parent, false), mPicasso);
             case RECEIVER_LOCATION:
                 return ReceivedLocationMessageHolder.create(layoutInflater.inflate(ReceivedLocationMessageHolder.getLayoutRes(), parent, false), mPicasso);
-            case RECEIVER_TEXT:
+            case RECEIVED_TEXT:
                 return ReceivedTextMessageHolder.create(layoutInflater.inflate(ReceivedTextMessageHolder.getLayoutRes(), parent, false), mPicasso);
             case RECEIVED_SHOUT:
                 return ReceivedShoutMessageHolder.create(layoutInflater.inflate(ReceivedShoutMessageHolder.getLayoutRes(), parent, false), mPicasso);
-            case RECEIVER_VIDEO:
+            case RECEIVED_VIDEO:
                 return ReceivedVideoMessageHolder.create(layoutInflater.inflate(ReceivedVideoMessageHolder.getLayoutRes(), parent, false), mPicasso);
             case SENT_IMAGE:
                 return SentImageMessageHolder.create(layoutInflater.inflate(SentImageMessageHolder.getLayoutRes(), parent, false), mPicasso);
@@ -80,6 +84,10 @@ public class ChatsAdapter extends BaseAdapter {
                 return InformationItemHolder.create(layoutInflater.inflate(InformationItemHolder.getLayoutRes(), parent, false));
             case TYPING_ITEM:
                 return TypingItemHolder.create(layoutInflater.inflate(TypingItemHolder.getLayoutRes(), parent, false), context.getResources());
+            case RECEIVED_PROFILE:
+                return ReceivedProfileMessageHolder.create(layoutInflater.inflate(ReceivedProfileMessageHolder.getLayoutRes(), parent, false), mPicasso, context);
+            case SENT_PROFILE:
+                return SentProfileMessageHolder.create(layoutInflater.inflate(SentProfileMessageHolder.getLayoutRes(), parent, false), mPicasso, context);
             default:
                 throw new RuntimeException();
         }
@@ -101,11 +109,11 @@ public class ChatsAdapter extends BaseAdapter {
         } else if (baseAdapterItem instanceof ReceivedImageMessage) {
             return RECEIVER_IMAGE;
         } else if (baseAdapterItem instanceof ReceivedVideoMessage) {
-            return RECEIVER_VIDEO;
+            return RECEIVED_VIDEO;
         } else if (baseAdapterItem instanceof ReceivedShoutMessage) {
             return RECEIVED_SHOUT;
         } else if (baseAdapterItem instanceof ReceivedTextMessage) {
-            return RECEIVER_TEXT;
+            return RECEIVED_TEXT;
         } else if (baseAdapterItem instanceof SentImageMessage) {
             return SENT_IMAGE;
         } else if (baseAdapterItem instanceof SentTextMessage) {
@@ -120,6 +128,10 @@ public class ChatsAdapter extends BaseAdapter {
             return INFO_ITEM;
         } else if (baseAdapterItem instanceof TypingItem) {
             return TYPING_ITEM;
+        } else if (baseAdapterItem instanceof ReceivedProfileMessage) {
+            return RECEIVED_PROFILE;
+        } else if (baseAdapterItem instanceof SentProfileMessage) {
+            return SENT_PROFILE;
         } else {
             throw new RuntimeException();
         }

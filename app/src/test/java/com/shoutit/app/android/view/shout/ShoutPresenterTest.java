@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 import retrofit2.Response;

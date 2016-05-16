@@ -29,9 +29,9 @@ if (keystoreProperties.exists()) {
     props.load(new FileInputStream(keystoreProperties))
 }
 
-def baseVersionName = "2.0.4"
+def baseVersionName = "2.0.5"
 
-project.ext.versionCode = 73
+project.ext.versionCode = 74
 
 if (project.hasProperty("versionSuffix")) {
     project.ext.versionChangeSuffix = project.versionSuffix
@@ -210,6 +210,10 @@ dependencies {
     compile 'com.jakewharton.picasso:picasso2-okhttp3-downloader:1.0.2'
     compile 'com.squareup.retrofit2:converter-gson:2.0.0-beta3'
     compile 'com.squareup.retrofit2:adapter-rxjava:2.0.0-beta3'
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'
+    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
+    stagingCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
+    localCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
 
     // RX
     compile 'com.trello:rxlifecycle:0.4.0'

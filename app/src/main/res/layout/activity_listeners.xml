@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/listeners_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/default_bg_color"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/listeners_toolbar"
+        style="@style/AppTheme.BaseToolbarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize"
+        android:elevation="0dp" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/listeners_recycler_view"
+        android:layout_below="@+id/listeners_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <include layout="@layout/base_progress" />
+
+</RelativeLayout>

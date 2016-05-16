@@ -20,6 +20,7 @@
     <color name="button_stroke">#1e000000</color>
     <color name="base_item_selected_color">#0f000000</color>
     <color name="accent_red">#ff5252</color>
+    <color name="green_tab_text_color">#b2ffffff</color>
 
     <!-- Intro -->
     <color name="intro_gradient_start">#43cea2</color>
@@ -98,6 +99,7 @@
     <color name="video_calls_dismiss_call_button">#FF0000</color>
     <color name="video_calls_semi_transparent_background">#80000000</color>
     <color name="white97">#e3ffffff</color>
+    <color name="listening_tab_text">#b2ffffff</color>
 
     <!-- Media -->
     <color name="media_image_background">#C8E6C9</color>

@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.google.common.base.Strings;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
@@ -21,6 +22,8 @@ import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.view.chats.ChatActivity;
 import com.shoutit.app.android.view.chats.chatsfirstconversation.ChatFirstConversationActivity;
 import com.shoutit.app.android.view.editprofile.EditProfileActivity;
+import com.shoutit.app.android.view.listeners.ListenersActivity;
+import com.shoutit.app.android.view.listenings.ListeningsActivity;
 import com.shoutit.app.android.view.notifications.NotificationsActivity;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsActivity;
@@ -71,6 +74,14 @@ public class UserOrPageProfileActivity extends ProfileActivity {
                     }
                 });
 
+        presenter.getRefreshUserShoutsObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
+
+        presenter.getUserUpdatesObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
+
         // User Profile specific subscriptions
         presenter.getUserProfilePresenter().getOnChatIconClickedSubject()
                 .compose(this.<ChatInfo>bindToLifecycle())
@@ -108,6 +119,18 @@ public class UserOrPageProfileActivity extends ProfileActivity {
                     }
                 });
 
+        // My Profile specific subscriptions
+        presenter.getMyProfilePresenter().getEditProfileClickObservable()
+                .compose(bindToLifecycle())
+                .subscribe(new Action1<Object>() {
+                    @Override
+                    public void call(Object ignore) {
+                        startActivityForResult(
+                                EditProfileActivity.newIntent(UserOrPageProfileActivity.this),
+                                REQUEST_CODE_FROM_EDIT_PROFILE);
+                    }
+                });
+
         presenter.getMyProfilePresenter()
                 .getVerifyAccountClickObservable()
                 .compose(bindToLifecycle())
@@ -118,15 +141,36 @@ public class UserOrPageProfileActivity extends ProfileActivity {
                     }
                 });
 
-        // My Profile specific subscriptions
-        presenter.getMyProfilePresenter().getEditProfileClickObservable()
+        presenter.getMyProfilePresenter()
+                .getListeningsClickObservable()
                 .compose(bindToLifecycle())
                 .subscribe(new Action1<Object>() {
                     @Override
-                    public void call(Object ignore) {
-                        startActivityForResult(
-                                EditProfileActivity.newIntent(UserOrPageProfileActivity.this),
-                                REQUEST_CODE_FROM_EDIT_PROFILE);
+                    public void call(Object o) {
+                        startActivityForResult(ListeningsActivity.newIntent(UserOrPageProfileActivity.this, false),
+                                REQUEST_CODE_PROFILE_UPDATED_FROM_LISTENINGS);
+                    }
+                });
+
+        presenter.getMyProfilePresenter()
+                .getInterestsClickObservable()
+                .compose(bindToLifecycle())
+                .subscribe(new Action1<Object>() {
+                    @Override
+                    public void call(Object o) {
+                        startActivityForResult(ListeningsActivity.newIntent(UserOrPageProfileActivity.this, true),
+                                REQUEST_CODE_PROFILE_UPDATED_FROM_LISTENINGS);
+                    }
+                });
+
+        presenter.getMyProfilePresenter()
+                .getListenersClickObservable()
+                .compose(bindToLifecycle())
+                .subscribe(new Action1<Object>() {
+                    @Override
+                    public void call(Object o) {
+                        startActivityForResult(ListenersActivity.newIntent(UserOrPageProfileActivity.this, User.ME),
+                                REQUEST_CODE_PROFILE_UPDATED_FROM_LISTENINGS);
                     }
                 });
 

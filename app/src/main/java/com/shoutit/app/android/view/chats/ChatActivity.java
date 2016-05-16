@@ -46,7 +46,9 @@ import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.utils.TextWatcherAdapter;
 import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
+import com.shoutit.app.android.view.chooseprofile.SelectProfileActivity;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
+import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.shoutit.app.android.view.shouts.selectshout.SelectShoutActivity;
 import com.shoutit.app.android.view.videoconversation.VideoConversationActivity;
@@ -71,6 +73,7 @@ public class ChatActivity extends BaseActivity implements Listener {
     private static final int REQUEST_ATTACHMENT = 0;
     private static final int REQUEST_LOCATION = 1;
     private static final int SELECT_SHOUT_REQUEST_CODE = 2;
+    private static final int SELECT_PROFILE_REQUEST_CODE = 3;
 
     private static final String TAG = ChatActivity.class.getCanonicalName();
 
@@ -264,7 +267,7 @@ public class ChatActivity extends BaseActivity implements Listener {
     }
 
     @Override
-    public void setChatToolbatInfo(String chatWithString) {
+    public void setChatToolbarInfo(String chatWithString) {
         mChatsToolbar.setTitle(chatWithString);
     }
 
@@ -330,6 +333,11 @@ public class ChatActivity extends BaseActivity implements Listener {
     }
 
     @Override
+    public void onProfileClicked(String userName) {
+        startActivity(UserOrPageProfileActivity.newIntent(this, userName));
+    }
+
+    @Override
     public void hideAttatchentsMenu() {
         mChatsAttatchmentsLayout.setVisibility(View.GONE);
     }
@@ -340,14 +348,14 @@ public class ChatActivity extends BaseActivity implements Listener {
         super.onDestroy();
     }
 
-    @OnClick(R.id.chats_attatchments_video)
-    void videoClicked() {
-        startActivityForResult(RecordMediaActivity.newIntent(this, true, true, true, false), REQUEST_ATTACHMENT);
+    @OnClick(R.id.chats_attatchments_profile)
+    void onProfileClicked() {
+        startActivityForResult(SelectProfileActivity.newIntent(this), SELECT_PROFILE_REQUEST_CODE);
     }
 
-    @OnClick(R.id.chats_attatchments_photo)
-    void photoClicked() {
-        startActivityForResult(RecordMediaActivity.newIntent(this, true, false, true, false), REQUEST_ATTACHMENT);
+    @OnClick(R.id.chats_attatchments_media)
+    void onMediaClicked() {
+        startActivityForResult(RecordMediaActivity.newIntent(this, true, true, true, false), REQUEST_ATTACHMENT);
     }
 
     @OnClick(R.id.chats_attatchments_shout)
@@ -398,6 +406,9 @@ public class ChatActivity extends BaseActivity implements Listener {
         } else if (requestCode == SELECT_SHOUT_REQUEST_CODE && resultCode == RESULT_OK) {
             final String shoutId = data.getStringExtra(SelectShoutActivity.RESULT_SHOUT_ID);
             presenter.sendShout(shoutId);
+        } else if (requestCode == SELECT_PROFILE_REQUEST_CODE && resultCode == RESULT_OK) {
+            final String profileId = data.getStringExtra(SelectProfileActivity.RESULT_PROFILE_ID);
+            presenter.sendProfile(profileId);
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }

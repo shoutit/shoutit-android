@@ -25,7 +25,6 @@ import com.shoutit.app.android.api.model.MessageAttachment;
 import com.shoutit.app.android.api.model.PostMessage;
 import com.shoutit.app.android.api.model.PusherMessage;
 import com.shoutit.app.android.api.model.Shout;
-import com.shoutit.app.android.api.model.ShoutResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ForActivity;
@@ -41,6 +40,7 @@ import com.shoutit.app.android.view.conversations.ConversationsUtils;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
@@ -129,6 +129,12 @@ public class ChatsFirstConversationPresenter {
         getConversationInfo(user);
     }
 
+    private void setupUserForVideoChat(@Nonnull User user) {
+            chatParticipantUsernameSubject.onNext(user.getUsername());
+            mUserPreferences.setShoutOwnerName(user.getName());
+            mListener.showVideoChatIcon();
+    }
+
     private void getConversationInfo(User user) {
         if (mIsShoutConversation) {
             getShout(user);
@@ -144,13 +150,15 @@ public class ChatsFirstConversationPresenter {
                 .subscribe(new Action1<User>() {
                     @Override
                     public void call(User user) {
-                        mListener.setChatToolbatInfo(ConversationsUtils.getChatWithString(
+                        //noinspection ConstantConditions
+                        mListener.setChatToolbarInfo(ConversationsUtils.getChatWithString(
                                 ImmutableList.of(new ConversationProfile(
                                         user.getId(),
                                         user.getName(),
                                         user.getUsername(),
                                         user.getType(),
                                         user.getImage())), mUserPreferences.getUser().getId()));
+                        setupUserForVideoChat(user);
                     }
                 }, getOnError()));
     }
@@ -161,33 +169,35 @@ public class ChatsFirstConversationPresenter {
                 .compose(ResponseOrError.<Shout>onlySuccess())
                 .subscribe(new Action1<Shout>() {
                     @Override
-                    public void call(Shout about) {
-                        final String title = about.getTitle();
-                        final String thumbnail = Strings.emptyToNull(about.getThumbnail());
-                        final String type = about.getType().equals(Shout.TYPE_OFFER) ? mContext.getString(R.string.chat_offer) : mContext.getString(R.string.chat_request);
-                        final String price = PriceUtils.formatPriceWithCurrency(about.getPrice(), mResources, about.getCurrency());
-                        final User profile = about.getProfile();
-                        final String authorAndTime = profile.getName() + " - " + DateUtils.getRelativeTimeSpanString(mContext, about.getDatePublishedInMillis());
-                        final String id = about.getId();
+                    public void call(Shout shout) {
+                        final String title = shout.getTitle();
+                        final String thumbnail = Strings.emptyToNull(shout.getThumbnail());
+                        final String type = shout.getType().equals(Shout.TYPE_OFFER) ? mContext.getString(R.string.chat_offer) : mContext.getString(R.string.chat_request);
+                        final String price = PriceUtils.formatPriceWithCurrency(shout.getPrice(), mResources, shout.getCurrency());
+                        final User shoutOwner = shout.getProfile();
+                        final String authorAndTime = shoutOwner.getName() + " - " + DateUtils.getRelativeTimeSpanString(mContext, shout.getDatePublishedInMillis());
+                        final String id = shout.getId();
 
                         if (!Strings.isNullOrEmpty(id)) {
                             mListener.setAboutShoutData(title, thumbnail, type, price, authorAndTime, id);
                             mListener.setShoutToolbarInfo(title, ConversationsUtils.getChatWithString(
                                     ImmutableList.of(new ConversationProfile(
-                                            profile.getId(),
-                                            profile.getName(),
-                                            profile.getUsername(),
-                                            profile.getType(),
-                                            profile.getImage())), user.getId()));
+                                            shoutOwner.getId(),
+                                            shoutOwner.getName(),
+                                            shoutOwner.getUsername(),
+                                            shoutOwner.getType(),
+                                            shoutOwner.getImage())), user.getId()));
                         } else {
                             mListener.setShoutToolbarInfo(mContext.getString(R.string.chat_shout_chat), ConversationsUtils.getChatWithString(
                                     ImmutableList.of(new ConversationProfile(
-                                            profile.getId(),
-                                            profile.getName(),
-                                            profile.getUsername(),
-                                            profile.getType(),
-                                            profile.getImage())), user.getId()));
+                                            shoutOwner.getId(),
+                                            shoutOwner.getName(),
+                                            shoutOwner.getUsername(),
+                                            shoutOwner.getType(),
+                                            shoutOwner.getImage())), user.getId()));
                         }
+
+                        setupUserForVideoChat(shoutOwner);
                     }
                 }, getOnError()));
     }
@@ -341,13 +351,15 @@ public class ChatsFirstConversationPresenter {
         mSubscribe.add(mChatsDelegate.addMedia(media, isVideo, new Func1<Video, Observable<Message>>() {
             @Override
             public Observable<Message> call(Video video) {
-                final PostMessage message = new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_MEDIA, null, null, null, ImmutableList.of(video))));
+                final PostMessage message = new PostMessage(null, ImmutableList.of(
+                        new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_MEDIA, null, null, null, ImmutableList.of(video), null)));
                 return sendMessage(message);
             }
         }, new Func1<String, Observable<Message>>() {
             @Override
             public Observable<Message> call(String url) {
-                final PostMessage message = new PostMessage(null, ImmutableList.of(new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_MEDIA, null, null, ImmutableList.of(url), null)));
+                final PostMessage message = new PostMessage(null, ImmutableList.of(
+                        new MessageAttachment(MessageAttachment.ATTACHMENT_TYPE_MEDIA, null, null, ImmutableList.of(url), null, null)));
                 return sendMessage(message);
             }
         }, conversationId));
@@ -373,22 +385,32 @@ public class ChatsFirstConversationPresenter {
     }
 
     public void sendShout(final String shoutId) {
-        mSubscribe.add(mApiService.getShout(shoutId)
-                .subscribeOn(mNetworkScheduler)
-                .observeOn(mUiScheduler)
-                .flatMap(new Func1<ShoutResponse, Observable<Message>>() {
-                    @Override
-                    public Observable<Message> call(ShoutResponse shoutResponse) {
-                        return sendMessage(mChatsDelegate.getShoutMessage(shoutResponse, shoutId));
-                    }
-                })
-                .subscribe(new Action1<Message>() {
-                    @Override
-                    public void call(Message message) {
-                        mChatsDelegate.postLocalMessage(message, conversationId);
-                        mListener.hideAttatchentsMenu();
-                    }
-                }, getOnError()));
+        mSubscribe.add(
+                sendMessage(mChatsDelegate.getShoutMessage(shoutId))
+                        .subscribeOn(mNetworkScheduler)
+                        .observeOn(mUiScheduler)
+                        .subscribe(new Action1<Message>() {
+                            @Override
+                            public void call(Message message) {
+                                mChatsDelegate.postLocalMessage(message, conversationId);
+                                mListener.hideAttatchentsMenu();
+                            }
+                        }, getOnError()));
+    }
+
+    public void sendProfile(@Nonnull String profileId) {
+        mSubscribe.add(
+                mApiService.postMessage(conversationId, mChatsDelegate.getProfileMessage(profileId))
+                        .subscribeOn(mNetworkScheduler)
+                        .observeOn(mUiScheduler)
+                        .subscribe(new Action1<Message>() {
+                            @Override
+                            public void call(Message message) {
+                                mChatsDelegate.postLocalMessage(message, conversationId);
+                                mListener.hideAttatchentsMenu();
+                            }
+                        }, getOnError())
+        );
     }
 
     public void sendTyping() {

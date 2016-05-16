@@ -6,6 +6,9 @@ import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 
+import okhttp3.MediaType;
+import okhttp3.ResponseBody;
+
 public class TestUtils {
 
     public static User getUser() {
@@ -18,5 +21,9 @@ public class TestUtils {
         return new Shout("", "", "", "", new UserLocation(
                 0, 0, "", "", "", "", ""), "", "", 0L, 0, "", "", "", getUser(),
                 null, null, 0, null, null, 0, ImmutableList.<Conversation>of(), true, null, null);
+    }
+
+    public static ResponseBody getResponseBody() {
+        return ResponseBody.create(MediaType.parse(""), "c");
     }
 }

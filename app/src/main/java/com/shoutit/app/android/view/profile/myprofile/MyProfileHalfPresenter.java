@@ -7,6 +7,7 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.view.profile.ProfileAdapterItems;
 
+
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
@@ -22,6 +23,12 @@ public class MyProfileHalfPresenter {
     @Nonnull
     private final PublishSubject<Object> verifyAccountClickObserver = PublishSubject.create();
     private final Context context;
+    @Nonnull
+    private final PublishSubject<Object> listeningsClickObserver = PublishSubject.create();
+    @Nonnull
+    private final PublishSubject<Object> interestsClickObserver = PublishSubject.create();
+    @Nonnull
+    private final PublishSubject<Object> listenersClickObserver = PublishSubject.create();
 
     @Inject
     public MyProfileHalfPresenter(@ForActivity Context context) {
@@ -34,8 +41,9 @@ public class MyProfileHalfPresenter {
                 notificationsClickObserver, verifyAccountClickObserver, notificationsUnreadObservable);
     }
 
-    public ProfileAdapterItems.MyUserThreeIconsAdapterItem getThreeIconsAdapterItem(@Nonnull User user) {
-        return new ProfileAdapterItems.MyUserThreeIconsAdapterItem(user);
+    public ProfileAdapterItems.MyProfileThreeIconsAdapterItem getThreeIconsAdapterItem(@Nonnull User user) {
+        return new ProfileAdapterItems.MyProfileThreeIconsAdapterItem(
+                user, listeningsClickObserver, interestsClickObserver, listenersClickObserver);
     }
 
     public String getShoutsHeaderTitle() {
@@ -55,5 +63,20 @@ public class MyProfileHalfPresenter {
     @Nonnull
     public Observable<Object> getVerifyAccountClickObservable() {
         return verifyAccountClickObserver;
+    }
+
+    @Nonnull
+    public Observable<Object> getListeningsClickObservable() {
+        return listeningsClickObserver;
+    }
+
+    @Nonnull
+    public Observable<Object> getInterestsClickObservable() {
+        return interestsClickObserver;
+    }
+
+    @Nonnull
+    public Observable<Object> getListenersClickObservable() {
+        return listenersClickObserver;
     }
 }

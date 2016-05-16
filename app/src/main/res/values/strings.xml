@@ -384,8 +384,8 @@
     <string name="chat_show_map">Show Map</string>
     <string name="chat_attatchment">Attachment</string>
     <string name="chat_video_call">Video Call</string>
-    <string name="chats_attatchments_photo">Photo</string>
-    <string name="chats_attatchments_video">Video</string>
+    <string name="chats_attatchments_media">Media</string>
+    <string name="chats_attatchments_profile">Profile</string>
     <string name="chats_attatchments_shout">Shout</string>
     <string name="chats_attatchments_location">Location</string>
     <string name="chat_edit_text_hint">Type a message</string>
@@ -511,5 +511,21 @@
     <string name="create_public_chat_location">Location</string>
     <string name="create_public_chat_change_location">Change</string>
     <string name="create_public_chat_error">Error</string>
+
+    <!-- Listenings -->
+    <string name="listenings_empty">You have no items here yet.</string>
+    <string name="listenings_ab_title">Listenings</string>
+    <string name="listers_ab_title">Listeners</string>
+    <string name="listening_tab_user">Users</string>
+    <string name="listening_tab_pages">Pages</string>
+    <string name="listenings_interests_ab_title">Interests</string>
+
+    <!-- Listeners -->
+    <string name="listeners_ab_title">Listeners</string>
+
+    <!-- Select profile -->
+    <string name="select_profile_ab_title">Select profile</string>
+    <string name="select_profile_tab_listenings">Listenings</string>
+    <string name="select_profile_tab_listeners">Listeners</string>
 
 </resources>

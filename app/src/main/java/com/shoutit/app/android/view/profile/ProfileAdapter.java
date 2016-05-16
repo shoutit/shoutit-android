@@ -78,7 +78,7 @@ public class ProfileAdapter extends BaseAdapter {
             return VIEW_TYPE_USER_INFO;
         } else if (item instanceof ProfileAdapterItems.UserThreeIconsAdapterItem) {
             return VIEW_TYPE_THREE_ICONS;
-        } else if (item instanceof ProfileAdapterItems.MyUserThreeIconsAdapterItem) {
+        } else if (item instanceof ProfileAdapterItems.MyProfileThreeIconsAdapterItem) {
             return VIEW_TYPE_MY_PROFILE_THREE_ICONS;
         } else if (item instanceof ShoutAdapterItem) {
             return VIEW_TYPE_SHOUT;

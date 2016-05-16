@@ -163,11 +163,18 @@
         <activity android:name=".view.createshout.CreateShoutDialogActivity"
                   android:screenOrientation="portrait"
                   android:theme="@style/AppTheme.DialogActivity"/>
+        <activity android:name=".view.listenings.ListeningsActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".view.listeners.ListenersActivity"
+            android:screenOrientation="portrait"/>
 
         <activity
             android:name=".view.videoconversation.DialogCallActivity"
             android:screenOrientation="portrait"
             android:theme="@style/TranslucentBackground"/>
+
+        <activity android:name=".view.chooseprofile.SelectProfileActivity"
+            android:screenOrientation="portrait"/>
 
         <!-- Facebook -->
         <meta-data
