@@ -122,7 +122,7 @@
                 android:layout_gravity="bottom"
                 android:layout_marginBottom="20dp"
                 android:background="@color/colorPrimary"
-                android:text="Create"
+                android:text="@string/create_chat_create"
                 android:textColor="@android:color/white"/>
 
             <FrameLayout

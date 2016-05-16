@@ -511,6 +511,7 @@
     <string name="create_public_chat_location">Location</string>
     <string name="create_public_chat_change_location">Change</string>
     <string name="create_public_chat_error">Error</string>
+    <string name="create_chat_create">Create</string>
 
     <!-- Listenings -->
     <string name="listenings_empty">You have no items here yet.</string>
@@ -527,5 +528,8 @@
     <string name="select_profile_ab_title">Select profile</string>
     <string name="select_profile_tab_listenings">Listenings</string>
     <string name="select_profile_tab_listeners">Listeners</string>
+    <string name="chat_info_subject">Subject</string>
+    <string name="chat_info_attachment">Attachments</string>
+    <string name="chat_info_members">Members</string>
 
 </resources>
