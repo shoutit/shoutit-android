@@ -135,11 +135,7 @@ public class ConversationsPresenter {
                 .filter(new Func1<Conversation, Boolean>() {
                     @Override
                     public Boolean call(Conversation conversation) {
-                        if (isMyConversationsList) {
-                            return !Conversation.PUBLIC_CHAT_TYPE.equals(conversation.getType());
-                        } else {
-                            return Conversation.PUBLIC_CHAT_TYPE.equals(conversation.getType());
-                        }
+                        return isMyConversationsList;
                     }
                 })
                 .scan(Maps.<String, Conversation>newHashMap(), new Func2<HashMap<String, Conversation>, Conversation, HashMap<String, Conversation>>() {
@@ -188,9 +184,9 @@ public class ConversationsPresenter {
                             }
                         }), new Predicate<Conversation>() {
                             @Override
-                            public boolean apply(@Nullable Conversation input) {
-                                assert input != null;
-                                return !isMyConversationsList || input.getProfiles().size() > 1;
+                            public boolean apply(@Nullable Conversation conversation) {
+                                assert conversation != null;
+                                return conversation.isPublicChat() || conversation.getProfiles().size() > 1;
                             }
                         }));
                     }
@@ -246,18 +242,9 @@ public class ConversationsPresenter {
         assert user != null;
 
         final boolean isUnread = input.getUnreadMessagesCount() > 0;
-        if (Conversation.ABOUT_SHOUT_TYPE.equals(input.getType())) {
-            return new ConversationShoutItem(input.getId(), displayData.getTitle(),
-                    displayData.getSubTitle(), message, elapsedTime, displayData.getImage(), isUnread);
-        } else if (Conversation.CHAT_TYPE.equals(input.getType())) {
-            return new ConversationChatItem(input.getId(), message, displayData.getTitle(),
-                    elapsedTime, displayData.getImage(), isUnread, false);
-        } else if (Conversation.PUBLIC_CHAT_TYPE.equals(input.getType())) {
-            return new ConversationChatItem(input.getId(), message, displayData.getSubTitle(),
-                    elapsedTime, displayData.getImage(), isUnread, true);
-        } else {
-            throw new RuntimeException(input.getType() + " : unknown type");
-        }
+
+        return new ConversationAdapterItem(input.getId(), displayData.getTitle(), displayData.getSubTitle(),
+                message, elapsedTime, displayData.getImage(), isUnread, input.getType());
     }
 
     private String getMessageString(Message lastMessage) {
@@ -302,24 +289,32 @@ public class ConversationsPresenter {
         void onItemClicked(@NonNull String id, boolean shoutChat, boolean isPublicChat);
     }
 
-    public class ConversationChatItem extends BaseNoIDAdapterItem {
+    public class ConversationAdapterItem extends BaseNoIDAdapterItem {
         private final String id;
+        private final String title;
+        private final String subTitle;
         private final String message;
-        private final String user;
         private final String time;
         private final String image;
         private final boolean mIsUnread;
-        private final boolean isPublicChat;
+        private final String conversationType;
 
-        public ConversationChatItem(String id, String message, String user, String time,
-                                    String image, boolean isUnread, boolean isPublicChat) {
+        public ConversationAdapterItem(String id,
+                                       String title,
+                                       String subTitle,
+                                       String lastMessage,
+                                       String time,
+                                       String image,
+                                       boolean isUnread,
+                                       String conversationType) {
             this.id = id;
-            this.message = message;
-            this.user = user;
+            this.title = title;
+            this.subTitle = subTitle;
+            this.message = lastMessage;
             this.time = time;
             this.image = image;
             mIsUnread = isUnread;
-            this.isPublicChat = isPublicChat;
+            this.conversationType = conversationType;
         }
 
         @Override
@@ -336,81 +331,12 @@ public class ConversationsPresenter {
             return id;
         }
 
-        public String getMessage() {
-            return message;
+        public String getTitle() {
+            return title;
         }
 
-        public String getUser() {
-            return user;
-        }
-
-        public String getTime() {
-            return time;
-        }
-
-        public String getImage() {
-            return image;
-        }
-
-        public boolean isUnread() {
-            return mIsUnread;
-        }
-
-        public void click() {
-            mListener.onItemClicked(id, false, isPublicChat);
-        }
-    }
-
-    public class ConversationShoutItem implements BaseAdapterItem {
-        private final String id;
-        private final String shoutDescription;
-        private final String userNames;
-        private final String message;
-        private final String time;
-        private final String image;
-        private final boolean mIsUnread;
-
-        public ConversationShoutItem(String id,
-                                     String shoutDescription,
-                                     String userNames,
-                                     String message,
-                                     String time,
-                                     String image,
-                                     boolean isUnread) {
-            this.id = id;
-            this.shoutDescription = shoutDescription;
-            this.userNames = userNames;
-            this.message = message;
-            this.time = time;
-            this.image = image;
-            mIsUnread = isUnread;
-        }
-
-        @Override
-        public long adapterId() {
-            return 0;
-        }
-
-        @Override
-        public boolean matches(@Nonnull BaseAdapterItem item) {
-            return false;
-        }
-
-        @Override
-        public boolean same(@Nonnull BaseAdapterItem item) {
-            return false;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public String getShoutDescription() {
-            return shoutDescription;
-        }
-
-        public String getUserNames() {
-            return userNames;
+        public String getSubTitle() {
+            return subTitle;
         }
 
         public String getMessage() {
@@ -429,8 +355,16 @@ public class ConversationsPresenter {
             return mIsUnread;
         }
 
+        public boolean isShoutChat() {
+            return Conversation.ABOUT_SHOUT_TYPE.equals(conversationType);
+        }
+
+        public boolean isPublicChat() {
+            return Conversation.PUBLIC_CHAT_TYPE.equals(conversationType);
+        }
+
         public void click() {
-            mListener.onItemClicked(id, true, false);
+            mListener.onItemClicked(id, isShoutChat(), isPublicChat());
         }
     }
 

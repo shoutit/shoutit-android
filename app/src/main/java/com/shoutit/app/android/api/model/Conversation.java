@@ -56,6 +56,10 @@ public class Conversation {
         return display;
     }
 
+    public boolean isPublicChat() {
+        return PUBLIC_CHAT_TYPE.equals(type);
+    }
+
     public class DisplayData {
         private final String image;
         private final String subTitle;
