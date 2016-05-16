@@ -10,6 +10,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 
+import com.shoutit.app.android.R;
+
 import javax.annotation.Nonnull;
 
 public class PermissionHelper {
@@ -75,5 +77,16 @@ public class PermissionHelper {
 
     public static boolean hasPermission(@Nonnull Context context, @Nonnull String permission) {
         return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    public static void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults, @NonNull Activity activity) {
+        final boolean permissionsGranted = PermissionHelper.arePermissionsGranted(grantResults);
+        if (permissionsGranted) {
+            ColoredSnackBar.success(ColoredSnackBar.contentView(activity),
+                    R.string.permission_granted, Snackbar.LENGTH_SHORT).show();
+        } else {
+            ColoredSnackBar.error(ColoredSnackBar.contentView(activity),
+                    R.string.permission_not_granted, Snackbar.LENGTH_SHORT).show();
+        }
     }
 }

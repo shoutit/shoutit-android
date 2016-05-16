@@ -9,6 +9,7 @@ import com.shoutit.app.android.api.model.ChangePasswordRequest;
 import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.ConversationsResponse;
 import com.shoutit.app.android.api.model.CreateOfferShoutWithImageRequest;
+import com.shoutit.app.android.api.model.CreatePublicChatRequest;
 import com.shoutit.app.android.api.model.CreateRequestShoutRequest;
 import com.shoutit.app.android.api.model.CreateRequestShoutWithPriceRequest;
 import com.shoutit.app.android.api.model.CreateShoutResponse;
@@ -40,7 +41,6 @@ import com.shoutit.app.android.api.model.SuggestionsResponse;
 import com.shoutit.app.android.api.model.TagDetail;
 import com.shoutit.app.android.api.model.TagsRequest;
 import com.shoutit.app.android.api.model.TwilioResponse;
-import com.shoutit.app.android.api.model.VideoCallRequest;
 import com.shoutit.app.android.api.model.UpdateLocationRequest;
 import com.shoutit.app.android.api.model.UpdateUserRequest;
 import com.shoutit.app.android.api.model.User;
@@ -48,6 +48,7 @@ import com.shoutit.app.android.api.model.UserIdentity;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.VerifyEmailRequest;
 import com.shoutit.app.android.api.model.VerifyEmailResponse;
+import com.shoutit.app.android.api.model.VideoCallRequest;
 import com.shoutit.app.android.api.model.login.EmailLoginRequest;
 import com.shoutit.app.android.api.model.login.FacebookLogin;
 import com.shoutit.app.android.api.model.login.GoogleLogin;
@@ -392,6 +393,9 @@ public interface ApiService {
 
     @POST("messages/{id}/read")
     Observable<ResponseBody> readMessage(@Path("id") String messageId);
+
+    @POST("conversations")
+    Observable<ResponseBody> createPublicChat(@Body CreatePublicChatRequest createPublicChatRequest);
 
     /**
      * Notifications

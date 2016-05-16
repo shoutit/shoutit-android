@@ -45,13 +45,21 @@
     <string name="intro_help">Help</string>
     <string name="intro_fail_login">Failed to create guest account</string>
     <string name="intro_search">Search</string>
-    <string name="intro_search_text">Find what you need in your Community or anywhere in the World.</string>
+    <string name="intro_search_text">Find what you need in your Community or anywhere in the
+        World.
+    </string>
     <string name="intro_shout">Shout</string>
-    <string name="intro_shout_text">List anything for FREE. Include Photos and Videos to appeal to Buyers.</string>
+    <string name="intro_shout_text">List anything for FREE. Include Photos and Videos to appeal to
+        Buyers.
+    </string>
     <string name="intro_chat">Chat</string>
-    <string name="intro_chat_text">Connect with Buyers and Sellers. Send Photos, Videos and Shouts.</string>
+    <string name="intro_chat_text">Connect with Buyers and Sellers. Send Photos, Videos and
+        Shouts.
+    </string>
     <string name="intro_video">Video Chat</string>
-    <string name="intro_video_text">Video is worth a thousand pictures! see what you want to buy live before buying it.</string>
+    <string name="intro_video_text">Video is worth a thousand pictures! see what you want to buy
+        live before buying it.
+    </string>
 
     <!-- Home -->
     <string name="home_menu_chat">Chat</string>
@@ -80,7 +88,9 @@
     <string name="register_password">Password</string>
     <string name="register_login_text">Have an account? Log in</string>
     <string name="register_empty_mail">Email cannot be empty.</string>
-    <string name="register_empty_password">Password must have at least 6 and no more than 20 characters.</string>
+    <string name="register_empty_password">Password must have at least 6 and no more than 20
+        characters.
+    </string>
     <string name="register_empty_name">Name cannot be empty</string>
     <string name="register_have_an_account">Have an account?</string>
     <string name="register_log_in">Log in</string>
@@ -152,7 +162,9 @@
     </string>
     <string name="location_update_success">Location successfully changed</string>
     <string name="home_no_shouts">No shouts in current location</string>
-    <string name="home_no_shouts_logged_in_user">Nothing in your feed click here to add some interests</string>
+    <string name="home_no_shouts_logged_in_user">Nothing in your feed click here to add some
+        interests
+    </string>
 
     <!-- Discover -->
     <string name="discover_shouts_header">Discover shouts</string>
@@ -299,7 +311,8 @@
     <!-- Published -->
     <string name="published_congratulations">Congratulations!</string>
     <string name="published_extra_info">Your %1$s will appear on Shoutit soon.</string>
-    <string name="published_extra_info_with_title">Your %1$s \"%2$s\" will appear on Shoutit soon.</string>
+    <string name="published_extra_info_with_title">Your %1$s \"%2$s\" will appear on Shoutit soon.
+    </string>
     <string name="published_add_details">Add more details</string>
     <string name="published_create_another_shout">Create another %1$s</string>
     <string name="published_or_label">or</string>
@@ -408,7 +421,8 @@
     <string name="video_calls_conversation_ended">Conversation has ended</string>
     <string name="video_calls_connecting">Connecting…</string>
     <string name="video_calls_connected">Connected with %s</string>
-    <string name="video_calls_participant_disconected">Participant finished the conversation</string>
+    <string name="video_calls_participant_disconected">Participant finished the conversation
+    </string>
     <string name="video_call_error">Sorry, cannot start conversation. Try again later.</string>
 
     <string name="no_phone_number_error">Phone number is not currently available.</string>
@@ -416,7 +430,9 @@
     <string name="dialog_cancel_button">Cancel</string>
     <string name="call_dialog_message">"Call %1$s ?"</string>
     <string name="permission_call_phone_explanation">Permissions needed to start call.</string>
-    <string name="delete_shout_error">Currently, You can not delete this shoutit. Please try again later.</string>
+    <string name="delete_shout_error">Currently, You can not delete this shoutit. Please try again
+        later.
+    </string>
     <string name="delete_shout_success">Shout was deleted.</string>
     <string name="send_report_positive_button">Send</string>
     <string name="report_dialog_hint">Enter report</string>
@@ -464,17 +480,37 @@
     <string name="select_shout_title">Select Shout</string>
 
     <!-- Verify email -->
-    <string name="verify_email_text1">We have sent you a verification link on this email. Please check your inbox and click on it to verify your account.\n\nYou can also change the email and click “Resend” for us to send you the verification link again.</string>
+    <string name="verify_email_text1">We have sent you a verification link on this email. Please
+        check your inbox and click on it to verify your account.\n\nYou can also change the email
+        and click “Resend” for us to send you the verification link again.
+    </string>
     <string name="verify_email_hint">Email</string>
-    <string name="verify_bottom_text">If you have already clicked on the link that was sent to you, you may click “Verify” now.</string>
+    <string name="verify_bottom_text">If you have already clicked on the link that was sent to you,
+        you may click “Verify” now.
+    </string>
     <string name="verify_email_verify">Verify</string>
     <string name="verify_email_resend">Resend</string>
     <string name="verify_verified">Your account has been successfully verified</string>
     <string name="verify_not_verified">Your account isn\'t verified yet</string>
     <string name="profile_verify_account">Verify your account</string>
     <string name="verify_email_title">Email Verification</string>
-    <string name="video_calls_cannot_start_conversation">Sorry, cannot start this video call. Please try again later.</string>
+    <string name="video_calls_cannot_start_conversation">Sorry, cannot start this video call. Please
+        try again later.
+    </string>
+
+    <!-- Conversations -->
     <string name="conversations_empty">No conversations</string>
+    <string name="conversations_create_public_chat">Create public chat</string>
+
+    <!-- Create Public Chat -->
+    <string name="create_public_chat_title">Create Public Chat</string>
+    <string name="create_public_chat_header">Public chats are country based conversations that
+        everyone can join and post what he is selling or buying
+    </string>
+    <string name="create_public_chat_subject">Subject</string>
+    <string name="create_public_chat_location">Location</string>
+    <string name="create_public_chat_change_location">Change</string>
+    <string name="create_public_chat_error">Error</string>
 
     <!-- Listenings -->
     <string name="listenings_empty">You have no items here yet.</string>

@@ -29,6 +29,7 @@ import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.chats.ChatActivity;
+import com.shoutit.app.android.view.chats.public_chat.CreatePublicChatActivity;
 
 import java.util.List;
 
@@ -132,12 +133,27 @@ public class ConverstationsFragment extends BaseFragment implements Conversation
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.conversations_menu, menu);
         for (int i = 0; i < menu.size(); i++) {
             final MenuItem item = menu.getItem(i);
-            item.setVisible(false);
+            if (item.getItemId() != R.id.chats_create_public_chat) {
+                item.setVisible(false);
+            }
             mItems.add(item);
         }
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.chats_create_public_chat: {
+                startActivity(CreatePublicChatActivity.newIntent(getActivity()));
+                return true;
+            }
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override

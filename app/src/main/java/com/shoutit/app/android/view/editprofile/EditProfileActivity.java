@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -38,6 +37,7 @@ import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.utils.rx.Actions1;
 import com.shoutit.app.android.view.createshout.location.LocationActivity;
+import com.shoutit.app.android.view.createshout.location.LocationResultHelper;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -400,7 +400,7 @@ public class EditProfileActivity extends BaseActivity {
                 }
                 break;
             case REQUEST_CODE_LOCATION:
-                final UserLocation userLocation = (UserLocation) data.getSerializableExtra(LocationActivity.EXTRAS_USER_LOCATION);
+                final UserLocation userLocation = LocationResultHelper.getLocationFromIntent(data);
                 presenter.onLocationChanged(userLocation);
                 break;
             default:
@@ -424,14 +424,7 @@ public class EditProfileActivity extends BaseActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_CODE_PERMISSION) {
-            final boolean permissionsGranted = PermissionHelper.arePermissionsGranted(grantResults);
-            if (permissionsGranted) {
-                ColoredSnackBar.success(ColoredSnackBar.contentView(this),
-                        R.string.permission_granted, Snackbar.LENGTH_SHORT).show();
-            } else {
-                ColoredSnackBar.error(ColoredSnackBar.contentView(this),
-                        R.string.permission_not_granted, Snackbar.LENGTH_SHORT).show();
-            }
+            PermissionHelper.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
