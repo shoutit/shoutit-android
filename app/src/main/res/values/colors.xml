@@ -99,4 +99,7 @@
     <color name="video_calls_semi_transparent_background">#80000000</color>
     <color name="white97">#e3ffffff</color>
 
+    <!-- Media -->
+    <color name="media_image_background">#C8E6C9</color>
+
 </resources>

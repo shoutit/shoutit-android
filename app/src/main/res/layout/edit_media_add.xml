@@ -3,7 +3,7 @@
              android:layout_margin="@dimen/edit_shout_media_item_padding"
              android:layout_width="@dimen/edit_shout_media_item_size"
              android:layout_height="@dimen/edit_shout_media_item_size"
-             android:background="#C8E6C9">
+             android:background="@color/media_image_background">
 
     <ImageView
         android:layout_width="wrap_content"

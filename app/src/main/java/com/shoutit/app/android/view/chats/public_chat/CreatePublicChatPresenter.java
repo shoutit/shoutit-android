@@ -12,6 +12,7 @@ import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.CreatePublicChatRequest;
 import com.shoutit.app.android.api.model.UpdateLocationRequest;
@@ -24,6 +25,8 @@ import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.view.createshout.location.LocationResultHelper;
 
 import java.io.File;
+
+import javax.inject.Inject;
 
 import okhttp3.ResponseBody;
 import rx.Observable;
@@ -44,19 +47,24 @@ public class CreatePublicChatPresenter {
     private final Scheduler mNetworkScheduler;
     private final Scheduler mUiScheduler;
     private final AmazonHelper mAmazonHelper;
+    @NonNull
+    private final UserPreferences mUserPreferences;
 
+    @Inject
     public CreatePublicChatPresenter(@NonNull ImageCaptureHelper imageCaptureHelper,
                                      @NonNull @ForActivity Context context,
                                      @NonNull ApiService apiService,
                                      @NetworkScheduler Scheduler networkScheduler,
                                      @UiScheduler Scheduler uiScheduler,
-                                     AmazonHelper amazonHelper) {
+                                     @NonNull AmazonHelper amazonHelper,
+                                     @NonNull UserPreferences userPreferences) {
         mImageCaptureHelper = imageCaptureHelper;
         mContext = context;
         mApiService = apiService;
         mNetworkScheduler = networkScheduler;
         mUiScheduler = uiScheduler;
         mAmazonHelper = amazonHelper;
+        mUserPreferences = userPreferences;
     }
 
     public void selectImageClicked() {
@@ -122,6 +130,15 @@ public class CreatePublicChatPresenter {
 
     public void register(@NonNull CreatePublicChatView listener) {
         this.listener = listener;
+        final UserLocation location = mUserPreferences.getLocation();
+        if (location != null) {
+            setLocation(location);
+        }
+    }
+
+    public void unregister() {
+        listener = null;
+        // TODO unsub
     }
 
     public void onImageActivityFinished(int resultCode, Intent data) {
@@ -136,9 +153,13 @@ public class CreatePublicChatPresenter {
     public void onLocationActivityFinished(int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             final UserLocation location = LocationResultHelper.getLocationFromIntent(data);
-            state = new State(state.url, location);
-            listener.setLocation(ResourcesHelper.getResourceIdForName(location.getCountry(), mContext), location.getCity());
+            setLocation(location);
         }
+    }
+
+    private void setLocation(UserLocation location) {
+        state = new State(state.url, location);
+        listener.setLocation(ResourcesHelper.getResourceIdForName(location.getCountry(), mContext), location.getCity());
     }
 
     private static class State {

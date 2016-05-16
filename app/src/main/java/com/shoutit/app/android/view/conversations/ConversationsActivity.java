@@ -48,7 +48,6 @@ public class ConversationsActivity extends BaseActivity {
     private void setUpToolbar() {
         setSupportActionBar(toolbar);
         toolbar.setTitle(R.string.conversation_title);
-        toolbar.inflateMenu(R.menu.conversations_menu);
         toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override

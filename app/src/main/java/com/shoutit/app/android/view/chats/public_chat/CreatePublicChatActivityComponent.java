@@ -19,7 +19,7 @@ import dagger.Component;
 )
 public interface CreatePublicChatActivityComponent extends BaseActivityComponent {
 
-    void inject(CreateRequestActivity activity);
+    void inject(CreatePublicChatActivity activity);
 
 }
 
