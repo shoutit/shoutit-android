@@ -166,6 +166,8 @@ public class ShoutMediaPresenter {
     }
 
     public void setUp(List<String> images, List<Video> videos, boolean isOffer) {
+        clear();
+
         mIsOffer = isOffer;
         for (String image : images) {
             addImageItem(image, true);
@@ -176,6 +178,14 @@ public class ShoutMediaPresenter {
         }
 
         mMediaListener.setImages(mediaItems);
+    }
+
+    private void clear() {
+        mediaItems.forcePut(0, new AddImageItem());
+        mediaItems.forcePut(1, new BlankItem());
+        mediaItems.forcePut(2, new BlankItem());
+        mediaItems.forcePut(3, new BlankItem());
+        mediaItems.forcePut(4, new BlankItem());
     }
 
     public void addMediaItem(@NonNull String media, boolean isVideo) {
