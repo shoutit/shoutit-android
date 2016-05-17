@@ -215,7 +215,11 @@ public class ChatActivity extends BaseActivity implements Listener {
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
         final Intent intent = getIntent();
-        final String conversationId = intent.getStringExtra(ARGS_CONVERSATION_ID);
+        String conversationId = intent.getStringExtra(ARGS_CONVERSATION_ID);
+        if (conversationId == null && intent.getData() != null) {
+            conversationId = intent.getData().getQueryParameter("id");
+        }
+
         final boolean isShoutConversation = intent.getExtras().getBoolean(ARGS_IS_SHOUT_CONVERSATION);
         final ChatActivityComponent component = DaggerChatActivityComponent
                 .builder()

@@ -264,7 +264,12 @@ public class UserOrPageProfileActivity extends ProfileActivity {
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
         final Intent intent = checkNotNull(getIntent());
-        final String userName = checkNotNull(intent.getStringExtra(KEY_PROFILE_ID));
+        String userName = intent.getStringExtra(KEY_PROFILE_ID);
+        if (userName == null && intent.getData() != null) {
+            // TODO this param will be probably renamed to username
+            userName = intent.getData().getQueryParameter("id");
+        }
+        checkNotNull(userName);
 
         final ProfileActivityComponent component = DaggerProfileActivityComponent
                 .builder()

@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
@@ -35,7 +36,9 @@ import com.squareup.picasso.Transformation;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 import com.uservoice.uservoicesdk.UserVoice;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -90,6 +93,14 @@ public class MenuHandler {
     private final UserPreferences userPreferences;
 
     private List<CheckedTextView> selectableItems = ImmutableList.of();
+
+    private static Map<String, Integer> viewTagViewIdMap = new HashMap<>();
+    static {
+        viewTagViewIdMap.put(FRAGMENT_HOME, R.id.menu_home);
+        viewTagViewIdMap.put(FRAGMENT_DISCOVER, R.id.menu_discover);
+        viewTagViewIdMap.put(FRAGMENT_BROWSE, R.id.menu_browse);
+        viewTagViewIdMap.put(FRAGMENT_CHATS, R.id.menu_chat);
+    }
 
     @Inject
     public MenuHandler(@Nonnull final RxAppCompatActivity rxActivity,
@@ -157,23 +168,27 @@ public class MenuHandler {
     @OnClick({R.id.menu_home, R.id.menu_discover, R.id.menu_browse, R.id.menu_chat,
              R.id.menu_settings, R.id.menu_help})
     public void onMenuItemSelected(View view) {
-        switch (view.getId()) {
+        selectMenuItem(view.getId());
+    }
+
+    private void selectMenuItem(int viewId) {
+        switch (viewId) {
             case R.id.menu_home:
                 onMenuItemSelectedListener.onMenuItemSelected(FRAGMENT_HOME);
-                selectItem(view.getId());
+                selectItem(viewId);
                 break;
             case R.id.menu_discover:
                 onMenuItemSelectedListener.onMenuItemSelected(FRAGMENT_DISCOVER);
-                selectItem(view.getId());
+                selectItem(viewId);
                 break;
             case R.id.menu_browse:
                 onMenuItemSelectedListener.onMenuItemSelected(FRAGMENT_BROWSE);
-                selectItem(view.getId());
+                selectItem(viewId);
                 break;
             case R.id.menu_chat:
                 if (userPreferences.isNormalUser()) {
                     onMenuItemSelectedListener.onMenuItemSelected(FRAGMENT_CHATS);
-                    selectItem(view.getId());
+                    selectItem(viewId);
                 } else {
                     showLoginActivity();
                 }
@@ -187,7 +202,11 @@ public class MenuHandler {
         }
 
         KeyboardHelper.hideSoftKeyboard(rxActivity);
-        selectItem(view.getId());
+    }
+
+
+    public void selectMenuItem(@Nonnull String viewTag) {
+        selectMenuItem(viewTagViewIdMap.get(viewTag));
     }
 
     private void showLoginActivity() {

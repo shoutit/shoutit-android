@@ -572,7 +572,11 @@ public class ShoutActivity extends BaseActivity {
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
         final Intent intent = checkNotNull(getIntent());
-        mShoutId = checkNotNull(intent.getStringExtra(KEY_SHOUT_ID));
+        mShoutId = intent.getStringExtra(KEY_SHOUT_ID);
+        if (mShoutId == null && intent.getData() != null) {
+            mShoutId = intent.getData().getQueryParameter("id");
+        }
+        checkNotNull(mShoutId);
 
         final ShoutActivityComponent component = DaggerShoutActivityComponent
                 .builder()
