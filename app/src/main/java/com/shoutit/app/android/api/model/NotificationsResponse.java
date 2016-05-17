@@ -32,19 +32,21 @@ public class NotificationsResponse extends PaginatedResponse {
         private final String type;
         private final int createdAt;
         private final boolean isRead;
+        private final DisplayInfo display;
         private final AttachedObject attachedObject;
 
         public Notification(@Nonnull String id, @Nonnull String type, int createdAt,
-                            boolean isRead, AttachedObject attachedObject) {
+                            boolean isRead, DisplayInfo display, AttachedObject attachedObject) {
             this.id = id;
             this.type = type;
             this.createdAt = createdAt;
             this.isRead = isRead;
+            this.display = display;
             this.attachedObject = attachedObject;
         }
 
         public Notification markAsRead() {
-            return new Notification(id, type, createdAt, true, attachedObject);
+            return new Notification(id, type, createdAt, true, display, attachedObject);
         }
 
         public boolean isListenNotification() {
@@ -74,6 +76,10 @@ public class NotificationsResponse extends PaginatedResponse {
 
         public AttachedObject getAttachedObject() {
             return attachedObject;
+        }
+
+        public DisplayInfo getDisplay() {
+            return display;
         }
     }
 
@@ -130,6 +136,61 @@ public class NotificationsResponse extends PaginatedResponse {
         @Nullable
         public String getText() {
             return text;
+        }
+    }
+
+    public class DisplayInfo {
+        private final String title;
+        private final String text;
+        private final List<Range> ranges;
+        private final String image;
+        private final String appUrl;
+
+        private DisplayInfo(String title, String text, List<Range> ranges,
+                            String image, String appUrl) {
+            this.title = title;
+            this.text = text;
+            this.ranges = ranges;
+            this.image = image;
+            this.appUrl = appUrl;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public String getText() {
+            return text;
+        }
+
+        public List<Range> getRanges() {
+            return ranges;
+        }
+
+        public String getImage() {
+            return image;
+        }
+
+        public String getAppUrl() {
+            return appUrl;
+        }
+    }
+
+    public class Range {
+        private final int length;
+        private final int offset;
+
+        private Range(int length, int offset) {
+            this.length = length;
+            this.offset = offset;
+        }
+
+        public int getLength() {
+            return length;
+        }
+
+        public int getOffset() {
+            return offset;
         }
     }
 }

@@ -257,5 +257,9 @@ public class NotificationsPresenter {
                 markSingleAsReadSubject.onNext(notification.getId());
             }
         }
+
+        public NotificationsResponse.DisplayInfo getDisplayInfo() {
+            return notification.getDisplay();
+        }
     }
 }

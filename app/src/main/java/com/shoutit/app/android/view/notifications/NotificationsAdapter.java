@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.text.SpannableString;
 import android.text.Spanned;
-import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
@@ -19,7 +18,6 @@ import com.google.common.base.Strings;
 import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
-import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.NotificationsResponse;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.DateTimeUtils;
@@ -28,8 +26,9 @@ import com.shoutit.app.android.viewholders.NoDataViewHolder;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
+import java.util.List;
+
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
@@ -91,43 +90,28 @@ public class NotificationsAdapter extends BaseAdapter {
             final String timeAgo = DateTimeUtils.timeAgoFromDate(notification.getCreatedAtInMillis());
             timeAgoTextView.setText(timeAgo);
 
-            final NotificationsResponse.AttachedObject attachedObject = notification.getAttachedObject();
-            if (attachedObject != null) {
-                String imageUrl = null;
-                if (notification.isMessageNotification() && attachedObject.getMessage() != null) {
-                    final BaseProfile profile = attachedObject.getMessage().getProfile();
-                    imageUrl = profile.getImage();
+            final NotificationsResponse.DisplayInfo displayInfo = item.getDisplayInfo();
+            final SpannableString spannedText = getSpannedText(displayInfo.getText(), displayInfo.getRanges());
+            textTv.setText(spannedText);
 
-                    String text = attachedObject.getMessage().getText();
-                    if (TextUtils.isEmpty(text)) {
-                        text = context.getString(R.string.notifications_message_replacement);
-                    }
-                    final SpannableString spannedText = getSpannedText(profile.getFirstName(), text);
-                    textTv.setText(spannedText);
-                } else if (notification.isListenNotification() && attachedObject.getProfile() != null) {
-                    final BaseProfile profile = attachedObject.getProfile();
-                    imageUrl = profile.getImage();
-
-                    final SpannableString spannedText = getSpannedText(
-                            profile.getFirstName(),
-                            context.getString(R.string.notifications_listening_to_you));
-                    textTv.setText(spannedText);
-                }
-
-                picasso.load(imageUrl)
-                        .placeholder(R.drawable.ic_rect_avatar_placeholder)
-                        .into(target);
-            }
+            picasso.load(Strings.emptyToNull(displayInfo.getImage()))
+                    .placeholder(R.drawable.ic_rect_avatar_placeholder)
+                    .into(target);
         }
 
         @Nonnull
-        private SpannableString getSpannedText(String name, @Nullable String message) {
-            final String text = name + "  " + Strings.nullToEmpty(message);
+        private SpannableString getSpannedText(String text, List<NotificationsResponse.Range> rangeList) {
             final SpannableString spannableString = new SpannableString(text);
 
-            spannableString.setSpan(boldedName, 0, name.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-            spannableString.setSpan(typefaceSpan, 0, name.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-            spannableString.setSpan(colorSpan, 0, name.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+
+            for (NotificationsResponse.Range range : rangeList) {
+                final int start = range.getOffset();
+                final int end = start + range.getLength();
+
+                spannableString.setSpan(boldedName, start, end, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                spannableString.setSpan(typefaceSpan, start, end, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                spannableString.setSpan(colorSpan, start, end, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            }
 
             return spannableString;
         }
