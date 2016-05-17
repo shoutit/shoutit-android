@@ -2,17 +2,16 @@ package com.shoutit.app.android.view.notifications;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
-import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
 import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.jakewharton.rxbinding.view.RxView;
@@ -27,10 +26,9 @@ import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
+import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.profile.tagprofile.TagProfileActivity;
-
-import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -84,21 +82,17 @@ public class NotificationsActivity extends BaseActivity {
                 .compose(this.<Throwable>bindToLifecycle())
                 .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(this)));
 
-        presenter.getOpenUserOrPageProfileObservable()
+        presenter.getOpenViewForNotificationObservable()
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(new Action1<String>() {
                     @Override
-                    public void call(String userName) {
-                        startActivity(UserOrPageProfileActivity.newIntent(NotificationsActivity.this, userName));
-                    }
-                });
-
-        presenter.getOpenTagProfileObservable()
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String userName) {
-                        startActivity(TagProfileActivity.newIntent(NotificationsActivity.this, userName));
+                    public void call(String appUrl) {
+                        if (TextUtils.isEmpty(appUrl)) {
+                            startActivity(MainActivity.newIntent(NotificationsActivity.this));
+                            finishAffinity();
+                        } else {
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(appUrl)));
+                        }
                     }
                 });
 

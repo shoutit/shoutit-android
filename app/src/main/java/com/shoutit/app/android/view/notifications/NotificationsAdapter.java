@@ -118,11 +118,7 @@ public class NotificationsAdapter extends BaseAdapter {
 
         @OnClick(R.id.notifications_root_view)
         public void onItemClicked() {
-            if (item.getNotification().isListenNotification()) {
-                item.openProfileAndMarkAsRead();
-            } else {
-                item.markNotificationAsRead();
-            }
+            item.onNotificationClicked();
         }
     }
 

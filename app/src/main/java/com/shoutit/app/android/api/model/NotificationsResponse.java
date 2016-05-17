@@ -144,10 +144,11 @@ public class NotificationsResponse extends PaginatedResponse {
         private final String text;
         private final List<Range> ranges;
         private final String image;
+        @Nullable
         private final String appUrl;
 
         private DisplayInfo(String title, String text, List<Range> ranges,
-                            String image, String appUrl) {
+                            String image, @Nullable String appUrl) {
             this.title = title;
             this.text = text;
             this.ranges = ranges;
@@ -171,6 +172,7 @@ public class NotificationsResponse extends PaginatedResponse {
             return image;
         }
 
+        @Nullable
         public String getAppUrl() {
             return appUrl;
         }
