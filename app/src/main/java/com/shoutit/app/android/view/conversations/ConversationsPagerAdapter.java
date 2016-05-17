@@ -12,6 +12,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 public class ConversationsPagerAdapter extends FragmentPagerAdapter {
+    public static final int POSITION_MY_CONVERSATIONS = 0;
+    public static final int POSITION_PUBLIC_CONVERSATIONS = 1;
 
     private final Context context;
 
@@ -25,9 +27,9 @@ public class ConversationsPagerAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
         switch (position) {
-            case 0:
+            case POSITION_MY_CONVERSATIONS:
                 return ConversationsFragment.newInstance(true);
-            case 1:
+            case POSITION_PUBLIC_CONVERSATIONS:
                 return ConversationsFragment.newInstance(false);
             default:
                 throw new RuntimeException("Unknown adpater position: " + position);
@@ -37,9 +39,9 @@ public class ConversationsPagerAdapter extends FragmentPagerAdapter {
     @Override
     public CharSequence getPageTitle(int position) {
         switch (position) {
-            case 0:
+            case POSITION_MY_CONVERSATIONS:
                 return context.getString(R.string.conversations_my_ab_title);
-            case 1:
+            case POSITION_PUBLIC_CONVERSATIONS:
                 return context.getString(R.string.conversations_public_ab_title);
             default:
                 throw new RuntimeException("Unknown adpater position: " + position);

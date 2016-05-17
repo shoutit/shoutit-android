@@ -69,6 +69,15 @@ public class ConversationsPagerFragment extends BaseFragment {
 
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
+
+        viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                getActivity().invalidateOptionsMenu();
+
+            }
+        });
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -87,12 +96,33 @@ public class ConversationsPagerFragment extends BaseFragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.conversations_menu, menu);
+
         for (int i = 0; i < menu.size(); i++) {
             final MenuItem item = menu.getItem(i);
             item.setVisible(false);
             mMenuItems.add(item);
         }
+
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        final MenuItem item = menu.findItem(R.id.conversations_menu_create_public_chat);
+        item.setVisible(viewPager.getCurrentItem() == ConversationsPagerAdapter.POSITION_PUBLIC_CONVERSATIONS);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.conversations_menu_create_public_chat:
+                // TODO create public chat
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
