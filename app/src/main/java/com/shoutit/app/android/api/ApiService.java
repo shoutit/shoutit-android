@@ -360,10 +360,7 @@ public interface ApiService {
      * Conversations
      */
     @GET("conversations")
-    Observable<ConversationsResponse> getConversations(@Query("page_size") Integer pageSize);
-
-    @GET("conversations")
-    Observable<ConversationsResponse> getConversations(@NonNull @Query("before") String timestamp,
+    Observable<ConversationsResponse> getConversations(@Nullable @Query("before") String timestamp,
                                                        @Query("page_size") Integer pageSize);
 
     @GET("conversations/{id}")
@@ -392,6 +389,13 @@ public interface ApiService {
 
     @POST("messages/{id}/read")
     Observable<ResponseBody> readMessage(@Path("id") String messageId);
+
+    /**
+     * Public Chats
+     */
+    @GET("public_chats")
+    Observable<ConversationsResponse> publicChats(@Nullable @Query("before") String timestamp,
+                                                  @Query("page_size") Integer pageSize);
 
     /**
      * Notifications

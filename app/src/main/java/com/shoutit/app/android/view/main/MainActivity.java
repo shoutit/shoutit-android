@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -30,7 +29,6 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dao.ProfilesDao;
-import com.shoutit.app.android.data.DeepLinksContants;
 import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.model.Stats;
 import com.shoutit.app.android.twilio.Twilio;
@@ -41,14 +39,10 @@ import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.PlayServicesHelper;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
-import com.shoutit.app.android.view.conversations.ConverstationsFragment;
-import com.shoutit.app.android.view.createshout.request.CreateRequestActivity;
 import com.shoutit.app.android.view.discover.DiscoverActivity;
 import com.shoutit.app.android.view.discover.OnNewDiscoverSelectedListener;
 import com.shoutit.app.android.view.home.HomeFragment;
 import com.shoutit.app.android.view.intro.IntroActivity;
-import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
-import com.shoutit.app.android.view.media.RecordMediaActivity;
 import com.shoutit.app.android.view.postlogininterest.PostLoginInterestActivity;
 import com.shoutit.app.android.view.search.main.MainSearchActivity;
 import com.shoutit.app.android.view.signin.LoginActivity;
@@ -214,6 +208,8 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
                 return super.onOptionsItemSelected(item);
         }
     }
+
+
 
     private boolean showMainSearchActivityOrLetFragmentsHandleIt() {
         final Fragment fragment = Iterables.getLast(getSupportFragmentManager().getFragments());

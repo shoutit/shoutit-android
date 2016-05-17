@@ -53,7 +53,6 @@ public class DeepLinksHelper {
             menuHandler.selectMenuItem(MenuHandler.FRAGMENT_CHATS);
         } else if (stringUri.contains(DeepLinksContants.PUBLIC_CHATS)) {
             redirectToLoginIfGuest();
-            // TODO change to public chats
             menuHandler.selectMenuItem(MenuHandler.FRAGMENT_CHATS);
         } else if (stringUri.contains(DeepLinksContants.CREATE_SHOUT)) {
             redirectToLoginIfGuest();

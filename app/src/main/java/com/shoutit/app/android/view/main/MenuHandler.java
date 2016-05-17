@@ -5,13 +5,13 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
 import android.view.View;
 import android.widget.CheckedTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
@@ -20,7 +20,7 @@ import com.shoutit.app.android.utils.BlurTransform;
 import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.RtlUtils;
-import com.shoutit.app.android.view.conversations.ConverstationsFragment;
+import com.shoutit.app.android.view.conversations.ConversationsPagerFragment;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
 import com.shoutit.app.android.view.discover.DiscoverFragment;
 import com.shoutit.app.android.view.home.HomeFragment;
@@ -53,6 +53,9 @@ public class MenuHandler {
     public static final String FRAGMENT_DISCOVER = "fragment_discover";
     public static final String FRAGMENT_BROWSE = "fragment_browse";
     public static final String FRAGMENT_CHATS = "fragment_chats";
+    public static final String FRAGMENT_PUBLIC_CHATS = "fragment_public_chats";
+    public static final String ACTIVITY_SETTINGS = "activity_settings";
+    public static final String ACTIVITY_HELP = "activity_help";
 
     @Bind(R.id.menu_user_name_tv)
     TextView userNameTextView;
@@ -100,6 +103,18 @@ public class MenuHandler {
         viewTagViewIdMap.put(FRAGMENT_DISCOVER, R.id.menu_discover);
         viewTagViewIdMap.put(FRAGMENT_BROWSE, R.id.menu_browse);
         viewTagViewIdMap.put(FRAGMENT_CHATS, R.id.menu_chat);
+        viewTagViewIdMap.put(FRAGMENT_PUBLIC_CHATS, R.id.menu_chat);
+        viewTagViewIdMap.put(ACTIVITY_HELP, R.id.menu_help);
+        viewTagViewIdMap.put(ACTIVITY_SETTINGS, R.id.menu_settings);
+    }
+    private static Map<Integer, String> viewIdViewTagMap = new HashMap<>();
+    static {
+        viewIdViewTagMap.put(R.id.menu_home, FRAGMENT_HOME);
+        viewIdViewTagMap.put(R.id.menu_discover, FRAGMENT_DISCOVER);
+        viewIdViewTagMap.put(R.id.menu_browse, FRAGMENT_BROWSE);
+        viewIdViewTagMap.put(R.id.menu_chat, FRAGMENT_CHATS);
+        viewIdViewTagMap.put(R.id.menu_help, ACTIVITY_HELP);
+        viewIdViewTagMap.put(R.id.menu_settings, ACTIVITY_SETTINGS);
     }
 
     @Inject
@@ -165,56 +180,57 @@ public class MenuHandler {
         };
     }
 
-    @OnClick({R.id.menu_home, R.id.menu_discover, R.id.menu_browse, R.id.menu_chat,
-             R.id.menu_settings, R.id.menu_help})
+    @OnClick({R.id.menu_home, R.id.menu_discover, R.id.menu_browse, R.id.menu_chat, R.id.menu_settings, R.id.menu_help})
     public void onMenuItemSelected(View view) {
-        selectMenuItem(view.getId());
+        selectMenuItem(viewIdViewTagMap.get(view.getId()));
     }
 
-    private void selectMenuItem(int viewId) {
-        switch (viewId) {
-            case R.id.menu_home:
-                onMenuItemSelectedListener.onMenuItemSelected(FRAGMENT_HOME);
-                selectItem(viewId);
+    public void selectMenuItem(@Nonnull String viewTag) {
+        switch (viewTag) {
+            case FRAGMENT_HOME:
+            case FRAGMENT_DISCOVER:
+            case FRAGMENT_BROWSE:
+                selectFragment(viewTag);
                 break;
-            case R.id.menu_discover:
-                onMenuItemSelectedListener.onMenuItemSelected(FRAGMENT_DISCOVER);
-                selectItem(viewId);
-                break;
-            case R.id.menu_browse:
-                onMenuItemSelectedListener.onMenuItemSelected(FRAGMENT_BROWSE);
-                selectItem(viewId);
-                break;
-            case R.id.menu_chat:
+            case FRAGMENT_CHATS:
+            case FRAGMENT_PUBLIC_CHATS:
                 if (userPreferences.isNormalUser()) {
-                    onMenuItemSelectedListener.onMenuItemSelected(FRAGMENT_CHATS);
-                    selectItem(viewId);
+                    selectFragment(viewTag);
                 } else {
                     showLoginActivity();
                 }
                 break;
-            case R.id.menu_settings:
+            case ACTIVITY_SETTINGS:
                 rxActivity.startActivity(SettingsActivity.newIntent(rxActivity));
                 break;
-            case R.id.menu_help:
+            case ACTIVITY_HELP:
                 UserVoice.launchUserVoice(rxActivity);
                 break;
+            default:
+                throw new RuntimeException("Unknown menu item with tag: " + viewTag);
         }
 
         KeyboardHelper.hideSoftKeyboard(rxActivity);
     }
 
+    private void selectFragment(@Nonnull String viewTag) {
+        selectItem(viewTagViewIdMap.get(viewTag));
+        onMenuItemSelectedListener.onMenuItemSelected(viewTag);
+        setToolbarElevation(viewTagViewIdMap.get(viewTag) != R.id.menu_chat);
+    }
 
-    public void selectMenuItem(@Nonnull String viewTag) {
-        selectMenuItem(viewTagViewIdMap.get(viewTag));
+    public void setToolbarElevation(boolean enable) {
+        final ActionBar actionBar = rxActivity.getSupportActionBar();
+        if (actionBar == null) {
+            return;
+        }
+
+        actionBar.setElevation(enable ?
+                rxActivity.getResources().getDimensionPixelSize(R.dimen.toolbar_elevation) : 0f);
     }
 
     private void showLoginActivity() {
         rxActivity.startActivity(LoginIntroActivity.newIntent(rxActivity));
-    }
-
-    public void selectChats() {
-        selectItem(R.id.menu_chat);
     }
 
     private void selectItem(@IdRes int id) {
@@ -307,7 +323,9 @@ public class MenuHandler {
             case FRAGMENT_BROWSE:
                 return SearchShoutsResultsFragment.newInstance(null, null, SearchPresenter.SearchType.BROWSE);
             case FRAGMENT_CHATS:
-                return ConverstationsFragment.newInstance();
+                return ConversationsPagerFragment.newInstance();
+            case FRAGMENT_PUBLIC_CHATS:
+                return ConversationsPagerFragment.newInstance(true);
             default:
                 throw new RuntimeException("Unknown fragment tag");
 
