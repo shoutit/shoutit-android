@@ -7,19 +7,14 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
-import com.google.common.collect.Lists;
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
 import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
-import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
@@ -37,7 +32,9 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 
-public class ConverstationsFragment extends BaseFragment implements ConversationsPresenter.Listener {
+public class ConversationsFragment extends BaseFragment implements ConversationsPresenter.Listener {
+
+    private static final String KEY_IS_MY_CONVERSATIONS = "is_my_conversations";
 
     @Bind(R.id.conversation_recyclerview)
     RecyclerView mConversationRecyclerview;
@@ -51,12 +48,14 @@ public class ConverstationsFragment extends BaseFragment implements Conversation
     @Inject
     ConversationsAdapter adapter;
 
-    @Nullable
-    private View mLogo;
-    private List<MenuItem> mItems = Lists.newArrayList();
+    public static Fragment newInstance(final boolean isMyConversations) {
+        final Bundle bundle = new Bundle();
+        bundle.putBoolean(KEY_IS_MY_CONVERSATIONS, isMyConversations);
 
-    public static Fragment newInstance() {
-        return new ConverstationsFragment();
+        final ConversationsFragment fragment = new ConversationsFragment();
+        fragment.setArguments(bundle);
+
+        return fragment;
     }
 
     @Nullable
@@ -69,9 +68,13 @@ public class ConverstationsFragment extends BaseFragment implements Conversation
     protected void injectComponent(@Nonnull BaseActivityComponent baseActivityComponent,
                                    @Nonnull FragmentModule fragmentModule,
                                    @Nullable Bundle savedInstanceState) {
+
+        final boolean isMyConversations = getArguments().getBoolean(KEY_IS_MY_CONVERSATIONS);
+
         final ConversationsFragmentComponent component = DaggerConversationsFragmentComponent
                 .builder()
                 .fragmentModule(new FragmentModule(this))
+                .converstationsFragmentModule(new ConverstationsFragmentModule(isMyConversations))
                 .baseActivityComponent(baseActivityComponent)
                 .build();
         component.inject(this);
@@ -91,13 +94,6 @@ public class ConverstationsFragment extends BaseFragment implements Conversation
         mConversationRecyclerview.setAdapter(adapter);
         mConversationRecyclerview.setLayoutManager(new MyLinearLayoutManager(getActivity()));
 
-        final BaseActivity activity = (BaseActivity) getActivity();
-        activity.getSupportActionBar().setTitle(R.string.conversation_title);
-        mLogo = activity.findViewById(R.id.activity_main_logo);
-        if (mLogo != null) {
-            mLogo.setVisibility(View.GONE);
-        }
-
         RxRecyclerView.scrollEvents(mConversationRecyclerview)
                 .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
                 .filter(LoadMoreHelper.needLoadMore((MyLayoutManager) mConversationRecyclerview.getLayoutManager(), adapter))
@@ -114,30 +110,6 @@ public class ConverstationsFragment extends BaseFragment implements Conversation
     public void onPause() {
         super.onPause();
         presenter.unregister();
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (mLogo != null) {
-            mLogo.setVisibility(View.VISIBLE);
-        }
-        final BaseActivity activity = (BaseActivity) getActivity();
-        activity.getSupportActionBar().setTitle(null);
-        for (MenuItem item : mItems) {
-            item.setVisible(true);
-        }
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        for (int i = 0; i < menu.size(); i++) {
-            final MenuItem item = menu.getItem(i);
-            item.setVisible(false);
-            mItems.add(item);
-        }
-        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -163,7 +135,11 @@ public class ConverstationsFragment extends BaseFragment implements Conversation
     }
 
     @Override
-    public void onItemClicked(@NonNull String id, boolean shoutChat) {
-        startActivity(ChatActivity.newIntent(getActivity(), id, shoutChat));
+    public void onItemClicked(@NonNull String id, boolean shoutChat, boolean isPublicChat) {
+        if (isPublicChat) {
+            // TODO Piotrek
+        } else {
+            startActivity(ChatActivity.newIntent(getActivity(), id, shoutChat));
+        }
     }
 }

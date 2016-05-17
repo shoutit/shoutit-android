@@ -39,7 +39,7 @@ import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.PlayServicesHelper;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
-import com.shoutit.app.android.view.conversations.ConverstationsFragment;
+import com.shoutit.app.android.view.conversations.ConversationsPagerFragment;
 import com.shoutit.app.android.view.discover.DiscoverActivity;
 import com.shoutit.app.android.view.discover.OnNewDiscoverSelectedListener;
 import com.shoutit.app.android.view.home.HomeFragment;
@@ -196,9 +196,11 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
             case R.id.base_menu_chat:
                 if (mUserPreferences.isNormalUser()) {
                     getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.activity_main_fragment_container, ConverstationsFragment.newInstance(), MenuHandler.FRAGMENT_CHATS)
+                            .replace(R.id.activity_main_fragment_container,
+                                    ConversationsPagerFragment.newInstance(), MenuHandler.FRAGMENT_CHATS)
                             .commit();
                     menuHandler.selectChats();
+                    menuHandler.setToolbarElevation(false);
                 } else {
                     startActivity(LoginIntroActivity.newIntent(this));
                 }
@@ -207,6 +209,8 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
                 return super.onOptionsItemSelected(item);
         }
     }
+
+
 
     private boolean showMainSearchActivityOrLetFragmentsHandleIt() {
         final Fragment fragment = Iterables.getLast(getSupportFragmentManager().getFragments());

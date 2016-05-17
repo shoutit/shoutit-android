@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.shoutit.app.android.App;
@@ -38,7 +39,7 @@ public class ConversationsActivity extends BaseActivity {
         if (savedInstanceState == null) {
             getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.activity_conversations_container, ConverstationsFragment.newInstance())
+                    .replace(R.id.activity_conversations_container, ConversationsPagerFragment.newInstance())
                     .commit();
         }
     }
