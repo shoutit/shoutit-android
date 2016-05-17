@@ -396,6 +396,7 @@
     <string name="chat_request">Request</string>
     <string name="chats_empty">No messages.</string>
     <string name="chat_menu_delete">Delete Conversation</string>
+    <string name="chats_chat_info">Chat Info</string>
 
     <!-- Notifications -->
     <string name="notifications_title">Notifications</string>
@@ -528,8 +529,12 @@
     <string name="select_profile_ab_title">Select profile</string>
     <string name="select_profile_tab_listenings">Listenings</string>
     <string name="select_profile_tab_listeners">Listeners</string>
+
+    <!-- Chat Info -->
     <string name="chat_info_subject">Subject</string>
     <string name="chat_info_attachment">Attachments</string>
     <string name="chat_info_members">Members</string>
+    <string name="chat_info_title">Chat Info</string>
+    <string name="chat_info_add_person">Add Person</string>
 
 </resources>

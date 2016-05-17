@@ -122,6 +122,7 @@ public class ChatsFirstConversationPresenter {
         assert user != null;
         mListener = listener;
         mListener.showDeleteMenu(false);
+        mListener.showChatInfoMenu(false);
         mChatsDelegate.setListener(listener);
 
         subscribeToMessages();
@@ -130,9 +131,9 @@ public class ChatsFirstConversationPresenter {
     }
 
     private void setupUserForVideoChat(@Nonnull User user) {
-            chatParticipantUsernameSubject.onNext(user.getUsername());
-            mUserPreferences.setShoutOwnerName(user.getName());
-            mListener.showVideoChatIcon();
+        chatParticipantUsernameSubject.onNext(user.getUsername());
+        mUserPreferences.setShoutOwnerName(user.getName());
+        mListener.showVideoChatIcon();
     }
 
     private void getConversationInfo(User user) {
@@ -326,6 +327,7 @@ public class ChatsFirstConversationPresenter {
                 @Override
                 public void call(Message message) {
                     mListener.showDeleteMenu(true);
+                    mListener.showChatInfoMenu(true);
                     conversationCreated = true;
                     conversationId = message.getConversationId();
                     if (mIsShoutConversation) {
@@ -419,5 +421,10 @@ public class ChatsFirstConversationPresenter {
 
     public Observable<String> calledPersonUsernameObservable() {
         return calledPersonUsernameObservable;
+    }
+
+    @Nullable
+    public String getId() {
+        return conversationId;
     }
 }

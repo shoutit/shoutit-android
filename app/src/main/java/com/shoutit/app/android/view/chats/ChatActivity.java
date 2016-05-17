@@ -45,6 +45,7 @@ import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.utils.TextWatcherAdapter;
+import com.shoutit.app.android.view.chats.chat_info.ChatInfoActivity;
 import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
 import com.shoutit.app.android.view.chooseprofile.SelectProfileActivity;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
@@ -120,6 +121,7 @@ public class ChatActivity extends BaseActivity implements Listener {
 
     @Bind(R.id.conversations_empty)
     View emptyList;
+    private String mConversationId;
 
     public static Intent newIntent(@Nonnull Context context, @NonNull String conversationId, boolean shoutConversation) {
         return new Intent(context, ChatActivity.class)
@@ -129,6 +131,7 @@ public class ChatActivity extends BaseActivity implements Listener {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        mConversationId = getIntent().getStringExtra(ARGS_CONVERSATION_ID);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chats);
         ButterKnife.bind(this);
@@ -169,6 +172,10 @@ public class ChatActivity extends BaseActivity implements Listener {
                     }
                     case R.id.chats_delete: {
                         deleteConversation();
+                        return true;
+                    }
+                    case R.id.chats_chat_information: {
+                        startActivity(ChatInfoActivity.newIntent(ChatActivity.this, mConversationId));
                         return true;
                     }
                     default:
@@ -215,13 +222,13 @@ public class ChatActivity extends BaseActivity implements Listener {
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
         final Intent intent = getIntent();
-        final String conversationId = intent.getStringExtra(ARGS_CONVERSATION_ID);
+
         final boolean isShoutConversation = intent.getExtras().getBoolean(ARGS_IS_SHOUT_CONVERSATION);
         final ChatActivityComponent component = DaggerChatActivityComponent
                 .builder()
                 .activityModule(new ActivityModule(this))
                 .appComponent(App.getAppComponent(getApplication()))
-                .chatsActivityModule(new ChatsActivityModule(conversationId, isShoutConversation))
+                .chatsActivityModule(new ChatsActivityModule(mConversationId, isShoutConversation))
                 .build();
         component.inject(this);
 

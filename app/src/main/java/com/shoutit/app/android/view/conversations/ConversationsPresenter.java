@@ -232,7 +232,7 @@ public class ConversationsPresenter {
         } else if (Conversation.CHAT_TYPE.equals(input.getType())) {
             return new ConversationChatItem(input.getId(), message, chatWith, elapsedTime, image, isUnread);
         } else {
-            throw new RuntimeException(input.getType() + " : unknown type");
+            return new ConversationChatItem(input.getId(), message, chatWith, elapsedTime, image, isUnread);
         }
     }
 

@@ -16,6 +16,7 @@ import com.shoutit.app.android.api.model.CreateShoutResponse;
 import com.shoutit.app.android.api.model.Currency;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
+import com.shoutit.app.android.api.model.EditPublicChatRequest;
 import com.shoutit.app.android.api.model.EditShoutPriceRequest;
 import com.shoutit.app.android.api.model.EditShoutRequest;
 import com.shoutit.app.android.api.model.EditShoutRequestWithPrice;
@@ -369,6 +370,9 @@ public interface ApiService {
 
     @GET("conversations/{id}")
     Observable<Conversation> getConversation(@NonNull @Path("id") String id);
+
+    @PATCH("conversations/{id}")
+    Observable<ResponseBody> updateConversation(@NonNull @Path("id") String id, @Body EditPublicChatRequest request);
 
     @GET("conversations/{id}/messages")
     Observable<MessagesResponse> getMessages(@NonNull @Path("id") String conversationId,

@@ -1,20 +1,14 @@
 package com.shoutit.app.android.view.chats.chat_info;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -29,8 +23,6 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.ImageCaptureHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
-import com.shoutit.app.android.view.chats.public_chat.DaggerCreatePublicChatActivityComponent;
-import com.shoutit.app.android.view.createshout.location.LocationActivity;
 import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;
@@ -39,27 +31,12 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
-public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.CreatePublicChatView {
+public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.ChatInfoView {
 
-    private static final int REQUEST_LOCATION = 0;
-    private static final int REQUEST_IMAGE = 1;
-    private static final int REQUEST_CODE_PERMISSION = 2;
-
-
-    @Bind(R.id.create_chat_progress)
-    FrameLayout mCreateChatProgress;
-    @Bind(R.id.create_chat_avatar)
-    ImageView mCreateChatAvatar;
-    @Bind(R.id.create_chat_subject)
-    EditText mCreateChatSubject;
-    @Bind(R.id.create_chat_location_flag)
-    ImageView mCreateChatLocationFlag;
-    @Bind(R.id.create_chat_location_name)
-    TextView mCreateChatLocationName;
-    @Bind(R.id.create_chat_toolbar)
-    Toolbar mToolbar;
+    private static final int REQUEST_IMAGE = 0;
+    private static final int REQUEST_CODE_PERMISSION = 1;
+    private static final String EXTRA_CONVERSATION_ID = "extra_conversation_id";
 
     @Inject
     Picasso picasso;
@@ -67,25 +44,47 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
     ImageCaptureHelper mImageCaptureHelper;
     @Inject
     ChatInfoPresenter mCreatePublicChatPresenter;
+    @Bind(R.id.chat_info_toolbar)
+    Toolbar mChatInfoToolbar;
+    @Bind(R.id.chat_info_avatar)
+    ImageView mChatInfoAvatar;
+    @Bind(R.id.chat_info_subject)
+    EditText mChatInfoSubject;
+    @Bind(R.id.chat_info_shouts_number)
+    TextView mChatInfoShoutsNumber;
+    @Bind(R.id.chat_info_media_number)
+    TextView mChatInfoMediaNumber;
+    @Bind(R.id.chat_info_participants)
+    TextView mChatInfoParticipants;
+    @Bind(R.id.chat_info_blocked_number)
+    TextView mChatInfoBlockedNumber;
+    @Bind(R.id.chat_info_edit_chat)
+    Button mChatInfoEditChat;
+    @Bind(R.id.chat_info_progress)
+    FrameLayout mChatInfoProgress;
+    @Bind(R.id.chat_info_subject_layout)
+    View mChatInfoSubjectLayout;
 
-    public static Intent newIntent(Context context) {
-        return new Intent(context, ChatInfoActivity.class);
+    public static Intent newIntent(@NonNull Context context, @NonNull String conversationId) {
+        return new Intent(context, ChatInfoActivity.class)
+                .putExtra(EXTRA_CONVERSATION_ID, conversationId);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.create_chat_activity);
+        setContentView(R.layout.chat_info_activity);
         ButterKnife.bind(this);
 
-        mToolbar.setTitle(R.string.create_public_chat_title);
-        mToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
-        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+        mChatInfoToolbar.setTitle(R.string.chat_info_title);
+        mChatInfoToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        mChatInfoToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finish();
             }
         });
+        mChatInfoToolbar.inflateMenu(R.menu.chat_info_menu);
 
         mCreatePublicChatPresenter.register(this);
     }
@@ -99,8 +98,10 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
     @Nonnull
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
-        final ChatInfoComponent build = DaggerCreatePublicChatActivityComponent.builder()
+        final String conversationId = getIntent().getStringExtra(EXTRA_CONVERSATION_ID);
+        final ChatInfoComponent build = DaggerChatInfoComponent.builder()
                 .activityModule(new ActivityModule(this))
+                .chatInfoModule(new ChatInfoModule(conversationId))
                 .appComponent(App.getAppComponent(getApplication()))
                 .build();
         build.inject(this);
@@ -108,31 +109,30 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_CODE_PERMISSION) {
+            PermissionHelper.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+    @Override
     public void showProgress(boolean show) {
-        mCreateChatProgress.setVisibility(show ? View.VISIBLE : View.GONE);
+        mChatInfoProgress.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     @Override
-    public void setLocation(@DrawableRes int flag, @NonNull String location) {
-        final Resources resources = getResources();
-        final Bitmap bitmap = BitmapFactory.decodeResource(resources, flag);
-        final RoundedBitmapDrawable roundedBitmapDrawable = RoundedBitmapDrawableFactory.create(resources, bitmap);
-        roundedBitmapDrawable.setCircular(true);
-        mCreateChatLocationFlag.setImageDrawable(roundedBitmapDrawable);
-        mCreateChatLocationName.setText(location);
-    }
-
-    @Override
-    public void setImage(@Nullable Uri imageUrl) {
+    public void setImage(@android.support.annotation.Nullable Uri imageUrl) {
         picasso.load(imageUrl)
                 .centerCrop()
                 .fit()
-                .into(mCreateChatAvatar);
+                .into(mChatInfoAvatar);
     }
 
     @Override
-    public void startSelectLocationActivity() {
-        startActivityForResult(LocationActivity.newIntent(this), REQUEST_LOCATION);
+    public void setSubject(@Nonnull String subject) {
+        mChatInfoSubject.setText(subject);
     }
 
     @Override
@@ -147,9 +147,7 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_LOCATION) {
-            mCreatePublicChatPresenter.onLocationActivityFinished(resultCode, data);
-        } else if (requestCode == REQUEST_IMAGE) {
+        if (requestCode == REQUEST_IMAGE) {
             mCreatePublicChatPresenter.onImageActivityFinished(resultCode, data);
         } else {
             super.onActivityResult(requestCode, resultCode, data);
@@ -158,46 +156,51 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
 
     @Override
     public void subjectEmptyError() {
-        mCreateChatSubject.setError(getString(R.string.create_public_chat_error));
+        mChatInfoSubject.setError(getString(R.string.create_public_chat_error));
     }
 
     @Override
-    public ChatInfoPresenter.CreatePublicChatData getData() {
-        return new ChatInfoPresenter.CreatePublicChatData(mCreateChatSubject.getText().toString(), false, false);
+    public String getSubject() {
+        return mChatInfoSubject.getText().toString();
     }
 
     @Override
-    public void createRequestError() {
-        ColoredSnackBar.error(ColoredSnackBar.contentView(this), R.string.create_public_chat_error, Snackbar.LENGTH_SHORT).show();
-    }
-
-    @OnClick(R.id.create_chat_location_change)
-    void changeLocation() {
-        mCreatePublicChatPresenter.selectLocationClicked();
-    }
-
-    @OnClick(R.id.create_chat_create)
-    void createChat() {
-        mCreatePublicChatPresenter.createClicked();
-    }
-
-    @OnClick(R.id.create_chat_avatar)
-    void selectAvatar() {
-        if (!PermissionHelper.checkPermissions(this, REQUEST_CODE_PERMISSION, ColoredSnackBar.contentView(this),
-                R.string.permission_location_explanation,
-                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA})) {
-            return;
-        }
-
-        mCreatePublicChatPresenter.selectImageClicked();
+    public void editRequestError() {
+        ColoredSnackBar.error(ColoredSnackBar.contentView(this), "Error", Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_CODE_PERMISSION) {
-            PermissionHelper.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
-        } else {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
+    public void setShoutsCount(int count) {
+
+    }
+
+    @Override
+    public void setMediaCount(int count) {
+
+    }
+
+    @Override
+    public void setParticipantsCount(int count) {
+        mChatInfoParticipants.setText(String.valueOf(count));
+    }
+
+    @Override
+    public void setBlockedCount(int count) {
+        mChatInfoBlockedNumber.setText(String.valueOf(count));
+    }
+
+    @Override
+    public void loadConversationError() {
+        ColoredSnackBar.error(ColoredSnackBar.contentView(this), "Error", Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void isAdmin(boolean isAdmin) {
+        mChatInfoToolbar.getMenu().findItem(R.id.chat_info_add_person).setVisible(isAdmin);
+    }
+
+    @Override
+    public void showSubject(boolean show) {
+        mChatInfoSubjectLayout.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 }

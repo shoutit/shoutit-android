@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 
 import com.google.common.base.Optional;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.CreatePublicChatRequest;
 import com.shoutit.app.android.api.model.UpdateLocationRequest;
@@ -56,6 +57,8 @@ public class CreatePublicChatPresenterTest {
     ImageCaptureHelper imageCaptureHelper;
     @Mock
     AmazonHelper mAmazonHelper;
+    @Mock
+    UserPreferences mUserPreferences;
 
     private CreatePublicChatPresenter mCreatePublicChatPresenter;
 
@@ -64,7 +67,7 @@ public class CreatePublicChatPresenterTest {
         MockitoAnnotations.initMocks(this);
         PowerMockito.mockStatic(LocationResultHelper.class);
         PowerMockito.mockStatic(ResourcesHelper.class);
-        mCreatePublicChatPresenter = new CreatePublicChatPresenter(imageCaptureHelper, mContext, mApiService, Schedulers.immediate(), Schedulers.immediate(), mAmazonHelper);
+        mCreatePublicChatPresenter = new CreatePublicChatPresenter(imageCaptureHelper, mContext, mApiService, Schedulers.immediate(), Schedulers.immediate(), mAmazonHelper, mUserPreferences);
         when(mAmazonHelper.uploadGroupChatObservable(any(File.class))).thenReturn(Observable.just("url"));
     }
 

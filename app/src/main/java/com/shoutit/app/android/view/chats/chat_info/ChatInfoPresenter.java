@@ -1,10 +1,8 @@
 package com.shoutit.app.android.view.chats.chat_info;
 
 
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -14,97 +12,91 @@ import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
-import com.shoutit.app.android.api.model.CreatePublicChatRequest;
-import com.shoutit.app.android.api.model.UpdateLocationRequest;
+import com.shoutit.app.android.api.model.Conversation;
+import com.shoutit.app.android.api.model.EditPublicChatRequest;
 import com.shoutit.app.android.api.model.User;
-import com.shoutit.app.android.api.model.UserLocation;
-import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.ImageCaptureHelper;
-import com.shoutit.app.android.utils.ResourcesHelper;
-import com.shoutit.app.android.view.createshout.location.LocationResultHelper;
 
 import java.io.File;
+import java.util.List;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Scheduler;
 import rx.functions.Action1;
+import rx.functions.Func0;
 import rx.functions.Func1;
 
 public class ChatInfoPresenter {
 
     public static final int RESULT_OK = -1;
 
-    private State state = State.empty();
-    private CreatePublicChatView listener;
+    private Uri url;
+    private ChatInfoView listener;
 
     private final ImageCaptureHelper mImageCaptureHelper;
-    private final Context mContext;
     private final ApiService mApiService;
     private final Scheduler mNetworkScheduler;
     private final Scheduler mUiScheduler;
     private final AmazonHelper mAmazonHelper;
-    @NonNull
+    private final String mConversationId;
     private final UserPreferences mUserPreferences;
 
     @Inject
     public ChatInfoPresenter(@NonNull ImageCaptureHelper imageCaptureHelper,
-                             @NonNull @ForActivity Context context,
                              @NonNull ApiService apiService,
                              @NetworkScheduler Scheduler networkScheduler,
                              @UiScheduler Scheduler uiScheduler,
                              @NonNull AmazonHelper amazonHelper,
+                             @NonNull String conversationId,
                              @NonNull UserPreferences userPreferences) {
         mImageCaptureHelper = imageCaptureHelper;
-        mContext = context;
         mApiService = apiService;
         mNetworkScheduler = networkScheduler;
         mUiScheduler = uiScheduler;
         mAmazonHelper = amazonHelper;
+        mConversationId = conversationId;
         mUserPreferences = userPreferences;
     }
 
     public void selectImageClicked() {
-        if (state.url == null) {
+        if (url == null) {
             listener.startSelectImageActivity();
         } else {
-            state = new State(null, state.location);
+            url = null;
             listener.setImage(null);
         }
     }
 
-    public void selectLocationClicked() {
-        listener.startSelectLocationActivity();
-    }
-
     public void createClicked() {
-        final CreatePublicChatData data = listener.getData();
+        final String data = listener.getSubject();
         if (!isDataCorrect(data)) {
             listener.subjectEmptyError();
         } else {
             listener.showProgress(true);
-            mApiService.updateUserLocation(new UpdateLocationRequest(state.location))
-                    .subscribeOn(mNetworkScheduler)
-                    .observeOn(mUiScheduler)
-                    .flatMap(new Func1<User, Observable<?>>() {
+            Observable
+                    .defer(new Func0<Observable<String>>() {
                         @Override
-                        public Observable<?> call(User user) {
-                            if (state.url != null) {
-                                return mAmazonHelper.uploadGroupChatObservable(new File(state.url.toString()))
+                        public Observable<String> call() {
+                            if (url != null) {
+                                return mAmazonHelper.uploadGroupChatObservable(new File(url.toString()))
                                         .subscribeOn(mNetworkScheduler)
                                         .observeOn(mUiScheduler);
                             } else {
-                                return Observable.just(new Object());
+                                return Observable.just(null);
                             }
                         }
                     })
+                    .subscribeOn(mNetworkScheduler)
+                    .observeOn(mUiScheduler)
                     .flatMap(new Func1<Object, Observable<ResponseBody>>() {
                         @Override
                         public Observable<ResponseBody> call(Object user) {
-                            return mApiService.createPublicChat(new CreatePublicChatRequest(data.subject))
+                            return mApiService.updateConversation(mConversationId, new EditPublicChatRequest(data))
                                     .subscribeOn(mNetworkScheduler)
                                     .observeOn(mUiScheduler);
                         }
@@ -117,23 +109,57 @@ public class ChatInfoPresenter {
                     }, new Action1<Throwable>() {
                         @Override
                         public void call(Throwable throwable) {
-                            listener.createRequestError();
+                            listener.editRequestError();
                             listener.showProgress(false);
                         }
                     });
         }
     }
 
-    private boolean isDataCorrect(CreatePublicChatData data) {
-        return !Strings.isNullOrEmpty(data.subject);
+    private boolean isDataCorrect(String data) {
+        return !Strings.isNullOrEmpty(data);
     }
 
-    public void register(@NonNull CreatePublicChatView listener) {
+    public void register(@NonNull ChatInfoView listener) {
         this.listener = listener;
-        final UserLocation location = mUserPreferences.getLocation();
-        if (location != null) {
-            setLocation(location);
-        }
+        loadConversation();
+    }
+
+    private void loadConversation() {
+        mApiService.getConversation(mConversationId)
+                .subscribeOn(mNetworkScheduler)
+                .observeOn(mUiScheduler)
+                .subscribe(
+                        new Action1<Conversation>() {
+                            @Override
+                            public void call(Conversation conversation) {
+                                final int participantsCount = conversation.getProfiles().size();
+                                final int blockedSize = conversation.getBlocked().size();
+
+                                final boolean isAdmin = isAdmin(conversation.getAdmins());
+
+                                listener.isAdmin(isAdmin);
+                                listener.setParticipantsCount(participantsCount);
+                                listener.setBlockedCount(blockedSize);
+                                if (!Strings.isNullOrEmpty(conversation.getIcon())) {
+                                    listener.setImage(Uri.parse(conversation.getIcon()));
+                                }
+                                listener.setSubject(conversation.getSubject());
+                                listener.showSubject(conversation.isPublicChat());
+                            }
+                        },
+                        new Action1<Throwable>() {
+                            @Override
+                            public void call(Throwable throwable) {
+                                listener.loadConversationError();
+                            }
+                        });
+    }
+
+    private boolean isAdmin(List<String> admins) {
+        final User user = mUserPreferences.getUser();
+        assert user != null;
+        return admins.contains(user.getId());
     }
 
     public void unregister() {
@@ -144,69 +170,41 @@ public class ChatInfoPresenter {
     public void onImageActivityFinished(int resultCode, Intent data) {
         final Optional<Uri> uriOptional = mImageCaptureHelper.onResult(resultCode, data);
         if (uriOptional.isPresent()) {
-            final Uri imageUrl = uriOptional.get();
-            state = new State(imageUrl, state.location);
-            listener.setImage(imageUrl);
+            url = uriOptional.get();
+            listener.setImage(url);
         }
     }
 
-    public void onLocationActivityFinished(int resultCode, Intent data) {
-        if (resultCode == RESULT_OK) {
-            final UserLocation location = LocationResultHelper.getLocationFromIntent(data);
-            setLocation(location);
-        }
-    }
-
-    private void setLocation(UserLocation location) {
-        state = new State(state.url, location);
-        listener.setLocation(ResourcesHelper.getResourceIdForName(location.getCountry(), mContext), location.getCity());
-    }
-
-    private static class State {
-        private final Uri url;
-        private final UserLocation location;
-
-        private State(Uri url, UserLocation location) {
-            this.url = url;
-            this.location = location;
-        }
-
-        public static State empty() {
-            return new State(null, null);
-        }
-    }
-
-    public static class CreatePublicChatData {
-
-        private final String subject;
-        private final boolean facebook;
-        private final boolean twitter;
-
-        public CreatePublicChatData(String subject, boolean facebook, boolean twitter) {
-            this.subject = subject;
-            this.facebook = facebook;
-            this.twitter = twitter;
-        }
-    }
-
-    public interface CreatePublicChatView {
+    public interface ChatInfoView {
 
         void showProgress(boolean show);
 
-        void setLocation(@DrawableRes int flag, @NonNull String location);
-
         void setImage(@Nullable Uri imageUrl);
 
-        void startSelectLocationActivity();
+        void setSubject(@Nonnull String subject);
 
         void startSelectImageActivity();
 
         void subjectEmptyError();
 
-        CreatePublicChatData getData();
+        String getSubject();
 
         void finish();
 
-        void createRequestError();
+        void editRequestError();
+
+        void setShoutsCount(int count);
+
+        void setMediaCount(int count);
+
+        void setParticipantsCount(int count);
+
+        void setBlockedCount(int count);
+
+        void loadConversationError();
+
+        void isAdmin(boolean isAdmin);
+
+        void showSubject(boolean show);
     }
 }

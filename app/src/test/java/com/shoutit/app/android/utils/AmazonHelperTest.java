@@ -3,13 +3,18 @@ package com.shoutit.app.android.utils;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.User;
+import com.squareup.okhttp.ResponseBody;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.List;
 import java.util.Locale;
+
+import rx.Observable;
+import rx.functions.Func1;
 
 import static com.google.common.truth.Truth.assert_;
 import static org.junit.Assert.*;
