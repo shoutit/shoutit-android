@@ -103,7 +103,6 @@ public class ChatsPresenter {
     private final Resources mResources;
     private final Context mContext;
     private final PusherHelper mPusher;
-    private final boolean mIsShoutConversation;
     private Listener mListener;
     private CompositeSubscription mSubscribe = new CompositeSubscription();
     private final PublishSubject<Object> requestSubject = PublishSubject.create();
@@ -121,8 +120,7 @@ public class ChatsPresenter {
                           @ForActivity Resources resources,
                           @ForActivity Context context,
                           AmazonHelper amazonHelper,
-                          PusherHelper pusher,
-                          boolean isShoutConversation) {
+                          PusherHelper pusher) {
         this.conversationId = conversationId;
         mApiService = apiService;
         mUiScheduler = uiScheduler;
@@ -131,7 +129,6 @@ public class ChatsPresenter {
         mResources = resources;
         mContext = context;
         mPusher = pusher;
-        mIsShoutConversation = isShoutConversation;
 
         calledPersonUsernameObservable = chatParticipantUsernameSubject
                 .filter(Functions1.isNotNull())
@@ -165,7 +162,7 @@ public class ChatsPresenter {
                 .subscribe(new Action1<Conversation>() {
                     @Override
                     public void call(Conversation conversationResponse) {
-                        if (mIsShoutConversation) {
+                        if (conversationResponse.isShoutChat()) {
                             final AboutShout about = conversationResponse.getAbout();
                             final String id = about.getId();
 

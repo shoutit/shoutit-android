@@ -73,7 +73,7 @@
                     android:host="public_chats"
                     android:scheme="shoutit" />
                 <data
-                    android:host="create_shout?type="
+                    android:host="create_shout"
                     android:scheme="shoutit" />
             </intent-filter>
 
@@ -136,7 +136,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="conversation?id="
+                    android:host="conversation"
                     android:scheme="shoutit" />
             </intent-filter>
         </activity>
@@ -223,7 +223,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="shout?id="
+                    android:host="shout"
                     android:scheme="shoutit" />
             </intent-filter>
 
@@ -240,7 +240,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="profile?id="
+                    android:host="profile"
                     android:scheme="shoutit" />
             </intent-filter>
 

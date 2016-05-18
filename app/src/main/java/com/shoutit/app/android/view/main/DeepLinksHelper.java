@@ -50,7 +50,7 @@ public class DeepLinksHelper {
             menuHandler.selectMenuItem(MenuHandler.FRAGMENT_DISCOVER);
         } else if (stringUri.contains(DeepLinksContants.CHATS)) {
             redirectToLoginIfGuest();
-            menuHandler.selectMenuItem(MenuHandler.FRAGMENT_CHATS);
+            menuHandler.selectMenuItem(MenuHandler.FRAGMENT_PUBLIC_CHATS);
         } else if (stringUri.contains(DeepLinksContants.PUBLIC_CHATS)) {
             redirectToLoginIfGuest();
             menuHandler.selectMenuItem(MenuHandler.FRAGMENT_CHATS);

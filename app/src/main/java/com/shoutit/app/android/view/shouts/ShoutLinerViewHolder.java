@@ -119,7 +119,7 @@ public class ShoutLinerViewHolder extends ViewHolderManager.BaseViewHolder<Shout
 
                                 final boolean hasConversation = conversations != null && !conversations.isEmpty();
                                 if (hasConversation) {
-                                    context.startActivity(ChatActivity.newIntent(context, conversations.get(0).getId(), true));
+                                    context.startActivity(ChatActivity.newIntent(context, conversations.get(0).getId()));
                                 } else {
                                     context.startActivity(ChatFirstConversationActivity.newIntent(context, true, item.getShout().getId()));
                                 }

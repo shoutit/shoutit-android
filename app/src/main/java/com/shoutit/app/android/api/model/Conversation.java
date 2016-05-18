@@ -60,6 +60,10 @@ public class Conversation {
         return PUBLIC_CHAT_TYPE.equals(type);
     }
 
+    public boolean isShoutChat() {
+        return ABOUT_SHOUT_TYPE.equals(type);
+    }
+
     public class DisplayData {
         private final String image;
         private final String subTitle;

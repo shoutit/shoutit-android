@@ -439,7 +439,7 @@ public class ShoutActivity extends BaseActivity {
                         public void onClick(View v) {
                             if (bottomBarData.isNormalUser()) {
                                 if (bottomBarData.isHasConversation()) {
-                                    startActivity(ChatActivity.newIntent(ShoutActivity.this, bottomBarData.getConversationId(), true));
+                                    startActivity(ChatActivity.newIntent(ShoutActivity.this, bottomBarData.getConversationId()));
                                 } else {
                                     startActivity(ChatFirstConversationActivity.newIntent(ShoutActivity.this, true, mShoutId));
                                 }

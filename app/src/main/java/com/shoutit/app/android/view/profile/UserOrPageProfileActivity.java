@@ -94,7 +94,7 @@ public class UserOrPageProfileActivity extends ProfileActivity {
                                 if (conversationId == null) {
                                     startActivity(ChatFirstConversationActivity.newIntent(UserOrPageProfileActivity.this, false, chatInfo.getUsername()));
                                 } else {
-                                    startActivity(ChatActivity.newIntent(UserOrPageProfileActivity.this, conversationId, false));
+                                    startActivity(ChatActivity.newIntent(UserOrPageProfileActivity.this, conversationId));
                                 }
                             } else {
                                 Toast.makeText(UserOrPageProfileActivity.this, R.string.profile_not_listening, Toast.LENGTH_SHORT).show();
@@ -266,8 +266,7 @@ public class UserOrPageProfileActivity extends ProfileActivity {
         final Intent intent = checkNotNull(getIntent());
         String userName = intent.getStringExtra(KEY_PROFILE_ID);
         if (userName == null && intent.getData() != null) {
-            // TODO this param will be probably renamed to username
-            userName = intent.getData().getQueryParameter("id");
+            userName = intent.getData().getQueryParameter("username");
         }
         checkNotNull(userName);
 
