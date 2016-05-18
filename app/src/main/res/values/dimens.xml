@@ -5,6 +5,7 @@
     <dimen name="button_with_default_bg_height">52dp</dimen>
     <!-- It includes 12dp inset in default button bg -->
     <dimen name="default_button_height">40dp</dimen>
+    <dimen name="toolbar_elevation">4dp</dimen>
 
     <!-- Home -->
     <dimen name="home_discover_image_height">90dp</dimen>

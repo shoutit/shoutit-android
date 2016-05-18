@@ -29,9 +29,9 @@ if (keystoreProperties.exists()) {
     props.load(new FileInputStream(keystoreProperties))
 }
 
-def baseVersionName = "2.0.5"
+def baseVersionName = "2.0.6"
 
-project.ext.versionCode = 74
+project.ext.versionCode = 75
 
 if (project.hasProperty("versionSuffix")) {
     project.ext.versionChangeSuffix = project.versionSuffix
@@ -120,10 +120,6 @@ android {
             buildConfigField "String", "API_URL", production_api_url
             buildConfigField 'Boolean', 'enableCrashlytics', 'true'
         }
-    }
-
-    dexOptions {
-        dexInProcess true
     }
 
     productFlavors {

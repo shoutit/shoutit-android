@@ -40,7 +40,7 @@ public class ConversationsActivity extends BaseActivity {
         if (savedInstanceState == null) {
             getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.activity_conversations_container, ConverstationsFragment.newInstance())
+                    .replace(R.id.activity_conversations_container, ConversationsPagerFragment.newInstance())
                     .commit();
         }
     }

@@ -39,12 +39,10 @@ import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.PlayServicesHelper;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
-import com.shoutit.app.android.view.conversations.ConverstationsFragment;
 import com.shoutit.app.android.view.discover.DiscoverActivity;
 import com.shoutit.app.android.view.discover.OnNewDiscoverSelectedListener;
 import com.shoutit.app.android.view.home.HomeFragment;
 import com.shoutit.app.android.view.intro.IntroActivity;
-import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.postlogininterest.PostLoginInterestActivity;
 import com.shoutit.app.android.view.search.main.MainSearchActivity;
 import com.shoutit.app.android.view.signin.LoginActivity;
@@ -90,6 +88,8 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
     PusherHelper mPusherHelper;
     @Inject
     ApiService apiService;
+    @Inject
+    DeepLinksHelper deepLinksHelper;
 
     private ActionBarDrawerToggle drawerToggle;
     private BackPressedHelper mBackPressedHelper;
@@ -130,12 +130,20 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
             menuHandler.initMenu(drawerLayout, selectedItem);
         }
 
+        deepLinksHelper.checkForDeepLinksIntent(getIntent());
+
         if (mUserPreferences.isNormalUser()) {
             subscribeToStats();
         }
 
         profilesDao.registerToGcmAction(AppuniteGcm.getInstance()
                 .getPushToken());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        deepLinksHelper.checkForDeepLinksIntent(intent);
     }
 
     private void registerToGcm() {
@@ -194,19 +202,14 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
             case R.id.base_menu_search:
                 return showMainSearchActivityOrLetFragmentsHandleIt();
             case R.id.base_menu_chat:
-                if (mUserPreferences.isNormalUser()) {
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.activity_main_fragment_container, ConverstationsFragment.newInstance(), MenuHandler.FRAGMENT_CHATS)
-                            .commit();
-                    menuHandler.selectChats();
-                } else {
-                    startActivity(LoginIntroActivity.newIntent(this));
-                }
+                menuHandler.selectMenuItem(MenuHandler.FRAGMENT_CHATS);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
+
+
 
     private boolean showMainSearchActivityOrLetFragmentsHandleIt() {
         final Fragment fragment = Iterables.getLast(getSupportFragmentManager().getFragments());

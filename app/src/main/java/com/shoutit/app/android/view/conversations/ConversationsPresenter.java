@@ -10,15 +10,16 @@ import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.operators.OperatorMergeNextToken;
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.Conversation;
-import com.shoutit.app.android.api.model.ConversationProfile;
 import com.shoutit.app.android.api.model.ConversationsResponse;
 import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessageAttachment;
@@ -57,15 +58,15 @@ public class ConversationsPresenter {
                 public Observable<ConversationsResponse> call(ConversationsResponse conversationsResponse) {
                     if (conversationsResponse == null || conversationsResponse.getPrevious() != null) {
                         if (conversationsResponse == null) {
-                            return mApiService.getConversations(PAGE_SIZE)
+                            return getConversationsRequest(null)
                                     .subscribeOn(mNetworkScheduler)
                                     .observeOn(mUiScheduler);
                         } else {
-                            final String after = Uri.parse(conversationsResponse.getPrevious()).getQueryParameter("before");
+                            final String before = Uri.parse(conversationsResponse.getPrevious()).getQueryParameter("before");
                             return Observable.just(
                                     conversationsResponse)
                                     .zipWith(
-                                            mApiService.getConversations(after, PAGE_SIZE)
+                                            getConversationsRequest(before)
                                                     .subscribeOn(mNetworkScheduler)
                                                     .observeOn(mUiScheduler),
                                             new Func2<ConversationsResponse, ConversationsResponse, ConversationsResponse>() {
@@ -91,6 +92,7 @@ public class ConversationsPresenter {
     private final Context mContext;
     private final UserPreferences mUserPreferences;
     private final PusherHelper mPusherHelper;
+    private final boolean isMyConversationsList;
     private final PublishSubject<Object> requestSubject = PublishSubject.create();
     private Listener mListener;
     private Subscription mSubscription;
@@ -102,13 +104,23 @@ public class ConversationsPresenter {
                                   @UiScheduler Scheduler uiScheduler,
                                   @ForActivity Context context,
                                   UserPreferences userPreferences,
-                                  PusherHelper pusherHelper) {
+                                  PusherHelper pusherHelper,
+                                  boolean isMyConversationsList) {
         mApiService = apiService;
         mNetworkScheduler = networkScheduler;
         mUiScheduler = uiScheduler;
         mContext = context;
         mUserPreferences = userPreferences;
         mPusherHelper = pusherHelper;
+        this.isMyConversationsList = isMyConversationsList;
+    }
+
+    private Observable<ConversationsResponse> getConversationsRequest(@Nullable String before) {
+        if (isMyConversationsList) {
+            return mApiService.getConversations(before, PAGE_SIZE);
+        } else {
+            return mApiService.publicChats(before, PAGE_SIZE);
+        }
     }
 
     public void register(@NonNull final Listener listener) {
@@ -120,6 +132,12 @@ public class ConversationsPresenter {
                     }
                 })
                 .observeOn(mUiScheduler)
+                .filter(new Func1<Conversation, Boolean>() {
+                    @Override
+                    public Boolean call(Conversation conversation) {
+                        return isMyConversationsList;
+                    }
+                })
                 .scan(Maps.<String, Conversation>newHashMap(), new Func2<HashMap<String, Conversation>, Conversation, HashMap<String, Conversation>>() {
                     @Override
                     public HashMap<String, Conversation> call(HashMap<String, Conversation> map, Conversation pusherMessage) {
@@ -210,35 +228,17 @@ public class ConversationsPresenter {
     @NonNull
     private BaseAdapterItem getConversationItem(@NonNull Conversation input) {
         final Message lastMessage = input.getLastMessage();
-        final List<ConversationProfile> profiles = input.getProfiles();
+        final Conversation.Display displayData = input.getDisplay();
 
         final String message = getMessageString(lastMessage);
         final String elapsedTime = DateUtils.getRelativeTimeSpanString(mContext, lastMessage.getCreatedAt() * 1000).toString();
         final User user = mUserPreferences.getUser();
         assert user != null;
-        final String chatWith = ConversationsUtils.getChatWithString(profiles, user.getId());
-        final String image = getImage(profiles);
 
         final boolean isUnread = input.getUnreadMessagesCount() > 0;
-        if (Conversation.ABOUT_SHOUT_TYPE.equals(input.getType())) {
-            return new ConversationShoutItem(input.getId(), input.getAbout().getTitle(), chatWith, message, elapsedTime, image, isUnread);
-        } else if (Conversation.CHAT_TYPE.equals(input.getType())) {
-            return new ConversationChatItem(input.getId(), message, chatWith, elapsedTime, image, isUnread);
-        } else {
-            return new ConversationChatItem(input.getId(), message, chatWith, elapsedTime, image, isUnread);
-        }
-    }
 
-    private String getImage(List<ConversationProfile> profiles) {
-        final User user = mUserPreferences.getUser();
-        assert user != null;
-        final String id = user.getId();
-        for (ConversationProfile profile : profiles) {
-            if (!profile.getId().equals(id)) {
-                return profile.getImage();
-            }
-        }
-        return null;
+        return new ConversationAdapterItem(input.getId(), displayData.getTitle(), displayData.getSubTitle(),
+                message, elapsedTime, displayData.getImage(), isUnread, input.getType());
     }
 
     private String getMessageString(Message lastMessage) {
@@ -280,98 +280,35 @@ public class ConversationsPresenter {
 
         void error();
 
-        void onItemClicked(@NonNull String id, boolean shoutChat);
+        void onItemClicked(@NonNull String id, boolean isPublicChat);
     }
 
-    public class ConversationChatItem implements BaseAdapterItem {
+    public class ConversationAdapterItem extends BaseNoIDAdapterItem {
         private final String id;
-        private final String message;
-        private final String user;
-        private final String time;
-        private final String image;
-        private final boolean mIsUnread;
-
-        public ConversationChatItem(String id, String message, String user, String time, String image, boolean isUnread) {
-            this.id = id;
-            this.message = message;
-            this.user = user;
-            this.time = time;
-            this.image = image;
-            mIsUnread = isUnread;
-        }
-
-        @Override
-        public boolean matches(@Nonnull BaseAdapterItem item) {
-            return false;
-        }
-
-        @Override
-        public boolean same(@Nonnull BaseAdapterItem item) {
-            return false;
-        }
-
-        @Override
-        public long adapterId() {
-            return 0;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public String getUser() {
-            return user;
-        }
-
-        public String getTime() {
-            return time;
-        }
-
-        public String getImage() {
-            return image;
-        }
-
-        public boolean isUnread() {
-            return mIsUnread;
-        }
-
-        public void click() {
-            mListener.onItemClicked(id, false);
-        }
-    }
-
-    public class ConversationShoutItem implements BaseAdapterItem {
-        private final String id;
-        private final String shoutDescription;
-        private final String userNames;
+        private final String title;
+        private final String subTitle;
         private final String message;
         private final String time;
         private final String image;
         private final boolean mIsUnread;
+        private final String conversationType;
 
-        public ConversationShoutItem(String id,
-                                     String shoutDescription,
-                                     String userNames,
-                                     String message,
-                                     String time,
-                                     String image,
-                                     boolean isUnread) {
+        public ConversationAdapterItem(String id,
+                                       String title,
+                                       String subTitle,
+                                       String lastMessage,
+                                       String time,
+                                       String image,
+                                       boolean isUnread,
+                                       String conversationType) {
             this.id = id;
-            this.shoutDescription = shoutDescription;
-            this.userNames = userNames;
-            this.message = message;
+            this.title = title;
+            this.subTitle = subTitle;
+            this.message = lastMessage;
             this.time = time;
             this.image = image;
             mIsUnread = isUnread;
-        }
-
-        @Override
-        public long adapterId() {
-            return 0;
+            this.conversationType = conversationType;
         }
 
         @Override
@@ -388,12 +325,12 @@ public class ConversationsPresenter {
             return id;
         }
 
-        public String getShoutDescription() {
-            return shoutDescription;
+        public String getTitle() {
+            return title;
         }
 
-        public String getUserNames() {
-            return userNames;
+        public String getSubTitle() {
+            return subTitle;
         }
 
         public String getMessage() {
@@ -412,8 +349,16 @@ public class ConversationsPresenter {
             return mIsUnread;
         }
 
+        public boolean isShoutChat() {
+            return Conversation.ABOUT_SHOUT_TYPE.equals(conversationType);
+        }
+
+        public boolean isPublicChat() {
+            return Conversation.PUBLIC_CHAT_TYPE.equals(conversationType);
+        }
+
         public void click() {
-            mListener.onItemClicked(id, true);
+            mListener.onItemClicked(id, isPublicChat());
         }
     }
 

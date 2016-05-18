@@ -116,16 +116,17 @@ public class Conversation {
         return unreadMessagesCount;
     }
 
-    public List<String> getBlocked() {
-        return blocked;
-    }
-
     public List<String> getAdmins() {
         return admins;
     }
 
     public boolean isPublicChat() {
         return PUBLIC_CHAT_TYPE.equals(type);
+    }
+
+
+    public boolean isShoutChat() {
+        return ABOUT_SHOUT_TYPE.equals(type);
     }
 
     public MiniProfile getCreator() {
@@ -142,5 +143,9 @@ public class Conversation {
 
     public AttatchmentCount getAttachmentsCount() {
         return attachmentsCount;
+    }
+
+    public List<String> getBlocked() {
+        return blocked;
     }
 }

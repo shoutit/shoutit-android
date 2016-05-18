@@ -25,57 +25,7 @@ import butterknife.ButterKnife;
 
 public class ConversationsAdapter extends BaseAdapter {
 
-    public static class ConversationChatItemHolder extends ViewHolderManager.BaseViewHolder<BaseAdapterItem> {
-
-        @Nonnull
-        private final View mItemView;
-        private final Picasso mPicasso;
-        private final Resources mResources;
-
-        @Bind(R.id.conversation_chat_item_image)
-        ImageView mConversationChatItemImage;
-        @Bind(R.id.conversation_chat_item_name)
-        TextView mConversationChatItemName;
-        @Bind(R.id.conversation_chat_item_message)
-        TextView mConversationChatItemMessage;
-        @Bind(R.id.conversation_chat_item_time)
-        TextView mConversationShoutItemTime;
-
-        public ConversationChatItemHolder(@Nonnull View itemView, Picasso picasso, Resources resources) {
-            super(itemView);
-            mItemView = itemView;
-            mPicasso = picasso;
-            mResources = resources;
-            ButterKnife.bind(this, itemView);
-        }
-
-        @Override
-        public void bind(@Nonnull BaseAdapterItem item) {
-            final ConversationsPresenter.ConversationChatItem conversationChatItem = (ConversationsPresenter.ConversationChatItem) item;
-            mPicasso.load(conversationChatItem.getImage())
-                    .placeholder(R.drawable.ic_rect_avatar_placeholder)
-                    .error(R.drawable.ic_rect_avatar_placeholder)
-                    .into(mConversationChatItemImage);
-            mConversationChatItemName.setText(conversationChatItem.getUser());
-            mConversationChatItemMessage.setText(conversationChatItem.getMessage());
-            mConversationShoutItemTime.setText(conversationChatItem.getTime());
-
-            mItemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    conversationChatItem.click();
-                }
-            });
-
-            mItemView.setBackgroundColor(conversationChatItem.isUnread() ? mResources.getColor(R.color.conversation_not_read) : Color.WHITE);
-        }
-
-        private static ViewHolderManager.BaseViewHolder create(@NonNull View view, Picasso picasso, Resources resources) {
-            return new ConversationChatItemHolder(view, picasso, resources);
-        }
-    }
-
-    public static class ConversationShoutItemHolder extends ViewHolderManager.BaseViewHolder<BaseAdapterItem> {
+    public static class ConversationItemHolder extends ViewHolderManager.BaseViewHolder<BaseAdapterItem> {
 
         @Nonnull
         private final View mItemView;
@@ -83,17 +33,17 @@ public class ConversationsAdapter extends BaseAdapter {
         private final Resources mResources;
 
         @Bind(R.id.conversation_shout_item_image)
-        ImageView mConversationShoutItemImage;
+        ImageView mImageIv;
         @Bind(R.id.conversation_shout_item_shout_title)
-        TextView mConversationShoutItemShoutTitle;
+        TextView mTitleTv;
         @Bind(R.id.conversation_shout_item_name)
-        TextView mConversationShoutItemName;
+        TextView mSubtitleTv;
         @Bind(R.id.conversation_shout_item_message)
-        TextView mConversationShoutItemMessage;
+        TextView mLastMessageTv;
         @Bind(R.id.conversation_shout_item_time)
-        TextView mConversationShoutItemTime;
+        TextView mTimeTv;
 
-        public ConversationShoutItemHolder(@Nonnull View itemView, Picasso picasso, Resources resources) {
+        public ConversationItemHolder(@Nonnull View itemView, Picasso picasso, Resources resources) {
             super(itemView);
             mItemView = itemView;
             mPicasso = picasso;
@@ -103,40 +53,49 @@ public class ConversationsAdapter extends BaseAdapter {
 
         @Override
         public void bind(@Nonnull final BaseAdapterItem item) {
-            final ConversationsPresenter.ConversationShoutItem conversationShoutItem = (ConversationsPresenter.ConversationShoutItem) item;
+            final ConversationsPresenter.ConversationAdapterItem adapterItem =
+                    (ConversationsPresenter.ConversationAdapterItem) item;
 
-            mPicasso.load(conversationShoutItem.getImage())
+            mPicasso.load(adapterItem.getImage())
                     .placeholder(R.drawable.ic_rect_avatar_placeholder)
                     .error(R.drawable.ic_rect_avatar_placeholder)
-                    .into(mConversationShoutItemImage);
-            final String shoutDescription = conversationShoutItem.getShoutDescription();
-            if(Strings.isNullOrEmpty(shoutDescription)){
-                mConversationShoutItemShoutTitle.setVisibility(View.GONE);
-            } else {
-                mConversationShoutItemShoutTitle.setVisibility(View.VISIBLE);
-                mConversationShoutItemShoutTitle.setText(shoutDescription);
-            }
-            mConversationShoutItemName.setText(conversationShoutItem.getUserNames());
-            mConversationShoutItemMessage.setText(conversationShoutItem.getMessage());
-            mConversationShoutItemTime.setText(conversationShoutItem.getTime());
+                    .into(mImageIv);
 
-            mItemView.setBackgroundColor(conversationShoutItem.isUnread() ? mResources.getColor(R.color.conversation_not_read) : Color.WHITE);
+            final String title = adapterItem.getTitle();
+            setText(mTitleTv, title);
+            mTitleTv.setTextColor(mResources.getColor(
+                    adapterItem.isShoutChat() ? R.color.accent_blue : R.color.black_87));
+
+            final String subTitle = adapterItem.getSubTitle();
+            setText(mSubtitleTv, subTitle);
+
+            mLastMessageTv.setText(adapterItem.getMessage());
+            mTimeTv.setText(adapterItem.getTime());
+
+            mItemView.setBackgroundColor(adapterItem.isUnread() ?
+                    mResources.getColor(R.color.conversation_not_read) : Color.WHITE);
 
             mItemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    conversationShoutItem.click();
+                    adapterItem.click();
                 }
             });
         }
 
+        private void setText(TextView textView, String text) {
+            if (Strings.isNullOrEmpty(text)) {
+                textView.setVisibility(View.GONE);
+            } else {
+                textView.setVisibility(View.VISIBLE);
+                textView.setText(text);
+            }
+        }
+
         private static ViewHolderManager.BaseViewHolder create(@NonNull View view, Picasso picasso, Resources resources) {
-            return new ConversationShoutItemHolder(view, picasso, resources);
+            return new ConversationItemHolder(view, picasso, resources);
         }
     }
-
-    private static final int CONVERSATION_CHAT_TYPE = 0;
-    private static final int CONVERSATION_SHOUT_TYPE = 1;
 
     @NonNull
     private final Picasso mPicasso;
@@ -149,31 +108,13 @@ public class ConversationsAdapter extends BaseAdapter {
 
     @Override
     public ViewHolderManager.BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        switch (viewType) {
-            case CONVERSATION_CHAT_TYPE:
-                return ConversationChatItemHolder.create(layoutInflater.inflate(R.layout.conversation_chat_item, parent, false), mPicasso, context.getResources());
-            case CONVERSATION_SHOUT_TYPE:
-                return ConversationShoutItemHolder.create(layoutInflater.inflate(R.layout.conversation_shout_item, parent, false), mPicasso, context.getResources());
-            default:
-                throw new RuntimeException();
-        }
+        return ConversationItemHolder.create(
+                layoutInflater.inflate(R.layout.conversation_item, parent, false), mPicasso, context.getResources());
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(ViewHolderManager.BaseViewHolder holder, int position) {
         holder.bind(items.get(position));
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        final BaseAdapterItem baseAdapterItem = items.get(position);
-        if (baseAdapterItem instanceof ConversationsPresenter.ConversationChatItem) {
-            return CONVERSATION_CHAT_TYPE;
-        } else if (baseAdapterItem instanceof ConversationsPresenter.ConversationShoutItem) {
-            return CONVERSATION_SHOUT_TYPE;
-        } else {
-            throw new RuntimeException();
-        }
     }
 }

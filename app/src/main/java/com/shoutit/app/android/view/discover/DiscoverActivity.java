@@ -48,7 +48,11 @@ public class DiscoverActivity extends BaseActivity implements OnNewDiscoverSelec
         setUpActionBar();
 
         final Intent intent = checkNotNull(getIntent());
-        final String discoverId = checkNotNull(intent.getStringExtra(KEY_DISCOVER_ID));
+        String discoverId = intent.getStringExtra(KEY_DISCOVER_ID);
+        if (discoverId == null && intent.getData() != null) {
+            discoverId = intent.getData().getQueryParameter("id");
+        }
+        checkNotNull(discoverId);
 
         if (savedInstanceState == null) {
             getSupportFragmentManager()

@@ -1,0 +1,34 @@
+package com.shoutit.app.android.view.conversations;
+
+import android.content.Context;
+
+import com.appunite.rx.dagger.NetworkScheduler;
+import com.appunite.rx.dagger.UiScheduler;
+import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.utils.pusher.PusherHelper;
+
+import dagger.Module;
+import dagger.Provides;
+import rx.Scheduler;
+
+@Module
+public class ConverstationsFragmentModule {
+
+    private final boolean isMyConversations;
+
+    public ConverstationsFragmentModule(boolean isMyConversations) {
+        this.isMyConversations = isMyConversations;
+    }
+
+    @Provides
+    ConversationsPresenter provideConversationsPresenter(ApiService apiService, UserPreferences userPreferences,
+                                                         @NetworkScheduler Scheduler networkScheduler,
+                                                         @UiScheduler Scheduler uiScheduler,
+                                                         @ForActivity Context context,
+                                                         PusherHelper pusherHelper) {
+        return new ConversationsPresenter(apiService, networkScheduler, uiScheduler, context,
+                userPreferences, pusherHelper, isMyConversations);
+    }
+}
