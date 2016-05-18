@@ -22,6 +22,7 @@ import com.shoutit.app.android.retainfragment.RetainFragmentHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.view.createshout.location.LocationActivity;
+import com.shoutit.app.android.view.createshout.location.LocationResultHelper;
 import com.shoutit.app.android.view.search.SearchPresenter;
 
 import java.io.Serializable;
@@ -151,7 +152,7 @@ public class FiltersFragment extends BaseFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_GET_LOCATION && resultCode == Activity.RESULT_OK && data != null) {
-            final UserLocation userLocation = (UserLocation) data.getSerializableExtra(LocationActivity.EXTRAS_USER_LOCATION);
+            final UserLocation userLocation = LocationResultHelper.getLocationFromIntent(data);
             presenter.onLocationChanged(userLocation);
         } else if (resultCode == Activity.RESULT_OK) {
             super.onActivityResult(requestCode, resultCode, data);

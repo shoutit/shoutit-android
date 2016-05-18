@@ -10,6 +10,9 @@ import javax.annotation.Nonnull;
 
 public class DateTimeUtils {
 
+    private static SimpleDateFormat sSimpleDateFormat = new SimpleDateFormat("dd - MM - yyyy", Locale.getDefault());
+    private static SimpleDateFormat sChatCreatedAtFormat = new SimpleDateFormat("dd MM yyyy", Locale.getDefault());
+
     @Nonnull
     public static String timeAgoFromSecondsToWeek(Context context, long datePublishedInMillis) {
         return android.text.format.DateUtils.getRelativeDateTimeString(context, datePublishedInMillis,
@@ -24,8 +27,11 @@ public class DateTimeUtils {
                 .toString();
     }
 
-    public static String getShoutDetailDate(Context context, long datePublishedInMillis) {
-        final SimpleDateFormat dateFormat = new SimpleDateFormat("dd - MM - yyyy", Locale.getDefault());
-        return dateFormat.format(new Date(datePublishedInMillis));
+    public static String getShoutDetailDate(long datePublishedInMillis) {
+        return sSimpleDateFormat.format(new Date(datePublishedInMillis));
+    }
+
+    public static String getChatCreatedAtDate(long millis) {
+        return sChatCreatedAtFormat.format(new Date(millis));
     }
 }

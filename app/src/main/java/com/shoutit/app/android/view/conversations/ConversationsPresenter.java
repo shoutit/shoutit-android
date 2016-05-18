@@ -175,18 +175,12 @@ public class ConversationsPresenter {
                             }
                         }
 
-                        return ImmutableList.copyOf(Iterables.filter(Iterables.transform(map.entrySet(), new Function<Map.Entry<String, Conversation>, Conversation>() {
+                        return ImmutableList.copyOf(Iterables.transform(map.entrySet(), new Function<Map.Entry<String, Conversation>, Conversation>() {
                             @Nullable
                             @Override
                             public Conversation apply(@Nullable Map.Entry<String, Conversation> input) {
                                 assert input != null;
                                 return input.getValue();
-                            }
-                        }), new Predicate<Conversation>() {
-                            @Override
-                            public boolean apply(@Nullable Conversation conversation) {
-                                assert conversation != null;
-                                return conversation.isPublicChat() || conversation.getProfiles().size() > 1;
                             }
                         }));
                     }
@@ -234,7 +228,7 @@ public class ConversationsPresenter {
     @NonNull
     private BaseAdapterItem getConversationItem(@NonNull Conversation input) {
         final Message lastMessage = input.getLastMessage();
-        final Conversation.DisplayData displayData = input.getDisplay();
+        final Conversation.Display displayData = input.getDisplay();
 
         final String message = getMessageString(lastMessage);
         final String elapsedTime = DateUtils.getRelativeTimeSpanString(mContext, lastMessage.getCreatedAt() * 1000).toString();

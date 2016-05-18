@@ -17,6 +17,7 @@ import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
+import com.shoutit.app.android.view.chats.public_chat.CreatePublicChatActivity;
 
 import java.util.List;
 
@@ -137,7 +138,7 @@ public class ConversationsPagerFragment extends BaseFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.conversations_menu_create_public_chat:
-                // TODO create public chat
+                startActivity(CreatePublicChatActivity.newIntent(getActivity()));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

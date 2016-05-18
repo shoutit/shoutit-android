@@ -101,4 +101,7 @@
     <color name="white97">#e3ffffff</color>
     <color name="listening_tab_text">#b2ffffff</color>
 
+    <!-- Media -->
+    <color name="media_image_background">#C8E6C9</color>
+
 </resources>

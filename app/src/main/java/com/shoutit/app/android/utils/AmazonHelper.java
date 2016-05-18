@@ -64,6 +64,10 @@ public class AmazonHelper {
         return uploadImageObservable(AmazonBucket.USER, fileToUpload, getImageFileName());
     }
 
+    public Observable<String> uploadGroupChatObservable(@Nonnull final File fileToUpload) {
+        return uploadImageObservable(AmazonBucket.TAG, fileToUpload, getImageFileName());
+    }
+
     private Observable<String> uploadImageObservable(@Nonnull final AmazonBucket bucket,
                                                      @Nonnull final File fileToUpload, final String fileName) {
         return Observable
