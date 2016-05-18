@@ -7,11 +7,7 @@ import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.TestUtils;
 import com.shoutit.app.android.UserPreferences;
-import com.shoutit.app.android.api.model.Conversation;
-import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
-import com.shoutit.app.android.api.model.User;
-import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.view.shouts.discover.DiscoverShoutsPresenter;
 

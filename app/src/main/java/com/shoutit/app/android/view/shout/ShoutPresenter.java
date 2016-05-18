@@ -13,7 +13,7 @@ import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
-import com.shoutit.app.android.api.model.Conversation;
+import com.shoutit.app.android.api.model.ConversationDetails;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
@@ -61,7 +61,7 @@ public class ShoutPresenter {
     private final Observable<Boolean> showDeleteDialogObservable;
     private final PublishSubject<Object> deleteShoutSubject = PublishSubject.create();
     private final Observable<Response<Object>> reportShoutObservable;
-    private final Observable<List<Conversation>> conversationObservable;
+    private final Observable<List<ConversationDetails>> conversationObservable;
     private final Observable<Object> refreshShoutsObservable;
     private final Observable<String> videoCallClickedObservable;
     private final Observable<Boolean> editShoutClickedObservable;
@@ -149,9 +149,9 @@ public class ShoutPresenter {
                 });
 
         conversationObservable = successShoutResponse
-                .map(new Func1<Shout, List<Conversation>>() {
+                .map(new Func1<Shout, List<ConversationDetails>>() {
                     @Override
-                    public List<Conversation> call(Shout shout) {
+                    public List<ConversationDetails> call(Shout shout) {
                         return shout.getConversations();
                     }
                 });
@@ -525,9 +525,9 @@ public class ShoutPresenter {
                 .flatMap(new Func1<List<BaseAdapterItem>, Observable<BottomBarData>>() {
                     @Override
                     public Observable<BottomBarData> call(List<BaseAdapterItem> baseAdapterItems) {
-                        return isUserShoutOwnerObservable.zipWith(conversationObservable, new Func2<Boolean, List<Conversation>, BottomBarData>() {
+                        return isUserShoutOwnerObservable.zipWith(conversationObservable, new Func2<Boolean, List<ConversationDetails>, BottomBarData>() {
                             @Override
-                            public BottomBarData call(Boolean isUserShoutOwner, List<Conversation> conversations) {
+                            public BottomBarData call(Boolean isUserShoutOwner, List<ConversationDetails> conversations) {
                                 final boolean hasConversation = conversations != null && !conversations.isEmpty();
                                 return new BottomBarData(isUserShoutOwner, hasConversation, hasConversation ? conversations.get(0).getId() : null, mUserPreferences.isNormalUser());
                             }

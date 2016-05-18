@@ -8,7 +8,7 @@ import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.base.Objects;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
-import com.shoutit.app.android.api.model.Conversation;
+import com.shoutit.app.android.api.model.ConversationDetails;
 import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.api.model.RelatedTagsResponse;
 import com.shoutit.app.android.api.model.TagDetail;
@@ -430,7 +430,7 @@ public class ProfileAdapterItems {
         }
 
         public void onChatActionClicked() {
-            final Conversation conversation = user.getConversation();
+            final ConversationDetails conversation = user.getConversation();
             onChatIconClickedObserver.onNext(new ChatInfo(user.getUsername(), conversation != null ? conversation.getId() : null, user.isListener(), isNormalUser));
         }
 

@@ -11,7 +11,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
-import com.shoutit.app.android.api.model.Conversation;
+import com.shoutit.app.android.api.model.ConversationDetails;
 import com.shoutit.app.android.api.model.Discover;
 import com.shoutit.app.android.api.model.DiscoverChild;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
@@ -173,7 +173,7 @@ public class DiscoverPresenterTest {
     private ShoutsResponse getShoutsResponse() {
         return new ShoutsResponse(0, "a", null,
                 Lists.newArrayList(new Shout("z", null, null, null, null, null, null,
-                        0L, 0, null, null, null, null, null, null, 1L, null, null, 0, ImmutableList.<Conversation>of(), true, null, null)), null);
+                        0L, 0, null, null, null, null, null, null, 1L, null, null, 0, ImmutableList.<ConversationDetails>of(), true, null, null)), null);
     }
 
     private DiscoverResponse getDiscoverResponse() {

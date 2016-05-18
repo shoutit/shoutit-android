@@ -7,6 +7,7 @@ import com.shoutit.app.android.api.model.CallerProfile;
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.ChangePasswordRequest;
 import com.shoutit.app.android.api.model.Conversation;
+import com.shoutit.app.android.api.model.ConversationDetails;
 import com.shoutit.app.android.api.model.ConversationsResponse;
 import com.shoutit.app.android.api.model.CreateOfferShoutWithImageRequest;
 import com.shoutit.app.android.api.model.CreateRequestShoutRequest;
@@ -361,10 +362,10 @@ public interface ApiService {
      */
     @GET("conversations")
     Observable<ConversationsResponse> getConversations(@Nullable @Query("before") String timestamp,
-                                                       @Query("page_size") Integer pageSize);
+                                              @Query("page_size") Integer pageSize);
 
     @GET("conversations/{id}")
-    Observable<Conversation> getConversation(@NonNull @Path("id") String id);
+    Observable<ConversationDetails> getConversation(@NonNull @Path("id") String id);
 
     @GET("conversations/{id}/messages")
     Observable<MessagesResponse> getMessages(@NonNull @Path("id") String conversationId,

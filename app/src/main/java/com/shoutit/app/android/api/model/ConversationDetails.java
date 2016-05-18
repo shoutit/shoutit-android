@@ -1,9 +1,8 @@
 package com.shoutit.app.android.api.model;
 
+import java.util.List;
 
-import javax.annotation.Nonnull;
-
-public class Conversation {
+public class ConversationDetails {
 
     public static final String ABOUT_SHOUT_TYPE = "about_shout";
     public static final String CHAT_TYPE = "chat";
@@ -11,28 +10,42 @@ public class Conversation {
 
 
     private final String id;
+    private final List<ConversationProfile> profiles;
     private final String type;
+    private final Message lastMessage;
+    private final AboutShout about;
     private final int unreadMessagesCount;
     private final DisplayData display;
-    private final MiniProfile creator;
-    private final long modifiedAt;
 
-    public Conversation(String id, String type, int unreadMessagesCount,
-                        DisplayData display, MiniProfile creator, long modifiedAt) {
+    public ConversationDetails(String id, List<ConversationProfile> profiles, String type,
+                               Message lastMessage, AboutShout about, int unreadMessagesCount, DisplayData display) {
         this.id = id;
+        this.profiles = profiles;
         this.type = type;
+        this.lastMessage = lastMessage;
+        this.about = about;
         this.unreadMessagesCount = unreadMessagesCount;
         this.display = display;
-        this.creator = creator;
-        this.modifiedAt = modifiedAt;
     }
 
     public String getId() {
         return id;
     }
 
+    public List<ConversationProfile> getProfiles() {
+        return profiles;
+    }
+
     public String getType() {
         return type;
+    }
+
+    public Message getLastMessage() {
+        return lastMessage;
+    }
+
+    public AboutShout getAbout() {
+        return about;
     }
 
     public int getUnreadMessagesCount() {
@@ -51,30 +64,15 @@ public class Conversation {
         return ABOUT_SHOUT_TYPE.equals(type);
     }
 
-    public long getModifiedAt() {
-        return modifiedAt;
-    }
-
-    public MiniProfile getCreator() {
-        return creator;
-    }
-
-    public Conversation withUpdatedLastMessage(@Nonnull String newMessage, long createdAt) {
-        return new Conversation(id, type, unreadMessagesCount + 1,
-                display.withUpdatedMessage(newMessage), creator, createdAt);
-    }
-
     public class DisplayData {
         private final String image;
         private final String subTitle;
         private final String title;
-        private final String lastMessageSummary;
 
-        public DisplayData(String image, String subTitle, String title, String lastMessageSummary) {
+        public DisplayData(String image, String subTitle, String title) {
             this.image = image;
             this.subTitle = subTitle;
             this.title = title;
-            this.lastMessageSummary = lastMessageSummary;
         }
 
         public String getImage() {
@@ -87,14 +85,6 @@ public class Conversation {
 
         public String getTitle() {
             return title;
-        }
-
-        public String getLastMessageSummary() {
-            return lastMessageSummary;
-        }
-
-        public DisplayData withUpdatedMessage(@Nonnull String newMessage) {
-            return new DisplayData(image, subTitle, title, newMessage);
         }
     }
 }
