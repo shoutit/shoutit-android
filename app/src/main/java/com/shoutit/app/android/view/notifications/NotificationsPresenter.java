@@ -12,9 +12,7 @@ import com.google.common.collect.Lists;
 import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
 import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
 import com.shoutit.app.android.api.ApiService;
-import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.NotificationsResponse;
-import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.dao.NotificationsDao;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
 
@@ -43,9 +41,7 @@ public class NotificationsPresenter {
     private final Observable<List<BaseAdapterItem>> adapterItemsObservable;
 
     @Nonnull
-    private final PublishSubject<String> openUserOrPageProfileSubject = PublishSubject.create();
-    @Nonnull
-    private final PublishSubject<String> openTagProfileSubject = PublishSubject.create();
+    private final PublishSubject<String> openViewForNotification = PublishSubject.create();
     @Nonnull
     private final PublishSubject<Object> markAllAsReadSubject = PublishSubject.create();
     @Nonnull
@@ -83,8 +79,7 @@ public class NotificationsPresenter {
                                     new Function<NotificationsResponse.Notification, BaseAdapterItem>() {
                                         @Override
                                         public BaseAdapterItem apply(NotificationsResponse.Notification input) {
-                                            return new NotificationAdapterItem(input, openUserOrPageProfileSubject,
-                                                    openTagProfileSubject, markSingleAsReadSubject);
+                                            return new NotificationAdapterItem(input, openViewForNotification, markSingleAsReadSubject);
                                         }
                                     }));
                             builder.add(new NoDataAdapterItem());
@@ -186,13 +181,8 @@ public class NotificationsPresenter {
     }
 
     @Nonnull
-    public Observable<String> getOpenUserOrPageProfileObservable() {
-        return openUserOrPageProfileSubject;
-    }
-
-    @Nonnull
-    public Observable<String> getOpenTagProfileObservable() {
-        return openTagProfileSubject;
+    public Observable<String> getOpenViewForNotificationObservable() {
+        return openViewForNotification;
     }
 
     public void markAllNotificationsAsRead() {
@@ -204,19 +194,15 @@ public class NotificationsPresenter {
         @Nonnull
         private final NotificationsResponse.Notification notification;
         @Nonnull
-        private final Observer<String> openUserOrPageProfileObserver;
-        @Nonnull
-        private final Observer<String> openTagProfileObserver;
+        private final Observer<String> openViewForNotification;
         @Nonnull
         private final Observer<String> markSingleAsReadSubject;
 
         public NotificationAdapterItem(@Nonnull NotificationsResponse.Notification notification,
-                                       @Nonnull Observer<String> openUserOrPageProfileObserver,
-                                       @Nonnull Observer<String> openTagProfileObserver,
+                                       @Nonnull Observer<String> openViewForNotification,
                                        @Nonnull Observer<String> markSingleAsReadSubject) {
             this.notification = notification;
-            this.openUserOrPageProfileObserver = openUserOrPageProfileObserver;
-            this.openTagProfileObserver = openTagProfileObserver;
+            this.openViewForNotification = openViewForNotification;
             this.markSingleAsReadSubject = markSingleAsReadSubject;
         }
 
@@ -237,25 +223,19 @@ public class NotificationsPresenter {
             return notification;
         }
 
-        public void openProfileAndMarkAsRead() {
-            final BaseProfile profile = notification.getAttachedObject().getProfile();
-            if (profile == null) {
-                return;
-            }
-
-            if (ProfileType.USER.equals(profile.getType()) || ProfileType.PAGE.equals(profile.getType())) {
-                openUserOrPageProfileObserver.onNext(profile.getUsername());
-                markNotificationAsRead();
-            } else if (ProfileType.TAG.equals(profile.getType())) {
-                openTagProfileObserver.onNext(profile.getUsername());
-                markNotificationAsRead();
-            }
-        }
-
-        public void markNotificationAsRead() {
+        private void markNotificationAsRead() {
             if (!notification.isRead()) {
                 markSingleAsReadSubject.onNext(notification.getId());
             }
+        }
+
+        public void onNotificationClicked() {
+            markNotificationAsRead();
+            openViewForNotification.onNext(notification.getDisplay().getAppUrl());
+        }
+
+        public NotificationsResponse.DisplayInfo getDisplayInfo() {
+            return notification.getDisplay();
         }
     }
 }
