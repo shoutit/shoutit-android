@@ -30,6 +30,7 @@ import com.shoutit.app.android.api.model.NotificationsResponse;
 import com.shoutit.app.android.api.model.PostMessage;
 import com.shoutit.app.android.api.model.RegisterDeviceRequest;
 import com.shoutit.app.android.api.model.RelatedTagsResponse;
+import com.shoutit.app.android.api.model.RemoveProfileRequest;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.api.model.SearchProfileResponse;
 import com.shoutit.app.android.api.model.Shout;
@@ -394,6 +395,9 @@ public interface ApiService {
 
     @DELETE("conversations/{id}")
     Observable<ResponseBody> deleteConversation(@Path("id") String conversationId);
+
+    @POST("conversations/{id}/remove_profile")
+    Observable<ResponseBody> removeProfile(@Path("id") String conversationId, @Body RemoveProfileRequest removeProfileRequest);
 
     @POST("messages/{id}/read")
     Observable<ResponseBody> readMessage(@Path("id") String messageId);

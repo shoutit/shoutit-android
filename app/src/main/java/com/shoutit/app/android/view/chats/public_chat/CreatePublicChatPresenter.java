@@ -33,6 +33,7 @@ import rx.Observable;
 import rx.Scheduler;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.subscriptions.CompositeSubscription;
 
 public class CreatePublicChatPresenter {
 
@@ -49,6 +50,7 @@ public class CreatePublicChatPresenter {
     private final AmazonHelper mAmazonHelper;
     @NonNull
     private final UserPreferences mUserPreferences;
+    private final CompositeSubscription mCompositeSubscription = new CompositeSubscription();
 
     @Inject
     public CreatePublicChatPresenter(@NonNull ImageCaptureHelper imageCaptureHelper,
@@ -86,41 +88,42 @@ public class CreatePublicChatPresenter {
             listener.subjectEmptyError();
         } else {
             listener.showProgress(true);
-            mApiService.updateUserLocation(new UpdateLocationRequest(state.location))
-                    .subscribeOn(mNetworkScheduler)
-                    .observeOn(mUiScheduler)
-                    .flatMap(new Func1<User, Observable<?>>() {
-                        @Override
-                        public Observable<?> call(User user) {
-                            if (state.url != null) {
-                                return mAmazonHelper.uploadGroupChatObservable(new File(state.url.toString()))
-                                        .subscribeOn(mNetworkScheduler)
-                                        .observeOn(mUiScheduler);
-                            } else {
-                                return Observable.just(new Object());
-                            }
-                        }
-                    })
-                    .flatMap(new Func1<Object, Observable<ResponseBody>>() {
-                        @Override
-                        public Observable<ResponseBody> call(Object user) {
-                            return mApiService.createPublicChat(new CreatePublicChatRequest(data.subject))
-                                    .subscribeOn(mNetworkScheduler)
-                                    .observeOn(mUiScheduler);
-                        }
-                    })
-                    .subscribe(new Action1<ResponseBody>() {
-                        @Override
-                        public void call(ResponseBody responseBody) {
-                            listener.finish();
-                        }
-                    }, new Action1<Throwable>() {
-                        @Override
-                        public void call(Throwable throwable) {
-                            listener.createRequestError();
-                            listener.showProgress(false);
-                        }
-                    });
+            mCompositeSubscription.add(
+                    mApiService.updateUserLocation(new UpdateLocationRequest(state.location))
+                            .subscribeOn(mNetworkScheduler)
+                            .observeOn(mUiScheduler)
+                            .flatMap(new Func1<User, Observable<String>>() {
+                                @Override
+                                public Observable<String> call(User user) {
+                                    if (state.url != null) {
+                                        return mAmazonHelper.uploadGroupChatObservable(new File(state.url.toString()))
+                                                .subscribeOn(mNetworkScheduler)
+                                                .observeOn(mUiScheduler);
+                                    } else {
+                                        return Observable.just(null);
+                                    }
+                                }
+                            })
+                            .flatMap(new Func1<String, Observable<ResponseBody>>() {
+                                @Override
+                                public Observable<ResponseBody> call(String url) {
+                                    return mApiService.createPublicChat(new CreatePublicChatRequest(data.subject, url))
+                                            .subscribeOn(mNetworkScheduler)
+                                            .observeOn(mUiScheduler);
+                                }
+                            })
+                            .subscribe(new Action1<ResponseBody>() {
+                                @Override
+                                public void call(ResponseBody responseBody) {
+                                    listener.finish();
+                                }
+                            }, new Action1<Throwable>() {
+                                @Override
+                                public void call(Throwable throwable) {
+                                    listener.createRequestError();
+                                    listener.showProgress(false);
+                                }
+                            }));
         }
     }
 
@@ -138,7 +141,7 @@ public class CreatePublicChatPresenter {
 
     public void unregister() {
         listener = null;
-        // TODO unsub
+        mCompositeSubscription.unsubscribe();
     }
 
     public void onImageActivityFinished(int resultCode, Intent data) {

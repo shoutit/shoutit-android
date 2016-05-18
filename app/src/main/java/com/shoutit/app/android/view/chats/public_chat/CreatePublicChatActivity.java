@@ -182,9 +182,7 @@ public class CreatePublicChatActivity extends BaseActivity implements CreatePubl
 
     @OnClick(R.id.create_chat_avatar)
     void selectAvatar() {
-        if (!PermissionHelper.checkPermissions(this, REQUEST_CODE_PERMISSION, ColoredSnackBar.contentView(this),
-                R.string.permission_location_explanation,
-                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA})) {
+        if (!PermissionHelper.checkSelectImagePermission(this, REQUEST_CODE_PERMISSION)) {
             return;
         }
 

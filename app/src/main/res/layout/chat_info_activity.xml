@@ -44,23 +44,43 @@
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:layout_marginBottom="12dp"
-                        android:layout_marginLeft="4dp"
-                        android:layout_marginStart="4dp"
+                        android:layout_marginLeft="6dp"
+                        android:layout_marginStart="6dp"
                         android:layout_marginTop="12dp"
                         android:background="@color/media_image_background"
                         android:padding="12dp"
                         android:src="@drawable/add_media"/>
 
                     <EditText
-                        android:id="@+id/chat_info_subject"
+                        android:id="@+id/chat_info_subject_edittext"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginLeft="4dp"
-                        android:layout_marginStart="4dp"
+                        android:layout_marginLeft="6dp"
+                        android:layout_marginStart="6dp"
                         android:hint="@string/chat_info_subject"/>
 
+                    <TextView
+                        android:id="@+id/chat_info_subject_textview"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="6dp"
+                        android:layout_marginStart="6dp"
+                        android:visibility="gone"/>
+
                 </LinearLayout>
+
+                <Button
+                    android:id="@+id/chat_info_edit_save"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginTop="6dp"
+                    android:background="@android:color/white"
+                    android:text="Save"
+                    android:textColor="@android:color/holo_red_dark"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -83,10 +103,10 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical|start"
-                            android:layout_marginTop="10dp"
                             android:layout_marginBottom="10dp"
                             android:layout_marginLeft="8dp"
                             android:layout_marginStart="8dp"
+                            android:layout_marginTop="10dp"
                             android:text="Shouts"/>
 
                         <TextView
@@ -94,10 +114,10 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical|end"
-                            android:layout_marginTop="10dp"
                             android:layout_marginBottom="10dp"
                             android:layout_marginEnd="8dp"
                             android:layout_marginRight="8dp"
+                            android:layout_marginTop="10dp"
                             tools:text="102"/>
 
                     </FrameLayout>
@@ -118,10 +138,10 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical|start"
-                            android:layout_marginTop="10dp"
                             android:layout_marginBottom="10dp"
                             android:layout_marginLeft="8dp"
                             android:layout_marginStart="8dp"
+                            android:layout_marginTop="10dp"
                             android:text="Media"/>
 
                         <TextView
@@ -129,10 +149,10 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical|end"
-                            android:layout_marginTop="10dp"
                             android:layout_marginBottom="10dp"
                             android:layout_marginEnd="8dp"
                             android:layout_marginRight="8dp"
+                            android:layout_marginTop="10dp"
                             tools:text="102"/>
 
                     </FrameLayout>
@@ -160,10 +180,10 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical|start"
-                            android:layout_marginTop="10dp"
                             android:layout_marginBottom="10dp"
                             android:layout_marginLeft="8dp"
                             android:layout_marginStart="8dp"
+                            android:layout_marginTop="10dp"
                             android:text="Participants"/>
 
                         <TextView
@@ -171,10 +191,10 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical|end"
-                            android:layout_marginTop="10dp"
                             android:layout_marginBottom="10dp"
                             android:layout_marginEnd="8dp"
                             android:layout_marginRight="8dp"
+                            android:layout_marginTop="10dp"
                             tools:text="102"/>
 
                     </FrameLayout>
@@ -195,10 +215,10 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical|start"
-                            android:layout_marginTop="10dp"
                             android:layout_marginBottom="10dp"
                             android:layout_marginLeft="8dp"
                             android:layout_marginStart="8dp"
+                            android:layout_marginTop="10dp"
                             android:text="Blocked"/>
 
                         <TextView
@@ -206,27 +226,40 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical|end"
-                            android:layout_marginTop="10dp"
                             android:layout_marginBottom="10dp"
                             android:layout_marginEnd="8dp"
                             android:layout_marginRight="8dp"
+                            android:layout_marginTop="10dp"
                             tools:text="102"/>
 
                     </FrameLayout>
 
                 </LinearLayout>
 
-            </LinearLayout>
+                <Button
+                    android:id="@+id/chat_info_exit_chat"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@android:color/white"
+                    android:text="Exit Chat"
+                    android:textColor="@android:color/holo_red_dark"/>
 
-            <Button
-                android:id="@+id/chat_info_edit_chat"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:layout_marginBottom="20dp"
-                android:background="@android:color/white"
-                android:text="Exit Chat"
-                android:textColor="@android:color/holo_red_dark"/>
+                <TextView
+                    android:id="@+id/chat_info_chat_created_by"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"/>
+
+                <TextView
+                    android:id="@+id/chat_info_chat_created_at"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"/>
+
+            </LinearLayout>
 
             <FrameLayout
                 android:id="@+id/chat_info_progress"

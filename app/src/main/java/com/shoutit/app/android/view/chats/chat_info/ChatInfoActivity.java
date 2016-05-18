@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,6 +24,7 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.ImageCaptureHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
+import com.shoutit.app.android.utils.TextWatcherAdapter;
 import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;
@@ -31,6 +33,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.ChatInfoView {
 
@@ -48,8 +51,10 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
     Toolbar mChatInfoToolbar;
     @Bind(R.id.chat_info_avatar)
     ImageView mChatInfoAvatar;
-    @Bind(R.id.chat_info_subject)
+    @Bind(R.id.chat_info_subject_edittext)
     EditText mChatInfoSubject;
+    @Bind(R.id.chat_info_subject_textview)
+    TextView mChatInfoSubjectTextView;
     @Bind(R.id.chat_info_shouts_number)
     TextView mChatInfoShoutsNumber;
     @Bind(R.id.chat_info_media_number)
@@ -58,12 +63,18 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
     TextView mChatInfoParticipants;
     @Bind(R.id.chat_info_blocked_number)
     TextView mChatInfoBlockedNumber;
-    @Bind(R.id.chat_info_edit_chat)
+    @Bind(R.id.chat_info_exit_chat)
     Button mChatInfoEditChat;
     @Bind(R.id.chat_info_progress)
     FrameLayout mChatInfoProgress;
     @Bind(R.id.chat_info_subject_layout)
     View mChatInfoSubjectLayout;
+    @Bind(R.id.chat_info_chat_created_by)
+    TextView mChatInfoChatCreatedBy;
+    @Bind(R.id.chat_info_chat_created_at)
+    TextView mChatInfoChatCreatedAt;
+    @Bind(R.id.chat_info_edit_save)
+    Button mChatInfoEditSave;
 
     public static Intent newIntent(@NonNull Context context, @NonNull String conversationId) {
         return new Intent(context, ChatInfoActivity.class)
@@ -87,6 +98,14 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
         mChatInfoToolbar.inflateMenu(R.menu.chat_info_menu);
 
         mCreatePublicChatPresenter.register(this);
+
+        mChatInfoSubject.addTextChangedListener(new TextWatcherAdapter() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                super.afterTextChanged(s);
+                mCreatePublicChatPresenter.onTextChanged();
+            }
+        });
     }
 
     @Override
@@ -133,6 +152,7 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
     @Override
     public void setSubject(@Nonnull String subject) {
         mChatInfoSubject.setText(subject);
+        mChatInfoSubjectTextView.setText(subject);
     }
 
     @Override
@@ -171,12 +191,12 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
 
     @Override
     public void setShoutsCount(int count) {
-
+        mChatInfoShoutsNumber.setText(String.valueOf(count));
     }
 
     @Override
     public void setMediaCount(int count) {
-
+        mChatInfoMediaNumber.setText(String.valueOf(count));
     }
 
     @Override
@@ -197,10 +217,51 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
     @Override
     public void isAdmin(boolean isAdmin) {
         mChatInfoToolbar.getMenu().findItem(R.id.chat_info_add_person).setVisible(isAdmin);
+        mChatInfoSubject.setVisibility(isAdmin ? View.VISIBLE : View.GONE);
+        mChatInfoSubjectTextView.setVisibility(!isAdmin ? View.VISIBLE : View.GONE);
     }
 
     @Override
     public void showSubject(boolean show) {
         mChatInfoSubjectLayout.setVisibility(show ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public void showSaveButton() {
+        mChatInfoEditSave.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void setChatCreatedBy(@NonNull String createdBy) {
+        mChatInfoChatCreatedBy.setText(createdBy);
+    }
+
+    @Override
+    public void setChatCreatedAt(@NonNull String chatCreatedAt) {
+        mChatInfoChatCreatedAt.setText(chatCreatedAt);
+    }
+
+    @Override
+    public void exitChatError() {
+        ColoredSnackBar.error(ColoredSnackBar.contentView(this), "Error", Snackbar.LENGTH_SHORT).show();
+    }
+
+    @OnClick(R.id.chat_info_edit_save)
+    void saveClick() {
+        mCreatePublicChatPresenter.saveClicked();
+    }
+
+    @OnClick(R.id.chat_info_exit_chat)
+    void exitClick() {
+        mCreatePublicChatPresenter.exitChatClicked();
+    }
+
+    @OnClick(R.id.chat_info_avatar)
+    void avatarClick(){
+        if (!PermissionHelper.checkSelectImagePermission(this, REQUEST_CODE_PERMISSION)) {
+            return;
+        }
+
+        mCreatePublicChatPresenter.selectImageClicked();
     }
 }

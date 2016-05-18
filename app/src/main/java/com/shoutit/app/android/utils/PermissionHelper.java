@@ -1,5 +1,6 @@
 package com.shoutit.app.android.utils;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -34,6 +35,12 @@ public class PermissionHelper {
                     permissions, explanationTextId);
             return false;
         }
+    }
+
+    public static boolean checkSelectImagePermission(Activity context, int requestCodePermmision) {
+        return PermissionHelper.checkPermissions(context, requestCodePermmision, ColoredSnackBar.contentView(context),
+                R.string.permission_location_explanation,
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA});
     }
 
     public static boolean arePermissionsGranted(@NonNull int[] grantResults) {

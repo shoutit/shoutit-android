@@ -2,6 +2,7 @@ package com.shoutit.app.android.view.chats.chat_info;
 
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -10,12 +11,16 @@ import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
+import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.EditPublicChatRequest;
+import com.shoutit.app.android.api.model.RemoveProfileRequest;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.AmazonHelper;
+import com.shoutit.app.android.utils.DateTimeUtils;
 import com.shoutit.app.android.utils.ImageCaptureHelper;
 
 import java.io.File;
@@ -30,11 +35,13 @@ import rx.Scheduler;
 import rx.functions.Action1;
 import rx.functions.Func0;
 import rx.functions.Func1;
+import rx.subscriptions.CompositeSubscription;
 
 public class ChatInfoPresenter {
 
     public static final int RESULT_OK = -1;
 
+    private boolean isAdmin;
     private Uri url;
     private ChatInfoView listener;
 
@@ -44,7 +51,10 @@ public class ChatInfoPresenter {
     private final Scheduler mUiScheduler;
     private final AmazonHelper mAmazonHelper;
     private final String mConversationId;
-    private final UserPreferences mUserPreferences;
+    @NonNull
+    private final Resources mResources;
+    private final String mId;
+    private final CompositeSubscription mCompositeSubscription = new CompositeSubscription();
 
     @Inject
     public ChatInfoPresenter(@NonNull ImageCaptureHelper imageCaptureHelper,
@@ -53,32 +63,39 @@ public class ChatInfoPresenter {
                              @UiScheduler Scheduler uiScheduler,
                              @NonNull AmazonHelper amazonHelper,
                              @NonNull String conversationId,
-                             @NonNull UserPreferences userPreferences) {
+                             @NonNull UserPreferences userPreferences,
+                             @NonNull @ForActivity Resources resources) {
         mImageCaptureHelper = imageCaptureHelper;
         mApiService = apiService;
         mNetworkScheduler = networkScheduler;
         mUiScheduler = uiScheduler;
         mAmazonHelper = amazonHelper;
         mConversationId = conversationId;
-        mUserPreferences = userPreferences;
+        mResources = resources;
+
+        final User user = userPreferences.getUser();
+        assert user != null;
+        mId = user.getId();
     }
 
     public void selectImageClicked() {
-        if (url == null) {
-            listener.startSelectImageActivity();
-        } else {
-            url = null;
-            listener.setImage(null);
+        if (isAdmin) {
+            if (url == null) {
+                listener.startSelectImageActivity();
+            } else {
+                url = null;
+                listener.setImage(null);
+            }
         }
     }
 
-    public void createClicked() {
+    public void saveClicked() {
         final String data = listener.getSubject();
         if (!isDataCorrect(data)) {
             listener.subjectEmptyError();
         } else {
             listener.showProgress(true);
-            Observable
+            mCompositeSubscription.add(Observable
                     .defer(new Func0<Observable<String>>() {
                         @Override
                         public Observable<String> call() {
@@ -93,10 +110,10 @@ public class ChatInfoPresenter {
                     })
                     .subscribeOn(mNetworkScheduler)
                     .observeOn(mUiScheduler)
-                    .flatMap(new Func1<Object, Observable<ResponseBody>>() {
+                    .flatMap(new Func1<String, Observable<ResponseBody>>() {
                         @Override
-                        public Observable<ResponseBody> call(Object user) {
-                            return mApiService.updateConversation(mConversationId, new EditPublicChatRequest(data))
+                        public Observable<ResponseBody> call(String url) {
+                            return mApiService.updateConversation(mConversationId, new EditPublicChatRequest(data, url))
                                     .subscribeOn(mNetworkScheduler)
                                     .observeOn(mUiScheduler);
                         }
@@ -112,7 +129,7 @@ public class ChatInfoPresenter {
                             listener.editRequestError();
                             listener.showProgress(false);
                         }
-                    });
+                    }));
         }
     }
 
@@ -126,26 +143,30 @@ public class ChatInfoPresenter {
     }
 
     private void loadConversation() {
-        mApiService.getConversation(mConversationId)
+        mCompositeSubscription.add(mApiService.getConversation(mConversationId)
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
                 .subscribe(
                         new Action1<Conversation>() {
                             @Override
                             public void call(Conversation conversation) {
-                                final int participantsCount = conversation.getProfiles().size();
-                                final int blockedSize = conversation.getBlocked().size();
-
-                                final boolean isAdmin = isAdmin(conversation.getAdmins());
+                                isAdmin = isAdmin(conversation.getAdmins());
 
                                 listener.isAdmin(isAdmin);
-                                listener.setParticipantsCount(participantsCount);
-                                listener.setBlockedCount(blockedSize);
-                                if (!Strings.isNullOrEmpty(conversation.getIcon())) {
-                                    listener.setImage(Uri.parse(conversation.getIcon()));
+                                final Conversation.AttatchmentCount attachmentsCount = conversation.getAttachmentsCount();
+                                listener.setParticipantsCount(conversation.getProfiles().size());
+                                listener.setBlockedCount(conversation.getBlocked().size());
+                                listener.setMediaCount(attachmentsCount.getMedia());
+                                listener.setShoutsCount(attachmentsCount.getShout());
+                                final Conversation.Display display = conversation.getDisplay();
+                                final String image = display.getImage();
+                                if (!Strings.isNullOrEmpty(image)) {
+                                    listener.setImage(Uri.parse(image));
                                 }
-                                listener.setSubject(conversation.getSubject());
+                                listener.setSubject(display.getTitle());
                                 listener.showSubject(conversation.isPublicChat());
+                                listener.setChatCreatedBy(getCreatedByString(conversation.getCreator().getName()));
+                                listener.setChatCreatedAt(getCreatedAtString(conversation.getCreatedAt()));
                             }
                         },
                         new Action1<Throwable>() {
@@ -153,13 +174,19 @@ public class ChatInfoPresenter {
                             public void call(Throwable throwable) {
                                 listener.loadConversationError();
                             }
-                        });
+                        }));
+    }
+
+    private String getCreatedByString(@NonNull String name) {
+        return String.format(mResources.getString(R.string.chat_info_created_by), name);
+    }
+
+    private String getCreatedAtString(long createdAt) {
+        return String.format(mResources.getString(R.string.chat_info_created_at), DateTimeUtils.getChatCreatedAtDate(createdAt * 1000));
     }
 
     private boolean isAdmin(List<String> admins) {
-        final User user = mUserPreferences.getUser();
-        assert user != null;
-        return admins.contains(user.getId());
+        return admins.contains(mId);
     }
 
     public void unregister() {
@@ -170,9 +197,33 @@ public class ChatInfoPresenter {
     public void onImageActivityFinished(int resultCode, Intent data) {
         final Optional<Uri> uriOptional = mImageCaptureHelper.onResult(resultCode, data);
         if (uriOptional.isPresent()) {
+            listener.showSaveButton();
             url = uriOptional.get();
             listener.setImage(url);
         }
+    }
+
+    public void exitChatClicked() {
+        listener.showProgress(true);
+        mCompositeSubscription.add(mApiService.removeProfile(mConversationId, new RemoveProfileRequest(mId))
+                .observeOn(mUiScheduler)
+                .subscribeOn(mNetworkScheduler)
+                .subscribe(new Action1<ResponseBody>() {
+                    @Override
+                    public void call(ResponseBody responseBody) {
+                        listener.finish();
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        listener.exitChatError();
+                        listener.showProgress(false);
+                    }
+                }));
+    }
+
+    public void onTextChanged() {
+        listener.showSaveButton();
     }
 
     public interface ChatInfoView {
@@ -206,5 +257,13 @@ public class ChatInfoPresenter {
         void isAdmin(boolean isAdmin);
 
         void showSubject(boolean show);
+
+        void showSaveButton();
+
+        void setChatCreatedBy(@NonNull String createdBy);
+
+        void setChatCreatedAt(@NonNull String chatCreatedAt);
+
+        void exitChatError();
     }
 }
