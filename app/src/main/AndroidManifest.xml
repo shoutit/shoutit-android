@@ -43,12 +43,40 @@
         <activity
             android:name=".view.main.MainActivity"
             android:screenOrientation="portrait"
+            android:launchMode="singleTop"
             android:theme="@style/AppTheme.WithDrawer">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="home"
+                    android:scheme="shoutit" />
+                <data
+                    android:host="discover"
+                    android:scheme="shoutit" />
+                <data
+                    android:host="browse"
+                    android:scheme="shoutit" />
+                <data
+                    android:host="chats"
+                    android:scheme="shoutit" />
+                <data
+                    android:host="public_chats"
+                    android:scheme="shoutit" />
+                <data
+                    android:host="create_shout"
+                    android:scheme="shoutit" />
+            </intent-filter>
+
         </activity>
         <activity
             android:name=".view.intro.IntroActivity"
@@ -82,11 +110,36 @@
             />
         <activity android:name=".view.location.LocationActivity"
             android:screenOrientation="portrait"/>
-        <activity android:name=".view.discover.DiscoverActivity"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".view.discover.DiscoverActivity"
+            android:screenOrientation="portrait">
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="discover?id="
+                    android:scheme="shoutit" />
+            </intent-filter>
+
+        </activity>
         <activity
             android:name=".view.chats.ChatActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="conversation"
+                    android:scheme="shoutit" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".view.chats.chatsfirstconversation.ChatFirstConversationActivity"
             android:screenOrientation="portrait"/>
@@ -94,8 +147,22 @@
             android:screenOrientation="portrait"/>
         <activity android:name=".view.shouts.discover.DiscoverShoutsActivity"
             android:screenOrientation="portrait"/>
-        <activity android:name=".view.settings.SettingsActivity"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".view.settings.SettingsActivity"
+            android:screenOrientation="portrait">
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="settings"
+                    android:scheme="shoutit" />
+            </intent-filter>
+
+        </activity>
         <activity android:name=".view.createshout.request.CreateRequestActivity"
             android:screenOrientation="portrait"/>
         <activity android:name=".view.createshout.location.LocationActivity"
@@ -116,6 +183,18 @@
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable"/>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="search"
+                    android:scheme="shoutit" />
+            </intent-filter>
+
         </activity>
         <activity
             android:name=".view.search.subsearch.SubSearchActivity"
@@ -133,12 +212,39 @@
             android:name=".view.settings.account.AccountActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize"/>
-        <activity android:name=".view.shout.ShoutActivity"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".view.shout.ShoutActivity"
+            android:screenOrientation="portrait">
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="shout"
+                    android:scheme="shoutit" />
+            </intent-filter>
+
+        </activity>
         <activity
             android:name=".view.profile.UserOrPageProfileActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/TranslucentStatusBar"/>
+            android:theme="@style/TranslucentStatusBar">
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="profile"
+                    android:scheme="shoutit" />
+            </intent-filter>
+
+        </activity>
         <activity
             android:name=".view.profile.tagprofile.TagProfileActivity"
             android:screenOrientation="portrait"
@@ -147,8 +253,22 @@
             android:name=".view.editprofile.EditProfileActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden"/>
-        <activity android:name=".view.notifications.NotificationsActivity"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".view.notifications.NotificationsActivity"
+            android:screenOrientation="portrait">
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="notifications"
+                    android:scheme="shoutit" />
+            </intent-filter>
+
+        </activity>
         <activity
             android:name=".view.videoconversation.VideoConversationActivity"
             android:screenOrientation="portrait"/>
@@ -156,8 +276,10 @@
         <activity android:name=".view.verifyemail.VerifyEmailActivity"
             android:windowSoftInputMode="adjustResize"
             android:screenOrientation="portrait"/>
-        <activity android:name=".view.conversations.ConversationsActivity"
+        <activity
+            android:name=".view.conversations.ConversationsActivity"
             android:screenOrientation="portrait"/>
+
         <activity android:name=".view.createshout.CreateShoutDialogActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.DialogActivity"/>

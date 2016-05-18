@@ -28,6 +28,8 @@ import butterknife.Bind;
 
 public class ConversationsPagerFragment extends BaseFragment {
 
+    private static final String ARG_SHOW_PUBLIC_CHATS = "show_public_chats";
+
     @Bind(R.id.conversations_pager_tablayout)
     TabLayout tabLayout;
     @Bind(R.id.conversations_pager_view_pager)
@@ -42,6 +44,16 @@ public class ConversationsPagerFragment extends BaseFragment {
 
     public static Fragment newInstance() {
         return new ConversationsPagerFragment();
+    }
+
+    public static Fragment newInstance(boolean showPublicChats) {
+        final Bundle bundle = new Bundle();
+        bundle.putBoolean(ARG_SHOW_PUBLIC_CHATS, showPublicChats);
+
+        final ConversationsPagerFragment fragment = new ConversationsPagerFragment();
+        fragment.setArguments(bundle);
+
+        return fragment;
     }
 
     @Override
@@ -78,6 +90,13 @@ public class ConversationsPagerFragment extends BaseFragment {
 
             }
         });
+
+        if (getArguments() != null) {
+            final boolean showPublicChats = getArguments().getBoolean(ARG_SHOW_PUBLIC_CHATS);
+            if (showPublicChats) {
+                viewPager.setCurrentItem(ConversationsPagerAdapter.POSITION_PUBLIC_CONVERSATIONS);
+            }
+        }
     }
 
     @SuppressWarnings("ConstantConditions")

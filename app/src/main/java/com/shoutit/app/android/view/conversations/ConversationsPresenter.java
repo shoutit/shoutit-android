@@ -286,7 +286,7 @@ public class ConversationsPresenter {
 
         void error();
 
-        void onItemClicked(@NonNull String id, boolean shoutChat, boolean isPublicChat);
+        void onItemClicked(@NonNull String id, boolean isPublicChat);
     }
 
     public class ConversationAdapterItem extends BaseNoIDAdapterItem {
@@ -364,7 +364,7 @@ public class ConversationsPresenter {
         }
 
         public void click() {
-            mListener.onItemClicked(id, isShoutChat(), isPublicChat());
+            mListener.onItemClicked(id, isPublicChat());
         }
     }
 

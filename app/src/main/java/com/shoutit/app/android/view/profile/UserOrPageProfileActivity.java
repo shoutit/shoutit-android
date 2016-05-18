@@ -94,7 +94,7 @@ public class UserOrPageProfileActivity extends ProfileActivity {
                                 if (conversationId == null) {
                                     startActivity(ChatFirstConversationActivity.newIntent(UserOrPageProfileActivity.this, false, chatInfo.getUsername()));
                                 } else {
-                                    startActivity(ChatActivity.newIntent(UserOrPageProfileActivity.this, conversationId, false));
+                                    startActivity(ChatActivity.newIntent(UserOrPageProfileActivity.this, conversationId));
                                 }
                             } else {
                                 Toast.makeText(UserOrPageProfileActivity.this, R.string.profile_not_listening, Toast.LENGTH_SHORT).show();
@@ -264,7 +264,11 @@ public class UserOrPageProfileActivity extends ProfileActivity {
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
         final Intent intent = checkNotNull(getIntent());
-        final String userName = checkNotNull(intent.getStringExtra(KEY_PROFILE_ID));
+        String userName = intent.getStringExtra(KEY_PROFILE_ID);
+        if (userName == null && intent.getData() != null) {
+            userName = intent.getData().getQueryParameter("username");
+        }
+        checkNotNull(userName);
 
         final ProfileActivityComponent component = DaggerProfileActivityComponent
                 .builder()

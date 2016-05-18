@@ -9,11 +9,9 @@ import dagger.Provides;
 public class ChatsActivityModule {
 
     private final String conversationId;
-    private final boolean mIsShoutConversation;
 
-    public ChatsActivityModule(@NonNull String conversationId, boolean isShoutConversation) {
+    public ChatsActivityModule(@NonNull String conversationId) {
         this.conversationId = conversationId;
-        mIsShoutConversation = isShoutConversation;
     }
 
     @Provides
@@ -21,8 +19,4 @@ public class ChatsActivityModule {
         return conversationId;
     }
 
-    @Provides
-    public boolean isShoutConversation() {
-        return mIsShoutConversation;
-    }
 }

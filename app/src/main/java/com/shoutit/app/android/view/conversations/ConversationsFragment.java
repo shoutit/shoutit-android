@@ -135,11 +135,11 @@ public class ConversationsFragment extends BaseFragment implements Conversations
     }
 
     @Override
-    public void onItemClicked(@NonNull String id, boolean shoutChat, boolean isPublicChat) {
+    public void onItemClicked(@NonNull String id, boolean isPublicChat) {
         if (isPublicChat) {
             // TODO Piotrek
         } else {
-            startActivity(ChatActivity.newIntent(getActivity(), id, shoutChat));
+            startActivity(ChatActivity.newIntent(getActivity(), id));
         }
     }
 }

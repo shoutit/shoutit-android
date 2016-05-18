@@ -36,7 +36,9 @@ import com.squareup.picasso.Transformation;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 import com.uservoice.uservoicesdk.UserVoice;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -51,6 +53,9 @@ public class MenuHandler {
     public static final String FRAGMENT_DISCOVER = "fragment_discover";
     public static final String FRAGMENT_BROWSE = "fragment_browse";
     public static final String FRAGMENT_CHATS = "fragment_chats";
+    public static final String FRAGMENT_PUBLIC_CHATS = "fragment_public_chats";
+    public static final String ACTIVITY_SETTINGS = "activity_settings";
+    public static final String ACTIVITY_HELP = "activity_help";
 
     @Bind(R.id.menu_user_name_tv)
     TextView userNameTextView;
@@ -91,6 +96,26 @@ public class MenuHandler {
     private final UserPreferences userPreferences;
 
     private List<CheckedTextView> selectableItems = ImmutableList.of();
+
+    private static Map<String, Integer> viewTagViewIdMap = new HashMap<>();
+    static {
+        viewTagViewIdMap.put(FRAGMENT_HOME, R.id.menu_home);
+        viewTagViewIdMap.put(FRAGMENT_DISCOVER, R.id.menu_discover);
+        viewTagViewIdMap.put(FRAGMENT_BROWSE, R.id.menu_browse);
+        viewTagViewIdMap.put(FRAGMENT_CHATS, R.id.menu_chat);
+        viewTagViewIdMap.put(FRAGMENT_PUBLIC_CHATS, R.id.menu_chat);
+        viewTagViewIdMap.put(ACTIVITY_HELP, R.id.menu_help);
+        viewTagViewIdMap.put(ACTIVITY_SETTINGS, R.id.menu_settings);
+    }
+    private static Map<Integer, String> viewIdViewTagMap = new HashMap<>();
+    static {
+        viewIdViewTagMap.put(R.id.menu_home, FRAGMENT_HOME);
+        viewIdViewTagMap.put(R.id.menu_discover, FRAGMENT_DISCOVER);
+        viewIdViewTagMap.put(R.id.menu_browse, FRAGMENT_BROWSE);
+        viewIdViewTagMap.put(R.id.menu_chat, FRAGMENT_CHATS);
+        viewIdViewTagMap.put(R.id.menu_help, ACTIVITY_HELP);
+        viewIdViewTagMap.put(R.id.menu_settings, ACTIVITY_SETTINGS);
+    }
 
     @Inject
     public MenuHandler(@Nonnull final RxAppCompatActivity rxActivity,
@@ -155,40 +180,43 @@ public class MenuHandler {
         };
     }
 
-    @OnClick({R.id.menu_home, R.id.menu_discover, R.id.menu_browse, R.id.menu_chat,
-             R.id.menu_settings, R.id.menu_help})
+    @OnClick({R.id.menu_home, R.id.menu_discover, R.id.menu_browse, R.id.menu_chat, R.id.menu_settings, R.id.menu_help})
     public void onMenuItemSelected(View view) {
-        switch (view.getId()) {
-            case R.id.menu_home:
-                onMenuItemSelectedListener.onMenuItemSelected(FRAGMENT_HOME);
-                selectItem(view.getId());
+        selectMenuItem(viewIdViewTagMap.get(view.getId()));
+    }
+
+    public void selectMenuItem(@Nonnull String viewTag) {
+        switch (viewTag) {
+            case FRAGMENT_HOME:
+            case FRAGMENT_DISCOVER:
+            case FRAGMENT_BROWSE:
+                selectFragment(viewTag);
                 break;
-            case R.id.menu_discover:
-                onMenuItemSelectedListener.onMenuItemSelected(FRAGMENT_DISCOVER);
-                selectItem(view.getId());
-                break;
-            case R.id.menu_browse:
-                onMenuItemSelectedListener.onMenuItemSelected(FRAGMENT_BROWSE);
-                selectItem(view.getId());
-                break;
-            case R.id.menu_chat:
+            case FRAGMENT_CHATS:
+            case FRAGMENT_PUBLIC_CHATS:
                 if (userPreferences.isNormalUser()) {
-                    onMenuItemSelectedListener.onMenuItemSelected(FRAGMENT_CHATS);
-                    selectItem(view.getId());
+                    selectFragment(viewTag);
                 } else {
                     showLoginActivity();
                 }
                 break;
-            case R.id.menu_settings:
+            case ACTIVITY_SETTINGS:
                 rxActivity.startActivity(SettingsActivity.newIntent(rxActivity));
                 break;
-            case R.id.menu_help:
+            case ACTIVITY_HELP:
                 UserVoice.launchUserVoice(rxActivity);
                 break;
+            default:
+                throw new RuntimeException("Unknown menu item with tag: " + viewTag);
         }
 
         KeyboardHelper.hideSoftKeyboard(rxActivity);
-        setToolbarElevation(view.getId() != R.id.menu_chat);
+    }
+
+    private void selectFragment(@Nonnull String viewTag) {
+        selectItem(viewTagViewIdMap.get(viewTag));
+        onMenuItemSelectedListener.onMenuItemSelected(viewTag);
+        setToolbarElevation(viewTagViewIdMap.get(viewTag) != R.id.menu_chat);
     }
 
     public void setToolbarElevation(boolean enable) {
@@ -203,10 +231,6 @@ public class MenuHandler {
 
     private void showLoginActivity() {
         rxActivity.startActivity(LoginIntroActivity.newIntent(rxActivity));
-    }
-
-    public void selectChats() {
-        selectItem(R.id.menu_chat);
     }
 
     private void selectItem(@IdRes int id) {
@@ -300,6 +324,8 @@ public class MenuHandler {
                 return SearchShoutsResultsFragment.newInstance(null, null, SearchPresenter.SearchType.BROWSE);
             case FRAGMENT_CHATS:
                 return ConversationsPagerFragment.newInstance();
+            case FRAGMENT_PUBLIC_CHATS:
+                return ConversationsPagerFragment.newInstance(true);
             default:
                 throw new RuntimeException("Unknown fragment tag");
 

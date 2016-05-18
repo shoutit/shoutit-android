@@ -65,6 +65,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.functions.Action1;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class ChatActivity extends BaseActivity implements Listener {
 
     private static final String ARGS_IS_SHOUT_CONVERSATION = "args_shout_conversation";
@@ -121,10 +123,9 @@ public class ChatActivity extends BaseActivity implements Listener {
     @Bind(R.id.conversations_empty)
     View emptyList;
 
-    public static Intent newIntent(@Nonnull Context context, @NonNull String conversationId, boolean shoutConversation) {
+    public static Intent newIntent(@Nonnull Context context, @NonNull String conversationId) {
         return new Intent(context, ChatActivity.class)
-                .putExtra(ARGS_CONVERSATION_ID, conversationId)
-                .putExtra(ARGS_IS_SHOUT_CONVERSATION, shoutConversation);
+                .putExtra(ARGS_CONVERSATION_ID, conversationId);
     }
 
     @Override
@@ -215,13 +216,17 @@ public class ChatActivity extends BaseActivity implements Listener {
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
         final Intent intent = getIntent();
-        final String conversationId = intent.getStringExtra(ARGS_CONVERSATION_ID);
-        final boolean isShoutConversation = intent.getExtras().getBoolean(ARGS_IS_SHOUT_CONVERSATION);
+        String conversationId = intent.getStringExtra(ARGS_CONVERSATION_ID);
+        if (conversationId == null && intent.getData() != null) {
+            conversationId = intent.getData().getQueryParameter("id");
+        }
+        checkNotNull(conversationId);
+
         final ChatActivityComponent component = DaggerChatActivityComponent
                 .builder()
                 .activityModule(new ActivityModule(this))
                 .appComponent(App.getAppComponent(getApplication()))
-                .chatsActivityModule(new ChatsActivityModule(conversationId, isShoutConversation))
+                .chatsActivityModule(new ChatsActivityModule(conversationId))
                 .build();
         component.inject(this);
 
@@ -397,7 +402,7 @@ public class ChatActivity extends BaseActivity implements Listener {
             final Bundle extras = data.getExtras();
             final boolean isVideo = extras.getBoolean(RecordMediaActivity.EXTRA_IS_VIDEO);
             final String media = extras.getString(RecordMediaActivity.EXTRA_MEDIA);
-            Preconditions.checkNotNull(media);
+            checkNotNull(media);
             presenter.addMedia(media, isVideo);
         } else if (requestCode == REQUEST_LOCATION && resultCode == RESULT_OK) {
             final Place place = PlacePicker.getPlace(this, data);

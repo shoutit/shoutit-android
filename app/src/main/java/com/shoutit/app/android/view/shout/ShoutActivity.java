@@ -439,7 +439,7 @@ public class ShoutActivity extends BaseActivity {
                         public void onClick(View v) {
                             if (bottomBarData.isNormalUser()) {
                                 if (bottomBarData.isHasConversation()) {
-                                    startActivity(ChatActivity.newIntent(ShoutActivity.this, bottomBarData.getConversationId(), true));
+                                    startActivity(ChatActivity.newIntent(ShoutActivity.this, bottomBarData.getConversationId()));
                                 } else {
                                     startActivity(ChatFirstConversationActivity.newIntent(ShoutActivity.this, true, mShoutId));
                                 }
@@ -572,7 +572,11 @@ public class ShoutActivity extends BaseActivity {
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
         final Intent intent = checkNotNull(getIntent());
-        mShoutId = checkNotNull(intent.getStringExtra(KEY_SHOUT_ID));
+        mShoutId = intent.getStringExtra(KEY_SHOUT_ID);
+        if (mShoutId == null && intent.getData() != null) {
+            mShoutId = intent.getData().getQueryParameter("id");
+        }
+        checkNotNull(mShoutId);
 
         final ShoutActivityComponent component = DaggerShoutActivityComponent
                 .builder()
