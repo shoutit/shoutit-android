@@ -247,7 +247,7 @@ public class ConversationsPresenter {
 
     @NonNull
     private BaseAdapterItem getConversationItem(@NonNull Conversation conversation) {
-        final Conversation.DisplayData displayData = conversation.getDisplay();
+        final Conversation.Display display = conversation.getDisplay();
 
         final String elapsedTime = DateUtils.getRelativeTimeSpanString(mContext, conversation.getModifiedAt() * 1000).toString();
         final User user = mUserPreferences.getUser();
@@ -255,8 +255,8 @@ public class ConversationsPresenter {
 
         final boolean isUnread = conversation.getUnreadMessagesCount() > 0;
 
-        return new ConversationAdapterItem(conversation.getId(), displayData.getTitle(), displayData.getSubTitle(),
-                displayData.getLastMessageSummary(), elapsedTime, displayData.getImage(), isUnread, conversation.getType());
+        return new ConversationAdapterItem(conversation.getId(), display.getTitle(), display.getSubTitle(),
+                display.getLastMessageSummary(), elapsedTime, display.getImage(), isUnread, conversation.getType());
     }
 
     public Observer<Object> loadMoreObserver() {

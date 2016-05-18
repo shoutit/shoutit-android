@@ -1,5 +1,6 @@
 package com.shoutit.app.android.utils;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -9,6 +10,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
+
+import com.shoutit.app.android.R;
 
 import javax.annotation.Nonnull;
 
@@ -32,6 +35,12 @@ public class PermissionHelper {
                     permissions, explanationTextId);
             return false;
         }
+    }
+
+    public static boolean checkSelectImagePermission(Activity context, int requestCodePermmision) {
+        return PermissionHelper.checkPermissions(context, requestCodePermmision, ColoredSnackBar.contentView(context),
+                R.string.permission_location_explanation,
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA});
     }
 
     public static boolean arePermissionsGranted(@NonNull int[] grantResults) {
@@ -75,5 +84,16 @@ public class PermissionHelper {
 
     public static boolean hasPermission(@Nonnull Context context, @Nonnull String permission) {
         return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    public static void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults, @NonNull Activity activity) {
+        final boolean permissionsGranted = PermissionHelper.arePermissionsGranted(grantResults);
+        if (permissionsGranted) {
+            ColoredSnackBar.success(ColoredSnackBar.contentView(activity),
+                    R.string.permission_granted, Snackbar.LENGTH_SHORT).show();
+        } else {
+            ColoredSnackBar.error(ColoredSnackBar.contentView(activity),
+                    R.string.permission_not_granted, Snackbar.LENGTH_SHORT).show();
+        }
     }
 }

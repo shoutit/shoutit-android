@@ -42,6 +42,7 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.utils.TextWatcherAdapter;
 import com.shoutit.app.android.view.chats.ChatsHelper;
+import com.shoutit.app.android.view.chats.chat_info.ChatInfoActivity;
 import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
 import com.shoutit.app.android.view.chooseprofile.SelectProfileActivity;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
@@ -166,6 +167,10 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
                                         startActivity(VideoConversationActivity.newIntent(null, calledUserUsername, ChatFirstConversationActivity.this));
                                     }
                                 });
+                        return true;
+                    }
+                    case R.id.chats_chat_information: {
+                        startActivity(ChatInfoActivity.newIntent(ChatFirstConversationActivity.this, Preconditions.checkNotNull(presenter.getId())));
                         return true;
                     }
                     default:
@@ -412,5 +417,10 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
     @Override
     public void showDeleteMenu(boolean show) {
         mChatsToolbar.getMenu().findItem(R.id.chats_overflow).setVisible(show);
+    }
+
+    @Override
+    public void showChatInfoMenu(boolean show) {
+        mChatsToolbar.getMenu().findItem(R.id.chats_chat_information).setVisible(show);
     }
 }

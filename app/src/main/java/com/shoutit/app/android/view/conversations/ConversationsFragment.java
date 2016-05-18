@@ -7,6 +7,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -24,6 +25,7 @@ import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.chats.ChatActivity;
+import com.shoutit.app.android.view.chats.public_chat.CreatePublicChatActivity;
 
 import java.util.List;
 
@@ -80,12 +82,6 @@ public class ConversationsFragment extends BaseFragment implements Conversations
         component.inject(this);
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
     @SuppressWarnings("ConstantConditions")
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -136,10 +132,6 @@ public class ConversationsFragment extends BaseFragment implements Conversations
 
     @Override
     public void onItemClicked(@NonNull String id, boolean isPublicChat) {
-        if (isPublicChat) {
-            // TODO Piotrek
-        } else {
-            startActivity(ChatActivity.newIntent(getActivity(), id));
-        }
+        startActivity(ChatActivity.newIntent(getActivity(), id));
     }
 }

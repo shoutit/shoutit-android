@@ -10,12 +10,14 @@ import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.ConversationDetails;
 import com.shoutit.app.android.api.model.ConversationsResponse;
 import com.shoutit.app.android.api.model.CreateOfferShoutWithImageRequest;
+import com.shoutit.app.android.api.model.CreatePublicChatRequest;
 import com.shoutit.app.android.api.model.CreateRequestShoutRequest;
 import com.shoutit.app.android.api.model.CreateRequestShoutWithPriceRequest;
 import com.shoutit.app.android.api.model.CreateShoutResponse;
 import com.shoutit.app.android.api.model.Currency;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
+import com.shoutit.app.android.api.model.EditPublicChatRequest;
 import com.shoutit.app.android.api.model.EditShoutPriceRequest;
 import com.shoutit.app.android.api.model.EditShoutRequest;
 import com.shoutit.app.android.api.model.EditShoutRequestWithPrice;
@@ -29,6 +31,7 @@ import com.shoutit.app.android.api.model.NotificationsResponse;
 import com.shoutit.app.android.api.model.PostMessage;
 import com.shoutit.app.android.api.model.RegisterDeviceRequest;
 import com.shoutit.app.android.api.model.RelatedTagsResponse;
+import com.shoutit.app.android.api.model.RemoveProfileRequest;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.api.model.SearchProfileResponse;
 import com.shoutit.app.android.api.model.Shout;
@@ -41,7 +44,6 @@ import com.shoutit.app.android.api.model.SuggestionsResponse;
 import com.shoutit.app.android.api.model.TagDetail;
 import com.shoutit.app.android.api.model.TagsRequest;
 import com.shoutit.app.android.api.model.TwilioResponse;
-import com.shoutit.app.android.api.model.VideoCallRequest;
 import com.shoutit.app.android.api.model.UpdateLocationRequest;
 import com.shoutit.app.android.api.model.UpdateUserRequest;
 import com.shoutit.app.android.api.model.User;
@@ -49,6 +51,7 @@ import com.shoutit.app.android.api.model.UserIdentity;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.VerifyEmailRequest;
 import com.shoutit.app.android.api.model.VerifyEmailResponse;
+import com.shoutit.app.android.api.model.VideoCallRequest;
 import com.shoutit.app.android.api.model.login.EmailLoginRequest;
 import com.shoutit.app.android.api.model.login.FacebookLogin;
 import com.shoutit.app.android.api.model.login.GoogleLogin;
@@ -367,6 +370,9 @@ public interface ApiService {
     @GET("conversations/{id}")
     Observable<ConversationDetails> getConversation(@NonNull @Path("id") String id);
 
+    @PATCH("conversations/{id}")
+    Observable<ResponseBody> updateConversation(@NonNull @Path("id") String id, @Body EditPublicChatRequest request);
+
     @GET("conversations/{id}/messages")
     Observable<MessagesResponse> getMessages(@NonNull @Path("id") String conversationId,
                                              @Query("page_size") Integer pageSize);
@@ -388,8 +394,14 @@ public interface ApiService {
     @DELETE("conversations/{id}")
     Observable<ResponseBody> deleteConversation(@Path("id") String conversationId);
 
+    @POST("conversations/{id}/remove_profile")
+    Observable<ResponseBody> removeProfile(@Path("id") String conversationId, @Body RemoveProfileRequest removeProfileRequest);
+
     @POST("messages/{id}/read")
     Observable<ResponseBody> readMessage(@Path("id") String messageId);
+
+    @POST("conversations")
+    Observable<ResponseBody> createPublicChat(@Body CreatePublicChatRequest createPublicChatRequest);
 
     /**
      * Public Chats

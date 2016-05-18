@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/chat_info_add_person"
+        android:icon="@drawable/ic_person_add"
+        android:title="@string/chat_info_add_person"
+        app:showAsAction="ifRoom" />
+
+</menu>

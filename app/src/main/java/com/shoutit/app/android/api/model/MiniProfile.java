@@ -6,13 +6,13 @@ public class MiniProfile {
     @Nonnull
     private final String id;
     @Nonnull
-    private final String userName;
+    private final String username;
     @Nonnull
     private final String name;
 
-    public MiniProfile(@Nonnull String id, @Nonnull String userName, @Nonnull String name) {
+    public MiniProfile(@Nonnull String id, @Nonnull String username, @Nonnull String name) {
         this.id = id;
-        this.userName = userName;
+        this.username = username;
         this.name = name;
     }
 
@@ -22,8 +22,8 @@ public class MiniProfile {
     }
 
     @Nonnull
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
 
     @Nonnull

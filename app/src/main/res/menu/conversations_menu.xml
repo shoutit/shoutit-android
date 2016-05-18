@@ -5,7 +5,6 @@
     <item
         android:id="@+id/conversations_menu_create_public_chat"
         android:icon="@drawable/ic_add"
-        android:title="@string/conversation_create_public_chat"
-        app:showAsAction="ifRoom"/>
+        android:title="@string/conversation_create_public_chat"/>
 
 </menu>

@@ -15,17 +15,53 @@ public class ConversationDetails {
     private final Message lastMessage;
     private final AboutShout about;
     private final int unreadMessagesCount;
-    private final DisplayData display;
+    private final List<String> blocked;
+    private final List<String> admins;
+    private final MiniProfile creator;
+    private final long createdAt;
+    private final Display display;
+    private final AttatchmentCount attachmentsCount;
 
     public ConversationDetails(String id, List<ConversationProfile> profiles, String type,
-                               Message lastMessage, AboutShout about, int unreadMessagesCount, DisplayData display) {
+                               Message lastMessage, AboutShout about, int unreadMessagesCount,
+                               List<String> blocked, List<String> admins, MiniProfile creator,
+                               long createdAt, Display display, AttatchmentCount attachmentsCount) {
         this.id = id;
         this.profiles = profiles;
         this.type = type;
         this.lastMessage = lastMessage;
         this.about = about;
         this.unreadMessagesCount = unreadMessagesCount;
+        this.blocked = blocked;
+        this.admins = admins;
+        this.creator = creator;
+        this.createdAt = createdAt;
         this.display = display;
+        this.attachmentsCount = attachmentsCount;
+    }
+
+    public static String getAboutShoutType() {
+        return ABOUT_SHOUT_TYPE;
+    }
+
+    public List<String> getBlocked() {
+        return blocked;
+    }
+
+    public List<String> getAdmins() {
+        return admins;
+    }
+
+    public MiniProfile getCreator() {
+        return creator;
+    }
+
+    public long getCreatedAt() {
+        return createdAt;
+    }
+
+    public AttatchmentCount getAttachmentsCount() {
+        return attachmentsCount;
     }
 
     public String getId() {
@@ -52,7 +88,7 @@ public class ConversationDetails {
         return unreadMessagesCount;
     }
 
-    public DisplayData getDisplay() {
+    public Display getDisplay() {
         return display;
     }
 
@@ -64,12 +100,12 @@ public class ConversationDetails {
         return ABOUT_SHOUT_TYPE.equals(type);
     }
 
-    public class DisplayData {
+    public static class Display {
         private final String image;
         private final String subTitle;
         private final String title;
 
-        public DisplayData(String image, String subTitle, String title) {
+        public Display(String image, String subTitle, String title) {
             this.image = image;
             this.subTitle = subTitle;
             this.title = title;
@@ -87,4 +123,36 @@ public class ConversationDetails {
             return title;
         }
     }
+
+    public static class AttatchmentCount {
+
+        private final int profile;
+        private final int media;
+        private final int shout;
+        private final int location;
+
+        public AttatchmentCount(int profile, int media, int shout, int location) {
+            this.profile = profile;
+            this.media = media;
+            this.shout = shout;
+            this.location = location;
+        }
+
+        public int getProfile() {
+            return profile;
+        }
+
+        public int getMedia() {
+            return media;
+        }
+
+        public int getShout() {
+            return shout;
+        }
+
+        public int getLocation() {
+            return location;
+        }
+    }
+
 }

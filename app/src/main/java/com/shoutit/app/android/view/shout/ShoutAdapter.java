@@ -170,7 +170,7 @@ public class ShoutAdapter extends BaseAdapter {
             descriptionHeader.setVisibility(isDescription ? View.VISIBLE : View.GONE);
             descriptionContainer.setVisibility(isDescription ? View.VISIBLE : View.GONE);
 
-            dateTextView.setText(DateTimeUtils.getShoutDetailDate(context, shout.getDatePublishedInMillis()));
+            dateTextView.setText(DateTimeUtils.getShoutDetailDate(shout.getDatePublishedInMillis()));
             categoryTextView.setText(shout.getCategory().getName());
 
             final Optional<Integer> flagResId = ResourcesHelper.getCountryResId(context, shout.getLocation());

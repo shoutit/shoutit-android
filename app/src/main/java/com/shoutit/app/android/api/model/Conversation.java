@@ -13,12 +13,12 @@ public class Conversation {
     private final String id;
     private final String type;
     private final int unreadMessagesCount;
-    private final DisplayData display;
+    private final Display display;
     private final MiniProfile creator;
     private final long modifiedAt;
 
     public Conversation(String id, String type, int unreadMessagesCount,
-                        DisplayData display, MiniProfile creator, long modifiedAt) {
+                        Display display, MiniProfile creator, long modifiedAt) {
         this.id = id;
         this.type = type;
         this.unreadMessagesCount = unreadMessagesCount;
@@ -39,7 +39,7 @@ public class Conversation {
         return unreadMessagesCount;
     }
 
-    public DisplayData getDisplay() {
+    public Display getDisplay() {
         return display;
     }
 
@@ -64,13 +64,13 @@ public class Conversation {
                 display.withUpdatedMessage(newMessage), creator, createdAt);
     }
 
-    public class DisplayData {
+    public class Display {
         private final String image;
         private final String subTitle;
         private final String title;
         private final String lastMessageSummary;
 
-        public DisplayData(String image, String subTitle, String title, String lastMessageSummary) {
+        public Display(String image, String subTitle, String title, String lastMessageSummary) {
             this.image = image;
             this.subTitle = subTitle;
             this.title = title;
@@ -93,8 +93,8 @@ public class Conversation {
             return lastMessageSummary;
         }
 
-        public DisplayData withUpdatedMessage(@Nonnull String newMessage) {
-            return new DisplayData(image, subTitle, title, newMessage);
+        public Display withUpdatedMessage(@Nonnull String newMessage) {
+            return new Display(image, subTitle, title, newMessage);
         }
     }
 }
