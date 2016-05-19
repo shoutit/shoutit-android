@@ -14,7 +14,7 @@ import com.google.common.base.Strings;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
-import com.shoutit.app.android.api.model.Conversation;
+import com.shoutit.app.android.api.model.ConversationDetails;
 import com.shoutit.app.android.api.model.EditPublicChatRequest;
 import com.shoutit.app.android.api.model.RemoveProfileRequest;
 import com.shoutit.app.android.api.model.User;
@@ -147,18 +147,18 @@ public class ChatInfoPresenter {
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
                 .subscribe(
-                        new Action1<Conversation>() {
+                        new Action1<ConversationDetails>() {
                             @Override
-                            public void call(Conversation conversation) {
+                            public void call(ConversationDetails conversation) {
                                 isAdmin = isAdmin(conversation.getAdmins());
 
                                 listener.isAdmin(isAdmin);
-                                final Conversation.AttatchmentCount attachmentsCount = conversation.getAttachmentsCount();
+                                final ConversationDetails.AttatchmentCount attachmentsCount = conversation.getAttachmentsCount();
                                 listener.setParticipantsCount(conversation.getProfiles().size());
                                 listener.setBlockedCount(conversation.getBlocked().size());
                                 listener.setMediaCount(attachmentsCount.getMedia());
                                 listener.setShoutsCount(attachmentsCount.getShout());
-                                final Conversation.Display display = conversation.getDisplay();
+                                final ConversationDetails.Display display = conversation.getDisplay();
                                 final String image = display.getImage();
                                 if (!Strings.isNullOrEmpty(image)) {
                                     listener.setImage(Uri.parse(image));

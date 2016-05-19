@@ -35,7 +35,7 @@ public class Shout {
     private final List<Filter> filters;
     private final int availableCount;
     private final Boolean isMobileSet;
-    private final List<Conversation> conversations;
+    private final List<ConversationDetails> conversations;
     private final String mobileHint;
     private final String mobile;
 
@@ -43,7 +43,7 @@ public class Shout {
                  UserLocation location, String title, String text, Long price, float number,
                  String currency, String thumbnail, String videoUrl, User profile,
                  Category category, List<Filter> filters, long datePublished, List<String> images,
-                 List<Video> videos, int availableCount, List<Conversation> conversations, boolean isMobileSet,
+                 List<Video> videos, int availableCount, List<ConversationDetails> conversations, boolean isMobileSet,
                  String mobileHint, String mobile) {
         this.id = id;
         this.apiUrl = apiUrl;
@@ -158,7 +158,7 @@ public class Shout {
         return isMobileSet;
     }
 
-    public List<Conversation> getConversations() {
+    public List<ConversationDetails> getConversations() {
         return conversations;
     }
 
