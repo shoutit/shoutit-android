@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.chats.chat_info.chats_blocked;
+package com.shoutit.app.android.view.chats.chat_info.chats_users_list;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -12,6 +12,7 @@ import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.view.chats.chat_info.chats_users_list.ChatListProfileItem;
 import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;
@@ -20,13 +21,13 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class ChatBlockedUsersAdapter extends BaseAdapter {
+public class ChatUsersListAdapter extends BaseAdapter {
 
     private final LayoutInflater mLayoutInflater;
     private final Picasso mPicasso;
 
     @Inject
-    public ChatBlockedUsersAdapter(@ForActivity @Nonnull Context context, Picasso picasso) {
+    public ChatUsersListAdapter(@ForActivity @Nonnull Context context, Picasso picasso) {
         super(context);
         mPicasso = picasso;
         mLayoutInflater = LayoutInflater.from(context);
@@ -67,7 +68,7 @@ public class ChatBlockedUsersAdapter extends BaseAdapter {
 
         @Override
         public void bind(@Nonnull BaseAdapterItem item) {
-            final BlockedProfileItem profileItem = (BlockedProfileItem) item;
+            final ChatListProfileItem profileItem = (ChatListProfileItem) item;
             mPicasso.load(profileItem.getImage())
                     .placeholder(R.drawable.ic_rect_avatar_placeholder)
                     .error(R.drawable.ic_rect_avatar_placeholder)

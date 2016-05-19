@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.chats.chat_info.chats_blocked;
+package com.shoutit.app.android.view.chats.chat_info.chats_users_list.chats_blocked;
 
 import android.content.Context;
 import android.content.DialogInterface;

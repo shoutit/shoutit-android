@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.chats.chat_info.chats_blocked;
+package com.shoutit.app.android.view.chats.chat_info.chats_users_list;
 
 import android.support.annotation.NonNull;
 
@@ -6,11 +6,11 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class ChatBlockedUsersModule {
+public class ChatUsersListModule {
 
     private final String conversationId;
 
-    public ChatBlockedUsersModule(@NonNull String conversationId) {
+    public ChatUsersListModule(@NonNull String conversationId) {
         this.conversationId = conversationId;
     }
 

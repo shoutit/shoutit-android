@@ -1,17 +1,17 @@
-package com.shoutit.app.android.view.chats.chat_info.chats_blocked;
+package com.shoutit.app.android.view.chats.chat_info.chats_users_list;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 
 import javax.annotation.Nonnull;
 
-public class BlockedProfileItem implements BaseAdapterItem {
+public class ChatListProfileItem implements BaseAdapterItem {
 
     private final String mId;
     private final String mName;
     private final String mImage;
     private final OnItemClicked onItemClicked;
 
-    public BlockedProfileItem(String id, String name, String image, OnItemClicked onItemClicked) {
+    public ChatListProfileItem(String id, String name, String image, OnItemClicked onItemClicked) {
         mId = id;
         mName = name;
         mImage = image;
@@ -39,7 +39,7 @@ public class BlockedProfileItem implements BaseAdapterItem {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        final BlockedProfileItem that = (BlockedProfileItem) o;
+        final ChatListProfileItem that = (ChatListProfileItem) o;
 
         if (mId != null ? !mId.equals(that.mId) : that.mId != null) return false;
         if (mName != null ? !mName.equals(that.mName) : that.mName != null) return false;
@@ -58,7 +58,7 @@ public class BlockedProfileItem implements BaseAdapterItem {
 
     @Override
     public boolean matches(@Nonnull BaseAdapterItem item) {
-        return item instanceof BlockedProfileItem && ((BlockedProfileItem) item).getId().equals(mId);
+        return item instanceof ChatListProfileItem && ((ChatListProfileItem) item).getId().equals(mId);
     }
 
     @Override

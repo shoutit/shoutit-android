@@ -394,6 +394,9 @@ public interface ApiService {
     @DELETE("conversations/{id}")
     Observable<ResponseBody> deleteConversation(@Path("id") String conversationId);
 
+    @POST("conversations/{id}/add_profile")
+    Observable<ResponseBody> addProfile(@Path("id") String conversationId, @Body ProfileRequest removeProfileRequest);
+
     @POST("conversations/{id}/remove_profile")
     Observable<ResponseBody> removeProfile(@Path("id") String conversationId, @Body ProfileRequest removeProfileRequest);
 

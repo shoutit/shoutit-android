@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,8 +26,9 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.ImageCaptureHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.TextWatcherAdapter;
-import com.shoutit.app.android.view.chats.chat_info.chats_blocked.ChatBlockedUsersActivity;
+import com.shoutit.app.android.view.chats.chat_info.chats_users_list.chats_blocked.ChatBlockedUsersActivity;
 import com.shoutit.app.android.view.chats.chat_info.chats_participants.ChatParticipantsActivity;
+import com.shoutit.app.android.view.chats.chat_info.chats_users_list.chats_select.ChatSelectUsersActivity;
 import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;
@@ -99,6 +101,19 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
             }
         });
         mChatInfoToolbar.inflateMenu(R.menu.chat_info_menu);
+        mChatInfoToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.chat_info_add_person: {
+                        startActivity(ChatSelectUsersActivity.newIntent(ChatInfoActivity.this, mConversationId));
+                        return true;
+                    }
+                    default:
+                        return false;
+                }
+            }
+        });
 
         mCreatePublicChatPresenter.register(this);
 

@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.chats.chat_info.chats_blocked;
+package com.shoutit.app.android.view.chats.chat_info.chats_users_list.chats_select;
 
 import android.support.annotation.NonNull;
 
@@ -8,10 +8,13 @@ import com.appunite.rx.dagger.UiScheduler;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
-import com.shoutit.app.android.api.model.BlockedProfilesResposne;
-import com.shoutit.app.android.api.model.ConversationProfile;
+import com.shoutit.app.android.api.model.BaseProfile;
+import com.shoutit.app.android.api.model.ListenersResponse;
 import com.shoutit.app.android.api.model.ProfileRequest;
+import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.view.chats.chat_info.chats_users_list.ChatListProfileItem;
 
 import java.util.List;
 
@@ -23,7 +26,7 @@ import rx.Scheduler;
 import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
 
-public class ChatBlockedUsersPresenter {
+public class ChatSelectUsersPresenter {
 
     private final ApiService mApiService;
     private final String mConversationId;
@@ -31,16 +34,22 @@ public class ChatBlockedUsersPresenter {
     private final Scheduler mUiScheduler;
     private final CompositeSubscription mCompositeSubscription = new CompositeSubscription();
     private Listener mListener;
+    private final String mId;
 
     @Inject
-    public ChatBlockedUsersPresenter(@NonNull ApiService apiService,
-                                     @NonNull String conversationId,
-                                     @NetworkScheduler Scheduler networkScheduler,
-                                     @UiScheduler Scheduler uiScheduler) {
+    public ChatSelectUsersPresenter(@NonNull ApiService apiService,
+                                    @NonNull String conversationId,
+                                    @NetworkScheduler Scheduler networkScheduler,
+                                    @UiScheduler Scheduler uiScheduler,
+                                    UserPreferences userPreferences) {
         mApiService = apiService;
         mConversationId = conversationId;
         mNetworkScheduler = networkScheduler;
         mUiScheduler = uiScheduler;
+
+        final User user = userPreferences.getUser();
+        assert user != null;
+        mId = user.getUsername();
     }
 
     public void register(Listener listener) {
@@ -50,13 +59,13 @@ public class ChatBlockedUsersPresenter {
 
     private void getConversation() {
         mListener.showProgress(true);
-        mCompositeSubscription.add(mApiService.getBlockedProfiles(mConversationId)
+        mCompositeSubscription.add(mApiService.listeners(mId, 1, 20) // TODO paging
                 .observeOn(mUiScheduler)
                 .subscribeOn(mNetworkScheduler)
-                .subscribe(new Action1<BlockedProfilesResposne>() {
+                .subscribe(new Action1<ListenersResponse>() {
                     @Override
-                    public void call(final BlockedProfilesResposne blockedProfilesResposne) {
-                        final List<ConversationProfile> profiles = blockedProfilesResposne.getProfiles();
+                    public void call(final ListenersResponse listenersResponse) {
+                        final List<BaseProfile> profiles = listenersResponse.getProfiles();
                         final List<BaseAdapterItem> profileItems = getProfileItems(profiles);
 
                         mListener.setData(profileItems);
@@ -71,13 +80,13 @@ public class ChatBlockedUsersPresenter {
                 }));
     }
 
-    private List<BaseAdapterItem> getProfileItems(List<ConversationProfile> profiles) {
-        return ImmutableList.copyOf(Iterables.transform(profiles, new Function<ConversationProfile, BaseAdapterItem>() {
+    private List<BaseAdapterItem> getProfileItems(List<BaseProfile> profiles) {
+        return ImmutableList.copyOf(Iterables.transform(profiles, new Function<BaseProfile, BaseAdapterItem>() {
             @Nullable
             @Override
-            public BaseAdapterItem apply(@Nullable ConversationProfile input) {
+            public BaseAdapterItem apply(@Nullable BaseProfile input) {
                 assert input != null;
-                return new BlockedProfileItem(input.getId(), input.getName(), input.getImage(), new BlockedProfileItem.OnItemClicked() {
+                return new ChatListProfileItem(input.getId(), input.getName(), input.getImage(), new ChatListProfileItem.OnItemClicked() {
                     @Override
                     public void onItemClicked(String id, String name) {
                         mListener.showDialog(id, name);
@@ -87,9 +96,9 @@ public class ChatBlockedUsersPresenter {
         }));
     }
 
-    public void unblockUser(String id) {
+    public void addProfile(String id) {
         mListener.showProgress(true);
-        mCompositeSubscription.add(mApiService.unblockProfile(mConversationId, new ProfileRequest(id))
+        mCompositeSubscription.add(mApiService.addProfile(mConversationId, new ProfileRequest(id))
                 .observeOn(mUiScheduler)
                 .subscribeOn(mNetworkScheduler)
                 .subscribe(new Action1<ResponseBody>() {
