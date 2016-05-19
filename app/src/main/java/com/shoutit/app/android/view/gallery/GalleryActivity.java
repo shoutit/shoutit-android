@@ -2,11 +2,7 @@ package com.shoutit.app.android.view.gallery;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.ImageView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -16,14 +12,9 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
-import com.shoutit.app.android.utils.AmazonRequestTransfomer;
-import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
-import com.veinhorn.scrollgalleryview.Constants;
 import com.veinhorn.scrollgalleryview.MediaInfo;
 import com.veinhorn.scrollgalleryview.ScrollGalleryView;
-import com.veinhorn.scrollgalleryview.VideoPlayerActivity;
-import com.veinhorn.scrollgalleryview.loader.MediaLoader;
 
 import java.util.List;
 
@@ -85,112 +76,16 @@ public class GalleryActivity extends BaseActivity {
                 .setFragmentManager(getSupportFragmentManager());
 
         for (String imageUrl : imagesList) {
-            galleryView.addMedia(MediaInfo.mediaLoader(new ImagesLoader(imageUrl)));
+            galleryView.addMedia(MediaInfo.mediaLoader(
+                    new MediaLoaders.ImagesLoader(imageUrl, picasso, picassoWithoutAmazonTransformer, getResources())));
         }
 
         for (Video video : videosList) {
-            galleryView.addMedia(MediaInfo.mediaLoader(new VideosLoader(video.getUrl(), video.getThumbnailUrl())));
+            galleryView.addMedia(MediaInfo.mediaLoader(
+                    new MediaLoaders.VideosLoader(picassoWithoutAmazonTransformer, video.getUrl(), video.getThumbnailUrl())));
         }
 
         galleryView.setCurrentItem(position);
-    }
-
-    class ImagesLoader implements MediaLoader {
-
-        private final String imageUrl;
-
-        public ImagesLoader(String imageUrl) {
-            this.imageUrl = imageUrl;
-        }
-
-        @Override
-        public boolean isImage() {
-            return true;
-        }
-
-        @Override
-        public void loadMedia(Context context, ImageView imageView, final SuccessCallback callback) {
-            picassoWithoutAmazonTransformer.load(AmazonRequestTransfomer.transformUrl(imageUrl, AmazonRequestTransfomer.LARGE))
-                    .placeholder(new BitmapDrawable(getResources(), Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)))
-                    .into(imageView, new Callback() {
-                        @Override
-                        public void onSuccess() {
-                            callback.onSuccess();
-                        }
-
-                        @Override
-                        public void onError() {
-                        }
-                    });
-        }
-
-        @Override
-        public void loadThumbnail(Context context, ImageView thumbnailView, final SuccessCallback callback) {
-            picasso.load(imageUrl)
-                    .placeholder(new BitmapDrawable(getResources(), Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)))
-                    .resizeDimen(R.dimen.gallery_thumbnail_size, R.dimen.gallery_thumbnail_size)
-                    .into(thumbnailView, new Callback() {
-                        @Override
-                        public void onSuccess() {
-                            callback.onSuccess();
-                        }
-
-                        @Override
-                        public void onError() {
-                        }
-                    });
-        }
-    }
-
-    class VideosLoader implements MediaLoader {
-
-        @Nonnull
-        private final String videoUrl;
-        @Nonnull
-        private final String thumbnailUrl;
-
-        public VideosLoader(@Nonnull String videoUrl, @Nonnull String thumbnailUrl) {
-            this.videoUrl = videoUrl;
-            this.thumbnailUrl = thumbnailUrl;
-        }
-
-        @Override
-        public boolean isImage() {
-            return false;
-        }
-
-        @Override
-        public void loadMedia(final Context context, ImageView imageView, SuccessCallback callback) {
-            imageView.setImageResource(R.drawable.ic_play_circle_outline_white_48dp);
-            imageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    displayVideo(context, videoUrl);
-                }
-            });
-        }
-
-        @Override
-        public void loadThumbnail(Context context, ImageView thumbnailView, final SuccessCallback callback) {
-            picasso.load(thumbnailUrl)
-                    .resizeDimen(R.dimen.gallery_thumbnail_size, R.dimen.gallery_thumbnail_size)
-                    .into(thumbnailView, new Callback() {
-                        @Override
-                        public void onSuccess() {
-                            callback.onSuccess();
-                        }
-
-                        @Override
-                        public void onError() {
-                        }
-                    });
-        }
-
-        private void displayVideo(Context context, String url) {
-            final Intent intent = new Intent(context, VideoPlayerActivity.class);
-            intent.putExtra(Constants.URL, url);
-            context.startActivity(intent);
-        }
     }
 
     @Nonnull

@@ -25,6 +25,7 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.ImageCaptureHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.TextWatcherAdapter;
+import com.shoutit.app.android.view.chats.chat_media_gallery.ChatMediaGalleryActivity;
 import com.shoutit.app.android.view.chats.chat_shouts.ChatShoutsActivity;
 import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsActivity;
 import com.squareup.picasso.Picasso;
@@ -278,6 +279,6 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
 
     @OnClick(R.id.chat_info_media_cell)
     public void onMediaClick() {
-
+        startActivity(ChatMediaGalleryActivity.newIntent(this, conversationId));
     }
 }

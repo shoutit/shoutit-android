@@ -19,6 +19,7 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.utils.PreferencesHelper;
+import com.shoutit.app.android.utils.rx.RxMoreObservers;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
 import java.util.List;
@@ -124,8 +125,9 @@ public class ChatShoutsPresenter {
     }
 
     public Observer<Object> getLoadMoreObserver() {
-        return shoutsDao.getConversationsShoutsDao(conversationId)
-                .getLoadMoreObserver();
+        return RxMoreObservers.ignoreCompleted(
+                shoutsDao.getConversationsShoutsDao(conversationId)
+                        .getLoadMoreObserver());
     }
 
     public Observable<Integer> getCountObservable() {

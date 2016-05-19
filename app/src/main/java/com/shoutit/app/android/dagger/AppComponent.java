@@ -13,6 +13,7 @@ import com.shoutit.app.android.App;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.dao.CategoriesDao;
+import com.shoutit.app.android.dao.ConversationMediaDaos;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ListenersDaos;
@@ -91,6 +92,8 @@ public interface AppComponent {
     ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter();
 
     NotificationsDao notificationsDao();
+
+    ConversationMediaDaos conversationMediaDaos();
 
     GoogleApiClient googleApiClient();
 
