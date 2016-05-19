@@ -25,6 +25,8 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.ImageCaptureHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.TextWatcherAdapter;
+import com.shoutit.app.android.view.chats.chat_shouts.ChatShoutsActivity;
+import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsActivity;
 import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;
@@ -76,6 +78,8 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
     @Bind(R.id.chat_info_edit_save)
     Button mChatInfoEditSave;
 
+    private String conversationId;
+
     public static Intent newIntent(@NonNull Context context, @NonNull String conversationId) {
         return new Intent(context, ChatInfoActivity.class)
                 .putExtra(EXTRA_CONVERSATION_ID, conversationId);
@@ -86,6 +90,8 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.chat_info_activity);
         ButterKnife.bind(this);
+
+        conversationId = getIntent().getStringExtra(EXTRA_CONVERSATION_ID);
 
         mChatInfoToolbar.setTitle(R.string.chat_info_title);
         mChatInfoToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
@@ -263,5 +269,15 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
         }
 
         mCreatePublicChatPresenter.selectImageClicked();
+    }
+
+    @OnClick(R.id.chat_info_shouts_cell)
+    public void onShoutsClick() {
+        startActivity(ChatShoutsActivity.newIntent(this, conversationId));
+    }
+
+    @OnClick(R.id.chat_info_media_cell)
+    public void onMediaClick() {
+
     }
 }

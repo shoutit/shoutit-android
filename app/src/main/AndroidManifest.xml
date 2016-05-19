@@ -298,6 +298,9 @@
         <activity android:name=".view.chooseprofile.SelectProfileActivity"
             android:screenOrientation="portrait"/>
 
+        <activity android:name=".view.chats.chat_shouts.ChatShoutsActivity"
+            android:screenOrientation="portrait"/>
+
         <!-- Facebook -->
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"

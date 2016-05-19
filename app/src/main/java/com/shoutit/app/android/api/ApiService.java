@@ -402,6 +402,11 @@ public interface ApiService {
     @POST("conversations")
     Observable<ResponseBody> createPublicChat(@Body CreatePublicChatRequest createPublicChatRequest);
 
+    @GET("conversations/{id}/shouts")
+    Observable<ShoutsResponse> conversationShouts(@Path("id") String conversationId,
+                                                  @Query("page") Integer page,
+                                                  @Query("page_size") Integer pageSize);
+
     /**
      * Public Chats
      */

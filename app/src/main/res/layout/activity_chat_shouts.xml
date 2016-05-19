@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/chat_shouts_toolbar"
+            style="@style/AppTheme.BaseToolbarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="8dp"
+            android:paddingEnd="11dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="11dp"
+            android:paddingStart="16dp"
+            android:paddingTop="15dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="left|start"
+                    android:maxLines="1"
+                    android:textColor="@color/black_54"
+                    android:textSize="14sp"
+                    android:text="@string/chat_shouts_title" />
+
+                <TextView
+                    android:id="@+id/chat_shouts_count_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black_38"
+                    android:textSize="12sp"
+                    tools:text="1234 Results" />
+
+            </LinearLayout>
+
+            <CheckedTextView
+                android:id="@+id/chat_shouts_layout_switcher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_list_switch" />
+
+        </LinearLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/chat_shouts_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <include layout="@layout/base_progress" />
+
+</FrameLayout>
