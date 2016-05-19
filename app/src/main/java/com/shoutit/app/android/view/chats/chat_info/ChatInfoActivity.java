@@ -25,6 +25,7 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.ImageCaptureHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.TextWatcherAdapter;
+import com.shoutit.app.android.view.chats.chat_info.chats_participants.ChatParticipantsActivity;
 import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;
@@ -75,6 +76,7 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
     TextView mChatInfoChatCreatedAt;
     @Bind(R.id.chat_info_edit_save)
     Button mChatInfoEditSave;
+    private String mConversationId;
 
     public static Intent newIntent(@NonNull Context context, @NonNull String conversationId) {
         return new Intent(context, ChatInfoActivity.class)
@@ -117,10 +119,10 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
     @Nonnull
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
-        final String conversationId = getIntent().getStringExtra(EXTRA_CONVERSATION_ID);
+        mConversationId = getIntent().getStringExtra(EXTRA_CONVERSATION_ID);
         final ChatInfoComponent build = DaggerChatInfoComponent.builder()
                 .activityModule(new ActivityModule(this))
-                .chatInfoModule(new ChatInfoModule(conversationId))
+                .chatInfoModule(new ChatInfoModule(mConversationId))
                 .appComponent(App.getAppComponent(getApplication()))
                 .build();
         build.inject(this);
@@ -257,11 +259,17 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
     }
 
     @OnClick(R.id.chat_info_avatar)
-    void avatarClick(){
+    void avatarClick() {
         if (!PermissionHelper.checkSelectImagePermission(this, REQUEST_CODE_PERMISSION)) {
             return;
         }
 
         mCreatePublicChatPresenter.selectImageClicked();
     }
+
+    @OnClick(R.id.chat_info_participants_layouts)
+    void clickParticipants() {
+        startActivity(ChatParticipantsActivity.newIntent(this, mConversationId));
+    }
+
 }

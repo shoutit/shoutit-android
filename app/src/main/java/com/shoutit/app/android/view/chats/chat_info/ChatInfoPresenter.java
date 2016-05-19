@@ -16,7 +16,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.EditPublicChatRequest;
-import com.shoutit.app.android.api.model.RemoveProfileRequest;
+import com.shoutit.app.android.api.model.ProfileRequest;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.AmazonHelper;
@@ -205,7 +205,7 @@ public class ChatInfoPresenter {
 
     public void exitChatClicked() {
         listener.showProgress(true);
-        mCompositeSubscription.add(mApiService.removeProfile(mConversationId, new RemoveProfileRequest(mId))
+        mCompositeSubscription.add(mApiService.removeProfile(mConversationId, new ProfileRequest(mId))
                 .observeOn(mUiScheduler)
                 .subscribeOn(mNetworkScheduler)
                 .subscribe(new Action1<ResponseBody>() {

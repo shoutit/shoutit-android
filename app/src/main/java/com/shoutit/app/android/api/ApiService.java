@@ -28,9 +28,9 @@ import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessagesResponse;
 import com.shoutit.app.android.api.model.NotificationsResponse;
 import com.shoutit.app.android.api.model.PostMessage;
+import com.shoutit.app.android.api.model.ProfileRequest;
 import com.shoutit.app.android.api.model.RegisterDeviceRequest;
 import com.shoutit.app.android.api.model.RelatedTagsResponse;
-import com.shoutit.app.android.api.model.RemoveProfileRequest;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.api.model.SearchProfileResponse;
 import com.shoutit.app.android.api.model.Shout;
@@ -281,7 +281,7 @@ public interface ApiService {
 
     @GET("profiles/me/interests")
     Observable<ListeningResponse> tagsListenings(@Query("page") Integer page,
-                                                  @Query("page_size") Integer pageSize);
+                                                 @Query("page_size") Integer pageSize);
 
     @GET("profiles/{user_name}/listeners")
     Observable<ListenersResponse> listeners(@Path("user_name") String userName,
@@ -394,13 +394,22 @@ public interface ApiService {
     Observable<ResponseBody> deleteConversation(@Path("id") String conversationId);
 
     @POST("conversations/{id}/remove_profile")
-    Observable<ResponseBody> removeProfile(@Path("id") String conversationId, @Body RemoveProfileRequest removeProfileRequest);
+    Observable<ResponseBody> removeProfile(@Path("id") String conversationId, @Body ProfileRequest removeProfileRequest);
 
     @POST("messages/{id}/read")
     Observable<ResponseBody> readMessage(@Path("id") String messageId);
 
     @POST("conversations")
     Observable<ResponseBody> createPublicChat(@Body CreatePublicChatRequest createPublicChatRequest);
+
+    @POST("conversations{id}/promote_admin")
+    Observable<ResponseBody> promoteAdmin(@Path("id") String conversationId, @Body ProfileRequest profileRequest);
+
+    @POST("conversations{id}/block_profile")
+    Observable<ResponseBody> blockProfile(@Path("id") String conversationId, @Body ProfileRequest profileRequest);
+
+    @POST("conversations{id}/unblock_profile")
+    Observable<ResponseBody> unblockProfile(@Path("id") String conversationId, @Body ProfileRequest profileRequest);
 
     /**
      * Public Chats
