@@ -282,6 +282,8 @@
                   android:screenOrientation="portrait"/>
         <activity android:name=".view.chats.public_chat.CreatePublicChatActivity"
                   android:screenOrientation="portrait"/>
+        <activity android:name=".view.chats.chat_info.chats_blocked.ChatBlockedUsersActivity"
+                  android:screenOrientation="portrait"/>
         <activity android:name=".view.chats.chat_info.ChatInfoActivity"
                   android:screenOrientation="portrait"/>
         <activity android:name=".view.createshout.CreateShoutDialogActivity"

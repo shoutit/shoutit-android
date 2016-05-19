@@ -25,6 +25,7 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.ImageCaptureHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.TextWatcherAdapter;
+import com.shoutit.app.android.view.chats.chat_info.chats_blocked.ChatBlockedUsersActivity;
 import com.shoutit.app.android.view.chats.chat_info.chats_participants.ChatParticipantsActivity;
 import com.squareup.picasso.Picasso;
 
@@ -108,6 +109,12 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
                 mCreatePublicChatPresenter.onTextChanged();
             }
         });
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        mCreatePublicChatPresenter.refreshCounts();
     }
 
     @Override
@@ -270,6 +277,11 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
     @OnClick(R.id.chat_info_participants_layouts)
     void clickParticipants() {
         startActivity(ChatParticipantsActivity.newIntent(this, mConversationId));
+    }
+
+    @OnClick(R.id.chat_info_blocked_layouts)
+    void clickBlocked() {
+        startActivity(ChatBlockedUsersActivity.newIntent(this, mConversationId));
     }
 
 }

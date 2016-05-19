@@ -3,6 +3,7 @@ package com.shoutit.app.android.api;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.shoutit.app.android.api.model.BlockedProfilesResposne;
 import com.shoutit.app.android.api.model.CallerProfile;
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.ChangePasswordRequest;
@@ -402,14 +403,17 @@ public interface ApiService {
     @POST("conversations")
     Observable<ResponseBody> createPublicChat(@Body CreatePublicChatRequest createPublicChatRequest);
 
-    @POST("conversations{id}/promote_admin")
+    @POST("conversations/{id}/promote_admin")
     Observable<ResponseBody> promoteAdmin(@Path("id") String conversationId, @Body ProfileRequest profileRequest);
 
-    @POST("conversations{id}/block_profile")
+    @POST("conversations/{id}/block_profile")
     Observable<ResponseBody> blockProfile(@Path("id") String conversationId, @Body ProfileRequest profileRequest);
 
-    @POST("conversations{id}/unblock_profile")
+    @POST("conversations/{id}/unblock_profile")
     Observable<ResponseBody> unblockProfile(@Path("id") String conversationId, @Body ProfileRequest profileRequest);
+
+    @GET("conversations/{id}/blocked")
+    Observable<BlockedProfilesResposne> getBlockedProfiles(@Path("id") String conversationId);
 
     /**
      * Public Chats

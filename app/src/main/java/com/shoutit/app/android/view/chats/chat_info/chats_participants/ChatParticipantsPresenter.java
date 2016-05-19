@@ -68,19 +68,7 @@ public class ChatParticipantsPresenter {
                         final boolean isUserAdmin = conversation.getAdmins().contains(mId);
 
                         final List<ConversationProfile> profiles = conversation.getProfiles();
-                        final List<BaseAdapterItem> profileItems = ImmutableList.copyOf(Iterables.transform(profiles, new Function<ConversationProfile, BaseAdapterItem>() {
-                            @Nullable
-                            @Override
-                            public BaseAdapterItem apply(@Nullable final ConversationProfile input) {
-                                return getProfileItem(input, conversation, new ProfileItem.OnItemClicked() {
-                                    @Override
-                                    public void onItemClicked(String id, boolean isBlocked, boolean isAdmin, String name) {
-                                        assert input != null;
-                                        mListener.showDialog(id, isBlocked, isAdmin, name, isUserAdmin && !input.getId().equals(mId));
-                                    }
-                                });
-                            }
-                        }));
+                        final List<BaseAdapterItem> profileItems = getBaseAdapterItems(conversation, isUserAdmin, profiles);
                         mListener.setData(profileItems);
                         mListener.showProgress(false);
                     }
@@ -91,6 +79,22 @@ public class ChatParticipantsPresenter {
                         mListener.showProgress(false);
                     }
                 }));
+    }
+
+    private ImmutableList<BaseAdapterItem> getBaseAdapterItems(final Conversation conversation, final boolean isUserAdmin, List<ConversationProfile> profiles) {
+        return ImmutableList.copyOf(Iterables.transform(profiles, new Function<ConversationProfile, BaseAdapterItem>() {
+            @Nullable
+            @Override
+            public BaseAdapterItem apply(@Nullable final ConversationProfile input) {
+                return getProfileItem(input, conversation, new ProfileItem.OnItemClicked() {
+                    @Override
+                    public void onItemClicked(String id, boolean isBlocked, boolean isAdmin, String name) {
+                        assert input != null;
+                        mListener.showDialog(id, isBlocked, isAdmin, name, isUserAdmin && !input.getId().equals(mId));
+                    }
+                });
+            }
+        }));
     }
 
     @NonNull
