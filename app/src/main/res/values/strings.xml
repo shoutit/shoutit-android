@@ -544,5 +544,7 @@
     <string name="chat_info_add_person">Add Person</string>
     <string name="chat_info_created_by">Chat created by %1$s</string>
     <string name="chat_info_created_at">Created %1$s</string>
+    <string name="chat_participant_title">Participants</string>
+    <string name="chat_blocked_users_title">Blocked Users</string>
 
 </resources>
