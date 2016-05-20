@@ -12,12 +12,17 @@ import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 
+import com.shoutit.app.android.utils.FileHelper;
+import com.shoutit.app.android.utils.ImageHelper;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class MediaUtils {
+
+    public static int MAX_MEDIA_SIZE = 1024;
 
     public static int getVideoLength(Context context, String path) {
         return getVideoLength(context, new File(path));
@@ -55,5 +60,11 @@ public class MediaUtils {
         thumbnail.compress(Bitmap.CompressFormat.JPEG, 80, os);
 
         return thumbnailFile;
+    }
+
+    public static File createFileFromUri(Context context, Uri imageUri, int maxImageSize) throws Exception {
+        final String tempFile = FileHelper.createTempFileAndStoreUri(context, imageUri);
+        final Bitmap bitmapToUpload = ImageHelper.prepareImageToUpload(tempFile, maxImageSize);
+        return FileHelper.saveBitmapToTempFile(context, bitmapToUpload);
     }
 }

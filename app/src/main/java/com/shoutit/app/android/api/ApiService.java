@@ -405,7 +405,7 @@ public interface ApiService {
     @POST("messages/{id}/read")
     Observable<ResponseBody> readMessage(@Path("id") String messageId);
 
-    @POST("conversations")
+    @POST("public_chats")
     Observable<ResponseBody> createPublicChat(@Body CreatePublicChatRequest createPublicChatRequest);
 
     @GET("conversations/{id}/shouts")

@@ -15,6 +15,7 @@ import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.ImageCaptureHelper;
 import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.view.createshout.location.LocationResultHelper;
+import com.shoutit.app.android.view.media.MediaUtils;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +41,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({LocationResultHelper.class, ResourcesHelper.class})
+@PrepareForTest({LocationResultHelper.class, ResourcesHelper.class, MediaUtils.class})
 public class CreatePublicChatPresenterTest {
 
     @Mock
@@ -63,12 +64,14 @@ public class CreatePublicChatPresenterTest {
     private CreatePublicChatPresenter mCreatePublicChatPresenter;
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         PowerMockito.mockStatic(LocationResultHelper.class);
         PowerMockito.mockStatic(ResourcesHelper.class);
-        mCreatePublicChatPresenter = new CreatePublicChatPresenter(imageCaptureHelper, mContext, mApiService, Schedulers.immediate(), Schedulers.immediate(), mAmazonHelper, mUserPreferences);
+        PowerMockito.mockStatic(MediaUtils.class);
+        when(MediaUtils.createFileFromUri(any(Context.class), any(Uri.class), anyInt())).thenReturn(new File(""));
         when(mAmazonHelper.uploadGroupChatObservable(any(File.class))).thenReturn(Observable.just("url"));
+        mCreatePublicChatPresenter = new CreatePublicChatPresenter(imageCaptureHelper, mContext, mApiService, Schedulers.immediate(), Schedulers.immediate(), mAmazonHelper, mUserPreferences);
     }
 
     @Test
@@ -194,24 +197,6 @@ public class CreatePublicChatPresenterTest {
         when(mApiService.updateUserLocation(any(UpdateLocationRequest.class))).thenReturn(Observable.<User>just(null));
 
         when(mApiService.createPublicChat(any(CreatePublicChatRequest.class))).thenReturn(Observable.<ResponseBody>error(new RuntimeException("")));
-
-        //when
-        mCreatePublicChatPresenter.createClicked();
-
-        //then
-        verify(listener).createRequestError();
-        verify(listener).showProgress(false);
-    }
-
-    @Test
-    public void whenConfirmClickedAndDataCorrectAndProfileFailed_showErrror() {
-        //given
-        mCreatePublicChatPresenter.register(listener);
-        when(listener.getData()).thenReturn(new CreatePublicChatPresenter.CreatePublicChatData("subject", false, false));
-
-        when(mApiService.updateUserLocation(any(UpdateLocationRequest.class))).thenReturn(Observable.<User>error(new RuntimeException()));
-
-        when(mApiService.createPublicChat(any(CreatePublicChatRequest.class))).thenReturn(Observable.just(ResponseBody.create(MediaType.parse("*/*"), "")));
 
         //when
         mCreatePublicChatPresenter.createClicked();

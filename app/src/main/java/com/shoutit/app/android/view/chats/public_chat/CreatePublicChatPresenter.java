@@ -15,16 +15,14 @@ import com.google.common.base.Strings;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.CreatePublicChatRequest;
-import com.shoutit.app.android.api.model.UpdateLocationRequest;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
+import com.shoutit.app.android.api.model.UserLocationSimple;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.ImageCaptureHelper;
 import com.shoutit.app.android.utils.ResourcesHelper;
+import com.shoutit.app.android.view.chats.ChatsMediaHelper;
 import com.shoutit.app.android.view.createshout.location.LocationResultHelper;
-
-import java.io.File;
 
 import javax.inject.Inject;
 
@@ -89,25 +87,17 @@ public class CreatePublicChatPresenter {
         } else {
             listener.showProgress(true);
             mCompositeSubscription.add(
-                    mApiService.updateUserLocation(new UpdateLocationRequest(state.location))
+                    ChatsMediaHelper.uploadChatImage(mAmazonHelper, state.url, mContext, mNetworkScheduler, mUiScheduler)
                             .subscribeOn(mNetworkScheduler)
                             .observeOn(mUiScheduler)
-                            .flatMap(new Func1<User, Observable<String>>() {
-                                @Override
-                                public Observable<String> call(User user) {
-                                    if (state.url != null) {
-                                        return mAmazonHelper.uploadGroupChatObservable(new File(state.url.toString()))
-                                                .subscribeOn(mNetworkScheduler)
-                                                .observeOn(mUiScheduler);
-                                    } else {
-                                        return Observable.just(null);
-                                    }
-                                }
-                            })
                             .flatMap(new Func1<String, Observable<ResponseBody>>() {
                                 @Override
                                 public Observable<ResponseBody> call(String url) {
-                                    return mApiService.createPublicChat(new CreatePublicChatRequest(data.subject, url))
+                                    final UserLocation location = state.location;
+                                    return mApiService.createPublicChat(new CreatePublicChatRequest(
+                                            data.subject,
+                                            url,
+                                            location == null ? null : new UserLocationSimple(location.getLatitude(), location.getLongitude())))
                                             .subscribeOn(mNetworkScheduler)
                                             .observeOn(mUiScheduler);
                                 }
