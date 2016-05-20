@@ -26,6 +26,7 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.ImageCaptureHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
+import com.shoutit.app.android.view.ReportDialog;
 import com.shoutit.app.android.view.chats.chat_info.chats_participants.ChatParticipantsActivity;
 import com.shoutit.app.android.view.chats.chat_info.chats_users_list.chats_blocked.ChatBlockedUsersActivity;
 import com.shoutit.app.android.view.chats.chat_info.chats_users_list.chats_select.ChatSelectUsersActivity;
@@ -40,6 +41,7 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.functions.Action1;
 
 public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.ChatInfoView {
 
@@ -115,6 +117,14 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
                     case R.id.chat_info_add_person: {
                         startActivity(ChatSelectUsersActivity.newIntent(ChatInfoActivity.this, mConversationId));
                         return true;
+                    }
+                    case R.id.chats_info_report: {
+                        ReportDialog.show(ChatInfoActivity.this, new Action1<String>() {
+                            @Override
+                            public void call(String reportBody) {
+                                mChatInfoPresenter.sendReport(reportBody);
+                            }
+                        });
                     }
                     default:
                         return false;
@@ -268,6 +278,21 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
 
     @Override
     public void exitChatError() {
+        ColoredSnackBar.error(ColoredSnackBar.contentView(this), "Error", Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showReport(boolean show) {
+        mChatInfoToolbar.getMenu().findItem(R.id.chats_info_overflow).setVisible(show);
+    }
+
+    @Override
+    public void reportSent() {
+        ColoredSnackBar.success(ColoredSnackBar.contentView(this), "Report has been sent", Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void reportError() {
         ColoredSnackBar.error(ColoredSnackBar.contentView(this), "Error", Snackbar.LENGTH_SHORT).show();
     }
 

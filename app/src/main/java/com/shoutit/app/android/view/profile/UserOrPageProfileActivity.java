@@ -1,17 +1,13 @@
 package com.shoutit.app.android.view.profile;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AlertDialog;
 import android.view.MenuItem;
-import android.widget.EditText;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
-import com.google.common.base.Strings;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.User;
@@ -19,6 +15,7 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.IntentHelper;
+import com.shoutit.app.android.view.ReportDialog;
 import com.shoutit.app.android.view.chats.ChatActivity;
 import com.shoutit.app.android.view.chats.chatsfirstconversation.ChatFirstConversationActivity;
 import com.shoutit.app.android.view.editprofile.EditProfileActivity;
@@ -226,29 +223,12 @@ public class UserOrPageProfileActivity extends ProfileActivity {
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                final EditText editText = new EditText(UserOrPageProfileActivity.this);
-                editText.setHint(R.string.report_dialog_hint);
-
-                final int spacing = getResources().getDimensionPixelOffset(R.dimen.activity_horizontal_margin);
-                new AlertDialog.Builder(UserOrPageProfileActivity.this)
-                        .setTitle(R.string.shout_bottom_bar_report)
-                        .setView(editText, spacing, spacing / 2, spacing, spacing / 2)
-                        .setPositiveButton(getString(R.string.send_report_positive_button), new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                final String reportBody = editText.getText().toString();
-                                if (Strings.isNullOrEmpty(reportBody)) {
-                                    editText.setError(getString(R.string.report_dialog_empty_error));
-                                    dialog.dismiss();
-                                    return;
-                                }
-
-                                presenter.sendReportObserver().onNext(reportBody);
-                                dialog.dismiss();
-                            }
-                        })
-                        .setNegativeButton(getString(R.string.dialog_cancel_button), null)
-                        .show();
+                ReportDialog.show(UserOrPageProfileActivity.this, new Action1<String>() {
+                    @Override
+                    public void call(String reportBody) {
+                        presenter.sendReportObserver().onNext(reportBody);
+                    }
+                });
 
                 return true;
             }

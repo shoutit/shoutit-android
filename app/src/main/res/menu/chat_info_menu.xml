@@ -1,11 +1,28 @@
 <?xml version="1.0"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+      xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/chat_info_add_person"
         android:icon="@drawable/ic_person_add"
         android:title="@string/chat_info_add_person"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/chats_info_overflow"
+        android:icon="@drawable/abc_ic_menu_moreoverflow_mtrl_alpha"
+        android:title=""
+        app:showAsAction="always">
+
+        <menu>
+
+            <item
+                android:id="@+id/chats_info_report"
+                android:title="@string/chats_chat_info"
+                app:showAsAction="never"/>
+
+        </menu>
+
+    </item>
 
 </menu>
