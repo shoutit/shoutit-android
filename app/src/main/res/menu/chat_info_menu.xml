@@ -12,6 +12,7 @@
         android:id="@+id/chats_info_overflow"
         android:icon="@drawable/abc_ic_menu_moreoverflow_mtrl_alpha"
         android:title=""
+        android:visible="false"
         app:showAsAction="always">
 
         <menu>
