@@ -318,9 +318,9 @@ public class ShoutMediaPresenter {
                 mCompositeSubscription.add(images.subscribe(new Action1<List<String>>() {
                     @Override
                     public void call(List<String> images) {
-                        getAllEditedImagesAndComplete(images, ImmutableList.<Video>of()));
+                        getAllEditedImagesAndComplete(images, ImmutableList.<Video>of());
                     }
-                });
+                }));
             } else {
                 mCompositeSubscription.add(images.zipWith(
                         videoObservable, new Func2<List<String>, Video, BothParams<List<String>, Video>>() {
