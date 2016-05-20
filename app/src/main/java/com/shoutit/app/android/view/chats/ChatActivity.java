@@ -30,7 +30,6 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.common.base.Preconditions;
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
 import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.jakewharton.rxbinding.widget.RxTextView;
@@ -70,13 +69,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class ChatActivity extends BaseActivity implements Listener {
 
-    private static final String ARGS_IS_SHOUT_CONVERSATION = "args_shout_conversation";
     private static final String ARGS_CONVERSATION_ID = "conversation_id";
 
     private static final int REQUEST_ATTACHMENT = 0;
     private static final int REQUEST_LOCATION = 1;
     private static final int SELECT_SHOUT_REQUEST_CODE = 2;
     private static final int SELECT_PROFILE_REQUEST_CODE = 3;
+    private static final int INFO_REQUEST = 4;
 
     private static final String TAG = ChatActivity.class.getCanonicalName();
 
@@ -176,7 +175,7 @@ public class ChatActivity extends BaseActivity implements Listener {
                         return true;
                     }
                     case R.id.chats_chat_information: {
-                        startActivity(ChatInfoActivity.newIntent(ChatActivity.this, mConversationId));
+                        startActivityForResult(ChatInfoActivity.newIntent(ChatActivity.this, mConversationId), INFO_REQUEST);
                         return true;
                     }
                     default:
@@ -421,6 +420,11 @@ public class ChatActivity extends BaseActivity implements Listener {
         } else if (requestCode == SELECT_PROFILE_REQUEST_CODE && resultCode == RESULT_OK) {
             final String profileId = data.getStringExtra(SelectProfileActivity.RESULT_PROFILE_ID);
             presenter.sendProfile(profileId);
+        } else if (requestCode == INFO_REQUEST && resultCode == RESULT_OK) {
+            final boolean closeChat = data.getBooleanExtra(ChatInfoActivity.EXTRA_CLOSE_CHAT, false);
+            if (closeChat) {
+                finish();
+            }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }

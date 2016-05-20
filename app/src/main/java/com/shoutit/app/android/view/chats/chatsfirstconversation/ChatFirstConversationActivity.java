@@ -72,6 +72,7 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
     private static final int REQUEST_LOCATION = 1;
     private static final int SELECT_SHOUT_REQUEST_CODE = 2;
     private static final int SELECT_PROFILE_REQUEST_CODE = 3;
+    private static final int INFO_REQUEST = 4;
 
     private static final String TAG = ChatFirstConversationActivity.class.getCanonicalName();
 
@@ -170,7 +171,7 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
                         return true;
                     }
                     case R.id.chats_chat_information: {
-                        startActivity(ChatInfoActivity.newIntent(ChatFirstConversationActivity.this, Preconditions.checkNotNull(presenter.getId())));
+                        startActivityForResult(ChatInfoActivity.newIntent(ChatFirstConversationActivity.this, Preconditions.checkNotNull(presenter.getId())), INFO_REQUEST);
                         return true;
                     }
                     default:
@@ -409,6 +410,11 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
         } else if (requestCode == SELECT_PROFILE_REQUEST_CODE && resultCode == RESULT_OK) {
             final String profileId = data.getStringExtra(SelectProfileActivity.RESULT_PROFILE_ID);
             presenter.sendProfile(profileId);
+        } else if (requestCode == INFO_REQUEST && resultCode == RESULT_OK) {
+            final boolean closeChat = data.getBooleanExtra(ChatInfoActivity.EXTRA_CLOSE_CHAT, false);
+            if (closeChat) {
+                finish();
+            }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }

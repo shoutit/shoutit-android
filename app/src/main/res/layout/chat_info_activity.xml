@@ -72,6 +72,7 @@
                 </LinearLayout>
 
                 <Button
+                    android:visibility="gone"
                     android:id="@+id/chat_info_edit_save"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
