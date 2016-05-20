@@ -10,7 +10,7 @@ import com.google.common.collect.Lists;
 import com.shoutit.app.android.TestUtils;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
-import com.shoutit.app.android.api.model.Conversation;
+import com.shoutit.app.android.api.model.ConversationDetails;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
@@ -26,7 +26,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.lang.ref.WeakReference;
 import java.util.List;
 
 import retrofit2.Response;
@@ -202,7 +201,7 @@ public class ShoutPresenterTest {
 
     private Shout getShout() {
         return new Shout("id", null, null, null, null, null, null, 1L, 2, null, null, null,
-                getUser(), null, null, 1, null, null, 0, ImmutableList.<Conversation>of(), true, null, null);
+                getUser(), null, null, 1, null, null, 0, ImmutableList.<ConversationDetails>of(), true, null, null);
     }
 
     private User getUser() {

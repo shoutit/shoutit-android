@@ -6,13 +6,13 @@ import android.view.ViewGroup;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.shoutit.app.android.R;
-import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
+import com.shoutit.app.android.adapteritems.NoDataTextAdapterItem;
 import com.shoutit.app.android.adapters.ChangeableLayoutManagerAdapter;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 import com.shoutit.app.android.view.shouts.ShoutGridViewHolder;
 import com.shoutit.app.android.view.shouts.ShoutLinerViewHolder;
-import com.shoutit.app.android.viewholders.NoDataViewHolder;
+import com.shoutit.app.android.viewholders.NoDataTextViewHolder;
 import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;
@@ -43,7 +43,7 @@ public class SearchShoutsResultsAdapter extends ChangeableLayoutManagerAdapter {
                         new ShoutLinerViewHolder(layoutInflater.inflate(R.layout.home_feed_item_linear, parent, false), context, picasso, picassoNoTransformer) :
                         new ShoutGridViewHolder(layoutInflater.inflate(R.layout.shout_item_grid, parent, false), picasso);
             case VIEW_TYPE_NO_RESULTS:
-                return new NoDataViewHolder(layoutInflater.inflate(R.layout.search_shouts_results_no_results, parent, false));
+                return new NoDataTextViewHolder(layoutInflater.inflate(R.layout.no_data_text_adapter_item, parent, false));
             default:
                 throw new RuntimeException("Unknown view type: " + viewType);
         }
@@ -54,7 +54,7 @@ public class SearchShoutsResultsAdapter extends ChangeableLayoutManagerAdapter {
         final BaseAdapterItem item = items.get(position);
         if (item instanceof ShoutAdapterItem) {
             return VIEW_TYPE_SHOUT;
-        } else if (item instanceof NoDataAdapterItem) {
+        } else if (item instanceof NoDataTextAdapterItem) {
             return VIEW_TYPE_NO_RESULTS;
         } else {
             throw new RuntimeException("Unknown view type: " + item.getClass().getSimpleName());

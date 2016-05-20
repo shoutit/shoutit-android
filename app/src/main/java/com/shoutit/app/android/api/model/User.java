@@ -28,7 +28,7 @@ public class User extends BaseProfile {
     private final String mobile;
     private final String website;
     private final String email;
-    private final Conversation conversation;
+    private final ConversationDetails conversation;
     @Nullable
     private final Stats stats;
 
@@ -36,7 +36,7 @@ public class User extends BaseProfile {
                 String name, String firstName, String lastName, boolean isActivated, String image,
                 String cover, boolean isListening, boolean isListener, boolean isPasswordSet, UserLocation location,
                 int listenersCount, List<Page> pages, List<Admin> admins, String bio, int dateJoined,
-                Listening listeningCount, boolean isOwner, String about, String mobile, String website, String email, Conversation conversation, @Nullable Stats stats) {
+                Listening listeningCount, boolean isOwner, String about, String mobile, String website, String email, ConversationDetails conversation, @Nullable Stats stats) {
         super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount);
         this.apiUrl = apiUrl;
         this.webUrl = webUrl;
@@ -183,7 +183,7 @@ public class User extends BaseProfile {
         return website;
     }
 
-    public Conversation getConversation() {
+    public ConversationDetails getConversation() {
         return conversation;
     }
 

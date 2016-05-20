@@ -31,6 +31,7 @@ import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.AuthInterceptor;
 import com.shoutit.app.android.constants.AmazonConstants;
 import com.shoutit.app.android.dao.CategoriesDao;
+import com.shoutit.app.android.dao.ConversationMediaDaos;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ListenersDaos;
@@ -303,6 +304,12 @@ public final class AppModule {
     @Provides
     public VideoCallsDao provideVideoCallsDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
         return new VideoCallsDao(apiService, networkScheduler);
+    }
+
+    @Singleton
+    @Provides
+    ConversationMediaDaos provideConversationMediaDaos(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
+        return new ConversationMediaDaos(apiService, networkScheduler);
     }
 
     @Singleton

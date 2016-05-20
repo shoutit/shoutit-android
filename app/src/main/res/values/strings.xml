@@ -548,4 +548,13 @@
     <string name="chat_blocked_users_title">Blocked Users</string>
     <string name="chat_select_users_title">Add to Chat</string>
 
+    <!-- Chat shouts -->
+    <string name="chat_shouts_no_results">No shouts in this conversation</string>
+    <string name="chat_shouts_ab_title">Shouts</string>
+    <string name="chat_shouts_title">Conversations Shouts</string>
+    <plurals name="chat_shouts_results">
+        <item quantity="one">%d Shout</item>
+        <item quantity="other">%d Shouts</item>
+    </plurals>
+
 </resources>

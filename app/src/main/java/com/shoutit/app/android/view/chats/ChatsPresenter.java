@@ -20,7 +20,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.AboutShout;
-import com.shoutit.app.android.api.model.Conversation;
+import com.shoutit.app.android.api.model.ConversationDetails;
 import com.shoutit.app.android.api.model.ConversationProfile;
 import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessageAttachment;
@@ -159,9 +159,9 @@ public class ChatsPresenter {
         mSubscribe.add(mApiService.getConversation(conversationId)
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
-                .subscribe(new Action1<Conversation>() {
+                .subscribe(new Action1<ConversationDetails>() {
                     @Override
-                    public void call(Conversation conversationResponse) {
+                    public void call(ConversationDetails conversationResponse) {
                         if (conversationResponse.isShoutChat()) {
                             final AboutShout about = conversationResponse.getAbout();
                             final String id = about.getId();

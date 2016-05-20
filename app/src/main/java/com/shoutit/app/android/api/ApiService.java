@@ -8,6 +8,8 @@ import com.shoutit.app.android.api.model.CallerProfile;
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.ChangePasswordRequest;
 import com.shoutit.app.android.api.model.Conversation;
+import com.shoutit.app.android.api.model.ConversationMediaResponse;
+import com.shoutit.app.android.api.model.ConversationDetails;
 import com.shoutit.app.android.api.model.ConversationsResponse;
 import com.shoutit.app.android.api.model.CreateOfferShoutWithImageRequest;
 import com.shoutit.app.android.api.model.CreatePublicChatRequest;
@@ -365,10 +367,10 @@ public interface ApiService {
      */
     @GET("conversations")
     Observable<ConversationsResponse> getConversations(@Nullable @Query("before") String timestamp,
-                                                       @Query("page_size") Integer pageSize);
+                                              @Query("page_size") Integer pageSize);
 
     @GET("conversations/{id}")
-    Observable<Conversation> getConversation(@NonNull @Path("id") String id);
+    Observable<ConversationDetails> getConversation(@NonNull @Path("id") String id);
 
     @PATCH("conversations/{id}")
     Observable<ResponseBody> updateConversation(@NonNull @Path("id") String id, @Body EditPublicChatRequest request);
@@ -405,6 +407,16 @@ public interface ApiService {
 
     @POST("conversations")
     Observable<ResponseBody> createPublicChat(@Body CreatePublicChatRequest createPublicChatRequest);
+
+    @GET("conversations/{id}/shouts")
+    Observable<ShoutsResponse> conversationShouts(@Path("id") String conversationId,
+                                                  @Query("page") Integer page,
+                                                  @Query("page_size") Integer pageSize);
+
+    @GET("conversations/{id}/media")
+    Observable<ConversationMediaResponse> conversationMedia(@Path("id") String conversationId,
+                                                            @Query("page") Integer page,
+                                                            @Query("page_size") Integer pageSize);
 
     @POST("conversations/{id}/promote_admin")
     Observable<ResponseBody> promoteAdmin(@Path("id") String conversationId, @Body ProfileRequest profileRequest);
