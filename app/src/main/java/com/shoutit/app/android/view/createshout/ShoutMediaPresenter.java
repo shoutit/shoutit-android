@@ -31,6 +31,7 @@ import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func2;
 import rx.functions.FuncN;
+import rx.subscriptions.CompositeSubscription;
 
 public class ShoutMediaPresenter {
 
@@ -142,6 +143,7 @@ public class ShoutMediaPresenter {
 
     private final Context context;
     private final AmazonHelper mAmazonHelper;
+    private final CompositeSubscription mCompositeSubscription = new CompositeSubscription();
 
     @Inject
     public ShoutMediaPresenter(@ForActivity Context context, AmazonHelper amazonHelper) {
@@ -290,12 +292,12 @@ public class ShoutMediaPresenter {
     private void mergeVideoAndImagesObservable(List<Observable<String>> imageObservables, Observable<Video> videoObservable) {
         if (imageObservables.isEmpty()) {
             if (videoObservable != null) {
-                videoObservable.subscribe(new Action1<Video>() {
+                mCompositeSubscription.add(videoObservable.subscribe(new Action1<Video>() {
                     @Override
                     public void call(Video video) {
                         getAllEditedImagesAndComplete(ImmutableList.<String>of(), ImmutableList.of(video));
                     }
-                });
+                }));
             } else {
                 getAllEditedImagesAndComplete(ImmutableList.<String>of(), ImmutableList.<Video>of());
             }
@@ -313,14 +315,14 @@ public class ShoutMediaPresenter {
             });
 
             if (videoObservable == null) {
-                images.subscribe(new Action1<List<String>>() {
+                mCompositeSubscription.add(images.subscribe(new Action1<List<String>>() {
                     @Override
                     public void call(List<String> images) {
                         getAllEditedImagesAndComplete(images, ImmutableList.<Video>of());
                     }
-                });
+                }));
             } else {
-                images.zipWith(
+                mCompositeSubscription.add(images.zipWith(
                         videoObservable, new Func2<List<String>, Video, BothParams<List<String>, Video>>() {
                             @Override
                             public BothParams<List<String>, Video> call(List<String> images, Video video) {
@@ -332,7 +334,7 @@ public class ShoutMediaPresenter {
                             public void call(BothParams<List<String>, Video> listBothParamsBothParams) {
                                 getAllEditedImagesAndComplete(listBothParamsBothParams.param1(), ImmutableList.of(listBothParamsBothParams.param2()));
                             }
-                        });
+                        }));
             }
         }
     }
@@ -372,6 +374,7 @@ public class ShoutMediaPresenter {
 
     public void unregister() {
         mMediaListener = null;
+        mCompositeSubscription.unsubscribe();
     }
 
     public interface MediaListener {
