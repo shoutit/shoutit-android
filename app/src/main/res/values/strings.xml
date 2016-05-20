@@ -552,6 +552,7 @@
     <string name="chat_shouts_no_results">No shouts in this conversation</string>
     <string name="chat_shouts_ab_title">Shouts</string>
     <string name="chat_shouts_title">Conversations Shouts</string>
+    <string name="chat_info_exit_question">Do you want to exit this chat?</string>
     <plurals name="chat_shouts_results">
         <item quantity="one">%d Shout</item>
         <item quantity="other">%d Shouts</item>

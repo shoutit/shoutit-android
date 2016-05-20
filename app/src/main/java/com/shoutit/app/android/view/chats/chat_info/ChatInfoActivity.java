@@ -1,13 +1,14 @@
 package com.shoutit.app.android.view.chats.chat_info;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -25,12 +26,11 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.ImageCaptureHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
-import com.shoutit.app.android.utils.TextWatcherAdapter;
+import com.shoutit.app.android.view.chats.chat_info.chats_participants.ChatParticipantsActivity;
 import com.shoutit.app.android.view.chats.chat_info.chats_users_list.chats_blocked.ChatBlockedUsersActivity;
+import com.shoutit.app.android.view.chats.chat_info.chats_users_list.chats_select.ChatSelectUsersActivity;
 import com.shoutit.app.android.view.chats.chat_media_gallery.ChatMediaGalleryActivity;
 import com.shoutit.app.android.view.chats.chat_shouts.ChatShoutsActivity;
-import com.shoutit.app.android.view.chats.chat_info.chats_participants.ChatParticipantsActivity;
-import com.shoutit.app.android.view.chats.chat_info.chats_users_list.chats_select.ChatSelectUsersActivity;
 import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;
@@ -46,13 +46,14 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
     private static final int REQUEST_IMAGE = 0;
     private static final int REQUEST_CODE_PERMISSION = 1;
     private static final String EXTRA_CONVERSATION_ID = "extra_conversation_id";
+    public static final String EXTRA_CLOSE_CHAT = "extra_close_chat";
 
     @Inject
     Picasso picasso;
     @Inject
     ImageCaptureHelper mImageCaptureHelper;
     @Inject
-    ChatInfoPresenter mCreatePublicChatPresenter;
+    ChatInfoPresenter mChatInfoPresenter;
     @Bind(R.id.chat_info_toolbar)
     Toolbar mChatInfoToolbar;
     @Bind(R.id.chat_info_avatar)
@@ -121,27 +122,19 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
             }
         });
 
-        mCreatePublicChatPresenter.register(this);
-
-        mChatInfoSubject.addTextChangedListener(new TextWatcherAdapter() {
-            @Override
-            public void afterTextChanged(Editable s) {
-                super.afterTextChanged(s);
-                mCreatePublicChatPresenter.onTextChanged();
-            }
-        });
+        mChatInfoPresenter.register(this);
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
-        mCreatePublicChatPresenter.refreshCounts();
+        mChatInfoPresenter.refreshCounts();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mCreatePublicChatPresenter.unregister();
+        mChatInfoPresenter.unregister();
     }
 
     @Nonnull
@@ -198,7 +191,7 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE) {
-            mCreatePublicChatPresenter.onImageActivityFinished(resultCode, data);
+            mChatInfoPresenter.onImageActivityFinished(resultCode, data);
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
@@ -212,6 +205,12 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
     @Override
     public String getSubject() {
         return mChatInfoSubject.getText().toString();
+    }
+
+    @Override
+    public void finishScreen(boolean closeChat) {
+        setResult(RESULT_OK, new Intent().putExtra(EXTRA_CLOSE_CHAT, closeChat));
+        finish();
     }
 
     @Override
@@ -254,11 +253,7 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
     @Override
     public void showSubject(boolean show) {
         mChatInfoSubjectLayout.setVisibility(show ? View.VISIBLE : View.GONE);
-    }
-
-    @Override
-    public void showSaveButton() {
-        mChatInfoEditSave.setVisibility(View.VISIBLE);
+        mChatInfoEditSave.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -278,12 +273,28 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
 
     @OnClick(R.id.chat_info_edit_save)
     void saveClick() {
-        mCreatePublicChatPresenter.saveClicked();
+        mChatInfoPresenter.saveClicked();
     }
 
     @OnClick(R.id.chat_info_exit_chat)
     void exitClick() {
-        mCreatePublicChatPresenter.exitChatClicked();
+        final AlertDialog alertDialog = new AlertDialog.Builder(this)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mChatInfoPresenter.exitChatClicked();
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .setMessage(getString(R.string.chat_info_exit_question))
+                .create();
+        alertDialog.show();
     }
 
     @OnClick(R.id.chat_info_avatar)
@@ -292,7 +303,7 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
             return;
         }
 
-        mCreatePublicChatPresenter.selectImageClicked();
+        mChatInfoPresenter.selectImageClicked();
     }
 
     @OnClick(R.id.chat_info_shouts_cell)
