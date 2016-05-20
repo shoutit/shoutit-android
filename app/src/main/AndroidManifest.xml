@@ -281,6 +281,7 @@
         <activity android:name=".view.chats.chat_info.chats_participants.ChatParticipantsActivity"
                   android:screenOrientation="portrait"/>
         <activity android:name=".view.chats.public_chat.CreatePublicChatActivity"
+                  android:windowSoftInputMode="adjustPan"
                   android:screenOrientation="portrait"/>
         <activity android:name=".view.chats.chat_info.chats_users_list.chats_blocked.ChatBlockedUsersActivity"
                   android:screenOrientation="portrait"/>
