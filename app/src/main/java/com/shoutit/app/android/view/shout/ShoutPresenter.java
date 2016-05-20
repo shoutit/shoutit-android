@@ -328,7 +328,7 @@ public class ShoutPresenter {
                     }
                 });
 
-        final Observable<Object> refreshRelatedShouts= shoutsGlobalRefreshPresenter.getShoutsGlobalRefreshObservable()
+        final Observable<Object> refreshRelatedShouts = shoutsGlobalRefreshPresenter.getShoutsGlobalRefreshObservable()
                 .map(new Func1<Object, Object>() {
                     @Override
                     public Object call(Object o) {
@@ -450,18 +450,22 @@ public class ShoutPresenter {
     public Observable<Boolean> getEditShoutClickedObservable() {
         return editShoutClickedObservable;
     }
+
     @Nonnull
     public Observable<Object> getOnlyForLoggedInUserObservable() {
         return onlyForLoggedInUserObservable;
     }
+
     @Nonnull
     public Observable<String> getVideoCallClickedObservable() {
         return videoCallClickedObservable;
     }
+
     @Nonnull
     public Observer<Object> getVideoOrEditClickSubject() {
         return RxMoreObservers.ignoreCompleted(onVideoOrEditClickSubject);
     }
+
     @Nonnull
     public Observable<Object> getRefreshShoutsObservable() {
         return refreshShoutsObservable;
@@ -521,7 +525,7 @@ public class ShoutPresenter {
     @Nonnull
     public Observable<BottomBarData> getIsUserShoutOwnerObservable() {
         return allAdapterItemsObservable
-                .first()
+                .take(1)
                 .flatMap(new Func1<List<BaseAdapterItem>, Observable<BottomBarData>>() {
                     @Override
                     public Observable<BottomBarData> call(List<BaseAdapterItem> baseAdapterItems) {
