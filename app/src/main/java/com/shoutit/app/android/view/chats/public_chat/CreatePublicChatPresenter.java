@@ -97,7 +97,7 @@ public class CreatePublicChatPresenter {
                                     return mApiService.createPublicChat(new CreatePublicChatRequest(
                                             data.subject,
                                             url,
-                                            new UserLocationSimple(location.getLatitude(), location.getLongitude())))
+                                            location == null ? null : new UserLocationSimple(location.getLatitude(), location.getLongitude())))
                                             .subscribeOn(mNetworkScheduler)
                                             .observeOn(mUiScheduler);
                                 }
