@@ -45,7 +45,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/black_87"
-            tools:text="phillip Jenkins"/>
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:lines="1"
+            tools:text="phillip Jenkins dsjfdns,jfnds,fnsd dsjfdsjkfsd dsfdsfsd  dsjfhsdf"/>
 
         <TextView
             android:fontFamily="@string/font_roboto_regular"
@@ -57,7 +60,7 @@
             android:layout_height="wrap_content"
             android:lines="1"
             android:ellipsize="end"
-            tools:text="this is a sample message."/>
+            tools:text="this is a sample message. sdfdsfdsf dsfhsdjf sdhfs dfsdh fgsdhfgsdhjfgdsf"/>
 
     </LinearLayout>
 

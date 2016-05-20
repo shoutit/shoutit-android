@@ -4,6 +4,7 @@ import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.UiScheduler;
+import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
@@ -38,7 +39,7 @@ public class SelectProfilePresenter {
     @Nonnull
     private final Observable<Boolean> progressObservable;
 
-    private PublishSubject<String> profileSelectedSubject = PublishSubject.create();
+    private PublishSubject<BothParams<String, String>> profileSelectedSubject = PublishSubject.create();
     private PublishSubject<Object> loadMoreListenings = PublishSubject.create();
     private PublishSubject<Object> loadMoreListeners = PublishSubject.create();
 
@@ -113,7 +114,7 @@ public class SelectProfilePresenter {
         return errorObservable;
     }
 
-    public Observable<String> getProfileSelectedObservable() {
+    public Observable<BothParams<String, String>> getProfileSelectedObservable() {
         return profileSelectedSubject;
     }
 

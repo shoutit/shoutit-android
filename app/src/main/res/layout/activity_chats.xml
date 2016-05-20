@@ -207,7 +207,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="?selectableItemBackgroundBorderless"
-                    android:src="@drawable/video_attachment"/>
+                    android:src="@drawable/ic_attachment_profile"/>
 
                 <TextView
                     android:layout_width="wrap_content"

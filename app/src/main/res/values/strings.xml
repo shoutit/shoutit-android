@@ -403,6 +403,13 @@
     <string name="chats_empty">No messages.</string>
     <string name="chat_menu_delete">Delete Conversation</string>
     <string name="chats_chat_info">Chat Info</string>
+    <string name="chat_picture_confirmation">Are you sure you want to attach picture?</string>
+    <string name="chat_video_confirmation">Are you sure you want to attach video?</string>
+    <string name="chat_location_confirmation">Are you sure you want to attach location?</string>
+    <string name="chat_shout_confirmation">Are you sure you want to attach shout?</string>
+    <string name="chat_profile_confirmation">Are you sure you want to attach %1$s?</string>
+    <string name="chat_dialog_attach">Attach</string>
+    <string name="chat_dialog_title">Confirmation</string>
 
     <!-- Notifications -->
     <string name="notifications_title">Notifications</string>
@@ -552,6 +559,7 @@
     <string name="chat_shouts_no_results">No shouts in this conversation</string>
     <string name="chat_shouts_ab_title">Shouts</string>
     <string name="chat_shouts_title">Conversations Shouts</string>
+
     <plurals name="chat_shouts_results">
         <item quantity="one">%d Shout</item>
         <item quantity="other">%d Shouts</item>
