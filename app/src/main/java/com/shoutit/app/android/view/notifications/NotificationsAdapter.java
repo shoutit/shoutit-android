@@ -3,6 +3,7 @@ package com.shoutit.app.android.view.notifications;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
@@ -63,18 +64,10 @@ public class NotificationsAdapter extends BaseAdapter {
 
         private NotificationsPresenter.NotificationAdapterItem item;
         private final Target target;
-        private final StyleSpan boldedName;
-        private final ForegroundColorSpan colorSpan;
-        private final TypefaceSpan typefaceSpan;
 
         public NotificationViewHolder(@Nonnull View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-
-            boldedName = new StyleSpan(Typeface.BOLD);
-            colorSpan = new ForegroundColorSpan(context.getResources().getColor(R.color.black_87));
-            typefaceSpan = new TypefaceSpan("sans-serif-medium");
-
             target = PicassoHelper.getRoundedBitmapTarget(context, avatarImageView,
                     context.getResources().getDimensionPixelSize(R.dimen.notifications_avatar_corners));
         }
@@ -108,9 +101,10 @@ public class NotificationsAdapter extends BaseAdapter {
                 final int start = range.getOffset();
                 final int end = start + range.getLength();
 
-                spannableString.setSpan(boldedName, start, end, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-                spannableString.setSpan(typefaceSpan, start, end, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-                spannableString.setSpan(colorSpan, start, end, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                spannableString.setSpan(new StyleSpan(Typeface.BOLD), start, end, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                spannableString.setSpan(new TypefaceSpan("sans-serif-medium"), start, end, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                spannableString.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.black_87))
+                        , start, end, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
             }
 
             return spannableString;
