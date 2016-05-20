@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.chats.chat_info.chats_blocked;
+package com.shoutit.app.android.view.chats.chat_info.chats_users_list.chats_blocked;
 
 import android.content.Context;
 import android.content.Intent;
@@ -16,7 +16,10 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
-import com.shoutit.app.android.view.chats.chat_info.chats_participants.DaggerChatParticipantsComponent;
+import com.shoutit.app.android.view.chats.chat_info.chats_users_list.ChatUsersListAdapter;
+import com.shoutit.app.android.view.chats.chat_info.chats_users_list.ChatUsersListComponent;
+import com.shoutit.app.android.view.chats.chat_info.chats_users_list.ChatUsersListModule;
+import com.shoutit.app.android.view.chats.chat_info.chats_users_list.DaggerChatUsersListComponent;
 
 import java.util.List;
 
@@ -39,7 +42,7 @@ public class ChatBlockedUsersActivity extends BaseActivity implements ChatBlocke
     View mProgress;
 
     @Inject
-    ChatBlockedUsersAdapter adapter;
+    ChatUsersListAdapter adapter;
 
     @Inject
     ChatBlockedUsersPresenter mChatParticipantsPresenter;
@@ -83,10 +86,10 @@ public class ChatBlockedUsersActivity extends BaseActivity implements ChatBlocke
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
         final String conversationId = getIntent().getStringExtra(EXTRA_CONVERSATION_ID);
-        final ChatBlockedUsersComponent build = DaggerChatBlockedUsersComponent.builder()
+        final ChatUsersListComponent build = DaggerChatUsersListComponent.builder()
                 .appComponent(App.getAppComponent(getApplication()))
                 .activityModule(new ActivityModule(this))
-                .chatBlockedUsersModule(new ChatBlockedUsersModule(conversationId))
+                .chatUsersListModule(new ChatUsersListModule(conversationId))
                 .build();
         build.inject(this);
         return build;
