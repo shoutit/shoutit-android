@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.chats.chat_info;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
@@ -21,6 +22,8 @@ import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.DateTimeUtils;
 import com.shoutit.app.android.utils.ImageCaptureHelper;
+import com.shoutit.app.android.view.chats.ChatsMediaHelper;
+import com.shoutit.app.android.view.media.MediaUtils;
 
 import java.io.File;
 import java.util.List;
@@ -52,6 +55,7 @@ public class ChatInfoPresenter {
     private final String mConversationId;
     @NonNull
     private final Resources mResources;
+    private final Context mContext;
     private final String mId;
     private final CompositeSubscription mCompositeSubscription = new CompositeSubscription();
 
@@ -63,7 +67,8 @@ public class ChatInfoPresenter {
                              @NonNull AmazonHelper amazonHelper,
                              @NonNull String conversationId,
                              @NonNull UserPreferences userPreferences,
-                             @NonNull @ForActivity Resources resources) {
+                             @NonNull @ForActivity Resources resources,
+                             @ForActivity Context context) {
         mImageCaptureHelper = imageCaptureHelper;
         mApiService = apiService;
         mNetworkScheduler = networkScheduler;
@@ -71,6 +76,7 @@ public class ChatInfoPresenter {
         mAmazonHelper = amazonHelper;
         mConversationId = conversationId;
         mResources = resources;
+        mContext = context;
 
         final User user = userPreferences.getUser();
         assert user != null;
@@ -98,13 +104,7 @@ public class ChatInfoPresenter {
                     .defer(new Func0<Observable<String>>() {
                         @Override
                         public Observable<String> call() {
-                            if (url != null) {
-                                return mAmazonHelper.uploadGroupChatObservable(new File(url.toString()))
-                                        .subscribeOn(mNetworkScheduler)
-                                        .observeOn(mUiScheduler);
-                            } else {
-                                return Observable.just(null);
-                            }
+                            return ChatsMediaHelper.uploadChatImage(mAmazonHelper, url, mContext, mNetworkScheduler, mUiScheduler);
                         }
                     })
                     .subscribeOn(mNetworkScheduler)

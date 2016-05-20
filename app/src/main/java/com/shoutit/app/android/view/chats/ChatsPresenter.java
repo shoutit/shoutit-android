@@ -36,7 +36,6 @@ import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
 import com.shoutit.app.android.utils.pusher.TypingInfo;
 import com.shoutit.app.android.view.chats.message_models.TypingItem;
-import com.shoutit.app.android.view.conversations.ConversationsUtils;
 
 import java.util.List;
 
@@ -162,6 +161,8 @@ public class ChatsPresenter {
                 .subscribe(new Action1<ConversationDetails>() {
                     @Override
                     public void call(ConversationDetails conversationResponse) {
+                        final ConversationDetails.Display display = conversationResponse.getDisplay();
+                        mListener.setToolbarInfo(display.getTitle(), display.getSubTitle());
                         if (conversationResponse.isShoutChat()) {
                             final AboutShout about = conversationResponse.getAbout();
                             final String id = about.getId();
@@ -173,13 +174,8 @@ public class ChatsPresenter {
                                 final String price = PriceUtils.formatPriceWithCurrency(about.getPrice(), mResources, about.getCurrency());
                                 final String authorAndTime = about.getProfile().getName() + " - " + DateUtils.getRelativeTimeSpanString(mContext, about.getDatePublished() * 1000);
                                 mListener.setAboutShoutData(title, thumbnail, type, price, authorAndTime, id);
-                                mListener.setShoutToolbarInfo(title, ConversationsUtils.getChatWithString(conversationResponse.getProfiles(), user.getId()));
                                 mListener.showVideoChatIcon();
-                            } else {
-                                mListener.setShoutToolbarInfo(mContext.getString(R.string.chat_shout_chat), ConversationsUtils.getChatWithString(conversationResponse.getProfiles(), user.getId()));
                             }
-                        } else {
-                            mListener.setChatToolbarInfo(ConversationsUtils.getChatWithString(conversationResponse.getProfiles(), user.getId()));
                         }
                         setupUserForVideoChat(conversationResponse.getProfiles());
                     }

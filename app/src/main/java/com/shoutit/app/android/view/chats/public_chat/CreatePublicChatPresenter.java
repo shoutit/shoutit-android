@@ -22,9 +22,8 @@ import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.ImageCaptureHelper;
 import com.shoutit.app.android.utils.ResourcesHelper;
+import com.shoutit.app.android.view.chats.ChatsMediaHelper;
 import com.shoutit.app.android.view.createshout.location.LocationResultHelper;
-
-import java.io.File;
 
 import javax.inject.Inject;
 
@@ -95,13 +94,7 @@ public class CreatePublicChatPresenter {
                             .flatMap(new Func1<User, Observable<String>>() {
                                 @Override
                                 public Observable<String> call(User user) {
-                                    if (state.url != null) {
-                                        return mAmazonHelper.uploadGroupChatObservable(new File(state.url.toString()))
-                                                .subscribeOn(mNetworkScheduler)
-                                                .observeOn(mUiScheduler);
-                                    } else {
-                                        return Observable.just(null);
-                                    }
+                                    return ChatsMediaHelper.uploadChatImage(mAmazonHelper, state.url, mContext, mNetworkScheduler, mUiScheduler);
                                 }
                             })
                             .flatMap(new Func1<String, Observable<ResponseBody>>() {
