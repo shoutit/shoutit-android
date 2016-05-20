@@ -10,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.appunite.rx.functions.BothParams;
 import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
@@ -29,6 +30,7 @@ import rx.functions.Action1;
 public class SelectProfileActivity extends BaseActivity {
 
     public static final String RESULT_PROFILE_ID = "result_profile_id";
+    public static final String RESULT_PROFILE_NAME = "result_profile_name";
 
     @Bind(R.id.select_profile_toolbar)
     Toolbar toolbar;
@@ -68,11 +70,13 @@ public class SelectProfileActivity extends BaseActivity {
                 .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(this)));
 
         presenter.getProfileSelectedObservable()
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
+                .compose(this.<BothParams<String,String>>bindToLifecycle())
+                .subscribe(new Action1<BothParams<String, String>>() {
                     @Override
-                    public void call(String selectedProfileId) {
-                        setResult(RESULT_OK, new Intent().putExtra(RESULT_PROFILE_ID, selectedProfileId));
+                    public void call(BothParams<String, String> profileIdAndName) {
+                        setResult(RESULT_OK, new Intent()
+                                .putExtra(RESULT_PROFILE_ID, profileIdAndName.param1())
+                                .putExtra(RESULT_PROFILE_NAME, profileIdAndName.param2()));
                         finish();
                     }
                 });

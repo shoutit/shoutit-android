@@ -361,22 +361,26 @@ public class ChatActivity extends BaseActivity implements Listener {
 
     @OnClick(R.id.chats_attatchments_profile)
     void onProfileClicked() {
+        hideAttatchentsMenu();
         startActivityForResult(SelectProfileActivity.newIntent(this), SELECT_PROFILE_REQUEST_CODE);
     }
 
     @OnClick(R.id.chats_attatchments_media)
     void onMediaClicked() {
+        hideAttatchentsMenu();
         startActivityForResult(RecordMediaActivity.newIntent(this, true, true, true, false), REQUEST_ATTACHMENT);
     }
 
     @OnClick(R.id.chats_attatchments_shout)
     void shoutClicked() {
+        hideAttatchentsMenu();
         startActivityForResult(SelectShoutActivity.newIntent(ChatActivity.this), SELECT_SHOUT_REQUEST_CODE);
     }
 
     @OnClick(R.id.chats_attatchments_location)
     void locationClicked() {
         try {
+            hideAttatchentsMenu();
             startActivityForResult(new PlacePicker.IntentBuilder().build(this), REQUEST_LOCATION);
         } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
             ColoredSnackBar.error(ColoredSnackBar.contentView(this), R.string.error_default, Snackbar.LENGTH_SHORT).show();
@@ -403,24 +407,62 @@ public class ChatActivity extends BaseActivity implements Listener {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
         if (requestCode == REQUEST_ATTACHMENT && resultCode == RESULT_OK) {
+
             final Bundle extras = data.getExtras();
             final boolean isVideo = extras.getBoolean(RecordMediaActivity.EXTRA_IS_VIDEO);
             final String media = extras.getString(RecordMediaActivity.EXTRA_MEDIA);
             checkNotNull(media);
-            presenter.addMedia(media, isVideo);
+
+            final String dialogText = getString(isVideo ?
+                    R.string.chat_video_confirmation :
+                    R.string.chat_picture_confirmation);
+
+            showShareConfirmationDialog(dialogText, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    presenter.addMedia(media, isVideo);
+                }
+            });
         } else if (requestCode == REQUEST_LOCATION && resultCode == RESULT_OK) {
+
             final Place place = PlacePicker.getPlace(this, data);
             final LatLng latLng = place.getLatLng();
-            presenter.sendLocation(latLng.latitude, latLng.longitude);
+
+            final String dialogText = getString(R.string.chat_location_confirmation);
+
+            showShareConfirmationDialog(dialogText, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    presenter.sendLocation(latLng.latitude, latLng.longitude);
+                }
+            });
         } else if (requestCode == SELECT_SHOUT_REQUEST_CODE && resultCode == RESULT_OK) {
-            final String shoutId = data.getStringExtra(SelectShoutActivity.RESULT_SHOUT_ID);
-            presenter.sendShout(shoutId);
+
+            final String dialogText = getString(R.string.chat_shout_confirmation);
+            showShareConfirmationDialog(dialogText, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    final String shoutId = data.getStringExtra(SelectShoutActivity.RESULT_SHOUT_ID);
+                    presenter.sendShout(shoutId);
+                }
+            });
         } else if (requestCode == SELECT_PROFILE_REQUEST_CODE && resultCode == RESULT_OK) {
+
             final String profileId = data.getStringExtra(SelectProfileActivity.RESULT_PROFILE_ID);
+            final String profileName = data.getStringExtra(SelectProfileActivity.RESULT_PROFILE_NAME);
+            final String dialogText = getString(R.string.chat_profile_confirmation, profileName);
+
+            showShareConfirmationDialog(dialogText, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    presenter.sendProfile(profileId);
+                }
+            });
             presenter.sendProfile(profileId);
         } else if (requestCode == INFO_REQUEST && resultCode == RESULT_OK) {
+
             final boolean closeChat = data.getBooleanExtra(ChatInfoActivity.EXTRA_CLOSE_CHAT, false);
             if (closeChat) {
                 finish();
@@ -428,5 +470,24 @@ public class ChatActivity extends BaseActivity implements Listener {
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    private void showShareConfirmationDialog(@Nonnull String text,
+                                             @Nonnull DialogInterface.OnClickListener positiveButtonListener) {
+        if (isFinishing()) {
+            return;
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.chat_dialog_title)
+                .setMessage(text)
+                .setPositiveButton(R.string.chat_dialog_attach, positiveButtonListener)
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .show();
     }
 }
