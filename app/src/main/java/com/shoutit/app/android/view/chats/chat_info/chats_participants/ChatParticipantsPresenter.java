@@ -10,7 +10,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
-import com.shoutit.app.android.api.model.Conversation;
+import com.shoutit.app.android.api.model.ConversationDetails;
 import com.shoutit.app.android.api.model.ConversationProfile;
 import com.shoutit.app.android.api.model.ProfileRequest;
 import com.shoutit.app.android.api.model.User;
@@ -62,9 +62,9 @@ public class ChatParticipantsPresenter {
         mCompositeSubscription.add(mApiService.getConversation(mConversationId)
                 .observeOn(mUiScheduler)
                 .subscribeOn(mNetworkScheduler)
-                .subscribe(new Action1<Conversation>() {
+                .subscribe(new Action1<ConversationDetails>() {
                     @Override
-                    public void call(final Conversation conversation) {
+                    public void call(final ConversationDetails conversation) {
                         final boolean isUserAdmin = conversation.getAdmins().contains(mId);
 
                         final List<ConversationProfile> profiles = conversation.getProfiles();
@@ -81,7 +81,7 @@ public class ChatParticipantsPresenter {
                 }));
     }
 
-    private ImmutableList<BaseAdapterItem> getBaseAdapterItems(final Conversation conversation, final boolean isUserAdmin, List<ConversationProfile> profiles) {
+    private ImmutableList<BaseAdapterItem> getBaseAdapterItems(final ConversationDetails conversation, final boolean isUserAdmin, List<ConversationProfile> profiles) {
         return ImmutableList.copyOf(Iterables.transform(profiles, new Function<ConversationProfile, BaseAdapterItem>() {
             @Nullable
             @Override
@@ -98,7 +98,7 @@ public class ChatParticipantsPresenter {
     }
 
     @NonNull
-    private ProfileItem getProfileItem(@Nullable ConversationProfile input, Conversation conversation, ProfileItem.OnItemClicked onItemClicked) {
+    private ProfileItem getProfileItem(@Nullable ConversationProfile input, ConversationDetails conversation, ProfileItem.OnItemClicked onItemClicked) {
         assert input != null;
 
         final String id = input.getId();

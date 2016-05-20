@@ -25,6 +25,9 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.ImageCaptureHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.TextWatcherAdapter;
+import com.shoutit.app.android.view.chats.chat_media_gallery.ChatMediaGalleryActivity;
+import com.shoutit.app.android.view.chats.chat_shouts.ChatShoutsActivity;
+import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsActivity;
 import com.shoutit.app.android.view.chats.chat_info.chats_blocked.ChatBlockedUsersActivity;
 import com.shoutit.app.android.view.chats.chat_info.chats_participants.ChatParticipantsActivity;
 import com.squareup.picasso.Picasso;
@@ -79,6 +82,8 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
     Button mChatInfoEditSave;
     private String mConversationId;
 
+    private String conversationId;
+
     public static Intent newIntent(@NonNull Context context, @NonNull String conversationId) {
         return new Intent(context, ChatInfoActivity.class)
                 .putExtra(EXTRA_CONVERSATION_ID, conversationId);
@@ -89,6 +94,8 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.chat_info_activity);
         ButterKnife.bind(this);
+
+        conversationId = getIntent().getStringExtra(EXTRA_CONVERSATION_ID);
 
         mChatInfoToolbar.setTitle(R.string.chat_info_title);
         mChatInfoToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
@@ -274,6 +281,16 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
         mCreatePublicChatPresenter.selectImageClicked();
     }
 
+    @OnClick(R.id.chat_info_shouts_cell)
+    public void onShoutsClick() {
+        startActivity(ChatShoutsActivity.newIntent(this, conversationId));
+    }
+
+    @OnClick(R.id.chat_info_media_cell)
+    public void onMediaClick() {
+        startActivity(ChatMediaGalleryActivity.newIntent(this, conversationId));
+    }
+
     @OnClick(R.id.chat_info_participants_layouts)
     void clickParticipants() {
         startActivity(ChatParticipantsActivity.newIntent(this, mConversationId));
@@ -283,5 +300,4 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
     void clickBlocked() {
         startActivity(ChatBlockedUsersActivity.newIntent(this, mConversationId));
     }
-
 }

@@ -181,13 +181,13 @@ public class ChatInfoPresenter {
 
     public void refreshCounts() {
         mCompositeSubscription.add(getConversationObservable()
-                .subscribe(new Action1<Conversation>() {
+                .subscribe(new Action1<ConversationDetails>() {
                     @Override
-                    public void call(Conversation conversation) {
+                    public void call(ConversationDetails conversation) {
                         listener.setParticipantsCount(conversation.getProfiles().size());
                         listener.setBlockedCount(conversation.getBlocked().size());
 
-                        final Conversation.AttatchmentCount attachmentsCount = conversation.getAttachmentsCount();
+                        final ConversationDetails.AttatchmentCount attachmentsCount = conversation.getAttachmentsCount();
                         listener.setMediaCount(attachmentsCount.getMedia());
                         listener.setShoutsCount(attachmentsCount.getShout());
                     }
@@ -199,7 +199,7 @@ public class ChatInfoPresenter {
                 }));
     }
 
-    private Observable<Conversation> getConversationObservable() {
+    private Observable<ConversationDetails> getConversationObservable() {
         return mApiService.getConversation(mConversationId)
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler);

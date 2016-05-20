@@ -1,4 +1,4 @@
-include ':app', ':rx-extensions', ':rx-android-extensions', ":FFmpegAndroid", ":appuniteGcm"
+include ':app', ':rx-extensions', ':rx-android-extensions', ":FFmpegAndroid", ":appuniteGcm", ":ScrollViewGallery"
 
 project(':rx-android-extensions').projectDir = new File('rx-java-extensions/rx-android-extensions')
 project(':rx-extensions').projectDir = new File('rx-java-extensions/rx-extensions')

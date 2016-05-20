@@ -10,8 +10,9 @@ import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
-import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
+import com.shoutit.app.android.adapteritems.NoDataTextAdapterItem;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
@@ -126,7 +127,7 @@ public class SearchShoutsResultsPresenter {
                     @Override
                     public List<BaseAdapterItem> call(ShoutsResponse shoutsResponse) {
                         if (shoutsResponse.getShouts().isEmpty()) {
-                            return ImmutableList.<BaseAdapterItem>of(new NoDataAdapterItem());
+                            return ImmutableList.<BaseAdapterItem>of(new NoDataTextAdapterItem(context.getString(R.string.search_results_no_results)));
                         } else {
                             final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
                             builder.addAll(Lists.transform(shoutsResponse.getShouts(), new Function<Shout, BaseAdapterItem>() {

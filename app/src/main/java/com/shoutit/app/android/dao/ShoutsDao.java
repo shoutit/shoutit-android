@@ -56,6 +56,8 @@ public class ShoutsDao {
     private final LoadingCache<TagShoutsPointer, TagShoutsDao> tagsShoutsCache;
     @Nonnull
     private final LoadingCache<SearchShoutPointer, SearchShoutsDao> searchShoutCache;
+    @Nonnull
+    private final LoadingCache<String, ConversationsShoutsDao> conversationShoutsCache;
 
     public ShoutsDao(@Nonnull final ApiService apiService,
                      @Nonnull @NetworkScheduler final Scheduler networkScheduler,
@@ -109,6 +111,14 @@ public class ShoutsDao {
                     @Override
                     public SearchShoutsDao load(@Nonnull SearchShoutPointer key) throws Exception {
                         return new SearchShoutsDao(key);
+                    }
+                });
+
+        conversationShoutsCache = CacheBuilder.newBuilder()
+                .build(new CacheLoader<String, ConversationsShoutsDao>() {
+                    @Override
+                    public ConversationsShoutsDao load(@Nonnull String conversationId) throws Exception {
+                        return new ConversationsShoutsDao(networkScheduler, conversationId);
                     }
                 });
     }
@@ -191,6 +201,11 @@ public class ShoutsDao {
     @Nonnull
     public Observable<Response<Object>> getReportShoutObservable(@Nonnull String shoutId) {
         return shoutCache.getUnchecked(shoutId).getReportShoutResponseObservable();
+    }
+
+    @Nonnull
+    public ConversationsShoutsDao getConversationsShoutsDao(@Nonnull String conversationId) {
+        return conversationShoutsCache.getUnchecked(conversationId);
     }
 
     public class HomeShoutsDao extends BaseShoutsDao {
@@ -323,6 +338,24 @@ public class ShoutsDao {
         Observable<ShoutsResponse> getShoutsRequest(int pageNumber) {
             return apiService
                     .shoutsForUser(pointer.getUserName(), pageNumber, pointer.getPageSize());
+        }
+    }
+
+    public class ConversationsShoutsDao extends BaseShoutsDao {
+
+        @Nonnull
+        private final String conversationId;
+
+        public ConversationsShoutsDao(@Nonnull @NetworkScheduler Scheduler networkScheduler,
+                                      @Nonnull String conversationId) {
+            super(networkScheduler);
+            this.conversationId = conversationId;
+        }
+
+        @Nonnull
+        @Override
+        Observable<ShoutsResponse> getShoutsRequest(int pageNumber) {
+            return apiService.conversationShouts(conversationId, pageNumber, PAGE_SIZE);
         }
     }
 

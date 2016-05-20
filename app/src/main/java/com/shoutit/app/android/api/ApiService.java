@@ -8,6 +8,7 @@ import com.shoutit.app.android.api.model.CallerProfile;
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.ChangePasswordRequest;
 import com.shoutit.app.android.api.model.Conversation;
+import com.shoutit.app.android.api.model.ConversationMediaResponse;
 import com.shoutit.app.android.api.model.ConversationDetails;
 import com.shoutit.app.android.api.model.ConversationsResponse;
 import com.shoutit.app.android.api.model.CreateOfferShoutWithImageRequest;
@@ -403,6 +404,16 @@ public interface ApiService {
 
     @POST("conversations")
     Observable<ResponseBody> createPublicChat(@Body CreatePublicChatRequest createPublicChatRequest);
+
+    @GET("conversations/{id}/shouts")
+    Observable<ShoutsResponse> conversationShouts(@Path("id") String conversationId,
+                                                  @Query("page") Integer page,
+                                                  @Query("page_size") Integer pageSize);
+
+    @GET("conversations/{id}/media")
+    Observable<ConversationMediaResponse> conversationMedia(@Path("id") String conversationId,
+                                                            @Query("page") Integer page,
+                                                            @Query("page_size") Integer pageSize);
 
     @POST("conversations/{id}/promote_admin")
     Observable<ResponseBody> promoteAdmin(@Path("id") String conversationId, @Body ProfileRequest profileRequest);
