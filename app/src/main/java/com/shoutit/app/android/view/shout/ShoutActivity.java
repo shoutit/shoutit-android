@@ -43,6 +43,7 @@ import com.shoutit.app.android.utils.ImageHelper;
 import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.RtlUtils;
+import com.shoutit.app.android.view.ReportDialog;
 import com.shoutit.app.android.view.chats.ChatActivity;
 import com.shoutit.app.android.view.chats.chatsfirstconversation.ChatFirstConversationActivity;
 import com.shoutit.app.android.view.conversations.ConversationsActivity;
@@ -363,30 +364,12 @@ public class ShoutActivity extends BaseActivity {
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-
-                final EditText editText = new EditText(ShoutActivity.this);
-                editText.setHint(R.string.report_dialog_hint);
-
-                final int spacing = getResources().getDimensionPixelOffset(R.dimen.activity_horizontal_margin);
-                new AlertDialog.Builder(ShoutActivity.this)
-                        .setTitle(R.string.shout_bottom_bar_report)
-                        .setView(editText, spacing, spacing / 2, spacing, spacing / 2)
-                        .setPositiveButton(getString(R.string.send_report_positive_button), new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                final String reportBody = editText.getText().toString();
-                                if (Strings.isNullOrEmpty(reportBody)) {
-                                    editText.setError(getString(R.string.report_dialog_empty_error));
-                                    dialog.dismiss();
-                                    return;
-                                }
-
-                                presenter.sendReportObserver().onNext(reportBody);
-                                dialog.dismiss();
-                            }
-                        })
-                        .setNegativeButton(getString(R.string.dialog_cancel_button), null)
-                        .show();
+                ReportDialog.show(ShoutActivity.this, new Action1<String>() {
+                    @Override
+                    public void call(String reportBody) {
+                        presenter.sendReportObserver().onNext(reportBody);
+                    }
+                });
 
                 return true;
             }

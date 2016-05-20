@@ -14,39 +14,37 @@ public class ReportBody {
     }
 
     public static ReportBody forShout(String id, String body) {
-        return new ReportBody(body, new AttachedObject(null, new Shout(id)));
+        return new ReportBody(body, new AttachedObject(null, new NestedObject(id), null));
     }
 
     public static ReportBody forProfile(String id, String body) {
-        return new ReportBody(body, new AttachedObject(new Profile(id), null));
+        return new ReportBody(body, new AttachedObject(new NestedObject(id), null, null));
+    }
+
+    public static ReportBody forConversation(String id, String body) {
+        return new ReportBody(body, new AttachedObject(null, null, new NestedObject(id)));
     }
 
     static class AttachedObject {
         @Nullable
-        private final Profile profile;
+        private final NestedObject profile;
         @Nullable
-        private final Shout shout;
+        private final NestedObject shout;
+        @Nullable
+        private final NestedObject conversation;
 
-        AttachedObject(@Nullable Profile profile, @Nullable Shout shout) {
+        AttachedObject(@Nullable NestedObject profile, @Nullable NestedObject shout, @Nullable NestedObject conversation) {
             this.profile = profile;
             this.shout = shout;
+            this.conversation = conversation;
         }
     }
 
-    static class Profile {
+    static class NestedObject {
         @Nonnull
         private final String id;
 
-        Profile(@Nonnull String id) {
-            this.id = id;
-        }
-    }
-
-    static class Shout {
-        @Nonnull
-        private final String id;
-
-        Shout(@Nonnull String id) {
+        NestedObject(@Nonnull String id) {
             this.id = id;
         }
     }

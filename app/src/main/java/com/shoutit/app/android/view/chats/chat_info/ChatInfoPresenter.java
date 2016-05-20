@@ -19,19 +19,19 @@ import com.shoutit.app.android.api.model.ConversationDetails;
 import com.shoutit.app.android.api.model.EditPublicChatRequest;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.model.ReportBody;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.DateTimeUtils;
 import com.shoutit.app.android.utils.ImageCaptureHelper;
 import com.shoutit.app.android.view.chats.ChatsMediaHelper;
-import com.shoutit.app.android.view.media.MediaUtils;
 
-import java.io.File;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import okhttp3.ResponseBody;
+import retrofit2.Response;
 import rx.Observable;
 import rx.Scheduler;
 import rx.functions.Action1;
@@ -163,6 +163,7 @@ public class ChatInfoPresenter {
                                 }
                                 listener.setSubject(display.getTitle());
                                 listener.showSubject(conversation.isPublicChat());
+                                listener.showReport(conversation.isPublicChat());
                                 listener.setChatCreatedBy(getCreatedByString(conversation.getCreator().getName()));
                                 listener.setChatCreatedAt(getCreatedAtString(conversation.getCreatedAt()));
                                 listener.showProgress(false);
@@ -248,6 +249,26 @@ public class ChatInfoPresenter {
                 }));
     }
 
+    public void sendReport(String reportBody) {
+        listener.showProgress(true);
+        mCompositeSubscription.add(mApiService.report(ReportBody.forConversation(mConversationId, reportBody))
+                .subscribeOn(mNetworkScheduler)
+                .observeOn(mUiScheduler)
+                .subscribe(new Action1<Response<Object>>() {
+                    @Override
+                    public void call(Response<Object> objectResponse) {
+                        listener.reportSent();
+                        listener.showProgress(false);
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        listener.reportError();
+                        listener.showProgress(false);
+                    }
+                }));
+    }
+
     public interface ChatInfoView {
 
         void showProgress(boolean show);
@@ -285,5 +306,11 @@ public class ChatInfoPresenter {
         void setChatCreatedAt(@NonNull String chatCreatedAt);
 
         void exitChatError();
+
+        void showReport(boolean show);
+
+        void reportSent();
+
+        void reportError();
     }
 }
