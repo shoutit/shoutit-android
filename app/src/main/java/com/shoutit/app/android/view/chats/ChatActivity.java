@@ -75,6 +75,7 @@ public class ChatActivity extends BaseActivity implements Listener {
     private static final int REQUEST_LOCATION = 1;
     private static final int SELECT_SHOUT_REQUEST_CODE = 2;
     private static final int SELECT_PROFILE_REQUEST_CODE = 3;
+    private static final int INFO_REQUEST = 4;
 
     private static final String TAG = ChatActivity.class.getCanonicalName();
 
@@ -174,7 +175,7 @@ public class ChatActivity extends BaseActivity implements Listener {
                         return true;
                     }
                     case R.id.chats_chat_information: {
-                        startActivity(ChatInfoActivity.newIntent(ChatActivity.this, mConversationId));
+                        startActivityForResult(ChatInfoActivity.newIntent(ChatActivity.this, mConversationId), INFO_REQUEST);
                         return true;
                     }
                     default:
@@ -459,6 +460,13 @@ public class ChatActivity extends BaseActivity implements Listener {
                     presenter.sendProfile(profileId);
                 }
             });
+            presenter.sendProfile(profileId);
+        } else if (requestCode == INFO_REQUEST && resultCode == RESULT_OK) {
+
+            final boolean closeChat = data.getBooleanExtra(ChatInfoActivity.EXTRA_CLOSE_CHAT, false);
+            if (closeChat) {
+                finish();
+            }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }

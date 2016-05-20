@@ -16,7 +16,6 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.ConversationDetails;
 import com.shoutit.app.android.api.model.EditPublicChatRequest;
-import com.shoutit.app.android.api.model.ProfileRequest;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.AmazonHelper;
@@ -121,7 +120,7 @@ public class ChatInfoPresenter {
                     .subscribe(new Action1<ResponseBody>() {
                         @Override
                         public void call(ResponseBody responseBody) {
-                            listener.finish();
+                            listener.finishScreen(false);
                         }
                     }, new Action1<Throwable>() {
                         @Override
@@ -225,7 +224,6 @@ public class ChatInfoPresenter {
     public void onImageActivityFinished(int resultCode, Intent data) {
         final Optional<Uri> uriOptional = mImageCaptureHelper.onResult(resultCode, data);
         if (uriOptional.isPresent()) {
-            listener.showSaveButton();
             url = uriOptional.get();
             listener.setImage(url);
         }
@@ -233,13 +231,13 @@ public class ChatInfoPresenter {
 
     public void exitChatClicked() {
         listener.showProgress(true);
-        mCompositeSubscription.add(mApiService.removeProfile(mConversationId, new ProfileRequest(mId))
+        mCompositeSubscription.add(mApiService.deleteConversation(mConversationId)
                 .observeOn(mUiScheduler)
                 .subscribeOn(mNetworkScheduler)
                 .subscribe(new Action1<ResponseBody>() {
                     @Override
                     public void call(ResponseBody responseBody) {
-                        listener.finish();
+                        listener.finishScreen(true);
                     }
                 }, new Action1<Throwable>() {
                     @Override
@@ -248,10 +246,6 @@ public class ChatInfoPresenter {
                         listener.showProgress(false);
                     }
                 }));
-    }
-
-    public void onTextChanged() {
-        listener.showSaveButton();
     }
 
     public interface ChatInfoView {
@@ -268,7 +262,7 @@ public class ChatInfoPresenter {
 
         String getSubject();
 
-        void finish();
+        void finishScreen(boolean closeChat);
 
         void editRequestError();
 
@@ -285,8 +279,6 @@ public class ChatInfoPresenter {
         void isAdmin(boolean isAdmin);
 
         void showSubject(boolean show);
-
-        void showSaveButton();
 
         void setChatCreatedBy(@NonNull String createdBy);
 
