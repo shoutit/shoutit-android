@@ -14,9 +14,9 @@ import com.google.common.base.Strings;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
-import com.shoutit.app.android.api.model.Conversation;
+import com.shoutit.app.android.api.model.ConversationDetails;
 import com.shoutit.app.android.api.model.EditPublicChatRequest;
-import com.shoutit.app.android.api.model.RemoveProfileRequest;
+import com.shoutit.app.android.api.model.ProfileRequest;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.AmazonHelper;
@@ -139,26 +139,25 @@ public class ChatInfoPresenter {
 
     public void register(@NonNull ChatInfoView listener) {
         this.listener = listener;
+        listener.showProgress(true);
         loadConversation();
     }
 
     private void loadConversation() {
-        mCompositeSubscription.add(mApiService.getConversation(mConversationId)
-                .subscribeOn(mNetworkScheduler)
-                .observeOn(mUiScheduler)
+        mCompositeSubscription.add(getConversationObservable()
                 .subscribe(
-                        new Action1<Conversation>() {
+                        new Action1<ConversationDetails>() {
                             @Override
-                            public void call(Conversation conversation) {
+                            public void call(ConversationDetails conversation) {
                                 isAdmin = isAdmin(conversation.getAdmins());
 
                                 listener.isAdmin(isAdmin);
-                                final Conversation.AttatchmentCount attachmentsCount = conversation.getAttachmentsCount();
+                                final ConversationDetails.AttatchmentCount attachmentsCount = conversation.getAttachmentsCount();
                                 listener.setParticipantsCount(conversation.getProfiles().size());
                                 listener.setBlockedCount(conversation.getBlocked().size());
                                 listener.setMediaCount(attachmentsCount.getMedia());
                                 listener.setShoutsCount(attachmentsCount.getShout());
-                                final Conversation.Display display = conversation.getDisplay();
+                                final ConversationDetails.Display display = conversation.getDisplay();
                                 final String image = display.getImage();
                                 if (!Strings.isNullOrEmpty(image)) {
                                     listener.setImage(Uri.parse(image));
@@ -167,14 +166,43 @@ public class ChatInfoPresenter {
                                 listener.showSubject(conversation.isPublicChat());
                                 listener.setChatCreatedBy(getCreatedByString(conversation.getCreator().getName()));
                                 listener.setChatCreatedAt(getCreatedAtString(conversation.getCreatedAt()));
+                                listener.showProgress(false);
                             }
                         },
                         new Action1<Throwable>() {
                             @Override
                             public void call(Throwable throwable) {
+                                listener.showProgress(false);
                                 listener.loadConversationError();
                             }
                         }));
+    }
+
+
+    public void refreshCounts() {
+        mCompositeSubscription.add(getConversationObservable()
+                .subscribe(new Action1<ConversationDetails>() {
+                    @Override
+                    public void call(ConversationDetails conversation) {
+                        listener.setParticipantsCount(conversation.getProfiles().size());
+                        listener.setBlockedCount(conversation.getBlocked().size());
+
+                        final ConversationDetails.AttatchmentCount attachmentsCount = conversation.getAttachmentsCount();
+                        listener.setMediaCount(attachmentsCount.getMedia());
+                        listener.setShoutsCount(attachmentsCount.getShout());
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        listener.loadConversationError();
+                    }
+                }));
+    }
+
+    private Observable<ConversationDetails> getConversationObservable() {
+        return mApiService.getConversation(mConversationId)
+                .subscribeOn(mNetworkScheduler)
+                .observeOn(mUiScheduler);
     }
 
     private String getCreatedByString(@NonNull String name) {
@@ -191,7 +219,7 @@ public class ChatInfoPresenter {
 
     public void unregister() {
         listener = null;
-        // TODO unsub
+        mCompositeSubscription.unsubscribe();
     }
 
     public void onImageActivityFinished(int resultCode, Intent data) {
@@ -205,7 +233,7 @@ public class ChatInfoPresenter {
 
     public void exitChatClicked() {
         listener.showProgress(true);
-        mCompositeSubscription.add(mApiService.removeProfile(mConversationId, new RemoveProfileRequest(mId))
+        mCompositeSubscription.add(mApiService.removeProfile(mConversationId, new ProfileRequest(mId))
                 .observeOn(mUiScheduler)
                 .subscribeOn(mNetworkScheduler)
                 .subscribe(new Action1<ResponseBody>() {

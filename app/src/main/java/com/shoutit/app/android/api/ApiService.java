@@ -3,11 +3,13 @@ package com.shoutit.app.android.api;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.shoutit.app.android.api.model.BlockedProfilesResposne;
 import com.shoutit.app.android.api.model.CallerProfile;
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.ChangePasswordRequest;
 import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.ConversationMediaResponse;
+import com.shoutit.app.android.api.model.ConversationDetails;
 import com.shoutit.app.android.api.model.ConversationsResponse;
 import com.shoutit.app.android.api.model.CreateOfferShoutWithImageRequest;
 import com.shoutit.app.android.api.model.CreatePublicChatRequest;
@@ -29,9 +31,9 @@ import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessagesResponse;
 import com.shoutit.app.android.api.model.NotificationsResponse;
 import com.shoutit.app.android.api.model.PostMessage;
+import com.shoutit.app.android.api.model.ProfileRequest;
 import com.shoutit.app.android.api.model.RegisterDeviceRequest;
 import com.shoutit.app.android.api.model.RelatedTagsResponse;
-import com.shoutit.app.android.api.model.RemoveProfileRequest;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.api.model.SearchProfileResponse;
 import com.shoutit.app.android.api.model.Shout;
@@ -282,7 +284,7 @@ public interface ApiService {
 
     @GET("profiles/me/interests")
     Observable<ListeningResponse> tagsListenings(@Query("page") Integer page,
-                                                  @Query("page_size") Integer pageSize);
+                                                 @Query("page_size") Integer pageSize);
 
     @GET("profiles/{user_name}/listeners")
     Observable<ListenersResponse> listeners(@Path("user_name") String userName,
@@ -365,10 +367,10 @@ public interface ApiService {
      */
     @GET("conversations")
     Observable<ConversationsResponse> getConversations(@Nullable @Query("before") String timestamp,
-                                                       @Query("page_size") Integer pageSize);
+                                              @Query("page_size") Integer pageSize);
 
     @GET("conversations/{id}")
-    Observable<Conversation> getConversation(@NonNull @Path("id") String id);
+    Observable<ConversationDetails> getConversation(@NonNull @Path("id") String id);
 
     @PATCH("conversations/{id}")
     Observable<ResponseBody> updateConversation(@NonNull @Path("id") String id, @Body EditPublicChatRequest request);
@@ -395,7 +397,7 @@ public interface ApiService {
     Observable<ResponseBody> deleteConversation(@Path("id") String conversationId);
 
     @POST("conversations/{id}/remove_profile")
-    Observable<ResponseBody> removeProfile(@Path("id") String conversationId, @Body RemoveProfileRequest removeProfileRequest);
+    Observable<ResponseBody> removeProfile(@Path("id") String conversationId, @Body ProfileRequest removeProfileRequest);
 
     @POST("messages/{id}/read")
     Observable<ResponseBody> readMessage(@Path("id") String messageId);
@@ -412,6 +414,18 @@ public interface ApiService {
     Observable<ConversationMediaResponse> conversationMedia(@Path("id") String conversationId,
                                                             @Query("page") Integer page,
                                                             @Query("page_size") Integer pageSize);
+
+    @POST("conversations/{id}/promote_admin")
+    Observable<ResponseBody> promoteAdmin(@Path("id") String conversationId, @Body ProfileRequest profileRequest);
+
+    @POST("conversations/{id}/block_profile")
+    Observable<ResponseBody> blockProfile(@Path("id") String conversationId, @Body ProfileRequest profileRequest);
+
+    @POST("conversations/{id}/unblock_profile")
+    Observable<ResponseBody> unblockProfile(@Path("id") String conversationId, @Body ProfileRequest profileRequest);
+
+    @GET("conversations/{id}/blocked")
+    Observable<BlockedProfilesResposne> getBlockedProfiles(@Path("id") String conversationId);
 
     /**
      * Public Chats

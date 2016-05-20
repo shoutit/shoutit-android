@@ -35,6 +35,7 @@ import rx.functions.Func1;
 public class PusherHelper {
 
     private static final String NEW_MESSAGE = "new_message";
+    private static final String CONVERSATION_UPDATE = "conversation_update";
     private static final String STATS_UPDATE = "stats_update";
     private static final String CLIENT_IS_TYPING = "client-is_typing";
 

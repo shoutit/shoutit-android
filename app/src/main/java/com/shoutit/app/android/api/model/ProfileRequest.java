@@ -1,10 +1,10 @@
 package com.shoutit.app.android.api.model;
 
-public class RemoveProfileRequest {
+public class ProfileRequest {
 
     private final Profile profile;
 
-    public RemoveProfileRequest(String id) {
+    public ProfileRequest(String id) {
         this.profile = new Profile(id);
     }
 

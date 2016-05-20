@@ -179,8 +179,10 @@
                     android:background="@android:color/white"
                     android:orientation="vertical">
 
-                    <FrameLayout android:layout_width="match_parent"
-                                 android:layout_height="wrap_content">
+                    <FrameLayout
+                        android:id="@+id/chat_info_participants_layouts"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -214,8 +216,10 @@
                         android:layout_marginStart="10dp"
                         android:background="@color/black_20"/>
 
-                    <FrameLayout android:layout_width="match_parent"
-                                 android:layout_height="wrap_content">
+                    <FrameLayout
+                        android:id="@+id/chat_info_blocked_layouts"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
 
                         <TextView
                             android:layout_width="wrap_content"
