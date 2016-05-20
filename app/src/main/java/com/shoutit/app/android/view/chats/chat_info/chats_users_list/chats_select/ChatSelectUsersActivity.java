@@ -61,7 +61,7 @@ public class ChatSelectUsersActivity extends BaseActivity implements ChatSelectU
         setContentView(R.layout.chat_participants_activity);
         ButterKnife.bind(this);
 
-        mChatParticipantToolbar.setTitle(R.string.chat_blocked_users_title);
+        mChatParticipantToolbar.setTitle(R.string.chat_select_users_title);
         mChatParticipantToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
         mChatParticipantToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -113,5 +113,10 @@ public class ChatSelectUsersActivity extends BaseActivity implements ChatSelectU
     @Override
     public void showDialog(String id, String name) {
         dialog.show(id, name, mChatParticipantsPresenter);
+    }
+
+    @Override
+    public void finishScreen() {
+        finish();
     }
 }

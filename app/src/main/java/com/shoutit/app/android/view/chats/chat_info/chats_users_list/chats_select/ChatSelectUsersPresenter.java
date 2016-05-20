@@ -104,7 +104,7 @@ public class ChatSelectUsersPresenter {
                 .subscribe(new Action1<ResponseBody>() {
                     @Override
                     public void call(ResponseBody responseBody) {
-                        getConversation();
+                        mListener.finishScreen();
                     }
                 }, new Action1<Throwable>() {
                     @Override
@@ -128,5 +128,7 @@ public class ChatSelectUsersPresenter {
         void showProgress(boolean show);
 
         void showDialog(String id, String name);
+
+        void finishScreen();
     }
 }
