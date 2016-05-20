@@ -25,11 +25,6 @@
         <menu>
 
             <item
-                android:id="@+id/chats_delete"
-                android:title="@string/chat_menu_delete"
-                app:showAsAction="never"/>
-
-            <item
                 android:id="@+id/chats_chat_information"
                 android:title="@string/chats_chat_info"
                 app:showAsAction="never"/>

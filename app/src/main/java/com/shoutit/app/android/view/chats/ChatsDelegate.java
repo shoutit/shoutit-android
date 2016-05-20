@@ -17,7 +17,6 @@ import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessageAttachment;
 import com.shoutit.app.android.api.model.PostMessage;
 import com.shoutit.app.android.api.model.PusherMessage;
-import com.shoutit.app.android.api.model.ShoutResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.utils.AmazonHelper;
@@ -32,9 +31,9 @@ import com.shoutit.app.android.view.chats.message_models.ReceivedProfileMessage;
 import com.shoutit.app.android.view.chats.message_models.ReceivedShoutMessage;
 import com.shoutit.app.android.view.chats.message_models.ReceivedTextMessage;
 import com.shoutit.app.android.view.chats.message_models.ReceivedVideoMessage;
-import com.shoutit.app.android.view.chats.message_models.SentProfileMessage;
 import com.shoutit.app.android.view.chats.message_models.SentImageMessage;
 import com.shoutit.app.android.view.chats.message_models.SentLocationMessage;
+import com.shoutit.app.android.view.chats.message_models.SentProfileMessage;
 import com.shoutit.app.android.view.chats.message_models.SentShoutMessage;
 import com.shoutit.app.android.view.chats.message_models.SentTextMessage;
 import com.shoutit.app.android.view.chats.message_models.SentVideoMessage;
@@ -267,7 +266,8 @@ public class ChatsDelegate {
             return true;
         } else {
             final Message prevMessage = results.get(position - 1);
-            return !prevMessage.getProfile().getId().equals(currentMessageUserId);
+            final ConversationProfile profile = prevMessage.getProfile();
+            return profile == null || !profile.getId().equals(currentMessageUserId);
         }
     }
 

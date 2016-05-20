@@ -152,13 +152,14 @@ public class ChatsFirstConversationPresenter {
                     @Override
                     public void call(User user) {
                         //noinspection ConstantConditions
-                        mListener.setChatToolbarInfo(ConversationsUtils.getChatWithString(
+                        mListener.setToolbarInfo(ConversationsUtils.getChatWithString(
                                 ImmutableList.of(new ConversationProfile(
                                         user.getId(),
                                         user.getName(),
                                         user.getUsername(),
                                         user.getType(),
-                                        user.getImage())), mUserPreferences.getUser().getId()));
+                                        user.getImage())), mUserPreferences.getUser().getId())
+                                , null);
                         setupUserForVideoChat(user);
                     }
                 }, getOnError()));
@@ -181,7 +182,7 @@ public class ChatsFirstConversationPresenter {
 
                         if (!Strings.isNullOrEmpty(id)) {
                             mListener.setAboutShoutData(title, thumbnail, type, price, authorAndTime, id);
-                            mListener.setShoutToolbarInfo(title, ConversationsUtils.getChatWithString(
+                            mListener.setToolbarInfo(title, ConversationsUtils.getChatWithString(
                                     ImmutableList.of(new ConversationProfile(
                                             shoutOwner.getId(),
                                             shoutOwner.getName(),
@@ -189,7 +190,7 @@ public class ChatsFirstConversationPresenter {
                                             shoutOwner.getType(),
                                             shoutOwner.getImage())), user.getId()));
                         } else {
-                            mListener.setShoutToolbarInfo(mContext.getString(R.string.chat_shout_chat), ConversationsUtils.getChatWithString(
+                            mListener.setToolbarInfo(mContext.getString(R.string.chat_shout_chat), ConversationsUtils.getChatWithString(
                                     ImmutableList.of(new ConversationProfile(
                                             shoutOwner.getId(),
                                             shoutOwner.getName(),
