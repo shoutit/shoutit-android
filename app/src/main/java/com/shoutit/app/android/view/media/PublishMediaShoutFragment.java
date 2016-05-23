@@ -89,7 +89,7 @@ public class PublishMediaShoutFragment extends Fragment {
     private String createdShoutOfferId;
     private String mWebUrl;
 
-    private final CompositeSubscription mCompositeSubscription = new CompositeSubscription();
+    private CompositeSubscription mCompositeSubscription;
 
     public static Fragment newInstance(@Nonnull String file, boolean isVideo) {
         final PublishMediaShoutFragment fragment = new PublishMediaShoutFragment();
@@ -123,6 +123,7 @@ public class PublishMediaShoutFragment extends Fragment {
     @android.support.annotation.Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mCompositeSubscription = new CompositeSubscription();
         View view = inflater.inflate(R.layout.publish_media_shout_fragment, container, false);
         ButterKnife.bind(this, view);
         return view;
@@ -333,5 +334,6 @@ public class PublishMediaShoutFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.unbind(this);
+        mCompositeSubscription.unsubscribe();
     }
 }
