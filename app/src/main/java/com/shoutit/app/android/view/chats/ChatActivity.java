@@ -432,7 +432,6 @@ public class ChatActivity extends BaseActivity implements Listener {
                     presenter.sendProfile(profileId);
                 }
             });
-            presenter.sendProfile(profileId);
         } else if (requestCode == INFO_REQUEST && resultCode == RESULT_OK) {
 
             final boolean closeChat = data.getBooleanExtra(ChatInfoActivity.EXTRA_CLOSE_CHAT, false);
