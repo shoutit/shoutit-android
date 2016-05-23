@@ -89,7 +89,7 @@ public class PublishMediaShoutFragment extends Fragment {
     private String createdShoutOfferId;
     private String mWebUrl;
 
-    private final CompositeSubscription mCompositeSubscription = new CompositeSubscription();
+    private CompositeSubscription mCompositeSubscription;
 
     public static Fragment newInstance(@Nonnull String file, boolean isVideo) {
         final PublishMediaShoutFragment fragment = new PublishMediaShoutFragment();
@@ -131,6 +131,7 @@ public class PublishMediaShoutFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mCompositeSubscription = new CompositeSubscription();
         mCameraPublishedCurrency.setAdapter(mCurrencyAdapter);
         mCameraPublishedCurrency.setEnabled(false);
 
@@ -333,5 +334,6 @@ public class PublishMediaShoutFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.unbind(this);
+        mCompositeSubscription.unsubscribe();
     }
 }

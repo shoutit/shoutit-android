@@ -8,9 +8,9 @@ public class Media implements Parcelable {
     private final long id;
     private final String name;
     private final String path;
-    private final String duration;
+    private final long duration;
 
-    public Media(long id, String name, String path, String duration) {
+    public Media(long id, String name, String path, long duration) {
         this.id = id;
         this.name = name;
         this.path = path;
@@ -27,7 +27,7 @@ public class Media implements Parcelable {
         dest.writeLong(id);
         dest.writeString(name);
         dest.writeString(path);
-        dest.writeString(duration);
+        dest.writeLong(duration);
 
     }
 
@@ -47,7 +47,7 @@ public class Media implements Parcelable {
         id = in.readLong();
         name = in.readString();
         path = in.readString();
-        duration = in.readString();
+        duration = in.readLong();
     }
 
     public long getId() {
@@ -62,7 +62,7 @@ public class Media implements Parcelable {
         return path;
     }
 
-    public String getDuration() {
+    public long getDuration() {
         return duration;
     }
 }

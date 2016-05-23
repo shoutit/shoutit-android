@@ -49,6 +49,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -344,18 +345,19 @@ public class CameraFragment extends Fragment {
     @Override
     @SuppressLint("NewApi")
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        ArrayList<Media> images;
         switch (requestCode) {
             case RC_MEDIA_COMPRESS: {
                 if (resultCode == Activity.RESULT_OK) {
-                    images = data.getParcelableArrayListExtra(MediaConstants.INTENT_EXTRA_IMAGES);
-                    ArrayList<String> paths = new ArrayList<>();
-                    for (int i = 0; i < images.size(); i++) {
-                        paths.add(images.get(i).path);
-                    }
-                    Intent result = new Intent();
+                    final Media media = data.getParcelableExtra(VideoCompressActivity.EXTRA_COMPRESSED_MEDIA);
+
+                    final ArrayList<String> paths = new ArrayList<>();
+                    final ArrayList<Media> mediaList = new ArrayList<>();
+                    paths.add(media.getPath());
+                    mediaList.add(media);
+
+                    final Intent result = new Intent();
                     result.putStringArrayListExtra(EXTRA_IMAGE_URI, paths);
-                    result.putParcelableArrayListExtra(EXTRA_IMAGE_VIDEO_LIST, images);
+                    result.putParcelableArrayListExtra(EXTRA_IMAGE_VIDEO_LIST, mediaList);
                     result.putExtra(EXTRA_EXISTING_MEDIA, true);
                     result.putExtra(EXTRA_IS_VIDEO, isVideoMode);
                     result.putExtra(IS_IMAGE_LIST, true);
@@ -814,16 +816,8 @@ public class CameraFragment extends Fragment {
     void onConfirmMedia() {
         if (isVideoMode) {
             final File file = new File(videoOutput);
-
-            final ArrayList<Media> tempImages = new ArrayList<>();
-            try {
-                final Media image = new Media(System.currentTimeMillis(), file.getName(), file.getAbsolutePath(), false,
-                        true, VideoUtils.getDuration(file.getAbsolutePath()) + "");
-                tempImages.add(image);
-            } catch (Exception e) {
-                Log.e("tag", "Error while getting image.", e);
-            }
-            startActivityForResult(VideoCompressActivity.newIntent(tempImages, getActivity()), CameraFragment.RC_MEDIA_COMPRESS);
+            final Media image = new Media(System.currentTimeMillis(), file.getName(), file.getAbsolutePath(), VideoUtils.getDuration(file.getAbsolutePath()));
+            startActivityForResult(VideoCompressActivity.newIntent(image, getActivity()), CameraFragment.RC_MEDIA_COMPRESS);
         } else {
             onPictureConfirmed();
         }
