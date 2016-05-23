@@ -19,6 +19,7 @@ import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.NotificationsResponse;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
@@ -27,6 +28,7 @@ import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
+import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.profile.tagprofile.TagProfileActivity;
@@ -54,6 +56,8 @@ public class NotificationsActivity extends BaseActivity {
     NotificationsPresenter presenter;
     @Inject
     NotificationsAdapter adapter;
+    @Inject
+    UserPreferences userPreferences;
 
     private Subscription subscription;
 
@@ -68,6 +72,12 @@ public class NotificationsActivity extends BaseActivity {
         ButterKnife.bind(this);
 
         setUpToolbar();
+
+        if (isFromDeepLink() && !userPreferences.isNormalUser()) {
+            finish();
+            startActivity(LoginIntroActivity.newIntent(this));
+            return;
+        }
 
         recyclerView.setLayoutManager(new MyLinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
@@ -107,6 +117,10 @@ public class NotificationsActivity extends BaseActivity {
                     }
                 })
                 .subscribe(presenter.loadMoreObserver());
+    }
+
+    private boolean isFromDeepLink() {
+        return getIntent() != null && getIntent().getData() != null;
     }
 
     private void setUpToolbar() {

@@ -70,6 +70,8 @@ public class App extends MultiDexApplication {
     StackCounterManager mStackCounterManager;
     @Inject
     ProfilesDao profilesDao;
+    @Inject
+    NotificationHelper notificationHelper;
 
     @Override
     public void onCreate() {
@@ -154,7 +156,7 @@ public class App extends MultiDexApplication {
         AppuniteGcm.initialize(this, GCM_TOKEN)
                 .loggingEnabled(!BuildConfig.DEBUG)
                 .getPushBundleObservable()
-                .subscribe(NotificationHelper.sendNotificationAction(this));
+                .subscribe(notificationHelper.sendNotificationAction(this));
     }
 
     private void initPusher() {
