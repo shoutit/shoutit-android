@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 
+import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ForActivity;
 
 import javax.inject.Inject;
@@ -32,7 +33,7 @@ public class SelectDialog {
                         dialog.dismiss();
                     }
                 })
-                .setMessage(String.format("Do you want to add user %1$s?", name))
+                .setMessage(String.format(mContext.getString(R.string.chat_select_user_dialog_title), name))
                 .create();
         alertDialog.show();
     }

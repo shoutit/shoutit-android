@@ -348,7 +348,7 @@ public class CameraFragment extends Fragment {
         switch (requestCode) {
             case RC_MEDIA_COMPRESS: {
                 if (resultCode == Activity.RESULT_OK) {
-                    images = data.getParcelableArrayListExtra(Constants.INTENT_EXTRA_IMAGES);
+                    images = data.getParcelableArrayListExtra(MediaConstants.INTENT_EXTRA_IMAGES);
                     ArrayList<String> paths = new ArrayList<>();
                     for (int i = 0; i < images.size(); i++) {
                         paths.add(images.get(i).path);

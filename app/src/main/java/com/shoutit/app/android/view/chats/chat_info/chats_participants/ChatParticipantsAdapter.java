@@ -23,11 +23,14 @@ import butterknife.ButterKnife;
 public class ChatParticipantsAdapter extends BaseAdapter {
 
     private final LayoutInflater mLayoutInflater;
+    @Nonnull
+    private final Context mContext;
     private final Picasso mPicasso;
 
     @Inject
     public ChatParticipantsAdapter(@ForActivity @Nonnull Context context, Picasso picasso) {
         super(context);
+        mContext = context;
         mPicasso = picasso;
         mLayoutInflater = LayoutInflater.from(context);
     }
@@ -48,6 +51,7 @@ public class ChatParticipantsAdapter extends BaseAdapter {
         @Nonnull
         private final View mItemView;
         private final Picasso mPicasso;
+        private final Context mContext;
         @Bind(R.id.chat_participant_item_image)
         ImageView mChatParticipantItemImage;
         @Bind(R.id.chat_participant_item_name)
@@ -55,15 +59,16 @@ public class ChatParticipantsAdapter extends BaseAdapter {
         @Bind(R.id.chat_participant_item_type)
         TextView mChatParticipantItemType;
 
-        public ParticipantViewHolder(@Nonnull View itemView, Picasso picasso) {
+        public ParticipantViewHolder(@Nonnull View itemView, Picasso picasso, Context context) {
             super(itemView);
             mItemView = itemView;
             mPicasso = picasso;
+            mContext = context;
             ButterKnife.bind(this, itemView);
         }
 
-        public static ParticipantViewHolder create(View layout, Picasso picasso) {
-            return new ParticipantViewHolder(layout, picasso);
+        public static ParticipantViewHolder create(View layout, Picasso picasso, Context context) {
+            return new ParticipantViewHolder(layout, picasso, context);
         }
 
         @Override
@@ -88,9 +93,9 @@ public class ChatParticipantsAdapter extends BaseAdapter {
 
         private String getStatus(ProfileItem profileItem) {
             if (profileItem.isBlocked()) {
-                return "Blocked";
+                return mContext.getString(R.string.chat_paricipants_blocked);
             } else if (profileItem.isAdmin()) {
-                return "Admin";
+                return mContext.getString(R.string.chat_participants_admin);
             } else {
                 return null;
             }

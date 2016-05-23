@@ -48,23 +48,6 @@ public class ChangeEmailPresenterTest {
         presenter = new ChangeEmailPresenter(apiService, scheduler, scheduler, userPreferences);
     }
 
-    public class A {
-        protected String dupa;
-
-        public A(String dupa) {
-            this.dupa = dupa;
-        }
-    }
-
-    public class B extends A {
-        private String lol;
-
-        public B(String lol) {
-            super("dupa");
-            this.lol = lol;
-        }
-    }
-
     @Test
     public void testWhenEmailValid_success() throws Exception {
         TestSubscriber<Object> subscriber = new TestSubscriber<>();

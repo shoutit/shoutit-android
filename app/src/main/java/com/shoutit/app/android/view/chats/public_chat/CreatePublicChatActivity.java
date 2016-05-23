@@ -140,7 +140,7 @@ public class CreatePublicChatActivity extends BaseActivity implements CreatePubl
         if (selectOrCaptureImageIntent.isPresent()) {
             startActivityForResult(selectOrCaptureImageIntent.get(), REQUEST_IMAGE);
         } else {
-            ColoredSnackBar.error(ColoredSnackBar.contentView(this), "Error", Snackbar.LENGTH_SHORT).show();
+            ColoredSnackBar.error(ColoredSnackBar.contentView(this), R.string.create_public_chat_image_error, Snackbar.LENGTH_SHORT).show();
         }
     }
 

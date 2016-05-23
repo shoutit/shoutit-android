@@ -194,7 +194,7 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
         if (selectOrCaptureImageIntent.isPresent()) {
             startActivityForResult(selectOrCaptureImageIntent.get(), REQUEST_IMAGE);
         } else {
-            ColoredSnackBar.error(ColoredSnackBar.contentView(this), "Error", Snackbar.LENGTH_SHORT).show();
+            ColoredSnackBar.error(ColoredSnackBar.contentView(this), R.string.chat_info_select_image_error, Snackbar.LENGTH_SHORT).show();
         }
     }
 
@@ -225,7 +225,7 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
 
     @Override
     public void editRequestError() {
-        ColoredSnackBar.error(ColoredSnackBar.contentView(this), "Error", Snackbar.LENGTH_SHORT).show();
+        ColoredSnackBar.error(ColoredSnackBar.contentView(this), R.string.chat_info_edit_error, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
@@ -250,7 +250,7 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
 
     @Override
     public void loadConversationError() {
-        ColoredSnackBar.error(ColoredSnackBar.contentView(this), "Error", Snackbar.LENGTH_SHORT).show();
+        ColoredSnackBar.error(ColoredSnackBar.contentView(this), R.string.chat_info_load_error, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
@@ -278,7 +278,7 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
 
     @Override
     public void exitChatError() {
-        ColoredSnackBar.error(ColoredSnackBar.contentView(this), "Error", Snackbar.LENGTH_SHORT).show();
+        ColoredSnackBar.error(ColoredSnackBar.contentView(this), R.string.chat_info_chat_error, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
@@ -288,12 +288,12 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
 
     @Override
     public void reportSent() {
-        ColoredSnackBar.success(ColoredSnackBar.contentView(this), "Report has been sent", Snackbar.LENGTH_SHORT).show();
+        ColoredSnackBar.success(ColoredSnackBar.contentView(this), R.string.chat_info_report_success, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
     public void reportError() {
-        ColoredSnackBar.error(ColoredSnackBar.contentView(this), "Error", Snackbar.LENGTH_SHORT).show();
+        ColoredSnackBar.error(ColoredSnackBar.contentView(this), R.string.chat_info_report_error, Snackbar.LENGTH_SHORT).show();
     }
 
     @OnClick(R.id.chat_info_edit_save)
