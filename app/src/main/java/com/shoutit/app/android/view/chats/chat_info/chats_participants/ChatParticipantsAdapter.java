@@ -37,7 +37,7 @@ public class ChatParticipantsAdapter extends BaseAdapter {
 
     @Override
     public ViewHolderManager.BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return ParticipantViewHolder.create(mLayoutInflater.inflate(R.layout.participant_item, parent, false), mPicasso);
+        return ParticipantViewHolder.create(mLayoutInflater.inflate(R.layout.participant_item, parent, false), mPicasso, mContext);
     }
 
     @SuppressWarnings("unchecked")
