@@ -54,7 +54,7 @@ public class ParticipantDialog {
             }
         });
 
-        mChatParticipantBlock.setText(isBlocked ? "Unblock" : "Block");
+        mChatParticipantBlock.setText(isBlocked ? mContext.getString(R.string.chat_participant_unblock) : mContext.getString(R.string.chat_participant_block));
         mChatParticipantBlock.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

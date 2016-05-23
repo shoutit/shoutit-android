@@ -63,7 +63,6 @@ public class VideoConversationActivityPresenter {
                     }
                 })
                 .takeUntil(finishCallRetriesSubject)
-                .compose(LogTransformer.<Integer>transformer("lol", "retry observable"))
                 .withLatestFrom(calledUserTwilioIdentitySubject, new Func2<Integer, String, BothParams<String, Integer>>() {
                     @Override
                     public BothParams<String, Integer> call(Integer retryNumber, String twilioIdentity) {

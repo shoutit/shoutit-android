@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 
+import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ForActivity;
 
 import javax.inject.Inject;
@@ -32,7 +33,7 @@ public class UnblockDialog {
                         dialog.dismiss();
                     }
                 })
-                .setMessage(String.format("Do you want to unblock user %1$s?", name))
+                .setMessage(String.format(mContext.getString(R.string.blocked_users_unblock_dialog_title), name))
                 .create();
         alertDialog.show();
     }

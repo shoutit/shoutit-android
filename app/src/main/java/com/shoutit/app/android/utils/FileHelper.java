@@ -73,7 +73,6 @@ public class FileHelper {
                     os.close();
                 } catch (IOException e) {
                     Log.e("FileHelper", "Error writing bitmap", e);
-                    throw e;
                 }
             }
         }

@@ -81,7 +81,7 @@ public class PublishShoutActivity extends RxAppCompatActivity {
 
                         share.putExtra(Intent.EXTRA_TEXT, mWebUrl);
 
-                        startActivity(Intent.createChooser(share, "Share link!"));
+                        startActivity(Intent.createChooser(share, getString(R.string.publish_shout_share_title)));
                         return true;
                     }
                     default:

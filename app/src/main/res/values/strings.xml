@@ -291,6 +291,7 @@
 
     <!-- Publish -->
     <string name="publish_menu_share">Share Shout</string>
+    <string name="publish_shout_share_title">Share link!</string>
 
     <!-- Edit Profile -->
     <string name="edit_profile_hint_name">Name</string>
@@ -526,6 +527,7 @@
     <string name="create_public_chat_change_location">Change</string>
     <string name="create_public_chat_error">Error</string>
     <string name="create_chat_create">Create</string>
+    <string name="create_public_chat_image_error">Error</string>
 
     <!-- Listenings -->
     <string name="listenings_empty">You have no items here yet.</string>
@@ -560,10 +562,30 @@
     <string name="chat_shouts_no_results">No shouts in this conversation</string>
     <string name="chat_shouts_ab_title">Shouts</string>
     <string name="chat_shouts_title">Conversations Shouts</string>
-    <string name="chat_info_report">Report this Chat</string>
     <plurals name="chat_shouts_results">
         <item quantity="one">%d Shout</item>
         <item quantity="other">%d Shouts</item>
     </plurals>
+
+    <!-- Chat Info -->
+    <string name="chat_info_report">Report this Chat</string>
+    <string name="chat_info_report_success">Report has been sent</string>
+    <string name="chat_info_load_error">Error</string>
+    <string name="chat_info_select_image_error">Error</string>
+    <string name="chat_info_edit_error">Error</string>
+    <string name="chat_info_chat_error">Error</string>
+    <string name="chat_info_report_error">Error</string>
+
+    <!-- Chat Participants -->
+    <string name="chat_paricipants_blocked">Blocked</string>
+    <string name="chat_participants_admin">Admin</string>
+    <string name="chat_participant_unblock">Unblock</string>
+    <string name="chat_participant_block">Block</string>
+
+    <!-- Chat Select Users -->
+    <string name="chat_select_user_dialog_title">Do you want to add user %1$s?</string>
+
+    <!-- Chat Blocked Users -->
+    <string name="blocked_users_unblock_dialog_title">Do you want to unblock user %1$s?</string>
 
 </resources>

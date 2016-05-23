@@ -220,7 +220,7 @@ public class VideoCompressActivity extends Activity {
                 Log.i("paths ", new Gson().toJson(dataSet));
 
             }
-            intent.putParcelableArrayListExtra(Constants.INTENT_EXTRA_IMAGES, dataSet);
+            intent.putParcelableArrayListExtra(MediaConstants.INTENT_EXTRA_IMAGES, dataSet);
             setResult(RESULT_OK, intent);
             finish();
         } else {
