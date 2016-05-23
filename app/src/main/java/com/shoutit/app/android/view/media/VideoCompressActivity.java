@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 public class VideoCompressActivity extends Activity {
 
     private static final String EXTRA_LOCAL_MEDIA = "EXTRA_LOCAL_MEDIA";
-    private static final String EXTRA_COMPRESSED_MEDIA = "EXTRA_COMPRESSED_MEDIA";
+    public static final String EXTRA_COMPRESSED_MEDIA = "EXTRA_COMPRESSED_MEDIA";
 
     private Media media;
     private String oldCopyPath;
@@ -67,7 +67,7 @@ public class VideoCompressActivity extends Activity {
         if (BuildConfig.DEBUG) {
             Log.i("command is ", command);
         }
-        doTheWorking(command, newPath, Long.parseLong(media.getDuration()));
+        doTheWorking(command, newPath, media.getDuration());
     }
 
 
