@@ -12,14 +12,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class VideoUtils {
-    public static final String EXTRA_LOCAL_MEDIA = "EXTRA_LOCAL_MEDIA";
-
-    public static void CompressVideo(ArrayList<Image> dataSet, final Fragment context) {
-
-        Intent toCompressActivity = new Intent(context.getActivity(), VideoCompressActivity.class);
-        toCompressActivity.putParcelableArrayListExtra(EXTRA_LOCAL_MEDIA, dataSet);
-        context.startActivityForResult(toCompressActivity, CameraFragment.RC_MEDIA_COMPRESS);
-    }
 
     public static String getValidFileNameFromPathWithtimStamp(String path) {
         int startIndex = path.lastIndexOf("/") + 1;

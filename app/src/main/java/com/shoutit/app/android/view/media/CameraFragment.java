@@ -344,7 +344,7 @@ public class CameraFragment extends Fragment {
     @Override
     @SuppressLint("NewApi")
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        ArrayList<Image> images;
+        ArrayList<Media> images;
         switch (requestCode) {
             case RC_MEDIA_COMPRESS: {
                 if (resultCode == Activity.RESULT_OK) {
@@ -815,15 +815,15 @@ public class CameraFragment extends Fragment {
         if (isVideoMode) {
             final File file = new File(videoOutput);
 
-            final ArrayList<Image> tempImages = new ArrayList<>();
+            final ArrayList<Media> tempImages = new ArrayList<>();
             try {
-                final Image image = new Image(System.currentTimeMillis(), file.getName(), file.getAbsolutePath(), false,
+                final Media image = new Media(System.currentTimeMillis(), file.getName(), file.getAbsolutePath(), false,
                         true, VideoUtils.getDuration(file.getAbsolutePath()) + "");
                 tempImages.add(image);
             } catch (Exception e) {
                 Log.e("tag", "Error while getting image.", e);
             }
-            VideoUtils.CompressVideo(tempImages, CameraFragment.this);
+            startActivityForResult(VideoCompressActivity.newIntent(tempImages, getActivity()), CameraFragment.RC_MEDIA_COMPRESS);
         } else {
             onPictureConfirmed();
         }
