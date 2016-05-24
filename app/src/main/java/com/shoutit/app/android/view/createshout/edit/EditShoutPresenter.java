@@ -195,8 +195,10 @@ public class EditShoutPresenter {
                             mListener.setMobilePhone(shoutResponse.getMobile());
                             mListener.setMediaData(shoutResponse.getImages(), shoutResponse.getVideos(), shoutResponse.getType().equals(Shout.TYPE_OFFER));
                             changeCategoryWithSelectedOptions(shoutResponse.getCategory().getSlug(), shoutResponse.getFilters());
+                            mListener.enableEditButton(true);
                         } else {
                             mListener.showBodyError();
+                            mListener.enableEditButton(false);
                         }
                     }
                 }));
@@ -386,6 +388,8 @@ public class EditShoutPresenter {
         void setMediaData(@NonNull List<String> images, @NonNull List<Video> videos, boolean b);
 
         void setMobilePhone(@Nullable String mobileHint);
+
+        void enableEditButton(boolean enable);
     }
 
 }
