@@ -49,9 +49,9 @@ public class DeepLinksHelper {
         } else if (stringUri.contains(DeepLinksContants.DISCOVER)) {
             menuHandler.selectMenuItem(MenuHandler.FRAGMENT_DISCOVER);
         } else if (stringUri.contains(DeepLinksContants.CHATS)) {
-            menuHandler.selectMenuItem(MenuHandler.FRAGMENT_PUBLIC_CHATS);
-        } else if (stringUri.contains(DeepLinksContants.PUBLIC_CHATS)) {
             menuHandler.selectMenuItem(MenuHandler.FRAGMENT_CHATS);
+        } else if (stringUri.contains(DeepLinksContants.PUBLIC_CHATS)) {
+            menuHandler.selectMenuItem(MenuHandler.FRAGMENT_PUBLIC_CHATS);
         } else if (stringUri.contains(DeepLinksContants.CREATE_SHOUT)) {
             if (userPreferences.isGuest()) {
                 context.startActivity(LoginIntroActivity.newIntent(context));
