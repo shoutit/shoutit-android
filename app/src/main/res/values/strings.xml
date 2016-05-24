@@ -423,6 +423,7 @@
     <string name="option_not_set">Not set</string>
     <string name="edit_shout_mobile_hint">Mobile</string>
     <string name="notifications_message_replacement">sends you a message</string>
+    <string name="notifications_badge">You\'ve got new notification</string>
 
     <!-- Video Calls -->
     <string name="video_calls_no_premissions">Camera and Microphone permissions needed.</string>
