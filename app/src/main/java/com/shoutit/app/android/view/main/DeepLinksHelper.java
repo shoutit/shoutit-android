@@ -49,25 +49,21 @@ public class DeepLinksHelper {
         } else if (stringUri.contains(DeepLinksContants.DISCOVER)) {
             menuHandler.selectMenuItem(MenuHandler.FRAGMENT_DISCOVER);
         } else if (stringUri.contains(DeepLinksContants.CHATS)) {
-            redirectToLoginIfGuest();
-            menuHandler.selectMenuItem(MenuHandler.FRAGMENT_PUBLIC_CHATS);
-        } else if (stringUri.contains(DeepLinksContants.PUBLIC_CHATS)) {
-            redirectToLoginIfGuest();
             menuHandler.selectMenuItem(MenuHandler.FRAGMENT_CHATS);
+        } else if (stringUri.contains(DeepLinksContants.PUBLIC_CHATS)) {
+            menuHandler.selectMenuItem(MenuHandler.FRAGMENT_PUBLIC_CHATS);
         } else if (stringUri.contains(DeepLinksContants.CREATE_SHOUT)) {
-            redirectToLoginIfGuest();
+            if (userPreferences.isGuest()) {
+                context.startActivity(LoginIntroActivity.newIntent(context));
+                return;
+            }
+
             final String type = uri.getQueryParameter("type");
             if (DeepLinksContants.CREATE_SHOUT_TYPE_OFFER.equals(type)) {
                 context.startActivity(RecordMediaActivity.newIntent(context, false, false, false, true));
             } else if (DeepLinksContants.CREATE_SHOUT_TYPE_REQUEST.equals(type)) {
                 context.startActivity(CreateRequestActivity.newIntent(context));
             }
-        }
-    }
-
-    public void redirectToLoginIfGuest() {
-        if (userPreferences.isGuest()) {
-            context.startActivity(LoginIntroActivity.newIntent(context));
         }
     }
 }
