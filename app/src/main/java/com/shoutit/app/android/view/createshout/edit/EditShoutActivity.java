@@ -19,6 +19,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -103,6 +104,9 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     LinearLayout mEditMediaContainer;
     @Bind(R.id.edit_shout_mobile)
     EditText mobileEditText;
+
+    @Bind(R.id.edit_confirm)
+    Button editButton;
 
     @Inject
     EditShoutPresenter mEditShoutPresenter;
@@ -406,6 +410,11 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     @Override
     public void setMobilePhone(@Nullable String mobileHint) {
         mobileEditText.setText(mobileHint);
+    }
+
+    @Override
+    public void enableEditButton(boolean enable) {
+        editButton.setEnabled(enable);
     }
 
     @Override
