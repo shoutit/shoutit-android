@@ -720,7 +720,8 @@ public class CameraFragment extends Fragment {
 
             @Override
             protected void onPostExecute(String[] keyValue) {
-                if (keyValue != null) {
+                final Activity activity = getActivity();
+                if (activity != null && keyValue != null) {
                     final Intent returnIntent = new Intent();
                     returnIntent.putExtra(EXTRA_EXISTING_MEDIA, false);
 
@@ -732,9 +733,9 @@ public class CameraFragment extends Fragment {
                     }
                     returnIntent.putExtra(EXTRA_IS_VIDEO, isVideoMode);
 
-                    ((CameraFragmentListener) getActivity()).onMediaResult(returnIntent);
+                    ((CameraFragmentListener) activity).onMediaResult(returnIntent);
                 } else {
-                    Toast.makeText(getActivity(), "resizing failed",
+                    Toast.makeText(activity, "resizing failed",
                             Toast.LENGTH_LONG).show();
 
                     resetView();
