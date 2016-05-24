@@ -814,17 +814,25 @@ public class CameraFragment extends Fragment {
     @OnClick(R.id.fragment_camera_confirm_yes_btn)
     void onConfirmMedia() {
         if (isVideoMode) {
-            final File file = new File(videoOutput);
+            if (videoOutput != null) {
+                final File file = new File(videoOutput);
 
-            final ArrayList<Image> tempImages = new ArrayList<>();
-            try {
-                final Image image = new Image(System.currentTimeMillis(), file.getName(), file.getAbsolutePath(), false,
-                        true, VideoUtils.getDuration(file.getAbsolutePath()) + "");
-                tempImages.add(image);
-            } catch (Exception e) {
-                Log.e("tag", "Error while getting image.", e);
+                final ArrayList<Image> tempImages = new ArrayList<>();
+                try {
+                    final Image image = new Image(System.currentTimeMillis(), file.getName(), file.getAbsolutePath(), false,
+                            true, VideoUtils.getDuration(file.getAbsolutePath()) + "");
+                    tempImages.add(image);
+                } catch (Exception e) {
+                    Log.e("tag", "Error while getting image.", e);
+                }
+                VideoUtils.CompressVideo(tempImages, CameraFragment.this);
+            } else {
+                ColoredSnackBar.error(
+                        ColoredSnackBar.contentView(getActivity()),
+                        R.string.error_default,
+                        Snackbar.LENGTH_SHORT)
+                        .show();
             }
-            VideoUtils.CompressVideo(tempImages, CameraFragment.this);
         } else {
             onPictureConfirmed();
         }
