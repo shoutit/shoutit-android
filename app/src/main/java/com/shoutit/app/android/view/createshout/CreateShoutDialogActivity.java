@@ -53,7 +53,7 @@ public class CreateShoutDialogActivity extends BaseActivity {
                     ColoredSnackBar.contentView(this),
                     R.string.permission_camera_explanation,
                     new String[] {Manifest.permission.CAMERA})) {
-                startActivity(RecordMediaActivity.newIntent(this, false, false, false, true));
+                startActivity(RecordMediaActivity.newIntent(this, false, false, false, true, true));
             }
         }
         finish();

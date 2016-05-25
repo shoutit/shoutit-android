@@ -32,6 +32,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.adobe.creativesdk.aviary.AdobeImageIntent;
 import com.appunite.rx.internal.Preconditions;
 import com.commonsware.cwac.cam2.CameraController;
 import com.commonsware.cwac.cam2.CameraEngine;
@@ -49,7 +50,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -63,6 +63,8 @@ public class CameraFragment extends Fragment {
 
     private static final int REQUEST_GALLERY_IMAGE_CODE = 0;
     private static final int REQUEST_GALLERY_VIDEO_CODE = 1;
+    private static final int REQUEST_CODE_IMAGE_EDITOR = 2;
+
     private static final int VIDEO_LENGTH = 60_000;
 
     private static final int MAX_SIZE = 1024;
@@ -70,6 +72,7 @@ public class CameraFragment extends Fragment {
     private static final String ARGS_VIDEO_FIRST = "arg_video_first";
     private static final String ARGS_CHAT_MEDIA = "arg_is_chat";
     private static final String ARGS_FIRST_MEDIA = "arg_first_media";
+    private static final String ARGS_USE_EDITOR = "args_use_editor";
 
     private static final String TAG = CameraFragment.class.getCanonicalName();
 
@@ -94,11 +97,13 @@ public class CameraFragment extends Fragment {
     private boolean mirrorPreview = false;
     private boolean isVideoMode = false;
     private CountDownTimer countDownTimer;
-    private String videoOutput, imageOutput;
+    private String videoOutput;
+    private String imageOutput;
     private CameraFragmentListener cameraFragmentListener;
     private boolean isMFfcEnabled = false;
     private boolean chatMedia;
     private boolean firstMedia;
+    private boolean useEditor;
 
     @Bind(R.id.fragment_camera_preview_stack)
     ViewGroup previewStack;
@@ -133,11 +138,12 @@ public class CameraFragment extends Fragment {
     @Bind(R.id.camera_text_header)
     TextView cameraTextHeader;
 
-    public static CameraFragment newInstance(boolean videoFirst, boolean chatMedia, boolean firstMedia) {
+    public static CameraFragment newInstance(boolean videoFirst, boolean chatMedia, boolean firstMedia, boolean useEditor) {
         final Bundle args = new Bundle();
         args.putBoolean(ARGS_VIDEO_FIRST, videoFirst);
         args.putBoolean(ARGS_CHAT_MEDIA, chatMedia);
         args.putBoolean(ARGS_FIRST_MEDIA, firstMedia);
+        args.putBoolean(ARGS_USE_EDITOR, useEditor);
         final CameraFragment cameraFragment = new CameraFragment();
         cameraFragment.setArguments(args);
         return cameraFragment;
@@ -164,6 +170,7 @@ public class CameraFragment extends Fragment {
         isVideoMode = getArguments().getBoolean(ARGS_VIDEO_FIRST);
         chatMedia = getArguments().getBoolean(ARGS_CHAT_MEDIA);
         firstMedia = getArguments().getBoolean(ARGS_FIRST_MEDIA);
+        useEditor = getArguments().getBoolean(ARGS_USE_EDITOR);
 
         if (hasCameras()) {
             cameraFragmentListener.onInitializationFailed(
@@ -429,6 +436,10 @@ public class CameraFragment extends Fragment {
                     }
                 }
                 break;
+            case REQUEST_CODE_IMAGE_EDITOR:
+                if (resultCode == Activity.RESULT_OK) {
+                    onPictureConfirmed(data.getData());
+                }
             default:
                 super.onActivityResult(requestCode, resultCode, data);
                 break;
@@ -452,7 +463,7 @@ public class CameraFragment extends Fragment {
                 if (intent.getData() != null) {
                     uri = intent.getData();
                 } else {
-                    final String outputMediaFileUri = getUriFromBitmap((Bitmap) intent.getParcelableExtra("data"));
+                    final String outputMediaFileUri = getUriFromBitmap(intent.getParcelableExtra("data"));
                     if (outputMediaFileUri == null) {
                         return Optional.absent();
                     }
@@ -571,20 +582,20 @@ public class CameraFragment extends Fragment {
     }
 
     public void showConfirmImage() {
-        ExifInterface ei = null;
+        ExifInterface exifInterface = null;
         layoutConfirm.setVisibility(View.VISIBLE);
 
         try {
-            ei = new ExifInterface(imageOutput);
+            exifInterface = new ExifInterface(imageOutput);
         } catch (IOException e) {
             Log.e("tag", "Error getting image exif info", e);
         }
 
-        if (ei != null) {
+        if (exifInterface != null) {
             Bitmap scaledBitmap = getScaledBitmap();
 
             int orientation =
-                    ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+                    exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
             Log.d("IMAGE", "orientation : " + orientation);
 
             switch (orientation) {
@@ -698,8 +709,7 @@ public class CameraFragment extends Fragment {
         buttonDiscard.setEnabled(true);
     }
 
-
-    private void onPictureConfirmed() {
+    private void onPictureConfirmed(Uri uri) {
         new AsyncTask<Void, Void, String[]>() {
             @Override
             protected void onPreExecute() {
@@ -709,15 +719,25 @@ public class CameraFragment extends Fragment {
 
             @Override
             protected String[] doInBackground(Void... params) {
-                if (imageOutput == null) return null;
+                if (uri == null) return null;
 
-                final File imageFile = new File(imageOutput);
-                if (!imageFile.exists()) return null;
+                final File file;
+                if (uri.getScheme() == null || uri.getScheme().equals("file")) {
+                    file = new File(uri.getPath());
+                    if (!file.exists()) return null;
+                } else {
+                    try {
+                        copyGalleryFile(imageOutput, uri);
+                        file = new File(imageOutput);
+                    } catch (IOException e) {
+                        return null;
+                    }
+                }
 
-                final Bitmap imageBitmap = CameraUtils.getScaledBitmapFromFile(imageFile.getAbsolutePath(), MAX_SIZE);
+                final Bitmap imageBitmap = CameraUtils.getScaledBitmapFromFile(file.getAbsolutePath(), MAX_SIZE);
 
-                CameraUtils.bitmapToFile(imageBitmap, imageFile, Bitmap.CompressFormat.JPEG, DEFAULT_IMAGE_QUALITY);
-                return new String[]{EXTRA_IMAGE_URI, "file://" + imageOutput};
+                CameraUtils.bitmapToFile(imageBitmap, file, Bitmap.CompressFormat.JPEG, DEFAULT_IMAGE_QUALITY);
+                return new String[]{EXTRA_IMAGE_URI, "file://" + file.getAbsolutePath()};
             }
 
             @Override
@@ -726,12 +746,8 @@ public class CameraFragment extends Fragment {
                     final Intent returnIntent = new Intent();
                     returnIntent.putExtra(EXTRA_EXISTING_MEDIA, false);
 
-                    if (isVideoMode) {
-                        returnIntent.putExtra(keyValue[0], keyValue[1]);
-                    } else {
-                        returnIntent.putExtra(keyValue[0], Uri.parse(keyValue[1]));
-                        returnIntent.putExtra(IS_IMAGE_LIST, false);
-                    }
+                    returnIntent.putExtra(keyValue[0], Uri.parse(keyValue[1]));
+                    returnIntent.putExtra(IS_IMAGE_LIST, false);
                     returnIntent.putExtra(EXTRA_IS_VIDEO, isVideoMode);
 
                     ((CameraFragmentListener) getActivity()).onMediaResult(returnIntent);
@@ -819,7 +835,14 @@ public class CameraFragment extends Fragment {
             final Media image = new Media(System.currentTimeMillis(), file.getName(), file.getAbsolutePath(), VideoUtils.getDuration(file.getAbsolutePath()));
             startActivityForResult(VideoCompressActivity.newIntent(image, getActivity()), CameraFragment.RC_MEDIA_COMPRESS);
         } else {
-            onPictureConfirmed();
+            if (useEditor) {
+                final Intent imageEditorIntent = new AdobeImageIntent.Builder(getActivity())
+                        .setData(Uri.parse(imageOutput))
+                        .build();
+                startActivityForResult(imageEditorIntent, REQUEST_CODE_IMAGE_EDITOR);
+            } else {
+                onPictureConfirmed(Uri.parse(imageOutput));
+            }
         }
     }
 

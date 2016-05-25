@@ -58,7 +58,7 @@ public class DeepLinksHelper {
             redirectToLoginIfGuest();
             final String type = uri.getQueryParameter("type");
             if (DeepLinksContants.CREATE_SHOUT_TYPE_OFFER.equals(type)) {
-                context.startActivity(RecordMediaActivity.newIntent(context, false, false, false, true));
+                context.startActivity(RecordMediaActivity.newIntent(context, false, false, false, true, true));
             } else if (DeepLinksContants.CREATE_SHOUT_TYPE_REQUEST.equals(type)) {
                 context.startActivity(CreateRequestActivity.newIntent(context));
             }

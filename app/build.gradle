@@ -215,8 +215,8 @@ dependencies {
     localCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
 
     // RX
-    compile 'com.trello:rxlifecycle:0.4.0'
-    compile 'com.trello:rxlifecycle-components:0.4.0'
+    compile 'com.trello:rxlifecycle:0.3.0'
+    compile 'com.trello:rxlifecycle-components:0.3.0'
     compile 'com.jakewharton.rxbinding:rxbinding:0.3.0'
     compile 'com.jakewharton.rxbinding:rxbinding-recyclerview-v7:0.3.0'
 

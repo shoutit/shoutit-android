@@ -38,6 +38,7 @@ public class RecordMediaActivity extends AbstractCameraActivity
     private static final String EXTRA_VIDEO_FIRST = "extra_video_first";
     private static final String EXTRA_IS_CHAT_MEDIA = "extra_is_chat_media";
     private static final String EXTRA_IS_FIRST_MEDIA = "extra_is_first_media";
+    private static final String EXTRA_USE_EDITOR = "extra_use_editor";
 
     private CameraFragment cameraFragment;
     private MultiplePermissionsListener customMultiplePermissionsListener;
@@ -46,13 +47,15 @@ public class RecordMediaActivity extends AbstractCameraActivity
     private boolean isVideoFirst;
     private boolean isChatMedia;
     private boolean isFirstMedia;
+    private boolean useEditor;
 
-    public static Intent newIntent(Context context, boolean activityForResult, boolean videoFirst, boolean isChatMedia, boolean firstMedia) {
+    public static Intent newIntent(Context context, boolean activityForResult, boolean videoFirst, boolean isChatMedia, boolean firstMedia, boolean useEditor) {
         return new Intent(context, RecordMediaActivity.class)
                 .putExtra(EXTRA_IS_FOR_RESULT, activityForResult)
                 .putExtra(EXTRA_VIDEO_FIRST, videoFirst)
                 .putExtra(EXTRA_IS_CHAT_MEDIA, isChatMedia)
-                .putExtra(EXTRA_IS_FIRST_MEDIA, firstMedia);
+                .putExtra(EXTRA_IS_FIRST_MEDIA, firstMedia)
+                .putExtra(EXTRA_USE_EDITOR, useEditor);
     }
 
     @Override
@@ -93,6 +96,7 @@ public class RecordMediaActivity extends AbstractCameraActivity
             isVideoFirst = extras.getBoolean(EXTRA_VIDEO_FIRST);
             isChatMedia = extras.getBoolean(EXTRA_IS_CHAT_MEDIA);
             isFirstMedia = extras.getBoolean(EXTRA_IS_FIRST_MEDIA);
+            useEditor = extras.getBoolean(EXTRA_USE_EDITOR);
         }
 
         Dexter.continuePendingRequestsIfPossible(customMultiplePermissionsListener);
@@ -105,7 +109,7 @@ public class RecordMediaActivity extends AbstractCameraActivity
         final Fragment fragment = getFragmentManager().findFragmentByTag(TAG_CAMERA);
 
         if (fragment == null) {
-            cameraFragment = CameraFragment.newInstance(isVideoFirst, isChatMedia, isFirstMedia);
+            cameraFragment = CameraFragment.newInstance(isVideoFirst, isChatMedia, isFirstMedia, useEditor);
             getFragmentManager().beginTransaction()
                     .replace(android.R.id.content, cameraFragment, TAG_CAMERA)
                     .commit();

@@ -122,7 +122,7 @@ public class PublishShoutActivity extends RxAppCompatActivity {
         if (mRequest) {
             startActivity(CreateRequestActivity.newIntent(this));
         } else {
-            startActivity(RecordMediaActivity.newIntent(this, false, false, false, true));
+            startActivity(RecordMediaActivity.newIntent(this, false, false, false, true, true));
         }
         finish();
     }

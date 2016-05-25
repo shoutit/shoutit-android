@@ -359,7 +359,7 @@ public class ChatActivity extends BaseActivity implements Listener {
     @OnClick(R.id.chats_attatchments_media)
     void onMediaClicked() {
         hideAttatchentsMenu();
-        startActivityForResult(RecordMediaActivity.newIntent(this, true, true, true, false), REQUEST_ATTACHMENT);
+        startActivityForResult(RecordMediaActivity.newIntent(this, true, true, true, false, false), REQUEST_ATTACHMENT);
     }
 
     @OnClick(R.id.chats_attatchments_shout)
