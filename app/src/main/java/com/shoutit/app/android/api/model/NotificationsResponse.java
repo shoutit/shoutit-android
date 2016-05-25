@@ -34,19 +34,22 @@ public class NotificationsResponse extends PaginatedResponse {
         private final boolean isRead;
         private final DisplayInfo display;
         private final AttachedObject attachedObject;
+        @Nullable
+        private final String appUrl;
 
         public Notification(@Nonnull String id, @Nonnull String type, int createdAt,
-                            boolean isRead, DisplayInfo display, AttachedObject attachedObject) {
+                            boolean isRead, DisplayInfo display, AttachedObject attachedObject, @Nullable String appUrl) {
             this.id = id;
             this.type = type;
             this.createdAt = createdAt;
             this.isRead = isRead;
             this.display = display;
             this.attachedObject = attachedObject;
+            this.appUrl = appUrl;
         }
 
         public Notification markAsRead() {
-            return new Notification(id, type, createdAt, true, display, attachedObject);
+            return new Notification(id, type, createdAt, true, display, attachedObject, appUrl);
         }
 
         public boolean isListenNotification() {
@@ -80,6 +83,11 @@ public class NotificationsResponse extends PaginatedResponse {
 
         public DisplayInfo getDisplay() {
             return display;
+        }
+
+        @Nullable
+        public String getAppUrl() {
+            return appUrl;
         }
     }
 
@@ -144,16 +152,12 @@ public class NotificationsResponse extends PaginatedResponse {
         private final String text;
         private final List<Range> ranges;
         private final String image;
-        @Nullable
-        private final String appUrl;
 
-        private DisplayInfo(String title, String text, List<Range> ranges,
-                            String image, @Nullable String appUrl) {
+        private DisplayInfo(String title, String text, List<Range> ranges, String image) {
             this.title = title;
             this.text = text;
             this.ranges = ranges;
             this.image = image;
-            this.appUrl = appUrl;
         }
 
         public String getTitle() {
@@ -170,11 +174,6 @@ public class NotificationsResponse extends PaginatedResponse {
 
         public String getImage() {
             return image;
-        }
-
-        @Nullable
-        public String getAppUrl() {
-            return appUrl;
         }
     }
 

@@ -14,9 +14,12 @@ import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.NotificationsResponse;
 import com.shoutit.app.android.dao.NotificationsDao;
+import com.shoutit.app.android.utils.pusher.PusherHelper;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -52,12 +55,15 @@ public class NotificationsPresenter {
     private final PublishSubject<Throwable> errorSubject = PublishSubject.create();
     @Nonnull
     private final NotificationsDao dao;
+    @Nonnull
+    private final Observable<Object> scrollUpObservable;
 
     @Inject
     public NotificationsPresenter(@Nonnull NotificationsDao dao,
                                   @Nonnull @UiScheduler final Scheduler uiScheduler,
                                   @Nonnull @NetworkScheduler final Scheduler networkScheduler,
-                                  @Nonnull final ApiService apiService) {
+                                  @Nonnull final ApiService apiService,
+                                  @Nonnull PusherHelper pusherHelper) {
         this.dao = dao;
 
         final Observable<ResponseOrError<NotificationsResponse>> notificationsObservable = dao
@@ -68,26 +74,62 @@ public class NotificationsPresenter {
         final Observable<NotificationsResponse> successNotificationsObservable =
                 notificationsObservable.compose(ResponseOrError.<NotificationsResponse>onlySuccess());
 
-        adapterItemsObservable = successNotificationsObservable
-                .map(new Func1<NotificationsResponse, List<BaseAdapterItem>>() {
-                    @Override
-                    public List<BaseAdapterItem> call(NotificationsResponse notificationsResponse) {
-                        final ImmutableList.Builder<BaseAdapterItem> builder = new ImmutableList.Builder<>();
+        final Observable<List<NotificationsResponse.Notification>> notificationsFromPusher = pusherHelper
+                .getNewNotificationObservable()
+                .observeOn(uiScheduler)
+                .scan(ImmutableList.<NotificationsResponse.Notification>of(),
+                        new Func2<List<NotificationsResponse.Notification>, NotificationsResponse.Notification, List<NotificationsResponse.Notification>>() {
+                            @Override
+                            public List<NotificationsResponse.Notification> call(List<NotificationsResponse.Notification> notificationsList,
+                                                                                 NotificationsResponse.Notification newNotification) {
+                                final List<NotificationsResponse.Notification> notificationsFromPusher = new ArrayList<>();
+                                notificationsFromPusher.add(newNotification);
+                                notificationsFromPusher.addAll(notificationsList);
 
-                        if (!notificationsResponse.getResults().isEmpty()) {
-                            builder.addAll(Lists.transform(notificationsResponse.getResults(),
+                                Collections.sort(notificationsFromPusher, new Comparator<NotificationsResponse.Notification>() {
+                                    @Override
+                                    public int compare(NotificationsResponse.Notification lhs, NotificationsResponse.Notification rhs) {
+                                        return lhs.getCreatedAt() == rhs.getCreatedAt() ? 0 :
+                                                lhs.getCreatedAt() > rhs.getCreatedAt() ? -1 : 1;
+                                    }
+                                });
+
+                                return notificationsFromPusher;
+                            }
+                        });
+
+        adapterItemsObservable = Observable.combineLatest(
+                successNotificationsObservable,
+                notificationsFromPusher,
+                new Func2<NotificationsResponse, List<NotificationsResponse.Notification>, List<BaseAdapterItem>>() {
+                    @Override
+                    public List<BaseAdapterItem> call(NotificationsResponse notificationsResponse,
+                                                      List<NotificationsResponse.Notification> notificationsFromPusher) {
+                        final ImmutableList<NotificationsResponse.Notification> allNotifications =
+                                ImmutableList.<NotificationsResponse.Notification>builder()
+                                .addAll(notificationsFromPusher)
+                                .addAll(notificationsResponse.getResults())
+                                .build();
+
+                        final ImmutableList.Builder<BaseAdapterItem> adapterItems = new ImmutableList.Builder<>();
+                        if (!allNotifications.isEmpty()) {
+                            adapterItems.addAll(Lists.transform(allNotifications,
                                     new Function<NotificationsResponse.Notification, BaseAdapterItem>() {
                                         @Override
                                         public BaseAdapterItem apply(NotificationsResponse.Notification input) {
                                             return new NotificationAdapterItem(input, openViewForNotification, markSingleAsReadSubject);
                                         }
                                     }));
-                            builder.add(new NoDataAdapterItem());
+                        } else {
+                            adapterItems.add(new NoDataAdapterItem());
                         }
 
-                        return builder.build();
+                        return adapterItems.build();
                     }
                 });
+
+        scrollUpObservable = notificationsFromPusher.map(Functions1.toObject())
+                .sample(adapterItemsObservable.map(Functions1.toObject()));
 
         final Observable<ResponseOrError<ResponseBody>> markAllAsReadObservable = markAllAsReadSubject
                 .switchMap(new Func1<Object, Observable<ResponseOrError<ResponseBody>>>() {
@@ -161,6 +203,11 @@ public class NotificationsPresenter {
     }
 
     @Nonnull
+    public Observable<Object> getScrollUpObservable() {
+        return scrollUpObservable;
+    }
+
+    @Nonnull
     public Observer<NotificationsResponse> loadMoreObserver() {
         return RxMoreObservers.ignoreCompleted(dao.getLoadMoreObserver());
     }
@@ -231,7 +278,7 @@ public class NotificationsPresenter {
 
         public void onNotificationClicked() {
             markNotificationAsRead();
-            openViewForNotification.onNext(notification.getDisplay().getAppUrl());
+            openViewForNotification.onNext(notification.getAppUrl());
         }
 
         public NotificationsResponse.DisplayInfo getDisplayInfo() {

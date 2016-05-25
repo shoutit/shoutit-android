@@ -83,9 +83,6 @@ public class MenuHandler {
     @Bind(R.id.menu_chat)
     CheckedTextView chatItem;
 
-    @Inject
-    MenuHandlerPresenter presenter;
-
     @Nonnull
     private final RxAppCompatActivity rxActivity;
     @Nonnull
@@ -94,6 +91,8 @@ public class MenuHandler {
     private final Picasso picasso;
     @Nonnull
     private final UserPreferences userPreferences;
+    @Nonnull
+    private final MenuHandlerPresenter presenter;
 
     private List<CheckedTextView> selectableItems = ImmutableList.of();
 
@@ -117,15 +116,16 @@ public class MenuHandler {
         viewIdViewTagMap.put(R.id.menu_settings, ACTIVITY_SETTINGS);
     }
 
-    @Inject
     public MenuHandler(@Nonnull final RxAppCompatActivity rxActivity,
                        @Nonnull OnMenuItemSelectedListener onMenuItemSelectedListener,
                        @Nonnull Picasso picasso,
-                       @Nonnull UserPreferences userPreferences) {
+                       @Nonnull UserPreferences userPreferences,
+                       @Nonnull MenuHandlerPresenter presenter) {
         this.rxActivity = rxActivity;
         this.onMenuItemSelectedListener = onMenuItemSelectedListener;
         this.picasso = picasso;
         this.userPreferences = userPreferences;
+        this.presenter = presenter;
     }
 
     public void initMenu(@Nonnull View view) {

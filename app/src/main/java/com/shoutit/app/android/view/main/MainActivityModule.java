@@ -1,14 +1,14 @@
 package com.shoutit.app.android.view.main;
 
+import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.dagger.ActivityScope;
+import com.squareup.picasso.Picasso;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
 import javax.annotation.Nonnull;
-import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import rx.Observer;
-import rx.subjects.PublishSubject;
 
 @Module
 public class MainActivityModule {
@@ -28,6 +28,14 @@ public class MainActivityModule {
     @Provides
     OnMenuItemSelectedListener provideOnMenuItemSelectedListener() {
         return activity;
+    }
+
+    @Provides
+    @ActivityScope
+    MenuHandler providesMenuHandler(OnMenuItemSelectedListener onMenuItemSelectedListener,
+                                    Picasso picasso, UserPreferences userPreferences,
+                                    MenuHandlerPresenter presenter) {
+        return new MenuHandler(activity, onMenuItemSelectedListener, picasso, userPreferences, presenter);
     }
 
 }

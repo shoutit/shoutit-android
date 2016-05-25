@@ -83,7 +83,7 @@ public class VideoCompressActivity extends Activity {
         }
     }
 
-    private void doTheWorking(String command, String newPath, long duration) {
+    private void doTheWorking(String command, final String newPath, final long duration) {
         final ProgressDialog progressBar = getProgressBar();
         final FFmpeg ffmpeg = FFmpeg.getInstance(this);
         try {

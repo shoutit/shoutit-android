@@ -356,13 +356,13 @@ public class CameraFragment extends Fragment {
             case RC_MEDIA_COMPRESS: {
                 if (resultCode == Activity.RESULT_OK) {
                     final Media media = data.getParcelableExtra(VideoCompressActivity.EXTRA_COMPRESSED_MEDIA);
+                    ArrayList<String> paths = new ArrayList<>();
+                    ArrayList<Media> mediaList = new ArrayList<>();
 
-                    final ArrayList<String> paths = new ArrayList<>();
-                    final ArrayList<Media> mediaList = new ArrayList<>();
                     paths.add(media.getPath());
                     mediaList.add(media);
 
-                    final Intent result = new Intent();
+                    Intent result = new Intent();
                     result.putStringArrayListExtra(EXTRA_IMAGE_URI, paths);
                     result.putParcelableArrayListExtra(EXTRA_IMAGE_VIDEO_LIST, mediaList);
                     result.putExtra(EXTRA_EXISTING_MEDIA, true);

@@ -37,6 +37,7 @@ import com.jakewharton.rxbinding.widget.TextViewAfterTextChangeEvent;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
@@ -47,6 +48,7 @@ import com.shoutit.app.android.utils.TextWatcherAdapter;
 import com.shoutit.app.android.view.chats.chat_info.ChatInfoActivity;
 import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
 import com.shoutit.app.android.view.chooseprofile.SelectProfileActivity;
+import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
@@ -87,6 +89,9 @@ public class ChatActivity extends BaseActivity implements Listener {
 
     @Inject
     ChatsAdapter chatsAdapter;
+
+    @Inject
+    UserPreferences userPreferences;
 
     @Bind(R.id.chats_toolbar)
     Toolbar mChatsToolbar;
@@ -139,6 +144,12 @@ public class ChatActivity extends BaseActivity implements Listener {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             // It doesn't work from xml
             inputContainer.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
+        }
+
+        if (isFromDeepLink() && !userPreferences.isNormalUser()) {
+            finish();
+            startActivity(LoginIntroActivity.newIntent(this));
+            return;
         }
 
         mChatsToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
@@ -212,6 +223,11 @@ public class ChatActivity extends BaseActivity implements Listener {
         ChatsHelper.setOnClickHideListener(mMainLayout, mChatsAttatchmentsLayout);
         ChatsHelper.setOnClickHideListener(mChatsRecyclerview, mChatsAttatchmentsLayout);
         ChatsHelper.setOnClickHideListener(mChatsMessageEdittext, mChatsAttatchmentsLayout);
+    }
+
+    private boolean isFromDeepLink() {
+        final String conversationId = getIntent().getStringExtra(ARGS_CONVERSATION_ID);
+        return conversationId == null && getIntent().getData() != null;
     }
 
     @Nonnull
@@ -432,7 +448,6 @@ public class ChatActivity extends BaseActivity implements Listener {
                     presenter.sendProfile(profileId);
                 }
             });
-            presenter.sendProfile(profileId);
         } else if (requestCode == INFO_REQUEST && resultCode == RESULT_OK) {
 
             final boolean closeChat = data.getBooleanExtra(ChatInfoActivity.EXTRA_CLOSE_CHAT, false);

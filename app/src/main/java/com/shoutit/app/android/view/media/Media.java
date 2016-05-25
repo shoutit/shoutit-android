@@ -28,7 +28,6 @@ public class Media implements Parcelable {
         dest.writeString(name);
         dest.writeString(path);
         dest.writeLong(duration);
-
     }
 
     public static final Parcelable.Creator<Media> CREATOR = new Parcelable.Creator<Media>() {

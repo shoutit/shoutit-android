@@ -8,6 +8,7 @@ import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.pusher.client.Pusher;
 import com.pusher.client.PusherOptions;
 import com.pusher.client.channel.PresenceChannel;
@@ -17,6 +18,7 @@ import com.pusher.client.connection.ConnectionStateChange;
 import com.pusher.client.util.HttpAuthorizer;
 import com.shoutit.app.android.BuildConfig;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.model.NotificationsResponse;
 import com.shoutit.app.android.api.model.PusherMessage;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.model.Stats;
@@ -35,6 +37,7 @@ import rx.functions.Func1;
 public class PusherHelper {
 
     private static final String NEW_MESSAGE = "new_message";
+    private static final String NEW_NOTIFICATION = "new_notification";
     private static final String CONVERSATION_UPDATE = "conversation_update";
     private static final String STATS_UPDATE = "stats_update";
     private static final String CLIENT_IS_TYPING = "client-is_typing";
@@ -129,6 +132,28 @@ public class PusherHelper {
                                     final PusherMessage pusherMessage = mGson.getAdapter(PusherMessage.class).fromJson(data);
                                     subscriber.onNext(pusherMessage);
                                 } catch (IOException e) {
+                                    subscriber.onError(e);
+                                }
+                            }
+                        });
+                    }
+                });
+    }
+
+    public Observable<NotificationsResponse.Notification> getNewNotificationObservable() {
+        return Observable
+                .create(new Observable.OnSubscribe<NotificationsResponse.Notification>() {
+                    @Override
+                    public void call(final Subscriber<? super NotificationsResponse.Notification> subscriber) {
+                        getProfileChannel().bind(NEW_NOTIFICATION, new PresenceChannelEventListenerAdapter() {
+
+                            @Override
+                            public void onEvent(String channelName, String eventName, String data) {
+                                try {
+                                    final NotificationsResponse.Notification notification = mGson
+                                            .fromJson(data, NotificationsResponse.Notification.class);
+                                    subscriber.onNext(notification);
+                                } catch (JsonSyntaxException e) {
                                     subscriber.onError(e);
                                 }
                             }
