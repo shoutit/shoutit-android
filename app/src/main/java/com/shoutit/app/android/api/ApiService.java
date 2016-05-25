@@ -46,6 +46,7 @@ import com.shoutit.app.android.api.model.SuggestionsResponse;
 import com.shoutit.app.android.api.model.TagDetail;
 import com.shoutit.app.android.api.model.TagsRequest;
 import com.shoutit.app.android.api.model.TwilioResponse;
+import com.shoutit.app.android.api.model.UpdateFacebookTokenRequest;
 import com.shoutit.app.android.api.model.UpdateLocationRequest;
 import com.shoutit.app.android.api.model.UpdateUserRequest;
 import com.shoutit.app.android.api.model.User;
@@ -465,4 +466,7 @@ public interface ApiService {
 
     @POST("twilio/video_call")
     Observable<ResponseBody> videoCall(@Body VideoCallRequest rejectRequest);
+
+    @PATCH("profiles/me/link")
+    Observable<User> updateFacebookToken(@Body UpdateFacebookTokenRequest updateFacebookTokenRequest);
 }
