@@ -3,6 +3,8 @@ machine:
        JAVA_TOOL_OPTIONS: "-Xmx4096m -XX:MaxPermSize=4g"
    pre:
      - printf "org.gradle.jvmargs=-XX:MaxPermSize=4g\ndisablePreDex=true\n" > gradle.properties
+   java:
+       version: oraclejdk8
 
 dependencies:
     override:
