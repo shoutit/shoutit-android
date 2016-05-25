@@ -28,6 +28,7 @@ import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.twilio.Twilio;
+import com.shoutit.app.android.utils.AviaryContants;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
 import com.shoutit.app.android.utils.stackcounter.StackCounterManager;
@@ -47,9 +48,6 @@ import rx.plugins.RxJavaPlugins;
 
 
 public class App extends MultiDexApplication implements IAviaryClientCredentials {
-
-    private static final String CREATIVE_SDK_CLIENT_ID = "<d28fc7c854974249b66b40d2d1176d6d>";
-    private static final String CREATIVE_SDK_CLIENT_SECRET = "a72c07af-c322-4d9c-828a-b4c465dad61b";
 
     private static final String GCM_TOKEN = "935842257865";
 
@@ -279,16 +277,16 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
 
     @Override
     public String getClientID() {
-        return CREATIVE_SDK_CLIENT_ID;
+        return AviaryContants.CREATIVE_SDK_CLIENT_ID;
     }
 
     @Override
     public String getClientSecret() {
-        return CREATIVE_SDK_CLIENT_SECRET;
+        return AviaryContants.CREATIVE_SDK_CLIENT_SECRET;
     }
 
     @Override
     public String getBillingKey() {
-        return null; // TODO
+        return null;
     }
 }
