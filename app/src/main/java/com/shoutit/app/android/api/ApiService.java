@@ -468,5 +468,5 @@ public interface ApiService {
     Observable<ResponseBody> videoCall(@Body VideoCallRequest rejectRequest);
 
     @PATCH("profiles/me/link")
-    Observable<User> updateFacebookToken(@Body UpdateFacebookTokenRequest updateFacebookTokenRequest);
+    Observable<ResponseBody> updateFacebookToken(@Body UpdateFacebookTokenRequest updateFacebookTokenRequest);
 }

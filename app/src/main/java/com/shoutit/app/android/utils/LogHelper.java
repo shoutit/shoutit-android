@@ -5,6 +5,8 @@ import android.util.Log;
 import com.crashlytics.android.Crashlytics;
 import com.shoutit.app.android.BuildConfig;
 
+import javax.annotation.Nonnull;
+
 public class LogHelper {
 
     public static void logThrowable(String tag, String msg, Throwable t) {
@@ -24,6 +26,12 @@ public class LogHelper {
             Crashlytics.logException(t);
         } else {
             Log.e(tag, msg, t);
+        }
+    }
+
+    public static void logIfDebug(@Nonnull String tag, @Nonnull String msg) {
+        if (BuildConfig.DEBUG) {
+            Log.d(tag, msg);
         }
     }
 }
