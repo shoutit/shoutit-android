@@ -59,7 +59,7 @@ android {
 
     dexOptions {
         dexInProcess false
-        maxProgressCount 1
+        maxProcessCount 1
     }
 
     compileOptions {
