@@ -128,6 +128,13 @@
             android:background="@color/black_12"/>
 
         <CheckedTextView
+            android:id="@+id/menu_invite_friends"
+            android:paddingLeft="16dp"
+            android:paddingStart="16dp"
+            style="@style/SideMenuItem"
+            android:text="Invite Friends" />
+
+        <CheckedTextView
             android:id="@+id/menu_settings"
             android:paddingLeft="16dp"
             android:paddingStart="16dp"

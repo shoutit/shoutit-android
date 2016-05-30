@@ -11,6 +11,8 @@ import android.widget.CheckedTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.R;
@@ -24,6 +26,7 @@ import com.shoutit.app.android.view.conversations.ConversationsPagerFragment;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
 import com.shoutit.app.android.view.discover.DiscoverFragment;
 import com.shoutit.app.android.view.home.HomeFragment;
+import com.shoutit.app.android.view.invitefriends.InviteFriendsFragment;
 import com.shoutit.app.android.view.location.LocationActivity;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
@@ -36,12 +39,9 @@ import com.squareup.picasso.Transformation;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 import com.uservoice.uservoicesdk.UserVoice;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -54,6 +54,7 @@ public class MenuHandler {
     public static final String FRAGMENT_BROWSE = "fragment_browse";
     public static final String FRAGMENT_CHATS = "fragment_chats";
     public static final String FRAGMENT_PUBLIC_CHATS = "fragment_public_chats";
+    public static final String FRAGMENT_INVITE_FRIENDS = "fragment_invite_friends";
     public static final String ACTIVITY_SETTINGS = "activity_settings";
     public static final String ACTIVITY_HELP = "activity_help";
 
@@ -96,24 +97,16 @@ public class MenuHandler {
 
     private List<CheckedTextView> selectableItems = ImmutableList.of();
 
-    private static Map<String, Integer> viewTagViewIdMap = new HashMap<>();
+    private static BiMap<String, Integer> viewTagViewIdMap = HashBiMap.create();
+
     static {
         viewTagViewIdMap.put(FRAGMENT_HOME, R.id.menu_home);
         viewTagViewIdMap.put(FRAGMENT_DISCOVER, R.id.menu_discover);
         viewTagViewIdMap.put(FRAGMENT_BROWSE, R.id.menu_browse);
         viewTagViewIdMap.put(FRAGMENT_CHATS, R.id.menu_chat);
-        viewTagViewIdMap.put(FRAGMENT_PUBLIC_CHATS, R.id.menu_chat);
+        viewTagViewIdMap.put(FRAGMENT_INVITE_FRIENDS, R.id.menu_invite_friends);
         viewTagViewIdMap.put(ACTIVITY_HELP, R.id.menu_help);
         viewTagViewIdMap.put(ACTIVITY_SETTINGS, R.id.menu_settings);
-    }
-    private static Map<Integer, String> viewIdViewTagMap = new HashMap<>();
-    static {
-        viewIdViewTagMap.put(R.id.menu_home, FRAGMENT_HOME);
-        viewIdViewTagMap.put(R.id.menu_discover, FRAGMENT_DISCOVER);
-        viewIdViewTagMap.put(R.id.menu_browse, FRAGMENT_BROWSE);
-        viewIdViewTagMap.put(R.id.menu_chat, FRAGMENT_CHATS);
-        viewIdViewTagMap.put(R.id.menu_help, ACTIVITY_HELP);
-        viewIdViewTagMap.put(R.id.menu_settings, ACTIVITY_SETTINGS);
     }
 
     public MenuHandler(@Nonnull final RxAppCompatActivity rxActivity,
@@ -180,9 +173,9 @@ public class MenuHandler {
         };
     }
 
-    @OnClick({R.id.menu_home, R.id.menu_discover, R.id.menu_browse, R.id.menu_chat, R.id.menu_settings, R.id.menu_help})
+    @OnClick({R.id.menu_home, R.id.menu_discover, R.id.menu_browse, R.id.menu_chat, R.id.menu_settings, R.id.menu_help, R.id.menu_invite_friends})
     public void onMenuItemSelected(View view) {
-        selectMenuItem(viewIdViewTagMap.get(view.getId()));
+        selectMenuItem(viewTagViewIdMap.inverse().get(view.getId()));
     }
 
     public void selectMenuItem(@Nonnull String viewTag) {
@@ -190,10 +183,10 @@ public class MenuHandler {
             case FRAGMENT_HOME:
             case FRAGMENT_DISCOVER:
             case FRAGMENT_BROWSE:
+            case FRAGMENT_INVITE_FRIENDS:
                 selectFragment(viewTag);
                 break;
             case FRAGMENT_CHATS:
-            case FRAGMENT_PUBLIC_CHATS:
                 if (userPreferences.isNormalUser()) {
                     selectFragment(viewTag);
                 } else {
@@ -326,13 +319,14 @@ public class MenuHandler {
                 return ConversationsPagerFragment.newInstance();
             case FRAGMENT_PUBLIC_CHATS:
                 return ConversationsPagerFragment.newInstance(true);
+            case FRAGMENT_INVITE_FRIENDS:
+                return InviteFriendsFragment.newInstance();
             default:
                 throw new RuntimeException("Unknown fragment tag");
-
         }
     }
 
-    public void setStats(int messageCount, int notificationsCount){
+    public void setStats(int messageCount, int notificationsCount) {
         chatsBadgeTv.setVisibility(messageCount > 0 ? View.VISIBLE : View.GONE);
         chatsBadgeTv.setText(String.valueOf(messageCount));
 
