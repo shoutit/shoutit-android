@@ -59,6 +59,7 @@ android {
 
     dexOptions {
         dexInProcess false
+        maxProgressCount 1
     }
 
     compileOptions {
