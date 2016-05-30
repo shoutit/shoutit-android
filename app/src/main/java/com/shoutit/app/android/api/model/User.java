@@ -31,12 +31,15 @@ public class User extends BaseProfile {
     private final ConversationDetails conversation;
     @Nullable
     private final Stats stats;
+    @Nullable
+    private final LinkedAccounts linkedAccounts;
 
     public User(String id, String type, String apiUrl, String webUrl, String username,
                 String name, String firstName, String lastName, boolean isActivated, String image,
                 String cover, boolean isListening, boolean isListener, boolean isPasswordSet, UserLocation location,
                 int listenersCount, List<Page> pages, List<Admin> admins, String bio, int dateJoined,
-                Listening listeningCount, boolean isOwner, String about, String mobile, String website, String email, ConversationDetails conversation, @Nullable Stats stats) {
+                Listening listeningCount, boolean isOwner, String about, String mobile, String website, String email, ConversationDetails conversation,
+                @Nullable Stats stats, @Nullable LinkedAccounts linkedAccounts) {
         super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount);
         this.apiUrl = apiUrl;
         this.webUrl = webUrl;
@@ -55,6 +58,7 @@ public class User extends BaseProfile {
         this.email = email;
         this.conversation = conversation;
         this.stats = stats;
+        this.linkedAccounts = linkedAccounts;
     }
 
     public User getListenedProfile() {
@@ -64,7 +68,7 @@ public class User extends BaseProfile {
                 firstName, lastName, isActivated, image, cover,
                 newIsListening, isListener, isPasswordSet, location,
                 newListenersCount, pages, admins, bio, dateJoined, listeningCount,
-                false, about, mobile, website, email, conversation, stats);
+                false, about, mobile, website, email, conversation, stats, linkedAccounts);
     }
 
     public static User userWithUpdatedPages(@Nonnull User user, List<Page> pages) {
@@ -72,7 +76,7 @@ public class User extends BaseProfile {
                 user.firstName, user.lastName, user.isActivated, user.image, user.cover,
                 user.isListening, user.isListener, user.isPasswordSet, user.location,
                 user.listenersCount, pages, user.admins, user.bio, user.dateJoined, user.listeningCount,
-                false, user.about, user.mobile, user.website, user.email, user.conversation, user.stats);
+                false, user.about, user.mobile, user.website, user.email, user.conversation, user.stats, user.linkedAccounts);
     }
 
     public static User userWithUpdatedAdmins(@Nonnull User user, List<Admin> updatedAdmins) {
@@ -80,7 +84,7 @@ public class User extends BaseProfile {
                 user.firstName, user.lastName, user.isActivated, user.image, user.cover,
                 user.isListening, user.isListener, user.isPasswordSet, user.location,
                 user.listenersCount, user.pages, updatedAdmins, user.bio, user.dateJoined, user.listeningCount,
-                false, user.about, user.mobile, user.website, user.email, user.conversation, user.stats);
+                false, user.about, user.mobile, user.website, user.email, user.conversation, user.stats, user.linkedAccounts);
     }
 
     public String getId() {
@@ -192,6 +196,11 @@ public class User extends BaseProfile {
     }
 
     @Nullable
+    public LinkedAccounts getLinkedAccounts() {
+        return linkedAccounts;
+    }
+
+    @Nullable
     public Stats getStats() {
         return stats;
     }
@@ -241,6 +250,7 @@ public class User extends BaseProfile {
                 Objects.equal(isListener, user.isListener) &&
                 Objects.equal(email, user.email) &&
                 Objects.equal(stats, user.stats) &&
+                Objects.equal(linkedAccounts, user.linkedAccounts) &&
                 Objects.equal(listeningCount, user.listeningCount);
     }
 
@@ -248,6 +258,6 @@ public class User extends BaseProfile {
     public int hashCode() {
         return Objects.hashCode(id, type, apiUrl, webUrl, username, name, firstName, lastName,
                 isActivated, image, cover, isListening, isPasswordSet, location, listenersCount,
-                pages, bio, dateJoined, listeningCount, isListener, admins, isOwner, website, email, stats);
+                pages, bio, dateJoined, listeningCount, isListener, admins, isOwner, website, email, stats, linkedAccounts);
     }
 }

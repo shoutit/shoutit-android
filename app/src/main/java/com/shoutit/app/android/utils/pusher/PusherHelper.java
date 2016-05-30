@@ -36,11 +36,12 @@ import rx.functions.Func1;
 
 public class PusherHelper {
 
-    private static final String NEW_MESSAGE = "new_message";
-    private static final String NEW_NOTIFICATION = "new_notification";
-    private static final String CONVERSATION_UPDATE = "conversation_update";
-    private static final String STATS_UPDATE = "stats_update";
-    private static final String CLIENT_IS_TYPING = "client-is_typing";
+    private static final String EVENT_NEW_MESSAGE = "new_message";
+    private static final String EVENT_NEW_NOTIFICATION = "new_notification";
+    private static final String EVENT_CONVERSATION_UPDATE = "conversation_update";
+    private static final String EVENT_STATS_UPDATE = "stats_update";
+    private static final String EVENT_CLIENT_IS_TYPING = "client-is_typing";
+    private static final String EVENT_PROFILE_UPDATE = "profile_update";
 
     private static final String DEBUG_KEY = "7bee1e468fabb6287fc5";
     private static final String LOCAL_KEY = "d6a98f27e49289344791";
@@ -103,7 +104,7 @@ public class PusherHelper {
                 .create(new Observable.OnSubscribe<PusherMessage>() {
                     @Override
                     public void call(final Subscriber<? super PusherMessage> subscriber) {
-                        conversationChannel.bind(NEW_MESSAGE, new PresenceChannelEventListenerAdapter() {
+                        conversationChannel.bind(EVENT_NEW_MESSAGE, new PresenceChannelEventListenerAdapter() {
 
                             @Override
                             public void onEvent(String channelName, String eventName, String data) {
@@ -119,12 +120,29 @@ public class PusherHelper {
                 });
     }
 
+    public Observable<User> getUserUpdatedObservable() {
+        return Observable
+                .create(new Observable.OnSubscribe<User>() {
+                    @Override
+                    public void call(final Subscriber<? super User> subscriber) {
+                        getProfileChannel().bind(EVENT_PROFILE_UPDATE, new PresenceChannelEventListenerAdapter() {
+
+                            @Override
+                            public void onEvent(String channelName, String eventName, String data) {
+                                final User user = mGson.fromJson(data, User.class);
+                                subscriber.onNext(user);
+                            }
+                        });
+                    }
+                });
+    }
+
     public Observable<PusherMessage> getNewMessagesObservable() {
         return Observable
                 .create(new Observable.OnSubscribe<PusherMessage>() {
                     @Override
                     public void call(final Subscriber<? super PusherMessage> subscriber) {
-                        getProfileChannel().bind(NEW_MESSAGE, new PresenceChannelEventListenerAdapter() {
+                        getProfileChannel().bind(EVENT_NEW_MESSAGE, new PresenceChannelEventListenerAdapter() {
 
                             @Override
                             public void onEvent(String channelName, String eventName, String data) {
@@ -145,7 +163,7 @@ public class PusherHelper {
                 .create(new Observable.OnSubscribe<NotificationsResponse.Notification>() {
                     @Override
                     public void call(final Subscriber<? super NotificationsResponse.Notification> subscriber) {
-                        getProfileChannel().bind(NEW_NOTIFICATION, new PresenceChannelEventListenerAdapter() {
+                        getProfileChannel().bind(EVENT_NEW_NOTIFICATION, new PresenceChannelEventListenerAdapter() {
 
                             @Override
                             public void onEvent(String channelName, String eventName, String data) {
@@ -173,7 +191,7 @@ public class PusherHelper {
                                 .create(new Observable.OnSubscribe<Stats>() {
                                     @Override
                                     public void call(final Subscriber<? super Stats> subscriber) {
-                                        getProfileChannel().bind(STATS_UPDATE, new PresenceChannelEventListenerAdapter() {
+                                        getProfileChannel().bind(EVENT_STATS_UPDATE, new PresenceChannelEventListenerAdapter() {
 
                                             @Override
                                             public void onEvent(String channelName, String eventName, String data) {
@@ -203,7 +221,7 @@ public class PusherHelper {
                 .create(new Observable.OnSubscribe<TypingInfo>() {
                     @Override
                     public void call(final Subscriber<? super TypingInfo> subscriber) {
-                        conversationChannel.bind(CLIENT_IS_TYPING, new PresenceChannelEventListenerAdapter() {
+                        conversationChannel.bind(EVENT_CLIENT_IS_TYPING, new PresenceChannelEventListenerAdapter() {
 
                             @Override
                             public void onEvent(String channelName, String eventName, String data) {

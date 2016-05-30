@@ -273,6 +273,7 @@
         long
     </string>
     <string name="create_request_activity_price_empty">Price cannot be empty</string>
+    <string name="request_activity_sharing">Sharing</string>
 
     <!-- Edit Shout -->
     <string name="edit_shout_option">Option</string>
@@ -588,5 +589,6 @@
 
     <!-- Chat Blocked Users -->
     <string name="blocked_users_unblock_dialog_title">Do you want to unblock user %1$s?</string>
+    <string name="request_activity_facebook">Facebook</string>
 
 </resources>

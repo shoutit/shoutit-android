@@ -28,6 +28,7 @@ import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
 import com.shoutit.app.android.utils.stackcounter.StackCounterManager;
+import com.shoutit.app.android.view.loginintro.FacebookHelper;
 import com.squareup.leakcanary.LeakCanary;
 import com.uservoice.uservoicesdk.Config;
 import com.uservoice.uservoicesdk.UserVoice;
@@ -72,6 +73,8 @@ public class App extends MultiDexApplication {
     ProfilesDao profilesDao;
     @Inject
     NotificationHelper notificationHelper;
+    @Inject
+    FacebookHelper facebookHelper;
 
     @Override
     public void onCreate() {
@@ -103,6 +106,8 @@ public class App extends MultiDexApplication {
         initPusher();
 
         initTwilio();
+
+        facebookHelper.initFacebook();
 
         mStackCounterManager.register(this)
                 .subscribe(new Action1<Boolean>() {
