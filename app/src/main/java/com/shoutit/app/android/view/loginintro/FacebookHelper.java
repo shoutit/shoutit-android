@@ -9,6 +9,7 @@ import com.appunite.rx.dagger.NetworkScheduler;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
+import com.facebook.FacebookAuthorizationException;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
@@ -28,8 +29,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import okhttp3.ResponseBody;
 import rx.Observable;
@@ -38,13 +37,12 @@ import rx.Subscriber;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
-@Singleton
 public class FacebookHelper {
 
     private static final String TAG = FacebookHelper.class.getSimpleName();
 
     private static final String PERMISSION_EMAIL = "email";
-    private static final String PERMISSION_PUBLISH_ACTIONS = "publish_actions";
+    public static final String PERMISSION_PUBLISH_ACTIONS = "publish_actions";
 
     private final ApiService apiService;
     private final UserPreferences userPreferences;
@@ -52,7 +50,6 @@ public class FacebookHelper {
     private final Scheduler networkScheduler;
     private final PusherHelper pusherHelper;
 
-    @Inject
     public FacebookHelper(final ApiService apiService,
                           final UserPreferences userPreferences,
                           @ForApplication Context context,
@@ -69,38 +66,9 @@ public class FacebookHelper {
         FacebookSdk.sdkInitialize(context, new FacebookSdk.InitializeCallback() {
             @Override
             public void onInitialized() {
-
-                new AccessTokenTracker() {
-                    @Override
-                    protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken,
-                                                               AccessToken currentAccessToken) {
-                        if (!userPreferences.isNormalUser()) {
-                            return;
-                        }
-
-                        updateFacebookTokenInApi(currentAccessToken.getToken())
-                                .subscribe(new Action1<ResponseBody>() {
-                                    @Override
-                                    public void call(ResponseBody responseBody) {
-                                        LogHelper.logIfDebug(TAG, "Facebook token updated");
-                                    }
-                                }, new Action1<Throwable>() {
-                                    @Override
-                                    public void call(Throwable throwable) {
-                                        LogHelper.logThrowableAndCrashlytics(TAG, "Cannot update fb token", throwable);
-                                    }
-                                });
-                    }
-                };
-
                 refreshTokenIfNeeded();
             }
         });
-    }
-
-    public Observable<ResponseBody> updateFacebookTokenInApi(@Nonnull String facebookToken) {
-        return apiService.updateFacebookToken(new UpdateFacebookTokenRequest(facebookToken))
-                .subscribeOn(networkScheduler);
     }
 
     private void refreshTokenIfNeeded() {
@@ -109,8 +77,42 @@ public class FacebookHelper {
             return;
         }
 
+        new AccessTokenTracker() {
+            @Override
+            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken,
+                                                       AccessToken currentAccessToken) {
+                if (!userPreferences.isNormalUser()) {
+                    return;
+                }
+
+                updateFacebookTokenInApi(currentAccessToken.getToken())
+                        .subscribe(new Action1<ResponseBody>() {
+                            @Override
+                            public void call(ResponseBody responseBody) {
+                                stopTracking();
+                                LogHelper.logIfDebug(TAG, "Facebook token updated");
+                            }
+                        }, new Action1<Throwable>() {
+                            @Override
+                            public void call(Throwable throwable) {
+                                stopTracking();
+                                LogHelper.logThrowableAndCrashlytics(TAG, "Cannot update fb token", throwable);
+                            }
+                        });
+            }
+        };
+
         LogHelper.logIfDebug(TAG, "Facebook token expired");
         AccessToken.refreshCurrentAccessTokenAsync();
+    }
+
+    public Observable<ResponseBody> updateFacebookTokenInApi(@Nonnull String facebookToken) {
+        return apiService.updateFacebookToken(new UpdateFacebookTokenRequest(facebookToken))
+                .subscribeOn(networkScheduler);
+    }
+
+    public static void logOutFromFacebook() {
+        LoginManager.getInstance().logOut();
     }
 
     /**
@@ -132,6 +134,7 @@ public class FacebookHelper {
                         public void call(final Subscriber<? super Boolean> subscriber) {
                             final LoginManager loginManager = LoginManager.getInstance();
                             if (!isLoggedInToFacebook()) {
+                                LogHelper.logIfDebug(TAG, "Not logged in to facebook");
                                 loginManager.logInWithReadPermissions(activity, Collections.singleton(PERMISSION_EMAIL));
                             }
 
@@ -141,6 +144,7 @@ public class FacebookHelper {
                                 @Override
                                 public void onSuccess(LoginResult loginResult) {
                                     if (isPermissionGranted(permissionName) && !subscriber.isUnsubscribed()) {
+                                        LogHelper.logIfDebug(TAG, "Persmission " + permissionName + " has been granted");
                                         subscriber.onNext(true);
                                     }
                                 }
@@ -154,6 +158,13 @@ public class FacebookHelper {
 
                                 @Override
                                 public void onError(FacebookException error) {
+                                    if (error instanceof FacebookAuthorizationException &&
+                                            AccessToken.getCurrentAccessToken() != null) {
+                                        // Case when app has token from other user and tries to log in
+                                        // as different one.
+                                        loginManager.logOut();
+                                    }
+
                                     if (!subscriber.isUnsubscribed()) {
                                         subscriber.onError(error);
                                     }
@@ -168,13 +179,7 @@ public class FacebookHelper {
                             if (isPermissionGranted) {
                                 return updateFacebookTokenInApi(AccessToken.getCurrentAccessToken().getToken())
                                         .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable())
-                                        .compose(ResponseOrError.switchMap(waitForUserToBeUpdated()))
-                                        .compose(ResponseOrError.map(new Func1<User, Boolean>() {
-                                            @Override
-                                            public Boolean call(User user) {
-                                                return hasRequiredPermissionInApi(user, permissionName);
-                                            }
-                                        }));
+                                        .compose(ResponseOrError.switchMap(waitForUserToBeUpdatedInApi(permissionName)));
                             } else {
                                 return Observable.just(ResponseOrError.fromData(false));
                             }
@@ -184,16 +189,25 @@ public class FacebookHelper {
     }
 
     @NonNull
-    private Func1<ResponseBody, Observable<ResponseOrError<User>>> waitForUserToBeUpdated() {
-        return new Func1<ResponseBody, Observable<ResponseOrError<User>>>() {
+    private Func1<ResponseBody, Observable<ResponseOrError<Boolean>>> waitForUserToBeUpdatedInApi(@Nonnull final String requiredPermissionName) {
+        return new Func1<ResponseBody, Observable<ResponseOrError<Boolean>>>() {
             @Override
-            public Observable<ResponseOrError<User>> call(ResponseBody responseBody) {
+            public Observable<ResponseOrError<Boolean>> call(ResponseBody responseBody) {
+                LogHelper.logIfDebug(TAG, "Waiting for user to be updated in API");
                 return pusherHelper.getUserUpdatedObservable()
-                        .take(1)
-                        .map(new Func1<User, ResponseOrError<User>>() {
+                        .takeUntil(new Func1<User, Boolean>() {
                             @Override
-                            public ResponseOrError<User> call(User user) {
-                                return ResponseOrError.fromData(user);
+                            public Boolean call(User user) {
+                                userPreferences.updateUserJson(user);
+                                LogHelper.logIfDebug(TAG, "Pusher event: User updated in API");
+
+                                return hasRequiredPermissionInApi(user, requiredPermissionName);
+                            }
+                        })
+                        .map(new Func1<User, ResponseOrError<Boolean>>() {
+                            @Override
+                            public ResponseOrError<Boolean> call(User user) {
+                                return ResponseOrError.fromData(true);
                             }
                         });
             }
