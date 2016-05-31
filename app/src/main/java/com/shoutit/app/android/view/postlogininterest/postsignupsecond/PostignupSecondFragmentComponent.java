@@ -1,6 +1,5 @@
 package com.shoutit.app.android.view.postlogininterest.postsignupsecond;
 
-import com.shoutit.app.android.PostSignupPresenterComponent;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.BaseFragmentComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
