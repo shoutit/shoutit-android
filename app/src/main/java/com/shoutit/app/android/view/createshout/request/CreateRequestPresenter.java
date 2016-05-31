@@ -21,7 +21,6 @@ import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.UserLocationSimple;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
-import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
@@ -170,7 +169,7 @@ public class CreateRequestPresenter {
         mListener.showProgress();
 
         pendingSubscriptions.add(
-                facebookHelper.askForPublicPermissionIfNeeded(activity,
+                facebookHelper.askForPermissionIfNeeded(activity,
                         FacebookHelper.PERMISSION_PUBLISH_ACTIONS, callbackManager)
                         .observeOn(mUiScheduler)
                         .subscribe(new Action1<ResponseOrError<Boolean>>() {

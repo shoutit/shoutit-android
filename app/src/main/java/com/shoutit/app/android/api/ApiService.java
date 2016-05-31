@@ -29,6 +29,7 @@ import com.shoutit.app.android.api.model.ListenersResponse;
 import com.shoutit.app.android.api.model.ListeningResponse;
 import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessagesResponse;
+import com.shoutit.app.android.api.model.MutualFriendsResponse;
 import com.shoutit.app.android.api.model.NotificationsResponse;
 import com.shoutit.app.android.api.model.PostMessage;
 import com.shoutit.app.android.api.model.ProfileRequest;
@@ -291,6 +292,11 @@ public interface ApiService {
     Observable<ListenersResponse> listeners(@Path("user_name") String userName,
                                             @Query("page") Integer page,
                                             @Query("page_size") Integer pageSize);
+
+    @GET("profiles/{user_name}/mutual_friends")
+    Observable<MutualFriendsResponse> facebookFriends(@Path("user_name") String userName,
+                                                      @Query("page") Integer page,
+                                                      @Query("page_size") Integer pageSize);
 
     /**
      * Misc

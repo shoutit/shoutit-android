@@ -15,6 +15,7 @@ import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
+import com.google.common.collect.Lists;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.LinkedAccounts;
@@ -42,6 +43,7 @@ public class FacebookHelper {
     private static final String TAG = FacebookHelper.class.getSimpleName();
 
     private static final String PERMISSION_EMAIL = "email";
+    public static final String PERMISSION_USER_FRIENDS = "user_friends";
     public static final String PERMISSION_PUBLISH_ACTIONS = "publish_actions";
 
     private final ApiService apiService;
@@ -120,9 +122,10 @@ public class FacebookHelper {
      * @param permissionName
      * @return true if permission granted, false otherwise
      */
-    public Observable<ResponseOrError<Boolean>> askForPublicPermissionIfNeeded(@Nonnull final Activity activity,
-                                                  @Nonnull final String permissionName,
-                                                  @Nonnull final CallbackManager callbackManager) {
+    public Observable<ResponseOrError<Boolean>> askForPermissionIfNeeded(@Nonnull final Activity activity,
+                                                                         @Nonnull final String permissionName,
+                                                                         @Nonnull final CallbackManager callbackManager,
+                                                                         final boolean isPublishPermission) {
         final User user = userPreferences.getUser();
 
         if (user != null && hasRequiredPermissionInApi(user, permissionName)) {
@@ -133,12 +136,26 @@ public class FacebookHelper {
                         @Override
                         public void call(final Subscriber<? super Boolean> subscriber) {
                             final LoginManager loginManager = LoginManager.getInstance();
+
                             if (!isLoggedInToFacebook()) {
                                 LogHelper.logIfDebug(TAG, "Not logged in to facebook");
-                                loginManager.logInWithReadPermissions(activity, Collections.singleton(PERMISSION_EMAIL));
+
+                                final List<String> permissions = Lists.newArrayList();
+                                permissions.add(PERMISSION_EMAIL);
+
+                                if (!isPublishPermission) {
+                                    permissions.add(permissionName);
+                                }
+
+                                loginManager.logInWithReadPermissions(activity, Lists.newArrayList(PERMISSION_EMAIL));
+
+                            } else if (!isPublishPermission) {
+                                loginManager.logInWithReadPermissions(activity, Collections.singleton(permissionName));
                             }
 
-                            loginManager.logInWithPublishPermissions(activity, Collections.singleton(permissionName));
+                            if (isPublishPermission) {
+                                loginManager.logInWithPublishPermissions(activity, Collections.singleton(permissionName));
+                            }
 
                             loginManager.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
                                 @Override
