@@ -25,7 +25,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class ListeningsActivity extends BaseProfilesListActivity {
 
     private static final String KEY_ARE_INTERESTS = "are_interests";
-    private static final int REQUEST_OPENED_PROFILE_WAS_LISTENED = 1;
 
     @Inject
     ProfilesListAdapter adapter;

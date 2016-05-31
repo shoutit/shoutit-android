@@ -205,7 +205,7 @@ public class PublishMediaShoutFragment extends Fragment {
                                 showProgress(true);
 
                                 return mFacebookHelper.askForPermissionIfNeeded(getActivity(),
-                                        FacebookHelper.PERMISSION_PUBLISH_ACTIONS, mCallbackManager)
+                                        FacebookHelper.PERMISSION_PUBLISH_ACTIONS, mCallbackManager, true)
                                         .observeOn(MyAndroidSchedulers.mainThread());
                             }
                         })

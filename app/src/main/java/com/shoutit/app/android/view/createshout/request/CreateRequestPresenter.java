@@ -170,7 +170,7 @@ public class CreateRequestPresenter {
 
         pendingSubscriptions.add(
                 facebookHelper.askForPermissionIfNeeded(activity,
-                        FacebookHelper.PERMISSION_PUBLISH_ACTIONS, callbackManager)
+                        FacebookHelper.PERMISSION_PUBLISH_ACTIONS, callbackManager, true)
                         .observeOn(mUiScheduler)
                         .subscribe(new Action1<ResponseOrError<Boolean>>() {
                             @Override

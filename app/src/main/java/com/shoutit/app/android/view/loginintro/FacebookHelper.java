@@ -147,7 +147,7 @@ public class FacebookHelper {
                                     permissions.add(permissionName);
                                 }
 
-                                loginManager.logInWithReadPermissions(activity, Lists.newArrayList(PERMISSION_EMAIL));
+                                loginManager.logInWithReadPermissions(activity, permissions);
 
                             } else if (!isPublishPermission) {
                                 loginManager.logInWithReadPermissions(activity, Collections.singleton(permissionName));
@@ -189,10 +189,10 @@ public class FacebookHelper {
                             });
                         }
                     })
-                    .switchMap(new Func1<Boolean, Observable<ResponseOrError<Boolean>>>() {
+                    .compose(ResponseOrError.<Boolean>toResponseOrErrorObservable())
+                    .compose(ResponseOrError.switchMap(new Func1<Boolean, Observable<ResponseOrError<Boolean>>>() {
                         @Override
                         public Observable<ResponseOrError<Boolean>> call(Boolean isPermissionGranted) {
-
                             if (isPermissionGranted) {
                                 return updateFacebookTokenInApi(AccessToken.getCurrentAccessToken().getToken())
                                         .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable())
@@ -201,7 +201,7 @@ public class FacebookHelper {
                                 return Observable.just(ResponseOrError.fromData(false));
                             }
                         }
-                    });
+                    }));
         }
     }
 

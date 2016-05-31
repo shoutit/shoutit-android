@@ -30,7 +30,7 @@ import rx.functions.Action1;
 
 public abstract class BaseProfilesListActivity extends BaseActivity {
 
-    private static final int REQUEST_OPENED_PROFILE_WAS_LISTENED = 1;
+    protected static final int REQUEST_OPENED_PROFILE_WAS_LISTENED = 1;
 
     @Bind(R.id.listenings_toolbar)
     protected Toolbar toolbar;

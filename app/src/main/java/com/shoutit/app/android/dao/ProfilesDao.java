@@ -69,6 +69,19 @@ public class ProfilesDao {
                         return new SearchProfilesDao(query);
                     }
                 });
+
+        friendsCache = CacheBuilder.newBuilder()
+                .build(new CacheLoader<String, FriendsDao>() {
+                    @Override
+                    public FriendsDao load(@Nonnull String userName) throws Exception {
+                        return new FriendsDao(userName);
+                    }
+                });
+    }
+
+    @Nonnull
+    public FriendsDao getFriendsDao(@Nonnull String userName) {
+        return friendsCache.getUnchecked(userName);
     }
 
     @Nonnull
