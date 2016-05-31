@@ -273,6 +273,7 @@
         long
     </string>
     <string name="create_request_activity_price_empty">Price cannot be empty</string>
+    <string name="request_activity_sharing">Sharing</string>
 
     <!-- Edit Shout -->
     <string name="edit_shout_option">Option</string>
@@ -588,6 +589,9 @@
 
     <!-- Chat Blocked Users -->
     <string name="blocked_users_unblock_dialog_title">Do you want to unblock user %1$s?</string>
+    <string name="request_activity_facebook">Facebook</string>
+    <string name="request_activity_twitter">Twitter</string>
+    <string name="request_activity_facebook_permission_error">Permissions not granted. We need it to share shouts on Facebook.</string>
 
     <!-- User suggestions -->
     <string name="user_suggestion_pages">Suggested Pages</string>

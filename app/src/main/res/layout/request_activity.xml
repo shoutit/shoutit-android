@@ -134,6 +134,54 @@
                     android:layout_marginBottom="10dp"
                     android:background="@android:color/darker_gray" />
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="6dp"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/request_activity_sharing"
+                    android:textAllCaps="true"
+                    android:textColor="#8a000000"
+                    android:textSize="12sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="18dp"
+                    android:orientation="horizontal">
+
+                    <CheckBox
+                        android:id="@+id/request_activity_facebook_checkbox"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginRight="16dp"
+                        android:layout_weight="1"
+                        android:paddingLeft="14dp"
+                        android:paddingStart="14dp"
+                        android:text="@string/request_activity_facebook"
+                        android:textColor="@color/black_54"
+                        android:textSize="16sp"
+                        android:theme="@style/BlueCheckBoxOnChecked"
+                        tools:checked="true" />
+
+                    <CheckBox
+                        android:id="@+id/request_activity_twitter_checkbox"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginRight="16dp"
+                        android:layout_weight="1"
+                        android:paddingLeft="14dp"
+                        android:paddingStart="14dp"
+                        android:text="@string/request_activity_twitter"
+                        android:textColor="@color/black_54"
+                        android:textSize="16sp"
+                        android:visibility="invisible"
+                        android:theme="@style/BlueCheckBoxOnChecked" />
+
+                </LinearLayout>
+
                 <Button
                     android:id="@+id/create_request_confirm"
                     style="@style/BaseButtonStyle"

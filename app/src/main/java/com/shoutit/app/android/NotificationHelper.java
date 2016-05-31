@@ -94,7 +94,7 @@ public class NotificationHelper {
         if (dataJson != null) {
             try {
                 dataObject = new JSONObject(dataJson);
-                appUrl = dataObject.getString(GCM_APP_URL_FIELD);
+                appUrl = dataObject.optString(GCM_APP_URL_FIELD);
             } catch (JSONException e) {
                 LogHelper.logThrowableAndCrashlytics(TAG, "Cannot parse data field from push", e);
                 appUrl = null;

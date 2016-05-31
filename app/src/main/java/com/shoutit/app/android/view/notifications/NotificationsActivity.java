@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.UiScheduler;
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
 import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
@@ -35,6 +36,7 @@ import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.profile.tagprofile.TagProfileActivity;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -96,6 +98,7 @@ public class NotificationsActivity extends BaseActivity {
         recyclerView.setAdapter(adapter);
 
         subscription = presenter.getAdapterItemsObservable()
+                .compose(this.<List<BaseAdapterItem>>bindToLifecycle())
                 .subscribe(adapter);
 
         presenter.getProgressObservable()
