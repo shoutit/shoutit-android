@@ -17,7 +17,7 @@ test:
         - python tools/download.py --token P8uXtUgTeNDYEIvw5gXUWjDM --key-version agxzfmF1dG8tY2xvc2VyGAsSC1Byb2plY3RLZXlzGICAgKDI0JMKDA
 
     override:
-        - (./gradlew --stacktrace --project-prop versionSuffix="${CIRCLE_BUILD_NUM}" clean build -PpreDexEnable=false -Pcom.android.build.threadPoolSize=1 -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xms2048m -Xmx2048m" -Dorg.gradle.daemon=false):
+        - (./gradlew --stacktrace --project-prop versionSuffix="${CIRCLE_BUILD_NUM}" clean build -PpreDexEnable=false -Pcom.android.build.threadPoolSize=2 -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xms2048m -Xmx2048m" -Dorg.gradle.daemon=false):
             timeout: 1800
 
     post:
