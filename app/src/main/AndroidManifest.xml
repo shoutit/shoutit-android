@@ -340,6 +340,11 @@
             android:name="com.amazonaws.mobileconnectors.s3.transferutility.TransferService"
             android:enabled="true"/>
 
+        <provider
+            android:name="com.adobe.creativesdk.aviary.internal.cds.CdsProvider"
+            android:authorities="${applicationId}.CdsProvider"
+            android:exported="false" />
+
     </application>
 
 

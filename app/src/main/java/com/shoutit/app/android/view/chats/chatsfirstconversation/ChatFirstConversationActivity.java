@@ -345,7 +345,7 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
 
     @OnClick(R.id.chats_attatchments_media)
     void mediaClicked() {
-        startActivityForResult(RecordMediaActivity.newIntent(this, true, true, true, false), REQUEST_ATTACHMENT);
+        startActivityForResult(RecordMediaActivity.newIntent(this, true, true, true, false, false), REQUEST_ATTACHMENT);
     }
 
     @OnClick(R.id.chats_attatchments_shout)

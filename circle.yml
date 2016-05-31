@@ -1,8 +1,6 @@
 machine:
-   environment:
-       JAVA_TOOL_OPTIONS: "-Xmx4096m -XX:MaxPermSize=4g"
-   pre:
-     - printf "org.gradle.jvmargs=-XX:MaxPermSize=4g\ndisablePreDex=true\n" > gradle.properties
+   java:
+       version: oraclejdk8
 
 dependencies:
     override:
@@ -19,7 +17,7 @@ test:
         - python tools/download.py --token P8uXtUgTeNDYEIvw5gXUWjDM --key-version agxzfmF1dG8tY2xvc2VyGAsSC1Byb2plY3RLZXlzGICAgKDI0JMKDA
 
     override:
-        - (./gradlew --stacktrace --project-prop versionSuffix="${CIRCLE_BUILD_NUM}" clean build):
+        - (./gradlew --stacktrace --project-prop versionSuffix="${CIRCLE_BUILD_NUM}" clean build -PpreDexEnable=false -Dorg.gradle.jvmargs="-Xms1280m -Xmx1280m" -Dorg.gradle.daemon=false):
             timeout: 1800
 
     post:
