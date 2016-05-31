@@ -12,10 +12,12 @@ import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.adapteritems.BaseProfileAdapterItem;
 import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
+import com.shoutit.app.android.adapteritems.NoDataTextAdapterItem;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.TextHelper;
+import com.shoutit.app.android.viewholders.NoDataTextViewHolder;
 import com.shoutit.app.android.viewholders.NoDataViewHolder;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -31,6 +33,7 @@ public class ProfilesListAdapter extends BaseAdapter {
 
     private static final int VIEW_TYPE_PROFILE = 1;
     private static final int VIEW_TYPE_EMPTY = 2;
+    private static final int VIEW_TYPE_EMPTY_WITH_TEXT = 3;
 
     private final Picasso picasso;
 
@@ -103,6 +106,8 @@ public class ProfilesListAdapter extends BaseAdapter {
                 return new ProfileViewHolder(layoutInflater.inflate(R.layout.search_results_profile_item, parent, false));
             case VIEW_TYPE_EMPTY:
                 return new NoDataViewHolder(layoutInflater.inflate(R.layout.listenings_empty, parent, false));
+            case VIEW_TYPE_EMPTY_WITH_TEXT:
+                return new NoDataTextViewHolder(layoutInflater.inflate(R.layout.no_data_text_adapter_item, parent, false));
             default:
                 throw new RuntimeException("Invalid view type: " + viewType);
         }
@@ -115,6 +120,8 @@ public class ProfilesListAdapter extends BaseAdapter {
             return VIEW_TYPE_PROFILE;
         } else if (item instanceof NoDataAdapterItem) {
             return VIEW_TYPE_EMPTY;
+        } else if (item instanceof NoDataTextAdapterItem) {
+            return VIEW_TYPE_EMPTY_WITH_TEXT;
         } else {
             throw new RuntimeException("Invalid view type: " + item.getClass().getSimpleName());
         }
