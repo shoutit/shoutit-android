@@ -590,5 +590,7 @@
     <!-- Chat Blocked Users -->
     <string name="blocked_users_unblock_dialog_title">Do you want to unblock user %1$s?</string>
     <string name="request_activity_facebook">Facebook</string>
+    <string name="request_activity_twitter">Twitter</string>
+    <string name="request_activity_facebook_permission_error">Permissions not granted. We need it to share shouts on Facebook.</string>
 
 </resources>

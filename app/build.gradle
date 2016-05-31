@@ -133,9 +133,9 @@ android {
     }
 
     android.variantFilter { variant ->
-        if (variant.buildType.name.equals('staging') && variant.getFlavors().get(0).name.equals('dev')) {
+   /*     if (variant.buildType.name.equals('staging') && variant.getFlavors().get(0).name.equals('dev')) {
             variant.setIgnore(true);
-        }
+        }*/
         if (variant.buildType.name.equals('release') && variant.getFlavors().get(0).name.equals('dev')) {
             variant.setIgnore(true);
         }

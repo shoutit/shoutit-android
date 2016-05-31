@@ -7,8 +7,10 @@ public class CreateRequestShoutWithPriceRequest extends CreateRequestShoutReques
     private final long price;
     private final String currency;
 
-    public CreateRequestShoutWithPriceRequest(@NonNull String title, @NonNull UserLocationSimple location, long price, @NonNull String currency) {
-        super(title, location);
+    public CreateRequestShoutWithPriceRequest(@NonNull String title, @NonNull UserLocationSimple location,
+                                              long price, @NonNull String currency,
+                                              boolean publishToFacebook) {
+        super(title, location, publishToFacebook);
         this.price = price;
         this.currency = currency;
     }

@@ -16,15 +16,19 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.facebook.CallbackManager;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
@@ -33,12 +37,12 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.ImageHelper;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.RtlUtils;
-import com.shoutit.app.android.utils.TextHelper;
 import com.shoutit.app.android.utils.TextWatcherAdapter;
 import com.shoutit.app.android.view.createshout.DialogsHelper;
 import com.shoutit.app.android.view.createshout.location.LocationActivity;
 import com.shoutit.app.android.view.createshout.location.LocationResultHelper;
 import com.shoutit.app.android.view.createshout.publish.PublishShoutActivity;
+import com.shoutit.app.android.view.loginintro.FacebookHelper;
 import com.shoutit.app.android.widget.SimpleCurrencySpinnerAdapter;
 
 import java.util.List;
@@ -57,6 +61,7 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
     private static final String KEY_LOCATION = "key_location";
 
     private SimpleCurrencySpinnerAdapter mAdapter;
+    private CallbackManager mCallbackManager;
 
     public static Intent newIntent(Context activity) {
         return new Intent(activity, CreateRequestActivity.class);
@@ -78,9 +83,15 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
     TextInputLayout mRequestActivityDescriptionLayout;
     @Bind(R.id.create_request_currency_info)
     ImageView mCreateCurrencyInfo;
+    @Bind(R.id.request_activity_facebook_checkbox)
+    CheckBox facebookCheckbox;
 
     @Inject
     CreateRequestPresenter mCreateRequestPresenter;
+    @Inject
+    FacebookHelper facebookHelper;
+    @Inject
+    UserPreferences userPreferences;
 
     private UserLocation changedLocation;
     private BackPressedHelper mBackPressedHelper;
@@ -91,6 +102,8 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
         setContentView(R.layout.request_activity);
         ButterKnife.bind(this);
 
+        mCallbackManager = CallbackManager.Factory.create();
+
         RtlUtils.setTextDirection(this, mCreateRequestLocation);
         mCreateRequestBudget.addTextChangedListener(new TextWatcherAdapter() {
             @Override
@@ -98,6 +111,11 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
                 mCreateRequestPresenter.onBudgetChanged(s.toString());
             }
         });
+
+        //noinspection ConstantConditions
+        facebookCheckbox.setChecked(facebookHelper.hasRequiredPermissionInApi(
+                userPreferences.getUser(), FacebookHelper.PERMISSION_PUBLISH_ACTIONS));
+        RtlUtils.setTextDirection(this, facebookCheckbox);
 
         mAdapter = new SimpleCurrencySpinnerAdapter(R.string.request_activity_currency, this);
         mCreateRequestSpinner.setAdapter(mAdapter);
@@ -128,6 +146,18 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
         }
 
         mBackPressedHelper = new BackPressedHelper(this);
+
+        facebookCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (!isChecked) {
+                    return;
+                }
+
+                mCreateRequestPresenter.askForFacebookPermissionIfNeeded(
+                        CreateRequestActivity.this, mCallbackManager);
+            }
+        });
     }
 
     @Override
@@ -150,7 +180,7 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
 
     @OnClick(R.id.create_request_confirm)
     public void onClick() {
-        mCreateRequestPresenter.confirmClicked();
+        mCreateRequestPresenter.confirmClicked(facebookCheckbox.isChecked());
     }
 
     @OnClick(R.id.create_request_location_btn)
@@ -165,6 +195,7 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
             mCreateRequestPresenter.updateLocation(userLocation);
             changedLocation = userLocation;
         } else {
+            mCallbackManager.onActivityResult(requestCode, resultCode, data);
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
@@ -200,7 +231,7 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
 
     @Override
     public void showApiError(Throwable throwable) {
-        ColoredSnackBar.error(ColoredSnackBar.contentView(this), throwable, Snackbar.LENGTH_SHORT).show();
+        ColoredSnackBar.error(ColoredSnackBar.contentView(this), throwable, Snackbar.LENGTH_LONG).show();
     }
 
     @Override
@@ -248,6 +279,17 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
     public void finishActivity(String id, String webUrl, String title) {
         finish();
         startActivity(PublishShoutActivity.newIntent(this, id, webUrl, true, title));
+    }
+
+    @Override
+    public void uncheckFacebookCheckbox() {
+        facebookCheckbox.setChecked(false);
+    }
+
+    @Override
+    public void showPermissionNotGranted() {
+        ColoredSnackBar.error(ColoredSnackBar.contentView(this),
+                R.string.request_activity_facebook_permission_error, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override

@@ -72,6 +72,56 @@
 
         </LinearLayout>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/request_activity_sharing"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:textAllCaps="true"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="18dp"
+            android:layout_gravity="center_horizontal"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/camera_published_facebook_checkbox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_weight="1"
+                android:paddingLeft="14dp"
+                android:paddingStart="14dp"
+                android:text="@string/request_activity_facebook"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:theme="@style/CreateShoutCheckBox"
+                tools:checked="true" />
+
+            <CheckBox
+                android:id="@+id/camera_published_twitter_checkbox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_weight="1"
+                android:paddingLeft="14dp"
+                android:paddingStart="14dp"
+                android:text="@string/request_activity_twitter"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:theme="@style/CreateShoutCheckBox" />
+
+        </LinearLayout>
+
         <Button
             android:enabled="false"
             android:id="@+id/camera_published_done"
