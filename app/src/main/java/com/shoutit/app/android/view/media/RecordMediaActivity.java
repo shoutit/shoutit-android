@@ -219,6 +219,12 @@ public class RecordMediaActivity extends AbstractCameraActivity
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Let fragment handle results
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
     public void onEventMainThread(CameraController.ControllerDestroyedEvent event) {
         // dont destroy
     }

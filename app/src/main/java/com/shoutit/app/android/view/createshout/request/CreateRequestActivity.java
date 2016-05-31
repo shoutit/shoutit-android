@@ -115,6 +115,7 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
         //noinspection ConstantConditions
         facebookCheckbox.setChecked(facebookHelper.hasRequiredPermissionInApi(
                 userPreferences.getUser(), FacebookHelper.PERMISSION_PUBLISH_ACTIONS));
+        RtlUtils.setTextDirection(this, facebookCheckbox);
 
         mAdapter = new SimpleCurrencySpinnerAdapter(R.string.request_activity_currency, this);
         mCreateRequestSpinner.setAdapter(mAdapter);

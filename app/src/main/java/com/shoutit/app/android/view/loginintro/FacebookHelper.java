@@ -195,12 +195,12 @@ public class FacebookHelper {
             public Observable<ResponseOrError<Boolean>> call(ResponseBody responseBody) {
                 LogHelper.logIfDebug(TAG, "Waiting for user to be updated in API");
                 return pusherHelper.getUserUpdatedObservable()
-                        .takeUntil(new Func1<User, Boolean>() {
+                        .filter(new Func1<User, Boolean>() {
                             @Override
                             public Boolean call(User user) {
                                 userPreferences.updateUserJson(user);
                                 LogHelper.logIfDebug(TAG, "Pusher event: User updated in API");
-
+                                
                                 return hasRequiredPermissionInApi(user, requiredPermissionName);
                             }
                         })
