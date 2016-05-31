@@ -1,12 +1,15 @@
 package com.shoutit.app.android.view.createshout.request;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 
 import com.appunite.rx.ObservableExtensions;
+import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
+import com.facebook.CallbackManager;
 import com.google.common.base.Strings;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
@@ -18,11 +21,14 @@ import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.UserLocationSimple;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
+import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.ResourcesHelper;
+import com.shoutit.app.android.view.loginintro.FacebookHelper;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import rx.Observable;
@@ -56,6 +62,7 @@ public class CreateRequestPresenter {
     private final Scheduler mUiScheduler;
     @NonNull
     private final ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter;
+    private final FacebookHelper facebookHelper;
     private Listener mListener;
     private UserLocation mUserLocation;
     private Subscription locationSubscription;
@@ -67,12 +74,14 @@ public class CreateRequestPresenter {
                                   ApiService apiService,
                                   @NetworkScheduler Scheduler networkScheduler,
                                   @UiScheduler Scheduler uiScheduler,
-                                  @NonNull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter) {
+                                  @NonNull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
+                                  FacebookHelper facebookHelper) {
         mContext = context;
         mApiService = apiService;
         mNetworkScheduler = networkScheduler;
         mUiScheduler = uiScheduler;
         this.shoutsGlobalRefreshPresenter = shoutsGlobalRefreshPresenter;
+        this.facebookHelper = facebookHelper;
         mLocationObservable = userPreferences.getLocationObservable()
                 .compose(ObservableExtensions.<UserLocation>behaviorRefCount());
     }
@@ -118,7 +127,7 @@ public class CreateRequestPresenter {
         mListener.setLocation(ResourcesHelper.getResourceIdForName(userLocation.getCountry(), mContext), userLocation.getCity());
     }
 
-    public void confirmClicked() {
+    public void confirmClicked(boolean publishToFacebook) {
         final RequestData requestData = mListener.getRequestData();
         if (!checkValidity(requestData)) return;
 
@@ -129,12 +138,12 @@ public class CreateRequestPresenter {
         if (Strings.isNullOrEmpty(requestData.mBudget)) {
             observable = mApiService.createShoutRequest(new CreateRequestShoutRequest(
                     requestData.mDescription,
-                    new UserLocationSimple(mUserLocation.getLatitude(), mUserLocation.getLongitude())));
+                    new UserLocationSimple(mUserLocation.getLatitude(), mUserLocation.getLongitude()), publishToFacebook));
         } else {
             observable = mApiService.createShoutRequest(new CreateRequestShoutWithPriceRequest(
                     requestData.mDescription,
                     new UserLocationSimple(mUserLocation.getLatitude(), mUserLocation.getLongitude()),
-                    PriceUtils.getPriceInCents(requestData.mBudget), requestData.mCurrencyId));
+                    PriceUtils.getPriceInCents(requestData.mBudget), requestData.mCurrencyId, publishToFacebook));
         }
 
         pendingSubscriptions.add(observable
@@ -154,6 +163,42 @@ public class CreateRequestPresenter {
                         mListener.showApiError(throwable);
                     }
                 }));
+    }
+
+    public void askForFacebookPermissionIfNeeded(@Nonnull final Activity activity,
+                                                 @Nonnull CallbackManager callbackManager) {
+        mListener.showProgress();
+
+        pendingSubscriptions.add(
+                facebookHelper.askForPublicPermissionIfNeeded(activity,
+                        FacebookHelper.PERMISSION_PUBLISH_ACTIONS, callbackManager)
+                        .observeOn(mUiScheduler)
+                        .subscribe(new Action1<ResponseOrError<Boolean>>() {
+                            @Override
+                            public void call(ResponseOrError<Boolean> responseOrError) {
+                                mListener.hideProgress();
+
+                                if (responseOrError.isData()) {
+                                    final Boolean isPermissionGranted = responseOrError.data();
+                                    if (!isPermissionGranted) {
+                                        mListener.uncheckFacebookCheckbox();
+                                        mListener.showPermissionNotGranted();
+                                    }
+                                } else {
+                                    mListener.uncheckFacebookCheckbox();
+                                    mListener.showApiError(responseOrError.error());
+                                }
+                            }
+                        }, new Action1<Throwable>() {
+                            @Override
+                            public void call(Throwable throwable) {
+                                mListener.hideProgress();
+                                mListener.uncheckFacebookCheckbox();
+                                mListener.showApiError(throwable);
+                            }
+                        })
+        );
+
     }
 
     private boolean checkValidity(RequestData requestData) {
@@ -207,6 +252,10 @@ public class CreateRequestPresenter {
         void showTitleTooShortError(boolean show);
 
         void finishActivity(String id, String webUrl, String title);
+
+        void uncheckFacebookCheckbox();
+
+        void showPermissionNotGranted();
     }
 
 }

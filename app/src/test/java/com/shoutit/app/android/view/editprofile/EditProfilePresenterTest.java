@@ -73,6 +73,6 @@ public class EditProfilePresenterTest {
 
     private User getUser() {
         return new User("z", null, null, null, null, null, null, null, false, null,
-                null, false, false, false, null, 1, null, null, null, 1, null, false, null, null, null, null, null, null);
+                null, false, false, false, null, 1, null, null, null, 1, null, false, null, null, null, null, null, null, null);
     }
 }

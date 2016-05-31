@@ -50,6 +50,7 @@ import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.utils.AmazonRequestTransfomer;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
 import com.shoutit.app.android.utils.VersionUtils;
+import com.shoutit.app.android.view.loginintro.FacebookHelper;
 import com.shoutit.app.android.view.videoconversation.CameraTool;
 import com.shoutit.app.android.view.videoconversation.CameraToolImpl;
 import com.shoutit.app.android.view.videoconversation.CameraToolImplLollipop;
@@ -354,5 +355,13 @@ public final class AppModule {
     @Provides
     SharedPreferences provideSharedPrefs(@ForApplication Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context);
+    }
+
+    @Provides
+    @Singleton
+    FacebookHelper provideFacebookHelper(ApiService apiService, UserPreferences userPreferences,
+                                         @ForApplication Context context, @NetworkScheduler Scheduler networkScheduler,
+                                         PusherHelper pusherHelper) {
+        return new FacebookHelper(apiService, userPreferences, context, networkScheduler, pusherHelper);
     }
 }

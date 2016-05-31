@@ -7,6 +7,7 @@ import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.db.RecentSearchesTable;
 import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
+import com.shoutit.app.android.view.loginintro.FacebookHelper;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -47,5 +48,6 @@ public class LogoutHelper {
 
         userPreferences.logout();
         recentSearchesTable.clearRecentSearches();
+        FacebookHelper.logOutFromFacebook();
     }
 }

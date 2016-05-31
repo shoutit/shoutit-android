@@ -12,6 +12,7 @@ import com.shoutit.app.android.api.model.Currency;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.utils.ResourcesHelper;
+import com.shoutit.app.android.view.loginintro.FacebookHelper;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -55,6 +56,9 @@ public class CreateRequestPresenterTest {
     @Mock
     UserPreferences mUserPreferences;
 
+    @Mock
+    FacebookHelper facebookHelper;
+
     ShoutsGlobalRefreshPresenter globalRefreshPresenter;
 
     @Mock
@@ -71,7 +75,7 @@ public class CreateRequestPresenterTest {
         when(mUserPreferences.getLocationObservable()).thenReturn(Observable.just(getUserLocation()));
         when(mListener.getRequestData()).thenReturn(new CreateRequestPresenter.RequestData("123456", "5", "a"));
 
-        mCreateRequestPresenter = new CreateRequestPresenter(mUserPreferences, mContext, mApiService, Schedulers.immediate(), Schedulers.immediate(), globalRefreshPresenter);
+        mCreateRequestPresenter = new CreateRequestPresenter(mUserPreferences, mContext, mApiService, Schedulers.immediate(), Schedulers.immediate(), globalRefreshPresenter, facebookHelper);
     }
 
     @NonNull
@@ -94,7 +98,7 @@ public class CreateRequestPresenterTest {
         when(mApiService.createShoutRequest(any(CreateRequestShoutWithPriceRequest.class))).thenReturn(Observable.just(emptyCreateShoutResponse()));
         mCreateRequestPresenter.registerListener(mListener);
 
-        mCreateRequestPresenter.confirmClicked();
+        mCreateRequestPresenter.confirmClicked(true);
 
         verify(mListener).getRequestData();
     }
@@ -105,7 +109,7 @@ public class CreateRequestPresenterTest {
         when(mApiService.createShoutRequest(any(CreateRequestShoutWithPriceRequest.class))).thenReturn(Observable.just(emptyCreateShoutResponse()));
         mCreateRequestPresenter.registerListener(mListener);
 
-        mCreateRequestPresenter.confirmClicked();
+        mCreateRequestPresenter.confirmClicked(true);
 
         verify(mApiService).createShoutRequest(any(CreateRequestShoutWithPriceRequest.class));
     }
@@ -116,7 +120,7 @@ public class CreateRequestPresenterTest {
         when(mApiService.createShoutRequest(any(CreateRequestShoutWithPriceRequest.class))).thenReturn(Observable.just(emptyCreateShoutResponse()));
         mCreateRequestPresenter.registerListener(mListener);
 
-        mCreateRequestPresenter.confirmClicked();
+        mCreateRequestPresenter.confirmClicked(true);
 
         verify(mListener, times(2)).showProgress();
         verify(mListener, times(2)).hideProgress();
@@ -129,7 +133,7 @@ public class CreateRequestPresenterTest {
         when(mApiService.createShoutRequest(any(CreateRequestShoutWithPriceRequest.class))).thenReturn(Observable.<CreateShoutResponse>error(new RuntimeException("")));
         mCreateRequestPresenter.registerListener(mListener);
 
-        mCreateRequestPresenter.confirmClicked();
+        mCreateRequestPresenter.confirmClicked(true);
 
         verify(mListener, times(2)).showProgress();
         verify(mListener, times(2)).hideProgress();
