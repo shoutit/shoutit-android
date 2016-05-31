@@ -1,6 +1,6 @@
 package com.shoutit.app.android.view.invitefriends;
 
-import com.shoutit.app.android.PostSignupPresenterComponent;
+import com.shoutit.app.android.view.postlogininterest.postsignupsecond.PostSignupPresenterComponent;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.ActivityScope;
 import com.shoutit.app.android.dagger.AppComponent;

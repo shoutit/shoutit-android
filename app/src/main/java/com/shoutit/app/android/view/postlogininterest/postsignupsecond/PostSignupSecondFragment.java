@@ -2,7 +2,6 @@ package com.shoutit.app.android.view.postlogininterest.postsignupsecond;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,11 +11,9 @@ import android.widget.TextView;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.shoutit.app.android.BaseFragment;
-import com.shoutit.app.android.PostSignupPresenterComponent;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
-import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.rx.RxUtils;
 
 import java.util.List;
@@ -27,7 +24,6 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import rx.Observable;
-import rx.functions.Action1;
 
 public abstract class PostSignupSecondFragment extends BaseFragment {
 

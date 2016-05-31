@@ -602,4 +602,16 @@
     <string name="facebook_friends_no_friends">None of your friends has Shoutit yet.\n Go ahead and invite them!</string>
     <string name="facebook_friends_permission_error">Permissions not granted. We need it to get your friends list.</string>
 
+    <!-- Invite Friends -->
+    <string name="invite_friends_suggestions">Suggestions</string>
+    <string name="invite_friends_users">Users</string>
+    <string name="invite_friends_pages">Pages</string>
+    <string name="invite_friends_find_friends">Find Friends</string>
+    <string name="invite_friends_facebook">Facebook</string>
+    <string name="invite_friends_contacts">Contacts</string>
+    <string name="invite_friends_invite_friends">Invite Friends</string>
+    <string name="invite_friends_facebook_header">Facebook</string>
+    <string name="invite_friends_twitter">Twitter</string>
+    <string name="invite_friends_share">Share Shoutit App</string>
+
 </resources>

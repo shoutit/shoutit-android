@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 
 import com.google.common.base.Preconditions;
 import com.shoutit.app.android.App;
@@ -54,6 +55,13 @@ public class UserSuggestionActivity extends BaseActivity {
         final int type = getIntent().getIntExtra(EXTRA_TYPE, -1);
         Preconditions.checkArgument(type >= 0);
 
+        mToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
         mToolbar.setTitle(getToolbarTitle(type));
 
         if (savedInstanceState == null) {
