@@ -589,4 +589,8 @@
     <!-- Chat Blocked Users -->
     <string name="blocked_users_unblock_dialog_title">Do you want to unblock user %1$s?</string>
 
+    <!-- User suggestions -->
+    <string name="user_suggestion_pages">Suggested Pages</string>
+    <string name="user_suggestion_users">Suggested Users</string>
+
 </resources>

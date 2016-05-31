@@ -48,8 +48,10 @@ public class InviteFriendsFragment extends BaseFragment {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.invite_friends_users:
+                startActivity(UserSuggestionActivity.newUserIntent(getActivity()));
                 break;
             case R.id.invite_friends_pages:
+                startActivity(UserSuggestionActivity.newPagesIntent(getActivity()));
                 break;
             case R.id.invite_friends_find_facebook:
                 break;

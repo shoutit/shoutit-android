@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.shoutit.app.android.BaseFragment;
+import com.shoutit.app.android.PostSignupPresenterComponent;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
@@ -82,7 +83,8 @@ public abstract class PostSignupSecondFragment extends BaseFragment {
                                    @Nullable Bundle savedInstanceState) {
         DaggerPostignupSecondFragmentComponent
                 .builder()
-                .postSignupSecondActivityComponent((PostSignupSecondActivityComponent) baseActivityComponent)
+                .baseActivityComponent(baseActivityComponent)
+                .postSignupPresenterComponent((PostSignupPresenterComponent) baseActivityComponent)
                 .fragmentModule(fragmentModule)
                 .build()
                 .inject(this);
