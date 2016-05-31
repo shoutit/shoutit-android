@@ -1,11 +1,14 @@
-package com.shoutit.app.android.view.postlogininterest.postsignupsecond;
+package com.shoutit.app.android.view.invitefriends;
 
+import com.shoutit.app.android.view.postlogininterest.postsignupsecond.PostSignupPresenterComponent;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.ActivityScope;
 import com.shoutit.app.android.dagger.AppComponent;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.view.postlogininterest.postsignupsecond.PostSignupSecondActivityModule;
 
 import dagger.Component;
+
 
 @ActivityScope
 @Component(
@@ -15,8 +18,9 @@ import dagger.Component;
                 PostSignupSecondActivityModule.class
         }
 )
-public interface PostSignupSecondActivityComponent extends BaseActivityComponent, PostSignupPresenterComponent {
+public interface UserSuggestionsActivityComponent extends BaseActivityComponent, PostSignupPresenterComponent {
 
-    void inject(PostSignupSecondActivity activity);
+    void inject(UserSuggestionActivity activity);
 
 }
+
