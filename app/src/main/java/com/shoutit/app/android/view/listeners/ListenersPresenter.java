@@ -7,7 +7,6 @@ import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.collect.ImmutableList;
-import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
 import com.shoutit.app.android.adapteritems.BaseProfileAdapterItem;
 import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
 import com.shoutit.app.android.api.ApiService;
@@ -15,6 +14,7 @@ import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.ListenersResponse;
 import com.shoutit.app.android.dao.ListenersDaos;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
+import com.shoutit.app.android.view.profileslist.ProfilesListPresenter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +30,7 @@ import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.subjects.PublishSubject;
 
-public class ListenersPresenter {
+public class ListenersPresenter implements ProfilesListPresenter {
 
     @Nonnull
     private final ListenersDaos dao;

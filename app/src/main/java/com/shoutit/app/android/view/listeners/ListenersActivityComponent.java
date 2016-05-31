@@ -4,6 +4,7 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.ActivityScope;
 import com.shoutit.app.android.dagger.AppComponent;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.view.profileslist.ProfilesListPresenter;
 
 import dagger.Component;
 
@@ -19,6 +20,8 @@ import dagger.Component;
 public interface ListenersActivityComponent extends BaseActivityComponent {
 
     void inject(ListenersActivity activity);
+
+    ProfilesListPresenter profilesListPresenter();
 
 }
 

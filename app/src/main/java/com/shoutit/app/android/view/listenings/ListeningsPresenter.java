@@ -13,6 +13,7 @@ import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.ListeningResponse;
 import com.shoutit.app.android.dao.ListeningsDao;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
+import com.shoutit.app.android.view.profileslist.ProfilesListPresenter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +29,7 @@ import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.subjects.PublishSubject;
 
-public class ListeningsPresenter {
+public class ListeningsPresenter implements ProfilesListPresenter {
 
     public enum ListeningsType {
         USERS_AND_PAGES, INTERESTS
