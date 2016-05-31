@@ -39,7 +39,7 @@
 
                     <TextView
                         android:id="@+id/invite_friends_users"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical|start"
                         android:layout_marginBottom="10dp"
@@ -60,7 +60,7 @@
 
                     <TextView
                         android:id="@+id/invite_friends_pages"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical|start"
                         android:layout_marginBottom="10dp"
