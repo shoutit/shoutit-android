@@ -19,6 +19,7 @@ repositories {
     maven { url "https://s3.amazonaws.com/repo.commonsware.com" }
     maven { url 'https://maven.fabric.io/public' }
     maven { url 'http://clojars.org/repo' }
+    maven { url "https://jitpack.io" }
 }
 
 apply plugin: 'com.android.application'
@@ -225,9 +226,8 @@ dependencies {
     compile 'com.jakewharton.rxbinding:rxbinding:0.3.0'
     compile 'com.jakewharton.rxbinding:rxbinding-recyclerview-v7:0.3.0'
 
-    compile(project(":rx-android-extensions")) {
-        exclude group: 'com.google.code.findbugs', module: 'annotations'
-    }
+    compile 'com.github.jacek-marchwicki.rx-java-extensions:rx-extensions:9906cc7974'
+    compile 'com.github.jacek-marchwicki.rx-java-extensions:rx-android-extensions:9906cc7974'
     compile project(":FFmpegAndroid")
     compile project(":appuniteGcm")
     compile project(":ScrollViewGallery")
