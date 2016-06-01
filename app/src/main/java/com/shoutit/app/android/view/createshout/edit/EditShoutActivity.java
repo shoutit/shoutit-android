@@ -168,22 +168,12 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
 
         mEditToolbar.setTitle(getString(R.string.edit_shout_title));
         mEditToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
-        mEditToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
+        mEditToolbar.setNavigationOnClickListener(view -> finish());
 
         mEditShoutPresenter.registerListener(this);
         mShoutMediaPresenter.register(this);
 
-        mEditCurrencyInfo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DialogsHelper.showCurrencyDialog(EditShoutActivity.this);
-            }
-        });
+        mEditCurrencyInfo.setOnClickListener(v -> DialogsHelper.showCurrencyDialog(EditShoutActivity.this));
     }
 
     @Override
@@ -421,7 +411,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
             if (item instanceof ShoutMediaPresenter.AddImageItem) {
                 view = layoutInflater.inflate(R.layout.edit_media_add, mEditMediaContainer, false);
             } else if (item instanceof ShoutMediaPresenter.MediaItem) {
-                view = layoutInflater.inflate(R.layout.edit_media_item, mEditMediaContainer, false);
+                view = layoutInflater.inflate(item instanceof ShoutMediaPresenter.IVideoItem ? R.layout.edit_media_video_item :  R.layout.edit_media_item, mEditMediaContainer, false);
                 final ImageView imageView = (ImageView) view.findViewById(R.id.edit_media_item_image);
                 mPicasso.load(Uri.parse(((ShoutMediaPresenter.MediaItem) item).getThumb()))
                         .centerCrop()
@@ -433,12 +423,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
                 throw new RuntimeException();
             }
 
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    item.click();
-                }
-            });
+            view.setOnClickListener(v -> item.click());
             mEditMediaContainer.addView(view);
         }
     }

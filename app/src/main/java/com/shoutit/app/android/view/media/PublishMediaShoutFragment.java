@@ -401,12 +401,6 @@ public class PublishMediaShoutFragment extends Fragment {
     }
 
     @Override
-    public void onDestroy() {
-        mCompositeSubscription.unsubscribe();
-        super.onDestroy();
-    }
-
-    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         mCallbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
