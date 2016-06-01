@@ -48,11 +48,11 @@ public class ContactsFriendsPresenter implements ProfilesListPresenter {
 
     private final PublishSubject<Object> fetchLocalContactSubject = PublishSubject.create();
     private final PublishSubject<String> openProfileSubject = PublishSubject.create();
-    private final PublishSubject<BaseProfile> profileListenedSubject = PublishSubject.create();
 
     private final Observable<List<BaseAdapterItem>> adapterItems;
     private final Observable<Throwable> errorObservable;
     private final Observable<Boolean> progressObservable;
+    private final Observable<Object> refreshContactsObservable;
 
     @Inject
     public ContactsFriendsPresenter(@Nonnull PhoneContactsHelper phoneContactsHelper,
@@ -65,6 +65,12 @@ public class ContactsFriendsPresenter implements ProfilesListPresenter {
 
         this.dao = dao;
         this.listeningHalfPresenter = listeningHalfPresenter;
+
+        final Observable<ResponseOrError<ProfilesListResponse>> fetchContactsRequest =
+                dao.getContactsDao(User.ME)
+                        .getProfilesObservable()
+                        .observeOn(uiScheduler)
+                        .compose(ObservableExtensions.behaviorRefCount());
 
         final Observable<ResponseOrError<ResponseBody>> uploadContactsRequest =
                 fetchLocalContactSubject
@@ -81,12 +87,11 @@ public class ContactsFriendsPresenter implements ProfilesListPresenter {
         final Observable<ResponseBody> successContactsUpload = uploadContactsRequest
                 .compose(ResponseOrError.onlySuccess());
 
-        final Observable<ResponseOrError<ProfilesListResponse>> fetchContactsRequest =
-                Observable.merge(Observable.just(null), successContactsUpload)
-                        .switchMap(successfullyUploaded -> dao.getContactsDao(User.ME)
-                                .getProfilesObservable()
-                                .observeOn(uiScheduler))
-                        .compose(ObservableExtensions.behaviorRefCount());
+        refreshContactsObservable = successContactsUpload
+                .map(responseBody -> {
+                    refreshData();
+                    return null;
+                });
 
         final Observable<ProfilesListResponse> successFetchContactsRequest = fetchContactsRequest
                 .compose(ResponseOrError.onlySuccess());
@@ -103,7 +108,7 @@ public class ContactsFriendsPresenter implements ProfilesListPresenter {
                                 @Nullable
                                 @Override
                                 public BaseAdapterItem apply(BaseProfile profile) {
-                                    return new ProfileListAdapterItem(profile, openProfileSubject, profileListenedSubject);
+                                    return new ProfileListAdapterItem(profile, openProfileSubject, listeningHalfPresenter.getListenProfileSubject());
                                 }
                             }));
                         }
@@ -138,6 +143,11 @@ public class ContactsFriendsPresenter implements ProfilesListPresenter {
     @Override
     public Observable<String> getUnListenSuccessObservable() {
         return listeningHalfPresenter.getUnListenSuccess();
+    }
+
+    @Nonnull
+    public Observable<Object> getRefreshContactsObservable() {
+        return refreshContactsObservable;
     }
 
     @Override

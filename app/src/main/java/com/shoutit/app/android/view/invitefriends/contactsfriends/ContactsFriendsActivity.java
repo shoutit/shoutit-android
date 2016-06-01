@@ -51,6 +51,10 @@ public class ContactsFriendsActivity extends BaseProfilesListActivity {
                             UserOrPageProfileActivity.newIntent(ContactsFriendsActivity.this, userName),
                             REQUEST_OPENED_PROFILE_WAS_LISTENED);
                 });
+
+        presenter.getRefreshContactsObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
     }
 
     @Override
