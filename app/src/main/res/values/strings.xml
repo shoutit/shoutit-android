@@ -597,6 +597,11 @@
     <string name="user_suggestion_pages">Suggested Pages</string>
     <string name="user_suggestion_users">Suggested Users</string>
 
+    <!-- Facebook friends -->
+    <string name="facebook_friends_ab_title">Facebook friends</string>
+    <string name="facebook_friends_no_friends">None of your friends has Shoutit yet.\n Go ahead and invite them!</string>
+    <string name="facebook_friends_permission_error">Permissions not granted. We need it to get your friends list.</string>
+
     <!-- Invite Friends -->
     <string name="invite_friends_suggestions">Suggestions</string>
     <string name="invite_friends_users">Users</string>

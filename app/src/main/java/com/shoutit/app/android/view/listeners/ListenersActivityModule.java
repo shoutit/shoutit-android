@@ -3,7 +3,9 @@ package com.shoutit.app.android.view.listeners;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.dagger.ActivityScope;
 import com.shoutit.app.android.dao.ListenersDaos;
+import com.shoutit.app.android.view.profileslist.ProfilesListPresenter;
 
 import javax.annotation.Nonnull;
 
@@ -23,11 +25,11 @@ public class ListenersActivityModule {
     }
 
     @Provides
-    ListenersPresenter providesListenersPresenter(@UiScheduler Scheduler uiScheduler,
-                                                  ListenersDaos dao,
-                                                  @NetworkScheduler Scheduler networkScheduler,
-                                                  ApiService apiService) {
+    @ActivityScope
+    ProfilesListPresenter providesListenersPresenter(@UiScheduler Scheduler uiScheduler,
+                                                     ListenersDaos dao,
+                                                     @NetworkScheduler Scheduler networkScheduler,
+                                                     ApiService apiService) {
         return new ListenersPresenter(dao, apiService, uiScheduler, networkScheduler, userName);
     }
-
 }

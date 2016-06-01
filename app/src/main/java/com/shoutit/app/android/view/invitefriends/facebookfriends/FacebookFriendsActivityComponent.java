@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.listeners;
+package com.shoutit.app.android.view.invitefriends.facebookfriends;
 
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.ActivityScope;
@@ -14,14 +14,15 @@ import dagger.Component;
         dependencies = AppComponent.class,
         modules = {
                 ActivityModule.class,
-                ListenersActivityModule.class
+                FacebookFriendsActivityModule.class
         }
 )
-public interface ListenersActivityComponent extends BaseActivityComponent {
+public interface FacebookFriendsActivityComponent extends BaseActivityComponent {
 
-    void inject(ListenersActivity activity);
+    void inject(FacebookFriendsActivity activity);
 
     ProfilesListPresenter profilesListPresenter();
 
 }
+
 

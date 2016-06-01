@@ -11,6 +11,7 @@ import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
+import com.shoutit.app.android.view.invitefriends.facebookfriends.FacebookFriendsActivity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -54,6 +55,7 @@ public class InviteFriendsFragment extends BaseFragment {
                 startActivity(UserSuggestionActivity.newPagesIntent(getActivity()));
                 break;
             case R.id.invite_friends_find_facebook:
+                startActivity(FacebookFriendsActivity.newIntent(getActivity()));
                 break;
             case R.id.invite_friends_find_contacts:
                 break;
