@@ -37,13 +37,33 @@ public class ShoutMediaPresenter {
 
     private boolean mIsOffer;
 
-    public abstract class Item {
+    public interface Item {
 
-        public abstract void click();
+        void click();
 
     }
 
-    public class BlankItem extends Item {
+    public interface IVideoItem {
+
+        String getVideo();
+
+        int getDuration();
+
+    }
+
+    public interface IImageItem {
+
+        String getThumb();
+
+    }
+
+    public interface LocalOrRemote {
+
+        boolean isRemote();
+
+    }
+
+    public class BlankItem implements Item {
 
         @Override
         public void click() {
@@ -51,7 +71,7 @@ public class ShoutMediaPresenter {
         }
     }
 
-    public abstract class MediaItem extends Item {
+    public abstract class MediaItem implements Item, IImageItem, LocalOrRemote {
 
         private final String mThumb;
 
@@ -74,6 +94,11 @@ public class ShoutMediaPresenter {
         public ImageItem(@NonNull String media) {
             super(media);
         }
+
+        @Override
+        public boolean isRemote() {
+            return false;
+        }
     }
 
     public class RemoteImageItem extends MediaItem {
@@ -81,9 +106,14 @@ public class ShoutMediaPresenter {
         public RemoteImageItem(@NonNull String media) {
             super(media);
         }
+
+        @Override
+        public boolean isRemote() {
+            return true;
+        }
     }
 
-    public class VideoItem extends MediaItem {
+    public abstract class VideoItem extends MediaItem implements IVideoItem {
 
         private final String video;
         private final int duration;
@@ -103,27 +133,31 @@ public class ShoutMediaPresenter {
         }
     }
 
-    public class RemoteVideoItem extends MediaItem {
+    public class LocalVideoItem extends VideoItem {
 
-        private final String video;
-        private final int duration;
-
-        public RemoteVideoItem(@Nullable String media, @NonNull String video, int duration) {
-            super(media);
-            this.video = video;
-            this.duration = duration;
+        public LocalVideoItem(@Nullable String media, @NonNull String video, int duration) {
+            super(media, video, duration);
         }
 
-        public String getVideo() {
-            return video;
-        }
-
-        public int getDuration() {
-            return duration;
+        @Override
+        public boolean isRemote() {
+            return false;
         }
     }
 
-    public class AddImageItem extends Item {
+    public class RemoteVideoItem extends VideoItem {
+
+        public RemoteVideoItem(@Nullable String media, @NonNull String video, int duration) {
+            super(media, video, duration);
+        }
+
+        @Override
+        public boolean isRemote() {
+            return true;
+        }
+    }
+
+    public class AddImageItem implements Item {
 
         @Override
         public void click() {
@@ -203,7 +237,7 @@ public class ShoutMediaPresenter {
         }
 
         final int videoLength = MediaUtils.getVideoLength(context, media);
-        mediaItems.put(position, new VideoItem(
+        mediaItems.put(position, new LocalVideoItem(
                 videoThumbnail != null ? String.format("file://%1$s", videoThumbnail.getAbsolutePath()) : null,
                 media,
                 videoLength));
@@ -242,7 +276,7 @@ public class ShoutMediaPresenter {
         final boolean hasVideo = Iterables.any(mediaItems.values(), new Predicate<Item>() {
             @Override
             public boolean apply(@Nullable Item input) {
-                return input instanceof VideoItem || input instanceof RemoteVideoItem;
+                return input instanceof LocalVideoItem || input instanceof RemoteVideoItem;
             }
         });
         return !hasVideo;
@@ -270,14 +304,14 @@ public class ShoutMediaPresenter {
         Observable<Video> videoObservable = null;
 
         for (Item item : mediaItems.values()) {
-            if (item instanceof VideoItem) {
-                final VideoItem videoItem = (VideoItem) item;
-                final Observable<String> videoFileObservable = mAmazonHelper.uploadShoutMediaVideoObservable(AmazonHelper.getfileFromPath(videoItem.getVideo()));
-                final Observable<String> thumbFileObservable = mAmazonHelper.uploadShoutMediaImageObservable(AmazonHelper.getfileFromPath(videoItem.getThumb()));
+            if (item instanceof LocalVideoItem) {
+                final LocalVideoItem localVideoItem = (LocalVideoItem) item;
+                final Observable<String> videoFileObservable = mAmazonHelper.uploadShoutMediaVideoObservable(AmazonHelper.getfileFromPath(localVideoItem.getVideo()));
+                final Observable<String> thumbFileObservable = mAmazonHelper.uploadShoutMediaImageObservable(AmazonHelper.getfileFromPath(localVideoItem.getThumb()));
                 videoObservable = Observable.zip(videoFileObservable, thumbFileObservable, new Func2<String, String, Video>() {
                     @Override
                     public Video call(String video, String thumb) {
-                        return Video.createVideo(video, thumb, videoItem.getDuration());
+                        return Video.createVideo(video, thumb, localVideoItem.getDuration());
                     }
                 });
             } else if (item instanceof ImageItem) {
