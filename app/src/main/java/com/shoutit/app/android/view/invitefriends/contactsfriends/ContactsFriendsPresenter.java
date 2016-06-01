@@ -49,6 +49,7 @@ public class ContactsFriendsPresenter implements ProfilesListPresenter {
     private final PublishSubject<Object> fetchLocalContactSubject = PublishSubject.create();
     private final PublishSubject<String> openProfileSubject = PublishSubject.create();
     private final PublishSubject<BaseProfile> profileListenedSubject = PublishSubject.create();
+
     private final Observable<List<BaseAdapterItem>> adapterItems;
     private final Observable<Throwable> errorObservable;
     private final Observable<Boolean> progressObservable;
@@ -68,9 +69,10 @@ public class ContactsFriendsPresenter implements ProfilesListPresenter {
         final Observable<ResponseOrError<ResponseBody>> uploadContactsRequest =
                 fetchLocalContactSubject
                         .switchMap(initFetch -> Observable.just(phoneContactsHelper.getAllPhoneContacts()))
+                        .subscribeOn(networkScheduler)
                         .filter(MoreFunctions1.listNotEmpty())
                         .map(UploadContactsRequest::new)
-                        .switchMap(uploadContactsRequestBody -> apiService.uploadContacts(uploadContactsRequestBody)
+                        .switchMap(uploadContactsRequestBody -> apiService.uploadContacts(User.ME, uploadContactsRequestBody)
                                 .subscribeOn(networkScheduler)
                                 .observeOn(uiScheduler)
                                 .compose(ResponseOrError.toResponseOrErrorObservable()))
@@ -83,7 +85,7 @@ public class ContactsFriendsPresenter implements ProfilesListPresenter {
                 Observable.merge(Observable.just(null), successContactsUpload)
                         .switchMap(successfullyUploaded -> dao.getContactsDao(User.ME)
                                 .getProfilesObservable()
-                                .observeOn(networkScheduler))
+                                .observeOn(uiScheduler))
                         .compose(ObservableExtensions.behaviorRefCount());
 
         final Observable<ProfilesListResponse> successFetchContactsRequest = fetchContactsRequest
@@ -120,6 +122,7 @@ public class ContactsFriendsPresenter implements ProfilesListPresenter {
                 .mergeWith(listeningHalfPresenter.getErrorSubject());
 
         progressObservable = Observable.merge(
+                successContactsUpload.map(Functions1.returnTrue()),
                 successFetchContactsRequest.map(Functions1.returnFalse()),
                 errorObservable.map(Functions1.returnFalse()))
                 .startWith(true);

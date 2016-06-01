@@ -299,9 +299,10 @@ public interface ApiService {
                                                       @Query("page_size") Integer pageSize);
 
     @PATCH("profiles/{user_name}/contacts")
-    Observable<ResponseBody> uploadContacts(UploadContactsRequest uploadContactsRequest);
+    Observable<ResponseBody> uploadContacts(@Path("user_name") String userName,
+                                            @Body UploadContactsRequest uploadContactsRequest);
 
-    @GET("profiles/{username}/mutual_contacts")
+    @GET("profiles/{user_name}/mutual_contacts")
     Observable<ProfilesListResponse> mutualContacts(@Path("user_name") String userName,
                                                     @Query("page") Integer page,
                                                     @Query("page_size") Integer pageSize);

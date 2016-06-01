@@ -13,9 +13,6 @@ import javax.inject.Inject;
 import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Scheduler;
-import rx.functions.Action1;
-import rx.functions.Func1;
-import rx.functions.Func2;
 import rx.subjects.PublishSubject;
 
 public class ListeningHalfPresenter {

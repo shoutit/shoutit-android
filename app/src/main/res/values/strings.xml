@@ -29,6 +29,7 @@
         content
     </string>
     <string name="permission_camera_explanation">Permissions needed to get your photos</string>
+    <string name="permission_contacts_explanation">We need this permissions to check which of your contacts use Shoutit</string>
     <string name="permission_granted">Permissions have been granted</string>
     <string name="permission_not_granted">Permissions not granted</string>
 
@@ -613,5 +614,8 @@
     <string name="invite_friends_facebook_header">Facebook</string>
     <string name="invite_friends_twitter">Twitter</string>
     <string name="invite_friends_share">Share Shoutit App</string>
+
+    <!-- Contacts fiends -->
+    <string name="contacts_friends_ab_title">Contacts friends</string>
 
 </resources>

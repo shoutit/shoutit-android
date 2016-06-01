@@ -1,6 +1,5 @@
 package com.shoutit.app.android.view.invitefriends.facebookfriends;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;

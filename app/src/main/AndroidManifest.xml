@@ -314,7 +314,11 @@
 
         <activity android:name=".view.chats.chat_media_gallery.ChatMediaGalleryActivity"/>
 
-        <activity android:name=".view.invitefriends.facebookfriends.FacebookFriendsActivity"/>
+        <activity android:name=".view.invitefriends.facebookfriends.FacebookFriendsActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".view.invitefriends.contactsfriends.ContactsFriendsActivity"
+            android:screenOrientation="portrait"/>
 
         <!-- Facebook -->
         <meta-data

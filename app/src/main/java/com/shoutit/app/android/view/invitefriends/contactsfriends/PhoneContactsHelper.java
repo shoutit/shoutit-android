@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.database.Cursor;
 import android.os.Build;
 import android.provider.ContactsContract;
+import android.text.TextUtils;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -46,11 +47,12 @@ public class PhoneContactsHelper {
         final Cursor phoneCursor = contentResolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                 new String[]{ContactsContract.Contacts._ID,
                         DISPLAY_NAME_COLUMN,
-                        ContactsContract.CommonDataKinds.Phone.NUMBER
+                        ContactsContract.CommonDataKinds.Phone.NUMBER,
+                        ContactsContract.CommonDataKinds.Phone.NORMALIZED_NUMBER
                 },
                 DISPLAY_NAME_COLUMN + " IS NOT NULL",
                 null,
-                DISPLAY_NAME_COLUMN + " COLLATE LOCALIZED ASC");
+                null);
 
         if (phoneCursor != null) {
             try {
@@ -58,12 +60,16 @@ public class PhoneContactsHelper {
                     final String userId = phoneCursor.getString(0);
                     final String name = phoneCursor.getString(1);
                     final String phone = phoneCursor.getString(2);
+                    final String normalizedPhone = phoneCursor.getString(3);
+
+                    final String phoneNumber = TextUtils.isEmpty(normalizedPhone) ?
+                            phone : normalizedPhone;
 
                     if (contactsMap.containsKey(userId)) {
                         final Contact contact = contactsMap.get(userId);
-                        contactsMap.put(userId, contact.withNewMobile(name, phone));
+                        contactsMap.put(userId, contact.withNewMobile(name, phoneNumber));
                     } else {
-                        contactsMap.put(userId, new Contact(name, Lists.newArrayList(phone), Lists.newArrayList()));
+                        contactsMap.put(userId, new Contact(name, Lists.newArrayList(phoneNumber), Lists.newArrayList()));
                     }
                 }
             } finally {
@@ -80,7 +86,7 @@ public class PhoneContactsHelper {
                 },
                 DISPLAY_NAME_COLUMN + " IS NOT NULL",
                 null,
-                DISPLAY_NAME_COLUMN + " COLLATE LOCALIZED ASC");
+                null);
 
         if (emailCursor != null) {
             try {
