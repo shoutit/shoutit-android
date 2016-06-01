@@ -17,7 +17,7 @@ test:
         - python tools/download.py --token P8uXtUgTeNDYEIvw5gXUWjDM --key-version agxzfmF1dG8tY2xvc2VyGAsSC1Byb2plY3RLZXlzGICAgKDI0JMKDA
 
     override:
-        - (./gradlew --stacktrace --project-prop versionSuffix="${CIRCLE_BUILD_NUM}" clean build -PpreDexEnable=false -Dorg.gradle.jvmargs="-Xms2560m -Xmx2560m"):
+        - (./gradlew --stacktrace --project-prop versionSuffix="${CIRCLE_BUILD_NUM}" clean build -PpreDexEnable=false -Dorg.gradle.jvmargs="-Xms3072m -Xmx3072m"):
             timeout: 1800
 
     post:
