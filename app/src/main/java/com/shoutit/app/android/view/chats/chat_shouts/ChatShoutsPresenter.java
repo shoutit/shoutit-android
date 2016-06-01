@@ -9,7 +9,7 @@ import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Iterables;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.NoDataTextAdapterItem;
@@ -18,7 +18,6 @@ import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ShoutsDao;
-import com.shoutit.app.android.utils.PreferencesHelper;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
@@ -75,26 +74,23 @@ public class ChatShoutsPresenter {
                         if (shoutsResponse.getShouts().isEmpty()) {
                             return ImmutableList.<BaseAdapterItem>of(new NoDataTextAdapterItem(context.getString(R.string.chat_shouts_no_results)));
                         } else {
-                            return Lists.transform(shoutsResponse.getShouts(),
-                                    new Function<Shout, BaseAdapterItem>() {
-                                        @Override
-                                        public ShoutAdapterItem apply(Shout shout) {
-                                            final boolean isShoutOwner = shout.getProfile().getUsername().equals(currentUserName);
-                                            return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context, shoutSelectedSubject);
-                                        }
+                            final Iterable<Shout> shouts = Iterables.filter(shoutsResponse.getShouts(), input -> {
+                                assert input != null;
+                                return input.getProfile() != null;
+                            });
+                            final Iterable<BaseAdapterItem> baseAdapterItems = Iterables.transform(shouts,
+                                    (Function<Shout, BaseAdapterItem>) shout -> {
+                                        final boolean isShoutOwner = shout.getProfile().getUsername().equals(currentUserName);
+                                        return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context, shoutSelectedSubject);
                                     });
+                            return ImmutableList.copyOf(baseAdapterItems);
                         }
                     }
                 });
 
         resultsCountObservable = requestObservable
                 .compose(ResponseOrError.<ShoutsResponse>onlySuccess())
-                .map(new Func1<ShoutsResponse, Integer>() {
-                    @Override
-                    public Integer call(ShoutsResponse shoutsResponse) {
-                        return shoutsResponse.getCount();
-                    }
-                });
+                .map(ShoutsResponse::getCount);
 
         errorObservable = requestObservable
                 .compose(ResponseOrError.<ShoutsResponse>onlyError());
