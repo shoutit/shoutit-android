@@ -88,7 +88,7 @@ public class CameraFragment extends Fragment {
     public static final String EXTRA_IS_VIDEO = CameraFragment.class.getName() + ".existing_media";
     public static final String IS_IMAGE_LIST = CameraFragment.class.getName() + ".is_list";
 
-    public static final int DEFAULT_IMAGE_QUALITY = 100;
+    public static final int DEFAULT_IMAGE_QUALITY = 90;
 
     public static final int RC_MEDIA_COMPRESS = 1339;
 

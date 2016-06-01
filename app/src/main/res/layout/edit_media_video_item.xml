@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_margin="@dimen/edit_shout_media_item_padding"
+             android:layout_width="@dimen/edit_shout_media_item_size"
+             android:layout_height="@dimen/edit_shout_media_item_size">
+
+    <ImageView
+        android:src="@drawable/edit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"/>
+
+    <ImageView
+        android:id="@+id/edit_media_item_image"
+        android:layout_width="@dimen/edit_shout_media_item_size"
+        android:layout_height="@dimen/edit_shout_media_item_size"/>
+
+    <ImageView
+        android:src="@drawable/video_icon"
+        android:layout_width="@dimen/edit_shout_media_item_size"
+        android:layout_height="@dimen/edit_shout_media_item_size"/>
+
+</FrameLayout>

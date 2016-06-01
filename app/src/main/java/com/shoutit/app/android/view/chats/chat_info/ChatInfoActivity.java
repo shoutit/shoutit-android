@@ -1,7 +1,6 @@
 package com.shoutit.app.android.view.chats.chat_info;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,7 +8,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
@@ -41,7 +40,6 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import rx.functions.Action1;
 
 public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.ChatInfoView {
 
@@ -89,6 +87,7 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
     private String conversationId;
 
     public static Intent newIntent(@NonNull Context context, @NonNull String conversationId) {
+        Preconditions.checkNotNull(conversationId);
         return new Intent(context, ChatInfoActivity.class)
                 .putExtra(EXTRA_CONVERSATION_ID, conversationId);
     }
@@ -100,35 +99,23 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
         ButterKnife.bind(this);
 
         conversationId = getIntent().getStringExtra(EXTRA_CONVERSATION_ID);
+        Preconditions.checkNotNull(conversationId);
 
         mChatInfoToolbar.setTitle(R.string.chat_info_title);
         mChatInfoToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
-        mChatInfoToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
+        mChatInfoToolbar.setNavigationOnClickListener(view -> finish());
         mChatInfoToolbar.inflateMenu(R.menu.chat_info_menu);
-        mChatInfoToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.chat_info_add_person: {
-                        startActivity(ChatSelectUsersActivity.newIntent(ChatInfoActivity.this, mConversationId));
-                        return true;
-                    }
-                    case R.id.chats_info_report: {
-                        ReportDialog.show(ChatInfoActivity.this, new Action1<String>() {
-                            @Override
-                            public void call(String reportBody) {
-                                mChatInfoPresenter.sendReport(reportBody);
-                            }
-                        });
-                    }
-                    default:
-                        return false;
+        mChatInfoToolbar.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.chat_info_add_person: {
+                    startActivity(ChatSelectUsersActivity.newIntent(ChatInfoActivity.this, mConversationId));
+                    return true;
                 }
+                case R.id.chats_info_report: {
+                    ReportDialog.show(ChatInfoActivity.this, reportBody -> mChatInfoPresenter.sendReport(reportBody));
+                }
+                default:
+                    return false;
             }
         });
 
@@ -304,18 +291,12 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
     @OnClick(R.id.chat_info_exit_chat)
     void exitClick() {
         final AlertDialog alertDialog = new AlertDialog.Builder(this)
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mChatInfoPresenter.exitChatClicked();
-                        dialog.dismiss();
-                    }
+                .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                    mChatInfoPresenter.exitChatClicked();
+                    dialog.dismiss();
                 })
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
+                .setNegativeButton(android.R.string.no, (dialog, which) -> {
+                    dialog.dismiss();
                 })
                 .setMessage(getString(R.string.chat_info_exit_question))
                 .create();

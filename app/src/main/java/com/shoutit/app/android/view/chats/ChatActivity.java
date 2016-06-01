@@ -33,7 +33,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
 import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.jakewharton.rxbinding.widget.RxTextView;
-import com.jakewharton.rxbinding.widget.TextViewAfterTextChangeEvent;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
@@ -65,7 +64,6 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import rx.functions.Action1;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -136,7 +134,7 @@ public class ChatActivity extends BaseActivity implements Listener {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        mConversationId = getIntent().getStringExtra(ARGS_CONVERSATION_ID);
+        mConversationId = getConversationId();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chats);
         ButterKnife.bind(this);
@@ -153,41 +151,30 @@ public class ChatActivity extends BaseActivity implements Listener {
         }
 
         mChatsToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
-        mChatsToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
+        mChatsToolbar.setNavigationOnClickListener(view -> finish());
         mChatsToolbar.inflateMenu(R.menu.chats_menu);
-        mChatsToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                final int itemId = item.getItemId();
-                switch (itemId) {
-                    case R.id.chats_attatchments_menu: {
-                        final int visibility = mChatsAttatchmentsLayout.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE;
-                        mChatsAttatchmentsLayout.setVisibility(visibility);
-                        return true;
-                    }
-                    case R.id.chats_video_menu: {
-                        presenter.getCalledPersonNameObservable()
-                                .compose(ChatActivity.this.<String>bindToLifecycle())
-                                .subscribe(new Action1<String>() {
-                                    @Override
-                                    public void call(String calledUserUserName) {
-                                        startActivity(VideoConversationActivity.newIntent(null, calledUserUserName, ChatActivity.this));
-                                    }
-                                });
-                        return true;
-                    }
-                    case R.id.chats_chat_information: {
-                        startActivityForResult(ChatInfoActivity.newIntent(ChatActivity.this, mConversationId), INFO_REQUEST);
-                        return true;
-                    }
-                    default:
-                        return false;
+        mChatsToolbar.setOnMenuItemClickListener(item -> {
+            final int itemId = item.getItemId();
+            switch (itemId) {
+                case R.id.chats_attatchments_menu: {
+                    final int visibility = mChatsAttatchmentsLayout.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE;
+                    mChatsAttatchmentsLayout.setVisibility(visibility);
+                    return true;
                 }
+                case R.id.chats_video_menu: {
+                    presenter.getCalledPersonNameObservable()
+                            .compose(ChatActivity.this.<String>bindToLifecycle())
+                            .subscribe(calledUserUserName -> {
+                                startActivity(VideoConversationActivity.newIntent(null, calledUserUserName, ChatActivity.this));
+                            });
+                    return true;
+                }
+                case R.id.chats_chat_information: {
+                    startActivityForResult(ChatInfoActivity.newIntent(ChatActivity.this, mConversationId), INFO_REQUEST);
+                    return true;
+                }
+                default:
+                    return false;
             }
         });
 
@@ -204,11 +191,8 @@ public class ChatActivity extends BaseActivity implements Listener {
         RxTextView.afterTextChangeEvents(mChatsMessageEdittext)
                 .skip(1)
                 .throttleFirst(2, TimeUnit.SECONDS)
-                .subscribe(new Action1<TextViewAfterTextChangeEvent>() {
-                    @Override
-                    public void call(TextViewAfterTextChangeEvent textViewAfterTextChangeEvent) {
-                        presenter.sendTyping();
-                    }
+                .subscribe(textViewAfterTextChangeEvent -> {
+                    presenter.sendTyping();
                 });
 
         sendButton.setEnabled(false);
@@ -225,6 +209,18 @@ public class ChatActivity extends BaseActivity implements Listener {
         ChatsHelper.setOnClickHideListener(mChatsMessageEdittext, mChatsAttatchmentsLayout);
     }
 
+    private String getConversationId() {
+        final Intent intent = getIntent();
+        final String conversationId;
+        if (intent.hasExtra(ARGS_CONVERSATION_ID)) {
+            conversationId = intent.getStringExtra(ARGS_CONVERSATION_ID);
+        } else {
+            conversationId = intent.getData().getQueryParameter("id");
+        }
+        checkNotNull(conversationId);
+        return conversationId;
+    }
+
     private boolean isFromDeepLink() {
         final String conversationId = getIntent().getStringExtra(ARGS_CONVERSATION_ID);
         return conversationId == null && getIntent().getData() != null;
@@ -233,18 +229,11 @@ public class ChatActivity extends BaseActivity implements Listener {
     @Nonnull
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
-        final Intent intent = getIntent();
-        String conversationId = intent.getStringExtra(ARGS_CONVERSATION_ID);
-        if (conversationId == null && intent.getData() != null) {
-            conversationId = intent.getData().getQueryParameter("id");
-        }
-        checkNotNull(conversationId);
-
         final ChatActivityComponent component = DaggerChatActivityComponent
                 .builder()
                 .activityModule(new ActivityModule(this))
                 .appComponent(App.getAppComponent(getApplication()))
-                .chatsActivityModule(new ChatsActivityModule(conversationId))
+                .chatsActivityModule(new ChatsActivityModule(mConversationId))
                 .build();
         component.inject(this);
 
@@ -337,12 +326,7 @@ public class ChatActivity extends BaseActivity implements Listener {
         mChatsShoutLayoutTitle.setText(title);
         mChatsShoutLayoutPrice.setText(price);
         mChatsShoutLayoutAuthorDate.setText(authorAndTime);
-        mChatsShoutLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(ShoutActivity.newIntent(ChatActivity.this, id));
-            }
-        });
+        mChatsShoutLayout.setOnClickListener(v -> startActivity(ShoutActivity.newIntent(ChatActivity.this, id)));
     }
 
     @Override
@@ -407,12 +391,7 @@ public class ChatActivity extends BaseActivity implements Listener {
                     R.string.chat_video_confirmation :
                     R.string.chat_picture_confirmation);
 
-            showShareConfirmationDialog(dialogText, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    presenter.addMedia(media, isVideo);
-                }
-            });
+            showShareConfirmationDialog(dialogText, (dialog, which) -> presenter.addMedia(media, isVideo));
         } else if (requestCode == REQUEST_LOCATION && resultCode == RESULT_OK) {
 
             final Place place = PlacePicker.getPlace(this, data);
@@ -420,21 +399,13 @@ public class ChatActivity extends BaseActivity implements Listener {
 
             final String dialogText = getString(R.string.chat_location_confirmation);
 
-            showShareConfirmationDialog(dialogText, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    presenter.sendLocation(latLng.latitude, latLng.longitude);
-                }
-            });
+            showShareConfirmationDialog(dialogText, (dialog, which) -> presenter.sendLocation(latLng.latitude, latLng.longitude));
         } else if (requestCode == SELECT_SHOUT_REQUEST_CODE && resultCode == RESULT_OK) {
 
             final String dialogText = getString(R.string.chat_shout_confirmation);
-            showShareConfirmationDialog(dialogText, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    final String shoutId = data.getStringExtra(SelectShoutActivity.RESULT_SHOUT_ID);
-                    presenter.sendShout(shoutId);
-                }
+            showShareConfirmationDialog(dialogText, (dialog, which) -> {
+                final String shoutId = data.getStringExtra(SelectShoutActivity.RESULT_SHOUT_ID);
+                presenter.sendShout(shoutId);
             });
         } else if (requestCode == SELECT_PROFILE_REQUEST_CODE && resultCode == RESULT_OK) {
 
@@ -442,12 +413,7 @@ public class ChatActivity extends BaseActivity implements Listener {
             final String profileName = data.getStringExtra(SelectProfileActivity.RESULT_PROFILE_NAME);
             final String dialogText = getString(R.string.chat_profile_confirmation, profileName);
 
-            showShareConfirmationDialog(dialogText, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    presenter.sendProfile(profileId);
-                }
-            });
+            showShareConfirmationDialog(dialogText, (dialog, which) -> presenter.sendProfile(profileId));
         } else if (requestCode == INFO_REQUEST && resultCode == RESULT_OK) {
 
             final boolean closeChat = data.getBooleanExtra(ChatInfoActivity.EXTRA_CLOSE_CHAT, false);
@@ -469,11 +435,8 @@ public class ChatActivity extends BaseActivity implements Listener {
                 .setTitle(R.string.chat_dialog_title)
                 .setMessage(text)
                 .setPositiveButton(R.string.chat_dialog_attach, positiveButtonListener)
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
+                .setNegativeButton(android.R.string.no, (dialog, which) -> {
+                    dialog.dismiss();
                 })
                 .show();
     }
