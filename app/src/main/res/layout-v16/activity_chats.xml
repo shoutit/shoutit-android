@@ -27,6 +27,7 @@
         android:paddingTop="4dp">
 
         <EditText
+            android:background="@null"
             android:id="@+id/chats_message_edittext"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
