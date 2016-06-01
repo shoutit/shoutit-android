@@ -62,35 +62,34 @@ public class NotificationHelper {
     }
 
     public Action1<Bundle> sendNotificationAction(@NonNull final Context context) {
-        return new Action1<Bundle>() {
-            @Override
-            public void call(Bundle bundle) {
-                sendNotification(bundle, context);
-            }
-        };
+        return bundle -> sendNotification(bundle, context);
     }
 
-    private void sendNotification(@NonNull Bundle bundle, @NonNull Context context) {
+    public void sendNotification(@NonNull Bundle bundle, @NonNull Context context) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "Received Push bundle: " + bundle.toString());
         }
 
         final String eventName = bundle.getString(GCM_EVENT_NAME);
         if (!EVENT_INCOMING_CALL.equals(eventName)) {
-            showNotification(bundle, context);
+            showNotificationFromBundle(bundle, context);
         }
     }
 
-    private void showNotification(Bundle bundle, Context context) {
+    private void showNotificationFromBundle(Bundle bundle, Context context) {
         final String title = bundle.getString(GCM_TITLE_FIELD) != null ?
                 bundle.getString(GCM_TITLE_FIELD) : context.getString(R.string.app_name);
         final String body = bundle.getString(GCM_BODY_FIELD);
         final String iconUrl = bundle.getString(GCM_ICON_FIELD);
         final String eventName = bundle.getString(GCM_EVENT_NAME);
+        final String dataJson = bundle.getString(GCM_DATA_FIELD);
 
+        showNotification(dataJson, context, title, body, iconUrl, eventName);
+    }
+
+    private void showNotification(String dataJson, Context context, String title, String body, String iconUrl, String eventName) {
         final JSONObject dataObject;
         String appUrl = null;
-        final String dataJson = bundle.getString(GCM_DATA_FIELD);
         if (dataJson != null) {
             try {
                 dataObject = new JSONObject(dataJson);
@@ -132,7 +131,8 @@ public class NotificationHelper {
                 .setLargeIcon(largeIcon)
                 .setSound(defaultSoundUri)
                 .setAutoCancel(true)
-                .setContentIntent(pendingIntent);
+                .setContentIntent(pendingIntent)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(body));
 
         ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE))
                 .notify(getNotificationId(eventName), notificationBuilder.build());
