@@ -224,8 +224,11 @@ public class RecordMediaActivity extends AbstractCameraActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // Let fragment handle results
         super.onActivityResult(requestCode, resultCode, data);
+        final Fragment fragment = getFragmentManager().findFragmentByTag(TAG_CAMERA);
+        if (fragment != null) {
+            fragment.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     @Override
