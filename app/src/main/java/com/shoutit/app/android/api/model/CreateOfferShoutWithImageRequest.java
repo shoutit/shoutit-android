@@ -11,19 +11,17 @@ public class CreateOfferShoutWithImageRequest {
     private final String type = "offer";
     private final List<String> images;
     private final List<Video> videos;
-    private final boolean publishToFacebook;
 
-    public CreateOfferShoutWithImageRequest(@NonNull List<String> images, @NonNull List<Video> videos, boolean publishToFacebook) {
+    public CreateOfferShoutWithImageRequest(@NonNull List<String> images, @NonNull List<Video> videos) {
         this.images = images;
         this.videos = videos;
-        this.publishToFacebook = publishToFacebook;
     }
 
-    public static CreateOfferShoutWithImageRequest withImage(@NonNull String url, boolean publishToFacebook) {
-        return new CreateOfferShoutWithImageRequest(ImmutableList.of(url), ImmutableList.<Video>of(), publishToFacebook);
+    public static CreateOfferShoutWithImageRequest withImage(@NonNull String url) {
+        return new CreateOfferShoutWithImageRequest(ImmutableList.of(url), ImmutableList.<Video>of());
     }
 
-    public static CreateOfferShoutWithImageRequest withVideo(@NonNull String thumbnail, @NonNull String url, boolean publishToFacebook) {
-        return new CreateOfferShoutWithImageRequest(ImmutableList.<String>of(), ImmutableList.of(Video.createVideo(url, thumbnail, 40)), publishToFacebook);// TODO duration
+    public static CreateOfferShoutWithImageRequest withVideo(@NonNull String thumbnail, @NonNull String url) {
+        return new CreateOfferShoutWithImageRequest(ImmutableList.<String>of(), ImmutableList.of(Video.createVideo(url, thumbnail, 40)));// TODO duration
     }
 }

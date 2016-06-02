@@ -20,6 +20,7 @@ import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
 import com.shoutit.app.android.api.model.EditPublicChatRequest;
 import com.shoutit.app.android.api.model.EditShoutPriceRequest;
+import com.shoutit.app.android.api.model.EditShoutPublishToFacebook;
 import com.shoutit.app.android.api.model.EditShoutRequest;
 import com.shoutit.app.android.api.model.EditShoutRequestWithPrice;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
@@ -350,6 +351,9 @@ public interface ApiService {
 
     @PATCH("shouts/{id}")
     Observable<CreateShoutResponse> editShoutPrice(@Path("id") String id, @Body EditShoutPriceRequest request);
+
+    @PATCH("shouts/{id}")
+    Observable<CreateShoutResponse> editShoutPublishToFacebbok(@Path("id") String id, @Body EditShoutPublishToFacebook body);
 
     @GET("shouts/{id}")
     Observable<ShoutResponse> getShout(@Path("id") String id);
