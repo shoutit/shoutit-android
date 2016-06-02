@@ -10,7 +10,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.common.base.Optional;
+import com.facebook.CallbackManager;
 import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
@@ -31,13 +31,21 @@ import butterknife.OnClick;
 
 public class InviteFriendsFragment extends BaseFragment {
 
-    private static final String SHARE_APP_TEXT = "www.shoutit.com/app";
+    private static final String SHARE_APP_URL = "https://www.shoutit.com/app";
+    private static final String SHARE_FACEBOOK_APP_LINK_URL = "https://fb.me/1224908360855680";
 
     private Menu mMenu;
+    private CallbackManager callbackManager;
 
     @Nonnull
     public static Fragment newInstance() {
         return new InviteFriendsFragment();
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        callbackManager = CallbackManager.Factory.create();
     }
 
     @android.support.annotation.Nullable
@@ -73,13 +81,13 @@ public class InviteFriendsFragment extends BaseFragment {
                 startActivity(ContactsFriendsActivity.newIntent(getActivity()));
                 break;
             case R.id.invite_friends_invite_facebook:
-                FacebookHelper.showAppInviteDialog(this, SHARE_APP_TEXT);
+                FacebookHelper.showAppInviteDialog(this, SHARE_FACEBOOK_APP_LINK_URL, callbackManager);
                 break;
             case R.id.invite_friends_invite_twitter:
                 shareThroughTwitter();
                 break;
             case R.id.invite_friends_share_app:
-                startActivity(IntentHelper.getShareIntent(SHARE_APP_TEXT));
+                startActivity(IntentHelper.getShareIntent(SHARE_APP_URL));
                 break;
         }
     }
@@ -103,6 +111,12 @@ public class InviteFriendsFragment extends BaseFragment {
                     R.string.invite_no_twitter_app, Snackbar.LENGTH_LONG)
                     .show();
         }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

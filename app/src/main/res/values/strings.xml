@@ -617,6 +617,7 @@
     <string name="invite_text">Join Shoutit on www.shoutit.com</string>
     <string name="invite_chooser_text">Select app</string>
     <string name="invite_no_twitter_app">You need the Twitter app to be installed</string>
+    <string name="invite_error">Sorry, cannot send invitation</string>
 
     <!-- Contacts fiends -->
     <string name="contacts_friends_ab_title">Contacts friends</string>

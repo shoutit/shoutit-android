@@ -3,6 +3,7 @@ package com.shoutit.app.android.view.loginintro;
 import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 
 import com.appunite.rx.ResponseOrError;
@@ -19,12 +20,14 @@ import com.facebook.login.LoginResult;
 import com.facebook.share.model.AppInviteContent;
 import com.facebook.share.widget.AppInviteDialog;
 import com.google.common.collect.Lists;
+import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.LinkedAccounts;
 import com.shoutit.app.android.api.model.UpdateFacebookTokenRequest;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForApplication;
+import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
 
@@ -306,12 +309,34 @@ public class FacebookHelper {
         });
     }
 
-    public static void showAppInviteDialog(@Nonnull Fragment fragment, @Nonnull String appLinkUrl) {
+    public static void showAppInviteDialog(@Nonnull Fragment fragment, @Nonnull String appLinkUrl,
+                                           @Nonnull CallbackManager callbackManager) {
         if (AppInviteDialog.canShow()) {
             AppInviteContent content = new AppInviteContent.Builder()
                     .setApplinkUrl(appLinkUrl)
                     .build();
-            AppInviteDialog.show(fragment, content);
+
+            AppInviteDialog appInviteDialog = new AppInviteDialog(fragment);
+            appInviteDialog.registerCallback(callbackManager, new FacebookCallback<AppInviteDialog.Result>() {
+                @Override
+                public void onSuccess(AppInviteDialog.Result result) {
+                    LogHelper.logIfDebug(TAG, "Successful app invite");
+                }
+
+                @Override
+                public void onCancel() {
+                    LogHelper.logIfDebug(TAG, "App invite canceled");
+                }
+
+                @Override
+                public void onError(FacebookException error) {
+                    LogHelper.logIfDebug(TAG, "Failed to app invite");
+                    ColoredSnackBar.error(ColoredSnackBar.contentView(fragment.getActivity()),
+                            R.string.invite_error, Snackbar.LENGTH_LONG).show();
+                }
+            });
+
+            appInviteDialog.show(fragment, content);
         }
     }
 }
