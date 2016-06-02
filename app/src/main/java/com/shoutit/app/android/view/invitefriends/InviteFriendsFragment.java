@@ -14,6 +14,7 @@ import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.view.invitefriends.contactsfriends.ContactsFriendsActivity;
 import com.shoutit.app.android.view.invitefriends.facebookfriends.FacebookFriendsActivity;
+import com.shoutit.app.android.view.loginintro.FacebookHelper;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -65,6 +66,7 @@ public class InviteFriendsFragment extends BaseFragment {
                 startActivity(ContactsFriendsActivity.newIntent(getActivity()));
                 break;
             case R.id.invite_friends_invite_facebook:
+                FacebookHelper.showAppInviteDialog(this, SHARE_APP_TEXT);
                 break;
             case R.id.invite_friends_invite_twitter:
                 break;

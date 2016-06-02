@@ -3,6 +3,7 @@ package com.shoutit.app.android.view.loginintro;
 import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
@@ -15,6 +16,8 @@ import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
+import com.facebook.share.model.AppInviteContent;
+import com.facebook.share.widget.AppInviteDialog;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
@@ -301,5 +304,14 @@ public class FacebookHelper {
                 instance.logInWithReadPermissions(activity, Collections.singletonList(PERMISSION_EMAIL));
             }
         });
+    }
+
+    public static void showAppInviteDialog(@Nonnull Fragment fragment, @Nonnull String appLinkUrl) {
+        if (AppInviteDialog.canShow()) {
+            AppInviteContent content = new AppInviteContent.Builder()
+                    .setApplinkUrl(appLinkUrl)
+                    .build();
+            AppInviteDialog.show(fragment, content);
+        }
     }
 }
