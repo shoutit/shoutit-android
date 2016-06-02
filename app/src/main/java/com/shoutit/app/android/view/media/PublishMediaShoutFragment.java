@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -36,8 +37,10 @@ import com.shoutit.app.android.api.model.CreateOfferShoutWithImageRequest;
 import com.shoutit.app.android.api.model.CreateShoutResponse;
 import com.shoutit.app.android.api.model.Currency;
 import com.shoutit.app.android.api.model.EditShoutPriceRequest;
+import com.shoutit.app.android.api.model.EditShoutPublishToFacebook;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.view.createshout.publish.PublishShoutActivity;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
@@ -286,7 +289,7 @@ public class PublishMediaShoutFragment extends Fragment {
                 .flatMap(new Func1<String, Observable<CreateShoutResponse>>() {
                     @Override
                     public Observable<CreateShoutResponse> call(String url) {
-                        return mApiService.createShoutOffer(CreateOfferShoutWithImageRequest.withImage(url, faceBookCheckbox.isChecked()))
+                        return mApiService.createShoutOffer(CreateOfferShoutWithImageRequest.withImage(url))
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(MyAndroidSchedulers.mainThread());
                     }
@@ -337,7 +340,7 @@ public class PublishMediaShoutFragment extends Fragment {
                 .flatMap(new Func1<BothParams<String, String>, Observable<CreateShoutResponse>>() {
                     @Override
                     public Observable<CreateShoutResponse> call(BothParams<String, String> urls) {
-                        return mApiService.createShoutOffer(CreateOfferShoutWithImageRequest.withVideo(urls.param1(), urls.param2(), faceBookCheckbox.isChecked()))
+                        return mApiService.createShoutOffer(CreateOfferShoutWithImageRequest.withVideo(urls.param1(), urls.param2()))
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(MyAndroidSchedulers.mainThread());
                     }
@@ -373,27 +376,41 @@ public class PublishMediaShoutFragment extends Fragment {
             showProgress(true);
             final long priceInCents = PriceUtils.getPriceInCents(price);
             final PriceUtils.SpinnerCurrency selectedItem = (PriceUtils.SpinnerCurrency) mCameraPublishedCurrency.getSelectedItem();
-            mCompositeSubscription.add(mApiService.editShoutPrice(createdShoutOfferId, new EditShoutPriceRequest(priceInCents, selectedItem.getCode()))
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(MyAndroidSchedulers.mainThread())
-                    .subscribe(new Action1<CreateShoutResponse>() {
-                        @Override
-                        public void call(CreateShoutResponse createShoutResponse) {
-                            getActivity().finish();
-                            startActivity(PublishShoutActivity.newIntent(getActivity(), createdShoutOfferId, mWebUrl, false, null));
-                        }
-                    }, new Action1<Throwable>() {
-                        @Override
-                        public void call(Throwable throwable) {
-                            Log.e(TAG, "error", throwable);
-                            showProgress(false);
-                            showApiError(throwable);
-                        }
-                    }));
+            mCompositeSubscription.add(
+                    mApiService.editShoutPrice(createdShoutOfferId, new EditShoutPriceRequest(priceInCents, selectedItem.getCode()))
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(MyAndroidSchedulers.mainThread())
+                            .subscribe(createShoutResponse -> {
+                                finishActivity();
+                            }, handleApiError())
+            );
+        } else if (faceBookCheckbox.isChecked()) {
+            showProgress(true);
+            mCompositeSubscription.add(
+                    mApiService.editShoutPublishToFacebbok(createdShoutOfferId, new EditShoutPublishToFacebook(true))
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(MyAndroidSchedulers.mainThread())
+                            .subscribe(createShoutResponse -> {
+                                finishActivity();
+                            }, handleApiError())
+            );
         } else {
-            getActivity().finish();
-            startActivity(PublishShoutActivity.newIntent(getActivity(), createdShoutOfferId, mWebUrl, false, null));
+            finishActivity();
         }
+    }
+
+    @NonNull
+    private Action1<Throwable> handleApiError() {
+        return throwable -> {
+            Log.e(TAG, "error", throwable);
+            showProgress(false);
+            showApiError(throwable);
+        };
+    }
+
+    private void finishActivity() {
+        getActivity().finish();
+        startActivity(PublishShoutActivity.newIntent(getActivity(), createdShoutOfferId, mWebUrl, false, null));
     }
 
     public void showApiError(Throwable throwable) {
@@ -403,6 +420,7 @@ public class PublishMediaShoutFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         mCallbackManager.onActivityResult(requestCode, resultCode, data);
+        LogHelper.logIfDebug(TAG, "onActivityResult from facebook");
         super.onActivityResult(requestCode, resultCode, data);
     }
 

@@ -168,6 +168,7 @@ public class FacebookHelper {
 
                                 @Override
                                 public void onCancel() {
+                                    LogHelper.logIfDebug(TAG, "onCancel while asking for permission");
                                     if (!subscriber.isUnsubscribed()) {
                                         subscriber.onNext(false);
                                     }
@@ -175,6 +176,7 @@ public class FacebookHelper {
 
                                 @Override
                                 public void onError(FacebookException error) {
+                                    LogHelper.logIfDebug(TAG, "Error while asking for permission: " + error.getMessage());
                                     if (error instanceof FacebookAuthorizationException &&
                                             AccessToken.getCurrentAccessToken() != null) {
                                         // Case when app has token from other user and tries to log in

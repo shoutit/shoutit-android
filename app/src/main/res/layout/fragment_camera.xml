@@ -179,24 +179,27 @@
             android:orientation="horizontal">
 
             <Button
+                android:theme="@style/AppTheme.AppBarOverlay"
                 android:id="@+id/fragment_camera_confirm_no_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="40dp"
                 android:layout_marginRight="40dp"
-                android:background="?selectableItemBackground"
+                android:background="?selectableItemBackgroundBorderless"
                 android:fontFamily="sans-serif"
                 android:text="@string/camera_retake"
                 android:textAllCaps="true"
+                tools:textColor="@color/accent_red"
                 android:textColor="@android:color/darker_gray"/>
 
             <Button
+                android:theme="@style/AppTheme.AppBarOverlay"
                 android:id="@+id/fragment_camera_confirm_yes_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="40dp"
                 android:layout_marginStart="40dp"
-                android:background="?selectableItemBackground"
+                android:background="?selectableItemBackgroundBorderless"
                 android:fontFamily="sans-serif"
                 tools:text="@string/camera_publish"
                 android:textAllCaps="true"
