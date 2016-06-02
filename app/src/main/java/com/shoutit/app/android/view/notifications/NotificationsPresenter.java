@@ -135,7 +135,7 @@ public class NotificationsPresenter {
                 .switchMap(new Func1<Object, Observable<ResponseOrError<ResponseBody>>>() {
                     @Override
                     public Observable<ResponseOrError<ResponseBody>> call(Object o) {
-                        return apiService.markAllAsRead()
+                        return apiService.markAllNotificationsAsRead()
                                 .subscribeOn(networkScheduler)
                                 .observeOn(uiScheduler)
                                 .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
@@ -150,7 +150,7 @@ public class NotificationsPresenter {
                 .switchMap(new Func1<String, Observable<ResponseOrError<ResponseBody>>>() {
                     @Override
                     public Observable<ResponseOrError<ResponseBody>> call(final String notificationId) {
-                        return apiService.markAsRead(notificationId)
+                        return apiService.markNotificationAsRead(notificationId)
                                 .subscribeOn(networkScheduler)
                                 .observeOn(uiScheduler)
                                 .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable())
