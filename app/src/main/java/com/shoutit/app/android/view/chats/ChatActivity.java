@@ -30,6 +30,7 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.common.base.Strings;
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
 import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.jakewharton.rxbinding.widget.RxTextView;
@@ -326,12 +327,20 @@ public class ChatActivity extends BaseActivity implements Listener {
         mChatsShoutLayoutTitle.setText(title);
         mChatsShoutLayoutPrice.setText(price);
         mChatsShoutLayoutAuthorDate.setText(authorAndTime);
-        mChatsShoutLayout.setOnClickListener(v -> startActivity(ShoutActivity.newIntent(ChatActivity.this, id)));
+        if (Strings.isNullOrEmpty(id)) {
+            mChatsShoutLayout.setOnClickListener(v -> ColoredSnackBar.error(ColoredSnackBar.contentView(ChatActivity.this), getString(R.string.shout_deleted), Snackbar.LENGTH_SHORT));
+        } else {
+            mChatsShoutLayout.setOnClickListener(v -> startActivity(ShoutActivity.newIntent(ChatActivity.this, id)));
+        }
     }
 
     @Override
     public void onShoutClicked(String shoutId) {
-        startActivity(ShoutActivity.newIntent(ChatActivity.this, shoutId));
+        if (Strings.isNullOrEmpty(shoutId)) {
+            ColoredSnackBar.error(ColoredSnackBar.contentView(ChatActivity.this), getString(R.string.shout_deleted), Snackbar.LENGTH_SHORT).show();
+        } else {
+            startActivity(ShoutActivity.newIntent(ChatActivity.this, shoutId));
+        }
     }
 
     @Override

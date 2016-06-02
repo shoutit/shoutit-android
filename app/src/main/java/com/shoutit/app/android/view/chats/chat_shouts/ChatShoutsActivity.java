@@ -3,6 +3,7 @@ package com.shoutit.app.android.view.chats.chat_shouts;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -12,6 +13,7 @@ import android.widget.CheckedTextView;
 import android.widget.TextView;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.google.common.base.Strings;
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
 import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.jakewharton.rxbinding.view.RxView;
@@ -26,6 +28,7 @@ import com.shoutit.app.android.utils.LayoutManagerHelper;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyGridLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
+import com.shoutit.app.android.view.chats.ChatActivity;
 import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsAdapter;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 
@@ -97,7 +100,11 @@ public class ChatShoutsActivity extends BaseActivity {
                 .subscribe(new Action1<String>() {
                     @Override
                     public void call(String shoutId) {
-                        startActivity(ShoutActivity.newIntent(ChatShoutsActivity.this, shoutId));
+                        if (Strings.isNullOrEmpty(shoutId)) {
+                            ColoredSnackBar.error(ColoredSnackBar.contentView(ChatShoutsActivity.this), getString(R.string.shout_deleted), Snackbar.LENGTH_SHORT).show();
+                        } else {
+                            startActivity(ShoutActivity.newIntent(ChatShoutsActivity.this, shoutId));
+                        }
                     }
                 });
 

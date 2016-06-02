@@ -29,6 +29,7 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.jakewharton.rxbinding.widget.TextViewAfterTextChangeEvent;
 import com.shoutit.app.android.App;
@@ -39,6 +40,7 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.utils.TextWatcherAdapter;
+import com.shoutit.app.android.view.chats.ChatActivity;
 import com.shoutit.app.android.view.chats.ChatsHelper;
 import com.shoutit.app.android.view.chats.chat_info.ChatInfoActivity;
 import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
@@ -295,9 +297,10 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
         mChatsShoutLayoutTitle.setText(title);
         mChatsShoutLayoutPrice.setText(price);
         mChatsShoutLayoutAuthorDate.setText(authorAndTime);
-        mChatsShoutLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        mChatsShoutLayout.setOnClickListener(v -> {
+            if (Strings.isNullOrEmpty(id)) {
+                ColoredSnackBar.error(ColoredSnackBar.contentView(ChatFirstConversationActivity.this), getString(R.string.shout_deleted), Snackbar.LENGTH_SHORT).show();
+            } else {
                 startActivity(ShoutActivity.newIntent(ChatFirstConversationActivity.this, id));
             }
         });
@@ -305,7 +308,11 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
 
     @Override
     public void onShoutClicked(String shoutId) {
-        startActivity(ShoutActivity.newIntent(ChatFirstConversationActivity.this, shoutId));
+        if (Strings.isNullOrEmpty(shoutId)) {
+            ColoredSnackBar.error(ColoredSnackBar.contentView(ChatFirstConversationActivity.this), getString(R.string.shout_deleted), Snackbar.LENGTH_SHORT).show();
+        } else {
+            startActivity(ShoutActivity.newIntent(ChatFirstConversationActivity.this, shoutId));
+        }
     }
 
     @Override
