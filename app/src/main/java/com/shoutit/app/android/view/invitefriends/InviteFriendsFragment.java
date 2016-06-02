@@ -11,6 +11,7 @@ import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
+import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.view.invitefriends.contactsfriends.ContactsFriendsActivity;
 import com.shoutit.app.android.view.invitefriends.facebookfriends.FacebookFriendsActivity;
 
@@ -21,6 +22,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class InviteFriendsFragment extends BaseFragment {
+
+    private static final String SHARE_APP_TEXT = "www.shoutit.com/app";
 
     private Menu mMenu;
 
@@ -66,6 +69,7 @@ public class InviteFriendsFragment extends BaseFragment {
             case R.id.invite_friends_invite_twitter:
                 break;
             case R.id.invite_friends_share_app:
+                startActivity(IntentHelper.getShareIntent(SHARE_APP_TEXT));
                 break;
         }
     }
