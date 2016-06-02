@@ -303,6 +303,13 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+            if (fragment.getTag().equals(MenuHandler.FRAGMENT_INVITE_FRIENDS)) {
+                fragment.onActivityResult(requestCode, resultCode, data);
+                break;
+            }
+        }
+
         if (resultCode == Activity.RESULT_OK && requestCode == REQUST_CODE_PLAY_SERVICES_CHECK) {
             registerToGcm();
         } else if (requestCode == Activity.RESULT_OK) {
