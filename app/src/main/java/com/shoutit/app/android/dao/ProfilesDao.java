@@ -13,7 +13,7 @@ import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.BaseProfile;
-import com.shoutit.app.android.api.model.MutualFriendsResponse;
+import com.shoutit.app.android.api.model.ProfilesListResponse;
 import com.shoutit.app.android.api.model.RegisterDeviceRequest;
 import com.shoutit.app.android.api.model.SearchProfileResponse;
 import com.shoutit.app.android.api.model.User;
@@ -40,6 +40,8 @@ public class ProfilesDao {
     private final LoadingCache<String, SearchProfilesDao> searchProfilesCache;
     @Nonnull
     private final LoadingCache<String, FriendsDao> friendsCache;
+    @Nonnull
+    private final LoadingCache<String, ContactsDao> contactsCache;
     @Nonnull
     private final ApiService apiService;
     @Nonnull
@@ -77,6 +79,19 @@ public class ProfilesDao {
                         return new FriendsDao(userName);
                     }
                 });
+
+        contactsCache = CacheBuilder.newBuilder()
+                .build(new CacheLoader<String, ContactsDao>() {
+                    @Override
+                    public ContactsDao load(@Nonnull String userName) throws Exception {
+                        return new ContactsDao(userName);
+                    }
+                });
+    }
+
+    @Nonnull
+    public ContactsDao getContactsDao(@Nonnull String userName) {
+        return contactsCache.getUnchecked(userName);
     }
 
     @Nonnull
@@ -230,39 +245,41 @@ public class ProfilesDao {
         }
     }
 
-    public class FriendsDao {
-        private final int SEARCH_PAGE_SIZE = 20;
+    public abstract class BaseProfileListDao {
+        protected final int PAGE_SIZE = 20;
 
         @Nonnull
-        private final Observable<ResponseOrError<MutualFriendsResponse>> profilesObservable;
+        private final Observable<ResponseOrError<ProfilesListResponse>> profilesObservable;
         @Nonnull
         private final PublishSubject<Object> refreshSubject = PublishSubject.create();
         @Nonnull
-        private final PublishSubject<ResponseOrError<MutualFriendsResponse>> updatedProfilesLocallySubject = PublishSubject.create();
+        private final PublishSubject<ResponseOrError<ProfilesListResponse>> updatedProfilesLocallySubject = PublishSubject.create();
         @Nonnull
         private final PublishSubject<Object> loadMoreShoutsSubject = PublishSubject.create();
+        @Nonnull
+        protected final String userName;
 
-        public FriendsDao(@Nonnull final String userName) {
-            final OperatorMergeNextToken<MutualFriendsResponse, Object> loadMoreOperator =
-                    OperatorMergeNextToken.create(new Func1<MutualFriendsResponse, Observable<MutualFriendsResponse>>() {
+        public BaseProfileListDao(@Nonnull final String userName) {
+            this.userName = userName;
+            final OperatorMergeNextToken<ProfilesListResponse, Object> loadMoreOperator =
+                    OperatorMergeNextToken.create(new Func1<ProfilesListResponse, Observable<ProfilesListResponse>>() {
                         private int pageNumber = 0;
 
                         @Override
-                        public Observable<MutualFriendsResponse> call(MutualFriendsResponse previousResponse) {
+                        public Observable<ProfilesListResponse> call(ProfilesListResponse previousResponse) {
                             if (previousResponse == null || previousResponse.getNext() != null) {
                                 if (previousResponse == null) {
                                     pageNumber = 0;
                                 }
                                 ++pageNumber;
 
-                                final Observable<MutualFriendsResponse> apiRequest = apiService
-                                        .facebookFriends(userName, pageNumber, SEARCH_PAGE_SIZE)
+                                final Observable<ProfilesListResponse> apiRequest = getRequest(pageNumber)
                                         .subscribeOn(networkScheduler);
 
                                 if (previousResponse == null) {
                                     return apiRequest;
                                 } else {
-                                    return Observable.just(previousResponse).zipWith(apiRequest, new MergeMutualFriendsResponses());
+                                    return Observable.just(previousResponse).zipWith(apiRequest, new MergeProfilesListResponses());
                                 }
                             } else {
                                 return Observable.never();
@@ -273,11 +290,13 @@ public class ProfilesDao {
 
             profilesObservable = loadMoreShoutsSubject.startWith((Object) null)
                     .lift(loadMoreOperator)
-                    .compose(ResponseOrError.<MutualFriendsResponse>toResponseOrErrorObservable())
-                    .compose(MoreOperators.<ResponseOrError<MutualFriendsResponse>>refresh(refreshSubject))
+                    .compose(ResponseOrError.<ProfilesListResponse>toResponseOrErrorObservable())
+                    .compose(MoreOperators.<ResponseOrError<ProfilesListResponse>>refresh(refreshSubject))
                     .mergeWith(updatedProfilesLocallySubject)
-                    .compose(MoreOperators.<ResponseOrError<MutualFriendsResponse>>cacheWithTimeout(networkScheduler));
+                    .compose(MoreOperators.<ResponseOrError<ProfilesListResponse>>cacheWithTimeout(networkScheduler));
         }
+
+        protected abstract Observable<ProfilesListResponse> getRequest(int pageNumber);
 
         @Nonnull
         public Observer<Object> getLoadMoreShoutsObserver() {
@@ -285,7 +304,7 @@ public class ProfilesDao {
         }
 
         @Nonnull
-        public Observable<ResponseOrError<MutualFriendsResponse>> getProfilesObservable() {
+        public Observable<ResponseOrError<ProfilesListResponse>> getProfilesObservable() {
             return profilesObservable;
         }
 
@@ -295,8 +314,32 @@ public class ProfilesDao {
         }
 
         @Nonnull
-        public Observer<ResponseOrError<MutualFriendsResponse>> updatedProfileLocallyObserver() {
+        public Observer<ResponseOrError<ProfilesListResponse>> updatedProfileLocallyObserver() {
             return updatedProfilesLocallySubject;
+        }
+    }
+
+    public class FriendsDao extends BaseProfileListDao {
+
+        public FriendsDao(@Nonnull String userName) {
+            super(userName);
+        }
+
+        @Override
+        protected Observable<ProfilesListResponse> getRequest(int pageNumber) {
+            return apiService.facebookFriends(userName, pageNumber, PAGE_SIZE);
+        }
+    }
+
+    public class ContactsDao extends BaseProfileListDao {
+
+        public ContactsDao(@Nonnull String userName) {
+            super(userName);
+        }
+
+        @Override
+        protected Observable<ProfilesListResponse> getRequest(int pageNumber) {
+            return apiService.mutualContacts(userName, pageNumber, PAGE_SIZE);
         }
     }
 
@@ -321,16 +364,17 @@ public class ProfilesDao {
         }
     }
 
-    public class MergeMutualFriendsResponses implements Func2<MutualFriendsResponse, MutualFriendsResponse, MutualFriendsResponse> {
+    public class MergeProfilesListResponses implements Func2<ProfilesListResponse, ProfilesListResponse, ProfilesListResponse> {
         @Override
-        public MutualFriendsResponse call(MutualFriendsResponse previousData, MutualFriendsResponse newData) {
+        public ProfilesListResponse call(ProfilesListResponse previousData, ProfilesListResponse newData) {
             final ImmutableList<BaseProfile> allItems = ImmutableList.<BaseProfile>builder()
                     .addAll(previousData.getResults())
                     .addAll(newData.getResults())
                     .build();
 
-            final int count = previousData.getCount() + newData.getCount();
-            return new MutualFriendsResponse(count, newData.getNext(), newData.getPrevious(), allItems);
+            return new ProfilesListResponse(newData.getCount(), newData.getNext(), newData.getPrevious(), allItems);
         }
     }
+
+
 }

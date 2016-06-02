@@ -7,7 +7,6 @@ import com.shoutit.app.android.api.model.BlockedProfilesResposne;
 import com.shoutit.app.android.api.model.CallerProfile;
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.ChangePasswordRequest;
-import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.ConversationMediaResponse;
 import com.shoutit.app.android.api.model.ConversationDetails;
 import com.shoutit.app.android.api.model.ConversationsResponse;
@@ -29,10 +28,10 @@ import com.shoutit.app.android.api.model.ListenersResponse;
 import com.shoutit.app.android.api.model.ListeningResponse;
 import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessagesResponse;
-import com.shoutit.app.android.api.model.MutualFriendsResponse;
 import com.shoutit.app.android.api.model.NotificationsResponse;
 import com.shoutit.app.android.api.model.PostMessage;
 import com.shoutit.app.android.api.model.ProfileRequest;
+import com.shoutit.app.android.api.model.ProfilesListResponse;
 import com.shoutit.app.android.api.model.RegisterDeviceRequest;
 import com.shoutit.app.android.api.model.RelatedTagsResponse;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
@@ -50,6 +49,7 @@ import com.shoutit.app.android.api.model.TwilioResponse;
 import com.shoutit.app.android.api.model.UpdateFacebookTokenRequest;
 import com.shoutit.app.android.api.model.UpdateLocationRequest;
 import com.shoutit.app.android.api.model.UpdateUserRequest;
+import com.shoutit.app.android.api.model.UploadContactsRequest;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserIdentity;
 import com.shoutit.app.android.api.model.UserLocation;
@@ -294,9 +294,18 @@ public interface ApiService {
                                             @Query("page_size") Integer pageSize);
 
     @GET("profiles/{user_name}/mutual_friends")
-    Observable<MutualFriendsResponse> facebookFriends(@Path("user_name") String userName,
+    Observable<ProfilesListResponse> facebookFriends(@Path("user_name") String userName,
                                                       @Query("page") Integer page,
                                                       @Query("page_size") Integer pageSize);
+
+    @PATCH("profiles/{user_name}/contacts")
+    Observable<ResponseBody> uploadContacts(@Path("user_name") String userName,
+                                            @Body UploadContactsRequest uploadContactsRequest);
+
+    @GET("profiles/{user_name}/mutual_contacts")
+    Observable<ProfilesListResponse> mutualContacts(@Path("user_name") String userName,
+                                                    @Query("page") Integer page,
+                                                    @Query("page_size") Integer pageSize);
 
     /**
      * Misc

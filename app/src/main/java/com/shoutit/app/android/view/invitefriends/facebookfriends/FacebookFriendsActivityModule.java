@@ -2,13 +2,12 @@ package com.shoutit.app.android.view.invitefriends.facebookfriends;
 
 import android.app.Activity;
 
-import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.facebook.CallbackManager;
 import com.shoutit.app.android.UserPreferences;
-import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.dagger.ActivityScope;
 import com.shoutit.app.android.dao.ProfilesDao;
+import com.shoutit.app.android.utils.ListeningHalfPresenter;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
 import com.shoutit.app.android.view.profileslist.ProfilesListPresenter;
 
@@ -32,11 +31,10 @@ public class FacebookFriendsActivityModule {
                                                        FacebookHelper facebookHelper,
                                                        ProfilesDao dao,
                                                        UserPreferences userPreferences,
-                                                       @NetworkScheduler Scheduler networkScheduler,
                                                        CallbackManager callbackManager,
-                                                       ApiService apiService) {
-        return new FacebookFriendsPresenter(facebookHelper, apiService, userPreferences,
-                activity, callbackManager, dao, uiScheduler, networkScheduler);
+                                                       ListeningHalfPresenter listeningHalfPresenter) {
+        return new FacebookFriendsPresenter(facebookHelper, userPreferences,
+                activity, callbackManager, dao, uiScheduler, listeningHalfPresenter);
     }
 
     @Provides

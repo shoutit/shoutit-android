@@ -28,6 +28,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
                     android:text="@string/invite_friends_suggestions"
+                    android:fontFamily="sans-serif-medium"
+                    android:textSize="14sp"
+                    android:textColor="@color/black_54"
                     android:textAllCaps="true"/>
 
                 <LinearLayout
@@ -35,38 +38,28 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:background="@android:color/white"
+                    android:elevation="2dp"
                     android:orientation="vertical">
 
                     <TextView
+                        style="@style/InviteFriendsItem"
                         android:id="@+id/invite_friends_users"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical|start"
-                        android:layout_marginBottom="10dp"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="10dp"
                         android:text="@string/invite_friends_users"/>
 
                     <View
                         android:layout_width="match_parent"
-                        android:layout_height="1dp"
+                        android:layout_height="0.5dp"
                         android:layout_marginEnd="10dp"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:layout_marginStart="10dp"
-                        android:background="@color/black_20"/>
-
-
-                    <TextView
-                        android:id="@+id/invite_friends_pages"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical|start"
-                        android:layout_marginBottom="10dp"
                         android:layout_marginLeft="8dp"
                         android:layout_marginStart="8dp"
-                        android:layout_marginTop="10dp"
+                        android:layout_marginRight="10dp"
+                        android:background="@color/black_20"/>
+
+                    <TextView
+                        style="@style/InviteFriendsItem"
+                        android:id="@+id/invite_friends_pages"
+                        android:layout_gravity="center_vertical|start"
                         android:text="@string/invite_friends_pages"/>
 
                 </LinearLayout>
@@ -74,6 +67,9 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="@color/black_54"
+                    android:textSize="14sp"
                     android:layout_marginTop="20dp"
                     android:text="@string/invite_friends_find_friends"
                     android:textAllCaps="true"/>
@@ -83,45 +79,34 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:background="@android:color/white"
+                    android:elevation="2dp"
                     android:orientation="vertical">
 
                     <TextView
+                        style="@style/InviteFriendsItem"
                         android:id="@+id/invite_friends_find_facebook"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical|start"
-                        android:layout_marginBottom="10dp"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="10dp"
-                        android:drawablePadding="6dp"
+                        android:drawablePadding="16dp"
                         android:drawableStart="@drawable/facebook_icon"
                         android:drawableLeft="@drawable/facebook_icon"
-                        android:gravity="center"
                         android:text="@string/invite_friends_facebook"/>
 
                     <View
                         android:layout_width="match_parent"
-                        android:layout_height="1dp"
+                        android:layout_height="0.5dp"
                         android:layout_marginEnd="10dp"
-                        android:layout_marginLeft="10dp"
+                        android:layout_marginLeft="48dp"
+                        android:layout_marginStart="48dp"
                         android:layout_marginRight="10dp"
-                        android:layout_marginStart="10dp"
                         android:background="@color/black_20"/>
 
                     <TextView
+                        style="@style/InviteFriendsItem"
                         android:id="@+id/invite_friends_find_contacts"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical|start"
-                        android:layout_marginBottom="10dp"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="10dp"
-                        android:drawablePadding="6dp"
+                        android:drawablePadding="16dp"
                         android:drawableStart="@drawable/contacts_icon"
                         android:drawableLeft="@drawable/facebook_icon"
-                        android:gravity="center"
                         android:text="@string/invite_friends_contacts"/>
 
                 </LinearLayout>
@@ -130,6 +115,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textSize="14sp"
+                    android:textColor="@color/black_54"
                     android:text="@string/invite_friends_invite_friends"
                     android:textAllCaps="true"/>
 
@@ -138,45 +126,34 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:background="@android:color/white"
+                    android:elevation="2dp"
                     android:orientation="vertical">
 
                     <TextView
+                        style="@style/InviteFriendsItem"
                         android:id="@+id/invite_friends_invite_facebook"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical|start"
-                        android:layout_marginBottom="10dp"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="10dp"
-                        android:drawablePadding="6dp"
+                        android:drawablePadding="16dp"
                         android:drawableStart="@drawable/facebook_icon"
                         android:drawableLeft="@drawable/facebook_icon"
-                        android:gravity="center"
                         android:text="@string/invite_friends_facebook_header"/>
 
                     <View
                         android:layout_width="match_parent"
-                        android:layout_height="1dp"
+                        android:layout_height="0.5dp"
                         android:layout_marginEnd="10dp"
-                        android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
-                        android:layout_marginStart="10dp"
+                        android:layout_marginLeft="48dp"
+                        android:layout_marginStart="48dp"
                         android:background="@color/black_20"/>
 
                     <TextView
+                        style="@style/InviteFriendsItem"
                         android:id="@+id/invite_friends_invite_twitter"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical|start"
-                        android:layout_marginBottom="10dp"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="10dp"
-                        android:drawablePadding="6dp"
+                        android:drawablePadding="16dp"
                         android:drawableStart="@drawable/twitter"
                         android:drawableLeft="@drawable/facebook_icon"
-                        android:gravity="center"
                         android:text="@string/invite_friends_twitter"/>
                 </LinearLayout>
 
