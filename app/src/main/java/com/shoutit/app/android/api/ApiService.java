@@ -452,10 +452,10 @@ public interface ApiService {
                                                     @Query("page_size") Integer pageSize);
 
     @POST("notifications/reset")
-    Observable<ResponseBody> markAllAsRead();
+    Observable<ResponseBody> markAllNotificationsAsRead();
 
     @POST("notifications/{id}/read")
-    Observable<ResponseBody> markAsRead(@Path("id") String notificationId);
+    Observable<ResponseBody> markNotificationAsRead(@Path("id") String notificationId);
 
     /**
      * Twilio

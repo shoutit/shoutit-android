@@ -50,7 +50,6 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Scheduler;
 import rx.Subscription;
@@ -107,21 +106,13 @@ public class ChatsDelegate {
 
     public Observable<PusherMessage> getPusherMessageObservable(PresenceChannel presenceChannel) {
         return mPusher.getNewMessageObservable(presenceChannel)
-                .flatMap(new Func1<PusherMessage, Observable<PusherMessage>>() {
-                    @Override
-                    public Observable<PusherMessage> call(final PusherMessage pusherMessage) {
-                        final String id = pusherMessage.getId();
-                        if (mUser.getId().equals(id)) {
-                            return Observable.just(pusherMessage);
-                        } else {
-                            return mApiService.readMessage(id)
-                                    .map(new Func1<ResponseBody, PusherMessage>() {
-                                        @Override
-                                        public PusherMessage call(ResponseBody responseBody) {
-                                            return pusherMessage;
-                                        }
-                                    });
-                        }
+                .flatMap(pusherMessage -> {
+                    final String id = pusherMessage.getProfile().getId();
+                    if (mUser.getId().equals(id)) {
+                        return Observable.just(pusherMessage);
+                    } else {
+                        return mApiService.readMessage(id)
+                                .map(responseBody -> pusherMessage);
                     }
                 })
                 .observeOn(mUiScheduler);
@@ -129,42 +120,27 @@ public class ChatsDelegate {
 
     public Observable<TypingInfo> getTypingObservable(PresenceChannel presenceChannel) {
         return mPusher.getIsTypingObservable(presenceChannel)
-                .switchMap(new Func1<TypingInfo, Observable<TypingInfo>>() {
-                    @Override
-                    public Observable<TypingInfo> call(TypingInfo typingInfo) {
-                        return Observable.timer(3, TimeUnit.SECONDS)
-                                .map(new Func1<Long, TypingInfo>() {
-                                    @Override
-                                    public TypingInfo call(Long aLong) {
-                                        return TypingInfo.notTyping();
-                                    }
-                                })
-                                .startWith(typingInfo);
-                    }
-                })
+                .switchMap(typingInfo -> Observable.timer(3, TimeUnit.SECONDS)
+                        .map(aLong -> TypingInfo.notTyping())
+                        .startWith(typingInfo))
                 .observeOn(mUiScheduler)
                 .startWith(TypingInfo.notTyping());
     }
 
     public Observable.Transformer<PusherMessage, List<PusherMessage>> transformToScan() {
-        return new Observable.Transformer<PusherMessage, List<PusherMessage>>() {
+        return observable -> observable.scan(ImmutableList.<PusherMessage>of(), new Func2<List<PusherMessage>, PusherMessage, List<PusherMessage>>() {
             @Override
-            public Observable<List<PusherMessage>> call(Observable<PusherMessage> observable) {
-                return observable.scan(ImmutableList.<PusherMessage>of(), new Func2<List<PusherMessage>, PusherMessage, List<PusherMessage>>() {
-                    @Override
-                    public List<PusherMessage> call(List<PusherMessage> pusherMessages, PusherMessage pusherMessage) {
-                        if (containsMessage(pusherMessages, pusherMessage)) {
-                            return pusherMessages;
-                        } else {
-                            return ImmutableList.<PusherMessage>builder()
-                                    .addAll(pusherMessages)
-                                    .add(pusherMessage)
-                                    .build();
-                        }
-                    }
-                });
+            public List<PusherMessage> call(List<PusherMessage> pusherMessages, PusherMessage pusherMessage) {
+                if (containsMessage(pusherMessages, pusherMessage)) {
+                    return pusherMessages;
+                } else {
+                    return ImmutableList.<PusherMessage>builder()
+                            .addAll(pusherMessages)
+                            .add(pusherMessage)
+                            .build();
+                }
             }
-        };
+        });
     }
 
     private boolean containsMessage(@NonNull List<PusherMessage> pusherMessages, @NonNull PusherMessage pusherMessage) {
@@ -361,22 +337,14 @@ public class ChatsDelegate {
         return mApiService.deleteConversation(conversationId)
                 .observeOn(mUiScheduler)
                 .subscribeOn(mNetworkScheduler)
-                .subscribe(new Action1<ResponseBody>() {
-                    @Override
-                    public void call(ResponseBody responseBody) {
-                        mListener.conversationDeleted();
-                    }
+                .subscribe(responseBody -> {
+                    mListener.conversationDeleted();
                 }, getOnError());
     }
 
     @NonNull
     private Action1<Throwable> getOnError() {
-        return new Action1<Throwable>() {
-            @Override
-            public void call(Throwable throwable) {
-                mListener.error(throwable);
-            }
-        };
+        return throwable -> mListener.error(throwable);
     }
 
     public PostMessage getLocationMessage(double latitude, double longitude) {
@@ -393,28 +361,17 @@ public class ChatsDelegate {
                 final Observable<String> videoFileObservable = mAmazonHelper.uploadShoutMediaVideoObservable(AmazonHelper.getfileFromPath(media));
                 final Observable<String> thumbFileObservable = mAmazonHelper.uploadShoutMediaImageObservable(AmazonHelper.getfileFromPath(videoThumbnail.getAbsolutePath()));
                 return Observable
-                        .zip(videoFileObservable, thumbFileObservable, new Func2<String, String, Video>() {
-                            @Override
-                            public Video call(String video, String thumb) {
-                                return Video.createVideo(video, thumb, videoLength);
-                            }
-                        })
+                        .zip(videoFileObservable, thumbFileObservable, (video, thumb) -> Video.createVideo(video, thumb, videoLength))
                         .flatMap(videoToMessageFunc)
                         .subscribeOn(mNetworkScheduler)
                         .observeOn(mUiScheduler)
-                        .subscribe(new Action1<Message>() {
-                            @Override
-                            public void call(Message messagesResponse) {
-                                postLocalMessage(messagesResponse, conversationId);
-                                mListener.showProgress(false);
-                                mListener.hideAttatchentsMenu();
-                            }
-                        }, new Action1<Throwable>() {
-                            @Override
-                            public void call(Throwable throwable) {
-                                mListener.showProgress(false);
-                                mListener.error(throwable);
-                            }
+                        .subscribe(messagesResponse -> {
+                            postLocalMessage(messagesResponse, conversationId);
+                            mListener.showProgress(false);
+                            mListener.hideAttatchentsMenu();
+                        }, throwable -> {
+                            mListener.showProgress(false);
+                            mListener.error(throwable);
                         });
             } catch (IOException e) {
                 mListener.error(e);
@@ -425,18 +382,12 @@ public class ChatsDelegate {
                     .flatMap(photoToMessageFunc)
                     .subscribeOn(mNetworkScheduler)
                     .observeOn(mUiScheduler)
-                    .subscribe(new Action1<Message>() {
-                        @Override
-                        public void call(Message messagesResponse) {
-                            postLocalMessage(messagesResponse, conversationId);
-                            mListener.showProgress(false);
-                        }
-                    }, new Action1<Throwable>() {
-                        @Override
-                        public void call(Throwable throwable) {
-                            mListener.showProgress(false);
-                            mListener.error(throwable);
-                        }
+                    .subscribe(messagesResponse -> {
+                        postLocalMessage(messagesResponse, conversationId);
+                        mListener.showProgress(false);
+                    }, throwable -> {
+                        mListener.showProgress(false);
+                        mListener.error(throwable);
                     });
         }
     }
