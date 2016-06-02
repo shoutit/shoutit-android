@@ -45,7 +45,7 @@ public class PhoneContactsHelper {
 
     private void getPhoneNumbers(@Nonnull Map<String, Contact> contactsMap) {
         final Cursor phoneCursor = contentResolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                new String[]{ContactsContract.Contacts._ID,
+                new String[]{ContactsContract.Data.LOOKUP_KEY,
                         DISPLAY_NAME_COLUMN,
                         ContactsContract.CommonDataKinds.Phone.NUMBER,
                         ContactsContract.CommonDataKinds.Phone.NORMALIZED_NUMBER
@@ -57,7 +57,7 @@ public class PhoneContactsHelper {
         if (phoneCursor != null) {
             try {
                 for (phoneCursor.moveToFirst(); !phoneCursor.isAfterLast(); phoneCursor.moveToNext()) {
-                    final String userId = phoneCursor.getString(0);
+                    final String lookUpKey = phoneCursor.getString(0);
                     final String name = phoneCursor.getString(1);
                     final String phone = phoneCursor.getString(2);
                     final String normalizedPhone = phoneCursor.getString(3);
@@ -65,11 +65,11 @@ public class PhoneContactsHelper {
                     final String phoneNumber = TextUtils.isEmpty(normalizedPhone) ?
                             phone : normalizedPhone;
 
-                    if (contactsMap.containsKey(userId)) {
-                        final Contact contact = contactsMap.get(userId);
-                        contactsMap.put(userId, contact.withNewMobile(name, phoneNumber));
+                    if (contactsMap.containsKey(lookUpKey)) {
+                        final Contact contact = contactsMap.get(lookUpKey);
+                        contactsMap.put(lookUpKey, contact.withNewMobile(name, phoneNumber));
                     } else {
-                        contactsMap.put(userId, new Contact(name, Lists.newArrayList(phoneNumber), Lists.newArrayList()));
+                        contactsMap.put(lookUpKey, new Contact(name, Lists.newArrayList(phoneNumber), Lists.newArrayList()));
                     }
                 }
             } finally {
@@ -80,7 +80,7 @@ public class PhoneContactsHelper {
 
     private void getEmails(@Nonnull Map<String, Contact> contactsMap) {
         final Cursor emailCursor = contentResolver.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI,
-                new String[]{ContactsContract.Contacts._ID,
+                new String[]{ContactsContract.Data.LOOKUP_KEY,
                         DISPLAY_NAME_COLUMN,
                         ContactsContract.CommonDataKinds.Email.ADDRESS
                 },
@@ -91,15 +91,15 @@ public class PhoneContactsHelper {
         if (emailCursor != null) {
             try {
                 for (emailCursor.moveToFirst(); !emailCursor.isAfterLast(); emailCursor.moveToNext()) {
-                    final String userId = emailCursor.getString(0);
+                    final String lookUpKey = emailCursor.getString(0);
                     final String name = emailCursor.getString(1);
                     final String email = emailCursor.getString(2);
 
-                    if (contactsMap.containsKey(userId)) {
-                        final Contact contact = contactsMap.get(userId);
-                        contactsMap.put(userId, contact.withNewEmail(name, email));
+                    if (contactsMap.containsKey(lookUpKey)) {
+                        final Contact contact = contactsMap.get(lookUpKey);
+                        contactsMap.put(lookUpKey, contact.withNewEmail(name, email));
                     } else {
-                        contactsMap.put(userId, new Contact(name, Lists.newArrayList(), Lists.newArrayList(email)));
+                        contactsMap.put(lookUpKey, new Contact(name, Lists.newArrayList(), Lists.newArrayList(email)));
                     }
                 }
             } finally {
