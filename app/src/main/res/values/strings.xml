@@ -227,6 +227,7 @@
     <string name="shout_bottom_bar_delete">Delete</string>
     <string name="shout_bottom_bar_edit">Edit</string>
     <string name="shout_choose_video_app">Choose application</string>
+    <string name="shout_deleted">Shout has been deleted</string>
 
     <!-- Account -->
     <string name="account_email_changed">Email successfully changed</string>
