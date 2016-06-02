@@ -614,6 +614,9 @@
     <string name="invite_friends_facebook_header">Facebook</string>
     <string name="invite_friends_twitter">Twitter</string>
     <string name="invite_friends_share">Share Shoutit App</string>
+    <string name="invite_text">Join Shoutit on www.shoutit.com</string>
+    <string name="invite_chooser_text">Select app</string>
+    <string name="invite_no_twitter_app">You need the Twitter app to be installed</string>
 
     <!-- Contacts fiends -->
     <string name="contacts_friends_ab_title">Contacts friends</string>
