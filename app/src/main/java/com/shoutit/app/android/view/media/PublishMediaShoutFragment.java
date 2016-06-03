@@ -145,6 +145,7 @@ public class PublishMediaShoutFragment extends Fragment {
     @android.support.annotation.Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mCompositeSubscription = new CompositeSubscription();
         View view = inflater.inflate(R.layout.publish_media_shout_fragment, container, false);
         ButterKnife.bind(this, view);
         return view;
