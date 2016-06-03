@@ -5,6 +5,8 @@ import com.shoutit.app.android.dagger.ActivityScope;
 import com.shoutit.app.android.dagger.AppComponent;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.view.chats.LocalMessageBus;
+import com.shoutit.app.android.view.conversations.BusComponent;
+import com.shoutit.app.android.view.conversations.RefreshConversationBus;
 
 import dagger.Component;
 
@@ -16,10 +18,8 @@ import dagger.Component;
                 MainActivityModule.class
         }
 )
-public interface MainActivityComponent extends BaseActivityComponent {
+public interface MainActivityComponent extends BaseActivityComponent, BusComponent{
 
     void inject(MainActivity activity);
-
-    LocalMessageBus localMessageBus();
 
 }

@@ -10,7 +10,7 @@ import dagger.Component;
 
 @FragmentScope
 @Component(
-        dependencies = MainActivityComponent.class,
+        dependencies = {BaseActivityComponent.class, BusComponent.class},
         modules = {
                 FragmentModule.class,
                 ConverstationsFragmentModule.class

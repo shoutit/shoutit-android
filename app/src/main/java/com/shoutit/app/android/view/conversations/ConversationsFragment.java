@@ -77,7 +77,8 @@ public class ConversationsFragment extends BaseFragment implements Conversations
                 .builder()
                 .fragmentModule(new FragmentModule(this))
                 .converstationsFragmentModule(new ConverstationsFragmentModule(isMyConversations))
-                .mainActivityComponent((MainActivityComponent) baseActivityComponent)
+                .baseActivityComponent(baseActivityComponent)
+                .busComponent((BusComponent) baseActivityComponent)
                 .build();
         component.inject(this);
     }

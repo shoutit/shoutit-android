@@ -51,6 +51,7 @@ import com.shoutit.app.android.utils.AmazonRequestTransfomer;
 import com.shoutit.app.android.utils.VersionUtils;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
 import com.shoutit.app.android.view.chats.LocalMessageBus;
+import com.shoutit.app.android.view.conversations.RefreshConversationBus;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
 import com.shoutit.app.android.view.videoconversation.CameraTool;
 import com.shoutit.app.android.view.videoconversation.CameraToolImpl;
@@ -370,5 +371,11 @@ public final class AppModule {
     @Singleton
     LocalMessageBus provideLocalMessageBus() {
         return new LocalMessageBus();
+    }
+
+    @Provides
+    @Singleton
+    RefreshConversationBus provideRefreshConversationBus() {
+        return new RefreshConversationBus();
     }
 }
