@@ -29,8 +29,9 @@ public class ConverstationsFragmentModule {
                                                          @UiScheduler Scheduler uiScheduler,
                                                          @ForActivity Context context,
                                                          PusherHelper pusherHelper,
-                                                         LocalMessageBus bus) {
+                                                         LocalMessageBus bus,
+                                                         RefreshConversationBus refreshConversationBus) {
         return new ConversationsPresenter(apiService, networkScheduler, uiScheduler, context,
-                userPreferences, pusherHelper, isMyConversations, bus);
+                userPreferences, pusherHelper, isMyConversations, bus, refreshConversationBus);
     }
 }
