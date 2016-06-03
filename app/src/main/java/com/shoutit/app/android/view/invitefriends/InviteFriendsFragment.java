@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import com.facebook.CallbackManager;
 import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.ColoredSnackBar;
@@ -25,6 +26,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -36,6 +38,9 @@ public class InviteFriendsFragment extends BaseFragment {
 
     private Menu mMenu;
     private CallbackManager callbackManager;
+
+    @Inject
+    UserPreferences userPreferences;
 
     @Nonnull
     public static Fragment newInstance() {
@@ -75,10 +80,18 @@ public class InviteFriendsFragment extends BaseFragment {
                 startActivity(UserSuggestionActivity.newPagesIntent(getActivity()));
                 break;
             case R.id.invite_friends_find_facebook:
-                startActivity(FacebookFriendsActivity.newIntent(getActivity()));
+                if (userPreferences.isNormalUser()) {
+                    startActivity(FacebookFriendsActivity.newIntent(getActivity()));
+                } else {
+                    showOnlyForLoggedUserError();
+                }
                 break;
             case R.id.invite_friends_find_contacts:
-                startActivity(ContactsFriendsActivity.newIntent(getActivity()));
+                if (userPreferences.isNormalUser()) {
+                    startActivity(ContactsFriendsActivity.newIntent(getActivity()));
+                } else {
+                    showOnlyForLoggedUserError();
+                }
                 break;
             case R.id.invite_friends_invite_facebook:
                 FacebookHelper.showAppInviteDialog(this, SHARE_FACEBOOK_APP_LINK_URL, callbackManager);
@@ -90,6 +103,13 @@ public class InviteFriendsFragment extends BaseFragment {
                 startActivity(IntentHelper.getShareIntent(SHARE_APP_URL));
                 break;
         }
+    }
+
+    private void showOnlyForLoggedUserError() {
+        ColoredSnackBar.error(
+                ColoredSnackBar.contentView(getActivity()),
+                R.string.error_action_only_for_logged_in_user, Snackbar.LENGTH_SHORT)
+                .show();
     }
 
     private void shareThroughTwitter() {
