@@ -135,9 +135,6 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
         if (mUserPreferences.isNormalUser()) {
             subscribeToStats();
         }
-
-        profilesDao.registerToGcmAction(AppuniteGcm.getInstance()
-                .getPushToken());
     }
 
     @Override
