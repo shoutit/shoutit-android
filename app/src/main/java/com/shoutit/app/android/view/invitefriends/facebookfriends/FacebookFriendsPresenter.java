@@ -19,6 +19,7 @@ import com.shoutit.app.android.api.model.ProfilesListResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.utils.ListeningHalfPresenter;
+import com.shoutit.app.android.utils.PreferencesHelper;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
 import com.shoutit.app.android.view.profileslist.ProfileListAdapterItem;
@@ -38,6 +39,7 @@ import rx.subjects.PublishSubject;
 public class FacebookFriendsPresenter implements ProfilesListPresenter {
 
     private final PublishSubject<String> openProfileSubject = PublishSubject.create();
+    private final PublishSubject<Object> actionOnlyForLoggedInUser = PublishSubject.create();
 
     private final Observable<List<BaseAdapterItem>> adapterItems;
     private final Observable<Throwable> errorObservable;
@@ -52,9 +54,12 @@ public class FacebookFriendsPresenter implements ProfilesListPresenter {
                                     final CallbackManager callbackManager,
                                     ProfilesDao dao,
                                     @UiScheduler final Scheduler uiScheduler,
-                                    ListeningHalfPresenter listeningHalfPresenter) {
+                                    ListeningHalfPresenter listeningHalfPresenter,
+                                    PreferencesHelper preferencesHelper) {
         this.dao = dao;
         this.listeningHalfPresenter = listeningHalfPresenter;
+
+        final boolean isNormalUser = userPreferences.isNormalUser();
 
         //noinspection ConstantConditions
         final boolean hasRequiredPermissionInApi = facebookHelper.hasRequiredPermissionInApi(
@@ -97,7 +102,10 @@ public class FacebookFriendsPresenter implements ProfilesListPresenter {
                                         @Nullable
                                         @Override
                                         public BaseAdapterItem apply(BaseProfile profile) {
-                                            return new ProfileListAdapterItem(profile, openProfileSubject, listeningHalfPresenter.getListenProfileSubject());
+                                            return new ProfileListAdapterItem(profile, openProfileSubject,
+                                                    listeningHalfPresenter.getListenProfileSubject(),
+                                                    actionOnlyForLoggedInUser, isNormalUser,
+                                                    preferencesHelper.isMyProfile(profile.getUsername()));
                                         }
                                     }));
                         }
@@ -125,6 +133,11 @@ public class FacebookFriendsPresenter implements ProfilesListPresenter {
                 errorObservable.map(Functions1.returnFalse()),
                 permissionsNotGrantedObservable.map(Functions1.returnFalse()))
                 .startWith(true);
+    }
+
+    @Nonnull
+    public Observable<Object> getActionOnlyForLoggedInUser() {
+        return actionOnlyForLoggedInUser;
     }
 
     @Nonnull

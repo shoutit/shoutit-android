@@ -12,6 +12,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.NoDataTextAdapterItem;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.BaseProfile;
@@ -22,6 +23,7 @@ import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.utils.ListeningHalfPresenter;
 import com.shoutit.app.android.utils.MoreFunctions1;
+import com.shoutit.app.android.utils.PreferencesHelper;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
 import com.shoutit.app.android.view.profileslist.ProfileListAdapterItem;
 import com.shoutit.app.android.view.profileslist.ProfilesListPresenter;
@@ -48,6 +50,7 @@ public class ContactsFriendsPresenter implements ProfilesListPresenter {
 
     private final PublishSubject<Object> fetchLocalContactSubject = PublishSubject.create();
     private final PublishSubject<String> openProfileSubject = PublishSubject.create();
+    private final PublishSubject<Object> actionOnlyForLoggedInUser = PublishSubject.create();
 
     private final Observable<List<BaseAdapterItem>> adapterItems;
     private final Observable<Throwable> errorObservable;
@@ -61,10 +64,13 @@ public class ContactsFriendsPresenter implements ProfilesListPresenter {
                                     @Nonnull @UiScheduler Scheduler uiScheduler,
                                     @ForActivity Resources resources,
                                     @Nonnull ProfilesDao dao,
-                                    @Nonnull ListeningHalfPresenter listeningHalfPresenter) {
-
+                                    @Nonnull ListeningHalfPresenter listeningHalfPresenter,
+                                    @Nonnull UserPreferences userPreferences,
+                                    @Nonnull PreferencesHelper preferencesHelper) {
         this.dao = dao;
         this.listeningHalfPresenter = listeningHalfPresenter;
+
+        final boolean isNormalUser = userPreferences.isNormalUser();
 
         final Observable<ResponseOrError<ProfilesListResponse>> fetchContactsRequest =
                 dao.getContactsDao(User.ME)
@@ -108,7 +114,10 @@ public class ContactsFriendsPresenter implements ProfilesListPresenter {
                                 @Nullable
                                 @Override
                                 public BaseAdapterItem apply(BaseProfile profile) {
-                                    return new ProfileListAdapterItem(profile, openProfileSubject, listeningHalfPresenter.getListenProfileSubject());
+                                    return new ProfileListAdapterItem(profile, openProfileSubject,
+                                            listeningHalfPresenter.getListenProfileSubject(),
+                                            actionOnlyForLoggedInUser, isNormalUser,
+                                            preferencesHelper.isMyProfile(profile.getUsername()));
                                 }
                             }));
                         }
@@ -131,6 +140,11 @@ public class ContactsFriendsPresenter implements ProfilesListPresenter {
                 successFetchContactsRequest.map(Functions1.returnFalse()),
                 errorObservable.map(Functions1.returnFalse()))
                 .startWith(true);
+    }
+
+    @Nonnull
+    public Observable<Object> getActionOnlyForLoggedInUser() {
+        return actionOnlyForLoggedInUser;
     }
 
     @Nonnull

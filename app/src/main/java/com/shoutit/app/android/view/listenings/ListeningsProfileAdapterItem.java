@@ -21,8 +21,11 @@ public class ListeningsProfileAdapterItem extends BaseProfileAdapterItem {
     public ListeningsProfileAdapterItem(@Nonnull BaseProfile profile,
                                         @Nonnull Observer<String> openProfileObserver,
                                         @Nonnull Observer<BaseProfile> profileListenedObserver,
-                                        @Nonnull ListeningsPresenter.ListeningsType listeningsType) {
-        super(profile, profileListenedObserver);
+                                        @Nonnull ListeningsPresenter.ListeningsType listeningsType,
+                                        @Nonnull Observer<Object> actionOnlyForLoggedInUsers,
+                                        boolean isNormalUser,
+                                        boolean isProfileMine) {
+        super(profile, profileListenedObserver, actionOnlyForLoggedInUsers, isNormalUser, isProfileMine);
         this.profile = profile;
         this.openProfileObserver = openProfileObserver;
         this.listeningsType = listeningsType;
