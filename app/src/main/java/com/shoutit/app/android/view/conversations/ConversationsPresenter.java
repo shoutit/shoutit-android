@@ -310,13 +310,46 @@ public class ConversationsPresenter {
         }
 
         @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            final ConversationAdapterItem that = (ConversationAdapterItem) o;
+
+            if (mIsUnread != that.mIsUnread) return false;
+            if (id != null ? !id.equals(that.id) : that.id != null) return false;
+            if (title != null ? !title.equals(that.title) : that.title != null) return false;
+            if (subTitle != null ? !subTitle.equals(that.subTitle) : that.subTitle != null)
+                return false;
+            if (message != null ? !message.equals(that.message) : that.message != null)
+                return false;
+            if (time != null ? !time.equals(that.time) : that.time != null) return false;
+            if (image != null ? !image.equals(that.image) : that.image != null) return false;
+            return conversationType != null ? conversationType.equals(that.conversationType) : that.conversationType == null;
+
+        }
+
+        @Override
+        public int hashCode() {
+            int result = id != null ? id.hashCode() : 0;
+            result = 31 * result + (title != null ? title.hashCode() : 0);
+            result = 31 * result + (subTitle != null ? subTitle.hashCode() : 0);
+            result = 31 * result + (message != null ? message.hashCode() : 0);
+            result = 31 * result + (time != null ? time.hashCode() : 0);
+            result = 31 * result + (image != null ? image.hashCode() : 0);
+            result = 31 * result + (mIsUnread ? 1 : 0);
+            result = 31 * result + (conversationType != null ? conversationType.hashCode() : 0);
+            return result;
+        }
+
+        @Override
         public boolean matches(@Nonnull BaseAdapterItem item) {
-            return false;
+            return item instanceof ConversationAdapterItem && ((ConversationAdapterItem) item).getId().equals(id);
         }
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return false;
+            return equals(item);
         }
 
         public String getId() {
