@@ -86,6 +86,7 @@ public class ConversationsPresenter {
     private final Scheduler mUiScheduler;
     private final Context mContext;
     private final UserPreferences mUserPreferences;
+    private final RefreshConversationBus mRefreshConversationBus;
     private final PusherHelper mPusherHelper;
     private final boolean isMyConversationsList;
     private final LocalMessageBus mLocalMessageBus;
@@ -94,7 +95,6 @@ public class ConversationsPresenter {
     private Listener mListener;
     private Subscription mSubscription;
     private boolean showProgress = true;
-    private final PublishSubject<Object> refreshSubject = PublishSubject.create();
     private final PublishSubject<ConversationAction> conversationActionSubject = PublishSubject.create();
 
     @Inject
@@ -105,12 +105,14 @@ public class ConversationsPresenter {
                                   UserPreferences userPreferences,
                                   PusherHelper pusherHelper,
                                   boolean isMyConversationsList,
-                                  LocalMessageBus localMessageBus) {
+                                  LocalMessageBus localMessageBus,
+                                  RefreshConversationBus refreshConversationBus) {
         mApiService = apiService;
         mNetworkScheduler = networkScheduler;
         mUiScheduler = uiScheduler;
         mContext = context;
         mUserPreferences = userPreferences;
+        mRefreshConversationBus = refreshConversationBus;
         mUserId = mUserPreferences.getUser().getId();
         mPusherHelper = pusherHelper;
         this.isMyConversationsList = isMyConversationsList;
@@ -139,7 +141,7 @@ public class ConversationsPresenter {
         final Observable<Map<String, Conversation>> requestObservable = requestSubject
                 .startWith(new Object())
                 .lift(loadMoreOperator)
-                .compose(MoreOperators.<ConversationsResponse>refresh(refreshSubject))
+                .compose(MoreOperators.<ConversationsResponse>refresh(mRefreshConversationBus.getRefreshConversationBus()))
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
                 .flatMap(conversationsResponse -> Observable.from(conversationsResponse.getResults())
@@ -225,7 +227,7 @@ public class ConversationsPresenter {
     }
 
     private void refreshData() {
-        refreshSubject.onNext(null);
+        mRefreshConversationBus.post();
     }
 
     @NonNull
