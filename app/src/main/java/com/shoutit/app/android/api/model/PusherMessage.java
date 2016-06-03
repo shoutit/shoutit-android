@@ -2,7 +2,7 @@ package com.shoutit.app.android.api.model;
 
 import java.util.List;
 
-public class PusherMessage {
+public class PusherMessage implements ChatMessage {
 
     private final ConversationProfile profile;
     private final String conversationId;
@@ -21,26 +21,32 @@ public class PusherMessage {
         this.createdAt = createdAt;
     }
 
+    @Override
     public String getId() {
         return id;
     }
 
+    @Override
     public String getText() {
         return text;
     }
 
+    @Override
     public List<MessageAttachment> getAttachments() {
         return attachments;
     }
 
+    @Override
     public long getCreatedAt() {
         return createdAt;
     }
 
+    @Override
     public ConversationProfile getProfile() {
         return profile;
     }
 
+    @Override
     public String getConversationId() {
         return conversationId;
     }

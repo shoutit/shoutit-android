@@ -35,6 +35,7 @@ import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
 import com.shoutit.app.android.utils.pusher.TypingInfo;
 import com.shoutit.app.android.view.chats.ChatsDelegate;
+import com.shoutit.app.android.view.chats.LocalMessageBus;
 import com.shoutit.app.android.view.chats.message_models.TypingItem;
 import com.shoutit.app.android.view.conversations.ConversationsUtils;
 
@@ -92,7 +93,8 @@ public class ChatsFirstConversationPresenter {
                                            PusherHelper pusher,
                                            String idForCreation,
                                            ShoutsDao shoutsDao,
-                                           ProfilesDao profilesDao) {
+                                           ProfilesDao profilesDao,
+                                           LocalMessageBus bus) {
         mIsShoutConversation = isShoutConversation;
         mApiService = apiService;
         mUiScheduler = uiScheduler;
@@ -114,7 +116,7 @@ public class ChatsFirstConversationPresenter {
                     }
                 });
 
-        mChatsDelegate = new ChatsDelegate(pusher, uiScheduler, networkScheduler, apiService, resources, userPreferences, context, amazonHelper, newMessagesSubject);
+        mChatsDelegate = new ChatsDelegate(pusher, uiScheduler, networkScheduler, apiService, resources, userPreferences, context, amazonHelper, newMessagesSubject, bus);
     }
 
     public void register(@NonNull FirstConversationListener listener) {

@@ -59,8 +59,8 @@ public class Conversation {
         return creator;
     }
 
-    public Conversation withUpdatedLastMessage(@Nonnull String newMessage, long createdAt) {
-        return new Conversation(id, type, unreadMessagesCount + 1,
+    public Conversation withUpdatedLastMessage(@Nonnull String newMessage, long createdAt, boolean isOwnMessage) {
+        return new Conversation(id, type, unreadMessagesCount + (isOwnMessage ? 0 : 1),
                 display.withUpdatedMessage(newMessage), creator, createdAt);
     }
 
