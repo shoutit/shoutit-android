@@ -603,6 +603,9 @@
     <string name="facebook_friends_ab_title">Facebook friends</string>
     <string name="facebook_friends_no_friends">None of your friends has Shoutit yet.\n Go ahead and invite them!</string>
     <string name="facebook_friends_permission_error">Permissions not granted. We need it to get your friends list.</string>
+    <string name="facebook_friends_refresh">Refresh friends list</string>
+    <string name="facebook_friends_invite_text">Friends not on the list? Send them an invite!</string>
+    <string name="facebook_friends_invite">INVITE</string>
 
     <!-- Invite Friends -->
     <string name="invite_friends_suggestions">Suggestions</string>

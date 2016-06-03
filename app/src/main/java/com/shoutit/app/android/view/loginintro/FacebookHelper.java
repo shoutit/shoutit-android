@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
@@ -309,14 +308,14 @@ public class FacebookHelper {
         });
     }
 
-    public static void showAppInviteDialog(@Nonnull Fragment fragment, @Nonnull String appLinkUrl,
+    public static void showAppInviteDialog(@Nonnull Activity activity, @Nonnull String appLinkUrl,
                                            @Nonnull CallbackManager callbackManager) {
         if (AppInviteDialog.canShow()) {
             AppInviteContent content = new AppInviteContent.Builder()
                     .setApplinkUrl(appLinkUrl)
                     .build();
 
-            AppInviteDialog appInviteDialog = new AppInviteDialog(fragment);
+            AppInviteDialog appInviteDialog = new AppInviteDialog(activity);
             appInviteDialog.registerCallback(callbackManager, new FacebookCallback<AppInviteDialog.Result>() {
                 @Override
                 public void onSuccess(AppInviteDialog.Result result) {
@@ -331,12 +330,12 @@ public class FacebookHelper {
                 @Override
                 public void onError(FacebookException error) {
                     LogHelper.logIfDebug(TAG, "Failed to app invite");
-                    ColoredSnackBar.error(ColoredSnackBar.contentView(fragment.getActivity()),
+                    ColoredSnackBar.error(ColoredSnackBar.contentView(activity),
                             R.string.invite_error, Snackbar.LENGTH_LONG).show();
                 }
             });
 
-            appInviteDialog.show(fragment, content);
+            appInviteDialog.show(activity, content);
         }
     }
 }

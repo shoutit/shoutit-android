@@ -32,9 +32,9 @@ public abstract class BaseProfilesListActivity extends BaseActivity {
 
     protected static final int REQUEST_OPENED_PROFILE_WAS_LISTENED = 1;
 
-    @Bind(R.id.listenings_toolbar)
+    @Bind(R.id.profiles_list_toolbar)
     protected Toolbar toolbar;
-    @Bind(R.id.listenings_recycler_view)
+    @Bind(R.id.profiles_list_recycler_view)
     RecyclerView recyclerView;
     @Bind(R.id.base_progress)
     View progressView;
@@ -47,7 +47,7 @@ public abstract class BaseProfilesListActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_listenings);
+        setContentView(R.layout.activity_profiles_list);
         ButterKnife.bind(this);
 
         recyclerView.setLayoutManager(new MyLinearLayoutManager(this));
