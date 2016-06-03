@@ -89,6 +89,19 @@ public class NotificationsResponse extends PaginatedResponse {
         public String getAppUrl() {
             return appUrl;
         }
+
+        @Override
+        public String toString() {
+            return "Notification{" +
+                    "id='" + id + '\'' +
+                    ", type='" + type + '\'' +
+                    ", createdAt=" + createdAt +
+                    ", isRead=" + isRead +
+                    ", display=" + display +
+                    ", attachedObject=" + attachedObject +
+                    ", appUrl='" + appUrl + '\'' +
+                    '}';
+        }
     }
 
     public class AttachedObject {

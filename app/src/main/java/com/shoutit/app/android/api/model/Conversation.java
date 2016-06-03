@@ -64,6 +64,10 @@ public class Conversation {
                 display.withUpdatedMessage(newMessage), creator, createdAt);
     }
 
+    public Conversation withIsReadTrue() {
+        return new Conversation(id, type, 0, display, creator, modifiedAt);
+    }
+
     public class Display {
         private final String image;
         private final String subTitle;
