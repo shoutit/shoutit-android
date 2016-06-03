@@ -20,6 +20,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.AboutShout;
+import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.ConversationDetails;
 import com.shoutit.app.android.api.model.ConversationProfile;
 import com.shoutit.app.android.api.model.Message;
@@ -178,7 +179,7 @@ public class ChatsPresenter {
                                 mListener.showVideoChatIcon();
                             }
                         }
-                        setupUserForVideoChat(conversationResponse.getProfiles());
+                        setupUserForVideoChat(conversationResponse);
                     }
                 }, getOnError()));
     }
@@ -242,8 +243,9 @@ public class ChatsPresenter {
                 }));
     }
 
-    private void setupUserForVideoChat(@Nonnull List<ConversationProfile> profiles) {
-        if (profiles.size() == 2) {
+    private void setupUserForVideoChat(@NonNull ConversationDetails conversation) {
+        final List<ConversationProfile> profiles = conversation.getProfiles();
+        if (profiles.size() == 2 && !conversation.isPublicChat()) {
             final ConversationProfile participant;
             if (profiles.get(0).getUsername()
                     .equals(mUserPreferences.getUser().getUsername())) {
