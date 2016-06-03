@@ -36,6 +36,7 @@ public class RecordMediaActivity extends AbstractCameraActivity
     private static final String EXTRA_USE_EDITOR = "extra_use_editor";
 
     private static final int REQUEST_CODE_PERMISSIONS = 1;
+    public static final int REQUEST_CODE_PERMISSION_RECORD_AUDIO = 2;
 
     private CameraFragment cameraFragment;
 
@@ -76,7 +77,7 @@ public class RecordMediaActivity extends AbstractCameraActivity
 
     @Override
     protected String[] getNeededPermissions() {
-        return new String[]{Manifest.permission.CAMERA};
+        return new String[]{};
     }
 
     @Override
@@ -100,6 +101,10 @@ public class RecordMediaActivity extends AbstractCameraActivity
 
     @Override
     protected void init() {
+        if (!hasPermissions()) {
+            return;
+        }
+
         final Fragment fragment = getFragmentManager().findFragmentByTag(TAG_CAMERA);
 
         if (fragment == null) {
@@ -111,16 +116,19 @@ public class RecordMediaActivity extends AbstractCameraActivity
             cameraFragment = (CameraFragment) fragment;
         }
 
-        if (cameraFragment != null && PermissionHelper.checkPermissions(
+        if (cameraFragment != null) {
+            initCamera();
+        }
+    }
+
+    private boolean hasPermissions() {
+        return PermissionHelper.checkPermissions(
                 this, REQUEST_CODE_PERMISSIONS, ColoredSnackBar.contentView(this),
                 R.string.permission_camera_create_shout_explanation,
                 new String[]{
                         Manifest.permission.CAMERA,
-                        Manifest.permission.RECORD_AUDIO,
                         Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE})) {
-            initCamera();
-        }
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE});
     }
 
     @Override
@@ -199,17 +207,17 @@ public class RecordMediaActivity extends AbstractCameraActivity
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_CODE_PERMISSIONS) {
+        if (requestCode == REQUEST_CODE_PERMISSION_RECORD_AUDIO && cameraFragment != null) {
+            cameraFragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        } else {
             final boolean permissionsGranted = PermissionHelper.arePermissionsGranted(grantResults);
-            if (permissionsGranted) {
+            if (permissionsGranted && requestCode == REQUEST_CODE_PERMISSIONS) {
                 ColoredSnackBar.success(findViewById(android.R.id.content), R.string.permission_granted, Snackbar.LENGTH_SHORT).show();
-                initCamera();
-            } else {
+                init();
+            } else if (!permissionsGranted) {
                 Toast.makeText(this, R.string.permission_not_granted, Toast.LENGTH_SHORT).show();
                 finish();
             }
-        } else {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 
