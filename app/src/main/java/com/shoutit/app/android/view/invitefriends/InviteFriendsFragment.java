@@ -33,7 +33,6 @@ import butterknife.OnClick;
 
 public class InviteFriendsFragment extends BaseFragment {
 
-    private static final String SHARE_APP_URL = "https://www.shoutit.com/app";
     private static final String SHARE_FACEBOOK_APP_LINK_URL = "https://fb.me/1224908360855680";
 
     private Menu mMenu;
@@ -100,7 +99,7 @@ public class InviteFriendsFragment extends BaseFragment {
                 shareThroughTwitter();
                 break;
             case R.id.invite_friends_share_app:
-                startActivity(IntentHelper.getShareIntent(SHARE_APP_URL));
+                startActivity(IntentHelper.getShareIntent(getString(R.string.invite_app_invite_text)));
                 break;
         }
     }
@@ -114,7 +113,7 @@ public class InviteFriendsFragment extends BaseFragment {
 
     private void shareThroughTwitter() {
         final List<Intent> twitterShareIntents = IntentHelper.getTwitterShareIntent(
-                getActivity().getPackageManager(), getString(R.string.invite_text));
+                getActivity().getPackageManager(), getString(R.string.invite_app_invite_text));
 
         if (!twitterShareIntents.isEmpty()) {
             if (twitterShareIntents.size() > 1) {
