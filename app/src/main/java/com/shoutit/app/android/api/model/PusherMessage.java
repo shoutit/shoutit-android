@@ -72,4 +72,16 @@ public class PusherMessage {
         result = 31 * result + (int) (createdAt ^ (createdAt >>> 32));
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "PusherMessage{" +
+                "profile=" + profile +
+                ", conversationId='" + conversationId + '\'' +
+                ", id='" + id + '\'' +
+                ", text='" + text + '\'' +
+                ", attachments=" + attachments +
+                ", createdAt=" + createdAt +
+                '}';
+    }
 }

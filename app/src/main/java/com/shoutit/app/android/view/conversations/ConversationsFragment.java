@@ -94,18 +94,13 @@ public class ConversationsFragment extends BaseFragment implements Conversations
                 .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
                 .filter(LoadMoreHelper.needLoadMore((MyLayoutManager) mConversationRecyclerview.getLayoutManager(), adapter))
                 .subscribe(presenter.loadMoreObserver());
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
         presenter.register(this);
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onDestroyView() {
         presenter.unregister();
+        super.onDestroyView();
     }
 
     @Override

@@ -110,6 +110,7 @@ public class PusherHelper {
                             public void onEvent(String channelName, String eventName, String data) {
                                 try {
                                     final PusherMessage pusherMessage = mGson.getAdapter(PusherMessage.class).fromJson(data);
+                                    logMessage(pusherMessage, "conversation");
                                     subscriber.onNext(pusherMessage);
                                 } catch (IOException e) {
                                     subscriber.onError(e);
@@ -148,6 +149,7 @@ public class PusherHelper {
                             public void onEvent(String channelName, String eventName, String data) {
                                 try {
                                     final PusherMessage pusherMessage = mGson.getAdapter(PusherMessage.class).fromJson(data);
+                                    logMessage(pusherMessage, "profile");
                                     subscriber.onNext(pusherMessage);
                                 } catch (IOException e) {
                                     subscriber.onError(e);
@@ -170,6 +172,7 @@ public class PusherHelper {
                                 try {
                                     final NotificationsResponse.Notification notification = mGson
                                             .fromJson(data, NotificationsResponse.Notification.class);
+                                    logMessage(notification, "profile");
                                     subscriber.onNext(notification);
                                 } catch (JsonSyntaxException e) {
                                     subscriber.onError(e);
@@ -184,29 +187,25 @@ public class PusherHelper {
         return mUserPreferences.getUserObservable()
                 .filter(Functions1.isNotNull())
                 .first()
-                .flatMap(new Func1<User, Observable<Stats>>() {
-                    @Override
-                    public Observable<Stats> call(User user) {
-                        return Observable
-                                .create(new Observable.OnSubscribe<Stats>() {
-                                    @Override
-                                    public void call(final Subscriber<? super Stats> subscriber) {
-                                        getProfileChannel().bind(EVENT_STATS_UPDATE, new PresenceChannelEventListenerAdapter() {
+                .flatMap(user -> Observable
+                        .create(new Observable.OnSubscribe<Stats>() {
+                            @Override
+                            public void call(final Subscriber<? super Stats> subscriber) {
+                                getProfileChannel().bind(EVENT_STATS_UPDATE, new PresenceChannelEventListenerAdapter() {
 
-                                            @Override
-                                            public void onEvent(String channelName, String eventName, String data) {
-                                                try {
-                                                    final Stats pusherStats = mGson.getAdapter(Stats.class).fromJson(data);
-                                                    subscriber.onNext(pusherStats);
-                                                } catch (IOException e) {
-                                                    subscriber.onError(e);
-                                                }
-                                            }
-                                        });
+                                    @Override
+                                    public void onEvent(String channelName, String eventName, String data) {
+                                        try {
+                                            final Stats pusherStats = mGson.getAdapter(Stats.class).fromJson(data);
+                                            logMessage(pusherStats, "profile");
+                                            subscriber.onNext(pusherStats);
+                                        } catch (IOException e) {
+                                            subscriber.onError(e);
+                                        }
                                     }
                                 });
-                    }
-                })
+                            }
+                        }))
                 .observeOn(uiScheduler);
     }
 
@@ -226,7 +225,7 @@ public class PusherHelper {
                             @Override
                             public void onEvent(String channelName, String eventName, String data) {
                                 final TypingPusherModel typingPusherModel = mGson.fromJson(data, TypingPusherModel.class);
-
+                                logMessage(typingPusherModel, "conversation");
                                 subscriber.onNext(TypingInfo.typing(typingPusherModel.username));
                             }
                         });
@@ -282,6 +281,20 @@ public class PusherHelper {
         public TypingPusherModel(@NonNull String id, @NonNull String username) {
             this.id = id;
             this.username = username;
+        }
+
+        @Override
+        public String toString() {
+            return "TypingPusherModel{" +
+                    "id='" + id + '\'' +
+                    ", username='" + username + '\'' +
+                    '}';
+        }
+    }
+
+    private void logMessage(Object message, String channel) {
+        if (BuildConfig.DEBUG) {
+            Log.i(TAG, channel + " : " + message.toString());
         }
     }
 }

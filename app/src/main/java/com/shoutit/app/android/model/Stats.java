@@ -42,4 +42,12 @@ public class Stats {
     public int hashCode() {
         return Objects.hashCode(unreadConversationsCount, unreadNotificationsCount);
     }
+
+    @Override
+    public String toString() {
+        return "Stats{" +
+                "unreadConversationsCount=" + unreadConversationsCount +
+                ", unreadNotificationsCount=" + unreadNotificationsCount +
+                '}';
+    }
 }
