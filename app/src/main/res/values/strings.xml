@@ -29,7 +29,8 @@
         content
     </string>
     <string name="permission_camera_explanation">Permissions needed to get your photos</string>
-    <string name="permission_contacts_explanation">We need Contacts permission to check which of your contacts use Shoutit</string>
+    <string name="permission_camera_create_shout_explanation">We need the Camera permission so you can make photos and record videos.</string>
+    <string name="permission_contacts_explanation">We need the Contacts permission to check which of your contacts use Shoutit</string>
     <string name="permission_granted">Permissions have been granted</string>
     <string name="permission_not_granted">Permissions not granted</string>
 
