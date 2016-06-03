@@ -119,7 +119,8 @@ public class ChatsPresenter {
                           @ForActivity Resources resources,
                           @ForActivity Context context,
                           AmazonHelper amazonHelper,
-                          PusherHelper pusher) {
+                          PusherHelper pusher,
+                          LocalMessageBus bus) {
         this.conversationId = conversationId;
         mApiService = apiService;
         mUiScheduler = uiScheduler;
@@ -138,7 +139,7 @@ public class ChatsPresenter {
                     }
                 });
 
-        mChatsDelegate = new ChatsDelegate(pusher, uiScheduler, networkScheduler, apiService, resources, userPreferences, context, amazonHelper, newMessagesSubject);
+        mChatsDelegate = new ChatsDelegate(pusher, uiScheduler, networkScheduler, apiService, resources, userPreferences, context, amazonHelper, newMessagesSubject, bus);
     }
 
     public void register(@NonNull Listener listener) {
