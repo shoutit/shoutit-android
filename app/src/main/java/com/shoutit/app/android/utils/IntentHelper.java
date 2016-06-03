@@ -29,10 +29,10 @@ public class IntentHelper {
         return new Intent(Intent.ACTION_VIEW, Uri.parse(url));
     }
 
-    public static Intent getShareIntent(@Nonnull String shareUrl) {
+    public static Intent getShareIntent(@Nonnull String shareText) {
         final Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_TEXT, shareUrl);
+        intent.putExtra(Intent.EXTRA_TEXT, shareText);
 
         return intent;
     }
