@@ -4,6 +4,7 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.ActivityScope;
 import com.shoutit.app.android.dagger.AppComponent;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+
 import dagger.Component;
 
 @ActivityScope
@@ -13,7 +14,7 @@ import dagger.Component;
                 ActivityModule.class,
         }
 )
-public interface ConversationsActivityComponent extends BaseActivityComponent {
+public interface ConversationsActivityComponent extends BaseActivityComponent, BusComponent {
 
     void inject(ConversationsActivity activity);
 
