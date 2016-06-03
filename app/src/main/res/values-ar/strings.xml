@@ -360,8 +360,6 @@
 <string name="chat_show_map">"إظهار الخريطة"</string>
 <string name="chat_attatchment">"المرفقات"</string>
 <string name="chat_video_call">"مكالمة فيديو"</string>
-<string name="chats_attatchments_photo">"صورة"</string>
-<string name="chats_attatchments_video">"فيديو"</string>
 <string name="chats_attatchments_shout">"إعلان"</string>
 <string name="chats_attatchments_location">"الموقع"</string>
 <string name="chat_edit_text_hint">"اكتب رسالة"</string>
@@ -470,6 +468,7 @@
 <string name="permission_contacts_explanation">"نحتاج صلاحية جهات الاتصال لنتحقق من منهم يستخدم شاوت ات"</string>
 <string name="shout_deleted">"هذا الإعلان ملغي"</string>
 <string name="request_activity_sharing">"مشاركة"</string>
+<string name="publish_shout_share_title">"انشر اعلانك"</string>
 <string name="conversations_my_ab_title">"محادثاتي"</string>
 <string name="conversations_public_ab_title">"المحادثات العامة"</string>
 <string name="conversation_create_public_chat">"إنشاء محادثة عامة"</string>
@@ -530,6 +529,14 @@
 <string name="chat_shouts_no_results">"لا توجد إعلانات في هذه المحادثة"</string>
 <string name="chat_shouts_ab_title">"الإعلانات"</string>
 <string name="chat_shouts_title">"إعلانات المحادثة"</string>
+<plurals name="chat_shouts_results">
+<item quantity="zero">"لا توجد إعلانات"</item>
+<item quantity="one">"%d اعلان"</item>
+<item quantity="two">"إعلانين"</item>
+<item quantity="few"></item>
+<item quantity="many"></item>
+<item quantity="other">"%d اعلانات"</item>
+</plurals>
 
 <!-- Chat Info -->
 <string name="chat_info_report">"التبليغ عن المحادثة"</string>
