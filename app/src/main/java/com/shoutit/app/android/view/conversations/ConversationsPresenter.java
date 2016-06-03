@@ -19,12 +19,14 @@ import com.google.common.collect.Maps;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.ChatMessage;
 import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.ConversationsResponse;
 import com.shoutit.app.android.api.model.PusherMessage;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
+import com.shoutit.app.android.view.chats.LocalMessageBus;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -84,13 +86,15 @@ public class ConversationsPresenter {
     private final Scheduler mUiScheduler;
     private final Context mContext;
     private final UserPreferences mUserPreferences;
+    private final RefreshConversationBus mRefreshConversationBus;
     private final PusherHelper mPusherHelper;
     private final boolean isMyConversationsList;
+    private final LocalMessageBus mLocalMessageBus;
     private final PublishSubject<Object> requestSubject = PublishSubject.create();
+    private final String mUserId;
     private Listener mListener;
     private Subscription mSubscription;
     private boolean showProgress = true;
-    private final PublishSubject<Object> refreshSubject = PublishSubject.create();
     private final PublishSubject<ConversationAction> conversationActionSubject = PublishSubject.create();
 
     @Inject
@@ -100,14 +104,19 @@ public class ConversationsPresenter {
                                   @ForActivity Context context,
                                   UserPreferences userPreferences,
                                   PusherHelper pusherHelper,
-                                  boolean isMyConversationsList) {
+                                  boolean isMyConversationsList,
+                                  LocalMessageBus localMessageBus,
+                                  RefreshConversationBus refreshConversationBus) {
         mApiService = apiService;
         mNetworkScheduler = networkScheduler;
         mUiScheduler = uiScheduler;
         mContext = context;
         mUserPreferences = userPreferences;
+        mRefreshConversationBus = refreshConversationBus;
+        mUserId = mUserPreferences.getUser().getId();
         mPusherHelper = pusherHelper;
         this.isMyConversationsList = isMyConversationsList;
+        mLocalMessageBus = localMessageBus;
     }
 
     private Observable<ConversationsResponse> getConversationsRequest(@Nullable String before) {
@@ -126,13 +135,13 @@ public class ConversationsPresenter {
         final Observable<ConversationAction> newMessageObservable = mPusherHelper
                 .getNewMessagesObservable()
                 .filter(pusherMessage -> isMyConversationsList)
-                .map((Func1<PusherMessage, ConversationAction>) PusherMessageAction::new)
+                .map((Func1<PusherMessage, ConversationAction>) ConversationMessageAction::new)
                 .observeOn(mUiScheduler);
 
         final Observable<Map<String, Conversation>> requestObservable = requestSubject
                 .startWith(new Object())
                 .lift(loadMoreOperator)
-                .compose(MoreOperators.<ConversationsResponse>refresh(refreshSubject))
+                .compose(MoreOperators.<ConversationsResponse>refresh(mRefreshConversationBus.getRefreshConversationBus()))
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
                 .flatMap(conversationsResponse -> Observable.from(conversationsResponse.getResults())
@@ -141,18 +150,19 @@ public class ConversationsPresenter {
         final Observable<List<Conversation>> conversationsListObservable = requestObservable
                 .switchMap(conversationsMap -> newMessageObservable.startWith((ConversationAction) null)
                         .mergeWith(conversationActionSubject)
+                        .mergeWith(mLocalMessageBus.getLocalMessageObservable().map((Func1<LocalMessageBus.LocalMessage, ConversationAction>) ConversationMessageAction::new))
                         .scan(conversationsMap, new Func2<Map<String, Conversation>, ConversationAction, Map<String, Conversation>>() {
                             @Override
                             public Map<String, Conversation> call(Map<String, Conversation> conversationsMap,
                                                                   ConversationAction newMessage) {
                                 if (newMessage == null) {
                                     return conversationsMap;
-                                } else if (newMessage instanceof PusherMessageAction) {
-                                    if (isNewConversation(conversationsMap, ((PusherMessageAction) newMessage).mPusherMessage)) {
+                                } else if (newMessage instanceof ConversationMessageAction) {
+                                    if (isNewConversation(conversationsMap, ((ConversationMessageAction) newMessage).mPusherMessage)) {
                                         refreshData();
                                         return conversationsMap;
                                     } else {
-                                        return updateMapWithNewMessage(conversationsMap, ((PusherMessageAction) newMessage).mPusherMessage);
+                                        return updateMapWithNewMessage(conversationsMap, ((ConversationMessageAction) newMessage).mPusherMessage);
                                     }
                                 } else if (newMessage instanceof ConversationReadAction) {
                                     ConversationReadAction conversationReadAction = (ConversationReadAction) newMessage;
@@ -168,15 +178,15 @@ public class ConversationsPresenter {
                             }
 
                             private boolean isNewConversation(Map<String, Conversation> conversationsMap,
-                                                              PusherMessage newMessage) {
+                                                              ChatMessage newMessage) {
                                 return !conversationsMap.containsKey(newMessage.getConversationId());
                             }
 
                             private Map<String, Conversation> updateMapWithNewMessage(Map<String, Conversation> conversationsMap,
-                                                                                      PusherMessage newMessage) {
+                                                                                      ChatMessage newMessage) {
                                 final Conversation conversationToUpdate = conversationsMap.get(newMessage.getConversationId());
                                 final Conversation updatedConversation = conversationToUpdate
-                                        .withUpdatedLastMessage(newMessage.getText(), newMessage.getCreatedAt());
+                                        .withUpdatedLastMessage(newMessage.getText(), newMessage.getCreatedAt(), newMessage.getProfile().getId().equals(mUserId));
 
                                 final Map<String, Conversation> newMap = new HashMap<>(conversationsMap);
                                 newMap.put(updatedConversation.getId(), updatedConversation);
@@ -217,7 +227,7 @@ public class ConversationsPresenter {
     }
 
     private void refreshData() {
-        refreshSubject.onNext(null);
+        mRefreshConversationBus.post();
     }
 
     @NonNull
@@ -381,10 +391,10 @@ public class ConversationsPresenter {
         }
     }
 
-    private static class PusherMessageAction implements ConversationAction {
-        private final PusherMessage mPusherMessage;
+    private static class ConversationMessageAction implements ConversationAction {
+        private final ChatMessage mPusherMessage;
 
-        public PusherMessageAction(PusherMessage pusherMessage) {
+        public ConversationMessageAction(ChatMessage pusherMessage) {
             mPusherMessage = pusherMessage;
         }
     }

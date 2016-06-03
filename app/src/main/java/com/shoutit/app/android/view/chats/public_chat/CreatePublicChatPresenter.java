@@ -22,6 +22,7 @@ import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.ImageCaptureHelper;
 import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.view.chats.ChatsMediaHelper;
+import com.shoutit.app.android.view.conversations.RefreshConversationBus;
 import com.shoutit.app.android.view.createshout.location.LocationResultHelper;
 
 import javax.inject.Inject;
@@ -48,6 +49,7 @@ public class CreatePublicChatPresenter {
     private final AmazonHelper mAmazonHelper;
     @NonNull
     private final UserPreferences mUserPreferences;
+    private final RefreshConversationBus mRefreshConversationBus;
     private final CompositeSubscription mCompositeSubscription = new CompositeSubscription();
 
     @Inject
@@ -57,7 +59,8 @@ public class CreatePublicChatPresenter {
                                      @NetworkScheduler Scheduler networkScheduler,
                                      @UiScheduler Scheduler uiScheduler,
                                      @NonNull AmazonHelper amazonHelper,
-                                     @NonNull UserPreferences userPreferences) {
+                                     @NonNull UserPreferences userPreferences,
+                                     RefreshConversationBus refreshConversationBus) {
         mImageCaptureHelper = imageCaptureHelper;
         mContext = context;
         mApiService = apiService;
@@ -65,6 +68,7 @@ public class CreatePublicChatPresenter {
         mUiScheduler = uiScheduler;
         mAmazonHelper = amazonHelper;
         mUserPreferences = userPreferences;
+        mRefreshConversationBus = refreshConversationBus;
     }
 
     public void selectImageClicked() {
@@ -105,6 +109,7 @@ public class CreatePublicChatPresenter {
                             .subscribe(new Action1<ResponseBody>() {
                                 @Override
                                 public void call(ResponseBody responseBody) {
+                                    mRefreshConversationBus.post();
                                     listener.finish();
                                 }
                             }, new Action1<Throwable>() {

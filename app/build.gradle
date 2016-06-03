@@ -33,7 +33,7 @@ if (keystoreProperties.exists()) {
     props.load(new FileInputStream(keystoreProperties))
 }
 
-def baseVersionName = "2.0.8"
+def baseVersionName = "2.5.0"
 
 project.ext.versionCode = 77
 

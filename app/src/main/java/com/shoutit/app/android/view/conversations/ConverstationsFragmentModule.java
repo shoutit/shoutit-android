@@ -8,6 +8,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
+import com.shoutit.app.android.view.chats.LocalMessageBus;
 
 import dagger.Module;
 import dagger.Provides;
@@ -27,8 +28,10 @@ public class ConverstationsFragmentModule {
                                                          @NetworkScheduler Scheduler networkScheduler,
                                                          @UiScheduler Scheduler uiScheduler,
                                                          @ForActivity Context context,
-                                                         PusherHelper pusherHelper) {
+                                                         PusherHelper pusherHelper,
+                                                         LocalMessageBus bus,
+                                                         RefreshConversationBus refreshConversationBus) {
         return new ConversationsPresenter(apiService, networkScheduler, uiScheduler, context,
-                userPreferences, pusherHelper, isMyConversations);
+                userPreferences, pusherHelper, isMyConversations, bus, refreshConversationBus);
     }
 }
