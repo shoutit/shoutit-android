@@ -113,7 +113,7 @@ public class ChatsDelegate {
                     if (mUser.getId().equals(id)) {
                         return Observable.just(pusherMessage);
                     } else {
-                        return mApiService.readMessage(id)
+                        return mApiService.readMessage(pusherMessage.getId())
                                 .map(responseBody -> pusherMessage);
                     }
                 })

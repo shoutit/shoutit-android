@@ -110,7 +110,7 @@ public class PusherHelper {
                             public void onEvent(String channelName, String eventName, String data) {
                                 try {
                                     final PusherMessage pusherMessage = mGson.getAdapter(PusherMessage.class).fromJson(data);
-                                    logMessage(pusherMessage, "conversation");
+                                    logMessage(pusherMessage, "conversation channel / getNewMessageObservable");
                                     subscriber.onNext(pusherMessage);
                                 } catch (IOException e) {
                                     subscriber.onError(e);
@@ -149,7 +149,7 @@ public class PusherHelper {
                             public void onEvent(String channelName, String eventName, String data) {
                                 try {
                                     final PusherMessage pusherMessage = mGson.getAdapter(PusherMessage.class).fromJson(data);
-                                    logMessage(pusherMessage, "profile");
+                                    logMessage(pusherMessage, "profile / getNewMessagesObservable");
                                     subscriber.onNext(pusherMessage);
                                 } catch (IOException e) {
                                     subscriber.onError(e);
@@ -172,7 +172,7 @@ public class PusherHelper {
                                 try {
                                     final NotificationsResponse.Notification notification = mGson
                                             .fromJson(data, NotificationsResponse.Notification.class);
-                                    logMessage(notification, "profile");
+                                    logMessage(notification, "profile / getNewNotificationObservable");
                                     subscriber.onNext(notification);
                                 } catch (JsonSyntaxException e) {
                                     subscriber.onError(e);
@@ -197,7 +197,7 @@ public class PusherHelper {
                                     public void onEvent(String channelName, String eventName, String data) {
                                         try {
                                             final Stats pusherStats = mGson.getAdapter(Stats.class).fromJson(data);
-                                            logMessage(pusherStats, "profile");
+                                            logMessage(pusherStats, "profile / getStatsObservable");
                                             subscriber.onNext(pusherStats);
                                         } catch (IOException e) {
                                             subscriber.onError(e);
@@ -225,7 +225,7 @@ public class PusherHelper {
                             @Override
                             public void onEvent(String channelName, String eventName, String data) {
                                 final TypingPusherModel typingPusherModel = mGson.fromJson(data, TypingPusherModel.class);
-                                logMessage(typingPusherModel, "conversation");
+                                logMessage(typingPusherModel, "conversation / getIsTypingObservable");
                                 subscriber.onNext(TypingInfo.typing(typingPusherModel.username));
                             }
                         });
