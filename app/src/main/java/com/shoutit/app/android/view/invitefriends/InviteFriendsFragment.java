@@ -33,7 +33,7 @@ import butterknife.OnClick;
 
 public class InviteFriendsFragment extends BaseFragment {
 
-    private static final String SHARE_FACEBOOK_APP_LINK_URL = "https://fb.me/1224908360855680";
+    public static final String SHARE_FACEBOOK_APP_LINK_URL = "https://fb.me/1224908360855680";
 
     private Menu mMenu;
     private CallbackManager callbackManager;
@@ -93,7 +93,7 @@ public class InviteFriendsFragment extends BaseFragment {
                 }
                 break;
             case R.id.invite_friends_invite_facebook:
-                FacebookHelper.showAppInviteDialog(this, SHARE_FACEBOOK_APP_LINK_URL, callbackManager);
+                FacebookHelper.showAppInviteDialog(getActivity(), SHARE_FACEBOOK_APP_LINK_URL, callbackManager);
                 break;
             case R.id.invite_friends_invite_twitter:
                 shareThroughTwitter();

@@ -1,6 +1,5 @@
 package com.shoutit.app.android.utils;
 
-import com.pusher.client.Pusher;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dao.ProfilesDao;
@@ -40,11 +39,10 @@ public class LogoutHelper {
 
         mProfilesDao.registerToGcmAction(null);
 
-        final Pusher pusher = mPusherHelper.getPusher();
         final User user = userPreferences.getUser();
         assert user != null;
-        pusher.unsubscribe(PusherHelper.getProfileChannelName(user.getId()));
-        pusher.disconnect();
+        mPusherHelper.unsubscribeProfileChannel(user.getId());
+        mPusherHelper.disconnect();
 
         userPreferences.logout();
         recentSearchesTable.clearRecentSearches();
