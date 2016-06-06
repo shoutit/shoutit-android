@@ -207,7 +207,6 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
     }
 
 
-
     private boolean showMainSearchActivityOrLetFragmentsHandleIt() {
         final Fragment fragment = Iterables.getLast(getSupportFragmentManager().getFragments());
         if (fragment != null && MenuHandler.FRAGMENT_DISCOVER.equals(fragment.getTag())) {
@@ -301,7 +300,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         for (Fragment fragment : getSupportFragmentManager().getFragments()) {
-            if (fragment.getTag().equals(MenuHandler.FRAGMENT_INVITE_FRIENDS)) {
+            if (MenuHandler.FRAGMENT_INVITE_FRIENDS.equals(fragment.getTag())) {
                 fragment.onActivityResult(requestCode, resultCode, data);
                 break;
             }
