@@ -62,6 +62,12 @@ public class FacebookFriendsActivity extends BaseProfilesListActivity {
                 .subscribe(o -> {
                     FacebookHelper.showAppInviteDialog(this, InviteFriendsFragment.SHARE_FACEBOOK_APP_LINK_URL, callbackManager);
                 });
+
+        presenter.getActionOnlyForLoggedInUser()
+                .compose(bindToLifecycle())
+                .subscribe(ColoredSnackBar.errorSnackBarAction(
+                        ColoredSnackBar.contentView(this),
+                        R.string.error_action_only_for_logged_in_user));
     }
 
     protected void setUpToolbar() {

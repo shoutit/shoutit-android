@@ -44,6 +44,7 @@ public class ListeningsPresenter implements ProfilesListPresenter {
     private final PublishSubject<BaseProfile> profileListenedSubject = PublishSubject.create();
     private final PublishSubject<String> listenSuccess = PublishSubject.create();
     private final PublishSubject<String> unListenSuccess = PublishSubject.create();
+    private final PublishSubject<Object> actionOnlyForLoggedInUser = PublishSubject.create();
     
     @Nonnull
     private final ListeningsDao listeningsDao;
@@ -78,7 +79,8 @@ public class ListeningsPresenter implements ProfilesListPresenter {
 
                         for (BaseProfile profile : listeningResponse.getProfiles()) {
                             builder.add(new ListeningsProfileAdapterItem(
-                                    profile, openProfileSubject, profileListenedSubject, listeningsType));
+                                    profile, openProfileSubject, profileListenedSubject, listeningsType,
+                                    actionOnlyForLoggedInUser, true, false));
                         }
 
                         final ImmutableList<BaseAdapterItem> items = builder.build();

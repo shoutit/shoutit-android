@@ -14,6 +14,7 @@ import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.ImageCaptureHelper;
 import com.shoutit.app.android.utils.ResourcesHelper;
+import com.shoutit.app.android.view.conversations.RefreshConversationBus;
 import com.shoutit.app.android.view.createshout.location.LocationResultHelper;
 import com.shoutit.app.android.view.media.MediaUtils;
 
@@ -60,6 +61,8 @@ public class CreatePublicChatPresenterTest {
     AmazonHelper mAmazonHelper;
     @Mock
     UserPreferences mUserPreferences;
+    @Mock
+    RefreshConversationBus mRefreshConversationBus;
 
     private CreatePublicChatPresenter mCreatePublicChatPresenter;
 
@@ -71,7 +74,7 @@ public class CreatePublicChatPresenterTest {
         PowerMockito.mockStatic(MediaUtils.class);
         when(MediaUtils.createFileFromUri(any(Context.class), any(Uri.class), anyInt())).thenReturn(new File(""));
         when(mAmazonHelper.uploadGroupChatObservable(any(File.class))).thenReturn(Observable.just("url"));
-        mCreatePublicChatPresenter = new CreatePublicChatPresenter(imageCaptureHelper, mContext, mApiService, Schedulers.immediate(), Schedulers.immediate(), mAmazonHelper, mUserPreferences);
+        mCreatePublicChatPresenter = new CreatePublicChatPresenter(imageCaptureHelper, mContext, mApiService, Schedulers.immediate(), Schedulers.immediate(), mAmazonHelper, mUserPreferences, mRefreshConversationBus);
     }
 
     @Test

@@ -135,9 +135,6 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
         if (mUserPreferences.isNormalUser()) {
             subscribeToStats();
         }
-
-        profilesDao.registerToGcmAction(AppuniteGcm.getInstance()
-                .getPushToken());
     }
 
     @Override
@@ -208,7 +205,6 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
                 return super.onOptionsItemSelected(item);
         }
     }
-
 
 
     private boolean showMainSearchActivityOrLetFragmentsHandleIt() {
@@ -304,7 +300,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         for (Fragment fragment : getSupportFragmentManager().getFragments()) {
-            if (fragment.getTag().equals(MenuHandler.FRAGMENT_INVITE_FRIENDS)) {
+            if (MenuHandler.FRAGMENT_INVITE_FRIENDS.equals(fragment.getTag())) {
                 fragment.onActivityResult(requestCode, resultCode, data);
                 break;
             }

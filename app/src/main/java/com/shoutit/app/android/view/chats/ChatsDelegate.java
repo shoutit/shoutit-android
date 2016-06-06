@@ -78,9 +78,10 @@ public class ChatsDelegate {
     private Listener mListener;
     private final User mUser;
     private final PublishSubject<PusherMessage> newMessagesSubject;
+    private final LocalMessageBus mBus;
 
 
-    public ChatsDelegate(PusherHelper pusher, Scheduler uiScheduler, Scheduler networkScheduler, ApiService apiService, Resources resources, UserPreferences userPreferences, Context context, AmazonHelper amazonHelper, PublishSubject<PusherMessage> newMessagesSubject) {
+    public ChatsDelegate(PusherHelper pusher, Scheduler uiScheduler, Scheduler networkScheduler, ApiService apiService, Resources resources, UserPreferences userPreferences, Context context, AmazonHelper amazonHelper, PublishSubject<PusherMessage> newMessagesSubject, LocalMessageBus bus) {
         mPusher = pusher;
         mUiScheduler = uiScheduler;
         mNetworkScheduler = networkScheduler;
@@ -90,6 +91,7 @@ public class ChatsDelegate {
         mContext = context;
         mAmazonHelper = amazonHelper;
         this.newMessagesSubject = newMessagesSubject;
+        mBus = bus;
         mUser = mUserPreferences.getUser();
     }
 
@@ -400,6 +402,13 @@ public class ChatsDelegate {
 
     public void postLocalMessage(Message messagesResponse, String conversationId) {
         newMessagesSubject.onNext(new PusherMessage(
+                messagesResponse.getProfile(),
+                conversationId,
+                messagesResponse.getId(),
+                messagesResponse.getText(),
+                messagesResponse.getAttachments(),
+                messagesResponse.getCreatedAt()));
+        mBus.post(new LocalMessageBus.LocalMessage(
                 messagesResponse.getProfile(),
                 conversationId,
                 messagesResponse.getId(),

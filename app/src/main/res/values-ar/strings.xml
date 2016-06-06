@@ -352,23 +352,23 @@
 <string name="publish_sub_header">"هل ترغب بإضافة سعر؟"</string>
 <string name="publish_price_hint">"قابل للتفاوض"</string>
 <string name="publish_done">"تم"</string>
+
+<!-- Conversations -->
 <string name="conversation_title">"المحادثات"</string>
 
 <!-- Chats -->
 <string name="chat_show_map">"إظهار الخريطة"</string>
 <string name="chat_attatchment">"المرفقات"</string>
 <string name="chat_video_call">"مكالمة فيديو"</string>
-<string name="chats_attatchments_media">"صورة"</string>
 <string name="chats_attatchments_shout">"إعلان"</string>
 <string name="chats_attatchments_location">"الموقع"</string>
 <string name="chat_edit_text_hint">"اكتب رسالة"</string>
 <string name="chats_delete_conversatin">"هل ترغب بحذف هذه المحادثة؟"</string>
-<string name="chat_typing">"..."</string>
+<string name="chat_typing">"%1$s يكتب الآن"</string>
 <string name="chat_shout_chat">"محادثة الإعلان"</string>
 <string name="chat_offer">"عرض"</string>
 <string name="chat_request">"طلب"</string>
 <string name="chats_empty">"لا توجد رسائل"</string>
- <string name="chat_menu_delete">حذف المحادثة</string>
 
 <!-- Notifications -->
 <string name="notifications_title">"الإشعارات"</string>
@@ -460,7 +460,133 @@
 <string name="profile_verify_account">"فعل حسابك"</string>
 <string name="verify_email_title">"التحقق من البريد الإلكتروني"</string>
 <string name="video_calls_cannot_start_conversation">"عذراً, لايمكن بدء مكالمة فيديو حالياً. يرجى المحاولة لاحقاً"</string>
+
+<!-- Conversations -->
 <string name="conversations_empty">"لا توجد محادثات"</string>
 <string name="listen_success">"لقد بدأت بالاستماع إلى %1$s بنجاح"</string>
 <string name="unlisten_success">"لقد توقفت عن الاستماع إلى %1$s بنجاح"</string>
+<string name="permission_contacts_explanation">"نحتاج صلاحية جهات الاتصال لنتحقق من منهم يستخدم شاوت ات"</string>
+<string name="shout_deleted">"هذا الإعلان ملغي"</string>
+<string name="request_activity_sharing">"مشاركة"</string>
+<string name="publish_shout_share_title">"انشر اعلانك"</string>
+<string name="conversations_my_ab_title">"محادثاتي"</string>
+<string name="conversations_public_ab_title">"المحادثات العامة"</string>
+<string name="conversation_create_public_chat">"إنشاء محادثة عامة"</string>
+<string name="chats_attatchments_media">"وسائط متعددة"</string>
+<string name="chats_attatchments_profile">"ملف شخصي"</string>
+<string name="chat_menu_delete">"حذف المحادثة"</string>
+<string name="chats_chat_info">"معلومات المحادثة"</string>
+<string name="chat_picture_confirmation">"هل انت متأكد من ارفاق الصورة؟"</string>
+<string name="chat_video_confirmation">"هل انت متأكد من ارفاق الفيديو؟"</string>
+<string name="chat_location_confirmation">"هل انت متأكد من ارفاق الموقع؟"</string>
+<string name="chat_shout_confirmation">"هل انت متأكد من ارفاق الإعلان؟"</string>
+<string name="chat_profile_confirmation">"هل انت متأكد من ارفاق %1$s؟"</string>
+<string name="chat_dialog_attach">"ارفاق"</string>
+<string name="chat_dialog_title">"موافقة"</string>
+<string name="notifications_badge">"لديك إشعار جديد"</string>
+<string name="conversations_create_public_chat">"إنشاء محادثة عامة"</string>
+
+<!-- Create Public Chat -->
+<string name="create_public_chat_title">"إنشاء محادثة عامة"</string>
+<string name="create_public_chat_header">"المحادثات العامة هي محادثات مخصصة لكل بلد ويمكن للجميع المشاركة بها ووضع ما يريدون بيعه أو شراءه."</string>
+<string name="create_public_chat_subject">"الموضوع"</string>
+<string name="create_public_chat_location">"الموقع"</string>
+<string name="create_public_chat_change_location">"تغيير"</string>
+<string name="create_public_chat_error">"خطأ"</string>
+<string name="create_chat_create">"إنشاء"</string>
+<string name="create_public_chat_image_error">"خطأ"</string>
+
+<!-- Listenings -->
+<string name="listenings_empty">"لا توجد استماعات"</string>
+<string name="listenings_ab_title">"استماعات"</string>
+<string name="listers_ab_title">"مستمعين"</string>
+<string name="listening_tab_user">"المستخدمين"</string>
+<string name="listening_tab_pages">"الصفحات"</string>
+<string name="listenings_interests_ab_title">"إهتمامات"</string>
+
+<!-- Listeners -->
+<string name="listeners_ab_title">"مستمعين"</string>
+
+<!-- Select profile -->
+<string name="select_profile_ab_title">"اختر ملف شخصي"</string>
+<string name="select_profile_tab_listenings">"استماعات"</string>
+<string name="select_profile_tab_listeners">"مستمعين"</string>
+
+<!-- Chat Info -->
+<string name="chat_info_subject">"الموضوع"</string>
+<string name="chat_info_attachment">"المرفقات"</string>
+<string name="chat_info_members">"المشاركون"</string>
+<string name="chat_info_title">"معلومات المحادثة"</string>
+<string name="chat_info_add_person">"إضافة مشترك"</string>
+<string name="chat_info_created_by">"أنشئت بواسطة %1$s"</string>
+<string name="chat_info_created_at">"بتاريخ %1$s"</string>
+<string name="chat_participant_title">"المشاركون"</string>
+<string name="chat_blocked_users_title">"محظورين"</string>
+<string name="chat_select_users_title">"أضافة مشترك للمحادثة"</string>
+<string name="chat_info_exit_question">"هل تريد ترك هذه المحادثة؟"</string>
+
+<!-- Chat shouts -->
+<string name="chat_shouts_no_results">"لا توجد إعلانات في هذه المحادثة"</string>
+<string name="chat_shouts_ab_title">"الإعلانات"</string>
+<string name="chat_shouts_title">"إعلانات المحادثة"</string>
+<plurals name="chat_shouts_results">
+<item quantity="zero">"لا توجد إعلانات"</item>
+<item quantity="one">"%d اعلان"</item>
+<item quantity="two">"إعلانين"</item>
+<item quantity="few"></item>
+<item quantity="many"></item>
+<item quantity="other">"%d اعلانات"</item>
+</plurals>
+
+<!-- Chat Info -->
+<string name="chat_info_report">"التبليغ عن المحادثة"</string>
+<string name="chat_info_report_success">"تم ارسال التبليغ"</string>
+<string name="chat_info_load_error">"خطأ"</string>
+<string name="chat_info_select_image_error">"خطأ"</string>
+<string name="chat_info_edit_error">"خطأ"</string>
+<string name="chat_info_chat_error">"خطأ"</string>
+<string name="chat_info_report_error">"خطأ"</string>
+
+<!-- Chat Participants -->
+<string name="chat_paricipants_blocked">"محظورين"</string>
+<string name="chat_participants_admin">"مدير"</string>
+<string name="chat_participant_unblock">"إلغاء حظر"</string>
+<string name="chat_participant_block">"حظر"</string>
+
+<!-- Chat Select Users -->
+<string name="chat_select_user_dialog_title">"هل انت متأكد من اضافة %1$s؟"</string>
+
+<!-- Chat Blocked Users -->
+<string name="blocked_users_unblock_dialog_title">"هل انت متأكد من الغاء حظر %1$s؟"</string>
+<string name="request_activity_facebook">"فيسبوك"</string>
+<string name="request_activity_twitter">"تويتر"</string>
+<string name="request_activity_facebook_permission_error">"لا توجد الصلاحية المطلوبة لنشر إعلانك على فيسبوك"</string>
+
+<!-- User suggestions -->
+<string name="user_suggestion_pages">"صفحات مقترحة"</string>
+<string name="user_suggestion_users">"مستخدمين مقترحين"</string>
+
+<!-- Facebook friends -->
+<string name="facebook_friends_ab_title">"أصدقاء فيسبوك"</string>
+<string name="facebook_friends_no_friends">"لا"</string>
+<string name="facebook_friends_permission_error">"لا توجد الصلاحية المطلوبة لمعرفة اصدقاء الفيسبوك الذين يستخدمون شاوت ات"</string>
+
+<!-- Invite Friends -->
+<string name="invite_friends_suggestions">"الاقتراحات"</string>
+<string name="invite_friends_users">"المستخدمين"</string>
+<string name="invite_friends_pages">"الصفحات"</string>
+<string name="invite_friends_find_friends">"البحث عن أصدقاء"</string>
+<string name="invite_friends_facebook">"فيسبوك"</string>
+<string name="invite_friends_contacts">"جهات الاتصال"</string>
+<string name="invite_friends_invite_friends">"دعوة الأصدقاء"</string>
+<string name="invite_friends_facebook_header">"فيسبوك"</string>
+<string name="invite_friends_twitter">"تويتر"</string>
+<string name="invite_friends_share">"مشاركة تطبيق شاوت ات"</string>
+<string name="invite_chooser_text">"اختر التطبيق"</string>
+<string name="invite_no_twitter_app">"تحتاج تطبيق تويتر"</string>
+
+<!-- Contacts fiends -->
+<string name="contacts_friends_ab_title">"أصدقاء من دفتر الهاتف"</string>
+<string name="invite_app_invite_text">"بيع و اشتري وانت تدردش على شاوت ات! حمل التطبيق الآن shoutit.com/app #شاوت_ات #Shoutit"</string>
+<string name="invite_error">"لم نتمكن من ارسال الدعوة"</string>
 </resources>

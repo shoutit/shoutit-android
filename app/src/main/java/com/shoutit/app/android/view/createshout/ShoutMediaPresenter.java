@@ -17,6 +17,7 @@ import com.google.common.collect.Lists;
 import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.AmazonHelper;
+import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.view.media.MediaUtils;
 
 import java.io.File;
@@ -34,6 +35,8 @@ import rx.functions.FuncN;
 import rx.subscriptions.CompositeSubscription;
 
 public class ShoutMediaPresenter {
+
+    private static final String TAG = ShoutMediaPresenter.class.getSimpleName();
 
     private boolean mIsOffer;
 
@@ -202,6 +205,8 @@ public class ShoutMediaPresenter {
     }
 
     public void setUp(List<String> images, List<Video> videos, boolean isOffer) {
+        clear();
+
         mIsOffer = isOffer;
         for (String image : images) {
             addImageItem(image, true);
@@ -212,6 +217,14 @@ public class ShoutMediaPresenter {
         }
 
         mMediaListener.setImages(mediaItems);
+    }
+
+    private void clear() {
+        mediaItems.forcePut(0, new AddImageItem());
+        mediaItems.forcePut(1, new BlankItem());
+        mediaItems.forcePut(2, new BlankItem());
+        mediaItems.forcePut(3, new BlankItem());
+        mediaItems.forcePut(4, new BlankItem());
     }
 
     public void addMediaItem(@NonNull String media, boolean isVideo) {
@@ -326,11 +339,10 @@ public class ShoutMediaPresenter {
     private void mergeVideoAndImagesObservable(List<Observable<String>> imageObservables, Observable<Video> videoObservable) {
         if (imageObservables.isEmpty()) {
             if (videoObservable != null) {
-                mCompositeSubscription.add(videoObservable.subscribe(new Action1<Video>() {
-                    @Override
-                    public void call(Video video) {
-                        getAllEditedImagesAndComplete(ImmutableList.<String>of(), ImmutableList.of(video));
-                    }
+                mCompositeSubscription.add(videoObservable.subscribe(video -> {
+                    getAllEditedImagesAndComplete(ImmutableList.<String>of(), ImmutableList.of(video));
+                }, throwable -> {
+                    mMediaListener.showUploadError(throwable);
                 }));
             } else {
                 getAllEditedImagesAndComplete(ImmutableList.<String>of(), ImmutableList.<Video>of());
@@ -357,17 +369,14 @@ public class ShoutMediaPresenter {
                 }));
             } else {
                 mCompositeSubscription.add(images.zipWith(
-                        videoObservable, new Func2<List<String>, Video, BothParams<List<String>, Video>>() {
-                            @Override
-                            public BothParams<List<String>, Video> call(List<String> images, Video video) {
-                                return BothParams.of(images, video);
-                            }
+                        videoObservable, (images1, video) -> {
+                            return BothParams.of(images1, video);
                         })
-                        .subscribe(new Action1<BothParams<List<String>, Video>>() {
-                            @Override
-                            public void call(BothParams<List<String>, Video> listBothParamsBothParams) {
-                                getAllEditedImagesAndComplete(listBothParamsBothParams.param1(), ImmutableList.of(listBothParamsBothParams.param2()));
-                            }
+                        .subscribe(listBothParamsBothParams -> {
+                            getAllEditedImagesAndComplete(listBothParamsBothParams.param1(), ImmutableList.of(listBothParamsBothParams.param2()));
+                        }, throwable -> {
+                            mMediaListener.showUploadError(throwable);
+                            LogHelper.logThrowableAndCrashlytics(TAG, "Media upload failed", throwable);
                         }));
             }
         }
@@ -424,5 +433,7 @@ public class ShoutMediaPresenter {
         void mediaEditionCompleted(@NonNull List<String> images, @NonNull List<Video> videos);
 
         void showMediaProgress();
+
+        void showUploadError(Throwable throwable);
     }
 }

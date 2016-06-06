@@ -19,6 +19,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -43,6 +44,7 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.ImageHelper;
+import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.view.createshout.DialogsHelper;
@@ -104,6 +106,9 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     LinearLayout mEditMediaContainer;
     @Bind(R.id.edit_shout_mobile)
     EditText mobileEditText;
+
+    @Bind(R.id.edit_confirm)
+    Button editButton;
 
     @Inject
     EditShoutPresenter mEditShoutPresenter;
@@ -400,6 +405,11 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     }
 
     @Override
+    public void enableEditButton(boolean enable) {
+        editButton.setEnabled(enable);
+    }
+
+    @Override
     public void setImages(@NonNull Map<Integer, ShoutMediaPresenter.Item> mediaElements) {
         mEditMediaContainer.removeAllViews();
 
@@ -460,5 +470,10 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     @Override
     public void showMediaProgress() {
         mEditProgress.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void showUploadError(Throwable throwable) {
+        ColoredSnackBar.error(ColoredSnackBar.contentView(this), throwable, Snackbar.LENGTH_LONG).show();
     }
 }
