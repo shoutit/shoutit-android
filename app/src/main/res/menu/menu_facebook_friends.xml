@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/facebook_friends_menu_refresh"
+        android:title="@string/facebook_friends_refresh"
+        android:icon="@drawable/ic_refresh_white_24dp"
+        app:showAsAction="ifRoom" />
+
+</menu>

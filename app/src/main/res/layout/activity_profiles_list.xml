@@ -7,15 +7,15 @@
     android:orientation="vertical">
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/listenings_toolbar"
+        android:id="@+id/profiles_list_toolbar"
         style="@style/AppTheme.BaseToolbarStyle"
         android:layout_width="match_parent"
         android:layout_height="?actionBarSize"
         android:elevation="0dp" />
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/listenings_recycler_view"
-        android:layout_below="@+id/listenings_toolbar"
+        android:id="@+id/profiles_list_recycler_view"
+        android:layout_below="@+id/profiles_list_toolbar"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

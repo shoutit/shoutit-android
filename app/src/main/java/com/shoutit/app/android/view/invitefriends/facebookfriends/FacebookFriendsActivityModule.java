@@ -8,9 +8,11 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityScope;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.utils.ListeningHalfPresenter;
+import com.shoutit.app.android.view.listenings.ProfilesListAdapter;
 import com.shoutit.app.android.utils.PreferencesHelper;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
 import com.shoutit.app.android.view.profileslist.ProfilesListPresenter;
+import com.squareup.picasso.Picasso;
 
 import dagger.Module;
 import dagger.Provides;
@@ -43,6 +45,11 @@ public class FacebookFriendsActivityModule {
     @ActivityScope
     CallbackManager provideCallbackManager() {
         return CallbackManager.Factory.create();
+    }
+
+    @Provides
+    ProfilesListAdapter provideProfilesListAdapter(Picasso picasso) {
+        return new FacebookFriendsAdapter(activity, picasso);
     }
 }
 

@@ -608,8 +608,11 @@ You can also change the email
 <string name="facebook_friends_no_friends">"None of your friends has Shoutit yet.
  Go ahead and invite them!"</string>
 <string name="facebook_friends_permission_error">"Permissions not granted. We need it to get your friends list."</string>
+    <string name="facebook_friends_refresh">Refresh friends list</string>
+    <string name="facebook_friends_invite_text">Friends not on the list? Send them an invite!</string>
+    <string name="facebook_friends_invite">INVITE</string>
 
-<!-- Invite Friends -->
+    <!-- Invite Friends -->
 <string name="invite_friends_suggestions">"Suggestions"</string>
 <string name="invite_friends_users">"Users"</string>
 <string name="invite_friends_pages">"Pages"</string>

@@ -13,6 +13,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
 import com.shoutit.app.android.adapteritems.NoDataTextAdapterItem;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.ProfilesListResponse;
@@ -39,12 +40,15 @@ import rx.subjects.PublishSubject;
 public class FacebookFriendsPresenter implements ProfilesListPresenter {
 
     private final PublishSubject<String> openProfileSubject = PublishSubject.create();
+    private final PublishSubject<Object> openInviteClickedSubject = PublishSubject.create();
+    private final PublishSubject<Object> progressSubject = PublishSubject.create();
     private final PublishSubject<Object> actionOnlyForLoggedInUser = PublishSubject.create();
 
     private final Observable<List<BaseAdapterItem>> adapterItems;
     private final Observable<Throwable> errorObservable;
     private final Observable<Boolean> permissionsNotGrantedObservable;
     private final Observable<Boolean> progressObservable;
+
     private final ProfilesDao dao;
     private final ListeningHalfPresenter listeningHalfPresenter;
 
@@ -94,21 +98,19 @@ public class FacebookFriendsPresenter implements ProfilesListPresenter {
                 .map(new Func1<ProfilesListResponse, List<BaseAdapterItem>>() {
                     @Override
                     public List<BaseAdapterItem> call(ProfilesListResponse response) {
-                        if (response.getResults().isEmpty()) {
-                            return ImmutableList.<BaseAdapterItem>of(new NoDataTextAdapterItem(activity.getString(R.string.facebook_friends_no_friends)));
-                        } else {
-                            return ImmutableList.copyOf(
-                                    Lists.transform(response.getResults(), new Function<BaseProfile, BaseAdapterItem>() {
-                                        @Nullable
-                                        @Override
-                                        public BaseAdapterItem apply(BaseProfile profile) {
-                                            return new ProfileListAdapterItem(profile, openProfileSubject,
-                                                    listeningHalfPresenter.getListenProfileSubject(),
-                                                    actionOnlyForLoggedInUser, isNormalUser,
-                                                    preferencesHelper.isMyProfile(profile.getUsername()));
-                                        }
-                                    }));
-                        }
+                        return ImmutableList.<BaseAdapterItem>builder().addAll(
+                                Lists.transform(response.getResults(), new Function<BaseProfile, BaseAdapterItem>() {
+                                    @Nullable
+                                    @Override
+                                    public BaseAdapterItem apply(BaseProfile profile) {
+                                        return new ProfileListAdapterItem(profile, openProfileSubject,
+                                                listeningHalfPresenter.getListenProfileSubject(),
+                                                actionOnlyForLoggedInUser, isNormalUser,
+                                                preferencesHelper.isMyProfile(profile.getUsername()));
+                                    }
+                                }))
+                                .add(new FacebookInviteFriendsAdapterItem(openInviteClickedSubject))
+                                .build();
                     }
                 });
 
@@ -129,6 +131,7 @@ public class FacebookFriendsPresenter implements ProfilesListPresenter {
                 .filter(Functions1.isFalse());
 
         progressObservable = Observable.merge(
+                progressSubject.map(Functions1.returnTrue()),
                 adapterItems.map(Functions1.returnFalse()),
                 errorObservable.map(Functions1.returnFalse()),
                 permissionsNotGrantedObservable.map(Functions1.returnFalse()))
@@ -177,8 +180,14 @@ public class FacebookFriendsPresenter implements ProfilesListPresenter {
         return openProfileSubject;
     }
 
+    @Nonnull
+    public Observable<Object> getOpenInviteClickedObservable() {
+        return openInviteClickedSubject;
+    }
+
     @Override
     public void refreshData() {
+        progressSubject.onNext(null);
         dao.getFriendsDao(User.ME)
                 .getRefreshSubject()
                 .onNext(null);
@@ -188,5 +197,29 @@ public class FacebookFriendsPresenter implements ProfilesListPresenter {
     public Observer<Object> getLoadMoreObserver() {
         return RxMoreObservers.ignoreCompleted(dao.getFriendsDao(User.ME)
                 .getLoadMoreShoutsObserver());
+    }
+
+    public static class FacebookInviteFriendsAdapterItem extends BaseNoIDAdapterItem {
+
+        @Nonnull
+        private final Observer<Object> openInviteClicked;
+
+        public FacebookInviteFriendsAdapterItem(@Nonnull Observer<Object> openInviteClicked) {
+            this.openInviteClicked = openInviteClicked;
+        }
+
+        @Override
+        public boolean matches(@Nonnull BaseAdapterItem baseAdapterItem) {
+            return baseAdapterItem instanceof FacebookInviteFriendsAdapterItem;
+        }
+
+        @Override
+        public boolean same(@Nonnull BaseAdapterItem baseAdapterItem) {
+            return true;
+        }
+
+        public void onOpenInviteClicked() {
+            openInviteClicked.onNext(null);
+        }
     }
 }
