@@ -117,7 +117,8 @@ public class UserOrPageProfileActivity extends ProfileActivity {
                 });
 
         // My Profile specific subscriptions
-        presenter.getMyProfilePresenter().getEditProfileClickObservable()
+        presenter.getMyProfilePresenter()
+                .getEditProfileClickObservable()
                 .compose(bindToLifecycle())
                 .subscribe(new Action1<Object>() {
                     @Override
@@ -168,6 +169,16 @@ public class UserOrPageProfileActivity extends ProfileActivity {
                     public void call(Object o) {
                         startActivityForResult(ListenersActivity.newIntent(UserOrPageProfileActivity.this, User.ME),
                                 REQUEST_CODE_PROFILE_UPDATED_FROM_LISTENINGS);
+                    }
+                });
+
+        presenter.getMyProfilePresenter()
+                .getVerifyAccountClickObservable()
+                .compose(bindToLifecycle())
+                .subscribe(new Action1<Object>() {
+                    @Override
+                    public void call(Object o) {
+                        startActivity(VerifyEmailActivity.newIntent(UserOrPageProfileActivity.this));
                     }
                 });
 

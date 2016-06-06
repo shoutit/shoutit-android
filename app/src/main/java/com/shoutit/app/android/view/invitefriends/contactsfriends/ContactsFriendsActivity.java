@@ -55,6 +55,12 @@ public class ContactsFriendsActivity extends BaseProfilesListActivity {
         presenter.getRefreshContactsObservable()
                 .compose(bindToLifecycle())
                 .subscribe();
+
+        presenter.getActionOnlyForLoggedInUser()
+                .compose(bindToLifecycle())
+                .subscribe(ColoredSnackBar.errorSnackBarAction(
+                        ColoredSnackBar.contentView(this),
+                        R.string.error_action_only_for_logged_in_user));
     }
 
     @Override

@@ -230,9 +230,6 @@ public class VideoConversationActivity extends BaseActivity {
             @Override
             public void onError(CapturerException e) {
                 conversationErrorSubject.onNext(getString(R.string.video_calls_camera_issue));
-                if (!cameraCapturer.isPreviewing()) {
-                    cameraCapturer.startPreview(localVideoPreview);
-                }
             }
         };
     }

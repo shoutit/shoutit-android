@@ -25,7 +25,7 @@ import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.chats.ChatActivity;
-import com.shoutit.app.android.view.chats.public_chat.CreatePublicChatActivity;
+import com.shoutit.app.android.view.main.MainActivityComponent;
 
 import java.util.List;
 
@@ -78,6 +78,7 @@ public class ConversationsFragment extends BaseFragment implements Conversations
                 .fragmentModule(new FragmentModule(this))
                 .converstationsFragmentModule(new ConverstationsFragmentModule(isMyConversations))
                 .baseActivityComponent(baseActivityComponent)
+                .busComponent((BusComponent) baseActivityComponent)
                 .build();
         component.inject(this);
     }
@@ -94,18 +95,13 @@ public class ConversationsFragment extends BaseFragment implements Conversations
                 .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
                 .filter(LoadMoreHelper.needLoadMore((MyLayoutManager) mConversationRecyclerview.getLayoutManager(), adapter))
                 .subscribe(presenter.loadMoreObserver());
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
         presenter.register(this);
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onDestroyView() {
         presenter.unregister();
+        super.onDestroyView();
     }
 
     @Override

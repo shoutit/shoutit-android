@@ -1,33 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Shoutit</string>
+<string name="app_name">"Shoutit"</string>
 
-    <!-- Global strings -->
-    <string name="price_with_currency" translatable="false">%1$s %2$s</string>
-    <string name="price_free">FREE</string>
-    <string name="shout_type_offer">Offer</string>
-    <string name="shout_type_request">Request</string>
-    <string name="terms_of_service">Terms of Service</string>
-    <string name="google_api_key" translatable="false">AIzaSyBWHadI_MPYQgDLqI4RXhymEs42YEtgTEE
-    </string>
-    <string name="facebook_app_id" translatable="false">353625811317277</string>
-    <string name="exit_text">Press BACK again to exit</string>
-    <string name="font_roboto_regular" translatable="false">sans-serif</string>
-    <string name="font_roboto_medium" translatable="false">sans-serif</string>
-    <string name="listen_success">You have successfully started listening to %1$s</string>
-    <string name="unlisten_success">You have successfully stopped listening to %1$s</string>
+<!-- Global strings -->
+<string name="price_free">"FREE"</string>
+<string name="shout_type_offer">"Offer"</string>
+<string name="shout_type_request">"Request"</string>
+<string name="terms_of_service">"Terms of Service"</string>
+<string name="facebook_app_id">"353625811317277"</string>
+<string name="exit_text">"Press BACK again to exit"</string>
 
-    <!-- Errors -->
-    <string name="error_default">Ooops, something went wrong</string>
-    <string name="error_connection">Ooops, probably there is no Internet connection</string>
-    <string name="error_field_empty">Field cannot be empty</string>
-    <string name="error_wrong_email_or_password">Wrong email or password</string>
-    <string name="error_action_only_for_logged_in_user">Only for logged in users</string>
-    <string name="error_image_upload">Sorry, cannot upload image. Please try again</string>
+<!-- Errors -->
+<string name="error_default">"Ooops, something went wrong"</string>
+<string name="error_connection">"Ooops, probably there is no Internet connection"</string>
+<string name="error_field_empty">"Field cannot be empty"</string>
+<string name="error_wrong_email_or_password">"Wrong email or password"</string>
+<string name="error_action_only_for_logged_in_user">"Only for logged in users"</string>
+<string name="error_image_upload">"Sorry, cannot upload image. Please try again"</string>
 
-    <!-- Permissions -->
-    <string name="permission_location_explanation">We need your location to prepare appropriate
-        content
-    </string>
+<!-- Permissions -->
+    <string name="permission_location_explanation">"We need your location to prepare appropriate content</string>
     <string name="permission_camera_explanation">Permissions needed to get your photos</string>
     <string name="permission_camera_create_shout_explanation">Permissions needed to take photos and record videos.</string>
     <string name="permission_contacts_explanation">We need the Contacts permission to check which of your contacts use Shoutit</string>
@@ -48,581 +40,586 @@
     <string name="intro_help">Help</string>
     <string name="intro_fail_login">Failed to create guest account</string>
     <string name="intro_search">Search</string>
-    <string name="intro_search_text">Find what you need in your Community or anywhere in the
-        World.
-    </string>
-    <string name="intro_shout">Shout</string>
-    <string name="intro_shout_text">List anything for FREE. Include Photos and Videos to appeal to
-        Buyers.
-    </string>
-    <string name="intro_chat">Chat</string>
-    <string name="intro_chat_text">Connect with Buyers and Sellers. Send Photos, Videos and
-        Shouts.
-    </string>
-    <string name="intro_video">Video Chat</string>
-    <string name="intro_video_text">Video is worth a thousand pictures! see what you want to buy
-        live before buying it.
-    </string>
+    <string name="intro_search_text">Find what you need in your Community or anywhere in the World.</string>
 
-    <!-- Home -->
-    <string name="home_menu_chat">Chat</string>
-    <string name="home_menu_search">Search</string>
-    <string name="home_see_all">See All</string>
-    <string name="home_shouts_header_logged">MY FEED</string>
-    <string name="home_shouts_header_guest">SHOUTS IN %1$s</string>
-    <string name="home_discover_header">DISCOVER %1$s</string>
-    <string name="home_user_and_date" translatable="false">%1$s - %2$s</string>
+    <!-- Image capture helper -->
+    <string name="intro_shout">"Shout"</string>
+    <string name="intro_shout_text">"List anything for FREE. Include Photos and Videos to appeal to Buyers."</string>
+    <string name="intro_chat">"Chat"</string>
+    <string name="intro_chat_text">"Connect with Buyers and Sellers. Send Photos, Videos and Shouts.</string>
+    <string name="intro_video">"Video Chat"</string>
+    <string name="intro_video_text">"Video is worth a thousand pictures! see what you want to buy live before buying it.</string>
 
-    <!-- Login -->
-    <string name="login_email_hint">Email or Username</string>
-    <string name="login_password_hint">Password</string>
-    <string name="login_btn_text">Log in</string>
-    <string name="login_sign_up_text">Sign up</string>
-    <string name="login_error">Wrong data</string>
-    <string name="login_empty_mail">Mail cannot be empty.</string>
-    <string name="login_empty_password">Password cannot be empty.</string>
-    <string name="login_success_reset_password">Password reset email will be sent soon.</string>
-    <string name="login_error_empty_email">Email or username cannot be empty</string>
+<!-- Home -->
+<string name="home_menu_chat">"Chat"</string>
+<string name="home_menu_search">"Search"</string>
+<string name="home_see_all">"See All"</string>
+<string name="home_shouts_header_logged">"MY FEED"</string>
+<string name="home_shouts_header_guest">"SHOUTS IN %1$s"</string>
+<string name="home_discover_header">"DISCOVER %1$s"</string>
 
-    <!-- Register -->
-    <string name="register_sign_up_btn_text">Sign up</string>
-    <string name="register_name">Name</string>
-    <string name="register_email">Email</string>
-    <string name="register_password">Password</string>
-    <string name="register_login_text">Have an account? Log in</string>
-    <string name="register_empty_mail">Email cannot be empty.</string>
-    <string name="register_empty_password">Password must have at least 6 and no more than 20
+<!-- Login -->
+<string name="login_email_hint">"Email or Username"</string>
+<string name="login_password_hint">"Password"</string>
+<string name="login_btn_text">"Log in"</string>
+<string name="login_sign_up_text">"Sign up"</string>
+<string name="login_error">"Wrong data"</string>
+<string name="login_empty_mail">"Mail cannot be empty."</string>
+<string name="login_empty_password">"Password cannot be empty."</string>
+<string name="login_success_reset_password">"Password reset email will be sent soon."</string>
+<string name="login_error_empty_email">"Email or username cannot be empty"</string>
+
+<!-- Register -->
+<string name="register_sign_up_btn_text">"Sign up"</string>
+<string name="register_name">"Name"</string>
+<string name="register_email">"Email"</string>
+<string name="register_password">"Password"</string>
+<string name="register_login_text">"Have an account? Log in"</string>
+<string name="register_empty_mail">"Email cannot be empty."</string>
+<string name="register_empty_password">"Password must have at least 6 and no more than 20
         characters.
-    </string>
-    <string name="register_empty_name">Name cannot be empty</string>
-    <string name="register_have_an_account">Have an account?</string>
-    <string name="register_log_in">Log in</string>
-    <string name="register_bottom_text1">By Proceeding you also agree to Shoutit’s</string>
-    <string name="register_bottom_text2">Terms of Service</string>
-    <string name="register_bottom_text3">and</string>
-    <string name="register_bottom_text4">Privacy Policy</string>
-    <string name="register_forgot_password">Forgot your password?</string>
-    <string name="register_next_label">Next</string>
-    <string name="register_done_label">Done</string>
+    "</string>
+<string name="register_empty_name">"Name cannot be empty"</string>
+<string name="register_have_an_account">"Have an account?"</string>
+<string name="register_log_in">"Log in"</string>
+<string name="register_bottom_text1">"By Proceeding you also agree to Shoutit’s"</string>
+<string name="register_bottom_text2">"Terms of Service"</string>
+<string name="register_bottom_text3">"and"</string>
+<string name="register_bottom_text4">"Privacy Policy"</string>
+<string name="register_forgot_password">"Forgot your password?"</string>
+<string name="register_next_label">"Next"</string>
+<string name="register_done_label">"Done"</string>
 
-    <!-- Login Intro -->
-    <string name="login_intro_join">Join Now!</string>
-    <string name="login_intro_text">Login and discover what others are\n selling in your
-        neighborhood or start\n selling in seconds
-    </string>
-    <string name="login_intro_facebook">Log in with Facebook</string>
-    <string name="login_intro_google">Log in with Google+</string>
-    <string name="login_intro_signup">Sign up / Log in with E-mail</string>
-    <string name="login_intro_feedback">Feedback</string>
-    <string name="login_intro_help">Help</string>
-    <string name="login_intro_about">About</string>
-    <string name="login_sign_up_new">New to Shoutit?</string>
-    <string name="login_intro_fail">Failed to login</string>
-    <string name="login_next_label">Next</string>
-    <string name="login_done_label">Done</string>
+<!-- Login Intro -->
+<string name="login_intro_join">"Join Now!"</string>
+<string name="login_intro_text">"Login and discover what others are
+ selling in your
+        neighborhood or start
+ selling in seconds
+    "</string>
+<string name="login_intro_facebook">"Log in with Facebook"</string>
+<string name="login_intro_google">"Log in with Google+"</string>
+<string name="login_intro_signup">"Sign up / Log in with E-mail"</string>
+<string name="login_intro_feedback">"Feedback"</string>
+<string name="login_intro_help">"Help"</string>
+<string name="login_intro_about">"About"</string>
+<string name="login_sign_up_new">"New to Shoutit?"</string>
+<string name="login_intro_fail">"Failed to login"</string>
+<string name="login_next_label">"Next"</string>
+<string name="login_done_label">"Done"</string>
 
-    <!-- About -->
-    <string name="about_terms_of_service">Terms of Service</string>
-    <string name="about_privacy_policy">Privacy Policy</string>
-    <string name="about_legal">Legal</string>
-    <string name="about_terms_of_service_title">Terms of Service</string>
-    <string name="about_privacy_policy_title">Privacy Policy</string>
-    <string name="about_legal_title">Legal</string>
-    <string name="about_title">About</string>
+<!-- About -->
+<string name="about_terms_of_service">"Terms of Service"</string>
+<string name="about_privacy_policy">"Privacy Policy"</string>
+<string name="about_legal">"Legal"</string>
+<string name="about_terms_of_service_title">"Terms of Service"</string>
+<string name="about_privacy_policy_title">"Privacy Policy"</string>
+<string name="about_legal_title">"Legal"</string>
+<string name="about_title">"About"</string>
 
-    <!-- Html Activity -->
-    <string name="html_activity_terms">Terms of Service</string>
-    <string name="html_activity_privacy">Privacy Policy</string>
+<!-- Html Activity -->
+<string name="html_activity_terms">"Terms of Service"</string>
+<string name="html_activity_privacy">"Privacy Policy"</string>
 
-    <!-- Location -->
-    <string name="location_toolbar_title">Change your location</string>
-    <string name="location_search_hint">Type an address</string>
-    <string name="location_header">My current location (automatic updates)</string>
-    <string name="location_header_selected_location">Current location</string>
-    <string name="location_location" translatable="false">%1$s, %2$s</string>
+<!-- Location -->
+<string name="location_toolbar_title">"Change your location"</string>
+<string name="location_search_hint">"Type an address"</string>
+<string name="location_header">"My current location (automatic updates)"</string>
+<string name="location_header_selected_location">"Current location"</string>
 
-    <!-- Side Menu -->
-    <string name="menu_create_shout">Create Shout</string>
-    <string name="menu_item_home">Home</string>
-    <string name="menu_item_discover">Discover</string>
-    <string name="menu_item_browse">Browse</string>
-    <string name="menu_item_chats">Chats</string>
-    <string name="menu_item_settings">Settings</string>
-    <string name="menu_item_help">Help</string>
-    <string name="menu_item_invite_friends">Invite Friends</string>
-    <string name="menu_change_location">Change</string>
-    <string name="drawer_open">Open</string>
-    <string name="drawer_close">Close</string>
-    <string name="menu_guest">Guest</string>
-    <string name="menu_item_logout">Logout</string>
-    <string name="menu_version_name">Shoutit %1$s</string>
+<!-- Side Menu -->
+<string name="menu_create_shout">"Create Shout"</string>
+<string name="menu_item_home">"Home"</string>
+<string name="menu_item_discover">"Discover"</string>
+<string name="menu_item_browse">"Browse"</string>
+<string name="menu_item_chats">"Chats"</string>
+<string name="menu_item_settings">"Settings"</string>
+<string name="menu_item_help">"Help"</string>
+<string name="menu_item_invite_friends">"Invite Friends"</string>
+<string name="menu_change_location">"Change"</string>
+<string name="drawer_open">"Open"</string>
+<string name="drawer_close">"Close"</string>
+<string name="menu_guest">"Guest"</string>
+<string name="menu_item_logout">"Logout"</string>
+<string name="menu_version_name">"Shoutit %1$s"</string>
 
-    <!-- Post Login -->
-    <string name="post_login_next">next</string>
-    <string name="post_login_activity_title">Listen to your Interest!</string>
-    <string name="location_fetching_error">Sorry, cannot get locations</string>
-    <string name="location_update_error">Sorry, cannot update your location. Please try again.
-    </string>
-    <string name="location_update_success">Location successfully changed</string>
-    <string name="home_no_shouts">No shouts in current location</string>
-    <string name="home_no_shouts_logged_in_user">Nothing in your feed click here to add some
+<!-- Post Login -->
+<string name="post_login_next">"next"</string>
+<string name="post_login_activity_title">"Listen to your Interest!"</string>
+<string name="location_fetching_error">"Sorry, cannot get locations"</string>
+<string name="location_update_error">"Sorry, cannot update your location. Please try again.
+    "</string>
+<string name="location_update_success">"Location successfully changed"</string>
+<string name="home_no_shouts">"No shouts in current location"</string>
+<string name="home_no_shouts_logged_in_user">"Nothing in your feed click here to add some
         interests
-    </string>
+    "</string>
 
-    <!-- Discover -->
-    <string name="discover_shouts_header">Discover shouts</string>
-    <string name="discover_see_all_button">See all shouts</string>
+<!-- Discover -->
+<string name="discover_shouts_header">"Discover shouts"</string>
+<string name="discover_see_all_button">"See all shouts"</string>
 
-    <!-- Shout -->
-    <string name="shout_add_to_cart">Add to cart</string>
-    <string name="shout_date">Date</string>
-    <string name="shout_category">Category</string>
-    <string name="shout_location">Location</string>
-    <string name="shout_model">Model</string>
-    <string name="shout_color">Color</string>
-    <string name="shout_share">Share shout</string>
+<!-- Shout -->
+<string name="shout_add_to_cart">"Add to cart"</string>
+<string name="shout_date">"Date"</string>
+<string name="shout_category">"Category"</string>
+<string name="shout_location">"Location"</string>
+<string name="shout_model">"Model"</string>
+<string name="shout_color">"Color"</string>
+<string name="shout_share">"Share shout"</string>
 
-    <!-- Discover Shouts -->
-    <string name="discover_shouts_share">Share</string>
-    <string name="discover_shouts_title">%s Shouts</string>
-    <plurals name="shouts_results_pluaral">
-        <item quantity="one">%1$d result</item>
-        <item quantity="other">%1$d results</item>
-    </plurals>
+<!-- Discover Shouts -->
+<string name="discover_shouts_share">"Share"</string>
+<string name="discover_shouts_title">"%s Shouts"</string>
+<plurals name="shouts_results_pluaral">
+<item quantity="one">"%1$d result"</item>
+<item quantity="other">"%1$d results"</item>
+</plurals>
 
-    <!-- Settings -->
-    <string name="settings_title">Settings</string>
-    <string name="settings_account">Account</string>
-    <string name="settings_notifications">Notifications</string>
-    <string name="settings_about">About</string>
+<!-- Settings -->
+<string name="settings_title">"Settings"</string>
+<string name="settings_account">"Account"</string>
+<string name="settings_notifications">"Notifications"</string>
+<string name="settings_about">"About"</string>
 
-    <!-- Account -->
-    <string name="account_title">Account</string>
-    <string name="account_email">Email</string>
-    <string name="account_password">Password</string>
-    <string name="settings_new_email">New email</string>
-    <string name="settings_change_email">Change email</string>
-    <string name="settings_current_password">Current Password</string>
-    <string name="settings_new_password">New Password</string>
-    <string name="settings_new_email_verify">Verify New Password</string>
-    <string name="settings_change_password">Change Password</string>
-    <string name="settings_passwords_not_match">Passwords do not match</string>
-    <string name="account_title_change_email">Change email</string>
-    <string name="account_title_change_password">Change password</string>
-    <string name="account_error_old_password">Please provide old password</string>
+<!-- Account -->
+<string name="account_title">"Account"</string>
+<string name="account_email">"Email"</string>
+<string name="account_password">"Password"</string>
+<string name="settings_new_email">"New email"</string>
+<string name="settings_change_email">"Change email"</string>
+<string name="settings_current_password">"Current Password"</string>
+<string name="settings_new_password">"New Password"</string>
+<string name="settings_new_email_verify">"Verify New Password"</string>
+<string name="settings_change_password">"Change Password"</string>
+<string name="settings_passwords_not_match">"Passwords do not match"</string>
+<string name="account_title_change_email">"Change email"</string>
+<string name="account_title_change_password">"Change password"</string>
+<string name="account_error_old_password">"Please provide old password"</string>
 
-    <!-- Shout -->
-    <string name="shout_related_shouts_header">RELATED SHOUTS</string>
-    <string name="shout_related_more">More</string>
-    <string name="shout_header_description">DESCRIPTION</string>
-    <string name="shout_header_details">Details</string>
-    <string name="shout_user_shouts_header">OTHER SHOUTS FROM %1$s</string>
-    <string name="shout_user_location" translatable="false">%1$s, %2$s</string>
-    <string name="shout_only_available">Only %1$d available</string>
-    <string name="shout_available">%1$d available</string>
-    <string name="shout_bottom_bar_call">Call</string>
-    <string name="shout_bottom_bar_video_call">Video call</string>
-    <string name="shout_bottom_bar_chat">Chat</string>
-    <string name="shout_bottom_bar_chats">Chats</string>
-    <string name="shout_bottom_bar_report">Report</string>
-    <string name="shout_visit_profile">VISIT %1$s\'s PROFILE</string>
-    <string name="shout_bottom_bar_delete">Delete</string>
-    <string name="shout_bottom_bar_edit">Edit</string>
-    <string name="shout_choose_video_app">Choose application</string>
-    <string name="shout_deleted">Shout has been deleted</string>
+<!-- Shout -->
+<string name="shout_related_shouts_header">"RELATED SHOUTS"</string>
+<string name="shout_related_more">"More"</string>
+<string name="shout_header_description">"DESCRIPTION"</string>
+<string name="shout_header_details">"Details"</string>
+<string name="shout_user_shouts_header">"OTHER SHOUTS FROM %1$s"</string>
+<string name="shout_only_available">"Only %1$d available"</string>
+<string name="shout_available">"%1$d available"</string>
+<string name="shout_bottom_bar_call">"Call"</string>
+<string name="shout_bottom_bar_video_call">"Video call"</string>
+<string name="shout_bottom_bar_chat">"Chat"</string>
+<string name="shout_bottom_bar_chats">"Chats"</string>
+<string name="shout_bottom_bar_report">"Report"</string>
+<string name="shout_visit_profile">"VISIT %1$s's PROFILE"</string>
+<string name="shout_bottom_bar_delete">"Delete"</string>
+<string name="shout_bottom_bar_edit">"Edit"</string>
+<string name="shout_choose_video_app">"Choose application"</string>
 
-    <!-- Account -->
-    <string name="account_email_changed">Email successfully changed</string>
-    <string name="account_wrong_email">Wrong email address</string>
-    <string name="account_logout">Log out</string>
+<!-- Account -->
+<string name="account_email_changed">"Email successfully changed"</string>
+<string name="account_wrong_email">"Wrong email address"</string>
+<string name="account_logout">"Log out"</string>
 
-    <!-- Profile -->
-    <string name="profile_shuts_button">See all shouts</string>
-    <string name="profile_my_shouts_header">My shouts</string>
-    <string name="profile_listening_label">Listening</string>
-    <string name="profile_interests_label">Interests</string>
-    <string name="profile_subtitle">%1$d Listeners</string>
-    <string name="profile_empty_field">---</string>
-    <string name="profile_share_profile_title">Share profile</string>
-    <string name="profile_joined_date">Joined %1$s</string>
-    <string name="profile_listening_to_you">listening to you</string>
-    <string name="profile_my_pages">MY PAGES</string>
-    <string name="profile_my_shouts">MY SHOUTS</string>
-    <string name="profile_user_pages">%1$s pages</string>
-    <string name="profile_page_admins">%1$s admins</string>
-    <string name="profile_listeners">%1$s Listeners</string>
-    <string name="profile_listeners_label">Listeners</string>
-    <string name="profile_see_all_shouts">See all shouts</string>
-    <string name="profile_user_shouts_header">%1$s shouts</string>
-    <string name="profile_chat_label">Chat</string>
-    <string name="profile_listen_label">Listen</string>
-    <string name="profile_stop_listening_label">Stop Listening</string>
-    <string name="profile_report">Report</string>
-    <string name="profile_user_shouts">%1$s SHOUTS</string>
-    <string name="profile_report_succes">Successfully reported</string>
-    <string name="profile_not_listening">This user is not listening to you.</string>
+<!-- Profile -->
+<string name="profile_shuts_button">"See all shouts"</string>
+<string name="profile_my_shouts_header">"My shouts"</string>
+<string name="profile_listening_label">"Listening"</string>
+<string name="profile_interests_label">"Interests"</string>
+<string name="profile_subtitle">"%1$d Listeners"</string>
+<string name="profile_empty_field">"---"</string>
+<string name="profile_share_profile_title">"Share profile"</string>
+<string name="profile_joined_date">"Joined %1$s"</string>
+<string name="profile_listening_to_you">"listening to you"</string>
+<string name="profile_my_pages">"MY PAGES"</string>
+<string name="profile_my_shouts">"MY SHOUTS"</string>
+<string name="profile_user_pages">"%1$s pages"</string>
+<string name="profile_page_admins">"%1$s admins"</string>
+<string name="profile_listeners">"%1$s Listeners"</string>
+<string name="profile_listeners_label">"Listeners"</string>
+<string name="profile_see_all_shouts">"See all shouts"</string>
+<string name="profile_user_shouts_header">"%1$s shouts"</string>
+<string name="profile_chat_label">"Chat"</string>
+<string name="profile_listen_label">"Listen"</string>
+<string name="profile_stop_listening_label">"Stop Listening"</string>
+<string name="profile_report">"Report"</string>
+<string name="profile_user_shouts">"%1$s SHOUTS"</string>
+<string name="profile_report_succes">"Successfully reported"</string>
+<string name="profile_not_listening">"This user is not listening to you."</string>
 
-    <!-- Request Shout -->
-    <string name="request_activity_title">Create Request</string>
-    <string name="request_activity_what_are_you_looking_for">What are you looking for?</string>
-    <string name="request_activity_budget">What is your budget?</string>
-    <string name="request_activity_when">When do you want it</string>
-    <string name="request_activity_where">Where?</string>
-    <string name="request_activity_change_location">Change</string>
-    <string name="request_activity_btn">Let us help!</string>
-    <string name="request_activity_currency">Currency</string>
-    <string name="request_acitvity_currency_error">Failed to load currencies</string>
-    <string name="request_acitvity_post_error">Failed to post request</string>
-    <string name="create_request_activity_title_too_short">Title must be at least 6 characters
+<!-- Request Shout -->
+<string name="request_activity_title">"Create Request"</string>
+<string name="request_activity_what_are_you_looking_for">"What are you looking for?"</string>
+<string name="request_activity_budget">"What is your budget?"</string>
+<string name="request_activity_when">"When do you want it"</string>
+<string name="request_activity_where">"Where?"</string>
+<string name="request_activity_change_location">"Change"</string>
+<string name="request_activity_btn">"Let us help!"</string>
+<string name="request_activity_currency">"Currency"</string>
+<string name="request_acitvity_currency_error">"Failed to load currencies"</string>
+<string name="request_acitvity_post_error">"Failed to post request"</string>
+<string name="create_request_activity_title_too_short">"Title must be at least 6 characters
         long
-    </string>
-    <string name="create_request_activity_price_empty">Price cannot be empty</string>
-    <string name="request_activity_sharing">Sharing</string>
+    "</string>
+<string name="create_request_activity_price_empty">"Price cannot be empty"</string>
 
-    <!-- Edit Shout -->
-    <string name="edit_shout_option">Option</string>
-    <string name="edit_shout_category">Category</string>
-    <string name="edit_shout_categories_error">Failed to load categories</string>
-    <string name="edit_shout_currencies_error">Failed to load currency</string>
-    <string name="edit_shout_body_error">Failed to load shout</string>
-    <string name="edit_shout_description_hint">Description</string>
-    <string name="edit_shout_location">Location</string>
-    <string name="edit_shout_price_hint">Price</string>
-    <string name="edit_shout_title_hint">Title</string>
-    <string name="edit_shout_title">Edit %s</string>
-    <string name="edit_currency_info">If negotiable leave it empty. Set it to 0 if Free</string>
-    <string name="edit_only_one_video">Only one video is allowed</string>
-    <string name="edit_thumbnail_error">Error creating thumbnail</string>
+<!-- Edit Shout -->
+<string name="edit_shout_option">"Option"</string>
+<string name="edit_shout_category">"Category"</string>
+<string name="edit_shout_categories_error">"Failed to load categories"</string>
+<string name="edit_shout_currencies_error">"Failed to load currency"</string>
+<string name="edit_shout_body_error">"Failed to load shout"</string>
+<string name="edit_shout_description_hint">"Description"</string>
+<string name="edit_shout_location">"Location"</string>
+<string name="edit_shout_price_hint">"Price"</string>
+<string name="edit_shout_title_hint">"Title"</string>
+<string name="edit_shout_title">"Edit %s"</string>
+<string name="edit_currency_info">"If negotiable leave it empty. Set it to 0 if Free"</string>
+<string name="edit_only_one_video">"Only one video is allowed"</string>
+<string name="edit_thumbnail_error">"Error creating thumbnail"</string>
 
-    <!-- Publish -->
-    <string name="publish_menu_share">Share Shout</string>
-    <string name="publish_shout_share_title">Share link!</string>
+<!-- Publish -->
+<string name="publish_menu_share">"Share Shout"</string>
 
-    <!-- Edit Profile -->
-    <string name="edit_profile_hint_name">Name</string>
-    <string name="edit_profile_hint_username">Username</string>
-    <string name="edit_profile_hint_bio">Bio</string>
-    <string name="edit_profile_header_location">Location</string>
-    <string name="edit_profile_location_change">Change</string>
-    <string name="edit_profile_hint_website">Website</string>
-    <string name="edit_profile_menu_save">Save</string>
-    <string name="edit_profile_toolbar_title">Edit Profile</string>
-    <string name="edit_profile_country" translatable="false">%1$s, %2$s</string>
-    <string name="edit_profile_success">Profile successfully updated</string>
-    <string name="edit_profile_hint_first_name">First Name</string>
-    <string name="edit_profile_hint_last_name">Last Name</string>
-    <string name="edit_profile_hint_mobile">Mobile</string>
-    <string name="edit_done_btn">Edit</string>
+<!-- Edit Profile -->
+<string name="edit_profile_hint_name">"Name"</string>
+<string name="edit_profile_hint_username">"Username"</string>
+<string name="edit_profile_hint_bio">"Bio"</string>
+<string name="edit_profile_header_location">"Location"</string>
+<string name="edit_profile_location_change">"Change"</string>
+<string name="edit_profile_hint_website">"Website"</string>
+<string name="edit_profile_menu_save">"Save"</string>
+<string name="edit_profile_toolbar_title">"Edit Profile"</string>
+<string name="edit_profile_success">"Profile successfully updated"</string>
+<string name="edit_profile_hint_first_name">"First Name"</string>
+<string name="edit_profile_hint_last_name">"Last Name"</string>
+<string name="edit_profile_hint_mobile">"Mobile"</string>
+<string name="edit_done_btn">"Edit"</string>
 
-    <!-- Published -->
-    <string name="published_congratulations">Congratulations!</string>
-    <string name="published_extra_info">Your %1$s will appear on Shoutit soon.</string>
-    <string name="published_extra_info_with_title">Your %1$s \"%2$s\" will appear on Shoutit soon.
-    </string>
-    <string name="published_add_details">Add more details</string>
-    <string name="published_create_another_shout">Create another %1$s</string>
-    <string name="published_or_label">or</string>
-    <string name="publish_offer">offer</string>
-    <string name="publish_request">request</string>
-    <string name="publish_offer_capitalized">Offer</string>
-    <string name="publish_request_capitalized">Request</string>
+<!-- Published -->
+<string name="published_congratulations">"Congratulations!"</string>
+<string name="published_extra_info">"Your %1$s will appear on Shoutit soon."</string>
+<string name="published_extra_info_with_title">"Your %1$s \"%2$s\" will appear on Shoutit soon.
+    "</string>
+<string name="published_add_details">"Add more details"</string>
+<string name="published_create_another_shout">"Create another %1$s"</string>
+<string name="published_or_label">"or"</string>
+<string name="publish_offer">"offer"</string>
+<string name="publish_request">"request"</string>
+<string name="publish_offer_capitalized">"Offer"</string>
+<string name="publish_request_capitalized">"Request"</string>
 
-    <!-- Forgot Password -->
-    <string name="forgot_password_send">Reset password</string>
-    <string name="forgot_password_fail">Failed to reset password</string>
+<!-- Forgot Password -->
+<string name="forgot_password_send">"Reset password"</string>
+<string name="forgot_password_fail">"Failed to reset password"</string>
 
-    <!-- Post Signup Second -->
-    <string name="post_signup_next">Next</string>
-    <string name="post_signup_skip">Skip</string>
-    <string name="post_signup_suggested_users">Suggested users</string>
-    <string name="post_signup_suggested_pages">Suggested pages</string>
-    <string name="post_signup_done">Done</string>
+<!-- Post Signup Second -->
+<string name="post_signup_next">"Next"</string>
+<string name="post_signup_skip">"Skip"</string>
+<string name="post_signup_suggested_users">"Suggested users"</string>
+<string name="post_signup_suggested_pages">"Suggested pages"</string>
+<string name="post_signup_done">"Done"</string>
 
-    <!-- Search -->
-    <string name="search_base_title">Search</string>
-    <string name="search_base_hint">Search Shoutit</string>
-    <string name="search_category_header">Categories</string>
-    <string name="search_shouts_tab">SHOUTS</string>
-    <string name="search_users_tab">USERS</string>
-    <string name="search_recent_searches">Recent searches</string>
-    <string name="search_clear_all">Clear all</string>
-    <string name="search_users_placeholder">Search Users</string>
-    <string name="search_empty_query">Search query cannot be empty</string>
+<!-- Search -->
+<string name="search_base_title">"Search"</string>
+<string name="search_base_hint">"Search Shoutit"</string>
+<string name="search_category_header">"Categories"</string>
+<string name="search_shouts_tab">"SHOUTS"</string>
+<string name="search_users_tab">"USERS"</string>
+<string name="search_recent_searches">"Recent searches"</string>
+<string name="search_clear_all">"Clear all"</string>
+<string name="search_users_placeholder">"Search Users"</string>
+<string name="search_empty_query">"Search query cannot be empty"</string>
 
-    <!-- Tag Profile -->
-    <string name="tag_profile_related_interests">Related interests</string>
-    <string name="tag_profile_shouts">%1$s shouts</string>
-    <string name="search_hint">Search in %1$s shouts</string>
+<!-- Tag Profile -->
+<string name="tag_profile_related_interests">"Related interests"</string>
+<string name="tag_profile_shouts">"%1$s shouts"</string>
+<string name="search_hint">"Search in %1$s shouts"</string>
 
-    <!-- Create Shout Dialog -->
-    <string name="create_shout_dialog_header">What are you posting?</string>
-    <string name="create_shout_dialog_offer">Offer</string>
-    <string name="create_shout_dialog_request">Request</string>
+<!-- Create Shout Dialog -->
+<string name="create_shout_dialog_header">"What are you posting?"</string>
+<string name="create_shout_dialog_offer">"Offer"</string>
+<string name="create_shout_dialog_request">"Request"</string>
 
-    <!-- Search Results -->
-    <string name="search_profiles_results">Results</string>
-    <string name="search_shout_results_header_title">All Results for \'%1$s\'</string>
-    <string name="search_shout_results_header_title_location">All Results for your location</string>
-    <string name="search_shout_results_all_results">All Results</string>
-    <string name="search_shouts_results_header_count">%1$d Results</string>
-    <string name="search_results_no_results">No results found</string>
-    <string name="search_share_results">Share results</string>
+<!-- Search Results -->
+<string name="search_profiles_results">"Results"</string>
+<string name="search_shout_results_header_title">"All Results for '%1$s'"</string>
+<string name="search_shout_results_header_title_location">"All Results for your location"</string>
+<string name="search_shout_results_all_results">"All Results"</string>
+<string name="search_shouts_results_header_count">"%1$d Results"</string>
+<string name="search_results_no_results">"No results found"</string>
+<string name="search_share_results">"Share results"</string>
 
-    <!-- Camera -->
-    <string name="camera_publish_currency">Currency</string>
-    <string name="camera_publish">Publish</string>
-    <string name="camera_retake">Retake</string>
-    <string name="camera_sub_header">This is your featured %1$s. Make sure it\'s a good one!
-    </string>
-    <string name="camera_header">What are you offering?</string>
-    <string name="camera_video">video</string>
-    <string name="camera_photo">photo</string>
-    <string name="camera_send">Send</string>
+<!-- Camera -->
+<string name="camera_publish_currency">"Currency"</string>
+<string name="camera_publish">"Publish"</string>
+<string name="camera_retake">"Retake"</string>
+<string name="camera_sub_header">"This is your featured %1$s. Make sure it's a good one!
+    "</string>
+<string name="camera_header">"What are you offering?"</string>
+<string name="camera_video">"video"</string>
+<string name="camera_photo">"photo"</string>
+<string name="camera_send">"Send"</string>
 
-    <!-- Media Published -->
-    <string name="publish_header">Shout published. Congrats!</string>
-    <string name="publish_sub_header">Want to add a price?</string>
-    <string name="publish_price_hint">Negotiable</string>
-    <string name="publish_done">Done</string>
+<!-- Media Published -->
+<string name="publish_header">"Shout published. Congrats!"</string>
+<string name="publish_sub_header">"Want to add a price?"</string>
+<string name="publish_price_hint">"Negotiable"</string>
+<string name="publish_done">"Done"</string>
 
+<!-- Conversations -->
+<string name="conversation_title">"Chats"</string>
 
-    <!-- Conversations -->
-    <string name="conversation_title">Chats</string>
-    <string name="conversations_my_ab_title">My chats</string>
-    <string name="conversations_public_ab_title">Public chats</string>
-    <string name="conversation_create_public_chat">Create public chat</string>
+<!-- Chats -->
+<string name="chat_show_map">"Show Map"</string>
+<string name="chat_attatchment">"Attachment"</string>
+<string name="chat_video_call">"Video Call"</string>
+<string name="chats_attatchments_shout">"Shout"</string>
+<string name="chats_attatchments_location">"Location"</string>
+<string name="chat_edit_text_hint">"Type a message"</string>
+<string name="chats_delete_conversatin">"Do you want to delete this conversation?"</string>
+<string name="chat_typing">"%1$s is typing"</string>
+<string name="chat_shout_chat">"Shout Chat"</string>
+<string name="chat_offer">"Offer"</string>
+<string name="chat_request">"Request"</string>
+<string name="chats_empty">"No messages."</string>
 
-    <!-- Chats -->
-    <string name="chat_show_map">Show Map</string>
-    <string name="chat_attatchment">Attachment</string>
-    <string name="chat_video_call">Video Call</string>
-    <string name="chats_attatchments_media">Media</string>
-    <string name="chats_attatchments_profile">Profile</string>
-    <string name="chats_attatchments_shout">Shout</string>
-    <string name="chats_attatchments_location">Location</string>
-    <string name="chat_edit_text_hint">Type a message</string>
-    <string name="chats_delete_conversatin">Do you want to delete this conversation?</string>
-    <string name="chat_typing">%1$s is typing</string>
-    <string name="chat_shout_chat">Shout Chat</string>
-    <string name="chat_offer">Offer</string>
-    <string name="chat_request">Request</string>
-    <string name="chats_empty">No messages.</string>
-    <string name="chat_menu_delete">Delete Conversation</string>
-    <string name="chats_chat_info">Chat Info</string>
-    <string name="chat_picture_confirmation">Are you sure you want to attach picture?</string>
-    <string name="chat_video_confirmation">Are you sure you want to attach video?</string>
-    <string name="chat_location_confirmation">Are you sure you want to attach location?</string>
-    <string name="chat_shout_confirmation">Are you sure you want to attach shout?</string>
-    <string name="chat_profile_confirmation">Are you sure you want to attach %1$s?</string>
-    <string name="chat_dialog_attach">Attach</string>
-    <string name="chat_dialog_title">Confirmation</string>
+<!-- Notifications -->
+<string name="notifications_title">"Notifications"</string>
+<string name="notifications_menu_mark">"Mark all as read"</string>
+<string name="notifications_menu_settings">"Notifications Settings"</string>
+<string name="notifications_listening_to_you">"started listening to you"</string>
+<string name="create_request_description">"Title"</string>
+<string name="create_request_price">"Price"</string>
+<string name="edit_shout_add_pictures_label">"Add pictures and videos"</string>
+<string name="option_not_set">"Not set"</string>
+<string name="edit_shout_mobile_hint">"Mobile"</string>
+<string name="notifications_message_replacement">"sends you a message"</string>
 
-    <!-- Notifications -->
-    <string name="notifications_title">Notifications</string>
-    <string name="notifications_menu_mark">Mark all as read</string>
-    <string name="notifications_menu_settings">Notifications Settings</string>
-    <string name="notifications_listening_to_you">started listening to you</string>
-    <string name="create_request_description">Title</string>
-    <string name="create_request_price">Price</string>
-    <string name="edit_shout_add_pictures_label">Add pictures and videos</string>
-    <string name="option_not_set">Not set</string>
-    <string name="edit_shout_mobile_hint">Mobile</string>
-    <string name="notifications_message_replacement">sends you a message</string>
-    <string name="notifications_badge">You\'ve got new notification</string>
-
-    <!-- Video Calls -->
-    <string name="video_calls_no_premissions">Camera and Microphone permissions needed.</string>
-    <string name="video_calls_button_call">Call</string>
-    <string name="video_calls_camera_issue">Problem with camera preview</string>
-    <string name="video_calls_caller_name">Incoming Call from %s</string>
-    <string name="video_calls_accept_call">Answer</string>
-    <string name="video_calls_reject_call">Discard</string>
-    <string name="video_calls_participant_reject">Participant rejected the call</string>
-    <string name="video_calls_cannot_connect">Problem with connection. Try later</string>
-    <string name="video_calls_conversation_ended">Conversation has ended</string>
-    <string name="video_calls_connecting">Connecting…</string>
-    <string name="video_calls_connected">Connected with %s</string>
-    <string name="video_calls_participant_disconected">Participant finished the conversation
-    </string>
-    <string name="video_call_error">Sorry, cannot start conversation. Try again later.</string>
-
-    <string name="no_phone_number_error">Phone number is not currently available.</string>
-    <string name="call_dialog_positive_button">Call</string>
-    <string name="dialog_cancel_button">Cancel</string>
-    <string name="call_dialog_message">"Call %1$s ?"</string>
-    <string name="permission_call_phone_explanation">Permissions needed to start call.</string>
-    <string name="delete_shout_error">Currently, You can not delete this shoutit. Please try again
+<!-- Video Calls -->
+<string name="video_calls_no_premissions">"Camera and Microphone permissions needed."</string>
+<string name="video_calls_button_call">"Call"</string>
+<string name="video_calls_camera_issue">"Problem with camera preview"</string>
+<string name="video_calls_caller_name">"Incoming Call from %s"</string>
+<string name="video_calls_accept_call">"Answer"</string>
+<string name="video_calls_reject_call">"Discard"</string>
+<string name="video_calls_participant_reject">"Participant rejected the call"</string>
+<string name="video_calls_cannot_connect">"Problem with connection. Try later"</string>
+<string name="video_calls_conversation_ended">"Conversation has ended"</string>
+<string name="video_calls_connecting">"Connecting…"</string>
+<string name="video_calls_connected">"Connected with %s"</string>
+<string name="video_calls_participant_disconected">"Participant finished the conversation
+    "</string>
+<string name="video_call_error">"Sorry, cannot start conversation. Try again later."</string>
+<string name="no_phone_number_error">"Phone number is not currently available."</string>
+<string name="call_dialog_positive_button">"Call"</string>
+<string name="dialog_cancel_button">"Cancel"</string>
+<string name="call_dialog_message">"Call %1$s ?"</string>
+<string name="permission_call_phone_explanation">"Permissions needed to start call."</string>
+<string name="delete_shout_error">"Currently, You can not delete this shoutit. Please try again
         later.
-    </string>
-    <string name="delete_shout_success">Shout was deleted.</string>
-    <string name="send_report_positive_button">Send</string>
-    <string name="report_dialog_hint">Enter report</string>
-    <string name="report_dialog_empty_error">Body cannot be empty</string>
-    <string name="delete_shout_dialog_title">Delete shout</string>
-    <string name="delete_shout_dialog_message">Are You sure?</string>
-    <string name="delete_shout_dialog_button">Delete</string>
-    <string name="report_send_success">Report was send</string>
+    "</string>
+<string name="delete_shout_success">"Shout was deleted."</string>
+<string name="send_report_positive_button">"Send"</string>
+<string name="report_dialog_hint">"Enter report"</string>
+<string name="report_dialog_empty_error">"Body cannot be empty"</string>
+<string name="delete_shout_dialog_title">"Delete shout"</string>
+<string name="delete_shout_dialog_message">"Are You sure?"</string>
+<string name="delete_shout_dialog_button">"Delete"</string>
+<string name="report_send_success">"Report was send"</string>
 
-    <!-- Filters -->
-    <string name="filters_filters">Filters</string>
-    <string name="filters_reset">Reset</string>
-    <string name="filters_done">Done</string>
-    <string name="filters_type_all">Offers and Requests</string>
-    <string name="filters_type_offers">Offers</string>
-    <string name="filters_type_requests">Requests</string>
-    <string name="filters_shout_type">Shout type</string>
-    <string name="filters_ctegory_header">Category</string>
-    <string name="filters_price_from">From</string>
-    <string name="filters_price_to">To</string>
-    <string name="filters_location_header">Location</string>
-    <string name="filters_search_within">Search within:</string>
-    <string name="filters_search_init_distance">"0 KM</string>
-    <string name="filters_default_category_name">All Categories</string>
-    <string name="filters_distance_1KM">1KM</string>
-    <string name="filters_distance_2KM">2KM</string>
-    <string name="filters_distance_3KM">3KM</string>
-    <string name="filters_distance_5KM">5KM</string>
-    <string name="filters_distance_7KM">7KM</string>
-    <string name="filters_distance_10KM">10KM</string>
-    <string name="filters_distance_15KM">15KM</string>
-    <string name="filters_distance_20KM">20KM</string>
-    <string name="filters_distance_30KM">30KM</string>
-    <string name="filters_distance_60KM">60KM</string>
-    <string name="filters_distance_100KM">100KM</string>
-    <string name="filters_distance_200KM">200KM</string>
-    <string name="filters_distance_300KM">300KM</string>
-    <string name="filters_distance_400KM">400KM</string>
-    <string name="filters_distance_500KM">500KM</string>
-    <string name="filters_distance_entire_country">Entire Country</string>
-    <string name="filters_sort_type_header">Sort By:</string>
-    <string name="filters_price_header">Price</string>
-    <string name="filters_not_set">Not set</string>
+<!-- Filters -->
+<string name="filters_filters">"Filters"</string>
+<string name="filters_reset">"Reset"</string>
+<string name="filters_done">"Done"</string>
+<string name="filters_type_all">"Offers and Requests"</string>
+<string name="filters_type_offers">"Offers"</string>
+<string name="filters_type_requests">"Requests"</string>
+<string name="filters_shout_type">"Shout type"</string>
+<string name="filters_ctegory_header">"Category"</string>
+<string name="filters_price_from">"From"</string>
+<string name="filters_price_to">"To"</string>
+<string name="filters_location_header">"Location"</string>
+<string name="filters_search_within">"Search within:"</string>
+<string name="filters_search_init_distance">"0 KM"</string>
+<string name="filters_default_category_name">"All Categories"</string>
+<string name="filters_distance_1KM">"1KM"</string>
+<string name="filters_distance_2KM">"2KM"</string>
+<string name="filters_distance_3KM">"3KM"</string>
+<string name="filters_distance_5KM">"5KM"</string>
+<string name="filters_distance_7KM">"7KM"</string>
+<string name="filters_distance_10KM">"10KM"</string>
+<string name="filters_distance_15KM">"15KM"</string>
+<string name="filters_distance_20KM">"20KM"</string>
+<string name="filters_distance_30KM">"30KM"</string>
+<string name="filters_distance_60KM">"60KM"</string>
+<string name="filters_distance_100KM">"100KM"</string>
+<string name="filters_distance_200KM">"200KM"</string>
+<string name="filters_distance_300KM">"300KM"</string>
+<string name="filters_distance_400KM">"400KM"</string>
+<string name="filters_distance_500KM">"500KM"</string>
+<string name="filters_distance_entire_country">"Entire Country"</string>
+<string name="filters_sort_type_header">"Sort By:"</string>
+<string name="filters_price_header">"Price"</string>
+<string name="filters_not_set">"Not set"</string>
+<string name="select_shout_title">"Select Shout"</string>
 
-    <string name="select_shout_title">Select Shout</string>
+<!-- Verify email -->
+<string name="verify_email_text1">"We have sent you a verification link on this email. Please
+        check your inbox and click on it to verify your account.
 
-    <!-- Verify email -->
-    <string name="verify_email_text1">We have sent you a verification link on this email. Please
-        check your inbox and click on it to verify your account.\n\nYou can also change the email
+You can also change the email
         and click “Resend” for us to send you the verification link again.
-    </string>
-    <string name="verify_email_hint">Email</string>
-    <string name="verify_bottom_text">If you have already clicked on the link that was sent to you,
+    "</string>
+<string name="verify_email_hint">"Email"</string>
+<string name="verify_bottom_text">"If you have already clicked on the link that was sent to you,
         you may click “Verify” now.
-    </string>
-    <string name="verify_email_verify">Verify</string>
-    <string name="verify_email_resend">Resend</string>
-    <string name="verify_verified">Your account has been successfully verified</string>
-    <string name="verify_not_verified">Your account isn\'t verified yet</string>
-    <string name="profile_verify_account">Verify your account</string>
-    <string name="verify_email_title">Email Verification</string>
-    <string name="video_calls_cannot_start_conversation">Sorry, cannot start this video call. Please
+    "</string>
+<string name="verify_email_verify">"Verify"</string>
+<string name="verify_email_resend">"Resend"</string>
+<string name="verify_verified">"Your account has been successfully verified"</string>
+<string name="verify_not_verified">"Your account isn't verified yet"</string>
+<string name="profile_verify_account">"Verify your account"</string>
+<string name="verify_email_title">"Email Verification"</string>
+<string name="video_calls_cannot_start_conversation">"Sorry, cannot start this video call. Please
         try again later.
-    </string>
+    "</string>
 
-    <!-- Conversations -->
-    <string name="conversations_empty">No conversations</string>
-    <string name="conversations_create_public_chat">Create public chat</string>
+<!-- Conversations -->
+<string name="conversations_empty">"No conversations"</string>
 
-    <!-- Create Public Chat -->
-    <string name="create_public_chat_title">Create Public Chat</string>
-    <string name="create_public_chat_header">Public chats are country based conversations that
+<!-- Global strings -->
+<string name="price_with_currency">"%1$s %2$s"</string>
+<string name="google_api_key">"AIzaSyBWHadI_MPYQgDLqI4RXhymEs42YEtgTEE
+    "</string>
+<string name="font_roboto_regular">"sans-serif"</string>
+<string name="font_roboto_medium">"sans-serif"</string>
+<string name="listen_success">"You have successfully started listening to %1$s"</string>
+<string name="unlisten_success">"You have successfully stopped listening to %1$s"</string>
+<string name="home_user_and_date">"%1$s - %2$s"</string>
+<string name="location_location">"%1$s, %2$s"</string>
+<string name="shout_user_location">"%1$s, %2$s"</string>
+<string name="edit_profile_country">"%1$s, %2$s"</string>
+<string name="shout_deleted">"Shout has been deleted"</string>
+<string name="request_activity_sharing">"Sharing"</string>
+<string name="publish_shout_share_title">"Share your Shout"</string>
+<string name="conversations_my_ab_title">"My chats"</string>
+<string name="conversations_public_ab_title">"Public chats"</string>
+<string name="conversation_create_public_chat">"Create public chat"</string>
+<string name="chats_attatchments_media">"Media"</string>
+<string name="chats_attatchments_profile">"Profile"</string>
+<string name="chat_menu_delete">"Delete Conversation"</string>
+<string name="chats_chat_info">"Chat Info"</string>
+<string name="chat_picture_confirmation">"Are you sure you want to attach picture?"</string>
+<string name="chat_video_confirmation">"Are you sure you want to attach video?"</string>
+<string name="chat_location_confirmation">"Are you sure you want to attach location?"</string>
+<string name="chat_shout_confirmation">"Are you sure you want to attach shout?"</string>
+<string name="chat_profile_confirmation">"Are you sure you want to attach %1$s?"</string>
+<string name="chat_dialog_attach">"Attach"</string>
+<string name="chat_dialog_title">"Confirmation"</string>
+<string name="notifications_badge">"You've got new notification"</string>
+<string name="conversations_create_public_chat">"Create public chat"</string>
+
+<!-- Create Public Chat -->
+<string name="create_public_chat_title">"Create Public Chat"</string>
+<string name="create_public_chat_header">"Public chats are country based conversations that
         everyone can join and post what he is selling or buying
-    </string>
-    <string name="create_public_chat_subject">Subject</string>
-    <string name="create_public_chat_location">Location</string>
-    <string name="create_public_chat_change_location">Change</string>
-    <string name="create_public_chat_error">Error</string>
-    <string name="create_chat_create">Create</string>
-    <string name="create_public_chat_image_error">Error</string>
+    "</string>
+<string name="create_public_chat_subject">"Subject"</string>
+<string name="create_public_chat_location">"Location"</string>
+<string name="create_public_chat_change_location">"Change"</string>
+<string name="create_public_chat_error">"Error"</string>
+<string name="create_chat_create">"Create"</string>
+<string name="create_public_chat_image_error">"Error"</string>
 
-    <!-- Listenings -->
-    <string name="listenings_empty">You have no items here yet.</string>
-    <string name="listenings_ab_title">Listenings</string>
-    <string name="listers_ab_title">Listeners</string>
-    <string name="listening_tab_user">Users</string>
-    <string name="listening_tab_pages">Pages</string>
-    <string name="listenings_interests_ab_title">Interests</string>
+<!-- Listenings -->
+<string name="listenings_empty">"You have no items here yet."</string>
+<string name="listenings_ab_title">"Listenings"</string>
+<string name="listers_ab_title">"Listeners"</string>
+<string name="listening_tab_user">"Users"</string>
+<string name="listening_tab_pages">"Pages"</string>
+<string name="listenings_interests_ab_title">"Interests"</string>
 
-    <!-- Listeners -->
-    <string name="listeners_ab_title">Listeners</string>
+<!-- Listeners -->
+<string name="listeners_ab_title">"Listeners"</string>
 
-    <!-- Select profile -->
-    <string name="select_profile_ab_title">Select profile</string>
-    <string name="select_profile_tab_listenings">Listenings</string>
-    <string name="select_profile_tab_listeners">Listeners</string>
+<!-- Select profile -->
+<string name="select_profile_ab_title">"Select profile"</string>
+<string name="select_profile_tab_listenings">"Listenings"</string>
+<string name="select_profile_tab_listeners">"Listeners"</string>
 
-    <!-- Chat Info -->
-    <string name="chat_info_subject">Subject</string>
-    <string name="chat_info_attachment">Attachments</string>
-    <string name="chat_info_members">Members</string>
-    <string name="chat_info_title">Chat Info</string>
-    <string name="chat_info_add_person">Add Person</string>
-    <string name="chat_info_created_by">Chat created by %1$s</string>
-    <string name="chat_info_created_at">Created %1$s</string>
-    <string name="chat_participant_title">Participants</string>
-    <string name="chat_blocked_users_title">Blocked Users</string>
-    <string name="chat_select_users_title">Add to Chat</string>
-    <string name="chat_info_exit_question">Do you want to exit this chat?</string>
+<!-- Chat Info -->
+<string name="chat_info_subject">"Subject"</string>
+<string name="chat_info_attachment">"Attachments"</string>
+<string name="chat_info_members">"Members"</string>
+<string name="chat_info_title">"Chat Info"</string>
+<string name="chat_info_add_person">"Add Person"</string>
+<string name="chat_info_created_by">"Chat created by %1$s"</string>
+<string name="chat_info_created_at">"Created %1$s"</string>
+<string name="chat_participant_title">"Participants"</string>
+<string name="chat_blocked_users_title">"Blocked Users"</string>
+<string name="chat_select_users_title">"Add to Chat"</string>
+<string name="chat_info_exit_question">"Do you want to exit this chat?"</string>
 
-    <!-- Chat shouts -->
-    <string name="chat_shouts_no_results">No shouts in this conversation</string>
-    <string name="chat_shouts_ab_title">Shouts</string>
-    <string name="chat_shouts_title">Conversations Shouts</string>
-    <plurals name="chat_shouts_results">
-        <item quantity="one">%d Shout</item>
-        <item quantity="other">%d Shouts</item>
-    </plurals>
+<!-- Chat shouts -->
+<string name="chat_shouts_no_results">"No shouts in this conversation"</string>
+<string name="chat_shouts_ab_title">"Shouts"</string>
+<string name="chat_shouts_title">"Conversations Shouts"</string>
+<plurals name="chat_shouts_results">
+<item quantity="one">"%d Shout"</item>
+<item quantity="other">"%d Shouts"</item>
+</plurals>
 
-    <!-- Chat Info -->
-    <string name="chat_info_report">Report this Chat</string>
-    <string name="chat_info_report_success">Report has been sent</string>
-    <string name="chat_info_load_error">Error</string>
-    <string name="chat_info_select_image_error">Error</string>
-    <string name="chat_info_edit_error">Error</string>
-    <string name="chat_info_chat_error">Error</string>
-    <string name="chat_info_report_error">Error</string>
+<!-- Chat Info -->
+<string name="chat_info_report">"Report this Chat"</string>
+<string name="chat_info_report_success">"Report has been sent"</string>
+<string name="chat_info_load_error">"Error"</string>
+<string name="chat_info_select_image_error">"Error"</string>
+<string name="chat_info_edit_error">"Error"</string>
+<string name="chat_info_chat_error">"Error"</string>
+<string name="chat_info_report_error">"Error"</string>
 
-    <!-- Chat Participants -->
-    <string name="chat_paricipants_blocked">Blocked</string>
-    <string name="chat_participants_admin">Admin</string>
-    <string name="chat_participant_unblock">Unblock</string>
-    <string name="chat_participant_block">Block</string>
+<!-- Chat Participants -->
+<string name="chat_paricipants_blocked">"Blocked"</string>
+<string name="chat_participants_admin">"Admin"</string>
+<string name="chat_participant_unblock">"Unblock"</string>
+<string name="chat_participant_block">"Block"</string>
 
-    <!-- Chat Select Users -->
-    <string name="chat_select_user_dialog_title">Do you want to add user %1$s?</string>
+<!-- Chat Select Users -->
+<string name="chat_select_user_dialog_title">"Do you want to add user %1$s?"</string>
 
-    <!-- Chat Blocked Users -->
-    <string name="blocked_users_unblock_dialog_title">Do you want to unblock user %1$s?</string>
-    <string name="request_activity_facebook">Facebook</string>
-    <string name="request_activity_twitter">Twitter</string>
-    <string name="request_activity_facebook_permission_error">Permissions not granted. We need it to share shouts on Facebook.</string>
+<!-- Chat Blocked Users -->
+<string name="blocked_users_unblock_dialog_title">"Do you want to unblock user %1$s?"</string>
+<string name="request_activity_facebook">"Facebook"</string>
+<string name="request_activity_twitter">"Twitter"</string>
+<string name="request_activity_facebook_permission_error">"Permissions not granted. We need it to share shouts on Facebook."</string>
 
-    <!-- User suggestions -->
-    <string name="user_suggestion_pages">Suggested Pages</string>
-    <string name="user_suggestion_users">Suggested Users</string>
+<!-- User suggestions -->
+<string name="user_suggestion_pages">"Suggested Pages"</string>
+<string name="user_suggestion_users">"Suggested Users"</string>
 
-    <!-- Facebook friends -->
-    <string name="facebook_friends_ab_title">Facebook friends</string>
-    <string name="facebook_friends_no_friends">None of your friends has Shoutit yet.\n Go ahead and invite them!</string>
-    <string name="facebook_friends_permission_error">Permissions not granted. We need it to get your friends list.</string>
+<!-- Facebook friends -->
+<string name="facebook_friends_ab_title">"Facebook friends"</string>
+<string name="facebook_friends_no_friends">"None of your friends has Shoutit yet.
+ Go ahead and invite them!"</string>
+<string name="facebook_friends_permission_error">"Permissions not granted. We need it to get your friends list."</string>
 
-    <!-- Invite Friends -->
-    <string name="invite_friends_suggestions">Suggestions</string>
-    <string name="invite_friends_users">Users</string>
-    <string name="invite_friends_pages">Pages</string>
-    <string name="invite_friends_find_friends">Find Friends</string>
-    <string name="invite_friends_facebook">Facebook</string>
-    <string name="invite_friends_contacts">Contacts</string>
-    <string name="invite_friends_invite_friends">Invite Friends</string>
-    <string name="invite_friends_facebook_header">Facebook</string>
-    <string name="invite_friends_twitter">Twitter</string>
-    <string name="invite_friends_share">Share Shoutit App</string>
-    <string name="invite_text">Join Shoutit on www.shoutit.com</string>
-    <string name="invite_chooser_text">Select app</string>
-    <string name="invite_no_twitter_app">You need the Twitter app to be installed</string>
-    <string name="invite_error">Sorry, cannot send invitation</string>
+<!-- Invite Friends -->
+<string name="invite_friends_suggestions">"Suggestions"</string>
+<string name="invite_friends_users">"Users"</string>
+<string name="invite_friends_pages">"Pages"</string>
+<string name="invite_friends_find_friends">"Find Friends"</string>
+<string name="invite_friends_facebook">"Facebook"</string>
+<string name="invite_friends_contacts">"Contacts"</string>
+<string name="invite_friends_invite_friends">"Invite Friends"</string>
+<string name="invite_friends_facebook_header">"Facebook"</string>
+<string name="invite_friends_twitter">"Twitter"</string>
+<string name="invite_friends_share">"Share Shoutit App"</string>
+<string name="invite_text">"Join Shoutit on www.shoutit.com"</string>
+<string name="invite_chooser_text">"Select app"</string>
+<string name="invite_no_twitter_app">"You need the Twitter app to be installed"</string>
 
-    <!-- Contacts fiends -->
-    <string name="contacts_friends_ab_title">Contacts friends</string>
-
+<!-- Contacts fiends -->
+<string name="contacts_friends_ab_title">"Contacts friends"</string>
+<string name="invite_app_invite_text">"Buy &amp; Sell while Chatting on #Shoutit App! Get it on shoutit.com/app"</string>
+<string name="invite_error">"Sorry, cannot send invitation"</string>
 </resources>

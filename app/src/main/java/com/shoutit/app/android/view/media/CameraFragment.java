@@ -745,7 +745,8 @@ public class CameraFragment extends Fragment {
 
             @Override
             protected void onPostExecute(String[] keyValue) {
-                if (keyValue != null) {
+                final Activity activity = getActivity();
+                if (activity != null && keyValue != null) {
                     final Intent returnIntent = new Intent();
                     returnIntent.putExtra(EXTRA_EXISTING_MEDIA, false);
 
@@ -753,9 +754,9 @@ public class CameraFragment extends Fragment {
                     returnIntent.putExtra(IS_IMAGE_LIST, false);
                     returnIntent.putExtra(EXTRA_IS_VIDEO, isVideoMode);
 
-                    ((CameraFragmentListener) getActivity()).onMediaResult(returnIntent);
+                    ((CameraFragmentListener) activity).onMediaResult(returnIntent);
                 } else {
-                    Toast.makeText(getActivity(), "resizing failed",
+                    Toast.makeText(activity, "resizing failed",
                             Toast.LENGTH_LONG).show();
 
                     resetView();
@@ -844,9 +845,17 @@ public class CameraFragment extends Fragment {
     @OnClick(R.id.fragment_camera_confirm_yes_btn)
     void onConfirmMedia() {
         if (isVideoMode) {
-            final File file = new File(videoOutput);
-            final Media image = new Media(System.currentTimeMillis(), file.getName(), file.getAbsolutePath(), VideoUtils.getDuration(file.getAbsolutePath()));
-            startActivityForResult(VideoCompressActivity.newIntent(image, getActivity()), CameraFragment.RC_MEDIA_COMPRESS);
+            if (videoOutput != null) {
+                final File file = new File(videoOutput);
+                final Media image = new Media(System.currentTimeMillis(), file.getName(), file.getAbsolutePath(), VideoUtils.getDuration(file.getAbsolutePath()));
+                startActivityForResult(VideoCompressActivity.newIntent(image, getActivity()), CameraFragment.RC_MEDIA_COMPRESS);
+            } else {
+                ColoredSnackBar.error(
+                        ColoredSnackBar.contentView(getActivity()),
+                        R.string.error_default,
+                        Snackbar.LENGTH_SHORT)
+                        .show();
+            }
         } else {
             if (useEditor) {
                 final Intent imageEditorIntent = new AdobeImageIntent.Builder(getActivity())

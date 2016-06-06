@@ -145,6 +145,7 @@ public class PublishMediaShoutFragment extends Fragment {
     @android.support.annotation.Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mCompositeSubscription = new CompositeSubscription();
         View view = inflater.inflate(R.layout.publish_media_shout_fragment, container, false);
         ButterKnife.bind(this, view);
         return view;
@@ -261,26 +262,15 @@ public class PublishMediaShoutFragment extends Fragment {
         mCompositeSubscription.add(observable
                 .subscribeOn(Schedulers.io())
                 .observeOn(MyAndroidSchedulers.mainThread())
-                .doOnTerminate(new Action0() {
-                    @Override
-                    public void call() {
-                        showProgress(false);
-                    }
-                })
+                .doOnTerminate(() -> showProgress(false))
                 .subscribe(
-                        new Action1<CreateShoutResponse>() {
-                            @Override
-                            public void call(CreateShoutResponse createShoutResponse) {
-                                createdShoutOfferId = createShoutResponse.getId();
-                                mWebUrl = createShoutResponse.getWebUrl();
-                                mCameraPublishedDone.setEnabled(true);
-                            }
-                        }, new Action1<Throwable>() {
-                            @Override
-                            public void call(Throwable throwable) {
-                                Log.e(TAG, "error", throwable);
-                                showApiError(throwable);
-                            }
+                        createShoutResponse -> {
+                            createdShoutOfferId = createShoutResponse.getId();
+                            mWebUrl = createShoutResponse.getWebUrl();
+                            mCameraPublishedDone.setEnabled(true);
+                        }, throwable -> {
+                            Log.e(TAG, "error", throwable);
+                            showApiError(throwable);
                         }));
     }
 

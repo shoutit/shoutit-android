@@ -7,6 +7,7 @@ import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.collect.ImmutableList;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.BaseProfileAdapterItem;
 import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
 import com.shoutit.app.android.api.ApiService;
@@ -48,6 +49,7 @@ public class ListenersPresenter implements ProfilesListPresenter {
     private final PublishSubject<BaseProfile> profileListenedSubject = PublishSubject.create();
     private final PublishSubject<String> listenSuccess = PublishSubject.create();
     private final PublishSubject<String> unListenSuccess = PublishSubject.create();
+    private final PublishSubject<Object> actionOnlyForLoggedInUser = PublishSubject.create();
 
     public ListenersPresenter(@Nonnull ListenersDaos dao,
                               @Nonnull final ApiService apiService,
@@ -73,7 +75,7 @@ public class ListenersPresenter implements ProfilesListPresenter {
 
                         for (BaseProfile profile : listeningResponse.getProfiles()) {
                             builder.add(new ListenersAdapterItem(
-                                    profile, openProfileSubject, profileListenedSubject));
+                                    profile, openProfileSubject, profileListenedSubject, actionOnlyForLoggedInUser, true, false));
                         }
 
                         final ImmutableList<BaseAdapterItem> items = builder.build();
@@ -223,8 +225,11 @@ public class ListenersPresenter implements ProfilesListPresenter {
 
         public ListenersAdapterItem(@Nonnull BaseProfile profile,
                                     @Nonnull Observer<String> openProfileObserver,
-                                    @Nonnull Observer<BaseProfile> profileListenedObserver) {
-            super(profile, profileListenedObserver);
+                                    @Nonnull Observer<BaseProfile> profileListenedObserver,
+                                    @Nonnull Observer<Object> actionOnlyForLoggedInUsers,
+                                    boolean isNormalUser,
+                                    boolean isProfileMine) {
+            super(profile, profileListenedObserver, actionOnlyForLoggedInUsers, isNormalUser, isProfileMine);
             this.profile = profile;
             this.openProfileObserver = openProfileObserver;
             this.profileListenedObserver = profileListenedObserver;
