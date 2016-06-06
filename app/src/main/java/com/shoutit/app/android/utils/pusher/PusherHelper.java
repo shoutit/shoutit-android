@@ -5,7 +5,6 @@ import android.util.Log;
 
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -32,13 +31,11 @@ import javax.annotation.Nonnull;
 import rx.Observable;
 import rx.Scheduler;
 import rx.Subscriber;
-import rx.functions.Func1;
 
 public class PusherHelper {
 
     private static final String EVENT_NEW_MESSAGE = "new_message";
     private static final String EVENT_NEW_NOTIFICATION = "new_notification";
-    private static final String EVENT_CONVERSATION_UPDATE = "conversation_update";
     private static final String EVENT_STATS_UPDATE = "stats_update";
     private static final String EVENT_CLIENT_IS_TYPING = "client-is_typing";
     private static final String EVENT_PROFILE_UPDATE = "profile_update";
@@ -84,11 +81,6 @@ public class PusherHelper {
         } else {
             throw BuildTypeUtils.unknownTypeException();
         }
-    }
-
-    public Pusher getPusher() {
-        Preconditions.checkState(mPusher != null);
-        return mPusher;
     }
 
     public static String getProfileChannelName(@NonNull String userId) {
@@ -237,6 +229,10 @@ public class PusherHelper {
         mPusher.unsubscribe(getConversationChannelName(conversationId));
     }
 
+    public void unsubscribeProfileChannel(@NonNull String userId) {
+        mPusher.unsubscribe(PusherHelper.getProfileChannelName(userId));
+    }
+
     @Nonnull
     public PresenceChannel subscribeConversationChannel(@NonNull String conversationId) {
         final PresenceChannel presenceChannel = mPusher.getPresenceChannel(PusherHelper.getConversationChannelName(conversationId));
@@ -252,7 +248,7 @@ public class PusherHelper {
         return mPusher.getConnection().getState() != ConnectionState.CONNECTING && mPusher.getConnection().getState() != ConnectionState.CONNECTED;
     }
 
-    public ConnectionEventListener getEventListener() {
+    private ConnectionEventListener getEventListener() {
         return new ConnectionEventListener() {
             @Override
             public void onConnectionStateChange(ConnectionStateChange connectionStateChange) {
@@ -266,12 +262,29 @@ public class PusherHelper {
         };
     }
 
+    public void subscribeProfileChannel(@NonNull String id) {
+        mPusher.subscribePresence(PusherHelper.getProfileChannelName(id));
+    }
+
+    public void connect() {
+        mPusher.connect(getEventListener());
+    }
+
     public void sendTyping(@NonNull String conversationId, @NonNull String userId, @NonNull String userName) {
         final PresenceChannel presenceChannel = mPusher.getPresenceChannel(getConversationChannelName(conversationId));
         if (presenceChannel != null && presenceChannel.isSubscribed() && mPusher.getConnection().getState() != ConnectionState.CONNECTING) {
             final String typing = mGson.toJson(new TypingPusherModel(userId, userName));
             presenceChannel.trigger("client-is_typing", typing);
         }
+    }
+
+    public boolean isInit() {
+        return mPusher != null;
+    }
+
+    public void disconnect(){
+        mPusher.disconnect();
+        mPusher = null;
     }
 
     private static class TypingPusherModel {
