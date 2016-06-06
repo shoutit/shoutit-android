@@ -888,8 +888,7 @@ public class CameraFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResultSupport(int requestCode, @NonNull int[] grantResults) {
         if (requestCode == RecordMediaActivity.REQUEST_CODE_PERMISSION_RECORD_AUDIO) {
             final boolean permissionsGranted = PermissionHelper.arePermissionsGranted(grantResults);
             if (permissionsGranted) {
@@ -898,8 +897,6 @@ public class CameraFragment extends Fragment {
             } else {
                 ColoredSnackBar.error(ColoredSnackBar.contentView(getActivity()), R.string.permission_not_granted, Snackbar.LENGTH_SHORT);
             }
-        } else {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 }

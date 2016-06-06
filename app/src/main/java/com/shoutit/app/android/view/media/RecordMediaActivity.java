@@ -208,7 +208,7 @@ public class RecordMediaActivity extends AbstractCameraActivity
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_CODE_PERMISSION_RECORD_AUDIO && cameraFragment != null) {
-            cameraFragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
+            cameraFragment.onRequestPermissionsResultSupport(requestCode, grantResults);
         } else {
             final boolean permissionsGranted = PermissionHelper.arePermissionsGranted(grantResults);
             if (permissionsGranted && requestCode == REQUEST_CODE_PERMISSIONS) {
