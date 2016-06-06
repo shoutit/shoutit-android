@@ -151,22 +151,15 @@ public class Twilio {
                 })
                 .compose(ObservableExtensions.<ResponseOrError<CallerProfile>>behaviorRefCount());
 
-        final Observable<String> callerNameObservable = callerProfileResponse
+        callerProfileResponse
                 .compose(ResponseOrError.<CallerProfile>onlySuccess())
                 .filter(Functions1.isNotNull())
-                .map(new Func1<CallerProfile, String>() {
+                .observeOn(uiScheduler)
+                .subscribe(new Action1<CallerProfile>() {
                     @Override
-                    public String call(CallerProfile callerProfile) {
-                        return callerProfile.getName();
-                    }
-                })
-                .observeOn(uiScheduler);
-
-        callerNameObservable
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String callerName) {
-                        Intent intent = DialogCallActivity.newIntent(callerName, mContext);
+                    public void call(CallerProfile callerProfile) {
+                        Intent intent = DialogCallActivity.newIntent(
+                                callerProfile.getName(), callerProfile.getImage(), mContext);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         mContext.startActivity(intent);
                     }

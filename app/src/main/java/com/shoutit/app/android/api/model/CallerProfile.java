@@ -14,7 +14,7 @@ public class CallerProfile {
     private final String firstName;
     private final String lastName;
     private final boolean isActivated;
-    private final String imageUrl;
+    private final String image;
     private final String cover;
     private final String isListening;
     private final String listenersCount;
@@ -22,7 +22,7 @@ public class CallerProfile {
 
     public CallerProfile(String id, String type, String apiUrl, String webUrl,
                          String username, String name, String firstName,
-                         String lastName, boolean isActivated, String imageUrl,
+                         String lastName, boolean isActivated, String image,
                          String cover, String isListening, String listenersCount, String isOwner) {
         this.id = id;
         this.type = type;
@@ -33,7 +33,7 @@ public class CallerProfile {
         this.firstName = firstName;
         this.lastName = lastName;
         this.isActivated = isActivated;
-        this.imageUrl = imageUrl;
+        this.image = image;
         this.cover = cover;
         this.isListening = isListening;
         this.listenersCount = listenersCount;
@@ -76,8 +76,8 @@ public class CallerProfile {
         return isActivated;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public String getImage() {
+        return image;
     }
 
     public String getCover() {
@@ -110,7 +110,7 @@ public class CallerProfile {
                 Objects.equal(name, that.name) &&
                 Objects.equal(firstName, that.firstName) &&
                 Objects.equal(lastName, that.lastName) &&
-                Objects.equal(imageUrl, that.imageUrl) &&
+                Objects.equal(image, that.image) &&
                 Objects.equal(cover, that.cover) &&
                 Objects.equal(isListening, that.isListening) &&
                 Objects.equal(listenersCount, that.listenersCount) &&
@@ -120,6 +120,6 @@ public class CallerProfile {
     @Override
     public int hashCode() {
         return Objects.hashCode(id, type, apiUrl, webUrl, username, name,
-                firstName, lastName, isActivated, imageUrl, cover, isListening, listenersCount, isOwner);
+                firstName, lastName, isActivated, image, cover, isListening, listenersCount, isOwner);
     }
 }

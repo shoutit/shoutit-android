@@ -82,4 +82,7 @@
     <dimen name="chat_sent_shout_image_width">150dp</dimen>
     <dimen name="chat_sent_shout_image_height">96dp</dimen>
 
+    <!-- Call Dialog -->
+    <dimen name="call_dialog_avatar_corners">2dp</dimen>
+
 </resources>

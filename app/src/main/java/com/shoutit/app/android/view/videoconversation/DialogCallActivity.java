@@ -7,7 +7,8 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Vibrator;
-import android.widget.Button;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.jakewharton.rxbinding.view.RxView;
@@ -18,6 +19,8 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.twilio.Twilio;
+import com.shoutit.app.android.utils.PicassoHelper;
+import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -32,21 +35,30 @@ import static com.appunite.rx.internal.Preconditions.checkNotNull;
 public class DialogCallActivity extends BaseActivity {
 
     private static final String CALLER_NAME = "caller_name";
+    private static final String CALLER_IMAGE_URL = "caller_image_url";
 
     @Bind(R.id.dialog_call_accept)
-    Button acceptButton;
+    View acceptButton;
     @Bind(R.id.dialog_call_reject)
-    Button rejectButton;
+    View rejectButton;
     @Bind(R.id.dialog_call_info)
     TextView callInfo;
+    @Bind(R.id.dialog_call_avatar_iv)
+    ImageView calledPersonAvatarIv;
 
     @Inject
     UserPreferences preferences;
     @Inject
     Twilio mTwilio;
+    @Inject
+    Picasso picasso;
 
-    public static Intent newIntent(@Nonnull final String callerName, @Nonnull final Context context) {
-        return new Intent(context, DialogCallActivity.class).putExtra(CALLER_NAME, callerName);
+    public static Intent newIntent(@Nonnull final String callerName,
+                                   @Nullable String imageUrl,
+                                   @Nonnull final Context context) {
+        return new Intent(context, DialogCallActivity.class)
+                .putExtra(CALLER_NAME, callerName)
+                .putExtra(CALLER_IMAGE_URL, imageUrl);
     }
 
     @Override
@@ -58,7 +70,13 @@ public class DialogCallActivity extends BaseActivity {
         playRingtone(this);
 
         final String callerName = checkNotNull(getIntent().getStringExtra(CALLER_NAME));
-        callInfo.setText(String.format(getString(R.string.video_calls_caller_name), callerName));
+        final String callerImageUrl = getIntent().getStringExtra(CALLER_IMAGE_URL);
+
+        callInfo.setText(getString(R.string.video_calls_caller_name, callerName));
+
+        picasso.load(callerImageUrl)
+                .into(PicassoHelper.getRoundedBitmapTarget(this, calledPersonAvatarIv,
+                        getResources().getDimensionPixelSize(R.dimen.call_dialog_avatar_corners)));
 
         RxView.clicks(acceptButton)
                 .subscribe(new Action1<Void>() {
