@@ -15,7 +15,6 @@ import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
 import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler;
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
 import com.karumi.dexter.Dexter;
-import com.pusher.client.Pusher;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.constants.UserVoiceConstants;
@@ -41,8 +40,6 @@ import javax.inject.Inject;
 
 import io.fabric.sdk.android.Fabric;
 import rx.Scheduler;
-import rx.functions.Action1;
-import rx.functions.Func1;
 import rx.plugins.RxJavaErrorHandler;
 import rx.plugins.RxJavaPlugins;
 
@@ -50,6 +47,7 @@ import rx.plugins.RxJavaPlugins;
 public class App extends MultiDexApplication implements IAviaryClientCredentials {
 
     private static final String GCM_TOKEN = "935842257865";
+    private static final String TAG = App.class.getCanonicalName();
 
     private AppComponent component;
 
@@ -106,46 +104,20 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
 
         initGcm();
 
-        initPusher();
+        setUpPusher();
 
         initTwilio();
 
         facebookHelper.initFacebook();
 
-        mStackCounterManager.register(this)
-                .subscribe(new Action1<Boolean>() {
-                    @Override
-                    public void call(Boolean foreground) {
-                        if (userPreferences.isNormalUser()) {
-                            final Pusher pusher = mPusherHelper.getPusher();
-                            if (pusher != null) {
-                                if (foreground && mPusherHelper.shouldConnect()) {
-                                    pusher.connect(mPusherHelper.getEventListener());
-                                } else if (!foreground) {
-                                    pusher.disconnect();
-                                }
-                            }
-                        }
-                    }
-                });
-
         AdobeCSDKFoundation.initializeCSDKFoundation(this);
-
     }
 
     private void initTwilio() {
         userPreferences.getTokenObservable()
-                .filter(new Func1<String, Boolean>() {
-                    @Override
-                    public Boolean call(String userToken) {
-                        return userToken != null && !userPreferences.isGuest();
-                    }
-                })
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String ignore) {
-                        mTwilio.initTwilio();
-                    }
+                .filter(userToken -> userToken != null && !userPreferences.isGuest())
+                .subscribe(ignore -> {
+                    mTwilio.initTwilio();
                 });
     }
 
@@ -155,11 +127,8 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
         }
 
         profilesDao.updateUser()
-                .subscribe(new Action1<User>() {
-                    @Override
-                    public void call(User user) {
-                        userPreferences.updateUserJson(user);
-                    }
+                .subscribe(user -> {
+                    userPreferences.updateUserJson(user);
                 });
     }
 
@@ -170,20 +139,23 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
                 .subscribe(notificationHelper.sendNotificationAction(this));
     }
 
-    private void initPusher() {
+    private void setUpPusher() {
         userPreferences.getTokenObservable()
-                .filter(new Func1<String, Boolean>() {
-                    @Override
-                    public Boolean call(String token) {
-                        return token != null && !userPreferences.isGuest();
+                .filter(token -> token != null && !userPreferences.isGuest())
+                .subscribe(token -> {
+                    final User user = userPreferences.getUser();
+                    if (user != null) {
+                        initPusher(token, user);
                     }
-                })
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String token) {
-                        final User user = userPreferences.getUser();
-                        if (user != null) {
-                            initPusher(token, user);
+                });
+
+        mStackCounterManager.register(this)
+                .subscribe(foreground -> {
+                    if (userPreferences.isNormalUser() && mPusherHelper.isInit()) {
+                        if (foreground && mPusherHelper.shouldConnect()) {
+                            mPusherHelper.connect();
+                        } else if (!foreground) {
+                            mPusherHelper.disconnect();
                         }
                     }
                 });
@@ -191,49 +163,23 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
 
     private void initPusher(@Nonnull String token, @Nonnull User user) {
         mPusherHelper.init(token);
-        final Pusher pusher = mPusherHelper.getPusher();
-
         if (mPusherHelper.shouldConnect()) {
-            pusher.connect();
-            pusher.subscribePresence(PusherHelper.getProfileChannelName(user.getId()));
+            mPusherHelper.connect();
+            mPusherHelper.subscribeProfileChannel(user.getId());
             mNetworkObservableProvider.networkObservable()
-                    .filter(new Func1<NetworkObservableProvider.NetworkStatus, Boolean>() {
-                        @Override
-                        public Boolean call(NetworkObservableProvider.NetworkStatus networkStatus) {
-                            return networkStatus.isNetwork();
-                        }
-                    })
-                    .subscribe(new Action1<NetworkObservableProvider.NetworkStatus>() {
-                        @Override
-                        public void call(NetworkObservableProvider.NetworkStatus networkStatus) {
-                            pusher.connect(mPusherHelper.getEventListener());
-                        }
+                    .filter(NetworkObservableProvider.NetworkStatus::isNetwork)
+                    .subscribe(networkStatus -> {
+                        mPusherHelper.connect();
                     });
         }
     }
 
     private void initFfmpeg() {
-        FFmpeg ffmpeg = FFmpeg.getInstance(this);
         try {
-            ffmpeg.loadBinary(new LoadBinaryResponseHandler() {
-
-                @Override
-                public void onStart() {
-                }
-
-                @Override
-                public void onFailure() {
-                }
-
-                @Override
-                public void onSuccess() {
-                }
-
-                @Override
-                public void onFinish() {
-                }
-            });
+            final FFmpeg ffmpeg = FFmpeg.getInstance(this);
+            ffmpeg.loadBinary(new LoadBinaryResponseHandler());
         } catch (FFmpegNotSupportedException ignored) {
+            LogHelper.logThrowableAndCrashlytics(TAG, "ffpmpeg init", ignored);
         }
     }
 
