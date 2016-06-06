@@ -82,15 +82,23 @@ public class ProfilesListAdapter extends BaseAdapter {
         }
 
         private void setListeningIcon(boolean isListening) {
-            listenImageView.setVisibility(View.VISIBLE);
-            listenImageView.setImageDrawable(context.getResources().getDrawable(
-                    isListening ? R.drawable.ic_listening_on : R.drawable.ic_listening_off));
+            if (item.isProfileMine()) {
+                listenImageView.setVisibility(View.GONE);
+            } else {
+                listenImageView.setVisibility(View.VISIBLE);
+                listenImageView.setImageDrawable(context.getResources().getDrawable(
+                        isListening ? R.drawable.ic_listening_on : R.drawable.ic_listening_off));
+            }
         }
 
         @OnClick(R.id.profile_section_listening_iv)
         public void onListenClicked() {
-            setListeningIcon(!item.getProfile().isListening());
-            item.onProfileListened();
+            if (item.isNormalUser()) {
+                setListeningIcon(!item.getProfile().isListening());
+                item.onProfileListened();
+            } else {
+                item.onActionOnlyForLoggedInUsers();
+            }
         }
 
         @OnClick(R.id.profile_section_container)

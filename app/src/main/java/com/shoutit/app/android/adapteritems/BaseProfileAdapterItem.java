@@ -12,11 +12,21 @@ public abstract class BaseProfileAdapterItem extends BaseNoIDAdapterItem {
     private final BaseProfile profile;
     @Nonnull
     private final Observer<BaseProfile> profileListenedObserver;
+    @Nonnull
+    private final Observer<Object> actionOnlyForLoggedInUsers;
+    private final boolean isNormalUser;
+    private final boolean isProfileMine;
 
     public BaseProfileAdapterItem(@Nonnull BaseProfile profile,
-                                        @Nonnull Observer<BaseProfile> profileListenedObserver) {
+                                  @Nonnull Observer<BaseProfile> profileListenedObserver,
+                                  @Nonnull Observer<Object> actionOnlyForLoggedInUsers,
+                                  boolean isNormalUser,
+                                  boolean isProfileMine) {
         this.profile = profile;
         this.profileListenedObserver = profileListenedObserver;
+        this.actionOnlyForLoggedInUsers = actionOnlyForLoggedInUsers;
+        this.isNormalUser = isNormalUser;
+        this.isProfileMine = isProfileMine;
     }
 
     public abstract void openProfile();
@@ -30,4 +40,15 @@ public abstract class BaseProfileAdapterItem extends BaseNoIDAdapterItem {
         return profile;
     }
 
+    public boolean isNormalUser() {
+        return isNormalUser;
+    }
+
+    public void onActionOnlyForLoggedInUsers() {
+        actionOnlyForLoggedInUsers.onNext(null);
+    }
+
+    public boolean isProfileMine() {
+        return isProfileMine;
+    }
 }

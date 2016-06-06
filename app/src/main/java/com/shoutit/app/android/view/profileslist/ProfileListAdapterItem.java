@@ -20,8 +20,11 @@ public class ProfileListAdapterItem extends BaseProfileAdapterItem {
 
     public ProfileListAdapterItem(@Nonnull BaseProfile profile,
                                   @Nonnull Observer<String> openProfileObserver,
-                                  @Nonnull Observer<BaseProfile> profileListenedObserver) {
-        super(profile, profileListenedObserver);
+                                  @Nonnull Observer<BaseProfile> profileListenedObserver,
+                                  @Nonnull Observer<Object> actionOnlyForLoggedInUsers,
+                                  boolean isNormalUser,
+                                  boolean isProfileMine) {
+        super(profile, profileListenedObserver, actionOnlyForLoggedInUsers, isNormalUser, isProfileMine);
         this.profile = profile;
         this.openProfileObserver = openProfileObserver;
         this.profileListenedObserver = profileListenedObserver;
