@@ -44,6 +44,7 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.ImageHelper;
+import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.view.createshout.DialogsHelper;
@@ -469,5 +470,10 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     @Override
     public void showMediaProgress() {
         mEditProgress.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void showUploadError(Throwable throwable) {
+        ColoredSnackBar.error(ColoredSnackBar.contentView(this), throwable, Snackbar.LENGTH_LONG).show();
     }
 }
