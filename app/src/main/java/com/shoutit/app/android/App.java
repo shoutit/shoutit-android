@@ -97,8 +97,7 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
 
         Dexter.initialize(this);
 
-        mixPanel.initMixPanel();
-        mixPanel.trackAppOpen();
+        setUpMixPanel();
 
         initFfmpeg();
 
@@ -111,6 +110,14 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
         facebookHelper.initFacebook();
 
         AdobeCSDKFoundation.initializeCSDKFoundation(this);
+    }
+
+    private void setUpMixPanel() {
+        mixPanel.initMixPanel();
+        mStackCounterManager.register(this)
+                .subscribe(foreground -> {
+                    mixPanel.trackAppOpenOrClose(foreground);
+                });
     }
 
     private void initTwilio() {
