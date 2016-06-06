@@ -50,6 +50,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Scheduler;
 import rx.Subscription;
@@ -112,7 +113,12 @@ public class ChatsDelegate {
                         return Observable.just(pusherMessage);
                     } else {
                         return mApiService.readMessage(id)
-                                .map(responseBody -> pusherMessage);
+                                .map(new Func1<ResponseBody, PusherMessage>() {
+                                    @Override
+                                    public PusherMessage call(ResponseBody responseBody) {
+                                        return pusherMessage;
+                                    }
+                                });
                     }
                 })
                 .observeOn(mUiScheduler);

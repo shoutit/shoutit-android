@@ -93,20 +93,16 @@ public class FacebookFriendsPresenter implements ProfilesListPresenter {
                 .map(new Func1<ProfilesListResponse, List<BaseAdapterItem>>() {
                     @Override
                     public List<BaseAdapterItem> call(ProfilesListResponse response) {
-                        if (response.getResults().isEmpty()) {
-                            return ImmutableList.<BaseAdapterItem>of(new NoDataTextAdapterItem(activity.getString(R.string.facebook_friends_no_friends)));
-                        } else {
-                            return ImmutableList.<BaseAdapterItem>builder().addAll(
-                                    Lists.transform(response.getResults(), new Function<BaseProfile, BaseAdapterItem>() {
-                                        @Nullable
-                                        @Override
-                                        public BaseAdapterItem apply(BaseProfile profile) {
-                                            return new ProfileListAdapterItem(profile, openProfileSubject, listeningHalfPresenter.getListenProfileSubject());
-                                        }
-                                    }))
-                                    .add(new FacebookInviteFriendsAdapterItem(openInviteClickedSubject))
-                                    .build();
-                        }
+                        return ImmutableList.<BaseAdapterItem>builder().addAll(
+                                Lists.transform(response.getResults(), new Function<BaseProfile, BaseAdapterItem>() {
+                                    @Nullable
+                                    @Override
+                                    public BaseAdapterItem apply(BaseProfile profile) {
+                                        return new ProfileListAdapterItem(profile, openProfileSubject, listeningHalfPresenter.getListenProfileSubject());
+                                    }
+                                }))
+                                .add(new FacebookInviteFriendsAdapterItem(openInviteClickedSubject))
+                                .build();
                     }
                 });
 
