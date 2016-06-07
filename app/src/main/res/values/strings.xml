@@ -7,7 +7,7 @@
     <string name="shout_type_offer">Offer</string>
     <string name="shout_type_request">Request</string>
     <string name="terms_of_service">Terms of Service</string>
-    <string name="facebook_app_id">353625811317277</string>
+    <string name="facebook_app_id" translatable="false">353625811317277</string>
     <string name="exit_text">Press BACK again to exit</string>
 
     <!-- Errors -->
@@ -454,7 +454,7 @@
     <string name="verify_not_verified">Your account isn\'t verified yet</string>
     <string name="profile_verify_account">Verify your account</string>
     <string name="verify_email_title">Email Verification</string>
-    <string name="video_calls_cannot_start_conversation">Sorry, cannot start this video call. Pleasetry again later.</string>
+    <string name="video_calls_cannot_start_conversation">Sorry, cannot start this video call. Please try again later.</string>
 
     <!-- Conversations -->
     <string name="conversations_empty">No conversations</string>
