@@ -23,6 +23,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.appunite.rx.functions.BothParams;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
@@ -145,34 +146,31 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
             }
         });
         mChatsToolbar.inflateMenu(R.menu.chats_menu);
-        mChatsToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                final int itemId = item.getItemId();
-                switch (itemId) {
-                    case R.id.chats_attatchments_menu: {
-                        final int visibility = mChatsAttatchmentsLayout.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE;
-                        mChatsAttatchmentsLayout.setVisibility(visibility);
-                        return true;
-                    }
-                    case R.id.chats_video_menu: {
-                        presenter.calledPersonUsernameObservable()
-                                .compose(ChatFirstConversationActivity.this.<String>bindToLifecycle())
-                                .subscribe(new Action1<String>() {
-                                    @Override
-                                    public void call(String calledUserUsername) {
-                                        startActivity(VideoConversationActivity.newIntent(null, calledUserUsername, ChatFirstConversationActivity.this));
-                                    }
-                                });
-                        return true;
-                    }
-                    case R.id.chats_chat_information: {
-                        startActivityForResult(ChatInfoActivity.newIntent(ChatFirstConversationActivity.this, Preconditions.checkNotNull(presenter.getId())), INFO_REQUEST);
-                        return true;
-                    }
-                    default:
-                        return false;
+        mChatsToolbar.setOnMenuItemClickListener(item -> {
+            final int itemId = item.getItemId();
+            switch (itemId) {
+                case R.id.chats_attatchments_menu: {
+                    final int visibility = mChatsAttatchmentsLayout.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE;
+                    mChatsAttatchmentsLayout.setVisibility(visibility);
+                    return true;
                 }
+                case R.id.chats_video_menu: {
+                    presenter.calledPersonUsernameObservable()
+                            .compose(ChatFirstConversationActivity.this.bindToLifecycle())
+                            .subscribe(calledUserNameAndUsername -> {
+                                startActivity(VideoConversationActivity.newIntent(
+                                        calledUserNameAndUsername.param1(),
+                                        calledUserNameAndUsername.param2(),
+                                        ChatFirstConversationActivity.this));
+                            });
+                    return true;
+                }
+                case R.id.chats_chat_information: {
+                    startActivityForResult(ChatInfoActivity.newIntent(ChatFirstConversationActivity.this, Preconditions.checkNotNull(presenter.getId())), INFO_REQUEST);
+                    return true;
+                }
+                default:
+                    return false;
             }
         });
 

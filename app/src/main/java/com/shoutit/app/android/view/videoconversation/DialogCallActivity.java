@@ -93,8 +93,8 @@ public class DialogCallActivity extends BaseActivity {
                     public void call(Void aVoid) {
                         if (mTwilio.getInvite() != null) {
                             mTwilio.getInvite().reject();
-                            finish();
                         }
+                        finish();
                     }
                 });
     }

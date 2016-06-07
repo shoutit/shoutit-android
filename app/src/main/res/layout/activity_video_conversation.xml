@@ -6,41 +6,91 @@
     android:layout_height="match_parent"
     tools:context="com.shoutit.app.android.view.videoconversation.VideoConversationActivity">
 
-    <include layout="@layout/video_conversation_content_layout"/>
+    <include layout="@layout/video_conversation_content_layout" />
+
+    <Button
+        android:id="@+id/video_conversation_button_call"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/shape_call_button"
+        android:drawableLeft="@drawable/accept"
+        android:drawablePadding="8dp"
+        android:drawableStart="@drawable/accept"
+        android:paddingLeft="30dp"
+        android:paddingRight="30dp"
+        android:text="@string/video_calls_button_call"
+        android:textColor="@android:color/white"
+        android:textSize="21sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="30dp"
-        android:layout_marginEnd="30dp"
-        android:layout_marginRight="30dp"
-        android:layout_centerHorizontal="true"
-        android:gravity="center_horizontal"
         android:orientation="vertical">
 
-        <Button
-            android:id="@+id/video_conversation_button_call"
-            android:layout_width="140dp"
-            android:layout_height="50dp"
-            android:paddingLeft="30dp"
-            android:paddingRight="30dp"
-            android:background="@drawable/shape_call_button"
-            android:drawableLeft="@drawable/ic_call"
-            android:drawableStart="@drawable/ic_call"
-            android:layout_marginBottom="15dp"
-            android:textAllCaps="false"
-            android:textColor="@android:color/white"
-            android:textSize="21sp"
-            android:text="@string/video_calls_button_call"/>
+        <FrameLayout
+            android:id="@+id/video_conversation_content_local_window"
+            android:layout_width="125dp"
+            android:layout_height="175dp"
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:background="@drawable/shape_video_preview"/>
 
-        <ImageButton
-            android:id="@+id/video_conversation_button_dismiss_call"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:src="@drawable/ic_call"
-            android:background="@drawable/shape_dismiss_call_button"/>
+        <include layout="@layout/video_conversation_action_buttons"/>
 
     </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="92dp"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:background="@color/black_38"
+        android:paddingTop="16dp"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:paddingBottom="4dp">
+
+        <TextView
+            android:id="@+id/conversation_participant_name_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="Mike D dsfdsfs DAFASDF ADSF ASDF ASDF ASDF ASDF ADSF"
+            android:textColor="@android:color/white"
+            android:ellipsize="end"
+            android:gravity="center_horizontal"
+            android:maxLines="1"
+            android:fontFamily="sans-serif-light"
+            android:textSize="30sp"/>
+
+        <TextView
+            android:id="@+id/video_conversation_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:fontFamily="sans-serif-light"
+            android:textSize="16sp"
+            tools:text="Conversation infromations sdfsdfdsf dsfsdfdsf sdfdsfdsf sdfdsfdsf" />
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/video_conversation_watermark_iv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/watermark"
+        android:layout_marginTop="12dp"
+        android:layout_marginRight="12dp"
+        android:layout_marginEnd="12dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"/>
 
 </RelativeLayout>

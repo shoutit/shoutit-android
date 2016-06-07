@@ -164,9 +164,12 @@ public class ChatActivity extends BaseActivity implements Listener {
                 }
                 case R.id.chats_video_menu: {
                     presenter.getCalledPersonNameObservable()
-                            .compose(ChatActivity.this.<String>bindToLifecycle())
-                            .subscribe(calledUserUserName -> {
-                                startActivity(VideoConversationActivity.newIntent(null, calledUserUserName, ChatActivity.this));
+                            .compose(ChatActivity.this.bindToLifecycle())
+                            .subscribe(calledUserNameAndUsername -> {
+                                startActivity(VideoConversationActivity.newIntent(
+                                        calledUserNameAndUsername.param1(),
+                                        calledUserNameAndUsername.param2(),
+                                        ChatActivity.this));
                             });
                     return true;
                 }

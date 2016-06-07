@@ -415,6 +415,9 @@
 <string name="video_calls_participant_disconected">"Participant finished the conversation
     "</string>
 <string name="video_call_error">"Sorry, cannot start conversation. Try again later."</string>
+    <string name="video_call_calling">calling…</string>
+
+
 <string name="no_phone_number_error">"Phone number is not currently available."</string>
 <string name="call_dialog_positive_button">"Call"</string>
 <string name="dialog_cancel_button">"Cancel"</string>
@@ -631,4 +634,5 @@ You can also change the email
 <string name="contacts_friends_ab_title">"Contacts friends"</string>
 <string name="invite_app_invite_text">"Buy &amp; Sell while Chatting on #Shoutit App! Get it on shoutit.com/app"</string>
 <string name="invite_error">"Sorry, cannot send invitation"</string>
+
 </resources>

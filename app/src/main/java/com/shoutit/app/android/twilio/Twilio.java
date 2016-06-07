@@ -106,76 +106,40 @@ public class Twilio {
                 .observeOn(uiScheduler);
 
         initTwilioSubject
-                .filter(new Func1<Object, Boolean>() {
-                    @Override
-                    public Boolean call(Object o) {
-                        return !userPreferences.isGuest();
+                .filter(o -> !userPreferences.isGuest())
+                .switchMap(ignore -> Observable.just(userPreferences.getTwilioToken()))
+                .switchMap(twilioToken -> {
+                    if (TextUtils.isEmpty(twilioToken)) {
+                        return successTwilioTokenRequestObservable;
+                    } else {
+                        return Observable.just(twilioToken);
                     }
                 })
-                .switchMap(new Func1<Object, Observable<String>>() {
-                    @Override
-                    public Observable<String> call(Object ignore) {
-                        return Observable.just(userPreferences.getTwilioToken());
-                    }
-                })
-                .switchMap(new Func1<String, Observable<String>>() {
-                    @Override
-                    public Observable<String> call(String twilioToken) {
-                        if (TextUtils.isEmpty(twilioToken)) {
-                            return successTwilioTokenRequestObservable;
-                        } else {
-                            return Observable.just(twilioToken);
-                        }
-                    }
-                })
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String token) {
-                        initializeTwilio(token);
-                    }
-                });
+                .subscribe(this::initializeTwilio);
 
         final Observable<ResponseOrError<CallerProfile>> callerProfileResponse = profileRefreshSubject
                 .withLatestFrom(callerIdentitySubject,
-                        new Func2<Object, String, String>() {
-                            @Override
-                            public String call(Object o, String identity) {
-                                return identity;
-                            }
-                        })
-                .switchMap(new Func1<String, Observable<ResponseOrError<CallerProfile>>>() {
-                    @Override
-                    public Observable<ResponseOrError<CallerProfile>> call(String callerName) {
-                        return usersIdentityDao.getUserByIdentityObservable(callerName);
-                    }
-                })
+                        (o, identity) -> identity)
+                .switchMap(usersIdentityDao::getUserByIdentityObservable)
                 .compose(ObservableExtensions.<ResponseOrError<CallerProfile>>behaviorRefCount());
 
         callerProfileResponse
                 .compose(ResponseOrError.<CallerProfile>onlySuccess())
                 .filter(Functions1.isNotNull())
                 .observeOn(uiScheduler)
-                .subscribe(new Action1<CallerProfile>() {
-                    @Override
-                    public void call(CallerProfile callerProfile) {
-                        Intent intent = DialogCallActivity.newIntent(
-                                callerProfile.getName(), callerProfile.getImage(), mContext);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        mContext.startActivity(intent);
-                    }
+                .subscribe(callerProfile -> {
+                    Intent intent = DialogCallActivity.newIntent(
+                            callerProfile.getName(), callerProfile.getImage(), mContext);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    mContext.startActivity(intent);
                 });
 
         rejectCallSubject
                 .filter(Functions1.isNotNull())
-                .switchMap(new Func1<String, Observable<Throwable>>() {
-                    @Override
-                    public Observable<Throwable> call(String calledIdentity) {
-                        return apiService.videoCall(new VideoCallRequest(calledIdentity, true))
-                                .subscribeOn(networkScheduler)
-                                .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable())
-                                .compose(ResponseOrError.<ResponseBody>onlyError());
-                    }
-                })
+                .switchMap(calledIdentity -> apiService.videoCall(new VideoCallRequest(calledIdentity, true))
+                        .subscribeOn(networkScheduler)
+                        .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable())
+                        .compose(ResponseOrError.<ResponseBody>onlyError()))
                 .subscribe(new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
@@ -184,23 +148,13 @@ public class Twilio {
                 });
 
         final Observable<ResponseOrError<UserIdentity>> calledPersonIdentityResponse = initCalledPersonIdentityRequestSubject
-                .switchMap(new Func1<String, Observable<ResponseOrError<UserIdentity>>>() {
-                    @Override
-                    public Observable<ResponseOrError<UserIdentity>> call(String username) {
-                        return usersIdentityDao.getUserIdentityObservable(username)
-                                .observeOn(uiScheduler);
-                    }
-                })
+                .switchMap(username -> usersIdentityDao.getUserIdentityObservable(username)
+                        .observeOn(uiScheduler))
                 .compose(ObservableExtensions.<ResponseOrError<UserIdentity>>behaviorRefCount());
 
         successCalledPersonIdentity = calledPersonIdentityResponse
                 .compose(ResponseOrError.<UserIdentity>onlySuccess())
-                .map(new Func1<UserIdentity, String>() {
-                    @Override
-                    public String call(UserIdentity userIdentity) {
-                        return userIdentity.getIdentity();
-                    }
-                });
+                .map(UserIdentity::getIdentity);
 
         errorCalledPersonIdentity = calledPersonIdentityResponse
                 .compose(ResponseOrError.<UserIdentity>onlyError());

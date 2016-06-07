@@ -98,6 +98,10 @@
     <color name="video_calls_call_button">#4CAF50</color>
     <color name="video_calls_dismiss_call_button">#FF0000</color>
     <color name="video_calls_semi_transparent_background">#80000000</color>
+    <color name="video_call_button_stroke">#b2ffffff</color>
+    <color name="video_call_preview_stroke">#979797</color>
+    <color name="video_call_button">#61000000</color>
+
     <color name="white97">#e3ffffff</color>
     <color name="listening_tab_text">#b2ffffff</color>
 
