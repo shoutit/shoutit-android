@@ -30,6 +30,7 @@ public class MixPanel {
      * EVENTS
      **/
     private static final String EVENT_APP_OPEN = "app_open";
+    private static final String EVENT_APP_CLOSE = "app_close";
 
     /**
      * PROPERTIES
@@ -82,7 +83,9 @@ public class MixPanel {
         return mixpanel.getDistinctId();
     }
 
-    public void trackAppOpen() {
+    public void trackAppOpenOrClose(boolean appOpen) {
+        LogHelper.logIfDebug(TAG, "app open event: " + appOpen);
+
         final boolean isLoggedIn = userPreferences.isUserLoggedIn();
         final boolean isGuest = userPreferences.isGuest();
 
@@ -96,7 +99,7 @@ public class MixPanel {
         } catch (JSONException e) {
             logError(e);
         }
-        mixpanel.track(EVENT_APP_OPEN, properties);
+        mixpanel.track(appOpen ? EVENT_APP_OPEN : EVENT_APP_CLOSE, properties);
     }
 
     private void logError(Throwable throwable) {
