@@ -1,5 +1,6 @@
 package com.shoutit.app.android.view.media;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
@@ -19,6 +20,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -42,6 +44,7 @@ import com.commonsware.cwac.cam2.VideoTransaction;
 import com.google.common.base.Optional;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.PermissionHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -816,6 +819,10 @@ public class CameraFragment extends Fragment {
     }
 
     private void enableVideoMode() {
+        if (!hasRecordAudioPermission()) {
+            return;
+        }
+
         isVideoMode = true;
         actionBtn.setImageResource(R.drawable.video_capture);
         textViewTime.setVisibility(View.VISIBLE);
@@ -827,6 +834,12 @@ public class CameraFragment extends Fragment {
         } else {
             cameraText.setText(getString(R.string.camera_sub_header, getString(R.string.camera_video)));
         }
+    }
+
+    private boolean hasRecordAudioPermission() {
+        return PermissionHelper.checkPermissions(getActivity(), RecordMediaActivity.REQUEST_CODE_PERMISSION_RECORD_AUDIO,
+                ColoredSnackBar.contentView(getActivity()), R.string.permission_record_audio_explanation,
+                new String[]{Manifest.permission.RECORD_AUDIO});
     }
 
     @OnClick(R.id.fragment_camera_confirm_yes_btn)
@@ -872,6 +885,18 @@ public class CameraFragment extends Fragment {
                     MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
                     .setType("image/*");
             startActivityForResult(selectImageIntent, REQUEST_GALLERY_IMAGE_CODE);
+        }
+    }
+
+    public void onRequestPermissionsResultSupport(int requestCode, @NonNull int[] grantResults) {
+        if (requestCode == RecordMediaActivity.REQUEST_CODE_PERMISSION_RECORD_AUDIO) {
+            final boolean permissionsGranted = PermissionHelper.arePermissionsGranted(grantResults);
+            if (permissionsGranted) {
+                ColoredSnackBar.success(ColoredSnackBar.contentView(getActivity()), R.string.permission_granted, Snackbar.LENGTH_SHORT).show();
+                enableVideoMode();
+            } else {
+                ColoredSnackBar.error(ColoredSnackBar.contentView(getActivity()), R.string.permission_not_granted, Snackbar.LENGTH_SHORT);
+            }
         }
     }
 }

@@ -19,41 +19,36 @@
 <string name="error_image_upload">"Sorry, cannot upload image. Please try again"</string>
 
 <!-- Permissions -->
-<string name="permission_location_explanation">"We need your location to prepare appropriate
-        content
-    "</string>
-<string name="permission_camera_explanation">"Permissions needed to get your photos"</string>
-<string name="permission_granted">"Permissions have been granted"</string>
-<string name="permission_not_granted">"Permissions not granted"</string>
+    <string name="permission_location_explanation">"We need your location to prepare appropriate content</string>
+    <string name="permission_camera_explanation">Permissions needed to get your photos</string>
+    <string name="permission_camera_create_shout_explanation">Permissions needed to take photos and record videos.</string>
+    <string name="permission_contacts_explanation">We need the Contacts permission to check which of your contacts use Shoutit</string>
+    <string name="permission_record_audio_explanation">We need Record Audio permission to record videos.</string>
+    <string name="permission_granted">Permissions have been granted</string>
+    <string name="permission_not_granted">Permissions not granted</string>
 
-<!-- Image capture helper -->
-<string name="image_video_capture_helper_select_image_source">"Select image source"</string>
-<string name="image_video_capture_helper_sd_unmounted">"No external storage"</string>
-<string name="image_video_capture_helper_sd_unmounted_title">"Error"</string>
+    <!-- Image capture helper -->
+    <string name="image_video_capture_helper_select_image_source">Select image source</string>
+    <string name="image_video_capture_helper_sd_unmounted">No external storage</string>
+    <string name="image_video_capture_helper_sd_unmounted_title">Error</string>
 
-<!-- Intro -->
-<string name="intro_welcome">"Welcome To Shoutit"</string>
-<string name="intro_buy">"Buy and Sell while Chatting"</string>
-<string name="intro_login">"Login"</string>
-<string name="intro_skip">"Skip"</string>
-<string name="intro_help">"Help"</string>
-<string name="intro_fail_login">"Failed to create guest account"</string>
-<string name="intro_search">"Search"</string>
-<string name="intro_search_text">"Find what you need in your Community or anywhere in the
-        World.
-    "</string>
-<string name="intro_shout">"Shout"</string>
-<string name="intro_shout_text">"List anything for FREE. Include Photos and Videos to appeal to
-        Buyers.
-    "</string>
-<string name="intro_chat">"Chat"</string>
-<string name="intro_chat_text">"Connect with Buyers and Sellers. Send Photos, Videos and
-        Shouts.
-    "</string>
-<string name="intro_video">"Video Chat"</string>
-<string name="intro_video_text">"Video is worth a thousand pictures! see what you want to buy
-        live before buying it.
-    "</string>
+    <!-- Intro -->
+    <string name="intro_welcome">Welcome To Shoutit</string>
+    <string name="intro_buy">Buy and Sell while Chatting</string>
+    <string name="intro_login">Login</string>
+    <string name="intro_skip">Skip</string>
+    <string name="intro_help">Help</string>
+    <string name="intro_fail_login">Failed to create guest account</string>
+    <string name="intro_search">Search</string>
+    <string name="intro_search_text">Find what you need in your Community or anywhere in the World.</string>
+
+    <!-- Image capture helper -->
+    <string name="intro_shout">"Shout"</string>
+    <string name="intro_shout_text">"List anything for FREE. Include Photos and Videos to appeal to Buyers."</string>
+    <string name="intro_chat">"Chat"</string>
+    <string name="intro_chat_text">"Connect with Buyers and Sellers. Send Photos, Videos and Shouts.</string>
+    <string name="intro_video">"Video Chat"</string>
+    <string name="intro_video_text">"Video is worth a thousand pictures! see what you want to buy live before buying it.</string>
 
 <!-- Home -->
 <string name="home_menu_chat">"Chat"</string>
@@ -504,7 +499,6 @@ You can also change the email
 <string name="location_location">"%1$s, %2$s"</string>
 <string name="shout_user_location">"%1$s, %2$s"</string>
 <string name="edit_profile_country">"%1$s, %2$s"</string>
-<string name="permission_contacts_explanation">"We need Contacts permission to check which of your contacts use Shoutit"</string>
 <string name="shout_deleted">"Shout has been deleted"</string>
 <string name="request_activity_sharing">"Sharing"</string>
 <string name="publish_shout_share_title">"Share your Shout"</string>
