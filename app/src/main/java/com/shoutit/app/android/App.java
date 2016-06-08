@@ -96,7 +96,7 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
 
         setUpMixPanel();
 
-        initFfmpeg();
+//        initFfmpeg();
 
         initGcm();
 
