@@ -97,6 +97,7 @@
     <!-- Video Conversations -->
     <color name="video_calls_call_button">#4CAF50</color>
     <color name="video_calls_dismiss_call_button">#FF0000</color>
+    <color name="video_calls_dismiss_call_button_pressed">#c10101</color>
     <color name="video_calls_semi_transparent_background">#80000000</color>
     <color name="video_call_button_stroke">#b2ffffff</color>
     <color name="video_call_preview_stroke">#979797</color>

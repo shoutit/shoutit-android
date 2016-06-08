@@ -6,21 +6,24 @@
     android:background="@android:color/black"
     tools:showIn="@layout/activity_video_conversation">
 
-    <ImageView
+    <FrameLayout
+        android:id="@+id/video_conversation_content_participant_window"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/pattern_placeholder"
+        android:fitsSystemWindows="true" />
+
+    <ImageView
+        android:id="@+id/video_conversation_participant_window_cover"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/img_pattern"
+        android:background="@color/default_bg_color"
+        android:visibility="gone"
         android:scaleType="centerCrop"/>
 
     <FrameLayout
         android:id="@+id/video_conversation_local_preview"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
-    <FrameLayout
-        android:id="@+id/video_conversation_content_participant_window"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true" />
 
 </RelativeLayout>

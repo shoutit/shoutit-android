@@ -28,6 +28,7 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.TextHelper;
 import com.shoutit.app.android.widget.CheckableImageButton;
@@ -35,7 +36,6 @@ import com.twilio.conversations.AudioTrack;
 import com.twilio.conversations.CameraCapturer;
 import com.twilio.conversations.CameraCapturerFactory;
 import com.twilio.conversations.CapturerErrorListener;
-import com.twilio.conversations.CapturerException;
 import com.twilio.conversations.Conversation;
 import com.twilio.conversations.ConversationCallback;
 import com.twilio.conversations.ConversationListener;
@@ -53,6 +53,7 @@ import com.twilio.conversations.Participant;
 import com.twilio.conversations.ParticipantListener;
 import com.twilio.conversations.TwilioConversations;
 import com.twilio.conversations.TwilioConversationsException;
+import com.twilio.conversations.VideoRenderer;
 import com.twilio.conversations.VideoRendererObserver;
 import com.twilio.conversations.VideoTrack;
 import com.twilio.conversations.VideoViewRenderer;
@@ -68,7 +69,7 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import rx.functions.Action1;
-import rx.subjects.BehaviorSubject;
+import rx.subjects.PublishSubject;
 
 import static com.appunite.rx.internal.Preconditions.checkNotNull;
 
@@ -91,7 +92,7 @@ public class VideoConversationActivity extends BaseActivity {
     private IncomingInvite invite;
 
     @Bind(R.id.video_conversation_layout)
-    View videoCallView;
+    View rootView;
     @Bind(R.id.video_conversation_content_local_window)
     ViewGroup smallPreviewWindow;
     @Bind(R.id.video_conversation_local_preview)
@@ -102,15 +103,25 @@ public class VideoConversationActivity extends BaseActivity {
     Button callButton;
     @Bind(R.id.conversation_participant_name_tv)
     TextView participantNameTv;
+    @Bind(R.id.video_conversation_content_local_window_cover)
+    View smallPreviewCoverView;
+    @Bind(R.id.video_conversation_participant_window_cover)
+    View participantWindowCoverView;
 
     @Bind(R.id.video_conversation_button_dismiss_call)
     ImageButton dismissCallButton;
     @Bind(R.id.video_conversation_button_audio_btn)
     CheckableImageButton audioButton;
     @Bind(R.id.video_conversation_button_show_preview_btn)
-    CheckableImageButton showPreviewButton;
+    CheckableImageButton hideVideoButton;
     @Bind(R.id.video_conversation_info)
     TextView conversationInfo;
+    @Bind(R.id.video_conversation_info_view)
+    View conversationInfoView;
+    @Bind(R.id.video_conversation_watermark_iv)
+    View watermarkView;
+    @Bind(R.id.video_conversation_action_buttons_container)
+    View actionButtonsContainer;
 
     @Inject
     UserPreferences preferences;
@@ -124,8 +135,8 @@ public class VideoConversationActivity extends BaseActivity {
     private String calledUserUsername;
     private String calledUserTwilioIdentity;
 
-    private BehaviorSubject<String> conversationInfoSubject = BehaviorSubject.create();
-    private BehaviorSubject<String> conversationErrorSubject = BehaviorSubject.create();
+    private PublishSubject<String> conversationInfoSubject = PublishSubject.create();
+    private PublishSubject<String> conversationErrorSubject = PublishSubject.create();
 
     public static Intent newIntent(@Nullable String callerName,
                                    @Nullable String calledUserUsername,
@@ -188,12 +199,18 @@ public class VideoConversationActivity extends BaseActivity {
                             R.drawable.shape_video_enabled : R.drawable.shape_video_disabled));
                 });
 
-        RxView.clicks(showPreviewButton)
+        RxView.clicks(hideVideoButton)
                 .compose(bindToLifecycle())
                 .subscribe(ignore -> {
-                    showCameraPreview(!showPreviewButton.isChecked());
-                    showPreviewButton.setBackground(getResources().getDrawable(showPreviewButton.isChecked() ?
+                    showOrHideVideo(shouldShowVideo());
+                    hideVideoButton.setBackground(getResources().getDrawable(hideVideoButton.isChecked() ?
                             R.drawable.shape_video_enabled : R.drawable.shape_video_disabled));
+                });
+
+        RxView.clicks(rootView)
+                .compose(bindToLifecycle())
+                .subscribe(ignore -> {
+                    switchToFullScreenMode(conversationInfoView.getVisibility() == View.VISIBLE);
                 });
 
         presenter
@@ -220,7 +237,7 @@ public class VideoConversationActivity extends BaseActivity {
                 .filter(Functions1.isNotNull())
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(error -> {
-                    ColoredSnackBar.error(videoCallView, error, Snackbar.LENGTH_LONG).show();
+                    ColoredSnackBar.error(rootView, error, Snackbar.LENGTH_LONG).show();
                 });
 
         mTwilio.getErrorCalledPersonIdentity()
@@ -238,24 +255,30 @@ public class VideoConversationActivity extends BaseActivity {
                 });
     }
 
-    private void showCameraPreview(boolean showCameraPreview) {
-        if (conversation == null || conversation.getLocalMedia() == null ||
-                conversation.getLocalMedia().getLocalVideoTracks() == null) {
-            if (showCameraPreview) {
-                cameraCapturer.startPreview(bigPreviewWindow);
-            } else {
-                cameraCapturer.stopPreview();
-            }
+    private void showOrHideVideo(boolean showVideo) {
+        LogHelper.logIfDebug(TAG, "Show camera preview:" + showVideo);
+        if (conversation != null && conversation.getLocalMedia() != null &&
+                conversation.getLocalMedia().getLocalVideoTracks() != null) {
+            final LocalVideoTrack track = conversation.getLocalMedia().getLocalVideoTracks().get(0);
+            track.enable(showVideo);
+            showOrHideSmallPreview(showVideo);
         } else {
-            if (showCameraPreview) {
-                final LocalVideoTrack localVideoTrack = LocalVideoTrackFactory.createLocalVideoTrack(cameraCapturer);
-                conversation.getLocalMedia().addLocalVideoTrack(localVideoTrack);
-            } else {
-                for (LocalVideoTrack videoTrack : conversation.getLocalMedia().getLocalVideoTracks()) {
-                    conversation.getLocalMedia().removeLocalVideoTrack(videoTrack);
-                }
-            }
+            showOrHideParticipantView(showVideo);
         }
+    }
+
+    private boolean shouldShowVideo() {
+        return !hideVideoButton.isChecked();
+    }
+
+    private void switchToFullScreenMode(boolean fullscreen) {
+        if (conversation == null) {
+            return;
+        }
+
+        watermarkView.setVisibility(fullscreen ? View.VISIBLE : View.GONE);
+        actionButtonsContainer.setVisibility(fullscreen ? View.GONE : View.VISIBLE);
+        conversationInfoView.setVisibility(fullscreen ? View.GONE : View.VISIBLE);
     }
 
     private CapturerErrorListener capturerErrorListener() {
@@ -264,11 +287,8 @@ public class VideoConversationActivity extends BaseActivity {
 
     private LocalMedia setupLocalMedia() {
         final LocalMedia localMedia = LocalMediaFactory.createLocalMedia(localMediaListener());
-
-        if (!showPreviewButton.isChecked()) {
-            final LocalVideoTrack localVideoTrack = LocalVideoTrackFactory.createLocalVideoTrack(cameraCapturer);
-            localMedia.addLocalVideoTrack(localVideoTrack);
-        }
+        final LocalVideoTrack localVideoTrack = LocalVideoTrackFactory.createLocalVideoTrack(cameraCapturer);
+        localMedia.addLocalVideoTrack(localVideoTrack);
 
         return localMedia;
     }
@@ -328,12 +348,14 @@ public class VideoConversationActivity extends BaseActivity {
                             @Override
                             public void onConversation(Conversation conversation, TwilioConversationsException exception) {
                                 if (exception == null) {
+                                    showOrHideVideo(shouldShowVideo());
                                     presenter.finishRetries();
                                     VideoConversationActivity.this.conversation = conversation;
                                     conversation.setConversationListener(conversationListener());
                                     Log.d(TAG, "Succesfully connected");
                                 } else if (isLastRetry) {
                                     handleTwilioError(exception);
+                                    switchToFullScreenMode(false);
                                     mTwilio.rejectCall(calledUserTwilioIdentity);
                                     Log.d(TAG, "Failed on last retry with code: " + exception.getErrorCode() + " and message: " + exception.getMessage());
                                 } else if (exception.getErrorCode() == Twilio.ERROR_PARTICIPANT_UNAVAILABLE) {
@@ -341,6 +363,7 @@ public class VideoConversationActivity extends BaseActivity {
                                     presenter.retryCall();
                                 } else {
                                     Log.d(TAG, "Error? with code: " + exception.getErrorCode() + " and message: " + exception.getMessage());
+                                    switchToFullScreenMode(false);
                                     handleTwilioError(exception);
                                     presenter.finishRetries();
                                     mTwilio.rejectCall(calledUserTwilioIdentity);
@@ -363,18 +386,24 @@ public class VideoConversationActivity extends BaseActivity {
         return new LocalMediaListener() {
             @Override
             public void onLocalVideoTrackAdded(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
+                LogHelper.logIfDebug(TAG, "onLocalVideoTrackAdded");
                 localVideoRenderer = new VideoViewRenderer(VideoConversationActivity.this, smallPreviewWindow);
                 localVideoTrack.addRenderer(localVideoRenderer);
             }
 
             @Override
             public void onLocalVideoTrackRemoved(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
-                localVideoTrack.removeRenderer(localVideoRenderer);
+                LogHelper.logIfDebug(TAG, "onLocalVideoTrackRemoved");
+                for (VideoRenderer videoRenderer : localVideoTrack.getRenderers()) {
+                    localVideoTrack.removeRenderer(videoRenderer);
+                }
             }
 
             @Override
             public void onLocalVideoTrackError(LocalMedia localMedia, LocalVideoTrack localVideoTrack, TwilioConversationsException e) {
-                localVideoTrack.removeRenderer(localVideoRenderer);
+                for (VideoRenderer videoRenderer : localVideoTrack.getRenderers()) {
+                    localVideoTrack.removeRenderer(videoRenderer);
+                }
             }
         };
     }
@@ -384,6 +413,7 @@ public class VideoConversationActivity extends BaseActivity {
             @Override
             public void onParticipantConnected(Conversation conversation, Participant participant) {
                 smallPreviewWindow.setVisibility(View.VISIBLE);
+                smallPreviewCoverView.setVisibility(View.VISIBLE);
                 startVideoTimer();
 
                 participant.setParticipantListener(participantListener());
@@ -395,6 +425,8 @@ public class VideoConversationActivity extends BaseActivity {
 
             @Override
             public void onParticipantDisconnected(Conversation conversation, Participant participant) {
+                stopVideoTimer();
+                switchToFullScreenMode(false);
                 conversationInfoSubject.onNext(getString(R.string.video_calls_participant_disconected));
             }
 
@@ -436,7 +468,6 @@ public class VideoConversationActivity extends BaseActivity {
 
             @Override
             public void onVideoTrackRemoved(Conversation conversation, Participant participant, VideoTrack videoTrack) {
-                participantWindow.removeAllViews();
                 videoTrack.removeRenderer(participantVideoRenderer);
             }
 
@@ -450,10 +481,12 @@ public class VideoConversationActivity extends BaseActivity {
 
             @Override
             public void onTrackEnabled(Conversation conversation, Participant participant, MediaTrack mediaTrack) {
+                showOrHideParticipantView(true);
             }
 
             @Override
             public void onTrackDisabled(Conversation conversation, Participant participant, MediaTrack mediaTrack) {
+                showOrHideParticipantView(false);
             }
         };
     }
@@ -467,8 +500,9 @@ public class VideoConversationActivity extends BaseActivity {
             cameraCapturer = CameraCapturerFactory.createCameraCapturer(VideoConversationActivity.this,
                     CameraCapturer.CameraSource.CAMERA_SOURCE_BACK_CAMERA, capturerErrorListener());
         }
+
         setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
-        showCameraPreview(true);
+        startPreview();
     }
 
     private void muteMicrophone(boolean mute) {
@@ -524,8 +558,18 @@ public class VideoConversationActivity extends BaseActivity {
             conversationClient.listen();
         }
 
-        if (cameraCapturer != null && !cameraCapturer.isPreviewing()) {
+        startPreview();
+    }
+
+    private void startPreview() {
+        if (cameraCapturer != null) {
             cameraCapturer.startPreview(bigPreviewWindow);
+        }
+    }
+
+    private void stopPreview() {
+        if (cameraCapturer != null) {
+            cameraCapturer.stopPreview();
         }
     }
 
@@ -539,9 +583,15 @@ public class VideoConversationActivity extends BaseActivity {
             conversationClient.unlisten();
         }
 
-        if (cameraCapturer != null && cameraCapturer.isPreviewing()) {
-            cameraCapturer.stopPreview();
-        }
+        stopPreview();
+    }
+
+    private void showOrHideSmallPreview(boolean show) {
+        smallPreviewCoverView.setVisibility(show ? View.GONE : View.VISIBLE);
+    }
+
+    private void showOrHideParticipantView(boolean show) {
+        participantWindowCoverView.setVisibility(show ? View.GONE : View.VISIBLE);
     }
 
     private void closeConversation() {

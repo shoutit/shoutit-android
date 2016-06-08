@@ -31,18 +31,33 @@
         android:orientation="vertical">
 
         <FrameLayout
-            android:id="@+id/video_conversation_content_local_window"
-            android:layout_width="125dp"
-            android:layout_height="175dp"
-            android:visibility="gone"
-            tools:visibility="visible"
-            android:background="@drawable/shape_video_preview"/>
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <FrameLayout
+                android:id="@+id/video_conversation_content_local_window"
+                android:layout_width="125dp"
+                android:layout_height="175dp"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:background="@drawable/shape_video_preview"/>
+
+            <FrameLayout
+                android:id="@+id/video_conversation_content_local_window_cover"
+                android:layout_width="125dp"
+                android:layout_height="175dp"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:background="@drawable/shape_video_preview"/>
+
+        </FrameLayout>
 
         <include layout="@layout/video_conversation_action_buttons"/>
 
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/video_conversation_info_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="92dp"
