@@ -134,7 +134,6 @@ public class ConversationsPresenter {
 
         final Observable<ConversationAction> newMessageObservable = mPusherHelper
                 .getNewMessagesObservable()
-                .filter(pusherMessage -> isMyConversationsList)
                 .map((Func1<PusherMessage, ConversationAction>) ConversationMessageAction::new)
                 .observeOn(mUiScheduler);
 
