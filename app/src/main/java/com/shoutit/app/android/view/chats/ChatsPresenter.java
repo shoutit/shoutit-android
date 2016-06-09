@@ -61,25 +61,29 @@ public class ChatsPresenter {
 
                 @Override
                 public Observable<MessagesResponse> call(MessagesResponse conversationsResponse) {
-                    if (conversationsResponse == null) {
-                        return mApiService.getMessages(conversationId, PAGE_SIZE)
-                                .subscribeOn(mNetworkScheduler)
-                                .observeOn(mUiScheduler);
+                    if (conversationsResponse == null || conversationsResponse.getPrevious() != null) {
+                        if (conversationsResponse == null) {
+                            return mApiService.getMessages(conversationId, PAGE_SIZE)
+                                    .subscribeOn(mNetworkScheduler)
+                                    .observeOn(mUiScheduler);
+                        } else {
+                            final String before = Uri.parse(conversationsResponse.getPrevious()).getQueryParameter("before");
+                            return Observable.just(
+                                    conversationsResponse)
+                                    .zipWith(
+                                            mApiService.getMessages(conversationId, before, PAGE_SIZE)
+                                                    .subscribeOn(mNetworkScheduler)
+                                                    .observeOn(mUiScheduler),
+                                            (previousResponses, newResponse) -> {
+                                                return new MessagesResponse(newResponse.getNext(),
+                                                        newResponse.getPrevious(),
+                                                        ImmutableList.copyOf(Iterables.concat(
+                                                                newResponse.getResults(),
+                                                                previousResponses.getResults())));
+                                            });
+                        }
                     } else {
-                        final String before = Uri.parse(conversationsResponse.getPrevious()).getQueryParameter("before");
-                        return Observable.just(
-                                conversationsResponse)
-                                .zipWith(
-                                        mApiService.getMessages(conversationId, before, PAGE_SIZE)
-                                                .subscribeOn(mNetworkScheduler)
-                                                .observeOn(mUiScheduler),
-                                        (previousResponses, newResponse) -> {
-                                            return new MessagesResponse(newResponse.getNext(),
-                                                    newResponse.getPrevious(),
-                                                    ImmutableList.copyOf(Iterables.concat(
-                                                            newResponse.getResults(),
-                                                            previousResponses.getResults())));
-                                        });
+                        return Observable.never();
                     }
                 }
             });
