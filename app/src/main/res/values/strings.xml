@@ -394,6 +394,7 @@
     <string name="video_calls_connected">Connected with %s</string>
     <string name="video_calls_participant_disconected">Participant finished the conversation</string>
     <string name="video_call_error">Sorry, cannot start conversation. Try again later.</string>
+    <string name="video_call_finished">Video call has been finished</string>
     <string name="no_phone_number_error">Phone number is not currently available.</string>
     <string name="call_dialog_positive_button">Call</string>
     <string name="dialog_cancel_button">Cancel</string>

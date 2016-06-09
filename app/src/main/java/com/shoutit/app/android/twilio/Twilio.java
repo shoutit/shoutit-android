@@ -29,6 +29,7 @@ import com.twilio.conversations.AudioOutput;
 import com.twilio.conversations.ConversationsClient;
 import com.twilio.conversations.ConversationsClientListener;
 import com.twilio.conversations.IncomingInvite;
+import com.twilio.conversations.InviteStatus;
 import com.twilio.conversations.TwilioConversations;
 import com.twilio.conversations.TwilioConversationsException;
 
@@ -245,6 +246,10 @@ public class Twilio {
 
             @Override
             public void onIncomingInvite(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+                if (incomingInvite.getInviteStatus() != InviteStatus.PENDING) {
+                    return;
+                }
+
                 invite = incomingInvite;
                 String caller = String.valueOf(incomingInvite.getParticipants());
 

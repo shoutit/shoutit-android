@@ -10,6 +10,7 @@ import android.os.Vibrator;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.App;
@@ -19,8 +20,10 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.twilio.Twilio;
+import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.squareup.picasso.Picasso;
+import com.twilio.conversations.InviteStatus;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -79,15 +82,22 @@ public class DialogCallActivity extends BaseActivity {
                         getResources().getDimensionPixelSize(R.dimen.call_dialog_avatar_corners)));
 
         RxView.clicks(acceptButton)
+                .compose(bindToLifecycle())
                 .subscribe(new Action1<Void>() {
                     @Override
                     public void call(Void aVoid) {
-                        startActivity(VideoConversationActivity.newIntent(callerName, null, callerImageUrl, DialogCallActivity.this));
+                        if (mTwilio.getInvite() != null && mTwilio.getInvite().getInviteStatus() == InviteStatus.PENDING) {
+                            startActivity(VideoConversationActivity.newIntent(callerName, null, callerImageUrl, DialogCallActivity.this));
+                        } else {
+                            Toast.makeText(DialogCallActivity.this, R.string.video_call_finished, Toast.LENGTH_SHORT)
+                                    .show();
+                        }
                         finish();
                     }
                 });
 
         RxView.clicks(rejectButton)
+                .compose(bindToLifecycle())
                 .subscribe(new Action1<Void>() {
                     @Override
                     public void call(Void aVoid) {
