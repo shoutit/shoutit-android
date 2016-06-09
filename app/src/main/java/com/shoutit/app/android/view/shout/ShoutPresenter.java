@@ -6,6 +6,7 @@ import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.UiScheduler;
+import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
@@ -18,6 +19,7 @@ import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.BaseShoutsDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.model.MobilePhoneResponse;
@@ -36,7 +38,6 @@ import retrofit2.Response;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
-import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.functions.Func3;
@@ -52,9 +53,7 @@ public class ShoutPresenter {
     private final Observable<Throwable> errorObservable;
     private final Observable<Boolean> progressObservable;
     private final Observable<String> titleObservable;
-    private final Observable<String> usernameObservable;
     private final Observable<Boolean> isUserShoutOwnerObservable;
-    private final Observable<String> shoutOwnerNameObservable;
     private final Observable<ResponseOrError<MobilePhoneResponse>> callErrorObservable;
     private final Observable<Boolean> hasMobilePhoneObservable;
     private final Observable<Response<Object>> deleteShoutResponseObservable;
@@ -63,7 +62,7 @@ public class ShoutPresenter {
     private final Observable<Response<Object>> reportShoutObservable;
     private final Observable<List<ConversationDetails>> conversationObservable;
     private final Observable<Object> refreshShoutsObservable;
-    private final Observable<String> videoCallClickedObservable;
+    private final Observable<User> videoCallClickedObservable;
     private final Observable<Boolean> editShoutClickedObservable;
     private final Observable<Object> onlyForLoggedInUserObservable;
     private final Observable<String> shareObservable;
@@ -85,6 +84,7 @@ public class ShoutPresenter {
     private final PublishSubject<Object> callOrDeleteSubject = PublishSubject.create();
     private final PublishSubject<String> sendReportObserver = PublishSubject.create();
     private final PublishSubject<Object> refreshShoutsSubject = PublishSubject.create();
+    private final Observable<User> shoutOwnerProfile;
 
     @Inject
     public ShoutPresenter(@Nonnull final ShoutsDao shoutsDao,
@@ -108,53 +108,20 @@ public class ShoutPresenter {
                 .compose(ResponseOrError.<Shout>onlySuccess());
 
         final Observable<String> userNameObservable = successShoutResponse
-                .map(new Func1<Shout, String>() {
-                    @Override
-                    public String call(Shout shout) {
-                        return shout.getProfile().getUsername();
-                    }
-                })
+                .map(shout -> shout.getProfile().getUsername())
                 .compose(ObservableExtensions.<String>behaviorRefCount());
 
+        shoutOwnerProfile = successShoutResponse
+                .map(Shout::getProfile);
+
         titleObservable = successShoutResponse
-                .map(new Func1<Shout, String>() {
-                    @Override
-                    public String call(Shout shout) {
-                        return shout.getTitle();
-                    }
-                });
+                .map(Shout::getTitle);
 
         hasMobilePhoneObservable = successShoutResponse
-                .map(new Func1<Shout, Boolean>() {
-                    @Override
-                    public Boolean call(Shout shout) {
-                        return shout.isMobileSet();
-                    }
-                });
-
-        usernameObservable = successShoutResponse
-                .map(new Func1<Shout, String>() {
-                    @Override
-                    public String call(Shout shout) {
-                        return shout.getProfile().getUsername();
-                    }
-                });
-
-        shoutOwnerNameObservable = successShoutResponse
-                .map(new Func1<Shout, String>() {
-                    @Override
-                    public String call(Shout shout) {
-                        return shout.getProfile().getName();
-                    }
-                });
+                .map(Shout::isMobileSet);
 
         conversationObservable = successShoutResponse
-                .map(new Func1<Shout, List<ConversationDetails>>() {
-                    @Override
-                    public List<ConversationDetails> call(Shout shout) {
-                        return shout.getConversations();
-                    }
-                });
+                .map(Shout::getConversations);
 
         final Observable<ShoutsDao.UserShoutsDao> userShoutDaoObservable = userNameObservable
                 .map(new Func1<String, ShoutsDao.UserShoutsDao>() {
@@ -166,22 +133,12 @@ public class ShoutPresenter {
                 .compose(ObservableExtensions.<ShoutsDao.UserShoutsDao>behaviorRefCount());
 
         final Observable<ResponseOrError<ShoutsResponse>> userShoutsObservable = userShoutDaoObservable
-                .flatMap(new Func1<ShoutsDao.UserShoutsDao, Observable<ResponseOrError<ShoutsResponse>>>() {
-                    @Override
-                    public Observable<ResponseOrError<ShoutsResponse>> call(ShoutsDao.UserShoutsDao userShoutsDao) {
-                        return userShoutsDao.getShoutsObservable();
-                    }
-                })
+                .flatMap(BaseShoutsDao::getShoutsObservable)
                 .compose(ObservableExtensions.<ResponseOrError<ShoutsResponse>>behaviorRefCount());
 
         final Observable<List<Shout>> successUserShoutsObservable = userShoutsObservable
                 .compose(ResponseOrError.<ShoutsResponse>onlySuccess())
-                .map(new Func1<ShoutsResponse, List<Shout>>() {
-                    @Override
-                    public List<Shout> call(ShoutsResponse shoutsResponse) {
-                        return shoutsResponse.getShouts();
-                    }
-                })
+                .map(ShoutsResponse::getShouts)
                 .filter(Functions1.isNotNull());
 
         final Observable<ResponseOrError<ShoutsResponse>> relatedShoutsObservable = shoutsDao
@@ -191,39 +148,21 @@ public class ShoutPresenter {
         final Observable<List<Shout>> successRelatedShoutsObservable = shoutsDao
                 .getRelatedShoutsObservable(new RelatedShoutsPointer(shoutId, RELATED_SHOUTS_PAGE_SIZE))
                 .compose(ResponseOrError.<ShoutsResponse>onlySuccess())
-                .map(new Func1<ShoutsResponse, List<Shout>>() {
-                    @Override
-                    public List<Shout> call(ShoutsResponse shoutsResponse) {
-                        return shoutsResponse.getShouts();
-                    }
-                })
+                .map(ShoutsResponse::getShouts)
                 .filter(Functions1.isNotNull());
 
 
         /** Adapter Items **/
         final Observable<ShoutAdapterItems.MainShoutAdapterItem> shoutItemObservable =
-                successShoutResponse.map(new Func1<Shout, ShoutAdapterItems.MainShoutAdapterItem>() {
-                    @Override
-                    public ShoutAdapterItems.MainShoutAdapterItem call(Shout shout) {
-                        return new ShoutAdapterItems.MainShoutAdapterItem(addToCartSubject, onCategoryClickedSubject,
-                                visitProfileSubject, shout, context.getResources());
-                    }
-                });
+                successShoutResponse.map(shout -> new ShoutAdapterItems.MainShoutAdapterItem(addToCartSubject, onCategoryClickedSubject,
+                        visitProfileSubject, shout, context.getResources()));
 
         final Observable<List<BaseAdapterItem>> userShoutItemsObservable =
-                successUserShoutsObservable.map(new Func1<List<Shout>, List<BaseAdapterItem>>() {
-                    @Override
-                    public List<BaseAdapterItem> call(List<Shout> shouts) {
-                        final List<BaseAdapterItem> items =
-                                Lists.transform(shouts, new Function<Shout, BaseAdapterItem>() {
-                                    @Override
-                                    public ShoutAdapterItems.UserShoutAdapterItem apply(Shout input) {
-                                        return new ShoutAdapterItems.UserShoutAdapterItem(input, userShoutSelectedSubject, context.getResources());
-                                    }
-                                });
+                successUserShoutsObservable.map((Func1<List<Shout>, List<BaseAdapterItem>>) shouts -> {
+                    final List<BaseAdapterItem> items =
+                            Lists.transform(shouts, (Function<Shout, BaseAdapterItem>) input -> new ShoutAdapterItems.UserShoutAdapterItem(input, userShoutSelectedSubject, context.getResources()));
 
-                        return ImmutableList.copyOf(items);
-                    }
+                    return ImmutableList.copyOf(items);
                 });
 
         final Observable<List<BaseAdapterItem>> relatedShoutsItems = successRelatedShoutsObservable
@@ -231,12 +170,9 @@ public class ShoutPresenter {
                     @Override
                     public List<BaseAdapterItem> call(List<Shout> shouts) {
                         final List<BaseAdapterItem> items =
-                                Lists.transform(shouts, new Function<Shout, BaseAdapterItem>() {
-                                    @Override
-                                    public ShoutAdapterItem apply(Shout shout) {
-                                        final boolean isShoutOwner = shout.getProfile().getUsername().equals(currentUserName);
-                                        return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context, relatedShoutSelectedSubject);
-                                    }
+                                Lists.transform(shouts, (Function<Shout, BaseAdapterItem>) shout -> {
+                                    final boolean isShoutOwner = shout.getProfile().getUsername().equals(currentUserName);
+                                    return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context, relatedShoutSelectedSubject);
                                 });
 
                         final ImmutableList.Builder<BaseAdapterItem> builder = new ImmutableList.Builder<>();
@@ -376,69 +312,24 @@ public class ShoutPresenter {
 
         deleteShoutResponseObservable = shoutsDao.getDeleteShoutObservable(shoutId)
                 .observeOn(uiScheduler)
-                .doOnNext(new Action1<Response<Object>>() {
-                    @Override
-                    public void call(Response<Object> objectResponse) {
-                        shoutsGlobalRefreshPresenter.refreshShouts();
-                    }
-                });
+                .doOnNext(objectResponse -> shoutsGlobalRefreshPresenter.refreshShouts());
 
         videoCallClickedObservable = onVideoOrEditClickSubject
-                .withLatestFrom(isUserShoutOwnerObservable, new Func2<Object, Boolean, Boolean>() {
-                    @Override
-                    public Boolean call(Object o, Boolean isShoutOwner) {
-                        return isShoutOwner;
-                    }
-                })
+                .withLatestFrom(isUserShoutOwnerObservable, (o, isShoutOwner) -> isShoutOwner)
                 .filter(Functions1.isFalse())
-                .filter(new Func1<Boolean, Boolean>() {
-                    @Override
-                    public Boolean call(Boolean aBoolean) {
-                        return !userPreferences.isGuest();
-                    }
-                })
-                .withLatestFrom(userNameObservable, new Func2<Boolean, String, String>() {
-                    @Override
-                    public String call(Boolean aBoolean, String username) {
-                        return username;
-                    }
-                });
+                .filter(aBoolean -> !userPreferences.isGuest())
+                .withLatestFrom(shoutOwnerProfile, (aBoolean, profile) -> profile);
 
         editShoutClickedObservable = onVideoOrEditClickSubject
-                .withLatestFrom(isUserShoutOwnerObservable, new Func2<Object, Boolean, Boolean>() {
-                    @Override
-                    public Boolean call(Object o, Boolean isOwner) {
-                        return isOwner;
-                    }
-                })
-                .filter(new Func1<Boolean, Boolean>() {
-                    @Override
-                    public Boolean call(Boolean isOwner) {
-                        return isOwner;
-                    }
-                })
-                .filter(new Func1<Boolean, Boolean>() {
-                    @Override
-                    public Boolean call(Boolean aBoolean) {
-                        return !userPreferences.isGuest();
-                    }
-                });
+                .withLatestFrom(isUserShoutOwnerObservable, (o, isOwner) -> isOwner)
+                .filter(isOwner -> isOwner)
+                .filter(aBoolean -> !userPreferences.isGuest());
 
         onlyForLoggedInUserObservable = onVideoOrEditClickSubject
-                .filter(new Func1<Object, Boolean>() {
-                    @Override
-                    public Boolean call(Object o) {
-                        return userPreferences.isGuest();
-                    }
-                });
+                .filter(o -> userPreferences.isGuest());
 
         shareObservable = shareSubject
-                .withLatestFrom(successShoutResponse, new Func2<Object, Shout, String>() {
-                    @Override
-                    public String call(Object o, Shout shout) {
-                        return shout.getWebUrl();
-                    }
-                });
+                .withLatestFrom(successShoutResponse, (o, shout) -> shout.getWebUrl());
     }
 
     @Nonnull
@@ -457,7 +348,7 @@ public class ShoutPresenter {
     }
 
     @Nonnull
-    public Observable<String> getVideoCallClickedObservable() {
+    public Observable<User> getVideoCallClickedObservable() {
         return videoCallClickedObservable;
     }
 
@@ -539,11 +430,6 @@ public class ShoutPresenter {
                     }
                 })
                 .observeOn(uiScheduler);
-    }
-
-    @Nonnull
-    public Observable<String> getShoutOwnerNameObservable() {
-        return shoutOwnerNameObservable;
     }
 
     @Nonnull

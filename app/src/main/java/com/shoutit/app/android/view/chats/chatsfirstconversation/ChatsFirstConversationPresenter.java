@@ -9,6 +9,7 @@ import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
+import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
@@ -76,8 +77,8 @@ public class ChatsFirstConversationPresenter {
     private final CompositeSubscription mSubscribe = new CompositeSubscription();
     private final PublishSubject<PusherMessage> newMessagesSubject = PublishSubject.create();
     private final PublishSubject<Object> mRefreshTypingObservable = PublishSubject.create();
-    private final BehaviorSubject<String> chatParticipantUsernameSubject = BehaviorSubject.create();
-    private final Observable<String> calledPersonUsernameObservable;
+    private final BehaviorSubject<ConversationProfile> chatParticipantProfileSubject = BehaviorSubject.create();
+    private final Observable<ConversationProfile> calledPersonProfile;
     private PublishSubject<Object> mLocalAndPusherMessagesSubject;
     private final ChatsDelegate mChatsDelegate;
 
@@ -107,14 +108,11 @@ public class ChatsFirstConversationPresenter {
         mShoutsDao = shoutsDao;
         mProfilesDao = profilesDao;
 
-        calledPersonUsernameObservable = chatParticipantUsernameSubject
+        //noinspection ConstantConditions
+        calledPersonProfile = chatParticipantProfileSubject
                 .filter(Functions1.isNotNull())
-                .filter(new Func1<String, Boolean>() {
-                    @Override
-                    public Boolean call(String participantUsername) {
-                        return !Objects.equal(userPreferences.getUser().getUsername(), participantUsername);
-                    }
-                });
+                .filter(profile ->
+                        !Objects.equal(userPreferences.getUser().getUsername(), profile.getUsername()));
 
         mChatsDelegate = new ChatsDelegate(pusher, uiScheduler, networkScheduler, apiService, resources, userPreferences, context, amazonHelper, newMessagesSubject, bus);
     }
@@ -133,8 +131,8 @@ public class ChatsFirstConversationPresenter {
     }
 
     private void setupUserForVideoChat(@Nonnull User user) {
-        chatParticipantUsernameSubject.onNext(user.getUsername());
-        mUserPreferences.setShoutOwnerName(user.getName());
+        chatParticipantProfileSubject.onNext(new ConversationProfile(
+                user.getId(), user.getName(), user.getUsername(), user.getType(), user.getImage()));
         mListener.showVideoChatIcon();
     }
 
@@ -422,8 +420,8 @@ public class ChatsFirstConversationPresenter {
         mChatsDelegate.sendTyping(conversationId);
     }
 
-    public Observable<String> calledPersonUsernameObservable() {
-        return calledPersonUsernameObservable;
+    public Observable<ConversationProfile> calledPersonUsernameObservable() {
+        return calledPersonProfile;
     }
 
     @Nullable

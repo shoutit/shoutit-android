@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.appunite.rx.functions.BothParams;
 import com.google.common.base.Strings;
 import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.App;
@@ -196,15 +197,6 @@ public class ShoutActivity extends BaseActivity {
                     }
                 });
 
-        presenter.getShoutOwnerNameObservable()
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String name) {
-                        userPreferences.setShoutOwnerName(name);
-                    }
-                });
-
         presenter.getCallErrorObservable()
                 .compose(this.<ResponseOrError<MobilePhoneResponse>>bindToLifecycle())
                 .subscribe(new Action1<ResponseOrError<MobilePhoneResponse>>() {
@@ -305,41 +297,33 @@ public class ShoutActivity extends BaseActivity {
                 .subscribe(presenter.getVideoOrEditClickSubject());
 
         presenter.getVideoCallClickedObservable()
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String calledUserName) {
-                        startActivity(VideoConversationActivity.newIntent(null, calledUserName, ShoutActivity.this));
-                    }
+                .compose(bindToLifecycle())
+                .subscribe(shoutOwnerProfile -> {
+                    startActivity(VideoConversationActivity.newIntent(
+                            shoutOwnerProfile.getName(),
+                            shoutOwnerProfile.getUsername(),
+                            shoutOwnerProfile.getImage(),
+                            ShoutActivity.this));
                 });
 
         presenter.getEditShoutClickedObservable()
                 .compose(this.<Boolean>bindToLifecycle())
-                .subscribe(new Action1<Boolean>() {
-                    @Override
-                    public void call(Boolean aBoolean) {
-                        startActivityForResult(EditShoutActivity.newIntent(mShoutId, ShoutActivity.this), EDIT_SHOUT_REQUEST_CODE);
-                    }
+                .subscribe(aBoolean -> {
+                    startActivityForResult(EditShoutActivity.newIntent(mShoutId, ShoutActivity.this), EDIT_SHOUT_REQUEST_CODE);
                 });
 
         presenter.getOnlyForLoggedInUserObservable()
                 .compose(this.bindToLifecycle())
-                .subscribe(new Action1<Object>() {
-                    @Override
-                    public void call(Object o) {
-                        ColoredSnackBar.error(ColoredSnackBar.contentView(ShoutActivity.this), R.string.error_action_only_for_logged_in_user, Snackbar.LENGTH_SHORT).show();
-                    }
+                .subscribe(o -> {
+                    ColoredSnackBar.error(ColoredSnackBar.contentView(ShoutActivity.this), R.string.error_action_only_for_logged_in_user, Snackbar.LENGTH_SHORT).show();
                 });
 
         presenter.getShareObservable()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String shareUrl) {
-                        startActivity(Intent.createChooser(
-                                IntentHelper.getShareIntent(shareUrl),
-                                getString(R.string.shout_share)));
-                    }
+                .subscribe(shareUrl -> {
+                    startActivity(Intent.createChooser(
+                            IntentHelper.getShareIntent(shareUrl),
+                            getString(R.string.shout_share)));
                 });
 
     }
