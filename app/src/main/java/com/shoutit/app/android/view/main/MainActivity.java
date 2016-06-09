@@ -308,7 +308,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
         if (resultCode == Activity.RESULT_OK && requestCode == REQUST_CODE_PLAY_SERVICES_CHECK) {
             registerToGcm();
-        } else if (requestCode == Activity.RESULT_OK) {
+        } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }

@@ -14,7 +14,6 @@ import com.crashlytics.android.core.CrashlyticsCore;
 import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
 import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler;
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
-import com.karumi.dexter.Dexter;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.constants.UserVoiceConstants;
@@ -95,10 +94,7 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
         fetchLocation();
         refreshUser();
 
-        Dexter.initialize(this);
-
-        mixPanel.initMixPanel();
-        mixPanel.trackAppOpen();
+        setUpMixPanel();
 
         initFfmpeg();
 
@@ -111,6 +107,14 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
         facebookHelper.initFacebook();
 
         AdobeCSDKFoundation.initializeCSDKFoundation(this);
+    }
+
+    private void setUpMixPanel() {
+        mixPanel.initMixPanel();
+        mStackCounterManager.register(this)
+                .subscribe(foreground -> {
+                    mixPanel.trackAppOpenOrClose(foreground);
+                });
     }
 
     private void initTwilio() {

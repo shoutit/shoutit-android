@@ -204,6 +204,7 @@ public class PusherHelper {
     public PresenceChannel getProfileChannel() {
         final User user = mUserPreferences.getUser();
         assert user != null;
+        log("get profile channel id : " + user.getId());
         return mPusher.getPresenceChannel(PusherHelper.getProfileChannelName(user.getId()));
     }
 
@@ -226,15 +227,18 @@ public class PusherHelper {
     }
 
     public void unsubscribeConversationChannel(@NonNull String conversationId) {
+        log("unsubscribe conversation channel : " + conversationId);
         mPusher.unsubscribe(getConversationChannelName(conversationId));
     }
 
     public void unsubscribeProfileChannel(@NonNull String userId) {
+        log("unsubscribe profile channel : " + userId);
         mPusher.unsubscribe(PusherHelper.getProfileChannelName(userId));
     }
 
     @Nonnull
     public PresenceChannel subscribeConversationChannel(@NonNull String conversationId) {
+        log("subscribe conversation channel : " + conversationId);
         final PresenceChannel presenceChannel = mPusher.getPresenceChannel(PusherHelper.getConversationChannelName(conversationId));
 
         if (presenceChannel == null || !presenceChannel.isSubscribed()) {
@@ -263,6 +267,7 @@ public class PusherHelper {
     }
 
     public void subscribeProfileChannel(@NonNull String id) {
+        log("subscribe profile channel : " + id);
         mPusher.subscribePresence(PusherHelper.getProfileChannelName(id));
     }
 
@@ -282,9 +287,9 @@ public class PusherHelper {
         return mPusher != null;
     }
 
-    public void disconnect(){
+    public void disconnect() {
+        log("disconnect");
         mPusher.disconnect();
-        mPusher = null;
     }
 
     private static class TypingPusherModel {
@@ -308,6 +313,12 @@ public class PusherHelper {
     private void logMessage(Object message, String channel) {
         if (BuildConfig.DEBUG) {
             Log.i(TAG, channel + " : " + message.toString());
+        }
+    }
+
+    private void log(String msg) {
+        if (BuildConfig.DEBUG) {
+            Log.i(TAG, msg);
         }
     }
 }

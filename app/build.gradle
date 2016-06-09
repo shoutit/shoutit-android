@@ -33,9 +33,9 @@ if (keystoreProperties.exists()) {
     props.load(new FileInputStream(keystoreProperties))
 }
 
-def baseVersionName = "2.5.0"
+def baseVersionName = "2.5.1"
 
-project.ext.versionCode = 77
+project.ext.versionCode = 78
 
 if (project.hasProperty("versionSuffix")) {
     project.ext.versionChangeSuffix = project.versionSuffix
@@ -228,10 +228,6 @@ dependencies {
 
     compile 'com.github.jacek-marchwicki.rx-java-extensions:rx-extensions:9906cc7974'
     compile 'com.github.jacek-marchwicki.rx-java-extensions:rx-android-extensions:9906cc7974'
-    compile project(":FFmpegAndroid")
-    compile project(":appuniteGcm")
-    compile project(":ScrollViewGallery")
-    compile 'com.karumi:dexter:2.1.0'
 
     // other
     compile 'com.twilio:conversations-android:0.10.0'
@@ -245,6 +241,9 @@ dependencies {
     compile "com.mixpanel.android:mixpanel-android:4.8.5"
     compile 'com.adobe.creativesdk.foundation:auth:0.9.7'
     compile 'com.adobe.creativesdk:image:4.4.8'
+    compile project(":FFmpegAndroid")
+    compile project(":appuniteGcm")
+    compile project(":ScrollViewGallery")
 
     // Tests
     testCompile 'junit:junit:4.12'
