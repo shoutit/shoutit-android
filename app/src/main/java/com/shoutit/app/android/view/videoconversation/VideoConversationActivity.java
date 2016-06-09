@@ -12,6 +12,7 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import android.view.animation.AccelerateInterpolator;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.appunite.rx.functions.BothParams;
@@ -37,6 +39,7 @@ import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.TextHelper;
 import com.shoutit.app.android.widget.CheckableImageButton;
+import com.squareup.picasso.Picasso;
 import com.twilio.conversations.AudioTrack;
 import com.twilio.conversations.CameraCapturer;
 import com.twilio.conversations.CameraCapturerFactory;
@@ -82,6 +85,7 @@ import static com.appunite.rx.internal.Preconditions.checkNotNull;
 public class VideoConversationActivity extends BaseActivity {
 
 
+    private static final String ARGS_CALLED_USER_IMAGE = "args_person_to_call_image";
     private static final String ARGS_CALLED_USER_USERNAME = "args_person_to_call_username";
     private static final String ARGS_CALLER = "args_caller";
     private static final int CAMERA_MIC_PERMISSION_REQUEST_CODE = 1;
@@ -109,10 +113,8 @@ public class VideoConversationActivity extends BaseActivity {
     Button callButton;
     @Bind(R.id.conversation_participant_name_tv)
     TextView participantNameTv;
-    @Bind(R.id.video_conversation_content_local_window_cover)
-    View smallPreviewCoverView;
-    @Bind(R.id.video_conversation_participant_window_cover)
-    View participantWindowCoverView;
+    @Bind(R.id.video_conversation_participant_image)
+    ImageView participantImageView;
 
     @Bind(R.id.video_conversation_button_dismiss_call)
     ImageButton dismissCallButton;
@@ -128,6 +130,8 @@ public class VideoConversationActivity extends BaseActivity {
     View watermarkView;
     @Bind(R.id.video_conversation_action_buttons_container)
     View actionButtonsContainer;
+    @Bind(R.id.video_conversation_content_local_window_cover)
+    View smallPreviewCoverView;
 
     @Inject
     UserPreferences preferences;
@@ -137,6 +141,8 @@ public class VideoConversationActivity extends BaseActivity {
     CameraTool cameraTool;
     @Inject
     VideoConversationActivityPresenter presenter;
+    @Inject
+    Picasso picasso;
 
     private String calledUserUsername;
     private String calledUserTwilioIdentity;
@@ -146,9 +152,11 @@ public class VideoConversationActivity extends BaseActivity {
 
     public static Intent newIntent(@Nullable String callerName,
                                    @Nullable String calledUserUsername,
+                                   @Nullable String calledUserImage,
                                    @Nonnull Context context) {
         return new Intent(context, VideoConversationActivity.class)
                 .putExtra(ARGS_CALLED_USER_USERNAME, calledUserUsername)
+                .putExtra(ARGS_CALLED_USER_IMAGE, calledUserImage)
                 .putExtra(ARGS_CALLER, callerName);
     }
 
@@ -162,6 +170,14 @@ public class VideoConversationActivity extends BaseActivity {
         calledUserUsername = intent.getStringExtra(ARGS_CALLED_USER_USERNAME);
         final String callerName = intent.getStringExtra(ARGS_CALLER);
         participantNameTv.setText(callerName);
+
+        final String calledUserImage = intent.getStringExtra(ARGS_CALLED_USER_IMAGE);
+        if (!TextUtils.isEmpty(calledUserImage)) {
+            picasso.load(calledUserImage)
+                    .fit()
+                    .centerCrop()
+                    .into(participantImageView);
+        }
 
         if (hasVideoCallPermissions()) {
             initializeVideoConversations();
@@ -268,9 +284,17 @@ public class VideoConversationActivity extends BaseActivity {
             final LocalVideoTrack track = conversation.getLocalMedia().getLocalVideoTracks().get(0);
             track.enable(showVideo);
             showOrHideSmallPreview(showVideo);
+            participantImageView.setVisibility(View.GONE);
+        } else if (isCalling()) {
+            showOrHideSmallPreview(showVideo);
+            participantImageView.setVisibility(View.VISIBLE);
         } else {
             showOrHideParticipantView(showVideo);
         }
+    }
+
+    private boolean isCalling() {
+        return conversation == null && outgoingInvite != null;
     }
 
     private boolean shouldShowVideo() {
@@ -391,6 +415,10 @@ public class VideoConversationActivity extends BaseActivity {
                 final Set<String> participants = participantsWithIsLastRetry.param1();
                 final Boolean isLastRetry = participantsWithIsLastRetry.param2();
 
+                smallPreviewWindow.setVisibility(View.VISIBLE);
+                smallPreviewCoverView.setVisibility(View.VISIBLE);
+                showOrHideSmallPreview(true);
+
                 outgoingInvite = conversationClient
                         .sendConversationInvite(participants, setupLocalMedia(), new ConversationCallback() {
                             @Override
@@ -434,6 +462,7 @@ public class VideoConversationActivity extends BaseActivity {
             @Override
             public void onLocalVideoTrackAdded(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
                 LogHelper.logIfDebug(TAG, "onLocalVideoTrackAdded");
+                showOrHideVideo(shouldShowVideo());
                 localVideoRenderer = new VideoViewRenderer(VideoConversationActivity.this, smallPreviewWindow);
                 localVideoTrack.addRenderer(localVideoRenderer);
             }
@@ -460,7 +489,7 @@ public class VideoConversationActivity extends BaseActivity {
             @Override
             public void onParticipantConnected(Conversation conversation, Participant participant) {
                 smallPreviewWindow.setVisibility(View.VISIBLE);
-                smallPreviewCoverView.setVisibility(View.VISIBLE);
+                smallPreviewCoverView.setVisibility(shouldShowVideo() ? View.GONE : View.VISIBLE);
                 showOrHideVideo(shouldShowVideo());
                 startVideoTimer();
                 muteMicrophoneIfNeeded();
@@ -649,11 +678,10 @@ public class VideoConversationActivity extends BaseActivity {
 
     private void showOrHideSmallPreview(boolean show) {
         smallPreviewCoverView.setVisibility(show ? View.GONE : View.VISIBLE);
-        participantWindowCoverView.setVisibility(View.GONE);
     }
 
     private void showOrHideParticipantView(boolean show) {
-        participantWindowCoverView.setVisibility(show ? View.GONE : View.VISIBLE);
+        participantImageView.setVisibility(show ? View.GONE : View.VISIBLE);
     }
 
     private void closeConversation() {
@@ -661,7 +689,7 @@ public class VideoConversationActivity extends BaseActivity {
         smallPreviewWindow.removeAllViews();
         smallPreviewCoverView.setVisibility(View.VISIBLE);
         participantWindow.removeAllViews();
-        participantWindowCoverView.setVisibility(View.VISIBLE);
+        participantImageView.setVisibility(View.VISIBLE);
 
         localVideoRenderer = null;
         participantVideoRenderer = null;
@@ -673,10 +701,6 @@ public class VideoConversationActivity extends BaseActivity {
 
         if (invite != null) {
             invite.reject();
-        }
-
-        if (outgoingInvite != null) {
-            outgoingInvite.cancel();
         }
     }
 

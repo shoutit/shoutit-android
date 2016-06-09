@@ -298,10 +298,11 @@ public class ShoutActivity extends BaseActivity {
 
         presenter.getVideoCallClickedObservable()
                 .compose(bindToLifecycle())
-                .subscribe(shoutOwnerNameAndUserName -> {
+                .subscribe(shoutOwnerProfile -> {
                     startActivity(VideoConversationActivity.newIntent(
-                            shoutOwnerNameAndUserName.param1(),
-                            shoutOwnerNameAndUserName.param2(),
+                            shoutOwnerProfile.getName(),
+                            shoutOwnerProfile.getUsername(),
+                            shoutOwnerProfile.getImage(),
                             ShoutActivity.this));
                 });
 

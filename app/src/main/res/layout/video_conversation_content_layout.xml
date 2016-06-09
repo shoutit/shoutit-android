@@ -18,7 +18,7 @@
         android:layout_height="match_parent" />
 
     <ImageView
-        android:id="@+id/video_conversation_participant_window_cover"
+        android:id="@+id/video_conversation_participant_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@drawable/img_pattern"

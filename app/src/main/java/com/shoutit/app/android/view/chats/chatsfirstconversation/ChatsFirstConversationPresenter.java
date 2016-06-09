@@ -77,8 +77,8 @@ public class ChatsFirstConversationPresenter {
     private final CompositeSubscription mSubscribe = new CompositeSubscription();
     private final PublishSubject<PusherMessage> newMessagesSubject = PublishSubject.create();
     private final PublishSubject<Object> mRefreshTypingObservable = PublishSubject.create();
-    private final BehaviorSubject<BothParams<String, String>> chatParticipantUsernameSubject = BehaviorSubject.create();
-    private final Observable<BothParams<String, String>> calledPersonUsernameObservable;
+    private final BehaviorSubject<ConversationProfile> chatParticipantProfileSubject = BehaviorSubject.create();
+    private final Observable<ConversationProfile> calledPersonProfile;
     private PublishSubject<Object> mLocalAndPusherMessagesSubject;
     private final ChatsDelegate mChatsDelegate;
 
@@ -109,10 +109,10 @@ public class ChatsFirstConversationPresenter {
         mProfilesDao = profilesDao;
 
         //noinspection ConstantConditions
-        calledPersonUsernameObservable = chatParticipantUsernameSubject
+        calledPersonProfile = chatParticipantProfileSubject
                 .filter(Functions1.isNotNull())
-                .filter(participantNameAndUsername ->
-                        !Objects.equal(userPreferences.getUser().getUsername(), participantNameAndUsername.param2()));
+                .filter(profile ->
+                        !Objects.equal(userPreferences.getUser().getUsername(), profile.getUsername()));
 
         mChatsDelegate = new ChatsDelegate(pusher, uiScheduler, networkScheduler, apiService, resources, userPreferences, context, amazonHelper, newMessagesSubject, bus);
     }
@@ -131,7 +131,8 @@ public class ChatsFirstConversationPresenter {
     }
 
     private void setupUserForVideoChat(@Nonnull User user) {
-        chatParticipantUsernameSubject.onNext(new BothParams<>(user.getName(), user.getUsername()));
+        chatParticipantProfileSubject.onNext(new ConversationProfile(
+                user.getId(), user.getName(), user.getUsername(), user.getType(), user.getImage()));
         mListener.showVideoChatIcon();
     }
 
@@ -419,8 +420,8 @@ public class ChatsFirstConversationPresenter {
         mChatsDelegate.sendTyping(conversationId);
     }
 
-    public Observable<BothParams<String, String>> calledPersonUsernameObservable() {
-        return calledPersonUsernameObservable;
+    public Observable<ConversationProfile> calledPersonUsernameObservable() {
+        return calledPersonProfile;
     }
 
     @Nullable

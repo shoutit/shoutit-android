@@ -21,6 +21,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.AboutShout;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.ConversationDetails;
 import com.shoutit.app.android.api.model.ConversationProfile;
 import com.shoutit.app.android.api.model.Message;
@@ -97,8 +98,8 @@ public class ChatsPresenter {
     private CompositeSubscription mSubscribe = new CompositeSubscription();
     private final PublishSubject<Object> requestSubject = PublishSubject.create();
     private final PublishSubject<PusherMessage> newMessagesSubject = PublishSubject.create();
-    private final BehaviorSubject<BothParams<String, String>> chatParticipantUsernameSubject = BehaviorSubject.create();
-    private final Observable<BothParams<String, String>> calledPersonNameAndUsernameObservable;
+    private final BehaviorSubject<ConversationProfile> chatParticipantUsernameSubject = BehaviorSubject.create();
+    private final Observable<ConversationProfile> calledPersonNameAndUsernameObservable;
     private final ChatsDelegate mChatsDelegate;
 
     @Inject
@@ -125,7 +126,7 @@ public class ChatsPresenter {
         calledPersonNameAndUsernameObservable = chatParticipantUsernameSubject
                 .filter(Functions1.isNotNull())
                 .filter(calledPersonNameAndUsername ->
-                        !Objects.equal(userPreferences.getUser().getUsername(), calledPersonNameAndUsername.param2()));
+                        !Objects.equal(userPreferences.getUser().getUsername(), calledPersonNameAndUsername.getUsername()));
 
         mChatsDelegate = new ChatsDelegate(pusher, uiScheduler, networkScheduler, apiService, resources, userPreferences, context, amazonHelper, newMessagesSubject, bus);
     }
@@ -230,7 +231,7 @@ public class ChatsPresenter {
                 participant = profiles.get(0);
             }
 
-            chatParticipantUsernameSubject.onNext(new BothParams<>(participant.getName(), participant.getUsername()));
+            chatParticipantUsernameSubject.onNext(participant);
             mListener.showVideoChatIcon();
         }
     }
@@ -315,7 +316,7 @@ public class ChatsPresenter {
         mChatsDelegate.sendTyping(conversationId);
     }
 
-    public Observable<BothParams<String, String>> getCalledPersonNameObservable() {
+    public Observable<ConversationProfile> getCalledPersonNameObservable() {
         return calledPersonNameAndUsernameObservable;
     }
 

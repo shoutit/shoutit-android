@@ -38,7 +38,6 @@ import retrofit2.Response;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
-import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.functions.Func3;
@@ -63,7 +62,7 @@ public class ShoutPresenter {
     private final Observable<Response<Object>> reportShoutObservable;
     private final Observable<List<ConversationDetails>> conversationObservable;
     private final Observable<Object> refreshShoutsObservable;
-    private final Observable<BothParams<String, String>> videoCallClickedObservable;
+    private final Observable<User> videoCallClickedObservable;
     private final Observable<Boolean> editShoutClickedObservable;
     private final Observable<Object> onlyForLoggedInUserObservable;
     private final Observable<String> shareObservable;
@@ -85,7 +84,7 @@ public class ShoutPresenter {
     private final PublishSubject<Object> callOrDeleteSubject = PublishSubject.create();
     private final PublishSubject<String> sendReportObserver = PublishSubject.create();
     private final PublishSubject<Object> refreshShoutsSubject = PublishSubject.create();
-    private final Observable<BothParams<String, String>> shoutOwnerNameAndUserName;
+    private final Observable<User> shoutOwnerProfile;
 
     @Inject
     public ShoutPresenter(@Nonnull final ShoutsDao shoutsDao,
@@ -112,11 +111,8 @@ public class ShoutPresenter {
                 .map(shout -> shout.getProfile().getUsername())
                 .compose(ObservableExtensions.<String>behaviorRefCount());
 
-        shoutOwnerNameAndUserName = successShoutResponse
-                .map(shout -> {
-                    final User profile = shout.getProfile();
-                    return new BothParams<>(profile.getName(), profile.getUsername());
-                });
+        shoutOwnerProfile = successShoutResponse
+                .map(Shout::getProfile);
 
         titleObservable = successShoutResponse
                 .map(Shout::getTitle);
@@ -322,7 +318,7 @@ public class ShoutPresenter {
                 .withLatestFrom(isUserShoutOwnerObservable, (o, isShoutOwner) -> isShoutOwner)
                 .filter(Functions1.isFalse())
                 .filter(aBoolean -> !userPreferences.isGuest())
-                .withLatestFrom(shoutOwnerNameAndUserName, (aBoolean, nameAndUserName) -> nameAndUserName);
+                .withLatestFrom(shoutOwnerProfile, (aBoolean, profile) -> profile);
 
         editShoutClickedObservable = onVideoOrEditClickSubject
                 .withLatestFrom(isUserShoutOwnerObservable, (o, isOwner) -> isOwner)
@@ -352,7 +348,7 @@ public class ShoutPresenter {
     }
 
     @Nonnull
-    public Observable<BothParams<String, String>> getVideoCallClickedObservable() {
+    public Observable<User> getVideoCallClickedObservable() {
         return videoCallClickedObservable;
     }
 

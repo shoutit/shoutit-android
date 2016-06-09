@@ -157,10 +157,11 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
                 case R.id.chats_video_menu: {
                     presenter.calledPersonUsernameObservable()
                             .compose(ChatFirstConversationActivity.this.bindToLifecycle())
-                            .subscribe(calledUserNameAndUsername -> {
+                            .subscribe(calledUserProfile -> {
                                 startActivity(VideoConversationActivity.newIntent(
-                                        calledUserNameAndUsername.param1(),
-                                        calledUserNameAndUsername.param2(),
+                                        calledUserProfile.getName(),
+                                        calledUserProfile.getUsername(),
+                                        calledUserProfile.getImage(),
                                         ChatFirstConversationActivity.this));
                             });
                     return true;

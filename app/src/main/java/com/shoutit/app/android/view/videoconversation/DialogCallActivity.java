@@ -82,7 +82,7 @@ public class DialogCallActivity extends BaseActivity {
                 .subscribe(new Action1<Void>() {
                     @Override
                     public void call(Void aVoid) {
-                        startActivity(VideoConversationActivity.newIntent(callerName, null, DialogCallActivity.this));
+                        startActivity(VideoConversationActivity.newIntent(callerName, null, callerImageUrl, DialogCallActivity.this));
                         finish();
                     }
                 });
