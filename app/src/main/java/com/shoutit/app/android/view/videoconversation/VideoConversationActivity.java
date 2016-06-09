@@ -1,6 +1,10 @@
 package com.shoutit.app.android.view.videoconversation;
 
 import android.Manifest;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -11,6 +15,7 @@ import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -59,6 +64,7 @@ import com.twilio.conversations.VideoTrack;
 import com.twilio.conversations.VideoViewRenderer;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -194,7 +200,7 @@ public class VideoConversationActivity extends BaseActivity {
         RxView.clicks(audioButton)
                 .compose(bindToLifecycle())
                 .subscribe(ignore -> {
-                    muteMicrophone(audioButton.isChecked());
+                    muteMicrophoneIfNeeded();
                     audioButton.setBackground(getResources().getDrawable(audioButton.isChecked() ?
                             R.drawable.shape_video_enabled : R.drawable.shape_video_disabled));
                 });
@@ -276,9 +282,51 @@ public class VideoConversationActivity extends BaseActivity {
             return;
         }
 
-        watermarkView.setVisibility(fullscreen ? View.VISIBLE : View.GONE);
-        actionButtonsContainer.setVisibility(fullscreen ? View.GONE : View.VISIBLE);
-        conversationInfoView.setVisibility(fullscreen ? View.GONE : View.VISIBLE);
+        final int startPosition = fullscreen ? 0 : -conversationInfoView.getHeight();
+        final int endPosition = fullscreen ? -conversationInfoView.getHeight() : 0;
+        final ObjectAnimator topViewAnimator = ObjectAnimator.ofFloat(
+                conversationInfoView, "translationY", startPosition, endPosition);
+        topViewAnimator.setDuration(250);
+        topViewAnimator.setInterpolator(new AccelerateInterpolator());
+
+        final int bottomStartPosition = fullscreen ? 0 : actionButtonsContainer.getHeight();
+        final int bottomEndPosition = fullscreen ? actionButtonsContainer.getHeight() : 0;
+        final ObjectAnimator bottomViewAnimator = ObjectAnimator.ofFloat(
+                actionButtonsContainer, "translationY", bottomStartPosition, bottomEndPosition);
+        bottomViewAnimator.setDuration(250);
+        bottomViewAnimator.setInterpolator(new AccelerateInterpolator());
+
+        final int startAlpha = fullscreen ? 0 : 1;
+        final int endAlpha = fullscreen ? 1 : 0;
+        final ObjectAnimator waterMarkAnimator = ObjectAnimator.ofFloat(watermarkView, "alpha", startAlpha, endAlpha);
+        waterMarkAnimator.setDuration(250);
+        waterMarkAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                if (fullscreen) {
+                    watermarkView.setVisibility(View.VISIBLE);
+                } else {
+                    conversationInfoView.setVisibility(View.VISIBLE);
+                    actionButtonsContainer.setVisibility(View.VISIBLE);
+                }
+                super.onAnimationStart(animation);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                if (!fullscreen) {
+                    watermarkView.setVisibility(View.GONE);
+                } else {
+                    conversationInfoView.setVisibility(View.GONE);
+                    actionButtonsContainer.setVisibility(View.GONE);
+                }
+                super.onAnimationEnd(animation);
+            }
+        });
+
+        final AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.playTogether(topViewAnimator, bottomViewAnimator, waterMarkAnimator);
+        animatorSet.start();
     }
 
     private CapturerErrorListener capturerErrorListener() {
@@ -348,7 +396,6 @@ public class VideoConversationActivity extends BaseActivity {
                             @Override
                             public void onConversation(Conversation conversation, TwilioConversationsException exception) {
                                 if (exception == null) {
-                                    showOrHideVideo(shouldShowVideo());
                                     presenter.finishRetries();
                                     VideoConversationActivity.this.conversation = conversation;
                                     conversation.setConversationListener(conversationListener());
@@ -414,7 +461,9 @@ public class VideoConversationActivity extends BaseActivity {
             public void onParticipantConnected(Conversation conversation, Participant participant) {
                 smallPreviewWindow.setVisibility(View.VISIBLE);
                 smallPreviewCoverView.setVisibility(View.VISIBLE);
+                showOrHideVideo(shouldShowVideo());
                 startVideoTimer();
+                muteMicrophoneIfNeeded();
 
                 participant.setParticipantListener(participantListener());
             }
@@ -433,9 +482,7 @@ public class VideoConversationActivity extends BaseActivity {
             @Override
             public void onConversationEnded(Conversation conversation, TwilioConversationsException e) {
                 stopVideoTimer();
-                if (conversation != null) {
-                    conversation.disconnect();
-                }
+                closeConversation();
             }
         };
     }
@@ -481,14 +528,28 @@ public class VideoConversationActivity extends BaseActivity {
 
             @Override
             public void onTrackEnabled(Conversation conversation, Participant participant, MediaTrack mediaTrack) {
-                showOrHideParticipantView(true);
+                if (!isAudioTrack(mediaTrack, participant.getMedia().getAudioTracks())) {
+                    showOrHideParticipantView(true);
+                }
             }
 
             @Override
             public void onTrackDisabled(Conversation conversation, Participant participant, MediaTrack mediaTrack) {
-                showOrHideParticipantView(false);
+                if (!isAudioTrack(mediaTrack, participant.getMedia().getAudioTracks())) {
+                    showOrHideParticipantView(false);
+                }
             }
         };
+    }
+
+    private boolean isAudioTrack(@Nonnull MediaTrack mediaTrack, @Nonnull List<AudioTrack> audioTracks) {
+        for (AudioTrack track : audioTracks) {
+            if (track.getTrackId().equals(mediaTrack.getTrackId())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void setupAudioVideo() {
@@ -505,12 +566,12 @@ public class VideoConversationActivity extends BaseActivity {
         startPreview();
     }
 
-    private void muteMicrophone(boolean mute) {
+    private void muteMicrophoneIfNeeded() {
         if (conversation == null || conversation.getLocalMedia() == null) {
             return;
         }
 
-        conversation.getLocalMedia().mute(mute);
+        conversation.getLocalMedia().mute(audioButton.isChecked());
     }
 
     private boolean isFrontCameraAvailable() {
@@ -588,6 +649,7 @@ public class VideoConversationActivity extends BaseActivity {
 
     private void showOrHideSmallPreview(boolean show) {
         smallPreviewCoverView.setVisibility(show ? View.GONE : View.VISIBLE);
+        participantWindowCoverView.setVisibility(View.GONE);
     }
 
     private void showOrHideParticipantView(boolean show) {
@@ -597,20 +659,25 @@ public class VideoConversationActivity extends BaseActivity {
     private void closeConversation() {
 
         smallPreviewWindow.removeAllViews();
+        smallPreviewCoverView.setVisibility(View.VISIBLE);
         participantWindow.removeAllViews();
+        participantWindowCoverView.setVisibility(View.VISIBLE);
+
         localVideoRenderer = null;
         participantVideoRenderer = null;
 
         if (conversation != null) {
             conversation.disconnect();
+            conversation = null;
         }
+
         if (invite != null) {
             invite.reject();
         }
+
         if (outgoingInvite != null) {
             outgoingInvite.cancel();
         }
-
     }
 
     @Nonnull

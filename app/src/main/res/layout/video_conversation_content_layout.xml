@@ -12,6 +12,11 @@
         android:layout_height="match_parent"
         android:fitsSystemWindows="true" />
 
+    <FrameLayout
+        android:id="@+id/video_conversation_local_preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <ImageView
         android:id="@+id/video_conversation_participant_window_cover"
         android:layout_width="match_parent"
@@ -20,10 +25,5 @@
         android:background="@color/default_bg_color"
         android:visibility="gone"
         android:scaleType="centerCrop"/>
-
-    <FrameLayout
-        android:id="@+id/video_conversation_local_preview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 
 </RelativeLayout>
