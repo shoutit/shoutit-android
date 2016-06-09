@@ -101,6 +101,7 @@ public class CreatePublicChatActivity extends BaseActivity implements CreatePubl
         final CreatePublicChatActivityComponent build = DaggerCreatePublicChatActivityComponent.builder()
                 .activityModule(new ActivityModule(this))
                 .appComponent(App.getAppComponent(getApplication()))
+                .createPublicChatModule(new CreatePublicChatModule())
                 .build();
         build.inject(this);
         return build;
@@ -136,9 +137,16 @@ public class CreatePublicChatActivity extends BaseActivity implements CreatePubl
 
     @Override
     public void startSelectImageActivity() {
+        if (!PermissionHelper.checkPermissions(this, REQUEST_CODE_PERMISSION, ColoredSnackBar.contentView(this),
+                R.string.permission_location_explanation,
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA})) {
+            return;
+        }
+
         final Optional<Intent> selectOrCaptureImageIntent = mImageCaptureHelper.createSelectOrCaptureImageIntent();
         if (selectOrCaptureImageIntent.isPresent()) {
-            startActivityForResult(selectOrCaptureImageIntent.get(), REQUEST_IMAGE);
+            final Intent intent = selectOrCaptureImageIntent.get();
+            startActivityForResult(intent, REQUEST_IMAGE);
         } else {
             ColoredSnackBar.error(ColoredSnackBar.contentView(this), R.string.create_public_chat_image_error, Snackbar.LENGTH_SHORT).show();
         }

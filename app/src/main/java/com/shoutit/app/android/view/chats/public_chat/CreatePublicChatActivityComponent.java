@@ -14,7 +14,8 @@ import dagger.Component;
 @Component(
         dependencies = AppComponent.class,
         modules = {
-                ActivityModule.class
+                ActivityModule.class,
+                CreatePublicChatModule.class
         }
 )
 public interface CreatePublicChatActivityComponent extends BaseActivityComponent {
