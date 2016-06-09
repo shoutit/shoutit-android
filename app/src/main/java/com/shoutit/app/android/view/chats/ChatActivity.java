@@ -55,6 +55,8 @@ import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.shoutit.app.android.view.shouts.selectshout.SelectShoutActivity;
 import com.shoutit.app.android.view.videoconversation.VideoConversationActivity;
 import com.squareup.picasso.Picasso;
+import com.veinhorn.scrollgalleryview.Constants;
+import com.veinhorn.scrollgalleryview.VideoPlayerActivity;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -293,9 +295,8 @@ public class ChatActivity extends BaseActivity implements Listener {
 
     @Override
     public void onVideoClicked(String url) {
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.parse(url), "video/*");
+        final Intent intent = new Intent(this, VideoPlayerActivity.class);
+        intent.putExtra(Constants.URL, url);
         startActivity(intent);
     }
 

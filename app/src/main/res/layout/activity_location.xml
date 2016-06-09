@@ -33,6 +33,7 @@
             android:theme="@style/SearchEditText"
             android:paddingBottom="14dp"
             android:textColorHint="@color/location_input_hint"
+            android:singleLine="true"
             android:lines="1"
             android:hint="@string/location_search_hint"/>
 
