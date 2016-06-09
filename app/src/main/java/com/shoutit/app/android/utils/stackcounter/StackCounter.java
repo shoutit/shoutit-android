@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.functions.Functions1;
+import com.shoutit.app.android.utils.LogHelper;
 
 import java.util.concurrent.TimeUnit;
 
@@ -18,6 +19,7 @@ import rx.subscriptions.Subscriptions;
 public class StackCounter {
 
     public static final int DELAY = 5;
+    private static final String TAG = StackCounter.class.getCanonicalName();
 
     int activtitiesRunning;
     private Subscription mSubscription = Subscriptions.empty();
@@ -31,6 +33,7 @@ public class StackCounter {
 
     public void onActivityResumed() {
         activtitiesRunning++;
+        LogHelper.logIfDebug(TAG, "activityResumed, count : " + activtitiesRunning);
         checkIfMovedToForeground();
     }
 
@@ -43,6 +46,7 @@ public class StackCounter {
 
     public void onActivityPaused() {
         activtitiesRunning--;
+        LogHelper.logIfDebug(TAG, "activityPaused, count : " + activtitiesRunning);
         checkIfMovedToBackground();
     }
 
