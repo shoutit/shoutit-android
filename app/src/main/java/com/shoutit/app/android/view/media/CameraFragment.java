@@ -863,7 +863,15 @@ public class CameraFragment extends Fragment {
                         .build();
                 startActivityForResult(imageEditorIntent, REQUEST_CODE_IMAGE_EDITOR);
             } else {
-                onPictureConfirmed(Uri.parse(imageOutput));
+                if(imageOutput != null) {
+                    onPictureConfirmed(Uri.parse(imageOutput));
+                } else {
+                    ColoredSnackBar.error(
+                            ColoredSnackBar.contentView(getActivity()),
+                            R.string.error_default,
+                            Snackbar.LENGTH_SHORT)
+                            .show();
+                }
             }
         }
     }
