@@ -61,7 +61,7 @@ public class ChatsPresenter {
 
                 @Override
                 public Observable<MessagesResponse> call(MessagesResponse conversationsResponse) {
-                    if (conversationsResponse == null) {
+                    if (conversationsResponse == null || conversationsResponse.getPrevious() == null) {
                         return mApiService.getMessages(conversationId, PAGE_SIZE)
                                 .subscribeOn(mNetworkScheduler)
                                 .observeOn(mUiScheduler);

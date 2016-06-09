@@ -15,22 +15,19 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.CallerProfile;
 import com.shoutit.app.android.api.model.TwilioResponse;
-import com.shoutit.app.android.api.model.VideoCallRequest;
 import com.shoutit.app.android.api.model.UserIdentity;
+import com.shoutit.app.android.api.model.VideoCallRequest;
 import com.shoutit.app.android.dagger.ForApplication;
 import com.shoutit.app.android.dao.UsersIdentityDao;
 import com.shoutit.app.android.dao.VideoCallsDao;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.view.videoconversation.DialogCallActivity;
-import com.twilio.common.TwilioAccessManager;
-import com.twilio.common.TwilioAccessManagerFactory;
-import com.twilio.common.TwilioAccessManagerListener;
+import com.twilio.common.AccessManager;
 import com.twilio.conversations.AudioOutput;
-import com.twilio.conversations.ConversationsClient;
-import com.twilio.conversations.ConversationsClientListener;
 import com.twilio.conversations.IncomingInvite;
 import com.twilio.conversations.InviteStatus;
-import com.twilio.conversations.TwilioConversations;
+import com.twilio.conversations.LogLevel;
+import com.twilio.conversations.TwilioConversationsClient;
 import com.twilio.conversations.TwilioConversationsException;
 
 import javax.annotation.Nonnull;
@@ -42,7 +39,6 @@ import rx.Observable;
 import rx.Scheduler;
 import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.functions.Func2;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
@@ -58,8 +54,8 @@ public class Twilio {
     private final Context mContext;
     @Nonnull
     private final UserPreferences userPreferences;
-    private TwilioAccessManager accessManager;
-    private ConversationsClient conversationsClient;
+    private AccessManager accessManager;
+    private TwilioConversationsClient conversationsClient;
     private IncomingInvite invite;
     private int tokenErrorRetries;
 
@@ -180,41 +176,32 @@ public class Twilio {
     }
 
     private void initializeTwilio(@Nonnull final String accessToken) {
-        TwilioConversations.setLogLevel(TwilioConversations.LogLevel.DEBUG);
+        TwilioConversationsClient.setLogLevel(LogLevel.DEBUG);
 
-        if (!TwilioConversations.isInitialized()) {
-            TwilioConversations.initialize(mContext, new TwilioConversations.InitListener() {
-                @Override
-                public void onInitialized() {
-                    accessManager = TwilioAccessManagerFactory.createAccessManager(mContext, accessToken, accessManagerListener());
-                    conversationsClient = TwilioConversations.createConversationsClient(accessManager, conversationsClientListener());
-                    conversationsClient.setAudioOutput(AudioOutput.SPEAKERPHONE);
-                    conversationsClient.listen();
-                }
-
-                @Override
-                public void onError(Exception e) {
-                    LogHelper.logThrowableAndCrashlytics(TAG, "Failed to initialize the Twilio Conversations SDK with error: ", e);
-                }
-            });
+        if (!TwilioConversationsClient.isInitialized()) {
+            TwilioConversationsClient.initialize(mContext);
+            accessManager = AccessManager.create(mContext, accessToken, accessManagerListener());
+            conversationsClient = TwilioConversationsClient.create(accessManager, conversationsClientListener());
+            conversationsClient.setAudioOutput(AudioOutput.SPEAKERPHONE);
+            conversationsClient.listen();
         }
     }
 
-    private TwilioAccessManagerListener accessManagerListener() {
-        return new TwilioAccessManagerListener() {
+    private AccessManager.Listener accessManagerListener() {
+        return new AccessManager.Listener() {
             @Override
-            public void onTokenExpired(TwilioAccessManager twilioAccessManager) {
+            public void onTokenExpired(AccessManager twilioAccessManager) {
                 userPreferences.setTwilioToken(null);
                 initTwilio();
             }
 
             @Override
-            public void onTokenUpdated(TwilioAccessManager twilioAccessManager) {
+            public void onTokenUpdated(AccessManager twilioAccessManager) {
                 userPreferences.setTwilioToken(twilioAccessManager.getToken());
             }
 
             @Override
-            public void onError(TwilioAccessManager twilioAccessManager, String s) {
+            public void onError(AccessManager twilioAccessManager, String s) {
                 if (tokenErrorRetries <= TOKEN_ERROR_MAX_RETRIES) {
                     userPreferences.setTwilioToken(null);
                     initTwilio();
@@ -226,26 +213,26 @@ public class Twilio {
         };
     }
 
-    private ConversationsClientListener conversationsClientListener() {
-        return new ConversationsClientListener() {
+    private TwilioConversationsClient.Listener conversationsClientListener() {
+        return new TwilioConversationsClient.Listener() {
             @Override
-            public void onStartListeningForInvites(ConversationsClient conversationsClient) {
+            public void onStartListeningForInvites(TwilioConversationsClient conversationsClient) {
             }
 
             @Override
-            public void onStopListeningForInvites(ConversationsClient conversationsClient) {
+            public void onStopListeningForInvites(TwilioConversationsClient conversationsClient) {
                 conversationsClient.listen();
             }
 
             @Override
-            public void onFailedToStartListening(ConversationsClient conversationsClient, TwilioConversationsException e) {
+            public void onFailedToStartListening(TwilioConversationsClient conversationsClient, TwilioConversationsException e) {
                 if (e != null && e.getErrorCode() == 100) {
                     initTwilio();
                 }
             }
 
             @Override
-            public void onIncomingInvite(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+            public void onIncomingInvite(TwilioConversationsClient conversationsClient, IncomingInvite incomingInvite) {
                 if (incomingInvite.getInviteStatus() != InviteStatus.PENDING) {
                     return;
                 }
@@ -258,15 +245,15 @@ public class Twilio {
             }
 
             @Override
-            public void onIncomingInviteCancelled(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+            public void onIncomingInviteCancelled(TwilioConversationsClient conversationsClient, IncomingInvite incomingInvite) {
                 conversationsClient.listen();
             }
         };
     }
 
     public void unregisterTwillio(){
-        if (TwilioConversations.isInitialized()) {
-            TwilioConversations.destroy();
+        if (TwilioConversationsClient.isInitialized()) {
+            TwilioConversationsClient.destroy();
         }
     }
 
@@ -275,7 +262,7 @@ public class Twilio {
         return invite;
     }
 
-    public ConversationsClient getConversationsClient() {
+    public TwilioConversationsClient getConversationsClient() {
         return conversationsClient;
     }
 

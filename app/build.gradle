@@ -230,7 +230,7 @@ dependencies {
     compile 'com.github.jacek-marchwicki.rx-java-extensions:rx-android-extensions:9906cc7974'
 
     // other
-    compile 'com.twilio:conversations-android:0.10.0'
+    compile 'com.twilio:conversations-android:0.12.0'
     compile 'com.uservoice:uservoice-android-sdk:1.2.4'
     compile 'fr.avianey.com.viewpagerindicator:library:2.4.1@aar'
     compile('com.crashlytics.sdk.android:crashlytics:2.5.1@aar') {

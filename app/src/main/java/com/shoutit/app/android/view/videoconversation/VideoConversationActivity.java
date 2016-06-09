@@ -42,27 +42,19 @@ import com.shoutit.app.android.widget.CheckableImageButton;
 import com.squareup.picasso.Picasso;
 import com.twilio.conversations.AudioTrack;
 import com.twilio.conversations.CameraCapturer;
-import com.twilio.conversations.CameraCapturerFactory;
 import com.twilio.conversations.CapturerErrorListener;
 import com.twilio.conversations.Conversation;
 import com.twilio.conversations.ConversationCallback;
-import com.twilio.conversations.ConversationListener;
-import com.twilio.conversations.ConversationsClient;
 import com.twilio.conversations.IncomingInvite;
 import com.twilio.conversations.InviteStatus;
 import com.twilio.conversations.LocalMedia;
-import com.twilio.conversations.LocalMediaFactory;
-import com.twilio.conversations.LocalMediaListener;
 import com.twilio.conversations.LocalVideoTrack;
-import com.twilio.conversations.LocalVideoTrackFactory;
 import com.twilio.conversations.MediaTrack;
 import com.twilio.conversations.OutgoingInvite;
 import com.twilio.conversations.Participant;
-import com.twilio.conversations.ParticipantListener;
-import com.twilio.conversations.TwilioConversations;
+import com.twilio.conversations.TwilioConversationsClient;
 import com.twilio.conversations.TwilioConversationsException;
 import com.twilio.conversations.VideoRenderer;
-import com.twilio.conversations.VideoRendererObserver;
 import com.twilio.conversations.VideoTrack;
 import com.twilio.conversations.VideoViewRenderer;
 
@@ -94,7 +86,7 @@ public class VideoConversationActivity extends BaseActivity {
 
     private VideoViewRenderer participantVideoRenderer;
     private VideoViewRenderer localVideoRenderer;
-    private ConversationsClient conversationClient;
+    private TwilioConversationsClient conversationClient;
     private CameraCapturer cameraCapturer;
     private Conversation conversation;
 
@@ -358,8 +350,8 @@ public class VideoConversationActivity extends BaseActivity {
     }
 
     private LocalMedia setupLocalMedia() {
-        final LocalMedia localMedia = LocalMediaFactory.createLocalMedia(localMediaListener());
-        final LocalVideoTrack localVideoTrack = LocalVideoTrackFactory.createLocalVideoTrack(cameraCapturer);
+        final LocalMedia localMedia = new LocalMedia(localMediaListener());
+        final LocalVideoTrack localVideoTrack = new LocalVideoTrack(cameraCapturer);
         localMedia.addLocalVideoTrack(localVideoTrack);
 
         return localMedia;
@@ -420,7 +412,7 @@ public class VideoConversationActivity extends BaseActivity {
                 showOrHideSmallPreview(true);
 
                 outgoingInvite = conversationClient
-                        .sendConversationInvite(participants, setupLocalMedia(), new ConversationCallback() {
+                        .inviteToConversation(participants, setupLocalMedia(), new ConversationCallback() {
                             @Override
                             public void onConversation(Conversation conversation, TwilioConversationsException exception) {
                                 if (exception == null) {
@@ -457,8 +449,8 @@ public class VideoConversationActivity extends BaseActivity {
         }
     }
 
-    private LocalMediaListener localMediaListener() {
-        return new LocalMediaListener() {
+    private LocalMedia.Listener localMediaListener() {
+        return new LocalMedia.Listener() {
             @Override
             public void onLocalVideoTrackAdded(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
                 LogHelper.logIfDebug(TAG, "onLocalVideoTrackAdded");
@@ -484,8 +476,8 @@ public class VideoConversationActivity extends BaseActivity {
         };
     }
 
-    private ConversationListener conversationListener() {
-        return new ConversationListener() {
+    private Conversation.Listener conversationListener() {
+        return new Conversation.Listener() {
             @Override
             public void onParticipantConnected(Conversation conversation, Participant participant) {
                 smallPreviewWindow.setVisibility(View.VISIBLE);
@@ -524,12 +516,12 @@ public class VideoConversationActivity extends BaseActivity {
         presenter.startTimer();
     }
 
-    private ParticipantListener participantListener() {
-        return new ParticipantListener() {
+    private Participant.Listener participantListener() {
+        return new Participant.Listener() {
             @Override
             public void onVideoTrackAdded(Conversation conversation, Participant participant, VideoTrack videoTrack) {
                 participantVideoRenderer = new VideoViewRenderer(VideoConversationActivity.this, participantWindow);
-                participantVideoRenderer.setObserver(new VideoRendererObserver() {
+                participantVideoRenderer.setObserver(new VideoRenderer.Observer() {
 
                     @Override
                     public void onFirstFrame() {
@@ -584,10 +576,10 @@ public class VideoConversationActivity extends BaseActivity {
     private void setupAudioVideo() {
 
         if (isFrontCameraAvailable()) {
-            cameraCapturer = CameraCapturerFactory.createCameraCapturer(VideoConversationActivity.this,
+            cameraCapturer = CameraCapturer.create(VideoConversationActivity.this,
                     CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA, capturerErrorListener());
         } else {
-            cameraCapturer = CameraCapturerFactory.createCameraCapturer(VideoConversationActivity.this,
+            cameraCapturer = CameraCapturer.create(VideoConversationActivity.this,
                     CameraCapturer.CameraSource.CAMERA_SOURCE_BACK_CAMERA, capturerErrorListener());
         }
 
@@ -642,7 +634,7 @@ public class VideoConversationActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
 
-        if (TwilioConversations.isInitialized() &&
+        if (TwilioConversationsClient.isInitialized() &&
                 conversationClient != null &&
                 !conversationClient.isListening()) {
             conversationClient.listen();
@@ -666,7 +658,7 @@ public class VideoConversationActivity extends BaseActivity {
     @Override
     public void onPause() {
         super.onPause();
-        if (TwilioConversations.isInitialized() &&
+        if (TwilioConversationsClient.isInitialized() &&
                 conversationClient != null  &&
                 conversationClient.isListening() &&
                 conversation == null) {
