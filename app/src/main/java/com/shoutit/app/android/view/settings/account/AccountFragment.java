@@ -43,7 +43,6 @@ public class AccountFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ButterKnife.bind(this, view);
     }
 
     @OnClick(R.id.account_email_tv)
