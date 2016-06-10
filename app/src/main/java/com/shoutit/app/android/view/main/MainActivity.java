@@ -52,7 +52,6 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
 
 public class MainActivity extends BaseActivity implements OnMenuItemSelectedListener,
@@ -153,26 +152,17 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
     private void subscribeToStats() {
         mStatsSubscription.add(mPusherHelper.getStatsObservable()
                 .compose(this.<Stats>bindToLifecycle())
-                .subscribe(new Action1<Stats>() {
-                    @Override
-                    public void call(Stats pusherStats) {
-                        menuHandler.setStats(pusherStats.getUnreadConversationsCount(), pusherStats.getUnreadNotifications());
-                    }
+                .subscribe(pusherStats -> {
+                    menuHandler.setStats(pusherStats.getUnreadConversationsCount(), pusherStats.getUnreadNotifications());
                 }));
         mStatsSubscription.add(mUserPreferences.getUserObservable()
                 .filter(Functions1.isNotNull())
                 .distinctUntilChanged()
                 .compose(this.<User>bindToLifecycle())
-                .subscribe(new Action1<User>() {
-                    @Override
-                    public void call(User user) {
-                        menuHandler.setStats(user.getUnreadConversationsCount(), user.getUnreadNotificationsCount());
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        LogHelper.logThrowable(TAG, "error", throwable);
-                    }
+                .subscribe(user -> {
+                    menuHandler.setStats(user.getUnreadConversationsCount(), user.getUnreadNotificationsCount());
+                }, throwable -> {
+                    LogHelper.logThrowable(TAG, "error", throwable);
                 }));
     }
 
@@ -256,8 +246,11 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
     @Override
     public void onMenuItemSelected(@Nonnull String fragmentTag) {
-        if (MenuHandler.FRAGMENT_CHATS.equals(fragmentTag) && !mUserPreferences.isNormalUser()) {
-            startActivity(LoginActivity.newIntent(MainActivity.this));
+        if(!mUserPreferences.isNormalUser()){
+            if(MenuHandler.FRAGMENT_CHATS.equals(fragmentTag) || MenuHandler.FRAGMENT_CREDITS.equals(fragmentTag)){{
+                startActivity(LoginActivity.newIntent(MainActivity.this));
+                return;
+            }}
         }
 
         final FragmentManager fragmentManager = getSupportFragmentManager();

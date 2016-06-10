@@ -1,6 +1,8 @@
 package com.shoutit.app.android.api.model;
 
 
+import android.support.annotation.NonNull;
+
 import com.google.common.base.Objects;
 import com.shoutit.app.android.model.Stats;
 
@@ -29,7 +31,7 @@ public class User extends BaseProfile {
     private final String website;
     private final String email;
     private final ConversationDetails conversation;
-    @Nullable
+    @NonNull
     private final Stats stats;
     @Nullable
     private final LinkedAccounts linkedAccounts;
@@ -200,7 +202,7 @@ public class User extends BaseProfile {
         return linkedAccounts;
     }
 
-    @Nullable
+    @Nonnull
     public Stats getStats() {
         return stats;
     }

@@ -5,10 +5,12 @@ import com.google.common.base.Objects;
 
 public class Stats {
 
+    private final Integer credit;
     private final Integer unreadConversationsCount;
     private final Integer unreadNotificationsCount;
 
-    public Stats(Integer unreadConversationsCount, Integer unreadNotificationsCount) {
+    public Stats(Integer credit, Integer unreadConversationsCount, Integer unreadNotificationsCount) {
+        this.credit = credit;
         this.unreadConversationsCount = unreadConversationsCount;
         this.unreadNotificationsCount = unreadNotificationsCount;
     }
@@ -26,6 +28,14 @@ public class Stats {
             return 0;
         } else {
             return unreadNotificationsCount;
+        }
+    }
+
+    public int getCredits() {
+        if (credit == null) {
+            return 0;
+        } else {
+            return credit;
         }
     }
 

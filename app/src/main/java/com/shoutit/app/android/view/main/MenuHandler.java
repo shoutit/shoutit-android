@@ -1,7 +1,6 @@
 package com.shoutit.app.android.view.main;
 
 import android.graphics.Bitmap;
-import android.support.annotation.DrawableRes;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -11,6 +10,7 @@ import android.widget.CheckedTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
@@ -55,6 +55,7 @@ public class MenuHandler {
     public static final String FRAGMENT_CHATS = "fragment_chats";
     public static final String FRAGMENT_PUBLIC_CHATS = "fragment_public_chats";
     public static final String FRAGMENT_INVITE_FRIENDS = "fragment_invite_friends";
+    public static final String FRAGMENT_CREDITS = "fragment_credits";
     public static final String ACTIVITY_SETTINGS = "activity_settings";
     public static final String ACTIVITY_HELP = "activity_help";
 
@@ -74,6 +75,8 @@ public class MenuHandler {
     TextView notificationsBadgeTv;
     @Bind(R.id.menu_chat_badge)
     TextView chatsBadgeTv;
+    @Bind(R.id.menu_credits_badge)
+    TextView creditsBadgeTv;
 
     @Bind(R.id.menu_home)
     CheckedTextView homeItem;
@@ -104,6 +107,7 @@ public class MenuHandler {
         viewTagViewIdMap.put(FRAGMENT_DISCOVER, R.id.menu_discover);
         viewTagViewIdMap.put(FRAGMENT_BROWSE, R.id.menu_browse);
         viewTagViewIdMap.put(FRAGMENT_CHATS, R.id.menu_chat);
+        viewTagViewIdMap.put(FRAGMENT_CREDITS, R.id.menu_credits);
         viewTagViewIdMap.put(FRAGMENT_INVITE_FRIENDS, R.id.menu_invite_friends);
         viewTagViewIdMap.put(ACTIVITY_HELP, R.id.menu_help);
         viewTagViewIdMap.put(ACTIVITY_SETTINGS, R.id.menu_settings);
@@ -128,6 +132,16 @@ public class MenuHandler {
     public void initMenu(@Nonnull View view, @IdRes int id) {
         ButterKnife.bind(this, view);
         selectableItems = ImmutableList.of(homeItem, discoverItem, browseItem, chatItem);
+        userPreferences.getUserObservable()
+                .filter(user -> user != null)
+                .map(user -> {
+                    Preconditions.checkNotNull(user);
+                    return user.getStats().getCredits();
+                })
+                .subscribe(credits -> {
+                    creditsBadgeTv.setVisibility(credits > 0 ? View.VISIBLE : View.GONE);
+                    creditsBadgeTv.setText(String.valueOf(credits));
+                });
         setData(id);
     }
 
@@ -164,13 +178,8 @@ public class MenuHandler {
     @NonNull
     private Action1<Integer> loadFlag() {
         final Target roundedBitmapTarget = PicassoHelper.getRoundedBitmapTarget(rxActivity, flagImageView);
-        return new Action1<Integer>() {
-            @Override
-            public void call(@DrawableRes Integer flagId) {
-                picasso.load(flagId)
-                        .into(roundedBitmapTarget);
-            }
-        };
+        return flagId -> picasso.load(flagId)
+                .into(roundedBitmapTarget);
     }
 
     @OnClick({R.id.menu_home, R.id.menu_discover, R.id.menu_browse, R.id.menu_chat, R.id.menu_settings, R.id.menu_help, R.id.menu_invite_friends})
@@ -186,6 +195,7 @@ public class MenuHandler {
             case FRAGMENT_INVITE_FRIENDS:
                 selectFragment(viewTag);
                 break;
+            case FRAGMENT_CREDITS:
             case FRAGMENT_CHATS:
                 if (userPreferences.isNormalUser()) {
                     selectFragment(viewTag);
@@ -277,34 +287,24 @@ public class MenuHandler {
             }
         };
 
-        return new Action1<String>() {
-            @Override
-            public void call(String coverUrl) {
-                picasso.load(coverUrl)
-                        .fit()
-                        .centerCrop()
-                        .transform(blurTransformation)
-                        .into(coverImageView);
-            }
-        };
+        return coverUrl -> picasso.load(coverUrl)
+                .fit()
+                .centerCrop()
+                .transform(blurTransformation)
+                .into(coverImageView);
     }
 
     @NonNull
     private Action1<String> loadAvatarAction() {
         final int strokeSize = rxActivity.getResources().getDimensionPixelSize(R.dimen.side_menu_avatar_stroke_size);
 
-        return new Action1<String>() {
-            @Override
-            public void call(String avatarUrl) {
-                picasso.load(avatarUrl)
-                        .error(R.drawable.ic_avatar_placeholder)
-                        .placeholder(R.drawable.ic_avatar_placeholder)
-                        .resizeDimen(R.dimen.side_menu_avatar_size, R.dimen.side_menu_avatar_size)
-                        .centerCrop()
-                        .transform(PicassoHelper.getCircularBitmapWithStrokeTarget(strokeSize, "MenuAvatar"))
-                        .into(avatarImageView);
-            }
-        };
+        return avatarUrl -> picasso.load(avatarUrl)
+                .error(R.drawable.ic_avatar_placeholder)
+                .placeholder(R.drawable.ic_avatar_placeholder)
+                .resizeDimen(R.dimen.side_menu_avatar_size, R.dimen.side_menu_avatar_size)
+                .centerCrop()
+                .transform(PicassoHelper.getCircularBitmapWithStrokeTarget(strokeSize, "MenuAvatar"))
+                .into(avatarImageView);
     }
 
     public static Fragment getFragmentForTag(String fragmentTag) {
@@ -316,6 +316,8 @@ public class MenuHandler {
             case FRAGMENT_BROWSE:
                 return SearchShoutsResultsFragment.newInstance(null, null, SearchPresenter.SearchType.BROWSE);
             case FRAGMENT_CHATS:
+                return ConversationsPagerFragment.newInstance();
+            case FRAGMENT_CREDITS:
                 return ConversationsPagerFragment.newInstance();
             case FRAGMENT_PUBLIC_CHATS:
                 return ConversationsPagerFragment.newInstance(true);
