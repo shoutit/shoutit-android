@@ -3,7 +3,8 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:orientation="vertical">
 
     <ScrollView
@@ -27,7 +28,7 @@
                 <TextView android:layout_width="match_parent"
                           android:layout_height="wrap_content"
                           android:layout_marginTop="10dp"
-                          android:text="Shoutit credit is virtual currency that can be earned and spent while using Shoutit. "/>
+                          android:text="@string/credits_info"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -59,7 +60,7 @@
                             android:layout_marginLeft="60dp"
                             android:layout_marginStart="60dp"
                             android:layout_marginTop="10dp"
-                            android:text="Your balance"
+                            android:text="@string/credit_balance"
                             android:textColor="@color/black_87"/>
 
                         <TextView
@@ -69,8 +70,8 @@
                             android:layout_marginBottom="10dp"
                             android:layout_marginLeft="60dp"
                             android:layout_marginStart="60dp"
-                            android:textSize="12sp"
-                            android:text="Click to view Transactions"/>
+                            android:text="@string/credit_balance_hint"
+                            android:textSize="12sp"/>
 
                         <TextView
                             android:id="@+id/credit_number"
@@ -102,7 +103,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
                     android:fontFamily="sans-serif-medium"
-                    android:text="@string/invite_friends_suggestions"
+                    android:text="@string/credit_earn_by"
                     android:textAllCaps="true"
                     android:textColor="@color/black_54"
                     android:textSize="14sp"/>
@@ -122,7 +123,7 @@
                         android:drawableLeft="@drawable/ic_profile"
                         android:drawablePadding="16dp"
                         android:drawableStart="@drawable/ic_profile"
-                        android:text="Complete your Profile"/>
+                        android:text="@string/credit_profile"/>
 
                     <View
                         android:layout_width="match_parent"
@@ -140,7 +141,7 @@
                         android:drawableLeft="@drawable/ic_share_blue"
                         android:drawablePadding="16dp"
                         android:drawableStart="@drawable/ic_share_blue"
-                        android:text="Sharing on Facebook"/>
+                        android:text="@string/credit_facebook"/>
 
                     <View
                         android:layout_width="match_parent"
@@ -158,7 +159,7 @@
                         android:drawableLeft="@drawable/contacts_icon"
                         android:drawablePadding="16dp"
                         android:drawableStart="@drawable/contacts_icon"
-                        android:text="Inviting Friends"/>
+                        android:text="@string/credit_invite"/>
 
                     <View
                         android:layout_width="match_parent"
@@ -176,7 +177,7 @@
                         android:drawableLeft="@drawable/ic_stop_listening"
                         android:drawablePadding="16dp"
                         android:drawableStart="@drawable/ic_stop_listening"
-                        android:text="Listening to friends"/>
+                        android:text="@string/credit_listen"/>
 
                 </LinearLayout>
 
@@ -185,7 +186,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
                     android:fontFamily="sans-serif-medium"
-                    android:text="@string/invite_friends_invite_friends"
+                    android:text="@string/credits_spend_on"
                     android:textAllCaps="true"
                     android:textColor="@color/black_54"
                     android:textSize="14sp"/>
@@ -205,7 +206,7 @@
                         android:drawableLeft="@drawable/ic_promote_shouts"
                         android:drawablePadding="16dp"
                         android:drawableStart="@drawable/ic_promote_shouts"
-                        android:text="Promoting Shouts"/>
+                        android:text="@string/credit_promote"/>
 
                     <View
                         android:layout_width="match_parent"
