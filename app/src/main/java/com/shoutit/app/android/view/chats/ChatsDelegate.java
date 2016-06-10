@@ -114,13 +114,8 @@ public class ChatsDelegate {
                     if (mUser.getId().equals(id)) {
                         return Observable.just(pusherMessage);
                     } else {
-                        return mApiService.readMessage(id)
-                                .map(new Func1<ResponseBody, PusherMessage>() {
-                                    @Override
-                                    public PusherMessage call(ResponseBody responseBody) {
-                                        return pusherMessage;
-                                    }
-                                });
+                        return mApiService.readMessage(pusherMessage.getId())
+                                .map(responseBody -> pusherMessage);
                     }
                 })
                 .observeOn(mUiScheduler);
