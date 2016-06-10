@@ -9,6 +9,7 @@ import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
+import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.UserPreferences;
@@ -39,7 +40,6 @@ import rx.Observable;
 import rx.Scheduler;
 import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
 @Singleton
@@ -54,9 +54,8 @@ public class Twilio {
     private final Context mContext;
     @Nonnull
     private final UserPreferences userPreferences;
-    private AccessManager accessManager;
     private TwilioConversationsClient conversationsClient;
-    private IncomingInvite invite;
+    private IncomingInvite currentInvite;
     private int tokenErrorRetries;
 
     private final Observable<String> successTwilioTokenRequestObservable;
@@ -64,9 +63,9 @@ public class Twilio {
     private final Observable<Throwable> errorCalledPersonIdentity;
 
     @Nonnull
-    private final BehaviorSubject<String> callerIdentitySubject = BehaviorSubject.create();
+    private final PublishSubject<String> callerIdentitySubject = PublishSubject.create();
     @Nonnull
-    private final PublishSubject<Object> profileRefreshSubject = PublishSubject.create();
+    private final PublishSubject<BothParams<String, String>> profileRefreshSubject = PublishSubject.create();
     @Nonnull
     private final PublishSubject<String> initCalledPersonIdentityRequestSubject = PublishSubject.create();
     @Nonnull
@@ -114,21 +113,36 @@ public class Twilio {
                 })
                 .subscribe(this::initializeTwilio);
 
-        final Observable<ResponseOrError<CallerProfile>> callerProfileResponse = profileRefreshSubject
-                .withLatestFrom(callerIdentitySubject,
-                        (o, identity) -> identity)
-                .switchMap(usersIdentityDao::getUserByIdentityObservable)
-                .compose(ObservableExtensions.<ResponseOrError<CallerProfile>>behaviorRefCount());
+        final Observable<ResponseOrError<BothParams<CallerProfile, String>>> callerProfileResponse = profileRefreshSubject
+                .switchMap(new Func1<BothParams<String, String>, Observable<ResponseOrError<BothParams<CallerProfile, String>>>>() {
+                    @Override
+                    public Observable<ResponseOrError<BothParams<CallerProfile, String>>> call(BothParams<String, String> conversationIdWithIdentity) {
+                        return usersIdentityDao.getUserByIdentityObservable(conversationIdWithIdentity.param2())
+                                .compose(ResponseOrError.map(new Func1<CallerProfile, BothParams<CallerProfile, String>>() {
+                                    @Override
+                                    public BothParams<CallerProfile, String> call(CallerProfile callerProfile) {
+                                        return new BothParams<>(callerProfile, conversationIdWithIdentity.param1());
+                                    }
+                                }));
+                    }
+                })
+                .compose(ObservableExtensions.<ResponseOrError<BothParams<CallerProfile, String>>>behaviorRefCount());
 
         callerProfileResponse
-                .compose(ResponseOrError.<CallerProfile>onlySuccess())
+                .compose(ResponseOrError.onlySuccess())
                 .filter(Functions1.isNotNull())
                 .observeOn(uiScheduler)
-                .subscribe(callerProfile -> {
-                    Intent intent = DialogCallActivity.newIntent(
-                            callerProfile.getName(), callerProfile.getImage(), mContext);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    mContext.startActivity(intent);
+                .subscribe(new Action1<BothParams<CallerProfile, String>>() {
+                    @Override
+                    public void call(BothParams<CallerProfile, String> callerProfileWithConversationId) {
+                        final CallerProfile callerProfile = callerProfileWithConversationId.param1();
+                        final String conversationId = callerProfileWithConversationId.param2();
+
+                        final Intent intent = DialogCallActivity.newIntent(
+                                callerProfile.getName(), callerProfile.getImage(), conversationId, mContext);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        mContext.startActivity(intent);
+                    }
                 });
 
         rejectCallSubject
@@ -180,7 +194,7 @@ public class Twilio {
 
         if (!TwilioConversationsClient.isInitialized()) {
             TwilioConversationsClient.initialize(mContext);
-            accessManager = AccessManager.create(mContext, accessToken, accessManagerListener());
+            AccessManager accessManager = AccessManager.create(mContext, accessToken, accessManagerListener());
             conversationsClient = TwilioConversationsClient.create(accessManager, conversationsClientListener());
             conversationsClient.setAudioOutput(AudioOutput.SPEAKERPHONE);
             conversationsClient.listen();
@@ -221,7 +235,9 @@ public class Twilio {
 
             @Override
             public void onStopListeningForInvites(TwilioConversationsClient conversationsClient) {
-                conversationsClient.listen();
+                if (conversationsClient != null) {
+                    conversationsClient.listen();
+                }
             }
 
             @Override
@@ -233,22 +249,34 @@ public class Twilio {
 
             @Override
             public void onIncomingInvite(TwilioConversationsClient conversationsClient, IncomingInvite incomingInvite) {
-                if (incomingInvite.getInviteStatus() != InviteStatus.PENDING) {
-                    return;
-                }
+                LogHelper.logIfDebug(TAG, "onIncomingInvite with conversation sid: " +
+                        incomingInvite.getConversationSid() + " and invitation status: " + incomingInvite.getInviteStatus());
 
-                invite = incomingInvite;
-                String caller = String.valueOf(incomingInvite.getParticipants());
+                 if (!isDuringTheCall() && incomingInvite.getInviteStatus() == InviteStatus.PENDING) {
+                    currentInvite = incomingInvite;
 
-                callerIdentitySubject.onNext(caller.substring(1, caller.length() - 1));
-                profileRefreshSubject.onNext(null);
+                    final String caller = String.valueOf(incomingInvite.getParticipants());
+                    final String callerIdentity = caller.substring(1, caller.length() - 1);
+
+                    callerIdentitySubject.onNext(callerIdentity);
+                    profileRefreshSubject.onNext(new BothParams<>(incomingInvite.getConversationSid(), callerIdentity));
+                 }
             }
 
             @Override
             public void onIncomingInviteCancelled(TwilioConversationsClient conversationsClient, IncomingInvite incomingInvite) {
-                conversationsClient.listen();
+                LogHelper.logIfDebug(TAG, "onIncomingInviteCancelled with conversation sid: " +
+                        incomingInvite.getConversationSid() + " and invitation status: " + incomingInvite.getInviteStatus());
+                if (conversationsClient != null) {
+                    conversationsClient.listen();
+                }
             }
         };
+    }
+
+    private boolean isDuringTheCall() {
+        return currentInvite != null && (currentInvite.getInviteStatus() == InviteStatus.ACCEPTED ||
+                currentInvite.getInviteStatus() == InviteStatus.ACCEPTING);
     }
 
     public void unregisterTwillio(){
@@ -258,8 +286,8 @@ public class Twilio {
     }
 
     @Nullable
-    public IncomingInvite getInvite() {
-        return invite;
+    public IncomingInvite getCurrentInvite() {
+        return currentInvite;
     }
 
     public TwilioConversationsClient getConversationsClient() {

@@ -91,7 +91,7 @@ public class VideoConversationActivity extends BaseActivity {
     private Conversation conversation;
 
     private OutgoingInvite outgoingInvite;
-    private IncomingInvite invite;
+    private IncomingInvite incomingInvite;
 
     @Bind(R.id.video_conversation_layout)
     View rootView;
@@ -141,6 +141,7 @@ public class VideoConversationActivity extends BaseActivity {
 
     private PublishSubject<String> conversationInfoSubject = PublishSubject.create();
     private PublishSubject<String> conversationErrorSubject = PublishSubject.create();
+    private boolean isUserCallReceiver;
 
     public static Intent newIntent(@Nullable String callerName,
                                    @Nullable String calledUserUsername,
@@ -158,8 +159,25 @@ public class VideoConversationActivity extends BaseActivity {
         setContentView(R.layout.activity_video_conversation);
         ButterKnife.bind(this);
 
-        final Intent intent = checkNotNull(getIntent());
+        initData(getIntent());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        finish();
+        final String calledUserUsername = intent.getStringExtra(ARGS_CALLED_USER_USERNAME);
+        final String callerName = intent.getStringExtra(ARGS_CALLER);
+        final String calledUserImage = intent.getStringExtra(ARGS_CALLED_USER_IMAGE);
+
+        startActivity(VideoConversationActivity.newIntent(callerName, calledUserUsername, calledUserImage, this));
+    }
+
+    private void initData(@Nonnull Intent intent) {
+        checkNotNull(intent);
+
         calledUserUsername = intent.getStringExtra(ARGS_CALLED_USER_USERNAME);
+        isUserCallReceiver = calledUserUsername == null;
         final String callerName = intent.getStringExtra(ARGS_CALLER);
         participantNameTv.setText(callerName);
 
@@ -180,10 +198,10 @@ public class VideoConversationActivity extends BaseActivity {
 
         conversationInfo.bringToFront();
         conversationClient = mTwilio.getConversationsClient();
-        invite = mTwilio.getInvite();
         setupAudioVideo();
 
-        if (calledUserUsername == null) {
+        if (isUserCallReceiver) {
+            incomingInvite = mTwilio.getCurrentInvite();
             acceptIncomingCall();
         }
 
@@ -235,6 +253,7 @@ public class VideoConversationActivity extends BaseActivity {
                 });
 
         mTwilio.getSuccessCalledPersonIdentity()
+                .take(1)
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(calledUserIdentity -> {
                     calledUserTwilioIdentity = calledUserIdentity;
@@ -358,11 +377,12 @@ public class VideoConversationActivity extends BaseActivity {
     }
 
     private void acceptIncomingCall() {
-        if (invite != null && invite.getInviteStatus().equals(InviteStatus.PENDING)) {
+        if (incomingInvite != null && incomingInvite.getInviteStatus().equals(InviteStatus.PENDING)) {
+            LogHelper.logIfDebug(TAG, "VideoConAct started with conf sid: " + incomingInvite.getConversationSid());
 
             callButton.setVisibility(View.GONE);
 
-            invite.accept(setupLocalMedia(), new ConversationCallback() {
+            incomingInvite.accept(setupLocalMedia(), new ConversationCallback() {
                 @Override
                 public void onConversation(Conversation conversation, TwilioConversationsException exception) {
                     if (exception == null) {
@@ -677,23 +697,43 @@ public class VideoConversationActivity extends BaseActivity {
     }
 
     private void closeConversation() {
+        LogHelper.logIfDebug(TAG, "closeConversation()");
 
         smallPreviewWindow.removeAllViews();
         smallPreviewCoverView.setVisibility(View.VISIBLE);
         participantWindow.removeAllViews();
         participantImageView.setVisibility(View.VISIBLE);
 
-        localVideoRenderer = null;
-        participantVideoRenderer = null;
+        if (localVideoRenderer != null) {
+            localVideoRenderer.release();
+            localVideoRenderer = null;
+        }
+
+        if (participantVideoRenderer != null) {
+            participantVideoRenderer.release();
+            participantVideoRenderer = null;
+        }
+
+        cameraCapturer.stopPreview();
+
+        if (incomingInvite != null) {
+            incomingInvite.reject();
+        }
+
+        if (outgoingInvite != null) {
+            outgoingInvite.cancel();
+        }
 
         if (conversation != null) {
             conversation.disconnect();
             conversation = null;
         }
+    }
 
-        if (invite != null) {
-            invite.reject();
-        }
+    @Override
+    protected void onDestroy() {
+        closeConversation();
+        super.onDestroy();
     }
 
     @Nonnull

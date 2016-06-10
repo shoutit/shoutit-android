@@ -275,6 +275,7 @@
         </activity>
         <activity
             android:name=".view.videoconversation.VideoConversationActivity"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait"/>
         <activity android:name=".view.gallery.GalleryActivity"/>
         <activity android:name=".view.verifyemail.VerifyEmailActivity"
@@ -304,7 +305,7 @@
         <activity
             android:name=".view.videoconversation.DialogCallActivity"
             android:screenOrientation="portrait"
-            android:launchMode="singleTask"
+            android:excludeFromRecents="true"
             android:theme="@style/TranslucentBackground"/>
 
         <activity android:name=".view.chooseprofile.SelectProfileActivity"

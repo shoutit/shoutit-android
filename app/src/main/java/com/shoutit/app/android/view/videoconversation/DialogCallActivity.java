@@ -20,7 +20,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.twilio.Twilio;
-import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.squareup.picasso.Picasso;
 import com.twilio.conversations.InviteStatus;
@@ -37,8 +37,10 @@ import static com.appunite.rx.internal.Preconditions.checkNotNull;
 
 public class DialogCallActivity extends BaseActivity {
 
+    private final String TAG = DialogCallActivity.class.getSimpleName();
     private static final String CALLER_NAME = "caller_name";
     private static final String CALLER_IMAGE_URL = "caller_image_url";
+    private static final String CONVERSATION_ID = "conversation_id";
 
     @Bind(R.id.dialog_call_accept)
     View acceptButton;
@@ -56,10 +58,14 @@ public class DialogCallActivity extends BaseActivity {
     @Inject
     Picasso picasso;
 
-    public static Intent newIntent(@Nonnull final String callerName,
+    private String conversationId;
+
+    public static Intent newIntent(@Nonnull String callerName,
                                    @Nullable String imageUrl,
-                                   @Nonnull final Context context) {
+                                   @Nonnull String conversationId,
+                                   @Nonnull Context context) {
         return new Intent(context, DialogCallActivity.class)
+                .putExtra(CONVERSATION_ID, conversationId)
                 .putExtra(CALLER_NAME, callerName)
                 .putExtra(CALLER_IMAGE_URL, imageUrl);
     }
@@ -74,6 +80,7 @@ public class DialogCallActivity extends BaseActivity {
 
         final String callerName = checkNotNull(getIntent().getStringExtra(CALLER_NAME));
         final String callerImageUrl = getIntent().getStringExtra(CALLER_IMAGE_URL);
+        conversationId = checkNotNull(getIntent().getStringExtra(CONVERSATION_ID));
 
         callInfo.setText(getString(R.string.video_calls_caller_name, callerName));
 
@@ -86,7 +93,8 @@ public class DialogCallActivity extends BaseActivity {
                 .subscribe(new Action1<Void>() {
                     @Override
                     public void call(Void aVoid) {
-                        if (mTwilio.getInvite() != null && mTwilio.getInvite().getInviteStatus() == InviteStatus.PENDING) {
+                        if (mTwilio.getCurrentInvite() != null && mTwilio.getCurrentInvite().getInviteStatus() == InviteStatus.PENDING) {
+                            LogHelper.logIfDebug(TAG, "starting conversation with conv sid: " + conversationId);
                             startActivity(VideoConversationActivity.newIntent(callerName, null, callerImageUrl, DialogCallActivity.this));
                         } else {
                             Toast.makeText(DialogCallActivity.this, R.string.video_call_finished, Toast.LENGTH_SHORT)
@@ -101,9 +109,7 @@ public class DialogCallActivity extends BaseActivity {
                 .subscribe(new Action1<Void>() {
                     @Override
                     public void call(Void aVoid) {
-                        if (mTwilio.getInvite() != null) {
-                            mTwilio.getInvite().reject();
-                        }
+                        rejectCall();
                         finish();
                     }
                 });
@@ -124,9 +130,13 @@ public class DialogCallActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
+        rejectCall();
         super.onBackPressed();
-        if (mTwilio.getInvite() != null) {
-            mTwilio.getInvite().reject();
+    }
+
+    private void rejectCall() {
+        if (mTwilio.getCurrentInvite() != null) {
+            mTwilio.getCurrentInvite().reject();
         }
     }
 
