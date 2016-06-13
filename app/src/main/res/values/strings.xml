@@ -612,4 +612,36 @@
     <string name="credit_promote">Promoting Shouts</string>
     <string name="credits_spend_on">Spend On</string>
     <string name="credit_earn_by">Earn By</string>
+    <string name="credits_complete_profile">Complete your profile to earn 1 Shoutit Credit</string>
+    <string name="credits_profile_positive">Complete Profile</string>
+    <string name="credits_facebook">Earn 1 Shoutit Credit for each shout you publicly share on
+        Facebook
+    </string>
+    <string name="credits_facebook_positive">Create Shout</string>
+    <string name="credits_invite">Earn 1 Shoutit Credit whenever a friend you invited signs up
+    </string>
+    <string name="credits_invite_positive">Invite Friends</string>
+    <string name="credits_listen">Earn up to 10 Shoutit Credits for finding your friends and
+        listening to them
+    </string>
+    <string name="credits_listen_positive">Find Friends</string>
+    <string name="credits_negative">Got it</string>
+
+    <!-- Promote Shout -->
+    <string name="promote_shout_info_header">Draw more attention to your Shouts by promoting them!
+    </string>
+    <string name="promote_shout_info_premium_header">Premium</string>
+    <string name="promote_shout_info_premium_text">Your shout will be highlighted in all searches.
+    </string>
+    <string name="promote_shout_info_footer">
+        <![CDATA[Promote each shout on your Profile individually by clicking <font color=#26ffd700>"Promote"</font>. To promote a shout you ned to have enough Shoutit Credit.]]></string>
+    <string name="promote_shout_info_top_premium">Top Premium</string>
+    <string name="promote_shout_info_top">Top</string>
+    <string name="promote_shout_info_top_text">Your shout will appear on top of search results.
+    </string>
+    <string name="promote_shout_info_top_premium_text">Your shout will be highlighted and appear on
+        top of all searches
+    </string>
+    <string name="promote_shout_info_title">Promoting Shouts</string>
+
 </resources>
