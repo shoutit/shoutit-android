@@ -23,6 +23,7 @@ import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.squareup.picasso.Picasso;
+import com.twilio.conversations.IncomingInvite;
 import com.twilio.conversations.InviteStatus;
 
 import javax.annotation.Nonnull;
@@ -71,6 +72,17 @@ public class DialogCallActivity extends BaseActivity {
     }
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        finish();
+        final String callerName = checkNotNull(getIntent().getStringExtra(CALLER_NAME));
+        final String callerImageUrl = getIntent().getStringExtra(CALLER_IMAGE_URL);
+        conversationId = checkNotNull(getIntent().getStringExtra(CONVERSATION_ID));
+
+        startActivity(DialogCallActivity.newIntent(callerName, callerImageUrl,conversationId, this));
+        super.onNewIntent(intent);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dialog_call);
@@ -90,29 +102,31 @@ public class DialogCallActivity extends BaseActivity {
 
         RxView.clicks(acceptButton)
                 .compose(bindToLifecycle())
-                .subscribe(new Action1<Void>() {
-                    @Override
-                    public void call(Void aVoid) {
-                        if (mTwilio.getCurrentInvite() != null && mTwilio.getCurrentInvite().getInviteStatus() == InviteStatus.PENDING) {
-                            LogHelper.logIfDebug(TAG, "starting conversation with conv sid: " + conversationId);
-                            startActivity(VideoConversationActivity.newIntent(callerName, null, callerImageUrl, DialogCallActivity.this));
-                        } else {
-                            Toast.makeText(DialogCallActivity.this, R.string.video_call_finished, Toast.LENGTH_SHORT)
-                                    .show();
-                        }
-                        finish();
+                .subscribe(aVoid -> {
+                    if (canAnswerTheCall()) {
+                        LogHelper.logIfDebug(TAG, "starting conversation with conv sid: " + conversationId);
+                        startActivity(VideoConversationActivity.newIntent(callerName, null, callerImageUrl, DialogCallActivity.this));
+                    } else {
+                        final String status = mTwilio.getCurrentInvite() != null ? mTwilio.getCurrentInvite().getInviteStatus().name() : "";
+                        LogHelper.logIfDebug(TAG, "starting conversation with conv sid: " + conversationId + " and status: " + status);
+                        Toast.makeText(DialogCallActivity.this, R.string.video_call_finished, Toast.LENGTH_SHORT)
+                                .show();
                     }
+                    finish();
                 });
 
         RxView.clicks(rejectButton)
                 .compose(bindToLifecycle())
-                .subscribe(new Action1<Void>() {
-                    @Override
-                    public void call(Void aVoid) {
-                        rejectCall();
-                        finish();
-                    }
+                .subscribe(aVoid -> {
+                    rejectCall();
+                    finish();
                 });
+    }
+
+    private boolean canAnswerTheCall() {
+        final IncomingInvite currentInvite = mTwilio.getCurrentInvite();
+        return currentInvite != null &&
+                currentInvite.getInviteStatus() == InviteStatus.PENDING;
     }
 
     private void playRingtone(Context context) {

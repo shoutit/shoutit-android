@@ -295,7 +295,6 @@ public class VideoConversationActivity extends BaseActivity {
             final LocalVideoTrack track = conversation.getLocalMedia().getLocalVideoTracks().get(0);
             track.enable(showVideo);
             showOrHideSmallPreview(showVideo);
-            participantImageView.setVisibility(View.GONE);
         } else if (isCalling()) {
             showOrHideSmallPreview(showVideo);
             participantImageView.setVisibility(View.VISIBLE);
@@ -305,7 +304,7 @@ public class VideoConversationActivity extends BaseActivity {
     }
 
     private boolean isCalling() {
-        return conversation == null && outgoingInvite != null;
+        return conversation == null && !isUserCallReceiver && outgoingInvite != null;
     }
 
     private boolean shouldShowVideo() {
@@ -391,6 +390,7 @@ public class VideoConversationActivity extends BaseActivity {
                                 .conversation = conversation;
                         conversation
                                 .setConversationListener(conversationListener());
+                        showOrHideVideo(shouldShowVideo());
                     } else {
                         conversationErrorSubject.onNext(TextHelper.formatErrorMessage(exception.getMessage()));
                     }
@@ -474,9 +474,9 @@ public class VideoConversationActivity extends BaseActivity {
             @Override
             public void onLocalVideoTrackAdded(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
                 LogHelper.logIfDebug(TAG, "onLocalVideoTrackAdded");
-                showOrHideVideo(shouldShowVideo());
                 localVideoRenderer = new VideoViewRenderer(VideoConversationActivity.this, smallPreviewWindow);
                 localVideoTrack.addRenderer(localVideoRenderer);
+                showOrHideVideo(shouldShowVideo());
             }
 
             @Override
@@ -522,6 +522,9 @@ public class VideoConversationActivity extends BaseActivity {
 
             @Override
             public void onConversationEnded(Conversation conversation, TwilioConversationsException e) {
+                if (e != null) {
+                    LogHelper.logIfDebug(TAG, "onConversationEnded with error: " + e.getMessage() + " " + e.getErrorCode());
+                }
                 stopVideoTimer();
                 closeConversation();
             }
@@ -540,6 +543,8 @@ public class VideoConversationActivity extends BaseActivity {
         return new Participant.Listener() {
             @Override
             public void onVideoTrackAdded(Conversation conversation, Participant participant, VideoTrack videoTrack) {
+                LogHelper.logIfDebug(TAG, "onVideoTrackAdded");
+                showOrHideParticipantView(videoTrack.isEnabled());
                 participantVideoRenderer = new VideoViewRenderer(VideoConversationActivity.this, participantWindow);
                 participantVideoRenderer.setObserver(new VideoRenderer.Observer() {
 
@@ -556,6 +561,7 @@ public class VideoConversationActivity extends BaseActivity {
 
             @Override
             public void onVideoTrackRemoved(Conversation conversation, Participant participant, VideoTrack videoTrack) {
+                LogHelper.logIfDebug(TAG, "onVideoTrackRemoved");
                 videoTrack.removeRenderer(participantVideoRenderer);
             }
 
@@ -570,6 +576,7 @@ public class VideoConversationActivity extends BaseActivity {
             @Override
             public void onTrackEnabled(Conversation conversation, Participant participant, MediaTrack mediaTrack) {
                 if (!isAudioTrack(mediaTrack, participant.getMedia().getAudioTracks())) {
+                    LogHelper.logIfDebug(TAG, "onTrackEnabled");
                     showOrHideParticipantView(true);
                 }
             }
@@ -577,6 +584,7 @@ public class VideoConversationActivity extends BaseActivity {
             @Override
             public void onTrackDisabled(Conversation conversation, Participant participant, MediaTrack mediaTrack) {
                 if (!isAudioTrack(mediaTrack, participant.getMedia().getAudioTracks())) {
+                    LogHelper.logIfDebug(TAG, "onTrackDisabled");
                     showOrHideParticipantView(false);
                 }
             }
@@ -720,14 +728,12 @@ public class VideoConversationActivity extends BaseActivity {
             incomingInvite.reject();
         }
 
-        if (outgoingInvite != null) {
-            outgoingInvite.cancel();
-        }
-
         if (conversation != null) {
             conversation.disconnect();
             conversation = null;
         }
+
+        mTwilio.clearCurrentInvite();
     }
 
     @Override

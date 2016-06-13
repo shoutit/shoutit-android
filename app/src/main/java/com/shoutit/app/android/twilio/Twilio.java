@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
@@ -62,8 +63,6 @@ public class Twilio {
     private final Observable<String> successCalledPersonIdentity;
     private final Observable<Throwable> errorCalledPersonIdentity;
 
-    @Nonnull
-    private final PublishSubject<String> callerIdentitySubject = PublishSubject.create();
     @Nonnull
     private final PublishSubject<BothParams<String, String>> profileRefreshSubject = PublishSubject.create();
     @Nonnull
@@ -126,7 +125,9 @@ public class Twilio {
                                 }));
                     }
                 })
-                .compose(ObservableExtensions.<ResponseOrError<BothParams<CallerProfile, String>>>behaviorRefCount());
+                .compose(ObservableExtensions.<ResponseOrError<BothParams<CallerProfile, String>>>behaviorRefCount())
+                .mergeWith(Observable.never());
+
 
         callerProfileResponse
                 .compose(ResponseOrError.onlySuccess())
@@ -238,6 +239,7 @@ public class Twilio {
                 if (conversationsClient != null) {
                     conversationsClient.listen();
                 }
+                Twilio.this.conversationsClient.listen();
             }
 
             @Override
@@ -253,13 +255,16 @@ public class Twilio {
                         incomingInvite.getConversationSid() + " and invitation status: " + incomingInvite.getInviteStatus());
 
                  if (!isDuringTheCall() && incomingInvite.getInviteStatus() == InviteStatus.PENDING) {
+                     LogHelper.logIfDebug(TAG, "starting call");
                     currentInvite = incomingInvite;
 
                     final String caller = String.valueOf(incomingInvite.getParticipants());
                     final String callerIdentity = caller.substring(1, caller.length() - 1);
 
-                    callerIdentitySubject.onNext(callerIdentity);
                     profileRefreshSubject.onNext(new BothParams<>(incomingInvite.getConversationSid(), callerIdentity));
+                 } else {
+                     LogHelper.logIfDebug(TAG, "is during a call? " + isDuringTheCall());
+                     LogHelper.logIfDebug(TAG, "Cannot start conversation with id: " + incomingInvite.getConversationSid() + " and status: " + incomingInvite.getInviteStatus());
                  }
             }
 
@@ -270,6 +275,7 @@ public class Twilio {
                 if (conversationsClient != null) {
                     conversationsClient.listen();
                 }
+                Twilio.this.conversationsClient.listen();
             }
         };
     }
@@ -308,5 +314,12 @@ public class Twilio {
 
     public Observable<Throwable> getErrorCalledPersonIdentity() {
         return errorCalledPersonIdentity;
+    }
+
+    public void clearCurrentInvite() {
+        if (currentInvite != null) {
+            currentInvite.reject();
+            currentInvite = null;
+        }
     }
 }
