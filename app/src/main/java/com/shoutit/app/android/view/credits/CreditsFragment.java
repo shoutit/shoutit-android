@@ -73,16 +73,16 @@ public class CreditsFragment extends BaseFragment {
             case R.id.credit_balance:
                 break;
             case R.id.credit_complete_profile:
-                showDialogAndStartActivity("Complete your profile to earn 1 Shoutit Credit", "Complete Profile", UserOrPageProfileActivity.newIntent(getActivity(), User.ME));
+                showDialogAndStartActivity(getString(R.string.credits_complete_profile), getString(R.string.credits_profile_positive), UserOrPageProfileActivity.newIntent(getActivity(), User.ME));
                 break;
             case R.id.credit_facebook:
-                showDialogAndStartActivity("Earn 1 Shoutit Credit for each shout you publicly share on Facebook", "Create Shout", CreateShoutDialogActivity.getIntent(getActivity()));
+                showDialogAndStartActivity(getString(R.string.credits_facebook), getString(R.string.credits_facebook_positive), CreateShoutDialogActivity.getIntent(getActivity()));
                 break;
             case R.id.credit_invite_friends:
-                showDialogAndShowFragment("Earn 1 Shoutit Credit whenever a friend you invited signs up", "Invite Friends", MenuHandler.FRAGMENT_INVITE_FRIENDS);
+                showDialogAndShowFragment(getString(R.string.credits_invite), getString(R.string.credits_invite_positive), MenuHandler.FRAGMENT_INVITE_FRIENDS);
                 break;
             case R.id.credit_listen:
-                showDialogAndShowFragment("Earn up to 10 Shoutit Credits for finding your friends and listening to them", "Find Friends", MenuHandler.FRAGMENT_INVITE_FRIENDS);
+                showDialogAndShowFragment(getString(R.string.credits_listen), getString(R.string.credits_listen_positive), MenuHandler.FRAGMENT_INVITE_FRIENDS);
                 break;
             case R.id.credit_promote_shout:
                 startActivity(PromoteShoutInfoActivity.newIntent(getActivity()));
@@ -94,7 +94,7 @@ public class CreditsFragment extends BaseFragment {
         new AlertDialog.Builder(getActivity())
                 .setMessage(message)
                 .setPositiveButton(positiveText, onClickListener)
-                .setNegativeButton("Got it", (dialog, which) -> {
+                .setNegativeButton(getString(R.string.credits_negative), (dialog, which) -> {
                     dialog.dismiss();
                 })
                 .show();
