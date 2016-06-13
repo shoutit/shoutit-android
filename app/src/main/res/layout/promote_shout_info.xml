@@ -50,14 +50,14 @@
                 android:textSize="16sp"/>
 
             <View
-                android:id="@+id/promote_shout_info_anchor"
+                android:id="@+id/promote_shout_info_anchor_1"
                 android:layout_centerVertical="true"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:visibility="invisible"/>
 
             <TextView
-                android:layout_below="@id/promote_shout_info_anchor"
+                android:layout_below="@id/promote_shout_info_anchor_1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
@@ -94,14 +94,14 @@
                 android:textSize="16sp"/>
 
             <View
-                android:id="@+id/promote_shout_info_anchor"
+                android:id="@+id/promote_shout_info_anchor_2"
                 android:layout_centerVertical="true"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:visibility="invisible"/>
 
             <TextView
-                android:layout_below="@id/promote_shout_info_anchor"
+                android:layout_below="@id/promote_shout_info_anchor_2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
@@ -138,14 +138,14 @@
                 android:textSize="16sp"/>
 
             <View
-                android:id="@+id/promote_shout_info_anchor"
+                android:id="@+id/promote_shout_info_anchor_3"
                 android:layout_centerVertical="true"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:visibility="invisible"/>
 
             <TextView
-                android:layout_below="@id/promote_shout_info_anchor"
+                android:layout_below="@id/promote_shout_info_anchor_3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
