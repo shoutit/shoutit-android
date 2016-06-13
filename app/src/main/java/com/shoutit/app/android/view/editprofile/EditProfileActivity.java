@@ -3,12 +3,14 @@ package com.shoutit.app.android.view.editprofile;
 import android.Manifest;
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -68,7 +70,6 @@ public class EditProfileActivity extends BaseActivity {
     private static final int REQUEST_CODE_CAPTURE_IMAGE_FOR_AVATAR = 3;
     private static final int REQUEST_CODE_CAPTURE_IMAGE_FOR_COVER = 4;
     private static final String KEY_LOCATION = "key_location";
-    private static final SimpleDateFormat birthdayDateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
     @Bind(R.id.edit_profile_toolbar)
     Toolbar toolbar;
@@ -218,7 +219,12 @@ public class EditProfileActivity extends BaseActivity {
 
         RxView.clicks(birthDayTv)
                 .compose(bindToLifecycle())
-                .subscribe(presenter.showDatePicker());
+                .subscribe(new Action1<Void>() {
+                    @Override
+                    public void call(Void aVoid) {
+                        presenter.showDatePicker();
+                    }
+                });
 
         presenter.getShowDatePickerObservable()
                 .compose(bindToLifecycle())
@@ -304,10 +310,15 @@ public class EditProfileActivity extends BaseActivity {
         presenter.getUsernameErrorObservable()
                 .compose(this.<Boolean>bindToLifecycle())
                 .subscribe(Actions1.setOrEraseError(usernameInput, getString(R.string.error_field_empty)));
+
+        presenter.getShowCompleteProfileDialogObservable()
+                .compose(bindToLifecycle())
+                .subscribe(ignore -> {
+                    showCompleteProfileDialog();
+                });
     }
 
-    private void showDatePicker(@Nullable Long currentBirthday) {
-        final long initDate = currentBirthday != null ? currentBirthday : System.currentTimeMillis();
+    private void showDatePicker(long initDate) {
         final Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date(initDate));
 
@@ -318,6 +329,22 @@ public class EditProfileActivity extends BaseActivity {
                 presenter.birthdayChanged(calendar.getTimeInMillis());
             }
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), Calendar.DAY_OF_MONTH)
+                .show();
+    }
+
+    private void showCompleteProfileDialog() {
+        if (isFinishing()) {
+            return;
+        }
+
+        new AlertDialog.Builder(this)
+                .setMessage(R.string.edit_profile_complete_profile_message)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
                 .show();
     }
 
@@ -374,10 +401,7 @@ public class EditProfileActivity extends BaseActivity {
             mobileEt.setText(user.getMobile());
             final String gender = user.getGender();
             genderSpinner.setSelection(getAdapterPositionForGender(gender));
-            if (user.getBirthday() != null) {
-                final String birthDay = birthdayDateFormat.format(new Date(user.getBirthday()));
-                birthDayTv.setText(birthDay);
-            }
+            birthDayTv.setText(user.getBirthday());
         };
     }
 

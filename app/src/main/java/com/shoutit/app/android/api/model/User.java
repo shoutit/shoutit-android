@@ -53,7 +53,7 @@ public class User extends BaseProfile {
     @Nullable
     private final String gender;
     @Nullable
-    private final Long birthday;
+    private final String birthday; // Formatted like YYYY-MM-DD
     @NonNull
     private final Stats stats;
     @Nullable
@@ -64,7 +64,7 @@ public class User extends BaseProfile {
                 String cover, boolean isListening, boolean isListener, boolean isPasswordSet, UserLocation location,
                 int listenersCount, List<Page> pages, List<Admin> admins, String bio, int dateJoined,
                 Listening listeningCount, boolean isOwner, String about, String mobile, String website, String email, ConversationDetails conversation,
-                @Nullable String gender, @Nullable Long birthday, @Nullable Stats stats, @Nullable LinkedAccounts linkedAccounts) {
+                @Nullable String gender, @Nullable String birthday, @Nullable Stats stats, @Nullable LinkedAccounts linkedAccounts) {
         super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount);
         this.apiUrl = apiUrl;
         this.webUrl = webUrl;
@@ -240,7 +240,7 @@ public class User extends BaseProfile {
     }
 
     @Nullable
-    public Long getBirthday() {
+    public String getBirthday() {
         return birthday;
     }
 

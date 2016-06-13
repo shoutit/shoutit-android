@@ -289,6 +289,7 @@
     <string name="edit_profile_hint_last_name">Last Name</string>
     <string name="edit_profile_hint_mobile">Mobile</string>
     <string name="edit_done_btn">Edit</string>
+    <string name="edit_profile_complete_profile_message">Complete your profile to earn 1 Shoutit Credit</string>
     <string-array name="genders">
         <item>Male</item>
         <item>Female</item>
@@ -625,4 +626,5 @@
     <string name="credit_promote">Promoting Shouts</string>
     <string name="credits_spend_on">Spend On</string>
     <string name="credit_earn_by">Earn By</string>
+
 </resources>

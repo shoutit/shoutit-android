@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.profile.myprofile;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.User;
@@ -38,12 +39,18 @@ public class MyProfileHalfPresenter {
     public ProfileAdapterItems.NameAdapterItem getUserNameAdapterItem(@Nonnull User user,
                                                                       @Nonnull Observable<Integer> notificationsUnreadObservable) {
         return new ProfileAdapterItems.MyUserNameAdapterItem(user, editProfileClickObserver,
-                notificationsClickObserver, verifyAccountClickObserver, notificationsUnreadObservable);
+                notificationsClickObserver, verifyAccountClickObserver, notificationsUnreadObservable, shouldShowProfileBadge(user));
     }
 
     public ProfileAdapterItems.MyProfileThreeIconsAdapterItem getThreeIconsAdapterItem(@Nonnull User user) {
         return new ProfileAdapterItems.MyProfileThreeIconsAdapterItem(
                 user, listeningsClickObserver, interestsClickObserver, listenersClickObserver);
+    }
+
+    private boolean shouldShowProfileBadge(@Nonnull User user) {
+        return TextUtils.isEmpty(user.getImage()) ||
+                TextUtils.isEmpty(user.getGender()) ||
+                user.getBirthday() == null;
     }
 
     public String getShoutsHeaderTitle() {

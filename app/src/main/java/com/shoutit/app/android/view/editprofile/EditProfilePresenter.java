@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
@@ -26,6 +27,10 @@ import com.shoutit.app.android.utils.rx.RxMoreObservers;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 import javax.annotation.Nonnull;
 
@@ -42,6 +47,7 @@ import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
 public class EditProfilePresenter {
+    private static final SimpleDateFormat birthdayDateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
     private final BehaviorSubject<String> firstNameSubject = BehaviorSubject.create();
     private final BehaviorSubject<String> lastNameSubject = BehaviorSubject.create();
@@ -50,7 +56,7 @@ public class EditProfilePresenter {
     private final BehaviorSubject<String> websiteSubject = BehaviorSubject.create();
     private final BehaviorSubject<String> mobileSubject = BehaviorSubject.create();
     private final BehaviorSubject<String> genderSubject = BehaviorSubject.create();
-    private final BehaviorSubject<Long> birthdaySubject = BehaviorSubject.create();
+    private final BehaviorSubject<String> birthdaySubject = BehaviorSubject.create();
     private final BehaviorSubject<UserLocation> locationSubject = BehaviorSubject.create();
     private final BehaviorSubject<UpdateUserRequest> lastCombinedData = BehaviorSubject.create();
     private final BehaviorSubject<Uri> lastSelectedAvatarUri = BehaviorSubject.create();
@@ -68,6 +74,8 @@ public class EditProfilePresenter {
     private final Observable<User> successObservable;
     @Nonnull
     private final Observable<Object> imageUploadToApiSuccessObservable;
+    @Nonnull
+    private final Observable<Boolean> showCompleteProfileDialogObservable;
 
     @Nonnull
     private final ApiService apiService;
@@ -198,13 +206,13 @@ public class EditProfilePresenter {
                 websiteSubject.startWith((String) null),
                 mobileSubject.startWith((String) null),
                 genderSubject.startWith((String) null),
-                birthdaySubject.startWith((Long) null),
+                birthdaySubject.startWith((String) null),
                 locationSubject.startWith((UserLocation) null),
-                new Func9<String, String, String, String, String, String, String, Long, UserLocation, UpdateUserRequest>() {
+                new Func9<String, String, String, String, String, String, String, String, UserLocation, UpdateUserRequest>() {
                     @Override
                     public UpdateUserRequest call(String username, String firstName, String lastName, String bio,
                                                   String website, String mobile, String gender,
-                                                  Long birthday, UserLocation userLocation) {
+                                                  String birthday, UserLocation userLocation) {
                         return UpdateUserRequest.updateProfile(username, firstName, lastName, bio,
                                 website, mobile, gender, birthday, userLocation);
                     }
@@ -326,6 +334,17 @@ public class EditProfilePresenter {
 
         updateProfileError = updateRequest.compose(ResponseOrError.<User>onlyError())
                 .observeOn(uiScheduler);
+
+        showCompleteProfileDialogObservable = userObservable
+                .map(new Func1<User, Boolean>() {
+                    @Override
+                    public Boolean call(User user) {
+                        return TextUtils.isEmpty(user.getImage()) ||
+                                TextUtils.isEmpty(user.getGender()) ||
+                                user.getBirthday() == null;
+                    }
+                })
+                .filter(Functions1.isTrue());
     }
 
     @NonNull
@@ -484,6 +503,11 @@ public class EditProfilePresenter {
                 .observeOn(uiScheduler);
     }
 
+    @Nonnull
+    public Observable<Boolean> getShowCompleteProfileDialogObservable() {
+        return showCompleteProfileDialogObservable;
+    }
+
     public void onSaveClicked() {
         saveClickSubject.onNext(null);
     }
@@ -496,12 +520,30 @@ public class EditProfilePresenter {
         return showDatePickerSubject;
     }
 
-    public Action1<? super Void> showDatePicker() {
-        return ignore -> showDatePickerSubject.onNext(birthdaySubject.getValue());
+    public void showDatePicker() {
+        final String currentDate = birthdaySubject.getValue();
+        long initDate;
+
+        if (TextUtils.isEmpty(currentDate)) {
+            initDate = System.currentTimeMillis();
+        } else {
+            final String[] split = currentDate.split("-");
+            if (split.length != 3) {
+                initDate = System.currentTimeMillis();
+            } else {
+                final Calendar calendar = Calendar.getInstance();
+                calendar.set(Integer.valueOf(split[0]), Integer.valueOf(split[1]), Integer.valueOf(split[2]));
+
+                initDate = calendar.getTimeInMillis();
+            }
+        }
+
+        showDatePickerSubject.onNext(initDate);
     }
 
     public void birthdayChanged(long timeInMillis) {
-        birthdaySubject.onNext(timeInMillis);
+        final String birthDay = birthdayDateFormat.format(new Date(timeInMillis));
+        birthdaySubject.onNext(birthDay);
     }
 
     public static class State {

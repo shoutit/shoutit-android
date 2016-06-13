@@ -270,16 +270,19 @@ public class ProfileAdapterItems {
         private final Observer<Object> verifyAccountClickObserver;
         @Nonnull
         private final Observable<Integer> notificationsUnreadObservable;
+        private final boolean shouldShowProfileBadge;
 
         public MyUserNameAdapterItem(@Nonnull User user, @NonNull Observer<Object> editProfileClickObserver,
                                      @Nonnull Observer<Object> notificationsClickObserver,
                                      @Nonnull Observer<Object> verifyAccountClickObserver,
-                                     @Nonnull Observable<Integer> notificationsUnreadObservable) {
+                                     @Nonnull Observable<Integer> notificationsUnreadObservable,
+                                     boolean shouldShowProfileBadge) {
             super(user);
             this.editProfileClickObserver = editProfileClickObserver;
             this.notificationsClickObserver = notificationsClickObserver;
             this.verifyAccountClickObserver = verifyAccountClickObserver;
             this.notificationsUnreadObservable = notificationsUnreadObservable;
+            this.shouldShowProfileBadge = shouldShowProfileBadge;
         }
 
         @Override
@@ -312,6 +315,10 @@ public class ProfileAdapterItems {
 
         public void onVerifyAccountClick() {
             verifyAccountClickObserver.onNext(null);
+        }
+
+        public boolean shouldShowProfileBadge() {
+            return shouldShowProfileBadge;
         }
     }
 

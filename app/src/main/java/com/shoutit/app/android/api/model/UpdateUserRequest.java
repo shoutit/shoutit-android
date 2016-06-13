@@ -26,18 +26,19 @@ public class UpdateUserRequest {
     private final String email;
     @Nullable
     private final String gender;
-    private final long birtday;
+    @Nullable
+    private final String birthday;
 
     public static UpdateUserRequest updateWithEmail(String email) {
-        return new UpdateUserRequest(null, null, null, email, null, null, null, null, null, null, null, 0);
+        return new UpdateUserRequest(null, null, null, email, null, null, null, null, null, null, null, null);
     }
 
     public static UpdateUserRequest updateWithCoverUrl(String coverUrl) {
-        return new UpdateUserRequest(null, null, null, null, null, null, null, coverUrl, null, null, null, 0);
+        return new UpdateUserRequest(null, null, null, null, null, null, null, coverUrl, null, null, null, null);
     }
 
     public static UpdateUserRequest updateWithAvatarUrl(String avatarUrl) {
-        return new UpdateUserRequest(null, null, null, null, null, null, null, null, avatarUrl, null, null, 0);
+        return new UpdateUserRequest(null, null, null, null, null, null, null, null, avatarUrl, null, null, null);
     }
 
     public static UpdateUserRequest updateProfile(@Nullable String username,
@@ -47,7 +48,7 @@ public class UpdateUserRequest {
                                                   @Nullable String website,
                                                   @Nullable String mobile,
                                                   @Nullable String gender,
-                                                  long birthdayTimestamp,
+                                                  @Nullable String birthdayTimestamp,
                                                   @Nullable UserLocation location) {
         return new UpdateUserRequest(firstName, lastName, username, null, bio, website,
                 location, null, null, mobile, gender, birthdayTimestamp);
@@ -58,7 +59,7 @@ public class UpdateUserRequest {
                              @Nullable String bio, @Nullable String website,
                              @Nullable UserLocation location, @Nullable String cover,
                              @Nullable String image, @Nullable String mobile,
-                             @Nullable String gender, long birthdayTimestamp) {
+                             @Nullable String gender, @Nullable String birthdayTimestamp) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
@@ -70,6 +71,6 @@ public class UpdateUserRequest {
         this.image = image;
         this.mobile = mobile;
         this.gender = gender;
-        this.birtday = birthdayTimestamp;
+        this.birthday = birthdayTimestamp;
     }
 }
