@@ -111,6 +111,8 @@
         />
         <activity android:name=".view.location.LocationActivity"
             android:screenOrientation="portrait"/>
+        <activity android:name=".view.promote.PromoteShoutInfoActivity"
+                  android:screenOrientation="portrait"/>
         <activity
             android:name=".view.discover.DiscoverActivity"
             android:screenOrientation="portrait">
