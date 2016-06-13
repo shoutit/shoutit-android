@@ -32,10 +32,12 @@ import javax.annotation.Nonnull;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.functions.Func3;
 import rx.functions.Func7;
+import rx.functions.Func9;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
@@ -47,6 +49,8 @@ public class EditProfilePresenter {
     private final BehaviorSubject<String> bioSubject = BehaviorSubject.create();
     private final BehaviorSubject<String> websiteSubject = BehaviorSubject.create();
     private final BehaviorSubject<String> mobileSubject = BehaviorSubject.create();
+    private final BehaviorSubject<String> genderSubject = BehaviorSubject.create();
+    private final BehaviorSubject<Long> birthdaySubject = BehaviorSubject.create();
     private final BehaviorSubject<UserLocation> locationSubject = BehaviorSubject.create();
     private final BehaviorSubject<UpdateUserRequest> lastCombinedData = BehaviorSubject.create();
     private final BehaviorSubject<Uri> lastSelectedAvatarUri = BehaviorSubject.create();
@@ -54,6 +58,7 @@ public class EditProfilePresenter {
 
     private final PublishSubject<Object> saveClickSubject = PublishSubject.create();
     private final PublishSubject<Boolean> progressSubject = PublishSubject.create();
+    private final PublishSubject<Long> showDatePickerSubject = PublishSubject.create();
 
     @Nonnull
     private final Observable<String> avatarObservable;
@@ -192,11 +197,16 @@ public class EditProfilePresenter {
                 bioSubject.startWith((String) null),
                 websiteSubject.startWith((String) null),
                 mobileSubject.startWith((String) null),
+                genderSubject.startWith((String) null),
+                birthdaySubject.startWith((Long) null),
                 locationSubject.startWith((UserLocation) null),
-                new Func7<String, String, String, String, String, String, UserLocation, UpdateUserRequest>() {
+                new Func9<String, String, String, String, String, String, String, Long, UserLocation, UpdateUserRequest>() {
                     @Override
-                    public UpdateUserRequest call(String username, String firstName, String lastName, String bio, String website, String mobile, UserLocation userLocation) {
-                        return UpdateUserRequest.updateProfile(username, firstName, lastName, bio, website, mobile, userLocation);
+                    public UpdateUserRequest call(String username, String firstName, String lastName, String bio,
+                                                  String website, String mobile, String gender,
+                                                  Long birthday, UserLocation userLocation) {
+                        return UpdateUserRequest.updateProfile(username, firstName, lastName, bio,
+                                website, mobile, gender, birthday, userLocation);
                     }
                 })
                 .subscribe(lastCombinedData);
@@ -459,6 +469,10 @@ public class EditProfilePresenter {
         return RxMoreObservers.ignoreCompleted(mobileSubject);
     }
 
+    public Observer<String> getGenderObserver() {
+        return RxMoreObservers.ignoreCompleted(genderSubject);
+    }
+
     @Nonnull
     public Observable<User> getSuccessObservable() {
         return successObservable;
@@ -476,6 +490,18 @@ public class EditProfilePresenter {
 
     public void onLocationChanged(UserLocation userLocation) {
         locationSubject.onNext(userLocation);
+    }
+
+    public Observable<Long> getShowDatePickerObservable() {
+        return showDatePickerSubject;
+    }
+
+    public Action1<? super Void> showDatePicker() {
+        return ignore -> showDatePickerSubject.onNext(birthdaySubject.getValue());
+    }
+
+    public void birthdayChanged(long timeInMillis) {
+        birthdaySubject.onNext(timeInMillis);
     }
 
     public static class State {

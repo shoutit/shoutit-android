@@ -245,6 +245,52 @@
 
                     </android.support.design.widget.TextInputLayout>
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="4dp"
+                        android:paddingStart="4dp"
+                        android:text="@string/edit_profile_header_gender"
+                        android:textColor="@color/black_54"
+                        android:textSize="14sp" />
+
+                    <Spinner
+                        android:id="@+id/edit_profile_gender_spinner"
+                        style="@style/Base.Widget.AppCompat.Spinner.Underlined"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="22dp"
+                        android:layout_marginEnd="1dp"
+                        android:ellipsize="end"
+                        android:gravity="start|left"
+                        android:singleLine="true"
+                        android:textColor="@color/black_87"
+                        android:textSize="14sp"
+                        android:theme="@style/BlueEditText"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="4dp"
+                        android:paddingStart="4dp"
+                        android:text="@string/edit_profile_header_birthday"
+                        android:textColor="@color/black_54"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/edit_profile_birthday_tv"
+                        style="@style/Base.Widget.AppCompat.Spinner.Underlined"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="22dp"
+                        android:layout_marginEnd="1dp"
+                        android:ellipsize="end"
+                        android:gravity="start|left"
+                        android:singleLine="true"
+                        android:textColor="@color/black_87"
+                        android:textSize="14sp"
+                        android:theme="@style/BlueEditText" />
+
                 </LinearLayout>
 
             </RelativeLayout>

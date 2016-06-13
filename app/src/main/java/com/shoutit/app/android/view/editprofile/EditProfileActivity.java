@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.editprofile;
 
 import android.Manifest;
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -9,12 +10,17 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,10 +42,16 @@ import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.utils.rx.Actions1;
+import com.shoutit.app.android.utils.rx.RxUtils;
 import com.shoutit.app.android.view.createshout.location.LocationActivity;
 import com.shoutit.app.android.view.createshout.location.LocationResultHelper;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -56,6 +68,7 @@ public class EditProfileActivity extends BaseActivity {
     private static final int REQUEST_CODE_CAPTURE_IMAGE_FOR_AVATAR = 3;
     private static final int REQUEST_CODE_CAPTURE_IMAGE_FOR_COVER = 4;
     private static final String KEY_LOCATION = "key_location";
+    private static final SimpleDateFormat birthdayDateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
     @Bind(R.id.edit_profile_toolbar)
     Toolbar toolbar;
@@ -105,7 +118,10 @@ public class EditProfileActivity extends BaseActivity {
     ImageView avatarPhotoIconIv;
     @Bind(R.id.edit_profile_avatar_progressbar)
     ProgressBar avatarProgressbar;
-
+    @Bind(R.id.edit_profile_gender_spinner)
+    Spinner genderSpinner;
+    @Bind(R.id.edit_profile_birthday_tv)
+    TextView birthDayTv;
 
     @Inject
     EditProfilePresenter presenter;
@@ -130,6 +146,10 @@ public class EditProfileActivity extends BaseActivity {
         ButterKnife.bind(this);
 
         setUpToolbar();
+
+        final String[] genders = getResources().getStringArray(R.array.genders);
+        final SpinnerAdapter genderAdapter = new ArrayAdapter<>(this, android.R.layout.simple_expandable_list_item_1, genders);
+        genderSpinner.setAdapter(genderAdapter);
 
         presenter.getUserObservable()
                 .compose(this.<User>bindToLifecycle())
@@ -176,6 +196,33 @@ public class EditProfileActivity extends BaseActivity {
                 .map(MoreFunctions1.mapTextChangeEventToString())
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(presenter.getMobileObserver());
+
+        RxUtils.spinnerItemClicks(genderSpinner)
+                .map(onItemClickEvent -> {
+                    final int adapterPosition = onItemClickEvent.position;
+                    switch (adapterPosition) {
+                        case 0:
+                            return User.Gender.MALE.getGenderInApi();
+                        case 1:
+                            return User.Gender.FEMALE.getGenderInApi();
+                        case 2:
+                            return User.Gender.OTHER.getGenderInApi();
+                        case 3:
+                            return User.Gender.NOT_SPECIFIED.getGenderInApi();
+                        default:
+                            throw new RuntimeException("Unknown gender");
+                    }
+                })
+                .compose(bindToLifecycle())
+                .subscribe(presenter.getGenderObserver());
+
+        RxView.clicks(birthDayTv)
+                .compose(bindToLifecycle())
+                .subscribe(presenter.showDatePicker());
+
+        presenter.getShowDatePickerObservable()
+                .compose(bindToLifecycle())
+                .subscribe(this::showDatePicker);
 
         RxView.clicks(avatarSelectorView)
                 .compose(bindToLifecycle())
@@ -259,6 +306,21 @@ public class EditProfileActivity extends BaseActivity {
                 .subscribe(Actions1.setOrEraseError(usernameInput, getString(R.string.error_field_empty)));
     }
 
+    private void showDatePicker(@Nullable Long currentBirthday) {
+        final long initDate = currentBirthday != null ? currentBirthday : System.currentTimeMillis();
+        final Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date(initDate));
+
+        new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                calendar.set(year, monthOfYear, dayOfMonth);
+                presenter.birthdayChanged(calendar.getTimeInMillis());
+            }
+        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), Calendar.DAY_OF_MONTH)
+                .show();
+    }
+
     @NonNull
     private Action1<UserLocation> setLocation() {
         return new Action1<UserLocation>() {
@@ -303,17 +365,34 @@ public class EditProfileActivity extends BaseActivity {
 
     @NonNull
     private Action1<User> setUserData() {
-        return new Action1<User>() {
-            @Override
-            public void call(User user) {
-                firstNameEt.setText(user.getFirstName());
-                lastNameEt.setText(user.getLastName());
-                usernameEt.setText(user.getUsername());
-                bioEt.setText(user.getBio());
-                websiteEt.setText(user.getWebsite());
-                mobileEt.setText(user.getMobile());
+        return user -> {
+            firstNameEt.setText(user.getFirstName());
+            lastNameEt.setText(user.getLastName());
+            usernameEt.setText(user.getUsername());
+            bioEt.setText(user.getBio());
+            websiteEt.setText(user.getWebsite());
+            mobileEt.setText(user.getMobile());
+            final String gender = user.getGender();
+            genderSpinner.setSelection(getAdapterPositionForGender(gender));
+            if (user.getBirthday() != null) {
+                final String birthDay = birthdayDateFormat.format(new Date(user.getBirthday()));
+                birthDayTv.setText(birthDay);
             }
         };
+    }
+
+    private int getAdapterPositionForGender(@Nullable String gender) {
+        if (TextUtils.isEmpty(gender)) {
+            return 3;
+        } else if (gender.equals(User.Gender.MALE.getGenderInApi())){
+            return 0;
+        }  else if (gender.equals(User.Gender.FEMALE.getGenderInApi())){
+            return 1;
+        } else if (gender.equals(User.Gender.OTHER.getGenderInApi())){
+            return 2;
+        } else {
+            throw new RuntimeException("Unknwon gender");
+        }
     }
 
     @NonNull
