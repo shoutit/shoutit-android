@@ -598,4 +598,18 @@
     <string name="contacts_friends_ab_title">Contacts friends</string>
     <string name="invite_app_invite_text">Buy &amp; Sell while Chatting on #Shoutit App! Get it on shoutit.com/app</string>
     <string name="invite_error">Sorry, cannot send invitation</string>
+
+    <!-- Credits -->
+    <string name="credits_info">Shoutit credit is virtual currency that can be earned and spent while
+        using Shoutit.
+    </string>
+    <string name="credit_balance">Your balance</string>
+    <string name="credit_balance_hint">Click to view Transactions</string>
+    <string name="credit_profile">Complete your Profile</string>
+    <string name="credit_facebook">Sharing on Facebook</string>
+    <string name="credit_invite">Inviting Friends</string>
+    <string name="credit_listen">Listening to friends</string>
+    <string name="credit_promote">Promoting Shouts</string>
+    <string name="credits_spend_on">Spend On</string>
+    <string name="credit_earn_by">Earn By</string>
 </resources>

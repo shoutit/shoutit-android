@@ -24,6 +24,7 @@ import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.RtlUtils;
 import com.shoutit.app.android.view.conversations.ConversationsPagerFragment;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
+import com.shoutit.app.android.view.credits.CreditsFragment;
 import com.shoutit.app.android.view.discover.DiscoverFragment;
 import com.shoutit.app.android.view.home.HomeFragment;
 import com.shoutit.app.android.view.invitefriends.InviteFriendsFragment;
@@ -86,6 +87,8 @@ public class MenuHandler {
     CheckedTextView browseItem;
     @Bind(R.id.menu_chat)
     CheckedTextView chatItem;
+    @Bind(R.id.menu_credits)
+    CheckedTextView creditsItem;
 
     @Nonnull
     private final RxAppCompatActivity rxActivity;
@@ -131,7 +134,7 @@ public class MenuHandler {
 
     public void initMenu(@Nonnull View view, @IdRes int id) {
         ButterKnife.bind(this, view);
-        selectableItems = ImmutableList.of(homeItem, discoverItem, browseItem, chatItem);
+        selectableItems = ImmutableList.of(homeItem, discoverItem, browseItem, chatItem, creditsItem);
         userPreferences.getUserObservable()
                 .filter(user -> user != null)
                 .map(user -> {
@@ -182,7 +185,7 @@ public class MenuHandler {
                 .into(roundedBitmapTarget);
     }
 
-    @OnClick({R.id.menu_home, R.id.menu_discover, R.id.menu_browse, R.id.menu_chat, R.id.menu_settings, R.id.menu_help, R.id.menu_invite_friends})
+    @OnClick({R.id.menu_home, R.id.menu_discover, R.id.menu_browse, R.id.menu_chat, R.id.menu_settings, R.id.menu_help, R.id.menu_invite_friends, R.id.menu_credits})
     public void onMenuItemSelected(View view) {
         selectMenuItem(viewTagViewIdMap.inverse().get(view.getId()));
     }
@@ -318,7 +321,7 @@ public class MenuHandler {
             case FRAGMENT_CHATS:
                 return ConversationsPagerFragment.newInstance();
             case FRAGMENT_CREDITS:
-                return ConversationsPagerFragment.newInstance();
+                return CreditsFragment.newInstance();
             case FRAGMENT_PUBLIC_CHATS:
                 return ConversationsPagerFragment.newInstance(true);
             case FRAGMENT_INVITE_FRIENDS:
