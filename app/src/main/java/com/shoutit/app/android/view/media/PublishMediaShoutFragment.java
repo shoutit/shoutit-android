@@ -42,6 +42,7 @@ import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.PriceUtils;
+import com.shoutit.app.android.view.createshout.DialogsHelper;
 import com.shoutit.app.android.view.createshout.publish.PublishShoutActivity;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
 import com.shoutit.app.android.widget.CurrencySpinnerAdapter;
@@ -157,6 +158,7 @@ public class PublishMediaShoutFragment extends Fragment {
         mCompositeSubscription = new CompositeSubscription();
 
         setUpFacebookCheckbox();
+        showShareInfoDialogIfNeeded();
 
         mCameraPublishedCurrency.setAdapter(mCurrencyAdapter);
         mCameraPublishedCurrency.setEnabled(false);
@@ -239,6 +241,18 @@ public class PublishMediaShoutFragment extends Fragment {
                             }
                         })
         );
+    }
+
+    private void showShareInfoDialogIfNeeded() {
+        if (!mUserPreferences.wasShareDialogAlreadyDisplayed() && !faceBookCheckbox.isChecked()) {
+            DialogsHelper.showShareInfoDialog(getActivity());
+            mUserPreferences.setShareDialogDisplayed();
+        }
+    }
+
+    @OnClick(R.id.camera_published_credits_info_iv)
+    public void onCreditsInfoClick() {
+        DialogsHelper.showShareInfoDialog(getActivity());
     }
 
     public void showPermissionNotGrantedError() {

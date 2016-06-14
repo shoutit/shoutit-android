@@ -10,7 +10,7 @@ import com.shoutit.app.android.R;
 
 public class DialogsHelper {
 
-    private static void showDialog(@NonNull Context context, @StringRes int message) {
+    public static void showDialog(@NonNull Context context, @StringRes int message) {
         new AlertDialog.Builder(context)
                 .setMessage(context.getString(message))
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -28,5 +28,9 @@ public class DialogsHelper {
 
     public static void showOnlyOneVideoDialog(@NonNull Context context) {
         showDialog(context, R.string.edit_only_one_video);
+    }
+
+    public static void showShareInfoDialog(@NonNull Context context) {
+        showDialog(context, R.string.create_request_share_info);
     }
 }
