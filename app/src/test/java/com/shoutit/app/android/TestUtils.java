@@ -14,7 +14,7 @@ public class TestUtils {
     public static User getUser() {
         return new User("id", null, null, null, "userrname", null, null, null,
                 false, null, null, false, false, false, null, 1, null,
-                null, null, 1, null, false, null, null, null, null, null, null, null);
+                null, null, 1, null, false, null, null, null, null, null, null, null, null, null);
     }
 
     public static Shout getShout() {
