@@ -47,6 +47,7 @@ import com.shoutit.app.android.utils.rx.Actions1;
 import com.shoutit.app.android.utils.rx.RxUtils;
 import com.shoutit.app.android.view.createshout.location.LocationActivity;
 import com.shoutit.app.android.view.createshout.location.LocationResultHelper;
+import com.shoutit.app.android.widget.GenderSpinnerAdapter;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -149,7 +150,8 @@ public class EditProfileActivity extends BaseActivity {
         setUpToolbar();
 
         final String[] genders = getResources().getStringArray(R.array.genders);
-        final SpinnerAdapter genderAdapter = new ArrayAdapter<>(this, android.R.layout.simple_expandable_list_item_1, genders);
+        final GenderSpinnerAdapter genderAdapter = new GenderSpinnerAdapter(
+                this, R.layout.spinner_layout, android.R.layout.simple_dropdown_item_1line, genders);
         genderSpinner.setAdapter(genderAdapter);
 
         presenter.getUserObservable()
@@ -315,6 +317,12 @@ public class EditProfileActivity extends BaseActivity {
                 .compose(bindToLifecycle())
                 .subscribe(ignore -> {
                     showCompleteProfileDialog();
+                });
+
+        presenter.getBirthdayObservable()
+                .compose(bindToLifecycle())
+                .subscribe(birthDay -> {
+                    birthDayTv.setText(birthDay);
                 });
     }
 

@@ -157,7 +157,7 @@
                         android:paddingStart="4dp"
                         android:text="@string/edit_profile_header_location"
                         android:textColor="@color/black_54"
-                        android:textSize="14sp" />
+                        android:textSize="12sp" />
 
                     <LinearLayout
                         style="@style/Base.Widget.AppCompat.EditText"
@@ -252,7 +252,7 @@
                         android:paddingStart="4dp"
                         android:text="@string/edit_profile_header_gender"
                         android:textColor="@color/black_54"
-                        android:textSize="14sp" />
+                        android:textSize="12sp" />
 
                     <Spinner
                         android:id="@+id/edit_profile_gender_spinner"
@@ -275,7 +275,7 @@
                         android:paddingStart="4dp"
                         android:text="@string/edit_profile_header_birthday"
                         android:textColor="@color/black_54"
-                        android:textSize="14sp" />
+                        android:textSize="12sp" />
 
                     <TextView
                         android:id="@+id/edit_profile_birthday_tv"
