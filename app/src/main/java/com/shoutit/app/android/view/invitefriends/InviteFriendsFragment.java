@@ -18,6 +18,7 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.IntentHelper;
+import com.shoutit.app.android.view.createshout.DialogsHelper;
 import com.shoutit.app.android.view.invitefriends.contactsfriends.ContactsFriendsActivity;
 import com.shoutit.app.android.view.invitefriends.facebookfriends.FacebookFriendsActivity;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
@@ -69,7 +70,9 @@ public class InviteFriendsFragment extends BaseFragment {
                 .inject(this);
     }
 
-    @OnClick({R.id.invite_friends_users, R.id.invite_friends_pages, R.id.invite_friends_find_facebook, R.id.invite_friends_find_contacts, R.id.invite_friends_invite_facebook, R.id.invite_friends_invite_twitter, R.id.invite_friends_share_app})
+    @OnClick({R.id.invite_friends_users, R.id.invite_friends_pages, R.id.invite_friends_find_facebook,
+            R.id.invite_friends_find_contacts, R.id.invite_friends_invite_facebook,
+            R.id.invite_friends_invite_twitter, R.id.invite_friends_share_app})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.invite_friends_users:
@@ -102,6 +105,16 @@ public class InviteFriendsFragment extends BaseFragment {
                 startActivity(IntentHelper.getShareIntent(getString(R.string.invite_app_invite_text)));
                 break;
         }
+    }
+
+    @OnClick(R.id.invite_friend_find_friends_header)
+    public void onFindFriendInfoClicked() {
+        DialogsHelper.showDialog(getActivity(), R.string.invite_friend_find_friend_dialog);
+    }
+
+    @OnClick(R.id.invite_friend_invite_friends_header)
+    public void onInviteFriendInfoClicked() {
+        DialogsHelper.showDialog(getActivity(), R.string.invite_friend_invite_friend_dialog);
     }
 
     private void showOnlyForLoggedUserError() {

@@ -150,6 +150,8 @@ public class ProfileViewHolders {
         TextView verifyAccountButton;
         @Bind(R.id.profile_notification_badge_tv)
         TextView notificationsBadgeTv;
+        @Bind(R.id.profile_profile_badge_tv)
+        TextView profileBadgeTv;
 
         private ProfileAdapterItems.MyUserNameAdapterItem item;
         private Subscription subscription;
@@ -182,6 +184,8 @@ public class ProfileViewHolders {
                             notificationsBadgeTv.setText(String.valueOf(notificationsCount));
                         }
                     });
+
+            profileBadgeTv.setVisibility(item.shouldShowProfileBadge() ? View.VISIBLE : View.GONE);
         }
 
         @OnClick({R.id.profile_notification_badge_tv, R.id.profile_notification_iv})
