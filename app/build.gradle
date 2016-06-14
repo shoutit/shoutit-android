@@ -244,7 +244,6 @@ dependencies {
     compile project(":FFmpegAndroid")
     compile project(":appuniteGcm")
     compile project(":ScrollViewGallery")
-    compile 'me.grantland:autofittextview:0.2.+'
 
     // Tests
     testCompile 'junit:junit:4.12'

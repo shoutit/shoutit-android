@@ -647,6 +647,7 @@
     </string>
     <string name="promote_shout_info_title">Promoting Shouts</string>
     <string name="promote_available_credits">Available Shoutit Credit</string>
+    <string name="promote_ab_title">Promote Shout</string>
 
 
 </resources>
