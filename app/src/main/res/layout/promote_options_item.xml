@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="56dp"
+    android:background="@android:color/white"
+    android:orientation="horizontal"
+    android:layout_marginLeft="16dp"
+    android:layout_marginRight="16dp"
+    android:padding="8dp">
+
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/promote_option_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:fontFamily="sans-serif-medium"
+            android:textAllCaps="true"
+            android:textColor="@color/promote_text"
+            android:textSize="12sp"
+            tools:text="PREMIUM HIGHLIGHT" />
+
+        <TextView
+            android:id="@+id/promote_option_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/promote_option_name"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:gravity="center"
+            android:paddingBottom="2dp"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:paddingTop="2dp"
+            android:textColor="@android:color/white"
+            android:textSize="10sp"
+            tools:background="@drawable/shape_yellow_promote_badge"
+            tools:text="PREMIUM" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/promote_option_badge"
+            android:layout_toEndOf="@+id/promote_option_badge"
+            android:layout_toRightOf="@+id/promote_option_badge"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="@color/promote_text"
+            android:textSize="12sp"
+            tools:text="3 Days" />
+
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/promote_option_buy_button"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_gravity="center_vertical"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:minWidth="80dp"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        tools:text="3 Creditsy dfdf" />
+
+</LinearLayout>
