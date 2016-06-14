@@ -29,4 +29,8 @@ public class DialogsHelper {
     public static void showOnlyOneVideoDialog(@NonNull Context context) {
         showDialog(context, R.string.edit_only_one_video);
     }
+
+    public static void showShareInfoDialog(@NonNull Context context) {
+        showDialog(context, R.string.create_request_share_info);
+    }
 }
