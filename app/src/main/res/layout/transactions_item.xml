@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/transactions_item_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="20dp"
+        tools:src="@drawable/dollar_in"/>
+
+    <TextView
+        android:id="@+id/transactions_item_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="20dp"
+        android:layout_toEndOf="@id/transactions_item_icon"
+        android:layout_toRightOf="@id/transactions_item_icon"
+        android:textColor="@color/black_87"
+        tools:text="You earned 1 credit for sharing your Used Iphone 6s on Facebook"/>
+
+    <TextView
+        android:id="@+id/transactions_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/transactions_item_text"
+        android:layout_alignStart="@id/transactions_item_text"
+        android:layout_below="@+id/transactions_item_text"
+        android:layout_marginTop="10dp"
+        android:drawableLeft="@drawable/time_icon"
+        android:drawablePadding="4dp"
+        android:drawableStart="@drawable/time_icon"
+        tools:text="21 hours ago"/>
+
+</RelativeLayout>
