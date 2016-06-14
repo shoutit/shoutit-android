@@ -644,4 +644,7 @@
     </string>
     <string name="promote_shout_info_title">Promoting Shouts</string>
 
+    <!-- Transactions -->
+    <string name="transactions_title">Credit Transactions</string>
+
 </resources>
