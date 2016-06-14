@@ -296,11 +296,13 @@ public class EditProfilePresenter {
 
         showCompleteProfileDialogObservable = userObservable
                 .take(1)
+                .filter(user -> !userPreferences.wasProfileAlertAlreadyDisplayed())
                 .map(user ->
                         TextUtils.isEmpty(user.getImage()) ||
                         TextUtils.isEmpty(user.getGender()) ||
                         user.getBirthday() == null)
-                .filter(Functions1.isTrue());
+                .filter(Functions1.isTrue())
+                .doOnNext(aBoolean -> userPreferences.setProfileAlertAlreadyDisplayed());
     }
 
     @NonNull

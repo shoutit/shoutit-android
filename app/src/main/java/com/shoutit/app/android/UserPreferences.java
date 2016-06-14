@@ -38,6 +38,7 @@ public class UserPreferences {
     private static final String SHOULD_ASK_FOR_INTEREST = "is_first_run";
     private static final String GCM_PUSH_TOKEN = "gcm_push_token";
     private static final String TWILIO_TOKEN = "twilio_token";
+    private static final String KEY_PROFILE_ALERT_DISPLAYED = "profile_alert_displayed";
 
     private final PublishSubject<Object> userRefreshSubject = PublishSubject.create();
     private final PublishSubject<Object> locationRefreshSubject = PublishSubject.create();
@@ -271,5 +272,15 @@ public class UserPreferences {
     @Nullable
     public String getTwilioToken() {
         return mPreferences.getString(TWILIO_TOKEN, null);
+    }
+
+    public boolean wasProfileAlertAlreadyDisplayed() {
+        return mPreferences.getBoolean(KEY_PROFILE_ALERT_DISPLAYED, false);
+    }
+
+    @SuppressLint("CommitPrefEdits")
+    public void setProfileAlertAlreadyDisplayed() {
+        mPreferences.edit().putBoolean(KEY_PROFILE_ALERT_DISPLAYED, true)
+                .commit();
     }
 }

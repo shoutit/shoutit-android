@@ -4,6 +4,7 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.view.profile.ProfileAdapterItems;
@@ -24,6 +25,7 @@ public class MyProfileHalfPresenter {
     @Nonnull
     private final PublishSubject<Object> verifyAccountClickObserver = PublishSubject.create();
     private final Context context;
+    private final UserPreferences userPreferences;
     @Nonnull
     private final PublishSubject<Object> listeningsClickObserver = PublishSubject.create();
     @Nonnull
@@ -32,8 +34,10 @@ public class MyProfileHalfPresenter {
     private final PublishSubject<Object> listenersClickObserver = PublishSubject.create();
 
     @Inject
-    public MyProfileHalfPresenter(@ForActivity Context context) {
+    public MyProfileHalfPresenter(@ForActivity Context context,
+                                  UserPreferences userPreferences) {
         this.context = context;
+        this.userPreferences = userPreferences;
     }
 
     public ProfileAdapterItems.NameAdapterItem getUserNameAdapterItem(@Nonnull User user,
@@ -48,9 +52,10 @@ public class MyProfileHalfPresenter {
     }
 
     private boolean shouldShowProfileBadge(@Nonnull User user) {
-        return TextUtils.isEmpty(user.getImage()) ||
-                TextUtils.isEmpty(user.getGender()) ||
-                user.getBirthday() == null;
+        return !userPreferences.wasProfileAlertAlreadyDisplayed() &&
+                (TextUtils.isEmpty(user.getImage()) ||
+                        TextUtils.isEmpty(user.getGender()) ||
+                        user.getBirthday() == null);
     }
 
     public String getShoutsHeaderTitle() {
