@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/promote_shout_info_toolbar"
+            style="@style/BaseToolbarNoElevation"
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:text="@string/promote_shout_info_header"/>
+
+        <RelativeLayout android:layout_width="match_parent"
+                     android:layout_height="100dp"
+                     android:layout_marginEnd="20dp"
+                     android:layout_marginLeft="16dp"
+                     android:layout_marginRight="20dp"
+                     android:layout_marginStart="16dp"
+                     android:layout_marginTop="20dp"
+                     android:background="#26ffd700">
+
+            <TextView
+                android:layout_width="130dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:background="#ffd700"
+                android:gravity="center"
+                android:paddingBottom="4dp"
+                android:paddingEnd="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingStart="10dp"
+                android:paddingTop="4dp"
+                android:text="@string/promote_shout_info_premium_header"
+                android:textAllCaps="true"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"/>
+
+            <View
+                android:id="@+id/promote_shout_info_anchor_1"
+                android:layout_centerVertical="true"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:visibility="invisible"/>
+
+            <TextView
+                android:layout_below="@id/promote_shout_info_anchor_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:text="@string/promote_shout_info_premium_text"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout android:layout_width="match_parent"
+                     android:layout_height="100dp"
+                     android:layout_marginEnd="20dp"
+                     android:layout_marginLeft="16dp"
+                     android:layout_marginRight="20dp"
+                     android:layout_marginStart="16dp"
+                     android:layout_marginTop="10dp"
+                     android:background="#1f000000">
+
+            <TextView
+                android:layout_width="130dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:background="#c0c0c0"
+                android:gravity="center"
+                android:paddingBottom="4dp"
+                android:paddingEnd="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingStart="10dp"
+                android:paddingTop="4dp"
+                android:text="@string/promote_shout_info_top"
+                android:textAllCaps="true"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"/>
+
+            <View
+                android:id="@+id/promote_shout_info_anchor_2"
+                android:layout_centerVertical="true"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:visibility="invisible"/>
+
+            <TextView
+                android:layout_below="@id/promote_shout_info_anchor_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:text="@string/promote_shout_info_top_text"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout android:layout_width="match_parent"
+                     android:layout_height="100dp"
+                     android:layout_marginEnd="20dp"
+                     android:layout_marginLeft="16dp"
+                     android:layout_marginRight="20dp"
+                     android:layout_marginStart="16dp"
+                     android:layout_marginTop="10dp"
+                     android:background="#26ffd700">
+
+            <TextView
+                android:layout_width="130dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:background="#ffd700"
+                android:gravity="center"
+                android:paddingBottom="4dp"
+                android:paddingEnd="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingStart="10dp"
+                android:paddingTop="4dp"
+                android:text="@string/promote_shout_info_top_premium"
+                android:textAllCaps="true"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"/>
+
+            <View
+                android:id="@+id/promote_shout_info_anchor_3"
+                android:layout_centerVertical="true"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:visibility="invisible"/>
+
+            <TextView
+                android:layout_below="@id/promote_shout_info_anchor_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:text="@string/promote_shout_info_top_premium_text"/>
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/promote_shout_info_footer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="20dp"
+            android:text="@string/promote_shout_info_footer"/>
+
+    </LinearLayout>
+
+</ScrollView>
