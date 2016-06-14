@@ -65,6 +65,7 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/invite_friend_find_friends_header"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-medium"
@@ -72,6 +73,10 @@
                     android:textSize="14sp"
                     android:layout_marginTop="20dp"
                     android:text="@string/invite_friends_find_friends"
+                    android:drawableRight="@drawable/credits_info"
+                    android:drawableEnd="@drawable/credits_info"
+                    android:gravity="center_vertical"
+                    android:drawablePadding="10dp"
                     android:textAllCaps="true"/>
 
                 <LinearLayout
@@ -112,12 +117,17 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/invite_friend_invite_friends_header"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
                     android:fontFamily="sans-serif-medium"
                     android:textSize="14sp"
                     android:textColor="@color/black_54"
+                    android:drawableRight="@drawable/credits_info"
+                    android:drawableEnd="@drawable/credits_info"
+                    android:gravity="center_vertical"
+                    android:drawablePadding="10dp"
                     android:text="@string/invite_friends_invite_friends"
                     android:textAllCaps="true"/>
 
