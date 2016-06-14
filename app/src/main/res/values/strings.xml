@@ -594,6 +594,8 @@
     <string name="invite_text">Join Shoutit on www.shoutit.com</string>
     <string name="invite_chooser_text">Select app</string>
     <string name="invite_no_twitter_app">You need the Twitter app to be installed</string>
+    <string name="invite_friend_find_friend_dialog">Earn up to 10 Shoutit Credits for finding your friends and listening to them</string>
+    <string name="invite_friend_invite_friend_dialog">Earn 1 Shoutit Credit whenever a friend you invited signs up</string>
 
     <!-- Contacts fiends -->
     <string name="contacts_friends_ab_title">Contacts friends</string>
@@ -644,5 +646,6 @@
         top of all searches
     </string>
     <string name="promote_shout_info_title">Promoting Shouts</string>
+
 
 </resources>
