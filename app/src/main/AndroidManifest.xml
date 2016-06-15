@@ -113,6 +113,8 @@
             android:screenOrientation="portrait"/>
         <activity android:name=".view.promote.PromoteShoutInfoActivity"
                   android:screenOrientation="portrait"/>
+        <activity android:name=".view.credits.transactions.TransactionsActivity"
+                  android:screenOrientation="portrait"/>
         <activity
             android:name=".view.discover.DiscoverActivity"
             android:screenOrientation="portrait">

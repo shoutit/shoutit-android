@@ -278,6 +278,13 @@
     <string name="edit_profile_hint_username">Username</string>
     <string name="edit_profile_hint_bio">Bio</string>
     <string name="edit_profile_header_location">Location</string>
+    <string name="edit_profile_header_birthday">Birthday</string>
+    <string name="edit_profile_header_gender">Gender</string>
+    <string name="edit_profile_header_gender_not_specified">Not specified</string>
+    <string name="edit_profile_header_gender_male">Male</string>
+    <string name="edit_profile_header_gender_female">Female</string>
+    <string name="edit_profile_header_gender_other">Other</string>
+    <string name="edit_profile_header_birthday_hint">01/01/1970</string>
     <string name="edit_profile_location_change">Change</string>
     <string name="edit_profile_hint_website">Website</string>
     <string name="edit_profile_menu_save">Save</string>
@@ -287,6 +294,13 @@
     <string name="edit_profile_hint_last_name">Last Name</string>
     <string name="edit_profile_hint_mobile">Mobile</string>
     <string name="edit_done_btn">Edit</string>
+    <string name="edit_profile_complete_profile_message">Complete your profile to earn 1 Shoutit Credit</string>
+    <string-array name="genders">
+        <item>Male</item>
+        <item>Female</item>
+        <item>Other</item>
+        <item>Not specified</item>
+    </string-array>
 
     <!-- Published -->
     <string name="published_congratulations">Congratulations!</string>
@@ -619,6 +633,7 @@
     <string name="credit_promote">Promoting Shouts</string>
     <string name="credits_spend_on">Spend On</string>
     <string name="credit_earn_by">Earn By</string>
+
     <string name="credits_complete_profile">Complete your profile to earn 1 Shoutit Credit</string>
     <string name="credits_profile_positive">Complete Profile</string>
     <string name="credits_facebook">Earn 1 Shoutit Credit for each shout you publicly share on
@@ -654,5 +669,7 @@
     <string name="promote_ab_title">Promote Shout</string>
     <string name="promote_not_enough_money">You don\'t have enough Shoutit Credit for this action</string>
 
+    <!-- Transactions -->
+    <string name="transactions_title">Credit Transactions</string>
 
 </resources>

@@ -50,6 +50,8 @@ import com.shoutit.app.android.api.model.Suggestion;
 import com.shoutit.app.android.api.model.SuggestionsResponse;
 import com.shoutit.app.android.api.model.TagDetail;
 import com.shoutit.app.android.api.model.TagsRequest;
+import com.shoutit.app.android.api.model.Transaction;
+import com.shoutit.app.android.api.model.TransactionRsponse;
 import com.shoutit.app.android.api.model.TwilioResponse;
 import com.shoutit.app.android.api.model.UpdateFacebookTokenRequest;
 import com.shoutit.app.android.api.model.UpdateLocationRequest;
@@ -501,4 +503,10 @@ public interface ApiService {
 
     @PATCH("profiles/me/link")
     Observable<ResponseBody> updateFacebookToken(@Body UpdateFacebookTokenRequest updateFacebookTokenRequest);
+
+    /**
+     * Credit
+     **/
+    @GET("credit/transactions")
+    Observable<TransactionRsponse> getTransactions(@Nullable @Query("before") String timestamp);
 }

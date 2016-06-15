@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
@@ -26,20 +27,27 @@ import com.shoutit.app.android.utils.rx.RxMoreObservers;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 import javax.annotation.Nonnull;
 
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.functions.Func3;
 import rx.functions.Func7;
+import rx.functions.Func9;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
 public class EditProfilePresenter {
+    private static final SimpleDateFormat birthdayDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
     private final BehaviorSubject<String> firstNameSubject = BehaviorSubject.create();
     private final BehaviorSubject<String> lastNameSubject = BehaviorSubject.create();
@@ -47,6 +55,8 @@ public class EditProfilePresenter {
     private final BehaviorSubject<String> bioSubject = BehaviorSubject.create();
     private final BehaviorSubject<String> websiteSubject = BehaviorSubject.create();
     private final BehaviorSubject<String> mobileSubject = BehaviorSubject.create();
+    private final BehaviorSubject<String> genderSubject = BehaviorSubject.create();
+    private final BehaviorSubject<String> birthdaySubject = BehaviorSubject.create();
     private final BehaviorSubject<UserLocation> locationSubject = BehaviorSubject.create();
     private final BehaviorSubject<UpdateUserRequest> lastCombinedData = BehaviorSubject.create();
     private final BehaviorSubject<Uri> lastSelectedAvatarUri = BehaviorSubject.create();
@@ -54,6 +64,7 @@ public class EditProfilePresenter {
 
     private final PublishSubject<Object> saveClickSubject = PublishSubject.create();
     private final PublishSubject<Boolean> progressSubject = PublishSubject.create();
+    private final PublishSubject<Long> showDatePickerSubject = PublishSubject.create();
 
     @Nonnull
     private final Observable<String> avatarObservable;
@@ -63,6 +74,8 @@ public class EditProfilePresenter {
     private final Observable<User> successObservable;
     @Nonnull
     private final Observable<Object> imageUploadToApiSuccessObservable;
+    @Nonnull
+    private final Observable<Boolean> showCompleteProfileDialogObservable;
 
     @Nonnull
     private final ApiService apiService;
@@ -92,6 +105,8 @@ public class EditProfilePresenter {
     private final Observable<UserLocation> locationObservable;
     @Nonnull
     private final Observable<User> userInputsObservable;
+    @Nonnull
+    private final Observable<String> birthdayObservable;
 
     public EditProfilePresenter(@Nonnull final UserPreferences userPreferences,
                                 @Nonnull final ApiService apiService,
@@ -119,70 +134,35 @@ public class EditProfilePresenter {
 
         userInputsObservable = userObservable
                 .first()
-                .filter(new Func1<User, Boolean>() {
-                    @Override
-                    public Boolean call(User user) {
-                        return state == null;
-                    }
-                });
+                .filter(user -> state == null);
 
         locationObservable = Observable.merge(
-                userInputsObservable.map(new Func1<User, UserLocation>() {
-                    @Override
-                    public UserLocation call(User user) {
-                        return user.getLocation();
-                    }
-                }),
+                userInputsObservable.map(User::getLocation),
                 locationSubject);
 
         avatarObservable = userObservable
-                .map(new Func1<User, String>() {
-                    @Override
-                    public String call(User user) {
-                        return user.getImage();
-                    }
-                });
+                .map(User::getImage);
 
         coverObservable = userObservable
-                .map(new Func1<User, String>() {
-                    @Override
-                    public String call(User user) {
-                        return user.getCover();
-                    }
-                });
+                .map(User::getCover);
+
+        birthdayObservable = Observable.merge(
+                userObservable.map(User::getBirthday),
+                birthdaySubject);
 
         /** Errors **/
         firstNameErrorObservable = firstNameSubject
-                .map(new Func1<String, Boolean>() {
-                    @Override
-                    public Boolean call(String s) {
-                        return Strings.isNullOrEmpty(s);
-                    }
-                });
+                .map(Strings::isNullOrEmpty);
 
         lastNameErrorObservable = lastNameSubject
-                .map(new Func1<String, Boolean>() {
-                    @Override
-                    public Boolean call(String s) {
-                        return Strings.isNullOrEmpty(s);
-                    }
-                });
+                .map(Strings::isNullOrEmpty);
 
         usernameErrorObservable = usernameSubject
-                .map(new Func1<String, Boolean>() {
-                    @Override
-                    public Boolean call(String s) {
-                        return Strings.isNullOrEmpty(s);
-                    }
-                });
+                .map(Strings::isNullOrEmpty);
 
         final Observable<Boolean> hasAnyErrorObservable = Observable.combineLatest(
-                firstNameErrorObservable, lastNameErrorObservable, usernameErrorObservable, new Func3<Boolean, Boolean, Boolean, Boolean>() {
-                    @Override
-                    public Boolean call(Boolean error1, Boolean error2, Boolean error3) {
-                        return error1 || error2 || error3;
-                    }
-                });
+                firstNameErrorObservable, lastNameErrorObservable, usernameErrorObservable,
+                (error1, error2, error3) -> error1 || error2 || error3);
 
         /** Last Data from inputs **/
         Observable.combineLatest(
@@ -192,11 +172,16 @@ public class EditProfilePresenter {
                 bioSubject.startWith((String) null),
                 websiteSubject.startWith((String) null),
                 mobileSubject.startWith((String) null),
+                genderSubject.startWith((String) null),
+                birthdaySubject.startWith((String) null),
                 locationSubject.startWith((UserLocation) null),
-                new Func7<String, String, String, String, String, String, UserLocation, UpdateUserRequest>() {
+                new Func9<String, String, String, String, String, String, String, String, UserLocation, UpdateUserRequest>() {
                     @Override
-                    public UpdateUserRequest call(String username, String firstName, String lastName, String bio, String website, String mobile, UserLocation userLocation) {
-                        return UpdateUserRequest.updateProfile(username, firstName, lastName, bio, website, mobile, userLocation);
+                    public UpdateUserRequest call(String username, String firstName, String lastName, String bio,
+                                                  String website, String mobile, String gender,
+                                                  String birthday, UserLocation userLocation) {
+                        return UpdateUserRequest.updateProfile(username, firstName, lastName, bio,
+                                website, mobile, gender, birthday, userLocation);
                     }
                 })
                 .subscribe(lastCombinedData);
@@ -263,12 +248,7 @@ public class EditProfilePresenter {
 
         final Observable<ResponseOrError<User>> uploadAvatarToApiObservable = uploadAvatarToAmazonObservable
                 .compose(ResponseOrError.<String>onlySuccess())
-                .map(new Func1<String, UpdateUserRequest>() {
-                    @Override
-                    public UpdateUserRequest call(String imageUrl) {
-                        return UpdateUserRequest.updateWithAvatarUrl(imageUrl);
-                    }
-                })
+                .map(UpdateUserRequest::updateWithAvatarUrl)
                 .switchMap(updateUserInApi())
                 .compose(ObservableExtensions.<ResponseOrError<User>>behaviorRefCount());
 
@@ -277,12 +257,9 @@ public class EditProfilePresenter {
                 uploadCoverToApiObservable.compose(ResponseOrError.<User>onlySuccess()),
                 uploadAvatarToApiObservable.compose(ResponseOrError.<User>onlySuccess()),
                 successObservable)
-                .map(new Func1<User, Object>() {
-                    @Override
-                    public Object call(User user) {
-                        userPreferences.updateUserJson(user);
-                        return null;
-                    }
+                .map(user -> {
+                    userPreferences.updateUserJson(user);
+                    return null;
                 })
                 .observeOn(uiScheduler);
 
@@ -316,6 +293,16 @@ public class EditProfilePresenter {
 
         updateProfileError = updateRequest.compose(ResponseOrError.<User>onlyError())
                 .observeOn(uiScheduler);
+
+        showCompleteProfileDialogObservable = userObservable
+                .take(1)
+                .filter(user -> !userPreferences.wasProfileAlertAlreadyDisplayed())
+                .map(user ->
+                        TextUtils.isEmpty(user.getImage()) ||
+                        TextUtils.isEmpty(user.getGender()) ||
+                        user.getBirthday() == null)
+                .filter(Functions1.isTrue())
+                .doOnNext(aBoolean -> userPreferences.setProfileAlertAlreadyDisplayed());
     }
 
     @NonNull
@@ -459,6 +446,10 @@ public class EditProfilePresenter {
         return RxMoreObservers.ignoreCompleted(mobileSubject);
     }
 
+    public Observer<String> getGenderObserver() {
+        return RxMoreObservers.ignoreCompleted(genderSubject);
+    }
+
     @Nonnull
     public Observable<User> getSuccessObservable() {
         return successObservable;
@@ -470,12 +461,52 @@ public class EditProfilePresenter {
                 .observeOn(uiScheduler);
     }
 
+    @Nonnull
+    public Observable<Boolean> getShowCompleteProfileDialogObservable() {
+        return showCompleteProfileDialogObservable;
+    }
+
+    @Nonnull
+    public Observable<String> getBirthdayObservable() {
+        return birthdayObservable;
+    }
+
     public void onSaveClicked() {
         saveClickSubject.onNext(null);
     }
 
     public void onLocationChanged(UserLocation userLocation) {
         locationSubject.onNext(userLocation);
+    }
+
+    public Observable<Long> getShowDatePickerObservable() {
+        return showDatePickerSubject;
+    }
+
+    public void showDatePicker() {
+        final String currentDate = birthdaySubject.getValue();
+        long initDate;
+
+        if (TextUtils.isEmpty(currentDate)) {
+            initDate = System.currentTimeMillis();
+        } else {
+            final String[] split = currentDate.split("-");
+            if (split.length != 3) {
+                initDate = System.currentTimeMillis();
+            } else {
+                final Calendar calendar = Calendar.getInstance();
+                calendar.set(Integer.valueOf(split[0]), Integer.valueOf(split[1]), Integer.valueOf(split[2]));
+
+                initDate = calendar.getTimeInMillis();
+            }
+        }
+
+        showDatePickerSubject.onNext(initDate);
+    }
+
+    public void birthdayChanged(long timeInMillis) {
+        final String birthDay = birthdayDateFormat.format(new Date(timeInMillis));
+        birthdaySubject.onNext(birthDay);
     }
 
     public static class State {
