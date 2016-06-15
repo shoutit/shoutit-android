@@ -14,9 +14,9 @@ import dagger.Component;
                 ActivityModule.class,
         }
 )
-public interface PromoteShoutActivityComponent extends BaseActivityComponent {
+public interface PromoteActivityComponent extends BaseActivityComponent {
 
-    void inject(PromoteShoutActivity activity);
+    void inject(PromoteActivity activity);
 
 }
 

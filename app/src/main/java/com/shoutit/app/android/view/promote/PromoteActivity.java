@@ -10,11 +10,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.view.createshout.DialogsHelper;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -23,7 +26,9 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class PromoteShoutActivity extends BaseActivity {
+import static com.google.common.base.Preconditions.checkNotNull;
+
+public class PromoteActivity extends BaseActivity {
 
     private static final String KEY_SHOUT_NAME = "shout_name";
 
@@ -40,7 +45,7 @@ public class PromoteShoutActivity extends BaseActivity {
     PromotePresenter presenter;
 
     public static Intent newIntent(Context context, @Nonnull String shoutName) {
-        return new Intent(context, PromoteShoutActivity.class)
+        return new Intent(context, PromoteActivity.class)
                 .putExtra(KEY_SHOUT_NAME, shoutName);
     }
 
@@ -54,6 +59,28 @@ public class PromoteShoutActivity extends BaseActivity {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
+
+        presenter.getAdapterItemsObservable()
+                .compose(bindToLifecycle())
+                .subscribe(adapter);
+
+        presenter.getErrorObservable()
+                .compose(bindToLifecycle())
+                .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(this)));
+
+        presenter.getProgressObservable()
+                .compose(bindToLifecycle())
+                .subscribe(RxView.visibility(progressView));
+
+        presenter.getNotEnoughCreditsObservable()
+                .compose(bindToLifecycle())
+                .subscribe(DialogsHelper.showDialogAction(this, R.string.promote_not_enough_money));
+
+        presenter.getSuccessfullyPromotedObservable()
+                .compose(bindToLifecycle())
+                .subscribe(promoteResponse -> {
+                    // TODO show promoted screen
+                });
     }
 
     private void setUpToolbar() {
@@ -77,13 +104,18 @@ public class PromoteShoutActivity extends BaseActivity {
     @Nonnull
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
-        final PromoteShoutActivityComponent component = DaggerPromoteShoutActivityComponent
+        final String shoutTitle = checkNotNull(getIntent().getStringExtra(KEY_SHOUT_NAME));
+
+        final PromoteActivityComponent component = DaggerPromoteActivityComponent
                 .builder()
                 .activityModule(new ActivityModule(this))
+                .promoteActivityModule(new PromoteActivityModule(shoutTitle))
                 .appComponent(App.getAppComponent(getApplication()))
                 .build();
         component.inject(this);
 
         return component;
     }
+
+
 }

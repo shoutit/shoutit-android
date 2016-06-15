@@ -21,6 +21,8 @@ import com.shoutit.app.android.dao.PromoteLabelsDao;
 import com.shoutit.app.android.dao.PromoteOptionsDao;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import javax.annotation.Nonnull;
 
 import rx.Observable;
@@ -32,8 +34,11 @@ import rx.subjects.PublishSubject;
 
 public class PromotePresenter {
 
+    private static final int PAGE_SWITCH_INTERVAL = 3;
+
     private final PublishSubject<PromoteOption> promoteOptionBuyClickedSubject = PublishSubject.create();
-    
+    private final PublishSubject<Object> startSwitchingPages = PublishSubject.create();
+
     @Nonnull
     private final Observable<List<BaseAdapterItem>> adapterItemsObservable;
     @Nonnull
@@ -44,6 +49,8 @@ public class PromotePresenter {
     private final Observable<PromoteResponse> successfullyPromotedObservable;
     @Nonnull
     private final Observable<Object> notEnoughCreditsObservable;
+    @Nonnull
+    private final Observable<Object> switchLabelsObservable;
 
     public PromotePresenter(@Nonnull PromoteLabelsDao promoteLabelsDao,
                             @Nonnull PromoteOptionsDao promoteOptionsDao,
@@ -51,7 +58,17 @@ public class PromotePresenter {
                             @Nonnull @NetworkScheduler Scheduler networkScheduler,
                             @Nonnull PusherHelper pusherHelper,
                             @Nonnull UserPreferences userPreferences,
-                            @Nonnull ApiService apiService) {
+                            @Nonnull ApiService apiService,
+                            @Nonnull String shoutTitle) {
+
+        switchLabelsObservable = startSwitchingPages
+                .switchMap(new Func1<Object, Observable<Long>>() {
+                    @Override
+                    public Observable<Long> call(Object o) {
+                        return Observable.interval(PAGE_SWITCH_INTERVAL, TimeUnit.SECONDS);
+                    }
+                })
+                .map(Functions1.toObject());
 
         final Observable<User> userFromPusher = pusherHelper.getUserUpdatedObservable()
                 .doOnNext(userPreferences::updateUserJson);
@@ -73,11 +90,10 @@ public class PromotePresenter {
         final Observable<BaseAdapterItem> creditsAdapterItemObservable = creditsObservable
                 .map(PromoteAdapterItems.AvailableCreditsAdapterItem::new);
 
-        final Observable<List<BaseAdapterItem>> labelsAdapterItemsObservable = labelsRequest
+        final Observable<BaseAdapterItem> labelsAdapterItemObservable = labelsRequest
                 .compose(ResponseOrError.onlySuccess())
-                .map((Func1<List<PromoteLabel>, List<BaseAdapterItem>>)
-                        promoteLabels ->
-                                ImmutableList.copyOf(Lists.transform(promoteLabels, PromoteAdapterItems.LabelsAdapterItem::new)));
+                .map((Func1<List<PromoteLabel>, PromoteAdapterItems.LabelsAdapterItem>) promoteLabels ->
+                        new PromoteAdapterItems.LabelsAdapterItem(promoteLabels, switchLabelsObservable, shoutTitle));
 
         final Observable<List<BaseAdapterItem>> optionsAdapterItemsObservable = optionsRequest
                 .compose(ResponseOrError.onlySuccess())
@@ -91,13 +107,13 @@ public class PromotePresenter {
                 });
 
         adapterItemsObservable = Observable.combineLatest(
-                labelsAdapterItemsObservable,
+                labelsAdapterItemObservable,
                 optionsAdapterItemsObservable,
                 creditsAdapterItemObservable,
-                (Func3<List<BaseAdapterItem>, List<BaseAdapterItem>, BaseAdapterItem, List<BaseAdapterItem>>)
+                (Func3<BaseAdapterItem, List<BaseAdapterItem>, BaseAdapterItem, List<BaseAdapterItem>>)
                         (labelsAdapterItems, optionAdapterItems, availableCreditsAdapterItem) ->
                                 ImmutableList.<BaseAdapterItem>builder()
-                                        .addAll(labelsAdapterItems)
+                                        .add(labelsAdapterItems)
                                         .addAll(optionAdapterItems)
                                         .add(availableCreditsAdapterItem)
                                         .build());
@@ -145,11 +161,6 @@ public class PromotePresenter {
     @Nonnull
     public Observable<PromoteResponse> getSuccessfullyPromotedObservable() {
         return successfullyPromotedObservable;
-    }
-
-    @Nonnull
-    public Observable<PromoteOption> getPromoteOptionBuyClickedObservable() {
-        return promoteOptionBuyClickedSubject;
     }
 
     @Nonnull

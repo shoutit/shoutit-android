@@ -7,8 +7,11 @@ import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
 import com.shoutit.app.android.api.model.PromoteLabel;
 import com.shoutit.app.android.api.model.PromoteOption;
 
+import java.util.List;
+
 import javax.annotation.Nonnull;
 
+import rx.Observable;
 import rx.Observer;
 
 public class PromoteAdapterItems {
@@ -16,15 +19,33 @@ public class PromoteAdapterItems {
     public static class LabelsAdapterItem extends BaseNoIDAdapterItem {
 
         @NonNull
-        private final PromoteLabel promoteLabel;
+        private final List<PromoteLabel> promoteLabels;
+        @Nonnull
+        private final Observable<Object> switchLabelPageObservable;
+        @Nonnull
+        private final String shoutTitle;
 
-        public LabelsAdapterItem(@NonNull PromoteLabel promoteLabel) {
-            this.promoteLabel = promoteLabel;
+        public LabelsAdapterItem(@NonNull List<PromoteLabel> promoteLabels,
+                                 @Nonnull Observable<Object> switchLabelPageObservable,
+                                 @Nonnull String shoutTitle) {
+            this.promoteLabels = promoteLabels;
+            this.switchLabelPageObservable = switchLabelPageObservable;
+            this.shoutTitle = shoutTitle;
         }
 
         @NonNull
-        public PromoteLabel getPromoteLabel() {
-            return promoteLabel;
+        public List<PromoteLabel> getPromoteLabels() {
+            return promoteLabels;
+        }
+
+        @Nonnull
+        public Observable<Object> getSwitchLabelPageObservable() {
+            return switchLabelPageObservable;
+        }
+
+        @Nonnull
+        public String getShoutTitle() {
+            return shoutTitle;
         }
 
         @Override
@@ -62,6 +83,11 @@ public class PromoteAdapterItems {
             return false;
         }
 
+        @Nonnull
+        public PromoteOption getPromoteOption() {
+            return promoteOption;
+        }
+
         public void onBuyClicked() {
             promoteOptionBuyClickedObserver.onNext(promoteOption);
         }
@@ -83,6 +109,10 @@ public class PromoteAdapterItems {
         @Override
         public boolean same(@Nonnull BaseAdapterItem baseAdapterItem) {
             return false;
+        }
+
+        public int getCredits() {
+            return credits;
         }
     }
 

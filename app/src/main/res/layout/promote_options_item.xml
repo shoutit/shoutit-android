@@ -43,6 +43,7 @@
             tools:text="PREMIUM" />
 
         <TextView
+            android:id="@+id/promote_option_days_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@+id/promote_option_badge"

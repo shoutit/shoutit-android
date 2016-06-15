@@ -8,7 +8,13 @@ import android.support.v7.app.AlertDialog;
 
 import com.shoutit.app.android.R;
 
+import rx.functions.Action1;
+
 public class DialogsHelper {
+
+    public static Action1<Object> showDialogAction(@NonNull Context context, @StringRes int message) {
+        return o -> showDialog(context, message);
+    }
 
     public static void showDialog(@NonNull Context context, @StringRes int message) {
         new AlertDialog.Builder(context)

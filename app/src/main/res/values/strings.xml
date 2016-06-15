@@ -9,6 +9,10 @@
     <string name="terms_of_service">Terms of Service</string>
     <string name="facebook_app_id" translatable="false">353625811317277</string>
     <string name="exit_text">Press BACK again to exit</string>
+    <plurals name="plural_credits">
+        <item quantity="one">%1$d Credit</item>
+        <item quantity="other">%1$d Credits</item>
+    </plurals>
 
     <!-- Errors -->
     <string name="error_default">Ooops, something went wrong</string>
@@ -648,6 +652,7 @@
     <string name="promote_shout_info_title">Promoting Shouts</string>
     <string name="promote_available_credits">Available Shoutit Credit</string>
     <string name="promote_ab_title">Promote Shout</string>
+    <string name="promote_not_enough_money">You don\'t have enough Shoutit Credit for this action</string>
 
 
 </resources>
