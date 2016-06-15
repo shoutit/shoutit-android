@@ -212,4 +212,47 @@ public class Shout {
                 currency, thumbnail, videoUrl, profile, category, datePublished, images, videos,
                 filters, availableCount, isMobileSet, conversations, mobile, mobileHint, promotion);
     }
+
+    public static class Promotion {
+
+        private final Label label;
+        private final boolean isExpired;
+
+        public Promotion(Label label, boolean isExpired) {
+            this.label = label;
+            this.isExpired = isExpired;
+        }
+
+        public Label getLabel() {
+            return label;
+        }
+
+        public boolean isExpired() {
+            return isExpired;
+        }
+    }
+
+    public static class Label {
+        private final String name;
+        private final String color;
+        private final String bgColor;
+
+        public Label(String name, String color, String bgColor) {
+            this.name = name;
+            this.color = color;
+            this.bgColor = bgColor;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getColor() {
+            return color;
+        }
+
+        public String getBgColor() {
+            return bgColor;
+        }
+    }
 }

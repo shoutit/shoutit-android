@@ -26,6 +26,7 @@ import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.TagsDao;
 import com.shoutit.app.android.model.TagShoutsPointer;
+import com.shoutit.app.android.utils.PromotionHelper;
 import com.shoutit.app.android.view.profile.ProfileAdapterItems;
 import com.shoutit.app.android.view.profile.ProfilePresenter;
 import com.shoutit.app.android.view.search.SearchPresenter;
@@ -217,7 +218,7 @@ public class TagProfilePresenter implements ProfilePresenter {
                             @Nullable
                             @Override
                             public BaseAdapterItem apply(@Nullable Shout shout) {
-                                return new ShoutAdapterItem(shout, false,  false, context, shoutSelectedSubject);
+                                return new ShoutAdapterItem(shout, false,  false, context, shoutSelectedSubject, PromotionHelper.promotionInfoOrNull(shout));
                             }
                         });
 

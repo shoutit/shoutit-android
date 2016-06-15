@@ -18,6 +18,7 @@ import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.utils.PromotionHelper;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
 import java.util.List;
@@ -62,7 +63,7 @@ public class SelectShoutsPresenter {
                             @Nullable
                             @Override
                             public BaseAdapterItem apply(Shout input) {
-                                return new ShoutAdapterItem(input, false, false, context, shoutSelectedObserver);
+                                return new ShoutAdapterItem(input, false, false, context, shoutSelectedObserver, PromotionHelper.promotionInfoOrNull(input));
                             }
                         }));
                     }

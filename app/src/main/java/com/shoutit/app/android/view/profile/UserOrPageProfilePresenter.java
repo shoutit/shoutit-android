@@ -30,6 +30,7 @@ import com.shoutit.app.android.model.Stats;
 import com.shoutit.app.android.model.ReportBody;
 import com.shoutit.app.android.model.UserShoutsPointer;
 import com.shoutit.app.android.utils.PreferencesHelper;
+import com.shoutit.app.android.utils.PromotionHelper;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
 import com.shoutit.app.android.view.profile.myprofile.MyProfileHalfPresenter;
 import com.shoutit.app.android.view.profile.userprofile.UserProfileHalfPresenter;
@@ -226,7 +227,7 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
                             @Nullable
                             @Override
                             public BaseAdapterItem apply(Shout shout) {
-                                return new ShoutAdapterItem(shout, false, false, context, shoutSelectedSubject);
+                                return new ShoutAdapterItem(shout, false, false, context, shoutSelectedSubject, PromotionHelper.promotionInfoOrNull(shout));
                             }
                         });
 

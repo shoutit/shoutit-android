@@ -12,6 +12,7 @@
                                     tools:layout_height="120dp">
 
     <RelativeLayout
+        android:id="@+id/shout_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="4dp"
@@ -26,10 +27,26 @@
             android:layout_width="@dimen/home_feed_image_size_linear"
             android:layout_height="@dimen/home_feed_image_size_linear"
             android:layout_centerVertical="true"
-            android:scaleType="centerCrop"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
-            android:background="@android:color/black"/>
+            android:background="@android:color/black"
+            android:scaleType="centerCrop"/>
+
+        <TextView
+            android:id="@+id/shout_promoted_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingBottom="2dp"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:paddingTop="2dp"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            android:visibility="gone"
+            tools:background="@android:color/holo_red_dark"
+            tools:text="TOP PREMIUM"
+            tools:visibility="visible"/>
 
         <TextView
             android:id="@+id/shout_grid_title_tv"
@@ -97,7 +114,7 @@ Hat, Chunky Textured Knit Ht"/>
             android:paddingRight="6dp"
             android:paddingTop="6dp"
             tools:src="@drawable/ic_chat"
-            />
+        />
 
         <ImageView
             android:id="@+id/home_feed_card_item_icon_iv"
@@ -114,7 +131,7 @@ Hat, Chunky Textured Knit Ht"/>
             android:paddingRight="6dp"
             android:paddingTop="6dp"
             tools:src="@drawable/ic_chat"
-            />
+        />
 
         <ImageView
             android:id="@+id/home_feed_card_chat_iv"
@@ -129,7 +146,7 @@ Hat, Chunky Textured Knit Ht"/>
             android:paddingRight="6dp"
             android:paddingTop="6dp"
             android:src="@drawable/ic_chat"
-            />
+        />
 
         <TextView
             android:id="@+id/shout_grid_price_tv"

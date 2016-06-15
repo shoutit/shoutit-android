@@ -22,6 +22,7 @@ import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.model.FiltersToSubmit;
 import com.shoutit.app.android.model.SearchShoutPointer;
+import com.shoutit.app.android.utils.PromotionHelper;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
@@ -135,7 +136,7 @@ public class SearchShoutsResultsPresenter {
                                 @Override
                                 public BaseAdapterItem apply(Shout shout) {
                                     final boolean isShoutOwner = shout.getProfile().getUsername().equals(currentUserName);
-                                    return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context, shoutSelectedSubject);
+                                    return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context, shoutSelectedSubject, PromotionHelper.promotionInfoOrNull(shout));
                                 }
                             }));
                             return builder.build();

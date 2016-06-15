@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
 
     <ImageView
@@ -40,5 +40,15 @@
         android:drawablePadding="4dp"
         android:drawableStart="@drawable/time_icon"
         tools:text="21 hours ago"/>
+
+    <View
+        android:layout_below="@+id/transactions_date"
+        android:layout_width="match_parent"
+        android:layout_alignLeft="@+id/transactions_date"
+        android:layout_alignStart="@+id/transactions_date"
+        android:layout_height="1px"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="4dp"
+        android:background="@color/black_12"/>
 
 </RelativeLayout>

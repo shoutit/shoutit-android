@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.shouts;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -26,7 +27,6 @@ import javax.inject.Named;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
 
 public class ShoutLinerViewHolder extends ViewHolderManager.BaseViewHolder<ShoutAdapterItem> implements View.OnClickListener {
@@ -44,10 +44,15 @@ public class ShoutLinerViewHolder extends ViewHolderManager.BaseViewHolder<Shout
     ImageView itemCategoryImageView;
     @Bind(R.id.home_feed_card_type_label_tv)
     TextView typeLabelTextView;
+    @Bind(R.id.shout_promoted_label)
+    TextView mShoutPromotedLabel;
     @Bind(R.id.home_feed_card_country_iv)
     ImageView countryImageView;
+    @Bind(R.id.shout_container)
+    View shoutContainer;
 
     private CompositeSubscription subscription;
+    @Nonnull
     private final Context context;
     private final Picasso picasso;
     private final Picasso picassoNoTransformer;
@@ -67,6 +72,16 @@ public class ShoutLinerViewHolder extends ViewHolderManager.BaseViewHolder<Shout
     public void bind(@Nonnull final ShoutAdapterItem item) {
         this.item = item;
         recycle();
+
+        if (item.isPromoted()) {
+            mShoutPromotedLabel.setVisibility(View.VISIBLE);
+            mShoutPromotedLabel.setText(item.getLabel());
+            mShoutPromotedLabel.setBackgroundColor(item.getColor());
+            shoutContainer.setBackgroundColor(item.getBgColor());
+        } else {
+            mShoutPromotedLabel.setVisibility(View.GONE);
+            shoutContainer.setBackgroundColor(Color.WHITE);
+        }
 
         final Shout shout = item.getShout();
 
@@ -108,19 +123,16 @@ public class ShoutLinerViewHolder extends ViewHolderManager.BaseViewHolder<Shout
 
         subscription = new CompositeSubscription(
                 RxView.clicks(chatIcon)
-                        .subscribe(new Action1<Void>() {
-                            @Override
-                            public void call(Void aVoid) {
-                                if (!item.isNormalUser()) {
-                                    return;
-                                }
+                        .subscribe(aVoid -> {
+                            if (!item.isNormalUser()) {
+                                return;
+                            }
 
-                                final boolean hasConversation = conversations != null && !conversations.isEmpty();
-                                if (hasConversation) {
-                                    context.startActivity(ChatActivity.newIntent(context, conversations.get(0).getId()));
-                                } else {
-                                    context.startActivity(ChatFirstConversationActivity.newIntent(context, true, item.getShout().getId()));
-                                }
+                            final boolean hasConversation = conversations != null && !conversations.isEmpty();
+                            if (hasConversation) {
+                                context.startActivity(ChatActivity.newIntent(context, conversations.get(0).getId()));
+                            } else {
+                                context.startActivity(ChatFirstConversationActivity.newIntent(context, true, item.getShout().getId()));
                             }
                         })
         );

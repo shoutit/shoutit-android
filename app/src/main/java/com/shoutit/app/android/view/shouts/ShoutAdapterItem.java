@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.shouts;
 
 import android.content.Context;
+import android.support.annotation.ColorInt;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,6 +19,31 @@ import rx.Observer;
 
 public class ShoutAdapterItem implements BaseAdapterItem {
 
+    public static class PromotionInfo {
+
+        private final int bgColor;
+        private final int color;
+        private final String label;
+
+        public PromotionInfo(@ColorInt int bgColor, @ColorInt int color, @NonNull String label) {
+            this.bgColor = bgColor;
+            this.color = color;
+            this.label = label;
+        }
+
+        public int getBgColor() {
+            return bgColor;
+        }
+
+        public int getColor() {
+            return color;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+    }
+
     @Nonnull
     private final Shout shout;
     private final boolean isShoutOwner;
@@ -26,15 +52,19 @@ public class ShoutAdapterItem implements BaseAdapterItem {
     private final Context context;
     @Nonnull
     private final Observer<String> shoutSelectedObserver;
+    @Nullable
+    private final PromotionInfo mPromotionInfo;
 
     public ShoutAdapterItem(@Nonnull Shout shout, boolean isShoutOwner,
                             boolean isNormalUser, @Nonnull Context context,
-                            @Nonnull Observer<String> shoutSelectedObserver) {
+                            @Nonnull Observer<String> shoutSelectedObserver,
+                            @Nullable PromotionInfo promotionInfo) {
         this.shout = shout;
         this.isShoutOwner = isShoutOwner;
         this.isNormalUser = isNormalUser;
         this.context = context;
         this.shoutSelectedObserver = shoutSelectedObserver;
+        this.mPromotionInfo = promotionInfo;
     }
 
     @Override
@@ -54,6 +84,25 @@ public class ShoutAdapterItem implements BaseAdapterItem {
 
     public boolean isNormalUser() {
         return isNormalUser;
+    }
+
+    public boolean isPromoted(){
+        return mPromotionInfo != null;
+    }
+
+    public int getBgColor() {
+        assert mPromotionInfo != null;
+        return mPromotionInfo.getBgColor();
+    }
+
+    public int getColor() {
+        assert mPromotionInfo != null;
+        return mPromotionInfo.getColor();
+    }
+
+    public String getLabel() {
+        assert mPromotionInfo != null;
+        return mPromotionInfo.getLabel();
     }
 
     @Override
