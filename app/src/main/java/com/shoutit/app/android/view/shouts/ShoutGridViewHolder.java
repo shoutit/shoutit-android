@@ -1,5 +1,6 @@
 package com.shoutit.app.android.view.shouts;
 
+import android.graphics.Color;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -26,6 +27,11 @@ public class ShoutGridViewHolder extends ViewHolderManager.BaseViewHolder<ShoutA
     TextView nameTextView;
     @Bind(R.id.shout_grid_price_tv)
     TextView cardPriceTextView;
+    @Bind(R.id.shout_promoted_label)
+    TextView mShoutPromotedLabel;
+    @Bind(R.id.shout_container)
+    View mShoutContainer;
+
 
     private final Picasso picasso;
     private ShoutAdapterItem item;
@@ -51,6 +57,16 @@ public class ShoutGridViewHolder extends ViewHolderManager.BaseViewHolder<ShoutA
                 .fit()
                 .centerCrop()
                 .into(cardImageView);
+
+        if (item.isPromoted()) {
+            mShoutPromotedLabel.setVisibility(View.VISIBLE);
+            mShoutPromotedLabel.setText(item.getLabel());
+            mShoutPromotedLabel.setBackgroundColor(item.getColor());
+            mShoutContainer.setBackgroundColor(item.getBgColor());
+        } else {
+            mShoutPromotedLabel.setVisibility(View.GONE);
+            mShoutContainer.setBackgroundColor(Color.WHITE);
+        }
     }
 
     @Override

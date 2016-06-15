@@ -19,7 +19,7 @@ import rx.Observer;
 
 public class ShoutAdapterItem implements BaseAdapterItem {
 
-    private static class PromotionInfo {
+    public static class PromotionInfo {
 
         private final int bgColor;
         private final int color;
@@ -52,16 +52,19 @@ public class ShoutAdapterItem implements BaseAdapterItem {
     private final Context context;
     @Nonnull
     private final Observer<String> shoutSelectedObserver;
+    @Nullable
+    private final PromotionInfo mPromotionInfo;
 
     public ShoutAdapterItem(@Nonnull Shout shout, boolean isShoutOwner,
                             boolean isNormalUser, @Nonnull Context context,
                             @Nonnull Observer<String> shoutSelectedObserver,
-                            @NonNull PromotionInfo promotionInfo) {
+                            @Nullable PromotionInfo promotionInfo) {
         this.shout = shout;
         this.isShoutOwner = isShoutOwner;
         this.isNormalUser = isNormalUser;
         this.context = context;
         this.shoutSelectedObserver = shoutSelectedObserver;
+        this.mPromotionInfo = promotionInfo;
     }
 
     @Override
@@ -81,6 +84,25 @@ public class ShoutAdapterItem implements BaseAdapterItem {
 
     public boolean isNormalUser() {
         return isNormalUser;
+    }
+
+    public boolean isPromoted(){
+        return mPromotionInfo != null;
+    }
+
+    public int getBgColor() {
+        assert mPromotionInfo != null;
+        return mPromotionInfo.getBgColor();
+    }
+
+    public int getColor() {
+        assert mPromotionInfo != null;
+        return mPromotionInfo.getColor();
+    }
+
+    public String getLabel() {
+        assert mPromotionInfo != null;
+        return mPromotionInfo.getLabel();
     }
 
     @Override

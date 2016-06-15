@@ -218,7 +218,7 @@ public class HomePresenterTest {
     private ResponseOrError<ShoutsResponse> shoutsResponse() {
         return ResponseOrError.fromData(new ShoutsResponse(1, "2", null, Lists.newArrayList(
                 new Shout("id", null, null, null, null, null, null, 2L, 2f, null, null, null,
-                        TestUtils.getUser(), category, null, 2, null, null, 0, ImmutableList.<ConversationDetails>of(), true, null, null)), null));
+                        TestUtils.getUser(), category, null, 2, null, null, 0, ImmutableList.<ConversationDetails>of(), true, null, null, null)), null));
     }
 
     @Nonnull

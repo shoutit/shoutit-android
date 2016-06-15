@@ -27,6 +27,7 @@ import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.model.LocationPointer;
 import com.shoutit.app.android.utils.MoreFunctions1;
+import com.shoutit.app.android.utils.PromotionHelper;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
@@ -129,7 +130,7 @@ public class HomePresenter {
                                             public BaseAdapterItem apply(@Nullable Shout shout) {
                                                 assert shout != null;
                                                 final boolean isShoutOwner = shout.getProfile().getUsername().equals(currentUserName);
-                                                return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context, shoutSelectedObserver);
+                                                return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context, shoutSelectedObserver, PromotionHelper.promotionInfoOrNull(shout));
                                             }
                                         });
 
