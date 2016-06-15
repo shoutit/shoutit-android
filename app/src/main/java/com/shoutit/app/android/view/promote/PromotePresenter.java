@@ -19,10 +19,10 @@ import com.shoutit.app.android.api.model.PromoteLabel;
 import com.shoutit.app.android.api.model.PromoteOption;
 import com.shoutit.app.android.api.model.PromoteRequest;
 import com.shoutit.app.android.api.model.PromoteResponse;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dao.PromoteLabelsDao;
 import com.shoutit.app.android.dao.PromoteOptionsDao;
-import com.shoutit.app.android.utils.pusher.PusherHelper;
+import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
+
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -62,7 +62,7 @@ public class PromotePresenter {
                             @Nonnull PromoteOptionsDao promoteOptionsDao,
                             @Nonnull @UiScheduler Scheduler uiScheduler,
                             @Nonnull @NetworkScheduler Scheduler networkScheduler,
-                            @Nonnull PusherHelper pusherHelper,
+                            @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
                             @Nonnull UserPreferences userPreferences,
                             @Nonnull ApiService apiService,
                             @Nullable String shoutTitle,
@@ -78,9 +78,6 @@ public class PromotePresenter {
                 })
                 .map(Functions1.toObject());
 
-        final Observable<User> userFromPusher = pusherHelper.getUserUpdatedObservable()
-                .doOnNext(userPreferences::updateUserJson);
-
         final Observable<ResponseOrError<List<PromoteLabel>>> labelsRequest = promoteLabelsDao
                 .getLabelsObservable()
                 .observeOn(uiScheduler);
@@ -89,11 +86,10 @@ public class PromotePresenter {
                 .getOptionsObservable()
                 .observeOn(uiScheduler);
 
-        final Observable<Integer> creditsObservable = Observable.merge(
-                userPreferences.getUserObservable().first(),
-                userFromPusher)
-                .map(user -> user.getStats().getCredits())
-                .compose(ObservableExtensions.behaviorRefCount());
+        final Observable<Integer> creditsObservable =
+                userPreferences.getUserObservable()
+                        .map(user -> user.getStats().getCredits())
+                        .compose(ObservableExtensions.behaviorRefCount());
 
         final Observable<BaseAdapterItem> creditsAdapterItemObservable = creditsObservable
                 .map(PromoteAdapterItems.AvailableCreditsAdapterItem::new);
@@ -149,7 +145,8 @@ public class PromotePresenter {
 
         successfullyPromotedObservable = promoteRequestObservable
                 .compose(ResponseOrError.onlySuccess())
-                .map(promoteResponse -> new BothParams<>(shoutTitle, promoteResponse));
+                .map(promoteResponse -> new BothParams<>(shoutTitle, promoteResponse))
+                .doOnNext(stringPromoteResponseBothParams -> shoutsGlobalRefreshPresenter.refreshShouts());
 
         notEnoughCreditsObservable = optionToBuy
                 .filter(option -> !option.isPresent())
