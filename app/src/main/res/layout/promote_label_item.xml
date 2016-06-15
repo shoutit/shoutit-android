@@ -2,6 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
     android:layout_height="90dp">
 
     <View
@@ -13,7 +15,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:background="@drawable/shape_promote_stroke" />
+        android:background="@drawable/shape_promote_stroke" />
 
     <TextView
         android:id="@+id/promote_label_text"

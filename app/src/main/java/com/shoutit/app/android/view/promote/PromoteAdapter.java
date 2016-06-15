@@ -2,7 +2,11 @@ package com.shoutit.app.android.view.promote;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.RectF;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.RoundRectShape;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -12,6 +16,7 @@ import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.Label;
 import com.shoutit.app.android.api.model.PromoteOption;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.viewpagerindicator.CirclePageIndicator;
@@ -31,13 +36,13 @@ public class PromoteAdapter extends BaseAdapter {
     private static final int VIEW_TYPE_AVAILABLE_CREDITS = 3;
 
     @Nonnull
-    private final PromoteLabelsPager promoteLabelsPager;
+    private final PromoteLabelsPagerAdapter promoteLabelsPagerAdapter;
 
     @Inject
     public PromoteAdapter(@ForActivity @Nonnull Context context,
-                          @Nonnull PromoteLabelsPager promoteLabelsPager) {
+                          @Nonnull PromoteLabelsPagerAdapter promoteLabelsPagerAdapter) {
         super(context);
-        this.promoteLabelsPager = promoteLabelsPager;
+        this.promoteLabelsPagerAdapter = promoteLabelsPagerAdapter;
     }
 
     @Override
@@ -69,7 +74,7 @@ public class PromoteAdapter extends BaseAdapter {
         }
     }
 
-    private class LabelsViewHolder extends ViewHolderManager.BaseViewHolder<PromoteAdapterItems.LabelsAdapterItem> {
+    public class LabelsViewHolder extends ViewHolderManager.BaseViewHolder<PromoteAdapterItems.LabelsAdapterItem> {
 
         @Bind(R.id.promote_shout_title)
         TextView shoutTitleTv;
@@ -84,7 +89,7 @@ public class PromoteAdapter extends BaseAdapter {
             super(itemView);
             ButterKnife.bind(this, itemView);
 
-            viewPager.setAdapter(promoteLabelsPager);
+            viewPager.setAdapter(promoteLabelsPagerAdapter);
             pageIndicator.setViewPager(viewPager);
         }
 
@@ -93,14 +98,16 @@ public class PromoteAdapter extends BaseAdapter {
             recycle();
 
             shoutTitleTv.setText(item.getShoutTitle());
+            shoutTitleTv.setVisibility(TextUtils.isEmpty(item.getShoutTitle()) ? View.GONE : View.VISIBLE);
 
-            promoteLabelsPager.bindData(item.getPromoteLabels());
+            promoteLabelsPagerAdapter.bindData(item.getPromoteLabels());
 
             subscription = item.getSwitchLabelPageObservable()
                     .subscribe(o -> {
                         switchPagerPage();
                     });
 
+            item.startSwitchingPages();
         }
 
         private void switchPagerPage() {
@@ -128,7 +135,7 @@ public class PromoteAdapter extends BaseAdapter {
         }
     }
 
-    private class OptionsViewHolder extends ViewHolderManager.BaseViewHolder<PromoteAdapterItems.OptionAdapterItem> {
+    public class OptionsViewHolder extends ViewHolderManager.BaseViewHolder<PromoteAdapterItems.OptionAdapterItem> {
 
         @Bind(R.id.promote_option_name)
         TextView optionNameTv;
@@ -140,24 +147,32 @@ public class PromoteAdapter extends BaseAdapter {
         TextView daysTv;
 
         private PromoteAdapterItems.OptionAdapterItem item;
+        private final ShapeDrawable badgeDrawable;
 
         public OptionsViewHolder(@Nonnull View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+
+            final int badgeRadius = context.getResources().getDimensionPixelSize(R.dimen.promote_label_radius);
+            final float[] radiuses = {0, 0, 0, 0, badgeRadius, badgeRadius, 0, 0};
+            badgeDrawable = new ShapeDrawable(new RoundRectShape(radiuses, new RectF(), radiuses));
         }
 
         @Override
         public void bind(@Nonnull PromoteAdapterItems.OptionAdapterItem item) {
             this.item = item;
             final PromoteOption option = item.getPromoteOption();
-            final PromoteOption.Label label = option.getLabel();
+            final Label label = option.getLabel();
 
             optionNameTv.setText(option.getName());
 
             optionBadgeTv.setText(label.getName());
-            optionBadgeTv.setBackgroundColor(Color.parseColor(label.getColor()));
+            badgeDrawable.getPaint().setColor(Color.parseColor(label.getColor()));
+            optionBadgeTv.setBackground(badgeDrawable);
 
-            daysTv.setText(option.getDays() == null ? null : String.valueOf(option.getDays()));
+            daysTv.setText(option.getDays() == null ?
+                    null : context.getResources().getQuantityString(
+                    R.plurals.plural_days, option.getDays(), option.getDays()));
 
             buyButton.setText(context.getResources().getQuantityString(
                     R.plurals.plural_credits, option.getCredits(), option.getCredits()));
@@ -170,7 +185,7 @@ public class PromoteAdapter extends BaseAdapter {
         }
     }
 
-    private class CreditsViewHolder extends ViewHolderManager.BaseViewHolder<PromoteAdapterItems.AvailableCreditsAdapterItem> {
+    public class CreditsViewHolder extends ViewHolderManager.BaseViewHolder<PromoteAdapterItems.AvailableCreditsAdapterItem> {
 
         @Bind(R.id.promote_available_credits_tv)
         TextView availableCreditsTv;
@@ -182,9 +197,7 @@ public class PromoteAdapter extends BaseAdapter {
 
         @Override
         public void bind(@Nonnull PromoteAdapterItems.AvailableCreditsAdapterItem item) {
-            availableCreditsTv.setText(item.getCredits());
+            availableCreditsTv.setText(String.valueOf(item.getCredits()));
         }
     }
-
-
 }

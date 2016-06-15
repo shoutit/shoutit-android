@@ -16,21 +16,15 @@ import rx.Scheduler;
 public class PromoteLabelsDao {
 
     @NonNull
-    private final ApiService apiService;
-    @NonNull
-    private final Scheduler networkScheduler;
-    @NonNull
     private final Observable<ResponseOrError<List<PromoteLabel>>> labelsObservable;
 
     public PromoteLabelsDao(@NonNull ApiService apiService,
                             @NonNull @NetworkScheduler Scheduler networkScheduler) {
-        this.apiService = apiService;
-        this.networkScheduler = networkScheduler;
-
         labelsObservable = apiService.promoteLabels()
                 .subscribeOn(networkScheduler)
                 .compose(ResponseOrError.toResponseOrErrorObservable())
-                .compose(MoreOperators.cacheWithTimeout(networkScheduler));
+                .compose(MoreOperators.cacheWithTimeout(networkScheduler))
+                .mergeWith(Observable.never());
     }
 
     @NonNull

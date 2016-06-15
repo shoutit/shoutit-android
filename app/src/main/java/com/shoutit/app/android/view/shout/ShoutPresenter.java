@@ -6,7 +6,6 @@ import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.UiScheduler;
-import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
@@ -66,6 +65,8 @@ public class ShoutPresenter {
     private final Observable<Boolean> editShoutClickedObservable;
     private final Observable<Object> onlyForLoggedInUserObservable;
     private final Observable<String> shareObservable;
+    private final Observable<Shout> showPromoteObservable;
+    private final Observable<Boolean> showPromotedObservable;
 
     private PublishSubject<String> addToCartSubject = PublishSubject.create();
     private PublishSubject<String> onCategoryClickedSubject = PublishSubject.create();
@@ -75,16 +76,18 @@ public class ShoutPresenter {
     private PublishSubject<User> visitProfileSubject = PublishSubject.create();
     private PublishSubject<Object> onVideoOrEditClickSubject = PublishSubject.create();
     private PublishSubject<Object> shareSubject = PublishSubject.create();
+    private PublishSubject<Object> showDeleteDialogSubject = PublishSubject.create();
 
     @Nonnull
     private final Scheduler uiScheduler;
     @Nonnull
     private final UserPreferences mUserPreferences;
     @Nonnull
-    private final PublishSubject<Object> callOrDeleteSubject = PublishSubject.create();
+    private final PublishSubject<Object> callOrPromoteSubject = PublishSubject.create();
     private final PublishSubject<String> sendReportObserver = PublishSubject.create();
     private final PublishSubject<Object> refreshShoutsSubject = PublishSubject.create();
     private final Observable<User> shoutOwnerProfile;
+    private final Observable<Shout> successShoutResponse;
 
     @Inject
     public ShoutPresenter(@Nonnull final ShoutsDao shoutsDao,
@@ -104,7 +107,7 @@ public class ShoutPresenter {
         final Observable<ResponseOrError<Shout>> shoutResponse = shoutsDao.getShoutObservable(shoutId)
                 .compose(ObservableExtensions.<ResponseOrError<Shout>>behaviorRefCount());
 
-        final Observable<Shout> successShoutResponse = shoutResponse
+        successShoutResponse = shoutResponse
                 .compose(ResponseOrError.<Shout>onlySuccess());
 
         final Observable<String> userNameObservable = successShoutResponse
@@ -116,9 +119,6 @@ public class ShoutPresenter {
 
         titleObservable = successShoutResponse
                 .map(Shout::getTitle);
-
-        hasMobilePhoneObservable = successShoutResponse
-                .map(Shout::isMobileSet);
 
         conversationObservable = successShoutResponse
                 .map(Shout::getConversations);
@@ -243,6 +243,16 @@ public class ShoutPresenter {
                 .take(1)
                 .compose(ObservableExtensions.<Boolean>behaviorRefCount());
 
+        hasMobilePhoneObservable = successShoutResponse
+                .map(Shout::isMobileSet)
+                .withLatestFrom(isUserShoutOwnerObservable, (isMobileSet, isShoutOwner) -> {
+                    if (!isShoutOwner) {
+                        return isMobileSet;
+                    } else {
+                        return true;
+                    }
+                });
+
         /** Refresh shouts **/
         final Observable<Object> refreshShout = Observable
                 .merge(shoutsGlobalRefreshPresenter.getShoutsGlobalRefreshObservable(), refreshShoutsSubject)
@@ -277,26 +287,16 @@ public class ShoutPresenter {
         refreshShoutsObservable = Observable.merge(refreshUserShouts, refreshRelatedShouts, refreshShout);
         /** **/
 
-        final Observable<Boolean> callOrEditObservable = Observable
-                .combineLatest(callOrDeleteSubject, isUserShoutOwnerObservable, new Func2<Object, Boolean, Boolean>() {
-                    @Override
-                    public Boolean call(Object o, Boolean isOwner) {
-                        return isOwner;
-                    }
-                });
+        final Observable<Boolean> callOrPromoteObservable = Observable
+                .combineLatest(callOrPromoteSubject, isUserShoutOwnerObservable, (o, isOwner) -> isOwner);
 
         final Observable<ResponseOrError<MobilePhoneResponse>> shoutMobilePhoneErrorObservable = shoutsDao
                 .getShoutMobilePhoneObservable(shoutId)
                 .compose(ObservableExtensions.<ResponseOrError<MobilePhoneResponse>>behaviorRefCount());
 
-        callErrorObservable = callOrEditObservable
+        callErrorObservable = callOrPromoteObservable
                 .filter(Functions1.isFalse())
-                .flatMap(new Func1<Boolean, Observable<ResponseOrError<MobilePhoneResponse>>>() {
-                    @Override
-                    public Observable<ResponseOrError<MobilePhoneResponse>> call(Boolean aBoolean) {
-                        return shoutMobilePhoneErrorObservable;
-                    }
-                })
+                .flatMap(isNotShoutOwner -> shoutMobilePhoneErrorObservable)
                 .observeOn(uiScheduler);
 
         deleteShoutSubject.subscribe(shoutsDao.getDeleteShoutObserver(shoutId));
@@ -306,8 +306,21 @@ public class ShoutPresenter {
         reportShoutObservable = shoutsDao.getReportShoutObservable(shoutId)
                 .observeOn(uiScheduler);
 
-        showDeleteDialogObservable = callOrEditObservable
+        showDeleteDialogObservable = showDeleteDialogSubject
+                .withLatestFrom(isUserShoutOwnerObservable, (o, isShoutOwner) -> isShoutOwner)
                 .filter(Functions1.isTrue())
+                .observeOn(uiScheduler);
+
+        showPromoteObservable = callOrPromoteObservable
+                .filter(Functions1.isTrue())
+                .withLatestFrom(successShoutResponse, (ignore, shout) -> shout)
+                .filter(shout -> !shout.isPromoted())
+                .observeOn(uiScheduler);
+
+        showPromotedObservable = callOrPromoteObservable
+                .filter(Functions1.isTrue())
+                .withLatestFrom(successShoutResponse, (ignore, shout) -> shout.isPromoted())
+                .filter(Functions1.isFalse())
                 .observeOn(uiScheduler);
 
         deleteShoutResponseObservable = shoutsDao.getDeleteShoutObservable(shoutId)
@@ -414,27 +427,31 @@ public class ShoutPresenter {
     }
 
     @Nonnull
-    public Observable<BottomBarData> getIsUserShoutOwnerObservable() {
+    public Observer<Object> getShowDeleteDialogObserver() {
+        return showDeleteDialogSubject;
+    }
+
+    @Nonnull
+    public Observable<BottomBarData> getBottomBarDataObservable() {
         return allAdapterItemsObservable
                 .take(1)
-                .flatMap(new Func1<List<BaseAdapterItem>, Observable<BottomBarData>>() {
-                    @Override
-                    public Observable<BottomBarData> call(List<BaseAdapterItem> baseAdapterItems) {
-                        return isUserShoutOwnerObservable.zipWith(conversationObservable, new Func2<Boolean, List<ConversationDetails>, BottomBarData>() {
-                            @Override
-                            public BottomBarData call(Boolean isUserShoutOwner, List<ConversationDetails> conversations) {
-                                final boolean hasConversation = conversations != null && !conversations.isEmpty();
-                                return new BottomBarData(isUserShoutOwner, hasConversation, hasConversation ? conversations.get(0).getId() : null, mUserPreferences.isNormalUser());
-                            }
-                        });
-                    }
-                })
+                .flatMap(baseAdapterItems -> Observable.combineLatest(
+                        isUserShoutOwnerObservable,
+                        conversationObservable,
+                        successShoutResponse,
+                        (isUserShoutOwner, conversations, shout) -> {
+                            final boolean hasConversation = conversations != null && !conversations.isEmpty();
+                            return new BottomBarData(isUserShoutOwner, hasConversation,
+                                    hasConversation ? conversations.get(0).getId() : null,
+                                    mUserPreferences.isNormalUser(), shout.isPromoted());
+                        }
+                ))
                 .observeOn(uiScheduler);
     }
 
     @Nonnull
-    public Observer<Object> callOrDeleteObserver() {
-        return callOrDeleteSubject;
+    public Observer<Object> callOrPromoteObserver() {
+        return callOrPromoteSubject;
     }
 
     @Nonnull
@@ -463,6 +480,15 @@ public class ShoutPresenter {
     }
 
     @Nonnull
+    public Observable<Shout> getShowPromoteObservable() {
+        return showPromoteObservable;
+    }
+
+    public Observable<Boolean> getShowPromotedObservable() {
+        return showPromotedObservable;
+    }
+
+    @Nonnull
     public Observer<Object> getDeleteShoutObserver() {
         return deleteShoutSubject;
     }
@@ -487,12 +513,15 @@ public class ShoutPresenter {
         private final boolean hasConversation;
         private final String conversationId;
         private final boolean isNormalUser;
+        private final boolean isPromoted;
 
-        public BottomBarData(boolean isUserShoutOwner, boolean hasConversation, String conversationId, boolean isNormalUser) {
+        public BottomBarData(boolean isUserShoutOwner, boolean hasConversation, String conversationId,
+                             boolean isNormalUser, boolean isPromoted) {
             this.isUserShoutOwner = isUserShoutOwner;
             this.hasConversation = hasConversation;
             this.conversationId = conversationId;
             this.isNormalUser = isNormalUser;
+            this.isPromoted = isPromoted;
         }
 
         public boolean isUserShoutOwner() {
@@ -509,6 +538,10 @@ public class ShoutPresenter {
 
         public boolean isNormalUser() {
             return isNormalUser;
+        }
+
+        public boolean isPromoted() {
+            return isPromoted;
         }
     }
 }

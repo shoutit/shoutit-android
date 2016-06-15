@@ -1,6 +1,10 @@
 package com.shoutit.app.android.view.promote;
 
+import android.content.Context;
 import android.graphics.Color;
+import android.graphics.RectF;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.RoundRectShape;
 import android.support.v4.view.PagerAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +13,7 @@ import android.widget.TextView;
 
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.PromoteLabel;
+import com.shoutit.app.android.dagger.ForActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,15 +23,19 @@ import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 
-public class PromoteLabelsPager extends PagerAdapter {
+public class PromoteLabelsPagerAdapter extends PagerAdapter {
 
     @Nonnull
     private final LayoutInflater inflater;
+    private final ShapeDrawable badgeDrawable;
     private List<PromoteLabel> items = new ArrayList<>();
 
     @Inject
-    public PromoteLabelsPager(@Nonnull LayoutInflater inflater) {
+    public PromoteLabelsPagerAdapter(@ForActivity Context context, @Nonnull LayoutInflater inflater) {
         this.inflater = inflater;
+        final int badgeRadius = context.getResources().getDimensionPixelSize(R.dimen.promote_label_radius);
+        final float[] radiuses = {0, 0, 0, 0, badgeRadius, badgeRadius, 0, 0};
+        badgeDrawable = new ShapeDrawable(new RoundRectShape(radiuses, new RectF(), radiuses));
     }
 
     public void bindData(List<PromoteLabel> items) {
@@ -45,9 +54,14 @@ public class PromoteLabelsPager extends PagerAdapter {
         final PromoteLabel promoteLabel = items.get(position);
 
         backgroundView.setBackgroundColor(Color.parseColor(promoteLabel.getBgColor()));
+
         badgeTv.setText(promoteLabel.getName());
-        badgeTv.setBackgroundColor(Color.parseColor(promoteLabel.getColor()));
+        badgeDrawable.getPaint().setColor(Color.parseColor(promoteLabel.getColor()));
+        badgeTv.setBackground(badgeDrawable);
+
         labelText.setText(promoteLabel.getDescription());
+
+        container.addView(view);
 
         return view;
     }

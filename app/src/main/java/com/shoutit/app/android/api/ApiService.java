@@ -221,8 +221,9 @@ public interface ApiService {
     @GET("shouts/promote_options")
     Observable<List<PromoteOption>> promoteOptions();
 
-    @PATCH("shouts/promote")
-    Observable<PromoteResponse> promote(@Body PromoteRequest promoteRequest);
+    @PATCH("shouts/{id}/promote")
+    Observable<PromoteResponse> promote(@Path("id") String shoutId,
+                                        @Body PromoteRequest promoteRequest);
 
     /**
      * OAuth

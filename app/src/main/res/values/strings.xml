@@ -13,6 +13,10 @@
         <item quantity="one">%1$d Credit</item>
         <item quantity="other">%1$d Credits</item>
     </plurals>
+    <plurals name="plural_days">
+        <item quantity="one">%1$d Day</item>
+        <item quantity="other">%1$d Days</item>
+    </plurals>
 
     <!-- Errors -->
     <string name="error_default">Ooops, something went wrong</string>
@@ -206,6 +210,8 @@
     <string name="shout_bottom_bar_report">Report</string>
     <string name="shout_visit_profile">VISIT %1$s\'s PROFILE</string>
     <string name="shout_bottom_bar_delete">Delete</string>
+    <string name="shout_bottom_bar_promote">Promote</string>
+    <string name="shout_bottom_bar_promoted">Promoted</string>
     <string name="shout_bottom_bar_edit">Edit</string>
     <string name="shout_choose_video_app">Choose application</string>
 
@@ -668,6 +674,8 @@
     <string name="promote_available_credits">Available Shoutit Credit</string>
     <string name="promote_ab_title">Promote Shout</string>
     <string name="promote_not_enough_money">You don\'t have enough Shoutit Credit for this action</string>
+    <string name="promote_confirm_text">Confirm buying %1$s for %2$d credits</string>
+    <string name="promote_confirm_button">Confirm</string>
 
     <!-- Transactions -->
     <string name="transactions_title">Credit Transactions</string>

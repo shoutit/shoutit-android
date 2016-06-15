@@ -5,6 +5,7 @@
     android:layout_height="56dp"
     android:background="@android:color/white"
     android:orientation="horizontal"
+    android:layout_marginTop="8dp"
     android:layout_marginLeft="16dp"
     android:layout_marginRight="16dp"
     android:padding="8dp">
@@ -20,7 +21,6 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:fontFamily="sans-serif-medium"
-            android:textAllCaps="true"
             android:textColor="@color/promote_text"
             android:textSize="12sp"
             tools:text="PREMIUM HIGHLIGHT" />
@@ -28,10 +28,12 @@
         <TextView
             android:id="@+id/promote_option_badge"
             android:layout_width="wrap_content"
+            android:minWidth="82dp"
             android:layout_height="wrap_content"
             android:layout_below="@+id/promote_option_name"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
+            android:minHeight="20dp"
             android:gravity="center"
             android:paddingBottom="2dp"
             android:paddingLeft="4dp"

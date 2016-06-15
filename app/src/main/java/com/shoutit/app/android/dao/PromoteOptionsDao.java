@@ -17,21 +17,15 @@ import rx.Scheduler;
 public class PromoteOptionsDao {
 
     @NonNull
-    private final ApiService apiService;
-    @NonNull
-    private final Scheduler networkScheduler;
-    @NonNull
     private final Observable<ResponseOrError<List<PromoteOption>>> optionsObservable;
 
     public PromoteOptionsDao(@NonNull ApiService apiService,
                              @NonNull @NetworkScheduler Scheduler networkScheduler) {
-        this.apiService = apiService;
-        this.networkScheduler = networkScheduler;
-
         optionsObservable = apiService.promoteOptions()
                 .subscribeOn(networkScheduler)
                 .compose(ResponseOrError.toResponseOrErrorObservable())
-                .compose(MoreOperators.cacheWithTimeout(networkScheduler));
+                .compose(MoreOperators.cacheWithTimeout(networkScheduler))
+                .mergeWith(Observable.never());
     }
 
     @NonNull

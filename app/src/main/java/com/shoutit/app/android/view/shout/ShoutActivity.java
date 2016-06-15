@@ -21,20 +21,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
-import com.appunite.rx.functions.BothParams;
-import com.google.common.base.Strings;
 import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
@@ -52,6 +50,7 @@ import com.shoutit.app.android.view.createshout.edit.EditShoutActivity;
 import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.profile.tagprofile.TagProfileActivity;
+import com.shoutit.app.android.view.promote.PromoteActivity;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.main.MainSearchActivity;
 import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsActivity;
@@ -84,8 +83,8 @@ public class ShoutActivity extends BaseActivity {
     ProgressBar progressBar;
     @Bind(R.id.shout_bottom_toolbar)
     View bottomBar;
-    @Bind(R.id.shout_bottom_bar_call_or_delete)
-    TextView callOrDeleteTextView;
+    @Bind(R.id.shout_bottom_bar_call_or_promote)
+    TextView callOrPromoteTextView;
     @Bind(R.id.shout_bottom_bar_video_call_or_edit)
     TextView videoCallOrEditTextView;
     @Bind(R.id.shout_bottom_bar_chat_or_chats)
@@ -117,7 +116,7 @@ public class ShoutActivity extends BaseActivity {
         setUpBottomBar();
         setUpAdapter();
 
-        presenter.getIsUserShoutOwnerObservable()
+        presenter.getBottomBarDataObservable()
                 .compose(this.<ShoutPresenter.BottomBarData>bindToLifecycle())
                 .subscribe(setUpBottomBar());
 
@@ -224,15 +223,9 @@ public class ShoutActivity extends BaseActivity {
 
         presenter.getHasMobilePhoneObservable()
                 .compose(this.<Boolean>bindToLifecycle())
-                .subscribe(new Action1<Boolean>() {
-                    @Override
-                    public void call(Boolean hasPhoneNumber) {
-                        if (getString(R.string.shout_bottom_bar_delete).equals(callOrDeleteTextView.getText().toString())) {
-                            hasPhoneNumber = true;
-                        }
-                        callOrDeleteTextView.setEnabled(hasPhoneNumber);
-                        callOrDeleteTextView.setAlpha(hasPhoneNumber ? 1f : 0.5f);
-                    }
+                .subscribe(hasPhoneNumber -> {
+                    callOrPromoteTextView.setEnabled(hasPhoneNumber);
+                    callOrPromoteTextView.setAlpha(hasPhoneNumber ? 1f : 0.5f);
                 });
 
         presenter.getDeleteShoutResponseObservable()
@@ -326,6 +319,20 @@ public class ShoutActivity extends BaseActivity {
                             getString(R.string.shout_share)));
                 });
 
+        presenter.getShowPromoteObservable()
+                .compose(bindToLifecycle())
+                .subscribe(shout -> {
+                    startActivity(PromoteActivity.newIntent(this, shout.getTitle(), shout.getId()));
+                });
+
+        presenter.getShowPromotedObservable()
+                .compose(bindToLifecycle())
+                .subscribe(new Action1<Boolean>() {
+                    @Override
+                    public void call(Boolean aBoolean) {
+                        // TODO show promoted screen
+                    }
+                });
     }
 
     private void startCall(String phoneNumber) {
@@ -345,97 +352,86 @@ public class ShoutActivity extends BaseActivity {
     private Action1<ShoutPresenter.BottomBarData> setUpBottomBar() {
         final PopupMenu popupMenu = new PopupMenu(toolbar.getContext(), showMoreIcon);
         popupMenu.inflate(R.menu.menu_shout_bottom_bar);
-        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                ReportDialog.show(ShoutActivity.this, new Action1<String>() {
-                    @Override
-                    public void call(String reportBody) {
-                        presenter.sendReportObserver().onNext(reportBody);
-                    }
-                });
 
-                return true;
+        popupMenu.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.menu_report:
+                    ReportDialog.show(ShoutActivity.this,
+                            reportBody -> presenter.sendReportObserver().onNext(reportBody));
+                    return true;
+                case R.id.menu_delete_shout:
+                    presenter.getShowDeleteDialogObserver().onNext(null);
+                    return true;
+                default:
+                    return false;
             }
         });
 
-        return new Action1<ShoutPresenter.BottomBarData>() {
-            @Override
-            public void call(final ShoutPresenter.BottomBarData bottomBarData) {
-                final boolean isUserShoutOwner = bottomBarData.isUserShoutOwner();
+        return bottomBarData -> {
+            final boolean isUserShoutOwner = bottomBarData.isUserShoutOwner();
 
-                if (isUserShoutOwner) {
-                    callOrDeleteTextView.setEnabled(true);
-                    callOrDeleteTextView.setAlpha(1f);
-                    callOrDeleteTextView.setText(R.string.shout_bottom_bar_delete);
+            if (isUserShoutOwner) {
+                callOrPromoteTextView.setEnabled(true);
+                callOrPromoteTextView.setAlpha(1f);
+                callOrPromoteTextView.setText(bottomBarData.isPromoted() ?
+                        R.string.shout_bottom_bar_promoted : R.string.shout_bottom_bar_promote);
 
-                    ImageHelper.setStartCompoundRelativeDrawable(callOrDeleteTextView, R.drawable.ic_delete_red);
-                    ImageHelper.setStartCompoundRelativeDrawable(showMoreIcon, R.drawable.ic_more_disabled);
-                    ImageHelper.setStartCompoundRelativeDrawable(videoCallOrEditTextView, R.drawable.ic_edit_red);
+                ImageHelper.setStartCompoundRelativeDrawable(callOrPromoteTextView, R.drawable.ic_promote);
+                ImageHelper.setStartCompoundRelativeDrawable(videoCallOrEditTextView, R.drawable.ic_edit_red);
 
-                    videoCallOrEditTextView.setText(R.string.shout_bottom_bar_edit);
-                    showMoreIcon.setVisibility(View.GONE);
+                videoCallOrEditTextView.setText(R.string.shout_bottom_bar_edit);
 
-                    chatOrChatsTextView.setText(R.string.shout_bottom_bar_chats);
-                    chatOrChatsTextView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            startActivity(ConversationsActivity.newIntent(ShoutActivity.this));
+                chatOrChatsTextView.setText(R.string.shout_bottom_bar_chats);
+                chatOrChatsTextView.setOnClickListener(v ->
+                        startActivity(ConversationsActivity.newIntent(ShoutActivity.this)));
+
+            } else {
+                callOrPromoteTextView.setText(R.string.shout_bottom_bar_call);
+
+                chatOrChatsTextView.setText(R.string.shout_bottom_bar_chat);
+
+                ImageHelper.setStartCompoundRelativeDrawable(callOrPromoteTextView, R.drawable.ic_call_green);
+                ImageHelper.setStartCompoundRelativeDrawable(videoCallOrEditTextView, R.drawable.ic_video_chat_red);
+
+                videoCallOrEditTextView.setText(R.string.shout_bottom_bar_video_call);
+
+                chatOrChatsTextView.setOnClickListener(v -> {
+                    if (bottomBarData.isNormalUser()) {
+                        if (bottomBarData.isHasConversation()) {
+                            startActivity(ChatActivity.newIntent(ShoutActivity.this, bottomBarData.getConversationId()));
+                        } else {
+                            startActivity(ChatFirstConversationActivity.newIntent(ShoutActivity.this, true, mShoutId));
                         }
-                    });
-
-                } else {
-                    callOrDeleteTextView.setText(R.string.shout_bottom_bar_call);
-
-                    chatOrChatsTextView.setText(R.string.shout_bottom_bar_chat);
-                    showMoreIcon.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            popupMenu.show();
-                        }
-                    });
-
-                    ImageHelper.setStartCompoundRelativeDrawable(callOrDeleteTextView, R.drawable.ic_call_green);
-                    ImageHelper.setStartCompoundRelativeDrawable(videoCallOrEditTextView, R.drawable.ic_video_chat_red);
-                    ImageHelper.setStartCompoundRelativeDrawable(showMoreIcon, R.drawable.ic_more_white);
-
-                    videoCallOrEditTextView.setText(R.string.shout_bottom_bar_video_call);
-
-                    chatOrChatsTextView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (bottomBarData.isNormalUser()) {
-                                if (bottomBarData.isHasConversation()) {
-                                    startActivity(ChatActivity.newIntent(ShoutActivity.this, bottomBarData.getConversationId()));
-                                } else {
-                                    startActivity(ChatFirstConversationActivity.newIntent(ShoutActivity.this, true, mShoutId));
-                                }
-                            } else {
-                                ColoredSnackBar.error(ColoredSnackBar.contentView(ShoutActivity.this), R.string.error_action_only_for_logged_in_user, Snackbar.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
-                }
-
-                final int bottomBarHeight = getResources().getDimensionPixelSize(R.dimen.shout_bottom_bar);
-                final ObjectAnimator animator = ObjectAnimator.ofFloat(bottomBar, "translationY", bottomBarHeight, 0);
-                animator.setDuration(500)
-                        .setStartDelay(1000);
-                animator.setInterpolator(new DecelerateInterpolator());
-                animator.addListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationStart(Animator animation) {
-                        bottomBar.setVisibility(View.VISIBLE);
+                    } else {
+                        ColoredSnackBar.error(ColoredSnackBar.contentView(ShoutActivity.this), R.string.error_action_only_for_logged_in_user, Snackbar.LENGTH_SHORT).show();
                     }
                 });
-                animator.start();
             }
+
+            ImageHelper.setStartCompoundRelativeDrawable(showMoreIcon, R.drawable.ic_more_white);
+            showMoreIcon.setOnClickListener(v -> popupMenu.show());
+
+            popupMenu.getMenu().findItem(R.id.menu_delete_shout).setVisible(isUserShoutOwner);
+            popupMenu.getMenu().findItem(R.id.menu_report).setVisible(!isUserShoutOwner);
+
+            final int bottomBarHeight = getResources().getDimensionPixelSize(R.dimen.shout_bottom_bar);
+            final ObjectAnimator animator = ObjectAnimator.ofFloat(bottomBar, "translationY", bottomBarHeight, 0);
+            animator.setDuration(500)
+                    .setStartDelay(1000);
+            animator.setInterpolator(new DecelerateInterpolator());
+            animator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                    bottomBar.setVisibility(View.VISIBLE);
+                }
+            });
+            animator.start();
         };
     }
 
-    @OnClick(R.id.shout_bottom_bar_call_or_delete)
-    public void onCallOrDeleteClicked() {
-        presenter.callOrDeleteObserver().onNext(null);
+    @OnClick(R.id.shout_bottom_bar_call_or_promote)
+    public void onCallOrPromoteClicked() {
+        presenter.callOrPromoteObserver().onNext(null);
     }
 
     private void setUpAdapter() {

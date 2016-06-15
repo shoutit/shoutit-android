@@ -1,6 +1,8 @@
 package com.shoutit.app.android.view.promote;
 
 
+import android.support.annotation.Nullable;
+
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
@@ -34,9 +36,10 @@ import rx.subjects.PublishSubject;
 
 public class PromotePresenter {
 
-    private static final int PAGE_SWITCH_INTERVAL = 3;
+    private static final int PAGE_SWITCH_INTERVAL = 5;
 
-    private final PublishSubject<PromoteOption> promoteOptionBuyClickedSubject = PublishSubject.create();
+    private final PublishSubject<PromoteOption> buyButtonClicked = PublishSubject.create();
+    private final PublishSubject<PromoteOption> buyOptionSubject = PublishSubject.create();
     private final PublishSubject<Object> startSwitchingPages = PublishSubject.create();
 
     @Nonnull
@@ -51,6 +54,8 @@ public class PromotePresenter {
     private final Observable<Object> notEnoughCreditsObservable;
     @Nonnull
     private final Observable<Object> switchLabelsObservable;
+    @Nonnull
+    private final Observable<PromoteOption> showConfirmDialogObservable;
 
     public PromotePresenter(@Nonnull PromoteLabelsDao promoteLabelsDao,
                             @Nonnull PromoteOptionsDao promoteOptionsDao,
@@ -59,13 +64,15 @@ public class PromotePresenter {
                             @Nonnull PusherHelper pusherHelper,
                             @Nonnull UserPreferences userPreferences,
                             @Nonnull ApiService apiService,
-                            @Nonnull String shoutTitle) {
+                            @Nullable String shoutTitle,
+                            @Nonnull String shoutId) {
 
         switchLabelsObservable = startSwitchingPages
                 .switchMap(new Func1<Object, Observable<Long>>() {
                     @Override
                     public Observable<Long> call(Object o) {
-                        return Observable.interval(PAGE_SWITCH_INTERVAL, TimeUnit.SECONDS);
+                        return Observable.interval(PAGE_SWITCH_INTERVAL, TimeUnit.SECONDS)
+                                .observeOn(uiScheduler);
                     }
                 })
                 .map(Functions1.toObject());
@@ -93,7 +100,7 @@ public class PromotePresenter {
         final Observable<BaseAdapterItem> labelsAdapterItemObservable = labelsRequest
                 .compose(ResponseOrError.onlySuccess())
                 .map((Func1<List<PromoteLabel>, PromoteAdapterItems.LabelsAdapterItem>) promoteLabels ->
-                        new PromoteAdapterItems.LabelsAdapterItem(promoteLabels, switchLabelsObservable, shoutTitle));
+                        new PromoteAdapterItems.LabelsAdapterItem(promoteLabels, switchLabelsObservable, startSwitchingPages, shoutTitle));
 
         final Observable<List<BaseAdapterItem>> optionsAdapterItemsObservable = optionsRequest
                 .compose(ResponseOrError.onlySuccess())
@@ -101,7 +108,7 @@ public class PromotePresenter {
                     @Override
                     public List<BaseAdapterItem> call(List<PromoteOption> promoteOptions) {
                         return ImmutableList.copyOf(
-                                Lists.transform(promoteOptions, input -> new PromoteAdapterItems.OptionAdapterItem(input, promoteOptionBuyClickedSubject))
+                                Lists.transform(promoteOptions, input -> new PromoteAdapterItems.OptionAdapterItem(input, buyButtonClicked))
                         );
                     }
                 });
@@ -118,29 +125,32 @@ public class PromotePresenter {
                                         .add(availableCreditsAdapterItem)
                                         .build());
 
-        final Observable<Optional<String>> optionIdToBuy = promoteOptionBuyClickedSubject
-                .withLatestFrom(creditsObservable, (Func2<PromoteOption, Integer, Optional<String>>) (promoteOption, userCredits) -> {
+        final Observable<Optional<PromoteOption>> optionToBuy = buyButtonClicked
+                .withLatestFrom(creditsObservable, (Func2<PromoteOption, Integer, Optional<PromoteOption>>) (promoteOption, userCredits) -> {
                     if (promoteOption.getCredits() > userCredits) {
                         return Optional.absent();
                     } else {
-                        return Optional.of(promoteOption.getId());
+                        return Optional.of(promoteOption);
                     }
                 })
                 .compose(ObservableExtensions.behaviorRefCount());
 
-        final Observable<ResponseOrError<PromoteResponse>> promoteRequestObservable = optionIdToBuy
+        showConfirmDialogObservable = optionToBuy
                 .filter(Optional::isPresent)
-                .map(Optional::get)
-                .switchMap(optionId -> apiService.promote(new PromoteRequest(optionId))
+                .map(Optional::get);
+
+        final Observable<ResponseOrError<PromoteResponse>> promoteRequestObservable = buyOptionSubject
+                .switchMap(option -> apiService.promote(shoutId, new PromoteRequest(option.getId()))
                         .subscribeOn(networkScheduler)
+                        .observeOn(uiScheduler)
                         .compose(ResponseOrError.toResponseOrErrorObservable()))
                 .compose(ObservableExtensions.behaviorRefCount());
 
         successfullyPromotedObservable = promoteRequestObservable
                 .compose(ResponseOrError.onlySuccess());
 
-        notEnoughCreditsObservable = optionIdToBuy
-                .filter(optionId -> !optionId.isPresent())
+        notEnoughCreditsObservable = optionToBuy
+                .filter(option -> !option.isPresent())
                 .map(Functions1.toObject());
 
         errorObservable = ResponseOrError.combineErrorsObservable(
@@ -152,10 +162,16 @@ public class PromotePresenter {
                 .filter(Functions1.isNotNull());
 
         progressObservable = Observable.merge(
-                promoteOptionBuyClickedSubject.map(Functions1.returnTrue()),
+                buyOptionSubject.map(Functions1.returnTrue()),
                 adapterItemsObservable.map(Functions1.returnFalse()),
+                successfullyPromotedObservable.map(Functions1.returnFalse()),
+                notEnoughCreditsObservable.map(Functions1.returnFalse()),
                 errorObservable.map(Functions1.returnFalse()))
                 .startWith(true);
+    }
+
+    public void buyOption(@Nullable PromoteOption option) {
+        buyOptionSubject.onNext(option);
     }
 
     @Nonnull
@@ -181,5 +197,10 @@ public class PromotePresenter {
     @Nonnull
     public Observable<Object> getNotEnoughCreditsObservable() {
         return notEnoughCreditsObservable;
+    }
+
+    @Nonnull
+    public Observable<PromoteOption> getShowConfirmDialogObservable() {
+        return showConfirmDialogObservable;
     }
 }

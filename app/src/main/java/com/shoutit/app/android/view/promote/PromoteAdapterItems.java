@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.promote;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
@@ -23,13 +24,17 @@ public class PromoteAdapterItems {
         @Nonnull
         private final Observable<Object> switchLabelPageObservable;
         @Nonnull
+        private final Observer<Object> startSwitchingPages;
+        @Nullable
         private final String shoutTitle;
 
         public LabelsAdapterItem(@NonNull List<PromoteLabel> promoteLabels,
                                  @Nonnull Observable<Object> switchLabelPageObservable,
-                                 @Nonnull String shoutTitle) {
+                                 @Nonnull Observer<Object> startSwitchingPages,
+                                 @Nullable String shoutTitle) {
             this.promoteLabels = promoteLabels;
             this.switchLabelPageObservable = switchLabelPageObservable;
+            this.startSwitchingPages = startSwitchingPages;
             this.shoutTitle = shoutTitle;
         }
 
@@ -43,7 +48,11 @@ public class PromoteAdapterItems {
             return switchLabelPageObservable;
         }
 
-        @Nonnull
+        public void startSwitchingPages() {
+            startSwitchingPages.onNext(null);
+        }
+
+        @Nullable
         public String getShoutTitle() {
             return shoutTitle;
         }
