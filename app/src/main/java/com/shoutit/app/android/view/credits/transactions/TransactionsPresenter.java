@@ -129,7 +129,7 @@ public class TransactionsPresenter {
     private CharSequence createSpannedText(String text, int offset, int length) {
         final Spannable spannedString = new SpannableString(text);
         final int color = ContextCompat.getColor(mResources, R.color.accent_blue);
-        spannedString.setSpan(new ForegroundColorSpan(color), offset, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannedString.setSpan(new ForegroundColorSpan(color), offset, offset + length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         return spannedString;
     }
 
