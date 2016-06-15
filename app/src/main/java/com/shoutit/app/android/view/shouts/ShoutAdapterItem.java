@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.shouts;
 
 import android.content.Context;
+import android.support.annotation.ColorInt;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,6 +19,31 @@ import rx.Observer;
 
 public class ShoutAdapterItem implements BaseAdapterItem {
 
+    private static class PromotionInfo {
+
+        private final int bgColor;
+        private final int color;
+        private final String label;
+
+        public PromotionInfo(@ColorInt int bgColor, @ColorInt int color, @NonNull String label) {
+            this.bgColor = bgColor;
+            this.color = color;
+            this.label = label;
+        }
+
+        public int getBgColor() {
+            return bgColor;
+        }
+
+        public int getColor() {
+            return color;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+    }
+
     @Nonnull
     private final Shout shout;
     private final boolean isShoutOwner;
@@ -29,7 +55,8 @@ public class ShoutAdapterItem implements BaseAdapterItem {
 
     public ShoutAdapterItem(@Nonnull Shout shout, boolean isShoutOwner,
                             boolean isNormalUser, @Nonnull Context context,
-                            @Nonnull Observer<String> shoutSelectedObserver) {
+                            @Nonnull Observer<String> shoutSelectedObserver,
+                            @NonNull PromotionInfo promotionInfo) {
         this.shout = shout;
         this.isShoutOwner = isShoutOwner;
         this.isNormalUser = isNormalUser;
