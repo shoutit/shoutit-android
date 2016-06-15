@@ -25,6 +25,7 @@ import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.model.MobilePhoneResponse;
 import com.shoutit.app.android.model.RelatedShoutsPointer;
 import com.shoutit.app.android.model.UserShoutsPointer;
+import com.shoutit.app.android.utils.PromotionHelper;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
@@ -172,7 +173,7 @@ public class ShoutPresenter {
                         final List<BaseAdapterItem> items =
                                 Lists.transform(shouts, (Function<Shout, BaseAdapterItem>) shout -> {
                                     final boolean isShoutOwner = shout.getProfile().getUsername().equals(currentUserName);
-                                    return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context, relatedShoutSelectedSubject);
+                                    return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context, relatedShoutSelectedSubject, PromotionHelper.promotionInfoOrNull(shout));
                                 });
 
                         final ImmutableList.Builder<BaseAdapterItem> builder = new ImmutableList.Builder<>();

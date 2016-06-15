@@ -18,6 +18,7 @@ import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ShoutsDao;
+import com.shoutit.app.android.utils.PromotionHelper;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
@@ -81,7 +82,7 @@ public class ChatShoutsPresenter {
                             final Iterable<BaseAdapterItem> baseAdapterItems = Iterables.transform(shouts,
                                     (Function<Shout, BaseAdapterItem>) shout -> {
                                         final boolean isShoutOwner = shout.getProfile().getUsername().equals(currentUserName);
-                                        return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context, shoutSelectedSubject);
+                                        return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context, shoutSelectedSubject, PromotionHelper.promotionInfoOrNull(shout));
                                     });
                             return ImmutableList.copyOf(baseAdapterItems);
                         }

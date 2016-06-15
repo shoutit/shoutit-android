@@ -19,6 +19,7 @@ import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
+import com.shoutit.app.android.utils.PromotionHelper;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
@@ -85,7 +86,7 @@ public class DiscoverShoutsPresenter {
                             @Override
                             public BaseAdapterItem apply(Shout shout) {
                                 final boolean isShoutOwner = shout.getProfile().getUsername().equals(currentUserName);
-                                return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context, shoutSelectedObserver);
+                                return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context, shoutSelectedObserver, PromotionHelper.promotionInfoOrNull(shout));
                             }
                         }));
                     }

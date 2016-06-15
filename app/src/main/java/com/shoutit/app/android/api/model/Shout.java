@@ -38,13 +38,14 @@ public class Shout {
     private final List<ConversationDetails> conversations;
     private final String mobileHint;
     private final String mobile;
+    private final Promotion promotion;
 
     public Shout(@Nonnull String id, String apiUrl, String webUrl, String type,
                  UserLocation location, String title, String text, Long price, float number,
                  String currency, String thumbnail, String videoUrl, User profile,
                  Category category, List<Filter> filters, long datePublished, List<String> images,
                  List<Video> videos, int availableCount, List<ConversationDetails> conversations, boolean isMobileSet,
-                 String mobileHint, String mobile) {
+                 String mobileHint, String mobile, Promotion promotion) {
         this.id = id;
         this.apiUrl = apiUrl;
         this.webUrl = webUrl;
@@ -68,6 +69,7 @@ public class Shout {
         this.conversations = conversations;
         this.mobileHint = mobileHint;
         this.mobile = mobile;
+        this.promotion = promotion;
     }
 
     @Nonnull
@@ -178,6 +180,10 @@ public class Shout {
         return mobileHint;
     }
 
+    public Promotion getPromotion() {
+        return promotion;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -213,5 +219,48 @@ public class Shout {
         return Objects.hashCode(id, apiUrl, webUrl, type, location, title, text, price, number,
                 currency, thumbnail, videoUrl, profile, category, datePublished, images, videos,
                 filters, availableCount, isMobileSet, conversations, mobile, mobileHint);
+    }
+
+    public static class Promotion {
+
+        private final Label label;
+        private final boolean isExpired;
+
+        public Promotion(Label label, boolean isExpired) {
+            this.label = label;
+            this.isExpired = isExpired;
+        }
+
+        public Label getLabel() {
+            return label;
+        }
+
+        public boolean isExpired() {
+            return isExpired;
+        }
+    }
+
+    public static class Label {
+        private final String name;
+        private final String color;
+        private final String bgColor;
+
+        public Label(String name, String color, String bgColor) {
+            this.name = name;
+            this.color = color;
+            this.bgColor = bgColor;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getColor() {
+            return color;
+        }
+
+        public String getBgColor() {
+            return bgColor;
+        }
     }
 }
