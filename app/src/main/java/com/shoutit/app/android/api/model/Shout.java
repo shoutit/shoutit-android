@@ -213,25 +213,6 @@ public class Shout {
                 filters, availableCount, isMobileSet, conversations, mobile, mobileHint, promotion);
     }
 
-    public static class Promotion {
-
-        private final Label label;
-        private final boolean isExpired;
-
-        public Promotion(Label label, boolean isExpired) {
-            this.label = label;
-            this.isExpired = isExpired;
-        }
-
-        public Label getLabel() {
-            return label;
-        }
-
-        public boolean isExpired() {
-            return isExpired;
-        }
-    }
-
     public static class Label {
         private final String name;
         private final String color;

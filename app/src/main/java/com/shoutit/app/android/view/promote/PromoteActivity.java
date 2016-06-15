@@ -1,7 +1,6 @@
 package com.shoutit.app.android.view.promote;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -13,15 +12,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.PromoteOption;
+import com.shoutit.app.android.api.model.PromoteResponse;
+import com.shoutit.app.android.api.model.Promotion;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.view.createshout.DialogsHelper;
+import com.shoutit.app.android.view.promote.promoted.PromotedActivity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -48,6 +51,8 @@ public class PromoteActivity extends BaseActivity {
     PromoteAdapter adapter;
     @Inject
     PromotePresenter presenter;
+    @Inject
+    Gson gson;
 
     public static Intent newIntent(Context context,
                                    @Nullable String shoutName,
@@ -86,10 +91,17 @@ public class PromoteActivity extends BaseActivity {
 
         presenter.getSuccessfullyPromotedObservable()
                 .compose(bindToLifecycle())
-                .subscribe(promoteResponse -> {
-                    Toast.makeText(this, "Success !", Toast.LENGTH_SHORT).show();
+                .subscribe(shoutTitleAndPromoteResponse -> {
+                    final String shoutTitle = shoutTitleAndPromoteResponse.param1();
+                    final PromoteResponse promoteResponse = shoutTitleAndPromoteResponse.param2();
+
+                    Toast.makeText(this, promoteResponse.getSuccess(), Toast.LENGTH_SHORT).show();
+
                     setResult(RESULT_OK);
-                    // TODO show promoted screen
+                    finish();
+
+                    final String promotionJson = gson.toJson(promoteResponse.getPromotion(), Promotion.class);
+                    startActivity(PromotedActivity.newIntent(this, promotionJson, shoutTitle));
                 });
 
         presenter.getShowConfirmDialogObservable()

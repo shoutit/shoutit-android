@@ -14,6 +14,7 @@ import com.google.gson.Gson;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForApplication;
+import com.shoutit.app.android.model.Stats;
 
 
 import javax.annotation.Nonnull;
@@ -295,5 +296,15 @@ public class UserPreferences {
         mPreferences.edit()
                 .putBoolean(KEY_WAS_SHARE_DIALOG_DISPLAYED, true)
                 .commit();
+    }
+
+    public void updateStats(@Nonnull Stats pusherStats) {
+        final User user = getUser();
+        if (user == null) {
+            return;
+        }
+
+        final User updatedUser = user.withUpdatedStats(pusherStats);
+        updateUserJson(updatedUser);
     }
 }

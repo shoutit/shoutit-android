@@ -69,6 +69,12 @@ public class PusherHelper {
             final PusherOptions options = new PusherOptions().setAuthorizer(authorizer);
             mPusher = new Pusher(getKey(), options);
         }
+
+        getUserUpdatedObservable()
+                .subscribe();
+
+        getStatsObservable()
+                .subscribe();
     }
 
     private String getKey() {
@@ -123,6 +129,7 @@ public class PusherHelper {
                             @Override
                             public void onEvent(String channelName, String eventName, String data) {
                                 final User user = mGson.fromJson(data, User.class);
+                                mUserPreferences.updateUserJson(user);
                                 subscriber.onNext(user);
                             }
                         });
@@ -190,6 +197,7 @@ public class PusherHelper {
                                         try {
                                             final Stats pusherStats = mGson.getAdapter(Stats.class).fromJson(data);
                                             logMessage(pusherStats, "profile / getStatsObservable");
+                                            mUserPreferences.updateStats(pusherStats);
                                             subscriber.onNext(pusherStats);
                                         } catch (IOException e) {
                                             subscriber.onError(e);

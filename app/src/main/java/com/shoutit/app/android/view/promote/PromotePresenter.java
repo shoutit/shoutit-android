@@ -8,6 +8,7 @@ import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
+import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -49,7 +50,7 @@ public class PromotePresenter {
     @Nonnull
     private final Observable<Boolean> progressObservable;
     @Nonnull
-    private final Observable<PromoteResponse> successfullyPromotedObservable;
+    private final Observable<BothParams<String, PromoteResponse>> successfullyPromotedObservable;
     @Nonnull
     private final Observable<Object> notEnoughCreditsObservable;
     @Nonnull
@@ -147,7 +148,8 @@ public class PromotePresenter {
                 .compose(ObservableExtensions.behaviorRefCount());
 
         successfullyPromotedObservable = promoteRequestObservable
-                .compose(ResponseOrError.onlySuccess());
+                .compose(ResponseOrError.onlySuccess())
+                .map(promoteResponse -> new BothParams<>(shoutTitle, promoteResponse));
 
         notEnoughCreditsObservable = optionToBuy
                 .filter(option -> !option.isPresent())
@@ -175,7 +177,7 @@ public class PromotePresenter {
     }
 
     @Nonnull
-    public Observable<PromoteResponse> getSuccessfullyPromotedObservable() {
+    public Observable<BothParams<String, PromoteResponse>> getSuccessfullyPromotedObservable() {
         return successfullyPromotedObservable;
     }
 

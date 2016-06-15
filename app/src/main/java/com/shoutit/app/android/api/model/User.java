@@ -116,6 +116,14 @@ public class User extends BaseProfile {
                 user.gender, user.birthday, user.stats, user.linkedAccounts);
     }
 
+    @Nonnull
+    public User withUpdatedStats(@Nonnull Stats newStats) {
+        return new User(id, type, apiUrl, webUrl, username, name, firstName, lastName, isActivated,
+                image, cover, isListening, isListener, isPasswordSet, location, listenersCount,
+                pages, admins, bio, dateJoined, listeningCount, isOwner, about, mobile, website,
+                email, conversation, gender, birthday, newStats, linkedAccounts);
+    }
+
     public String getId() {
         return id;
     }

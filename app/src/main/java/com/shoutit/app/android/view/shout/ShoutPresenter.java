@@ -67,7 +67,7 @@ public class ShoutPresenter {
     private final Observable<Object> onlyForLoggedInUserObservable;
     private final Observable<String> shareObservable;
     private final Observable<Shout> showPromoteObservable;
-    private final Observable<Boolean> showPromotedObservable;
+    private final Observable<Shout> showPromotedObservable;
 
     private PublishSubject<String> addToCartSubject = PublishSubject.create();
     private PublishSubject<String> onCategoryClickedSubject = PublishSubject.create();
@@ -320,8 +320,8 @@ public class ShoutPresenter {
 
         showPromotedObservable = callOrPromoteObservable
                 .filter(Functions1.isTrue())
-                .withLatestFrom(successShoutResponse, (ignore, shout) -> shout.isPromoted())
-                .filter(Functions1.isFalse())
+                .withLatestFrom(successShoutResponse, (ignore, shout) -> shout)
+                .filter(Shout::isPromoted)
                 .observeOn(uiScheduler);
 
         deleteShoutResponseObservable = shoutsDao.getDeleteShoutObservable(shoutId)
@@ -485,7 +485,7 @@ public class ShoutPresenter {
         return showPromoteObservable;
     }
 
-    public Observable<Boolean> getShowPromotedObservable() {
+    public Observable<Shout> getShowPromotedObservable() {
         return showPromotedObservable;
     }
 
