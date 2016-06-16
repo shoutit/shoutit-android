@@ -114,20 +114,24 @@ public class PusherHelper {
     }
 
     public Observable<User> getUserUpdatedObservable() {
-        return Observable
-                .create(new Observable.OnSubscribe<User>() {
-                    @Override
-                    public void call(final Subscriber<? super User> subscriber) {
-                        getProfileChannel().bind(EVENT_PROFILE_UPDATE, new PresenceChannelEventListenerAdapter() {
-
+        return mUserPreferences.getUserObservable()
+                .filter(Functions1.isNotNull())
+                .first()
+                .flatMap(user -> Observable
+                        .create(new Observable.OnSubscribe<User>() {
                             @Override
-                            public void onEvent(String channelName, String eventName, String data) {
-                                final User user = mGson.fromJson(data, User.class);
-                                subscriber.onNext(user);
+                            public void call(final Subscriber<? super User> subscriber) {
+                                getProfileChannel().bind(EVENT_PROFILE_UPDATE, new PresenceChannelEventListenerAdapter() {
+
+                                    @Override
+                                    public void onEvent(String channelName, String eventName, String data) {
+                                        final User user = mGson.fromJson(data, User.class);
+                                        mUserPreferences.updateUserJson(user);
+                                        subscriber.onNext(user);
+                                    }
+                                });
                             }
-                        });
-                    }
-                });
+                        }));
     }
 
     public Observable<PusherMessage> getNewMessagesObservable() {
@@ -190,6 +194,7 @@ public class PusherHelper {
                                         try {
                                             final Stats pusherStats = mGson.getAdapter(Stats.class).fromJson(data);
                                             logMessage(pusherStats, "profile / getStatsObservable");
+                                            mUserPreferences.updateStats(pusherStats);
                                             subscriber.onNext(pusherStats);
                                         } catch (IOException e) {
                                             subscriber.onError(e);
@@ -268,7 +273,18 @@ public class PusherHelper {
 
     public void subscribeProfileChannel(@NonNull String id) {
         log("subscribe profile channel : " + id);
-        mPusher.subscribePresence(PusherHelper.getProfileChannelName(id));
+        mPusher.subscribePresence(PusherHelper.getProfileChannelName(id), new PresenceChannelEventListenerAdapter() {
+            @Override
+            public void userSubscribed(String channelName, com.pusher.client.channel.User user) {
+                super.userSubscribed(channelName, user);
+
+                getUserUpdatedObservable()
+                        .subscribe();
+
+                getStatsObservable()
+                        .subscribe();
+            }
+        });
     }
 
     public void connect() {

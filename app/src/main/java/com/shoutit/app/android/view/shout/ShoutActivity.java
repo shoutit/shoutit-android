@@ -27,11 +27,13 @@ import android.widget.Toast;
 
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.google.gson.Gson;
 import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.model.Promotion;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ActivityModule;
@@ -51,6 +53,7 @@ import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.profile.tagprofile.TagProfileActivity;
 import com.shoutit.app.android.view.promote.PromoteActivity;
+import com.shoutit.app.android.view.promote.promoted.PromotedActivity;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.main.MainSearchActivity;
 import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsActivity;
@@ -74,6 +77,7 @@ public class ShoutActivity extends BaseActivity {
 
     private static final String KEY_SHOUT_ID = "shout_id";
     private static final int EDIT_SHOUT_REQUEST_CODE = 3001;
+    private static final int REQUEST_CODE_PROMOTE = 2;
 
     @Bind(R.id.shout_toolbar)
     Toolbar toolbar;
@@ -98,6 +102,8 @@ public class ShoutActivity extends BaseActivity {
     ShoutAdapter adapter;
     @Inject
     UserPreferences userPreferences;
+    @Inject
+    Gson gson;
 
     private String mShoutId;
 
@@ -322,16 +328,19 @@ public class ShoutActivity extends BaseActivity {
         presenter.getShowPromoteObservable()
                 .compose(bindToLifecycle())
                 .subscribe(shout -> {
-                    startActivity(PromoteActivity.newIntent(this, shout.getTitle(), shout.getId()));
+                    startActivityForResult(
+                            PromoteActivity.newIntent(this, shout.getTitle(), shout.getId()),
+                            REQUEST_CODE_PROMOTE);
                 });
 
         presenter.getShowPromotedObservable()
                 .compose(bindToLifecycle())
-                .subscribe(new Action1<Boolean>() {
-                    @Override
-                    public void call(Boolean aBoolean) {
-                        // TODO show promoted screen
-                    }
+                .subscribe(shout -> {
+                    final Promotion promotion = shout.getPromotion();
+                    final String promotionJson = gson.toJson(promotion, Promotion.class);
+
+                    startActivity(PromotedActivity.newIntent(
+                            ShoutActivity.this, promotionJson, shout.getTitle()));
                 });
     }
 
@@ -525,7 +534,7 @@ public class ShoutActivity extends BaseActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == EDIT_SHOUT_REQUEST_CODE && resultCode == RESULT_OK) {
+        if ((requestCode == EDIT_SHOUT_REQUEST_CODE || requestCode == REQUEST_CODE_PROMOTE) && resultCode == RESULT_OK) {
             presenter.refreshShoutsObserver().onNext(null);
         }
         super.onActivityResult(requestCode, resultCode, data);

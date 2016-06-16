@@ -8,7 +8,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.dao.PromoteLabelsDao;
 import com.shoutit.app.android.dao.PromoteOptionsDao;
-import com.shoutit.app.android.utils.pusher.PusherHelper;
+import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 
 import javax.annotation.Nonnull;
 
@@ -32,9 +32,9 @@ public class PromoteActivityModule {
     @Provides
     PromotePresenter providePromotePresenter(PromoteLabelsDao labelsDao, PromoteOptionsDao optionsDao,
                                              @UiScheduler Scheduler uiScheduler, @NetworkScheduler Scheduler networkScheduler,
-                                             PusherHelper pusherHelper, UserPreferences userPreferences,
-                                             ApiService apiService) {
-        return new PromotePresenter(labelsDao, optionsDao, uiScheduler, networkScheduler, pusherHelper,
+                                             ShoutsGlobalRefreshPresenter shoutGlocalRefreshPresenter,
+                                             UserPreferences userPreferences, ApiService apiService) {
+        return new PromotePresenter(labelsDao, optionsDao, uiScheduler, networkScheduler, shoutGlocalRefreshPresenter,
                 userPreferences, apiService, shoutTitle, shoutId);
     }
 }
