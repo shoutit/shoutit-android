@@ -170,7 +170,7 @@
                     android:layout_marginBottom="18dp"
                     android:orientation="horizontal">
 
-                    <android.support.v7.widget.AppCompatCheckBox
+                    <CheckBox
                         android:id="@+id/request_activity_facebook_checkbox"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -185,7 +185,7 @@
                         android:theme="@style/BlueCheckBoxOnChecked"
                         tools:checked="true" />
 
-                    <android.support.v7.widget.AppCompatCheckBox
+                    <CheckBox
                         android:id="@+id/request_activity_twitter_checkbox"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
