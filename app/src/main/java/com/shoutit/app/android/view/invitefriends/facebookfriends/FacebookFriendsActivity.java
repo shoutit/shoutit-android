@@ -60,7 +60,7 @@ public class FacebookFriendsActivity extends BaseProfilesListActivity {
         presenter.getOpenInviteClickedObservable()
                 .compose(bindToLifecycle())
                 .subscribe(o -> {
-                    FacebookHelper.showAppInviteDialog(this, InviteFriendsFragment.SHARE_FACEBOOK_APP_LINK_URL, callbackManager);
+                    FacebookHelper.showAppInviteDialog(this, FacebookHelper.FACEBOOK_SHARE_APP_LINK, callbackManager, "sd");
                 });
 
         presenter.getActionOnlyForLoggedInUser()

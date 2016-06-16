@@ -194,7 +194,9 @@ dependencies {
     compile 'com.github.clans:fab:1.6.1'
 
     // Facebook
-    compile 'com.facebook.android:facebook-android-sdk:4.6.0'
+    compile ('com.facebook.android:facebook-android-sdk:4.12.1') {
+        transitive = true;
+    }
 
     // Google
     provided 'javax.annotation:jsr250-api:1.0'

@@ -14,6 +14,7 @@ import com.facebook.CallbackManager;
 import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.ColoredSnackBar;
@@ -33,8 +34,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class InviteFriendsFragment extends BaseFragment {
-
-    public static final String SHARE_FACEBOOK_APP_LINK_URL = "https://fb.me/1224908360855680";
 
     private Menu mMenu;
     private CallbackManager callbackManager;
@@ -96,7 +95,13 @@ public class InviteFriendsFragment extends BaseFragment {
                 }
                 break;
             case R.id.invite_friends_invite_facebook:
-                FacebookHelper.showAppInviteDialog(getActivity(), SHARE_FACEBOOK_APP_LINK_URL, callbackManager);
+                final User currentUser = userPreferences.getUser();
+                final String userId = currentUser == null ? null : currentUser.getId();
+
+                FacebookHelper.showAppInviteDialog(getActivity(),
+                        FacebookHelper.FACEBOOK_SHARE_APP_LINK,
+                        callbackManager,
+                        userId);
                 break;
             case R.id.invite_friends_invite_twitter:
                 shareThroughTwitter();

@@ -2,7 +2,10 @@ package com.shoutit.app.android.view.loginintro;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 
 import com.appunite.rx.ResponseOrError;
@@ -14,6 +17,7 @@ import com.facebook.FacebookAuthorizationException;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.applinks.AppLinkData;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.share.model.AppInviteContent;
@@ -36,6 +40,7 @@ import java.util.Set;
 
 import javax.annotation.Nonnull;
 
+import bolts.AppLinks;
 import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Scheduler;
@@ -50,6 +55,8 @@ public class FacebookHelper {
     private static final String PERMISSION_EMAIL = "email";
     public static final String PERMISSION_USER_FRIENDS = "user_friends";
     public static final String PERMISSION_PUBLISH_ACTIONS = "publish_actions";
+
+    public static final String FACEBOOK_SHARE_APP_LINK = "https://fb.me/1224908360855680";
 
     private final ApiService apiService;
     private final UserPreferences userPreferences;
@@ -70,12 +77,30 @@ public class FacebookHelper {
     }
 
     public void initFacebook() {
-        FacebookSdk.sdkInitialize(context, new FacebookSdk.InitializeCallback() {
-            @Override
-            public void onInitialized() {
-                refreshTokenIfNeeded();
-            }
-        });
+        FacebookSdk.sdkInitialize(context, this::refreshTokenIfNeeded);
+    }
+
+    public static void checkForAppLinks(@Nonnull Context context, @Nonnull Intent intent) {
+        LogHelper.logIfDebug(TAG, "Checking for App Links");
+        final Uri targetUrl = AppLinks.getTargetUrlFromInboundIntent(context, intent);
+
+        if (targetUrl != null) {
+            LogHelper.logIfDebug(TAG, "Target url != null");
+            context.startActivity(new Intent(Intent.ACTION_VIEW, targetUrl));
+        } else {
+            AppLinkData.fetchDeferredAppLinkData(context, FacebookHelper::processAppLinkData);
+        }
+    }
+
+    private static void processAppLinkData(@Nullable AppLinkData appLinkData) {
+        LogHelper.logIfDebug(TAG, "processing App Link data");
+        if (appLinkData == null) {
+            return;
+        }
+
+        if ("InviteFriends".equals(appLinkData.getPromotionCode())) {
+            LogHelper.logIfDebug(TAG, "ref data" + appLinkData.getRef() + " reference: " + appLinkData.getRefererData().toString());
+        }
     }
 
     private void refreshTokenIfNeeded() {
@@ -93,18 +118,12 @@ public class FacebookHelper {
                 }
 
                 updateFacebookTokenInApi(currentAccessToken.getToken())
-                        .subscribe(new Action1<ResponseBody>() {
-                            @Override
-                            public void call(ResponseBody responseBody) {
-                                stopTracking();
-                                LogHelper.logIfDebug(TAG, "Facebook token updated");
-                            }
-                        }, new Action1<Throwable>() {
-                            @Override
-                            public void call(Throwable throwable) {
-                                stopTracking();
-                                LogHelper.logThrowableAndCrashlytics(TAG, "Cannot update fb token", throwable);
-                            }
+                        .subscribe(responseBody -> {
+                            stopTracking();
+                            LogHelper.logIfDebug(TAG, "Facebook token updated");
+                        }, throwable -> {
+                            stopTracking();
+                            LogHelper.logThrowableAndCrashlytics(TAG, "Cannot update fb token", throwable);
                         });
             }
         };
@@ -214,27 +233,16 @@ public class FacebookHelper {
 
     @NonNull
     private Func1<ResponseBody, Observable<ResponseOrError<Boolean>>> waitForUserToBeUpdatedInApi(@Nonnull final String requiredPermissionName) {
-        return new Func1<ResponseBody, Observable<ResponseOrError<Boolean>>>() {
-            @Override
-            public Observable<ResponseOrError<Boolean>> call(ResponseBody responseBody) {
-                LogHelper.logIfDebug(TAG, "Waiting for user to be updated in API");
-                return pusherHelper.getUserUpdatedObservable()
-                        .filter(new Func1<User, Boolean>() {
-                            @Override
-                            public Boolean call(User user) {
-                                userPreferences.updateUserJson(user);
-                                LogHelper.logIfDebug(TAG, "Pusher event: User updated in API");
-                                
-                                return hasRequiredPermissionInApi(user, requiredPermissionName);
-                            }
-                        })
-                        .map(new Func1<User, ResponseOrError<Boolean>>() {
-                            @Override
-                            public ResponseOrError<Boolean> call(User user) {
-                                return ResponseOrError.fromData(true);
-                            }
-                        });
-            }
+        return responseBody -> {
+            LogHelper.logIfDebug(TAG, "Waiting for user to be updated in API");
+            return pusherHelper.getUserUpdatedObservable()
+                    .filter(user -> {
+                        userPreferences.updateUserJson(user);
+                        LogHelper.logIfDebug(TAG, "Pusher event: User updated in API");
+
+                        return hasRequiredPermissionInApi(user, requiredPermissionName);
+                    })
+                    .map(user -> ResponseOrError.fromData(true));
         };
     }
 
@@ -309,10 +317,11 @@ public class FacebookHelper {
     }
 
     public static void showAppInviteDialog(@Nonnull Activity activity, @Nonnull String appLinkUrl,
-                                           @Nonnull CallbackManager callbackManager) {
+                                           @Nonnull CallbackManager callbackManager, @Nullable String userId) {
         if (AppInviteDialog.canShow()) {
-            AppInviteContent content = new AppInviteContent.Builder()
+            final AppInviteContent content = new AppInviteContent.Builder()
                     .setApplinkUrl(appLinkUrl)
+                    .setPromotionDetails("InviteFriends",  "InviteFriends")
                     .build();
 
             AppInviteDialog appInviteDialog = new AppInviteDialog(activity);
