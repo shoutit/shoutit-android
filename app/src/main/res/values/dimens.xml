@@ -85,4 +85,7 @@
     <!-- Call Dialog -->
     <dimen name="call_dialog_avatar_corners">2dp</dimen>
 
+    <!-- Promote -->
+    <dimen name="promote_label_radius">5dp</dimen>
+
 </resources>

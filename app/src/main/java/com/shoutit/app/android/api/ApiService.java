@@ -33,6 +33,10 @@ import com.shoutit.app.android.api.model.NotificationsResponse;
 import com.shoutit.app.android.api.model.PostMessage;
 import com.shoutit.app.android.api.model.ProfileRequest;
 import com.shoutit.app.android.api.model.ProfilesListResponse;
+import com.shoutit.app.android.api.model.PromoteLabel;
+import com.shoutit.app.android.api.model.PromoteOption;
+import com.shoutit.app.android.api.model.PromoteRequest;
+import com.shoutit.app.android.api.model.PromoteResponse;
 import com.shoutit.app.android.api.model.RegisterDeviceRequest;
 import com.shoutit.app.android.api.model.RelatedTagsResponse;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
@@ -210,6 +214,16 @@ public interface ApiService {
 
     @GET("shouts/sort_types")
     Observable<List<SortType>> sortTypes();
+
+    @GET("shouts/promote_labels")
+    Observable<List<PromoteLabel>> promoteLabels();
+
+    @GET("shouts/promote_options")
+    Observable<List<PromoteOption>> promoteOptions();
+
+    @PATCH("shouts/{id}/promote")
+    Observable<PromoteResponse> promote(@Path("id") String shoutId,
+                                        @Body PromoteRequest promoteRequest);
 
     /**
      * OAuth

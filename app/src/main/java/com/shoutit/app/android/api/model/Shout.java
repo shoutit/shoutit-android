@@ -1,5 +1,6 @@
 package com.shoutit.app.android.api.model;
 
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 
 import com.google.common.base.Objects;
@@ -38,6 +39,7 @@ public class Shout {
     private final List<ConversationDetails> conversations;
     private final String mobileHint;
     private final String mobile;
+    @Nullable
     private final Promotion promotion;
 
     public Shout(@Nonnull String id, String apiUrl, String webUrl, String type,
@@ -45,7 +47,7 @@ public class Shout {
                  String currency, String thumbnail, String videoUrl, User profile,
                  Category category, List<Filter> filters, long datePublished, List<String> images,
                  List<Video> videos, int availableCount, List<ConversationDetails> conversations, boolean isMobileSet,
-                 String mobileHint, String mobile, Promotion promotion) {
+                 String mobileHint, String mobile, @Nullable Promotion promotion) {
         this.id = id;
         this.apiUrl = apiUrl;
         this.webUrl = webUrl;
@@ -120,10 +122,6 @@ public class Shout {
         return thumbnail;
     }
 
-    public String getVideoUrl() {
-        return videoUrl;
-    }
-
     public User getProfile() {
         return profile;
     }
@@ -164,24 +162,17 @@ public class Shout {
         return conversations;
     }
 
-    public long getDatePublished() {
-        return datePublished;
-    }
-
-    public Boolean getMobileSet() {
-        return isMobileSet;
-    }
-
     public String getMobile() {
         return mobile;
     }
 
-    public String getMobileHint() {
-        return mobileHint;
-    }
-
+    @Nullable
     public Promotion getPromotion() {
         return promotion;
+    }
+
+    public boolean isPromoted() {
+        return promotion != null && !promotion.isExpired();
     }
 
     @Override
@@ -211,6 +202,7 @@ public class Shout {
                 Objects.equal(isMobileSet, shout.isMobileSet) &&
                 Objects.equal(mobile, shout.mobile) &&
                 Objects.equal(mobileHint, shout.mobileHint) &&
+                Objects.equal(promotion, shout.promotion) &&
                 Objects.equal(conversations, shout.conversations);
     }
 
@@ -218,7 +210,7 @@ public class Shout {
     public int hashCode() {
         return Objects.hashCode(id, apiUrl, webUrl, type, location, title, text, price, number,
                 currency, thumbnail, videoUrl, profile, category, datePublished, images, videos,
-                filters, availableCount, isMobileSet, conversations, mobile, mobileHint);
+                filters, availableCount, isMobileSet, conversations, mobile, mobileHint, promotion);
     }
 
     public static class Promotion {

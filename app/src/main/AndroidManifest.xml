@@ -325,6 +325,9 @@
         <activity android:name=".view.invitefriends.contactsfriends.ContactsFriendsActivity"
             android:screenOrientation="portrait"/>
 
+        <activity android:name=".view.promote.PromoteActivity"
+            android:screenOrientation="portrait"/>
+
         <!-- Facebook -->
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"

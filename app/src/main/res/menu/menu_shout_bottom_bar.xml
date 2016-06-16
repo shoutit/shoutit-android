@@ -5,6 +5,12 @@
     <item
         android:id="@+id/menu_report"
         android:title="@string/shout_bottom_bar_report"
+        android:visible="false"
+        app:showAsAction="always"/>
+
+    <item android:id="@+id/menu_delete_shout"
+        android:title="@string/shout_bottom_bar_delete"
+        android:visible="false"
         app:showAsAction="always"/>
 
 </menu>

@@ -111,4 +111,9 @@
     <!-- Media -->
     <color name="media_image_background">#C8E6C9</color>
 
+    <!-- Promote -->
+    <color name="promote_text">#646464</color>
+    <color name="promote_yellow_badge">#ffd700</color>
+    <color name="promote_gray_badge">#c0c0c0</color>
+
 </resources>

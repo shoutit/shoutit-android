@@ -20,6 +20,8 @@ import com.shoutit.app.android.dao.ListenersDaos;
 import com.shoutit.app.android.dao.ListeningsDao;
 import com.shoutit.app.android.dao.NotificationsDao;
 import com.shoutit.app.android.dao.ProfilesDao;
+import com.shoutit.app.android.dao.PromoteLabelsDao;
+import com.shoutit.app.android.dao.PromoteOptionsDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.dao.SortTypesDao;
@@ -92,6 +94,8 @@ public interface AppComponent {
 
     ListeningsDao listeningsDao();
 
+    PromoteOptionsDao promoteOptionsDao();
+
     ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter();
 
     NotificationsDao notificationsDao();
@@ -127,4 +131,6 @@ public interface AppComponent {
     LocalMessageBus localMessageBus();
 
     RefreshConversationBus refreshConversationBus();
+
+    PromoteLabelsDao promoteDao();
 }

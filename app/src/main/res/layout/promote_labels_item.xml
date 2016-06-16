@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/promote_shout_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:layout_marginEnd="6dp"
+        android:layout_marginRight="6dp"
+        android:layout_marginTop="16dp"
+        android:background="@color/default_bg_color"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-medium"
+        android:maxLines="1"
+        android:textColor="@color/black_54"
+        android:textSize="14sp"
+        tools:text="Shout Title" />
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/promote_view_pager"
+        android:layout_width="match_parent"
+        android:layout_marginTop="22dp"
+        android:layout_height="90dp"
+        tools:background="@android:color/black" />
+
+    <com.viewpagerindicator.CirclePageIndicator
+        android:id="@+id/promote_circle_indicator"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="8dp"
+        android:padding="2dp"
+        app:fillColor="@android:color/white" />
+
+</LinearLayout>

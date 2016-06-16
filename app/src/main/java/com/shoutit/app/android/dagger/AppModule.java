@@ -38,6 +38,8 @@ import com.shoutit.app.android.dao.ListenersDaos;
 import com.shoutit.app.android.dao.ListeningsDao;
 import com.shoutit.app.android.dao.NotificationsDao;
 import com.shoutit.app.android.dao.ProfilesDao;
+import com.shoutit.app.android.dao.PromoteLabelsDao;
+import com.shoutit.app.android.dao.PromoteOptionsDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.dao.SortTypesDao;
@@ -325,6 +327,18 @@ public final class AppModule {
     @Singleton
     SortTypesDao sortTypesDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
         return new SortTypesDao(apiService, networkScheduler);
+    }
+
+    @Provides
+    @Singleton
+    PromoteLabelsDao promoteDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
+        return new PromoteLabelsDao(apiService, networkScheduler);
+    }
+
+    @Provides
+    @Singleton
+    PromoteOptionsDao promoteOptionsDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
+        return new PromoteOptionsDao(apiService, networkScheduler);
     }
 
     @Provides
