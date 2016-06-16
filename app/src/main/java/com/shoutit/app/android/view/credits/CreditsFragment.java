@@ -18,6 +18,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
+import com.shoutit.app.android.utils.pusher.PusherHelper;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
 import com.shoutit.app.android.view.credits.transactions.TransactionsActivity;
 import com.shoutit.app.android.view.main.MainActivity;
@@ -44,6 +45,9 @@ public class CreditsFragment extends BaseFragment {
     @Inject
     UserPreferences mUserPreferences;
 
+    @Inject
+    PusherHelper mPusherHelper;
+
     @android.support.annotation.Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @android.support.annotation.Nullable ViewGroup container, @android.support.annotation.Nullable Bundle savedInstanceState) {
@@ -55,6 +59,11 @@ public class CreditsFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
         final int credits = Preconditions.checkNotNull(mUserPreferences.getUser()).getStats().getCredits();
         mCreditNumber.setText(String.valueOf(credits));
+        mPusherHelper.getStatsObservable()
+                .compose(bindToLifecycle())
+                .subscribe(stats -> {
+                    mCreditNumber.setText(String.valueOf(stats.getCredits()));
+                });
     }
 
     @Override

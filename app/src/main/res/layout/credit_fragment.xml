@@ -12,8 +12,10 @@
         android:layout_height="match_parent"
         android:background="@color/black_6"
         android:fillViewport="true"
+        android:paddingEnd="20dp"
         android:paddingLeft="20dp"
-        android:paddingRight="20dp">
+        android:paddingRight="20dp"
+        android:paddingStart="20dp">
 
         <FrameLayout
             android:layout_width="match_parent"

@@ -56,7 +56,8 @@ public class Stats {
     @Override
     public String toString() {
         return "Stats{" +
-                "unreadConversationsCount=" + unreadConversationsCount +
+                "credit=" + credit +
+                ", unreadConversationsCount=" + unreadConversationsCount +
                 ", unreadNotificationsCount=" + unreadNotificationsCount +
                 '}';
     }
