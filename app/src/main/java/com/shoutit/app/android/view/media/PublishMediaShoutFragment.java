@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.MyAndroidSchedulers;
@@ -83,7 +84,7 @@ public class PublishMediaShoutFragment extends Fragment {
     @Bind(R.id.camera_progress)
     View progress;
     @Bind(R.id.camera_published_done)
-    Button mCameraPublishedDone;
+    TextView mCameraPublishedDone;
     @Bind(R.id.fragment_camera_close)
     ImageButton closeButton;
     @Bind(R.id.camera_published_facebook_checkbox)
