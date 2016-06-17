@@ -99,7 +99,6 @@ public class LocationPresenter {
         this.apiService = apiService;
         this.userPreferences = userPreferences;
 
-
         // Fetch gps location
 
         final Observable<Location> gpsLocationObservable = LocationUtils
@@ -129,13 +128,8 @@ public class LocationPresenter {
 
         final Observable<BaseAdapterItem> currentGpsLocationObservable = gpsLocationObservable
                 .filter(Functions1.isNotNull())
-                .switchMap(new Func1<android.location.Location, Observable<UserLocation>>() {
-                    @Override
-                    public Observable<UserLocation> call(android.location.Location location) {
-                        return getGeoCodeRequest(location.getLatitude(), location.getLongitude())
-                                .compose(ResponseOrError.<UserLocation>onlySuccess());
-                    }
-                })
+                .switchMap(location -> getGeoCodeRequest(location.getLatitude(), location.getLongitude())
+                        .compose(ResponseOrError.<UserLocation>onlySuccess()))
                 .map(new Func1<UserLocation, BaseAdapterItem>() {
                     @Override
                     public BaseAdapterItem call(UserLocation userLocation) {
@@ -154,27 +148,21 @@ public class LocationPresenter {
                 .distinctUntilChanged()
                 .doOnNext(showQueryProgressAction(true))
                 .observeOn(networkScheduler)
-                .switchMap(new Func1<String, Observable<AutocompletePredictionBuffer>>() {
-                    @Override
-                    public Observable<AutocompletePredictionBuffer> call(String query) {
-                        final PendingResult<AutocompletePredictionBuffer> results =
-                                LocationUtils.getPredictionsForQuery(googleApiClient, query);
-                        final AutocompletePredictionBuffer predictions = results.await(15, TimeUnit.SECONDS);
+                .switchMap(query -> {
+                    final PendingResult<AutocompletePredictionBuffer> results =
+                            LocationUtils.getPredictionsForQuery(googleApiClient, query);
+                    final AutocompletePredictionBuffer predictions = results.await(15, TimeUnit.SECONDS);
 
-                        return Observable.just(predictions);
-                    }
+                    return Observable.just(predictions);
                 })
                 .subscribeOn(networkScheduler)
                 .doOnNext(showQueryProgressAction(false))
-                .filter(new Func1<AutocompletePredictionBuffer, Boolean>() {
-                    @Override
-                    public Boolean call(AutocompletePredictionBuffer predictions) {
-                        final boolean isSuccess = predictions.getStatus().isSuccess();
-                        if (!isSuccess) {
-                            predictions.release();
-                        }
-                        return isSuccess;
+                .filter(predictions -> {
+                    final boolean isSuccess = predictions.getStatus().isSuccess();
+                    if (!isSuccess) {
+                        predictions.release();
                     }
+                    return isSuccess;
                 })
                 .map(new Func1<AutocompletePredictionBuffer, List<BaseAdapterItem>>() {
                     @Override
@@ -188,6 +176,7 @@ public class LocationPresenter {
                                     @Nullable
                                     @Override
                                     public BaseAdapterItem apply(@Nullable AutocompletePrediction prediction) {
+                                        assert prediction != null;
                                         return new PlaceAdapterItem(
                                                 prediction.getPlaceId(),
                                                 prediction.getFullText(null).toString(),
@@ -202,7 +191,8 @@ public class LocationPresenter {
 
                         return builder.build();
                     }
-                });
+                })
+                .observeOn(uiScheduler);
 
 
 
@@ -212,23 +202,18 @@ public class LocationPresenter {
                 currentlySelectedLocationObservable.startWith((BaseAdapterItem) null),
                 currentGpsLocationObservable.startWith((BaseAdapterItem) null),
                 placesForQueryObservable.startWith(ImmutableList.<BaseAdapterItem>of()),
-                new Func3<BaseAdapterItem, BaseAdapterItem, List<BaseAdapterItem>, List<BaseAdapterItem>>() {
-                    @Override
-                    public List<BaseAdapterItem> call(BaseAdapterItem selectedLocation,
-                                                      BaseAdapterItem gpsLocation,
-                                                      List<BaseAdapterItem> queryLocations) {
-                        final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
-                        if (selectedLocation != null) {
-                            builder.add(selectedLocation);
-                        }
-                        if (gpsLocation != null) {
-                            builder.add(gpsLocation);
-                        }
-
-                        builder.addAll(queryLocations);
-
-                        return builder.build();
+                (Func3<BaseAdapterItem, BaseAdapterItem, List<BaseAdapterItem>, List<BaseAdapterItem>>) (selectedLocation, gpsLocation, queryLocations) -> {
+                    final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
+                    if (selectedLocation != null) {
+                        builder.add(selectedLocation);
                     }
+                    if (gpsLocation != null) {
+                        builder.add(gpsLocation);
+                    }
+
+                    builder.addAll(queryLocations);
+
+                    return builder.build();
                 })
                 .observeOn(uiScheduler);
 
@@ -240,55 +225,36 @@ public class LocationPresenter {
                 .filter(Functions1.isNotNull())
                 .doOnNext(showProgressAction(true))
                 .observeOn(networkScheduler)
-                .switchMap(new Func1<String, Observable<PlaceBuffer>>() {
-                    @Override
-                    public Observable<PlaceBuffer> call(String placeId) {
-                        final PendingResult<PlaceBuffer> result = Places.GeoDataApi.getPlaceById(googleApiClient, placeId);
-                        final PlaceBuffer places = result.await(15, TimeUnit.SECONDS);
+                .switchMap(placeId -> {
+                    final PendingResult<PlaceBuffer> result = Places.GeoDataApi.getPlaceById(googleApiClient, placeId);
+                    final PlaceBuffer places = result.await(15, TimeUnit.SECONDS);
 
-                        return Observable.just(places);
-                    }
+                    return Observable.just(places);
                 })
                 .subscribeOn(networkScheduler)
-                .map(new Func1<PlaceBuffer, ResponseOrError<PlaceBuffer>>() {
-                    @Override
-                    public ResponseOrError<PlaceBuffer> call(PlaceBuffer places) {
-                        return places.getStatus().isSuccess() && places.getCount() > 0 ?
-                                ResponseOrError.fromData(places) :
-                                ResponseOrError.<PlaceBuffer>fromError(new Throwable(String.valueOf(places.getStatus().getStatusCode())));
-                    }
-                })
+                .map(places -> places.getStatus().isSuccess() && places.getCount() > 0 ?
+                        ResponseOrError.fromData(places) :
+                        ResponseOrError.<PlaceBuffer>fromError(new Throwable(String.valueOf(places.getStatus().getStatusCode()))))
+                .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<PlaceBuffer>>behaviorRefCount());
 
         final Observable<ResponseOrError<UserLocation>> selectedPlaceGeocodeResponse =
                 locationDetailsObservable
                         .compose(ResponseOrError.<PlaceBuffer>onlySuccess())
-                        .map(new Func1<PlaceBuffer, LatLng>() {
-                            @Override
-                            public LatLng call(PlaceBuffer places) {
-                                return places.get(0).getLatLng();
-                            }
-                        })
-                        .switchMap(new Func1<LatLng, Observable<ResponseOrError<UserLocation>>>() {
-                            @Override
-                            public Observable<ResponseOrError<UserLocation>> call(LatLng latLng) {
-                                return getGeoCodeRequest(latLng.latitude, latLng.longitude);
-                            }
-                        })
+                        .map(places -> places.get(0).getLatLng())
+                        .switchMap(latLng -> getGeoCodeRequest(latLng.latitude, latLng.longitude))
                         .compose(ObservableExtensions.<ResponseOrError<UserLocation>>behaviorRefCount());
 
         final Observable<ResponseOrError<User>> updateUserObservable = Observable.merge(
                 selectedPlaceGeocodeResponse.compose(ResponseOrError.<UserLocation>onlySuccess()),
                 selectedGpsUserLocation)
-                .switchMap(new Func1<UserLocation, Observable<ResponseOrError<User>>>() {
-                    @Override
-                    public Observable<ResponseOrError<User>> call(UserLocation userLocation) {
-                        userPreferences.setAutomaticLocationTrackingEnabled(userLocation.isFromGps());
+                .switchMap(userLocation -> {
+                    userPreferences.setAutomaticLocationTrackingEnabled(userLocation.isFromGps());
 
-                        return apiService.updateUserLocation(new UpdateLocationRequest(userLocation))
-                                .subscribeOn(networkScheduler)
-                                .compose(ResponseOrError.<User>toResponseOrErrorObservable());
-                    }
+                    return apiService.updateUserLocation(new UpdateLocationRequest(userLocation))
+                            .subscribeOn(networkScheduler)
+                            .observeOn(uiScheduler)
+                            .compose(ResponseOrError.<User>toResponseOrErrorObservable());
                 })
                 .compose(ObservableExtensions.<ResponseOrError<User>>behaviorRefCount());
 
@@ -325,38 +291,24 @@ public class LocationPresenter {
 
     @NonNull
     private Action1<User> saveToPreferencesAction() {
-        return new Action1<User>() {
-            @Override
-            public void call(User user) {
-                userPreferences.updateUserJson(user);
-            }
-        };
+        return userPreferences::updateUserJson;
     }
 
     private Observable<ResponseOrError<UserLocation>> getGeoCodeRequest(double latitude, double longitude) {
         return apiService.geocode(LocationUtils.convertCoordinatesForRequest(latitude, longitude))
                 .subscribeOn(networkScheduler)
+                .observeOn(uiScheduler)
                 .compose(ResponseOrError.<UserLocation>toResponseOrErrorObservable());
     }
 
     @NonNull
     private Action1<Object> showQueryProgressAction(final boolean showProgress) {
-        return new Action1<Object>() {
-            @Override
-            public void call(Object ignore) {
-                queryProgressSubject.onNext(showProgress);
-            }
-        };
+        return ignore -> queryProgressSubject.onNext(showProgress);
     }
 
     @NonNull
     private Action1<Object> showProgressAction(final boolean showProgress) {
-        return new Action1<Object>() {
-            @Override
-            public void call(Object ignore) {
-                progressSubject.onNext(showProgress);
-            }
-        };
+        return ignore -> progressSubject.onNext(showProgress);
     }
 
     @Nonnull
@@ -400,14 +352,9 @@ public class LocationPresenter {
 
     @Nonnull
     private Func1<String, Boolean> queryFilter() {
-        return new Func1<String, Boolean>() {
-            @Override
-            public Boolean call(String query) {
-                return googleApiClient.isConnected() &&
-                        query != null &&
-                        query.length() >= MINIMUM_SEARCH_INPUT;
-            }
-        };
+        return query -> googleApiClient.isConnected() &&
+                query != null &&
+                query.length() >= MINIMUM_SEARCH_INPUT;
     }
 
     public void disconnectGoogleApi() {
