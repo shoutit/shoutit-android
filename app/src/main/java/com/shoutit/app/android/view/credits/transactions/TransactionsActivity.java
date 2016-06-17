@@ -3,9 +3,11 @@ package com.shoutit.app.android.view.credits.transactions;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
@@ -15,6 +17,7 @@ import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
@@ -34,6 +37,8 @@ public class TransactionsActivity extends BaseActivity implements TransactionsPr
     Toolbar mTransactionsToolbar;
     @Bind(R.id.transactions_recyclerview)
     RecyclerView mTransactionsRecyclerview;
+    @Bind(R.id.base_progress)
+    View mProgress;
 
     @Inject
     TransactionsPresenter presenter;
@@ -86,5 +91,15 @@ public class TransactionsActivity extends BaseActivity implements TransactionsPr
     @Override
     public void setData(List<BaseAdapterItem> transactions) {
         adapter.call(transactions);
+    }
+
+    @Override
+    public void error() {
+        ColoredSnackBar.error(ColoredSnackBar.contentView(this), R.string.error_default, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void progress(boolean show) {
+        mProgress.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 }
