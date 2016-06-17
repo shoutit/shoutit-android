@@ -369,7 +369,7 @@ public interface ApiService {
     Observable<CreateShoutResponse> editShoutPrice(@Path("id") String id, @Body EditShoutPriceRequest request);
 
     @PATCH("shouts/{id}")
-    Observable<CreateShoutResponse> editShoutPublishToFacebbok(@Path("id") String id, @Body EditShoutPublishToFacebook body);
+    Observable<CreateShoutResponse> editShoutPublishToFacebook(@Path("id") String id, @Body EditShoutPublishToFacebook body);
 
     @GET("shouts/{id}")
     Observable<ShoutResponse> getShout(@Path("id") String id);

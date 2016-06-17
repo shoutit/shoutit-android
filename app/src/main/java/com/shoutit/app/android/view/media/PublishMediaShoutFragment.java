@@ -60,7 +60,6 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Observable;
-import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func0;
 import rx.functions.Func1;
@@ -373,7 +372,7 @@ public class PublishMediaShoutFragment extends Fragment {
 
     @SuppressWarnings("unchecked")
     @OnClick(R.id.camera_published_done)
-    public void done() {
+    public void doneClicked() {
         Preconditions.checkNotNull(mCameraPublishedPrice);
 
         final String price = mCameraPublishedPrice.getText().toString();
@@ -382,7 +381,7 @@ public class PublishMediaShoutFragment extends Fragment {
             final long priceInCents = PriceUtils.getPriceInCents(price);
             final PriceUtils.SpinnerCurrency selectedItem = (PriceUtils.SpinnerCurrency) mCameraPublishedCurrency.getSelectedItem();
             mCompositeSubscription.add(
-                    mApiService.editShoutPrice(createdShoutOfferId, new EditShoutPriceRequest(priceInCents, selectedItem.getCode()))
+                    mApiService.editShoutPrice(createdShoutOfferId, new EditShoutPriceRequest(priceInCents, selectedItem.getCode(), faceBookCheckbox.isChecked()))
                             .subscribeOn(Schedulers.io())
                             .observeOn(MyAndroidSchedulers.mainThread())
                             .subscribe(createShoutResponse -> {
@@ -392,7 +391,7 @@ public class PublishMediaShoutFragment extends Fragment {
         } else if (faceBookCheckbox.isChecked()) {
             showProgress(true);
             mCompositeSubscription.add(
-                    mApiService.editShoutPublishToFacebbok(createdShoutOfferId, new EditShoutPublishToFacebook(true))
+                    mApiService.editShoutPublishToFacebook(createdShoutOfferId, new EditShoutPublishToFacebook(true))
                             .subscribeOn(Schedulers.io())
                             .observeOn(MyAndroidSchedulers.mainThread())
                             .subscribe(createShoutResponse -> {
