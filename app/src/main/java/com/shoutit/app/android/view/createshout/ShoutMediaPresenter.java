@@ -43,6 +43,7 @@ public class ShoutMediaPresenter {
     }
 
     private void swapVideo(int position, String newUrl) {
+        mediaItems.remove(position);
         if (notifyIfCannotAddVideo()) return;
 
         final File videoThumbnail = getThumbnail(newUrl);
