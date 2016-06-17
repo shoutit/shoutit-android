@@ -130,16 +130,6 @@ public class UserOrPageProfileActivity extends ProfileActivity {
                 });
 
         presenter.getMyProfilePresenter()
-                .getVerifyAccountClickObservable()
-                .compose(bindToLifecycle())
-                .subscribe(new Action1<Object>() {
-                    @Override
-                    public void call(Object o) {
-                        startActivity(VerifyEmailActivity.newIntent(UserOrPageProfileActivity.this));
-                    }
-                });
-
-        presenter.getMyProfilePresenter()
                 .getListeningsClickObservable()
                 .compose(bindToLifecycle())
                 .subscribe(new Action1<Object>() {
