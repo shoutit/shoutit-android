@@ -246,9 +246,9 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
     }
 
     @Override
-    public void showSubject(boolean show) {
-        mChatInfoSubjectLayout.setVisibility(show ? View.VISIBLE : View.GONE);
-        mChatInfoEditSave.setVisibility(show ? View.VISIBLE : View.GONE);
+    public void showSubject(boolean isPublicChat, boolean isAdmin) {
+        mChatInfoSubjectLayout.setVisibility(isPublicChat ? View.VISIBLE : View.GONE);
+        mChatInfoEditSave.setVisibility(isAdmin && isPublicChat ? View.VISIBLE : View.GONE);
     }
 
     @Override

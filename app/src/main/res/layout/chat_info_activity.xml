@@ -72,7 +72,6 @@
                 </LinearLayout>
 
                 <Button
-                    android:visibility="gone"
                     android:id="@+id/chat_info_edit_save"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -81,7 +80,9 @@
                     android:layout_marginTop="6dp"
                     android:background="@android:color/white"
                     android:text="Save"
-                    android:textColor="@android:color/holo_red_dark"/>
+                    android:textColor="@android:color/holo_red_dark"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
 
                 <TextView
                     android:layout_width="wrap_content"
