@@ -305,7 +305,7 @@ public class ShoutMediaPresenterTest {
         target.click();
 
         ArgumentCaptor<Integer> positionCaptor = ArgumentCaptor.forClass(Integer.class);
-        verify(mMediaListener).showImageDialog(positionCaptor.capture());
+        verify(mMediaListener).showImageDialog(positionCaptor.capture(), anyString());
         return positionCaptor.getValue();
     }
 }
