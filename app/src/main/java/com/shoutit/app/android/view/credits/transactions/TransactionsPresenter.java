@@ -80,6 +80,7 @@ public class TransactionsPresenter {
     }
 
     public void register(Listener listener) {
+        listener.progress(true);
         final Observable<List<BaseAdapterItem>> dataObservable = requestSubject
                 .startWith(new Object())
                 .lift(loadMoreOperator)
@@ -111,7 +112,13 @@ public class TransactionsPresenter {
                 });
 
         mCompositeSubscription = new CompositeSubscription(dataObservable
-                .subscribe(listener::setData));
+                .subscribe((transactions) -> {
+                    listener.progress(false);
+                    listener.setData(transactions);
+                }, throwable -> {
+                    listener.progress(false);
+                    listener.error();
+                }));
     }
 
     @NonNull
@@ -142,7 +149,12 @@ public class TransactionsPresenter {
     }
 
     public interface Listener {
+
         void setData(List<BaseAdapterItem> transactions);
+
+        void error();
+
+        void progress(boolean show);
     }
 
     public static class TransactionItem implements BaseAdapterItem {
