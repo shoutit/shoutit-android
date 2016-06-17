@@ -28,7 +28,7 @@ public class MixPanel {
     private static final String API_CLIENT = "shoutit-android";
 
     private static final String PEOPLE_FIELD_USER_NAME = "username";
-    private static final String PEOPLE_FIELD_EMAIL = "email";
+    private static final String PEOPLE_FIELD_EMAIL = "Email";
 
     /**
      * EVENTS
