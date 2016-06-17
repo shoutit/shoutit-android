@@ -252,7 +252,7 @@ dependencies {
     }
     compile 'com.commonsware.cwac:cam2:0.5.3'
     compile 'com.pusher:pusher-java-client:1.1.2'
-    compile "com.mixpanel.android:mixpanel-android:4.8.5"
+    compile "com.mixpanel.android:mixpanel-android:4.8.7"
     compile 'com.adobe.creativesdk.foundation:auth:0.9.7'
     compile 'com.adobe.creativesdk:image:4.4.8'
     compile project(":FFmpegAndroid")
