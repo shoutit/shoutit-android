@@ -70,12 +70,7 @@ public class FacebookHelper {
     }
 
     public void initFacebook() {
-        FacebookSdk.sdkInitialize(context, new FacebookSdk.InitializeCallback() {
-            @Override
-            public void onInitialized() {
-                refreshTokenIfNeeded();
-            }
-        });
+        FacebookSdk.sdkInitialize(context, this::refreshTokenIfNeeded);
     }
 
     private void refreshTokenIfNeeded() {
@@ -93,18 +88,12 @@ public class FacebookHelper {
                 }
 
                 updateFacebookTokenInApi(currentAccessToken.getToken())
-                        .subscribe(new Action1<ResponseBody>() {
-                            @Override
-                            public void call(ResponseBody responseBody) {
-                                stopTracking();
-                                LogHelper.logIfDebug(TAG, "Facebook token updated");
-                            }
-                        }, new Action1<Throwable>() {
-                            @Override
-                            public void call(Throwable throwable) {
-                                stopTracking();
-                                LogHelper.logThrowableAndCrashlytics(TAG, "Cannot update fb token", throwable);
-                            }
+                        .subscribe(responseBody -> {
+                            stopTracking();
+                            LogHelper.logIfDebug(TAG, "Facebook token updated");
+                        }, throwable -> {
+                            stopTracking();
+                            LogHelper.logThrowableAndCrashlytics(TAG, "Cannot update fb token", throwable);
                         });
             }
         };
@@ -214,27 +203,16 @@ public class FacebookHelper {
 
     @NonNull
     private Func1<ResponseBody, Observable<ResponseOrError<Boolean>>> waitForUserToBeUpdatedInApi(@Nonnull final String requiredPermissionName) {
-        return new Func1<ResponseBody, Observable<ResponseOrError<Boolean>>>() {
-            @Override
-            public Observable<ResponseOrError<Boolean>> call(ResponseBody responseBody) {
-                LogHelper.logIfDebug(TAG, "Waiting for user to be updated in API");
-                return pusherHelper.getUserUpdatedObservable()
-                        .filter(new Func1<User, Boolean>() {
-                            @Override
-                            public Boolean call(User user) {
-                                userPreferences.updateUserJson(user);
-                                LogHelper.logIfDebug(TAG, "Pusher event: User updated in API");
-                                
-                                return hasRequiredPermissionInApi(user, requiredPermissionName);
-                            }
-                        })
-                        .map(new Func1<User, ResponseOrError<Boolean>>() {
-                            @Override
-                            public ResponseOrError<Boolean> call(User user) {
-                                return ResponseOrError.fromData(true);
-                            }
-                        });
-            }
+        return responseBody -> {
+            LogHelper.logIfDebug(TAG, "Waiting for user to be updated in API");
+            return pusherHelper.getUserUpdatedObservable()
+                    .filter(user -> {
+                        userPreferences.updateUserJson(user);
+                        LogHelper.logIfDebug(TAG, "Pusher event: User updated in API");
+
+                        return hasRequiredPermissionInApi(user, requiredPermissionName);
+                    })
+                    .map(user -> ResponseOrError.fromData(true));
         };
     }
 
@@ -334,8 +312,7 @@ public class FacebookHelper {
                             R.string.invite_error, Snackbar.LENGTH_LONG).show();
                 }
             });
-
-            appInviteDialog.show(activity, content);
+            appInviteDialog.show(content);
         }
     }
 }
