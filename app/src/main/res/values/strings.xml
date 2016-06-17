@@ -597,4 +597,10 @@
     <string name="contacts_friends_ab_title">Contacts friends</string>
     <string name="invite_app_invite_text">Buy &amp; Sell while Chatting on #Shoutit App! Get it on shoutit.com/app</string>
     <string name="invite_error">Sorry, cannot send invitation</string>
+
+    <!-- Shout Media Edit Dialog -->
+    <string name="shout_media_edit_dialog_delete">Delete</string>
+    <string name="shout_media_edit_dialog_change">Change</string>
+    <string name="shout_media_edit_dialog_edit">Edit</string>
+    <string name="shout_media_edit_dialog_title">Edit media</string>
 </resources>

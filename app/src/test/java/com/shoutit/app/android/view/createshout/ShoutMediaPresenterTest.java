@@ -119,7 +119,7 @@ public class ShoutMediaPresenterTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void whenMediaClicked_mediaWasDeleted() {
+    public void whenMediaDeleteClicked_mediaWasDeleted() {
         ArgumentCaptor<Map> argumentCaptor = ArgumentCaptor.forClass(Map.class);
         mShoutMediaPresenter.register(mMediaListener);
 
@@ -127,7 +127,7 @@ public class ShoutMediaPresenterTest {
 
         verify(mMediaListener, times(2)).setImages(argumentCaptor.capture());
         final ShoutMediaPresenter.MediaItem target = (ShoutMediaPresenter.MediaItem) argumentCaptor.getValue().get(0);
-        target.click();
+        removeItem(target);
 
         verify(mMediaListener, times(3)).setImages(argumentCaptor.capture());
         final ShoutMediaPresenter.Item removedItem = (ShoutMediaPresenter.Item) argumentCaptor.getValue().get(0);
@@ -135,6 +135,24 @@ public class ShoutMediaPresenterTest {
 
         final ShoutMediaPresenter.Item nextItem = (ShoutMediaPresenter.Item) argumentCaptor.getValue().get(1);
         assert_().that(nextItem).isInstanceOf(ShoutMediaPresenter.BlankItem.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void whenMediaEdit_mediaWasSwapped() {
+        ArgumentCaptor<Map> argumentCaptor = ArgumentCaptor.forClass(Map.class);
+        mShoutMediaPresenter.register(mMediaListener);
+
+        mShoutMediaPresenter.addMediaItem("test", false);
+
+        verify(mMediaListener, times(2)).setImages(argumentCaptor.capture());
+        final ShoutMediaPresenter.MediaItem target = (ShoutMediaPresenter.MediaItem) argumentCaptor.getValue().get(0);
+        final Integer position = capturePositionFromClick(target);
+        mShoutMediaPresenter.swapMediaItem(position, "newUrl", false);
+
+        verify(mMediaListener, times(3)).setImages(argumentCaptor.capture());
+        final ShoutMediaPresenter.MediaItem swappedItem = (ShoutMediaPresenter.MediaItem) argumentCaptor.getValue().get(position);
+        assert_().that(swappedItem.getThumb()).contains("newUrl");
     }
 
     @SuppressWarnings("unchecked")
@@ -148,7 +166,7 @@ public class ShoutMediaPresenterTest {
 
         verify(mMediaListener, times(3)).setImages(argumentCaptor.capture());
         final ShoutMediaPresenter.MediaItem target = (ShoutMediaPresenter.MediaItem) argumentCaptor.getValue().get(0);
-        target.click();
+        removeItem(target);
 
         verify(mMediaListener, times(4)).setImages(argumentCaptor.capture());
         final ShoutMediaPresenter.Item imageItem = (ShoutMediaPresenter.Item) argumentCaptor.getValue().get(0);
@@ -272,9 +290,22 @@ public class ShoutMediaPresenterTest {
         verify(mMediaListener, times(6)).setImages(argumentCaptor.capture());
 
         final ShoutMediaPresenter.MediaItem target = (ShoutMediaPresenter.MediaItem) argumentCaptor.getValue().get(0);
-        target.click();
+        removeItem(target);
 
         verify(mMediaListener, times(7)).setImages(argumentCaptor.capture());
         assert_().that(argumentCaptor.getValue().get(4)).isInstanceOf(ShoutMediaPresenter.AddImageItem.class);
+    }
+
+    private void removeItem(ShoutMediaPresenter.MediaItem target) {
+        final Integer position = capturePositionFromClick(target);
+        mShoutMediaPresenter.removeItem(position);
+    }
+
+    private Integer capturePositionFromClick(ShoutMediaPresenter.MediaItem target) {
+        target.click();
+
+        ArgumentCaptor<Integer> positionCaptor = ArgumentCaptor.forClass(Integer.class);
+        verify(mMediaListener).showImageDialog(positionCaptor.capture());
+        return positionCaptor.getValue();
     }
 }
