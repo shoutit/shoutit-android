@@ -287,7 +287,6 @@
 <!-- Published -->
 <string name="published_congratulations">"تهانينا!"</string>
 <string name="published_extra_info">"سيظهر إعلانك على شاوت ات بعد قليل."</string>
-<string name="published_extra_info_with_title">"سيظهر إعلانك \"%2$s\" على شاوت ات بعد قليل."</string>
 <string name="published_add_details">"اضافة تفاصيل اخرى"</string>
 <string name="published_create_another_shout">"إنشاء %1$s آخر"</string>
 <string name="published_or_label">"أو"</string>
