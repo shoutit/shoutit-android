@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import com.appunite.appunitegcm.AppuniteGcm;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.collect.Iterables;
+import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
@@ -134,6 +135,8 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
         if (mUserPreferences.isNormalUser()) {
             subscribeToStats();
         }
+
+        mixPanel.showNotificationIfAvailable(this);
     }
 
     @Override
