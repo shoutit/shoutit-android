@@ -58,6 +58,7 @@
                         android:layout_gravity="center_vertical"
                         android:layout_marginLeft="6dp"
                         android:layout_marginStart="6dp"
+                        android:visibility="gone"
                         android:hint="@string/chat_info_subject"/>
 
                     <TextView
