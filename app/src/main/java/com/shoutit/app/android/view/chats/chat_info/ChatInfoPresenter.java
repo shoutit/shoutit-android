@@ -162,7 +162,7 @@ public class ChatInfoPresenter {
                                     listener.setImage(Uri.parse(image));
                                 }
                                 listener.setSubject(display.getTitle());
-                                listener.showSubject(conversation.isPublicChat());
+                                listener.showSubject(conversation.isPublicChat(), isAdmin);
                                 listener.showReport(conversation.isPublicChat());
                                 listener.setChatCreatedBy(getCreatedByString(conversation.getCreator().getName()));
                                 listener.setChatCreatedAt(getCreatedAtString(conversation.getCreatedAt()));
@@ -299,7 +299,7 @@ public class ChatInfoPresenter {
 
         void isAdmin(boolean isAdmin);
 
-        void showSubject(boolean show);
+        void showSubject(boolean show, boolean isAdmin);
 
         void setChatCreatedBy(@NonNull String createdBy);
 
