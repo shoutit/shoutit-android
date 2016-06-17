@@ -170,7 +170,7 @@
             android:paddingLeft="16dp"
             android:paddingStart="16dp"
             style="@style/SideMenuItem"
-            android:text="Invite Friends" />
+            android:text="@string/menu_item_invite_friends" />
 
         <CheckedTextView
             android:id="@+id/menu_settings"
