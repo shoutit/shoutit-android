@@ -44,9 +44,7 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.ImageHelper;
-import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.PriceUtils;
-import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.view.createshout.DialogsHelper;
 import com.shoutit.app.android.view.createshout.ShoutMediaPresenter;
 import com.shoutit.app.android.view.createshout.location.LocationActivity;
@@ -70,11 +68,14 @@ import javax.inject.Named;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.subjects.PublishSubject;
 
 public class EditShoutActivity extends BaseActivity implements EditShoutPresenter.Listener, ShoutMediaPresenter.MediaListener {
 
     private static final int LOCATION_REQUEST = 0;
     private static final int MEDIA_REQUEST_CODE = 1;
+    public static final int MEDIA_EDIT_REQUEST_CODE = 2;
+    public static final int MEDIA_EDIT_EDTOR_REQUEST_CODE = 3;
 
     private static final String ARGS_ID = "args_id";
 
@@ -111,6 +112,10 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     Button editButton;
 
     @Inject
+    EditImageShoutDialog editImageDialog;
+    @Inject
+    EditVideoShoutDialog editVideoDialog;
+    @Inject
     EditShoutPresenter mEditShoutPresenter;
     @Inject
     ShoutMediaPresenter mShoutMediaPresenter;
@@ -122,6 +127,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
 
     private CurrencySpinnerAdapter mCurrencyAdapter;
     private SpinnerAdapter mCategoryAdapter;
+    private PublishSubject<Pair<String, Boolean>> mediaSwappedSubject = PublishSubject.create();
 
     public static Intent newIntent(@NonNull String id, @NonNull Context context) {
         return new Intent(context, EditShoutActivity.class)
@@ -223,6 +229,15 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
             final String media = extras.getString(RecordMediaActivity.EXTRA_MEDIA);
             Preconditions.checkNotNull(media);
             mShoutMediaPresenter.addMediaItem(media, isVideo);
+        } else if (requestCode == MEDIA_EDIT_REQUEST_CODE && resultCode == RESULT_OK) {
+            final Bundle extras = data.getExtras();
+            final boolean isVideo = extras.getBoolean(RecordMediaActivity.EXTRA_IS_VIDEO);
+            final String media = extras.getString(RecordMediaActivity.EXTRA_MEDIA);
+            Preconditions.checkNotNull(media);
+            mediaSwappedSubject.onNext(Pair.create(media, isVideo));
+        } else if (requestCode == MEDIA_EDIT_EDTOR_REQUEST_CODE && resultCode == RESULT_OK) {
+            final Uri editedImageUri = data.getData();
+            mediaSwappedSubject.onNext(Pair.create(editedImageUri.toString(), false));
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
@@ -421,7 +436,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
             if (item instanceof ShoutMediaPresenter.AddImageItem) {
                 view = layoutInflater.inflate(R.layout.edit_media_add, mEditMediaContainer, false);
             } else if (item instanceof ShoutMediaPresenter.MediaItem) {
-                view = layoutInflater.inflate(item instanceof ShoutMediaPresenter.IVideoItem ? R.layout.edit_media_video_item :  R.layout.edit_media_item, mEditMediaContainer, false);
+                view = layoutInflater.inflate(item instanceof ShoutMediaPresenter.IVideoItem ? R.layout.edit_media_video_item : R.layout.edit_media_item, mEditMediaContainer, false);
                 final ImageView imageView = (ImageView) view.findViewById(R.id.edit_media_item_image);
                 mPicasso.load(Uri.parse(((ShoutMediaPresenter.MediaItem) item).getThumb()))
                         .centerCrop()
@@ -475,5 +490,15 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     @Override
     public void showUploadError(Throwable throwable) {
         ColoredSnackBar.error(ColoredSnackBar.contentView(this), throwable, Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void showImageDialog(int position, String path) {
+        editImageDialog.show(position, mShoutMediaPresenter, mediaSwappedSubject, path);
+    }
+
+    @Override
+    public void showVideoDialog(int position) {
+        editVideoDialog.show(position, mShoutMediaPresenter, mediaSwappedSubject);
     }
 }
