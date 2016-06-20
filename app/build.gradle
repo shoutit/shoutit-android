@@ -43,6 +43,18 @@ if (project.hasProperty("versionSuffix")) {
     project.ext.versionChangeSuffix = "-snapshot"
 }
 
+if (project.hasProperty("commitId")) {
+    project.ext.commitId = project.commitId
+} else {
+    project.ext.commitId = "localBuildCommtId"
+}
+
+if (project.hasProperty("buildNumber")) {
+    project.ext.buildNumber = project.buildNumber
+} else {
+    project.ext.buildNumber = "localBuildNumber"
+}
+
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.3"
@@ -60,6 +72,8 @@ android {
         renderscriptTargetApi 23
         multiDexEnabled true
         testInstrumentationRunner "com.android.test.runner.MultiDexTestRunner"
+        buildConfigField 'String', 'commitId', "\"${project.ext.commitId}\""
+        buildConfigField 'String', 'buildNumber', "\"${project.ext.buildNumber}\""
     }
 
     compileOptions {
