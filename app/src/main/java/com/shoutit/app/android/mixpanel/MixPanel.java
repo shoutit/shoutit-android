@@ -1,5 +1,6 @@
 package com.shoutit.app.android.mixpanel;
 
+import android.app.Activity;
 import android.content.Context;
 
 import com.appunite.rx.functions.Functions1;
@@ -25,6 +26,9 @@ public class MixPanel {
     private static final String DEVELOPMENT = "d2de0109a8de7237dede66874c7b8951";
     private static final String LOCAL = "a5774a99b9068ae66129859421ade687";
     private static final String API_CLIENT = "shoutit-android";
+
+    private static final String PEOPLE_FIELD_USER_NAME = "username";
+    private static final String PEOPLE_FIELD_EMAIL = "Email";
 
     /**
      * EVENTS
@@ -54,11 +58,11 @@ public class MixPanel {
         userPreferences.getUserObservable()
                 .filter(Functions1.isNotNull())
                 .distinctUntilChanged()
-                .subscribe(new Action1<User>() {
-                    @Override
-                    public void call(User user) {
-                        mixpanel.identify(user.getId());
-                    }
+                .subscribe(user -> {
+                    mixpanel.identify(user.getId());
+                    mixpanel.getPeople().identify(user.getId());
+                    mixpanel.getPeople().set(PEOPLE_FIELD_USER_NAME, user.getUsername());
+                    mixpanel.getPeople().set(PEOPLE_FIELD_EMAIL, user.getEmail());
                 });
     }
 
@@ -104,5 +108,9 @@ public class MixPanel {
 
     private void logError(Throwable throwable) {
         LogHelper.logThrowable(TAG, "Cannot add property to json", throwable);
+    }
+
+    public void showNotificationIfAvailable(@Nonnull Activity activity) {
+        mixpanel.getPeople().showNotificationIfAvailable(activity);
     }
 }
