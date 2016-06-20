@@ -1,18 +1,28 @@
 package com.shoutit.app.android.view.chats.message_models;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.shoutit.app.android.view.chats.Listener;
 
 import javax.annotation.Nonnull;
+
+import rx.Observer;
 
 public class ReceivedTextMessage extends ReceivedMessage {
 
     private final String time;
     private final String message;
+    @Nonnull
+    private final String userName;
+    @Nonnull
+    private final Listener listener;
 
-    public ReceivedTextMessage(boolean isFirst, String time, String message, String avatarUrl) {
+    public ReceivedTextMessage(boolean isFirst, String time, String message, String avatarUrl,
+                               @Nonnull String userName, @Nonnull Listener listener) {
         super(isFirst, avatarUrl);
         this.time = time;
         this.message = message;
+        this.userName = userName;
+        this.listener = listener;
     }
 
     public String getTime() {
@@ -55,5 +65,9 @@ public class ReceivedTextMessage extends ReceivedMessage {
     @Override
     public boolean same(@Nonnull BaseAdapterItem item) {
         return item instanceof ReceivedTextMessage && this.equals(item);
+    }
+
+    public void onAvatarClicked() {
+        listener.onProfileClicked(userName);
     }
 }

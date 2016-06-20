@@ -81,7 +81,10 @@ public class ChatsDelegate {
     private final LocalMessageBus mBus;
 
 
-    public ChatsDelegate(PusherHelper pusher, Scheduler uiScheduler, Scheduler networkScheduler, ApiService apiService, Resources resources, UserPreferences userPreferences, Context context, AmazonHelper amazonHelper, PublishSubject<PusherMessage> newMessagesSubject, LocalMessageBus bus) {
+    public ChatsDelegate(PusherHelper pusher, Scheduler uiScheduler, Scheduler networkScheduler,
+                         ApiService apiService, Resources resources, UserPreferences userPreferences,
+                         Context context, AmazonHelper amazonHelper, PublishSubject<PusherMessage> newMessagesSubject,
+                         LocalMessageBus bus) {
         mPusher = pusher;
         mUiScheduler = uiScheduler;
         mNetworkScheduler = networkScheduler;
@@ -115,7 +118,12 @@ public class ChatsDelegate {
                         return Observable.just(pusherMessage);
                     } else {
                         return mApiService.readMessage(pusherMessage.getId())
-                                .map(responseBody -> pusherMessage);
+                                .map(new Func1<ResponseBody, PusherMessage>() {
+                                    @Override
+                                    public PusherMessage call(ResponseBody responseBody) {
+                                        return pusherMessage;
+                                    }
+                                });
                     }
                 })
                 .observeOn(mUiScheduler);
@@ -254,21 +262,25 @@ public class ChatsDelegate {
         final List<MessageAttachment> attachments = message.getAttachments();
         final String avatarUrl = message.getProfile().getImage();
         if (attachments.isEmpty()) {
-            return new ReceivedTextMessage(isFirst, time, message.getText(), avatarUrl);
+            return new ReceivedTextMessage(isFirst, time, message.getText(), avatarUrl,
+                    message.getProfile().getUsername(), mListener);
         } else {
             final MessageAttachment messageAttachment = attachments.get(0);
             final String type = messageAttachment.getType();
             if (MessageAttachment.ATTACHMENT_TYPE_MEDIA.equals(type)) {
                 final List<String> images = messageAttachment.getImages();
                 if (images != null && !images.isEmpty()) {
-                    return new ReceivedImageMessage(isFirst, time, images.get(0), avatarUrl, mListener);
+                    return new ReceivedImageMessage(isFirst, time, images.get(0), avatarUrl,
+                            message.getProfile().getUsername(), mListener);
                 } else {
                     final Video video = messageAttachment.getVideos().get(0);
-                    return new ReceivedVideoMessage(isFirst, video.getThumbnailUrl(), time, avatarUrl, mListener, video.getUrl());
+                    return new ReceivedVideoMessage(isFirst, video.getThumbnailUrl(), time, avatarUrl,
+                            message.getProfile().getUsername(), mListener, video.getUrl());
                 }
             } else if (MessageAttachment.ATTACHMENT_TYPE_LOCATION.equals(type)) {
                 final MessageAttachment.MessageLocation location = messageAttachment.getLocation();
-                return new ReceivedLocationMessage(isFirst, time, avatarUrl, mListener, location.getLatitude(), location.getLongitude());
+                return new ReceivedLocationMessage(isFirst, time, avatarUrl, message.getProfile().getUsername(),
+                        mListener, location.getLatitude(), location.getLongitude());
             } else if (MessageAttachment.ATTACHMENT_TYPE_SHOUT.equals(type)) {
                 final MessageAttachment.AttachtmentShout shout = messageAttachment.getShout();
                 return new ReceivedShoutMessage(
@@ -278,6 +290,7 @@ public class ChatsDelegate {
                         PriceUtils.formatPriceWithCurrency(shout.getPrice(), mResources, shout.getCurrency()),
                         shout.getText(),
                         shout.getUser().getName(),
+                        shout.getUser().getUsername(),
                         avatarUrl, mListener, shout.getId());
             } else if (MessageAttachment.ATTACHMENT_TYPE_PROFILE.equals(type)) {
                 final MessageAttachment.MessageProfile profile = messageAttachment.getProfile();
