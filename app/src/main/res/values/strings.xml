@@ -602,4 +602,12 @@
     <string name="shout_media_edit_dialog_change">Change</string>
     <string name="shout_media_edit_dialog_edit">Edit</string>
     <string name="shout_media_edit_dialog_title">Edit media</string>
+
+    <!-- Chat participants -->
+    <string name="chat_participants_promote_to_admin">Promote to admin</string>
+    <string name="chat_participants_remove_from_chat">Remove from chat</string>
+    <string name="chat_participants_view_profile">View Profile</string>
+
+    <!-- Chat Blocked -->
+    <string name="chat_blocked_unblock">Unblock user</string>
 </resources>

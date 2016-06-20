@@ -9,12 +9,15 @@ public class ReceivedImageMessage extends ReceivedMessage {
 
     private final String time;
     private final String url;
+    private final String userName;
     private final Listener mListener;
 
-    public ReceivedImageMessage(boolean isFirst, String time, String url, String avatarUrl, Listener listener) {
+    public ReceivedImageMessage(boolean isFirst, String time, String url,
+                                String avatarUrl, String userName, Listener listener) {
         super(isFirst, avatarUrl);
         this.time = time;
         this.url = url;
+        this.userName = userName;
         mListener = listener;
     }
 
@@ -64,5 +67,9 @@ public class ReceivedImageMessage extends ReceivedMessage {
 
     public void click() {
         mListener.onImageClicked(url);
+    }
+
+    public void onAvatarClicked() {
+        mListener.onProfileClicked(userName);
     }
 }

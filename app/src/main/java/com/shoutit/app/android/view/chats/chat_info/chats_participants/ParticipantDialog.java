@@ -9,6 +9,7 @@ import android.widget.Button;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ForActivity;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import butterknife.Bind;
@@ -24,14 +25,19 @@ public class ParticipantDialog {
     Button mChatParticipantPromote;
     @Bind(R.id.chat_participant_remove)
     Button mChatParticipantRemove;
+    @Bind(R.id.chat_participant_view_profile)
+    Button mViewProfileButton;
 
     @Inject
     public ParticipantDialog(@ForActivity Context context) {
         mContext = context;
     }
 
-    public void show(final String id, final boolean isBlocked, boolean isAdmin, String name, final ChatParticipantsPresenter presenter) {
+    public void show(final String id, final boolean isBlocked, boolean isAdmin,
+                     String name, @Nonnull String userName, final ChatParticipantsPresenter presenter) {
+
         final View view = LayoutInflater.from(mContext).inflate(R.layout.chat_participant_action_dialog, null, false);
+
         final AlertDialog alertDialog = new AlertDialog.Builder(mContext)
                 .setTitle(name)
                 .setView(view)
@@ -59,6 +65,14 @@ public class ParticipantDialog {
             @Override
             public void onClick(View v) {
                 presenter.blockAction(id, !isBlocked);
+                alertDialog.dismiss();
+            }
+        });
+
+        mViewProfileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.showProfile(userName);
                 alertDialog.dismiss();
             }
         });

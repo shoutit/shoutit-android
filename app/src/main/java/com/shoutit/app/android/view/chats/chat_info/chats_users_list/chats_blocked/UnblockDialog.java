@@ -2,6 +2,7 @@ package com.shoutit.app.android.view.chats.chat_info.chats_users_list.chats_bloc
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 
 import com.shoutit.app.android.R;
@@ -35,6 +36,7 @@ public class UnblockDialog {
                 })
                 .setMessage(String.format(mContext.getString(R.string.blocked_users_unblock_dialog_title), name))
                 .create();
+
         alertDialog.show();
     }
 

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="14dp"
+    android:orientation="vertical">
+
+    <Button
+        style="@style/BaseButtonDefaultBackgroundStyle"
+        android:textColor="@android:color/white"
+        android:id="@+id/chat_blocked_unblock"
+        android:layout_width="match_parent"
+        android:text="@string/chat_blocked_unblock"/>
+
+    <Button
+        style="@style/BaseButtonDefaultBackgroundStyle"
+        android:textColor="@android:color/white"
+        android:id="@+id/chat_blocked_view_profile"
+        android:layout_width="match_parent"
+        android:text="@string/chat_participants_view_profile"/>
+
+</LinearLayout>
