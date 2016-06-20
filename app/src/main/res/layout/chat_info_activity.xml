@@ -211,6 +211,7 @@
                     </FrameLayout>
 
                     <View
+                        android:id="@+id/chat_info_blocked_divider"
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginEnd="10dp"

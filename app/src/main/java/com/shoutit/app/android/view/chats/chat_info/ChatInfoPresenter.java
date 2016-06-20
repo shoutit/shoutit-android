@@ -133,13 +133,13 @@ public class ChatInfoPresenter {
         mCompositeSubscription.add(getConversationObservable()
                 .subscribe(
                         conversation -> {
-                            isAdmin = isAdmin(conversation.getAdmins());
                             final boolean isParticipant = Iterables.any(conversation.getProfiles(), input -> {
                                 assert input != null;
                                 return input.getId().equals(mId);
                             });
                             listener.showExitButton(isParticipant);
 
+                            isAdmin = isAdmin(conversation.getAdmins());
                             listener.isAdmin(isAdmin);
                             final ConversationDetails.AttatchmentCount attachmentsCount = conversation.getAttachmentsCount();
                             listener.setParticipantsCount(conversation.getProfiles().size());

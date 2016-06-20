@@ -82,6 +82,11 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
     TextView mChatInfoChatCreatedAt;
     @Bind(R.id.chat_info_edit_save)
     Button mChatInfoEditSave;
+    @Bind(R.id.chat_info_blocked_layouts)
+    View mBlockedView;
+    @Bind(R.id.chat_info_blocked_divider)
+    View mBlockedDividerView;
+
 
     private String conversationId;
 
@@ -243,6 +248,8 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
         mChatInfoToolbar.getMenu().findItem(R.id.chat_info_add_person).setVisible(isAdmin);
         mChatInfoSubject.setVisibility(isAdmin ? View.VISIBLE : View.GONE);
         mChatInfoSubjectTextView.setVisibility(!isAdmin ? View.VISIBLE : View.GONE);
+        mBlockedView.setVisibility(isAdmin ? View.VISIBLE : View.GONE);
+        mBlockedDividerView.setVisibility(isAdmin ? View.VISIBLE : View.GONE);
     }
 
     @Override
