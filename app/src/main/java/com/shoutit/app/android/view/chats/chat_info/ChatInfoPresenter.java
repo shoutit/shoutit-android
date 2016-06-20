@@ -11,11 +11,14 @@ import android.support.annotation.Nullable;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.ConversationDetails;
+import com.shoutit.app.android.api.model.ConversationProfile;
 import com.shoutit.app.android.api.model.EditPublicChatRequest;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
@@ -101,33 +104,17 @@ public class ChatInfoPresenter {
         } else {
             listener.showProgress(true);
             mCompositeSubscription.add(Observable
-                    .defer(new Func0<Observable<String>>() {
-                        @Override
-                        public Observable<String> call() {
-                            return ChatsMediaHelper.uploadChatImage(mAmazonHelper, url, mContext, mNetworkScheduler, mUiScheduler);
-                        }
-                    })
+                    .defer(() -> ChatsMediaHelper.uploadChatImage(mAmazonHelper, url, mContext, mNetworkScheduler, mUiScheduler))
                     .subscribeOn(mNetworkScheduler)
                     .observeOn(mUiScheduler)
-                    .flatMap(new Func1<String, Observable<ResponseBody>>() {
-                        @Override
-                        public Observable<ResponseBody> call(String url) {
-                            return mApiService.updateConversation(mConversationId, new EditPublicChatRequest(data, url))
-                                    .subscribeOn(mNetworkScheduler)
-                                    .observeOn(mUiScheduler);
-                        }
-                    })
-                    .subscribe(new Action1<ResponseBody>() {
-                        @Override
-                        public void call(ResponseBody responseBody) {
-                            listener.finishScreen(false);
-                        }
-                    }, new Action1<Throwable>() {
-                        @Override
-                        public void call(Throwable throwable) {
-                            listener.editRequestError();
-                            listener.showProgress(false);
-                        }
+                    .flatMap(url1 -> mApiService.updateConversation(mConversationId, new EditPublicChatRequest(data, url1))
+                            .subscribeOn(mNetworkScheduler)
+                            .observeOn(mUiScheduler))
+                    .subscribe(responseBody -> {
+                        listener.finishScreen(false);
+                    }, throwable -> {
+                        listener.editRequestError();
+                        listener.showProgress(false);
                     }));
         }
     }
@@ -145,57 +132,50 @@ public class ChatInfoPresenter {
     private void loadConversation() {
         mCompositeSubscription.add(getConversationObservable()
                 .subscribe(
-                        new Action1<ConversationDetails>() {
-                            @Override
-                            public void call(ConversationDetails conversation) {
-                                isAdmin = isAdmin(conversation.getAdmins());
+                        conversation -> {
+                            isAdmin = isAdmin(conversation.getAdmins());
+                            final boolean isParticipant = Iterables.any(conversation.getProfiles(), input -> {
+                                assert input != null;
+                                return input.getId().equals(mId);
+                            });
+                            listener.showExitButton(isParticipant);
 
-                                listener.isAdmin(isAdmin);
-                                final ConversationDetails.AttatchmentCount attachmentsCount = conversation.getAttachmentsCount();
-                                listener.setParticipantsCount(conversation.getProfiles().size());
-                                listener.setBlockedCount(conversation.getBlocked().size());
-                                listener.setMediaCount(attachmentsCount.getMedia());
-                                listener.setShoutsCount(attachmentsCount.getShout());
-                                final ConversationDetails.Display display = conversation.getDisplay();
-                                final String image = display.getImage();
-                                if (!Strings.isNullOrEmpty(image)) {
-                                    listener.setImage(Uri.parse(image));
-                                }
-                                listener.setSubject(display.getTitle());
-                                listener.showSubject(conversation.isPublicChat(), isAdmin);
-                                listener.showReport(conversation.isPublicChat());
-                                listener.setChatCreatedBy(getCreatedByString(conversation.getCreator().getName()));
-                                listener.setChatCreatedAt(getCreatedAtString(conversation.getCreatedAt()));
-                                listener.showProgress(false);
+                            listener.isAdmin(isAdmin);
+                            final ConversationDetails.AttatchmentCount attachmentsCount = conversation.getAttachmentsCount();
+                            listener.setParticipantsCount(conversation.getProfiles().size());
+                            listener.setBlockedCount(conversation.getBlocked().size());
+                            listener.setMediaCount(attachmentsCount.getMedia());
+                            listener.setShoutsCount(attachmentsCount.getShout());
+                            final ConversationDetails.Display display = conversation.getDisplay();
+                            final String image = display.getImage();
+                            if (!Strings.isNullOrEmpty(image)) {
+                                listener.setImage(Uri.parse(image));
                             }
+                            listener.setSubject(display.getTitle());
+                            listener.showSubject(conversation.isPublicChat(), isAdmin);
+                            listener.showReport(conversation.isPublicChat());
+                            listener.setChatCreatedBy(getCreatedByString(conversation.getCreator().getName()));
+                            listener.setChatCreatedAt(getCreatedAtString(conversation.getCreatedAt()));
+                            listener.showProgress(false);
                         },
-                        new Action1<Throwable>() {
-                            @Override
-                            public void call(Throwable throwable) {
-                                listener.showProgress(false);
-                                listener.loadConversationError();
-                            }
+                        throwable -> {
+                            listener.showProgress(false);
+                            listener.loadConversationError();
                         }));
     }
 
 
     public void refreshCounts() {
         mCompositeSubscription.add(getConversationObservable()
-                .subscribe(new Action1<ConversationDetails>() {
-                    @Override
-                    public void call(ConversationDetails conversation) {
-                        listener.setParticipantsCount(conversation.getProfiles().size());
-                        listener.setBlockedCount(conversation.getBlocked().size());
+                .subscribe(conversation -> {
+                    listener.setParticipantsCount(conversation.getProfiles().size());
+                    listener.setBlockedCount(conversation.getBlocked().size());
 
-                        final ConversationDetails.AttatchmentCount attachmentsCount = conversation.getAttachmentsCount();
-                        listener.setMediaCount(attachmentsCount.getMedia());
-                        listener.setShoutsCount(attachmentsCount.getShout());
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        listener.loadConversationError();
-                    }
+                    final ConversationDetails.AttatchmentCount attachmentsCount = conversation.getAttachmentsCount();
+                    listener.setMediaCount(attachmentsCount.getMedia());
+                    listener.setShoutsCount(attachmentsCount.getShout());
+                }, throwable -> {
+                    listener.loadConversationError();
                 }));
     }
 
@@ -235,17 +215,11 @@ public class ChatInfoPresenter {
         mCompositeSubscription.add(mApiService.deleteConversation(mConversationId)
                 .observeOn(mUiScheduler)
                 .subscribeOn(mNetworkScheduler)
-                .subscribe(new Action1<ResponseBody>() {
-                    @Override
-                    public void call(ResponseBody responseBody) {
-                        listener.finishScreen(true);
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        listener.exitChatError();
-                        listener.showProgress(false);
-                    }
+                .subscribe(responseBody -> {
+                    listener.finishScreen(true);
+                }, throwable -> {
+                    listener.exitChatError();
+                    listener.showProgress(false);
                 }));
     }
 
@@ -254,18 +228,12 @@ public class ChatInfoPresenter {
         mCompositeSubscription.add(mApiService.report(ReportBody.forConversation(mConversationId, reportBody))
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
-                .subscribe(new Action1<Response<Object>>() {
-                    @Override
-                    public void call(Response<Object> objectResponse) {
-                        listener.reportSent();
-                        listener.showProgress(false);
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        listener.reportError();
-                        listener.showProgress(false);
-                    }
+                .subscribe(objectResponse -> {
+                    listener.reportSent();
+                    listener.showProgress(false);
+                }, throwable -> {
+                    listener.reportError();
+                    listener.showProgress(false);
                 }));
     }
 
@@ -312,5 +280,7 @@ public class ChatInfoPresenter {
         void reportSent();
 
         void reportError();
+
+        void showExitButton(boolean show);
     }
 }

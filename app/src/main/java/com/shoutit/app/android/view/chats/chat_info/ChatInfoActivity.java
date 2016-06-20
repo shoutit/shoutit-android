@@ -71,7 +71,7 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
     @Bind(R.id.chat_info_blocked_number)
     TextView mChatInfoBlockedNumber;
     @Bind(R.id.chat_info_exit_chat)
-    Button mChatInfoEditChat;
+    Button mChatInfoExitChat;
     @Bind(R.id.chat_info_progress)
     FrameLayout mChatInfoProgress;
     @Bind(R.id.chat_info_subject_layout)
@@ -279,6 +279,11 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
     @Override
     public void reportError() {
         ColoredSnackBar.error(ColoredSnackBar.contentView(this), R.string.chat_info_report_error, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showExitButton(boolean show) {
+        mChatInfoExitChat.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     @OnClick(R.id.chat_info_edit_save)
