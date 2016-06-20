@@ -10,11 +10,11 @@ import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.appunite.rx.operators.MoreOperators;
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForApplication;
-
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -190,6 +190,11 @@ public class UserPreferences {
     public User getUser() {
         final String userJson = mPreferences.getString(KEY_USER, null);
         return gson.fromJson(userJson, User.class);
+    }
+
+    @NonNull
+    public User getUserOrThrow() {
+        return Preconditions.checkNotNull(getUser());
     }
 
     @Nonnull

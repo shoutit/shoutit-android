@@ -22,7 +22,7 @@ import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.ChatMessage;
 import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.ConversationsResponse;
-import com.shoutit.app.android.api.model.PusherMessage;
+import com.shoutit.app.android.api.model.PusherConversationUpdate;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
@@ -113,7 +113,7 @@ public class ConversationsPresenter {
         mContext = context;
         mUserPreferences = userPreferences;
         mRefreshConversationBus = refreshConversationBus;
-        mUserId = mUserPreferences.getUser().getId();
+        mUserId = mUserPreferences.getUserOrThrow().getId();
         mPusherHelper = pusherHelper;
         this.isMyConversationsList = isMyConversationsList;
         mLocalMessageBus = localMessageBus;
@@ -132,42 +132,48 @@ public class ConversationsPresenter {
 
         mListener.showProgress(showProgress);
 
-        final Observable<ConversationAction> newMessageObservable = mPusherHelper
-                .getNewMessagesObservable()
-                .map((Func1<PusherMessage, ConversationAction>) ConversationMessageAction::new)
+        final Observable<ConversationAction> conversationUpdateObservable = mPusherHelper
+                .getConverstionUpdateObservable()
+                .map((Func1<PusherConversationUpdate, ConversationAction>) ConversationUpdateAction::new)
                 .observeOn(mUiScheduler);
 
-        final Observable<Map<String, Conversation>> requestObservable = requestSubject
+        final Observable<Map<String, ConversationItem>> requestObservable = requestSubject
                 .startWith(new Object())
                 .lift(loadMoreOperator)
                 .compose(MoreOperators.<ConversationsResponse>refresh(mRefreshConversationBus.getRefreshConversationBus()))
+                .map((Func1<ConversationsResponse, List<ConversationItem>>) conversationsResponse -> ImmutableList.copyOf(Iterables.transform(conversationsResponse.getResults(), new Function<Conversation, ConversationItem>() {
+                    @Nullable
+                    @Override
+                    public ConversationItem apply(@Nullable Conversation input) {
+                        return ConversationItem.fromConversation(input);
+                    }
+                })))
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
-                .flatMap(conversationsResponse -> Observable.from(conversationsResponse.getResults())
-                        .toMap((Func1<Conversation, String>) Conversation::getId));
+                .flatMap(conversationsResponse -> Observable.from(conversationsResponse)
+                        .toMap((Func1<ConversationItem, String>) ConversationItem::getId));
 
-        final Observable<List<Conversation>> conversationsListObservable = requestObservable
-                .switchMap(conversationsMap -> newMessageObservable.startWith((ConversationAction) null)
+        final Observable<List<ConversationItem>> conversationsListObservable = requestObservable
+                .switchMap(conversationsMap -> conversationUpdateObservable.startWith((ConversationAction) null)
                         .mergeWith(conversationActionSubject)
                         .mergeWith(mLocalMessageBus.getLocalMessageObservable().map((Func1<LocalMessageBus.LocalMessage, ConversationAction>) ConversationMessageAction::new))
-                        .scan(conversationsMap, new Func2<Map<String, Conversation>, ConversationAction, Map<String, Conversation>>() {
+                        .scan(conversationsMap, new Func2<Map<String, ConversationItem>, ConversationAction, Map<String, ConversationItem>>() {
                             @Override
-                            public Map<String, Conversation> call(Map<String, Conversation> conversationsMap,
-                                                                  ConversationAction newMessage) {
+                            public Map<String, ConversationItem> call(Map<String, ConversationItem> conversationsMap,
+                                                                      ConversationAction newMessage) {
                                 if (newMessage == null) {
                                     return conversationsMap;
                                 } else if (newMessage instanceof ConversationMessageAction) {
-                                    if (isNewConversation(conversationsMap, ((ConversationMessageAction) newMessage).mPusherMessage)) {
-                                        refreshData();
-                                        return conversationsMap;
-                                    } else {
-                                        return updateMapWithNewMessage(conversationsMap, ((ConversationMessageAction) newMessage).mPusherMessage);
-                                    }
+                                    final ChatMessage chatMessage = ((ConversationMessageAction) newMessage).chatMessage;
+                                    final ConversationItem conversationItem = conversationsMap.get(chatMessage.getConversationId());
+                                    return updateMapWithNewMessage(conversationsMap, conversationItem.withUpdatedLastMessage(chatMessage.getText(), chatMessage.getCreatedAt(), chatMessage.getProfile().getId().equals(mUserId)));
+                                } else if (newMessage instanceof ConversationUpdateAction) {
+                                    return updateMapWithNewMessage(conversationsMap, ConversationItem.fromPusherUpdateConversation(((ConversationUpdateAction) newMessage).mConversationUpdate));
                                 } else if (newMessage instanceof ConversationReadAction) {
-                                    ConversationReadAction conversationReadAction = (ConversationReadAction) newMessage;
-                                    final Conversation conversation = conversationsMap.get(conversationReadAction.id);
+                                    final ConversationReadAction conversationReadAction = (ConversationReadAction) newMessage;
+                                    final ConversationItem conversation = conversationsMap.get(conversationReadAction.id);
 
-                                    final HashMap<String, Conversation> conversationHashMap = Maps.newHashMap(conversationsMap);
+                                    final Map<String, ConversationItem> conversationHashMap = Maps.newHashMap(conversationsMap);
                                     conversationHashMap.put(conversationReadAction.id, conversation.withIsReadTrue());
 
                                     return ImmutableMap.copyOf(conversationHashMap);
@@ -176,24 +182,15 @@ public class ConversationsPresenter {
                                 }
                             }
 
-                            private boolean isNewConversation(Map<String, Conversation> conversationsMap,
-                                                              ChatMessage newMessage) {
-                                return !conversationsMap.containsKey(newMessage.getConversationId());
-                            }
-
-                            private Map<String, Conversation> updateMapWithNewMessage(Map<String, Conversation> conversationsMap,
-                                                                                      ChatMessage newMessage) {
-                                final Conversation conversationToUpdate = conversationsMap.get(newMessage.getConversationId());
-                                final Conversation updatedConversation = conversationToUpdate
-                                        .withUpdatedLastMessage(newMessage.getText(), newMessage.getCreatedAt(), newMessage.getProfile().getId().equals(mUserId));
-
-                                final Map<String, Conversation> newMap = new HashMap<>(conversationsMap);
-                                newMap.put(updatedConversation.getId(), updatedConversation);
+                            private Map<String, ConversationItem> updateMapWithNewMessage(Map<String, ConversationItem> conversationsMap,
+                                                                                          ConversationItem newMessage) {
+                                final Map<String, ConversationItem> newMap = new HashMap<>(conversationsMap);
+                                newMap.put(newMessage.getId(), newMessage);
 
                                 return ImmutableMap.copyOf(newMap);
                             }
                         }))
-                .map((Func1<Map<String, Conversation>, List<Conversation>>) conversationsMap -> ImmutableList.copyOf(conversationsMap.values()));
+                .map((Func1<Map<String, ConversationItem>, List<ConversationItem>>) conversationsMap -> ImmutableList.copyOf(conversationsMap.values()));
 
         mSubscription = conversationsListObservable
                 .subscribe(conversations -> {
@@ -203,15 +200,15 @@ public class ConversationsPresenter {
                     if (conversations.isEmpty()) {
                         mListener.emptyList();
                     } else {
-                        final List<Conversation> list = Lists.newArrayList(conversations);
+                        final List<ConversationItem> list = Lists.newArrayList(conversations);
                         Collections.sort(list, (lhs, rhs) -> lhs.getModifiedAt() >= rhs.getModifiedAt() ? -1 : 1);
                         final ImmutableList<BaseAdapterItem> items = ImmutableList.copyOf(
                                 Iterables.transform(
                                         list,
-                                        new Function<Conversation, BaseAdapterItem>() {
+                                        new Function<ConversationItem, BaseAdapterItem>() {
                                             @Nullable
                                             @Override
-                                            public BaseAdapterItem apply(@Nullable Conversation input) {
+                                            public BaseAdapterItem apply(@Nullable ConversationItem input) {
                                                 assert input != null;
                                                 return getConversationItem(input);
                                             }
@@ -225,22 +222,16 @@ public class ConversationsPresenter {
                 });
     }
 
-    private void refreshData() {
-        mRefreshConversationBus.post();
-    }
-
     @NonNull
-    private BaseAdapterItem getConversationItem(@NonNull Conversation conversation) {
-        final Conversation.Display display = conversation.getDisplay();
-
+    private BaseAdapterItem getConversationItem(@NonNull ConversationItem conversation) {
         final String elapsedTime = DateUtils.getRelativeTimeSpanString(mContext, conversation.getModifiedAt() * 1000).toString();
         final User user = mUserPreferences.getUser();
         assert user != null;
 
         final boolean isUnread = conversation.getUnreadMessagesCount() > 0;
 
-        return new ConversationAdapterItem(conversation.getId(), display.getTitle(), display.getSubTitle(),
-                display.getLastMessageSummary(), elapsedTime, display.getImage(), isUnread, conversation.getType());
+        return new ConversationAdapterItem(conversation.getId(), conversation.getTitle(), conversation.getSubTitle(),
+                conversation.getLastMessageSummary(), elapsedTime, conversation.getImage(), isUnread, conversation.getType());
     }
 
     public Observer<Object> loadMoreObserver() {
@@ -391,10 +382,18 @@ public class ConversationsPresenter {
     }
 
     private static class ConversationMessageAction implements ConversationAction {
-        private final ChatMessage mPusherMessage;
+        private final ChatMessage chatMessage;
 
         public ConversationMessageAction(ChatMessage pusherMessage) {
-            mPusherMessage = pusherMessage;
+            chatMessage = pusherMessage;
+        }
+    }
+
+    private static class ConversationUpdateAction implements ConversationAction {
+        private final PusherConversationUpdate mConversationUpdate;
+
+        public ConversationUpdateAction(PusherConversationUpdate conversationUpdate) {
+            mConversationUpdate = conversationUpdate;
         }
     }
 
