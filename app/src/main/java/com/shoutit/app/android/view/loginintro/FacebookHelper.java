@@ -316,12 +316,14 @@ public class FacebookHelper {
         });
     }
 
-    public static void showAppInviteDialog(@Nonnull Activity activity, @Nonnull String appLinkUrl,
-                                           @Nonnull CallbackManager callbackManager, @Nullable String userId) {
+    public static void showAppInviteDialog(@Nonnull Activity activity,
+                                           @Nonnull String appLinkUrl,
+                                           @Nonnull CallbackManager callbackManager,
+                                           @Nullable String promotionalCode) {
         if (AppInviteDialog.canShow()) {
             final AppInviteContent content = new AppInviteContent.Builder()
                     .setApplinkUrl(appLinkUrl)
-                    .setPromotionDetails("InviteFriends",  "InviteFriends")
+                    .setPromotionDetails("InviteFriendsPromoCode",  promotionalCode)
                     .build();
 
             AppInviteDialog appInviteDialog = new AppInviteDialog(activity);
@@ -344,7 +346,7 @@ public class FacebookHelper {
                 }
             });
 
-            appInviteDialog.show(activity, content);
+            appInviteDialog.show(content);
         }
     }
 }
