@@ -1,12 +1,10 @@
 package com.shoutit.app.android.mixpanel;
 
-import android.app.Activity;
 import android.content.Context;
 
 import com.appunite.rx.functions.Functions1;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.shoutit.app.android.UserPreferences;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForApplication;
 import com.shoutit.app.android.utils.BuildTypeUtils;
 import com.shoutit.app.android.utils.LogHelper;
@@ -17,8 +15,6 @@ import org.json.JSONObject;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
-import rx.functions.Action1;
-
 public class MixPanel {
     private static final String TAG = MixPanel.class.getSimpleName();
 
@@ -26,9 +22,6 @@ public class MixPanel {
     private static final String DEVELOPMENT = "d2de0109a8de7237dede66874c7b8951";
     private static final String LOCAL = "a5774a99b9068ae66129859421ade687";
     private static final String API_CLIENT = "shoutit-android";
-
-    private static final String PEOPLE_FIELD_USER_NAME = "username";
-    private static final String PEOPLE_FIELD_EMAIL = "email";
 
     /**
      * EVENTS
@@ -55,15 +48,14 @@ public class MixPanel {
     }
 
     public void initMixPanel() {
-        userPreferences.getUserObservable()
-                .filter(Functions1.isNotNull())
-                .distinctUntilChanged()
-                .subscribe(user -> {
-                    mixpanel.identify(user.getId());
-                    mixpanel.getPeople().identify(user.getId());
-                    mixpanel.getPeople().set(PEOPLE_FIELD_USER_NAME, user.getUsername());
-                    mixpanel.getPeople().set(PEOPLE_FIELD_EMAIL, user.getEmail());
-                });
+        if (userPreferences.isNormalUser()) {
+            userPreferences.getUserObservable()
+                    .filter(Functions1.isNotNull())
+                    .distinctUntilChanged()
+                    .subscribe(user -> {
+                        mixpanel.identify(user.getId());
+                    });
+        }
     }
 
     private String getToken() {
@@ -108,9 +100,5 @@ public class MixPanel {
 
     private void logError(Throwable throwable) {
         LogHelper.logThrowable(TAG, "Cannot add property to json", throwable);
-    }
-
-    public void showNotificationIfAvailable(@Nonnull Activity activity) {
-        mixpanel.getPeople().showNotificationIfAvailable(activity);
     }
 }
