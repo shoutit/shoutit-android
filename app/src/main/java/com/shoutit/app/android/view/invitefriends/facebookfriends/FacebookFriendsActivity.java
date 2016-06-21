@@ -14,7 +14,6 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
-import com.shoutit.app.android.view.invitefriends.InviteFriendsFragment;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.profileslist.BaseProfilesListActivity;
@@ -57,17 +56,20 @@ public class FacebookFriendsActivity extends BaseProfilesListActivity {
                             R.string.facebook_friends_permission_error, Snackbar.LENGTH_LONG).show();
                 });
 
-        presenter.getOpenInviteClickedObservable()
-                .compose(bindToLifecycle())
-                .subscribe(o -> {
-                    FacebookHelper.showAppInviteDialog(this, FacebookHelper.FACEBOOK_SHARE_APP_LINK, callbackManager, "sd");
-                });
-
         presenter.getActionOnlyForLoggedInUser()
                 .compose(bindToLifecycle())
                 .subscribe(ColoredSnackBar.errorSnackBarAction(
                         ColoredSnackBar.contentView(this),
                         R.string.error_action_only_for_logged_in_user));
+
+        presenter.getInvitationCodeObservable()
+                .compose(bindToLifecycle())
+                .subscribe(invitationCode -> {
+                    FacebookHelper.showAppInviteDialog(this,
+                            FacebookHelper.FACEBOOK_SHARE_APP_LINK,
+                            callbackManager,
+                            invitationCode);
+                });
     }
 
     protected void setUpToolbar() {

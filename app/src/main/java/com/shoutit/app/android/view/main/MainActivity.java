@@ -43,7 +43,6 @@ import com.shoutit.app.android.view.discover.DiscoverActivity;
 import com.shoutit.app.android.view.discover.OnNewDiscoverSelectedListener;
 import com.shoutit.app.android.view.home.HomeFragment;
 import com.shoutit.app.android.view.intro.IntroActivity;
-import com.shoutit.app.android.view.loginintro.FacebookHelper;
 import com.shoutit.app.android.view.postlogininterest.PostLoginInterestActivity;
 import com.shoutit.app.android.view.search.main.MainSearchActivity;
 import com.shoutit.app.android.view.signin.LoginActivity;
@@ -131,7 +130,6 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
         }
 
         deepLinksHelper.checkForDeepLinksIntent(getIntent());
-        FacebookHelper.checkForAppLinks(this, getIntent());
 
         if (mUserPreferences.isNormalUser()) {
             subscribeToStats();
@@ -142,7 +140,6 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         deepLinksHelper.checkForDeepLinksIntent(intent);
-        FacebookHelper.checkForAppLinks(this, getIntent());
     }
 
     private void registerToGcm() {

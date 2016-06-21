@@ -13,13 +13,17 @@ public class BaseLoginRequest {
     private final String mixpanelDistinctId;
     private final String grantType;
     private final LoginUser user;
+    @Nullable
+    private final String invitationCode;
 
     public BaseLoginRequest(@Nonnull String mixpanelDistinctId,
                             @NonNull String grantType,
-                            @Nullable LoginUser user) {
+                            @Nullable LoginUser user,
+                            @Nullable String invitationCode) {
         this.mixpanelDistinctId = mixpanelDistinctId;
         this.grantType = grantType;
         this.user = user;
+        this.invitationCode = invitationCode;
     }
 
     public String getClientId() {

@@ -80,7 +80,7 @@ public class LoginPresenter {
                                 .zip(mEmailSubject.filter(getNotEmptyFunc1()), mPasswordSubject.filter(getNotEmptyFunc1()), new Func2<String, String, EmailLoginRequest>() {
                                     @Override
                                     public EmailLoginRequest call(String email, String password) {
-                                        return new EmailLoginRequest(email, password, LoginUser.loginUser(location), mixPanel.getDistinctId());
+                                        return new EmailLoginRequest(email, password, LoginUser.loginUser(location), mixPanel.getDistinctId(), null);
                                     }
                                 })
                                 .first();

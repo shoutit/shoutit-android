@@ -21,8 +21,9 @@ public class EmailSignupRequest extends BaseLoginRequest {
                               @NonNull String email,
                               @NonNull String password,
                               @Nullable LoginUser user,
-                              @NonNull String mixpanelDistinctId) {
-        super(mixpanelDistinctId, SHOUTIT_SIGNUP, user);
+                              @NonNull String mixpanelDistinctId,
+                              @Nullable String invitationCode) {
+        super(mixpanelDistinctId, SHOUTIT_SIGNUP, user, invitationCode);
         this.name = name;
         this.email = email;
         this.password = password;

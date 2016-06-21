@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.facebook.CallbackManager;
+import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
@@ -30,8 +31,10 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.functions.Action1;
 
 public class InviteFriendsFragment extends BaseFragment {
 
@@ -40,6 +43,11 @@ public class InviteFriendsFragment extends BaseFragment {
 
     @Inject
     UserPreferences userPreferences;
+    @Inject
+    InviteFriendsPresenter presenter;
+
+    @Bind(R.id.base_progress)
+    View progressView;
 
     @Nonnull
     public static Fragment newInstance() {
@@ -58,6 +66,28 @@ public class InviteFriendsFragment extends BaseFragment {
         View view = inflater.inflate(R.layout.invite_friends_fragment, container, false);
         ButterKnife.bind(this, view);
         return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        presenter.getInvitationCodeObservable()
+                .compose(bindToLifecycle())
+                .subscribe(invitationCode -> {
+                    FacebookHelper.showAppInviteDialog(getActivity(),
+                            FacebookHelper.FACEBOOK_SHARE_APP_LINK,
+                            callbackManager,
+                            invitationCode);
+                });
+
+        presenter.getProgressObservable()
+                .compose(bindToLifecycle())
+                .subscribe(RxView.visibility(progressView));
+
+        presenter.getErrorObservable()
+                .compose(bindToLifecycle())
+                .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(getActivity())));
     }
 
     @Override
@@ -95,13 +125,7 @@ public class InviteFriendsFragment extends BaseFragment {
                 }
                 break;
             case R.id.invite_friends_invite_facebook:
-                final User currentUser = userPreferences.getUser();
-                final String userId = currentUser == null ? null : currentUser.getId();
-
-                FacebookHelper.showAppInviteDialog(getActivity(),
-                        FacebookHelper.FACEBOOK_SHARE_APP_LINK,
-                        callbackManager,
-                        userId);
+                presenter.initFbFriendInvite();
                 break;
             case R.id.invite_friends_invite_twitter:
                 shareThroughTwitter();

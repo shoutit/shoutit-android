@@ -2,8 +2,6 @@ package com.shoutit.app.android.view.loginintro;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -40,12 +38,10 @@ import java.util.Set;
 
 import javax.annotation.Nonnull;
 
-import bolts.AppLinks;
 import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Scheduler;
 import rx.Subscriber;
-import rx.functions.Action1;
 import rx.functions.Func1;
 
 public class FacebookHelper {
@@ -80,27 +76,25 @@ public class FacebookHelper {
         FacebookSdk.sdkInitialize(context, this::refreshTokenIfNeeded);
     }
 
-    public static void checkForAppLinks(@Nonnull Context context, @Nonnull Intent intent) {
-        LogHelper.logIfDebug(TAG, "Checking for App Links");
-        final Uri targetUrl = AppLinks.getTargetUrlFromInboundIntent(context, intent);
-
-        if (targetUrl != null) {
-            LogHelper.logIfDebug(TAG, "Target url != null");
-            context.startActivity(new Intent(Intent.ACTION_VIEW, targetUrl));
-        } else {
-            AppLinkData.fetchDeferredAppLinkData(context, FacebookHelper::processAppLinkData);
-        }
-    }
-
-    private static void processAppLinkData(@Nullable AppLinkData appLinkData) {
-        LogHelper.logIfDebug(TAG, "processing App Link data");
-        if (appLinkData == null) {
-            return;
-        }
-
-        if ("InviteFriends".equals(appLinkData.getPromotionCode())) {
-            LogHelper.logIfDebug(TAG, "ref data" + appLinkData.getRef() + " reference: " + appLinkData.getRefererData().toString());
-        }
+    @Nonnull
+    public static Observable<String> getPromotionalCodeObservable(@Nonnull Context context) {
+        return Observable.create(new Observable.OnSubscribe<String>() {
+            @Override
+            public void call(Subscriber<? super String> subscriber) {
+                AppLinkData.fetchDeferredAppLinkData(context, appLinkData -> {
+                    if (!subscriber.isUnsubscribed()) {
+                        if (appLinkData == null || appLinkData.getPromotionCode() == null) {
+                            subscriber.onNext(null);
+                            subscriber.onCompleted();
+                        } else {
+                            LogHelper.logIfDebug(TAG, "Received promotionCode: " + appLinkData.getPromotionCode());
+                            subscriber.onNext(appLinkData.getPromotionCode());
+                            subscriber.onCompleted();
+                        }
+                    }
+                });
+            }
+        });
     }
 
     private void refreshTokenIfNeeded() {
