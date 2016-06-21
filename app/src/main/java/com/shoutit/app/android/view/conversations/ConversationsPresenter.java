@@ -41,6 +41,7 @@ import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
 import rx.Subscription;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.subjects.PublishSubject;
@@ -132,41 +133,80 @@ public class ConversationsPresenter {
 
         mListener.showProgress(showProgress);
 
-        final Observable<ConversationAction> conversationUpdateObservable = mPusherHelper
-                .getConverstionUpdateObservable()
-                .map((Func1<PusherConversationUpdate, ConversationAction>) ConversationUpdateAction::new)
-                .observeOn(mUiScheduler);
+        final Observable<List<ConversationItem>> conversationsListObservable = getListObservable();
 
-        final Observable<Map<String, ConversationItem>> requestObservable = requestSubject
-                .startWith(new Object())
-                .lift(loadMoreOperator)
-                .compose(MoreOperators.<ConversationsResponse>refresh(mRefreshConversationBus.getRefreshConversationBus()))
-                .map((Func1<ConversationsResponse, List<ConversationItem>>) conversationsResponse -> ImmutableList.copyOf(Iterables.transform(conversationsResponse.getResults(), new Function<Conversation, ConversationItem>() {
-                    @Nullable
-                    @Override
-                    public ConversationItem apply(@Nullable Conversation input) {
-                        return ConversationItem.fromConversation(input);
-                    }
-                })))
-                .subscribeOn(mNetworkScheduler)
-                .observeOn(mUiScheduler)
-                .flatMap(conversationsResponse -> Observable.from(conversationsResponse)
-                        .toMap((Func1<ConversationItem, String>) ConversationItem::getId));
+        mSubscription = conversationsListObservable
+                .subscribe(
+                        getConversationsSuccessCallback(),
+                        getConversationsErrorCallback());
+    }
 
-        final Observable<List<ConversationItem>> conversationsListObservable = requestObservable
+    @NonNull
+    private Action1<Throwable> getConversationsErrorCallback() {
+        return throwable -> {
+            mListener.showProgress(false);
+            mListener.error();
+        };
+    }
+
+    @NonNull
+    private Action1<List<ConversationItem>> getConversationsSuccessCallback() {
+        return conversations -> {
+            showProgress = false;
+            mListener.showProgress(false);
+
+            if (conversations.isEmpty()) {
+                mListener.emptyList();
+            } else {
+                final List<ConversationItem> list = Lists.newArrayList(conversations);
+                Collections.sort(list, (lhs, rhs) -> lhs.getModifiedAt() >= rhs.getModifiedAt() ? -1 : 1);
+                final ImmutableList<BaseAdapterItem> items = ImmutableList.copyOf(
+                        Iterables.transform(
+                                list,
+                                new Function<ConversationItem, BaseAdapterItem>() {
+                                    @Nullable
+                                    @Override
+                                    public BaseAdapterItem apply(@Nullable ConversationItem input) {
+                                        assert input != null;
+                                        return getConversationItem(input);
+                                    }
+                                }));
+
+                mListener.setData(items);
+            }
+        };
+    }
+
+    @NonNull
+    private Observable<List<ConversationItem>> getListObservable() {
+        final Observable<ConversationAction> conversationUpdateObservable = getPusherConversations();
+
+        final Observable<Map<String, ConversationItem>> requestObservable = getRemoteConversations();
+
+        final Observable<ConversationAction> localMessagesObservable = getLocalConversations();
+
+        return requestObservable
                 .switchMap(conversationsMap -> conversationUpdateObservable.startWith((ConversationAction) null)
                         .mergeWith(conversationActionSubject)
-                        .mergeWith(mLocalMessageBus.getLocalMessageObservable().map((Func1<LocalMessageBus.LocalMessage, ConversationAction>) ConversationMessageAction::new))
+                        .mergeWith(localMessagesObservable)
                         .scan(conversationsMap, new Func2<Map<String, ConversationItem>, ConversationAction, Map<String, ConversationItem>>() {
                             @Override
                             public Map<String, ConversationItem> call(Map<String, ConversationItem> conversationsMap,
                                                                       ConversationAction newMessage) {
+                                return getStringConversationItemMap(conversationsMap, newMessage);
+                            }
+
+                            private Map<String, ConversationItem> getStringConversationItemMap(Map<String, ConversationItem> conversationsMap, ConversationAction newMessage) {
                                 if (newMessage == null) {
                                     return conversationsMap;
                                 } else if (newMessage instanceof ConversationMessageAction) {
                                     final ChatMessage chatMessage = ((ConversationMessageAction) newMessage).chatMessage;
                                     final ConversationItem conversationItem = conversationsMap.get(chatMessage.getConversationId());
-                                    return updateMapWithNewMessage(conversationsMap, conversationItem.withUpdatedLastMessage(chatMessage.getText(), chatMessage.getCreatedAt(), chatMessage.getProfile().getId().equals(mUserId)));
+                                    if (conversationItem != null) { // FIXME this check is for public chats screen, proper implementation requires ChatMessage to contain isPublicChat() and filtering out for localMessageBus
+                                        return updateMapWithNewMessage(conversationsMap, conversationItem.withUpdatedLastMessage(chatMessage.getText(), chatMessage.getCreatedAt(), chatMessage.getProfile().getId().equals(mUserId)));
+                                    } else {
+                                        return conversationsMap;
+                                    }
                                 } else if (newMessage instanceof ConversationUpdateAction) {
                                     return updateMapWithNewMessage(conversationsMap, ConversationItem.fromPusherUpdateConversation(((ConversationUpdateAction) newMessage).mConversationUpdate));
                                 } else if (newMessage instanceof ConversationReadAction) {
@@ -191,35 +231,39 @@ public class ConversationsPresenter {
                             }
                         }))
                 .map((Func1<Map<String, ConversationItem>, List<ConversationItem>>) conversationsMap -> ImmutableList.copyOf(conversationsMap.values()));
+    }
 
-        mSubscription = conversationsListObservable
-                .subscribe(conversations -> {
-                    showProgress = false;
-                    mListener.showProgress(false);
+    @NonNull
+    private Observable<ConversationAction> getLocalConversations() {
+        return mLocalMessageBus
+                .getLocalMessageObservable()
+                .map((Func1<LocalMessageBus.LocalMessage, ConversationAction>) ConversationMessageAction::new);
+    }
 
-                    if (conversations.isEmpty()) {
-                        mListener.emptyList();
-                    } else {
-                        final List<ConversationItem> list = Lists.newArrayList(conversations);
-                        Collections.sort(list, (lhs, rhs) -> lhs.getModifiedAt() >= rhs.getModifiedAt() ? -1 : 1);
-                        final ImmutableList<BaseAdapterItem> items = ImmutableList.copyOf(
-                                Iterables.transform(
-                                        list,
-                                        new Function<ConversationItem, BaseAdapterItem>() {
-                                            @Nullable
-                                            @Override
-                                            public BaseAdapterItem apply(@Nullable ConversationItem input) {
-                                                assert input != null;
-                                                return getConversationItem(input);
-                                            }
-                                        }));
+    private Observable<ConversationAction> getPusherConversations() {
+        return mPusherHelper
+                .getConverstionUpdateObservable()
+                .filter(conversationUpdate -> isMyConversationsList || conversationUpdate.isPublicChat())
+                .map((Func1<PusherConversationUpdate, ConversationAction>) ConversationUpdateAction::new)
+                .observeOn(mUiScheduler);
+    }
 
-                        mListener.setData(items);
+    private Observable<Map<String, ConversationItem>> getRemoteConversations() {
+        return requestSubject
+                .startWith(new Object())
+                .lift(loadMoreOperator)
+                .compose(MoreOperators.<ConversationsResponse>refresh(mRefreshConversationBus.getRefreshConversationBus()))
+                .map((Func1<ConversationsResponse, List<ConversationItem>>) conversationsResponse -> ImmutableList.copyOf(Iterables.transform(conversationsResponse.getResults(), new Function<Conversation, ConversationItem>() {
+                    @Nullable
+                    @Override
+                    public ConversationItem apply(@Nullable Conversation input) {
+                        return ConversationItem.fromConversation(input);
                     }
-                }, throwable -> {
-                    mListener.showProgress(false);
-                    mListener.error();
-                });
+                })))
+                .subscribeOn(mNetworkScheduler)
+                .observeOn(mUiScheduler)
+                .flatMap(conversationsResponse -> Observable.from(conversationsResponse)
+                        .toMap((Func1<ConversationItem, String>) ConversationItem::getId));
     }
 
     @NonNull
@@ -231,7 +275,7 @@ public class ConversationsPresenter {
         final boolean isUnread = conversation.getUnreadMessagesCount() > 0;
 
         return new ConversationAdapterItem(conversation.getId(), conversation.getTitle(), conversation.getSubTitle(),
-                conversation.getLastMessageSummary(), elapsedTime, conversation.getImage(), isUnread, conversation.getType());
+                conversation.getLastMessageSummary(), elapsedTime, conversation.getImage(), isUnread, Conversation.ABOUT_SHOUT_TYPE.equals(conversation.getType()), Conversation.PUBLIC_CHAT_TYPE.equals(conversation.getType()));
     }
 
     public Observer<Object> loadMoreObserver() {
@@ -264,7 +308,8 @@ public class ConversationsPresenter {
         private final String time;
         private final String image;
         private final boolean mIsUnread;
-        private final String conversationType;
+        private final boolean mIsShoutChat;
+        private final boolean mIsPublicChat;
 
         public ConversationAdapterItem(String id,
                                        String title,
@@ -273,7 +318,8 @@ public class ConversationsPresenter {
                                        String time,
                                        String image,
                                        boolean isUnread,
-                                       String conversationType) {
+                                       boolean isShoutChat,
+                                       boolean isPublicChat) {
             this.id = id;
             this.title = title;
             this.subTitle = subTitle;
@@ -281,7 +327,8 @@ public class ConversationsPresenter {
             this.time = time;
             this.image = image;
             mIsUnread = isUnread;
-            this.conversationType = conversationType;
+            mIsShoutChat = isShoutChat;
+            mIsPublicChat = isPublicChat;
         }
 
         @Override
@@ -292,6 +339,8 @@ public class ConversationsPresenter {
             final ConversationAdapterItem that = (ConversationAdapterItem) o;
 
             if (mIsUnread != that.mIsUnread) return false;
+            if (mIsShoutChat != that.mIsShoutChat) return false;
+            if (mIsPublicChat != that.mIsPublicChat) return false;
             if (id != null ? !id.equals(that.id) : that.id != null) return false;
             if (title != null ? !title.equals(that.title) : that.title != null) return false;
             if (subTitle != null ? !subTitle.equals(that.subTitle) : that.subTitle != null)
@@ -299,8 +348,7 @@ public class ConversationsPresenter {
             if (message != null ? !message.equals(that.message) : that.message != null)
                 return false;
             if (time != null ? !time.equals(that.time) : that.time != null) return false;
-            if (image != null ? !image.equals(that.image) : that.image != null) return false;
-            return conversationType != null ? conversationType.equals(that.conversationType) : that.conversationType == null;
+            return image != null ? image.equals(that.image) : that.image == null;
 
         }
 
@@ -313,7 +361,8 @@ public class ConversationsPresenter {
             result = 31 * result + (time != null ? time.hashCode() : 0);
             result = 31 * result + (image != null ? image.hashCode() : 0);
             result = 31 * result + (mIsUnread ? 1 : 0);
-            result = 31 * result + (conversationType != null ? conversationType.hashCode() : 0);
+            result = 31 * result + (mIsShoutChat ? 1 : 0);
+            result = 31 * result + (mIsPublicChat ? 1 : 0);
             return result;
         }
 
@@ -355,12 +404,12 @@ public class ConversationsPresenter {
             return mIsUnread;
         }
 
-        public boolean isShoutChat() {
-            return com.shoutit.app.android.api.model.Conversation.ABOUT_SHOUT_TYPE.equals(conversationType);
+        public boolean isPublicChat() {
+            return mIsPublicChat;
         }
 
-        public boolean isPublicChat() {
-            return com.shoutit.app.android.api.model.Conversation.PUBLIC_CHAT_TYPE.equals(conversationType);
+        public boolean isShoutChat() {
+            return mIsShoutChat;
         }
 
         public void click() {
