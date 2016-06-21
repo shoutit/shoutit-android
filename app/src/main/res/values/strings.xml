@@ -680,5 +680,7 @@
 
     <!-- Transactions -->
     <string name="transactions_title">Credit Transactions</string>
+    <string name="menu_item_pages">Pages</string>
+    <string name="menu_item_admins">Admins</string>
 
 </resources>
