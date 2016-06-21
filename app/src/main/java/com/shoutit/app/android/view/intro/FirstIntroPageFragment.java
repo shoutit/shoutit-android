@@ -6,7 +6,7 @@ public class FirstIntroPageFragment extends IntroFragment {
 
     @Override
     protected int getLogoResId() {
-        return R.drawable.ic_logo;
+        return R.drawable.logo_white;
     }
 
     @Override
@@ -16,6 +16,6 @@ public class FirstIntroPageFragment extends IntroFragment {
 
     @Override
     protected int getSecondTextResId() {
-        return R.string.intro_buy;
+        return R.string.empty_field;
     }
 }

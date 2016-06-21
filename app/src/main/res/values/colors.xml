@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Base theme colors -->
-    <color name="colorPrimary">#4CAF50</color>
+    <color name="colorPrimary">#35dd69</color>
     <color name="colorPrimaryDark">#3C8C40</color>
     <color name="colorAccent">#4CAF50</color>
 
@@ -23,8 +23,8 @@
     <color name="green_tab_text_color">#b2ffffff</color>
 
     <!-- Intro -->
-    <color name="intro_gradient_start">#43cea2</color>
-    <color name="intro_gradient_end">#0072ff</color>
+    <color name="intro_gradient_start">#35dd69</color>
+    <color name="intro_gradient_end">#40c4ff</color>
     <color name="intro_buy">#b2ffffff</color>
     <color name="intro_status_bar">#34000000</color>
     <color name="intro_login_normal">#ffffff</color>
@@ -58,6 +58,8 @@
     <color name="shout_bottom_bar">#de000000</color>
     <color name="shout_item_dark">#10000000</color>
     <color name="shout_promoted_background">#26ffd700</color>
+    <color name="shout_offer_popup">#40c4ff</color>
+    <color name="shout_request_popup">#ff5252</color>
 
     <!-- Profile -->
     <color name="profile_name">#de000000</color>
