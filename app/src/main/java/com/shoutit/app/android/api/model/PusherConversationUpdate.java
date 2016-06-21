@@ -2,6 +2,9 @@ package com.shoutit.app.android.api.model;
 
 public class PusherConversationUpdate {
 
+    public static final String ABOUT_SHOUT_TYPE = "about_shout";
+    public static final String PUBLIC_CHAT_TYPE = "public_chat";
+
     private final String id;
     private final Display display;
     private final int unreadMessagesCount;
@@ -46,6 +49,10 @@ public class PusherConversationUpdate {
 
     public String getType() {
         return type;
+    }
+
+    public boolean isPublicChat() {
+        return PUBLIC_CHAT_TYPE.equals(type);
     }
 
     public int getUnreadMessagesCount() {

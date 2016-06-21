@@ -155,28 +155,6 @@ public class PusherHelper {
                 });
     }
 
-    public Observable<PusherMessage> getNewMessagesObservable() {
-        return Observable
-                .create(new Observable.OnSubscribe<PusherMessage>() {
-                    @Override
-                    public void call(final Subscriber<? super PusherMessage> subscriber) {
-                        getProfileChannel().bind(EVENT_NEW_MESSAGE, new PresenceChannelEventListenerAdapter() {
-
-                            @Override
-                            public void onEvent(String channelName, String eventName, String data) {
-                                try {
-                                    final PusherMessage pusherMessage = mGson.getAdapter(PusherMessage.class).fromJson(data);
-                                    logMessage(pusherMessage, "profile / getNewMessagesObservable");
-                                    subscriber.onNext(pusherMessage);
-                                } catch (IOException e) {
-                                    subscriber.onError(e);
-                                }
-                            }
-                        });
-                    }
-                });
-    }
-
     public Observable<NotificationsResponse.Notification> getNewNotificationObservable() {
         return Observable
                 .create(new Observable.OnSubscribe<NotificationsResponse.Notification>() {
