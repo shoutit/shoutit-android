@@ -329,6 +329,9 @@
             android:name="com.mixpanel.android.MPConfig.EnableDebugLogging"
             android:value="true" />
 
+        <meta-data android:name="com.mixpanel.android.MPConfig.AutoShowMixpanelUpdates"
+            android:value="false" />
+
         <receiver
             android:name="com.mixpanel.android.mpmetrics.GCMReceiver"
             android:permission="com.google.android.c2dm.permission.SEND" >
