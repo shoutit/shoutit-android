@@ -158,13 +158,10 @@ public class MenuHandler {
         userPreferences.getUserObservable()
                 .filter(user -> user != null)
                 .subscribe(user -> {
-                    if (user.isUser(user)) {
-                        pagesItem.setVisibility(View.VISIBLE);
-                        adminsItem.setVisibility(View.GONE);
-                    } else {
-                        pagesItem.setVisibility(View.GONE);
-                        adminsItem.setVisibility(View.VISIBLE);
-                    }
+                    pagesItem.setVisibility(user.isUser(user) ?
+                            View.VISIBLE : View.GONE);
+                    adminsItem.setVisibility(user.isUser(user) ?
+                            View.GONE : View.VISIBLE);
                 });
 
         setData(id);
