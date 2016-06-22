@@ -680,4 +680,8 @@
     <!-- Transactions -->
     <string name="transactions_title">Credit Transactions</string>
 
+    <!-- Pages -->
+    <string name="pages_my_pages_tab">My pages</string>
+    <string name="pages_public_pages_tab">Public pages</string>
+
 </resources>
