@@ -303,7 +303,7 @@
 <!-- Post Signup Second -->
 <string name="post_signup_next">"التالي"</string>
 <string name="post_signup_skip">"تخطي"</string>
-<string name="post_signup_suggested_users">"مستخدمون مقترحون"</string>
+<string name="post_signup_suggested_users">"مستخدمين مقترحين"</string>
 <string name="post_signup_suggested_pages">"صفحات مقترحة"</string>
 <string name="post_signup_done">"تم"</string>
 
@@ -568,7 +568,7 @@
 
 <!-- Facebook friends -->
 <string name="facebook_friends_ab_title">"أصدقاء فيسبوك"</string>
-<string name="facebook_friends_no_friends">"لا"</string>
+<string name="facebook_friends_no_friends">"لا يوجد لديك اصدقاء فيسبوك يستخدمون شاوت ات. قم بدعوتهم!"</string>
 <string name="facebook_friends_permission_error">"لا توجد الصلاحية المطلوبة لمعرفة اصدقاء الفيسبوك الذين يستخدمون شاوت ات"</string>
 
 <!-- Invite Friends -->
@@ -589,4 +589,12 @@
 <string name="contacts_friends_ab_title">"أصدقاء من دفتر الهاتف"</string>
 <string name="invite_app_invite_text">"بيع و اشتري وانت تدردش على شاوت ات! حمل التطبيق الآن shoutit.com/app #شاوت_ات #Shoutit"</string>
 <string name="invite_error">"لم نتمكن من ارسال الدعوة"</string>
+<string name="permission_camera_create_shout_explanation">"صلاحية التقاط الصور و تسجيل الفيديو مطلوبة"</string>
+<string name="permission_record_audio_explanation">"صلاحية تسجيل الصوت مطلوبة لتسجيل الفيديو"</string>
+<string name="edit_profile_header_gender">"الجنس"</string>
+<string name="edit_profile_header_gender_not_specified">"غير محدد"</string>
+<string name="edit_profile_header_gender_male">"ذكر"</string>
+<string name="edit_profile_header_gender_female">"انثى"</string>
+<string name="edit_profile_header_gender_other">"غير ذلك"</string>
+<string name="video_call_calling">"مكالمة…"</string>
 </resources>

@@ -70,6 +70,7 @@ public class TransactionsPresenter {
     private final Context mResources;
     private CompositeSubscription mCompositeSubscription;
     private final PublishSubject<Object> requestSubject = PublishSubject.create();
+    private Listener mListener;
 
     @Inject
     public TransactionsPresenter(@NonNull ApiService apiService, @NetworkScheduler Scheduler networkScheduler, @UiScheduler Scheduler uiScheduler, @Nonnull @ForActivity Context context) {
@@ -80,6 +81,8 @@ public class TransactionsPresenter {
     }
 
     public void register(Listener listener) {
+        mListener = listener;
+        listener.progress(true);
         final Observable<List<BaseAdapterItem>> dataObservable = requestSubject
                 .startWith(new Object())
                 .lift(loadMoreOperator)
@@ -104,14 +107,20 @@ public class TransactionsPresenter {
                                 end = range.getLength();
                             }
 
-                            return new TransactionItem(input.getId(), createSpannedText(display.getText(), offset, end), getTime(input.getCreatedAt()), input.isOut());
+                            return new TransactionItem(input.getId(), createSpannedText(display.getText(), offset, end), getTime(input.getCreatedAt()), input.isOut(), input.getAppUrl());
                         }
                     });
                     return ImmutableList.copyOf(transform);
                 });
 
         mCompositeSubscription = new CompositeSubscription(dataObservable
-                .subscribe(listener::setData));
+                .subscribe((transactions) -> {
+                    listener.progress(false);
+                    listener.setData(transactions);
+                }, throwable -> {
+                    listener.progress(false);
+                    listener.error();
+                }));
     }
 
     @NonNull
@@ -139,24 +148,34 @@ public class TransactionsPresenter {
 
     public void unregister() {
         mCompositeSubscription.unsubscribe();
+        mListener = null;
     }
 
     public interface Listener {
+
         void setData(List<BaseAdapterItem> transactions);
+
+        void error();
+
+        void progress(boolean show);
+
+        void startActivity(String appUrl);
     }
 
-    public static class TransactionItem implements BaseAdapterItem {
+    public class TransactionItem implements BaseAdapterItem {
 
         private final String id;
         private final CharSequence text;
         private final String time;
         private final boolean isOut;
+        private final String appUrl;
 
-        public TransactionItem(String id, CharSequence text, String time, boolean isOut) {
+        public TransactionItem(String id, CharSequence text, String time, boolean isOut, String appUrl) {
             this.id = id;
             this.text = text;
             this.time = time;
             this.isOut = isOut;
+            this.appUrl = appUrl;
         }
 
         public CharSequence getText() {
@@ -207,6 +226,16 @@ public class TransactionsPresenter {
         @Override
         public boolean same(@Nonnull BaseAdapterItem baseAdapterItem) {
             return baseAdapterItem.equals(this);
+        }
+
+        public void click() {
+            startActivity(appUrl);
+        }
+    }
+
+    private void startActivity(@Nullable String appUrl) {
+        if (appUrl != null) {
+            mListener.startActivity(appUrl);
         }
     }
 }

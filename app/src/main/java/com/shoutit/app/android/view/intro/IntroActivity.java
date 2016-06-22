@@ -18,7 +18,6 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.GuestSignupRequest;
-import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.login.LoginUser;
 import com.shoutit.app.android.dagger.ActivityModule;
@@ -41,9 +40,6 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Observable;
-import rx.functions.Action0;
-import rx.functions.Action1;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 public class IntroActivity extends BaseActivity {
@@ -122,6 +118,7 @@ public class IntroActivity extends BaseActivity {
                 .doOnTerminate(() -> progress.setVisibility(View.GONE))
                 .subscribe(signResponse -> {
                     mUserPreferences.setGuestLoggedIn(signResponse.getAccessToken(), signResponse.getRefreshToken());
+                    finish();
                     startActivity(MainActivity.newIntent(IntroActivity.this));
                 }, throwable -> {
                     ColoredSnackBar.error(ColoredSnackBar.contentView(IntroActivity.this), R.string.intro_fail_login, Snackbar.LENGTH_SHORT).show();

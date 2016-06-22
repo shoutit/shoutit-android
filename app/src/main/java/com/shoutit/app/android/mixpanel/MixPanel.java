@@ -5,7 +5,6 @@ import android.content.Context;
 import com.appunite.rx.functions.Functions1;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.shoutit.app.android.UserPreferences;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForApplication;
 import com.shoutit.app.android.utils.BuildTypeUtils;
 import com.shoutit.app.android.utils.LogHelper;
@@ -15,8 +14,6 @@ import org.json.JSONObject;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-
-import rx.functions.Action1;
 
 public class MixPanel {
     private static final String TAG = MixPanel.class.getSimpleName();
@@ -51,15 +48,14 @@ public class MixPanel {
     }
 
     public void initMixPanel() {
-        userPreferences.getUserObservable()
-                .filter(Functions1.isNotNull())
-                .distinctUntilChanged()
-                .subscribe(new Action1<User>() {
-                    @Override
-                    public void call(User user) {
+        if (userPreferences.isNormalUser()) {
+            userPreferences.getUserObservable()
+                    .filter(Functions1.isNotNull())
+                    .distinctUntilChanged()
+                    .subscribe(user -> {
                         mixpanel.identify(user.getId());
-                    }
-                });
+                    });
+        }
     }
 
     private String getToken() {
