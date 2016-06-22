@@ -9,6 +9,7 @@
     <string name="terms_of_service">Terms of Service</string>
     <string name="facebook_app_id" translatable="false">353625811317277</string>
     <string name="exit_text">Press BACK again to exit</string>
+    <string name="empty_field"/>
     <plurals name="plural_credits">
         <item quantity="one">%1$d Credit</item>
         <item quantity="other">%1$d Credits</item>
@@ -41,7 +42,7 @@
     <string name="image_video_capture_helper_sd_unmounted_title">Error</string>
 
     <!-- Intro -->
-    <string name="intro_welcome">Welcome To Shoutit</string>
+    <string name="intro_welcome">Buy &amp; Sell while Chatting</string>
     <string name="intro_buy">Buy and Sell while Chatting</string>
     <string name="intro_login">Login</string>
     <string name="intro_skip">Skip</string>
@@ -679,5 +680,7 @@
 
     <!-- Transactions -->
     <string name="transactions_title">Credit Transactions</string>
+    <string name="menu_item_pages">Pages</string>
+    <string name="menu_item_admins">Admins</string>
 
 </resources>

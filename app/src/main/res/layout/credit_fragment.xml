@@ -176,9 +176,9 @@
                         android:id="@+id/credit_listen"
                         style="@style/InviteFriendsItem"
                         android:layout_gravity="center_vertical|start"
-                        android:drawableLeft="@drawable/ic_stop_listening"
+                        android:drawableLeft="@drawable/ic_listening_on"
                         android:drawablePadding="16dp"
-                        android:drawableStart="@drawable/ic_stop_listening"
+                        android:drawableStart="@drawable/ic_listening_on"
                         android:text="@string/credit_listen"/>
 
                 </LinearLayout>

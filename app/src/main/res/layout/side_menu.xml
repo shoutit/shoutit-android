@@ -160,6 +160,26 @@
 
         </RelativeLayout>
 
+        <CheckedTextView
+            android:id="@+id/menu_pages"
+            style="@style/SideMenuItem"
+            android:visibility="gone"
+            android:paddingLeft="16dp"
+            android:paddingStart="16dp"
+            android:drawableStart="@drawable/menu_pages"
+            android:drawableLeft="@drawable/menu_pages"
+            android:text="@string/menu_item_pages" />
+
+        <CheckedTextView
+            android:id="@+id/menu_admins"
+            style="@style/SideMenuItem"
+            android:visibility="gone"
+            android:paddingLeft="16dp"
+            android:paddingStart="16dp"
+            android:drawableStart="@drawable/menu_admins"
+            android:drawableLeft="@drawable/menu_admins"
+            android:text="@string/menu_item_admins" />
+
         <View
             android:layout_width="match_parent"
             android:layout_height="0.5dp"
