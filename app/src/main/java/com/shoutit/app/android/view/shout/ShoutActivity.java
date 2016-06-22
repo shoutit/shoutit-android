@@ -34,7 +34,6 @@ import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.Promotion;
-import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
@@ -386,7 +385,7 @@ public class ShoutActivity extends BaseActivity {
                         R.string.shout_bottom_bar_promoted : R.string.shout_bottom_bar_promote);
 
                 ImageHelper.setStartCompoundRelativeDrawable(callOrPromoteTextView, R.drawable.ic_promote);
-                ImageHelper.setStartCompoundRelativeDrawable(videoCallOrEditTextView, R.drawable.ic_edit_red);
+                ImageHelper.setStartCompoundRelativeDrawable(videoCallOrEditTextView, R.drawable.ic_edit_green);
 
                 videoCallOrEditTextView.setText(R.string.shout_bottom_bar_edit);
 

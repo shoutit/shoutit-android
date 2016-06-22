@@ -2,8 +2,8 @@
 <resources>
     <!-- Base theme colors -->
     <color name="colorPrimary">#35dd69</color>
-    <color name="colorPrimaryDark">#3C8C40</color>
-    <color name="colorAccent">#4CAF50</color>
+    <color name="colorPrimaryDark">#289f43</color>
+    <color name="colorAccent">#35dd69</color>
 
     <!-- Global values -->
     <color name="default_bg_color">#f7f7f7</color>
@@ -99,7 +99,6 @@
     <color name="notification_read_selector_pressed">#96d498</color>
 
     <!-- Video Conversations -->
-    <color name="video_calls_call_button">#4CAF50</color>
     <color name="video_calls_dismiss_call_button">#FF0000</color>
     <color name="video_calls_dismiss_call_button_pressed">#c10101</color>
     <color name="video_calls_semi_transparent_background">#80000000</color>
