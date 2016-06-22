@@ -130,7 +130,7 @@ public class IntroActivity extends BaseActivity {
                 .subscribe(new Action1<SignResponse>() {
                     @Override
                     public void call(SignResponse signResponse) {
-                        mUserPreferences.setGuestLoggedIn(signResponse.getAccessToken(), signResponse.getRefreshToken());
+                        mUserPreferences.setGuestLoggedIn(signResponse.getUser(), signResponse.getAccessToken(), signResponse.getRefreshToken());
                         finish();
                         startActivity(MainActivity.newIntent(IntroActivity.this));
                     }
