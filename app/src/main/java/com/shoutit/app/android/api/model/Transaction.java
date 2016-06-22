@@ -10,12 +10,14 @@ public class Transaction {
     private final long createdAt;
     private final Display display;
     private final String type;
+    private final String appUrl;
 
-    public Transaction(String id, long createdAt, Display display, String type) {
+    public Transaction(String id, long createdAt, Display display, String type, String appUrl) {
         this.id = id;
         this.createdAt = createdAt;
         this.display = display;
         this.type = type;
+        this.appUrl = appUrl;
     }
 
     public long getCreatedAt() {
@@ -36,6 +38,10 @@ public class Transaction {
 
     public boolean isOut() {
         return !type.equals(TYPE_IN);
+    }
+
+    public String getAppUrl() {
+        return appUrl;
     }
 
     public class Display {

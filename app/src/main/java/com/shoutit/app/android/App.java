@@ -140,7 +140,7 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
         AppuniteGcm.initialize(this, GCM_TOKEN)
                 .loggingEnabled(!BuildConfig.DEBUG)
                 .getPushBundleObservable()
-                .subscribe(notificationHelper.sendNotificationAction(this));
+                .subscribe(notificationHelper.sendNotificationAction());
     }
 
     private void setUpPusher() {

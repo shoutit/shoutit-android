@@ -134,8 +134,6 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
         if (mUserPreferences.isNormalUser()) {
             subscribeToStats();
         }
-
-        mixPanel.showNotificationIfAvailable(this);
     }
 
     @Override
