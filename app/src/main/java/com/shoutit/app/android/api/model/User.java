@@ -127,14 +127,8 @@ public class User extends BaseProfile {
                 email, conversation, gender, birthday, newStats, linkedAccounts);
     }
 
-    @Nonnull
-    public Boolean isUser(@Nonnull User user){
+    public boolean isUser(@Nonnull User user){
         return (USER.equals(user.type));
-    }
-
-    @Nonnull
-    public Boolean isPage(@Nonnull User user){
-        return (PAGE.equals(user.type));
     }
 
     public String getId() {
