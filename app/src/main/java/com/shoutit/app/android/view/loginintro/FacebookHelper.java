@@ -317,7 +317,7 @@ public class FacebookHelper {
         if (AppInviteDialog.canShow()) {
             final AppInviteContent content = new AppInviteContent.Builder()
                     .setApplinkUrl(appLinkUrl)
-                    .setPromotionDetails("InviteFriendsPromoCode",  promotionalCode)
+                    .setPromotionDetails(activity.getString(R.string.invite_text_fb),  promotionalCode)
                     .build();
 
             AppInviteDialog appInviteDialog = new AppInviteDialog(activity);

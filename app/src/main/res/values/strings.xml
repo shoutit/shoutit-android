@@ -616,6 +616,7 @@
     <string name="invite_friends_twitter">Twitter</string>
     <string name="invite_friends_share">Share Shoutit App</string>
     <string name="invite_text">Join Shoutit on www.shoutit.com</string>
+    <string name="invite_text_fb">Join Shoutit</string>
     <string name="invite_chooser_text">Select app</string>
     <string name="invite_no_twitter_app">You need the Twitter app to be installed</string>
     <string name="invite_friend_find_friend_dialog">Earn up to 10 Shoutit Credits for finding your friends and listening to them</string>
