@@ -177,26 +177,20 @@ public class LoginIntroActivity extends BaseActivity {
 
     @NonNull
     private Func1<BothParams<String, UserLocation>, Observable<SignResponse>> getCallGoogleApi() {
-        return new Func1<BothParams<String, UserLocation>, Observable<SignResponse>>() {
-            @Override
-            public Observable<SignResponse> call(BothParams<String, UserLocation> bothParams) {
-                return mApiService.googleLogin(new GoogleLogin(bothParams.param1(), LoginUser.loginUser(bothParams.param2()), mixPanel.getDistinctId()))
+        return bothParams -> FacebookHelper.getPromotionalCodeObservable(LoginIntroActivity.this)
+                .flatMap(invitationCode -> mApiService.googleLogin(new GoogleLogin(
+                        bothParams.param1(), LoginUser.loginUser(bothParams.param2()), mixPanel.getDistinctId(), invitationCode))
                         .subscribeOn(Schedulers.io())
-                        .observeOn(MyAndroidSchedulers.mainThread());
-            }
-        };
+                        .observeOn(MyAndroidSchedulers.mainThread()));
     }
 
     @NonNull
     private Func1<BothParams<String, UserLocation>, Observable<SignResponse>> getCallFacebookApi() {
-        return new Func1<BothParams<String, UserLocation>, Observable<SignResponse>>() {
-            @Override
-            public Observable<SignResponse> call(BothParams<String, UserLocation> bothParams) {
-                return mApiService.facebookLogin(new FacebookLogin(bothParams.param1(), LoginUser.loginUser(bothParams.param2()), mixPanel.getDistinctId()))
+        return bothParams -> FacebookHelper.getPromotionalCodeObservable(LoginIntroActivity.this)
+                .flatMap(invitationCode -> mApiService.facebookLogin(new FacebookLogin(
+                        bothParams.param1(), LoginUser.loginUser(bothParams.param2()), mixPanel.getDistinctId(), invitationCode))
                         .subscribeOn(Schedulers.io())
-                        .observeOn(MyAndroidSchedulers.mainThread());
-            }
-        };
+                        .observeOn(MyAndroidSchedulers.mainThread()));
     }
 
     private void loginGoogle() {

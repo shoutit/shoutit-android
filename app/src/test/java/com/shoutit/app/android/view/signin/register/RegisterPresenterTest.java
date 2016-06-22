@@ -11,9 +11,8 @@ import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.UserLocationSimple;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.mixpanel.MixPanel;
-import com.shoutit.app.android.utils.LocationUtils;
-import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.Validators;
+import com.shoutit.app.android.view.loginintro.FacebookHelper;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +37,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(Validators.class)
+@PrepareForTest({Validators.class, FacebookHelper.class})
 public class RegisterPresenterTest {
 
     private RegisterPresenter mRegisterPresenter;
@@ -66,12 +65,16 @@ public class RegisterPresenterTest {
     LocationManager locationManager;
 
     @Mock
+    Context context;
+
+    @Mock
     MixPanel mixPanel;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         PowerMockito.mockStatic(Validators.class);
+        PowerMockito.mockStatic(FacebookHelper.class);
 
         when(location.getLatitude()).thenReturn(1d);
         when(location.getLongitude()).thenReturn(1d);
@@ -91,8 +94,11 @@ public class RegisterPresenterTest {
         when(mixPanel.getDistinctId())
                 .thenReturn("id");
 
+        when(FacebookHelper.getPromotionalCodeObservable(any(Context.class)))
+                .thenReturn(Observable.just("lala"));
+
         mRegisterPresenter = new RegisterPresenter(mApiService,
-                mUserPreferences, Schedulers.immediate(), Schedulers.immediate(), mixPanel);
+                mUserPreferences, Schedulers.immediate(), Schedulers.immediate(), mixPanel, context);
     }
 
     @Test

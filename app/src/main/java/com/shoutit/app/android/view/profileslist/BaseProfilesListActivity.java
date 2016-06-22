@@ -37,7 +37,7 @@ public abstract class BaseProfilesListActivity extends BaseActivity {
     @Bind(R.id.profiles_list_recycler_view)
     RecyclerView recyclerView;
     @Bind(R.id.base_progress)
-    View progressView;
+    protected View progressView;
 
     @Inject
     ProfilesListPresenter presenter;
