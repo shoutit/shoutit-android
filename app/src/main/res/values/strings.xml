@@ -610,4 +610,13 @@
 
     <!-- Chat Blocked -->
     <string name="chat_blocked_unblock">Unblock user</string>
+
+    <!-- Chat Info -->
+    <string name="chat_info_activity_save">Save</string>
+    <string name="chat_info_activity_shouts">Shouts</string>
+    <string name="chat_info_activity_media">Media</string>
+    <string name="chat_info_activity_participants">Participants</string>
+    <string name="chat_info_activity_blocked">Blocked</string>
+    <string name="chat_info_activity_exit_chat">Exit Chat</string>
+
 </resources>
