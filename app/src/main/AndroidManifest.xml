@@ -22,7 +22,7 @@
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.FLASHLIGHT"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
 
 
     <application
@@ -43,8 +43,8 @@
             android:screenOrientation="portrait"/>
         <activity
             android:name=".view.main.MainActivity"
-            android:screenOrientation="portrait"
             android:launchMode="singleTop"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.WithDrawer">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -53,29 +53,29 @@
             </intent-filter>
 
             <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.VIEW"/>
 
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
                     android:host="home"
-                    android:scheme="shoutit" />
+                    android:scheme="shoutit"/>
                 <data
                     android:host="discover"
-                    android:scheme="shoutit" />
+                    android:scheme="shoutit"/>
                 <data
                     android:host="browse"
-                    android:scheme="shoutit" />
+                    android:scheme="shoutit"/>
                 <data
                     android:host="chats"
-                    android:scheme="shoutit" />
+                    android:scheme="shoutit"/>
                 <data
                     android:host="public_chats"
-                    android:scheme="shoutit" />
+                    android:scheme="shoutit"/>
                 <data
                     android:host="create_shout"
-                    android:scheme="shoutit" />
+                    android:scheme="shoutit"/>
             </intent-filter>
 
         </activity>
@@ -110,24 +110,37 @@
             android:theme="@style/TranslucentStatusBar"
         />
         <activity android:name=".view.location.LocationActivity"
-            android:screenOrientation="portrait"/>
+                  android:screenOrientation="portrait"/>
         <activity android:name=".view.promote.PromoteShoutInfoActivity"
                   android:screenOrientation="portrait"/>
         <activity android:name=".view.credits.transactions.TransactionsActivity"
-                  android:screenOrientation="portrait"/>
+                  android:screenOrientation="portrait">
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                    android:host="credit_transactions"
+                    android:scheme="shoutit"/>
+            </intent-filter>
+
+        </activity>
         <activity
             android:name=".view.discover.DiscoverActivity"
             android:screenOrientation="portrait">
 
             <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.VIEW"/>
 
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
                     android:host="discover?id="
-                    android:scheme="shoutit" />
+                    android:scheme="shoutit"/>
             </intent-filter>
 
         </activity>
@@ -138,14 +151,14 @@
             android:name=".view.chats.ChatActivity"
             android:screenOrientation="portrait">
             <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.VIEW"/>
 
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
                     android:host="conversation"
-                    android:scheme="shoutit" />
+                    android:scheme="shoutit"/>
             </intent-filter>
         </activity>
         <activity
@@ -154,20 +167,20 @@
         <activity android:name=".view.shouts.selectshout.SelectShoutActivity"
                   android:screenOrientation="portrait"/>
         <activity android:name=".view.shouts.discover.DiscoverShoutsActivity"
-            android:screenOrientation="portrait"/>
+                  android:screenOrientation="portrait"/>
         <activity
             android:name=".view.settings.SettingsActivity"
             android:screenOrientation="portrait">
 
             <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.VIEW"/>
 
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
                     android:host="settings"
-                    android:scheme="shoutit" />
+                    android:scheme="shoutit"/>
             </intent-filter>
 
         </activity>
@@ -193,14 +206,14 @@
                 android:resource="@xml/searchable"/>
 
             <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.VIEW"/>
 
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
                     android:host="search"
-                    android:scheme="shoutit" />
+                    android:scheme="shoutit"/>
             </intent-filter>
 
         </activity>
@@ -225,14 +238,14 @@
             android:screenOrientation="portrait">
 
             <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.VIEW"/>
 
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
                     android:host="shout"
-                    android:scheme="shoutit" />
+                    android:scheme="shoutit"/>
             </intent-filter>
 
         </activity>
@@ -242,14 +255,14 @@
             android:theme="@style/TranslucentStatusBar">
 
             <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.VIEW"/>
 
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
                     android:host="profile"
-                    android:scheme="shoutit" />
+                    android:scheme="shoutit"/>
             </intent-filter>
 
         </activity>
@@ -266,14 +279,14 @@
             android:screenOrientation="portrait">
 
             <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.VIEW"/>
 
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
                     android:host="notifications"
-                    android:scheme="shoutit" />
+                    android:scheme="shoutit"/>
             </intent-filter>
 
         </activity>
@@ -289,65 +302,67 @@
         <activity android:name=".view.chats.chat_info.chats_participants.ChatParticipantsActivity"
                   android:screenOrientation="portrait"/>
         <activity android:name=".view.chats.public_chat.CreatePublicChatActivity"
-                  android:windowSoftInputMode="adjustPan"
-                  android:screenOrientation="portrait"/>
-        <activity android:name=".view.chats.chat_info.chats_users_list.chats_blocked.ChatBlockedUsersActivity"
-                  android:screenOrientation="portrait"/>
-        <activity android:name=".view.chats.chat_info.chats_users_list.chats_select.ChatSelectUsersActivity"
-                  android:screenOrientation="portrait"/>
+                  android:screenOrientation="portrait"
+                  android:windowSoftInputMode="adjustPan"/>
+        <activity
+            android:name=".view.chats.chat_info.chats_users_list.chats_blocked.ChatBlockedUsersActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".view.chats.chat_info.chats_users_list.chats_select.ChatSelectUsersActivity"
+            android:screenOrientation="portrait"/>
         <activity android:name=".view.chats.chat_info.ChatInfoActivity"
                   android:screenOrientation="portrait"/>
         <activity android:name=".view.createshout.CreateShoutDialogActivity"
                   android:screenOrientation="portrait"
                   android:theme="@style/AppTheme.DialogActivity"/>
         <activity android:name=".view.listenings.ListeningsActivity"
-            android:screenOrientation="portrait"/>
+                  android:screenOrientation="portrait"/>
         <activity android:name=".view.listeners.ListenersActivity"
-            android:screenOrientation="portrait"/>
+                  android:screenOrientation="portrait"/>
 
         <activity
             android:name=".view.videoconversation.DialogCallActivity"
-            android:screenOrientation="portrait"
             android:launchMode="singleTask"
+            android:screenOrientation="portrait"
             android:theme="@style/TranslucentBackground"/>
 
         <activity android:name=".view.chooseprofile.SelectProfileActivity"
-            android:screenOrientation="portrait"/>
+                  android:screenOrientation="portrait"/>
 
         <activity android:name=".view.chats.chat_shouts.ChatShoutsActivity"
-            android:screenOrientation="portrait"/>
+                  android:screenOrientation="portrait"/>
 
         <activity android:name=".view.chats.chat_media_gallery.ChatMediaGalleryActivity"/>
 
         <activity android:name=".view.invitefriends.facebookfriends.FacebookFriendsActivity"
-            android:screenOrientation="portrait"/>
+                  android:screenOrientation="portrait"/>
 
         <activity android:name=".view.invitefriends.contactsfriends.ContactsFriendsActivity"
-            android:screenOrientation="portrait"/>
+                  android:screenOrientation="portrait"/>
 
         <activity android:name=".view.promote.PromoteActivity"
-            android:screenOrientation="portrait"/>
+                  android:screenOrientation="portrait"/>
 
         <activity android:name=".view.promote.promoted.PromotedActivity"
-            android:screenOrientation="portrait"/>
+                  android:screenOrientation="portrait"/>
 
         <!-- Mixpanel -->
         <activity android:name="com.mixpanel.android.surveys.SurveyActivity"
-            android:theme="@style/com_mixpanel_android_SurveyActivityTheme"/>
+                  android:theme="@style/com_mixpanel_android_SurveyActivityTheme"/>
 
         <meta-data
             android:name="com.mixpanel.android.MPConfig.EnableDebugLogging"
-            android:value="true" />
+            android:value="true"/>
 
         <receiver
             android:name="com.mixpanel.android.mpmetrics.GCMReceiver"
-            android:permission="com.google.android.c2dm.permission.SEND" >
+            android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action
-                    android:name="com.google.android.c2dm.intent.RECEIVE" />
+                    android:name="com.google.android.c2dm.intent.RECEIVE"/>
                 <action
-                    android:name="com.google.android.c2dm.intent.REGISTRATION" />
-                <category android:name="${applicationId}" />
+                    android:name="com.google.android.c2dm.intent.REGISTRATION"/>
+                <category android:name="${applicationId}"/>
             </intent-filter>
         </receiver>
 
@@ -381,7 +396,7 @@
         <provider
             android:name="com.adobe.creativesdk.aviary.internal.cds.CdsProvider"
             android:authorities="${applicationId}.CdsProvider"
-            android:exported="false" />
+            android:exported="false"/>
 
     </application>
 
