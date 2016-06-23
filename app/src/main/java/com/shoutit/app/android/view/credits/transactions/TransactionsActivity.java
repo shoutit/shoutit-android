@@ -105,6 +105,6 @@ public class TransactionsActivity extends BaseActivity implements TransactionsPr
 
     @Override
     public void startActivity(String appUrl) {
-        startActivity(new Intent(Intent.CATEGORY_BROWSABLE).setData(Uri.parse(appUrl)));
+        startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(appUrl)));
     }
 }
