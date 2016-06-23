@@ -1,22 +1,23 @@
-package com.shoutit.app.android.view.pages;
+package com.shoutit.app.android.view.pages.my;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.ColoredSnackBar;
-
-import java.util.List;
+import com.shoutit.app.android.view.pages.PagesAdapter;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -24,7 +25,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 
-public class MyPagesFragment extends BaseFragment implements Listener {
+public class MyPagesFragment extends BaseFragment {
 
     @Bind(R.id.pages_recycler_view)
     RecyclerView recyclerView;
@@ -33,6 +34,10 @@ public class MyPagesFragment extends BaseFragment implements Listener {
 
     @Inject
     MyPagesPresenter presenter;
+    @Inject
+    PagesAdapter adapter;
+    @Inject
+    MyPagesDialog dialog;
 
     public static Fragment newInstance() {
         return new MyPagesFragment();
@@ -50,7 +55,26 @@ public class MyPagesFragment extends BaseFragment implements Listener {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        presenter.getPagesObservable()
+                .compose(bindToLifecycle())
+                .subscribe(adapter);
 
+        presenter.getProgressObservable()
+                .compose(bindToLifecycle())
+                .subscribe(RxView.visibility(progressView));
+
+        presenter.getErrorObservable()
+                .compose(bindToLifecycle())
+                .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(getActivity())));
+
+        presenter.getPageSelctedObservable()
+                .compose(bindToLifecycle())
+                .subscribe(this::showOptionsDialog);
+
+    }
+
+    private void showOptionsDialog(@Nonnull Page page) {
+        dialog.show(page);
     }
 
     @Override
@@ -62,20 +86,5 @@ public class MyPagesFragment extends BaseFragment implements Listener {
                 .fragmentModule(fragmentModule)
                 .build()
                 .inject(this);
-    }
-
-    @Override
-    public void showProgress(boolean show) {
-        progressView.setVisibility(show ? View.VISIBLE : View.GONE);
-    }
-
-    @Override
-    public void setData(@NonNull List<BaseAdapterItem> items) {
-
-    }
-
-    @Override
-    public void showError(Throwable throwable) {
-        ColoredSnackBar.error(ColoredSnackBar.contentView(getActivity()), throwable).show();
     }
 }

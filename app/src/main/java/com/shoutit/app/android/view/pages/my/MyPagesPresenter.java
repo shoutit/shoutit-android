@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.pages;
+package com.shoutit.app.android.view.pages.my;
 
 import android.content.res.Resources;
 
@@ -41,6 +41,7 @@ public class MyPagesPresenter {
     private final PublishSubject<Page> pageSelctedSubject = PublishSubject.create();
     private final Observable<List<BaseAdapterItem>> pagesObservable;
     private final Observable<Boolean> progressObservable;
+    private final Observable<Throwable> errorObservable;
 
     public MyPagesPresenter(@Nonnull PagesDao pagesDao,
                             @Nonnull @UiScheduler Scheduler uiScheduler,
@@ -72,7 +73,7 @@ public class MyPagesPresenter {
                     }
                 });
 
-        requestObservable
+        errorObservable = requestObservable
                 .compose(ResponseOrError.onlyError());
 
         progressObservable = requestObservable.map(Functions1.returnFalse())
@@ -80,9 +81,23 @@ public class MyPagesPresenter {
 
     }
 
-    public Observer<Page>
+    public Observable<List<BaseAdapterItem>> getPagesObservable() {
+        return pagesObservable;
+    }
 
-    private class PageAdapterItem extends BaseNoIDAdapterItem {
+    public Observable<Boolean> getProgressObservable() {
+        return progressObservable;
+    }
+
+    public Observable<Throwable> getErrorObservable() {
+        return errorObservable;
+    }
+
+    public Observable<Page> getPageSelctedObservable() {
+        return pageSelctedSubject;
+    }
+
+    public static class PageAdapterItem extends BaseNoIDAdapterItem {
 
         @Nonnull
         private final Page page;
@@ -93,6 +108,11 @@ public class MyPagesPresenter {
                                @Nonnull Observer<Page> pageSelectedObserver) {
             this.page = page;
             this.pageSelectedObserver = pageSelectedObserver;
+        }
+
+        @Nonnull
+        public Page getPage() {
+            return page;
         }
 
         public void onPagesSelected() {

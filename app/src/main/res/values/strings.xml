@@ -684,5 +684,9 @@
     <string name="pages_my_pages_tab">My pages</string>
     <string name="pages_public_pages_tab">Public pages</string>
     <string name="pages_my_empty">You don\'t have any pages yet</string>
+    <string name="pages_view_page">View Page</string>
+    <string name="pages_use_page">Use Shoutit as this Page</string>
+    <string name="pages_edit_page">Edit Page</string>
+    <string name="pages_create_page">Create page</string>
 
 </resources>

@@ -1,13 +1,18 @@
 package com.shoutit.app.android.api.model;
 
+import android.support.annotation.Nullable;
+
 import com.google.common.base.Objects;
 
 public class Page extends BaseProfile {
 
+    private final PageStats stats;
+
     public Page(String id, String type, String username, String name, String firstName,
                 String lastName, boolean isActivated, String image, String cover, boolean isListening,
-                int listenersCount, UserLocation location) {
+                int listenersCount, UserLocation location, PageStats stats) {
         super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount, location);
+        this.stats = stats;
     }
 
     @Override
@@ -16,7 +21,11 @@ public class Page extends BaseProfile {
         int newListenersCount = newIsListening ? listenersCount + 1 : listenersCount - 1;
 
         return new Page(id, type, username, name, firstName, lastName, isActivated, image, cover,
-                newIsListening, newListenersCount, location);
+                newIsListening, newListenersCount, location, stats);
+    }
+
+    public PageStats getStats() {
+        return stats;
     }
 
     @Override
@@ -39,13 +48,13 @@ public class Page extends BaseProfile {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount);
+        return Objects.hashCode(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount, stats);
     }
 
     public static Page withIsListening(Page page, boolean isListening) {
         int listenersCount = isListening ? page.listenersCount + 1 : page.listenersCount - 1;
         return new Page(page.id, page.type, page.username, page.name, page.firstName,
                 page.lastName, page.isActivated, page.image, page.cover, isListening,
-                listenersCount, page.location);
+                listenersCount, page.location, page.stats);
     }
 }

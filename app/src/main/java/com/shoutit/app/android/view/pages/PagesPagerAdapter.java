@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.view.pages.my.MyPagesFragment;
 
 import javax.inject.Inject;
 

@@ -99,6 +99,11 @@ public class BaseProfile implements ProfileType {
                 image, cover, newIsListening, newListenersCount, location);
     }
 
+    @Nullable
+    public UserLocation getLocation() {
+        return location;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

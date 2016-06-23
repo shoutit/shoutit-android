@@ -2,8 +2,12 @@ package com.shoutit.app.android.view.pages;
 
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -29,6 +33,10 @@ public class PagesPagerFragment extends BaseFragment {
     @Inject
     PagesPagerAdapter adapter;
 
+    public static Fragment newInstance() {
+        return new PagesPagerFragment();
+    }
+
     @android.support.annotation.Nullable
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -44,6 +52,24 @@ public class PagesPagerFragment extends BaseFragment {
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
 
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_pages, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.pages_menu_create:
+                // TODO create page
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
