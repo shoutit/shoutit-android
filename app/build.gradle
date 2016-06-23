@@ -33,14 +33,26 @@ if (keystoreProperties.exists()) {
     props.load(new FileInputStream(keystoreProperties))
 }
 
-def baseVersionName = "2.6.0"
+def baseVersionName = "2.6.2"
 
-project.ext.versionCode = 79
+project.ext.versionCode = 81
 
 if (project.hasProperty("versionSuffix")) {
     project.ext.versionChangeSuffix = project.versionSuffix
 } else {
     project.ext.versionChangeSuffix = "-snapshot"
+}
+
+if (project.hasProperty("commitId")) {
+    project.ext.commitId = project.commitId
+} else {
+    project.ext.commitId = "localBuildCommtId"
+}
+
+if (project.hasProperty("buildNumber")) {
+    project.ext.buildNumber = project.buildNumber
+} else {
+    project.ext.buildNumber = "localBuildNumber"
 }
 
 android {
@@ -60,6 +72,8 @@ android {
         renderscriptTargetApi 23
         multiDexEnabled true
         testInstrumentationRunner "com.android.test.runner.MultiDexTestRunner"
+        buildConfigField 'String', 'commitId', "\"${project.ext.commitId}\""
+        buildConfigField 'String', 'buildNumber', "\"${project.ext.buildNumber}\""
     }
 
     compileOptions {

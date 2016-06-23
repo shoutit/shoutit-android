@@ -117,7 +117,7 @@ public class IntroActivity extends BaseActivity {
                                 .observeOn(MyAndroidSchedulers.mainThread())))
                 .doOnTerminate(() -> progress.setVisibility(View.GONE))
                 .subscribe(signResponse -> {
-                    mUserPreferences.setGuestLoggedIn(signResponse.getAccessToken(), signResponse.getRefreshToken());
+                    mUserPreferences.setGuestLoggedIn(signResponse.getUser(), signResponse.getAccessToken(), signResponse.getRefreshToken());
                     finish();
                     startActivity(MainActivity.newIntent(IntroActivity.this));
                 }, throwable -> {

@@ -231,6 +231,7 @@ public class MenuHandler {
                 break;
             case FRAGMENT_CREDITS:
             case FRAGMENT_CHATS:
+            case FRAGMENT_PUBLIC_CHATS:
                 if (userPreferences.isNormalUser()) {
                     selectFragment(viewTag);
                 } else {

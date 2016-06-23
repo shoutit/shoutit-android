@@ -76,12 +76,12 @@ public class ChatBlockedUsersPresenter {
         return ImmutableList.copyOf(Iterables.transform(profiles, new Function<ConversationProfile, BaseAdapterItem>() {
             @Nullable
             @Override
-            public BaseAdapterItem apply(@Nullable ConversationProfile input) {
-                assert input != null;
-                return new ChatListProfileItem(input.getId(), input.getName(), input.getImage(), new ChatListProfileItem.OnItemClicked() {
+            public BaseAdapterItem apply(@Nullable ConversationProfile profile) {
+                assert profile != null;
+                return new ChatListProfileItem(profile.getId(), profile.getName(), profile.getImage(), new ChatListProfileItem.OnItemClicked() {
                     @Override
                     public void onItemClicked(String id, String name) {
-                        mListener.showDialog(id, name);
+                        mListener.showDialog(id, name, profile.getUsername());
                     }
                 });
             }
@@ -111,6 +111,14 @@ public class ChatBlockedUsersPresenter {
         mCompositeSubscription.unsubscribe();
     }
 
+    public void showProfile(String userName) {
+        mListener.showProfile(userName);
+    }
+
+    public void showUnblockConfirmDialog(String id, String name) {
+        mListener.showUnblockConfirmDialog(id, name);
+    }
+
     public interface Listener {
 
         void error();
@@ -119,6 +127,10 @@ public class ChatBlockedUsersPresenter {
 
         void showProgress(boolean show);
 
-        void showDialog(String id, String name);
+        void showDialog(String id, String name, String userName);
+
+        void showProfile(String userName);
+
+        void showUnblockConfirmDialog(String id, String name);
     }
 }

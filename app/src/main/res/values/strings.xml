@@ -312,7 +312,6 @@
     <!-- Published -->
     <string name="published_congratulations">Congratulations!</string>
     <string name="published_extra_info">Your %1$s will appear on Shoutit soon.</string>
-    <string name="published_extra_info_with_title">Your %1$s \"%2$s\" will appear on Shoutit soon.</string>
     <string name="published_add_details">Add more details</string>
     <string name="published_create_another_shout">Create another %1$s</string>
     <string name="published_or_label">or</string>
@@ -683,5 +682,27 @@
     <string name="transactions_title">Credit Transactions</string>
     <string name="menu_item_pages">Pages</string>
     <string name="menu_item_admins">Admins</string>
+
+    <!-- Shout Media Edit Dialog -->
+    <string name="shout_media_edit_dialog_delete">Delete</string>
+    <string name="shout_media_edit_dialog_change">Change</string>
+    <string name="shout_media_edit_dialog_edit">Edit</string>
+    <string name="shout_media_edit_dialog_title">Edit media</string>
+
+    <!-- Chat participants -->
+    <string name="chat_participants_promote_to_admin">Promote to admin</string>
+    <string name="chat_participants_remove_from_chat">Remove from chat</string>
+    <string name="chat_participants_view_profile">View Profile</string>
+
+    <!-- Chat Blocked -->
+    <string name="chat_blocked_unblock">Unblock user</string>
+
+    <!-- Chat Info -->
+    <string name="chat_info_activity_save">Save</string>
+    <string name="chat_info_activity_shouts">Shouts</string>
+    <string name="chat_info_activity_media">Media</string>
+    <string name="chat_info_activity_participants">Participants</string>
+    <string name="chat_info_activity_blocked">Blocked</string>
+    <string name="chat_info_activity_exit_chat">Exit Chat</string>
 
 </resources>

@@ -1,24 +1,21 @@
 package com.shoutit.app.android.api.model;
 
-public class Conversation {
+public class PusherConversationUpdate {
 
     public static final String ABOUT_SHOUT_TYPE = "about_shout";
     public static final String PUBLIC_CHAT_TYPE = "public_chat";
 
     private final String id;
-    private final String type;
-    private final int unreadMessagesCount;
     private final Display display;
-    private final MiniProfile creator;
+    private final int unreadMessagesCount;
+    private final String type;
     private final long modifiedAt;
 
-    public Conversation(String id, String type, int unreadMessagesCount,
-                        Display display, MiniProfile creator, long modifiedAt) {
+    public PusherConversationUpdate(String id, Display display, int unreadMessagesCount, String type, long modifiedAt) {
         this.id = id;
-        this.type = type;
-        this.unreadMessagesCount = unreadMessagesCount;
         this.display = display;
-        this.creator = creator;
+        this.unreadMessagesCount = unreadMessagesCount;
+        this.type = type;
         this.modifiedAt = modifiedAt;
     }
 
@@ -42,14 +39,6 @@ public class Conversation {
         return display.getLastMessageSummary();
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public int getUnreadMessagesCount() {
-        return unreadMessagesCount;
-    }
-
     public Display getDisplay() {
         return display;
     }
@@ -58,37 +47,46 @@ public class Conversation {
         return modifiedAt;
     }
 
-    public MiniProfile getCreator() {
-        return creator;
+    public String getType() {
+        return type;
     }
 
-    public class Display {
-        private final String image;
-        private final String subTitle;
+    public boolean isPublicChat() {
+        return PUBLIC_CHAT_TYPE.equals(type);
+    }
+
+    public int getUnreadMessagesCount() {
+        return unreadMessagesCount;
+    }
+
+    private static class Display {
+
         private final String title;
+        private final String subTitle;
         private final String lastMessageSummary;
+        private final String image;
 
-        public Display(String image, String subTitle, String title, String lastMessageSummary) {
-            this.image = image;
-            this.subTitle = subTitle;
+        public Display(String title, String subTitle, String lastMessageSummary, String image) {
             this.title = title;
+            this.subTitle = subTitle;
             this.lastMessageSummary = lastMessageSummary;
-        }
-
-        public String getImage() {
-            return image;
-        }
-
-        public String getSubTitle() {
-            return subTitle;
+            this.image = image;
         }
 
         public String getTitle() {
             return title;
         }
 
+        public String getSubTitle() {
+            return subTitle;
+        }
+
         public String getLastMessageSummary() {
             return lastMessageSummary;
+        }
+
+        public String getImage() {
+            return image;
         }
     }
 }
