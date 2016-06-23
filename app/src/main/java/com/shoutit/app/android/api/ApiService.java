@@ -25,6 +25,7 @@ import com.shoutit.app.android.api.model.EditShoutRequest;
 import com.shoutit.app.android.api.model.EditShoutRequestWithPrice;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.GuestSignupRequest;
+import com.shoutit.app.android.api.model.InvitationCodeResponse;
 import com.shoutit.app.android.api.model.ListenersResponse;
 import com.shoutit.app.android.api.model.ListeningResponse;
 import com.shoutit.app.android.api.model.Message;
@@ -516,4 +517,7 @@ public interface ApiService {
      **/
     @GET("credit/transactions")
     Observable<TransactionRsponse> getTransactions(@Nullable @Query("before") String timestamp);
+
+    @GET("credit/invitation_code")
+    Observable<InvitationCodeResponse> getInvitationCode();
 }

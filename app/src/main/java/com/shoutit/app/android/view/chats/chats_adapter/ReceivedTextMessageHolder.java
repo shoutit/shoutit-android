@@ -9,6 +9,7 @@ import android.widget.TextView;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.utils.TextHelper;
 import com.shoutit.app.android.view.chats.message_models.ReceivedTextMessage;
 import com.squareup.picasso.Picasso;
 
@@ -16,6 +17,7 @@ import javax.annotation.Nonnull;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class ReceivedTextMessageHolder extends ViewHolderManager.BaseViewHolder<BaseAdapterItem> {
 
@@ -27,6 +29,8 @@ public class ReceivedTextMessageHolder extends ViewHolderManager.BaseViewHolder<
     @Bind(R.id.chats_received_message_date_textview)
     TextView mChatsReceivedMessageDateTextview;
 
+    private ReceivedTextMessage item;
+
     public ReceivedTextMessageHolder(@Nonnull View itemView, Picasso picasso) {
         super(itemView);
         mPicasso = picasso;
@@ -34,16 +38,22 @@ public class ReceivedTextMessageHolder extends ViewHolderManager.BaseViewHolder<
     }
 
     @Override
-    public void bind(@Nonnull BaseAdapterItem item) {
-        final ReceivedTextMessage message = (ReceivedTextMessage) item;
-        mChatsReceivedMessageMessageTextview.setText(message.getMessage());
-        mChatsReceivedMessageDateTextview.setText(message.getTime());
+    public void bind(@Nonnull BaseAdapterItem adapterItem) {
+        this.item = (ReceivedTextMessage) adapterItem;
 
-        AvatarHelper.setAvatar(message.isFirst(), message.getAvatarUrl(), mPicasso, mChatsReceivedAvatar);
+        mChatsReceivedMessageMessageTextview.setText(item.getMessage());
+        mChatsReceivedMessageDateTextview.setText(item.getTime());
+
+        AvatarHelper.setAvatar(item.isFirst(), item.getAvatarUrl(), mPicasso, mChatsReceivedAvatar);
     }
 
     public static ViewHolderManager.BaseViewHolder create(@NonNull View view, Picasso picasso) {
         return new ReceivedTextMessageHolder(view, picasso);
+    }
+
+    @OnClick(R.id.chats_received_avatar)
+    public void onAvatarClicked() {
+        item.onAvatarClicked();
     }
 
     @LayoutRes

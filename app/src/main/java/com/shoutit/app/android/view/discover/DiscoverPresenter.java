@@ -17,6 +17,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
 import com.shoutit.app.android.api.model.DiscoverChild;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
@@ -30,7 +31,6 @@ import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.model.LocationPointer;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.utils.PriceUtils;
-import com.shoutit.app.android.view.home.HomePresenter;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.subsearch.SubSearchActivity;
 
@@ -375,7 +375,6 @@ public class DiscoverPresenter {
         private final String image;
 
         public HeaderAdapterItem(String title, String image) {
-
             this.title = title;
             this.image = image;
         }
@@ -387,12 +386,12 @@ public class DiscoverPresenter {
 
         @Override
         public boolean matches(@Nonnull BaseAdapterItem item) {
-            return false;
+            return item instanceof HeaderAdapterItem;
         }
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return false;
+            return item instanceof HeaderAdapterItem;
         }
 
         public String getTitle() {
@@ -404,7 +403,7 @@ public class DiscoverPresenter {
         }
     }
 
-    public class DiscoverAdapterItem implements BaseAdapterItem {
+    public class DiscoverAdapterItem extends BaseNoIDAdapterItem {
 
         @Nonnull
         private final DiscoverChild discoverChild;
@@ -423,19 +422,14 @@ public class DiscoverPresenter {
         }
 
         @Override
-        public long adapterId() {
-            return BaseAdapterItem.NO_ID;
-        }
-
-        @Override
         public boolean matches(@Nonnull BaseAdapterItem item) {
-            return item instanceof HomePresenter.DiscoverAdapterItem &&
-                    discoverChild.getId().equals(((HomePresenter.DiscoverAdapterItem) item).getDiscover().getId());
+            return item instanceof DiscoverAdapterItem &&
+                    discoverChild.getId().equals(((DiscoverAdapterItem) item).getDiscoverChild().getId());
         }
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof HomePresenter.DiscoverAdapterItem && this.equals(item);
+            return item instanceof DiscoverAdapterItem && this.equals(item);
         }
 
         public void onDiscoverSelected() {

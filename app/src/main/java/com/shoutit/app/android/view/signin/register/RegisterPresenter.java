@@ -1,5 +1,6 @@
 package com.shoutit.app.android.view.signin.register;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -15,10 +16,13 @@ import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.login.LoginUser;
+import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.utils.Validators;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
+import com.shoutit.app.android.view.intro.IntroActivity;
+import com.shoutit.app.android.view.loginintro.FacebookHelper;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -29,6 +33,7 @@ import rx.Scheduler;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func3;
+import rx.functions.Func4;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
@@ -54,7 +59,8 @@ public class RegisterPresenter {
                              @NonNull final UserPreferences userPreferences,
                              @NonNull @NetworkScheduler final Scheduler networkScheduler,
                              @NonNull @UiScheduler final Scheduler uiScheduler,
-                             @Nonnull final MixPanel mixPanel) {
+                             @Nonnull final MixPanel mixPanel,
+                             @ForActivity Context context) {
 
         mLocationObservable = userPreferences
                 .getLocationObservable()
@@ -62,41 +68,23 @@ public class RegisterPresenter {
                 .compose(ObservableExtensions.<UserLocation>behaviorRefCount());
 
         final Observable<ResponseOrError<SignResponse>> responseOrErrorObservable = mProceedSubject
-                .map(new Func1<Object, Boolean>() {
-                    @Override
-                    public Boolean call(Object o) {
-                        return areValuesCorrect();
-                    }
-                })
+                .map(o -> areValuesCorrect())
                 .filter(Functions1.isTrue())
-                .switchMap(new Func1<Boolean, Observable<UserLocation>>() {
-                    @Override
-                    public Observable<UserLocation> call(Boolean aBoolean) {
-                        return mLocationObservable.filter(Functions1.isNotNull()).first();
-                    }
-                })
+                .switchMap(aBoolean -> mLocationObservable.filter(Functions1.isNotNull()).first())
                 .switchMap(new Func1<UserLocation, Observable<EmailSignupRequest>>() {
                     @Override
                     public Observable<EmailSignupRequest> call(final UserLocation location) {
                         return Observable.zip(mNameSubject, mEmailSubject, mPasswordSubject,
-                                new Func3<String, String, String, EmailSignupRequest>() {
-                                    @Override
-                                    public EmailSignupRequest call(String name, String email, String password) {
-                                        return new EmailSignupRequest(name, email, password, LoginUser.loginUser(location), mixPanel.getDistinctId());
-                                    }
-                                })
+                                FacebookHelper.getPromotionalCodeObservable(context),
+                                (name, email, password, invitationCode) -> new EmailSignupRequest(
+                                        name, email, password, LoginUser.loginUser(location), mixPanel.getDistinctId(), invitationCode))
                                 .first();
                     }
                 })
-                .switchMap(new Func1<EmailSignupRequest, Observable<ResponseOrError<SignResponse>>>() {
-                    @Override
-                    public Observable<ResponseOrError<SignResponse>> call(EmailSignupRequest signupRequest) {
-                        return apiService.signup(signupRequest)
-                                .subscribeOn(networkScheduler)
-                                .observeOn(uiScheduler)
-                                .compose(ResponseOrError.<SignResponse>toResponseOrErrorObservable());
-                    }
-                })
+                .switchMap(signupRequest -> apiService.signup(signupRequest)
+                        .subscribeOn(networkScheduler)
+                        .observeOn(uiScheduler)
+                        .compose(ResponseOrError.<SignResponse>toResponseOrErrorObservable()))
                 .compose(ObservableExtensions.<ResponseOrError<SignResponse>>behaviorRefCount());
 
 

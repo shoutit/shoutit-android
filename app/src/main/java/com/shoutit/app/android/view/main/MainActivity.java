@@ -134,6 +134,9 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
         if (mUserPreferences.isNormalUser()) {
             subscribeToStats();
         }
+
+        mixPanel.initMixPanel(); // Workaround for mixpanel people id issue
+        mixPanel.showNotificationIfAvailable(this);
     }
 
     @Override

@@ -8,6 +8,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityScope;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.utils.ListeningHalfPresenter;
+import com.shoutit.app.android.view.invitefriends.InviteFriendsPresenter;
 import com.shoutit.app.android.view.listenings.ProfilesListAdapter;
 import com.shoutit.app.android.utils.PreferencesHelper;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
@@ -36,9 +37,11 @@ public class FacebookFriendsActivityModule {
                                                        UserPreferences userPreferences,
                                                        CallbackManager callbackManager,
                                                        ListeningHalfPresenter listeningHalfPresenter,
-                                                       PreferencesHelper preferencesHelper) {
+                                                       PreferencesHelper preferencesHelper,
+                                                       InviteFriendsPresenter inviteFriendsPresenter) {
         return new FacebookFriendsPresenter(facebookHelper, userPreferences,
-                activity, callbackManager, dao, uiScheduler, listeningHalfPresenter, preferencesHelper);
+                activity, callbackManager, dao, uiScheduler, listeningHalfPresenter, preferencesHelper,
+                inviteFriendsPresenter);
     }
 
     @Provides

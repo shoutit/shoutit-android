@@ -1,8 +1,10 @@
 package com.shoutit.app.android.api;
 
+import android.os.Build;
 import android.text.TextUtils;
 
 import com.appunite.rx.dagger.NetworkScheduler;
+import com.shoutit.app.android.BuildConfig;
 import com.shoutit.app.android.UserPreferences;
 
 import java.io.IOException;
@@ -10,7 +12,6 @@ import java.io.IOException;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
-import retrofit2.HttpException;
 
 public class AuthInterceptor implements Interceptor {
 
@@ -32,9 +33,16 @@ public class AuthInterceptor implements Interceptor {
         } else {
             final Request request = original.newBuilder()
                     .header("Authorization", TOKEN_PREFIX + token)
+                    .header("User-Agent", getUserAgent())
                     .build();
 
             return chain.proceed(request);
         }
+    }
+
+    private String getUserAgent() {
+        return "Shoutit " + BuildConfig.BUILD_TYPE + "/"
+                + BuildConfig.APPLICATION_ID + "(" + BuildConfig.buildNumber + "; " +
+                "OS Version Android " + Build.VERSION.RELEASE + " (Build " + BuildConfig.commitId + "))";
     }
 }

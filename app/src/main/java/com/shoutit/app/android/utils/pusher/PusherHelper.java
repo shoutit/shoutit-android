@@ -17,6 +17,7 @@ import com.pusher.client.util.HttpAuthorizer;
 import com.shoutit.app.android.BuildConfig;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.NotificationsResponse;
+import com.shoutit.app.android.api.model.PusherConversationUpdate;
 import com.shoutit.app.android.api.model.PusherMessage;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.model.Stats;
@@ -34,6 +35,7 @@ import rx.Subscriber;
 public class PusherHelper {
 
     private static final String EVENT_NEW_MESSAGE = "new_message";
+    private static final String EVENT_CONVERSATION_UPDATE = "conversation_update";
     private static final String EVENT_NEW_NOTIFICATION = "new_notification";
     private static final String EVENT_STATS_UPDATE = "stats_update";
     private static final String EVENT_CLIENT_IS_TYPING = "client-is_typing";
@@ -82,11 +84,11 @@ public class PusherHelper {
         }
     }
 
-    public static String getProfileChannelName(@NonNull String userId) {
+    private static String getProfileChannelName(@NonNull String userId) {
         return String.format(PROFILE_CHANNEL, userId);
     }
 
-    public static String getConversationChannelName(@NonNull String conversationId) {
+    private static String getConversationChannelName(@NonNull String conversationId) {
         return String.format(CONVERSATION_CHANNEL, conversationId);
     }
 
@@ -129,19 +131,20 @@ public class PusherHelper {
                 });
     }
 
-    public Observable<PusherMessage> getNewMessagesObservable() {
+    public Observable<PusherConversationUpdate> getConverstionUpdateObservable() {
         return Observable
-                .create(new Observable.OnSubscribe<PusherMessage>() {
+                .create(new Observable.OnSubscribe<PusherConversationUpdate>() {
                     @Override
-                    public void call(final Subscriber<? super PusherMessage> subscriber) {
-                        getProfileChannel().bind(EVENT_NEW_MESSAGE, new PresenceChannelEventListenerAdapter() {
+                    public void call(final Subscriber<? super PusherConversationUpdate> subscriber) {
+                        getProfileChannel().bind(EVENT_CONVERSATION_UPDATE, new PresenceChannelEventListenerAdapter() {
 
                             @Override
                             public void onEvent(String channelName, String eventName, String data) {
                                 try {
-                                    final PusherMessage pusherMessage = mGson.getAdapter(PusherMessage.class).fromJson(data);
-                                    logMessage(pusherMessage, "profile / getNewMessagesObservable");
-                                    subscriber.onNext(pusherMessage);
+
+                                    final PusherConversationUpdate conversationUpdate = mGson.getAdapter(PusherConversationUpdate.class).fromJson(data);
+                                    logMessage(data, "profile / getConverstionUpdateObservable");
+                                    subscriber.onNext(conversationUpdate);
                                 } catch (IOException e) {
                                     subscriber.onError(e);
                                 }
@@ -307,9 +310,7 @@ public class PusherHelper {
     }
 
     private void logMessage(Object message, String channel) {
-        if (BuildConfig.DEBUG) {
-            Log.i(TAG, channel + " : " + message.toString());
-        }
+        log(channel + " : " + message.toString());
     }
 
     private void log(String msg) {

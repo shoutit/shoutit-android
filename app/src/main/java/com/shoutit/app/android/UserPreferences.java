@@ -10,12 +10,12 @@ import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.appunite.rx.operators.MoreOperators;
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForApplication;
 import com.shoutit.app.android.model.Stats;
-
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -33,6 +33,7 @@ public class UserPreferences {
     private static final String AUTH_TOKEN = "token";
     private static final String REFRESH_TOKEN = "refresh_token";
     private static final String KEY_USER = "user";
+    private static final String KEY_GUEST_USER = "guest_user";
     private static final String KEY_LOCATION = "location";
     private static final String IS_GUEST = "is_guest";
     private static final String KEY_LOCATION_TRACKING = "location_tracking";
@@ -123,9 +124,12 @@ public class UserPreferences {
     }
 
     @SuppressLint("CommitPrefEdits")
-    public void setGuestLoggedIn(@NonNull String authToken, @NonNull String refreshToken) {
+    public void setGuestLoggedIn(@Nonnull User user, @NonNull String authToken, @NonNull String refreshToken) {
         final SharedPreferences.Editor editor = mPreferences.edit();
+        final String guestUser = gson.toJson(user, User.class);
+
         editor
+                .putString(KEY_GUEST_USER, guestUser)
                 .putString(AUTH_TOKEN, authToken)
                 .putString(REFRESH_TOKEN, refreshToken)
                 .putBoolean(IS_GUEST, true);
@@ -138,6 +142,12 @@ public class UserPreferences {
         final SharedPreferences.Editor editor = mPreferences.edit();
         editor.putBoolean(IS_GUEST, isGuest);
         editor.commit();
+    }
+
+    @Nullable
+    public User getGuestUser() {
+        final String guestUserJson = mPreferences.getString(KEY_GUEST_USER, null);
+        return gson.fromJson(guestUserJson, User.class);
     }
 
     public boolean isGuest() {
@@ -193,6 +203,11 @@ public class UserPreferences {
     public User getUser() {
         final String userJson = mPreferences.getString(KEY_USER, null);
         return gson.fromJson(userJson, User.class);
+    }
+
+    @NonNull
+    public User getUserOrThrow() {
+        return Preconditions.checkNotNull(getUser());
     }
 
     @Nonnull

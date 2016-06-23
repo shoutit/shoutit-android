@@ -16,13 +16,20 @@
         android:textColor="@android:color/white"
         android:id="@+id/chat_participant_promote"
         android:layout_width="match_parent"
-        android:text="Promote to admin"/>
+        android:text="@string/chat_participants_promote_to_admin"/>
 
     <Button
         style="@style/BaseButtonDefaultBackgroundStyle"
         android:textColor="@android:color/white"
         android:id="@+id/chat_participant_remove"
         android:layout_width="match_parent"
-        android:text="Remove from chat"/>
+        android:text="@string/chat_participants_remove_from_chat"/>
+
+    <Button
+        style="@style/BaseButtonDefaultBackgroundStyle"
+        android:textColor="@android:color/white"
+        android:id="@+id/chat_participant_view_profile"
+        android:layout_width="match_parent"
+        android:text="@string/chat_participants_view_profile"/>
 
 </LinearLayout>

@@ -4,6 +4,7 @@ package com.shoutit.app.android.api.model;
 import android.support.annotation.NonNull;
 
 import com.google.common.base.Objects;
+import com.google.common.primitives.Booleans;
 import com.shoutit.app.android.model.Stats;
 
 import java.util.List;
@@ -13,6 +14,8 @@ import javax.annotation.Nullable;
 
 public class User extends BaseProfile {
     public static final String ME = "me";
+    public static final String USER = "user";
+    public static final String PAGE = "page";
 
     public enum Gender {
         FEMALE("female"),
@@ -120,6 +123,10 @@ public class User extends BaseProfile {
                 image, cover, isListening, isListener, isPasswordSet, location, listenersCount,
                 pages, admins, bio, dateJoined, listeningCount, isOwner, about, mobile, website,
                 email, conversation, gender, birthday, newStats, linkedAccounts);
+    }
+
+    public boolean isUser(@Nonnull User user){
+        return (USER.equals(user.type));
     }
 
     public String getId() {

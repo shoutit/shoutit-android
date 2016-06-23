@@ -9,6 +9,7 @@
     <string name="terms_of_service">Terms of Service</string>
     <string name="facebook_app_id" translatable="false">353625811317277</string>
     <string name="exit_text">Press BACK again to exit</string>
+    <string name="empty_field"/>
     <plurals name="plural_credits">
         <item quantity="one">%1$d Credit</item>
         <item quantity="other">%1$d Credits</item>
@@ -41,7 +42,7 @@
     <string name="image_video_capture_helper_sd_unmounted_title">Error</string>
 
     <!-- Intro -->
-    <string name="intro_welcome">Welcome To Shoutit</string>
+    <string name="intro_welcome">Buy &amp; Sell while Chatting</string>
     <string name="intro_buy">Buy and Sell while Chatting</string>
     <string name="intro_login">Login</string>
     <string name="intro_skip">Skip</string>
@@ -311,7 +312,6 @@
     <!-- Published -->
     <string name="published_congratulations">Congratulations!</string>
     <string name="published_extra_info">Your %1$s will appear on Shoutit soon.</string>
-    <string name="published_extra_info_with_title">Your %1$s \"%2$s\" will appear on Shoutit soon.</string>
     <string name="published_add_details">Add more details</string>
     <string name="published_create_another_shout">Create another %1$s</string>
     <string name="published_or_label">or</string>
@@ -616,6 +616,7 @@
     <string name="invite_friends_twitter">Twitter</string>
     <string name="invite_friends_share">Share Shoutit App</string>
     <string name="invite_text">Join Shoutit on www.shoutit.com</string>
+    <string name="invite_text_fb">Join Shoutit</string>
     <string name="invite_chooser_text">Select app</string>
     <string name="invite_no_twitter_app">You need the Twitter app to be installed</string>
     <string name="invite_friend_find_friend_dialog">Earn up to 10 Shoutit Credits for finding your friends and listening to them</string>
@@ -679,6 +680,30 @@
 
     <!-- Transactions -->
     <string name="transactions_title">Credit Transactions</string>
+    <string name="menu_item_pages">Pages</string>
+    <string name="menu_item_admins">Admins</string>
+
+    <!-- Shout Media Edit Dialog -->
+    <string name="shout_media_edit_dialog_delete">Delete</string>
+    <string name="shout_media_edit_dialog_change">Change</string>
+    <string name="shout_media_edit_dialog_edit">Edit</string>
+    <string name="shout_media_edit_dialog_title">Edit media</string>
+
+    <!-- Chat participants -->
+    <string name="chat_participants_promote_to_admin">Promote to admin</string>
+    <string name="chat_participants_remove_from_chat">Remove from chat</string>
+    <string name="chat_participants_view_profile">View Profile</string>
+
+    <!-- Chat Blocked -->
+    <string name="chat_blocked_unblock">Unblock user</string>
+
+    <!-- Chat Info -->
+    <string name="chat_info_activity_save">Save</string>
+    <string name="chat_info_activity_shouts">Shouts</string>
+    <string name="chat_info_activity_media">Media</string>
+    <string name="chat_info_activity_participants">Participants</string>
+    <string name="chat_info_activity_blocked">Blocked</string>
+    <string name="chat_info_activity_exit_chat">Exit Chat</string>
 
     <!-- Pages -->
     <string name="pages_my_pages_tab">My pages</string>
