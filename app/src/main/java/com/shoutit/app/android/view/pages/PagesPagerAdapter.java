@@ -10,6 +10,7 @@ import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.view.pages.my.MyPagesFragment;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 public class PagesPagerAdapter extends FragmentPagerAdapter {
 
@@ -17,7 +18,7 @@ public class PagesPagerAdapter extends FragmentPagerAdapter {
 
     @Inject
     public PagesPagerAdapter(@ForActivity Resources resources,
-                             FragmentManager fm) {
+                             @Named("childFragmentManager") FragmentManager fm) {
         super(fm);
         this.resources = resources;
     }

@@ -9,15 +9,12 @@ import com.shoutit.app.android.api.model.PagesResponse;
 import com.shoutit.app.android.api.model.User;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import rx.Observable;
 import rx.Scheduler;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
-@Singleton
 public class PagesDao {
 
     private static final int PAGE_SIZE = 20;
@@ -26,7 +23,6 @@ public class PagesDao {
     @Nonnull
     private final Observable<ResponseOrError<PagesResponse>> pagesObservable;
 
-    @Inject
     public PagesDao(@Nonnull ApiService apiService,
                     @Nonnull @NetworkScheduler Scheduler networkScheduler) {
 

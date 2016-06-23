@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.CheckedTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
@@ -31,6 +30,7 @@ import com.shoutit.app.android.view.home.HomeFragment;
 import com.shoutit.app.android.view.invitefriends.InviteFriendsFragment;
 import com.shoutit.app.android.view.location.LocationActivity;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
+import com.shoutit.app.android.view.pages.PagesPagerFragment;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsFragment;
@@ -60,8 +60,8 @@ public class MenuHandler {
     public static final String FRAGMENT_CREDITS = "fragment_credits";
     public static final String ACTIVITY_SETTINGS = "activity_settings";
     public static final String ACTIVITY_HELP = "activity_help";
-    public static final String ACTIVITY_PAGES = "activity_pages";
-    public static final String ACTIVITY_ADMINS = "activity_admins";
+    public static final String FRAGMENT_PAGES = "fragment_pages";
+    public static final String FRAGMENT_ADMINS = "fragment_admins";
 
     @Bind(R.id.menu_user_name_tv)
     TextView userNameTextView;
@@ -121,8 +121,8 @@ public class MenuHandler {
         viewTagViewIdMap.put(FRAGMENT_INVITE_FRIENDS, R.id.menu_invite_friends);
         viewTagViewIdMap.put(ACTIVITY_HELP, R.id.menu_help);
         viewTagViewIdMap.put(ACTIVITY_SETTINGS, R.id.menu_settings);
-        viewTagViewIdMap.put(ACTIVITY_PAGES, R.id.menu_pages);
-        viewTagViewIdMap.put(ACTIVITY_ADMINS, R.id.menu_admins);
+        viewTagViewIdMap.put(FRAGMENT_PAGES, R.id.menu_pages);
+        viewTagViewIdMap.put(FRAGMENT_ADMINS, R.id.menu_admins);
     }
 
     public MenuHandler(@Nonnull final RxAppCompatActivity rxActivity,
@@ -232,6 +232,8 @@ public class MenuHandler {
             case FRAGMENT_CREDITS:
             case FRAGMENT_CHATS:
             case FRAGMENT_PUBLIC_CHATS:
+            case FRAGMENT_PAGES:
+            case FRAGMENT_ADMINS:
                 if (userPreferences.isNormalUser()) {
                     selectFragment(viewTag);
                 } else {
@@ -244,10 +246,6 @@ public class MenuHandler {
             case ACTIVITY_HELP:
                 UserVoice.launchUserVoice(rxActivity);
                 break;
-            case ACTIVITY_PAGES:
-                break;
-            case ACTIVITY_ADMINS:
-                break;
             default:
                 throw new RuntimeException("Unknown menu item with tag: " + viewTag);
         }
@@ -258,7 +256,9 @@ public class MenuHandler {
     private void selectFragment(@Nonnull String viewTag) {
         selectItem(viewTagViewIdMap.get(viewTag));
         onMenuItemSelectedListener.onMenuItemSelected(viewTag);
-        setToolbarElevation(viewTagViewIdMap.get(viewTag) != R.id.menu_chat);
+
+        final Integer selectedViewId = viewTagViewIdMap.get(viewTag);
+        setToolbarElevation(selectedViewId != R.id.menu_chat && selectedViewId != R.id.menu_pages);
     }
 
     public void setToolbarElevation(boolean enable) {
@@ -362,6 +362,8 @@ public class MenuHandler {
                 return ConversationsPagerFragment.newInstance(true);
             case FRAGMENT_INVITE_FRIENDS:
                 return InviteFriendsFragment.newInstance();
+            case FRAGMENT_PAGES:
+                return PagesPagerFragment.newInstance();
             default:
                 throw new RuntimeException("Unknown fragment tag");
         }

@@ -5,6 +5,7 @@
     <item
         android:id="@+id/pages_menu_create"
         android:icon="@drawable/ic_add"
+        android:orderInCategory="1"
         android:title="@string/pages_create_page"
         app:showAsAction="ifRoom" />
 

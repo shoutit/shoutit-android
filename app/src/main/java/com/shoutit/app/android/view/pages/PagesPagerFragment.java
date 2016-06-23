@@ -37,6 +37,12 @@ public class PagesPagerFragment extends BaseFragment {
         return new PagesPagerFragment();
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
     @android.support.annotation.Nullable
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -51,7 +57,6 @@ public class PagesPagerFragment extends BaseFragment {
 
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
-
     }
 
     @Override
@@ -59,7 +64,6 @@ public class PagesPagerFragment extends BaseFragment {
         inflater.inflate(R.menu.menu_pages, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -77,7 +81,7 @@ public class PagesPagerFragment extends BaseFragment {
                                    @Nonnull FragmentModule fragmentModule,
                                    @Nullable Bundle savedInstanceState) {
         DaggerPagesPagerFragmentComponent.builder()
-                .appComponent(App.getAppComponent(getActivity().getApplication()))
+                .baseActivityComponent(baseActivityComponent)
                 .fragmentModule(fragmentModule)
                 .build()
                 .inject(this);

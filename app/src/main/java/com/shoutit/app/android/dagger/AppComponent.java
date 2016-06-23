@@ -19,6 +19,7 @@ import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ListenersDaos;
 import com.shoutit.app.android.dao.ListeningsDao;
 import com.shoutit.app.android.dao.NotificationsDao;
+import com.shoutit.app.android.dao.PagesDao;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.PromoteLabelsDao;
 import com.shoutit.app.android.dao.PromoteOptionsDao;
@@ -79,6 +80,8 @@ public interface AppComponent {
     TagsDao tagsDao();
 
     DiscoversDao discoversDao();
+
+    PagesDao pagesDao();
 
     ProfilesDao profilesDao();
 

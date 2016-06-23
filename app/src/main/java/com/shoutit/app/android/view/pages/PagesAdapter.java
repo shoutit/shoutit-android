@@ -21,6 +21,7 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -32,6 +33,7 @@ public class PagesAdapter extends BaseAdapter {
 
     private final Picasso picasso;
 
+    @Inject
     public PagesAdapter(@ForActivity @Nonnull Context context,
                         Picasso picasso) {
         super(context);
@@ -63,7 +65,7 @@ public class PagesAdapter extends BaseAdapter {
         }
     }
 
-    private class PageViewHolder extends ViewHolderManager.BaseViewHolder<MyPagesPresenter.PageAdapterItem> {
+    public class PageViewHolder extends ViewHolderManager.BaseViewHolder<MyPagesPresenter.PageAdapterItem> {
 
         @Bind(R.id.pages_avatar_iv)
         ImageView avatarIv;

@@ -18,11 +18,13 @@ import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.api.model.PagesResponse;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.PagesDao;
+import com.shoutit.app.android.utils.rx.RxMoreObservers;
 
 import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Observer;
@@ -33,21 +35,18 @@ import rx.subscriptions.CompositeSubscription;
 
 public class MyPagesPresenter {
 
-    @Nonnull
-    private final PagesDao pagesDao;
-    @Nonnull
-    private final Scheduler uiScheduler;
-
     private final PublishSubject<Page> pageSelctedSubject = PublishSubject.create();
     private final Observable<List<BaseAdapterItem>> pagesObservable;
     private final Observable<Boolean> progressObservable;
     private final Observable<Throwable> errorObservable;
+    @Nonnull
+    private final PagesDao pagesDao;
 
+    @Inject
     public MyPagesPresenter(@Nonnull PagesDao pagesDao,
                             @Nonnull @UiScheduler Scheduler uiScheduler,
                             @Nonnull @ForActivity Resources resources) {
         this.pagesDao = pagesDao;
-        this.uiScheduler = uiScheduler;
 
         final Observable<ResponseOrError<PagesResponse>> requestObservable = pagesDao
                 .getPagesObservable()
@@ -93,8 +92,12 @@ public class MyPagesPresenter {
         return errorObservable;
     }
 
-    public Observable<Page> getPageSelctedObservable() {
+    public Observable<Page> getPageSelectedObservable() {
         return pageSelctedSubject;
+    }
+
+    public Observer<Object> getLoadMoreObserver() {
+        return RxMoreObservers.ignoreCompleted(pagesDao.getLoadMoreSubject());
     }
 
     public static class PageAdapterItem extends BaseNoIDAdapterItem {
