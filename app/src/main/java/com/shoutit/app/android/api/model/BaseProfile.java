@@ -1,6 +1,8 @@
 package com.shoutit.app.android.api.model;
 
 
+import android.support.annotation.Nullable;
+
 import com.google.common.base.Objects;
 
 public class BaseProfile implements ProfileType {
@@ -15,10 +17,12 @@ public class BaseProfile implements ProfileType {
     protected final String cover;
     protected final boolean isListening;
     protected final int listenersCount;
+    @Nullable
+    protected final UserLocation location;
 
     public BaseProfile(String id, String type, String username, String name,
-                          String firstName, String lastName, boolean isActivated, String image,
-                          String cover, boolean isListening, int listenersCount) {
+                       String firstName, String lastName, boolean isActivated, String image,
+                       String cover, boolean isListening, int listenersCount, @Nullable UserLocation location) {
         this.id = id;
         this.type = type;
         this.username = username;
@@ -30,6 +34,7 @@ public class BaseProfile implements ProfileType {
         this.cover = cover;
         this.isListening = isListening;
         this.listenersCount = listenersCount;
+        this.location = location;
     }
 
     protected boolean isUser() {
@@ -91,7 +96,12 @@ public class BaseProfile implements ProfileType {
         boolean newIsListening = !isListening;
         int newListenersCount = newIsListening ? listenersCount + 1 : listenersCount - 1;
         return new BaseProfile(id, type, username, name, firstName, lastName, isActivated,
-                image, cover, newIsListening, newListenersCount);
+                image, cover, newIsListening, newListenersCount, location);
+    }
+
+    @Nullable
+    public UserLocation getLocation() {
+        return location;
     }
 
     @Override
@@ -109,12 +119,13 @@ public class BaseProfile implements ProfileType {
                 Objects.equal(firstName, profile.firstName) &&
                 Objects.equal(lastName, profile.lastName) &&
                 Objects.equal(image, profile.image) &&
+                Objects.equal(location, profile.location) &&
                 Objects.equal(cover, profile.cover);
     }
 
     @Override
     public int hashCode() {
         return Objects.hashCode(id, type, username, name, firstName, lastName,
-                isActivated, image, cover, isListening, listenersCount);
+                isActivated, image, cover, isListening, listenersCount, location);
     }
 }

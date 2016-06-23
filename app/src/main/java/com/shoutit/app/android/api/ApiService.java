@@ -31,6 +31,7 @@ import com.shoutit.app.android.api.model.ListeningResponse;
 import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessagesResponse;
 import com.shoutit.app.android.api.model.NotificationsResponse;
+import com.shoutit.app.android.api.model.PagesResponse;
 import com.shoutit.app.android.api.model.PostMessage;
 import com.shoutit.app.android.api.model.ProfileRequest;
 import com.shoutit.app.android.api.model.ProfilesListResponse;
@@ -324,6 +325,11 @@ public interface ApiService {
     Observable<ProfilesListResponse> mutualContacts(@Path("user_name") String userName,
                                                     @Query("page") Integer page,
                                                     @Query("page_size") Integer pageSize);
+
+    @GET("profiles/{user_name}/pages")
+    Observable<PagesResponse> myPages(@Path("user_name") String userName,
+                                      @Query("page") Integer page,
+                                      @Query("page_size") Integer pageSize);
 
     /**
      * Misc
