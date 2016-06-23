@@ -25,9 +25,9 @@ public class PagesPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                return PagesFragment.newInstance(true);
+                return MyPagesFragment.newInstance();
             case 1:
-                return PagesFragment.newInstance(false);
+                return MyPagesFragment.newInstance();
             default:
                 throw new RuntimeException("Unknown pages pager adapter position: " + position);
 

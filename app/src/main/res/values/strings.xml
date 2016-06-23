@@ -683,5 +683,6 @@
     <!-- Pages -->
     <string name="pages_my_pages_tab">My pages</string>
     <string name="pages_public_pages_tab">Public pages</string>
+    <string name="pages_my_empty">You don\'t have any pages yet</string>
 
 </resources>

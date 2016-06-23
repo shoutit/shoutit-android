@@ -38,7 +38,6 @@ public class User extends BaseProfile {
     // whever the profile is listening to you
     private final boolean isListener;
     private final boolean isPasswordSet;
-    private final UserLocation location;
     private final List<Page> pages;
     private final List<Admin> admins;
     private final String bio;
@@ -61,16 +60,15 @@ public class User extends BaseProfile {
 
     public User(String id, String type, String apiUrl, String webUrl, String username,
                 String name, String firstName, String lastName, boolean isActivated, String image,
-                String cover, boolean isListening, boolean isListener, boolean isPasswordSet, UserLocation location,
+                String cover, boolean isListening, boolean isListener, boolean isPasswordSet, @Nullable UserLocation location,
                 int listenersCount, List<Page> pages, List<Admin> admins, String bio, int dateJoined,
                 Listening listeningCount, boolean isOwner, String about, String mobile, String website, String email, ConversationDetails conversation,
                 @Nullable String gender, @Nullable String birthday, @Nullable Stats stats, @Nullable LinkedAccounts linkedAccounts) {
-        super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount);
+        super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount, location);
         this.apiUrl = apiUrl;
         this.webUrl = webUrl;
         this.isListener = isListener;
         this.isPasswordSet = isPasswordSet;
-        this.location = location;
         this.pages = pages;
         this.admins = admins;
         this.bio = bio;

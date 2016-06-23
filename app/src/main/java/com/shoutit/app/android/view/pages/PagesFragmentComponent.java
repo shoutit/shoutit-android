@@ -17,7 +17,7 @@ import dagger.Component;
 )
 public interface PagesFragmentComponent extends BaseFragmentComponent {
 
-    void inject(PagesFragment fragment);
+    void inject(MyPagesFragment fragment);
 }
 
 
