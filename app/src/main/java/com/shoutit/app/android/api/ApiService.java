@@ -30,6 +30,7 @@ import com.shoutit.app.android.api.model.ListeningResponse;
 import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessagesResponse;
 import com.shoutit.app.android.api.model.NotificationsResponse;
+import com.shoutit.app.android.api.model.PageCategory;
 import com.shoutit.app.android.api.model.PostMessage;
 import com.shoutit.app.android.api.model.ProfileRequest;
 import com.shoutit.app.android.api.model.ProfilesListResponse;
@@ -510,4 +511,10 @@ public interface ApiService {
      **/
     @GET("credit/transactions")
     Observable<TransactionRsponse> getTransactions(@Nullable @Query("before") String timestamp);
+
+    /**
+     * Pages
+     */
+    @GET("pages/categories")
+    Observable<List<PageCategory>> pagesCategories();
 }

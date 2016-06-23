@@ -175,6 +175,8 @@
                   android:screenOrientation="portrait"/>
         <activity android:name=".view.createshout.location.LocationActivity"
                   android:screenOrientation="portrait"/>
+        <activity android:name=".view.createpage.CreatePageCategoryActivity"
+                  android:screenOrientation="portrait"/>
         <activity
             android:name=".view.createshout.edit.EditShoutActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"

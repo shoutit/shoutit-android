@@ -5,14 +5,9 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.res.ResourcesCompat;
 import android.text.SpannableString;
-import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.method.PasswordTransformationMethod;
-import android.text.style.ClickableSpan;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.UnderlineSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +29,7 @@ import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.utils.SpanUtils;
 import com.shoutit.app.android.utils.rx.Actions1;
 import com.shoutit.app.android.view.about.AboutActivity;
+import com.shoutit.app.android.view.createpage.CreatePageCategoryActivity;
 import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.signin.LoginActivityComponent;
 import com.shoutit.app.android.view.signin.login.LoginFragment;
@@ -196,12 +192,7 @@ public class RegisterFragment extends BaseFragment {
 
         final String createPageText = getString(R.string.register_create_page_text, getString(R.string.register_create_page_highlight));
         final String createPageClick = getString(R.string.register_create_page_highlight);
-        final SpannableString createPageSpan = SpanUtils.clickableColoredSpan(createPageText, createPageClick, ContextCompat.getColor(getActivity(), R.color.colorAccent), new SpanUtils.OnClickListener() {
-            @Override
-            public void onClick() {
-                // TODO
-            }
-        });
+        final SpannableString createPageSpan = SpanUtils.clickableColoredSpan(createPageText, createPageClick, ContextCompat.getColor(getActivity(), R.color.colorAccent), () -> startActivity(CreatePageCategoryActivity.newIntent(getActivity())));
         mRegisterCreatePage.setMovementMethod(LinkMovementMethod.getInstance());
         mRegisterCreatePage.setText(createPageSpan);
     }

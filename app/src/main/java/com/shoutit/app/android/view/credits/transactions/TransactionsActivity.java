@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -21,6 +20,7 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
+import com.shoutit.app.android.utils.ToolbarUtils;
 
 import java.util.List;
 
@@ -70,9 +70,7 @@ public class TransactionsActivity extends BaseActivity implements TransactionsPr
         mTransactionsRecyclerview.setAdapter(adapter);
         mTransactionsRecyclerview.setLayoutManager(new MyLinearLayoutManager(this));
 
-        mTransactionsToolbar.setTitle(R.string.transactions_title);
-        mTransactionsToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
-        mTransactionsToolbar.setNavigationOnClickListener(view -> finish());
+        ToolbarUtils.setupToolbar(mTransactionsToolbar, R.string.transactions_title, this);
 
         RxRecyclerView.scrollEvents(mTransactionsRecyclerview)
                 .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())

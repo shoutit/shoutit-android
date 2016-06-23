@@ -682,4 +682,11 @@
     <!-- Transactions -->
     <string name="transactions_title">Credit Transactions</string>
 
+    <!-- Create Page Category -->
+    <string
+        name="create_page_category_header_text">
+        Give your brand, product or business a voice on Shoutit and connect easily with your current
+        and potiential customers.\n\nIts. free to set up. Just choose a Page type to get started
+    </string>
+
 </resources>
