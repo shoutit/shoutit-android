@@ -3,8 +3,9 @@ package com.shoutit.app.android.view.createpage;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -19,6 +20,7 @@ import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.utils.ToolbarUtils;
 import com.shoutit.app.android.utils.adapter.ClassViewHolderManager;
 import com.shoutit.app.android.utils.adapter.EmptyClassViewHolderManager;
 import com.squareup.picasso.Picasso;
@@ -33,7 +35,7 @@ import butterknife.ButterKnife;
 
 public class CreatePageCategoryActivity extends BaseActivity implements CreatePageCategoryPresenter.Listener {
 
-    public class CategoryViewBinder {
+    class CategoryViewBinder {
 
         @Bind(R.id.create_page_categories_icon)
         ImageView mCreatePageCategoriesIcon;
@@ -67,6 +69,8 @@ public class CreatePageCategoryActivity extends BaseActivity implements CreatePa
         setContentView(R.layout.create_page_category_activity);
         ButterKnife.bind(this);
 
+        ToolbarUtils.setupToolbar(mCreatePageCategoryToolbar, R.string.create_page_category_title, this);
+
         mAdapter = new UniversalAdapter(ImmutableList.of(
                 new EmptyClassViewHolderManager<>(CreatePageCategoryPresenter.HeaderItem.class, R.layout.create_page_categories_header),
                 new ClassViewHolderManager<CreatePageCategoryPresenter.CategoryItem>(CreatePageCategoryPresenter.CategoryItem.class, R.layout.create_page_categories_item) {
@@ -90,10 +94,27 @@ public class CreatePageCategoryActivity extends BaseActivity implements CreatePa
                     }
                 }));
 
-        mCreatePageCategoryList.setLayoutManager(new LinearLayoutManager(this));
+        mCreatePageCategoryList.setLayoutManager(getGridLayoutManager());
         mCreatePageCategoryList.setAdapter(mAdapter);
 
         mPresenter.register(this);
+    }
+
+    @NonNull
+    private GridLayoutManager getGridLayoutManager() {
+        final GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
+        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                final int viewType = mAdapter.getItemViewType(position);
+                if (viewType == 0) {
+                    return 2;
+                } else {
+                    return 1;
+                }
+            }
+        });
+        return layoutManager;
     }
 
     @Override
