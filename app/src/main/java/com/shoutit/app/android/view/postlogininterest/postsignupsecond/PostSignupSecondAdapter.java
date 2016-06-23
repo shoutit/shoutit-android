@@ -36,7 +36,7 @@ public class PostSignupSecondAdapter extends BaseAdapter {
 
     @Override
     public ViewHolderManager.BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new SuggestionViewHolder(layoutInflater.inflate(R.layout.profile_section_item, parent, false), context, picasso);
+        return new SuggestionViewHolder(layoutInflater.inflate(R.layout.search_results_profile_item, parent, false), context, picasso);
     }
 
     public class SuggestionViewHolder extends ViewHolderManager.BaseViewHolder<PostSignupSecondPresenter.SuggestionAdapterItem> {
