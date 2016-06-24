@@ -18,7 +18,6 @@ import com.appunite.rx.dagger.UiScheduler;
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
 import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.jakewharton.rxbinding.view.RxView;
-import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
@@ -33,8 +32,6 @@ import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.main.MainActivity;
-import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
-import com.shoutit.app.android.view.profile.tagprofile.TagProfileActivity;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -52,7 +49,7 @@ import rx.Subscription;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
-public class NotificationsActivity extends BaseActivity {
+public class NotificationsActivity extends BaseActivity implements NotificationsPresenter.Listener{
 
     @Bind(R.id.notifications_reycler_view)
     RecyclerView recyclerView;
@@ -62,6 +59,8 @@ public class NotificationsActivity extends BaseActivity {
     View progressView;
     @Bind(R.id.notifications_badge)
     TextView notificationBadge;
+    @Bind(R.id.notifications_placeholder)
+    TextView notificationsPlaceholder;
 
     @Inject
     NotificationsPresenter presenter;
@@ -96,6 +95,7 @@ public class NotificationsActivity extends BaseActivity {
         final MyLinearLayoutManager layoutManager = new MyLinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
+        presenter.registerListener(this);
 
         subscription = presenter.getAdapterItemsObservable()
                 .compose(this.<List<BaseAdapterItem>>bindToLifecycle())
@@ -203,6 +203,7 @@ public class NotificationsActivity extends BaseActivity {
         return true;
     }
 
+
     @Override
     protected void onDestroy() {
         if (subscription != null) {
@@ -222,5 +223,11 @@ public class NotificationsActivity extends BaseActivity {
         component.inject(this);
 
         return component;
+    }
+
+    @Override
+    public void emptyList() {
+        notificationsPlaceholder.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.GONE);
     }
 }
