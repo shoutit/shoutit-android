@@ -8,7 +8,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.shoutit.app.android.api.ApiService;
-import com.shoutit.app.android.api.model.PagesResponse;
+import com.shoutit.app.android.api.model.ProfilesListResponse;
 
 import javax.annotation.Nonnull;
 
@@ -46,31 +46,33 @@ public class PublicPagesDaos {
 
     public class PublicPagesDao {
 
-        private final Observable<ResponseOrError<PagesResponse>> pagesObservable;
+        private final Observable<ResponseOrError<ProfilesListResponse>> pagesObservable;
         private final PublishSubject<Object> loadMoreSubject = PublishSubject.create();
+        private final PublishSubject<Object> refreshSubject = PublishSubject.create();
+        private final PublishSubject<ResponseOrError<ProfilesListResponse>> updatedProfilesLocallySubject = PublishSubject.create();
 
         public PublicPagesDao(@Nonnull String countryCode) {
 
-            final OperatorMergeNextToken<PagesResponse, Object> loadMoreOperator =
-                    OperatorMergeNextToken.create(new Func1<PagesResponse, Observable<PagesResponse>>() {
+            final OperatorMergeNextToken<ProfilesListResponse, Object> loadMoreOperator =
+                    OperatorMergeNextToken.create(new Func1<ProfilesListResponse, Observable<ProfilesListResponse>>() {
                         private int pageNumber = 0;
 
                         @Override
-                        public Observable<PagesResponse> call(PagesResponse previousResponse) {
+                        public Observable<ProfilesListResponse> call(ProfilesListResponse previousResponse) {
                             if (previousResponse == null || previousResponse.getNext() != null) {
                                 if (previousResponse == null) {
                                     pageNumber = 0;
                                 }
                                 ++pageNumber;
 
-                                final Observable<PagesResponse> apiRequest = apiService.getPublicPages(
+                                final Observable<ProfilesListResponse> apiRequest = apiService.getPublicPages(
                                         countryCode, pageNumber, PAGE_SIZE)
                                         .subscribeOn(networkScheduler);
 
                                 if (previousResponse == null) {
                                     return apiRequest;
                                 } else {
-                                    return Observable.just(previousResponse).zipWith(apiRequest, new MergePagesResponses());
+                                    return Observable.just(previousResponse).zipWith(apiRequest, new MergeProfilesListResponses());
                                 }
                             } else {
                                 return Observable.never();
@@ -78,20 +80,32 @@ public class PublicPagesDaos {
                         }
                     });
 
+
             pagesObservable = loadMoreSubject.startWith((Object) null)
                     .lift(loadMoreOperator)
-                    .compose(ResponseOrError.<PagesResponse>toResponseOrErrorObservable())
-                    .compose(MoreOperators.<ResponseOrError<PagesResponse>>cacheWithTimeout(networkScheduler))
-                    .mergeWith(Observable.never());
+                    .compose(ResponseOrError.<ProfilesListResponse>toResponseOrErrorObservable())
+                    .compose(MoreOperators.<ResponseOrError<ProfilesListResponse>>refresh(refreshSubject))
+                    .mergeWith(updatedProfilesLocallySubject)
+                    .compose(MoreOperators.<ResponseOrError<ProfilesListResponse>>cacheWithTimeout(networkScheduler));
 
         }
 
-        public Observable<ResponseOrError<PagesResponse>> getPagesObservable() {
+        public Observable<ResponseOrError<ProfilesListResponse>> getPagesObservable() {
             return pagesObservable;
         }
 
         public Observer<Object> getLoadMoreSubject() {
             return loadMoreSubject;
+        }
+
+        @Nonnull
+        public PublishSubject<Object> getRefreshSubject() {
+            return refreshSubject;
+        }
+
+        @Nonnull
+        public Observer<ResponseOrError<ProfilesListResponse>> updatedProfileLocallyObserver() {
+            return updatedProfilesLocallySubject;
         }
     }
 }

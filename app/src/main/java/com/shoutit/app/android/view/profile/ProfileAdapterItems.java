@@ -61,12 +61,12 @@ public class ProfileAdapterItems {
 
         @Override
         public boolean matches(@Nonnull BaseAdapterItem item) {
-            return item instanceof NameAdapterItem;
+            return item instanceof UserInfoAdapterItem;
         }
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof NameAdapterItem && user.equals(((NameAdapterItem) item).getUser());
+            return item instanceof UserInfoAdapterItem && user.equals(((UserInfoAdapterItem) item).getUser());
         }
 
         @Nonnull

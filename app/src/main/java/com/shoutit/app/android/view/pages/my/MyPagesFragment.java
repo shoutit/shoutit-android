@@ -1,5 +1,7 @@
 package com.shoutit.app.android.view.pages.my;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
@@ -19,6 +21,7 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.pages.PagesAdapter;
+import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -26,7 +29,9 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 
-public class MyPagesFragment extends BaseFragment {
+public class MyPagesFragment extends BaseFragment implements MyPagesDialog.PagesDialogListener {
+
+    public static final int REQUEST_OPENED_PROFILE_WAS_LISTENED = 1;
 
     @Bind(R.id.pages_recycler_view)
     RecyclerView recyclerView;
@@ -87,8 +92,18 @@ public class MyPagesFragment extends BaseFragment {
 
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK && (requestCode == REQUEST_OPENED_PROFILE_WAS_LISTENED)) {
+            // Need to refresh items if returned from other profile which was listened/unlistened.
+            presenter.refreshData();
+        } else {
+            super.onActivityResult(requestCode, requestCode, data);
+        }
+    }
+
     private void showOptionsDialog(@Nonnull Page page) {
-        dialog.show(page);
+        dialog.show(page, this);
     }
 
     @Override
@@ -100,5 +115,22 @@ public class MyPagesFragment extends BaseFragment {
                 .fragmentModule(fragmentModule)
                 .build()
                 .inject(this);
+    }
+
+    @Override
+    public void showProfile(String userName) {
+        getParentFragment().startActivityForResult(
+                UserOrPageProfileActivity.newIntent(getActivity(), userName),
+                REQUEST_OPENED_PROFILE_WAS_LISTENED);
+    }
+
+    @Override
+    public void editPage(String userName) {
+        // TODO
+    }
+
+    @Override
+    public void useShoutItAsPage(String userName) {
+        // TODO
     }
 }

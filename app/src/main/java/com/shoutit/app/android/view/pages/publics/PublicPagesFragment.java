@@ -1,5 +1,7 @@
 package com.shoutit.app.android.view.pages.publics;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +20,8 @@ import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
+import com.shoutit.app.android.utils.rx.RxUtils;
+import com.shoutit.app.android.view.listenings.ProfilesListAdapter;
 import com.shoutit.app.android.view.pages.PagesAdapter;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 
@@ -26,9 +30,12 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
+import rx.functions.Action1;
 
 
 public class PublicPagesFragment extends BaseFragment {
+
+    public static final int REQUEST_OPENED_PROFILE_WAS_LISTENED = 1;
 
     @Bind(R.id.pages_recycler_view)
     RecyclerView recyclerView;
@@ -38,7 +45,7 @@ public class PublicPagesFragment extends BaseFragment {
     @Inject
     PublicPagesPresenter presenter;
     @Inject
-    PagesAdapter adapter;
+    ProfilesListAdapter adapter;
 
     public static Fragment newInstance() {
         return new PublicPagesFragment();
@@ -60,7 +67,7 @@ public class PublicPagesFragment extends BaseFragment {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
 
-        presenter.getPagesObservable()
+        presenter.getAdapterItemsObservable()
                 .compose(bindToLifecycle())
                 .subscribe(adapter);
 
@@ -72,11 +79,31 @@ public class PublicPagesFragment extends BaseFragment {
                 .compose(bindToLifecycle())
                 .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(getActivity())));
 
-        presenter.getPageSelectedObservable()
+        presenter.getListenSuccessObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(RxUtils.listenMessageAction(getActivity()));
+
+        presenter.getUnListenSuccessObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(RxUtils.unListenMessageAction(getActivity()));
+
+        presenter.getLoadMoreObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
+
+        presenter.getLoadMoreObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
+
+        presenter.getRefreshDataObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
+
+        presenter.getProfileToOpenObservable()
                 .compose(bindToLifecycle())
                 .subscribe(this::showPageProfile);
 
-        presenter.getLoadMoreObservable()
+        presenter.getListeningObservable()
                 .compose(bindToLifecycle())
                 .subscribe();
 
@@ -87,8 +114,10 @@ public class PublicPagesFragment extends BaseFragment {
 
     }
 
-    private void showPageProfile(@Nonnull Page page) {
-        startActivity(UserOrPageProfileActivity.newIntent(getActivity(), page.getUsername()));
+    private void showPageProfile(@Nonnull String userName) {
+        getParentFragment().startActivityForResult(
+                UserOrPageProfileActivity.newIntent(getActivity(), userName),
+                REQUEST_OPENED_PROFILE_WAS_LISTENED);
     }
 
     @Override
@@ -100,6 +129,16 @@ public class PublicPagesFragment extends BaseFragment {
                 .fragmentModule(fragmentModule)
                 .build()
                 .inject(this);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK && (requestCode == REQUEST_OPENED_PROFILE_WAS_LISTENED)) {
+            // Need to refresh items if returned from other profile which was listened/unlistened.
+            presenter.refreshData();
+        } else {
+            super.onActivityResult(requestCode, requestCode, data);
+        }
     }
 }
 

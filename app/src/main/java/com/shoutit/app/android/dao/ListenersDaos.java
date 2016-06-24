@@ -11,7 +11,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.BaseProfile;
-import com.shoutit.app.android.api.model.ListenersResponse;
+import com.shoutit.app.android.api.model.ProfilesListResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,38 +50,38 @@ public class ListenersDaos {
     public class ListenersDao {
 
         @Nonnull
-        private final Observable<ResponseOrError<ListenersResponse>> listeningObservable;
+        private final Observable<ResponseOrError<ProfilesListResponse>> listeningObservable;
         @Nonnull
         private final PublishSubject<Object> loadMoreSubject = PublishSubject.create();
         @Nonnull
         private final PublishSubject<Object> refreshSubject = PublishSubject.create();
         @Nonnull
-        private PublishSubject<ResponseOrError<ListenersResponse>> updateResponseLocally = PublishSubject.create();
+        private PublishSubject<ResponseOrError<ProfilesListResponse>> updateResponseLocally = PublishSubject.create();
 
         public ListenersDao(final ApiService apiService,
                             @NetworkScheduler final Scheduler networkScheduler,
                             @Nonnull final String userName) {
 
-            final OperatorMergeNextToken<ListenersResponse, Object> loadMoreOperator =
-                    OperatorMergeNextToken.create(new Func1<ListenersResponse, Observable<ListenersResponse>>() {
+            final OperatorMergeNextToken<ProfilesListResponse, Object> loadMoreOperator =
+                    OperatorMergeNextToken.create(new Func1<ProfilesListResponse, Observable<ProfilesListResponse>>() {
                         private int pageNumber = 0;
 
                         @Override
-                        public Observable<ListenersResponse> call(ListenersResponse previousResponse) {
+                        public Observable<ProfilesListResponse> call(ProfilesListResponse previousResponse) {
                             if (previousResponse == null || previousResponse.getNext() != null) {
                                 if (previousResponse == null) {
                                     pageNumber = 0;
                                 }
                                 ++pageNumber;
 
-                                final Observable<ListenersResponse> apiRequest = apiService
+                                final Observable<ProfilesListResponse> apiRequest = apiService
                                         .listeners(userName, pageNumber, PAGE_SIZE)
                                         .subscribeOn(networkScheduler);
 
                                 if (previousResponse == null) {
                                     return apiRequest;
                                 } else {
-                                    return Observable.just(previousResponse).zipWith(apiRequest, new MergeListenersResponses());
+                                    return Observable.just(previousResponse).zipWith(apiRequest, new MergeProfilesListResponses());
                                 }
                             } else {
                                 return Observable.never();
@@ -91,15 +91,15 @@ public class ListenersDaos {
 
             listeningObservable = loadMoreSubject.startWith((Object) null)
                     .lift(loadMoreOperator)
-                    .compose(MoreOperators.<ListenersResponse>refresh(refreshSubject))
-                    .compose(ResponseOrError.<ListenersResponse>toResponseOrErrorObservable())
+                    .compose(MoreOperators.<ProfilesListResponse>refresh(refreshSubject))
+                    .compose(ResponseOrError.<ProfilesListResponse>toResponseOrErrorObservable())
                     .mergeWith(updateResponseLocally)
-                    .mergeWith(Observable.<ResponseOrError<ListenersResponse>>never());
+                    .mergeWith(Observable.<ResponseOrError<ProfilesListResponse>>never());
 
         }
 
         @NonNull
-        public Observable<ResponseOrError<ListenersResponse>> getLstenersObservable() {
+        public Observable<ResponseOrError<ProfilesListResponse>> getLstenersObservable() {
             return listeningObservable;
         }
 
@@ -114,24 +114,8 @@ public class ListenersDaos {
         }
 
         @Nonnull
-        public Observer<ResponseOrError<ListenersResponse>> getUpdateResponseLocally() {
+        public Observer<ResponseOrError<ProfilesListResponse>> getUpdateResponseLocally() {
             return updateResponseLocally;
         }
     }
-
-    private class MergeListenersResponses implements Func2<ListenersResponse, ListenersResponse, ListenersResponse> {
-
-        @Override
-        public ListenersResponse call(ListenersResponse previousResponses,
-                                      ListenersResponse newResponse) {
-            final List<BaseProfile> profiles = previousResponses.getProfiles();
-
-            final List<BaseProfile> updatedProfile = new ArrayList<>(profiles);
-            updatedProfile.addAll(previousResponses.getProfiles());
-
-            return new ListenersResponse(previousResponses.getCount(), previousResponses.getNext(),
-                    previousResponses.getPrevious(), updatedProfile);
-        }
-    }
-
 }
