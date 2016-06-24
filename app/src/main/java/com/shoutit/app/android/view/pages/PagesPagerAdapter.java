@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.view.pages.my.MyPagesFragment;
+import com.shoutit.app.android.view.pages.publics.PublicPagesFragment;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -29,7 +30,7 @@ public class PagesPagerAdapter extends FragmentPagerAdapter {
             case 0:
                 return MyPagesFragment.newInstance();
             case 1:
-                return MyPagesFragment.newInstance();
+                return PublicPagesFragment.newInstance();
             default:
                 throw new RuntimeException("Unknown pages pager adapter position: " + position);
 

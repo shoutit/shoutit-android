@@ -520,4 +520,12 @@ public interface ApiService {
 
     @GET("credit/invitation_code")
     Observable<InvitationCodeResponse> getInvitationCode();
+
+    /**
+     * Pages
+     **/
+    @GET("pages")
+    Observable<PagesResponse> getPublicPages(@Query("country") String countryCode,
+                                             @Query("page") Integer page,
+                                             @Query("page_size") Integer pageSize);
 }

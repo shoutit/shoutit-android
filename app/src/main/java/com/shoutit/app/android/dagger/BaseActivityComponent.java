@@ -19,6 +19,7 @@ import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ListeningsDao;
 import com.shoutit.app.android.dao.PagesDao;
 import com.shoutit.app.android.dao.ProfilesDao;
+import com.shoutit.app.android.dao.PublicPagesDaos;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.SortTypesDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
@@ -85,6 +86,8 @@ public interface BaseActivityComponent {
     SuggestionsDao suggestionsDao();
 
     ListeningsDao listeningsDao();
+
+    PublicPagesDaos publicPagesDaos();
 
     GoogleApiClient googleApiClient();
 

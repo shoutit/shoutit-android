@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.pages.my;
+package com.shoutit.app.android.view.pages.publics;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -19,6 +19,7 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.pages.PagesAdapter;
+import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -26,7 +27,8 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 
-public class MyPagesFragment extends BaseFragment {
+
+public class PublicPagesFragment extends BaseFragment {
 
     @Bind(R.id.pages_recycler_view)
     RecyclerView recyclerView;
@@ -34,14 +36,12 @@ public class MyPagesFragment extends BaseFragment {
     View progressView;
 
     @Inject
-    MyPagesPresenter presenter;
+    PublicPagesPresenter presenter;
     @Inject
     PagesAdapter adapter;
-    @Inject
-    MyPagesDialog dialog;
 
     public static Fragment newInstance() {
-        return new MyPagesFragment();
+        return new PublicPagesFragment();
     }
 
     @android.support.annotation.Nullable
@@ -74,7 +74,7 @@ public class MyPagesFragment extends BaseFragment {
 
         presenter.getPageSelectedObservable()
                 .compose(bindToLifecycle())
-                .subscribe(this::showOptionsDialog);
+                .subscribe(this::showPageProfile);
 
         presenter.getLoadMoreObservable()
                 .compose(bindToLifecycle())
@@ -87,18 +87,19 @@ public class MyPagesFragment extends BaseFragment {
 
     }
 
-    private void showOptionsDialog(@Nonnull Page page) {
-        dialog.show(page);
+    private void showPageProfile(@Nonnull Page page) {
+        startActivity(UserOrPageProfileActivity.newIntent(getActivity(), page.getUsername()));
     }
 
     @Override
     protected void injectComponent(@Nonnull BaseActivityComponent baseActivityComponent,
                                    @Nonnull FragmentModule fragmentModule,
                                    @Nullable Bundle savedInstanceState) {
-        DaggerPagesFragmentComponent.builder()
+        DaggerPublicPagesFragmentComponent.builder()
                 .baseActivityComponent(baseActivityComponent)
                 .fragmentModule(fragmentModule)
                 .build()
                 .inject(this);
     }
 }
+

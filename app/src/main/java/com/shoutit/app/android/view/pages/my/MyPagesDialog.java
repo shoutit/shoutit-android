@@ -9,6 +9,7 @@ import android.widget.Button;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -45,7 +46,7 @@ public class MyPagesDialog {
         ButterKnife.bind(this, view);
 
         viewPageBtn.setOnClickListener(v -> {
-            // TODO
+            mContext.startActivity(UserOrPageProfileActivity.newIntent(mContext, page.getUsername()));
             alertDialog.dismiss();
         });
 
