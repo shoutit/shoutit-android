@@ -7,14 +7,14 @@ public class SignResponse {
     private final String tokenType;
     private final String refreshToken;
     private final boolean newSignup;
-    private final User user;
+    private final User profile;
 
-    public SignResponse(String accessToken, String tokenType, String refreshToken, boolean newSignup, User user) {
+    public SignResponse(String accessToken, String tokenType, String refreshToken, boolean newSignup, User profile) {
         this.accessToken = accessToken;
         this.tokenType = tokenType;
         this.refreshToken = refreshToken;
         this.newSignup = newSignup;
-        this.user = user;
+        this.profile = profile;
     }
 
     public String getAccessToken() {
@@ -33,7 +33,7 @@ public class SignResponse {
         return newSignup;
     }
 
-    public User getUser() {
-        return user;
+    public User getProfile() {
+        return profile;
     }
 }

@@ -13,9 +13,9 @@ public class EmailLoginRequest extends BaseLoginRequest {
 
     public EmailLoginRequest(@NonNull String email,
                              @NonNull String password,
-                             @Nullable LoginUser loginUser,
+                             @Nullable LoginProfile loginProfile,
                              @NonNull String mixpanelDistinctId) {
-        super(mixpanelDistinctId, SHOUTIT_LOGIN, loginUser);
+        super(mixpanelDistinctId, SHOUTIT_LOGIN, loginProfile);
         this.email = email;
         this.password = password;
     }

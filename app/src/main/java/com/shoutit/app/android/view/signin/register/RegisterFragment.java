@@ -29,7 +29,7 @@ import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.utils.SpanUtils;
 import com.shoutit.app.android.utils.rx.Actions1;
 import com.shoutit.app.android.view.about.AboutActivity;
-import com.shoutit.app.android.view.createpage.CreatePageCategoryActivity;
+import com.shoutit.app.android.view.createpage.pagecategory.CreatePageCategoryActivity;
 import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.signin.LoginActivityComponent;
 import com.shoutit.app.android.view.signin.login.LoginFragment;

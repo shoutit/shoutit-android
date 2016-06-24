@@ -67,6 +67,7 @@ import com.shoutit.app.android.api.model.VideoCallRequest;
 import com.shoutit.app.android.api.model.login.EmailLoginRequest;
 import com.shoutit.app.android.api.model.login.FacebookLogin;
 import com.shoutit.app.android.api.model.login.GoogleLogin;
+import com.shoutit.app.android.api.model.login.PageLoginRequest;
 import com.shoutit.app.android.model.MobilePhoneResponse;
 import com.shoutit.app.android.model.ReportBody;
 
@@ -234,6 +235,9 @@ public interface ApiService {
 
     @POST("oauth2/access_token")
     Observable<SignResponse> loginGuest(@Body GuestSignupRequest request);
+
+    @POST("oauth2/access_token")
+    Observable<SignResponse> createPage(@Body PageLoginRequest request);
 
     @POST("oauth2/access_token")
     Observable<SignResponse> signup(@Body EmailSignupRequest request);

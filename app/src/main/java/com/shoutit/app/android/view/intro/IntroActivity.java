@@ -20,7 +20,7 @@ import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.GuestSignupRequest;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.UserLocation;
-import com.shoutit.app.android.api.model.login.LoginUser;
+import com.shoutit.app.android.api.model.login.LoginProfile;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.location.LocationManager;
@@ -116,7 +116,7 @@ public class IntroActivity extends BaseActivity {
                 .flatMap(new Func1<UserLocation, Observable<SignResponse>>() {
                     @Override
                     public Observable<SignResponse> call(UserLocation location) {
-                        return mApiService.loginGuest(new GuestSignupRequest(LoginUser.loginUser(location), mixPanel.getDistinctId()))
+                        return mApiService.loginGuest(new GuestSignupRequest(LoginProfile.loginUser(location), mixPanel.getDistinctId()))
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(MyAndroidSchedulers.mainThread());
                     }

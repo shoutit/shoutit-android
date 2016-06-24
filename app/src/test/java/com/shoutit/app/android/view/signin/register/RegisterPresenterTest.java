@@ -11,8 +11,6 @@ import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.UserLocationSimple;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.mixpanel.MixPanel;
-import com.shoutit.app.android.utils.LocationUtils;
-import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.Validators;
 
 import org.junit.Before;
@@ -280,7 +278,7 @@ public class RegisterPresenterTest {
         final ArgumentCaptor<EmailSignupRequest> argumentCaptor = ArgumentCaptor.forClass(EmailSignupRequest.class);
         verify(mApiService).signup(argumentCaptor.capture());
 
-        final UserLocationSimple location = argumentCaptor.getValue().getUser().getLocation();
+        final UserLocationSimple location = argumentCaptor.getValue().getProfile().getLocation();
         assert_().that(location.getLatitude()).isEqualTo(1d);
         assert_().that(location.getLongitude()).isEqualTo(1d);
     }

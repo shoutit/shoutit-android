@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.createpage;
+package com.shoutit.app.android.view.createpage.pagecategory;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.UniversalAdapter;
+import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
@@ -21,8 +22,9 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ToolbarUtils;
-import com.shoutit.app.android.utils.adapter.ClassViewHolderManager;
-import com.shoutit.app.android.utils.adapter.EmptyClassViewHolderManager;
+import com.shoutit.app.android.utils.adapter.BaseViewHolderManager;
+import com.shoutit.app.android.utils.adapter.EmptyViewHolder;
+import com.shoutit.app.android.view.createpage.pagedetails.CreatePageDetailsActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -35,15 +37,28 @@ import butterknife.ButterKnife;
 
 public class CreatePageCategoryActivity extends BaseActivity implements CreatePageCategoryPresenter.Listener {
 
-    class CategoryViewBinder {
+    class CategoryViewBinder extends ViewHolderManager.BaseViewHolder<CreatePageCategoryPresenter.CategoryItem> {
 
+        private final View mView;
         @Bind(R.id.create_page_categories_icon)
         ImageView mCreatePageCategoriesIcon;
         @Bind(R.id.create_page_categories_text)
         TextView mCreatePageCategoriesText;
 
         public CategoryViewBinder(View view) {
+            super(view);
+            mView = view;
             ButterKnife.bind(this, view);
+        }
+
+        @Override
+        public void bind(@Nonnull CreatePageCategoryPresenter.CategoryItem categoryItem) {
+            picasso.load(categoryItem.getImage())
+                    .fit()
+                    .into(mCreatePageCategoriesIcon);
+
+            mCreatePageCategoriesText.setText(categoryItem.getName());
+            mView.setOnClickListener(v -> categoryItem.click());
         }
     }
 
@@ -72,27 +87,8 @@ public class CreatePageCategoryActivity extends BaseActivity implements CreatePa
         ToolbarUtils.setupToolbar(mCreatePageCategoryToolbar, R.string.create_page_category_title, this);
 
         mAdapter = new UniversalAdapter(ImmutableList.of(
-                new EmptyClassViewHolderManager<>(CreatePageCategoryPresenter.HeaderItem.class, R.layout.create_page_categories_header),
-                new ClassViewHolderManager<CreatePageCategoryPresenter.CategoryItem>(CreatePageCategoryPresenter.CategoryItem.class, R.layout.create_page_categories_item) {
-
-                    @Override
-                    public ViewBinder createViewBinder(View view) {
-                        return new ViewBinder() {
-
-                            CategoryViewBinder binder = new CategoryViewBinder(view);
-
-                            @Override
-                            public void bind(CreatePageCategoryPresenter.CategoryItem categoryItem) {
-                                picasso.load(categoryItem.getImage())
-                                        .fit()
-                                        .into(binder.mCreatePageCategoriesIcon);
-
-                                binder.mCreatePageCategoriesText.setText(categoryItem.getName());
-                                view.setOnClickListener(v -> categoryItem.click());
-                            }
-                        };
-                    }
-                }));
+                new BaseViewHolderManager<>(R.layout.create_page_categories_header, EmptyViewHolder::new, CreatePageCategoryPresenter.HeaderItem.class),
+                new BaseViewHolderManager<>(R.layout.create_page_categories_item, CategoryViewBinder::new, CreatePageCategoryPresenter.CategoryItem.class)));
 
         mCreatePageCategoryList.setLayoutManager(getGridLayoutManager());
         mCreatePageCategoryList.setAdapter(mAdapter);
@@ -147,5 +143,10 @@ public class CreatePageCategoryActivity extends BaseActivity implements CreatePa
     @Override
     public void error() {
 
+    }
+
+    @Override
+    public void startDetailsActivity(String categoryId) {
+        startActivity(CreatePageDetailsActivity.newIntent(this, categoryId));
     }
 }

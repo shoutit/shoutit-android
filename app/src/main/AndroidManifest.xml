@@ -175,7 +175,9 @@
                   android:screenOrientation="portrait"/>
         <activity android:name=".view.createshout.location.LocationActivity"
                   android:screenOrientation="portrait"/>
-        <activity android:name=".view.createpage.CreatePageCategoryActivity"
+        <activity android:name=".view.createpage.pagecategory.CreatePageCategoryActivity"
+                  android:screenOrientation="portrait"/>
+        <activity android:name=".view.createpage.pagedetails.CreatePageDetailsActivity"
                   android:screenOrientation="portrait"/>
         <activity
             android:name=".view.createshout.edit.EditShoutActivity"

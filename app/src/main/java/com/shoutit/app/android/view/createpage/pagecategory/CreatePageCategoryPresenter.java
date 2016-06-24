@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.createpage;
+package com.shoutit.app.android.view.createpage.pagecategory;
 
 import android.support.annotation.NonNull;
 
@@ -68,6 +68,10 @@ public class CreatePageCategoryPresenter {
         mCompositeSubscription.unsubscribe();
     }
 
+    private void itemClicked(String id) {
+        mListener.startDetailsActivity(id);
+    }
+
     public interface Listener {
 
         void setData(List<BaseAdapterItem> items);
@@ -76,9 +80,10 @@ public class CreatePageCategoryPresenter {
 
         void error();
 
+        void startDetailsActivity(String categoryId);
     }
 
-    public static class CategoryItem extends BaseNoIDAdapterItem {
+    public class CategoryItem extends BaseNoIDAdapterItem {
 
         private final String id;
         private final String name;
@@ -134,7 +139,7 @@ public class CreatePageCategoryPresenter {
         }
 
         public void click() {
-
+            itemClicked(id);
         }
     }
 

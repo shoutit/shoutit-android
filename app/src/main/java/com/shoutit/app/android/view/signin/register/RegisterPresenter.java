@@ -1,7 +1,6 @@
 package com.shoutit.app.android.view.signin.register;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
@@ -14,8 +13,9 @@ import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.UserLocation;
-import com.shoutit.app.android.api.model.login.LoginUser;
+import com.shoutit.app.android.api.model.login.LoginProfile;
 import com.shoutit.app.android.mixpanel.MixPanel;
+import com.shoutit.app.android.utils.LoginUtils;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.utils.Validators;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
@@ -26,9 +26,7 @@ import javax.inject.Inject;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
-import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.functions.Func3;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
@@ -62,41 +60,21 @@ public class RegisterPresenter {
                 .compose(ObservableExtensions.<UserLocation>behaviorRefCount());
 
         final Observable<ResponseOrError<SignResponse>> responseOrErrorObservable = mProceedSubject
-                .map(new Func1<Object, Boolean>() {
-                    @Override
-                    public Boolean call(Object o) {
-                        return areValuesCorrect();
-                    }
-                })
+                .map(o -> areValuesCorrect())
                 .filter(Functions1.isTrue())
-                .switchMap(new Func1<Boolean, Observable<UserLocation>>() {
-                    @Override
-                    public Observable<UserLocation> call(Boolean aBoolean) {
-                        return mLocationObservable.filter(Functions1.isNotNull()).first();
-                    }
-                })
+                .switchMap(aBoolean -> mLocationObservable.filter(Functions1.isNotNull()).first())
                 .switchMap(new Func1<UserLocation, Observable<EmailSignupRequest>>() {
                     @Override
                     public Observable<EmailSignupRequest> call(final UserLocation location) {
                         return Observable.zip(mNameSubject, mEmailSubject, mPasswordSubject,
-                                new Func3<String, String, String, EmailSignupRequest>() {
-                                    @Override
-                                    public EmailSignupRequest call(String name, String email, String password) {
-                                        return new EmailSignupRequest(name, email, password, LoginUser.loginUser(location), mixPanel.getDistinctId());
-                                    }
-                                })
+                                (name, email, password) -> new EmailSignupRequest(name, email, password, LoginProfile.loginUser(location), mixPanel.getDistinctId()))
                                 .first();
                     }
                 })
-                .switchMap(new Func1<EmailSignupRequest, Observable<ResponseOrError<SignResponse>>>() {
-                    @Override
-                    public Observable<ResponseOrError<SignResponse>> call(EmailSignupRequest signupRequest) {
-                        return apiService.signup(signupRequest)
-                                .subscribeOn(networkScheduler)
-                                .observeOn(uiScheduler)
-                                .compose(ResponseOrError.<SignResponse>toResponseOrErrorObservable());
-                    }
-                })
+                .switchMap(signupRequest -> apiService.signup(signupRequest)
+                        .subscribeOn(networkScheduler)
+                        .observeOn(uiScheduler)
+                        .compose(ResponseOrError.<SignResponse>toResponseOrErrorObservable()))
                 .compose(ObservableExtensions.<ResponseOrError<SignResponse>>behaviorRefCount());
 
 
@@ -110,30 +88,22 @@ public class RegisterPresenter {
 
         mSuccessObservable = responseOrErrorObservable
                 .compose(ResponseOrError.<SignResponse>onlySuccess())
-                .doOnNext(new Action1<SignResponse>() {
-                    @Override
-                    public void call(SignResponse signResponse) {
-                        userPreferences.setLoggedIn(signResponse.getAccessToken(),
-                                signResponse.getRefreshToken(), signResponse.getUser());
-                        userPreferences.setShouldAskForInterestTrue();
-                    }
+                .doOnNext(signResponse -> {
+                    userPreferences.setLoggedIn(signResponse.getAccessToken(),
+                            signResponse.getRefreshToken(), signResponse.getProfile());
+                    userPreferences.setShouldAskForInterestTrue();
                 });
 
         mErrorObservable = responseOrErrorObservable.compose(ResponseOrError.<SignResponse>onlyError());
 
         wrongEmailErrorObservable = mProceedSubject
-                .map(new Func1<Object, Boolean>() {
-                    @Override
-                    public Boolean call(Object o) {
-                        return !isEmailCorrect();
-                    }
-                });
+                .map(o -> !isEmailCorrect());
     }
 
     private boolean areValuesCorrect() {
         return isEmailCorrect() &&
                 !Strings.isNullOrEmpty(mNameSubject.getValue()) &&
-                isPasswordCorrect(mPasswordSubject.getValue());
+                LoginUtils.isPasswordCorrect(mPasswordSubject.getValue());
     }
 
     private boolean isEmailCorrect() {
@@ -147,17 +117,10 @@ public class RegisterPresenter {
 
     @NonNull
     private Func1<? super CharSequence, Boolean> getLessThan6AndMoreThan20CharsFunc1() {
-        return new Func1<CharSequence, Boolean>() {
-            @Override
-            public Boolean call(CharSequence charSequence) {
-                final int length = charSequence.length();
-                return length < 6 || length > 20;
-            }
+        return charSequence -> {
+            final int length = charSequence.length();
+            return length < 6 || length > 20;
         };
-    }
-
-    private boolean isPasswordCorrect(@Nullable String password) {
-        return password != null && password.length() >= 6 && password.length() <= 20;
     }
 
     @NonNull
