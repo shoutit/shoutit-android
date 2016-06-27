@@ -23,7 +23,7 @@ public class ListeningHalfPresenter {
     private final PublishSubject<BaseProfile> listenProfileSubject = PublishSubject.create();
 
     @Nonnull
-    private final ApiService apiService;
+    protected final ApiService apiService;
     private final Scheduler networkScheduler;
     private final Scheduler uiScheduler;
 
@@ -42,18 +42,17 @@ public class ListeningHalfPresenter {
                 .withLatestFrom(successRequest, ProfilesHelper.ProfileToListenWithLastResponse::new)
                 .switchMap(profileToListenWithLastResponse -> {
 
-                    final String profileId = profileToListenWithLastResponse.getProfile().getUsername();
                     final boolean isListeningToProfile = profileToListenWithLastResponse.getProfile().isListening();
 
                     Observable<ResponseOrError<ResponseBody>> listenRequestObservable;
                     if (isListeningToProfile) {
-                        listenRequestObservable = apiService.unlistenProfile(profileId)
+                        listenRequestObservable = getUnlistenRequest(profileToListenWithLastResponse.getProfile())
                                 .subscribeOn(networkScheduler)
                                 .observeOn(uiScheduler)
                                 .doOnNext(responseBody -> unListenSuccess.onNext(profileToListenWithLastResponse.getProfile().getName()))
                                 .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
                     } else {
-                        listenRequestObservable = apiService.listenProfile(profileId)
+                        listenRequestObservable = getListenRequest(profileToListenWithLastResponse.getProfile())
                                 .subscribeOn(networkScheduler)
                                 .observeOn(uiScheduler)
                                 .doOnNext(responseBody -> listenSuccess.onNext(profileToListenWithLastResponse.getProfile().getName()))
@@ -63,7 +62,7 @@ public class ListeningHalfPresenter {
                     return listenRequestObservable
                             .map(response -> {
                                 if (response.isData()) {
-                                    return ResponseOrError.fromData(ProfilesHelper.updateLastResponseWithListenedProfiles(profileToListenWithLastResponse));
+                                    return ResponseOrError.fromData(updateResponseWithListenedProfiles(profileToListenWithLastResponse));
                                 } else {
                                     errorSubject.onNext(new Throwable());
                                     // On error return current user in order to select/deselect already deselected/selected item
@@ -71,6 +70,10 @@ public class ListeningHalfPresenter {
                                 }
                             });
                 });
+    }
+
+    protected ProfilesListResponse updateResponseWithListenedProfiles(@Nonnull ProfilesHelper.ProfileToListenWithLastResponse profileToListenWithLastResponse) {
+        return ProfilesHelper.updateLastResponseWithListenedProfiles(profileToListenWithLastResponse);
     }
 
     @Nonnull
@@ -90,5 +93,15 @@ public class ListeningHalfPresenter {
 
     public PublishSubject<BaseProfile> getListenProfileSubject() {
         return listenProfileSubject;
+    }
+
+    @Nonnull
+    public Observable<ResponseBody> getListenRequest(@Nonnull BaseProfile baseProfile) {
+        return apiService.listenProfile(baseProfile.getUsername());
+    }
+
+    @Nonnull
+    public Observable<ResponseBody> getUnlistenRequest(@Nonnull BaseProfile baseProfile) {
+        return apiService.unlistenProfile(baseProfile.getUsername());
     }
 }

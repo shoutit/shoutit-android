@@ -16,14 +16,14 @@ import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.ProfilesListResponse;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.dao.BaseProfileListDao;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.utils.ListeningHalfPresenter;
 import com.shoutit.app.android.utils.PreferencesHelper;
-import com.shoutit.app.android.utils.rx.RxMoreObservers;
 import com.shoutit.app.android.view.invitefriends.InviteFriendsPresenter;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
+import com.shoutit.app.android.view.profileslist.BaseProfileListPresenter;
 import com.shoutit.app.android.view.profileslist.ProfileListAdapterItem;
-import com.shoutit.app.android.view.profileslist.ProfilesListPresenter;
 
 import java.util.List;
 
@@ -36,7 +36,7 @@ import rx.Scheduler;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
-public class FacebookFriendsPresenter extends ProfilesListPresenter {
+public class FacebookFriendsPresenter extends BaseProfileListPresenter {
 
     private final PublishSubject<String> openProfileSubject = PublishSubject.create();
     private final PublishSubject<Object> progressSubject = PublishSubject.create();
@@ -49,6 +49,7 @@ public class FacebookFriendsPresenter extends ProfilesListPresenter {
 
     private final ProfilesDao dao;
     private final InviteFriendsPresenter inviteFriendsPresenter;
+    private final Observable<BaseProfileListDao> daoObservable;
 
     public FacebookFriendsPresenter(final FacebookHelper facebookHelper,
                                     UserPreferences userPreferences,
@@ -58,12 +59,14 @@ public class FacebookFriendsPresenter extends ProfilesListPresenter {
                                     @UiScheduler final Scheduler uiScheduler,
                                     ListeningHalfPresenter listeningHalfPresenter,
                                     PreferencesHelper preferencesHelper,
-                                    InviteFriendsPresenter inviteFriendsPresenter) {
-        super(listeningHalfPresenter);
+                                    InviteFriendsPresenter inviteFriendsPresenter,
+                                    String placeholderText) {
+        super(listeningHalfPresenter, uiScheduler, placeholderText, userPreferences);
         this.dao = dao;
         this.inviteFriendsPresenter = inviteFriendsPresenter;
 
-        final boolean isNormalUser = userPreferences.isNormalUser();
+        daoObservable = Observable.just(dao.getFriendsDao(User.ME))
+                .compose(ObservableExtensions.behaviorRefCount());
 
         //noinspection ConstantConditions
         final boolean hasRequiredPermissionInApi = facebookHelper.hasRequiredPermissionInApi(
@@ -114,10 +117,6 @@ public class FacebookFriendsPresenter extends ProfilesListPresenter {
                     }
                 });
 
-        listeningHalfPresenter
-                .listeningObservable(successFriendsRequest)
-                .subscribe(dao.getFriendsDao(User.ME).updatedProfileLocallyObserver());
-
         errorObservable = ResponseOrError.combineErrorsObservable(
                 ImmutableList.of(
                         ResponseOrError.transform(friendsRequest),
@@ -138,11 +137,8 @@ public class FacebookFriendsPresenter extends ProfilesListPresenter {
                 permissionsNotGrantedObservable.map(Functions1.returnFalse()))
                 .mergeWith(inviteFriendsPresenter.getProgressObservable())
                 .startWith(true);
-    }
 
-    @Nonnull
-    public Observable<Object> getActionOnlyForLoggedInUser() {
-        return actionOnlyForLoggedInUser;
+        init();
     }
 
     @Nonnull
@@ -151,25 +147,29 @@ public class FacebookFriendsPresenter extends ProfilesListPresenter {
     }
 
     @Override
+    protected Observable<BaseProfileListDao> getDaoObservable() {
+        return daoObservable;
+    }
+
+    @Override
+    @Nonnull
     public Observable<Boolean> getProgressObservable() {
         return progressObservable;
     }
 
     @Override
+    @Nonnull
     public Observable<Throwable> getErrorObservable() {
         return errorObservable;
     }
 
     @Override
+    @Nonnull
     public Observable<List<BaseAdapterItem>> getAdapterItemsObservable() {
         return adapterItems;
     }
 
-    @Override
-    public Observable<String> getProfileToOpenObservable() {
-        return openProfileSubject;
-    }
-
+    @Nonnull
     public Observable<String> getInvitationCodeObservable() {
         return inviteFriendsPresenter.getInvitationCodeObservable();
     }
@@ -180,12 +180,6 @@ public class FacebookFriendsPresenter extends ProfilesListPresenter {
         dao.getFriendsDao(User.ME)
                 .getRefreshSubject()
                 .onNext(null);
-    }
-
-    @Override
-    public Observer<Object> getLoadMoreObserver() {
-        return RxMoreObservers.ignoreCompleted(dao.getFriendsDao(User.ME)
-                .getLoadMoreShoutsObserver());
     }
 
     public static class FacebookInviteFriendsAdapterItem extends BaseNoIDAdapterItem {

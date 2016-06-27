@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 
+import com.appunite.rx.ResponseOrError;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
@@ -18,6 +19,9 @@ import com.shoutit.app.android.view.profileslist.BaseProfilesListActivity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import okhttp3.ResponseBody;
+import rx.functions.Action1;
 
 public class ContactsFriendsActivity extends BaseProfilesListActivity {
 
@@ -35,15 +39,6 @@ public class ContactsFriendsActivity extends BaseProfilesListActivity {
         presenter = (ContactsFriendsPresenter) ((ContactsFriendsActivityComponent)
                 getActivityComponent()).profilesListPresenter();
 
-        if (PermissionHelper.checkPermissions(this,
-                REQUEST_CODE_CONTACTS_PERMISSION,
-                ColoredSnackBar.contentView(this),
-                R.string.permission_contacts_explanation,
-                new String[] {Manifest.permission.READ_CONTACTS})) {
-
-            presenter.fetchContacts();
-        }
-
         presenter.getProfileToOpenObservable()
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(userName -> {
@@ -52,15 +47,20 @@ public class ContactsFriendsActivity extends BaseProfilesListActivity {
                             REQUEST_OPENED_PROFILE_WAS_LISTENED);
                 });
 
-        presenter.getRefreshContactsObservable()
+        presenter.getSuccessFetchContacts()
                 .compose(bindToLifecycle())
-                .subscribe();
+                .subscribe(responseBodyResponseOrError -> {
+                    presenter.refreshData();
+                });
 
-        presenter.getActionOnlyForLoggedInUser()
-                .compose(bindToLifecycle())
-                .subscribe(ColoredSnackBar.errorSnackBarAction(
-                        ColoredSnackBar.contentView(this),
-                        R.string.error_action_only_for_logged_in_user));
+        if (PermissionHelper.checkPermissions(this,
+                REQUEST_CODE_CONTACTS_PERMISSION,
+                ColoredSnackBar.contentView(this),
+                R.string.permission_contacts_explanation,
+                new String[] {Manifest.permission.READ_CONTACTS})) {
+
+            presenter.fetchContacts();
+        }
     }
 
     @Override

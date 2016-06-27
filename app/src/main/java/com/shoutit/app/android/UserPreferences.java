@@ -12,6 +12,7 @@ import com.appunite.rx.operators.MoreOperators;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
+import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForApplication;
@@ -321,5 +322,9 @@ public class UserPreferences {
 
         final User updatedUser = user.withUpdatedStats(pusherStats);
         updateUserJson(updatedUser);
+    }
+
+    public Observable<Page> getPageObservable() {
+        return null;
     }
 }

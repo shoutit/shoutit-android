@@ -4,6 +4,7 @@ package com.shoutit.app.android.api.model;
 import android.support.annotation.Nullable;
 
 import com.google.common.base.Objects;
+import com.shoutit.app.android.view.listenings.ListeningsPresenter;
 
 public class BaseProfile implements ProfileType {
     protected final String id;

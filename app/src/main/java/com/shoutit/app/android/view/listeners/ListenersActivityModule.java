@@ -1,10 +1,11 @@
 package com.shoutit.app.android.view.listeners;
 
 import com.appunite.rx.dagger.UiScheduler;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityScope;
 import com.shoutit.app.android.dao.ListenersDaos;
 import com.shoutit.app.android.utils.ListeningHalfPresenter;
-import com.shoutit.app.android.view.profileslist.ProfilesListPresenter;
+import com.shoutit.app.android.view.profileslist.BaseProfileListPresenter;
 
 import javax.annotation.Nonnull;
 
@@ -25,9 +26,10 @@ public class ListenersActivityModule {
 
     @Provides
     @ActivityScope
-    ProfilesListPresenter providesListenersPresenter(@UiScheduler Scheduler uiScheduler,
-                                                     ListenersDaos dao,
-                                                     ListeningHalfPresenter listeningHalfPresenter) {
-        return new ListenersPresenter(dao, uiScheduler, listeningHalfPresenter, userName);
+    BaseProfileListPresenter providesListenersPresenter(@UiScheduler Scheduler uiScheduler,
+                                                        ListenersDaos dao,
+                                                        ListeningHalfPresenter listeningHalfPresenter,
+                                                        UserPreferences userPreferences) {
+        return new ListenersPresenter(dao, uiScheduler, listeningHalfPresenter, userName, userPreferences);
     }
 }

@@ -12,7 +12,7 @@ import com.shoutit.app.android.view.invitefriends.InviteFriendsPresenter;
 import com.shoutit.app.android.view.listenings.ProfilesListAdapter;
 import com.shoutit.app.android.utils.PreferencesHelper;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
-import com.shoutit.app.android.view.profileslist.ProfilesListPresenter;
+import com.shoutit.app.android.view.profileslist.BaseProfileListPresenter;
 import com.squareup.picasso.Picasso;
 
 import dagger.Module;
@@ -31,17 +31,17 @@ public class FacebookFriendsActivityModule {
 
     @Provides
     @ActivityScope
-    ProfilesListPresenter provideProfilesListPresenter(@UiScheduler Scheduler uiScheduler,
-                                                       FacebookHelper facebookHelper,
-                                                       ProfilesDao dao,
-                                                       UserPreferences userPreferences,
-                                                       CallbackManager callbackManager,
-                                                       ListeningHalfPresenter listeningHalfPresenter,
-                                                       PreferencesHelper preferencesHelper,
-                                                       InviteFriendsPresenter inviteFriendsPresenter) {
+    BaseProfileListPresenter provideProfilesListPresenter(@UiScheduler Scheduler uiScheduler,
+                                                          FacebookHelper facebookHelper,
+                                                          ProfilesDao dao,
+                                                          UserPreferences userPreferences,
+                                                          CallbackManager callbackManager,
+                                                          ListeningHalfPresenter listeningHalfPresenter,
+                                                          PreferencesHelper preferencesHelper,
+                                                          InviteFriendsPresenter inviteFriendsPresenter) {
         return new FacebookFriendsPresenter(facebookHelper, userPreferences,
                 activity, callbackManager, dao, uiScheduler, listeningHalfPresenter, preferencesHelper,
-                inviteFriendsPresenter);
+                inviteFriendsPresenter, null);
     }
 
     @Provides

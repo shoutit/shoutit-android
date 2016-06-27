@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.pages.publics;
 
 import android.content.res.Resources;
+import android.support.annotation.NonNull;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
@@ -75,8 +76,7 @@ public class PublicPagesPresenter extends ProfilesListPresenter {
         final Observable<ProfilesListResponse> successRequestObservable = requestObservable
                 .compose(ResponseOrError.onlySuccess());
 
-        pagesObservable = requestObservable
-                .compose(ResponseOrError.onlySuccess())
+        pagesObservable = successRequestObservable
                 .map((Func1<ProfilesListResponse, List<BaseAdapterItem>>) pagesResponse -> {
                     final List<BaseProfile> pages = pagesResponse.getResults();
 
@@ -136,21 +136,25 @@ public class PublicPagesPresenter extends ProfilesListPresenter {
         return loadMoreObservable;
     }
 
+    @NonNull
     @Override
     public Observable<Boolean> getProgressObservable() {
         return progressObservable;
     }
 
+    @NonNull
     @Override
     public Observable<Throwable> getErrorObservable() {
         return errorObservable;
     }
 
+    @NonNull
     @Override
     public Observable<List<BaseAdapterItem>> getAdapterItemsObservable() {
         return pagesObservable;
     }
 
+    @NonNull
     @Override
     public Observable<String> getProfileToOpenObservable() {
         return openProfileSubject;
@@ -161,6 +165,7 @@ public class PublicPagesPresenter extends ProfilesListPresenter {
         refreshDataSubject.onNext(null);
     }
 
+    @NonNull
     @Override
     public Observer<Object> getLoadMoreObserver() {
         return loadMoreSubject;

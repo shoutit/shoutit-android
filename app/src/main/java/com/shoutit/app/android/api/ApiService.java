@@ -527,4 +527,9 @@ public interface ApiService {
     Observable<ProfilesListResponse> getPublicPages(@Query("country") String countryCode,
                                              @Query("page") Integer page,
                                              @Query("page_size") Integer pageSize);
+
+    @GET("pages/{user_name}/admins")
+    Observable<ProfilesListResponse> getAdmins(@Query("username") String pageUserName,
+                                               @Query("page") Integer page,
+                                               @Query("page_size") Integer pageSize);
 }

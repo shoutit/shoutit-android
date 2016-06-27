@@ -52,13 +52,13 @@ public class SelectProfilePresenter {
 
         final Observable<ResponseOrError<ProfilesListResponse>> listeningsObservable = listeningsDao
                 .getDao(ListeningsPresenter.ListeningsType.USERS_AND_PAGES)
-                .getListeningObservable()
+                .getProfilesObservable()
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<ProfilesListResponse>>behaviorRefCount());
 
         final Observable<ResponseOrError<ProfilesListResponse>> listenersObservable = listenersDao
                 .getDao(User.ME)
-                .getLstenersObservable()
+                .getProfilesObservable()
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<ProfilesListResponse>>behaviorRefCount());
 
