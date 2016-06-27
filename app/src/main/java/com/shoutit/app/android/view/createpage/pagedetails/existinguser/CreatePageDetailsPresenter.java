@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
+import com.google.common.base.Strings;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.CreatePageRequest;
 import com.shoutit.app.android.utils.LoginUtils;
@@ -48,7 +49,7 @@ public class CreatePageDetailsPresenter {
     }
 
     public void passCreatePageData(@NonNull CreatePageData createPageData) {
-        final boolean nameEmpty = LoginUtils.isPasswordCorrect(createPageData.mName);
+        final boolean nameEmpty = Strings.isNullOrEmpty(createPageData.mName);
 
         if (nameEmpty) mListener.nameEmpty();
 

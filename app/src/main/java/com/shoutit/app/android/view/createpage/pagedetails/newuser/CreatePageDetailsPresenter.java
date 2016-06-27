@@ -61,7 +61,7 @@ public class CreatePageDetailsPresenter {
         final boolean emailEmpty = Strings.isNullOrEmpty(createPageData.mEmail);
         final boolean fullNameEmpty = Strings.isNullOrEmpty(createPageData.mFullName);
         final boolean passwordEmpty = !LoginUtils.isPasswordCorrect(createPageData.mPassword);
-        final boolean nameEmpty = LoginUtils.isPasswordCorrect(createPageData.mName);
+        final boolean nameEmpty = Strings.isNullOrEmpty(createPageData.mName);
 
         if (emailEmpty) mListener.emptyEmail();
         if (fullNameEmpty) mListener.fullNameEmpty();
