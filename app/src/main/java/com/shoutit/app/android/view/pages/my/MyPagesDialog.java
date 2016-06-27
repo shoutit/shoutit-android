@@ -9,6 +9,7 @@ import android.widget.Button;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -33,7 +34,7 @@ public class MyPagesDialog {
         mContext = context;
     }
 
-    public void show(@Nonnull Page page) {
+    public void show(@Nonnull Page page, PagesDialogListener listener) {
 
         final View view = LayoutInflater.from(mContext).inflate(R.layout.my_pages_dialog, null, false);
 
@@ -45,22 +46,31 @@ public class MyPagesDialog {
         ButterKnife.bind(this, view);
 
         viewPageBtn.setOnClickListener(v -> {
-            // TODO
+            listener.showProfile(page.getUsername());
             alertDialog.dismiss();
         });
 
         useShoutItAsPageBtn.setOnClickListener(v -> {
-            // TODO
+            listener.useShoutItAsPage(page.getUsername());
             alertDialog.dismiss();
         });
 
         editPageBtn.setOnClickListener(v -> {
-            // TODO
+            listener.editPage(page.getUsername());
             alertDialog.dismiss();
         });
 
         alertDialog.show();
     }
 
+    public interface PagesDialogListener {
+
+        void showProfile(String userName);
+
+        void editPage(String userName);
+
+        void useShoutItAsPage(String userName);
+
+    }
 }
 

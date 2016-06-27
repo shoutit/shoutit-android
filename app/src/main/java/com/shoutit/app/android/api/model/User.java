@@ -46,7 +46,6 @@ public class User extends BaseProfile {
     private final String bio;
     private final int dateJoined;
     private final Listening listeningCount;
-    private final boolean isOwner;
     private final String about;
     private final String mobile;
     private final String website;
@@ -67,7 +66,7 @@ public class User extends BaseProfile {
                 int listenersCount, List<Page> pages, List<Admin> admins, String bio, int dateJoined,
                 Listening listeningCount, boolean isOwner, String about, String mobile, String website, String email, ConversationDetails conversation,
                 @Nullable String gender, @Nullable String birthday, @Nullable Stats stats, @Nullable LinkedAccounts linkedAccounts) {
-        super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount, location);
+        super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount, location, isOwner);
         this.apiUrl = apiUrl;
         this.webUrl = webUrl;
         this.isListener = isListener;

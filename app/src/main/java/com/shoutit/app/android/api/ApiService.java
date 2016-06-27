@@ -52,7 +52,6 @@ import com.shoutit.app.android.api.model.Suggestion;
 import com.shoutit.app.android.api.model.SuggestionsResponse;
 import com.shoutit.app.android.api.model.TagDetail;
 import com.shoutit.app.android.api.model.TagsRequest;
-import com.shoutit.app.android.api.model.Transaction;
 import com.shoutit.app.android.api.model.TransactionRsponse;
 import com.shoutit.app.android.api.model.TwilioResponse;
 import com.shoutit.app.android.api.model.UpdateFacebookTokenRequest;
@@ -300,15 +299,15 @@ public interface ApiService {
                                                      @Query("page_size") Integer pageSize);
 
     @GET("profiles/me/listening")
-    Observable<ListeningResponse> profilesListenings(@Query("page") Integer page,
+    Observable<ProfilesListResponse> profilesListenings(@Query("page") Integer page,
                                                      @Query("page_size") Integer pageSize);
 
     @GET("profiles/me/interests")
-    Observable<ListeningResponse> tagsListenings(@Query("page") Integer page,
+    Observable<ProfilesListResponse> tagsListenings(@Query("page") Integer page,
                                                  @Query("page_size") Integer pageSize);
 
     @GET("profiles/{user_name}/listeners")
-    Observable<ListenersResponse> listeners(@Path("user_name") String userName,
+    Observable<ProfilesListResponse> listeners(@Path("user_name") String userName,
                                             @Query("page") Integer page,
                                             @Query("page_size") Integer pageSize);
 
@@ -520,4 +519,12 @@ public interface ApiService {
 
     @GET("credit/invitation_code")
     Observable<InvitationCodeResponse> getInvitationCode();
+
+    /**
+     * Pages
+     **/
+    @GET("pages")
+    Observable<ProfilesListResponse> getPublicPages(@Query("country") String countryCode,
+                                             @Query("page") Integer page,
+                                             @Query("page_size") Integer pageSize);
 }

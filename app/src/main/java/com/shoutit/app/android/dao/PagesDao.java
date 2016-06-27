@@ -6,6 +6,7 @@ import com.appunite.rx.operators.MoreOperators;
 import com.appunite.rx.operators.OperatorMergeNextToken;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.PagesResponse;
+import com.shoutit.app.android.api.model.ProfilesListResponse;
 import com.shoutit.app.android.api.model.User;
 
 import javax.annotation.Nonnull;
@@ -20,6 +21,8 @@ public class PagesDao {
     private static final int PAGE_SIZE = 20;
 
     private final PublishSubject<Object> loadMoreSubject = PublishSubject.create();
+    private final PublishSubject<Object> refreshSubject = PublishSubject.create();
+
     @Nonnull
     private final Observable<ResponseOrError<PagesResponse>> pagesObservable;
 
@@ -55,8 +58,13 @@ public class PagesDao {
         pagesObservable = loadMoreSubject.startWith((Object) null)
                 .lift(loadMoreOperator)
                 .compose(ResponseOrError.<PagesResponse>toResponseOrErrorObservable())
+                .compose(MoreOperators.<ResponseOrError<PagesResponse>>refresh(refreshSubject))
                 .compose(MoreOperators.<ResponseOrError<PagesResponse>>cacheWithTimeout(networkScheduler))
                 .mergeWith(Observable.never());
+    }
+
+    public PublishSubject<Object> getRefreshSubject() {
+        return refreshSubject;
     }
 
     @Nonnull

@@ -10,9 +10,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.shoutit.app.android.api.ApiService;
-import com.shoutit.app.android.api.model.ListeningResponse;
-import com.shoutit.app.android.api.model.User;
-import com.shoutit.app.android.model.MergeListeningResponses;
+import com.shoutit.app.android.api.model.ProfilesListResponse;
 import com.shoutit.app.android.view.listenings.ListeningsPresenter;
 
 import javax.annotation.Nonnull;
@@ -20,7 +18,6 @@ import javax.annotation.Nonnull;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
-import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
@@ -54,38 +51,38 @@ public class ListeningsDao {
     public class ListeningDao {
 
         @Nonnull
-        private final Observable<ResponseOrError<ListeningResponse>> listeningObservable;
+        private final Observable<ResponseOrError<ProfilesListResponse>> listeningObservable;
         @Nonnull
         private final PublishSubject<Object> loadMoreSubject = PublishSubject.create();
         @Nonnull
         private final PublishSubject<Object> refreshSubject = PublishSubject.create();
         @Nonnull
-        private PublishSubject<ResponseOrError<ListeningResponse>> updatedProfileLocallySubject = PublishSubject.create();
+        private PublishSubject<ResponseOrError<ProfilesListResponse>> updatedProfileLocallySubject = PublishSubject.create();
 
         private final ListeningsPresenter.ListeningsType listeningsType;
 
         public ListeningDao(ListeningsPresenter.ListeningsType listeningsType) {
             this.listeningsType = listeningsType;
 
-            final OperatorMergeNextToken<ListeningResponse, Object> loadMoreOperator =
-                    OperatorMergeNextToken.create(new Func1<ListeningResponse, Observable<ListeningResponse>>() {
+            final OperatorMergeNextToken<ProfilesListResponse, Object> loadMoreOperator =
+                    OperatorMergeNextToken.create(new Func1<ProfilesListResponse, Observable<ProfilesListResponse>>() {
                         private int pageNumber = 0;
 
                         @Override
-                        public Observable<ListeningResponse> call(ListeningResponse previousResponse) {
+                        public Observable<ProfilesListResponse> call(ProfilesListResponse previousResponse) {
                             if (previousResponse == null || previousResponse.getNext() != null) {
                                 if (previousResponse == null) {
                                     pageNumber = 0;
                                 }
                                 ++pageNumber;
 
-                                final Observable<ListeningResponse> apiRequest = getRequest(pageNumber)
+                                final Observable<ProfilesListResponse> apiRequest = getRequest(pageNumber)
                                         .subscribeOn(networkScheduler);
 
                                 if (previousResponse == null) {
                                     return apiRequest;
                                 } else {
-                                    return Observable.just(previousResponse).zipWith(apiRequest, new MergeListeningResponses());
+                                    return Observable.just(previousResponse).zipWith(apiRequest, new MergeProfilesListResponses());
                                 }
                             } else {
                                 return Observable.never();
@@ -95,15 +92,15 @@ public class ListeningsDao {
 
             listeningObservable = loadMoreSubject.startWith((Object) null)
                     .lift(loadMoreOperator)
-                    .compose(MoreOperators.<ListeningResponse>refresh(refreshSubject))
-                    .compose(ResponseOrError.<ListeningResponse>toResponseOrErrorObservable())
+                    .compose(MoreOperators.<ProfilesListResponse>refresh(refreshSubject))
+                    .compose(ResponseOrError.<ProfilesListResponse>toResponseOrErrorObservable())
                     .mergeWith(updatedProfileLocallySubject)
-                    .mergeWith(Observable.<ResponseOrError<ListeningResponse>>never());
+                    .mergeWith(Observable.<ResponseOrError<ProfilesListResponse>>never());
 
         }
 
         @Nonnull
-        private Observable<ListeningResponse> getRequest(int page) {
+        private Observable<ProfilesListResponse> getRequest(int page) {
             switch (ListeningsPresenter.ListeningsType.values()[listeningsType.ordinal()]) {
                 case USERS_AND_PAGES:
                     return apiService.profilesListenings(page, PAGE_SIZE);
@@ -115,7 +112,7 @@ public class ListeningsDao {
         }
 
         @NonNull
-        public Observable<ResponseOrError<ListeningResponse>> getListeningObservable() {
+        public Observable<ResponseOrError<ProfilesListResponse>> getListeningObservable() {
             return listeningObservable;
         }
 
@@ -130,7 +127,7 @@ public class ListeningsDao {
         }
 
         @Nonnull
-        public Observer<ResponseOrError<ListeningResponse>> updatedResponseLocallyObserver() {
+        public Observer<ResponseOrError<ProfilesListResponse>> updatedResponseLocallyObserver() {
             return updatedProfileLocallySubject;
         }
     }

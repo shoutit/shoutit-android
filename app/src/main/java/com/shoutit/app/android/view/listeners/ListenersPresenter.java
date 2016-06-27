@@ -3,35 +3,29 @@ package com.shoutit.app.android.view.listeners;
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
-import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.collect.ImmutableList;
-import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.BaseProfileAdapterItem;
 import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
-import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.BaseProfile;
-import com.shoutit.app.android.api.model.ListenersResponse;
+import com.shoutit.app.android.api.model.ProfilesListResponse;
 import com.shoutit.app.android.dao.ListenersDaos;
+import com.shoutit.app.android.utils.ListeningHalfPresenter;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
 import com.shoutit.app.android.view.profileslist.ProfilesListPresenter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
-import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.functions.Func2;
 import rx.subjects.PublishSubject;
 
-public class ListenersPresenter implements ProfilesListPresenter {
+public class ListenersPresenter extends ProfilesListPresenter {
 
     @Nonnull
     private final ListenersDaos dao;
@@ -45,37 +39,34 @@ public class ListenersPresenter implements ProfilesListPresenter {
     private Observable<Throwable> errorObservable;
 
     private final PublishSubject<String> openProfileSubject = PublishSubject.create();
-    private final PublishSubject<Throwable> errorSubject = PublishSubject.create();
-    private final PublishSubject<BaseProfile> profileListenedSubject = PublishSubject.create();
-    private final PublishSubject<String> listenSuccess = PublishSubject.create();
-    private final PublishSubject<String> unListenSuccess = PublishSubject.create();
     private final PublishSubject<Object> actionOnlyForLoggedInUser = PublishSubject.create();
 
     public ListenersPresenter(@Nonnull ListenersDaos dao,
-                              @Nonnull final ApiService apiService,
                               @Nonnull @UiScheduler final Scheduler uiScheduler,
-                              @Nonnull @NetworkScheduler final Scheduler networkScheduler,
+                              @Nonnull ListeningHalfPresenter listeningHalfPresenter,
                               @Nonnull String userName) {
+        super(listeningHalfPresenter);
         this.dao = dao;
         this.userName = userName;
 
-        final Observable<ResponseOrError<ListenersResponse>> listenersRequest = dao.getDao(userName)
+        final Observable<ResponseOrError<ProfilesListResponse>> listenersRequest = dao.getDao(userName)
                 .getLstenersObservable()
                 .observeOn(uiScheduler)
-                .compose(ObservableExtensions.<ResponseOrError<ListenersResponse>>behaviorRefCount());
+                .compose(ObservableExtensions.<ResponseOrError<ProfilesListResponse>>behaviorRefCount());
 
-        final Observable<ListenersResponse> successListeners = listenersRequest
-                .compose(ResponseOrError.<ListenersResponse>onlySuccess());
+        final Observable<ProfilesListResponse> successListeners = listenersRequest
+                .compose(ResponseOrError.<ProfilesListResponse>onlySuccess());
 
         adapterItemsObservable = successListeners
-                .map(new Func1<ListenersResponse, List<BaseAdapterItem>>() {
+                .map(new Func1<ProfilesListResponse, List<BaseAdapterItem>>() {
                     @Override
-                    public List<BaseAdapterItem> call(ListenersResponse listeningResponse) {
+                    public List<BaseAdapterItem> call(ProfilesListResponse listeningResponse) {
                         final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
 
-                        for (BaseProfile profile : listeningResponse.getProfiles()) {
+                        for (BaseProfile profile : listeningResponse.getResults()) {
                             builder.add(new ListenersAdapterItem(
-                                    profile, openProfileSubject, profileListenedSubject, actionOnlyForLoggedInUser, true, false));
+                                    profile, openProfileSubject, listeningHalfPresenter.getListenProfileSubject(),
+                                    actionOnlyForLoggedInUser, true, false));
                         }
 
                         final ImmutableList<BaseAdapterItem> items = builder.build();
@@ -87,89 +78,15 @@ public class ListenersPresenter implements ProfilesListPresenter {
                     }
                 });
 
-        profileListenedSubject
-                .withLatestFrom(successListeners, new Func2<BaseProfile, ListenersResponse, ProfileToListenWithLastResponse>() {
-                    @Override
-                    public ProfileToListenWithLastResponse call(BaseProfile profileToListen, ListenersResponse listeningResponse) {
-                        return new ProfileToListenWithLastResponse(profileToListen, listeningResponse);
-                    }
-                })
-                .switchMap(new Func1<ProfileToListenWithLastResponse, Observable<ResponseOrError<ListenersResponse>>>() {
-                    @Override
-                    public Observable<ResponseOrError<ListenersResponse>> call(final ProfileToListenWithLastResponse profileToListenWithLastResponse) {
-
-                        final String profileId = profileToListenWithLastResponse.getProfile().getUsername();
-                        final boolean isListeningToProfile = profileToListenWithLastResponse.getProfile().isListening();
-
-                        Observable<ResponseOrError<ResponseBody>> listenRequestObservable;
-                        if (isListeningToProfile) {
-                            listenRequestObservable = apiService.unlistenProfile(profileId)
-                                    .subscribeOn(networkScheduler)
-                                    .observeOn(uiScheduler)
-                                    .doOnNext(new Action1<ResponseBody>() {
-                                        @Override
-                                        public void call(ResponseBody responseBody) {
-                                            unListenSuccess.onNext(profileToListenWithLastResponse.getProfile().getName());
-                                        }
-                                    })
-                                    .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
-                        } else {
-                            listenRequestObservable = apiService.listenProfile(profileId)
-                                    .subscribeOn(networkScheduler)
-                                    .observeOn(uiScheduler)
-                                    .doOnNext(new Action1<ResponseBody>() {
-                                        @Override
-                                        public void call(ResponseBody responseBody) {
-                                            listenSuccess.onNext(profileToListenWithLastResponse.getProfile().getName());
-                                        }
-                                    })
-                                    .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
-                        }
-
-                        return listenRequestObservable
-                                .map(new Func1<ResponseOrError<ResponseBody>, ResponseOrError<ListenersResponse>>() {
-                                    @Override
-                                    public ResponseOrError<ListenersResponse> call(ResponseOrError<ResponseBody> response) {
-                                        if (response.isData()) {
-                                            return ResponseOrError.fromData(updateLastResponse(profileToListenWithLastResponse));
-                                        } else {
-                                            errorSubject.onNext(new Throwable());
-                                            // On error return current user in order to select/deselect already deselected/selected item
-                                            return ResponseOrError.fromData(profileToListenWithLastResponse.getResponse());
-                                        }
-                                    }
-                                });
-                    }
-                })
+        listeningHalfPresenter
+                .listeningObservable(successListeners)
                 .subscribe(dao.getDao(userName).getUpdateResponseLocally());
 
         progressObservable = successListeners.map(Functions1.returnFalse())
                 .startWith(true);
 
-        errorObservable = listenersRequest.compose(ResponseOrError.<ListenersResponse>onlyError())
-                .mergeWith(errorSubject);
-    }
-
-    private ListenersResponse updateLastResponse(ProfileToListenWithLastResponse profileToListenWithLastResponse) {
-        final ListenersResponse response = profileToListenWithLastResponse.getResponse();
-
-        final List<BaseProfile> profiles = response.getProfiles();
-        final String profileToUpdateId = profileToListenWithLastResponse.getProfile().getUsername();
-
-        for (int i = 0; i < profiles.size(); i++) {
-            if (profiles.get(i).getUsername().equals(profileToUpdateId)) {
-                final BaseProfile profileToUpdate = profiles.get(i);
-                final BaseProfile updatedProfile = profileToUpdate.getListenedProfile();
-
-                final List<BaseProfile> updatedProfiles = new ArrayList<>(profiles);
-                updatedProfiles.set(i, updatedProfile);
-
-                return new ListenersResponse(response.getCount(), response.getNext(),
-                        response.getPrevious(), updatedProfiles);
-            }
-        }
-
-        return response;
+        errorObservable = listenersRequest.compose(ResponseOrError.<ProfilesListResponse>onlyError())
+                .mergeWith(listeningHalfPresenter.getErrorSubject());
     }
 
     @Nonnull
@@ -185,16 +102,6 @@ public class ListenersPresenter implements ProfilesListPresenter {
     @Nonnull
     public Observable<List<BaseAdapterItem>> getAdapterItemsObservable() {
         return adapterItemsObservable;
-    }
-
-    @Nonnull
-    public Observable<String> getListenSuccessObservable() {
-        return listenSuccess;
-    }
-
-    @Nonnull
-    public Observable<String> getUnListenSuccessObservable() {
-        return unListenSuccess;
     }
 
     @Nonnull
@@ -254,30 +161,6 @@ public class ListenersPresenter implements ProfilesListPresenter {
         public boolean same(@Nonnull BaseAdapterItem item) {
             return item instanceof ListenersAdapterItem &&
                     profile.equals(((ListenersAdapterItem) item).getProfile());
-        }
-    }
-
-    public static class ProfileToListenWithLastResponse {
-
-        @Nonnull
-        private final BaseProfile profile;
-        @Nonnull
-        private final ListenersResponse response;
-
-        public ProfileToListenWithLastResponse(@Nonnull BaseProfile profile,
-                                               @Nonnull ListenersResponse response) {
-            this.profile = profile;
-            this.response = response;
-        }
-
-        @Nonnull
-        public BaseProfile getProfile() {
-            return profile;
-        }
-
-        @Nonnull
-        public ListenersResponse getResponse() {
-            return response;
         }
     }
 }

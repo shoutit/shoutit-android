@@ -1,7 +1,5 @@
 package com.shoutit.app.android.dao;
 
-import android.support.annotation.NonNull;
-
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.operators.MoreOperators;
@@ -10,11 +8,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.shoutit.app.android.api.ApiService;
-import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.ProfilesListResponse;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -22,45 +16,42 @@ import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Func1;
-import rx.functions.Func2;
 import rx.subjects.PublishSubject;
 
-public class ListenersDaos {
+public class PublicPagesDaos {
+    private static final int PAGE_SIZE = 20;
 
-    private static final Integer PAGE_SIZE = 20;
+    private final LoadingCache<String, PublicPagesDao> daoCache;
+    private final ApiService apiService;
+    private final Scheduler networkScheduler;
 
-    private final LoadingCache<String, ListenersDao> daoCache;
+    public PublicPagesDaos(ApiService apiService,
+                           @NetworkScheduler Scheduler networkScheduler) {
+        this.apiService = apiService;
+        this.networkScheduler = networkScheduler;
 
-    public ListenersDaos(@Nonnull final ApiService apiService,
-                         @Nonnull @NetworkScheduler final Scheduler networkScheduler) {
-
-        daoCache = CacheBuilder.newBuilder()
-                .build(new CacheLoader<String, ListenersDao>() {
+        daoCache = CacheBuilder.newBuilder().build(
+                new CacheLoader<String, PublicPagesDao>() {
                     @Override
-                    public ListenersDao load(@Nonnull String userName) throws Exception {
-                        return new ListenersDao(apiService, networkScheduler, userName);
+                    public PublicPagesDao load(@Nonnull String countryCode) throws Exception {
+                        return new PublicPagesDao(countryCode);
                     }
-                });
+                }
+        );
     }
 
-    public ListenersDao getDao(@Nonnull String userName) {
-        return daoCache.getUnchecked(userName);
+    public PublicPagesDao getDao(@Nonnull String countryCode) {
+        return daoCache.getUnchecked(countryCode);
     }
 
-    public class ListenersDao {
+    public class PublicPagesDao {
 
-        @Nonnull
-        private final Observable<ResponseOrError<ProfilesListResponse>> listeningObservable;
-        @Nonnull
+        private final Observable<ResponseOrError<ProfilesListResponse>> pagesObservable;
         private final PublishSubject<Object> loadMoreSubject = PublishSubject.create();
-        @Nonnull
         private final PublishSubject<Object> refreshSubject = PublishSubject.create();
-        @Nonnull
-        private PublishSubject<ResponseOrError<ProfilesListResponse>> updateResponseLocally = PublishSubject.create();
+        private final PublishSubject<ResponseOrError<ProfilesListResponse>> updatedProfilesLocallySubject = PublishSubject.create();
 
-        public ListenersDao(final ApiService apiService,
-                            @NetworkScheduler final Scheduler networkScheduler,
-                            @Nonnull final String userName) {
+        public PublicPagesDao(@Nonnull String countryCode) {
 
             final OperatorMergeNextToken<ProfilesListResponse, Object> loadMoreOperator =
                     OperatorMergeNextToken.create(new Func1<ProfilesListResponse, Observable<ProfilesListResponse>>() {
@@ -74,8 +65,8 @@ public class ListenersDaos {
                                 }
                                 ++pageNumber;
 
-                                final Observable<ProfilesListResponse> apiRequest = apiService
-                                        .listeners(userName, pageNumber, PAGE_SIZE)
+                                final Observable<ProfilesListResponse> apiRequest = apiService.getPublicPages(
+                                        countryCode, pageNumber, PAGE_SIZE)
                                         .subscribeOn(networkScheduler);
 
                                 if (previousResponse == null) {
@@ -89,33 +80,32 @@ public class ListenersDaos {
                         }
                     });
 
-            listeningObservable = loadMoreSubject.startWith((Object) null)
+
+            pagesObservable = loadMoreSubject.startWith((Object) null)
                     .lift(loadMoreOperator)
-                    .compose(MoreOperators.<ProfilesListResponse>refresh(refreshSubject))
                     .compose(ResponseOrError.<ProfilesListResponse>toResponseOrErrorObservable())
-                    .mergeWith(updateResponseLocally)
-                    .mergeWith(Observable.<ResponseOrError<ProfilesListResponse>>never());
+                    .compose(MoreOperators.<ResponseOrError<ProfilesListResponse>>refresh(refreshSubject))
+                    .mergeWith(updatedProfilesLocallySubject)
+                    .compose(MoreOperators.<ResponseOrError<ProfilesListResponse>>cacheWithTimeout(networkScheduler));
 
         }
 
-        @NonNull
-        public Observable<ResponseOrError<ProfilesListResponse>> getLstenersObservable() {
-            return listeningObservable;
+        public Observable<ResponseOrError<ProfilesListResponse>> getPagesObservable() {
+            return pagesObservable;
         }
 
-        @NonNull
-        public Observer<Object> getLoadMoreObserver() {
+        public Observer<Object> getLoadMoreSubject() {
             return loadMoreSubject;
         }
 
         @Nonnull
-        public Observer<Object> getRefreshSubject() {
+        public PublishSubject<Object> getRefreshSubject() {
             return refreshSubject;
         }
 
         @Nonnull
-        public Observer<ResponseOrError<ProfilesListResponse>> getUpdateResponseLocally() {
-            return updateResponseLocally;
+        public Observer<ResponseOrError<ProfilesListResponse>> updatedProfileLocallyObserver() {
+            return updatedProfilesLocallySubject;
         }
     }
 }

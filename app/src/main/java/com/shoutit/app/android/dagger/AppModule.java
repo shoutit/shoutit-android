@@ -41,6 +41,7 @@ import com.shoutit.app.android.dao.PagesDao;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.PromoteLabelsDao;
 import com.shoutit.app.android.dao.PromoteOptionsDao;
+import com.shoutit.app.android.dao.PublicPagesDaos;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.dao.SortTypesDao;
@@ -304,6 +305,12 @@ public final class AppModule {
     @Singleton
     ListeningsDao listeningsDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
         return new ListeningsDao(apiService, networkScheduler);
+    }
+
+    @Provides
+    @Singleton
+    PublicPagesDaos publicPagesDaos(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
+        return new PublicPagesDaos(apiService, networkScheduler);
     }
 
     @Singleton

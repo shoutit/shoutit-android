@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.pages.my;
+package com.shoutit.app.android.view.pages.publics;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -20,6 +20,8 @@ import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
+import com.shoutit.app.android.utils.rx.RxUtils;
+import com.shoutit.app.android.view.listenings.ProfilesListAdapter;
 import com.shoutit.app.android.view.pages.PagesAdapter;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 
@@ -28,8 +30,10 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
+import rx.functions.Action1;
 
-public class MyPagesFragment extends BaseFragment implements MyPagesDialog.PagesDialogListener {
+
+public class PublicPagesFragment extends BaseFragment {
 
     public static final int REQUEST_OPENED_PROFILE_WAS_LISTENED = 1;
 
@@ -39,14 +43,12 @@ public class MyPagesFragment extends BaseFragment implements MyPagesDialog.Pages
     View progressView;
 
     @Inject
-    MyPagesPresenter presenter;
+    PublicPagesPresenter presenter;
     @Inject
-    PagesAdapter adapter;
-    @Inject
-    MyPagesDialog dialog;
+    ProfilesListAdapter adapter;
 
     public static Fragment newInstance() {
-        return new MyPagesFragment();
+        return new PublicPagesFragment();
     }
 
     @android.support.annotation.Nullable
@@ -65,7 +67,7 @@ public class MyPagesFragment extends BaseFragment implements MyPagesDialog.Pages
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
 
-        presenter.getPagesObservable()
+        presenter.getAdapterItemsObservable()
                 .compose(bindToLifecycle())
                 .subscribe(adapter);
 
@@ -77,11 +79,31 @@ public class MyPagesFragment extends BaseFragment implements MyPagesDialog.Pages
                 .compose(bindToLifecycle())
                 .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(getActivity())));
 
-        presenter.getPageSelectedObservable()
-                .compose(bindToLifecycle())
-                .subscribe(this::showOptionsDialog);
+        presenter.getListenSuccessObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(RxUtils.listenMessageAction(getActivity()));
+
+        presenter.getUnListenSuccessObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(RxUtils.unListenMessageAction(getActivity()));
 
         presenter.getLoadMoreObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
+
+        presenter.getLoadMoreObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
+
+        presenter.getRefreshDataObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
+
+        presenter.getProfileToOpenObservable()
+                .compose(bindToLifecycle())
+                .subscribe(this::showPageProfile);
+
+        presenter.getListeningObservable()
                 .compose(bindToLifecycle())
                 .subscribe();
 
@@ -90,6 +112,23 @@ public class MyPagesFragment extends BaseFragment implements MyPagesDialog.Pages
                 .filter(LoadMoreHelper.needLoadMore(layoutManager, adapter))
                 .subscribe(presenter.getLoadMoreObserver());
 
+    }
+
+    private void showPageProfile(@Nonnull String userName) {
+        getParentFragment().startActivityForResult(
+                UserOrPageProfileActivity.newIntent(getActivity(), userName),
+                REQUEST_OPENED_PROFILE_WAS_LISTENED);
+    }
+
+    @Override
+    protected void injectComponent(@Nonnull BaseActivityComponent baseActivityComponent,
+                                   @Nonnull FragmentModule fragmentModule,
+                                   @Nullable Bundle savedInstanceState) {
+        DaggerPublicPagesFragmentComponent.builder()
+                .baseActivityComponent(baseActivityComponent)
+                .fragmentModule(fragmentModule)
+                .build()
+                .inject(this);
     }
 
     @Override
@@ -101,36 +140,5 @@ public class MyPagesFragment extends BaseFragment implements MyPagesDialog.Pages
             super.onActivityResult(requestCode, requestCode, data);
         }
     }
-
-    private void showOptionsDialog(@Nonnull Page page) {
-        dialog.show(page, this);
-    }
-
-    @Override
-    protected void injectComponent(@Nonnull BaseActivityComponent baseActivityComponent,
-                                   @Nonnull FragmentModule fragmentModule,
-                                   @Nullable Bundle savedInstanceState) {
-        DaggerPagesFragmentComponent.builder()
-                .baseActivityComponent(baseActivityComponent)
-                .fragmentModule(fragmentModule)
-                .build()
-                .inject(this);
-    }
-
-    @Override
-    public void showProfile(String userName) {
-        getParentFragment().startActivityForResult(
-                UserOrPageProfileActivity.newIntent(getActivity(), userName),
-                REQUEST_OPENED_PROFILE_WAS_LISTENED);
-    }
-
-    @Override
-    public void editPage(String userName) {
-        // TODO
-    }
-
-    @Override
-    public void useShoutItAsPage(String userName) {
-        // TODO
-    }
 }
+

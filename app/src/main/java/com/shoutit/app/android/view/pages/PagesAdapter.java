@@ -15,7 +15,6 @@ import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.TextHelper;
-import com.shoutit.app.android.view.pages.my.MyPagesPresenter;
 import com.shoutit.app.android.viewholders.NoDataTextViewHolder;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -56,7 +55,7 @@ public class PagesAdapter extends BaseAdapter {
     public int getItemViewType(int position) {
         final BaseAdapterItem item = items.get(position);
 
-        if (item instanceof MyPagesPresenter.PageAdapterItem) {
+        if (item instanceof PageAdapterItem) {
             return VIEW_TYPE_PAGE;
         } else if (item instanceof NoDataTextAdapterItem) {
             return VIEW_TYPE_EMPTY;
@@ -65,7 +64,7 @@ public class PagesAdapter extends BaseAdapter {
         }
     }
 
-    public class PageViewHolder extends ViewHolderManager.BaseViewHolder<MyPagesPresenter.PageAdapterItem> {
+    public class PageViewHolder extends ViewHolderManager.BaseViewHolder<PageAdapterItem> {
 
         @Bind(R.id.pages_avatar_iv)
         ImageView avatarIv;
@@ -78,7 +77,7 @@ public class PagesAdapter extends BaseAdapter {
         @Bind(R.id.pages_badge_tv)
         TextView badgeTv;
 
-        private MyPagesPresenter.PageAdapterItem item;
+        private PageAdapterItem item;
         private final Target target;
 
         public PageViewHolder(@Nonnull View itemView) {
@@ -91,7 +90,7 @@ public class PagesAdapter extends BaseAdapter {
         }
 
         @Override
-        public void bind(@Nonnull MyPagesPresenter.PageAdapterItem pageAdapterItem) {
+        public void bind(@Nonnull PageAdapterItem pageAdapterItem) {
             item = pageAdapterItem;
 
             final Page page = pageAdapterItem.getPage();

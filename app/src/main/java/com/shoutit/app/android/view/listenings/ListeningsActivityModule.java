@@ -5,6 +5,7 @@ import com.appunite.rx.dagger.UiScheduler;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.dagger.ActivityScope;
 import com.shoutit.app.android.dao.ListeningsDao;
+import com.shoutit.app.android.utils.ListeningHalfPresenter;
 import com.shoutit.app.android.view.profileslist.ProfilesListPresenter;
 
 import dagger.Module;
@@ -25,10 +26,11 @@ public class ListeningsActivityModule {
     @ActivityScope
     ProfilesListPresenter providesListeningsPresenter(@UiScheduler Scheduler uiScheduler,
                                                       ListeningsDao listeningsDao,
+                                                      ListeningHalfPresenter listeningHalfPresenter,
                                                       @NetworkScheduler Scheduler networkScheduler,
                                                       ApiService apiService) {
         return new ListeningsPresenter(uiScheduler, listeningsDao, listeningsType,
-                networkScheduler, apiService);
+                networkScheduler, listeningHalfPresenter, apiService);
     }
 
 }

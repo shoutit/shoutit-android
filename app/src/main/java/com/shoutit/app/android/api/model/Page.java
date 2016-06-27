@@ -1,6 +1,5 @@
 package com.shoutit.app.android.api.model;
 
-import android.support.annotation.Nullable;
 
 import com.google.common.base.Objects;
 
@@ -10,8 +9,8 @@ public class Page extends BaseProfile {
 
     public Page(String id, String type, String username, String name, String firstName,
                 String lastName, boolean isActivated, String image, String cover, boolean isListening,
-                int listenersCount, UserLocation location, PageStats stats) {
-        super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount, location);
+                int listenersCount, UserLocation location, PageStats stats, boolean isOwner) {
+        super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount, location, isOwner);
         this.stats = stats;
     }
 
@@ -21,7 +20,7 @@ public class Page extends BaseProfile {
         int newListenersCount = newIsListening ? listenersCount + 1 : listenersCount - 1;
 
         return new Page(id, type, username, name, firstName, lastName, isActivated, image, cover,
-                newIsListening, newListenersCount, location, stats);
+                newIsListening, newListenersCount, location, stats, isOwner);
     }
 
     public PageStats getStats() {
@@ -55,6 +54,6 @@ public class Page extends BaseProfile {
         int listenersCount = isListening ? page.listenersCount + 1 : page.listenersCount - 1;
         return new Page(page.id, page.type, page.username, page.name, page.firstName,
                 page.lastName, page.isActivated, page.image, page.cover, isListening,
-                listenersCount, page.location, page.stats);
+                listenersCount, page.location, page.stats, page.isOwner);
     }
 }
