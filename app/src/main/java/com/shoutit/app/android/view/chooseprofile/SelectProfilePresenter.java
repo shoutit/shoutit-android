@@ -12,7 +12,10 @@ import com.google.common.collect.Lists;
 import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.ListenersResponse;
-import com.shoutit.app.android.api.model.ListeningResponse;
+import com.shoutit.app.android.api.model.ProfilesListResponse;
+import com.shoutit.app.android.api.model.ProfilesListResponse;
+import com.shoutit.app.android.api.model.ProfilesListResponse;
+import com.shoutit.app.android.api.model.ProfilesListResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dao.ListenersDaos;
 import com.shoutit.app.android.dao.ListeningsDao;
@@ -47,33 +50,33 @@ public class SelectProfilePresenter {
                                   @Nonnull ListenersDaos listenersDao,
                                   @UiScheduler Scheduler uiScheduler) {
 
-        final Observable<ResponseOrError<ListeningResponse>> listeningsObservable = listeningsDao
+        final Observable<ResponseOrError<ProfilesListResponse>> listeningsObservable = listeningsDao
                 .getDao(ListeningsPresenter.ListeningsType.USERS_AND_PAGES)
                 .getListeningObservable()
                 .observeOn(uiScheduler)
-                .compose(ObservableExtensions.<ResponseOrError<ListeningResponse>>behaviorRefCount());
+                .compose(ObservableExtensions.<ResponseOrError<ProfilesListResponse>>behaviorRefCount());
 
-        final Observable<ResponseOrError<ListenersResponse>> listenersObservable = listenersDao
+        final Observable<ResponseOrError<ProfilesListResponse>> listenersObservable = listenersDao
                 .getDao(User.ME)
                 .getLstenersObservable()
                 .observeOn(uiScheduler)
-                .compose(ObservableExtensions.<ResponseOrError<ListenersResponse>>behaviorRefCount());
+                .compose(ObservableExtensions.<ResponseOrError<ProfilesListResponse>>behaviorRefCount());
 
         listeningsAdapterItems = listeningsObservable
-                .compose(ResponseOrError.<ListeningResponse>onlySuccess())
-                .map(new Func1<ListeningResponse, List<BaseAdapterItem>>() {
+                .compose(ResponseOrError.<ProfilesListResponse>onlySuccess())
+                .map(new Func1<ProfilesListResponse, List<BaseAdapterItem>>() {
                     @Override
-                    public List<BaseAdapterItem> call(ListeningResponse listeningResponse) {
-                        return itemsToAdapterItem(listeningResponse.getProfiles());
+                    public List<BaseAdapterItem> call(ProfilesListResponse listeningResponse) {
+                        return itemsToAdapterItem(listeningResponse.getResults());
                     }
                 });
 
         listenersAdapterItems = listenersObservable
-                .compose(ResponseOrError.<ListenersResponse>onlySuccess())
-                .map(new Func1<ListenersResponse, List<BaseAdapterItem>>() {
+                .compose(ResponseOrError.<ProfilesListResponse>onlySuccess())
+                .map(new Func1<ProfilesListResponse, List<BaseAdapterItem>>() {
                     @Override
-                    public List<BaseAdapterItem> call(ListenersResponse listenersResponse) {
-                        return itemsToAdapterItem(listenersResponse.getProfiles());
+                    public List<BaseAdapterItem> call(ProfilesListResponse listenersResponse) {
+                        return itemsToAdapterItem(listenersResponse.getResults());
                     }
                 });
 

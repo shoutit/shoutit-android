@@ -710,4 +710,13 @@
     <string name="chat_info_activity_blocked">Blocked</string>
     <string name="chat_info_activity_exit_chat">Exit Chat</string>
 
+    <!-- Pages -->
+    <string name="pages_my_pages_tab">My pages</string>
+    <string name="pages_public_pages_tab">Public pages</string>
+    <string name="pages_empty">No pages here</string>
+    <string name="pages_view_page">View Page</string>
+    <string name="pages_use_page">Use Shoutit as this Page</string>
+    <string name="pages_edit_page">Edit Page</string>
+    <string name="pages_create_page">Create page</string>
+
 </resources>

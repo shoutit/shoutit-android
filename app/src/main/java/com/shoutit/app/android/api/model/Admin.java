@@ -5,8 +5,10 @@ import com.google.common.base.Objects;
 public class Admin extends BaseProfile {
 
     public Admin(String id, String type, String username, String name, String firstName,
-                 String lastName, boolean isActivated, String image, String cover, boolean isListening, int listenersCount) {
-        super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount);
+                 String lastName, boolean isActivated, String image, String cover, boolean isListening,
+                 int listenersCount, UserLocation location, boolean isOwner) {
+        super(id, type, username, name, firstName, lastName, isActivated, image, cover,
+                isListening, listenersCount, location, isOwner);
     }
 
     @Override
@@ -14,7 +16,8 @@ public class Admin extends BaseProfile {
         boolean newIsListening = !isListening;
         int newListenersCount = newIsListening ? listenersCount + 1 : listenersCount - 1;
 
-        return new Admin(id, type, username, name, firstName, lastName, isActivated, image, cover, newIsListening, newListenersCount);
+        return new Admin(id, type, username, name, firstName, lastName, isActivated, image, cover,
+                newIsListening, newListenersCount, location, isOwner);
     }
 
     @Override
@@ -43,7 +46,8 @@ public class Admin extends BaseProfile {
     public static Admin withIsListening(Admin admin, boolean isListening) {
         int listenersCount = isListening ? admin.listenersCount + 1 : admin.listenersCount - 1;
         return new Admin(admin.id, admin.type, admin.username, admin.name, admin.firstName,
-                admin.lastName, admin.isActivated, admin.image, admin.cover, isListening, listenersCount);
+                admin.lastName, admin.isActivated, admin.image, admin.cover, isListening,
+                listenersCount, admin.location, admin.isOwner);
     }
 }
 

@@ -41,12 +41,10 @@ import rx.Scheduler;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
-public class ContactsFriendsPresenter implements ProfilesListPresenter {
+public class ContactsFriendsPresenter extends ProfilesListPresenter {
 
     @Nonnull
     private final ProfilesDao dao;
-    @Nonnull
-    private final ListeningHalfPresenter listeningHalfPresenter;
 
     private final PublishSubject<Object> fetchLocalContactSubject = PublishSubject.create();
     private final PublishSubject<String> openProfileSubject = PublishSubject.create();
@@ -67,8 +65,8 @@ public class ContactsFriendsPresenter implements ProfilesListPresenter {
                                     @Nonnull ListeningHalfPresenter listeningHalfPresenter,
                                     @Nonnull UserPreferences userPreferences,
                                     @Nonnull PreferencesHelper preferencesHelper) {
+        super(listeningHalfPresenter);
         this.dao = dao;
-        this.listeningHalfPresenter = listeningHalfPresenter;
 
         final boolean isNormalUser = userPreferences.isNormalUser();
 
@@ -145,18 +143,6 @@ public class ContactsFriendsPresenter implements ProfilesListPresenter {
     @Nonnull
     public Observable<Object> getActionOnlyForLoggedInUser() {
         return actionOnlyForLoggedInUser;
-    }
-
-    @Nonnull
-    @Override
-    public Observable<String> getListenSuccessObservable() {
-        return listeningHalfPresenter.getListenSuccess();
-    }
-
-    @Nonnull
-    @Override
-    public Observable<String> getUnListenSuccessObservable() {
-        return listeningHalfPresenter.getUnListenSuccess();
     }
 
     @Nonnull
