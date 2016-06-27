@@ -44,9 +44,9 @@ public abstract class BaseProfileListPresenter {
     private Observable<Object> loadMoreObservable;
 
     @Nonnull
-    private final PublishSubject<Object> actionOnlyForLoggedInUsers = PublishSubject.create();
+    protected final PublishSubject<Object> actionOnlyForLoggedInUsers = PublishSubject.create();
     @Nonnull
-    private final PublishSubject<String> openProfileSubject = PublishSubject.create();
+    protected final PublishSubject<String> profileSelectedSubject = PublishSubject.create();
     @Nonnull
     private final PublishSubject<Object> loadMoreSubject = PublishSubject.create();
     @Nonnull
@@ -122,13 +122,22 @@ public abstract class BaseProfileListPresenter {
                                     @Nullable
                                     @Override
                                     public BaseAdapterItem apply(BaseProfile profile) {
-                                        return new ProfileListAdapterItem(profile, openProfileSubject,
-                                                listeningHalfPresenter.getListenProfileSubject(),
-                                                actionOnlyForLoggedInUsers, isNormalUser, profile.isOwner());
+                                        return createAdapterItem(profile);
                                     }
                                 }));
                     }
                 });
+    }
+
+    protected BaseAdapterItem createAdapterItem(BaseProfile profile) {
+        return new ProfileListAdapterItem(profile, profileSelectedSubject,
+                listeningHalfPresenter.getListenProfileSubject(),
+                actionOnlyForLoggedInUsers, isNormalUser, profile.isOwner());
+    }
+
+    @Nonnull
+    protected ListeningHalfPresenter getListeningHalfPresenter() {
+        return listeningHalfPresenter;
     }
 
     protected abstract Observable<BaseProfileListDao> getDaoObservable();
@@ -144,8 +153,8 @@ public abstract class BaseProfileListPresenter {
     }
 
     @Nonnull
-    public Observable<String> getProfileToOpenObservable() {
-        return openProfileSubject;
+    public Observable<String> getProfileSelectedObservable() {
+        return profileSelectedSubject;
     }
 
     public void refreshData() {

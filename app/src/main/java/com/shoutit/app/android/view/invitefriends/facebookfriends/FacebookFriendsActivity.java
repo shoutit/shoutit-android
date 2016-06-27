@@ -41,7 +41,7 @@ public class FacebookFriendsActivity extends BaseProfilesListActivity {
         presenter = (FacebookFriendsPresenter) ((FacebookFriendsActivityComponent)
                 getActivityComponent()).profilesListPresenter();
 
-        presenter.getProfileToOpenObservable()
+        presenter.getProfileSelectedObservable()
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(userName -> {
                     startActivityForResult(

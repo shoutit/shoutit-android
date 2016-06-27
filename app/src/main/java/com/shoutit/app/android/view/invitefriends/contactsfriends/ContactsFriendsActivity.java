@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 
-import com.appunite.rx.ResponseOrError;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
@@ -19,9 +18,6 @@ import com.shoutit.app.android.view.profileslist.BaseProfilesListActivity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import okhttp3.ResponseBody;
-import rx.functions.Action1;
 
 public class ContactsFriendsActivity extends BaseProfilesListActivity {
 
@@ -39,7 +35,7 @@ public class ContactsFriendsActivity extends BaseProfilesListActivity {
         presenter = (ContactsFriendsPresenter) ((ContactsFriendsActivityComponent)
                 getActivityComponent()).profilesListPresenter();
 
-        presenter.getProfileToOpenObservable()
+        presenter.getProfileSelectedObservable()
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(userName -> {
                     startActivityForResult(

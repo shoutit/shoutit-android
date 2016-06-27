@@ -69,7 +69,8 @@ public class ListeningHalfPresenter {
                                     return ResponseOrError.fromData(profileToListenWithLastResponse.getResponse());
                                 }
                             });
-                });
+                })
+                .observeOn(uiScheduler);
     }
 
     protected ProfilesListResponse updateResponseWithListenedProfiles(@Nonnull ProfilesHelper.ProfileToListenWithLastResponse profileToListenWithLastResponse) {
@@ -91,6 +92,7 @@ public class ListeningHalfPresenter {
         return unListenSuccess;
     }
 
+    @Nonnull
     public PublishSubject<BaseProfile> getListenProfileSubject() {
         return listenProfileSubject;
     }

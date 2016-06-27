@@ -528,8 +528,14 @@ public interface ApiService {
                                              @Query("page") Integer page,
                                              @Query("page_size") Integer pageSize);
 
-    @GET("pages/{user_name}/admins")
+    @GET("pages/{username}/admins")
     Observable<ProfilesListResponse> getAdmins(@Query("username") String pageUserName,
                                                @Query("page") Integer page,
                                                @Query("page_size") Integer pageSize);
+
+    @DELETE("pages/{username}/admin")
+    Observable<ResponseBody> deleteAdmin(@Query("username") String userName);
+
+    @POST("pages/{username}/admin")
+    Observable<ResponseBody> addAdmin(@Query("username") String userName);
 }
