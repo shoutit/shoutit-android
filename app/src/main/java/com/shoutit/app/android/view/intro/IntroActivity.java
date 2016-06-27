@@ -18,7 +18,6 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.GuestSignupRequest;
-import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.login.LoginProfile;
 import com.shoutit.app.android.dagger.ActivityModule;
@@ -28,6 +27,7 @@ import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.SystemUIUtils;
+import com.shoutit.app.android.view.loginintro.FacebookHelper;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.main.MainActivity;
 import com.uservoice.uservoicesdk.UserVoice;
@@ -40,9 +40,6 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Observable;
-import rx.functions.Action0;
-import rx.functions.Action1;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 public class IntroActivity extends BaseActivity {
@@ -113,32 +110,18 @@ public class IntroActivity extends BaseActivity {
 
         progress.setVisibility(View.VISIBLE);
         mLocationObservable.first()
-                .flatMap(new Func1<UserLocation, Observable<SignResponse>>() {
-                    @Override
-                    public Observable<SignResponse> call(UserLocation location) {
-                        return mApiService.loginGuest(new GuestSignupRequest(LoginProfile.loginUser(location), mixPanel.getDistinctId()))
+                .flatMap(location -> FacebookHelper.getPromotionalCodeObservable(IntroActivity.this)
+                        .flatMap(invitationCode -> mApiService.loginGuest(
+                                new GuestSignupRequest(LoginProfile.loginUser(location), mixPanel.getDistinctId(), invitationCode))
                                 .subscribeOn(Schedulers.io())
-                                .observeOn(MyAndroidSchedulers.mainThread());
-                    }
-                })
-                .doOnTerminate(new Action0() {
-                    @Override
-                    public void call() {
-                        progress.setVisibility(View.GONE);
-                    }
-                })
-                .subscribe(new Action1<SignResponse>() {
-                    @Override
-                    public void call(SignResponse signResponse) {
-                        mUserPreferences.setGuestLoggedIn(signResponse.getAccessToken(), signResponse.getRefreshToken());
-                        finish();
-                        startActivity(MainActivity.newIntent(IntroActivity.this));
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        ColoredSnackBar.error(ColoredSnackBar.contentView(IntroActivity.this), R.string.intro_fail_login, Snackbar.LENGTH_SHORT).show();
-                    }
+                                .observeOn(MyAndroidSchedulers.mainThread())))
+                .doOnTerminate(() -> progress.setVisibility(View.GONE))
+                .subscribe(signResponse -> {
+                    mUserPreferences.setGuestLoggedIn(signResponse.getProfile(), signResponse.getAccessToken(), signResponse.getRefreshToken());
+                    finish();
+                    startActivity(MainActivity.newIntent(IntroActivity.this));
+                }, throwable -> {
+                    ColoredSnackBar.error(ColoredSnackBar.contentView(IntroActivity.this), R.string.intro_fail_login, Snackbar.LENGTH_SHORT).show();
                 });
     }
 

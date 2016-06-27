@@ -16,6 +16,7 @@ import javax.annotation.Nonnull;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class ReceivedImageMessageHolder extends ViewHolderManager.BaseViewHolder<BaseAdapterItem> {
 
@@ -30,6 +31,8 @@ public class ReceivedImageMessageHolder extends ViewHolderManager.BaseViewHolder
     @Bind(R.id.chats_received_avatar)
     ImageView mChatsReceivedAvatar;
 
+    private ReceivedImageMessage item;
+
     public ReceivedImageMessageHolder(@Nonnull View itemView, Picasso picasso) {
         super(itemView);
         mItemView = itemView;
@@ -38,22 +41,27 @@ public class ReceivedImageMessageHolder extends ViewHolderManager.BaseViewHolder
     }
 
     @Override
-    public void bind(@Nonnull BaseAdapterItem item) {
-        final ReceivedImageMessage message = (ReceivedImageMessage) item;
-        mPicasso.load(message.getUrl())
+    public void bind(@Nonnull BaseAdapterItem adapterItem) {
+        item = (ReceivedImageMessage) adapterItem;
+        mPicasso.load(item.getUrl())
                 .fit()
                 .centerCrop()
                 .into(mCjatsReceivedImageImageview);
-        mCjatsReceivedImageTextview.setText(message.getTime());
+        mCjatsReceivedImageTextview.setText(item.getTime());
 
-        AvatarHelper.setAvatar(message.isFirst(), message.getAvatarUrl(), mPicasso, mChatsReceivedAvatar);
+        AvatarHelper.setAvatar(item.isFirst(), item.getAvatarUrl(), mPicasso, mChatsReceivedAvatar);
 
         mItemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                message.click();
+                item.click();
             }
         });
+    }
+
+    @OnClick(R.id.chats_received_avatar)
+    public void onAvatarClicked() {
+        item.onAvatarClicked();
     }
 
     public static ViewHolderManager.BaseViewHolder create(@NonNull View view, Picasso picasso) {

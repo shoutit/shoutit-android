@@ -4,6 +4,7 @@ package com.shoutit.app.android.api.model;
 import android.support.annotation.NonNull;
 
 import com.google.common.base.Objects;
+import com.google.common.primitives.Booleans;
 import com.shoutit.app.android.model.Stats;
 
 import java.util.List;
@@ -13,6 +14,8 @@ import javax.annotation.Nullable;
 
 public class User extends BaseProfile {
     public static final String ME = "me";
+    public static final String USER = "user";
+    public static final String PAGE = "page";
 
     public enum Gender {
         FEMALE("female"),
@@ -38,13 +41,11 @@ public class User extends BaseProfile {
     // whever the profile is listening to you
     private final boolean isListener;
     private final boolean isPasswordSet;
-    private final UserLocation location;
     private final List<Page> pages;
     private final List<Admin> admins;
     private final String bio;
     private final int dateJoined;
     private final Listening listeningCount;
-    private final boolean isOwner;
     private final String about;
     private final String mobile;
     private final String website;
@@ -61,16 +62,15 @@ public class User extends BaseProfile {
 
     public User(String id, String type, String apiUrl, String webUrl, String username,
                 String name, String firstName, String lastName, boolean isActivated, String image,
-                String cover, boolean isListening, boolean isListener, boolean isPasswordSet, UserLocation location,
+                String cover, boolean isListening, boolean isListener, boolean isPasswordSet, @Nullable UserLocation location,
                 int listenersCount, List<Page> pages, List<Admin> admins, String bio, int dateJoined,
                 Listening listeningCount, boolean isOwner, String about, String mobile, String website, String email, ConversationDetails conversation,
                 @Nullable String gender, @Nullable String birthday, @Nullable Stats stats, @Nullable LinkedAccounts linkedAccounts) {
-        super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount);
+        super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount, location, isOwner);
         this.apiUrl = apiUrl;
         this.webUrl = webUrl;
         this.isListener = isListener;
         this.isPasswordSet = isPasswordSet;
-        this.location = location;
         this.pages = pages;
         this.admins = admins;
         this.bio = bio;
@@ -122,6 +122,10 @@ public class User extends BaseProfile {
                 image, cover, isListening, isListener, isPasswordSet, location, listenersCount,
                 pages, admins, bio, dateJoined, listeningCount, isOwner, about, mobile, website,
                 email, conversation, gender, birthday, newStats, linkedAccounts);
+    }
+
+    public boolean isUser(@Nonnull User user){
+        return (USER.equals(user.type));
     }
 
     public String getId() {

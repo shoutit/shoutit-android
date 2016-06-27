@@ -11,10 +11,8 @@ import com.facebook.CallbackManager;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
-import com.shoutit.app.android.adapteritems.NoDataTextAdapterItem;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.ProfilesListResponse;
 import com.shoutit.app.android.api.model.User;
@@ -22,6 +20,7 @@ import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.utils.ListeningHalfPresenter;
 import com.shoutit.app.android.utils.PreferencesHelper;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
+import com.shoutit.app.android.view.invitefriends.InviteFriendsPresenter;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
 import com.shoutit.app.android.view.profileslist.ProfileListAdapterItem;
 import com.shoutit.app.android.view.profileslist.ProfilesListPresenter;
@@ -37,10 +36,9 @@ import rx.Scheduler;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
-public class FacebookFriendsPresenter implements ProfilesListPresenter {
+public class FacebookFriendsPresenter extends ProfilesListPresenter {
 
     private final PublishSubject<String> openProfileSubject = PublishSubject.create();
-    private final PublishSubject<Object> openInviteClickedSubject = PublishSubject.create();
     private final PublishSubject<Object> progressSubject = PublishSubject.create();
     private final PublishSubject<Object> actionOnlyForLoggedInUser = PublishSubject.create();
 
@@ -50,7 +48,7 @@ public class FacebookFriendsPresenter implements ProfilesListPresenter {
     private final Observable<Boolean> progressObservable;
 
     private final ProfilesDao dao;
-    private final ListeningHalfPresenter listeningHalfPresenter;
+    private final InviteFriendsPresenter inviteFriendsPresenter;
 
     public FacebookFriendsPresenter(final FacebookHelper facebookHelper,
                                     UserPreferences userPreferences,
@@ -59,9 +57,11 @@ public class FacebookFriendsPresenter implements ProfilesListPresenter {
                                     ProfilesDao dao,
                                     @UiScheduler final Scheduler uiScheduler,
                                     ListeningHalfPresenter listeningHalfPresenter,
-                                    PreferencesHelper preferencesHelper) {
+                                    PreferencesHelper preferencesHelper,
+                                    InviteFriendsPresenter inviteFriendsPresenter) {
+        super(listeningHalfPresenter);
         this.dao = dao;
-        this.listeningHalfPresenter = listeningHalfPresenter;
+        this.inviteFriendsPresenter = inviteFriendsPresenter;
 
         final boolean isNormalUser = userPreferences.isNormalUser();
 
@@ -109,7 +109,7 @@ public class FacebookFriendsPresenter implements ProfilesListPresenter {
                                                 preferencesHelper.isMyProfile(profile.getUsername()));
                                     }
                                 }))
-                                .add(new FacebookInviteFriendsAdapterItem(openInviteClickedSubject))
+                                .add(new FacebookInviteFriendsAdapterItem(inviteFriendsPresenter.getInitFBFriendInviteObserver()))
                                 .build();
                     }
                 });
@@ -124,7 +124,8 @@ public class FacebookFriendsPresenter implements ProfilesListPresenter {
                         ResponseOrError.transform(arePermissionsGranted)
                 ))
                 .filter(Functions1.isNotNull())
-                .mergeWith(listeningHalfPresenter.getErrorSubject());
+                .mergeWith(listeningHalfPresenter.getErrorSubject())
+                .mergeWith(inviteFriendsPresenter.getErrorObservable());
 
         permissionsNotGrantedObservable = arePermissionsGranted
                 .compose(ResponseOrError.<Boolean>onlySuccess())
@@ -135,6 +136,7 @@ public class FacebookFriendsPresenter implements ProfilesListPresenter {
                 adapterItems.map(Functions1.returnFalse()),
                 errorObservable.map(Functions1.returnFalse()),
                 permissionsNotGrantedObservable.map(Functions1.returnFalse()))
+                .mergeWith(inviteFriendsPresenter.getProgressObservable())
                 .startWith(true);
     }
 
@@ -146,18 +148,6 @@ public class FacebookFriendsPresenter implements ProfilesListPresenter {
     @Nonnull
     public Observable<Boolean> getPermissionsNotGrantedObservable() {
         return permissionsNotGrantedObservable;
-    }
-
-    @Nonnull
-    @Override
-    public Observable<String> getListenSuccessObservable() {
-        return listeningHalfPresenter.getListenSuccess();
-    }
-
-    @Nonnull
-    @Override
-    public Observable<String> getUnListenSuccessObservable() {
-        return listeningHalfPresenter.getUnListenSuccess();
     }
 
     @Override
@@ -180,9 +170,8 @@ public class FacebookFriendsPresenter implements ProfilesListPresenter {
         return openProfileSubject;
     }
 
-    @Nonnull
-    public Observable<Object> getOpenInviteClickedObservable() {
-        return openInviteClickedSubject;
+    public Observable<String> getInvitationCodeObservable() {
+        return inviteFriendsPresenter.getInvitationCodeObservable();
     }
 
     @Override

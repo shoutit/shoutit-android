@@ -85,12 +85,16 @@ public class ChatParticipantsPresenter {
         return ImmutableList.copyOf(Iterables.transform(profiles, new Function<ConversationProfile, BaseAdapterItem>() {
             @Nullable
             @Override
-            public BaseAdapterItem apply(@Nullable final ConversationProfile input) {
-                return getProfileItem(input, conversation, new ProfileItem.OnItemClicked() {
+            public BaseAdapterItem apply(@Nullable final ConversationProfile profile) {
+                return getProfileItem(profile, conversation, new ProfileItem.OnItemClicked() {
                     @Override
                     public void onItemClicked(String id, boolean isBlocked, boolean isAdmin, String name) {
-                        assert input != null;
-                        mListener.showDialog(id, isBlocked, isAdmin, name, isUserAdmin && !input.getId().equals(mId));
+                        assert profile != null;
+                        if (!profile.getId().equals(mId) && isUserAdmin) {
+                            mListener.showDialog(id, isBlocked, isAdmin, name, profile.getUsername());
+                        } else {
+                            mListener.showProfile(profile.getUsername());
+                        }
                     }
                 });
             }
@@ -156,6 +160,10 @@ public class ChatParticipantsPresenter {
         mCompositeSubscription.unsubscribe();
     }
 
+    public void showProfile(@NonNull String userName) {
+        mListener.showProfile(userName);
+    }
+
     public interface Listener {
 
         void error();
@@ -164,6 +172,8 @@ public class ChatParticipantsPresenter {
 
         void showProgress(boolean show);
 
-        void showDialog(String id, boolean isBlocked, boolean isAdmin, String name, boolean isClickable);
+        void showDialog(String id, boolean isBlocked, boolean isAdmin, String name, String userName);
+
+        void showProfile(String username);
     }
 }

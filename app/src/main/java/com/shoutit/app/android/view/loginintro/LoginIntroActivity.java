@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -103,9 +104,13 @@ public class LoginIntroActivity extends BaseActivity {
     }
 
     private void setUpActionBar() {
-        toolbar.setNavigationIcon(R.drawable.ic_blue_arrow);
+        toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(null);
+        final ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(null);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayUseLogoEnabled(true);
+        actionBar.setLogo(R.drawable.appbar_logo_white);
     }
 
     @Override
@@ -172,26 +177,20 @@ public class LoginIntroActivity extends BaseActivity {
 
     @NonNull
     private Func1<BothParams<String, UserLocation>, Observable<SignResponse>> getCallGoogleApi() {
-        return new Func1<BothParams<String, UserLocation>, Observable<SignResponse>>() {
-            @Override
-            public Observable<SignResponse> call(BothParams<String, UserLocation> bothParams) {
-                return mApiService.googleLogin(new GoogleLogin(bothParams.param1(), LoginProfile.loginUser(bothParams.param2()), mixPanel.getDistinctId()))
+        return bothParams -> FacebookHelper.getPromotionalCodeObservable(LoginIntroActivity.this)
+                .flatMap(invitationCode -> mApiService.googleLogin(new GoogleLogin(
+                        bothParams.param1(), LoginProfile.loginUser(bothParams.param2()), mixPanel.getDistinctId(), invitationCode))
                         .subscribeOn(Schedulers.io())
-                        .observeOn(MyAndroidSchedulers.mainThread());
-            }
-        };
+                        .observeOn(MyAndroidSchedulers.mainThread()));
     }
 
     @NonNull
     private Func1<BothParams<String, UserLocation>, Observable<SignResponse>> getCallFacebookApi() {
-        return new Func1<BothParams<String, UserLocation>, Observable<SignResponse>>() {
-            @Override
-            public Observable<SignResponse> call(BothParams<String, UserLocation> bothParams) {
-                return mApiService.facebookLogin(new FacebookLogin(bothParams.param1(), LoginProfile.loginUser(bothParams.param2()), mixPanel.getDistinctId()))
+        return bothParams -> FacebookHelper.getPromotionalCodeObservable(LoginIntroActivity.this)
+                .flatMap(invitationCode -> mApiService.facebookLogin(new FacebookLogin(
+                        bothParams.param1(), LoginProfile.loginUser(bothParams.param2()), mixPanel.getDistinctId(), invitationCode))
                         .subscribeOn(Schedulers.io())
-                        .observeOn(MyAndroidSchedulers.mainThread());
-            }
-        };
+                        .observeOn(MyAndroidSchedulers.mainThread()));
     }
 
     private void loginGoogle() {

@@ -20,6 +20,7 @@ import com.shoutit.app.android.view.chats.chat_info.chats_users_list.ChatUsersLi
 import com.shoutit.app.android.view.chats.chat_info.chats_users_list.ChatUsersListComponent;
 import com.shoutit.app.android.view.chats.chat_info.chats_users_list.ChatUsersListModule;
 import com.shoutit.app.android.view.chats.chat_info.chats_users_list.DaggerChatUsersListComponent;
+import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 
 import java.util.List;
 
@@ -48,7 +49,9 @@ public class ChatBlockedUsersActivity extends BaseActivity implements ChatBlocke
     ChatBlockedUsersPresenter mChatParticipantsPresenter;
 
     @Inject
-    UnblockDialog dialog;
+    UnblockDialog unblockDialog;
+    @Inject
+    BlockedDialog blockedDialog;
 
     public static Intent newIntent(Context context, String conversationId) {
         return new Intent(context, ChatBlockedUsersActivity.class)
@@ -111,7 +114,17 @@ public class ChatBlockedUsersActivity extends BaseActivity implements ChatBlocke
     }
 
     @Override
-    public void showDialog(String id, String name) {
-        dialog.show(id, name, mChatParticipantsPresenter);
+    public void showProfile(String userName) {
+        startActivity(UserOrPageProfileActivity.newIntent(this, userName));
+    }
+
+    @Override
+    public void showUnblockConfirmDialog(String id, String name) {
+        unblockDialog.show(id, name, mChatParticipantsPresenter);
+    }
+
+    @Override
+    public void showDialog(String id, String name, String userName) {
+        blockedDialog.show(id, name, userName, mChatParticipantsPresenter);
     }
 }

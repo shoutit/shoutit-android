@@ -16,6 +16,7 @@ import javax.annotation.Nonnull;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class ReceivedLocationMessageHolder extends ViewHolderManager.BaseViewHolder<BaseAdapterItem> {
 
@@ -28,6 +29,8 @@ public class ReceivedLocationMessageHolder extends ViewHolderManager.BaseViewHol
     @Bind(R.id.chats_received_avatar)
     ImageView mChatsReceivedAvatar;
 
+    private ReceivedLocationMessage item;
+
     public ReceivedLocationMessageHolder(@Nonnull View itemView, Picasso picasso) {
         super(itemView);
         mItemView = itemView;
@@ -36,18 +39,23 @@ public class ReceivedLocationMessageHolder extends ViewHolderManager.BaseViewHol
     }
 
     @Override
-    public void bind(@Nonnull BaseAdapterItem item) {
-        final ReceivedLocationMessage message = (ReceivedLocationMessage) item;
-        mChatsReceivedLocationTextview.setText(message.getTime());
+    public void bind(@Nonnull BaseAdapterItem adapterItem) {
+        item = (ReceivedLocationMessage) adapterItem;
+        mChatsReceivedLocationTextview.setText(item.getTime());
 
-        AvatarHelper.setAvatar(message.isFirst(), message.getAvatarUrl(), mPicasso, mChatsReceivedAvatar);
+        AvatarHelper.setAvatar(item.isFirst(), item.getAvatarUrl(), mPicasso, mChatsReceivedAvatar);
 
         mItemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                message.click();
+                item.click();
             }
         });
+    }
+
+    @OnClick(R.id.chats_received_avatar)
+    public void onAvatarClicked() {
+        item.onAvatarClicked();
     }
 
     public static ViewHolderManager.BaseViewHolder create(@NonNull View view, Picasso picasso) {

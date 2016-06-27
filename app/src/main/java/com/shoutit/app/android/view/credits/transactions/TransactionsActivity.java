@@ -2,6 +2,7 @@ package com.shoutit.app.android.view.credits.transactions;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
@@ -99,5 +100,10 @@ public class TransactionsActivity extends BaseActivity implements TransactionsPr
     @Override
     public void progress(boolean show) {
         mProgress.setVisibility(show ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public void startActivity(String appUrl) {
+        startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(appUrl)));
     }
 }

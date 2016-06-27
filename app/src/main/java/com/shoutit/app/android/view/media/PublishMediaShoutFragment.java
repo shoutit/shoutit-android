@@ -74,8 +74,6 @@ public class PublishMediaShoutFragment extends Fragment {
 
     @Bind(R.id.publish_media_shout_preview)
     ImageView mPublishMediaShoutPreview;
-    @Bind(R.id.camera_cool_icon)
-    ImageView mPublishMediaCool;
     @Bind(R.id.camera_published_price)
     EditText mCameraPublishedPrice;
     @Bind(R.id.camera_published_currency)
@@ -189,7 +187,6 @@ public class PublishMediaShoutFragment extends Fragment {
         }
 
         closeButton.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
-        mPublishMediaCool.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
     }
 
     private void setUpFacebookCheckbox() {

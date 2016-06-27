@@ -21,7 +21,7 @@ public class PageLoginRequest extends BaseLoginRequest {
                             String categorySlug,
                             String pageName,
                             String name) {
-        super(mixpanelDistinctId, PAGE_LOGIN, loginProfile);
+        super(mixpanelDistinctId, PAGE_LOGIN, loginProfile, null);
         this.email = email;
         this.password = password;
         this.pageName = pageName;

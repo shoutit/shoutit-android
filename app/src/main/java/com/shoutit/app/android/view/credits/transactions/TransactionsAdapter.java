@@ -36,6 +36,9 @@ public class TransactionsAdapter extends BaseAdapter {
 
     class TransactonViewHolder extends ViewHolderManager.BaseViewHolder {
 
+        @Nonnull
+        private final View mItemView;
+
         @Bind(R.id.transactions_item_icon)
         ImageView mTransactionsItemIcon;
         @Bind(R.id.transactions_item_text)
@@ -45,6 +48,7 @@ public class TransactionsAdapter extends BaseAdapter {
 
         public TransactonViewHolder(@Nonnull View itemView) {
             super(itemView);
+            mItemView = itemView;
             ButterKnife.bind(this, itemView);
         }
 
@@ -54,6 +58,8 @@ public class TransactionsAdapter extends BaseAdapter {
             mTransactionsItemIcon.setImageResource(item.isOut() ? R.drawable.dollar_out : R.drawable.dollar_in);
             mTransactionsItemText.setText(item.getText());
             mTransactionsDate.setText(item.getTime());
+
+            mItemView.setOnClickListener(v -> item.click());
         }
     }
 }

@@ -3,6 +3,7 @@ package com.shoutit.app.android.view.loginintro;
 import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 
 import com.appunite.rx.ResponseOrError;
@@ -14,6 +15,7 @@ import com.facebook.FacebookAuthorizationException;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.applinks.AppLinkData;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.share.model.AppInviteContent;
@@ -40,7 +42,6 @@ import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Scheduler;
 import rx.Subscriber;
-import rx.functions.Action1;
 import rx.functions.Func1;
 
 public class FacebookHelper {
@@ -50,6 +51,8 @@ public class FacebookHelper {
     private static final String PERMISSION_EMAIL = "email";
     public static final String PERMISSION_USER_FRIENDS = "user_friends";
     public static final String PERMISSION_PUBLISH_ACTIONS = "publish_actions";
+
+    public static final String FACEBOOK_SHARE_APP_LINK = "https://fb.me/1224908360855680";
 
     private final ApiService apiService;
     private final UserPreferences userPreferences;
@@ -71,6 +74,27 @@ public class FacebookHelper {
 
     public void initFacebook() {
         FacebookSdk.sdkInitialize(context, this::refreshTokenIfNeeded);
+    }
+
+    @Nonnull
+    public static Observable<String> getPromotionalCodeObservable(@Nonnull Context context) {
+        return Observable.create(new Observable.OnSubscribe<String>() {
+            @Override
+            public void call(Subscriber<? super String> subscriber) {
+                AppLinkData.fetchDeferredAppLinkData(context, appLinkData -> {
+                    if (!subscriber.isUnsubscribed()) {
+                        if (appLinkData == null || appLinkData.getPromotionCode() == null) {
+                            subscriber.onNext(null);
+                            subscriber.onCompleted();
+                        } else {
+                            LogHelper.logIfDebug(TAG, "Received promotionCode: " + appLinkData.getPromotionCode());
+                            subscriber.onNext(appLinkData.getPromotionCode());
+                            subscriber.onCompleted();
+                        }
+                    }
+                });
+            }
+        });
     }
 
     private void refreshTokenIfNeeded() {
@@ -286,11 +310,14 @@ public class FacebookHelper {
         });
     }
 
-    public static void showAppInviteDialog(@Nonnull Activity activity, @Nonnull String appLinkUrl,
-                                           @Nonnull CallbackManager callbackManager) {
+    public static void showAppInviteDialog(@Nonnull Activity activity,
+                                           @Nonnull String appLinkUrl,
+                                           @Nonnull CallbackManager callbackManager,
+                                           @Nullable String promotionalCode) {
         if (AppInviteDialog.canShow()) {
-            AppInviteContent content = new AppInviteContent.Builder()
+            final AppInviteContent content = new AppInviteContent.Builder()
                     .setApplinkUrl(appLinkUrl)
+                    .setPromotionDetails(activity.getString(R.string.invite_text_fb),  promotionalCode)
                     .build();
 
             AppInviteDialog appInviteDialog = new AppInviteDialog(activity);
@@ -312,6 +339,7 @@ public class FacebookHelper {
                             R.string.invite_error, Snackbar.LENGTH_LONG).show();
                 }
             });
+
             appInviteDialog.show(content);
         }
     }

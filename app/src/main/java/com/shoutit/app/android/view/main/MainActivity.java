@@ -134,6 +134,9 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
         if (mUserPreferences.isNormalUser()) {
             subscribeToStats();
         }
+
+        mixPanel.initMixPanel(); // Workaround for mixpanel people id issue
+        mixPanel.showNotificationIfAvailable(this);
     }
 
     @Override
@@ -297,17 +300,15 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        for (Fragment fragment : getSupportFragmentManager().getFragments()) {
-            if (MenuHandler.FRAGMENT_INVITE_FRIENDS.equals(fragment.getTag())) {
-                fragment.onActivityResult(requestCode, resultCode, data);
-                break;
-            }
-        }
-
         if (resultCode == Activity.RESULT_OK && requestCode == REQUST_CODE_PLAY_SERVICES_CHECK) {
             registerToGcm();
         } else {
             super.onActivityResult(requestCode, resultCode, data);
+        }
+
+        for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+            fragment.onActivityResult(requestCode, resultCode, data);
+            break;
         }
     }
 
@@ -318,7 +319,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
             if (permissionsGranted) {
                 ColoredSnackBar.success(findViewById(android.R.id.content), R.string.permission_granted, Snackbar.LENGTH_SHORT).show();
             } else {
-                ColoredSnackBar.error(findViewById(android.R.id.content), R.string.permission_not_granted, Snackbar.LENGTH_SHORT);
+                ColoredSnackBar.error(findViewById(android.R.id.content), R.string.permission_not_granted, Snackbar.LENGTH_SHORT).show();
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);

@@ -11,7 +11,9 @@ public class GuestSignupRequest extends BaseLoginRequest {
 
     private static final String SHOUTIT_SIGNUP = "shoutit_guest";
 
-    public GuestSignupRequest(@Nullable LoginProfile user, @Nonnull String mixpanelDistinctId) {
-        super(mixpanelDistinctId, SHOUTIT_SIGNUP, user);
+    public GuestSignupRequest(@Nullable LoginProfile user,
+                              @Nonnull String mixpanelDistinctId,
+                              @Nullable String invitationCode) {
+        super(mixpanelDistinctId, SHOUTIT_SIGNUP, user, invitationCode);
     }
 }

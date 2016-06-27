@@ -1,5 +1,6 @@
 package com.shoutit.app.android.view.signin.register;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.appunite.rx.ObservableExtensions;
@@ -14,11 +15,13 @@ import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.login.LoginProfile;
+import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.utils.LoginUtils;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.utils.Validators;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
+import com.shoutit.app.android.view.loginintro.FacebookHelper;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -52,7 +55,8 @@ public class RegisterPresenter {
                              @NonNull final UserPreferences userPreferences,
                              @NonNull @NetworkScheduler final Scheduler networkScheduler,
                              @NonNull @UiScheduler final Scheduler uiScheduler,
-                             @Nonnull final MixPanel mixPanel) {
+                             @Nonnull final MixPanel mixPanel,
+                             @ForActivity Context context) {
 
         mLocationObservable = userPreferences
                 .getLocationObservable()
@@ -67,7 +71,9 @@ public class RegisterPresenter {
                     @Override
                     public Observable<EmailSignupRequest> call(final UserLocation location) {
                         return Observable.zip(mNameSubject, mEmailSubject, mPasswordSubject,
-                                (name, email, password) -> new EmailSignupRequest(name, email, password, LoginProfile.loginUser(location), mixPanel.getDistinctId()))
+                                FacebookHelper.getPromotionalCodeObservable(context),
+                                (name, email, password, invitationCode) -> new EmailSignupRequest(
+                                        name, email, password, LoginProfile.loginUser(location), mixPanel.getDistinctId(), invitationCode))
                                 .first();
                     }
                 })

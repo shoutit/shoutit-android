@@ -40,7 +40,7 @@
                 android:layout_marginTop="20dp"
                 android:background="@drawable/selector_intro"
                 android:fontFamily="sans-serif-regular"
-                android:textAllCaps="true"
+                android:textAllCaps="false"
                 android:text="@string/intro_login"
                 android:textColor="@color/colorPrimary"
                 android:textSize="14sp"/>
