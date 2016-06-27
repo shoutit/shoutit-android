@@ -4,6 +4,7 @@ import android.os.Build;
 import android.text.TextUtils;
 
 import com.appunite.rx.dagger.NetworkScheduler;
+import com.google.common.base.Optional;
 import com.shoutit.app.android.BuildConfig;
 import com.shoutit.app.android.UserPreferences;
 
@@ -14,8 +15,6 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class AuthInterceptor implements Interceptor {
-
-    private static final String TOKEN_PREFIX = "Bearer ";
 
     private final UserPreferences userPreferences;
 
@@ -31,12 +30,15 @@ public class AuthInterceptor implements Interceptor {
         if (TextUtils.isEmpty(token)) {
             return chain.proceed(original);
         } else {
-            final Request request = original.newBuilder()
-                    .header("Authorization", TOKEN_PREFIX + token)
-                    .header("User-Agent", getUserAgent())
-                    .build();
+            final Request.Builder authorizationBuilder = original.newBuilder()
+                    .header(Headers.AUTHORIZATION, Headers.TOKEN_PREFIX + token)
+                    .header(Headers.USER_AGENT, getUserAgent());
+            final Optional<String> pageId = userPreferences.getPageId();
+            if (pageId.isPresent()) {
+                authorizationBuilder.addHeader(Headers.AUTHORIZATION_PAGE_ID, pageId.get());
+            }
 
-            return chain.proceed(request);
+            return chain.proceed(authorizationBuilder.build());
         }
     }
 

@@ -286,7 +286,7 @@ public class RegisterPresenterTest {
         final ArgumentCaptor<EmailSignupRequest> argumentCaptor = ArgumentCaptor.forClass(EmailSignupRequest.class);
         verify(mApiService).signup(argumentCaptor.capture());
 
-        final UserLocationSimple location = argumentCaptor.getValue().getUser().getLocation();
+        final UserLocationSimple location = argumentCaptor.getValue().getProfile().getLocation();
         assert_().that(location.getLatitude()).isEqualTo(1d);
         assert_().that(location.getLongitude()).isEqualTo(1d);
     }
