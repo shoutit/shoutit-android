@@ -58,7 +58,9 @@ public class CreatePageDetailsPresenter {
                 .observeOn(mUiScheduler)
                 .subscribe(categories -> {
                     listener.showProgress(false);
-                    final List<CategoryInfo> categoryInfos = getCategoryInfos(categories);
+                    final PageCategory currentCategory = getCurrentCategory(categories);
+                    listener.setToolbarTitle(currentCategory.getName());
+                    final List<CategoryInfo> categoryInfos = getCategoryInfos(currentCategory);
                     listener.setCategories(categoryInfos);
 
                 }, throwable -> {
@@ -66,18 +68,23 @@ public class CreatePageDetailsPresenter {
                 }));
     }
 
-    private List<CategoryInfo> getCategoryInfos(List<PageCategory> categories) {
-        return ImmutableList.copyOf(Iterables.transform(Iterables.filter(categories, input -> {
+    private PageCategory getCurrentCategory(List<PageCategory> categories) {
+        return Iterables.filter(categories, input -> {
             assert input != null;
             return input.getId().equals(mCategoryId);
-        }).iterator().next().getChildren(), new Function<PageCategory, CategoryInfo>() {
-            @Nullable
-            @Override
-            public CategoryInfo apply(@Nullable PageCategory input) {
-                assert input != null;
-                return new CategoryInfo(input.getImage(), input.getName(), input.getSlug());
-            }
-        }));
+        }).iterator().next();
+    }
+
+    private List<CategoryInfo> getCategoryInfos(PageCategory currentCategory) {
+        return ImmutableList.copyOf(Iterables.transform(currentCategory.getChildren(),
+                new Function<PageCategory, CategoryInfo>() {
+                    @Nullable
+                    @Override
+                    public CategoryInfo apply(@Nullable PageCategory input) {
+                        assert input != null;
+                        return new CategoryInfo(input.getImage(), input.getName(), input.getSlug());
+                    }
+                }));
     }
 
     public void unregister() {
@@ -88,7 +95,7 @@ public class CreatePageDetailsPresenter {
     public void passCreatePageData(@NonNull CreatePageData createPageData) {
         final boolean emailEmpty = Strings.isNullOrEmpty(createPageData.mEmail);
         final boolean fullNameEmpty = Strings.isNullOrEmpty(createPageData.mFullName);
-        final boolean passwordEmpty = LoginUtils.isPasswordCorrect(createPageData.mPassword);
+        final boolean passwordEmpty = !LoginUtils.isPasswordCorrect(createPageData.mPassword);
         final boolean nameEmpty = LoginUtils.isPasswordCorrect(createPageData.mName);
 
         if (emailEmpty) mListener.emptyEmail();
@@ -123,7 +130,7 @@ public class CreatePageDetailsPresenter {
 
     public interface Listener {
 
-        void setCategories(List<CategoryInfo> categoryInfos);
+        void setCategories(List<CategoryInfo> categoryInfoss);
 
         void showProgress(boolean show);
 
@@ -138,6 +145,8 @@ public class CreatePageDetailsPresenter {
         void startMainActivity();
 
         void nameEmpty();
+
+        void setToolbarTitle(String title);
     }
 
     public static class CategoryInfo {

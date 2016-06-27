@@ -26,6 +26,7 @@ import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.data.AssetsConstants;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.MoreFunctions1;
+import com.shoutit.app.android.utils.RegisterUtils;
 import com.shoutit.app.android.utils.SpanUtils;
 import com.shoutit.app.android.utils.rx.Actions1;
 import com.shoutit.app.android.view.about.AboutActivity;
@@ -175,20 +176,7 @@ public class RegisterFragment extends BaseFragment {
     }
 
     private void setUpSpans() {
-        final String bottomText = getString(R.string.register_bottom_text, getString(R.string.register_bottom_text_terms_of_service), getString(R.string.register_bottom_text_privacy_policy));
-        final String textTermsOfService = getString(R.string.register_bottom_text_terms_of_service);
-        final String textPrivacyPolicy = getString(R.string.register_bottom_text_privacy_policy);
-
-        final SpannableString spannableString = SpanUtils.clickableColoredUnderlinedSpan(bottomText, textTermsOfService, ContextCompat.getColor(getActivity(), R.color.register_underline), () -> startActivity(HtmlAssetViewerActivity.newIntent(
-                getActivity(), AssetsConstants.ASSET_TERMS_OF_SERVICE,
-                getString(R.string.html_activity_terms))));
-
-        final SpannableString finalSpannableString = SpanUtils.clickableColoredUnderlinedSpan(spannableString, textPrivacyPolicy, ContextCompat.getColor(getActivity(), R.color.register_underline), () -> startActivity(HtmlAssetViewerActivity.newIntent(
-                getActivity(), AssetsConstants.ASSET_TERMS_OF_SERVICE,
-                getString(R.string.html_activity_privacy))));
-
-        bottomTextView.setMovementMethod(LinkMovementMethod.getInstance());
-        bottomTextView.setText(finalSpannableString);
+        RegisterUtils.setUpSpans(getActivity(), bottomTextView);
 
         final String createPageText = getString(R.string.register_create_page_text, getString(R.string.register_create_page_highlight));
         final String createPageClick = getString(R.string.register_create_page_highlight);

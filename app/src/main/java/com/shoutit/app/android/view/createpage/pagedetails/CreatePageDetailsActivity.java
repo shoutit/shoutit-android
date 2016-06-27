@@ -5,9 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.Toolbar;
+import android.text.method.PasswordTransformationMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,8 +24,12 @@ import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.RegisterUtils;
 import com.shoutit.app.android.utils.ToolbarUtils;
+import com.shoutit.app.android.view.about.AboutActivity;
 import com.shoutit.app.android.view.main.MainActivity;
+import com.uservoice.uservoicesdk.UserVoice;
 
 import java.util.List;
 
@@ -32,6 +38,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 
 public class CreatePageDetailsActivity extends BaseActivity implements CreatePageDetailsPresenter.Listener {
@@ -65,7 +72,7 @@ public class CreatePageDetailsActivity extends BaseActivity implements CreatePag
         @SuppressLint("ViewHolder")
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            final View inflate = mLayoutInflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+            final View inflate = mLayoutInflater.inflate(R.layout.spinner_item, parent, false);
             final TextView text = (TextView) inflate.findViewById(android.R.id.text1);
             text.setText(mCategoryInfos.get(position).getName());
             return inflate;
@@ -94,6 +101,10 @@ public class CreatePageDetailsActivity extends BaseActivity implements CreatePag
     TextInputLayout mCreatePageDetailsPasswordLayout;
     @Bind(R.id.create_page_details_toolbar)
     Toolbar mCreatePageCategoryToolbar;
+    @Bind(R.id.base_progress)
+    View progressView;
+    @Bind(R.id.create_page_details_bottom_text)
+    TextView mCreatePageDetailsBottomText;
 
     public static Intent newIntent(Context context, String selectedCategory) {
         return new Intent(context, CreatePageDetailsActivity.class).putExtra(EXTRA_SELECTED_CATEGORY, selectedCategory);
@@ -113,6 +124,7 @@ public class CreatePageDetailsActivity extends BaseActivity implements CreatePag
         mAdapter = new SpinnerAdapter(LayoutInflater.from(this));
         mCreatePageDetailsSpinner.setAdapter(mAdapter);
         ToolbarUtils.setupToolbar(mCreatePageCategoryToolbar, R.string.create_page_category_title, this);
+        RegisterUtils.setUpSpans(this, mCreatePageDetailsBottomText);
 
         mPresenter.register(this);
     }
@@ -136,6 +148,17 @@ public class CreatePageDetailsActivity extends BaseActivity implements CreatePag
         return build;
     }
 
+    @OnCheckedChanged(R.id.create_page_details_lock_password)
+    public void lock(boolean checked) {
+        if (checked) {
+            mCreatePageDetailsPassword.setTransformationMethod(new PasswordTransformationMethod());
+        } else {
+            mCreatePageDetailsPassword.setTransformationMethod(null);
+
+        }
+        mCreatePageDetailsPassword.setSelection(mCreatePageDetailsPassword.length());
+    }
+
     @Override
     public void setCategories(List<CreatePageDetailsPresenter.CategoryInfo> categoryInfos) {
         notifyAdapter(categoryInfos);
@@ -148,27 +171,27 @@ public class CreatePageDetailsActivity extends BaseActivity implements CreatePag
 
     @Override
     public void showProgress(boolean show) {
-
+        progressView.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     @Override
     public void error() {
-
+        ColoredSnackBar.error(ColoredSnackBar.contentView(this), R.string.error_default, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
     public void emptyEmail() {
-
+        mCreatePageDetailsEmailLayout.setError(getString(R.string.login_error_empty_email));
     }
 
     @Override
     public void fullNameEmpty() {
-
+        mCreatePageDetailsFullNameLayout.setError(getString(R.string.register_empty_name));
     }
 
     @Override
     public void passwordEmpty() {
-
+        mCreatePageDetailsPasswordLayout.setError(getString(R.string.register_empty_password));
     }
 
     @Override
@@ -179,12 +202,32 @@ public class CreatePageDetailsActivity extends BaseActivity implements CreatePag
 
     @Override
     public void nameEmpty() {
+        mCreatePageDetailsNameLayout.setError(getString(R.string.register_empty_name));
+    }
 
+    @Override
+    public void setToolbarTitle(String title) {
+        mCreatePageCategoryToolbar.setTitle(title);
     }
 
     @OnClick(R.id.create_page_details_button)
     public void onClick() {
         mPresenter.passCreatePageData(new CreatePageDetailsPresenter.CreatePageData((CreatePageDetailsPresenter.CategoryInfo) mAdapter.getItem(mCreatePageDetailsSpinner.getSelectedItemPosition()), mCreatePageDetailsName.getText().toString(), mCreatePageDetailsFullName.getText().toString(), mCreatePageDetailsEmail.getText().toString(), mCreatePageDetailsPassword.getText().toString()));
+    }
+
+    @OnClick(R.id.activity_login_feedback)
+    public void onFeedbackClick() {
+        UserVoice.launchContactUs(this);
+    }
+
+    @OnClick(R.id.activity_login_help)
+    public void onHelpClick() {
+        UserVoice.launchUserVoice(this);
+    }
+
+    @OnClick(R.id.activity_login_about)
+    public void onAboutClick() {
+        startActivity(AboutActivity.newIntent(this));
     }
 
 
