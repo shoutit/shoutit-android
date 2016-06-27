@@ -689,5 +689,12 @@
         and potiential customers.\n\nIts. free to set up. Just choose a Page type to get started
     </string>
     <string name="create_page_category_title">Create a Page</string>
+    <string name="create_page_details_header">Page Details</string>
+    <string name="create_page_details_name_hint">Name</string>
+    <string name="create_page_details_button">Create Page</string>
+    <string name="create_page_details_your_info_header">Your Info</string>
+    <string name="create_page_details_full_name_hint">Full Name</string>
+    <string name="create_page_details_email_hint">Email</string>
+    <string name="create_page_details_password_hint">Password</string>
 
 </resources>

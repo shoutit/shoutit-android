@@ -24,7 +24,7 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ToolbarUtils;
 import com.shoutit.app.android.utils.adapter.BaseViewHolderManager;
 import com.shoutit.app.android.utils.adapter.EmptyViewHolder;
-import com.shoutit.app.android.view.createpage.pagedetails.CreatePageDetailsActivity;
+import com.shoutit.app.android.view.createpage.pagedetails.newuser.CreatePageDetailsActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;

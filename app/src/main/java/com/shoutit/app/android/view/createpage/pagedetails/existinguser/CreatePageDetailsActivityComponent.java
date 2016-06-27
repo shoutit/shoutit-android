@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.createpage.pagedetails;
+package com.shoutit.app.android.view.createpage.pagedetails.existinguser;
 
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.ActivityScope;

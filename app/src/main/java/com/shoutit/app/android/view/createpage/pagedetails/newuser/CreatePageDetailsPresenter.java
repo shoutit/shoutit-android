@@ -1,24 +1,20 @@
-package com.shoutit.app.android.view.createpage.pagedetails;
+package com.shoutit.app.android.view.createpage.pagedetails.newuser;
 
 import android.support.annotation.NonNull;
 
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
-import com.google.common.base.Function;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
-import com.shoutit.app.android.api.model.PageCategory;
 import com.shoutit.app.android.api.model.login.LoginProfile;
 import com.shoutit.app.android.api.model.login.PageLoginRequest;
 import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.utils.LoginUtils;
+import com.shoutit.app.android.view.createpage.pagedetails.common.CategoryInfo;
+import com.shoutit.app.android.view.createpage.pagedetails.common.CreatePageDetailsListener;
+import com.shoutit.app.android.view.createpage.pagedetails.common.CreatePageDetailsPresenterDelegate;
 
-import java.util.List;
-
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import rx.Scheduler;
@@ -30,61 +26,30 @@ public class CreatePageDetailsPresenter {
     private final Scheduler mNetworkScheduler;
     private final Scheduler mUiScheduler;
     private final MixPanel mMixPanel;
-    private final String mCategoryId;
     private final UserPreferences mUserPreferences;
     private Listener mListener;
     private CompositeSubscription mCompositeSubscription;
+    private final CreatePageDetailsPresenterDelegate mCreatePageDetailsPresenterDelegate;
 
     @Inject
     public CreatePageDetailsPresenter(@NonNull ApiService apiService,
                                       @NetworkScheduler Scheduler networkScheduler,
                                       @UiScheduler Scheduler uiScheduler,
                                       MixPanel mixPanel,
-                                      String categoryId,
-                                      UserPreferences userPreferences) {
+                                      UserPreferences userPreferences,
+                                      CreatePageDetailsPresenterDelegate createPageDetailsPresenterDelegate) {
         mApiService = apiService;
         mNetworkScheduler = networkScheduler;
         mUiScheduler = uiScheduler;
         mMixPanel = mixPanel;
-        mCategoryId = categoryId;
         mUserPreferences = userPreferences;
+        mCreatePageDetailsPresenterDelegate = createPageDetailsPresenterDelegate;
     }
 
     public void register(Listener listener) {
         mListener = listener;
         listener.showProgress(true);
-        mCompositeSubscription = new CompositeSubscription(mApiService.pagesCategories()
-                .subscribeOn(mNetworkScheduler)
-                .observeOn(mUiScheduler)
-                .subscribe(categories -> {
-                    listener.showProgress(false);
-                    final PageCategory currentCategory = getCurrentCategory(categories);
-                    listener.setToolbarTitle(currentCategory.getName());
-                    final List<CategoryInfo> categoryInfos = getCategoryInfos(currentCategory);
-                    listener.setCategories(categoryInfos);
-
-                }, throwable -> {
-                    listener.error();
-                }));
-    }
-
-    private PageCategory getCurrentCategory(List<PageCategory> categories) {
-        return Iterables.filter(categories, input -> {
-            assert input != null;
-            return input.getId().equals(mCategoryId);
-        }).iterator().next();
-    }
-
-    private List<CategoryInfo> getCategoryInfos(PageCategory currentCategory) {
-        return ImmutableList.copyOf(Iterables.transform(currentCategory.getChildren(),
-                new Function<PageCategory, CategoryInfo>() {
-                    @Nullable
-                    @Override
-                    public CategoryInfo apply(@Nullable PageCategory input) {
-                        assert input != null;
-                        return new CategoryInfo(input.getImage(), input.getName(), input.getSlug());
-                    }
-                }));
+        mCompositeSubscription = new CompositeSubscription(mCreatePageDetailsPresenterDelegate.register(listener));
     }
 
     public void unregister() {
@@ -103,9 +68,9 @@ public class CreatePageDetailsPresenter {
         if (passwordEmpty) mListener.passwordEmpty();
         if (nameEmpty) mListener.nameEmpty();
 
-        if (!emailEmpty && !fullNameEmpty && !passwordEmpty) {
+        if (!emailEmpty && !fullNameEmpty && !passwordEmpty && !nameEmpty) {
             mListener.showProgress(true);
-            mCompositeSubscription.add(mApiService.createPage(
+            mCompositeSubscription.add(mApiService.createPageAndLogin(
                     new PageLoginRequest(
                             createPageData.mEmail,
                             createPageData.mPassword,
@@ -128,13 +93,7 @@ public class CreatePageDetailsPresenter {
         }
     }
 
-    public interface Listener {
-
-        void setCategories(List<CategoryInfo> categoryInfoss);
-
-        void showProgress(boolean show);
-
-        void error();
+    public interface Listener extends CreatePageDetailsListener {
 
         void emptyEmail();
 
@@ -142,35 +101,7 @@ public class CreatePageDetailsPresenter {
 
         void passwordEmpty();
 
-        void startMainActivity();
-
         void nameEmpty();
-
-        void setToolbarTitle(String title);
-    }
-
-    public static class CategoryInfo {
-        private final String image;
-        private final String name;
-        private final String slug;
-
-        public CategoryInfo(String image, String name, String id) {
-            this.image = image;
-            this.name = name;
-            this.slug = id;
-        }
-
-        public String getImage() {
-            return image;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getSlug() {
-            return slug;
-        }
     }
 
     public static class CreatePageData {
@@ -180,7 +111,7 @@ public class CreatePageDetailsPresenter {
         private final String mEmail;
         private final String mPassword;
 
-        public CreatePageData(CreatePageDetailsPresenter.CategoryInfo item, String name, String fullName, String email, String password) {
+        public CreatePageData(CategoryInfo item, String name, String fullName, String email, String password) {
             mItem = item;
             mName = name;
             mFullName = fullName;

@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.createpage.pagedetails;
+package com.shoutit.app.android.view.createpage.pagedetails.newuser;
 
 import android.support.annotation.NonNull;
 

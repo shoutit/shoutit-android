@@ -7,10 +7,11 @@ import com.shoutit.app.android.api.model.BlockedProfilesResposne;
 import com.shoutit.app.android.api.model.CallerProfile;
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.ChangePasswordRequest;
-import com.shoutit.app.android.api.model.ConversationMediaResponse;
 import com.shoutit.app.android.api.model.ConversationDetails;
+import com.shoutit.app.android.api.model.ConversationMediaResponse;
 import com.shoutit.app.android.api.model.ConversationsResponse;
 import com.shoutit.app.android.api.model.CreateOfferShoutWithImageRequest;
+import com.shoutit.app.android.api.model.CreatePageRequest;
 import com.shoutit.app.android.api.model.CreatePublicChatRequest;
 import com.shoutit.app.android.api.model.CreateRequestShoutRequest;
 import com.shoutit.app.android.api.model.CreateRequestShoutWithPriceRequest;
@@ -51,7 +52,6 @@ import com.shoutit.app.android.api.model.Suggestion;
 import com.shoutit.app.android.api.model.SuggestionsResponse;
 import com.shoutit.app.android.api.model.TagDetail;
 import com.shoutit.app.android.api.model.TagsRequest;
-import com.shoutit.app.android.api.model.Transaction;
 import com.shoutit.app.android.api.model.TransactionRsponse;
 import com.shoutit.app.android.api.model.TwilioResponse;
 import com.shoutit.app.android.api.model.UpdateFacebookTokenRequest;
@@ -237,7 +237,7 @@ public interface ApiService {
     Observable<SignResponse> loginGuest(@Body GuestSignupRequest request);
 
     @POST("oauth2/access_token")
-    Observable<SignResponse> createPage(@Body PageLoginRequest request);
+    Observable<SignResponse> createPageAndLogin(@Body PageLoginRequest request);
 
     @POST("oauth2/access_token")
     Observable<SignResponse> signup(@Body EmailSignupRequest request);
@@ -317,8 +317,8 @@ public interface ApiService {
 
     @GET("profiles/{user_name}/mutual_friends")
     Observable<ProfilesListResponse> facebookFriends(@Path("user_name") String userName,
-                                                      @Query("page") Integer page,
-                                                      @Query("page_size") Integer pageSize);
+                                                     @Query("page") Integer page,
+                                                     @Query("page_size") Integer pageSize);
 
     @PATCH("profiles/{user_name}/contacts")
     Observable<ResponseBody> uploadContacts(@Path("user_name") String userName,
@@ -408,7 +408,7 @@ public interface ApiService {
      */
     @GET("conversations")
     Observable<ConversationsResponse> getConversations(@Nullable @Query("before") String timestamp,
-                                              @Query("page_size") Integer pageSize);
+                                                       @Query("page_size") Integer pageSize);
 
     @GET("conversations/{id}")
     Observable<ConversationDetails> getConversation(@NonNull @Path("id") String id);
@@ -521,4 +521,6 @@ public interface ApiService {
      */
     @GET("pages/categories")
     Observable<List<PageCategory>> pagesCategories();
+
+    Observable<ResponseBody> createPage(CreatePageRequest request);
 }
