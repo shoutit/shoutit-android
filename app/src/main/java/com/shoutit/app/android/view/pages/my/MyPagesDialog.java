@@ -51,7 +51,7 @@ public class MyPagesDialog {
         });
 
         useShoutItAsPageBtn.setOnClickListener(v -> {
-            listener.useShoutItAsPage(page.getUsername(), page.getId());
+            listener.useShoutItAsPage(page);
             alertDialog.dismiss();
         });
 
