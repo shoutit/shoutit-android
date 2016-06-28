@@ -170,9 +170,15 @@ public class UserPreferences {
     @SuppressLint("CommitPrefEdits")
     public void setUser(BaseProfile user) {
         if (isNormalUser()) {
-            mPreferences.edit()
-                    .putString(user.isUser() ? KEY_USER : KEY_PAGE, gson.toJson(user))
-                    .commit();
+            if (user.isUser()) {
+                mPreferences.edit()
+                        .putString(KEY_USER, gson.toJson(user, User.class))
+                        .commit();
+            } else {
+                mPreferences.edit()
+                        .putString(KEY_PAGE, gson.toJson(user, Page.class))
+                        .commit();
+            }
             refreshUser();
         }
 
