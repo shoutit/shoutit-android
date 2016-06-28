@@ -34,9 +34,9 @@ public class ChangePasswordPresenterTest {
         when(apiService.changePassword(any(ChangePasswordRequest.class)))
                 .thenReturn(Observable.just(ResponseBody.create(null, "z")));
 
-        when(userPreferences.getPageOrUserObservable())
-                .thenReturn(Observable.just(new User("z", null, null, null, null, null, null, null, false, null,
-                null, false, false, false, null, 1, null, null, null, 1, null, false, null, null, null, null, null, null, null, null, null)));
+        when(userPreferences.getUser())
+                .thenReturn(new User("z", null, null, null, null, null, null, null, false, null,
+                null, false, false, false, null, 1, null, null, null, 1, null, false, null, null, null, null, null, null, null, null, null));
 
         presenter = new ChangePasswordPresenter(apiService, userPreferences, Schedulers.immediate(), Schedulers.immediate());
     }
