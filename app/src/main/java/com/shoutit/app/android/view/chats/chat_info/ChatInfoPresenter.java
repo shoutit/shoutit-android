@@ -11,14 +11,13 @@ import android.support.annotation.Nullable;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.ConversationDetails;
-import com.shoutit.app.android.api.model.ConversationProfile;
 import com.shoutit.app.android.api.model.EditPublicChatRequest;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
@@ -33,13 +32,8 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
-import okhttp3.ResponseBody;
-import retrofit2.Response;
 import rx.Observable;
 import rx.Scheduler;
-import rx.functions.Action1;
-import rx.functions.Func0;
-import rx.functions.Func1;
 import rx.subscriptions.CompositeSubscription;
 
 public class ChatInfoPresenter {
@@ -81,9 +75,7 @@ public class ChatInfoPresenter {
         mResources = resources;
         mContext = context;
 
-        final User user = userPreferences.getUser();
-        assert user != null;
-        mId = user.getId();
+        mId = userPreferences.getUserId();
     }
 
     public void selectImageClicked() {

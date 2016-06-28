@@ -2,16 +2,14 @@ package com.shoutit.app.android.api.model;
 
 
 import com.google.common.base.Objects;
+import com.shoutit.app.android.model.Stats;
 
 public class Page extends BaseProfile {
 
-    private final PageStats stats;
-
     public Page(String id, String type, String username, String name, String firstName,
                 String lastName, boolean isActivated, String image, String cover, boolean isListening,
-                int listenersCount, UserLocation location, PageStats stats, boolean isOwner) {
-        super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount, location, isOwner);
-        this.stats = stats;
+                int listenersCount, UserLocation location, Stats stats, boolean isOwner, String email) {
+        super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount, location, isOwner, stats, email);
     }
 
     @Override
@@ -20,11 +18,7 @@ public class Page extends BaseProfile {
         int newListenersCount = newIsListening ? listenersCount + 1 : listenersCount - 1;
 
         return new Page(id, type, username, name, firstName, lastName, isActivated, image, cover,
-                newIsListening, newListenersCount, location, stats, isOwner);
-    }
-
-    public PageStats getStats() {
-        return stats;
+                newIsListening, newListenersCount, location, getStats(), isOwner, getEmail());
     }
 
     @Override
@@ -47,13 +41,13 @@ public class Page extends BaseProfile {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount, stats);
+        return Objects.hashCode(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount, getStats());
     }
 
     public static Page withIsListening(Page page, boolean isListening) {
         int listenersCount = isListening ? page.listenersCount + 1 : page.listenersCount - 1;
         return new Page(page.id, page.type, page.username, page.name, page.firstName,
                 page.lastName, page.isActivated, page.image, page.cover, isListening,
-                listenersCount, page.location, page.stats, page.isOwner);
+                listenersCount, page.location, page.getStats(), page.isOwner, page.getEmail());
     }
 }

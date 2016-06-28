@@ -16,6 +16,7 @@ import com.pusher.client.connection.ConnectionStateChange;
 import com.pusher.client.util.HttpAuthorizer;
 import com.shoutit.app.android.BuildConfig;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.NotificationsResponse;
 import com.shoutit.app.android.api.model.PusherConversationUpdate;
 import com.shoutit.app.android.api.model.PusherMessage;
@@ -201,7 +202,7 @@ public class PusherHelper {
     }
 
     public PresenceChannel getProfileChannel() {
-        final User user = mUserPreferences.getUser();
+        final BaseProfile user = mUserPreferences.getPageOrUser();
         assert user != null;
         log("get profile channel id : " + user.getId());
         return mPusher.getPresenceChannel(PusherHelper.getProfileChannelName(user.getId()));

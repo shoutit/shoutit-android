@@ -13,6 +13,7 @@ import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.NoDataTextAdapterItem;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
@@ -63,7 +64,7 @@ public class SearchShoutsResultsPresenter {
                                         @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter) {
 
         final boolean isNormalUser = userPreferences.isNormalUser();
-        final User currentUser = userPreferences.getUser();
+        final BaseProfile currentUser = userPreferences.getPageOrUser();
         final String currentUserName = currentUser != null ? currentUser.getUsername() : null;
 
         final boolean initWithUserLocation = searchType != SearchPresenter.SearchType.PROFILE &&

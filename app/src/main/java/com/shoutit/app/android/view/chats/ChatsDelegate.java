@@ -12,12 +12,12 @@ import com.google.common.collect.Lists;
 import com.pusher.client.channel.PresenceChannel;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.ConversationProfile;
 import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessageAttachment;
 import com.shoutit.app.android.api.model.PostMessage;
 import com.shoutit.app.android.api.model.PusherMessage;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.PriceUtils;
@@ -76,7 +76,7 @@ public class ChatsDelegate {
     private final Context mContext;
     private final AmazonHelper mAmazonHelper;
     private Listener mListener;
-    private final User mUser;
+    private final BaseProfile mUser;
     private final PublishSubject<PusherMessage> newMessagesSubject;
     private final LocalMessageBus mBus;
 
@@ -95,7 +95,7 @@ public class ChatsDelegate {
         mAmazonHelper = amazonHelper;
         this.newMessagesSubject = newMessagesSubject;
         mBus = bus;
-        mUser = mUserPreferences.getUser();
+        mUser = mUserPreferences.getPageOrUser();
     }
 
     public void setListener(Listener listener) {
@@ -177,9 +177,7 @@ public class ChatsDelegate {
 
     @NonNull
     public List<BaseAdapterItem> transform(@NonNull List<Message> results) {
-        final User user = mUserPreferences.getUser();
-        assert user != null;
-        final String userId = user.getId();
+        final String userId = mUserPreferences.getUserId();
 
         final List<BaseAdapterItem> objects = Lists.newArrayList();
         for (int i = 0; i < results.size(); i++) {

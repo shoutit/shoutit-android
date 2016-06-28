@@ -10,6 +10,7 @@ import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Strings;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.ChangePasswordRequest;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.utils.MoreFunctions1;
@@ -69,16 +70,8 @@ public class ChangePasswordPresenter {
         newPasswordSubject.onNext(null);
         newPasswordVerifySubject.onNext(null);
 
-        hadUserPasswordSetObservable = userPreferences.getUserObservable()
-                .observeOn(uiScheduler)
-                .filter(Functions1.isNotNull())
-                .first()
-                .map(new Func1<User, Boolean>() {
-                    @Override
-                    public Boolean call(User user) {
-                        return user.isPasswordSet();
-                    }
-                })
+        hadUserPasswordSetObservable = Observable.just(userPreferences.getUser())
+                .map(User::isPasswordSet)
                 .compose(ObservableExtensions.<Boolean>behaviorRefCount());
 
         /** Errors **/

@@ -6,9 +6,9 @@ public class Admin extends BaseProfile {
 
     public Admin(String id, String type, String username, String name, String firstName,
                  String lastName, boolean isActivated, String image, String cover, boolean isListening,
-                 int listenersCount, UserLocation location, boolean isOwner) {
+                 int listenersCount, UserLocation location, boolean isOwner, String email) {
         super(id, type, username, name, firstName, lastName, isActivated, image, cover,
-                isListening, listenersCount, location, isOwner);
+                isListening, listenersCount, location, isOwner, null, email);
     }
 
     @Override
@@ -17,7 +17,7 @@ public class Admin extends BaseProfile {
         int newListenersCount = newIsListening ? listenersCount + 1 : listenersCount - 1;
 
         return new Admin(id, type, username, name, firstName, lastName, isActivated, image, cover,
-                newIsListening, newListenersCount, location, isOwner);
+                newIsListening, newListenersCount, location, isOwner, getEmail());
     }
 
     @Override
@@ -47,7 +47,7 @@ public class Admin extends BaseProfile {
         int listenersCount = isListening ? admin.listenersCount + 1 : admin.listenersCount - 1;
         return new Admin(admin.id, admin.type, admin.username, admin.name, admin.firstName,
                 admin.lastName, admin.isActivated, admin.image, admin.cover, isListening,
-                listenersCount, admin.location, admin.isOwner);
+                listenersCount, admin.location, admin.isOwner, admin.getEmail());
     }
 }
 

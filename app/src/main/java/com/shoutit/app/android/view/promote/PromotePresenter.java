@@ -87,7 +87,7 @@ public class PromotePresenter {
                 .observeOn(uiScheduler);
 
         final Observable<Integer> creditsObservable =
-                userPreferences.getUserObservable()
+                userPreferences.getPageOrUserObservable()
                         .map(user -> user.getStats().getCredits())
                         .compose(ObservableExtensions.behaviorRefCount());
 
