@@ -11,7 +11,6 @@ import com.appunite.rx.functions.Functions1;
 import com.appunite.rx.operators.MoreOperators;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Iterables;
 import com.google.gson.Gson;
 import com.shoutit.app.android.api.model.Admin;
 import com.shoutit.app.android.api.model.BaseProfile;
@@ -339,20 +338,14 @@ public class UserPreferences {
         setUser(updatedUser);
     }
 
-    public void setPage(String userName, String id) {
-        final Page page = Iterables.filter(getUser().getPages(), input -> {
-            assert input != null;
-            return input.getId().equals(id);
-        }).iterator().next();
+    public void setPage(Page page) {
         setUser(page);
-        editPage(id, userName);
-        tokenRefreshSubject.onNext(new Object());
+        editPage(page.getId(), page.getUsername());
     }
 
     public void clearPage() {
         editPage(null, null);
         setPrimaryUserAsUser();
-        tokenRefreshSubject.onNext(new Object());
     }
 
     private void editPage(String id, String name) {

@@ -26,7 +26,6 @@ import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.RtlUtils;
 import com.shoutit.app.android.view.admins.AdminsFragment;
-import com.shoutit.app.android.utils.SwitchHelper;
 import com.shoutit.app.android.view.conversations.ConversationsPagerFragment;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
 import com.shoutit.app.android.view.credits.CreditsFragment;
@@ -114,8 +113,6 @@ public class MenuHandler {
     private final UserPreferences userPreferences;
     @Nonnull
     private final MenuHandlerPresenter presenter;
-    @Nonnull
-    private final SwitchHelper mSwitchHelper;
 
     private List<CheckedTextView> selectableItems = ImmutableList.of();
 
@@ -138,14 +135,12 @@ public class MenuHandler {
                        @Nonnull OnMenuItemSelectedListener onMenuItemSelectedListener,
                        @Nonnull Picasso picasso,
                        @Nonnull UserPreferences userPreferences,
-                       @Nonnull MenuHandlerPresenter presenter,
-                       @Nonnull SwitchHelper switchHelper) {
+                       @Nonnull MenuHandlerPresenter presenter) {
         this.rxActivity = rxActivity;
         this.onMenuItemSelectedListener = onMenuItemSelectedListener;
         this.picasso = picasso;
         this.userPreferences = userPreferences;
         this.presenter = presenter;
-        mSwitchHelper = switchHelper;
     }
 
     public void initMenu(@Nonnull View view) {
@@ -247,7 +242,6 @@ public class MenuHandler {
     private void dispatchClick(int id) {
         switch (id) {
             case R.id.menu_use_profile: {
-                mSwitchHelper.logout();
                 userPreferences.clearPage();
                 ActivityCompat.finishAffinity(rxActivity);
                 rxActivity.startActivity(MainActivity.newIntent(rxActivity));
