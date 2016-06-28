@@ -69,7 +69,7 @@ public class MyPagesDialog {
 
         void editPage(String userName);
 
-        void useShoutItAsPage(String userName, String id);
+        void useShoutItAsPage(Page page);
 
     }
 }

@@ -137,9 +137,9 @@ public class MyPagesFragment extends BaseFragment implements MyPagesDialog.Pages
     }
 
     @Override
-    public void useShoutItAsPage(String userName, String id) {
+    public void useShoutItAsPage(Page page) {
         switchHelper.logout();
-        mUserPreferences.setPage(userName, id);
+        mUserPreferences.setPage(page);
 
         ActivityCompat.finishAffinity(getActivity());
         startActivity(MainActivity.newIntent(getActivity()));
