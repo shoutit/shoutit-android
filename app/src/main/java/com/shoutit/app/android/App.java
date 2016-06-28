@@ -92,7 +92,6 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
         setupGraph();
 
         fetchLocation();
-        refreshUser();
 
         setUpMixPanel();
 
@@ -122,17 +121,6 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
                 .filter(userToken -> userToken != null && !userPreferences.isGuest())
                 .subscribe(ignore -> {
                     mTwilio.initTwilio();
-                });
-    }
-
-    private void refreshUser() {
-        if (!userPreferences.isNormalUser()) {
-            return;
-        }
-
-        profilesDao.updateUser()
-                .subscribe(user -> {
-                    userPreferences.setUser(user);
                 });
     }
 

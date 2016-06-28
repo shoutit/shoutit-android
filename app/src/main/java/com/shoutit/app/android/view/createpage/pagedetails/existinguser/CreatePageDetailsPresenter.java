@@ -66,6 +66,7 @@ public class CreatePageDetailsPresenter {
                         mListener.showProgress(false);
                         mListener.startMainActivity();
                     }, throwable -> {
+                        mListener.showProgress(false);
                         mListener.error();
                     }));
         }
