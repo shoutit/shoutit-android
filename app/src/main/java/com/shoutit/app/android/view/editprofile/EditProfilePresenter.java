@@ -15,6 +15,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.UpdateUserRequest;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
@@ -37,11 +38,8 @@ import javax.annotation.Nonnull;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
-import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
-import rx.functions.Func3;
-import rx.functions.Func7;
 import rx.functions.Func9;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
@@ -126,9 +124,7 @@ public class EditProfilePresenter {
         }
 
         /** User Data **/
-        final Observable<User> userObservable = userPreferences
-                .getUserObservable()
-                .observeOn(uiScheduler)
+        final Observable<User> userObservable = Observable.just(userPreferences.getUser())
                 .filter(Functions1.isNotNull())
                 .compose(ObservableExtensions.<User>behaviorRefCount());
 
@@ -137,17 +133,22 @@ public class EditProfilePresenter {
                 .filter(user -> state == null);
 
         locationObservable = Observable.merge(
-                userInputsObservable.map(User::getLocation),
+                userInputsObservable.map(BaseProfile::getLocation),
                 locationSubject);
 
         avatarObservable = userObservable
-                .map(User::getImage);
+                .map(BaseProfile::getImage);
 
         coverObservable = userObservable
-                .map(User::getCover);
+                .map(BaseProfile::getCover);
 
         birthdayObservable = Observable.merge(
-                userObservable.map(User::getBirthday),
+                userObservable.map(new Func1<User, String>() {
+                    @Override
+                    public String call(User baseProfile) {
+                        return baseProfile.getBirthday();
+                    }
+                }),
                 birthdaySubject);
 
         /** Errors **/
@@ -258,7 +259,7 @@ public class EditProfilePresenter {
                 uploadAvatarToApiObservable.compose(ResponseOrError.<User>onlySuccess()),
                 successObservable)
                 .map(user -> {
-                    userPreferences.updateUserJson(user);
+                    userPreferences.setUser(user);
                     return null;
                 })
                 .observeOn(uiScheduler);

@@ -106,8 +106,8 @@ public class PagesAdapter extends BaseAdapter {
                 locationTv.setText(null);
             }
 
-            if (page.getStats().getTotalUnreadCount() != null) {
-                badgeTv.setText(String.valueOf(page.getStats().getTotalUnreadCount()));
+            if (page.getStats() != null) {
+                badgeTv.setText(String.valueOf(page.getStats().getUnreadNotifications()));
             }
 
             listenersTv.setText(context.getString(R.string.profile_listeners,

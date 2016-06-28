@@ -9,7 +9,6 @@ import android.text.format.DateUtils;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
-import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.functions.Functions1;
 import com.appunite.rx.operators.OperatorMergeNextToken;
 import com.google.common.base.Objects;
@@ -130,13 +129,13 @@ public class ChatsPresenter {
         calledPersonNameAndUsernameObservable = chatParticipantUsernameSubject
                 .filter(Functions1.isNotNull())
                 .filter(calledPersonNameAndUsername ->
-                        !Objects.equal(userPreferences.getUser().getUsername(), calledPersonNameAndUsername.getUsername()));
+                        !Objects.equal(userPreferences.getPageOrUser().getUsername(), calledPersonNameAndUsername.getUsername()));
 
         mChatsDelegate = new ChatsDelegate(pusher, uiScheduler, networkScheduler, apiService, resources, userPreferences, context, amazonHelper, newMessagesSubject, bus);
     }
 
     public void register(@NonNull Listener listener) {
-        final User user = mUserPreferences.getUser();
+        final BaseProfile user = mUserPreferences.getPageOrUser();
         assert user != null;
 
         mListener = listener;
@@ -148,7 +147,7 @@ public class ChatsPresenter {
         getConversation(user);
     }
 
-    private void getConversation(final User user) {
+    private void getConversation(final BaseProfile user) {
         mSubscribe.add(mApiService.getConversation(conversationId)
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
@@ -229,7 +228,7 @@ public class ChatsPresenter {
             final ConversationProfile participant;
             //noinspection ConstantConditions
             if (profiles.get(0).getUsername()
-                    .equals(mUserPreferences.getUser().getUsername())) {
+                    .equals(mUserPreferences.getPageOrUser().getUsername())) {
                 participant = profiles.get(1);
             } else {
                 participant = profiles.get(0);

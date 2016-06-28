@@ -231,7 +231,7 @@ public class FacebookHelper {
             LogHelper.logIfDebug(TAG, "Waiting for user to be updated in API");
             return pusherHelper.getUserUpdatedObservable()
                     .filter(user -> {
-                        userPreferences.updateUserJson(user);
+                        userPreferences.setUser(user);
                         LogHelper.logIfDebug(TAG, "Pusher event: User updated in API");
 
                         return hasRequiredPermissionInApi(user, requiredPermissionName);

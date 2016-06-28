@@ -71,7 +71,7 @@ public class ShoutPresenterTest {
                 .thenReturn(Observable.just(ResponseOrError.fromData(new ShoutsResponse(1, "z", "z", Lists.newArrayList(TestUtils.getShout()), null))));
         when(shoutsDao.getRelatedShoutsObservable(any(RelatedShoutsPointer.class)))
                 .thenReturn(Observable.just(ResponseOrError.fromData(new ShoutsResponse(1, "z", "z", Lists.newArrayList(TestUtils.getShout()), null))));
-        when(userPreferences.getUserObservable())
+        when(userPreferences.getPageOrUserObservable())
                 .thenReturn(Observable.just(new User("z", null, null, null, null, null, null, null, false, null,
                 null, false, false, false, null, 1, null, null, null, 1, null, false, null, null, null, null, null, null, null, null, null)));
         when(userPreferences.isNormalUser())
@@ -101,7 +101,7 @@ public class ShoutPresenterTest {
                 .thenReturn("text");
 
         when(userPreferences.isNormalUser()).thenReturn(true);
-        when(userPreferences.getUser()).thenReturn(TestUtils.getUser());
+        when(userPreferences.getPageOrUser()).thenReturn(TestUtils.getUser());
 
         presenter = new ShoutPresenter(shoutsDao, "zz", context, Schedulers.immediate(), userPreferences, globalRefreshPresenter);
     }

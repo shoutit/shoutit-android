@@ -15,8 +15,8 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.CallerProfile;
 import com.shoutit.app.android.api.model.TwilioResponse;
-import com.shoutit.app.android.api.model.VideoCallRequest;
 import com.shoutit.app.android.api.model.UserIdentity;
+import com.shoutit.app.android.api.model.VideoCallRequest;
 import com.shoutit.app.android.dagger.ForApplication;
 import com.shoutit.app.android.dao.UsersIdentityDao;
 import com.shoutit.app.android.dao.VideoCallsDao;
@@ -41,7 +41,6 @@ import rx.Observable;
 import rx.Scheduler;
 import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.functions.Func2;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
@@ -85,7 +84,7 @@ public class Twilio {
                   @Nonnull final UsersIdentityDao usersIdentityDao,
                   @Nonnull final ApiService apiService,
                   @Nonnull final UserPreferences userPreferences,
-                  @Nonnull@NetworkScheduler final Scheduler networkScheduler,
+                  @Nonnull @NetworkScheduler final Scheduler networkScheduler,
                   @Nonnull @UiScheduler final Scheduler uiScheduler) {
         mContext = context;
         this.userPreferences = userPreferences;
@@ -259,7 +258,7 @@ public class Twilio {
         };
     }
 
-    public void unregisterTwillio(){
+    public static void unregisterTwillio() {
         if (TwilioConversations.isInitialized()) {
             TwilioConversations.destroy();
         }

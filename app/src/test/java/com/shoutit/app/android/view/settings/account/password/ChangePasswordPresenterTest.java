@@ -34,7 +34,7 @@ public class ChangePasswordPresenterTest {
         when(apiService.changePassword(any(ChangePasswordRequest.class)))
                 .thenReturn(Observable.just(ResponseBody.create(null, "z")));
 
-        when(userPreferences.getUserObservable())
+        when(userPreferences.getPageOrUserObservable())
                 .thenReturn(Observable.just(new User("z", null, null, null, null, null, null, null, false, null,
                 null, false, false, false, null, 1, null, null, null, 1, null, false, null, null, null, null, null, null, null, null, null)));
 
@@ -139,7 +139,7 @@ public class ChangePasswordPresenterTest {
         TestSubscriber<Object> subscriber = new TestSubscriber<>();
         presenter.getRequestSuccessObservable().subscribe(subscriber);
 
-        when(userPreferences.getUserObservable())
+        when(userPreferences.getPageOrUserObservable())
                 .thenReturn(Observable.just(userWithPasswordSet()));
 
         presenter.getOldPasswordObserver().onNext("Password");

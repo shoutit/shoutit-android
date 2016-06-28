@@ -22,6 +22,7 @@ import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
+import com.shoutit.app.android.utils.SwitchHelper;
 import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.pages.PagesAdapter;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
@@ -49,6 +50,8 @@ public class MyPagesFragment extends BaseFragment implements MyPagesDialog.Pages
     MyPagesDialog dialog;
     @Inject
     UserPreferences mUserPreferences;
+    @Inject
+    SwitchHelper switchHelper;
 
     public static Fragment newInstance() {
         return new MyPagesFragment();
@@ -135,7 +138,9 @@ public class MyPagesFragment extends BaseFragment implements MyPagesDialog.Pages
 
     @Override
     public void useShoutItAsPage(String userName, String id) {
+        switchHelper.logout();
         mUserPreferences.setPage(userName, id);
+
         ActivityCompat.finishAffinity(getActivity());
         startActivity(MainActivity.newIntent(getActivity()));
     }
