@@ -12,15 +12,12 @@ import com.appunite.rx.operators.MoreOperators;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
-import com.shoutit.app.android.api.model.Admin;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForApplication;
 import com.shoutit.app.android.model.Stats;
-
-import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -106,15 +103,12 @@ public class UserPreferences {
     public void setPageLoggedIn(@NonNull String authToken,
                                 @NonNull String refreshToken,
                                 @Nonnull Page page) {
-        final List<Admin> admins = page.getAdmins();
-        final BaseProfile user = admins.get(0);
-
         final SharedPreferences.Editor editor = mPreferences.edit();
         editor
                 .putString(AUTH_TOKEN, authToken)
                 .putString(REFRESH_TOKEN, refreshToken)
                 .putString(KEY_PAGE, gson.toJson(page))
-                .putString(KEY_USER, gson.toJson(user))
+                .putString(KEY_USER, gson.toJson(page.getAdmin()))
                 .putString(PAGE_ID, page.getId())
                 .putString(PAGE_NAME, page.getUsername())
                 .putBoolean(IS_GUEST, false);
