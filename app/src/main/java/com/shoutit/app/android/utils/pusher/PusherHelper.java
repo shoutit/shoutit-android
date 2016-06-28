@@ -205,7 +205,10 @@ public class PusherHelper {
         final BaseProfile user = mUserPreferences.getPageOrUser();
         assert user != null;
         log("get profile channel id : " + user.getId());
-        return mPusher.getPresenceChannel(PusherHelper.getProfileChannelName(user.getId()));
+
+        final PresenceChannel presenceChannel = mPusher.getPresenceChannel(PusherHelper.getProfileChannelName(user.getId()));
+
+        return presenceChannel == null ? subscribeProfileChannel(user.getId()) : presenceChannel;
     }
 
     public Observable<TypingInfo> getIsTypingObservable(@NonNull final PresenceChannel conversationChannel) {
@@ -266,9 +269,9 @@ public class PusherHelper {
         };
     }
 
-    public void subscribeProfileChannel(@NonNull String id) {
+    public PresenceChannel subscribeProfileChannel(@NonNull String id) {
         log("subscribe profile channel : " + id);
-        mPusher.subscribePresence(PusherHelper.getProfileChannelName(id));
+        return mPusher.subscribePresence(PusherHelper.getProfileChannelName(id));
     }
 
     public void connect() {
