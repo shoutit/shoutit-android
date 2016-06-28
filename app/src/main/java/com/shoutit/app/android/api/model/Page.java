@@ -4,12 +4,17 @@ package com.shoutit.app.android.api.model;
 import com.google.common.base.Objects;
 import com.shoutit.app.android.model.Stats;
 
+import java.util.List;
+
 public class Page extends BaseProfile {
+
+    private final List<Admin> admins;
 
     public Page(String id, String type, String username, String name, String firstName,
                 String lastName, boolean isActivated, String image, String cover, boolean isListening,
-                int listenersCount, UserLocation location, Stats stats, boolean isOwner, String email) {
+                int listenersCount, UserLocation location, Stats stats, boolean isOwner, String email, List<Admin> admins) {
         super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount, location, isOwner, stats, email);
+        this.admins = admins;
     }
 
     @Override
@@ -18,7 +23,11 @@ public class Page extends BaseProfile {
         int newListenersCount = newIsListening ? listenersCount + 1 : listenersCount - 1;
 
         return new Page(id, type, username, name, firstName, lastName, isActivated, image, cover,
-                newIsListening, newListenersCount, location, getStats(), isOwner, getEmail());
+                newIsListening, newListenersCount, location, getStats(), isOwner, getEmail(), admins);
+    }
+
+    public List<Admin> getAdmins() {
+        return admins;
     }
 
     @Override
@@ -48,6 +57,6 @@ public class Page extends BaseProfile {
         int listenersCount = isListening ? page.listenersCount + 1 : page.listenersCount - 1;
         return new Page(page.id, page.type, page.username, page.name, page.firstName,
                 page.lastName, page.isActivated, page.image, page.cover, isListening,
-                listenersCount, page.location, page.getStats(), page.isOwner, page.getEmail());
+                listenersCount, page.location, page.getStats(), page.isOwner, page.getEmail(), page.admins);
     }
 }

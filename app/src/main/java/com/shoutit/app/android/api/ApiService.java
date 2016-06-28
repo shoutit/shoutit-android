@@ -46,6 +46,7 @@ import com.shoutit.app.android.api.model.SearchProfileResponse;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutResponse;
 import com.shoutit.app.android.api.model.ShoutsResponse;
+import com.shoutit.app.android.api.model.SignPageResponse;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.SortType;
 import com.shoutit.app.android.api.model.Suggestion;
@@ -237,7 +238,7 @@ public interface ApiService {
     Observable<SignResponse> loginGuest(@Body GuestSignupRequest request);
 
     @POST("oauth2/access_token")
-    Observable<SignResponse> createPageAndLogin(@Body PageLoginRequest request);
+    Observable<SignPageResponse> createPageAndLogin(@Body PageLoginRequest request);
 
     @POST("oauth2/access_token")
     Observable<SignResponse> signup(@Body EmailSignupRequest request);
