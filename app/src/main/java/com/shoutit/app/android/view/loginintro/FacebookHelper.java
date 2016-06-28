@@ -103,27 +103,28 @@ public class FacebookHelper {
             return;
         }
 
-        new AccessTokenTracker() {
+        LogHelper.logIfDebug(TAG, "Facebook token expired");
+
+        AccessToken.refreshCurrentAccessTokenAsync(new AccessToken.AccessTokenRefreshCallback() {
             @Override
-            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken,
-                                                       AccessToken currentAccessToken) {
-                if (!userPreferences.isNormalUser()) {
+            public void OnTokenRefreshed(AccessToken accessToken) {
+                if (accessToken == null) {
                     return;
                 }
 
-                updateFacebookTokenInApi(currentAccessToken.getToken())
+                updateFacebookTokenInApi(accessToken.getToken())
                         .subscribe(responseBody -> {
-                            stopTracking();
                             LogHelper.logIfDebug(TAG, "Facebook token updated");
                         }, throwable -> {
-                            stopTracking();
                             LogHelper.logThrowableAndCrashlytics(TAG, "Cannot update fb token", throwable);
                         });
             }
-        };
 
-        LogHelper.logIfDebug(TAG, "Facebook token expired");
-        AccessToken.refreshCurrentAccessTokenAsync();
+            @Override
+            public void OnTokenRefreshFailed(FacebookException exception) {
+                LogHelper.logThrowableAndCrashlytics(TAG, "Cannot update fb token", exception);
+            }
+        });
     }
 
     public Observable<ResponseBody> updateFacebookTokenInApi(@Nonnull String facebookToken) {
@@ -146,7 +147,7 @@ public class FacebookHelper {
                                                                          final boolean isPublishPermission) {
         final User user = userPreferences.getUser();
 
-        if (user != null && hasRequiredPermissionInApi(user, permissionName)) {
+        if (user != null && hasRequiredPermissionLocally(permissionName) && hasRequiredPermissionInApi(user, permissionName)) {
             return Observable.just(ResponseOrError.fromData(true));
         } else {
             return Observable
@@ -244,7 +245,8 @@ public class FacebookHelper {
         final User user = userPreferences.getUser();
         return user != null &&
                 user.getLinkedAccounts() != null &&
-                user.getLinkedAccounts().getFacebook() != null;
+                user.getLinkedAccounts().getFacebook() != null
+                && AccessToken.getCurrentAccessToken() != null;
     }
 
     private boolean isPermissionGranted(@Nonnull String permissionName) {
@@ -264,6 +266,11 @@ public class FacebookHelper {
         }
 
         return false;
+    }
+
+    public boolean hasRequiredPermissionLocally(@Nonnull String permission) {
+        return AccessToken.getCurrentAccessToken() != null &&
+                AccessToken.getCurrentAccessToken().getPermissions().contains(permission);
     }
 
     private boolean shouldRefreshToken(@Nonnull User user) {
