@@ -42,7 +42,7 @@ public class SelectProfilePresenter {
     @Nonnull
     private final Observable<Boolean> progressObservable;
 
-    private PublishSubject<BothParams<String, String>> profileSelectedSubject = PublishSubject.create();
+    private PublishSubject<BaseProfile> profileSelectedSubject = PublishSubject.create();
     private PublishSubject<Object> loadMoreListenings = PublishSubject.create();
     private PublishSubject<Object> loadMoreListeners = PublishSubject.create();
 
@@ -117,7 +117,7 @@ public class SelectProfilePresenter {
         return errorObservable;
     }
 
-    public Observable<BothParams<String, String>> getProfileSelectedObservable() {
+    public Observable<BaseProfile> getProfileSelectedObservable() {
         return profileSelectedSubject;
     }
 

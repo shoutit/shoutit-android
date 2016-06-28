@@ -10,11 +10,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.appunite.rx.functions.BothParams;
 import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
@@ -25,7 +25,6 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import rx.functions.Action1;
 
 public class SelectProfileActivity extends BaseActivity {
 
@@ -70,15 +69,12 @@ public class SelectProfileActivity extends BaseActivity {
                 .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(this)));
 
         presenter.getProfileSelectedObservable()
-                .compose(this.<BothParams<String,String>>bindToLifecycle())
-                .subscribe(new Action1<BothParams<String, String>>() {
-                    @Override
-                    public void call(BothParams<String, String> profileIdAndName) {
-                        setResult(RESULT_OK, new Intent()
-                                .putExtra(RESULT_PROFILE_ID, profileIdAndName.param1())
-                                .putExtra(RESULT_PROFILE_NAME, profileIdAndName.param2()));
-                        finish();
-                    }
+                .compose(this.<BaseProfile>bindToLifecycle())
+                .subscribe(baseProfile -> {
+                    setResult(RESULT_OK, new Intent()
+                            .putExtra(RESULT_PROFILE_ID, baseProfile.getId())
+                            .putExtra(RESULT_PROFILE_NAME, baseProfile.getName()));
+                    finish();
                 });
     }
 

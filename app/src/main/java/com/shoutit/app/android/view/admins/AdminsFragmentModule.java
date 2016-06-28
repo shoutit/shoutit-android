@@ -7,10 +7,11 @@ import com.appunite.rx.dagger.UiScheduler;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.dagger.FragmentModule;
+import com.shoutit.app.android.dagger.FragmentScope;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.utils.ListeningHalfPresenter;
-import com.shoutit.app.android.utils.PreferencesHelper;
 import com.shoutit.app.android.view.profileslist.BaseProfileListPresenter;
+
 
 import dagger.Module;
 import dagger.Provides;
@@ -24,13 +25,13 @@ public class AdminsFragmentModule extends FragmentModule {
     }
 
     @Provides
+    @FragmentScope
     BaseProfileListPresenter profileListPresenter(ListeningHalfPresenter listeningHalfPresenter,
                                                   ProfilesDao profilesDao, @UiScheduler Scheduler uiScheduler,
                                                   @NetworkScheduler Scheduler networkScheduler,
                                                   UserPreferences userPreferences,
-                                                  PreferencesHelper preferencesHelper,
                                                   ApiService apiService) {
         return new AdminsFragmentPresenter(listeningHalfPresenter, profilesDao, null, uiScheduler,
-                networkScheduler, userPreferences, preferencesHelper, apiService);
+                networkScheduler, userPreferences, apiService);
     }
 }

@@ -13,6 +13,7 @@ import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
+import com.shoutit.app.android.utils.PreferencesHelper;
 import com.shoutit.app.android.view.chooseprofile.SelectProfileActivity;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.profileslist.BaseProfileListFragment;
@@ -23,15 +24,17 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class AdminsFragment extends BaseProfileListFragment implements AdminsDialog.AdminsDialogListener {
 
     private static final int REQUEST_CODE_SELECT_ADMIN = 2;
-    public static final String EXTRA_SELECTED_ADMIN_USERNAME = "slected_admin_username";
 
     @Inject
     AdminsDialog adminsDialog;
+    @Inject
+    PreferencesHelper preferencesHelper;
 
     private AdminsFragmentPresenter presenter;
 
@@ -92,7 +95,11 @@ public class AdminsFragment extends BaseProfileListFragment implements AdminsDia
     }
 
     private void showActionsDialog(String userName) {
-        adminsDialog.show(userName, this);
+        if (preferencesHelper.isMyProfile(userName)) {
+                openProfile(userName);
+        } else {
+            adminsDialog.show(userName, this);
+        }
     }
 
     @Override
@@ -116,9 +123,13 @@ public class AdminsFragment extends BaseProfileListFragment implements AdminsDia
         }
     }
 
+    private void openProfile(@Nonnull String userName) {
+        startActivityForResult(UserOrPageProfileActivity.newIntent(getActivity(), userName), REQUEST_OPENED_PROFILE_WAS_LISTENED);
+    }
+
     @Override
     public void showProfile(String userName) {
-        startActivityForResult(UserOrPageProfileActivity.newIntent(getActivity(), userName), REQUEST_OPENED_PROFILE_WAS_LISTENED);
+        openProfile(userName);
     }
 
     @Override
@@ -129,8 +140,8 @@ public class AdminsFragment extends BaseProfileListFragment implements AdminsDia
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE_SELECT_ADMIN) {
-            final String selectedAdminUserName = checkNotNull(data.getStringExtra(EXTRA_SELECTED_ADMIN_USERNAME));
-            presenter.addAdmin(selectedAdminUserName);
+            final String selectedAdminId = checkNotNull(data.getStringExtra(SelectProfileActivity.RESULT_PROFILE_ID));
+            presenter.addAdmin(selectedAdminId);
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }

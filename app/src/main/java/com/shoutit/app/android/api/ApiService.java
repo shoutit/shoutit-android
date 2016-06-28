@@ -3,6 +3,7 @@ package com.shoutit.app.android.api;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.shoutit.app.android.api.model.AddAdminRequest;
 import com.shoutit.app.android.api.model.BlockedProfilesResposne;
 import com.shoutit.app.android.api.model.CallerProfile;
 import com.shoutit.app.android.api.model.Category;
@@ -540,13 +541,14 @@ public interface ApiService {
                                              @Query("page_size") Integer pageSize);
 
     @GET("pages/{username}/admins")
-    Observable<ProfilesListResponse> getAdmins(@Query("username") String pageUserName,
+    Observable<ProfilesListResponse> getAdmins(@Path("username") String pageUserName,
                                                @Query("page") Integer page,
                                                @Query("page_size") Integer pageSize);
 
     @DELETE("pages/{username}/admin")
-    Observable<ResponseBody> deleteAdmin(@Query("username") String userName);
+    Observable<ResponseBody> deleteAdmin(@Path("username") String userName);
 
     @POST("pages/{username}/admin")
-    Observable<ResponseBody> addAdmin(@Query("username") String userName);
+    Observable<ResponseBody> addAdmin(@Path("username") String pageUserName,
+                                      @Body AddAdminRequest addAdminRequest);
 }

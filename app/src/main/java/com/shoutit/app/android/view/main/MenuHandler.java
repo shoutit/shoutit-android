@@ -25,11 +25,8 @@ import com.shoutit.app.android.utils.BlurTransform;
 import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.RtlUtils;
-<<<<<<< HEAD
 import com.shoutit.app.android.view.admins.AdminsFragment;
-=======
 import com.shoutit.app.android.utils.SwitchHelper;
->>>>>>> develop
 import com.shoutit.app.android.view.conversations.ConversationsPagerFragment;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
 import com.shoutit.app.android.view.credits.CreditsFragment;

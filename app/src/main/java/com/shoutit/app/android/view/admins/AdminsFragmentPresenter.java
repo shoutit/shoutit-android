@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.admins;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
@@ -9,15 +10,14 @@ import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.AddAdminRequest;
+import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dao.BaseProfileListDao;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.utils.ListeningHalfPresenter;
-import com.shoutit.app.android.utils.MoreFunctions1;
-import com.shoutit.app.android.utils.PreferencesHelper;
 import com.shoutit.app.android.view.profileslist.BaseProfileListPresenter;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
 
 import okhttp3.ResponseBody;
 import rx.Observable;
@@ -39,24 +39,20 @@ public class AdminsFragmentPresenter extends BaseProfileListPresenter {
     @Nonnull
     private final Observable<Throwable> errorObservable;
     @Nonnull
-    private final PreferencesHelper preferencesHelper;
-    @Nonnull
     private final Observable<ResponseBody> successAddAdminObservable;
 
     public AdminsFragmentPresenter(@Nonnull ListeningHalfPresenter listeningHalfPresenter,
                                    @Nonnull ProfilesDao profilesDao,
-                                   @Nonnull String placeholderText,
+                                   @Nullable String placeholderText,
                                    @Nonnull @UiScheduler Scheduler uiScheduler,
                                    @Nonnull @NetworkScheduler Scheduler networkScheduler,
                                    @Nonnull UserPreferences userPreferences,
-                                   @Nonnull PreferencesHelper preferencesHelper,
                                    @Nonnull ApiService apiService) {
         super(listeningHalfPresenter, uiScheduler, placeholderText, userPreferences);
-        this.preferencesHelper = preferencesHelper;
 
-        daoObservable = Observable.just(userPreferences.getPageUserName())
-                .filter(MoreFunctions1.isPresent())
-                .map(pageUserName -> profilesDao.getAdminsDao(pageUserName.get()))
+        final String pageUserName = userPreferences.getPageUserName().get();
+
+        daoObservable = Observable.just(profilesDao.getAdminsDao(User.ME))
                 .compose(ObservableExtensions.behaviorRefCount());
         
         final Observable<ResponseOrError<ResponseBody>> removeAdminObservable = removeAdminSubject
@@ -70,7 +66,7 @@ public class AdminsFragmentPresenter extends BaseProfileListPresenter {
                 .doOnNext(responseBody -> refreshData());
 
         final Observable<ResponseOrError<ResponseBody>> addAdminObservable = addAdminSubject
-                .switchMap(userName -> apiService.addAdmin(userName)
+                .switchMap(userId -> apiService.addAdmin(pageUserName, new AddAdminRequest(userId))
                         .subscribeOn(networkScheduler)
                         .observeOn(uiScheduler)
                         .compose(ResponseOrError.toResponseOrErrorObservable())).compose(ObservableExtensions.behaviorRefCount());
@@ -81,7 +77,7 @@ public class AdminsFragmentPresenter extends BaseProfileListPresenter {
 
         progressObservable = Observable.merge(
                 removeAdminObservable.map(Functions1.returnFalse()),
-                addAdminObservable.map(Functions1.returnTrue()),
+                addAdminObservable.map(Functions1.returnFalse()),
                 removeAdminSubject.map(Functions1.returnTrue()),
                 addAdminSubject.map(Functions1.returnTrue()));
 
@@ -121,14 +117,10 @@ public class AdminsFragmentPresenter extends BaseProfileListPresenter {
     }
 
     public void removeAdmin(@Nonnull String userName) {
-        if (preferencesHelper.isMyProfile(userName)) {
-            profileSelectedSubject.onNext(userName);
-        } else {
-            removeAdminSubject.onNext(userName);
-        }
+        removeAdminSubject.onNext(userName);
     }
 
-    public void addAdmin(String selectedAdminUserName) {
-        addAdminSubject.onNext(selectedAdminUserName);
+    public void addAdmin(String selectedAdminId) {
+        addAdminSubject.onNext(selectedAdminId);
     }
 }
