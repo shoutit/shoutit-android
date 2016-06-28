@@ -19,7 +19,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.GuestSignupRequest;
 import com.shoutit.app.android.api.model.UserLocation;
-import com.shoutit.app.android.api.model.login.LoginUser;
+import com.shoutit.app.android.api.model.login.LoginProfile;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.location.LocationManager;
@@ -112,12 +112,12 @@ public class IntroActivity extends BaseActivity {
         mLocationObservable.first()
                 .flatMap(location -> FacebookHelper.getPromotionalCodeObservable(IntroActivity.this)
                         .flatMap(invitationCode -> mApiService.loginGuest(
-                                new GuestSignupRequest(LoginUser.loginUser(location), mixPanel.getDistinctId(), invitationCode))
+                                new GuestSignupRequest(LoginProfile.loginUser(location), mixPanel.getDistinctId(), invitationCode))
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(MyAndroidSchedulers.mainThread())))
                 .doOnTerminate(() -> progress.setVisibility(View.GONE))
                 .subscribe(signResponse -> {
-                    mUserPreferences.setGuestLoggedIn(signResponse.getUser(), signResponse.getAccessToken(), signResponse.getRefreshToken());
+                    mUserPreferences.setGuestLoggedIn(signResponse.getProfile(), signResponse.getAccessToken(), signResponse.getRefreshToken());
                     finish();
                     startActivity(MainActivity.newIntent(IntroActivity.this));
                 }, throwable -> {

@@ -14,7 +14,7 @@ import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.login.EmailLoginRequest;
-import com.shoutit.app.android.api.model.login.LoginUser;
+import com.shoutit.app.android.api.model.login.LoginProfile;
 import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
@@ -80,7 +80,7 @@ public class LoginPresenter {
                                 .zip(mEmailSubject.filter(getNotEmptyFunc1()), mPasswordSubject.filter(getNotEmptyFunc1()), new Func2<String, String, EmailLoginRequest>() {
                                     @Override
                                     public EmailLoginRequest call(String email, String password) {
-                                        return new EmailLoginRequest(email, password, LoginUser.loginUser(location), mixPanel.getDistinctId(), null);
+                                        return new EmailLoginRequest(email, password, LoginProfile.loginUser(location), mixPanel.getDistinctId());
                                     }
                                 })
                                 .first();
@@ -110,7 +110,7 @@ public class LoginPresenter {
                     @Override
                     public void call(SignResponse signResponse) {
                         userPreferences.setLoggedIn(signResponse.getAccessToken(),
-                                signResponse.getRefreshToken(), signResponse.getUser());
+                                signResponse.getRefreshToken(), signResponse.getProfile());
                         userPreferences.setGcmPushToken(null);
                     }
                 });

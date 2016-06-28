@@ -7,10 +7,11 @@ import com.shoutit.app.android.api.model.BlockedProfilesResposne;
 import com.shoutit.app.android.api.model.CallerProfile;
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.ChangePasswordRequest;
-import com.shoutit.app.android.api.model.ConversationMediaResponse;
 import com.shoutit.app.android.api.model.ConversationDetails;
+import com.shoutit.app.android.api.model.ConversationMediaResponse;
 import com.shoutit.app.android.api.model.ConversationsResponse;
 import com.shoutit.app.android.api.model.CreateOfferShoutWithImageRequest;
+import com.shoutit.app.android.api.model.CreatePageRequest;
 import com.shoutit.app.android.api.model.CreatePublicChatRequest;
 import com.shoutit.app.android.api.model.CreateRequestShoutRequest;
 import com.shoutit.app.android.api.model.CreateRequestShoutWithPriceRequest;
@@ -26,11 +27,10 @@ import com.shoutit.app.android.api.model.EditShoutRequestWithPrice;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.GuestSignupRequest;
 import com.shoutit.app.android.api.model.InvitationCodeResponse;
-import com.shoutit.app.android.api.model.ListenersResponse;
-import com.shoutit.app.android.api.model.ListeningResponse;
 import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessagesResponse;
 import com.shoutit.app.android.api.model.NotificationsResponse;
+import com.shoutit.app.android.api.model.PageCategory;
 import com.shoutit.app.android.api.model.PagesResponse;
 import com.shoutit.app.android.api.model.PostMessage;
 import com.shoutit.app.android.api.model.ProfileRequest;
@@ -67,6 +67,7 @@ import com.shoutit.app.android.api.model.VideoCallRequest;
 import com.shoutit.app.android.api.model.login.EmailLoginRequest;
 import com.shoutit.app.android.api.model.login.FacebookLogin;
 import com.shoutit.app.android.api.model.login.GoogleLogin;
+import com.shoutit.app.android.api.model.login.PageLoginRequest;
 import com.shoutit.app.android.model.MobilePhoneResponse;
 import com.shoutit.app.android.model.ReportBody;
 
@@ -236,6 +237,9 @@ public interface ApiService {
     Observable<SignResponse> loginGuest(@Body GuestSignupRequest request);
 
     @POST("oauth2/access_token")
+    Observable<SignResponse> createPageAndLogin(@Body PageLoginRequest request);
+
+    @POST("oauth2/access_token")
     Observable<SignResponse> signup(@Body EmailSignupRequest request);
 
     @POST("oauth2/access_token")
@@ -313,8 +317,8 @@ public interface ApiService {
 
     @GET("profiles/{user_name}/mutual_friends")
     Observable<ProfilesListResponse> facebookFriends(@Path("user_name") String userName,
-                                                      @Query("page") Integer page,
-                                                      @Query("page_size") Integer pageSize);
+                                                     @Query("page") Integer page,
+                                                     @Query("page_size") Integer pageSize);
 
     @PATCH("profiles/{user_name}/contacts")
     Observable<ResponseBody> uploadContacts(@Path("user_name") String userName,
@@ -409,7 +413,7 @@ public interface ApiService {
      */
     @GET("conversations")
     Observable<ConversationsResponse> getConversations(@Nullable @Query("before") String timestamp,
-                                              @Query("page_size") Integer pageSize);
+                                                       @Query("page_size") Integer pageSize);
 
     @GET("conversations/{id}")
     Observable<ConversationDetails> getConversation(@NonNull @Path("id") String id);
@@ -517,12 +521,18 @@ public interface ApiService {
     @GET("credit/transactions")
     Observable<TransactionRsponse> getTransactions(@Nullable @Query("before") String timestamp);
 
+    /**
+     * Pages
+     */
+    @GET("pages/categories")
+    Observable<List<PageCategory>> pagesCategories();
+
+    @POST("pages")
+    Observable<ResponseBody> createPage(@Body CreatePageRequest request);
+
     @GET("credit/invitation_code")
     Observable<InvitationCodeResponse> getInvitationCode();
 
-    /**
-     * Pages
-     **/
     @GET("pages")
     Observable<ProfilesListResponse> getPublicPages(@Query("country") String countryCode,
                                              @Query("page") Integer page,

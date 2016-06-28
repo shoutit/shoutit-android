@@ -87,13 +87,15 @@
     <string name="register_empty_name">Name cannot be empty</string>
     <string name="register_have_an_account">Have an account?</string>
     <string name="register_log_in">Log in</string>
-    <string name="register_bottom_text1">By Proceeding you also agree to Shoutit’s</string>
-    <string name="register_bottom_text2">Terms of Service</string>
-    <string name="register_bottom_text3">and</string>
-    <string name="register_bottom_text4">Privacy Policy</string>
+    <string name="register_bottom_text">By Proceeding you also agree to Shoutit’s %1$s and %2$s</string>
+    <string name="register_bottom_text_terms_of_service">Terms of Service</string>
+    <string name="register_bottom_text_privacy_policy">Privacy Policy</string>
     <string name="register_forgot_password">Forgot your password?</string>
     <string name="register_next_label">Next</string>
     <string name="register_done_label">Done</string>
+    <string name="register_create_page_text">%1$s for brand or business</string>
+    <string name="register_create_page_highlight">Create a Page</string>
+
 
     <!-- Login Intro -->
     <string name="login_intro_join">Join Now!</string>
@@ -144,6 +146,7 @@
     <string name="menu_guest">Guest</string>
     <string name="menu_item_logout">Logout</string>
     <string name="menu_version_name">Shoutit %1$s</string>
+    <string name="menu_use_as_format">Use Shoutit as %1$s</string>
 
     <!-- Post Login -->
     <string name="post_login_next">next</string>
@@ -719,5 +722,19 @@
     <string name="admins_remove_admin">Remove Admin</string>
     <string name="admins_add_admin">Add Admin</string>
 
+    <!-- Create Page Category -->
+    <string
+        name="create_page_category_header_text">
+        Give your brand, product or business a voice on Shoutit and connect easily with your current
+        and potiential customers.\n\nIts. free to set up. Just choose a Page type to get started
+    </string>
+    <string name="create_page_category_title">Create a Page</string>
+    <string name="create_page_details_header">Page Details</string>
+    <string name="create_page_details_name_hint">Name</string>
+    <string name="create_page_details_button">Create Page</string>
+    <string name="create_page_details_your_info_header">Your Info</string>
+    <string name="create_page_details_full_name_hint">Full Name</string>
+    <string name="create_page_details_email_hint">Email</string>
+    <string name="create_page_details_password_hint">Password</string>
 
 </resources>

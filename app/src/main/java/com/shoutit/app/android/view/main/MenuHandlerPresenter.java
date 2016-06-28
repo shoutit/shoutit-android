@@ -9,6 +9,7 @@ import com.google.common.base.Strings;
 import com.shoutit.app.android.BuildConfig;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForActivity;
@@ -19,7 +20,6 @@ import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Scheduler;
-import rx.functions.Func1;
 
 public class MenuHandlerPresenter {
 
@@ -35,45 +35,45 @@ public class MenuHandlerPresenter {
     private final Observable<Integer> countryCodeObservable;
     @Nonnull
     private final Observable<String> versionNameObservable;
-    @Nonnull
-    private final Observable<Boolean> logoutItemVisibilityObservable;
+    private final Observable<String> userNameObservable;
 
     @Inject
     public MenuHandlerPresenter(@Nonnull final UserPreferences userPreferences,
                                 @Nonnull @ForActivity final Context context,
                                 @Nonnull @UiScheduler Scheduler uiScheduler) {
 
+        final Observable<BaseProfile> userOrPageObservable = userPreferences.getUserOrPageObservable()
+                .filter(Functions1.isNotNull())
+                .observeOn(uiScheduler)
+                .compose(ObservableExtensions.<BaseProfile>behaviorRefCount());
+
         final Observable<User> userObservable = userPreferences.getUserObservable()
                 .filter(Functions1.isNotNull())
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<User>behaviorRefCount());
 
-        avatarObservable = userObservable
-                .map(new Func1<User, String>() {
-                    @Override
-                    public String call(User user) {
-                        return Strings.emptyToNull(user.getImage());
+        avatarObservable = userOrPageObservable
+                .map(user -> Strings.emptyToNull(user.getImage()));
+
+        coverObservable = userOrPageObservable
+                .map(user -> Strings.emptyToNull(user.getCover()))
+                .filter(Functions1.isNotNull());
+
+        nameObservable = userOrPageObservable
+                .map(user -> {
+                    if (userPreferences.isGuest()) {
+                        return context.getString(R.string.menu_guest);
+                    } else {
+                        return user.getName();
                     }
                 });
 
-        coverObservable = userObservable
-                .map(new Func1<User, String>() {
-                    @Override
-                    public String call(User user) {
-                        return Strings.emptyToNull(user.getCover());
-                    }
-                })
-                .filter(Functions1.isNotNull());
-
-        nameObservable = userObservable
-                .map(new Func1<User, String>() {
-                    @Override
-                    public String call(User user) {
-                        if (userPreferences.isGuest()) {
-                            return context.getString(R.string.menu_guest);
-                        } else {
-                            return user.getName();
-                        }
+        userNameObservable = userObservable
+                .map(user -> {
+                    if (userPreferences.isGuest()) {
+                        return context.getString(R.string.menu_guest);
+                    } else {
+                        return user.getName();
                     }
                 });
 
@@ -83,39 +83,17 @@ public class MenuHandlerPresenter {
                 .compose(ObservableExtensions.<UserLocation>behaviorRefCount());
 
         cityObservable = locationObservable
-                .map(new Func1<UserLocation, String>() {
-                    @Override
-                    public String call(UserLocation location) {
-                        return location.getCity();
-                    }
-                });
+                .map(UserLocation::getCity);
 
         countryCodeObservable = locationObservable
-                .map(new Func1<UserLocation, String>() {
-                    @Override
-                    public String call(UserLocation location) {
-                        return Strings.emptyToNull(location.getCountry());
-                    }
-                })
+                .map(location -> Strings.emptyToNull(location.getCountry()))
                 .filter(Functions1.isNotNull())
-                .map(new Func1<String, Integer>() {
-                    @Override
-                    public Integer call(String countryCode) {
-                        return ResourcesHelper.getResourceIdForName(countryCode.toLowerCase(), context);
-                    }
-                })
-                .filter(new Func1<Integer, Boolean>() {
-                    @Override
-                    public Boolean call(Integer integer) {
-                        return integer != 0;
-                    }
-                });
+                .map(countryCode -> ResourcesHelper.getResourceIdForName(countryCode.toLowerCase(), context))
+                .filter(integer -> integer != 0);
 
         versionNameObservable = Observable.just(
                 context.getString(R.string.menu_version_name, BuildConfig.VERSION_NAME)
         );
-
-        logoutItemVisibilityObservable = Observable.just(userPreferences.isUserLoggedIn());
     }
 
     @Nonnull
@@ -134,6 +112,11 @@ public class MenuHandlerPresenter {
     }
 
     @Nonnull
+    public Observable<String> getUserNameObservable() {
+        return userNameObservable;
+    }
+
+    @Nonnull
     public Observable<String> getCityObservable() {
         return cityObservable;
     }
@@ -146,10 +129,5 @@ public class MenuHandlerPresenter {
     @Nonnull
     public Observable<String> getVersionNameObservable() {
         return versionNameObservable;
-    }
-
-    @Nonnull
-    public Observable<Boolean> getLogoutItemVisibilityObservable() {
-        return logoutItemVisibilityObservable;
     }
 }

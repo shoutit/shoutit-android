@@ -2,22 +2,23 @@ package com.shoutit.app.android.api.model.login;
 
 import android.support.annotation.Nullable;
 
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.UserLocationSimple;
 
-public class LoginUser {
+public class LoginProfile {
 
     private final UserLocationSimple location;
 
-    public LoginUser(double latitude, double longitude) {
+    public LoginProfile(double latitude, double longitude) {
         this.location = new UserLocationSimple(latitude, longitude);
     }
 
     @Nullable
-    public static LoginUser loginUser(@Nullable com.shoutit.app.android.api.model.UserLocation location) {
+    public static LoginProfile loginUser(@Nullable UserLocation location) {
         if (location == null) {
             return null;
         } else {
-            return new LoginUser(location.getLatitude(), location.getLongitude());
+            return new LoginProfile(location.getLatitude(), location.getLongitude());
         }
     }
 

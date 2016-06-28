@@ -3,13 +3,16 @@ package com.shoutit.app.android.view.main;
 import android.graphics.Bitmap;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -97,6 +100,8 @@ public class MenuHandler {
     CheckedTextView pagesItem;
     @Bind(R.id.menu_admins)
     CheckedTextView adminsItem;
+    @Bind(R.id.menu_use_profile)
+    Button useProfile;
 
     @Nonnull
     private final RxAppCompatActivity rxActivity;
@@ -165,6 +170,9 @@ public class MenuHandler {
                             View.GONE : View.VISIBLE);
                 });
 
+        final Optional<String> pageId = userPreferences.getPageId();
+        useProfile.setVisibility(pageId.isPresent() ? View.VISIBLE : View.GONE);
+
         setData(id);
     }
 
@@ -176,6 +184,12 @@ public class MenuHandler {
         presenter.getNameObservable()
                 .compose(rxActivity.<String>bindToLifecycle())
                 .subscribe(RxTextView.text(userNameTextView));
+
+        presenter.getUserNameObservable()
+                .compose(rxActivity.<String>bindToLifecycle())
+                .subscribe(userName -> {
+                    useProfile.setText(String.format(rxActivity.getString(R.string.menu_use_as_format), userName));
+                });
 
         presenter.getCityObservable()
                 .compose(rxActivity.<String>bindToLifecycle())
@@ -215,11 +229,24 @@ public class MenuHandler {
             R.id.menu_invite_friends,
             R.id.menu_credits,
             R.id.menu_pages,
-            R.id.menu_admins
+            R.id.menu_admins,
+            R.id.menu_use_profile
     })
-
     public void onMenuItemSelected(View view) {
-        selectMenuItem(viewTagViewIdMap.inverse().get(view.getId()));
+        dispatchClick(view.getId());
+    }
+
+    private void dispatchClick(int id) {
+        switch (id) {
+            case R.id.menu_use_profile: {
+                userPreferences.clearPage();
+                ActivityCompat.finishAffinity(rxActivity);
+                rxActivity.startActivity(MainActivity.newIntent(rxActivity));
+                break;
+            }
+            default:
+                selectMenuItem(viewTagViewIdMap.inverse().get(id));
+        }
     }
 
     public void selectMenuItem(@Nonnull String viewTag) {
