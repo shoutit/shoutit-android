@@ -12,6 +12,7 @@ import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.dao.BaseProfileListDao;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.utils.ListeningHalfPresenter;
+import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.utils.PreferencesHelper;
 import com.shoutit.app.android.view.profileslist.BaseProfileListPresenter;
 
@@ -53,10 +54,9 @@ public class AdminsFragmentPresenter extends BaseProfileListPresenter {
         super(listeningHalfPresenter, uiScheduler, placeholderText, userPreferences);
         this.preferencesHelper = preferencesHelper;
 
-        daoObservable = userPreferences.getPageObservable()
-                .filter(Functions1.isNotNull())
-                .distinctUntilChanged()
-                .map(page -> profilesDao.getAdminsDao(page.getUsername()))
+        daoObservable = Observable.just(userPreferences.getPageUserName())
+                .filter(MoreFunctions1.isPresent())
+                .map(pageUserName -> profilesDao.getAdminsDao(pageUserName.get()))
                 .compose(ObservableExtensions.behaviorRefCount());
         
         final Observable<ResponseOrError<ResponseBody>> removeAdminObservable = removeAdminSubject

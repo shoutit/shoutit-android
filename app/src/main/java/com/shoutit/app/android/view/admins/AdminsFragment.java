@@ -10,7 +10,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.google.common.collect.Lists;
-import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
@@ -37,6 +36,7 @@ public class AdminsFragment extends BaseProfileListFragment implements AdminsDia
     private AdminsFragmentPresenter presenter;
 
     private List<MenuItem> mMenuItems = Lists.newArrayList();
+    private AdminsFragmentComponent component;
 
     public static Fragment newInstance() {
         return new AdminsFragment();
@@ -47,8 +47,7 @@ public class AdminsFragment extends BaseProfileListFragment implements AdminsDia
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        presenter = (AdminsFragmentPresenter) ((AdminsFragmentComponent)
-                ((BaseActivity) getActivity()).getActivityComponent()).profileListPresenter();
+        presenter = (AdminsFragmentPresenter) component.profileListPresenter();
     }
 
     @Override
@@ -100,12 +99,13 @@ public class AdminsFragment extends BaseProfileListFragment implements AdminsDia
     protected void injectComponent(@Nonnull BaseActivityComponent baseActivityComponent,
                                    @Nonnull FragmentModule fragmentModule,
                                    @Nullable Bundle savedInstanceState) {
-        DaggerAdminsFragmentComponent.builder()
+        component = DaggerAdminsFragmentComponent.builder()
                 .baseActivityComponent(baseActivityComponent)
                 .fragmentModule(fragmentModule)
                 .adminsFragmentModule(new AdminsFragmentModule(this))
-                .build()
-                .inject(this);
+                .build();
+
+        component.inject(this);
     }
 
     @Override

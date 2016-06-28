@@ -336,4 +336,8 @@ public class UserPreferences {
     public Optional<String> getPageId() {
         return Optional.fromNullable(mPreferences.getString(PAGE_ID, null));
     }
+
+    public Optional<String> getPageUserName() {
+        return Optional.fromNullable(mPreferences.getString(PAGE_USER_NAME, null));
+    }
 }

@@ -161,13 +161,15 @@ public class MenuHandler {
                     creditsBadgeTv.setText(String.valueOf(credits));
                 });
 
-        userPreferences.getUserObservable()
+        userPreferences.getUserOrPageObservable()
                 .filter(user -> user != null)
                 .subscribe(user -> {
-                    pagesItem.setVisibility(user.isUser(user) ?
-                            View.VISIBLE : View.GONE);
-                    adminsItem.setVisibility(user.isUser(user) ?
+                    final Optional<String> pageUserName = userPreferences.getPageUserName();
+                    boolean isLoggedAsPage = pageUserName.isPresent();
+                    pagesItem.setVisibility(isLoggedAsPage ?
                             View.GONE : View.VISIBLE);
+                    adminsItem.setVisibility(isLoggedAsPage ?
+                            View.VISIBLE : View.GONE);
                 });
 
         final Optional<String> pageId = userPreferences.getPageId();
