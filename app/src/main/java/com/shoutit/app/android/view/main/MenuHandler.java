@@ -13,19 +13,23 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.utils.BlurTransform;
 import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.RtlUtils;
+<<<<<<< HEAD
 import com.shoutit.app.android.view.admins.AdminsFragment;
+=======
+import com.shoutit.app.android.utils.SwitchHelper;
+>>>>>>> develop
 import com.shoutit.app.android.view.conversations.ConversationsPagerFragment;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
 import com.shoutit.app.android.view.credits.CreditsFragment;
@@ -113,6 +117,8 @@ public class MenuHandler {
     private final UserPreferences userPreferences;
     @Nonnull
     private final MenuHandlerPresenter presenter;
+    @Nonnull
+    private final SwitchHelper mSwitchHelper;
 
     private List<CheckedTextView> selectableItems = ImmutableList.of();
 
@@ -135,12 +141,14 @@ public class MenuHandler {
                        @Nonnull OnMenuItemSelectedListener onMenuItemSelectedListener,
                        @Nonnull Picasso picasso,
                        @Nonnull UserPreferences userPreferences,
-                       @Nonnull MenuHandlerPresenter presenter) {
+                       @Nonnull MenuHandlerPresenter presenter,
+                       @Nonnull SwitchHelper switchHelper) {
         this.rxActivity = rxActivity;
         this.onMenuItemSelectedListener = onMenuItemSelectedListener;
         this.picasso = picasso;
         this.userPreferences = userPreferences;
         this.presenter = presenter;
+        mSwitchHelper = switchHelper;
     }
 
     public void initMenu(@Nonnull View view) {
@@ -150,27 +158,28 @@ public class MenuHandler {
     public void initMenu(@Nonnull View view, @IdRes int id) {
         ButterKnife.bind(this, view);
         selectableItems = ImmutableList.of(homeItem, discoverItem, browseItem, chatItem, creditsItem, pagesItem, adminsItem);
-        userPreferences.getUserObservable()
+        userPreferences.getPageOrUserObservable()
                 .filter(user -> user != null)
-                .map(user -> {
-                    Preconditions.checkNotNull(user);
-                    return user.getStats().getCredits();
-                })
-                .subscribe(credits -> {
-                    creditsBadgeTv.setVisibility(credits > 0 ? View.VISIBLE : View.GONE);
-                    creditsBadgeTv.setText(String.valueOf(credits));
+                .map(BaseProfile::getStats)
+                .subscribe(stats -> {
+                    if(stats != null) {
+                        final int credits = stats.getCredits();
+                        creditsBadgeTv.setVisibility(credits > 0 ? View.VISIBLE : View.GONE);
+                        creditsBadgeTv.setText(String.valueOf(credits));
+                    } else {
+                        creditsBadgeTv.setVisibility(View.GONE);
+                    }
                 });
 
-        userPreferences.getUserOrPageObservable()
+        userPreferences.getPageOrUserObservable()
                 .filter(user -> user != null)
                 .subscribe(user -> {
-                    final Optional<String> pageUserName = userPreferences.getPageUserName();
-                    boolean isLoggedAsPage = pageUserName.isPresent();
-                    pagesItem.setVisibility(isLoggedAsPage ?
-                            View.GONE : View.VISIBLE);
-                    adminsItem.setVisibility(isLoggedAsPage ?
+                    pagesItem.setVisibility(user.isUser() ?
                             View.VISIBLE : View.GONE);
+                    adminsItem.setVisibility(user.isUser() ?
+                            View.GONE : View.VISIBLE);
                 });
+
 
         final Optional<String> pageId = userPreferences.getPageId();
         useProfile.setVisibility(pageId.isPresent() ? View.VISIBLE : View.GONE);
@@ -241,6 +250,7 @@ public class MenuHandler {
     private void dispatchClick(int id) {
         switch (id) {
             case R.id.menu_use_profile: {
+                mSwitchHelper.logout();
                 userPreferences.clearPage();
                 ActivityCompat.finishAffinity(rxActivity);
                 rxActivity.startActivity(MainActivity.newIntent(rxActivity));

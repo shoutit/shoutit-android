@@ -47,9 +47,7 @@ public class ChatParticipantsPresenter {
         mNetworkScheduler = networkScheduler;
         mUiScheduler = uiScheduler;
 
-        final User user = userPreferences.getUser();
-        assert user != null;
-        mId = user.getId();
+        mId = userPreferences.getUserId();
     }
 
     public void register(Listener listener) {

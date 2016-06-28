@@ -15,6 +15,7 @@ import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
 import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler;
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.constants.UserVoiceConstants;
 import com.shoutit.app.android.dagger.AppComponent;
@@ -92,7 +93,6 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
         setupGraph();
 
         fetchLocation();
-        refreshUser();
 
         setUpMixPanel();
 
@@ -125,17 +125,6 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
                 });
     }
 
-    private void refreshUser() {
-        if (!userPreferences.isNormalUser()) {
-            return;
-        }
-
-        profilesDao.updateUser()
-                .subscribe(user -> {
-                    userPreferences.updateUserJson(user);
-                });
-    }
-
     private void initGcm() {
         AppuniteGcm.initialize(this, GCM_TOKEN)
                 .loggingEnabled(!BuildConfig.DEBUG)
@@ -147,7 +136,7 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
         userPreferences.getTokenObservable()
                 .filter(token -> token != null && !userPreferences.isGuest())
                 .subscribe(token -> {
-                    final User user = userPreferences.getUser();
+                    final BaseProfile user = userPreferences.getPageOrUser();
                     if (user != null) {
                         initPusher(token, user);
                     }
@@ -165,14 +154,14 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
                 });
     }
 
-    private void initPusher(@Nonnull String token, @Nonnull User user) {
+    private void initPusher(@Nonnull String token, @Nonnull BaseProfile user) {
         mPusherHelper.init(token);
         if (mPusherHelper.shouldConnect()) {
             mPusherHelper.connect();
             mPusherHelper.subscribeProfileChannel(user.getId());
             mPusherHelper.getUserUpdatedObservable()
                     .subscribe(user1 -> {
-                        userPreferences.updateUserJson(user1);
+                        userPreferences.setUser(user1);
                     });
 
             mPusherHelper.getStatsObservable()

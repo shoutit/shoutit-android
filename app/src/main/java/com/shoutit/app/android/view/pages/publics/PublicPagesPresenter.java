@@ -60,9 +60,9 @@ public class PublicPagesPresenter extends ProfilesListPresenter {
         super(listeningHalfPresenter);
 
         daoObservable = userPreferences
-                .getUserObservable()
+                .getPageOrUserObservable()
                 .filter(Functions1.isNotNull())
-                .map(User::getLocation)
+                .map(BaseProfile::getLocation)
                 .filter(Functions1.isNotNull())
                 .map(UserLocation::getCountry)
                 .map(pagesDaos::getDao)

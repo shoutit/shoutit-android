@@ -57,7 +57,7 @@ public class CreditsFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        final int credits = Preconditions.checkNotNull(mUserPreferences.getUser()).getStats().getCredits();
+        final int credits = Preconditions.checkNotNull(mUserPreferences.getPageOrUser()).getStats().getCredits();
         mCreditNumber.setText(String.valueOf(credits));
         mPusherHelper.getStatsObservable()
                 .compose(bindToLifecycle())

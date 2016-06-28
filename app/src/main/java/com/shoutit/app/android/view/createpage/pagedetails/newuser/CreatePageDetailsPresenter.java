@@ -82,12 +82,13 @@ public class CreatePageDetailsPresenter {
                     .subscribeOn(mNetworkScheduler)
                     .observeOn(mUiScheduler)
                     .subscribe(signResponse -> {
-                        mUserPreferences.setLoggedIn(signResponse.getAccessToken(),
+                        mUserPreferences.setPageLoggedIn(signResponse.getAccessToken(),
                                 signResponse.getRefreshToken(), signResponse.getProfile());
                         mUserPreferences.setGcmPushToken(null);
                         mListener.showProgress(false);
                         mListener.startMainActivity();
                     }, throwable -> {
+                        mListener.showProgress(false);
                         mListener.error();
                     }));
         }

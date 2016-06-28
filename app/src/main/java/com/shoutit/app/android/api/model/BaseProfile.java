@@ -4,7 +4,9 @@ package com.shoutit.app.android.api.model;
 import android.support.annotation.Nullable;
 
 import com.google.common.base.Objects;
-import com.shoutit.app.android.view.listenings.ListeningsPresenter;
+import com.shoutit.app.android.model.Stats;
+
+import javax.annotation.Nonnull;
 
 public class BaseProfile implements ProfileType {
     protected final String id;
@@ -21,11 +23,14 @@ public class BaseProfile implements ProfileType {
     @Nullable
     protected final UserLocation location;
     protected boolean isOwner;
+    @Nullable
+    private final Stats stats;
+    private final String email;
 
     public BaseProfile(String id, String type, String username, String name,
                        String firstName, String lastName, boolean isActivated, String image,
                        String cover, boolean isListening, int listenersCount, @Nullable UserLocation location,
-                       boolean isOwner) {
+                       boolean isOwner, @Nullable Stats stats, String email) {
         this.id = id;
         this.type = type;
         this.username = username;
@@ -39,9 +44,11 @@ public class BaseProfile implements ProfileType {
         this.listenersCount = listenersCount;
         this.location = location;
         this.isOwner = isOwner;
+        this.stats = stats;
+        this.email = email;
     }
 
-    protected boolean isUser() {
+    public boolean isUser() {
         return USER.equals(type);
     }
 
@@ -104,7 +111,39 @@ public class BaseProfile implements ProfileType {
         boolean newIsListening = !isListening;
         int newListenersCount = newIsListening ? listenersCount + 1 : listenersCount - 1;
         return new BaseProfile(id, type, username, name, firstName, lastName, isActivated,
-                image, cover, newIsListening, newListenersCount, location, isOwner);
+                image, cover, newIsListening, newListenersCount, location, isOwner, stats, email);
+    }
+
+    @Nonnull
+    public BaseProfile withUpdatedStats(@Nonnull Stats newStats) {
+        return new BaseProfile(id, type, username, name, firstName, lastName, isActivated,
+                image, cover, isListening, listenersCount,
+                location, isOwner, newStats, getEmail());
+    }
+
+    @Nullable
+    public Stats getStats() {
+        return stats;
+    }
+
+    public int getUnreadConversationsCount() {
+        if (stats == null) {
+            return 0;
+        } else {
+            return stats.getUnreadConversationsCount();
+        }
+    }
+
+    public int getUnreadNotificationsCount() {
+        if (stats == null) {
+            return 0;
+        } else {
+            return stats.getUnreadNotifications();
+        }
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     @Nullable

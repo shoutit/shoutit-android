@@ -10,7 +10,6 @@ import com.shoutit.app.android.BuildConfig;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.BaseProfile;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.ResourcesHelper;
@@ -42,15 +41,10 @@ public class MenuHandlerPresenter {
                                 @Nonnull @ForActivity final Context context,
                                 @Nonnull @UiScheduler Scheduler uiScheduler) {
 
-        final Observable<BaseProfile> userOrPageObservable = userPreferences.getUserOrPageObservable()
+        final Observable<BaseProfile> userOrPageObservable = userPreferences.getPageOrUserObservable()
                 .filter(Functions1.isNotNull())
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<BaseProfile>behaviorRefCount());
-
-        final Observable<User> userObservable = userPreferences.getUserObservable()
-                .filter(Functions1.isNotNull())
-                .observeOn(uiScheduler)
-                .compose(ObservableExtensions.<User>behaviorRefCount());
 
         avatarObservable = userOrPageObservable
                 .map(user -> Strings.emptyToNull(user.getImage()));
@@ -68,15 +62,7 @@ public class MenuHandlerPresenter {
                     }
                 });
 
-        userNameObservable = userObservable
-                .map(user -> {
-                    if (userPreferences.isGuest()) {
-                        return context.getString(R.string.menu_guest);
-                    } else {
-                        return user.getName();
-                    }
-                });
-
+        userNameObservable = Observable.defer(() -> Observable.just(userPreferences.getUser().getUsername()));
 
         final Observable<UserLocation> locationObservable = userPreferences.getLocationObservable()
                 .observeOn(uiScheduler)

@@ -25,6 +25,7 @@ import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
@@ -116,6 +117,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
         setUpActionBar();
         setUpDrawer();
+        refreshUser();
 
         if (savedInstanceState == null) {
             getSupportFragmentManager()
@@ -152,16 +154,27 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
         }
     }
 
+    private void refreshUser() {
+        if (!mUserPreferences.isNormalUser()) {
+            return;
+        }
+
+        profilesDao.updateUser()
+                .subscribe(user -> {
+                    mUserPreferences.setUser(user);
+                });
+    }
+
     private void subscribeToStats() {
         mStatsSubscription.add(mPusherHelper.getStatsObservable()
                 .compose(this.<Stats>bindToLifecycle())
                 .subscribe(pusherStats -> {
                     menuHandler.setStats(pusherStats.getUnreadConversationsCount(), pusherStats.getUnreadNotifications());
                 }));
-        mStatsSubscription.add(mUserPreferences.getUserObservable()
+        mStatsSubscription.add(mUserPreferences.getPageOrUserObservable()
                 .filter(Functions1.isNotNull())
                 .distinctUntilChanged()
-                .compose(this.<User>bindToLifecycle())
+                .compose(this.<BaseProfile>bindToLifecycle())
                 .subscribe(user -> {
                     menuHandler.setStats(user.getUnreadConversationsCount(), user.getUnreadNotificationsCount());
                 }, throwable -> {

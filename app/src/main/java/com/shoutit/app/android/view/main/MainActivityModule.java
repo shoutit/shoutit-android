@@ -2,6 +2,7 @@ package com.shoutit.app.android.view.main;
 
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityScope;
+import com.shoutit.app.android.utils.SwitchHelper;
 import com.squareup.picasso.Picasso;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
@@ -34,8 +35,8 @@ public class MainActivityModule {
     @ActivityScope
     MenuHandler providesMenuHandler(OnMenuItemSelectedListener onMenuItemSelectedListener,
                                     Picasso picasso, UserPreferences userPreferences,
-                                    MenuHandlerPresenter presenter) {
-        return new MenuHandler(activity, onMenuItemSelectedListener, picasso, userPreferences, presenter);
+                                    MenuHandlerPresenter presenter, SwitchHelper switchHelper) {
+        return new MenuHandler(activity, onMenuItemSelectedListener, picasso, userPreferences, presenter, switchHelper);
     }
 
 }

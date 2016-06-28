@@ -50,7 +50,7 @@ public class ShoutsPresenterTest {
         when(mDiscoverShoutsDao.getShoutsObservable(anyString())).thenReturn(mBehaviorSubject);
 
         when(userPreferences.isNormalUser()).thenReturn(true);
-        when(userPreferences.getUser()).thenReturn(TestUtils.getUser());
+        when(userPreferences.getPageOrUser()).thenReturn(TestUtils.getUser());
 
         mShoutsPresenter = new DiscoverShoutsPresenter(Schedulers.immediate(), Schedulers.immediate(), mDiscoverShoutsDao, "", "", userPreferences, mContext);
     }

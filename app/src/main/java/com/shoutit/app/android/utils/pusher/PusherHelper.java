@@ -16,6 +16,7 @@ import com.pusher.client.connection.ConnectionStateChange;
 import com.pusher.client.util.HttpAuthorizer;
 import com.shoutit.app.android.BuildConfig;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.NotificationsResponse;
 import com.shoutit.app.android.api.model.PusherConversationUpdate;
 import com.shoutit.app.android.api.model.PusherMessage;
@@ -201,10 +202,13 @@ public class PusherHelper {
     }
 
     public PresenceChannel getProfileChannel() {
-        final User user = mUserPreferences.getUser();
+        final BaseProfile user = mUserPreferences.getPageOrUser();
         assert user != null;
         log("get profile channel id : " + user.getId());
-        return mPusher.getPresenceChannel(PusherHelper.getProfileChannelName(user.getId()));
+
+        final PresenceChannel presenceChannel = mPusher.getPresenceChannel(PusherHelper.getProfileChannelName(user.getId()));
+
+        return presenceChannel == null ? subscribeProfileChannel(user.getId()) : presenceChannel;
     }
 
     public Observable<TypingInfo> getIsTypingObservable(@NonNull final PresenceChannel conversationChannel) {
@@ -265,9 +269,9 @@ public class PusherHelper {
         };
     }
 
-    public void subscribeProfileChannel(@NonNull String id) {
+    public PresenceChannel subscribeProfileChannel(@NonNull String id) {
         log("subscribe profile channel : " + id);
-        mPusher.subscribePresence(PusherHelper.getProfileChannelName(id));
+        return mPusher.subscribePresence(PusherHelper.getProfileChannelName(id));
     }
 
     public void connect() {
