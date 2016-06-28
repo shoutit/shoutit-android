@@ -13,12 +13,15 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.gson.Gson;
+import com.shoutit.app.android.api.model.Admin;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForApplication;
 import com.shoutit.app.android.model.Stats;
+
+import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -84,7 +87,6 @@ public class UserPreferences {
                 .observeOn(uiScheduler);
     }
 
-    @SuppressLint("CommitPrefEdits")
     public void setLoggedIn(@NonNull String authToken,
                             @NonNull String refreshToken,
                             @Nonnull User user) {
@@ -94,13 +96,38 @@ public class UserPreferences {
                 .putString(REFRESH_TOKEN, refreshToken)
                 .putString(KEY_USER, gson.toJson(user))
                 .putBoolean(IS_GUEST, false);
-        editor.commit();
+        editor.apply();
         tokenRefreshSubject.onNext(new Object());
         refreshUser();
         if (user.getLocation() != null) {
             saveLocation(user.getLocation());
         }
     }
+
+    public void setPageLoggedIn(@NonNull String authToken,
+                                @NonNull String refreshToken,
+                                @Nonnull Page page) {
+        final List<Admin> admins = page.getAdmins();
+        final BaseProfile user = admins.get(0);
+
+        final SharedPreferences.Editor editor = mPreferences.edit();
+        editor
+                .putString(AUTH_TOKEN, authToken)
+                .putString(REFRESH_TOKEN, refreshToken)
+                .putString(KEY_PAGE, gson.toJson(page))
+                .putString(KEY_USER, gson.toJson(user))
+                .putString(PAGE_ID, page.getId())
+                .putString(PAGE_NAME, page.getUsername())
+                .putBoolean(IS_GUEST, false);
+        editor.apply();
+
+        tokenRefreshSubject.onNext(new Object());
+        refreshUser();
+        if (page.getLocation() != null) {
+            saveLocation(page.getLocation());
+        }
+    }
+
 
     @SuppressLint("CommitPrefEdits")
     public void setGuestLoggedIn(@Nonnull User user, @NonNull String authToken, @NonNull String refreshToken) {
@@ -339,7 +366,7 @@ public class UserPreferences {
         return Optional.fromNullable(mPreferences.getString(PAGE_ID, null));
     }
 
-    public String getUserId(){
+    public String getUserId() {
         return Preconditions.checkNotNull(getPageOrUser()).getId();
     }
 }

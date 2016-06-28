@@ -117,6 +117,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
         setUpActionBar();
         setUpDrawer();
+        refreshUser();
 
         if (savedInstanceState == null) {
             getSupportFragmentManager()
@@ -151,6 +152,17 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
             profilesDao.registerToGcmAction(AppuniteGcm.getInstance()
                     .getPushToken());
         }
+    }
+
+    private void refreshUser() {
+        if (!mUserPreferences.isNormalUser()) {
+            return;
+        }
+
+        profilesDao.updateUser()
+                .subscribe(user -> {
+                    mUserPreferences.setUser(user);
+                });
     }
 
     private void subscribeToStats() {
