@@ -147,7 +147,7 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
         userPreferences.getTokenObservable()
                 .filter(token -> token != null && !userPreferences.isGuest())
                 .subscribe(token -> {
-                    final BaseProfile user = userPreferences.getPageOrUser();
+                    final BaseProfile user = userPreferences.getUser();
                     if (user != null) {
                         initPusher(token, user);
                     }
@@ -166,10 +166,10 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
     }
 
     private void initPusher(@Nonnull String token, @Nonnull BaseProfile user) {
-        mPusherHelper.init(token);
+        mPusherHelper.init(token, user);
         if (mPusherHelper.shouldConnect()) {
             mPusherHelper.connect();
-            mPusherHelper.subscribeProfileChannel(user.getId());
+            mPusherHelper.subscribeProfileChannel();
             mPusherHelper.getUserUpdatedObservable()
                     .subscribe(user1 -> {
                         userPreferences.setUser(user1);

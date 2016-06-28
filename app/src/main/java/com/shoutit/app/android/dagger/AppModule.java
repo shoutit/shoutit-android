@@ -363,8 +363,8 @@ public final class AppModule {
 
     @Provides
     @Singleton
-    PusherHelper providePusher(Gson gson, UserPreferences userPreferences, @UiScheduler Scheduler uiScheduler) {
-        return new PusherHelper(gson, userPreferences, uiScheduler);
+    PusherHelper providePusher(Gson gson, @UiScheduler Scheduler uiScheduler) {
+        return new PusherHelper(gson, uiScheduler);
     }
 
     @Provides

@@ -314,13 +314,11 @@ public class UserPreferences {
     public void setPage(Page page) {
         setUser(page);
         editPage(page.getId(), page.getUsername());
-        tokenRefreshSubject.onNext(new Object());
     }
 
     public void clearPage() {
         editPage(null, null);
         setPrimaryUserAsUser();
-        tokenRefreshSubject.onNext(new Object());
     }
 
     private void editPage(String id, String name) {
