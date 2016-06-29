@@ -49,7 +49,7 @@ import rx.Subscription;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
-public class NotificationsActivity extends BaseActivity implements NotificationsPresenter.Listener{
+public class NotificationsActivity extends BaseActivity {
 
     @Bind(R.id.notifications_reycler_view)
     RecyclerView recyclerView;
@@ -59,8 +59,6 @@ public class NotificationsActivity extends BaseActivity implements Notifications
     View progressView;
     @Bind(R.id.notifications_badge)
     TextView notificationBadge;
-    @Bind(R.id.notifications_placeholder)
-    TextView notificationsPlaceholder;
 
     @Inject
     NotificationsPresenter presenter;
@@ -95,7 +93,6 @@ public class NotificationsActivity extends BaseActivity implements Notifications
         final MyLinearLayoutManager layoutManager = new MyLinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
-        presenter.registerListener(this);
 
         subscription = presenter.getAdapterItemsObservable()
                 .compose(this.<List<BaseAdapterItem>>bindToLifecycle())
@@ -223,11 +220,5 @@ public class NotificationsActivity extends BaseActivity implements Notifications
         component.inject(this);
 
         return component;
-    }
-
-    @Override
-    public void emptyList() {
-        notificationsPlaceholder.setVisibility(View.VISIBLE);
-        recyclerView.setVisibility(View.GONE);
     }
 }
