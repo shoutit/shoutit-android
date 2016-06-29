@@ -334,8 +334,8 @@
     <string name="post_signup_suggested_users">Suggested users</string>
     <string name="post_signup_suggested_pages">Suggested pages</string>
     <string name="post_signup_done">Done</string>
-    <string name="no_suggested_users">No suggested users</string>
-    <string name="no_suggested_pages">No suggested pages</string>
+    <string name="post_no_suggested_users">No suggested users</string>
+    <string name="post_no_suggested_pages">No suggested pages</string>
 
     <!-- Search -->
     <string name="search_base_title">Search</string>

@@ -5,6 +5,7 @@ import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.operators.MoreOperators;
 import com.appunite.rx.operators.OperatorMergeNextToken;
+import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -331,10 +332,10 @@ public class ProfilesDao {
         @Override
         protected Observable<ProfilesListResponse> getRequest(int pageNumber) {
             if (userLocation != null) {
-                return apiService.usersSuggestion(userLocation.getCountry(), userLocation.getState(), userLocation.getCity(), 1, pointer.getPageSize())
+                return apiService.usersSuggestion(userLocation.getCountry(), userLocation.getState(), userLocation.getCity(), pageNumber, PAGE_SIZE)
                         .map((Func1<UserSuggestionResponse, ProfilesListResponse>) userSuggestionResponse -> userSuggestionResponse);
             } else {
-                return apiService.usersSuggestion(null, null, null, 1, pointer.getPageSize())
+                return apiService.usersSuggestion(null, null, null, pageNumber, PAGE_SIZE)
                         .map((Func1<UserSuggestionResponse, ProfilesListResponse>) userSuggestionResponse -> userSuggestionResponse);
             }
         }
@@ -354,10 +355,10 @@ public class ProfilesDao {
         @Override
         protected Observable<ProfilesListResponse> getRequest(final int pageNumber) {
             if (userLocation != null) {
-                return apiService.pagesSuggestion(userLocation.getCountry(), userLocation.getState(), userLocation.getCity(), 1, pointer.getPageSize())
+                return apiService.pagesSuggestion(userLocation.getCountry(), userLocation.getState(), userLocation.getCity(), pageNumber, PAGE_SIZE)
                         .map((Func1<PagesSuggestionResponse, ProfilesListResponse>) pagesSuggestionResponse -> pagesSuggestionResponse);
             } else {
-                return apiService.pagesSuggestion(null, null, null, 1, pointer.getPageSize())
+                return apiService.pagesSuggestion(null, null, null, pageNumber, PAGE_SIZE)
                         .map((Func1<PagesSuggestionResponse, ProfilesListResponse>) pagesSuggestionResponse -> pagesSuggestionResponse);
             }
         }
@@ -376,19 +377,13 @@ public class ProfilesDao {
     }
 
     public static class FriendsSuggestionPointer {
-        private final int pageSize;
         @android.support.annotation.Nullable
         private final UserLocation userLocation;
         private final String userName;
 
-        public FriendsSuggestionPointer(int pageSize, @android.support.annotation.Nullable UserLocation userLocation, String userName) {
-            this.pageSize = pageSize;
+        public FriendsSuggestionPointer(@android.support.annotation.Nullable UserLocation userLocation, String userName) {
             this.userLocation = userLocation;
             this.userName = userName;
-        }
-
-        public int getPageSize() {
-            return pageSize;
         }
 
         @android.support.annotation.Nullable
@@ -398,6 +393,20 @@ public class ProfilesDao {
 
         public String getUserName() {
             return userName;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            final FriendsSuggestionPointer that = (FriendsSuggestionPointer) o;
+            return Objects.equal(userLocation, that.userLocation) &&
+                    Objects.equal(userName, that.userName);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(userLocation, userName);
         }
     }
 

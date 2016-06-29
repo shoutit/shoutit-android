@@ -69,7 +69,7 @@ public abstract class PostSignupSecondFragment extends BaseFragment {
 
         RxTextView.textChangeEvents(titleTv)
                 .compose(bindToLifecycle())
-                .map(textViewTextChangeEvent -> getString(R.string.no_suggested_pages))
+                .map(textViewTextChangeEvent -> getString(R.string.post_no_suggested_pages))
                 .subscribe(RxTextView.text(placeholderTv));
 
         presenter.getListenSuccessObservable()

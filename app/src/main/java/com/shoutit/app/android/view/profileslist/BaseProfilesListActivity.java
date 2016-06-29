@@ -6,7 +6,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
@@ -27,8 +26,6 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import rx.functions.Action1;
-import rx.functions.Func1;
 
 public abstract class BaseProfilesListActivity extends BaseActivity {
 
@@ -40,8 +37,6 @@ public abstract class BaseProfilesListActivity extends BaseActivity {
     RecyclerView recyclerView;
     @Bind(R.id.base_progress)
     protected View progressView;
-    @Bind(R.id.placeholder)
-    protected TextView placeholderTv;
 
     @Inject
     BaseProfileListPresenter presenter;
@@ -58,14 +53,6 @@ public abstract class BaseProfilesListActivity extends BaseActivity {
         recyclerView.setAdapter(adapter);
 
         setUpToolbar();
-
-        presenter.getAdapterItemsObservable()
-                .filter(items -> !items.isEmpty())
-                .compose(this.<List<BaseAdapterItem>>bindToLifecycle())
-                .subscribe(items -> {
-                    placeholderTv.setVisibility(View.GONE);
-                    recyclerView.setVisibility(View.VISIBLE);
-                });
 
         presenter.getAdapterItemsObservable()
                 .compose(this.<List<BaseAdapterItem>>bindToLifecycle())
