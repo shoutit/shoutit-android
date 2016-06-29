@@ -46,7 +46,7 @@ public class ContactsFriendsActivity extends BaseProfilesListActivity {
         presenter.getSuccessFetchContacts()
                 .compose(bindToLifecycle())
                 .subscribe(responseBodyResponseOrError -> {
-                    presenter.refreshData();
+                    presenter.refreshData(); 
                 });
 
         if (PermissionHelper.checkPermissions(this,

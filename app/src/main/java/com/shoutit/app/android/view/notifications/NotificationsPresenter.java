@@ -58,6 +58,8 @@ public class NotificationsPresenter {
     @Nonnull
     private final Observable<Object> scrollUpObservable;
 
+    private Listener listener;
+
     @Inject
     public NotificationsPresenter(@Nonnull NotificationsDao dao,
                                   @Nonnull @UiScheduler final Scheduler uiScheduler,
@@ -121,6 +123,7 @@ public class NotificationsPresenter {
                                         }
                                     }));
                         } else {
+                            listener.emptyList();
                             adapterItems.add(new NoDataAdapterItem());
                         }
 
@@ -202,6 +205,10 @@ public class NotificationsPresenter {
                 .startWith(true);
     }
 
+    public void registerListener(@Nonnull final Listener mListener){
+        listener = mListener;
+    }
+
     @Nonnull
     public Observable<Object> getScrollUpObservable() {
         return scrollUpObservable;
@@ -234,6 +241,10 @@ public class NotificationsPresenter {
 
     public void markAllNotificationsAsRead() {
         markAllAsReadSubject.onNext(null);
+    }
+
+    public interface Listener {
+        void emptyList();
     }
 
     public class NotificationAdapterItem extends BaseNoIDAdapterItem {

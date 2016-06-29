@@ -9,6 +9,7 @@
     <string name="terms_of_service">Terms of Service</string>
     <string name="facebook_app_id" translatable="false">353625811317277</string>
     <string name="exit_text">Press BACK again to exit</string>
+    <string name="nothing_to_show">Nothing to show</string>
     <string name="empty_field"/>
     <plurals name="plural_credits">
         <item quantity="one">%1$d Credit</item>
@@ -333,6 +334,8 @@
     <string name="post_signup_suggested_users">Suggested users</string>
     <string name="post_signup_suggested_pages">Suggested pages</string>
     <string name="post_signup_done">Done</string>
+    <string name="post_no_suggested_users">No suggested users</string>
+    <string name="post_no_suggested_pages">No suggested pages</string>
 
     <!-- Search -->
     <string name="search_base_title">Search</string>
@@ -408,6 +411,7 @@
     <string name="option_not_set">Not set</string>
     <string name="edit_shout_mobile_hint">Mobile</string>
     <string name="notifications_message_replacement">sends you a message</string>
+    <string name="no_notifications">Notifications not found</string>
 
     <!-- Video Calls -->
     <string name="video_calls_no_premissions">Camera and Microphone permissions needed.</string>
@@ -598,6 +602,7 @@
     <!-- User suggestions -->
     <string name="user_suggestion_pages">Suggested Pages</string>
     <string name="user_suggestion_users">Suggested Users</string>
+
 
     <!-- Facebook friends -->
     <string name="facebook_friends_ab_title">Facebook friends</string>
