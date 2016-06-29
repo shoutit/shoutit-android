@@ -20,16 +20,21 @@ import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.ProfileType;
+import com.shoutit.app.android.api.model.ProfilesListResponse;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.BaseProfileListDao;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
+import com.shoutit.app.android.model.AdminsPointer;
+import com.shoutit.app.android.model.PagesPointer;
 import com.shoutit.app.android.model.ReportBody;
 import com.shoutit.app.android.model.Stats;
 import com.shoutit.app.android.model.UserShoutsPointer;
+import com.shoutit.app.android.utils.ListeningHalfPresenter;
 import com.shoutit.app.android.utils.PreferencesHelper;
 import com.shoutit.app.android.utils.PromotionHelper;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
@@ -39,7 +44,6 @@ import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.subsearch.SubSearchActivity;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -50,11 +54,12 @@ import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Func1;
-import rx.functions.Func2;
+import rx.functions.Func4;
 import rx.subjects.PublishSubject;
 
 public class UserOrPageProfilePresenter implements ProfilePresenter {
     private static final int SHOUTS_PAGE_SIZE = 4;
+    private static final int ADMINS_AND_PAGES_PAGE_SIZE = 3;
 
     @Nonnull
     private Observable<String> avatarObservable;
@@ -82,6 +87,10 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
     private final Observable<Object> refreshUserShoutsObservable;
     @Nonnull
     private final Observable<Object> userUpdatesObservable;
+    @Nonnull
+    private final Observable<Object> listeningObservable;
+    @Nonnull
+    private final Observable<Object> refreshPagesOrAdminsObservable;
 
     @Nonnull
     private final PublishSubject<String> showAllShoutsSubject = PublishSubject.create();
@@ -99,6 +108,8 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
     private final PublishSubject<Object> searchMenuItemClickSubject = PublishSubject.create();
     @Nonnull
     private final PublishSubject<String> reportSubmitSubject = PublishSubject.create();
+    @Nonnull
+    private final PublishSubject<Object> refreshPagesOrAdmins = PublishSubject.create();
 
     @Nonnull
     private final String userName;
@@ -113,6 +124,8 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
     private final UserProfileHalfPresenter userProfilePresenter;
     @Nonnull
     private final PreferencesHelper preferencesHelper;
+    @Nonnull
+    private final ListeningHalfPresenter listeningHalfPresenter;
     @Nullable
     private String loggedInUserName;
     private boolean isNormalUser;
@@ -128,6 +141,7 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
                                       @Nonnull UserProfileHalfPresenter userProfilePresenter,
                                       @Nonnull PreferencesHelper preferencesHelper,
                                       @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
+                                      @Nonnull ListeningHalfPresenter listeningHalfPresenter,
                                       @Nonnull final ApiService apiService,
                                       @NonNull PusherHelper pusherHelper) {
         this.userName = userName;
@@ -137,6 +151,7 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
         this.myProfilePresenter = myProfilePresenter;
         this.userProfilePresenter = userProfilePresenter;
         this.preferencesHelper = preferencesHelper;
+        this.listeningHalfPresenter = listeningHalfPresenter;
         this.isNormalUser = userPreferences.isNormalUser();
 
         final BaseProfile loggedInUser = userPreferences.getPageOrUser();
@@ -164,6 +179,65 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
                     }
                 })
                 .compose(ObservableExtensions.<User>behaviorRefCount());
+
+        final Observable<Boolean> isUserProfile = userSuccessObservable
+                .map(User::isUser)
+                .compose(ObservableExtensions.behaviorRefCount());
+
+        /** User Pages **/
+        final Observable<ProfilesDao.PagesDao> pagesDao = userSuccessObservable
+                .filter(User::isUser)
+                .map(user -> profilesDao.getPagesDao(new PagesPointer(user.getUsername(), ADMINS_AND_PAGES_PAGE_SIZE)));
+
+        final Observable<ResponseOrError<ProfilesListResponse>> pagesRequest = pagesDao
+                .switchMap(pagesDao1 -> pagesDao1.getProfilesObservable()
+                        .observeOn(uiScheduler))
+                .compose(ObservableExtensions.behaviorRefCount());
+
+        final Observable<ProfilesListResponse> successPagesRequest = pagesRequest
+                .compose(ResponseOrError.onlySuccess());
+
+        final Observable<List<BaseProfile>> pagesList = successPagesRequest
+                .map(ProfilesListResponse::getResults);
+
+        /** Pages Admins **/
+        final Observable<ProfilesDao.AdminsDao> adminsDao = userSuccessObservable
+                .filter(user -> !user.isUser())
+                .map(user -> profilesDao.getAdminsDao(new AdminsPointer(user.getUsername(), ADMINS_AND_PAGES_PAGE_SIZE)));
+
+        final Observable<ResponseOrError<ProfilesListResponse>> adminsRequest = adminsDao
+                .switchMap(dao -> dao.getProfilesObservable()
+                        .observeOn(uiScheduler))
+                .compose(ObservableExtensions.behaviorRefCount());
+
+        final Observable<ProfilesListResponse> successAdminsRequest = adminsRequest
+                .compose(ResponseOrError.onlySuccess());
+
+        final Observable<List<BaseProfile>> adminsList = successAdminsRequest
+                .map(ProfilesListResponse::getResults);
+
+        /** Pages or Admins Listening **/
+        final Observable<ProfilesListResponse> pagesOrAdminsRequestObservable = isUserProfile
+                .switchMap(isUserProfile1 -> isUserProfile1 ? successPagesRequest : successAdminsRequest);
+
+        final Observable<BaseProfileListDao> pagesOrAdminsDaoObservable = isUserProfile
+                .switchMap(isUserProfile1 -> isUserProfile1 ? pagesDao : adminsDao);
+
+        listeningObservable = listeningHalfPresenter
+                .listeningObservable(pagesOrAdminsRequestObservable)
+                .switchMap(updatedProfile -> pagesOrAdminsDaoObservable
+                        .map(dao -> {
+                            dao.updatedProfileLocallyObserver().onNext(updatedProfile);
+                            return null;
+                        }));
+
+        refreshPagesOrAdminsObservable = this.refreshPagesOrAdmins
+                .flatMap(ignore -> pagesOrAdminsDaoObservable)
+                .map(dao -> {
+                    dao.getRefreshSubject().onNext(null);
+                    return null;
+                });
+
 
         /** Header Data **/
         avatarObservable = userSuccessObservable
@@ -207,7 +281,9 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
         /** All adapter items **/
         allAdapterItemsObservable = Observable.combineLatest(
                 userSuccessObservable,
-                shoutsSuccessResponse.startWith(ImmutableList.<List<BaseAdapterItem>>of()),
+                shoutsSuccessResponse.startWith(ImmutableList.<BaseAdapterItem>of()),
+                pagesList.startWith(ImmutableList.<BaseProfile>of()),
+                adminsList.startWith(ImmutableList.<BaseProfile>of()),
                 combineAdapterItems());
 
         /** Report **/
@@ -233,8 +309,11 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
         errorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
                 ResponseOrError.transform(shoutsObservable),
                 ResponseOrError.transform(reportRequestObservable),
-                ResponseOrError.transform(userRequestObservable)))
+                ResponseOrError.transform(userRequestObservable),
+                ResponseOrError.transform(pagesRequest),
+                ResponseOrError.transform(adminsRequest)))
                 .mergeWith(userProfilePresenter.getErrorObservable())
+                .mergeWith(listeningHalfPresenter.getErrorSubject())
                 .filter(Functions1.isNotNull())
                 .observeOn(uiScheduler);
 
@@ -272,9 +351,8 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
                         .map(Stats::getUnreadNotifications));
     }
 
-    @NonNull
-    protected Func2<User, List<BaseAdapterItem>, List<BaseAdapterItem>> combineAdapterItems() {
-        return (user, shouts) -> {
+    private Func4<User, List<BaseAdapterItem>, List<BaseProfile>, List<BaseProfile>, List<BaseAdapterItem>> combineAdapterItems() {
+        return (user, shouts, pages, admins) -> {
             final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
 
             if (user.isOwner()) {
@@ -287,25 +365,11 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
 
             builder.add(new ProfileAdapterItems.UserInfoAdapterItem(user, webUrlClickedSubject));
 
-            final List<BaseAdapterItem> items = new ArrayList<>();
+            final List<BaseAdapterItem> pagesItems = createSectionAdapterItems(pages, user);
+            final List<BaseAdapterItem> adminsItems = createSectionAdapterItems(admins, user);
 
-            if (user.getPages() != null && !user.getPages().isEmpty()) {
-                builder.add(new HeaderAdapterItem(getSectionHeaderTitle(user)));
-
-                for (int i = 0; i < user.getPages().size(); i++) {
-                    items.add(getSectionAdapterItemForPosition(i, user, user.getPages(), loggedInUserName));
-                }
-                builder.addAll(items);
-            }
-
-            if (user.getAdmins() != null && !user.getAdmins().isEmpty()) {
-                builder.add(new HeaderAdapterItem(getSectionHeaderTitle(user)));
-
-                for (int i = 0; i < user.getAdmins().size(); i++) {
-                    items.add(getSectionAdapterItemForPosition(i, user, user.getAdmins(), loggedInUserName));
-                }
-                builder.addAll(items);
-            }
+            builder.addAll(pagesItems)
+                    .addAll(adminsItems);
 
             if (!shouts.isEmpty()) {
                 builder.add(new HeaderAdapterItem(user.isOwner() ?
@@ -319,16 +383,39 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
         };
     }
 
-    private <T extends ProfileType> ProfileAdapterItems.ProfileSectionAdapterItem getSectionAdapterItemForPosition(int position, User user, List<T> items, @Nullable String loggedInUserName) {
-        if (position == 0) {
-            return new ProfileAdapterItems.ProfileSectionAdapterItem<>(true, false, user, items.get(position),
-                    userProfilePresenter.getSectionItemListenObserver(), profileToOpenSubject, actionOnlyForLoggedInUserSubject, loggedInUserName, isNormalUser, items.size() == 1);
-        } else if (position == items.size() - 1) {
-            return new ProfileAdapterItems.ProfileSectionAdapterItem<>(false, true, user, items.get(position),
-                    userProfilePresenter.getSectionItemListenObserver(), profileToOpenSubject, actionOnlyForLoggedInUserSubject, loggedInUserName, isNormalUser, false);
+    @Nonnull
+    private List<BaseAdapterItem> createSectionAdapterItems(@Nonnull List<BaseProfile> pagesOrAdmins,
+                                                            @Nonnull User currentProfile) {
+
+        if (!pagesOrAdmins.isEmpty()) {
+            final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.<BaseAdapterItem>builder();
+
+            builder.add(new HeaderAdapterItem(getSectionHeaderTitle(currentProfile)));
+
+            for (int i = 0; i < pagesOrAdmins.size(); i++) {
+                builder.add(getSectionAdapterItemForPosition(i, pagesOrAdmins, loggedInUserName));
+            }
+
+            return builder.build();
         } else {
-            return new ProfileAdapterItems.ProfileSectionAdapterItem<>(false, false, user, items.get(position),
-                    userProfilePresenter.getSectionItemListenObserver(), profileToOpenSubject, actionOnlyForLoggedInUserSubject, loggedInUserName, isNormalUser, false);
+            return ImmutableList.<BaseAdapterItem>of();
+        }
+    }
+
+    private ProfileAdapterItems.ProfileSectionAdapterItem getSectionAdapterItemForPosition(int position,
+                                                                                           List<BaseProfile> items, @Nullable String loggedInUserName) {
+        if (position == 0) {
+            return new ProfileAdapterItems.ProfileSectionAdapterItem(true, false, items.get(position),
+                    listeningHalfPresenter.getListenProfileSubject(), profileToOpenSubject,
+                    actionOnlyForLoggedInUserSubject, loggedInUserName, isNormalUser, items.size() == 1);
+        } else if (position == items.size() - 1) {
+            return new ProfileAdapterItems.ProfileSectionAdapterItem(false, true, items.get(position),
+                    listeningHalfPresenter.getListenProfileSubject(), profileToOpenSubject,
+                    actionOnlyForLoggedInUserSubject, loggedInUserName, isNormalUser, false);
+        } else {
+            return new ProfileAdapterItems.ProfileSectionAdapterItem(false, false, items.get(position),
+                    listeningHalfPresenter.getListenProfileSubject(), profileToOpenSubject,
+                    actionOnlyForLoggedInUserSubject, loggedInUserName, isNormalUser, false);
         }
     }
 
@@ -353,15 +440,15 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
     }
 
     @Nonnull
-    public String getSectionHeaderTitle(User user) {
-        switch (user.getType()) {
+    public String getSectionHeaderTitle(BaseProfile baseProfile) {
+        switch (baseProfile.getType()) {
             case ProfileType.USER:
-                return preferencesHelper.isMyProfile(user.getUsername()) ? context.getString(R.string.profile_my_pages) :
-                        context.getString(R.string.profile_user_pages, user.getFirstName()).toUpperCase();
+                return preferencesHelper.isMyProfile(baseProfile.getUsername()) ? context.getString(R.string.profile_my_pages) :
+                        context.getString(R.string.profile_user_pages, baseProfile.getFirstName()).toUpperCase();
             case ProfileType.PAGE:
-                return context.getString(R.string.profile_page_admins, user.getFirstName()).toUpperCase();
+                return context.getString(R.string.profile_page_admins, baseProfile.getFirstName()).toUpperCase();
             default:
-                throw new RuntimeException("Unknown profile type: " + user.getType());
+                throw new RuntimeException("Unknown profile type: " + baseProfile.getType());
         }
     }
 
@@ -459,6 +546,7 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
         profilesDao.getRefreshProfileObserver(userName).onNext(null);
         shoutsDao.getUserShoutsDao(new UserShoutsPointer(SHOUTS_PAGE_SIZE, userName))
                 .getRefreshObserver().onNext(null);
+        refreshPagesOrAdmins.onNext(null);
     }
 
     @Nonnull
@@ -470,7 +558,8 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
     @Nonnull
     @Override
     public Observable<String> getListenSuccessObservable() {
-        return userProfilePresenter.getListenSuccessObservable();
+        return userProfilePresenter.getListenSuccessObservable()
+                .mergeWith(listeningHalfPresenter.getListenSuccess());
     }
 
     @Nonnull
@@ -481,7 +570,13 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
     @Nonnull
     @Override
     public Observable<String> getUnListenSuccessObservable() {
-        return userProfilePresenter.getUnListenSuccessObservable();
+        return userProfilePresenter.getUnListenSuccessObservable()
+                .mergeWith(listeningHalfPresenter.getUnListenSuccess());
+    }
+
+    @Nonnull
+    public Observable<Object> getListeningObservable() {
+        return listeningObservable;
     }
 
     @Nonnull
@@ -493,25 +588,8 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
         searchMenuItemClickSubject.onNext(null);
     }
 
-    public static class UserWithItemToListen {
-        @Nonnull
-        private final User currentProfileUser;
-        @Nonnull
-        private final ProfileType profileToListen;
-
-        public UserWithItemToListen(@Nonnull User user, @Nonnull ProfileType profileToListen) {
-            this.currentProfileUser = user;
-            this.profileToListen = profileToListen;
-        }
-
-        @Nonnull
-        public User getCurrentProfileUser() {
-            return currentProfileUser;
-        }
-
-        @Nonnull
-        public ProfileType getProfileToListen() {
-            return profileToListen;
-        }
+    @Nonnull
+    public Observable<Object> getRefreshPagesOrAdminsObservable() {
+        return refreshPagesOrAdminsObservable;
     }
 }

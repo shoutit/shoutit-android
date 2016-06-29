@@ -14,6 +14,7 @@ import com.shoutit.app.android.api.model.AddAdminRequest;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dao.BaseProfileListDao;
 import com.shoutit.app.android.dao.ProfilesDao;
+import com.shoutit.app.android.model.AdminsPointer;
 import com.shoutit.app.android.utils.ListeningHalfPresenter;
 import com.shoutit.app.android.view.profileslist.BaseProfileListPresenter;
 
@@ -25,6 +26,7 @@ import rx.Scheduler;
 import rx.subjects.PublishSubject;
 
 public class AdminsFragmentPresenter extends BaseProfileListPresenter {
+    private static final int PAGE_SIZE = 20;
 
     @Nonnull
     private final Observable<BaseProfileListDao> daoObservable;
@@ -52,7 +54,7 @@ public class AdminsFragmentPresenter extends BaseProfileListPresenter {
 
         final String pageUserName = userPreferences.getPageUserName().get();
 
-        daoObservable = Observable.just(profilesDao.getAdminsDao(User.ME))
+        daoObservable = Observable.just(profilesDao.getAdminsDao(new AdminsPointer(User.ME, PAGE_SIZE)))
                 .compose(ObservableExtensions.behaviorRefCount());
         
         final Observable<ResponseOrError<ResponseBody>> removeAdminObservable = removeAdminSubject

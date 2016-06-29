@@ -12,15 +12,12 @@ import com.appunite.rx.operators.MoreOperators;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
-import com.shoutit.app.android.api.model.Admin;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForApplication;
 import com.shoutit.app.android.model.Stats;
-
-import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -106,8 +103,7 @@ public class UserPreferences {
     public void setPageLoggedIn(@NonNull String authToken,
                                 @NonNull String refreshToken,
                                 @Nonnull Page page) {
-        final List<Admin> admins = page.getAdmins();
-        final BaseProfile user = admins.get(0);
+        final User user = page.getAdmin();
 
         final SharedPreferences.Editor editor = mPreferences.edit();
         editor

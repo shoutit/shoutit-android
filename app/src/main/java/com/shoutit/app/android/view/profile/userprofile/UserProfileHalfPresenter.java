@@ -2,22 +2,16 @@ package com.shoutit.app.android.view.profile.userprofile;
 
 import android.content.Context;
 
-import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.ApiService;
-import com.shoutit.app.android.api.model.Admin;
-import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.view.profile.ChatInfo;
 import com.shoutit.app.android.view.profile.ProfileAdapterItems;
-import com.shoutit.app.android.view.profile.UserOrPageProfilePresenter;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -25,9 +19,7 @@ import javax.inject.Inject;
 
 import okhttp3.ResponseBody;
 import rx.Observable;
-import rx.Observer;
 import rx.Scheduler;
-import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
@@ -41,8 +33,6 @@ public class UserProfileHalfPresenter {
     private final PublishSubject<ChatInfo> onChatIconClickedSubject = PublishSubject.create();
     @Nonnull
     private final PublishSubject<User> onListenActionClickedSubject = PublishSubject.create();
-    @Nonnull
-    protected final PublishSubject<UserOrPageProfilePresenter.UserWithItemToListen> sectionItemListenSubject = PublishSubject.create();
     @Nonnull
     protected final PublishSubject<Throwable> errorSubject = PublishSubject.create();
     @Nonnull
@@ -62,57 +52,7 @@ public class UserProfileHalfPresenter {
                                     @Nonnull @ForActivity Context context) {
         this.context = context;
 
-        final Observable<ResponseOrError<User>> userWithUpdatedSectionItems = sectionItemListenSubject
-                .throttleFirst(1, TimeUnit.SECONDS)
-                .switchMap(new Func1<UserOrPageProfilePresenter.UserWithItemToListen, Observable<ResponseOrError<User>>>() {
-                    @Override
-                    public Observable<ResponseOrError<User>> call(final UserOrPageProfilePresenter.UserWithItemToListen userWithItemToListen) {
-                        final String userName = userWithItemToListen.getProfileToListen().getUsername();
-                        final boolean isListeningToProfile = userWithItemToListen.getProfileToListen().isListening();
-
-                        Observable<ResponseOrError<ResponseBody>> listenRequestObservable;
-                        if (isListeningToProfile) {
-                            listenRequestObservable = apiService.unlistenProfile(userName)
-                                    .subscribeOn(networkScheduler)
-                                    .observeOn(uiScheduler)
-                                    .doOnNext(new Action1<ResponseBody>() {
-                                        @Override
-                                        public void call(ResponseBody responseBody) {
-                                            unListenSuccess.onNext(userWithItemToListen.getProfileToListen().getName());
-                                        }
-                                    })
-                                    .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
-                        } else {
-                            listenRequestObservable = apiService.listenProfile(userName)
-                                    .subscribeOn(networkScheduler)
-                                    .observeOn(uiScheduler)
-                                    .doOnNext(new Action1<ResponseBody>() {
-                                        @Override
-                                        public void call(ResponseBody responseBody) {
-                                            listenSuccess.onNext(userWithItemToListen.getProfileToListen().getName());
-                                        }
-                                    })
-                                    .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
-                        }
-
-                        return listenRequestObservable
-                                .map(new Func1<ResponseOrError<ResponseBody>, ResponseOrError<User>>() {
-                                    @Override
-                                    public ResponseOrError<User> call(ResponseOrError<ResponseBody> response) {
-                                        if (response.isData()) {
-                                            return ResponseOrError.fromData(updateUserWithChangedSectionItem(userWithItemToListen));
-                                        } else {
-                                            errorSubject.onNext(new Throwable());
-                                            // On error return current user in order to select/deselect already deselected/selected item to listenProfile
-                                            return ResponseOrError.fromData(userWithItemToListen.getCurrentProfileUser());
-                                        }
-                                    }
-                                });
-                    }
-                })
-                .compose(ObservableExtensions.<ResponseOrError<User>>behaviorRefCount());
-
-        final Observable<ResponseOrError<User>> updatedUserWithListeningToProfile = onListenActionClickedSubject
+        userUpdatesObservable = onListenActionClickedSubject
                 .throttleFirst(1, TimeUnit.SECONDS)
                 .switchMap(new Func1<User, Observable<ResponseOrError<User>>>() {
                     @Override
@@ -122,44 +62,27 @@ public class UserProfileHalfPresenter {
                              request = apiService.unlistenProfile(user.getUsername())
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
-                                     .doOnNext(new Action1<ResponseBody>() {
-                                         @Override
-                                         public void call(ResponseBody responseBody) {
-                                             unListenSuccess.onNext(user.getName());
-                                         }
-                                     })
+                                     .doOnNext(responseBody -> unListenSuccess.onNext(user.getName()))
                                     .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
                         } else {
                             request = apiService.listenProfile(user.getUsername())
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
-                                    .doOnNext(new Action1<ResponseBody>() {
-                                        @Override
-                                        public void call(ResponseBody responseBody) {
-                                            listenSuccess.onNext(user.getName());
-                                        }
-                                    })
+                                    .doOnNext(responseBody -> listenSuccess.onNext(user.getName()))
                                     .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
                         }
 
-                        return request.map(new Func1<ResponseOrError<ResponseBody>, ResponseOrError<User>>() {
-                            @Override
-                            public ResponseOrError<User> call(ResponseOrError<ResponseBody> response) {
-                                if (response.isData()) {
-                                    return ResponseOrError.fromData(user.getListenedProfile());
-                                } else {
-                                    errorSubject.onNext(new Throwable());
-                                    // On error return current user in order to select/deselect already deselected/selected 'listenProfile' icon
-                                    return ResponseOrError.fromData(user);
-                                }
+                        return request.map(response -> {
+                            if (response.isData()) {
+                                return ResponseOrError.fromData(user.getListenedProfile());
+                            } else {
+                                errorSubject.onNext(new Throwable());
+                                // On error return current user in order to select/deselect already deselected/selected 'listenProfile' icon
+                                return ResponseOrError.fromData(user);
                             }
                         });
                     }
                 });
-
-        userUpdatesObservable = Observable.merge(
-                userWithUpdatedSectionItems,
-                updatedUserWithListeningToProfile);
     }
 
     @Nonnull
@@ -170,35 +93,6 @@ public class UserProfileHalfPresenter {
     @Nonnull
     public Observable<String> getUnListenSuccessObservable() {
         return unListenSuccess;
-    }
-
-    @Nonnull
-    private User updateUserWithChangedSectionItem(@Nonnull UserOrPageProfilePresenter.UserWithItemToListen userWithItemToListen) {
-        final List<Page> pages = userWithItemToListen.getCurrentProfileUser().getPages();
-        for (int i = 0; i < pages.size(); i++) {
-            if (pages.get(i).getUsername().equals(userWithItemToListen.getProfileToListen().getUsername())) {
-                final Page pageToUpdate = pages.get(i);
-                final Page updatedPage = Page.withIsListening(pageToUpdate, !pageToUpdate.isListening());
-                final List<Page> updatedPages = new ArrayList<>(pages);
-                updatedPages.set(i, updatedPage);
-
-                return User.userWithUpdatedPages(userWithItemToListen.getCurrentProfileUser(), updatedPages);
-            }
-        }
-
-        final List<Admin> admins = userWithItemToListen.getCurrentProfileUser().getAdmins();
-        for (int i = 0; i < admins.size(); i++) {
-            if (admins.get(i).getUsername().equals(userWithItemToListen.getProfileToListen().getUsername())) {
-                final Admin adminToUpdate = admins.get(i);
-                final Admin updatedAdmin = Admin.withIsListening(adminToUpdate, !adminToUpdate.isListening());
-                final List<Admin> updatedAdmins = new ArrayList<>(admins);
-                updatedAdmins.set(i, updatedAdmin);
-
-                return User.userWithUpdatedAdmins(userWithItemToListen.getCurrentProfileUser(), updatedAdmins);
-            }
-        }
-
-        return userWithItemToListen.getCurrentProfileUser();
     }
 
     public ProfileAdapterItems.NameAdapterItem getUserNameAdapterItem(@Nonnull User user) {
@@ -237,10 +131,5 @@ public class UserProfileHalfPresenter {
     @Nonnull
     public PublishSubject<ChatInfo> getOnChatIconClickedSubject() {
         return onChatIconClickedSubject;
-    }
-
-    @Nonnull
-    public Observer<UserOrPageProfilePresenter.UserWithItemToListen> getSectionItemListenObserver() {
-        return sectionItemListenSubject;
     }
 }
