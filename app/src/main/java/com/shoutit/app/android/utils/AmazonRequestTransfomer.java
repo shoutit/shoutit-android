@@ -24,7 +24,7 @@ public class AmazonRequestTransfomer implements Picasso.RequestTransformer {
     @Override
     public Request transformRequest(Request request) {
         final Uri uri = request.uri;
-        if (uri != null && uri.getHost().contains(IMAGE_URL)) {
+        if (uri != null && uri.getHost() != null && uri.getHost().contains(IMAGE_URL)) {
             final String variation = getVariation(request.targetWidth, request.targetHeight);
 
             final String newPath = transformUrl(uri.getPath(), uri.getLastPathSegment(), variation);

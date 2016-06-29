@@ -145,7 +145,10 @@
 
         </activity>
         <activity
-            android:name=".view.invitefriends.UserSuggestionActivity"
+            android:name=".view.invitefriends.suggestionsusers.UserSuggestionActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".view.invitefriends.suggestionspages.PagesSuggestionActivity"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".view.chats.ChatActivity"
@@ -187,6 +190,10 @@
         <activity android:name=".view.createshout.request.CreateRequestActivity"
                   android:screenOrientation="portrait"/>
         <activity android:name=".view.createshout.location.LocationActivity"
+                  android:screenOrientation="portrait"/>
+        <activity android:name=".view.createpage.pagecategory.CreatePageCategoryActivity"
+                  android:screenOrientation="portrait"/>
+        <activity android:name=".view.createpage.pagedetails.newuser.CreatePageDetailsActivity"
                   android:screenOrientation="portrait"/>
         <activity
             android:name=".view.createshout.edit.EditShoutActivity"

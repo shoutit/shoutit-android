@@ -3,14 +3,16 @@ package com.shoutit.app.android.api;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.shoutit.app.android.api.model.AddAdminRequest;
 import com.shoutit.app.android.api.model.BlockedProfilesResposne;
 import com.shoutit.app.android.api.model.CallerProfile;
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.ChangePasswordRequest;
-import com.shoutit.app.android.api.model.ConversationMediaResponse;
 import com.shoutit.app.android.api.model.ConversationDetails;
+import com.shoutit.app.android.api.model.ConversationMediaResponse;
 import com.shoutit.app.android.api.model.ConversationsResponse;
 import com.shoutit.app.android.api.model.CreateOfferShoutWithImageRequest;
+import com.shoutit.app.android.api.model.CreatePageRequest;
 import com.shoutit.app.android.api.model.CreatePublicChatRequest;
 import com.shoutit.app.android.api.model.CreateRequestShoutRequest;
 import com.shoutit.app.android.api.model.CreateRequestShoutWithPriceRequest;
@@ -26,11 +28,12 @@ import com.shoutit.app.android.api.model.EditShoutRequestWithPrice;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.GuestSignupRequest;
 import com.shoutit.app.android.api.model.InvitationCodeResponse;
-import com.shoutit.app.android.api.model.ListenersResponse;
-import com.shoutit.app.android.api.model.ListeningResponse;
 import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessagesResponse;
 import com.shoutit.app.android.api.model.NotificationsResponse;
+import com.shoutit.app.android.api.model.PageCategory;
+import com.shoutit.app.android.api.model.PagesResponse;
+import com.shoutit.app.android.api.model.PagesSuggestionResponse;
 import com.shoutit.app.android.api.model.PostMessage;
 import com.shoutit.app.android.api.model.ProfileRequest;
 import com.shoutit.app.android.api.model.ProfilesListResponse;
@@ -45,13 +48,13 @@ import com.shoutit.app.android.api.model.SearchProfileResponse;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutResponse;
 import com.shoutit.app.android.api.model.ShoutsResponse;
+import com.shoutit.app.android.api.model.SignPageResponse;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.SortType;
 import com.shoutit.app.android.api.model.Suggestion;
 import com.shoutit.app.android.api.model.SuggestionsResponse;
 import com.shoutit.app.android.api.model.TagDetail;
 import com.shoutit.app.android.api.model.TagsRequest;
-import com.shoutit.app.android.api.model.Transaction;
 import com.shoutit.app.android.api.model.TransactionRsponse;
 import com.shoutit.app.android.api.model.TwilioResponse;
 import com.shoutit.app.android.api.model.UpdateFacebookTokenRequest;
@@ -61,12 +64,14 @@ import com.shoutit.app.android.api.model.UploadContactsRequest;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserIdentity;
 import com.shoutit.app.android.api.model.UserLocation;
+import com.shoutit.app.android.api.model.UserSuggestionResponse;
 import com.shoutit.app.android.api.model.VerifyEmailRequest;
 import com.shoutit.app.android.api.model.VerifyEmailResponse;
 import com.shoutit.app.android.api.model.VideoCallRequest;
 import com.shoutit.app.android.api.model.login.EmailLoginRequest;
 import com.shoutit.app.android.api.model.login.FacebookLogin;
 import com.shoutit.app.android.api.model.login.GoogleLogin;
+import com.shoutit.app.android.api.model.login.PageLoginRequest;
 import com.shoutit.app.android.model.MobilePhoneResponse;
 import com.shoutit.app.android.model.ReportBody;
 
@@ -236,6 +241,9 @@ public interface ApiService {
     Observable<SignResponse> loginGuest(@Body GuestSignupRequest request);
 
     @POST("oauth2/access_token")
+    Observable<SignPageResponse> createPageAndLogin(@Body PageLoginRequest request);
+
+    @POST("oauth2/access_token")
     Observable<SignResponse> signup(@Body EmailSignupRequest request);
 
     @POST("oauth2/access_token")
@@ -299,22 +307,22 @@ public interface ApiService {
                                                      @Query("page_size") Integer pageSize);
 
     @GET("profiles/me/listening")
-    Observable<ListeningResponse> profilesListenings(@Query("page") Integer page,
-                                                     @Query("page_size") Integer pageSize);
+    Observable<ProfilesListResponse> profilesListenings(@Query("page") Integer page,
+                                                        @Query("page_size") Integer pageSize);
 
     @GET("profiles/me/interests")
-    Observable<ListeningResponse> tagsListenings(@Query("page") Integer page,
-                                                 @Query("page_size") Integer pageSize);
+    Observable<ProfilesListResponse> tagsListenings(@Query("page") Integer page,
+                                                    @Query("page_size") Integer pageSize);
 
     @GET("profiles/{user_name}/listeners")
-    Observable<ListenersResponse> listeners(@Path("user_name") String userName,
-                                            @Query("page") Integer page,
-                                            @Query("page_size") Integer pageSize);
+    Observable<ProfilesListResponse> listeners(@Path("user_name") String userName,
+                                               @Query("page") Integer page,
+                                               @Query("page_size") Integer pageSize);
 
     @GET("profiles/{user_name}/mutual_friends")
     Observable<ProfilesListResponse> facebookFriends(@Path("user_name") String userName,
-                                                      @Query("page") Integer page,
-                                                      @Query("page_size") Integer pageSize);
+                                                     @Query("page") Integer page,
+                                                     @Query("page_size") Integer pageSize);
 
     @PATCH("profiles/{user_name}/contacts")
     Observable<ResponseBody> uploadContacts(@Path("user_name") String userName,
@@ -324,6 +332,11 @@ public interface ApiService {
     Observable<ProfilesListResponse> mutualContacts(@Path("user_name") String userName,
                                                     @Query("page") Integer page,
                                                     @Query("page_size") Integer pageSize);
+
+    @GET("profiles/{user_name}/pages")
+    Observable<PagesResponse> myPages(@Path("user_name") String userName,
+                                      @Query("page") Integer page,
+                                      @Query("page_size") Integer pageSize);
 
     /**
      * Misc
@@ -340,6 +353,20 @@ public interface ApiService {
                                                 @Query("city") String city,
                                                 @Query("page") Integer page,
                                                 @Query("page_size") Integer pageSize);
+
+    @GET("misc/suggestions?type=users")
+    Observable<UserSuggestionResponse> usersSuggestion(@Query("country") String country,
+                                                       @Query("state") String state,
+                                                       @Query("city") String city,
+                                                       @Query("page") Integer page,
+                                                       @Query("page_size") Integer pageSize);
+
+    @GET("misc/suggestions?type=pages")
+    Observable<PagesSuggestionResponse> pagesSuggestion(@Query("country") String country,
+                                                        @Query("state") String state,
+                                                        @Query("city") String city,
+                                                        @Query("page") Integer page,
+                                                        @Query("page_size") Integer pageSize);
 
     @GET("misc/currencies")
     Observable<List<Currency>> getCurrencies();
@@ -404,7 +431,7 @@ public interface ApiService {
      */
     @GET("conversations")
     Observable<ConversationsResponse> getConversations(@Nullable @Query("before") String timestamp,
-                                              @Query("page_size") Integer pageSize);
+                                                       @Query("page_size") Integer pageSize);
 
     @GET("conversations/{id}")
     Observable<ConversationDetails> getConversation(@NonNull @Path("id") String id);
@@ -512,6 +539,32 @@ public interface ApiService {
     @GET("credit/transactions")
     Observable<TransactionRsponse> getTransactions(@Nullable @Query("before") String timestamp);
 
+    /**
+     * Pages
+     */
+    @GET("pages/categories")
+    Observable<List<PageCategory>> pagesCategories();
+
+    @POST("pages")
+    Observable<ResponseBody> createPage(@Body CreatePageRequest request);
+
     @GET("credit/invitation_code")
     Observable<InvitationCodeResponse> getInvitationCode();
+
+    @GET("pages")
+    Observable<ProfilesListResponse> getPublicPages(@Query("country") String countryCode,
+                                                    @Query("page") Integer page,
+                                                    @Query("page_size") Integer pageSize);
+
+    @GET("pages/{username}/admins")
+    Observable<ProfilesListResponse> getAdmins(@Path("username") String pageUserName,
+                                               @Query("page") Integer page,
+                                               @Query("page_size") Integer pageSize);
+
+    @DELETE("pages/{username}/admin")
+    Observable<ResponseBody> deleteAdmin(@Path("username") String userName);
+
+    @POST("pages/{username}/admin")
+    Observable<ResponseBody> addAdmin(@Path("username") String pageUserName,
+                                      @Body AddAdminRequest addAdminRequest);
 }

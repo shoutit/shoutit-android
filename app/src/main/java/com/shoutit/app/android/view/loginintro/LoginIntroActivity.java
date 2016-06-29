@@ -31,7 +31,7 @@ import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.login.FacebookLogin;
 import com.shoutit.app.android.api.model.login.GoogleLogin;
-import com.shoutit.app.android.api.model.login.LoginUser;
+import com.shoutit.app.android.api.model.login.LoginProfile;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.mixpanel.MixPanel;
@@ -168,7 +168,7 @@ public class LoginIntroActivity extends BaseActivity {
             @Override
             public void call(SignResponse signResponse) {
                 mUserPreferences.setLoggedIn(signResponse.getAccessToken(),
-                        signResponse.getRefreshToken(), signResponse.getUser());
+                        signResponse.getRefreshToken(), signResponse.getProfile());
                 ActivityCompat.finishAffinity(LoginIntroActivity.this);
                 startActivity(MainActivity.newIntent(LoginIntroActivity.this));
             }
@@ -179,7 +179,7 @@ public class LoginIntroActivity extends BaseActivity {
     private Func1<BothParams<String, UserLocation>, Observable<SignResponse>> getCallGoogleApi() {
         return bothParams -> FacebookHelper.getPromotionalCodeObservable(LoginIntroActivity.this)
                 .flatMap(invitationCode -> mApiService.googleLogin(new GoogleLogin(
-                        bothParams.param1(), LoginUser.loginUser(bothParams.param2()), mixPanel.getDistinctId(), invitationCode))
+                        bothParams.param1(), LoginProfile.loginUser(bothParams.param2()), mixPanel.getDistinctId(), invitationCode))
                         .subscribeOn(Schedulers.io())
                         .observeOn(MyAndroidSchedulers.mainThread()));
     }
@@ -188,7 +188,7 @@ public class LoginIntroActivity extends BaseActivity {
     private Func1<BothParams<String, UserLocation>, Observable<SignResponse>> getCallFacebookApi() {
         return bothParams -> FacebookHelper.getPromotionalCodeObservable(LoginIntroActivity.this)
                 .flatMap(invitationCode -> mApiService.facebookLogin(new FacebookLogin(
-                        bothParams.param1(), LoginUser.loginUser(bothParams.param2()), mixPanel.getDistinctId(), invitationCode))
+                        bothParams.param1(), LoginProfile.loginUser(bothParams.param2()), mixPanel.getDistinctId(), invitationCode))
                         .subscribeOn(Schedulers.io())
                         .observeOn(MyAndroidSchedulers.mainThread()));
     }

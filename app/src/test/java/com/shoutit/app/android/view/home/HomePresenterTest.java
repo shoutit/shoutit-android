@@ -85,7 +85,7 @@ public class HomePresenterTest {
         when(userPreferences.isUserLoggedIn()).thenReturn(true);
         when(userPreferences.getLocationObservable()).thenReturn(Observable.just(new UserLocation(0, 0, "zz", null, null, null, null)));
         when(userPreferences.isNormalUser()).thenReturn(true);
-        when(userPreferences.getUser()).thenReturn(TestUtils.getUser());
+        when(userPreferences.getPageOrUser()).thenReturn(TestUtils.getUser());
 
         presenter = new HomePresenter(shoutsDao, discoversDao, userPreferences, context, Schedulers.immediate(), globalRefreshPresenter);
     }

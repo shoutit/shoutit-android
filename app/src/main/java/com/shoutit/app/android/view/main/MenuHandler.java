@@ -3,26 +3,29 @@ package com.shoutit.app.android.view.main;
 import android.graphics.Bitmap;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.common.base.Preconditions;
+import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.utils.BlurTransform;
 import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.RtlUtils;
+import com.shoutit.app.android.view.admins.AdminsFragment;
 import com.shoutit.app.android.view.conversations.ConversationsPagerFragment;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
 import com.shoutit.app.android.view.credits.CreditsFragment;
@@ -31,6 +34,7 @@ import com.shoutit.app.android.view.home.HomeFragment;
 import com.shoutit.app.android.view.invitefriends.InviteFriendsFragment;
 import com.shoutit.app.android.view.location.LocationActivity;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
+import com.shoutit.app.android.view.pages.PagesPagerFragment;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsFragment;
@@ -60,8 +64,8 @@ public class MenuHandler {
     public static final String FRAGMENT_CREDITS = "fragment_credits";
     public static final String ACTIVITY_SETTINGS = "activity_settings";
     public static final String ACTIVITY_HELP = "activity_help";
-    public static final String ACTIVITY_PAGES = "activity_pages";
-    public static final String ACTIVITY_ADMINS = "activity_admins";
+    public static final String FRAGMENT_PAGES = "fragment_pages";
+    public static final String FRAGMENT_ADMINS = "fragment_admins";
 
     @Bind(R.id.menu_user_name_tv)
     TextView userNameTextView;
@@ -96,6 +100,8 @@ public class MenuHandler {
     CheckedTextView pagesItem;
     @Bind(R.id.menu_admins)
     CheckedTextView adminsItem;
+    @Bind(R.id.menu_use_profile)
+    Button useProfile;
 
     @Nonnull
     private final RxAppCompatActivity rxActivity;
@@ -121,8 +127,8 @@ public class MenuHandler {
         viewTagViewIdMap.put(FRAGMENT_INVITE_FRIENDS, R.id.menu_invite_friends);
         viewTagViewIdMap.put(ACTIVITY_HELP, R.id.menu_help);
         viewTagViewIdMap.put(ACTIVITY_SETTINGS, R.id.menu_settings);
-        viewTagViewIdMap.put(ACTIVITY_PAGES, R.id.menu_pages);
-        viewTagViewIdMap.put(ACTIVITY_ADMINS, R.id.menu_admins);
+        viewTagViewIdMap.put(FRAGMENT_PAGES, R.id.menu_pages);
+        viewTagViewIdMap.put(FRAGMENT_ADMINS, R.id.menu_admins);
     }
 
     public MenuHandler(@Nonnull final RxAppCompatActivity rxActivity,
@@ -144,25 +150,31 @@ public class MenuHandler {
     public void initMenu(@Nonnull View view, @IdRes int id) {
         ButterKnife.bind(this, view);
         selectableItems = ImmutableList.of(homeItem, discoverItem, browseItem, chatItem, creditsItem, pagesItem, adminsItem);
-        userPreferences.getUserObservable()
+        userPreferences.getPageOrUserObservable()
                 .filter(user -> user != null)
-                .map(user -> {
-                    Preconditions.checkNotNull(user);
-                    return user.getStats().getCredits();
-                })
-                .subscribe(credits -> {
-                    creditsBadgeTv.setVisibility(credits > 0 ? View.VISIBLE : View.GONE);
-                    creditsBadgeTv.setText(String.valueOf(credits));
+                .map(BaseProfile::getStats)
+                .subscribe(stats -> {
+                    if(stats != null) {
+                        final int credits = stats.getCredits();
+                        creditsBadgeTv.setVisibility(credits > 0 ? View.VISIBLE : View.GONE);
+                        creditsBadgeTv.setText(String.valueOf(credits));
+                    } else {
+                        creditsBadgeTv.setVisibility(View.GONE);
+                    }
                 });
 
-        userPreferences.getUserObservable()
+        userPreferences.getPageOrUserObservable()
                 .filter(user -> user != null)
                 .subscribe(user -> {
-                    pagesItem.setVisibility(user.isUser(user) ?
+                    pagesItem.setVisibility(user.isUser() ?
                             View.VISIBLE : View.GONE);
-                    adminsItem.setVisibility(user.isUser(user) ?
+                    adminsItem.setVisibility(user.isUser() ?
                             View.GONE : View.VISIBLE);
                 });
+
+
+        final Optional<String> pageId = userPreferences.getPageId();
+        useProfile.setVisibility(pageId.isPresent() ? View.VISIBLE : View.GONE);
 
         setData(id);
     }
@@ -175,6 +187,12 @@ public class MenuHandler {
         presenter.getNameObservable()
                 .compose(rxActivity.<String>bindToLifecycle())
                 .subscribe(RxTextView.text(userNameTextView));
+
+        presenter.getUserNameObservable()
+                .compose(rxActivity.<String>bindToLifecycle())
+                .subscribe(userName -> {
+                    useProfile.setText(String.format(rxActivity.getString(R.string.menu_use_as_format), userName));
+                });
 
         presenter.getCityObservable()
                 .compose(rxActivity.<String>bindToLifecycle())
@@ -214,11 +232,24 @@ public class MenuHandler {
             R.id.menu_invite_friends,
             R.id.menu_credits,
             R.id.menu_pages,
-            R.id.menu_admins
+            R.id.menu_admins,
+            R.id.menu_use_profile
     })
-
     public void onMenuItemSelected(View view) {
-        selectMenuItem(viewTagViewIdMap.inverse().get(view.getId()));
+        dispatchClick(view.getId());
+    }
+
+    private void dispatchClick(int id) {
+        switch (id) {
+            case R.id.menu_use_profile: {
+                userPreferences.clearPage();
+                ActivityCompat.finishAffinity(rxActivity);
+                rxActivity.startActivity(MainActivity.newIntent(rxActivity));
+                break;
+            }
+            default:
+                selectMenuItem(viewTagViewIdMap.inverse().get(id));
+        }
     }
 
     public void selectMenuItem(@Nonnull String viewTag) {
@@ -232,6 +263,8 @@ public class MenuHandler {
             case FRAGMENT_CREDITS:
             case FRAGMENT_CHATS:
             case FRAGMENT_PUBLIC_CHATS:
+            case FRAGMENT_PAGES:
+            case FRAGMENT_ADMINS:
                 if (userPreferences.isNormalUser()) {
                     selectFragment(viewTag);
                 } else {
@@ -244,10 +277,6 @@ public class MenuHandler {
             case ACTIVITY_HELP:
                 UserVoice.launchUserVoice(rxActivity);
                 break;
-            case ACTIVITY_PAGES:
-                break;
-            case ACTIVITY_ADMINS:
-                break;
             default:
                 throw new RuntimeException("Unknown menu item with tag: " + viewTag);
         }
@@ -258,7 +287,9 @@ public class MenuHandler {
     private void selectFragment(@Nonnull String viewTag) {
         selectItem(viewTagViewIdMap.get(viewTag));
         onMenuItemSelectedListener.onMenuItemSelected(viewTag);
-        setToolbarElevation(viewTagViewIdMap.get(viewTag) != R.id.menu_chat);
+
+        final Integer selectedViewId = viewTagViewIdMap.get(viewTag);
+        setToolbarElevation(selectedViewId != R.id.menu_chat && selectedViewId != R.id.menu_pages);
     }
 
     public void setToolbarElevation(boolean enable) {
@@ -362,6 +393,10 @@ public class MenuHandler {
                 return ConversationsPagerFragment.newInstance(true);
             case FRAGMENT_INVITE_FRIENDS:
                 return InviteFriendsFragment.newInstance();
+            case FRAGMENT_PAGES:
+                return PagesPagerFragment.newInstance();
+            case FRAGMENT_ADMINS:
+                return AdminsFragment.newInstance();
             default:
                 throw new RuntimeException("Unknown fragment tag");
         }

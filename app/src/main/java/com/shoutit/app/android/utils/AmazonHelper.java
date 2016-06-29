@@ -48,8 +48,8 @@ public class AmazonHelper {
     @Inject
     public AmazonHelper(@Nonnull TransferUtility transferUtility, @Nonnull UserPreferences userPreferences) {
         this.transferUtility = transferUtility;
-        Preconditions.checkNotNull(userPreferences.getUser());
-        userId = userPreferences.getUser().getId();
+        Preconditions.checkNotNull(userPreferences.getPageOrUser());
+        userId = userPreferences.getPageOrUser().getId();
     }
 
     public Observable<String> uploadShoutMediaVideoObservable(@Nonnull final File fileToUpload) {

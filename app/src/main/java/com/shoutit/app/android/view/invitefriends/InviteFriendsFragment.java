@@ -15,7 +15,6 @@ import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.ColoredSnackBar;
@@ -23,6 +22,8 @@ import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.view.createshout.DialogsHelper;
 import com.shoutit.app.android.view.invitefriends.contactsfriends.ContactsFriendsActivity;
 import com.shoutit.app.android.view.invitefriends.facebookfriends.FacebookFriendsActivity;
+import com.shoutit.app.android.view.invitefriends.suggestionspages.PagesSuggestionActivity;
+import com.shoutit.app.android.view.invitefriends.suggestionsusers.UserSuggestionActivity;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
 
 import java.util.List;
@@ -34,7 +35,6 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import rx.functions.Action1;
 
 public class InviteFriendsFragment extends BaseFragment {
 
@@ -105,10 +105,10 @@ public class InviteFriendsFragment extends BaseFragment {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.invite_friends_users:
-                startActivity(UserSuggestionActivity.newUserIntent(getActivity()));
+                startActivity(UserSuggestionActivity.newIntent(getActivity()));
                 break;
             case R.id.invite_friends_pages:
-                startActivity(UserSuggestionActivity.newPagesIntent(getActivity()));
+                startActivity(PagesSuggestionActivity.newIntent(getActivity()));
                 break;
             case R.id.invite_friends_find_facebook:
                 if (userPreferences.isNormalUser()) {

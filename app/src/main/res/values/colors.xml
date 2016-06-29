@@ -117,4 +117,8 @@
     <color name="promote_yellow_badge">#ffd700</color>
     <color name="promote_gray_badge">#c0c0c0</color>
 
+    <!-- Create Page Category -->
+    <color name="create_page_category_item_background">#3334dd68</color>
+
+
 </resources>

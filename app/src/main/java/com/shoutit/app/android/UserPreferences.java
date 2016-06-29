@@ -12,10 +12,15 @@ import com.appunite.rx.operators.MoreOperators;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
+import com.shoutit.app.android.api.model.Admin;
+import com.shoutit.app.android.api.model.BaseProfile;
+import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForApplication;
 import com.shoutit.app.android.model.Stats;
+
+import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -23,8 +28,6 @@ import javax.inject.Singleton;
 
 import rx.Observable;
 import rx.Scheduler;
-import rx.functions.Func0;
-import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
 @Singleton
@@ -42,12 +45,15 @@ public class UserPreferences {
     private static final String TWILIO_TOKEN = "twilio_token";
     private static final String KEY_PROFILE_ALERT_DISPLAYED = "profile_alert_displayed";
     private static final String KEY_WAS_SHARE_DIALOG_DISPLAYED = "was_share_info_dialog_displayed";
+    private static final String PAGE_ID = "page_id";
+    private static final String PAGE_USER_NAME = "page_user_name";
+    private static final String KEY_PAGE = "page";
 
     private final PublishSubject<Object> userRefreshSubject = PublishSubject.create();
     private final PublishSubject<Object> locationRefreshSubject = PublishSubject.create();
     private final PublishSubject<Object> tokenRefreshSubject = PublishSubject.create();
-    private final Observable<User> userObservable;
-    // locationObservable should be used instead userObservable to get location as there is no user for guest
+    private final Observable<BaseProfile> pageOrUserObservable;
+    // locationObservable should be used instead pageOrUserObservable to get location as there is no user for guest
     private final Observable<UserLocation> locationObservable;
     private final Observable<String> tokenObservable;
 
@@ -62,50 +68,24 @@ public class UserPreferences {
         mPreferences = context.getSharedPreferences("prefs", 0);
 
         locationObservable = Observable
-                .defer(new Func0<Observable<UserLocation>>() {
-                    @Override
-                    public Observable<UserLocation> call() {
-                        return Observable.just(getLocation());
-                    }
-                })
+                .defer(() -> Observable.just(getLocation()))
                 .compose(MoreOperators.<UserLocation>refresh(locationRefreshSubject))
                 .filter(Functions1.isNotNull())
                 .observeOn(uiScheduler);
 
-        userObservable = Observable
-                .defer(new Func0<Observable<User>>() {
-                    @Override
-                    public Observable<User> call() {
-                        return Observable.just(getUser());
-                    }
-                })
-                .compose(MoreOperators.<User>refresh(userRefreshSubject))
+        pageOrUserObservable = Observable
+                .defer(() -> Observable.just(getPageOrUser()))
+                .compose(MoreOperators.<BaseProfile>refresh(userRefreshSubject))
                 .observeOn(uiScheduler);
 
         tokenObservable = Observable
-                .defer(new Func0<Observable<Optional<String>>>() {
-                    @Override
-                    public Observable<Optional<String>> call() {
-                        return Observable.just(getAuthToken());
-                    }
-                })
-                .filter(new Func1<Optional<String>, Boolean>() {
-                    @Override
-                    public Boolean call(Optional<String> stringOptional) {
-                        return stringOptional.isPresent();
-                    }
-                })
-                .map(new Func1<Optional<String>, String>() {
-                    @Override
-                    public String call(Optional<String> stringOptional) {
-                        return stringOptional.get();
-                    }
-                })
+                .defer(() -> Observable.just(getAuthToken()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .compose(MoreOperators.<String>refresh(tokenRefreshSubject))
                 .observeOn(uiScheduler);
     }
 
-    @SuppressLint("CommitPrefEdits")
     public void setLoggedIn(@NonNull String authToken,
                             @NonNull String refreshToken,
                             @Nonnull User user) {
@@ -115,13 +95,38 @@ public class UserPreferences {
                 .putString(REFRESH_TOKEN, refreshToken)
                 .putString(KEY_USER, gson.toJson(user))
                 .putBoolean(IS_GUEST, false);
-        editor.commit();
+        editor.apply();
         tokenRefreshSubject.onNext(new Object());
         refreshUser();
         if (user.getLocation() != null) {
             saveLocation(user.getLocation());
         }
     }
+
+    public void setPageLoggedIn(@NonNull String authToken,
+                                @NonNull String refreshToken,
+                                @Nonnull Page page) {
+        final List<Admin> admins = page.getAdmins();
+        final BaseProfile user = admins.get(0);
+
+        final SharedPreferences.Editor editor = mPreferences.edit();
+        editor
+                .putString(AUTH_TOKEN, authToken)
+                .putString(REFRESH_TOKEN, refreshToken)
+                .putString(KEY_PAGE, gson.toJson(page))
+                .putString(KEY_USER, gson.toJson(user))
+                .putString(PAGE_ID, page.getId())
+                .putString(PAGE_USER_NAME, page.getUsername())
+                .putBoolean(IS_GUEST, false);
+        editor.apply();
+
+        tokenRefreshSubject.onNext(new Object());
+        refreshUser();
+        if (page.getLocation() != null) {
+            saveLocation(page.getLocation());
+        }
+    }
+
 
     @SuppressLint("CommitPrefEdits")
     public void setGuestLoggedIn(@Nonnull User user, @NonNull String authToken, @NonNull String refreshToken) {
@@ -163,10 +168,10 @@ public class UserPreferences {
     }
 
     @SuppressLint("CommitPrefEdits")
-    public void updateUserJson(User user) {
+    public void setUser(BaseProfile user) {
         if (isNormalUser()) {
             mPreferences.edit()
-                    .putString(KEY_USER, gson.toJson(user))
+                    .putString(user.isUser() ? KEY_USER : KEY_PAGE, gson.toJson(user))
                     .commit();
             refreshUser();
         }
@@ -188,11 +193,6 @@ public class UserPreferences {
         mPreferences.edit().putString(GCM_PUSH_TOKEN, gcmPushToken).apply();
     }
 
-    @Nullable
-    public String getGcmPushToken() {
-        return mPreferences.getString(GCM_PUSH_TOKEN, null);
-    }
-
     public boolean shouldAskForInterestAndSetToFalse() {
         final boolean isFirstRun = mPreferences.getBoolean(SHOULD_ASK_FOR_INTEREST, false);
         mPreferences.edit().putBoolean(SHOULD_ASK_FOR_INTEREST, false).apply();
@@ -200,19 +200,34 @@ public class UserPreferences {
     }
 
     @Nullable
+    public BaseProfile getPageOrUser() {
+        return getUserByType(getPageId().isPresent() ? KEY_PAGE : KEY_USER);
+    }
+
+    /**
+     * User this method to switch from page to user
+     */
+    public void setPrimaryUserAsUser() {
+        setUser(getUser());
+    }
+
     public User getUser() {
-        final String userJson = mPreferences.getString(KEY_USER, null);
+        return getUserByType(KEY_USER);
+    }
+
+    private User getUserByType(String key) {
+        final String userJson = mPreferences.getString(key, null);
         return gson.fromJson(userJson, User.class);
     }
 
     @NonNull
-    public User getUserOrThrow() {
-        return Preconditions.checkNotNull(getUser());
+    public BaseProfile getUserOrThrow() {
+        return Preconditions.checkNotNull(getPageOrUser());
     }
 
     @Nonnull
-    public Observable<User> getUserObservable() {
-        return userObservable;
+    public Observable<BaseProfile> getPageOrUserObservable() {
+        return pageOrUserObservable;
     }
 
     private void refreshUser() {
@@ -251,7 +266,7 @@ public class UserPreferences {
         }
         mPreferences.edit()
                 .putString(KEY_LOCATION, gson.toJson(location))
-                .commit();
+                .apply();
         refreshLocation();
     }
 
@@ -314,12 +329,41 @@ public class UserPreferences {
     }
 
     public void updateStats(@Nonnull Stats pusherStats) {
-        final User user = getUser();
+        final BaseProfile user = getPageOrUser();
         if (user == null) {
             return;
         }
 
-        final User updatedUser = user.withUpdatedStats(pusherStats);
-        updateUserJson(updatedUser);
+        final BaseProfile updatedUser = user.withUpdatedStats(pusherStats);
+        setUser(updatedUser);
+    }
+
+    public void setPage(Page page) {
+        setUser(page);
+        editPage(page.getId(), page.getUsername());
+    }
+
+    public void clearPage() {
+        editPage(null, null);
+        setPrimaryUserAsUser();
+    }
+
+    private void editPage(String id, String name) {
+        mPreferences.edit()
+                .putString(PAGE_ID, id)
+                .putString(PAGE_USER_NAME, name)
+                .apply();
+    }
+
+    public Optional<String> getPageId() {
+        return Optional.fromNullable(mPreferences.getString(PAGE_ID, null));
+    }
+
+    public Optional<String> getPageUserName() {
+        return Optional.fromNullable(mPreferences.getString(PAGE_USER_NAME, null));
+    }
+
+    public String getUserId() {
+        return Preconditions.checkNotNull(getPageOrUser()).getId();
     }
 }

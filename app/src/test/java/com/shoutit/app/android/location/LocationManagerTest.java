@@ -170,7 +170,7 @@ public class LocationManagerTest {
 
         subscriber.assertValueCount(1);
         verify(apiService, times(1)).updateUserLocation(any(UpdateLocationRequest.class));
-        verify(userPreferences, times(1)).updateUserJson(any(User.class));
+        verify(userPreferences, times(1)).setUser(any(User.class));
     }
 
     @Test
@@ -188,7 +188,7 @@ public class LocationManagerTest {
 
         subscriber.assertValueCount(1);
         verify(apiService, times(0)).updateUserLocation(any(UpdateLocationRequest.class));
-        verify(userPreferences, times(0)).updateUserJson(any(User.class));
+        verify(userPreferences, times(0)).setUser(any(User.class));
     }
 
     private UserLocation getLocationWithLatLngCity(float lat, float lng, String city) {

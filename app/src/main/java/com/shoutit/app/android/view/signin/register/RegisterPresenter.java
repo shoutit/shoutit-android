@@ -2,7 +2,6 @@ package com.shoutit.app.android.view.signin.register;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
@@ -15,13 +14,13 @@ import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.UserLocation;
-import com.shoutit.app.android.api.model.login.LoginUser;
+import com.shoutit.app.android.api.model.login.LoginProfile;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.mixpanel.MixPanel;
+import com.shoutit.app.android.utils.LoginUtils;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.utils.Validators;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
-import com.shoutit.app.android.view.intro.IntroActivity;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
 
 import javax.annotation.Nonnull;
@@ -30,10 +29,7 @@ import javax.inject.Inject;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
-import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.functions.Func3;
-import rx.functions.Func4;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
@@ -77,7 +73,7 @@ public class RegisterPresenter {
                         return Observable.zip(mNameSubject, mEmailSubject, mPasswordSubject,
                                 FacebookHelper.getPromotionalCodeObservable(context),
                                 (name, email, password, invitationCode) -> new EmailSignupRequest(
-                                        name, email, password, LoginUser.loginUser(location), mixPanel.getDistinctId(), invitationCode))
+                                        name, email, password, LoginProfile.loginUser(location), mixPanel.getDistinctId(), invitationCode))
                                 .first();
                     }
                 })
@@ -98,30 +94,22 @@ public class RegisterPresenter {
 
         mSuccessObservable = responseOrErrorObservable
                 .compose(ResponseOrError.<SignResponse>onlySuccess())
-                .doOnNext(new Action1<SignResponse>() {
-                    @Override
-                    public void call(SignResponse signResponse) {
-                        userPreferences.setLoggedIn(signResponse.getAccessToken(),
-                                signResponse.getRefreshToken(), signResponse.getUser());
-                        userPreferences.setShouldAskForInterestTrue();
-                    }
+                .doOnNext(signResponse -> {
+                    userPreferences.setLoggedIn(signResponse.getAccessToken(),
+                            signResponse.getRefreshToken(), signResponse.getProfile());
+                    userPreferences.setShouldAskForInterestTrue();
                 });
 
         mErrorObservable = responseOrErrorObservable.compose(ResponseOrError.<SignResponse>onlyError());
 
         wrongEmailErrorObservable = mProceedSubject
-                .map(new Func1<Object, Boolean>() {
-                    @Override
-                    public Boolean call(Object o) {
-                        return !isEmailCorrect();
-                    }
-                });
+                .map(o -> !isEmailCorrect());
     }
 
     private boolean areValuesCorrect() {
         return isEmailCorrect() &&
                 !Strings.isNullOrEmpty(mNameSubject.getValue()) &&
-                isPasswordCorrect(mPasswordSubject.getValue());
+                LoginUtils.isPasswordCorrect(mPasswordSubject.getValue());
     }
 
     private boolean isEmailCorrect() {
@@ -135,17 +123,10 @@ public class RegisterPresenter {
 
     @NonNull
     private Func1<? super CharSequence, Boolean> getLessThan6AndMoreThan20CharsFunc1() {
-        return new Func1<CharSequence, Boolean>() {
-            @Override
-            public Boolean call(CharSequence charSequence) {
-                final int length = charSequence.length();
-                return length < 6 || length > 20;
-            }
+        return charSequence -> {
+            final int length = charSequence.length();
+            return length < 6 || length > 20;
         };
-    }
-
-    private boolean isPasswordCorrect(@Nullable String password) {
-        return password != null && password.length() >= 6 && password.length() <= 20;
     }
 
     @NonNull

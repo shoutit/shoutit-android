@@ -21,6 +21,7 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
+import com.shoutit.app.android.utils.ToolbarUtils;
 
 import java.util.List;
 
@@ -70,9 +71,7 @@ public class TransactionsActivity extends BaseActivity implements TransactionsPr
         mTransactionsRecyclerview.setAdapter(adapter);
         mTransactionsRecyclerview.setLayoutManager(new MyLinearLayoutManager(this));
 
-        mTransactionsToolbar.setTitle(R.string.transactions_title);
-        mTransactionsToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
-        mTransactionsToolbar.setNavigationOnClickListener(view -> finish());
+        ToolbarUtils.setupToolbar(mTransactionsToolbar, R.string.transactions_title, this);
 
         RxRecyclerView.scrollEvents(mTransactionsRecyclerview)
                 .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
@@ -105,6 +104,6 @@ public class TransactionsActivity extends BaseActivity implements TransactionsPr
 
     @Override
     public void startActivity(String appUrl) {
-        startActivity(new Intent(Intent.CATEGORY_BROWSABLE).setData(Uri.parse(appUrl)));
+        startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(appUrl)));
     }
 }

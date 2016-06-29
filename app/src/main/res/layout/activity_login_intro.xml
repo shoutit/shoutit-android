@@ -103,6 +103,7 @@
         android:layout_width="match_parent"
         android:layout_height="?actionBarSize"
         android:theme="@style/AppTheme.BaseToolbarStyle"
+        android:elevation="0dp"
         android:title=""/>
 
     <View

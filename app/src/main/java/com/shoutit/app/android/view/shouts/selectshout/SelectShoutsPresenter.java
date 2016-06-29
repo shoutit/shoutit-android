@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
@@ -47,7 +48,7 @@ public class SelectShoutsPresenter {
                                  ApiService apiService,
                                  UserPreferences userPreferences,
                                  @ForActivity final Context context) {
-        final User user = userPreferences.getUser();
+        final BaseProfile user = userPreferences.getPageOrUser();
         assert user != null;
         final Observable<ResponseOrError<ShoutsResponse>> shoutsResponse = apiService.shoutsForUser(user.getUsername(), 0, 100)
                 .subscribeOn(networkScheduler)

@@ -37,9 +37,11 @@ import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ListenersDaos;
 import com.shoutit.app.android.dao.ListeningsDao;
 import com.shoutit.app.android.dao.NotificationsDao;
+import com.shoutit.app.android.dao.PagesDao;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.PromoteLabelsDao;
 import com.shoutit.app.android.dao.PromoteOptionsDao;
+import com.shoutit.app.android.dao.PublicPagesDaos;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.dao.SortTypesDao;
@@ -305,6 +307,12 @@ public final class AppModule {
         return new ListeningsDao(apiService, networkScheduler);
     }
 
+    @Provides
+    @Singleton
+    PublicPagesDaos publicPagesDaos(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
+        return new PublicPagesDaos(apiService, networkScheduler);
+    }
+
     @Singleton
     @Provides
     public VideoCallsDao provideVideoCallsDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
@@ -343,14 +351,20 @@ public final class AppModule {
 
     @Provides
     @Singleton
+    PagesDao providePagesDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
+        return new PagesDao(apiService, networkScheduler);
+    }
+
+    @Provides
+    @Singleton
     DbHelper dbHelper(@ForApplication Context context) {
         return new DbHelper(context);
     }
 
     @Provides
     @Singleton
-    PusherHelper providePusher(Gson gson, UserPreferences userPreferences, @UiScheduler Scheduler uiScheduler) {
-        return new PusherHelper(gson, userPreferences, uiScheduler);
+    PusherHelper providePusher(Gson gson, @UiScheduler Scheduler uiScheduler) {
+        return new PusherHelper(gson, uiScheduler);
     }
 
     @Provides

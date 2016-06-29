@@ -13,6 +13,7 @@ import com.google.common.collect.Iterables;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.NoDataTextAdapterItem;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
@@ -58,7 +59,7 @@ public class ChatShoutsPresenter {
         this.conversationId = conversationId;
 
         final boolean isNormalUser = userPreferences.isNormalUser();
-        final User currentUser = userPreferences.getUser();
+        final BaseProfile currentUser = userPreferences.getPageOrUser();
         final String currentUserName = currentUser != null ? currentUser.getUsername() : null;
 
         final Observable<ResponseOrError<ShoutsResponse>> requestObservable = shoutsDao

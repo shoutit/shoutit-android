@@ -53,7 +53,7 @@ public class MixPanel {
 
     public void initMixPanel() {
         if (userPreferences.isNormalUser()) {
-            userPreferences.getUserObservable()
+            userPreferences.getPageOrUserObservable()
                     .filter(Functions1.isNotNull())
                     .distinctUntilChanged()
                     .subscribe(user -> {
