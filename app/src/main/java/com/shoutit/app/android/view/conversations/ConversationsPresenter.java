@@ -23,7 +23,6 @@ import com.shoutit.app.android.api.model.ChatMessage;
 import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.ConversationsResponse;
 import com.shoutit.app.android.api.model.PusherConversationUpdate;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
 import com.shoutit.app.android.view.chats.LocalMessageBus;
@@ -269,8 +268,6 @@ public class ConversationsPresenter {
     @NonNull
     private BaseAdapterItem getConversationItem(@NonNull ConversationItem conversation) {
         final String elapsedTime = DateUtils.getRelativeTimeSpanString(mContext, conversation.getModifiedAt() * 1000).toString();
-        final User user = mUserPreferences.getUser();
-        assert user != null;
 
         final boolean isUnread = conversation.getUnreadMessagesCount() > 0;
 

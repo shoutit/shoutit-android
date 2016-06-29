@@ -17,7 +17,6 @@ import com.google.android.gms.location.places.AutocompletePrediction;
 import com.google.android.gms.location.places.AutocompletePredictionBuffer;
 import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
@@ -291,7 +290,7 @@ public class LocationPresenter {
 
     @NonNull
     private Action1<User> saveToPreferencesAction() {
-        return userPreferences::updateUserJson;
+        return userPreferences::setUser;
     }
 
     private Observable<ResponseOrError<UserLocation>> getGeoCodeRequest(double latitude, double longitude) {

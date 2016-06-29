@@ -15,7 +15,7 @@ import com.pusher.client.connection.ConnectionState;
 import com.pusher.client.connection.ConnectionStateChange;
 import com.pusher.client.util.HttpAuthorizer;
 import com.shoutit.app.android.BuildConfig;
-import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.NotificationsResponse;
 import com.shoutit.app.android.api.model.PusherConversationUpdate;
 import com.shoutit.app.android.api.model.PusherMessage;
@@ -51,19 +51,18 @@ public class PusherHelper {
     private static final String TAG = PusherHelper.class.getCanonicalName();
 
     private Pusher mPusher;
+    private BaseProfile mUser;
     private final Gson mGson;
-    private final UserPreferences mUserPreferences;
     private final Scheduler uiScheduler;
 
     public PusherHelper(@NonNull Gson gson,
-                        @NonNull UserPreferences userPreferences,
                         @NonNull @UiScheduler Scheduler uiScheduler) {
         mGson = gson;
-        mUserPreferences = userPreferences;
         this.uiScheduler = uiScheduler;
     }
 
-    public void init(@NonNull String token) {
+    public void init(@NonNull String token, BaseProfile user) {
+        mUser = user;
         if (mPusher == null) {
             final HttpAuthorizer authorizer = new HttpAuthorizer(BuildConfig.API_URL + "pusher/auth");
             authorizer.setHeaders(ImmutableMap.of("Authorization", "Bearer " + token));
@@ -201,10 +200,12 @@ public class PusherHelper {
     }
 
     public PresenceChannel getProfileChannel() {
-        final User user = mUserPreferences.getUser();
-        assert user != null;
-        log("get profile channel id : " + user.getId());
-        return mPusher.getPresenceChannel(PusherHelper.getProfileChannelName(user.getId()));
+        final String id = mUser.getId();
+        log("get profile channel id : " + id);
+
+        final PresenceChannel presenceChannel = mPusher.getPresenceChannel(PusherHelper.getProfileChannelName(id));
+
+        return presenceChannel == null ? subscribeProfileChannel() : presenceChannel;
     }
 
     public Observable<TypingInfo> getIsTypingObservable(@NonNull final PresenceChannel conversationChannel) {
@@ -265,9 +266,10 @@ public class PusherHelper {
         };
     }
 
-    public void subscribeProfileChannel(@NonNull String id) {
+    public PresenceChannel subscribeProfileChannel() {
+        final String id = mUser.getId();
         log("subscribe profile channel : " + id);
-        mPusher.subscribePresence(PusherHelper.getProfileChannelName(id));
+        return mPusher.subscribePresence(PusherHelper.getProfileChannelName(id));
     }
 
     public void connect() {

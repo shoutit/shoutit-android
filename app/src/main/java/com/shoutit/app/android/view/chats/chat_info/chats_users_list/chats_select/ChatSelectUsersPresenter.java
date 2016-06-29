@@ -11,7 +11,6 @@ import com.google.common.collect.Iterables;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.BaseProfile;
-import com.shoutit.app.android.api.model.ListenersResponse;
 import com.shoutit.app.android.api.model.ProfileRequest;
 import com.shoutit.app.android.api.model.ProfilesListResponse;
 import com.shoutit.app.android.api.model.User;
@@ -48,7 +47,7 @@ public class ChatSelectUsersPresenter {
         mNetworkScheduler = networkScheduler;
         mUiScheduler = uiScheduler;
 
-        final User user = userPreferences.getUser();
+        final BaseProfile user = userPreferences.getPageOrUser();
         assert user != null;
         mId = user.getUsername();
     }

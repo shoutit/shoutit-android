@@ -82,10 +82,6 @@
     <string name="register_empty_name">"لايمكن ترك الإسم فارغ"</string>
     <string name="register_have_an_account">"هل يوجد لديك حساب؟"</string>
     <string name="register_log_in">"تسجيل الدخول"</string>
-    <string name="register_bottom_text1">"بمتابعتك ستكون قد وافقت على"</string>
-    <string name="register_bottom_text2">"شروط الخدمة ل شاوت ات"</string>
-    <string name="register_bottom_text3">"و"</string>
-    <string name="register_bottom_text4">"سياسة الخصوصية"</string>
     <string name="register_forgot_password">"هل نسيت كلمة المرور؟"</string>
     <string name="register_next_label">"التالي"</string>
     <string name="register_done_label">"تم"</string>

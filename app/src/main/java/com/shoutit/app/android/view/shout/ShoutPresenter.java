@@ -13,6 +13,7 @@ import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.ConversationDetails;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
@@ -101,7 +102,7 @@ public class ShoutPresenter {
         mUserPreferences = userPreferences;
 
         final boolean isNormalUser = userPreferences.isNormalUser();
-        final User currentUser = userPreferences.getUser();
+        final BaseProfile currentUser = userPreferences.getPageOrUser();
         final String currentUserName = currentUser != null ? currentUser.getUsername() : null;
 
         /** Requests **/
@@ -234,10 +235,10 @@ public class ShoutPresenter {
 
         /** Others **/
         isUserShoutOwnerObservable = Observable.zip(
-                userNameObservable, userPreferences.getUserObservable(), Observable.just(userPreferences.isNormalUser()),
-                new Func3<String, User, Boolean, Boolean>() {
+                userNameObservable, userPreferences.getPageOrUserObservable(), Observable.just(userPreferences.isNormalUser()),
+                new Func3<String, BaseProfile, Boolean, Boolean>() {
                     @Override
-                    public Boolean call(String shoutUser, @Nullable User user, Boolean isNormalUser) {
+                    public Boolean call(String shoutUser, @Nullable BaseProfile user, Boolean isNormalUser) {
                         return isNormalUser && user != null && user.getUsername().equals(shoutUser);
                     }
                 })

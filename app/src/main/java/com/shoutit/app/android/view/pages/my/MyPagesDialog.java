@@ -51,7 +51,7 @@ public class MyPagesDialog {
         });
 
         useShoutItAsPageBtn.setOnClickListener(v -> {
-            listener.useShoutItAsPage(page.getUsername());
+            listener.useShoutItAsPage(page);
             alertDialog.dismiss();
         });
 
@@ -69,7 +69,7 @@ public class MyPagesDialog {
 
         void editPage(String userName);
 
-        void useShoutItAsPage(String userName);
+        void useShoutItAsPage(Page page);
 
     }
 }

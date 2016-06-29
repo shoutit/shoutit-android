@@ -4,13 +4,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.text.SpannableString;
-import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.method.PasswordTransformationMethod;
-import android.text.style.ClickableSpan;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.UnderlineSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,8 +26,11 @@ import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.data.AssetsConstants;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.MoreFunctions1;
+import com.shoutit.app.android.utils.RegisterUtils;
+import com.shoutit.app.android.utils.SpanUtils;
 import com.shoutit.app.android.utils.rx.Actions1;
 import com.shoutit.app.android.view.about.AboutActivity;
+import com.shoutit.app.android.view.createpage.pagecategory.CreatePageCategoryActivity;
 import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.signin.LoginActivityComponent;
 import com.shoutit.app.android.view.signin.login.LoginFragment;
@@ -44,9 +44,9 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
+import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
-import rx.functions.Action1;
 
 public class RegisterFragment extends BaseFragment {
 
@@ -77,6 +77,9 @@ public class RegisterFragment extends BaseFragment {
     @Bind(R.id.register_bottom_text)
     TextView bottomTextView;
 
+    @Bind(R.id.register_create_page)
+    TextView mRegisterCreatePage;
+
     @Inject
     RegisterPresenter registerPresenter;
 
@@ -88,7 +91,9 @@ public class RegisterFragment extends BaseFragment {
     @android.support.annotation.Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @android.support.annotation.Nullable ViewGroup container, @android.support.annotation.Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.register_fragment, container, false);
+        View view = inflater.inflate(R.layout.register_fragment, container, false);
+        ButterKnife.bind(this, view);
+        return view;
     }
 
     @Override
@@ -99,15 +104,10 @@ public class RegisterFragment extends BaseFragment {
 
         setUpSpans();
 
-        signUpTextview.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.login_sign_layout, LoginFragment.newInstance())
-                        .commit();
-            }
-        });
+        signUpTextview.setOnClickListener(view1 -> getFragmentManager()
+                .beginTransaction()
+                .replace(R.id.login_sign_layout, LoginFragment.newInstance())
+                .commit());
 
         registerPresenter.getLocationObservable()
                 .compose(this.<UserLocation>bindToLifecycle())
@@ -143,12 +143,9 @@ public class RegisterFragment extends BaseFragment {
 
         registerPresenter.successObservable()
                 .compose(this.<SignResponse>bindToLifecycle())
-                .subscribe(new Action1<SignResponse>() {
-                    @Override
-                    public void call(SignResponse signResponse) {
-                        ActivityCompat.finishAffinity(getActivity());
-                        startActivity(MainActivity.newIntent(getActivity()));
-                    }
+                .subscribe(signResponse -> {
+                    ActivityCompat.finishAffinity(getActivity());
+                    startActivity(MainActivity.newIntent(getActivity()));
                 });
 
         registerPresenter.getWrongEmailErrorObservable()
@@ -179,39 +176,13 @@ public class RegisterFragment extends BaseFragment {
     }
 
     private void setUpSpans() {
-        final String bottomText1 = getString(R.string.register_bottom_text1);
-        final String textTermsOfService = getString(R.string.register_bottom_text2);
-        final String bottomText3 = getString(R.string.register_bottom_text3);
-        final String textPrivacyPolicy = getString(R.string.register_bottom_text4);
+        RegisterUtils.setUpSpans(getActivity(), bottomTextView);
 
-        final SpannableString spannableTermsOfService = new SpannableString(textTermsOfService);
-        spannableTermsOfService.setSpan(new UnderlineSpan(), 0, textTermsOfService.length(), 0);
-        spannableTermsOfService.setSpan(new ClickableSpan() {
-            @Override
-            public void onClick(View widget) {
-                startActivity(HtmlAssetViewerActivity.newIntent(
-                        getActivity(), AssetsConstants.ASSET_TERMS_OF_SERVICE,
-                        getString(R.string.html_activity_terms)));
-            }
-        }, 0, textTermsOfService.length(), 0);
-        spannableTermsOfService.setSpan(new ForegroundColorSpan(
-                getResources().getColor(R.color.register_underline)), 0, textTermsOfService.length(), 0);
-
-        final SpannableString spannablePrivacy = new SpannableString(textPrivacyPolicy);
-        spannablePrivacy.setSpan(new UnderlineSpan(), 0, textPrivacyPolicy.length(), 0);
-        spannablePrivacy.setSpan(new ClickableSpan() {
-            @Override
-            public void onClick(View widget) {
-                startActivity(HtmlAssetViewerActivity.newIntent(
-                        getActivity(), AssetsConstants.ASSET_PRIVACY_POLICY,
-                        getString(R.string.html_activity_privacy)));
-            }
-        }, 0, textPrivacyPolicy.length(), 0);
-        spannablePrivacy.setSpan(new ForegroundColorSpan(
-                getResources().getColor(R.color.register_underline)), 0, textPrivacyPolicy.length(), 0);
-
-        bottomTextView.setMovementMethod(LinkMovementMethod.getInstance());
-        bottomTextView.setText(TextUtils.concat(bottomText1, " ", spannableTermsOfService, " ", bottomText3, " ", spannablePrivacy));
+        final String createPageText = getString(R.string.register_create_page_text, getString(R.string.register_create_page_highlight));
+        final String createPageClick = getString(R.string.register_create_page_highlight);
+        final SpannableString createPageSpan = SpanUtils.clickableColoredSpan(createPageText, createPageClick, ContextCompat.getColor(getActivity(), R.color.colorAccent), () -> startActivity(CreatePageCategoryActivity.newIntent(getActivity())));
+        mRegisterCreatePage.setMovementMethod(LinkMovementMethod.getInstance());
+        mRegisterCreatePage.setText(createPageSpan);
     }
 
     @OnCheckedChanged(R.id.register_lock_password)
@@ -248,5 +219,11 @@ public class RegisterFragment extends BaseFragment {
     @OnClick(R.id.activity_login_about)
     public void onAboutClick() {
         startActivity(AboutActivity.newIntent(getActivity()));
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this);
     }
 }

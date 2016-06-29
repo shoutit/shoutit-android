@@ -19,6 +19,7 @@ import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.Label;
 import com.shoutit.app.android.api.model.Promotion;
 import com.shoutit.app.android.api.model.User;
@@ -79,7 +80,7 @@ public class PromotedActivity extends BaseActivity {
         final Promotion promotion = gson.fromJson(promotionJson, Promotion.class);
         final String shoutTitle = getIntent().getStringExtra(KEY_SHOUT_TITLE);
 
-        userPreferences.getUserObservable()
+        userPreferences.getPageOrUserObservable()
                 .compose(bindToLifecycle())
                 .subscribe(user -> {
                     bindData(shoutTitle, promotion, user);
@@ -117,7 +118,7 @@ public class PromotedActivity extends BaseActivity {
         return component;
     }
 
-    public void bindData(String shoutTitle, @Nonnull Promotion promotion, @Nonnull User user) {
+    public void bindData(String shoutTitle, @Nonnull Promotion promotion, @Nonnull BaseProfile user) {
         final Label label = promotion.getLabel();
 
         shoutTitleTv.setText(shoutTitle);
