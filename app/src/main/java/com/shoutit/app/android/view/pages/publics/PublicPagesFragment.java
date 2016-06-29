@@ -91,10 +91,6 @@ public class PublicPagesFragment extends BaseFragment {
                 .compose(bindToLifecycle())
                 .subscribe();
 
-        presenter.getLoadMoreObservable()
-                .compose(bindToLifecycle())
-                .subscribe();
-
         presenter.getRefreshDataObservable()
                 .compose(bindToLifecycle())
                 .subscribe();

@@ -32,6 +32,7 @@ import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessagesResponse;
 import com.shoutit.app.android.api.model.NotificationsResponse;
 import com.shoutit.app.android.api.model.PagesResponse;
+import com.shoutit.app.android.api.model.PagesSuggestionResponse;
 import com.shoutit.app.android.api.model.PostMessage;
 import com.shoutit.app.android.api.model.ProfileRequest;
 import com.shoutit.app.android.api.model.ProfilesListResponse;
@@ -61,6 +62,7 @@ import com.shoutit.app.android.api.model.UploadContactsRequest;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserIdentity;
 import com.shoutit.app.android.api.model.UserLocation;
+import com.shoutit.app.android.api.model.UserSuggestionResponse;
 import com.shoutit.app.android.api.model.VerifyEmailRequest;
 import com.shoutit.app.android.api.model.VerifyEmailResponse;
 import com.shoutit.app.android.api.model.VideoCallRequest;
@@ -300,21 +302,21 @@ public interface ApiService {
 
     @GET("profiles/me/listening")
     Observable<ProfilesListResponse> profilesListenings(@Query("page") Integer page,
-                                                     @Query("page_size") Integer pageSize);
+                                                        @Query("page_size") Integer pageSize);
 
     @GET("profiles/me/interests")
     Observable<ProfilesListResponse> tagsListenings(@Query("page") Integer page,
-                                                 @Query("page_size") Integer pageSize);
+                                                    @Query("page_size") Integer pageSize);
 
     @GET("profiles/{user_name}/listeners")
     Observable<ProfilesListResponse> listeners(@Path("user_name") String userName,
-                                            @Query("page") Integer page,
-                                            @Query("page_size") Integer pageSize);
+                                               @Query("page") Integer page,
+                                               @Query("page_size") Integer pageSize);
 
     @GET("profiles/{user_name}/mutual_friends")
     Observable<ProfilesListResponse> facebookFriends(@Path("user_name") String userName,
-                                                      @Query("page") Integer page,
-                                                      @Query("page_size") Integer pageSize);
+                                                     @Query("page") Integer page,
+                                                     @Query("page_size") Integer pageSize);
 
     @PATCH("profiles/{user_name}/contacts")
     Observable<ResponseBody> uploadContacts(@Path("user_name") String userName,
@@ -345,6 +347,20 @@ public interface ApiService {
                                                 @Query("city") String city,
                                                 @Query("page") Integer page,
                                                 @Query("page_size") Integer pageSize);
+
+    @GET("misc/suggestions?type=users")
+    Observable<UserSuggestionResponse> usersSuggestion(@Query("country") String country,
+                                                       @Query("state") String state,
+                                                       @Query("city") String city,
+                                                       @Query("page") Integer page,
+                                                       @Query("page_size") Integer pageSize);
+
+    @GET("misc/suggestions?type=pages")
+    Observable<PagesSuggestionResponse> pagesSuggestion(@Query("country") String country,
+                                                        @Query("state") String state,
+                                                        @Query("city") String city,
+                                                        @Query("page") Integer page,
+                                                        @Query("page_size") Integer pageSize);
 
     @GET("misc/currencies")
     Observable<List<Currency>> getCurrencies();
@@ -409,7 +425,7 @@ public interface ApiService {
      */
     @GET("conversations")
     Observable<ConversationsResponse> getConversations(@Nullable @Query("before") String timestamp,
-                                              @Query("page_size") Integer pageSize);
+                                                       @Query("page_size") Integer pageSize);
 
     @GET("conversations/{id}")
     Observable<ConversationDetails> getConversation(@NonNull @Path("id") String id);
@@ -525,6 +541,6 @@ public interface ApiService {
      **/
     @GET("pages")
     Observable<ProfilesListResponse> getPublicPages(@Query("country") String countryCode,
-                                             @Query("page") Integer page,
-                                             @Query("page_size") Integer pageSize);
+                                                    @Query("page") Integer page,
+                                                    @Query("page_size") Integer pageSize);
 }
