@@ -722,6 +722,11 @@
     <string name="pages_edit_page">Edit Page</string>
     <string name="pages_create_page">Create page</string>
 
+    <!-- Admins -->
+    <string name="admins_view_profile">View Profile</string>
+    <string name="admins_remove_admin">Remove Admin</string>
+    <string name="admins_add_admin">Add Admin</string>
+
     <!-- Create Page Category -->
     <string
         name="create_page_category_header_text">

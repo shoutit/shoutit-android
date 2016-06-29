@@ -46,7 +46,7 @@ public class UserPreferences {
     private static final String KEY_PROFILE_ALERT_DISPLAYED = "profile_alert_displayed";
     private static final String KEY_WAS_SHARE_DIALOG_DISPLAYED = "was_share_info_dialog_displayed";
     private static final String PAGE_ID = "page_id";
-    private static final String PAGE_NAME = "page_name";
+    private static final String PAGE_USER_NAME = "page_user_name";
     private static final String KEY_PAGE = "page";
 
     private final PublishSubject<Object> userRefreshSubject = PublishSubject.create();
@@ -116,7 +116,7 @@ public class UserPreferences {
                 .putString(KEY_PAGE, gson.toJson(page))
                 .putString(KEY_USER, gson.toJson(user))
                 .putString(PAGE_ID, page.getId())
-                .putString(PAGE_NAME, page.getUsername())
+                .putString(PAGE_USER_NAME, page.getUsername())
                 .putBoolean(IS_GUEST, false);
         editor.apply();
 
@@ -351,12 +351,16 @@ public class UserPreferences {
     private void editPage(String id, String name) {
         mPreferences.edit()
                 .putString(PAGE_ID, id)
-                .putString(PAGE_NAME, name)
+                .putString(PAGE_USER_NAME, name)
                 .apply();
     }
 
     public Optional<String> getPageId() {
         return Optional.fromNullable(mPreferences.getString(PAGE_ID, null));
+    }
+
+    public Optional<String> getPageUserName() {
+        return Optional.fromNullable(mPreferences.getString(PAGE_USER_NAME, null));
     }
 
     public String getUserId() {

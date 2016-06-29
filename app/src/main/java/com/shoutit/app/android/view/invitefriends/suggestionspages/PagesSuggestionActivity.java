@@ -28,25 +28,13 @@ public class PagesSuggestionActivity extends BaseProfilesListActivity {
         final PagesSuggestionPresenter presenter = (PagesSuggestionPresenter) ((PagesSuggestionActivityComponent)
                 getActivityComponent()).profilesListPresenter();
 
-        presenter.getProfileToOpenObservable()
+        presenter.getProfileSelectedObservable()
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(userName -> {
                     startActivityForResult(
                             UserOrPageProfileActivity.newIntent(PagesSuggestionActivity.this, userName),
                             REQUEST_OPENED_PROFILE_WAS_LISTENED);
                 });
-
-        presenter.getRefreshDataObservable()
-                .compose(bindToLifecycle())
-                .subscribe();
-
-        presenter.getLoadMoreObservable()
-                .compose(bindToLifecycle())
-                .subscribe();
-
-        presenter.getListeningObservable()
-                .compose(bindToLifecycle())
-                .subscribe();
     }
 
     @Override

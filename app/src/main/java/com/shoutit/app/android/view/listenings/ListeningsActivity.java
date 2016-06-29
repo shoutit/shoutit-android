@@ -45,7 +45,7 @@ public class ListeningsActivity extends BaseProfilesListActivity {
 
         presenter = (ListeningsPresenter) ((ListeningsActivityComponent) getActivityComponent()).profilesListPresenter();
 
-        presenter.getProfileToOpenObservable()
+        presenter.getProfileSelectedObservable()
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(new Action1<String>() {
                     @Override

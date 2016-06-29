@@ -42,7 +42,7 @@ public class SelectProfilePresenter {
     @Nonnull
     private final Observable<Boolean> progressObservable;
 
-    private PublishSubject<BothParams<String, String>> profileSelectedSubject = PublishSubject.create();
+    private PublishSubject<BaseProfile> profileSelectedSubject = PublishSubject.create();
     private PublishSubject<Object> loadMoreListenings = PublishSubject.create();
     private PublishSubject<Object> loadMoreListeners = PublishSubject.create();
 
@@ -52,13 +52,13 @@ public class SelectProfilePresenter {
 
         final Observable<ResponseOrError<ProfilesListResponse>> listeningsObservable = listeningsDao
                 .getDao(ListeningsPresenter.ListeningsType.USERS_AND_PAGES)
-                .getListeningObservable()
+                .getProfilesObservable()
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<ProfilesListResponse>>behaviorRefCount());
 
         final Observable<ResponseOrError<ProfilesListResponse>> listenersObservable = listenersDao
                 .getDao(User.ME)
-                .getLstenersObservable()
+                .getProfilesObservable()
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<ProfilesListResponse>>behaviorRefCount());
 
@@ -117,7 +117,7 @@ public class SelectProfilePresenter {
         return errorObservable;
     }
 
-    public Observable<BothParams<String, String>> getProfileSelectedObservable() {
+    public Observable<BaseProfile> getProfileSelectedObservable() {
         return profileSelectedSubject;
     }
 

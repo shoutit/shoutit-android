@@ -49,6 +49,9 @@ public class ProfilesDao {
     @Nonnull
     private final LoadingCache<FriendsSuggestionPointer, PagesSuggestionDao> pagesSuggestionCache;
     @Nonnull
+    private final LoadingCache<String, AdminsDao> adminsCache;
+
+    @Nonnull
     private final ApiService apiService;
     @Nonnull
     private final Scheduler networkScheduler;
@@ -110,6 +113,13 @@ public class ProfilesDao {
                     }
                 });
 
+        adminsCache = CacheBuilder.newBuilder()
+                .build(new CacheLoader<String, AdminsDao>() {
+                    @Override
+                    public AdminsDao load(@Nonnull String userName) throws Exception {
+                        return new AdminsDao(userName);
+                    }
+                });
     }
 
     @Nonnull
@@ -150,6 +160,11 @@ public class ProfilesDao {
     @Nonnull
     public ProfileDao getProfileDao(@Nonnull String userName) {
         return profilesCache.getUnchecked(userName);
+    }
+
+    @Nonnull
+    public AdminsDao getAdminsDao(@Nonnull String userName) {
+        return adminsCache.getUnchecked(userName);
     }
 
     public void registerToGcmAction(@Nullable final String token) {
@@ -278,84 +293,10 @@ public class ProfilesDao {
         }
     }
 
-    public abstract class BaseProfileListDao {
-        protected final int PAGE_SIZE = 20;
-
-        @Nonnull
-        private final Observable<ResponseOrError<ProfilesListResponse>> profilesObservable;
-        @Nonnull
-        private final PublishSubject<Object> refreshSubject = PublishSubject.create();
-        @Nonnull
-        private final PublishSubject<ResponseOrError<ProfilesListResponse>> updatedProfilesLocallySubject = PublishSubject.create();
-        @Nonnull
-        private final PublishSubject<Object> loadMoreShoutsSubject = PublishSubject.create();
-        @Nonnull
-        protected final String userName;
-
-        public BaseProfileListDao(@Nonnull final String userName) {
-            this.userName = userName;
-            final OperatorMergeNextToken<ProfilesListResponse, Object> loadMoreOperator =
-                    OperatorMergeNextToken.create(new Func1<ProfilesListResponse, Observable<ProfilesListResponse>>() {
-                        private int pageNumber = 0;
-
-                        @Override
-                        public Observable<ProfilesListResponse> call(ProfilesListResponse previousResponse) {
-                            if (previousResponse == null || previousResponse.getNext() != null) {
-                                if (previousResponse == null) {
-                                    pageNumber = 0;
-                                }
-                                ++pageNumber;
-
-                                final Observable<ProfilesListResponse> apiRequest = getRequest(pageNumber)
-                                        .subscribeOn(networkScheduler);
-
-                                if (previousResponse == null) {
-                                    return apiRequest;
-                                } else {
-                                    return Observable.just(previousResponse).zipWith(apiRequest, new MergeProfilesListResponses());
-                                }
-                            } else {
-                                return Observable.never();
-                            }
-                        }
-                    });
-
-
-            profilesObservable = loadMoreShoutsSubject.startWith((Object) null)
-                    .lift(loadMoreOperator)
-                    .compose(ResponseOrError.<ProfilesListResponse>toResponseOrErrorObservable())
-                    .compose(MoreOperators.<ResponseOrError<ProfilesListResponse>>refresh(refreshSubject))
-                    .mergeWith(updatedProfilesLocallySubject)
-                    .compose(MoreOperators.<ResponseOrError<ProfilesListResponse>>cacheWithTimeout(networkScheduler));
-        }
-
-        protected abstract Observable<ProfilesListResponse> getRequest(int pageNumber);
-
-        @Nonnull
-        public Observer<Object> getLoadMoreShoutsObserver() {
-            return loadMoreShoutsSubject;
-        }
-
-        @Nonnull
-        public Observable<ResponseOrError<ProfilesListResponse>> getProfilesObservable() {
-            return profilesObservable;
-        }
-
-        @Nonnull
-        public PublishSubject<Object> getRefreshSubject() {
-            return refreshSubject;
-        }
-
-        @Nonnull
-        public Observer<ResponseOrError<ProfilesListResponse>> updatedProfileLocallyObserver() {
-            return updatedProfilesLocallySubject;
-        }
-    }
-
     public class FriendsDao extends BaseProfileListDao {
 
         public FriendsDao(@Nonnull String userName) {
-            super(userName);
+            super(userName, networkScheduler);
         }
 
         @Override
@@ -367,7 +308,7 @@ public class ProfilesDao {
     public class ContactsDao extends BaseProfileListDao {
 
         public ContactsDao(@Nonnull String userName) {
-            super(userName);
+            super(userName, networkScheduler);
         }
 
         @Override
@@ -378,51 +319,59 @@ public class ProfilesDao {
 
     public class UsersSuggestionDao extends BaseProfileListDao {
 
-        @Nonnull
-        private Observable<ProfilesListResponse> suggestionsObservable;
+        private final UserLocation userLocation;
+        private FriendsSuggestionPointer pointer;
 
         public UsersSuggestionDao(@Nonnull FriendsSuggestionPointer pointer) {
-            super(pointer.getUserName());
-
-            final UserLocation userLocation = pointer.getUserLocation();
-
-            if (userLocation != null) {
-                suggestionsObservable = apiService.usersSuggestion(userLocation.getCountry(), userLocation.getState(), userLocation.getCity(), 1, pointer.getPageSize())
-                        .map((Func1<UserSuggestionResponse, ProfilesListResponse>) userSuggestionResponse -> userSuggestionResponse);
-            } else {
-                suggestionsObservable = apiService.usersSuggestion(null, null, null, 1, pointer.getPageSize())
-                        .map((Func1<UserSuggestionResponse, ProfilesListResponse>) userSuggestionResponse -> userSuggestionResponse);
-            }
+            super(pointer.getUserName(), networkScheduler);
+            this.pointer = pointer;
+            userLocation = pointer.getUserLocation();
         }
 
         @Override
         protected Observable<ProfilesListResponse> getRequest(int pageNumber) {
-            return suggestionsObservable;
+            if (userLocation != null) {
+                return apiService.usersSuggestion(userLocation.getCountry(), userLocation.getState(), userLocation.getCity(), 1, pointer.getPageSize())
+                        .map((Func1<UserSuggestionResponse, ProfilesListResponse>) userSuggestionResponse -> userSuggestionResponse);
+            } else {
+                return apiService.usersSuggestion(null, null, null, 1, pointer.getPageSize())
+                        .map((Func1<UserSuggestionResponse, ProfilesListResponse>) userSuggestionResponse -> userSuggestionResponse);
+            }
         }
     }
 
     public class PagesSuggestionDao extends BaseProfileListDao {
 
-        @Nonnull
-        private Observable<ProfilesListResponse> suggestionsObservable;
+        private final UserLocation userLocation;
+        private FriendsSuggestionPointer pointer;
 
         public PagesSuggestionDao(@Nonnull FriendsSuggestionPointer pointer) {
-            super(pointer.getUserName());
+            super(pointer.getUserName(), networkScheduler);
+            this.pointer = pointer;
+            userLocation = pointer.getUserLocation();
+        }
 
-            final UserLocation userLocation = pointer.getUserLocation();
-
+        @Override
+        protected Observable<ProfilesListResponse> getRequest(final int pageNumber) {
             if (userLocation != null) {
-                suggestionsObservable = apiService.pagesSuggestion(userLocation.getCountry(), userLocation.getState(), userLocation.getCity(), 1, pointer.getPageSize())
+                return apiService.pagesSuggestion(userLocation.getCountry(), userLocation.getState(), userLocation.getCity(), 1, pointer.getPageSize())
                         .map((Func1<PagesSuggestionResponse, ProfilesListResponse>) pagesSuggestionResponse -> pagesSuggestionResponse);
             } else {
-                suggestionsObservable = apiService.pagesSuggestion(null, null, null, 1, pointer.getPageSize())
+                return apiService.pagesSuggestion(null, null, null, 1, pointer.getPageSize())
                         .map((Func1<PagesSuggestionResponse, ProfilesListResponse>) pagesSuggestionResponse -> pagesSuggestionResponse);
             }
+        }
+    }
+
+    public class AdminsDao extends BaseProfileListDao {
+
+        public AdminsDao(@Nonnull String userName) {
+            super(userName, networkScheduler);
         }
 
         @Override
         protected Observable<ProfilesListResponse> getRequest(int pageNumber) {
-            return suggestionsObservable;
+            return apiService.getAdmins(userName, pageNumber, PAGE_SIZE);
         }
     }
 

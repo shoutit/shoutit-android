@@ -41,7 +41,7 @@ public class FacebookFriendsActivity extends BaseProfilesListActivity {
         presenter = (FacebookFriendsPresenter) ((FacebookFriendsActivityComponent)
                 getActivityComponent()).profilesListPresenter();
 
-        presenter.getProfileToOpenObservable()
+        presenter.getProfileSelectedObservable()
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(userName -> {
                     startActivityForResult(
@@ -55,12 +55,6 @@ public class FacebookFriendsActivity extends BaseProfilesListActivity {
                     ColoredSnackBar.error(ColoredSnackBar.contentView(FacebookFriendsActivity.this),
                             R.string.facebook_friends_permission_error, Snackbar.LENGTH_LONG).show();
                 });
-
-        presenter.getActionOnlyForLoggedInUser()
-                .compose(bindToLifecycle())
-                .subscribe(ColoredSnackBar.errorSnackBarAction(
-                        ColoredSnackBar.contentView(this),
-                        R.string.error_action_only_for_logged_in_user));
 
         presenter.getInvitationCodeObservable()
                 .compose(bindToLifecycle())

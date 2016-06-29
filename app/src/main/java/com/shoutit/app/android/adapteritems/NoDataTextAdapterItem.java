@@ -3,17 +3,18 @@ package com.shoutit.app.android.adapteritems;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class NoDataTextAdapterItem extends BaseNoIDAdapterItem {
 
-    @Nonnull
+    @Nullable
     private final String textToDisplay;
 
-    public NoDataTextAdapterItem(@Nonnull String textToDisplay) {
+    public NoDataTextAdapterItem(@Nullable String textToDisplay) {
         this.textToDisplay = textToDisplay;
     }
 
-    @Nonnull
+    @Nullable
     public String getTextToDisplay() {
         return textToDisplay;
     }
@@ -25,8 +26,7 @@ public class NoDataTextAdapterItem extends BaseNoIDAdapterItem {
 
     @Override
     public boolean same(@Nonnull BaseAdapterItem item) {
-        return item instanceof NoDataTextAdapterItem
-                && textToDisplay.equals(((NoDataTextAdapterItem) item).getTextToDisplay());
+        return item instanceof NoDataTextAdapterItem;
     }
 }
 

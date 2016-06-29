@@ -9,7 +9,7 @@ import com.shoutit.app.android.dagger.ActivityScope;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.utils.ListeningHalfPresenter;
-import com.shoutit.app.android.view.profileslist.ProfilesListPresenter;
+import com.shoutit.app.android.view.profileslist.BaseProfileListPresenter;
 
 import dagger.Module;
 import dagger.Provides;
@@ -26,11 +26,11 @@ public class PagesSuggestionActivityModule {
 
     @Provides
     @ActivityScope
-    ProfilesListPresenter provideProfilesListPresenter(@UiScheduler Scheduler uiScheduler,
-                                                       ProfilesDao profilesDao,
-                                                       @ForActivity Resources resources,
-                                                       ListeningHalfPresenter listeningHalfPresenter,
-                                                       UserPreferences userPreferences) {
+    BaseProfileListPresenter provideProfilesListPresenter(@UiScheduler Scheduler uiScheduler,
+                                                          ProfilesDao profilesDao,
+                                                          @ForActivity Resources resources,
+                                                          ListeningHalfPresenter listeningHalfPresenter,
+                                                          UserPreferences userPreferences) {
         return new PagesSuggestionPresenter(profilesDao, uiScheduler, resources, listeningHalfPresenter, userPreferences);
     }
 }
