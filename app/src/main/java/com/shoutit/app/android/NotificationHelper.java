@@ -109,7 +109,7 @@ public class NotificationHelper {
     @NonNull
     private Notification getNotification(String title, String body, Bitmap largeIcon, Uri defaultSoundUri, PendingIntent pendingIntent) {
         return new NotificationCompat.Builder(mContext)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.drawable.notification)
                 .setContentTitle(title)
                 .setContentText(body)
                 .setLargeIcon(largeIcon)
@@ -172,7 +172,7 @@ public class NotificationHelper {
     @Nullable
     private Bitmap getLargeIcon(@Nullable String imageUrl) throws IOException {
         if (TextUtils.isEmpty(imageUrl)) {
-            return BitmapFactory.decodeResource(mContext.getResources(), R.mipmap.ic_launcher);
+            return BitmapFactory.decodeResource(mContext.getResources(), R.drawable.notification);
         } else {
             return picasso.load(imageUrl)
                     .resizeDimen(R.dimen.notification_large_icon, R.dimen.notification_large_icon)
