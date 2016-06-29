@@ -26,7 +26,6 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import rx.functions.Action1;
 
 public abstract class BaseProfilesListActivity extends BaseActivity {
 

@@ -5,6 +5,7 @@ import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.operators.MoreOperators;
 import com.appunite.rx.operators.OperatorMergeNextToken;
+import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -12,12 +13,15 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.PagesSuggestionResponse;
 import com.shoutit.app.android.api.model.ProfilesListResponse;
 import com.shoutit.app.android.api.model.RegisterDeviceRequest;
 import com.shoutit.app.android.api.model.SearchProfileResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.model.AdminsPointer;
 import com.shoutit.app.android.model.PagesPointer;
+import com.shoutit.app.android.api.model.UserLocation;
+import com.shoutit.app.android.api.model.UserSuggestionResponse;
 import com.shoutit.app.android.utils.LogHelper;
 
 import javax.annotation.Nonnull;
@@ -28,7 +32,6 @@ import okhttp3.RequestBody;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
-import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.subjects.PublishSubject;
@@ -47,6 +50,10 @@ public class ProfilesDao {
     private final LoadingCache<AdminsPointer, AdminsDao> adminsCache;
     @Nonnull
     private final LoadingCache<PagesPointer, PagesDao> pagesCache;
+    @Nonnull
+    private final LoadingCache<FriendsSuggestionPointer, UsersSuggestionDao> usersSuggestionCache;
+    @Nonnull
+    private final LoadingCache<FriendsSuggestionPointer, PagesSuggestionDao> pagesSuggestionCache;
 
     @Nonnull
     private final ApiService apiService;
@@ -94,6 +101,22 @@ public class ProfilesDao {
                     }
                 });
 
+        usersSuggestionCache = CacheBuilder.newBuilder()
+                .build(new CacheLoader<FriendsSuggestionPointer, UsersSuggestionDao>() {
+                    @Override
+                    public UsersSuggestionDao load(final FriendsSuggestionPointer pointer) throws Exception {
+                        return new UsersSuggestionDao(pointer);
+                    }
+                });
+
+        pagesSuggestionCache = CacheBuilder.newBuilder()
+                .build(new CacheLoader<FriendsSuggestionPointer, PagesSuggestionDao>() {
+                    @Override
+                    public PagesSuggestionDao load(final FriendsSuggestionPointer pointer) throws Exception {
+                        return new PagesSuggestionDao(pointer);
+                    }
+                });
+
         adminsCache = CacheBuilder.newBuilder()
                 .build(new CacheLoader<AdminsPointer, AdminsDao>() {
                     @Override
@@ -109,6 +132,16 @@ public class ProfilesDao {
                         return new PagesDao(pointer);
                     }
                 });
+    }
+
+    @Nonnull
+    public UsersSuggestionDao getUsersSuggestionDao(@Nonnull FriendsSuggestionPointer pointer) {
+        return usersSuggestionCache.getUnchecked(pointer);
+    }
+
+    @Nonnull
+    public PagesSuggestionDao getPagesSuggestionDao(@Nonnull FriendsSuggestionPointer pointer) {
+        return pagesSuggestionCache.getUnchecked(pointer);
     }
 
     @Nonnull
@@ -295,6 +328,52 @@ public class ProfilesDao {
         }
     }
 
+    public class UsersSuggestionDao extends BaseProfileListDao {
+
+        private final UserLocation userLocation;
+        private FriendsSuggestionPointer pointer;
+
+        public UsersSuggestionDao(@Nonnull FriendsSuggestionPointer pointer) {
+            super(pointer.getUserName(), networkScheduler);
+            this.pointer = pointer;
+            userLocation = pointer.getUserLocation();
+        }
+
+        @Override
+        protected Observable<ProfilesListResponse> getRequest(int pageNumber) {
+            if (userLocation != null) {
+                return apiService.usersSuggestion(userLocation.getCountry(), userLocation.getState(), userLocation.getCity(), pageNumber, PAGE_SIZE)
+                        .map((Func1<UserSuggestionResponse, ProfilesListResponse>) userSuggestionResponse -> userSuggestionResponse);
+            } else {
+                return apiService.usersSuggestion(null, null, null, pageNumber, PAGE_SIZE)
+                        .map((Func1<UserSuggestionResponse, ProfilesListResponse>) userSuggestionResponse -> userSuggestionResponse);
+            }
+        }
+    }
+
+    public class PagesSuggestionDao extends BaseProfileListDao {
+
+        private final UserLocation userLocation;
+        private FriendsSuggestionPointer pointer;
+
+        public PagesSuggestionDao(@Nonnull FriendsSuggestionPointer pointer) {
+            super(pointer.getUserName(), networkScheduler);
+            this.pointer = pointer;
+            userLocation = pointer.getUserLocation();
+        }
+
+        @Override
+        protected Observable<ProfilesListResponse> getRequest(final int pageNumber) {
+            if (userLocation != null) {
+                return apiService.pagesSuggestion(userLocation.getCountry(), userLocation.getState(), userLocation.getCity(), pageNumber, PAGE_SIZE)
+                        .map((Func1<PagesSuggestionResponse, ProfilesListResponse>) pagesSuggestionResponse -> pagesSuggestionResponse);
+            } else {
+                return apiService.pagesSuggestion(null, null, null, pageNumber, PAGE_SIZE)
+                        .map((Func1<PagesSuggestionResponse, ProfilesListResponse>) pagesSuggestionResponse -> pagesSuggestionResponse);
+            }
+        }
+    }
+
     public class AdminsDao extends BaseProfileListDao {
 
         @Nonnull
@@ -324,6 +403,40 @@ public class ProfilesDao {
         @Override
         protected Observable<ProfilesListResponse> getRequest(int pageNumber) {
             return apiService.getPages(userName, pageNumber, pagesPointer.getPageSize());
+        }
+    }
+
+    public static class FriendsSuggestionPointer {
+        @android.support.annotation.Nullable
+        private final UserLocation userLocation;
+        private final String userName;
+
+        public FriendsSuggestionPointer(@android.support.annotation.Nullable UserLocation userLocation, String userName) {
+            this.userLocation = userLocation;
+            this.userName = userName;
+        }
+
+        @android.support.annotation.Nullable
+        public UserLocation getUserLocation() {
+            return userLocation;
+        }
+
+        public String getUserName() {
+            return userName;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            final FriendsSuggestionPointer that = (FriendsSuggestionPointer) o;
+            return Objects.equal(userLocation, that.userLocation) &&
+                    Objects.equal(userName, that.userName);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(userLocation, userName);
         }
     }
 
