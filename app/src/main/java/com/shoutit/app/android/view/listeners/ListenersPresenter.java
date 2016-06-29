@@ -11,7 +11,6 @@ import javax.annotation.Nonnull;
 
 import rx.Observable;
 import rx.Scheduler;
-import rx.subjects.PublishSubject;
 
 public class ListenersPresenter extends BaseProfileListPresenter {
 

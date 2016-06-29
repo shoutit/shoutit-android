@@ -46,7 +46,7 @@ public abstract class BaseProfileListPresenter {
     @Nonnull
     protected final PublishSubject<Object> actionOnlyForLoggedInUsers = PublishSubject.create();
     @Nonnull
-    protected final PublishSubject<String> profileSelectedSubject = PublishSubject.create();
+    protected final PublishSubject<BaseProfile> profileSelectedSubject = PublishSubject.create();
     @Nonnull
     private final PublishSubject<Object> loadMoreSubject = PublishSubject.create();
     @Nonnull
@@ -153,7 +153,7 @@ public abstract class BaseProfileListPresenter {
     }
 
     @Nonnull
-    public Observable<String> getProfileSelectedObservable() {
+    public Observable<BaseProfile> getProfileSelectedObservable() {
         return profileSelectedSubject;
     }
 

@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.dagger.ForActivity;
 
 import javax.annotation.Nonnull;
@@ -30,7 +31,7 @@ public class AdminsDialog {
         this.context = context;
     }
 
-    public void show(@Nonnull String userName, AdminsDialogListener listener) {
+    public void show(@Nonnull BaseProfile baseProfile, AdminsDialogListener listener) {
 
         final View view = LayoutInflater.from(context).inflate(R.layout.admins_dialog, null, false);
 
@@ -41,12 +42,12 @@ public class AdminsDialog {
         ButterKnife.bind(this, view);
 
         viewProfileBtn.setOnClickListener(v -> {
-            listener.showProfile(userName);
+            listener.showProfile(baseProfile.getUsername());
             alertDialog.dismiss();
         });
 
         removeAdminBtn.setOnClickListener(v -> {
-            listener.removeAdmin(userName);
+            listener.removeAdmin(baseProfile.getId());
             alertDialog.dismiss();
         });
 
@@ -57,7 +58,7 @@ public class AdminsDialog {
 
         void showProfile(String userName);
 
-        void removeAdmin(String userName);
+        void removeAdmin(String selectedAdminId);
     }
 }
 
