@@ -109,7 +109,7 @@ public class NotificationHelper {
     @NonNull
     private Notification getNotification(String title, String body, Bitmap largeIcon, Uri defaultSoundUri, PendingIntent pendingIntent) {
         return new NotificationCompat.Builder(mContext)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.drawable.notification)
                 .setContentTitle(title)
                 .setContentText(body)
                 .setLargeIcon(largeIcon)
