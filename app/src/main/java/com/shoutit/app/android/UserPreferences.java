@@ -13,7 +13,6 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.shoutit.app.android.api.model.BaseProfile;
-import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForApplication;
@@ -102,7 +101,7 @@ public class UserPreferences {
 
     public void setPageLoggedIn(@NonNull String authToken,
                                 @NonNull String refreshToken,
-                                @Nonnull Page page) {
+                                @Nonnull User page) {
         final SharedPreferences.Editor editor = mPreferences.edit();
 
         editor
@@ -163,22 +162,22 @@ public class UserPreferences {
     }
 
     @SuppressLint("CommitPrefEdits")
-    public void setUser(BaseProfile user) {
+    public void setUserOrPage(BaseProfile userOrPage) {
         if (isNormalUser()) {
-            if (user.isUser()) {
+            if (userOrPage.isUser()) {
                 mPreferences.edit()
-                        .putString(KEY_USER, gson.toJson(user, User.class))
+                        .putString(KEY_USER, gson.toJson(userOrPage, User.class))
                         .commit();
             } else {
                 mPreferences.edit()
-                        .putString(KEY_PAGE, gson.toJson(user, Page.class))
+                        .putString(KEY_PAGE, gson.toJson(userOrPage, User.class)) // temporary it is the same model as User
                         .commit();
             }
             refreshUser();
         }
 
-        if (user.getLocation() != null) {
-            saveLocation(user.getLocation());
+        if (userOrPage.getLocation() != null) {
+            saveLocation(userOrPage.getLocation());
         }
     }
 
@@ -209,7 +208,7 @@ public class UserPreferences {
      * User this method to switch from page to user
      */
     public void setPrimaryUserAsUser() {
-        setUser(getUser());
+        setUserOrPage(getUser());
     }
 
     public User getUser() {
@@ -336,11 +335,11 @@ public class UserPreferences {
         }
 
         final BaseProfile updatedUser = user.withUpdatedStats(pusherStats);
-        setUser(updatedUser);
+        setUserOrPage(updatedUser);
     }
 
-    public void setPage(Page page) {
-        setUser(page);
+    public void setPage(User page) {
+        setUserOrPage(page);
         editPage(page.getId(), page.getUsername());
     }
 

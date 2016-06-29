@@ -259,7 +259,7 @@ public class EditProfilePresenter {
                 uploadAvatarToApiObservable.compose(ResponseOrError.<User>onlySuccess()),
                 successObservable)
                 .map(user -> {
-                    userPreferences.setUser(user);
+                    userPreferences.setUserOrPage(user);
                     return null;
                 })
                 .observeOn(uiScheduler);

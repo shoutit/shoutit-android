@@ -139,7 +139,7 @@ public class LocationManager {
                         .doOnNext(new Action1<User>() {
                             @Override
                             public void call(User user) {
-                                userPreferences.setUser(user);
+                                userPreferences.setUserOrPage(user);
                             }
                         });
             }

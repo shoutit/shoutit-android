@@ -50,12 +50,16 @@ public class User extends BaseProfile {
     @Nullable
     private final LinkedAccounts linkedAccounts;
 
+
+    @Nullable
+    private final User admin; // Field only for Page user.
+
     public User(String id, String type, String apiUrl, String webUrl, String username,
                 String name, String firstName, String lastName, boolean isActivated, String image,
                 String cover, boolean isListening, boolean isListener, boolean isPasswordSet, @Nullable UserLocation location,
                 int listenersCount, String bio, int dateJoined,
                 Listening listeningCount, boolean isOwner, String about, String mobile, String website, String email, ConversationDetails conversation,
-                @Nullable String gender, @Nullable String birthday, @Nullable Stats stats, @Nullable LinkedAccounts linkedAccounts) {
+                @Nullable String gender, @Nullable String birthday, @Nullable Stats stats, @Nullable LinkedAccounts linkedAccounts, User admin) {
         super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount, location, isOwner, stats, email);
         this.apiUrl = apiUrl;
         this.webUrl = webUrl;
@@ -64,6 +68,7 @@ public class User extends BaseProfile {
         this.bio = bio;
         this.dateJoined = dateJoined;
         this.listeningCount = listeningCount;
+        this.admin = admin;
         this.isOwner = isOwner;
         this.about = about;
         this.mobile = mobile;
@@ -81,7 +86,7 @@ public class User extends BaseProfile {
                 firstName, lastName, isActivated, image, cover,
                 newIsListening, isListener, isPasswordSet, location,
                 newListenersCount, bio, dateJoined, listeningCount,
-                false, about, mobile, website, getEmail(), conversation, gender, birthday, getStats(), linkedAccounts);
+                false, about, mobile, website, getEmail(), conversation, gender, birthday, getStats(), linkedAccounts, admin);
     }
 
     public boolean isUser(@Nonnull User user) {
@@ -199,6 +204,11 @@ public class User extends BaseProfile {
         return birthday;
     }
 
+    @Nullable
+    public User getAdmin() {
+        return isUser() ? null : admin;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -227,7 +237,8 @@ public class User extends BaseProfile {
                 Objects.equal(birthday, user.birthday) &&
                 Objects.equal(gender, user.gender) &&
                 Objects.equal(linkedAccounts, user.linkedAccounts) &&
-                Objects.equal(listeningCount, user.listeningCount);
+                Objects.equal(listeningCount, user.listeningCount) &&
+                Objects.equal(admin, user.admin);
     }
 
     @Override
@@ -235,6 +246,6 @@ public class User extends BaseProfile {
         return Objects.hashCode(id, type, apiUrl, webUrl, username, name, firstName, lastName,
                 isActivated, image, cover, isListening, isPasswordSet, location, listenersCount,
                 bio, dateJoined, listeningCount, isListener, isOwner, website,
-                linkedAccounts, birthday, gender);
+                linkedAccounts, birthday, gender, admin);
     }
 }

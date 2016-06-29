@@ -160,7 +160,7 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
             mPusherHelper.subscribeProfileChannel();
             mPusherHelper.getUserUpdatedObservable()
                     .subscribe(user1 -> {
-                        userPreferences.setUser(user1);
+                        userPreferences.setUserOrPage(user1);
                     });
 
             mPusherHelper.getStatsObservable()

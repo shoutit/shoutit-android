@@ -9,7 +9,6 @@ import android.support.design.widget.Snackbar;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.facebook.AccessToken;
-import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookAuthorizationException;
 import com.facebook.FacebookCallback;
@@ -232,7 +231,7 @@ public class FacebookHelper {
             LogHelper.logIfDebug(TAG, "Waiting for user to be updated in API");
             return pusherHelper.getUserUpdatedObservable()
                     .filter(user -> {
-                        userPreferences.setUser(user);
+                        userPreferences.setUserOrPage(user);
                         LogHelper.logIfDebug(TAG, "Pusher event: User updated in API");
 
                         return hasRequiredPermissionInApi(user, requiredPermissionName);
