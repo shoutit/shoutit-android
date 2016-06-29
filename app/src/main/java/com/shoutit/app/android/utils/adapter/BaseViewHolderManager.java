@@ -14,17 +14,17 @@ import javax.annotation.Nonnull;
 public class BaseViewHolderManager<T extends BaseAdapterItem> implements ViewHolderManager {
 
     public interface ViewHolderFactory<TT extends BaseAdapterItem> {
-        BaseViewHolder<TT> createViewHolder(@NonNull View view);
+        @NonNull BaseViewHolder<TT> createViewHolder(@NonNull View view);
     }
 
     @NonNull
-    private final Class<T> clazz;
+    private final Class<? extends T> clazz;
     @LayoutRes
     private final int mLayoutRes;
     @NonNull
-    private final ViewHolderFactory mViewHolderFactory;
+    private final ViewHolderFactory<T> mViewHolderFactory;
 
-    public BaseViewHolderManager(@LayoutRes int layoutRes, @NonNull ViewHolderFactory viewHolderFactory, @NonNull Class<T> classList) {
+    public BaseViewHolderManager(@LayoutRes int layoutRes, @NonNull ViewHolderFactory<T> viewHolderFactory, @NonNull Class<? extends T> classList) {
         this.clazz = classList;
         mLayoutRes = layoutRes;
         mViewHolderFactory = viewHolderFactory;

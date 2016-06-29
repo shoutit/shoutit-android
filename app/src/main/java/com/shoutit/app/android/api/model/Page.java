@@ -53,11 +53,4 @@ public class Page extends BaseProfile {
         return Objects.hashCode(id, type, username, name, firstName, lastName, isActivated,
                 image, cover, isListening, listenersCount, getStats(), admin);
     }
-
-    public static Page withIsListening(Page page, boolean isListening) {
-        int listenersCount = isListening ? page.listenersCount + 1 : page.listenersCount - 1;
-        return new Page(page.id, page.type, page.username, page.name, page.firstName,
-                page.lastName, page.isActivated, page.image, page.cover, isListening,
-                listenersCount, page.location, page.getStats(), page.isOwner, page.getEmail(), page.admin);
-    }
 }
