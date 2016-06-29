@@ -1,5 +1,7 @@
 package com.shoutit.app.android.view.notifications;
 
+import android.content.res.Resources;
+
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
@@ -9,10 +11,12 @@ import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.shoutit.app.android.R;
 import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
-import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
+import com.shoutit.app.android.adapteritems.NoDataTextAdapterItem;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.NotificationsResponse;
+import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.NotificationsDao;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
@@ -58,14 +62,13 @@ public class NotificationsPresenter {
     @Nonnull
     private final Observable<Object> scrollUpObservable;
 
-    private Listener listener;
-
     @Inject
     public NotificationsPresenter(@Nonnull NotificationsDao dao,
                                   @Nonnull @UiScheduler final Scheduler uiScheduler,
                                   @Nonnull @NetworkScheduler final Scheduler networkScheduler,
                                   @Nonnull final ApiService apiService,
-                                  @Nonnull PusherHelper pusherHelper) {
+                                  @Nonnull PusherHelper pusherHelper,
+                                  @Nonnull @ForActivity Resources resources) {
         this.dao = dao;
 
         final Observable<ResponseOrError<NotificationsResponse>> notificationsObservable = dao
@@ -123,8 +126,7 @@ public class NotificationsPresenter {
                                         }
                                     }));
                         } else {
-                            listener.emptyList();
-                            adapterItems.add(new NoDataAdapterItem());
+                            adapterItems.add(new NoDataTextAdapterItem(resources.getString(R.string.notifications_no_notifications)));
                         }
 
                         return adapterItems.build();
@@ -205,10 +207,6 @@ public class NotificationsPresenter {
                 .startWith(true);
     }
 
-    public void registerListener(@Nonnull final Listener mListener){
-        listener = mListener;
-    }
-
     @Nonnull
     public Observable<Object> getScrollUpObservable() {
         return scrollUpObservable;
@@ -241,10 +239,6 @@ public class NotificationsPresenter {
 
     public void markAllNotificationsAsRead() {
         markAllAsReadSubject.onNext(null);
-    }
-
-    public interface Listener {
-        void emptyList();
     }
 
     public class NotificationAdapterItem extends BaseNoIDAdapterItem {
