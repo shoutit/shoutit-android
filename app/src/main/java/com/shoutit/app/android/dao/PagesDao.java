@@ -6,7 +6,6 @@ import com.appunite.rx.operators.MoreOperators;
 import com.appunite.rx.operators.OperatorMergeNextToken;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.PagesResponse;
-import com.shoutit.app.android.api.model.ProfilesListResponse;
 import com.shoutit.app.android.api.model.User;
 
 import javax.annotation.Nonnull;

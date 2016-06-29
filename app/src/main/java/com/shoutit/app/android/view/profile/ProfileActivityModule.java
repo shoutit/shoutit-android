@@ -11,6 +11,7 @@ import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
+import com.shoutit.app.android.utils.ListeningHalfPresenter;
 import com.shoutit.app.android.utils.PreferencesHelper;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
 import com.shoutit.app.android.view.profile.myprofile.MyProfileHalfPresenter;
@@ -40,9 +41,10 @@ public class ProfileActivityModule {
                                                     @NetworkScheduler Scheduler networkScheduler, ApiService apiService,
                                                     PreferencesHelper preferencesHelper, UserProfileHalfPresenter userProfilePresenter,
                                                     MyProfileHalfPresenter myProfilePresenter, ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
-                                                    PusherHelper pusherHelper) {
+                                                    PusherHelper pusherHelper, ListeningHalfPresenter listeningHalfPresenter) {
         return new UserOrPageProfilePresenter(userName, shoutsDao, context, preferences, uiScheduler, networkScheduler,
-                profilesDao, myProfilePresenter, userProfilePresenter, preferencesHelper, shoutsGlobalRefreshPresenter, apiService, pusherHelper);
+                profilesDao, myProfilePresenter, userProfilePresenter, preferencesHelper, shoutsGlobalRefreshPresenter,
+                listeningHalfPresenter, apiService, pusherHelper);
     }
 
 }

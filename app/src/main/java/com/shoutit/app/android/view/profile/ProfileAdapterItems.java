@@ -8,6 +8,7 @@ import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.base.Objects;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.ConversationDetails;
 import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.api.model.RelatedTagsResponse;
@@ -108,6 +109,7 @@ public class ProfileAdapterItems {
         @Nonnull
         private final T sectionItem;
         private final boolean isUserLoggedIn;
+        protected int listenersCount;
 
         protected BaseProfileSectionItem(@Nonnull Observer<String> profileToOpenObserver,
                                          @Nonnull Observer<Object> actionOnlyForLoggedInUserObserver,
@@ -120,6 +122,7 @@ public class ProfileAdapterItems {
             this.isOnlyItemInSection = isOnlyItemInSection;
             this.sectionItem = sectionItem;
             this.isUserLoggedIn = isUserLoggedIn;
+            listenersCount = sectionItem.getListenersCount();
         }
 
         public void onSectionItemSelected() {
@@ -162,8 +165,8 @@ public class ProfileAdapterItems {
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            // Done intentionally
-            return false;
+            return item instanceof BaseProfileSectionItem &&
+                    item.equals(this);
         }
 
         @Override
@@ -173,49 +176,53 @@ public class ProfileAdapterItems {
             final BaseProfileSectionItem<?> that = (BaseProfileSectionItem<?>) o;
             return isFirstItem == that.isFirstItem &&
                     isLastItem == that.isLastItem &&
-                    Objects.equal(sectionItem, that.sectionItem);
+                    Objects.equal(sectionItem, that.sectionItem) &&
+                    listenersCount == that.listenersCount;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(isFirstItem, isLastItem, sectionItem);
+            return Objects.hashCode(isFirstItem, isLastItem, sectionItem, listenersCount);
         }
     }
 
-    public static class ProfileSectionAdapterItem<T extends ProfileType> extends BaseProfileSectionItem {
+    public static class ProfileSectionAdapterItem extends BaseProfileSectionItem<BaseProfile> {
         @Nonnull
-        private final User user;
-        @Nonnull
-        private final Observer<UserOrPageProfilePresenter.UserWithItemToListen> listenItemObserver;
+        private final Observer<BaseProfile> listenItemObserver;
         @Nullable
         private final String loggedInUserName;
-        private final T sectionItem;
+        @Nonnull
+        private final BaseProfile pageOrAdmin;
 
         public ProfileSectionAdapterItem(boolean isFirstItem,
                                          boolean isLastItem,
-                                         @Nonnull User user,
-                                         @Nonnull T sectionItem,
-                                         @Nonnull Observer<UserOrPageProfilePresenter.UserWithItemToListen> listenItemObserver,
+                                         @Nonnull BaseProfile pageOrAdmin,
+                                         @Nonnull Observer<BaseProfile> listenItemObserver,
                                          @Nonnull Observer<String> profileToOpenObserver,
                                          @Nonnull Observer<Object> actionOnlyForLoggedInUserObserver,
                                          @Nullable String loggedInUserName,
                                          boolean isUserLoggedIn,
                                          boolean isOnlyItemInSection) {
-            super(profileToOpenObserver, actionOnlyForLoggedInUserObserver, isFirstItem, isLastItem, isOnlyItemInSection, sectionItem, isUserLoggedIn);
-            this.user = user;
-            this.sectionItem = sectionItem;
+            super(profileToOpenObserver, actionOnlyForLoggedInUserObserver, isFirstItem, isLastItem, isOnlyItemInSection, pageOrAdmin, isUserLoggedIn);
+            this.pageOrAdmin = pageOrAdmin;
             this.listenItemObserver = listenItemObserver;
             this.loggedInUserName = loggedInUserName;
         }
 
         @Override
         public void onItemListen() {
-            listenItemObserver.onNext(new UserOrPageProfilePresenter.UserWithItemToListen(user, sectionItem));
+            if (pageOrAdmin.isListening()) {
+                --listenersCount;
+            } else {
+                ++listenersCount;
+            }
+
+            listenItemObserver.onNext(pageOrAdmin);
         }
 
         @Override
         public boolean isSectionItemProfileMyProfile() {
-            return sectionItem.getUsername().equals(loggedInUserName);
+            return pageOrAdmin.getUsername().equals(loggedInUserName);
         }
     }
 
@@ -532,6 +539,12 @@ public class ProfileAdapterItems {
         }
 
         public void onItemListen() {
+            if (relatedTag.isListening()) {
+                --listenersCount;
+            } else {
+                ++listenersCount;
+            }
+
             listenItemObserver.onNext(new TagProfilePresenter.ListenedTagWithRelatedTags(lastResponse, relatedTag));
         }
 

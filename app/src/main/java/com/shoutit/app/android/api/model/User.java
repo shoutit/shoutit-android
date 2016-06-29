@@ -4,8 +4,6 @@ package com.shoutit.app.android.api.model;
 import com.google.common.base.Objects;
 import com.shoutit.app.android.model.Stats;
 
-import java.util.List;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -38,8 +36,6 @@ public class User extends BaseProfile {
     // whever the profile is listening to you
     private final boolean isListener;
     private final boolean isPasswordSet;
-    private final List<Page> pages;
-    private final List<Admin> admins;
     private final String bio;
     private final int dateJoined;
     private final Listening listeningCount;
@@ -57,7 +53,7 @@ public class User extends BaseProfile {
     public User(String id, String type, String apiUrl, String webUrl, String username,
                 String name, String firstName, String lastName, boolean isActivated, String image,
                 String cover, boolean isListening, boolean isListener, boolean isPasswordSet, @Nullable UserLocation location,
-                int listenersCount, List<Page> pages, List<Admin> admins, String bio, int dateJoined,
+                int listenersCount, String bio, int dateJoined,
                 Listening listeningCount, boolean isOwner, String about, String mobile, String website, String email, ConversationDetails conversation,
                 @Nullable String gender, @Nullable String birthday, @Nullable Stats stats, @Nullable LinkedAccounts linkedAccounts) {
         super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount, location, isOwner, stats, email);
@@ -65,8 +61,6 @@ public class User extends BaseProfile {
         this.webUrl = webUrl;
         this.isListener = isListener;
         this.isPasswordSet = isPasswordSet;
-        this.pages = pages;
-        this.admins = admins;
         this.bio = bio;
         this.dateJoined = dateJoined;
         this.listeningCount = listeningCount;
@@ -86,26 +80,8 @@ public class User extends BaseProfile {
         return new User(id, type, apiUrl, webUrl, username, name,
                 firstName, lastName, isActivated, image, cover,
                 newIsListening, isListener, isPasswordSet, location,
-                newListenersCount, pages, admins, bio, dateJoined, listeningCount,
+                newListenersCount, bio, dateJoined, listeningCount,
                 false, about, mobile, website, getEmail(), conversation, gender, birthday, getStats(), linkedAccounts);
-    }
-
-    public static User userWithUpdatedPages(@Nonnull User user, List<Page> pages) {
-        return new User(user.id, user.type, user.apiUrl, user.webUrl, user.username, user.name,
-                user.firstName, user.lastName, user.isActivated, user.image, user.cover,
-                user.isListening, user.isListener, user.isPasswordSet, user.location,
-                user.listenersCount, pages, user.admins, user.bio, user.dateJoined, user.listeningCount,
-                false, user.about, user.mobile, user.website, user.getEmail(), user.conversation,
-                user.gender, user.birthday, user.getStats(), user.linkedAccounts);
-    }
-
-    public static User userWithUpdatedAdmins(@Nonnull User user, List<Admin> updatedAdmins) {
-        return new User(user.id, user.type, user.apiUrl, user.webUrl, user.username, user.name,
-                user.firstName, user.lastName, user.isActivated, user.image, user.cover,
-                user.isListening, user.isListener, user.isPasswordSet, user.location,
-                user.listenersCount, user.pages, updatedAdmins, user.bio, user.dateJoined, user.listeningCount,
-                false, user.about, user.mobile, user.website, user.getEmail(), user.conversation,
-                user.gender, user.birthday, user.getStats(), user.linkedAccounts);
     }
 
     public boolean isUser(@Nonnull User user) {
@@ -176,10 +152,6 @@ public class User extends BaseProfile {
         return listenersCount;
     }
 
-    public List<Page> getPages() {
-        return pages;
-    }
-
     public String getBio() {
         return bio;
     }
@@ -194,10 +166,6 @@ public class User extends BaseProfile {
 
     public boolean isListener() {
         return isListener;
-    }
-
-    public List<Admin> getAdmins() {
-        return admins;
     }
 
     public boolean isOwner() {
@@ -254,8 +222,6 @@ public class User extends BaseProfile {
                 Objects.equal(image, user.image) &&
                 Objects.equal(cover, user.cover) &&
                 Objects.equal(location, user.location) &&
-                Objects.equal(pages, user.pages) &&
-                Objects.equal(admins, user.admins) &&
                 Objects.equal(bio, user.bio) &&
                 Objects.equal(isListener, user.isListener) &&
                 Objects.equal(birthday, user.birthday) &&
@@ -268,7 +234,7 @@ public class User extends BaseProfile {
     public int hashCode() {
         return Objects.hashCode(id, type, apiUrl, webUrl, username, name, firstName, lastName,
                 isActivated, image, cover, isListening, isPasswordSet, location, listenersCount,
-                pages, bio, dateJoined, listeningCount, isListener, admins, isOwner, website,
+                bio, dateJoined, listeningCount, isListener, isOwner, website,
                 linkedAccounts, birthday, gender);
     }
 }

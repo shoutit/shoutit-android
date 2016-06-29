@@ -104,6 +104,7 @@ public class UserPreferences {
                                 @NonNull String refreshToken,
                                 @Nonnull Page page) {
         final SharedPreferences.Editor editor = mPreferences.edit();
+
         editor
                 .putString(AUTH_TOKEN, authToken)
                 .putString(REFRESH_TOKEN, refreshToken)

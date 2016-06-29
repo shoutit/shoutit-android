@@ -338,6 +338,11 @@ public interface ApiService {
                                       @Query("page") Integer page,
                                       @Query("page_size") Integer pageSize);
 
+    @GET("profiles/{user_name}/pages")
+    Observable<ProfilesListResponse> getPages(@Path("user_name") String userName,
+                                      @Query("page") Integer page,
+                                      @Query("page_size") Integer pageSize);
+
     /**
      * Misc
      **/
@@ -567,4 +572,5 @@ public interface ApiService {
     @POST("pages/{username}/admin")
     Observable<ResponseBody> addAdmin(@Path("username") String pageUserName,
                                       @Body AddAdminRequest addAdminRequest);
+
 }
