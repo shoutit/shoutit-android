@@ -290,7 +290,7 @@ public class LocationPresenter {
 
     @NonNull
     private Action1<User> saveToPreferencesAction() {
-        return userPreferences::setUser;
+        return userPreferences::setUserOrPage;
     }
 
     private Observable<ResponseOrError<UserLocation>> getGeoCodeRequest(double latitude, double longitude) {

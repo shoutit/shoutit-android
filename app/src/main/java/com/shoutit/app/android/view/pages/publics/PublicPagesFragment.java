@@ -14,7 +14,6 @@ import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
-import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.ColoredSnackBar;
@@ -22,7 +21,6 @@ import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.utils.rx.RxUtils;
 import com.shoutit.app.android.view.listenings.ProfilesListAdapter;
-import com.shoutit.app.android.view.pages.PagesAdapter;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 
 import javax.annotation.Nonnull;
@@ -30,7 +28,6 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
-import rx.functions.Action1;
 
 
 public class PublicPagesFragment extends BaseFragment {

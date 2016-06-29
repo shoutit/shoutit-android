@@ -175,7 +175,7 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
         final Observable<User> userSuccessObservable = userRequestObservable.compose(ResponseOrError.<User>onlySuccess())
                 .doOnNext(user -> {
                     if (User.ME.equals(userName)) {
-                        userPreferences.setUser(user);
+                        userPreferences.setUserOrPage(user);
                     }
                 })
                 .compose(ObservableExtensions.<User>behaviorRefCount());

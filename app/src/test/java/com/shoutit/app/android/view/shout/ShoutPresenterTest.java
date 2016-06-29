@@ -73,7 +73,7 @@ public class ShoutPresenterTest {
                 .thenReturn(Observable.just(ResponseOrError.fromData(new ShoutsResponse(1, "z", "z", Lists.newArrayList(TestUtils.getShout()), null))));
         when(userPreferences.getPageOrUserObservable())
                 .thenReturn(Observable.just(new User("z", null, null, null, null, null, null, null, false, null,
-                null, false, false, false, null, 1, null, 1, null, false, null, null, null, null, null, null, null, null, null)));
+                null, false, false, false, null, 1, null, 1, null, false, null, null, null, null, null, null, null, null, null, admin)));
         when(userPreferences.isNormalUser())
                 .thenReturn(true);
         when(globalRefreshPresenter.getShoutsGlobalRefreshObservable())
@@ -206,7 +206,7 @@ public class ShoutPresenterTest {
 
     private User getUser() {
         return new User("z", null, null, null, null, null, null, null, false, null,
-                null, false, false, false, null, 1, null, 1, null, false, null, null, null, null, null, null, null, null, null);
+                null, false, false, false, null, 1, null, 1, null, false, null, null, null, null, null, null, null, null, null, admin);
     }
 
 

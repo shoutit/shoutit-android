@@ -7,9 +7,9 @@ public class SignPageResponse {
     private final String tokenType;
     private final String refreshToken;
     private final boolean newSignup;
-    private final Page profile;
+    private final User profile;
 
-    public SignPageResponse(String accessToken, String tokenType, String refreshToken, boolean newSignup, Page profile) {
+    public SignPageResponse(String accessToken, String tokenType, String refreshToken, boolean newSignup, User profile) {
         this.accessToken = accessToken;
         this.tokenType = tokenType;
         this.refreshToken = refreshToken;
@@ -33,7 +33,7 @@ public class SignPageResponse {
         return newSignup;
     }
 
-    public Page getProfile() {
+    public User getProfile() {
         return profile;
     }
 }
