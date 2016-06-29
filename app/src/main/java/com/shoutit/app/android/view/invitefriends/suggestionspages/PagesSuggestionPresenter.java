@@ -28,7 +28,7 @@ public class PagesSuggestionPresenter extends BaseProfileListPresenter {
                                     @Nonnull @ForActivity Resources resources,
                                     @Nonnull ListeningHalfPresenter listeningHalfPresenter,
                                     @Nonnull UserPreferences userPreferences) {
-        super(listeningHalfPresenter, uiScheduler, resources.getString(R.string.no_suggested_pages), userPreferences);
+        super(listeningHalfPresenter, uiScheduler, resources.getString(R.string.invite_no_suggested_pages), userPreferences);
 
         final Observable<ProfilesDao.FriendsSuggestionPointer> pointerObservable = userPreferences
                 .getPageOrUserObservable()

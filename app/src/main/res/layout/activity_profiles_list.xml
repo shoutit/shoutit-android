@@ -13,14 +13,6 @@
         android:layout_height="?actionBarSize"
         android:elevation="0dp" />
 
-    <TextView
-        android:id="@+id/placeholder"
-        android:layout_below="@id/profiles_list_toolbar"
-        android:gravity="center"
-        android:text="@string/nothing_to_show"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/profiles_list_recycler_view"
         android:layout_below="@+id/profiles_list_toolbar"
