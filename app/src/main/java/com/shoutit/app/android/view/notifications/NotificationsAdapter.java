@@ -19,10 +19,12 @@ import com.google.common.base.Strings;
 import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
+import com.shoutit.app.android.adapteritems.NoDataTextAdapterItem;
 import com.shoutit.app.android.api.model.NotificationsResponse;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.DateTimeUtils;
 import com.shoutit.app.android.utils.PicassoHelper;
+import com.shoutit.app.android.viewholders.NoDataTextViewHolder;
 import com.shoutit.app.android.viewholders.NoDataViewHolder;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -39,7 +41,7 @@ import butterknife.OnClick;
 public class NotificationsAdapter extends BaseAdapter {
 
     private static final int VIEW_TYPE_NOTIFICATION = 1;
-    private static final int VIEW_TYPE_SHADOW = 2;
+    private static final int VIEW_TYPE_NO_DATA = 2;
 
     @Nonnull
     private final Picasso picasso;
@@ -121,8 +123,8 @@ public class NotificationsAdapter extends BaseAdapter {
         switch (viewType) {
             case VIEW_TYPE_NOTIFICATION:
                 return new NotificationViewHolder(layoutInflater.inflate(R.layout.notifications_item, parent, false));
-            case VIEW_TYPE_SHADOW:
-                return new NoDataViewHolder(layoutInflater.inflate(R.layout.shadow_item, parent, false));
+            case VIEW_TYPE_NO_DATA:
+                return new NoDataTextViewHolder(layoutInflater.inflate(R.layout.no_data_text_adapter_item, parent, false));
             default:
                 throw new RuntimeException("Unknown view type:" + viewType);
         }
@@ -133,9 +135,9 @@ public class NotificationsAdapter extends BaseAdapter {
         final BaseAdapterItem item = items.get(position);
         if (item instanceof NotificationsPresenter.NotificationAdapterItem) {
             return VIEW_TYPE_NOTIFICATION;
-        } else if (item instanceof NoDataAdapterItem) {
-            return VIEW_TYPE_SHADOW;
-        } else {
+        } else if (item instanceof NoDataTextAdapterItem) {
+            return VIEW_TYPE_NO_DATA;
+        }else {
             throw new RuntimeException("Unknown view type: " + item.getClass().getSimpleName());
         }
     }

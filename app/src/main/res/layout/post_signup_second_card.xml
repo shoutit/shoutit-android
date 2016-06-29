@@ -33,23 +33,10 @@
             android:layout_marginRight="8dp"
             android:background="@color/black_12" />
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:id="@+id/placeholder"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="@string/no_suggested_users"
-                android:visibility="gone"
-                android:gravity="center"/>
-
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/post_signup_second_recyclerview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
-        </RelativeLayout>
 
     </LinearLayout>
 

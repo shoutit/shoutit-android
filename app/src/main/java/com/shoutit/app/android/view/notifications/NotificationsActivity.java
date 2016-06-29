@@ -46,10 +46,9 @@ import butterknife.OnClick;
 import rx.Observable;
 import rx.Scheduler;
 import rx.Subscription;
-import rx.functions.Action1;
 import rx.functions.Func1;
 
-public class NotificationsActivity extends BaseActivity implements NotificationsPresenter.Listener{
+public class NotificationsActivity extends BaseActivity {
 
     @Bind(R.id.notifications_reycler_view)
     RecyclerView recyclerView;
@@ -59,8 +58,6 @@ public class NotificationsActivity extends BaseActivity implements Notifications
     View progressView;
     @Bind(R.id.notifications_badge)
     TextView notificationBadge;
-    @Bind(R.id.notifications_placeholder)
-    TextView notificationsPlaceholder;
 
     @Inject
     NotificationsPresenter presenter;
@@ -95,7 +92,6 @@ public class NotificationsActivity extends BaseActivity implements Notifications
         final MyLinearLayoutManager layoutManager = new MyLinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
-        presenter.registerListener(this);
 
         subscription = presenter.getAdapterItemsObservable()
                 .compose(this.<List<BaseAdapterItem>>bindToLifecycle())
@@ -111,42 +107,31 @@ public class NotificationsActivity extends BaseActivity implements Notifications
 
         presenter.getOpenViewForNotificationObservable()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String appUrl) {
-                        if (TextUtils.isEmpty(appUrl)) {
-                            startActivity(MainActivity.newIntent(NotificationsActivity.this));
-                            finishAffinity();
-                        } else {
-                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(appUrl)));
-                        }
+                .subscribe(appUrl -> {
+                    if (TextUtils.isEmpty(appUrl)) {
+                        startActivity(MainActivity.newIntent(NotificationsActivity.this));
+                        finishAffinity();
+                    } else {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(appUrl)));
                     }
                 });
 
         presenter.getScrollUpObservable()
                 .compose(bindToLifecycle())
-                .subscribe(new Action1<Object>() {
-                    @Override
-                    public void call(Object o) {
-                        final int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
+                .subscribe(o -> {
+                    final int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
 
-                        if (firstVisibleItemPosition > 1) {
-                            showNewMessagesBadge();
-                        } else {
-                            recyclerView.scrollToPosition(0);
-                        }
+                    if (firstVisibleItemPosition > 1) {
+                        showNewMessagesBadge();
+                    } else {
+                        recyclerView.scrollToPosition(0);
                     }
                 });
 
         RxRecyclerView.scrollEvents(recyclerView)
                 .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
                 .filter(LoadMoreHelper.needLoadMore((MyLayoutManager) recyclerView.getLayoutManager(), adapter))
-                .map(new Func1<RecyclerViewScrollEvent, NotificationsResponse>() {
-                    @Override
-                    public NotificationsResponse call(RecyclerViewScrollEvent recyclerViewScrollEvent) {
-                        return null;
-                    }
-                })
+                .map((Func1<RecyclerViewScrollEvent, NotificationsResponse>) recyclerViewScrollEvent -> null)
                 .subscribe(presenter.loadMoreObserver());
     }
 
@@ -155,11 +140,8 @@ public class NotificationsActivity extends BaseActivity implements Notifications
         Observable.timer(4, TimeUnit.SECONDS)
                 .observeOn(uiScheduler)
                 .compose(this.<Long>bindToLifecycle())
-                .subscribe(new Action1<Long>() {
-                    @Override
-                    public void call(Long aLong) {
-                        notificationBadge.setVisibility(View.GONE);
-                    }
+                .subscribe(aLong -> {
+                    notificationBadge.setVisibility(View.GONE);
                 });
     }
 
@@ -223,11 +205,5 @@ public class NotificationsActivity extends BaseActivity implements Notifications
         component.inject(this);
 
         return component;
-    }
-
-    @Override
-    public void emptyList() {
-        notificationsPlaceholder.setVisibility(View.VISIBLE);
-        recyclerView.setVisibility(View.GONE);
     }
 }

@@ -331,8 +331,8 @@
     <string name="post_signup_suggested_users">Suggested users</string>
     <string name="post_signup_suggested_pages">Suggested pages</string>
     <string name="post_signup_done">Done</string>
-    <string name="no_suggested_users">No suggested users</string>
-    <string name="no_suggested_pages">No suggested pages</string>
+    <string name="post_no_suggested_users">No suggested users</string>
+    <string name="post_no_suggested_pages">No suggested pages</string>
 
     <!-- Search -->
     <string name="search_base_title">Search</string>
@@ -408,7 +408,7 @@
     <string name="option_not_set">Not set</string>
     <string name="edit_shout_mobile_hint">Mobile</string>
     <string name="notifications_message_replacement">sends you a message</string>
-    <string name="no_notifications">Notifications not found</string>
+    <string name="notifications_no_notifications">Notifications not found</string>
 
     <!-- Video Calls -->
     <string name="video_calls_no_premissions">Camera and Microphone permissions needed.</string>

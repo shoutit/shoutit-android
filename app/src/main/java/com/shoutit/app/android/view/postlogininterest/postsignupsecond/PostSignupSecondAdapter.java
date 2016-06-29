@@ -6,13 +6,16 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.adapteritems.NoDataTextAdapterItem;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.TextHelper;
+import com.shoutit.app.android.viewholders.NoDataTextViewHolder;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -25,6 +28,9 @@ import butterknife.OnClick;
 
 public class PostSignupSecondAdapter extends BaseAdapter {
 
+    private static final int VIEW_TYPE_SUGGESTIONS = 1;
+    private static final int VIEW_TYPE_NO_DATA = 2;
+
     @Nonnull
     private final Picasso picasso;
 
@@ -35,8 +41,27 @@ public class PostSignupSecondAdapter extends BaseAdapter {
     }
 
     @Override
+    public int getItemViewType(int position) {
+        final BaseAdapterItem item = items.get(position);
+        if (item instanceof PostSignupSecondPresenter.SuggestionAdapterItem) {
+            return VIEW_TYPE_SUGGESTIONS;
+        } else if (item instanceof NoDataTextAdapterItem) {
+            return VIEW_TYPE_NO_DATA;
+        } else {
+            throw new RuntimeException("Unknown view type: " + item.getClass().getSimpleName());
+        }
+    }
+
+    @Override
     public ViewHolderManager.BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new SuggestionViewHolder(layoutInflater.inflate(R.layout.search_results_profile_item, parent, false), context, picasso);
+        switch (viewType) {
+            case VIEW_TYPE_SUGGESTIONS:
+                return new SuggestionViewHolder(layoutInflater.inflate(R.layout.search_results_profile_item, parent, false), context, picasso);
+            case VIEW_TYPE_NO_DATA:
+                return new NoDataTextViewHolder(layoutInflater.inflate(R.layout.no_data_text_adapter_item, parent, false));
+            default:
+                throw new RuntimeException("Unknown view type:" + viewType);
+        }
     }
 
     public class SuggestionViewHolder extends ViewHolderManager.BaseViewHolder<PostSignupSecondPresenter.SuggestionAdapterItem> {

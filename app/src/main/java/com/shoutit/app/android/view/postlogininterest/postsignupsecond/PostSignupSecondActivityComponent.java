@@ -18,5 +18,4 @@ import dagger.Component;
 public interface PostSignupSecondActivityComponent extends BaseActivityComponent, PostSignupPresenterComponent {
 
     void inject(PostSignupSecondActivity activity);
-
 }

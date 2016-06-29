@@ -38,8 +38,6 @@ public abstract class PostSignupSecondFragment extends BaseFragment {
     RecyclerView recyclerView;
     @Bind(R.id.post_signup_second_title_tv)
     TextView titleTv;
-    @Bind(R.id.placeholder)
-    TextView placeholderTv;
 
     @Nullable
     @Override
@@ -56,21 +54,8 @@ public abstract class PostSignupSecondFragment extends BaseFragment {
         titleTv.setText(getTitle());
 
         getAdapterItems()
-                .filter(List::isEmpty)
-                .map(Functions1.returnTrue())
-                .subscribe(isEmpty -> {
-                    placeholderTv.setVisibility(View.VISIBLE);
-                    recyclerView.setVisibility(View.GONE);
-                });
-
-        getAdapterItems()
                 .compose(this.<List<BaseAdapterItem>>bindToLifecycle())
                 .subscribe(adapter);
-
-        RxTextView.textChangeEvents(titleTv)
-                .compose(bindToLifecycle())
-                .map(textViewTextChangeEvent -> getString(R.string.no_suggested_pages))
-                .subscribe(RxTextView.text(placeholderTv));
 
         presenter.getListenSuccessObservable()
                 .compose(this.<String>bindToLifecycle())
