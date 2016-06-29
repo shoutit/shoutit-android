@@ -1,5 +1,6 @@
 package com.shoutit.app.android.view.postlogininterest.postsignupsecond;
 
+import android.content.res.Resources;
 import android.support.annotation.NonNull;
 
 import com.appunite.rx.ObservableExtensions;
@@ -9,22 +10,21 @@ import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.functions.Functions1;
-import com.appunite.rx.functions.ThreeParams;
-import com.appunite.rx.operators.MoreOperators;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
+import com.shoutit.app.android.adapteritems.NoDataTextAdapterItem;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.api.model.SuggestionsResponse;
+import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.SuggestionsDao;
 
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -51,13 +51,16 @@ public class PostSignupSecondPresenter {
     private final PublishSubject<String> unListenSuccess = PublishSubject.create();
     private final Observable<Boolean> progressObservable;
 
+    private Resources resources;
+
     public PostSignupSecondPresenter(@Nonnull SuggestionsDao suggestionsDao,
                                      @Nonnull final ApiService apiService,
                                      @Nonnull UserPreferences userPreferences,
                                      @NetworkScheduler final Scheduler networkScheduler,
-                                     @UiScheduler final Scheduler uiScheduler) {
+                                     @UiScheduler final Scheduler uiScheduler,
+                                     @Nonnull @ForActivity Resources resources) {
 
-
+        this.resources = resources;
 
         final SuggestionsDao.SuggestionsPointer suggestionsPointer =
                 new SuggestionsDao.SuggestionsPointer(PAGE_SIZE, userPreferences.getLocation());
@@ -170,18 +173,20 @@ public class PostSignupSecondPresenter {
 
     @NonNull
     private Func1<List<BaseProfile>, List<BaseAdapterItem>> toAdapterItems() {
-        return new Func1<List<BaseProfile>, List<BaseAdapterItem>>() {
-            @Override
-            public List<BaseAdapterItem> call(List<BaseProfile> baseProfiles) {
+        return baseProfiles -> {
+            if (!baseProfiles.isEmpty()) {
                 final List<BaseAdapterItem> transform = Lists.transform(baseProfiles, new Function<BaseProfile, BaseAdapterItem>() {
                     @Nullable
                     @Override
                     public BaseAdapterItem apply(@Nullable BaseProfile input) {
+
                         return new SuggestionAdapterItem(input, itemListenedSubject);
                     }
                 });
 
                 return ImmutableList.copyOf(transform);
+            } else {
+                return ImmutableList.of(new NoDataTextAdapterItem(resources.getString(R.string.nothing_to_show)));
             }
         };
     }

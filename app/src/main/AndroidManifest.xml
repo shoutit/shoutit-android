@@ -145,7 +145,10 @@
 
         </activity>
         <activity
-            android:name=".view.invitefriends.UserSuggestionActivity"
+            android:name=".view.invitefriends.suggestionsusers.UserSuggestionActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".view.invitefriends.suggestionspages.PagesSuggestionActivity"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".view.chats.ChatActivity"

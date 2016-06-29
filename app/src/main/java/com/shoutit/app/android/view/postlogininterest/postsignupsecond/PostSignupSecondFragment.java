@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.appunite.rx.functions.Functions1;
+import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseActivityComponent;

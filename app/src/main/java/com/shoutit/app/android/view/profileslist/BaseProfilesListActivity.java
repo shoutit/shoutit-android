@@ -26,7 +26,6 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import rx.functions.Action1;
 
 public abstract class BaseProfilesListActivity extends BaseActivity {
 
@@ -117,7 +116,6 @@ public abstract class BaseProfilesListActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK && (requestCode == REQUEST_OPENED_PROFILE_WAS_LISTENED)) {
-            // Need to refresh items if returned from other profile which was listened/unlistened.
             presenter.refreshData();
             recyclerView.scrollToPosition(0);
         } else if (requestCode == RESULT_OK) {

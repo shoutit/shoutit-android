@@ -12,10 +12,13 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.PagesSuggestionResponse;
 import com.shoutit.app.android.api.model.ProfilesListResponse;
 import com.shoutit.app.android.api.model.RegisterDeviceRequest;
 import com.shoutit.app.android.api.model.SearchProfileResponse;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.api.model.UserLocation;
+import com.shoutit.app.android.api.model.UserSuggestionResponse;
 import com.shoutit.app.android.utils.LogHelper;
 
 import javax.annotation.Nonnull;
@@ -41,6 +44,10 @@ public class ProfilesDao {
     private final LoadingCache<String, FriendsDao> friendsCache;
     @Nonnull
     private final LoadingCache<String, ContactsDao> contactsCache;
+    @Nonnull
+    private final LoadingCache<FriendsSuggestionPointer, UsersSuggestionDao> usersSuggestionCache;
+    @Nonnull
+    private final LoadingCache<FriendsSuggestionPointer, PagesSuggestionDao> pagesSuggestionCache;
     @Nonnull
     private final LoadingCache<String, AdminsDao> adminsCache;
 
@@ -90,6 +97,22 @@ public class ProfilesDao {
                     }
                 });
 
+        usersSuggestionCache = CacheBuilder.newBuilder()
+                .build(new CacheLoader<FriendsSuggestionPointer, UsersSuggestionDao>() {
+                    @Override
+                    public UsersSuggestionDao load(final FriendsSuggestionPointer pointer) throws Exception {
+                        return new UsersSuggestionDao(pointer);
+                    }
+                });
+
+        pagesSuggestionCache = CacheBuilder.newBuilder()
+                .build(new CacheLoader<FriendsSuggestionPointer, PagesSuggestionDao>() {
+                    @Override
+                    public PagesSuggestionDao load(final FriendsSuggestionPointer pointer) throws Exception {
+                        return new PagesSuggestionDao(pointer);
+                    }
+                });
+
         adminsCache = CacheBuilder.newBuilder()
                 .build(new CacheLoader<String, AdminsDao>() {
                     @Override
@@ -97,6 +120,16 @@ public class ProfilesDao {
                         return new AdminsDao(userName);
                     }
                 });
+    }
+
+    @Nonnull
+    public UsersSuggestionDao getUsersSuggestionDao(@Nonnull FriendsSuggestionPointer pointer) {
+        return usersSuggestionCache.getUnchecked(pointer);
+    }
+
+    @Nonnull
+    public PagesSuggestionDao getPagesSuggestionDao(@Nonnull FriendsSuggestionPointer pointer) {
+        return pagesSuggestionCache.getUnchecked(pointer);
     }
 
     @Nonnull
@@ -284,6 +317,52 @@ public class ProfilesDao {
         }
     }
 
+    public class UsersSuggestionDao extends BaseProfileListDao {
+
+        private final UserLocation userLocation;
+        private FriendsSuggestionPointer pointer;
+
+        public UsersSuggestionDao(@Nonnull FriendsSuggestionPointer pointer) {
+            super(pointer.getUserName(), networkScheduler);
+            this.pointer = pointer;
+            userLocation = pointer.getUserLocation();
+        }
+
+        @Override
+        protected Observable<ProfilesListResponse> getRequest(int pageNumber) {
+            if (userLocation != null) {
+                return apiService.usersSuggestion(userLocation.getCountry(), userLocation.getState(), userLocation.getCity(), 1, pointer.getPageSize())
+                        .map((Func1<UserSuggestionResponse, ProfilesListResponse>) userSuggestionResponse -> userSuggestionResponse);
+            } else {
+                return apiService.usersSuggestion(null, null, null, 1, pointer.getPageSize())
+                        .map((Func1<UserSuggestionResponse, ProfilesListResponse>) userSuggestionResponse -> userSuggestionResponse);
+            }
+        }
+    }
+
+    public class PagesSuggestionDao extends BaseProfileListDao {
+
+        private final UserLocation userLocation;
+        private FriendsSuggestionPointer pointer;
+
+        public PagesSuggestionDao(@Nonnull FriendsSuggestionPointer pointer) {
+            super(pointer.getUserName(), networkScheduler);
+            this.pointer = pointer;
+            userLocation = pointer.getUserLocation();
+        }
+
+        @Override
+        protected Observable<ProfilesListResponse> getRequest(final int pageNumber) {
+            if (userLocation != null) {
+                return apiService.pagesSuggestion(userLocation.getCountry(), userLocation.getState(), userLocation.getCity(), 1, pointer.getPageSize())
+                        .map((Func1<PagesSuggestionResponse, ProfilesListResponse>) pagesSuggestionResponse -> pagesSuggestionResponse);
+            } else {
+                return apiService.pagesSuggestion(null, null, null, 1, pointer.getPageSize())
+                        .map((Func1<PagesSuggestionResponse, ProfilesListResponse>) pagesSuggestionResponse -> pagesSuggestionResponse);
+            }
+        }
+    }
+
     public class AdminsDao extends BaseProfileListDao {
 
         public AdminsDao(@Nonnull String userName) {
@@ -293,6 +372,32 @@ public class ProfilesDao {
         @Override
         protected Observable<ProfilesListResponse> getRequest(int pageNumber) {
             return apiService.getAdmins(userName, pageNumber, PAGE_SIZE);
+        }
+    }
+
+    public static class FriendsSuggestionPointer {
+        private final int pageSize;
+        @android.support.annotation.Nullable
+        private final UserLocation userLocation;
+        private final String userName;
+
+        public FriendsSuggestionPointer(int pageSize, @android.support.annotation.Nullable UserLocation userLocation, String userName) {
+            this.pageSize = pageSize;
+            this.userLocation = userLocation;
+            this.userName = userName;
+        }
+
+        public int getPageSize() {
+            return pageSize;
+        }
+
+        @android.support.annotation.Nullable
+        public UserLocation getUserLocation() {
+            return userLocation;
+        }
+
+        public String getUserName() {
+            return userName;
         }
     }
 
