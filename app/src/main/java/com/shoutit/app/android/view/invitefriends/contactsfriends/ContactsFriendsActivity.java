@@ -35,6 +35,20 @@ public class ContactsFriendsActivity extends BaseProfilesListActivity {
         presenter = (ContactsFriendsPresenter) ((ContactsFriendsActivityComponent)
                 getActivityComponent()).profilesListPresenter();
 
+        presenter.getProfileSelectedObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(userName -> {
+                    startActivityForResult(
+                            UserOrPageProfileActivity.newIntent(ContactsFriendsActivity.this, userName),
+                            REQUEST_OPENED_PROFILE_WAS_LISTENED);
+                });
+
+        presenter.getSuccessFetchContacts()
+                .compose(bindToLifecycle())
+                .subscribe(responseBodyResponseOrError -> {
+                    presenter.refreshData();
+                });
+
         if (PermissionHelper.checkPermissions(this,
                 REQUEST_CODE_CONTACTS_PERMISSION,
                 ColoredSnackBar.contentView(this),
@@ -43,24 +57,6 @@ public class ContactsFriendsActivity extends BaseProfilesListActivity {
 
             presenter.fetchContacts();
         }
-
-        presenter.getProfileToOpenObservable()
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(userName -> {
-                    startActivityForResult(
-                            UserOrPageProfileActivity.newIntent(ContactsFriendsActivity.this, userName),
-                            REQUEST_OPENED_PROFILE_WAS_LISTENED);
-                });
-
-        presenter.getRefreshContactsObservable()
-                .compose(bindToLifecycle())
-                .subscribe();
-
-        presenter.getActionOnlyForLoggedInUser()
-                .compose(bindToLifecycle())
-                .subscribe(ColoredSnackBar.errorSnackBarAction(
-                        ColoredSnackBar.contentView(this),
-                        R.string.error_action_only_for_logged_in_user));
     }
 
     @Override

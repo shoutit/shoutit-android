@@ -2,7 +2,6 @@ package com.shoutit.app.android.utils;
 
 
 import com.shoutit.app.android.UserPreferences;
-import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.User;
 
 import javax.annotation.Nonnull;
@@ -12,11 +11,11 @@ import javax.inject.Inject;
 public class PreferencesHelper {
 
     @Nullable
-    private final BaseProfile currentUser;
+    private final User currentUser;
 
     @Inject
     public PreferencesHelper(@Nonnull UserPreferences preferences) {
-        currentUser = preferences.getPageOrUser();
+        currentUser = preferences.getUser();
     }
 
     public boolean isMyProfile(@Nonnull String userNameToCompare) {

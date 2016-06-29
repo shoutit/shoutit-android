@@ -1,17 +1,18 @@
 package com.shoutit.app.android.view.profileslist;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
 import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.jakewharton.rxbinding.view.RxView;
-import com.shoutit.app.android.BaseActivity;
+import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LoadMoreHelper;
@@ -25,35 +26,35 @@ import java.util.List;
 import javax.inject.Inject;
 
 import butterknife.Bind;
-import butterknife.ButterKnife;
-import rx.functions.Action1;
 
-public abstract class BaseProfilesListActivity extends BaseActivity {
+public abstract class BaseProfileListFragment extends BaseFragment {
 
-    protected static final int REQUEST_OPENED_PROFILE_WAS_LISTENED = 1;
-
-    @Bind(R.id.profiles_list_toolbar)
-    protected Toolbar toolbar;
     @Bind(R.id.profiles_list_recycler_view)
     RecyclerView recyclerView;
     @Bind(R.id.base_progress)
-    protected View progressView;
+    View progressView;
 
     @Inject
     BaseProfileListPresenter presenter;
     @Inject
     ProfilesListAdapter adapter;
 
+    protected static final int REQUEST_OPENED_PROFILE_WAS_LISTENED = 1;
+
+    @android.support.annotation.Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_profiles_list);
-        ButterKnife.bind(this);
+    public View onCreateView(LayoutInflater inflater,
+                             @android.support.annotation.Nullable ViewGroup container,
+                             @android.support.annotation.Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_profile_list, container, false);
+    }
 
-        recyclerView.setLayoutManager(new MyLinearLayoutManager(this));
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        recyclerView.setLayoutManager(new MyLinearLayoutManager(getActivity()));
         recyclerView.setAdapter(adapter);
-
-        setUpToolbar();
 
         presenter.getAdapterItemsObservable()
                 .compose(this.<List<BaseAdapterItem>>bindToLifecycle())
@@ -65,17 +66,15 @@ public abstract class BaseProfilesListActivity extends BaseActivity {
 
         presenter.getErrorObservable()
                 .compose(this.<Throwable>bindToLifecycle())
-                .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(this)));
+                .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(getActivity())));
 
         presenter.getListenSuccessObservable()
                 .compose(this.<String>bindToLifecycle())
-                .doOnNext(s -> setResult(RESULT_OK))
-                .subscribe(RxUtils.listenMessageAction(this));
+                .subscribe(RxUtils.listenMessageAction(getActivity()));
 
         presenter.getUnListenSuccessObservable()
                 .compose(this.<String>bindToLifecycle())
-                .doOnNext(s -> setResult(RESULT_OK))
-                .subscribe(RxUtils.unListenMessageAction(this));
+                .subscribe(RxUtils.unListenMessageAction(getActivity()));
 
         presenter.getLoadMoreObservable()
                 .compose(bindToLifecycle())
@@ -92,7 +91,7 @@ public abstract class BaseProfilesListActivity extends BaseActivity {
         presenter.getActionOnlyForLoggedInUsers()
                 .compose(bindToLifecycle())
                 .subscribe(ColoredSnackBar.errorSnackBarAction(
-                        ColoredSnackBar.contentView(this),
+                        ColoredSnackBar.contentView(getActivity()),
                         R.string.error_action_only_for_logged_in_user));
 
         RxRecyclerView.scrollEvents(recyclerView)
@@ -101,26 +100,12 @@ public abstract class BaseProfilesListActivity extends BaseActivity {
                 .subscribe(presenter.getLoadMoreObserver());
     }
 
-    protected abstract void setUpToolbar();
-
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK && (requestCode == REQUEST_OPENED_PROFILE_WAS_LISTENED)) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK && (requestCode == REQUEST_OPENED_PROFILE_WAS_LISTENED)) {
             // Need to refresh items if returned from other profile which was listened/unlistened.
             presenter.refreshData();
-            recyclerView.scrollToPosition(0);
-        } else if (requestCode == RESULT_OK) {
+        } else if (requestCode == Activity.RESULT_OK) {
             super.onActivityResult(requestCode, requestCode, data);
         }
     }

@@ -25,6 +25,7 @@ import com.shoutit.app.android.utils.BlurTransform;
 import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.RtlUtils;
+import com.shoutit.app.android.view.admins.AdminsFragment;
 import com.shoutit.app.android.view.conversations.ConversationsPagerFragment;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
 import com.shoutit.app.android.view.credits.CreditsFragment;
@@ -170,6 +171,7 @@ public class MenuHandler {
                     adminsItem.setVisibility(user.isUser() ?
                             View.GONE : View.VISIBLE);
                 });
+
 
         final Optional<String> pageId = userPreferences.getPageId();
         useProfile.setVisibility(pageId.isPresent() ? View.VISIBLE : View.GONE);
@@ -393,6 +395,8 @@ public class MenuHandler {
                 return InviteFriendsFragment.newInstance();
             case FRAGMENT_PAGES:
                 return PagesPagerFragment.newInstance();
+            case FRAGMENT_ADMINS:
+                return AdminsFragment.newInstance();
             default:
                 throw new RuntimeException("Unknown fragment tag");
         }
