@@ -3,7 +3,7 @@ package com.shoutit.app.android.api;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.shoutit.app.android.api.model.AddAdminRequest;
+import com.shoutit.app.android.api.model.AdminRequest;
 import com.shoutit.app.android.api.model.BlockedProfilesResposne;
 import com.shoutit.app.android.api.model.CallerProfile;
 import com.shoutit.app.android.api.model.Category;
@@ -306,12 +306,14 @@ public interface ApiService {
                                                      @Query("page") Integer page,
                                                      @Query("page_size") Integer pageSize);
 
-    @GET("profiles/me/listening")
-    Observable<ProfilesListResponse> profilesListenings(@Query("page") Integer page,
+    @GET("profiles/{username}/listening")
+    Observable<ProfilesListResponse> profilesListenings(@Path("username") String userName,
+                                                        @Query("page") Integer page,
                                                         @Query("page_size") Integer pageSize);
 
-    @GET("profiles/me/interests")
-    Observable<ProfilesListResponse> tagsListenings(@Query("page") Integer page,
+    @GET("profiles/{username}/interests")
+    Observable<ProfilesListResponse> tagsListenings(@Path("username") String userName,
+                                                    @Query("page") Integer page,
                                                     @Query("page_size") Integer pageSize);
 
     @GET("profiles/{user_name}/listeners")
@@ -567,10 +569,11 @@ public interface ApiService {
                                                @Query("page_size") Integer pageSize);
 
     @DELETE("pages/{username}/admin")
-    Observable<ResponseBody> deleteAdmin(@Path("username") String userName);
+    Observable<ResponseBody> deleteAdmin(@Path("username") String userName,
+                                         @Body AdminRequest adminRequest);
 
     @POST("pages/{username}/admin")
     Observable<ResponseBody> addAdmin(@Path("username") String pageUserName,
-                                      @Body AddAdminRequest addAdminRequest);
+                                      @Body AdminRequest addAdminRequest);
 
 }

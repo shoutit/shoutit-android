@@ -7,12 +7,14 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.dao.BaseProfileListDao;
 import com.shoutit.app.android.dao.ListeningsDao;
+import com.shoutit.app.android.model.ListeningsPointer;
 import com.shoutit.app.android.view.profileslist.BaseProfileListPresenter;
 
 import javax.annotation.Nonnull;
 
 import rx.Observable;
 import rx.Scheduler;
+import rx.functions.Func1;
 
 public class ListeningsPresenter extends BaseProfileListPresenter {
 
@@ -33,8 +35,10 @@ public class ListeningsPresenter extends BaseProfileListPresenter {
         super(listeningHalfPresenter, uiScheduler, null, userPreferences);
         this.listeningsType = listeningsType;
 
+        @SuppressWarnings("ConstantConditions") final String username = userPreferences.getPageOrUser().getUsername();
+
         daoObservable = Observable.just(
-                listeningsDao.getDao(listeningsType))
+                listeningsDao.getDao(new ListeningsPointer(listeningsType, username)))
                 .compose(ObservableExtensions.behaviorRefCount());
 
         init();
@@ -45,6 +49,15 @@ public class ListeningsPresenter extends BaseProfileListPresenter {
         return new ListeningsProfileAdapterItem(
                 profile, profileSelectedSubject, getListeningHalfPresenter().getListenProfileSubject(),
                 listeningsType, actionOnlyForLoggedInUsers, true, false);
+    }
+
+    @Nonnull
+    public Observable<String> getOpenProfileObservable() {
+        if (listeningsType.equals(ListeningsPresenter.ListeningsType.INTERESTS)) {
+            return profileSelectedSubject.map(BaseProfile::getName);
+        } else {
+            return profileSelectedSubject.map(BaseProfile::getUsername);
+        }
     }
 
     @Override

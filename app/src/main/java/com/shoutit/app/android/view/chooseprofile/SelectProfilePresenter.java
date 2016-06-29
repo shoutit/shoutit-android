@@ -4,21 +4,18 @@ import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.UiScheduler;
-import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
 import com.shoutit.app.android.api.model.BaseProfile;
-import com.shoutit.app.android.api.model.ListenersResponse;
-import com.shoutit.app.android.api.model.ProfilesListResponse;
-import com.shoutit.app.android.api.model.ProfilesListResponse;
-import com.shoutit.app.android.api.model.ProfilesListResponse;
 import com.shoutit.app.android.api.model.ProfilesListResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dao.ListenersDaos;
 import com.shoutit.app.android.dao.ListeningsDao;
+import com.shoutit.app.android.model.ListeningsPointer;
 import com.shoutit.app.android.view.listenings.ListeningsPresenter;
 
 import java.util.List;
@@ -48,16 +45,19 @@ public class SelectProfilePresenter {
 
     public SelectProfilePresenter(@Nonnull ListeningsDao listeningsDao,
                                   @Nonnull ListenersDaos listenersDao,
-                                  @UiScheduler Scheduler uiScheduler) {
+                                  @UiScheduler Scheduler uiScheduler,
+                                  @Nonnull UserPreferences userPreferences) {
+
+        final String userName = userPreferences.getUser().getUsername();
 
         final Observable<ResponseOrError<ProfilesListResponse>> listeningsObservable = listeningsDao
-                .getDao(ListeningsPresenter.ListeningsType.USERS_AND_PAGES)
+                .getDao(new ListeningsPointer(ListeningsPresenter.ListeningsType.USERS_AND_PAGES, userName))
                 .getProfilesObservable()
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<ProfilesListResponse>>behaviorRefCount());
 
         final Observable<ResponseOrError<ProfilesListResponse>> listenersObservable = listenersDao
-                .getDao(User.ME)
+                .getDao(userName)
                 .getProfilesObservable()
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<ProfilesListResponse>>behaviorRefCount());

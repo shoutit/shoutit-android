@@ -8,12 +8,15 @@ import android.support.v7.app.ActionBar;
 
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.profileslist.BaseProfilesListActivity;
 
 import javax.annotation.Nonnull;
+
+import rx.functions.Func1;
 
 public class PagesSuggestionActivity extends BaseProfilesListActivity {
 
@@ -29,6 +32,7 @@ public class PagesSuggestionActivity extends BaseProfilesListActivity {
                 getActivityComponent()).profilesListPresenter();
 
         presenter.getProfileSelectedObservable()
+                .map(BaseProfile::getUsername)
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(userName -> {
                     startActivityForResult(

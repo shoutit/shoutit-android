@@ -7,6 +7,7 @@ import android.support.v7.app.ActionBar;
 
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.view.profileslist.BaseProfilesListActivity;
@@ -19,6 +20,7 @@ import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import rx.functions.Action1;
+import rx.functions.Func1;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -44,14 +46,12 @@ public class ListenersActivity extends BaseProfilesListActivity {
         presenter = (ListenersPresenter) ((ListenersActivityComponent) getActivityComponent()).profilesListPresenter();
 
         presenter.getProfileSelectedObservable()
+                .map(BaseProfile::getUsername)
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String userName) {
-                            startActivityForResult(
-                                    UserOrPageProfileActivity.newIntent(ListenersActivity.this, userName),
-                                    REQUEST_OPENED_PROFILE_WAS_LISTENED);
-                    }
+                .subscribe(userName -> {
+                        startActivityForResult(
+                                UserOrPageProfileActivity.newIntent(ListenersActivity.this, userName),
+                                REQUEST_OPENED_PROFILE_WAS_LISTENED);
                 });
     }
 

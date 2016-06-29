@@ -2,12 +2,12 @@ package com.shoutit.app.android.api.model;
 
 import javax.annotation.Nonnull;
 
-public class AddAdminRequest {
+public class AdminRequest {
 
     @Nonnull
     private final Profile profile;
 
-    public AddAdminRequest(@Nonnull String userId) {
+    public AdminRequest(@Nonnull String userId) {
         this.profile = new Profile(userId);
     }
 
