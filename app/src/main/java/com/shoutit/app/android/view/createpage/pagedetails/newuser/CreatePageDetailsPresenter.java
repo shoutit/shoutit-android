@@ -89,7 +89,7 @@ public class CreatePageDetailsPresenter {
                         mListener.startMainActivity();
                     }, throwable -> {
                         mListener.showProgress(false);
-                        mListener.error();
+                        mListener.error(throwable);
                     }));
         }
     }

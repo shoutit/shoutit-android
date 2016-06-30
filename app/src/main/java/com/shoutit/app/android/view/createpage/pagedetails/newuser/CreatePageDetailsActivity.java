@@ -138,8 +138,8 @@ public class CreatePageDetailsActivity extends BaseActivity implements CreatePag
     }
 
     @Override
-    public void error() {
-        ColoredSnackBar.error(ColoredSnackBar.contentView(this), R.string.error_default, Snackbar.LENGTH_SHORT).show();
+    public void error(final Throwable error) {
+        ColoredSnackBar.error(ColoredSnackBar.contentView(this), error).show();
     }
 
     @Override

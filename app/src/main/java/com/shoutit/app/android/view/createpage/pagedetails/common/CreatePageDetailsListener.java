@@ -8,7 +8,7 @@ public interface CreatePageDetailsListener {
 
     void showProgress(boolean show);
 
-    void error();
+    void error(Throwable error);
 
     void startMainActivity();
 

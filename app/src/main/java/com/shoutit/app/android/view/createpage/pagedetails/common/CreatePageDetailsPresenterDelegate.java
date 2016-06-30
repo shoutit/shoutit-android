@@ -43,7 +43,7 @@ public class CreatePageDetailsPresenterDelegate {
                     final List<CategoryInfo> categoryInfos = getCategoryInfos(currentCategory);
                     createPageDetailsListener.setCategories(categoryInfos);
                 }, throwable -> {
-                    createPageDetailsListener.error();
+                    createPageDetailsListener.error(throwable);
                 });
     }
 
