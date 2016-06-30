@@ -32,6 +32,7 @@ import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessagesResponse;
 import com.shoutit.app.android.api.model.NotificationsResponse;
 import com.shoutit.app.android.api.model.PageCategory;
+import com.shoutit.app.android.api.model.PageCreateRequest;
 import com.shoutit.app.android.api.model.PagesResponse;
 import com.shoutit.app.android.api.model.PagesSuggestionResponse;
 import com.shoutit.app.android.api.model.PostMessage;
@@ -575,5 +576,8 @@ public interface ApiService {
     @POST("pages/{username}/admin")
     Observable<ResponseBody> addAdmin(@Path("username") String pageUserName,
                                       @Body AdminRequest addAdminRequest);
+
+    @POST("pages")
+    Observable<User> createPage(@Body PageCreateRequest pageCreateRequest);
 
 }
