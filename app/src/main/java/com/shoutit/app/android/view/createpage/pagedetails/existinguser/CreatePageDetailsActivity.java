@@ -10,9 +10,11 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
@@ -28,6 +30,7 @@ import com.shoutit.app.android.view.main.MainActivity;
 import com.uservoice.uservoicesdk.UserVoice;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -50,6 +53,8 @@ public class CreatePageDetailsActivity extends BaseActivity implements CreatePag
     Toolbar mCreatePageCategoryToolbar;
     @Bind(R.id.base_progress)
     View progressView;
+    @Bind(R.id.create_page_details_button)
+    Button createButton;
 
     public static Intent newIntent(Context context, String selectedCategory) {
         return new Intent(context, CreatePageDetailsActivity.class).putExtra(EXTRA_SELECTED_CATEGORY, selectedCategory);
@@ -71,6 +76,15 @@ public class CreatePageDetailsActivity extends BaseActivity implements CreatePag
         ToolbarUtils.setupToolbar(mCreatePageCategoryToolbar, R.string.create_page_category_title, this);
 
         mPresenter.register(this);
+
+        RxView.clicks(createButton)
+                .throttleFirst(5, TimeUnit.SECONDS)
+                .compose(bindToLifecycle())
+                .subscribe(ignore -> {
+                    mPresenter.passCreatePageData(
+                            new CreatePageDetailsPresenter.CreatePageData((CategoryInfo) mAdapter.getItem(
+                                    mCreatePageDetailsSpinner.getSelectedItemPosition()), mCreatePageDetailsName.getText().toString()));
+                });
     }
 
     @Override
@@ -125,11 +139,6 @@ public class CreatePageDetailsActivity extends BaseActivity implements CreatePag
     @Override
     public void setToolbarTitle(String title) {
         mCreatePageCategoryToolbar.setTitle(title);
-    }
-
-    @OnClick(R.id.create_page_details_button)
-    public void onClick() {
-        mPresenter.passCreatePageData(new CreatePageDetailsPresenter.CreatePageData((CategoryInfo) mAdapter.getItem(mCreatePageDetailsSpinner.getSelectedItemPosition()), mCreatePageDetailsName.getText().toString()));
     }
 
     @OnClick(R.id.activity_login_feedback)
