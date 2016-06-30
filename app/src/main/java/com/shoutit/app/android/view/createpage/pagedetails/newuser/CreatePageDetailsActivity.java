@@ -84,6 +84,7 @@ public class CreatePageDetailsActivity extends BaseActivity implements CreatePag
         setContentView(R.layout.create_page_details_activity);
         ButterKnife.bind(this);
 
+        mCreatePageDetailsPassword.setTransformationMethod(new PasswordTransformationMethod());
         mAdapter = new SpinnerAdapter(LayoutInflater.from(this));
         mCreatePageDetailsSpinner.setAdapter(mAdapter);
         ToolbarUtils.setupToolbar(mCreatePageCategoryToolbar, R.string.create_page_category_title, this);
