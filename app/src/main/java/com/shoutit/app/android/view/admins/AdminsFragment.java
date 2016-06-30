@@ -16,6 +16,7 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.PreferencesHelper;
 import com.shoutit.app.android.view.chooseprofile.SelectProfileActivity;
+import com.shoutit.app.android.view.pages.my.SelectListenersActivity;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.profileslist.BaseProfileListFragment;
 
@@ -88,7 +89,7 @@ public class AdminsFragment extends BaseProfileListFragment implements AdminsDia
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.admins_menu_add:
-                startActivityForResult(SelectProfileActivity.newIntent(getActivity()), REQUEST_CODE_SELECT_ADMIN);
+                startActivityForResult(SelectListenersActivity.newIntent(getActivity()), REQUEST_CODE_SELECT_ADMIN);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -143,7 +144,7 @@ public class AdminsFragment extends BaseProfileListFragment implements AdminsDia
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE_SELECT_ADMIN) {
-            final String selectedAdminId = checkNotNull(data.getStringExtra(SelectProfileActivity.RESULT_PROFILE_ID));
+            final String selectedAdminId = checkNotNull(data.getStringExtra(SelectListenersActivity.RESULT_PROFILE_ID));
             presenter.addAdmin(selectedAdminId);
         } else {
             super.onActivityResult(requestCode, resultCode, data);
