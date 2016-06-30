@@ -84,6 +84,7 @@ import retrofit2.Response;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.HTTP;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -568,7 +569,7 @@ public interface ApiService {
                                                @Query("page") Integer page,
                                                @Query("page_size") Integer pageSize);
 
-    @DELETE("pages/{username}/admin")
+    @HTTP(method = "DELETE", path = "pages/{username}/admin", hasBody = true)
     Observable<ResponseBody> deleteAdmin(@Path("username") String userName,
                                          @Body AdminRequest adminRequest);
 
