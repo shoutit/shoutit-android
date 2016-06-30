@@ -101,7 +101,7 @@ public class ShoutPresenterTest {
                 .thenReturn("text");
 
         when(userPreferences.isNormalUser()).thenReturn(true);
-        when(userPreferences.getPageOrUser()).thenReturn(TestUtils.getUser());
+        when(userPreferences.getUserOrPage()).thenReturn(TestUtils.getUser());
 
         presenter = new ShoutPresenter(shoutsDao, "zz", context, Schedulers.immediate(), userPreferences, globalRefreshPresenter);
     }

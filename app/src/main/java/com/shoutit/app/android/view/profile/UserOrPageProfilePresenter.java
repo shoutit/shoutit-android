@@ -154,7 +154,7 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
         this.listeningHalfPresenter = listeningHalfPresenter;
         this.isNormalUser = userPreferences.isNormalUser();
 
-        final BaseProfile loggedInUser = userPreferences.getPageOrUser();
+        final BaseProfile loggedInUser = userPreferences.getUserOrPage();
         if (loggedInUser != null) {
             loggedInUserName = loggedInUser.getUsername();
         }

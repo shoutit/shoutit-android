@@ -149,7 +149,9 @@ public class MenuHandler {
 
     public void initMenu(@Nonnull View view, @IdRes int id) {
         ButterKnife.bind(this, view);
+
         selectableItems = ImmutableList.of(homeItem, discoverItem, browseItem, chatItem, creditsItem, pagesItem, adminsItem);
+
         userPreferences.getPageOrUserObservable()
                 .filter(user -> user != null)
                 .map(BaseProfile::getStats)
@@ -173,8 +175,7 @@ public class MenuHandler {
                 });
 
 
-        final Optional<String> pageId = userPreferences.getPageId();
-        useProfile.setVisibility(pageId.isPresent() ? View.VISIBLE : View.GONE);
+        useProfile.setVisibility(userPreferences.isLoggedInAsPage() ? View.VISIBLE : View.GONE);
 
         setData(id);
     }

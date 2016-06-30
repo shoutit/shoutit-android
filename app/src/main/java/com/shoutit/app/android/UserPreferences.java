@@ -70,7 +70,7 @@ public class UserPreferences {
                 .observeOn(uiScheduler);
 
         pageOrUserObservable = Observable
-                .defer(() -> Observable.just(getPageOrUser()))
+                .defer(() -> Observable.just(getUserOrPage()))
                 .compose(MoreOperators.<BaseProfile>refresh(userRefreshSubject))
                 .observeOn(uiScheduler);
 
@@ -157,6 +157,10 @@ public class UserPreferences {
         return !isGuest() && isUserLoggedIn();
     }
 
+    public boolean isLoggedInAsPage() {
+        return getPageId().isPresent();
+    }
+
     public Optional<String> getAuthToken() {
         return Optional.fromNullable(mPreferences.getString(AUTH_TOKEN, null));
     }
@@ -200,7 +204,7 @@ public class UserPreferences {
     }
 
     @Nullable
-    public BaseProfile getPageOrUser() {
+    public BaseProfile getUserOrPage() {
         return getUserByType(getPageId().isPresent() ? KEY_PAGE : KEY_USER);
     }
 
@@ -222,7 +226,7 @@ public class UserPreferences {
 
     @NonNull
     public BaseProfile getUserOrThrow() {
-        return Preconditions.checkNotNull(getPageOrUser());
+        return Preconditions.checkNotNull(getUserOrPage());
     }
 
     @Nonnull
@@ -329,7 +333,7 @@ public class UserPreferences {
     }
 
     public void updateStats(@Nonnull Stats pusherStats) {
-        final BaseProfile user = getPageOrUser();
+        final BaseProfile user = getUserOrPage();
         if (user == null) {
             return;
         }
@@ -364,6 +368,6 @@ public class UserPreferences {
     }
 
     public String getUserId() {
-        return Preconditions.checkNotNull(getPageOrUser()).getId();
+        return Preconditions.checkNotNull(getUserOrPage()).getId();
     }
 }

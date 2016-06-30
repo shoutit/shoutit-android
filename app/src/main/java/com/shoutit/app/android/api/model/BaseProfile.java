@@ -52,6 +52,10 @@ public class BaseProfile implements ProfileType {
         return USER.equals(type);
     }
 
+    public boolean isPage() {
+        return PAGE.equals(type);
+    }
+
     @Override
     public String getId() {
         return id;
