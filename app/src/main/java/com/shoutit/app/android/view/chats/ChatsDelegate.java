@@ -95,7 +95,7 @@ public class ChatsDelegate {
         mAmazonHelper = amazonHelper;
         this.newMessagesSubject = newMessagesSubject;
         mBus = bus;
-        mUser = mUserPreferences.getPageOrUser();
+        mUser = mUserPreferences.getUserOrPage();
     }
 
     public void setListener(Listener listener) {

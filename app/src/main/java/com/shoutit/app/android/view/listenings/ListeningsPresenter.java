@@ -14,7 +14,6 @@ import javax.annotation.Nonnull;
 
 import rx.Observable;
 import rx.Scheduler;
-import rx.functions.Func1;
 
 public class ListeningsPresenter extends BaseProfileListPresenter {
 
@@ -35,7 +34,7 @@ public class ListeningsPresenter extends BaseProfileListPresenter {
         super(listeningHalfPresenter, uiScheduler, null, userPreferences);
         this.listeningsType = listeningsType;
 
-        @SuppressWarnings("ConstantConditions") final String username = userPreferences.getPageOrUser().getUsername();
+        @SuppressWarnings("ConstantConditions") final String username = userPreferences.getUserOrPage().getUsername();
 
         daoObservable = Observable.just(
                 listeningsDao.getDao(new ListeningsPointer(listeningsType, username)))

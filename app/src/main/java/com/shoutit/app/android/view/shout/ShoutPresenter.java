@@ -102,7 +102,7 @@ public class ShoutPresenter {
         mUserPreferences = userPreferences;
 
         final boolean isNormalUser = userPreferences.isNormalUser();
-        final BaseProfile currentUser = userPreferences.getPageOrUser();
+        final BaseProfile currentUser = userPreferences.getUserOrPage();
         final String currentUserName = currentUser != null ? currentUser.getUsername() : null;
 
         /** Requests **/

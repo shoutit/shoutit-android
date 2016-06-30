@@ -112,13 +112,13 @@ public class ChatsFirstConversationPresenter {
         calledPersonProfile = chatParticipantProfileSubject
                 .filter(Functions1.isNotNull())
                 .filter(profile ->
-                        !Objects.equal(userPreferences.getPageOrUser().getUsername(), profile.getUsername()));
+                        !Objects.equal(userPreferences.getUserOrPage().getUsername(), profile.getUsername()));
 
         mChatsDelegate = new ChatsDelegate(pusher, uiScheduler, networkScheduler, apiService, resources, userPreferences, context, amazonHelper, newMessagesSubject, bus);
     }
 
     public void register(@NonNull FirstConversationListener listener) {
-        final BaseProfile user = mUserPreferences.getPageOrUser();
+        final BaseProfile user = mUserPreferences.getUserOrPage();
         assert user != null;
         mListener = listener;
         mListener.showDeleteMenu(false);
@@ -158,7 +158,7 @@ public class ChatsFirstConversationPresenter {
                                         user.getName(),
                                         user.getUsername(),
                                         user.getType(),
-                                        user.getImage())), mUserPreferences.getPageOrUser().getId())
+                                        user.getImage())), mUserPreferences.getUserOrPage().getId())
                                 , null);
                         setupUserForVideoChat(user);
                     }

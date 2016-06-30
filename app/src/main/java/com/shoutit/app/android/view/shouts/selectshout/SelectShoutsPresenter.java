@@ -17,7 +17,6 @@ import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.PromotionHelper;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
@@ -48,7 +47,7 @@ public class SelectShoutsPresenter {
                                  ApiService apiService,
                                  UserPreferences userPreferences,
                                  @ForActivity final Context context) {
-        final BaseProfile user = userPreferences.getPageOrUser();
+        final BaseProfile user = userPreferences.getUserOrPage();
         assert user != null;
         final Observable<ResponseOrError<ShoutsResponse>> shoutsResponse = apiService.shoutsForUser(user.getUsername(), 0, 100)
                 .subscribeOn(networkScheduler)
