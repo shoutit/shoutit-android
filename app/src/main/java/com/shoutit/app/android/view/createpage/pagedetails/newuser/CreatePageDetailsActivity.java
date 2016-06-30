@@ -43,6 +43,7 @@ public class CreatePageDetailsActivity extends BaseActivity implements CreatePag
 
 
     private static final String EXTRA_SELECTED_CATEGORY = "EXTRA_SELECTED_CATEGORY";
+    private static final String EXTRA_IS_FROM_REGISTRATION = "EXTRA_IS_FROM_REGISTRATION";
 
     @Bind(R.id.create_page_details_spinner)
     Spinner mCreatePageDetailsSpinner;
@@ -68,15 +69,22 @@ public class CreatePageDetailsActivity extends BaseActivity implements CreatePag
     View progressView;
     @Bind(R.id.create_page_details_bottom_text)
     TextView mCreatePageDetailsBottomText;
+    @Bind(R.id.create_page_info_section)
+    View infoSection;
+    @Bind(R.id.login_bottom_actions_container)
+    View bottomButtons;
 
-    public static Intent newIntent(Context context, String selectedCategory) {
-        return new Intent(context, CreatePageDetailsActivity.class).putExtra(EXTRA_SELECTED_CATEGORY, selectedCategory);
+    public static Intent newIntent(Context context, String selectedCategory, boolean isFromRegistration) {
+        return new Intent(context, CreatePageDetailsActivity.class)
+                .putExtra(EXTRA_SELECTED_CATEGORY, selectedCategory)
+                .putExtra(EXTRA_IS_FROM_REGISTRATION, isFromRegistration);
     }
 
     @Inject
     CreatePageDetailsPresenter mPresenter;
 
     private SpinnerAdapter mAdapter;
+    private boolean isFromRegistration;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -85,6 +93,13 @@ public class CreatePageDetailsActivity extends BaseActivity implements CreatePag
         ButterKnife.bind(this);
 
         mCreatePageDetailsPassword.setTransformationMethod(new PasswordTransformationMethod());
+
+        isFromRegistration = getIntent().getBooleanExtra(EXTRA_IS_FROM_REGISTRATION, false);
+
+        infoSection.setVisibility(isFromRegistration ? View.VISIBLE : View.GONE);
+        mCreatePageDetailsBottomText.setVisibility(isFromRegistration ? View.VISIBLE : View.GONE);
+        bottomButtons.setVisibility(isFromRegistration ? View.VISIBLE : View.GONE);
+
         mAdapter = new SpinnerAdapter(LayoutInflater.from(this));
         mCreatePageDetailsSpinner.setAdapter(mAdapter);
         ToolbarUtils.setupToolbar(mCreatePageCategoryToolbar, R.string.create_page_category_title, this);
@@ -175,7 +190,11 @@ public class CreatePageDetailsActivity extends BaseActivity implements CreatePag
 
     @OnClick(R.id.create_page_details_button)
     public void onClick() {
-        mPresenter.passCreatePageData(new CreatePageDetailsPresenter.CreatePageData((CategoryInfo) mAdapter.getItem(mCreatePageDetailsSpinner.getSelectedItemPosition()), mCreatePageDetailsName.getText().toString(), mCreatePageDetailsFullName.getText().toString(), mCreatePageDetailsEmail.getText().toString(), mCreatePageDetailsPassword.getText().toString()));
+        mPresenter.passCreatePageData(new CreatePageDetailsPresenter.CreatePageData((CategoryInfo)
+                mAdapter.getItem(mCreatePageDetailsSpinner.getSelectedItemPosition()),
+                mCreatePageDetailsName.getText().toString(), mCreatePageDetailsFullName.getText().toString(),
+                mCreatePageDetailsEmail.getText().toString(), mCreatePageDetailsPassword.getText().toString()),
+                isFromRegistration);
     }
 
     @OnClick(R.id.activity_login_feedback)

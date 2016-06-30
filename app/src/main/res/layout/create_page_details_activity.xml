@@ -74,107 +74,115 @@
 
                 </android.support.design.widget.TextInputLayout>
 
-                <TextView
+                <LinearLayout
+                    android:id="@+id/create_page_info_section"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="12dp"
-                    android:layout_marginLeft="12dp"
-                    android:layout_marginRight="12dp"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginTop="22dp"
-                    android:text="@string/create_page_details_your_info_header"
-                    android:textAllCaps="true"
-                    android:textStyle="bold"/>
+                    android:orientation="vertical">
 
-                <android.support.design.widget.TextInputLayout
-                    android:id="@+id/create_page_details_full_name_layout"
-                    style="@style/BlueInputStyle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="12dp"
-                    android:layout_marginLeft="12dp"
-                    android:layout_marginRight="12dp"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginTop="12dp"
-                    app:hintTextAppearance="@style/BlueInputStyle">
-
-                    <EditText
-                        android:id="@+id/create_page_details_full_name"
+                    <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/create_page_details_full_name_hint"
-                        android:imeActionLabel="@string/login_next_label"
-                        android:nextFocusDown="@+id/register_password_edittext"
-                        android:singleLine="true"
-                        android:theme="@style/BlueEditText"/>
-
-                </android.support.design.widget.TextInputLayout>
-
-                <android.support.design.widget.TextInputLayout
-                    android:id="@+id/create_page_details_email_layout"
-                    style="@style/BlueInputStyle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="12dp"
-                    android:layout_marginLeft="12dp"
-                    android:layout_marginRight="12dp"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginTop="12dp"
-                    app:hintTextAppearance="@style/BlueInputStyle">
-
-                    <EditText
-                        android:id="@+id/create_page_details_email"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/create_page_details_email_hint"
-                        android:imeActionLabel="@string/login_next_label"
-                        android:inputType="textEmailAddress"
-                        android:nextFocusDown="@+id/register_password_edittext"
-                        android:theme="@style/BlueEditText"/>
-
-                </android.support.design.widget.TextInputLayout>
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="12dp"
-                    android:layout_marginLeft="12dp"
-                    android:layout_marginRight="12dp"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginTop="12dp">
+                        android:layout_marginEnd="12dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginRight="12dp"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="22dp"
+                        android:text="@string/create_page_details_your_info_header"
+                        android:textAllCaps="true"
+                        android:textStyle="bold"/>
 
                     <android.support.design.widget.TextInputLayout
-                        android:id="@+id/create_page_details_password_layout"
+                        android:id="@+id/create_page_details_full_name_layout"
                         style="@style/BlueInputStyle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="24dp"
-                        android:layout_marginRight="24dp"
+                        android:layout_marginEnd="12dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginRight="12dp"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="12dp"
                         app:hintTextAppearance="@style/BlueInputStyle">
 
                         <EditText
-                            android:id="@+id/create_page_details_password"
+                            android:id="@+id/create_page_details_full_name"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="@string/create_page_details_password_hint"
+                            android:hint="@string/create_page_details_full_name_hint"
                             android:imeActionLabel="@string/login_next_label"
-                            android:inputType="textFilter"
+                            android:nextFocusDown="@+id/register_password_edittext"
+                            android:singleLine="true"
+                            android:theme="@style/BlueEditText"/>
+
+                    </android.support.design.widget.TextInputLayout>
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/create_page_details_email_layout"
+                        style="@style/BlueInputStyle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="12dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginRight="12dp"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="12dp"
+                        app:hintTextAppearance="@style/BlueInputStyle">
+
+                        <EditText
+                            android:id="@+id/create_page_details_email"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/create_page_details_email_hint"
+                            android:imeActionLabel="@string/login_next_label"
+                            android:inputType="textEmailAddress"
                             android:nextFocusDown="@+id/register_password_edittext"
                             android:theme="@style/BlueEditText"/>
 
                     </android.support.design.widget.TextInputLayout>
 
-                    <CheckBox
-                        android:id="@+id/create_page_details_lock_password"
-                        android:layout_width="wrap_content"
+                    <FrameLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="end|center_vertical"
-                        android:layout_marginTop="4dp"
-                        android:background="?selectableItemBackground"
-                        android:button="@drawable/selector_password_lock"
-                        android:checked="true"/>
+                        android:layout_marginEnd="12dp"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginRight="12dp"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="12dp">
 
-                </FrameLayout>
+                        <android.support.design.widget.TextInputLayout
+                            android:id="@+id/create_page_details_password_layout"
+                            style="@style/BlueInputStyle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="24dp"
+                            android:layout_marginRight="24dp"
+                            app:hintTextAppearance="@style/BlueInputStyle">
+
+                            <EditText
+                                android:id="@+id/create_page_details_password"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="@string/create_page_details_password_hint"
+                                android:imeActionLabel="@string/login_next_label"
+                                android:inputType="textFilter"
+                                android:nextFocusDown="@+id/register_password_edittext"
+                                android:theme="@style/BlueEditText"/>
+
+                        </android.support.design.widget.TextInputLayout>
+
+                        <CheckBox
+                            android:id="@+id/create_page_details_lock_password"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end|center_vertical"
+                            android:layout_marginTop="4dp"
+                            android:background="?selectableItemBackground"
+                            android:button="@drawable/selector_password_lock"
+                            android:checked="true"/>
+
+                    </FrameLayout>
+
+                </LinearLayout>
 
                 <Button
                     android:id="@+id/create_page_details_button"

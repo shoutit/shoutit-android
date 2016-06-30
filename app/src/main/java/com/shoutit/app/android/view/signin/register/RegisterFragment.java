@@ -180,7 +180,9 @@ public class RegisterFragment extends BaseFragment {
 
         final String createPageText = getString(R.string.register_create_page_text, getString(R.string.register_create_page_highlight));
         final String createPageClick = getString(R.string.register_create_page_highlight);
-        final SpannableString createPageSpan = SpanUtils.clickableColoredSpan(createPageText, createPageClick, ContextCompat.getColor(getActivity(), R.color.colorAccent), () -> startActivity(CreatePageCategoryActivity.newIntent(getActivity())));
+        final SpannableString createPageSpan = SpanUtils.clickableColoredSpan(createPageText,
+                createPageClick, ContextCompat.getColor(getActivity(), R.color.colorAccent),
+                () -> startActivity(CreatePageCategoryActivity.newIntent(getActivity(), true)));
         mRegisterCreatePage.setMovementMethod(LinkMovementMethod.getInstance());
         mRegisterCreatePage.setText(createPageSpan);
     }

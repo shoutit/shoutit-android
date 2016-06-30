@@ -40,6 +40,8 @@ import butterknife.OnClick;
 
 public class CreatePageCategoryActivity extends BaseActivity implements CreatePageCategoryPresenter.Listener {
 
+    private static final String KEY_IS_FROM_REGISTRATION = "is_from_registration";
+
     class CategoryViewBinder extends ViewHolderManager.BaseViewHolder<CreatePageCategoryPresenter.CategoryItem> {
 
         private final View mView;
@@ -66,9 +68,11 @@ public class CreatePageCategoryActivity extends BaseActivity implements CreatePa
     }
 
     private UniversalAdapter mAdapter;
+    private boolean isFromRegistration;
 
-    public static Intent newIntent(Context context) {
-        return new Intent(context, CreatePageCategoryActivity.class);
+    public static Intent newIntent(Context context, boolean isFromRegistration) {
+        return new Intent(context, CreatePageCategoryActivity.class)
+                .putExtra(KEY_IS_FROM_REGISTRATION, isFromRegistration);
     }
 
     @Bind(R.id.create_page_category_toolbar)
@@ -86,6 +90,8 @@ public class CreatePageCategoryActivity extends BaseActivity implements CreatePa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.create_page_category_activity);
         ButterKnife.bind(this);
+
+        isFromRegistration = getIntent().getBooleanExtra(KEY_IS_FROM_REGISTRATION, false);
 
         ToolbarUtils.setupToolbar(mCreatePageCategoryToolbar, R.string.create_page_category_title, this);
 
@@ -165,6 +171,6 @@ public class CreatePageCategoryActivity extends BaseActivity implements CreatePa
 
     @Override
     public void startDetailsActivity(String categoryId) {
-        startActivity(CreatePageDetailsActivity.newIntent(this, categoryId));
+        startActivity(CreatePageDetailsActivity.newIntent(this, categoryId, isFromRegistration));
     }
 }

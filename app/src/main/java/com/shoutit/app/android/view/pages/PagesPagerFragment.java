@@ -17,6 +17,7 @@ import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
+import com.shoutit.app.android.view.createpage.pagecategory.CreatePageCategoryActivity;
 
 import java.util.List;
 
@@ -72,7 +73,7 @@ public class PagesPagerFragment extends BaseFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.pages_menu_create:
-                // TODO create page
+                startActivity(CreatePageCategoryActivity.newIntent(getActivity(), false));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
