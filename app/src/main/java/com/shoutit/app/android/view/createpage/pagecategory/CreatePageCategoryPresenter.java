@@ -46,7 +46,6 @@ public class CreatePageCategoryPresenter {
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
                 .subscribe(categories -> {
-                    Collections.swap(categories, 1, 2);
                     listener.showProgress(false);
                     final List<BaseAdapterItem> list = ImmutableList.<BaseAdapterItem>builder()
                             .add(new HeaderItem())
