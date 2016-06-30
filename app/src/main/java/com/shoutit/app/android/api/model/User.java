@@ -1,6 +1,8 @@
 package com.shoutit.app.android.api.model;
 
 
+import android.support.annotation.NonNull;
+
 import com.google.common.base.Objects;
 import com.shoutit.app.android.model.Stats;
 
@@ -79,6 +81,8 @@ public class User extends BaseProfile {
         this.linkedAccounts = linkedAccounts;
     }
 
+    @NonNull
+    @Override
     public User getListenedProfile() {
         boolean newIsListening = !isListening;
         int newListenersCount = newIsListening ? listenersCount + 1 : listenersCount - 1;
@@ -87,6 +91,16 @@ public class User extends BaseProfile {
                 newIsListening, isListener, isPasswordSet, location,
                 newListenersCount, bio, dateJoined, listeningCount,
                 false, about, mobile, website, getEmail(), conversation, gender, birthday, getStats(), linkedAccounts, admin);
+    }
+
+    @Nonnull
+    @Override
+    public User withUpdatedStats(@Nonnull Stats newStats) {
+        return new User(id, type, apiUrl, webUrl, username, name,
+                firstName, lastName, isActivated, image, cover,
+                isListening, isListener, isPasswordSet, location,
+                listenersCount, bio, dateJoined, listeningCount,
+                false, about, mobile, website, getEmail(), conversation, gender, birthday, newStats, linkedAccounts, admin);
     }
 
     public boolean isUser(@Nonnull User user) {

@@ -8,7 +8,7 @@ import com.shoutit.app.android.model.Stats;
 
 import javax.annotation.Nonnull;
 
-public class BaseProfile implements ProfileType {
+public abstract class BaseProfile implements ProfileType {
     protected final String id;
     protected final String type;
     protected final String username;
@@ -111,19 +111,11 @@ public class BaseProfile implements ProfileType {
         return isOwner;
     }
 
-    public BaseProfile getListenedProfile() {
-        boolean newIsListening = !isListening;
-        int newListenersCount = newIsListening ? listenersCount + 1 : listenersCount - 1;
-        return new BaseProfile(id, type, username, name, firstName, lastName, isActivated,
-                image, cover, newIsListening, newListenersCount, location, isOwner, stats, email);
-    }
+    @Nonnull
+    public abstract BaseProfile getListenedProfile();
 
     @Nonnull
-    public BaseProfile withUpdatedStats(@Nonnull Stats newStats) {
-        return new BaseProfile(id, type, username, name, firstName, lastName, isActivated,
-                image, cover, isListening, listenersCount,
-                location, isOwner, newStats, getEmail());
-    }
+    public abstract BaseProfile withUpdatedStats(@Nonnull Stats newStats);
 
     @Nullable
     public Stats getStats() {
