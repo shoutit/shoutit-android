@@ -11,6 +11,7 @@ import com.appunite.rx.functions.Functions1;
 import com.appunite.rx.operators.MoreOperators;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.User;
@@ -99,14 +100,20 @@ public class UserPreferences {
         }
     }
 
-    public void setPageLoggedIn(@NonNull String authToken,
-                                @NonNull String refreshToken,
+    public void setPageLoggedIn(@Nullable String authToken,
+                                @Nullable String refreshToken,
                                 @Nonnull User page) {
         final SharedPreferences.Editor editor = mPreferences.edit();
 
+        if (!Strings.isNullOrEmpty(authToken)) {
+            editor.putString(AUTH_TOKEN, authToken);
+        }
+
+        if (!Strings.isNullOrEmpty(refreshToken)) {
+            editor.putString(REFRESH_TOKEN, refreshToken);
+        }
+
         editor
-                .putString(AUTH_TOKEN, authToken)
-                .putString(REFRESH_TOKEN, refreshToken)
                 .putString(KEY_PAGE, gson.toJson(page))
                 .putString(KEY_USER, gson.toJson(page.getAdmin()))
                 .putString(PAGE_ID, page.getId())
@@ -120,7 +127,6 @@ public class UserPreferences {
             saveLocation(page.getLocation());
         }
     }
-
 
     @SuppressLint("CommitPrefEdits")
     public void setGuestLoggedIn(@Nonnull User user, @NonNull String authToken, @NonNull String refreshToken) {

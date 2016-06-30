@@ -10,6 +10,7 @@ import com.shoutit.app.android.BuildConfig;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.BaseProfile;
+import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.ResourcesHelper;
@@ -62,7 +63,8 @@ public class MenuHandlerPresenter {
                     }
                 });
 
-        userNameObservable = userOrPageObservable
+        userNameObservable = Observable.just(userPreferences.getUser())
+                .filter(Functions1.isNotNull())
                 .map(BaseProfile::getUsername);
 
         final Observable<UserLocation> locationObservable = userPreferences.getLocationObservable()
