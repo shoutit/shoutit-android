@@ -48,7 +48,7 @@ public class PublicPagesPresenter extends ProfilesListPresenter {
 
     protected final PublishSubject<Object> loadMoreSubject = PublishSubject.create();
     protected final PublishSubject<Object> actionOnlyForLoggedInUsers = PublishSubject.create();
-    protected final PublishSubject<String> openProfileSubject = PublishSubject.create();
+    protected final PublishSubject<BaseProfile> openProfileSubject = PublishSubject.create();
     protected final PublishSubject<Object> refreshDataSubject = PublishSubject.create();
 
     @Inject
@@ -157,7 +157,8 @@ public class PublicPagesPresenter extends ProfilesListPresenter {
     @NonNull
     @Override
     public Observable<String> getProfileToOpenObservable() {
-        return openProfileSubject;
+        return openProfileSubject
+                .map(BaseProfile::getUsername);
     }
 
     @Override

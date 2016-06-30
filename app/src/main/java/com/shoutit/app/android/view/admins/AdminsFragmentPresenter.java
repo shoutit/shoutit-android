@@ -10,10 +10,11 @@ import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
-import com.shoutit.app.android.api.model.AddAdminRequest;
+import com.shoutit.app.android.api.model.AdminRequest;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dao.BaseProfileListDao;
 import com.shoutit.app.android.dao.ProfilesDao;
+import com.shoutit.app.android.model.AdminsPointer;
 import com.shoutit.app.android.utils.ListeningHalfPresenter;
 import com.shoutit.app.android.view.profileslist.BaseProfileListPresenter;
 
@@ -25,6 +26,7 @@ import rx.Scheduler;
 import rx.subjects.PublishSubject;
 
 public class AdminsFragmentPresenter extends BaseProfileListPresenter {
+    private static final int PAGE_SIZE = 20;
 
     @Nonnull
     private final Observable<BaseProfileListDao> daoObservable;
@@ -52,11 +54,11 @@ public class AdminsFragmentPresenter extends BaseProfileListPresenter {
 
         final String pageUserName = userPreferences.getPageUserName().get();
 
-        daoObservable = Observable.just(profilesDao.getAdminsDao(User.ME))
+        daoObservable = Observable.just(profilesDao.getAdminsDao(new AdminsPointer(User.ME, PAGE_SIZE)))
                 .compose(ObservableExtensions.behaviorRefCount());
         
         final Observable<ResponseOrError<ResponseBody>> removeAdminObservable = removeAdminSubject
-                .switchMap(userName -> apiService.deleteAdmin(userName)
+                .switchMap(userId -> apiService.deleteAdmin(pageUserName, new AdminRequest(userId))
                         .subscribeOn(networkScheduler)
                         .observeOn(uiScheduler)
                         .compose(ResponseOrError.toResponseOrErrorObservable()))
@@ -66,7 +68,7 @@ public class AdminsFragmentPresenter extends BaseProfileListPresenter {
                 .doOnNext(responseBody -> refreshData());
 
         final Observable<ResponseOrError<ResponseBody>> addAdminObservable = addAdminSubject
-                .switchMap(userId -> apiService.addAdmin(pageUserName, new AddAdminRequest(userId))
+                .switchMap(userId -> apiService.addAdmin(pageUserName, new AdminRequest(userId))
                         .subscribeOn(networkScheduler)
                         .observeOn(uiScheduler)
                         .compose(ResponseOrError.toResponseOrErrorObservable())).compose(ObservableExtensions.behaviorRefCount());
@@ -116,8 +118,8 @@ public class AdminsFragmentPresenter extends BaseProfileListPresenter {
         return successAddAdminObservable;
     }
 
-    public void removeAdmin(@Nonnull String userName) {
-        removeAdminSubject.onNext(userName);
+    public void removeAdmin(@Nonnull String selectedAdminId) {
+        removeAdminSubject.onNext(selectedAdminId);
     }
 
     public void addAdmin(String selectedAdminId) {

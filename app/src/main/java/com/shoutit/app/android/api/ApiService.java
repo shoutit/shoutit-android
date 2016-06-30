@@ -3,7 +3,7 @@ package com.shoutit.app.android.api;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.shoutit.app.android.api.model.AddAdminRequest;
+import com.shoutit.app.android.api.model.AdminRequest;
 import com.shoutit.app.android.api.model.BlockedProfilesResposne;
 import com.shoutit.app.android.api.model.CallerProfile;
 import com.shoutit.app.android.api.model.Category;
@@ -84,6 +84,7 @@ import retrofit2.Response;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.HTTP;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -306,12 +307,14 @@ public interface ApiService {
                                                      @Query("page") Integer page,
                                                      @Query("page_size") Integer pageSize);
 
-    @GET("profiles/me/listening")
-    Observable<ProfilesListResponse> profilesListenings(@Query("page") Integer page,
+    @GET("profiles/{username}/listening")
+    Observable<ProfilesListResponse> profilesListenings(@Path("username") String userName,
+                                                        @Query("page") Integer page,
                                                         @Query("page_size") Integer pageSize);
 
-    @GET("profiles/me/interests")
-    Observable<ProfilesListResponse> tagsListenings(@Query("page") Integer page,
+    @GET("profiles/{username}/interests")
+    Observable<ProfilesListResponse> tagsListenings(@Path("username") String userName,
+                                                    @Query("page") Integer page,
                                                     @Query("page_size") Integer pageSize);
 
     @GET("profiles/{user_name}/listeners")
@@ -335,6 +338,11 @@ public interface ApiService {
 
     @GET("profiles/{user_name}/pages")
     Observable<PagesResponse> myPages(@Path("user_name") String userName,
+                                      @Query("page") Integer page,
+                                      @Query("page_size") Integer pageSize);
+
+    @GET("profiles/{user_name}/pages")
+    Observable<ProfilesListResponse> getPages(@Path("user_name") String userName,
                                       @Query("page") Integer page,
                                       @Query("page_size") Integer pageSize);
 
@@ -561,10 +569,12 @@ public interface ApiService {
                                                @Query("page") Integer page,
                                                @Query("page_size") Integer pageSize);
 
-    @DELETE("pages/{username}/admin")
-    Observable<ResponseBody> deleteAdmin(@Path("username") String userName);
+    @HTTP(method = "DELETE", path = "pages/{username}/admin", hasBody = true)
+    Observable<ResponseBody> deleteAdmin(@Path("username") String userName,
+                                         @Body AdminRequest adminRequest);
 
     @POST("pages/{username}/admin")
     Observable<ResponseBody> addAdmin(@Path("username") String pageUserName,
-                                      @Body AddAdminRequest addAdminRequest);
+                                      @Body AdminRequest addAdminRequest);
+
 }

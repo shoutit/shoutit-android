@@ -26,7 +26,6 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.BaseProfile;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dao.ProfilesDao;
@@ -161,7 +160,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
         profilesDao.updateUser()
                 .subscribe(user -> {
-                    mUserPreferences.setUser(user);
+                    mUserPreferences.setUserOrPage(user);
                 });
     }
 

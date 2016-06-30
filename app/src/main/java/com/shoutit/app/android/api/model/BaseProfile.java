@@ -52,6 +52,10 @@ public class BaseProfile implements ProfileType {
         return USER.equals(type);
     }
 
+    public boolean isPage() {
+        return PAGE.equals(type);
+    }
+
     @Override
     public String getId() {
         return id;
@@ -107,6 +111,7 @@ public class BaseProfile implements ProfileType {
         return isOwner;
     }
 
+    @Nonnull
     public BaseProfile getListenedProfile() {
         boolean newIsListening = !isListening;
         int newListenersCount = newIsListening ? listenersCount + 1 : listenersCount - 1;

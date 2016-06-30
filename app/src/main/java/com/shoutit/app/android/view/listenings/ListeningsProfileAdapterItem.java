@@ -13,13 +13,13 @@ public class ListeningsProfileAdapterItem extends BaseProfileAdapterItem {
     @Nonnull
     private final BaseProfile profile;
     @Nonnull
-    private final Observer<String> openProfileObserver;
+    private final Observer<BaseProfile> openProfileObserver;
     @Nonnull
     private final ListeningsPresenter.ListeningsType listeningsType;
 
 
     public ListeningsProfileAdapterItem(@Nonnull BaseProfile profile,
-                                        @Nonnull Observer<String> openProfileObserver,
+                                        @Nonnull Observer<BaseProfile> openProfileObserver,
                                         @Nonnull Observer<BaseProfile> profileListenedObserver,
                                         @Nonnull ListeningsPresenter.ListeningsType listeningsType,
                                         @Nonnull Observer<Object> actionOnlyForLoggedInUsers,
@@ -33,11 +33,7 @@ public class ListeningsProfileAdapterItem extends BaseProfileAdapterItem {
 
     @Override
     public void openProfile() {
-        if (listeningsType.equals(ListeningsPresenter.ListeningsType.INTERESTS)) {
-            openProfileObserver.onNext(profile.getName());
-        } else {
-            openProfileObserver.onNext(profile.getUsername());
-        }
+        openProfileObserver.onNext(profile);
     }
 
     private String getProfileId() {

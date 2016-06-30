@@ -1,12 +1,14 @@
 package com.shoutit.app.android.dao;
 
 import com.appunite.rx.dagger.NetworkScheduler;
+import com.google.common.base.Objects;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.ProfilesListResponse;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.model.ListeningsPointer;
 import com.shoutit.app.android.view.listenings.ListeningsPresenter;
 
 import javax.annotation.Nonnull;
@@ -18,7 +20,7 @@ public class ListeningsDao {
 
     private final ApiService apiService;
     private final Scheduler networkScheduler;
-    private final LoadingCache<ListeningsPresenter.ListeningsType, ListeningDao> daosCache;
+    private final LoadingCache<ListeningsPointer, ListeningDao> daosCache;
 
     public ListeningsDao(final ApiService apiService,
                          @NetworkScheduler final Scheduler networkScheduler) {
@@ -26,40 +28,41 @@ public class ListeningsDao {
         this.networkScheduler = networkScheduler;
 
         daosCache = CacheBuilder.newBuilder()
-                .build(new CacheLoader<ListeningsPresenter.ListeningsType, ListeningDao>() {
+                .build(new CacheLoader<ListeningsPointer, ListeningDao>() {
                     @Override
-                    public ListeningDao load(@Nonnull ListeningsPresenter.ListeningsType key) throws Exception {
+                    public ListeningDao load(@Nonnull ListeningsPointer key) throws Exception {
                         return new ListeningDao(key);
                     }
                 });
     }
 
     @Nonnull
-    public ListeningDao getDao(ListeningsPresenter.ListeningsType listeningsType) {
-        return daosCache.getUnchecked(listeningsType);
+    public ListeningDao getDao(ListeningsPointer listeningsPointer) {
+        return daosCache.getUnchecked(listeningsPointer);
     }
 
     public class ListeningDao extends BaseProfileListDao {
 
         private final ListeningsPresenter.ListeningsType listeningsType;
+        private final ListeningsPointer pointer;
 
-        public ListeningDao(ListeningsPresenter.ListeningsType listeningsType) {
-            super(User.ME, networkScheduler);
+        public ListeningDao(ListeningsPointer pointer) {
+            super(pointer.getUserName(), networkScheduler);
+            this.pointer = pointer;
 
-            this.listeningsType = listeningsType;
+            this.listeningsType = pointer.getListeningsType();
         }
 
         @Nonnull
         public Observable<ProfilesListResponse> getRequest(int page) {
             switch (ListeningsPresenter.ListeningsType.values()[listeningsType.ordinal()]) {
                 case USERS_AND_PAGES:
-                    return apiService.profilesListenings(page, PAGE_SIZE);
+                    return apiService.profilesListenings(pointer.getUserName(), page, PAGE_SIZE);
                 case INTERESTS:
-                    return apiService.tagsListenings(page, PAGE_SIZE);
+                    return apiService.tagsListenings(pointer.getUserName(), page, PAGE_SIZE);
                 default:
                     throw new RuntimeException("Unknown listening type");
             }
         }
     }
-
 }

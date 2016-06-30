@@ -17,7 +17,6 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.utils.PromotionHelper;
@@ -65,7 +64,7 @@ public class DiscoverShoutsPresenter {
         this.discoverId = discoverId;
 
         final boolean isNormalUser = userPreferences.isNormalUser();
-        final BaseProfile currentUser = userPreferences.getPageOrUser();
+        final BaseProfile currentUser = userPreferences.getUserOrPage();
         final String currentUserName = currentUser != null ? currentUser.getUsername() : null;
 
         final Observable<ResponseOrError<ShoutsResponse>> shoutsObservable = discoverShoutsDao

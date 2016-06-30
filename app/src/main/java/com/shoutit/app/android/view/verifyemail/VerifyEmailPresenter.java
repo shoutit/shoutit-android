@@ -68,7 +68,7 @@ public class VerifyEmailPresenter {
 
         emailObservable = profilesSuccessObservable.first()
                 .map((Func1<User, BaseProfile>) user -> user)
-                .startWith(userPreferences.getPageOrUser())
+                .startWith(userPreferences.getUserOrPage())
                 .filter(Functions1.isNotNull())
                 .map(BaseProfile::getEmail)
                 .compose(ObservableExtensions.<String>behaviorRefCount());

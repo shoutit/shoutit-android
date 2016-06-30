@@ -84,7 +84,7 @@ public class ChangeEmailPresenter {
                 .doOnNext(new Action1<User>() {
                     @Override
                     public void call(User user) {
-                        userPreferences.setUser(user);
+                        userPreferences.setUserOrPage(user);
                     }
                 })
                 .map(Functions1.toObject());

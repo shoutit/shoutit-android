@@ -38,7 +38,6 @@ import rx.subjects.PublishSubject;
 
 public class FacebookFriendsPresenter extends BaseProfileListPresenter {
 
-    private final PublishSubject<String> openProfileSubject = PublishSubject.create();
     private final PublishSubject<Object> progressSubject = PublishSubject.create();
     private final PublishSubject<Object> actionOnlyForLoggedInUser = PublishSubject.create();
 
@@ -106,7 +105,7 @@ public class FacebookFriendsPresenter extends BaseProfileListPresenter {
                                     @Nullable
                                     @Override
                                     public BaseAdapterItem apply(BaseProfile profile) {
-                                        return new ProfileListAdapterItem(profile, openProfileSubject,
+                                        return new ProfileListAdapterItem(profile, profileSelectedSubject,
                                                 listeningHalfPresenter.getListenProfileSubject(),
                                                 actionOnlyForLoggedInUser, isNormalUser,
                                                 preferencesHelper.isMyProfile(profile.getUsername()));

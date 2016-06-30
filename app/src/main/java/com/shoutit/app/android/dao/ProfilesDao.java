@@ -18,6 +18,8 @@ import com.shoutit.app.android.api.model.ProfilesListResponse;
 import com.shoutit.app.android.api.model.RegisterDeviceRequest;
 import com.shoutit.app.android.api.model.SearchProfileResponse;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.model.AdminsPointer;
+import com.shoutit.app.android.model.PagesPointer;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.UserSuggestionResponse;
 import com.shoutit.app.android.utils.LogHelper;
@@ -30,7 +32,6 @@ import okhttp3.RequestBody;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
-import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.subjects.PublishSubject;
@@ -46,11 +47,13 @@ public class ProfilesDao {
     @Nonnull
     private final LoadingCache<String, ContactsDao> contactsCache;
     @Nonnull
+    private final LoadingCache<AdminsPointer, AdminsDao> adminsCache;
+    @Nonnull
+    private final LoadingCache<PagesPointer, PagesDao> pagesCache;
+    @Nonnull
     private final LoadingCache<FriendsSuggestionPointer, UsersSuggestionDao> usersSuggestionCache;
     @Nonnull
     private final LoadingCache<FriendsSuggestionPointer, PagesSuggestionDao> pagesSuggestionCache;
-    @Nonnull
-    private final LoadingCache<String, AdminsDao> adminsCache;
 
     @Nonnull
     private final ApiService apiService;
@@ -115,10 +118,18 @@ public class ProfilesDao {
                 });
 
         adminsCache = CacheBuilder.newBuilder()
-                .build(new CacheLoader<String, AdminsDao>() {
+                .build(new CacheLoader<AdminsPointer, AdminsDao>() {
                     @Override
-                    public AdminsDao load(@Nonnull String userName) throws Exception {
-                        return new AdminsDao(userName);
+                    public AdminsDao load(@Nonnull AdminsPointer pointer) throws Exception {
+                        return new AdminsDao(pointer);
+                    }
+                });
+
+        pagesCache = CacheBuilder.newBuilder()
+                .build(new CacheLoader<PagesPointer, PagesDao>() {
+                    @Override
+                    public PagesDao load(@Nonnull PagesPointer pointer) throws Exception {
+                        return new PagesDao(pointer);
                     }
                 });
     }
@@ -164,8 +175,13 @@ public class ProfilesDao {
     }
 
     @Nonnull
-    public AdminsDao getAdminsDao(@Nonnull String userName) {
-        return adminsCache.getUnchecked(userName);
+    public AdminsDao getAdminsDao(@Nonnull AdminsPointer pointer) {
+        return adminsCache.getUnchecked(pointer);
+    }
+
+    @Nonnull
+    public PagesDao getPagesDao(@Nonnull PagesPointer pointer) {
+        return pagesCache.getUnchecked(pointer);
     }
 
     public void registerToGcmAction(@Nullable final String token) {
@@ -178,16 +194,10 @@ public class ProfilesDao {
 
         user
                 .subscribeOn(networkScheduler)
-                .subscribe(new Action1<User>() {
-                    @Override
-                    public void call(User user) {
-                        userPreferences.setGcmPushToken(token);
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        LogHelper.logThrowableAndCrashlytics(AppuniteGcm.TAG, "Cannot register to gcm", throwable);
-                    }
+                .subscribe(user1 -> {
+                    userPreferences.setGcmPushToken(token);
+                }, throwable -> {
+                    LogHelper.logThrowableAndCrashlytics(AppuniteGcm.TAG, "Cannot register to gcm", throwable);
                 });
     }
 
@@ -366,13 +376,33 @@ public class ProfilesDao {
 
     public class AdminsDao extends BaseProfileListDao {
 
-        public AdminsDao(@Nonnull String userName) {
-            super(userName, networkScheduler);
+        @Nonnull
+        private final AdminsPointer adminsPointer;
+
+        public AdminsDao(@Nonnull AdminsPointer adminsPointer) {
+            super(adminsPointer.getUserName(), networkScheduler);
+            this.adminsPointer = adminsPointer;
         }
 
         @Override
         protected Observable<ProfilesListResponse> getRequest(int pageNumber) {
-            return apiService.getAdmins(userName, pageNumber, PAGE_SIZE);
+            return apiService.getAdmins(userName, pageNumber, adminsPointer.getPageSize());
+        }
+    }
+
+    public class PagesDao extends BaseProfileListDao {
+
+        @Nonnull
+        private final PagesPointer pagesPointer;
+
+        public PagesDao(@Nonnull PagesPointer pagesPointer) {
+            super(pagesPointer.getUserName(), networkScheduler);
+            this.pagesPointer = pagesPointer;
+        }
+
+        @Override
+        protected Observable<ProfilesListResponse> getRequest(int pageNumber) {
+            return apiService.getPages(userName, pageNumber, pagesPointer.getPageSize());
         }
     }
 

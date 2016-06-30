@@ -9,6 +9,7 @@ import android.support.v7.app.ActionBar;
 
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
@@ -18,6 +19,8 @@ import com.shoutit.app.android.view.profileslist.BaseProfilesListActivity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import rx.functions.Func1;
 
 public class ContactsFriendsActivity extends BaseProfilesListActivity {
 
@@ -36,6 +39,7 @@ public class ContactsFriendsActivity extends BaseProfilesListActivity {
                 getActivityComponent()).profilesListPresenter();
 
         presenter.getProfileSelectedObservable()
+                .map(BaseProfile::getUsername)
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(userName -> {
                     startActivityForResult(

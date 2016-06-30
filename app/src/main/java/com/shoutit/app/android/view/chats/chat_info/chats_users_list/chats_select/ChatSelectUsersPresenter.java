@@ -13,7 +13,6 @@ import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.ProfileRequest;
 import com.shoutit.app.android.api.model.ProfilesListResponse;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.view.chats.chat_info.chats_users_list.ChatListProfileItem;
 
 import java.util.List;
@@ -47,7 +46,7 @@ public class ChatSelectUsersPresenter {
         mNetworkScheduler = networkScheduler;
         mUiScheduler = uiScheduler;
 
-        final BaseProfile user = userPreferences.getPageOrUser();
+        final BaseProfile user = userPreferences.getUserOrPage();
         assert user != null;
         mId = user.getUsername();
     }

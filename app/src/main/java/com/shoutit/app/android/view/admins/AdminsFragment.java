@@ -11,6 +11,7 @@ import android.view.View;
 
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.PreferencesHelper;
@@ -94,11 +95,13 @@ public class AdminsFragment extends BaseProfileListFragment implements AdminsDia
         }
     }
 
-    private void showActionsDialog(String userName) {
+    private void showActionsDialog(BaseProfile baseProfile) {
+        final String userName = baseProfile.getUsername();
+
         if (preferencesHelper.isMyProfile(userName)) {
                 openProfile(userName);
         } else {
-            adminsDialog.show(userName, this);
+            adminsDialog.show(baseProfile, this);
         }
     }
 
@@ -133,8 +136,8 @@ public class AdminsFragment extends BaseProfileListFragment implements AdminsDia
     }
 
     @Override
-    public void removeAdmin(String userName) {
-        presenter.removeAdmin(userName);
+    public void removeAdmin(String selectedAdminId) {
+        presenter.removeAdmin(selectedAdminId);
     }
 
     @Override

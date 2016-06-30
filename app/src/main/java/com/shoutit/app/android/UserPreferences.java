@@ -12,15 +12,11 @@ import com.appunite.rx.operators.MoreOperators;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
-import com.shoutit.app.android.api.model.Admin;
 import com.shoutit.app.android.api.model.BaseProfile;
-import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForApplication;
 import com.shoutit.app.android.model.Stats;
-
-import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -74,7 +70,7 @@ public class UserPreferences {
                 .observeOn(uiScheduler);
 
         pageOrUserObservable = Observable
-                .defer(() -> Observable.just(getPageOrUser()))
+                .defer(() -> Observable.just(getUserOrPage()))
                 .compose(MoreOperators.<BaseProfile>refresh(userRefreshSubject))
                 .observeOn(uiScheduler);
 
@@ -105,16 +101,14 @@ public class UserPreferences {
 
     public void setPageLoggedIn(@NonNull String authToken,
                                 @NonNull String refreshToken,
-                                @Nonnull Page page) {
-        final List<Admin> admins = page.getAdmins();
-        final BaseProfile user = admins.get(0);
-
+                                @Nonnull User page) {
         final SharedPreferences.Editor editor = mPreferences.edit();
+
         editor
                 .putString(AUTH_TOKEN, authToken)
                 .putString(REFRESH_TOKEN, refreshToken)
                 .putString(KEY_PAGE, gson.toJson(page))
-                .putString(KEY_USER, gson.toJson(user))
+                .putString(KEY_USER, gson.toJson(page.getAdmin()))
                 .putString(PAGE_ID, page.getId())
                 .putString(PAGE_USER_NAME, page.getUsername())
                 .putBoolean(IS_GUEST, false);
@@ -163,21 +157,31 @@ public class UserPreferences {
         return !isGuest() && isUserLoggedIn();
     }
 
+    public boolean isLoggedInAsPage() {
+        return getPageId().isPresent();
+    }
+
     public Optional<String> getAuthToken() {
         return Optional.fromNullable(mPreferences.getString(AUTH_TOKEN, null));
     }
 
     @SuppressLint("CommitPrefEdits")
-    public void setUser(BaseProfile user) {
+    public void setUserOrPage(BaseProfile userOrPage) {
         if (isNormalUser()) {
-            mPreferences.edit()
-                    .putString(user.isUser() ? KEY_USER : KEY_PAGE, gson.toJson(user))
-                    .commit();
+            if (userOrPage.isUser()) {
+                mPreferences.edit()
+                        .putString(KEY_USER, gson.toJson(userOrPage, User.class))
+                        .commit();
+            } else {
+                mPreferences.edit()
+                        .putString(KEY_PAGE, gson.toJson(userOrPage, User.class)) // temporary it is the same model as User
+                        .commit();
+            }
             refreshUser();
         }
 
-        if (user.getLocation() != null) {
-            saveLocation(user.getLocation());
+        if (userOrPage.getLocation() != null) {
+            saveLocation(userOrPage.getLocation());
         }
     }
 
@@ -200,7 +204,7 @@ public class UserPreferences {
     }
 
     @Nullable
-    public BaseProfile getPageOrUser() {
+    public BaseProfile getUserOrPage() {
         return getUserByType(getPageId().isPresent() ? KEY_PAGE : KEY_USER);
     }
 
@@ -208,7 +212,7 @@ public class UserPreferences {
      * User this method to switch from page to user
      */
     public void setPrimaryUserAsUser() {
-        setUser(getUser());
+        setUserOrPage(getUser());
     }
 
     public User getUser() {
@@ -222,7 +226,7 @@ public class UserPreferences {
 
     @NonNull
     public BaseProfile getUserOrThrow() {
-        return Preconditions.checkNotNull(getPageOrUser());
+        return Preconditions.checkNotNull(getUserOrPage());
     }
 
     @Nonnull
@@ -329,17 +333,17 @@ public class UserPreferences {
     }
 
     public void updateStats(@Nonnull Stats pusherStats) {
-        final BaseProfile user = getPageOrUser();
+        final BaseProfile user = getUserOrPage();
         if (user == null) {
             return;
         }
 
         final BaseProfile updatedUser = user.withUpdatedStats(pusherStats);
-        setUser(updatedUser);
+        setUserOrPage(updatedUser);
     }
 
-    public void setPage(Page page) {
-        setUser(page);
+    public void setPage(User page) {
+        setUserOrPage(page);
         editPage(page.getId(), page.getUsername());
     }
 
@@ -364,6 +368,6 @@ public class UserPreferences {
     }
 
     public String getUserId() {
-        return Preconditions.checkNotNull(getPageOrUser()).getId();
+        return Preconditions.checkNotNull(getUserOrPage()).getId();
     }
 }
