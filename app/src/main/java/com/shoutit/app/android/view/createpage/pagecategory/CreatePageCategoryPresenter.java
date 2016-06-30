@@ -12,6 +12,7 @@ import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.PageCategory;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Nonnull;

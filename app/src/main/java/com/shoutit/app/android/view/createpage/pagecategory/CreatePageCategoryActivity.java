@@ -24,8 +24,10 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ToolbarUtils;
 import com.shoutit.app.android.utils.adapter.BaseViewHolderManager;
 import com.shoutit.app.android.utils.adapter.EmptyViewHolder;
+import com.shoutit.app.android.view.about.AboutActivity;
 import com.shoutit.app.android.view.createpage.pagedetails.newuser.CreatePageDetailsActivity;
 import com.squareup.picasso.Picasso;
+import com.uservoice.uservoicesdk.UserVoice;
 
 import java.util.List;
 
@@ -34,6 +36,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class CreatePageCategoryActivity extends BaseActivity implements CreatePageCategoryPresenter.Listener {
 
@@ -117,6 +120,21 @@ public class CreatePageCategoryActivity extends BaseActivity implements CreatePa
             }
         });
         return layoutManager;
+    }
+
+    @OnClick(R.id.activity_login_feedback)
+    public void onFeedbackClick() {
+        UserVoice.launchContactUs(this);
+    }
+
+    @OnClick(R.id.activity_login_help)
+    public void onHelpClick() {
+        UserVoice.launchUserVoice(this);
+    }
+
+    @OnClick(R.id.activity_login_about)
+    public void onAboutClick() {
+        startActivity(AboutActivity.newIntent(this));
     }
 
     @Override

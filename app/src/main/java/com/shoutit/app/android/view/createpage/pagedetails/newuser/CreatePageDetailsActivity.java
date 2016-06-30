@@ -92,7 +92,10 @@ public class CreatePageDetailsActivity extends BaseActivity implements CreatePag
         setContentView(R.layout.create_page_details_activity);
         ButterKnife.bind(this);
 
+        mCreatePageDetailsPassword.setTransformationMethod(new PasswordTransformationMethod());
+
         isFromRegistration = getIntent().getBooleanExtra(EXTRA_IS_FROM_REGISTRATION, false);
+
         infoSection.setVisibility(isFromRegistration ? View.VISIBLE : View.GONE);
         mCreatePageDetailsBottomText.setVisibility(isFromRegistration ? View.VISIBLE : View.GONE);
         bottomButtons.setVisibility(isFromRegistration ? View.VISIBLE : View.GONE);
@@ -150,8 +153,8 @@ public class CreatePageDetailsActivity extends BaseActivity implements CreatePag
     }
 
     @Override
-    public void error() {
-        ColoredSnackBar.error(ColoredSnackBar.contentView(this), R.string.error_default, Snackbar.LENGTH_SHORT).show();
+    public void error(final Throwable error) {
+        ColoredSnackBar.error(ColoredSnackBar.contentView(this), error).show();
     }
 
     @Override

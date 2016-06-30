@@ -95,9 +95,7 @@ public class CreatePageDetailsPresenter {
                             onCreateSuccess(signResponse.getAccessToken(),
                                     signResponse.getRefreshToken(),
                                     signResponse.getProfile());
-                        }, throwable -> {
-                            onError();
-                        }));
+                        }, this::onError));
             } else {
                 mCompositeSubscription.add(mApiService.createPage(new PageCreateRequest(
                         createPageData.mItem.getSlug(),
@@ -106,16 +104,14 @@ public class CreatePageDetailsPresenter {
                         .observeOn(mUiScheduler)
                         .subscribe(page -> {
                             onCreateSuccess(null, null, page);
-                        }, throwable -> {
-                            onError();
-                        }));
+                        }, this::onError));
             }
         }
     }
 
-    private void onError() {
+    private void onError(Throwable throwable) {
         mListener.showProgress(false);
-        mListener.error();
+        mListener.error(throwable);
     }
 
     private void onCreateSuccess(@Nullable String accessToken,

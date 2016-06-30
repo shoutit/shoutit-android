@@ -194,6 +194,7 @@
         <activity android:name=".view.createpage.pagecategory.CreatePageCategoryActivity"
                   android:screenOrientation="portrait"/>
         <activity android:name=".view.createpage.pagedetails.newuser.CreatePageDetailsActivity"
+                  android:windowSoftInputMode="adjustResize"
                   android:screenOrientation="portrait"/>
         <activity
             android:name=".view.createshout.edit.EditShoutActivity"
