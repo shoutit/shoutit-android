@@ -26,6 +26,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
+import rx.Observable;
 
 public class PagesPagerFragment extends BaseFragment {
 

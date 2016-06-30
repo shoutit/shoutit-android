@@ -11,10 +11,12 @@ import android.support.v7.widget.Toolbar;
 import android.text.method.PasswordTransformationMethod;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
@@ -30,6 +32,7 @@ import com.shoutit.app.android.view.main.MainActivity;
 import com.uservoice.uservoicesdk.UserVoice;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -73,6 +76,8 @@ public class CreatePageDetailsActivity extends BaseActivity implements CreatePag
     View infoSection;
     @Bind(R.id.login_bottom_actions_container)
     View bottomButtons;
+    @Bind(R.id.create_page_details_button)
+    Button createButton;
 
     public static Intent newIntent(Context context, String selectedCategory, boolean isFromRegistration) {
         return new Intent(context, CreatePageDetailsActivity.class)
@@ -103,6 +108,17 @@ public class CreatePageDetailsActivity extends BaseActivity implements CreatePag
         RegisterUtils.setUpSpans(this, mCreatePageDetailsBottomText);
 
         mPresenter.register(this);
+
+        RxView.clicks(createButton)
+                .throttleFirst(5, TimeUnit.SECONDS)
+                .compose(bindToLifecycle())
+                .subscribe(ignore -> {
+                    mPresenter.passCreatePageData(new CreatePageDetailsPresenter.CreatePageData((CategoryInfo)
+                                    mAdapter.getItem(mCreatePageDetailsSpinner.getSelectedItemPosition()),
+                                    mCreatePageDetailsName.getText().toString(), mCreatePageDetailsFullName.getText().toString(),
+                                    mCreatePageDetailsEmail.getText().toString(), mCreatePageDetailsPassword.getText().toString()),
+                            isFromRegistration);
+                });
     }
 
     @Override
@@ -183,15 +199,6 @@ public class CreatePageDetailsActivity extends BaseActivity implements CreatePag
     @Override
     public void setToolbarTitle(String title) {
         mCreatePageCategoryToolbar.setTitle(title);
-    }
-
-    @OnClick(R.id.create_page_details_button)
-    public void onClick() {
-        mPresenter.passCreatePageData(new CreatePageDetailsPresenter.CreatePageData((CategoryInfo)
-                mAdapter.getItem(mCreatePageDetailsSpinner.getSelectedItemPosition()),
-                mCreatePageDetailsName.getText().toString(), mCreatePageDetailsFullName.getText().toString(),
-                mCreatePageDetailsEmail.getText().toString(), mCreatePageDetailsPassword.getText().toString()),
-                isFromRegistration);
     }
 
     @OnClick(R.id.activity_login_feedback)
