@@ -111,6 +111,7 @@ public class BaseProfile implements ProfileType {
         return isOwner;
     }
 
+    @Nonnull
     public BaseProfile getListenedProfile() {
         boolean newIsListening = !isListening;
         int newListenersCount = newIsListening ? listenersCount + 1 : listenersCount - 1;

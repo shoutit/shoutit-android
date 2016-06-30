@@ -1,8 +1,12 @@
 package com.shoutit.app.android.api.model;
 
 
+import android.support.annotation.NonNull;
+
 import com.google.common.base.Objects;
 import com.shoutit.app.android.model.Stats;
+
+import javax.annotation.Nonnull;
 
 public class Page extends BaseProfile {
 
@@ -16,6 +20,7 @@ public class Page extends BaseProfile {
         this.admin = admin;
     }
 
+    @NonNull
     @Override
     public BaseProfile getListenedProfile() {
         boolean newIsListening = !isListening;
@@ -23,6 +28,13 @@ public class Page extends BaseProfile {
 
         return new Page(id, type, username, name, firstName, lastName, isActivated, image, cover,
                 newIsListening, newListenersCount, location, getStats(), isOwner, getEmail(), admin);
+    }
+
+    @Nonnull
+    @Override
+    public BaseProfile withUpdatedStats(@Nonnull Stats newStats) {
+        return new Page(id, type, username, name, firstName, lastName, isActivated, image, cover,
+                isListening, listenersCount, location, newStats, isOwner, getEmail(), admin);
     }
 
     public User getAdmin() {
