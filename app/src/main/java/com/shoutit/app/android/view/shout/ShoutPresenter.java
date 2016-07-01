@@ -33,7 +33,6 @@ import com.shoutit.app.android.utils.rx.RxMoreObservers;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -43,7 +42,6 @@ import retrofit2.Response;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
-import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.functions.Func3;
@@ -233,25 +231,27 @@ public class ShoutPresenter {
                 .switchMap(o -> apiService.likeShout(shoutId)
                         .subscribeOn(networkScheduler)
                         .observeOn(uiScheduler)
-                        .compose(ResponseOrError.toResponseOrErrorObservable()));
+                        .compose(ResponseOrError.toResponseOrErrorObservable()))
+                .compose(ObservableExtensions.behaviorRefCount());
 
         final Observable<ResponseOrError<LikeResponse>> unlikeShoutResponseObservable = likeClickedSubject
                 .filter(Functions1.isTrue())
                 .switchMap(o -> apiService.unlikeShout(shoutId)
                         .subscribeOn(networkScheduler)
                         .observeOn(uiScheduler)
-                        .compose(ResponseOrError.toResponseOrErrorObservable()));
+                        .compose(ResponseOrError.toResponseOrErrorObservable()))
+                .compose(ObservableExtensions.behaviorRefCount());
 
         likeShoutResponseObservable
                 .compose(ResponseOrError.onlySuccess())
                 .withLatestFrom(successShoutResponse,
-                        (o, shout) -> shout.updateShout(true))
+                        (o, shout) -> shout.likedShout(true))
                 .subscribe(shoutsDao.getShoutDao(shoutId).onShoutLikedObserver());
 
         unlikeShoutResponseObservable
                 .compose(ResponseOrError.onlySuccess())
                 .withLatestFrom(successShoutResponse,
-                        (o, shout) -> shout.updateShout(false))
+                        (o, shout) -> shout.likedShout(false))
                 .subscribe(shoutsDao.getShoutDao(shoutId).onShoutLikedObserver());
 
         /** Errors **/

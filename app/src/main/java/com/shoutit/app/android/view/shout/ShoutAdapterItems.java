@@ -66,7 +66,7 @@ public class ShoutAdapterItems {
         }
 
         public void onLikeClicked() {
-            likeClickedObserver.onNext(shout.getLiked());
+            likeClickedObserver.onNext(shout.isLiked());
         }
 
         @Override

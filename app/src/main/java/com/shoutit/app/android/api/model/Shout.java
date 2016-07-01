@@ -31,7 +31,7 @@ public class Shout {
     private final User profile;
     private final Category category;
     private final long datePublished;
-    private final Boolean isLiked;
+    private final boolean isLiked;
     private final List<String> images;
     private final List<Video> videos;
     private final List<Filter> filters;
@@ -46,7 +46,7 @@ public class Shout {
     public Shout(@Nonnull String id, String apiUrl, String webUrl, String type,
                  UserLocation location, String title, String text, Long price, float number,
                  String currency, String thumbnail, String videoUrl, User profile,
-                 Category category, List<Filter> filters, long datePublished, final Boolean isLiked, List<String> images,
+                 Category category, List<Filter> filters, long datePublished, final boolean isLiked, List<String> images,
                  List<Video> videos, int availableCount, List<ConversationDetails> conversations, boolean isMobileSet,
                  String mobileHint, String mobile, @Nullable Promotion promotion) {
         this.id = id;
@@ -76,10 +76,10 @@ public class Shout {
         this.promotion = promotion;
     }
 
-    public Shout updateShout(final Boolean isLikedUpdate){
+    public Shout likedShout(final boolean isShoutLiked){
         return new Shout(id, apiUrl, webUrl, type, location, title, text, price,
                 number, currency, thumbnail, videoUrl, profile, category, filters,
-                datePublished, isLikedUpdate, images, videos, availableCount, conversations,
+                datePublished, isShoutLiked, images, videos, availableCount, conversations,
                 isMobileSet, mobileHint, mobile, promotion);
     }
 
@@ -184,7 +184,7 @@ public class Shout {
         return promotion != null && !promotion.isExpired();
     }
 
-    public Boolean getLiked() {
+    public boolean isLiked() {
         return isLiked;
     }
 

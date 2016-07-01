@@ -142,7 +142,7 @@ public class ShoutAdapter extends BaseAdapter {
                     .error(R.drawable.ic_rect_avatar_placeholder)
                     .into(avatarImageView);
 
-                shoutLikeImageView.setImageResource(shout.getLiked() ? R.drawable.likeon : R.drawable.likeoff);
+                shoutLikeImageView.setImageResource(shout.isLiked() ? R.drawable.likeon : R.drawable.likeoff);
 
                 nameTextView.setText(user.getName());
             final UserLocation location = shout.getLocation();
