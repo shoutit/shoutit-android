@@ -9,10 +9,12 @@ import com.shoutit.app.android.BuildConfig;
 import com.shoutit.app.android.UserPreferences;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
+import retrofit2.http.HEAD;
 
 public class AuthInterceptor implements Interceptor {
 
@@ -32,7 +34,8 @@ public class AuthInterceptor implements Interceptor {
         } else {
             final Request.Builder authorizationBuilder = original.newBuilder()
                     .header(Headers.AUTHORIZATION, Headers.TOKEN_PREFIX + token)
-                    .header(Headers.USER_AGENT, getUserAgent());
+                    .header(Headers.USER_AGENT, getUserAgent())
+                    .header(Headers.ACCEPT_LANGUAGE, Locale.getDefault().toLanguageTag());
             final Optional<String> pageId = userPreferences.getPageId();
             if (pageId.isPresent()) {
                 authorizationBuilder.addHeader(Headers.AUTHORIZATION_PAGE_ID, pageId.get());
