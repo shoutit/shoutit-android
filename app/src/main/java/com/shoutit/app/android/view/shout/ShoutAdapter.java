@@ -106,6 +106,8 @@ public class ShoutAdapter extends BaseAdapter {
         View descriptionHeader;
         @Bind(R.id.shout_pager_container)
         View viewPagerContainer;
+        @Bind(R.id.shout_like)
+        ImageView shoutLikeImageView;
 
         private final Target flagTarget;
         private ShoutAdapterItems.MainShoutAdapterItem item;
@@ -122,6 +124,11 @@ public class ShoutAdapter extends BaseAdapter {
             item.addToCartClicked();
         }
 
+        @OnClick(R.id.shout_like)
+        public void onShoutLikeClicked() {
+            item.onLikeClicked();
+        }
+
         @Override
         public void bind(@Nonnull ShoutAdapterItems.MainShoutAdapterItem item) {
             this.item = item;
@@ -135,7 +142,9 @@ public class ShoutAdapter extends BaseAdapter {
                     .error(R.drawable.ic_rect_avatar_placeholder)
                     .into(avatarImageView);
 
-            nameTextView.setText(user.getName());
+                shoutLikeImageView.setImageResource(shout.isLiked() ? R.drawable.likeon : R.drawable.likeoff);
+
+                nameTextView.setText(user.getName());
             final UserLocation location = shout.getLocation();
             if (location != null) {
                 userLocationTextView.setText(context.getString(R.string.shout_user_location,
@@ -160,11 +169,7 @@ public class ShoutAdapter extends BaseAdapter {
             pageIndicator.setViewPager(shoutViewPager);
             boolean hasMoreThanOneItem = shout.getImages().size() + shout.getVideos().size() > 1;
             pageIndicator.setVisibility(hasMoreThanOneItem ? View.VISIBLE : View.GONE);
-
             imagesPagerAdapter.setData(shout.getImages(), shout.getVideos());
-            boolean hasAnyMedia = !shout.getImages().isEmpty() || !shout.getVideos().isEmpty();
-            viewPagerContainer.setVisibility(hasAnyMedia ? View.VISIBLE : View.GONE);
-
             descriptionTextView.setText(shout.getText());
             final boolean isDescription = !TextUtils.isEmpty(shout.getText());
             descriptionHeader.setVisibility(isDescription ? View.VISIBLE : View.GONE);

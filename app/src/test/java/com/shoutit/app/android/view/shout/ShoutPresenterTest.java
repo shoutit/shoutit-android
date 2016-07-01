@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 import com.shoutit.app.android.TestUtils;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
+import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.ConversationDetails;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
@@ -58,6 +59,8 @@ public class ShoutPresenterTest {
     ShoutsDao.RelatedShoutsDao relatedShoutsDao;
     @Mock
     ShoutsDao.UserShoutsDao userShoutsDao;
+    @Mock
+    ApiService apiService;
 
     private ShoutPresenter presenter;
 
@@ -103,7 +106,7 @@ public class ShoutPresenterTest {
         when(userPreferences.isNormalUser()).thenReturn(true);
         when(userPreferences.getUserOrPage()).thenReturn(TestUtils.getUser());
 
-        presenter = new ShoutPresenter(shoutsDao, "zz", context, Schedulers.immediate(), userPreferences, globalRefreshPresenter);
+        presenter = new ShoutPresenter(shoutsDao, "zz", apiService, context, Schedulers.immediate(), Schedulers.immediate(), userPreferences, globalRefreshPresenter);
     }
 
     @Test
@@ -196,12 +199,12 @@ public class ShoutPresenterTest {
         presenter.getErrorObservable().subscribe(subscriber);
 
         subscriber.assertNoErrors();
-        subscriber.assertValueCount(2);
+        subscriber.assertValueCount(1);
     }
 
     private Shout getShout() {
         return new Shout("id", null, null, null, null, null, null, 1L, 2, null, null, null,
-                getUser(), null, null, 1, null, null, 0, ImmutableList.<ConversationDetails>of(), true, null, null, null);
+                getUser(), null, null, 1,false, null, null, 0, ImmutableList.<ConversationDetails>of(), true, null, null, null);
     }
 
     private User getUser() {

@@ -26,6 +26,8 @@ public class ShoutAdapterItems {
         @Nonnull
         private final Observer<User> visitProfileObserver;
         @Nonnull
+        private final Observer<Boolean> likeClickedObserver;
+        @Nonnull
         private final Shout shout;
         @Nonnull
         private final Resources mResources;
@@ -33,11 +35,13 @@ public class ShoutAdapterItems {
         public MainShoutAdapterItem(@Nonnull Observer<String> addToCartObserver,
                                     @Nonnull Observer<String> onCategoryClickedObserver,
                                     @Nonnull Observer<User> visitProfileObserver,
+                                    @Nonnull Observer<Boolean> likeClickedObserver,
                                     @Nonnull Shout shout,
                                     @Nonnull Resources resources) {
             this.addToCartObserver = addToCartObserver;
             this.onCategoryClickedObserver = onCategoryClickedObserver;
             this.visitProfileObserver = visitProfileObserver;
+            this.likeClickedObserver = likeClickedObserver;
             this.shout = shout;
             mResources = resources;
         }
@@ -59,6 +63,10 @@ public class ShoutAdapterItems {
             } else {
                 return PriceUtils.formatPriceWithCurrency(shout.getPrice(), mResources, shout.getCurrency());
             }
+        }
+
+        public void onLikeClicked() {
+            likeClickedObserver.onNext(shout.isLiked());
         }
 
         @Override

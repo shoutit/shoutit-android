@@ -23,6 +23,7 @@ import com.shoutit.app.android.model.ReportBody;
 import com.shoutit.app.android.model.SearchShoutPointer;
 import com.shoutit.app.android.model.TagShoutsPointer;
 import com.shoutit.app.android.model.UserShoutsPointer;
+import com.shoutit.app.android.utils.rx.RxMoreObservers;
 import com.shoutit.app.android.view.search.SearchPresenter;
 
 import javax.annotation.Nonnull;
@@ -239,6 +240,8 @@ public class ShoutsDao {
         @Nonnull
         private Observable<ResponseOrError<Shout>> shoutObservable;
         @Nonnull
+        private PublishSubject<Shout> updateShoutLocally = PublishSubject.create();
+        @Nonnull
         private Observable<ResponseOrError<MobilePhoneResponse>> shoutMobileObservable;
         @Nonnull
         private final PublishSubject<Object> deleteShoutObserver = PublishSubject.create();
@@ -258,6 +261,7 @@ public class ShoutsDao {
                     .subscribeOn(networkScheduler)
                     .mergeWith(Observable.<Shout>never())
                     .compose(MoreOperators.<Shout>refresh(refreshShoutsSubject))
+                    .mergeWith(updateShoutLocally)
                     .compose(ResponseOrError.<Shout>toResponseOrErrorObservable())
                     .compose(MoreOperators.<ResponseOrError<Shout>>cacheWithTimeout(networkScheduler));
 
@@ -284,7 +288,11 @@ public class ShoutsDao {
                                     .subscribeOn(networkScheduler);
                         }
                     });
+        }
 
+        @Nonnull
+        public Observer<Shout> onShoutLikedObserver() {
+            return RxMoreObservers.ignoreCompleted(updateShoutLocally);
         }
 
         @Nonnull

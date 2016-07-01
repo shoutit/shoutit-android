@@ -28,6 +28,7 @@ import com.shoutit.app.android.api.model.EditShoutRequestWithPrice;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.GuestSignupRequest;
 import com.shoutit.app.android.api.model.InvitationCodeResponse;
+import com.shoutit.app.android.api.model.LikeResponse;
 import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessagesResponse;
 import com.shoutit.app.android.api.model.NotificationsResponse;
@@ -580,5 +581,11 @@ public interface ApiService {
 
     @POST("pages")
     Observable<User> createPage(@Body PageCreateRequest pageCreateRequest);
+
+    @POST("shouts/{id}/like")
+    Observable<LikeResponse> likeShout(@Path("id") String id);
+
+    @DELETE("shouts/{id}/like")
+    Observable<LikeResponse> unlikeShout(@Path("id") String id);
 
 }
