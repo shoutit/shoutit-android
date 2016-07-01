@@ -28,7 +28,9 @@ public class SelectListenersPresenter extends BaseProfileListPresenter {
                                     @Nonnull ListenersDaos listenersDaos) {
         super(listeningHalfPresenter, uiScheduler, placeholderText, userPreferences);
 
-        daoObservable = Observable.just(listenersDaos.getDao(User.ME));
+        final String username = userPreferences.getUser().getUsername();
+
+        daoObservable = Observable.just(listenersDaos.getDao(username));
 
         init();
     }
