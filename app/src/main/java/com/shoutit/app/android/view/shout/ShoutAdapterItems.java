@@ -181,7 +181,11 @@ public class ShoutAdapterItems {
 
         @Nonnull
         public String getName() {
-            return user.getFirstName().toUpperCase();
+            if (user.isUser()) {
+                return user.getFirstName().toUpperCase();
+            } else {
+                return user.getName().toUpperCase();
+            }
         }
 
         @Override
