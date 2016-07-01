@@ -92,8 +92,6 @@
             android:id="@+id/shout_pager_container"
             android:layout_below="@+id/shout_user_header"
             android:layout_width="wrap_content"
-            android:visibility="gone"
-            tools:visibility="visible"
             android:layout_height="wrap_content">
 
             <android.support.v4.view.ViewPager
@@ -111,6 +109,25 @@
                 android:layout_marginBottom="20dp"
                 app:fillColor="@android:color/white"
                 app:pageColor="@color/shout_page_indicator"/>
+
+            <ImageView
+                android:id="@+id/shout_like"
+                android:src="@drawable/likeoff"
+                android:layout_gravity="right"
+                android:layout_marginRight="45dp"
+                android:layout_marginTop="2dp"
+                android:clickable="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <ImageView
+                android:id="@+id/shout_bookmark"
+                android:src="@drawable/bookmarkoff"
+                android:layout_marginRight="10dp"
+                android:layout_gravity="right"
+                android:clickable="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
 
         </FrameLayout>
 

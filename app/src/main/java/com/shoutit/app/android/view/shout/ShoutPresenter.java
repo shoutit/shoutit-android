@@ -5,6 +5,7 @@ import android.content.Context;
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
@@ -13,8 +14,10 @@ import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
+import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.ConversationDetails;
+import com.shoutit.app.android.api.model.LikeResponse;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
@@ -30,6 +33,7 @@ import com.shoutit.app.android.utils.rx.RxMoreObservers;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -39,6 +43,7 @@ import retrofit2.Response;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.functions.Func3;
@@ -70,6 +75,7 @@ public class ShoutPresenter {
     private final Observable<Shout> showPromoteObservable;
     private final Observable<Shout> showPromotedObservable;
 
+    private PublishSubject<Boolean> likeClickedSubject = PublishSubject.create();
     private PublishSubject<String> addToCartSubject = PublishSubject.create();
     private PublishSubject<String> onCategoryClickedSubject = PublishSubject.create();
     private PublishSubject<String> userShoutSelectedSubject = PublishSubject.create();
@@ -89,13 +95,15 @@ public class ShoutPresenter {
     private final PublishSubject<String> sendReportObserver = PublishSubject.create();
     private final PublishSubject<Object> refreshShoutsSubject = PublishSubject.create();
     private final Observable<User> shoutOwnerProfile;
-    private final Observable<Shout> successShoutResponse;
+    protected final Observable<Shout> successShoutResponse;
 
     @Inject
     public ShoutPresenter(@Nonnull final ShoutsDao shoutsDao,
                           @Nonnull final String shoutId,
-                          @Nonnull @ForActivity final Context context,
+                          @Nonnull final ApiService apiService,
+                          @Nonnull@ForActivity final Context context,
                           @Nonnull @UiScheduler final Scheduler uiScheduler,
+                          @Nonnull @NetworkScheduler final Scheduler networkScheduler,
                           @Nonnull final UserPreferences userPreferences,
                           @Nonnull final ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter) {
         this.uiScheduler = uiScheduler;
@@ -157,7 +165,7 @@ public class ShoutPresenter {
         /** Adapter Items **/
         final Observable<ShoutAdapterItems.MainShoutAdapterItem> shoutItemObservable =
                 successShoutResponse.map(shout -> new ShoutAdapterItems.MainShoutAdapterItem(addToCartSubject, onCategoryClickedSubject,
-                        visitProfileSubject, shout, context.getResources()));
+                        visitProfileSubject, likeClickedSubject, shout, context.getResources()));
 
         final Observable<List<BaseAdapterItem>> userShoutItemsObservable =
                 successUserShoutsObservable.map((Func1<List<Shout>, List<BaseAdapterItem>>) shouts -> {
@@ -218,11 +226,41 @@ public class ShoutPresenter {
                 })
                 .observeOn(uiScheduler);
 
+        /** Like / Unlike Shout **/
+
+        final Observable<ResponseOrError<LikeResponse>> likeShoutResponseObservable = likeClickedSubject
+                .filter(Functions1.isFalse())
+                .switchMap(o -> apiService.likeShout(shoutId)
+                        .subscribeOn(networkScheduler)
+                        .observeOn(uiScheduler)
+                        .compose(ResponseOrError.toResponseOrErrorObservable()));
+
+        final Observable<ResponseOrError<LikeResponse>> unlikeShoutResponseObservable = likeClickedSubject
+                .filter(Functions1.isTrue())
+                .switchMap(o -> apiService.unlikeShout(shoutId)
+                        .subscribeOn(networkScheduler)
+                        .observeOn(uiScheduler)
+                        .compose(ResponseOrError.toResponseOrErrorObservable()));
+
+        likeShoutResponseObservable
+                .compose(ResponseOrError.onlySuccess())
+                .withLatestFrom(successShoutResponse,
+                        (o, shout) -> shout.updateShout(true))
+                .subscribe(shoutsDao.getShoutDao(shoutId).onShoutLikedObserver());
+
+        unlikeShoutResponseObservable
+                .compose(ResponseOrError.onlySuccess())
+                .withLatestFrom(successShoutResponse,
+                        (o, shout) -> shout.updateShout(false))
+                .subscribe(shoutsDao.getShoutDao(shoutId).onShoutLikedObserver());
+
         /** Errors **/
         errorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
                 ResponseOrError.transform(userShoutsObservable),
                 ResponseOrError.transform(shoutResponse),
-                ResponseOrError.transform(relatedShoutsObservable)))
+                ResponseOrError.transform(relatedShoutsObservable),
+                ResponseOrError.transform(likeShoutResponseObservable),
+                ResponseOrError.transform(unlikeShoutResponseObservable)))
                 .filter(Functions1.isNotNull())
                 .observeOn(uiScheduler);
 

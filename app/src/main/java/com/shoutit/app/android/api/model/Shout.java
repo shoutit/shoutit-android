@@ -31,6 +31,7 @@ public class Shout {
     private final User profile;
     private final Category category;
     private final long datePublished;
+    private final Boolean isLiked;
     private final List<String> images;
     private final List<Video> videos;
     private final List<Filter> filters;
@@ -45,7 +46,7 @@ public class Shout {
     public Shout(@Nonnull String id, String apiUrl, String webUrl, String type,
                  UserLocation location, String title, String text, Long price, float number,
                  String currency, String thumbnail, String videoUrl, User profile,
-                 Category category, List<Filter> filters, long datePublished, List<String> images,
+                 Category category, List<Filter> filters, long datePublished, final Boolean isLiked, List<String> images,
                  List<Video> videos, int availableCount, List<ConversationDetails> conversations, boolean isMobileSet,
                  String mobileHint, String mobile, @Nullable Promotion promotion) {
         this.id = id;
@@ -63,6 +64,7 @@ public class Shout {
         this.profile = profile;
         this.category = category;
         this.datePublished = datePublished;
+        this.isLiked = isLiked;
         this.images = images;
         this.filters = filters;
         this.videos = videos;
@@ -72,6 +74,13 @@ public class Shout {
         this.mobileHint = mobileHint;
         this.mobile = mobile;
         this.promotion = promotion;
+    }
+
+    public Shout updateShout(final Boolean isLikedUpdate){
+        return new Shout(id, apiUrl, webUrl, type, location, title, text, price,
+                number, currency, thumbnail, videoUrl, profile, category, filters,
+                datePublished, isLikedUpdate, images, videos, availableCount, conversations,
+                isMobileSet, mobileHint, mobile, promotion);
     }
 
     @Nonnull
@@ -175,10 +184,14 @@ public class Shout {
         return promotion != null && !promotion.isExpired();
     }
 
+    public Boolean getLiked() {
+        return isLiked;
+    }
+
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
-        if (!(o instanceof Shout)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         final Shout shout = (Shout) o;
         return Float.compare(shout.number, number) == 0 &&
                 datePublished == shout.datePublished &&
@@ -196,44 +209,21 @@ public class Shout {
                 Objects.equal(videoUrl, shout.videoUrl) &&
                 Objects.equal(profile, shout.profile) &&
                 Objects.equal(category, shout.category) &&
+                Objects.equal(isLiked, shout.isLiked) &&
                 Objects.equal(images, shout.images) &&
                 Objects.equal(videos, shout.videos) &&
                 Objects.equal(filters, shout.filters) &&
                 Objects.equal(isMobileSet, shout.isMobileSet) &&
-                Objects.equal(mobile, shout.mobile) &&
+                Objects.equal(conversations, shout.conversations) &&
                 Objects.equal(mobileHint, shout.mobileHint) &&
-                Objects.equal(promotion, shout.promotion) &&
-                Objects.equal(conversations, shout.conversations);
+                Objects.equal(mobile, shout.mobile) &&
+                Objects.equal(promotion, shout.promotion);
     }
 
     @Override
     public int hashCode() {
         return Objects.hashCode(id, apiUrl, webUrl, type, location, title, text, price, number,
-                currency, thumbnail, videoUrl, profile, category, datePublished, images, videos,
-                filters, availableCount, isMobileSet, conversations, mobile, mobileHint, promotion);
-    }
-
-    public static class Label {
-        private final String name;
-        private final String color;
-        private final String bgColor;
-
-        public Label(String name, String color, String bgColor) {
-            this.name = name;
-            this.color = color;
-            this.bgColor = bgColor;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getColor() {
-            return color;
-        }
-
-        public String getBgColor() {
-            return bgColor;
-        }
+                currency, thumbnail, videoUrl, profile, category, datePublished, isLiked, images,
+                videos, filters, availableCount, isMobileSet, conversations, mobileHint, mobile, promotion);
     }
 }
