@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseFragment;
@@ -20,10 +21,14 @@ import com.shoutit.app.android.view.main.MainActivity;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class AccountFragment extends BaseFragment {
+
+    @Bind(R.id.account_password_tv)
+    TextView changePasswordTextView;
 
     @Inject
     UserPreferences userPreferences;
@@ -43,6 +48,9 @@ public class AccountFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        ButterKnife.bind(this,view);
+
+        changePasswordTextView.setVisibility(userPreferences.isLoggedInAsPage() ? View.GONE : View.VISIBLE);
     }
 
     @OnClick(R.id.account_email_tv)
