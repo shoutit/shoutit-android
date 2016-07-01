@@ -240,7 +240,7 @@ public class ShoutsDao {
         @Nonnull
         private Observable<ResponseOrError<Shout>> shoutObservable;
         @Nonnull
-        private PublishSubject<Shout> shoutLikedSubject = PublishSubject.create();
+        private PublishSubject<Shout> updateShoutLocally = PublishSubject.create();
         @Nonnull
         private Observable<ResponseOrError<MobilePhoneResponse>> shoutMobileObservable;
         @Nonnull
@@ -261,7 +261,7 @@ public class ShoutsDao {
                     .subscribeOn(networkScheduler)
                     .mergeWith(Observable.<Shout>never())
                     .compose(MoreOperators.<Shout>refresh(refreshShoutsSubject))
-                    .mergeWith(shoutLikedSubject)
+                    .mergeWith(updateShoutLocally)
                     .compose(ResponseOrError.<Shout>toResponseOrErrorObservable())
                     .compose(MoreOperators.<ResponseOrError<Shout>>cacheWithTimeout(networkScheduler));
 
@@ -292,7 +292,7 @@ public class ShoutsDao {
 
         @Nonnull
         public Observer<Shout> onShoutLikedObserver() {
-            return RxMoreObservers.ignoreCompleted(shoutLikedSubject);
+            return RxMoreObservers.ignoreCompleted(updateShoutLocally);
         }
 
         @Nonnull
