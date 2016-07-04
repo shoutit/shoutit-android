@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.search.results.shouts;
+package com.shoutit.app.android.view.shouts_list_common;
 
 import android.content.Context;
 import android.view.ViewGroup;
@@ -19,16 +19,16 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-public class SearchShoutsResultsAdapter extends ChangeableLayoutManagerAdapter {
+public class SimpleShoutsAdapter extends ChangeableLayoutManagerAdapter {
     public static final int VIEW_TYPE_NO_RESULTS = 3;
 
     private final Picasso picasso;
     private final Picasso picassoNoTransformer;
 
     @Inject
-    public SearchShoutsResultsAdapter(@ForActivity @Nonnull Context context,
-                                      Picasso picasso,
-                                      @Named("NoAmazonTransformer") Picasso picassoNoTransformer) {
+    public SimpleShoutsAdapter(@ForActivity @Nonnull Context context,
+                               Picasso picasso,
+                               @Named("NoAmazonTransformer") Picasso picassoNoTransformer) {
         super(context);
         this.picasso = picasso;
         this.picassoNoTransformer = picassoNoTransformer;

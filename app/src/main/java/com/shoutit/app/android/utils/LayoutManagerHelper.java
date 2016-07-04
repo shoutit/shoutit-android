@@ -1,13 +1,33 @@
 package com.shoutit.app.android.utils;
 
+import android.content.Context;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.widget.CheckedTextView;
 
+import com.shoutit.app.android.R;
 import com.shoutit.app.android.adapters.ChangeableLayoutManagerAdapter;
 
 import javax.annotation.Nonnull;
 
 public class LayoutManagerHelper {
+
+    private final MyGridLayoutManager gridLayoutManager;
+    private final MyLinearLayoutManager linearLayoutManager;
+    private final Context mContext;
+    private final ChangeableLayoutManagerAdapter mAdapter;
+    private final RecyclerView mRecyclerView;
+    private final CheckedTextView mLayoutSwitchIcon;
+
+    public LayoutManagerHelper(Context context, ChangeableLayoutManagerAdapter adapter, RecyclerView recyclerView, CheckedTextView layoutSwitchIcon) {
+        mContext = context;
+        mAdapter = adapter;
+        mRecyclerView = recyclerView;
+        mLayoutSwitchIcon = layoutSwitchIcon;
+
+        gridLayoutManager = new MyGridLayoutManager(context, 2);
+        linearLayoutManager = new MyLinearLayoutManager(context);
+    }
 
     public static void setLinearLayoutManager(@Nonnull RecyclerView recyclerView,
                                               @Nonnull ChangeableLayoutManagerAdapter adapter,
@@ -33,5 +53,30 @@ public class LayoutManagerHelper {
         recyclerView.setLayoutManager(gridLayoutManager);
         recyclerView.setAdapter(adapter);
         adapter.switchLayoutManager(false);
+    }
+
+    public void setGridLayoutManager() {
+        setGridLayoutManager(mRecyclerView, mAdapter, gridLayoutManager);
+    }
+
+    public void setupLayoutSwitchIcon() {
+        mLayoutSwitchIcon.setOnClickListener(v -> {
+            mLayoutSwitchIcon.setChecked(!mLayoutSwitchIcon.isChecked());
+            if (mLayoutSwitchIcon.isChecked()) {
+                mLayoutSwitchIcon.setBackground(mContext.getDrawable(R.drawable.ic_grid_switch));
+                setLinearLayoutManager(mRecyclerView, mAdapter, linearLayoutManager);
+            } else {
+                mLayoutSwitchIcon.setBackground(mContext.getDrawable(R.drawable.ic_list_switch));
+                setGridLayoutManager(mRecyclerView, mAdapter, gridLayoutManager);
+            }
+        });
+    }
+
+    public MyGridLayoutManager getGridLayoutManager() {
+        return gridLayoutManager;
+    }
+
+    public MyLinearLayoutManager getLinearLayoutManager() {
+        return linearLayoutManager;
     }
 }

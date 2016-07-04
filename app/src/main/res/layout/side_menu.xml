@@ -170,6 +170,15 @@
         </RelativeLayout>
 
         <CheckedTextView
+            android:id="@+id/menu_bookmarks"
+            style="@style/SideMenuItem"
+            android:paddingLeft="16dp"
+            android:paddingStart="16dp"
+            android:drawableStart="@drawable/menu_bookmarks"
+            android:drawableLeft="@drawable/menu_bookmarks"
+            android:text="@string/menu_item_bookmarks" />
+
+        <CheckedTextView
             android:id="@+id/menu_pages"
             style="@style/SideMenuItem"
             android:visibility="gone"

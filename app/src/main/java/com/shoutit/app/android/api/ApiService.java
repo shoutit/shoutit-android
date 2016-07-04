@@ -345,8 +345,8 @@ public interface ApiService {
 
     @GET("profiles/{user_name}/pages")
     Observable<ProfilesListResponse> getPages(@Path("user_name") String userName,
-                                      @Query("page") Integer page,
-                                      @Query("page_size") Integer pageSize);
+                                              @Query("page") Integer page,
+                                              @Query("page_size") Integer pageSize);
 
     /**
      * Misc
@@ -596,4 +596,7 @@ public interface ApiService {
 
     @DELETE("shouts/{id}/bookmark")
     Observable<ResponseBody> deleteBookmark(@Path("id") String id);
+
+    @GET("profiles/{username}/bookmarks")
+    Observable<ShoutsResponse> getBookmarkedShouts(@Path("username") String username);
 }
