@@ -4,6 +4,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.shoutit.app.android.adapters.ChangeableLayoutManagerAdapter;
+import com.shoutit.app.android.adapters.FBAdsAdapter;
 
 import javax.annotation.Nonnull;
 
@@ -23,7 +24,8 @@ public class LayoutManagerHelper {
         gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
-                if (adapter.getItemViewType(position) == ChangeableLayoutManagerAdapter.VIEW_TYPE_SHOUT) {
+                if (adapter.getItemViewType(position) == ChangeableLayoutManagerAdapter.VIEW_TYPE_SHOUT ||
+                        adapter.getItemViewType(position) == FBAdsAdapter.VIEW_TYPE_AD) {
                     return 1;
                 } else {
                     return 2;

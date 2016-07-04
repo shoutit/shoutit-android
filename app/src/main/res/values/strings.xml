@@ -7,7 +7,6 @@
     <string name="shout_type_offer">Offer</string>
     <string name="shout_type_request">Request</string>
     <string name="terms_of_service">Terms of Service</string>
-    <string name="facebook_app_id" translatable="false">353625811317277</string>
     <string name="exit_text">Press BACK again to exit</string>
     <string name="nothing_to_show">Nothing to show</string>
     <string name="empty_field"/>
@@ -19,6 +18,12 @@
         <item quantity="one">%1$d Day</item>
         <item quantity="other">%1$d Days</item>
     </plurals>
+
+    <!-- FB -->
+    <string name="facebook_app_id" translatable="false">353625811317277</string>
+    <string name="facebook_shout_list_ad_id" translatable="false">1151546964858487_1245960495417133</string> <!-- TODO change to production ids -->
+    <string name="facebook_shout_grid_ad_id" translatable="false">1151546964858487_1245960432083806</string> <!-- TODO change to production ids -->
+    <string name="facebook_shout_detail_ad_id" translatable="false">1151546964858487_1245960432083806</string> <!-- TODO change to production ids -->
 
     <!-- Errors -->
     <string name="error_default">Ooops, something went wrong</string>
@@ -739,5 +744,8 @@
     <string name="create_page_details_full_name_hint">Full Name</string>
     <string name="create_page_details_email_hint">Email</string>
     <string name="create_page_details_password_hint">Password</string>
+
+    <!-- Sponsored -->
+    <string name="ad_sponsored">Sponsored</string>
 
 </resources>

@@ -22,6 +22,7 @@ import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.model.FiltersToSubmit;
 import com.shoutit.app.android.model.SearchShoutPointer;
+import com.shoutit.app.android.utils.FBAdHalfPresenter;
 import com.shoutit.app.android.utils.PromotionHelper;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
@@ -45,6 +46,7 @@ public class SearchShoutsResultsPresenter {
     private final PublishSubject<Object> loadMoreSubject = PublishSubject.create();
     private final PublishSubject<FiltersToSubmit> filtersSelectedSubject = PublishSubject.create();
     private final PublishSubject<Object> shareClickSubject = PublishSubject.create();
+    private final PublishSubject<Boolean> isLinearLayoutSubject = PublishSubject.create();
 
     private final Observable<List<BaseAdapterItem>> adapterItems;
     private final Observable<Boolean> progressObservable;
@@ -60,6 +62,7 @@ public class SearchShoutsResultsPresenter {
                                         @Nonnull final UserPreferences userPreferences,
                                         @Nonnull @ForActivity final Context context,
                                         @UiScheduler Scheduler uiScheduler,
+                                        @Nonnull FBAdHalfPresenter fbAdHalfPresenter,
                                         @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter) {
 
         final boolean isNormalUser = userPreferences.isNormalUser();
@@ -123,7 +126,7 @@ public class SearchShoutsResultsPresenter {
                     }
                 });
 
-        adapterItems = successShoutsResponse
+        final Observable<List<BaseAdapterItem>> shoutsItems = successShoutsResponse
                 .map(new Func1<ShoutsResponse, List<BaseAdapterItem>>() {
                     @Override
                     public List<BaseAdapterItem> call(ShoutsResponse shoutsResponse) {
@@ -143,6 +146,8 @@ public class SearchShoutsResultsPresenter {
                         }
                     }
                 });
+
+        adapterItems = fbAdHalfPresenter.getShoutsWithAdsObservable(shoutsItems, isLinearLayoutSubject);
 
         progressObservable = shoutsRequest.map(Functions1.returnFalse())
                 .startWith(true);
@@ -219,5 +224,9 @@ public class SearchShoutsResultsPresenter {
 
     public void onShareClicked() {
         shareClickSubject.onNext(null);
+    }
+
+    public void setLinearLayoutManager(boolean isLinearLayour) {
+
     }
 }

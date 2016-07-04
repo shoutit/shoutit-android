@@ -18,6 +18,7 @@ import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.google.common.base.Optional;
 import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.adapteritems.FbAdAdapterItem;
 import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
 import com.shoutit.app.android.api.model.Filter;
 import com.shoutit.app.android.api.model.Shout;
@@ -27,10 +28,13 @@ import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.DateTimeUtils;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.ResourcesHelper;
+import com.shoutit.app.android.viewholders.FbAdLinearViewHolder;
 import com.shoutit.app.android.viewholders.HeaderViewHolder;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.viewpagerindicator.CirclePageIndicator;
+
+import java.util.Locale;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -48,6 +52,7 @@ public class ShoutAdapter extends BaseAdapter {
     private static final int VIEW_TYPE_VISIT_PROFILE = 3;
     public static final int VIEW_TYPE_RELATED_SHOUTS_CONTAINER = 4;
     private static final int VIEW_TYPE_HEADER = 5;
+    private static final int VIEW_TYPE_FB_AD = 6;
 
     @Nonnull
     private final Picasso picasso;
@@ -353,6 +358,8 @@ public class ShoutAdapter extends BaseAdapter {
                 return new VisitProfileViewHolder(layoutInflater.inflate(R.layout.button_gray_with_stroke, parent, false));
             case VIEW_TYPE_RELATED_SHOUTS_CONTAINER:
                 return new RelatedShoutsContainerViewHolder(layoutInflater.inflate(R.layout.shout_related_shout_container_item, parent, false));
+            case VIEW_TYPE_FB_AD:
+                return new FbAdLinearViewHolder(layoutInflater.inflate(R.layout.ad_list_layout, parent, false), context);
             default:
                 throw new RuntimeException("Unknown view type");
         }
@@ -376,6 +383,8 @@ public class ShoutAdapter extends BaseAdapter {
             return VIEW_TYPE_VISIT_PROFILE;
         } else if (item instanceof ShoutAdapterItems.UserShoutAdapterItem) {
             return VIEW_TYPE_USER_SHOUTS;
+        } else if (item instanceof FbAdAdapterItem) {
+            return VIEW_TYPE_FB_AD;
         } else {
             throw new RuntimeException("Unknown view type: " + item.getClass().getSimpleName());
         }

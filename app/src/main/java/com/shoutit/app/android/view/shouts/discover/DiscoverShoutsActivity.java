@@ -232,10 +232,12 @@ public class DiscoverShoutsActivity extends BaseActivity {
 
     private void setLinearLayoutManager() {
         LayoutManagerHelper.setLinearLayoutManager(mRecyclerView, mShoutsAdapter, linearLayoutManager);
+        mShoutsPresenter.setLinearLayoutManager(true);
     }
 
     private void setGridLayoutManager() {
         LayoutManagerHelper.setGridLayoutManager(mRecyclerView, mShoutsAdapter, gridLayoutManager);
+        mShoutsPresenter.setLinearLayoutManager(false);
     }
 
     @NonNull

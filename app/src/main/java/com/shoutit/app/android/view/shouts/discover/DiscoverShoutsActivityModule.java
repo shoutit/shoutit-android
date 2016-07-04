@@ -7,6 +7,7 @@ import com.appunite.rx.dagger.UiScheduler;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
+import com.shoutit.app.android.utils.FBAdHalfPresenter;
 
 import dagger.Module;
 import dagger.Provides;
@@ -28,7 +29,9 @@ public class DiscoverShoutsActivityModule {
                                                                   @UiScheduler Scheduler uiScheduler,
                                                                   DiscoverShoutsDao dao,
                                                                   @ForActivity Context context,
-                                                                  UserPreferences userPreferences) {
-        return new DiscoverShoutsPresenter(networkScheduler, uiScheduler, dao, discoveryId, name, userPreferences, context);
+                                                                  UserPreferences userPreferences,
+                                                                  FBAdHalfPresenter fbAdHalfPresenter) {
+        return new DiscoverShoutsPresenter(networkScheduler, uiScheduler, dao, discoveryId,
+                name, userPreferences, fbAdHalfPresenter, context);
     }
 }

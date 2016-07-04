@@ -15,7 +15,7 @@ import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.appunite.rx.dagger.UiScheduler;
 import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.R;
-import com.shoutit.app.android.adapters.ChangeableLayoutManagerAdapter;
+import com.shoutit.app.android.adapters.FBAdsAdapter;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
@@ -33,10 +33,9 @@ import butterknife.OnClick;
 import rx.Observable;
 import rx.Scheduler;
 import rx.Subscription;
-import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
 
-public class HomeAdapter extends ChangeableLayoutManagerAdapter {
+public class HomeAdapter extends FBAdsAdapter {
 
     private static final int VIEW_TYPE_DISCOVER_HEADER = 1;
     private static final int VIEW_TYPE_DISCOVER_ITEMS_CONTAINER = 2;
@@ -219,7 +218,7 @@ public class HomeAdapter extends ChangeableLayoutManagerAdapter {
             case VIEW_TYPE_EMPTY_SHOUTS_ITEM:
                 return new ShoutEmptyViewHolder(layoutInflater.inflate(R.layout.home_shouts_empty, parent, false));
             default:
-                throw new RuntimeException("Unknown adapter view type");
+                return super.onCreateViewHolder(parent, viewType);
         }
     }
 
@@ -243,7 +242,7 @@ public class HomeAdapter extends ChangeableLayoutManagerAdapter {
         } else if (item instanceof HomePresenter.ShoutsEmptyAdapterItem) {
             return VIEW_TYPE_EMPTY_SHOUTS_ITEM;
         } else {
-            throw new RuntimeException("Unknown adapter view type");
+            return super.getItemViewType(position);
         }
     }
 }

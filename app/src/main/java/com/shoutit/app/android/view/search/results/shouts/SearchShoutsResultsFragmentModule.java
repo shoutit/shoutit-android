@@ -7,6 +7,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
+import com.shoutit.app.android.utils.FBAdHalfPresenter;
 import com.shoutit.app.android.view.search.SearchPresenter;
 
 import javax.annotation.Nonnull;
@@ -38,8 +39,10 @@ public class SearchShoutsResultsFragmentModule {
     SearchShoutsResultsPresenter provideSearchShoutsResultsPresenter(ShoutsDao dao, @ForActivity Context context,
                                                                      @UiScheduler Scheduler uiScheduler,
                                                                      UserPreferences userPreferences,
-                                                                     ShoutsGlobalRefreshPresenter globalRefreshPresenter) {
-        return new SearchShoutsResultsPresenter(dao, searchQuery, searchType, contextualItemId, userPreferences, context, uiScheduler, globalRefreshPresenter);
+                                                                     ShoutsGlobalRefreshPresenter globalRefreshPresenter,
+                                                                     FBAdHalfPresenter fbAdHalfPresenter) {
+        return new SearchShoutsResultsPresenter(dao, searchQuery, searchType, contextualItemId,
+                userPreferences, context, uiScheduler, fbAdHalfPresenter, globalRefreshPresenter);
     }
 }
 

@@ -30,6 +30,7 @@ import com.shoutit.app.android.db.RecentSearchesTable;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
+import com.shoutit.app.android.view.loginintro.FacebookHelper;
 import com.squareup.picasso.Picasso;
 
 
@@ -116,4 +117,6 @@ public interface BaseActivityComponent {
     MixPanel mixPanel();
 
     PagesDao pagesDao();
+
+    FacebookHelper facebookHelper();
 }

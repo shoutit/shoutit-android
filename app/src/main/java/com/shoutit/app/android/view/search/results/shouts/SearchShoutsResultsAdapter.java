@@ -7,7 +7,7 @@ import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.adapteritems.NoDataTextAdapterItem;
-import com.shoutit.app.android.adapters.ChangeableLayoutManagerAdapter;
+import com.shoutit.app.android.adapters.FBAdsAdapter;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 import com.shoutit.app.android.view.shouts.ShoutGridViewHolder;
@@ -19,7 +19,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-public class SearchShoutsResultsAdapter extends ChangeableLayoutManagerAdapter {
+public class SearchShoutsResultsAdapter extends FBAdsAdapter {
     public static final int VIEW_TYPE_NO_RESULTS = 3;
 
     private final Picasso picasso;
@@ -45,7 +45,7 @@ public class SearchShoutsResultsAdapter extends ChangeableLayoutManagerAdapter {
             case VIEW_TYPE_NO_RESULTS:
                 return new NoDataTextViewHolder(layoutInflater.inflate(R.layout.no_data_text_adapter_item, parent, false));
             default:
-                throw new RuntimeException("Unknown view type: " + viewType);
+                return super.onCreateViewHolder(parent, viewType);
         }
     }
 
@@ -57,7 +57,7 @@ public class SearchShoutsResultsAdapter extends ChangeableLayoutManagerAdapter {
         } else if (item instanceof NoDataTextAdapterItem) {
             return VIEW_TYPE_NO_RESULTS;
         } else {
-            throw new RuntimeException("Unknown view type: " + item.getClass().getSimpleName());
+            return super.getItemViewType(position);
         }
     }
 }

@@ -19,6 +19,7 @@ import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
+import com.shoutit.app.android.utils.FBAdHalfPresenter;
 import com.shoutit.app.android.utils.PromotionHelper;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
@@ -52,6 +53,8 @@ public class DiscoverShoutsPresenter {
     private final PublishSubject<Object> searchMenuItemClicked = PublishSubject.create();
     @Nonnull
     private final PublishSubject<Object> shareMenuItemClicked = PublishSubject.create();
+    @Nonnull
+    private final PublishSubject<Boolean> isLinearLayoutSubject = PublishSubject.create();
 
     public DiscoverShoutsPresenter(@NetworkScheduler Scheduler networkScheduler,
                                    @UiScheduler Scheduler uiScheduler,
@@ -59,6 +62,7 @@ public class DiscoverShoutsPresenter {
                                    final String discoverId,
                                    final String discoverName,
                                    UserPreferences userPreferences,
+                                   FBAdHalfPresenter fbAdHalfPresenter,
                                    @ForActivity final Context context) {
         mDiscoverShoutsDao = discoverShoutsDao;
         this.discoverId = discoverId;
@@ -77,7 +81,7 @@ public class DiscoverShoutsPresenter {
                 .compose(ResponseOrError.<ShoutsResponse>onlySuccess())
                 .compose(ObservableExtensions.<ShoutsResponse>behaviorRefCount());
 
-        mListObservable = successShoutsObservable
+        final Observable<List<BaseAdapterItem>> shoutItems = successShoutsObservable
                 .map(new Func1<ShoutsResponse, List<BaseAdapterItem>>() {
                     @Override
                     public List<BaseAdapterItem> call(ShoutsResponse shoutsResponse) {
@@ -91,6 +95,8 @@ public class DiscoverShoutsPresenter {
                         }));
                     }
                 });
+
+        mListObservable = fbAdHalfPresenter.getShoutsWithAdsObservable(shoutItems, isLinearLayoutSubject);
 
         countObservable = shoutsObservable.compose(ResponseOrError.<ShoutsResponse>onlySuccess())
                 .map(new Func1<ShoutsResponse, Integer>() {
@@ -167,5 +173,9 @@ public class DiscoverShoutsPresenter {
 
     public void onShareClicked() {
         shareMenuItemClicked.onNext(null);
+    }
+
+    public void setLinearLayoutManager(boolean isLinearLayout) {
+        isLinearLayoutSubject.onNext(isLinearLayout);
     }
 }

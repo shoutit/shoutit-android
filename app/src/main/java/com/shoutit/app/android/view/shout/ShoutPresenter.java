@@ -7,11 +7,13 @@ import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
+import com.facebook.ads.NativeAd;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.adapteritems.FbAdAdapterItem;
 import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.ConversationDetails;
@@ -27,6 +29,7 @@ import com.shoutit.app.android.model.RelatedShoutsPointer;
 import com.shoutit.app.android.model.UserShoutsPointer;
 import com.shoutit.app.android.utils.PromotionHelper;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
+import com.shoutit.app.android.view.loginintro.FacebookHelper;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
 import java.util.List;
@@ -42,6 +45,7 @@ import rx.Scheduler;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.functions.Func3;
+import rx.functions.Func4;
 import rx.subjects.PublishSubject;
 
 public class ShoutPresenter {
@@ -97,7 +101,8 @@ public class ShoutPresenter {
                           @Nonnull @ForActivity final Context context,
                           @Nonnull @UiScheduler final Scheduler uiScheduler,
                           @Nonnull final UserPreferences userPreferences,
-                          @Nonnull final ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter) {
+                          @Nonnull final ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
+                          @Nonnull FacebookHelper facebookHelper) {
         this.uiScheduler = uiScheduler;
         mUserPreferences = userPreferences;
 
@@ -187,34 +192,37 @@ public class ShoutPresenter {
                     }
                 });
 
+        final Observable<BaseAdapterItem> fbAddAdapterItem = facebookHelper.getAdObservable(facebookHelper.getShoutDetailAdManager())
+                .compose(ResponseOrError.onlySuccess())
+                .map(FbAdAdapterItem::new);
+
         allAdapterItemsObservable = Observable.combineLatest(
                 shoutItemObservable,
                 userShoutItemsObservable.startWith(ImmutableList.<BaseAdapterItem>of()),
                 relatedShoutsItems.startWith(ImmutableList.<BaseAdapterItem>of()),
-                new Func3<ShoutAdapterItems.MainShoutAdapterItem, List<BaseAdapterItem>, List<BaseAdapterItem>, List<BaseAdapterItem>>() {
-                    @Override
-                    public List<BaseAdapterItem> call(ShoutAdapterItems.MainShoutAdapterItem shout,
-                                                      List<BaseAdapterItem> userShouts,
-                                                      List<BaseAdapterItem> relatedShouts) {
-                        final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
+                fbAddAdapterItem.startWith(ImmutableList.<BaseAdapterItem>of()),
+                (Func4<ShoutAdapterItems.MainShoutAdapterItem, List<BaseAdapterItem>, List<BaseAdapterItem>, BaseAdapterItem, List<BaseAdapterItem>>)
+                        (shout, userShouts, relatedShouts, fbAdItem) -> {
+                    final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
 
-                        builder.add(shout);
+                    builder.add(shout);
 
-                        final User user = shout.getShout().getProfile();
-                        if (!userShouts.isEmpty()) {
-                            builder.add(new HeaderAdapterItem(context.getString(R.string.shout_user_shouts_header, user.getFirstName()).toUpperCase()))
-                                    .addAll(userShouts);
-                        }
-
-                        builder.add(new ShoutAdapterItems.VisitProfileAdapterItem(visitProfileSubject, user));
-
-                        if (!relatedShouts.isEmpty()) {
-                            builder.add(new HeaderAdapterItem(context.getString(R.string.shout_related_shouts_header)))
-                                    .add(new ShoutAdapterItems.RelatedContainerAdapterItem(relatedShouts));
-                        }
-
-                        return builder.build();
+                    final User user = shout.getShout().getProfile();
+                    if (!userShouts.isEmpty()) {
+                        builder.add(new HeaderAdapterItem(context.getString(R.string.shout_user_shouts_header, user.getFirstName()).toUpperCase()))
+                                .addAll(userShouts);
                     }
+
+                    builder.add(new ShoutAdapterItems.VisitProfileAdapterItem(visitProfileSubject, user));
+
+                    if (!relatedShouts.isEmpty()) {
+                        builder.add(new HeaderAdapterItem(context.getString(R.string.shout_related_shouts_header)))
+                                .add(new ShoutAdapterItems.RelatedContainerAdapterItem(relatedShouts));
+                    }
+
+                    builder.add(fbAdItem);
+
+                    return builder.build();
                 })
                 .observeOn(uiScheduler);
 
