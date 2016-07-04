@@ -7,6 +7,7 @@ import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
+import com.facebook.ads.NativeAd;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
@@ -39,8 +40,9 @@ import javax.inject.Inject;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
+import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.functions.Func3;
+import rx.functions.Func4;
 import rx.subjects.PublishSubject;
 
 public class HomePresenter {
@@ -129,7 +131,8 @@ public class HomePresenter {
                             return ImmutableList.of();
                         }
                     }
-                });
+                })
+                .doOnNext(fbAdHalfPresenter::updatedShoutsCount);
 
         /** Discovers **/
         final Observable<ResponseOrError<DiscoverResponse>> discoverRequestObservable = locationObservable
@@ -196,8 +199,9 @@ public class HomePresenter {
         allAdapterItemsObservable = Observable.combineLatest(
                 locationObservable,
                 allDiscoverAdapterItems,
-                fbAdHalfPresenter.getShoutsWithAdsObservable(allShoutAdapterItems, linearLayoutManagerObservable),
-                (Func3<LocationPointer, List<BaseAdapterItem>, List<BaseAdapterItem>, List<BaseAdapterItem>>) (locationPointer, discovers, shouts) -> {
+                allShoutAdapterItems,
+                fbAdHalfPresenter.getAdsObservable(linearLayoutManagerObservable).startWith(ImmutableList.<NativeAd>of()),
+                (Func4<LocationPointer, List<BaseAdapterItem>, List<BaseAdapterItem>, List<NativeAd>, List<BaseAdapterItem>>) (locationPointer, discovers, shouts, ads) -> {
                     final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
                     if (!discovers.isEmpty()) {
                         builder.add(new DiscoverHeaderAdapterItem(locationPointer.getCity()))
@@ -205,7 +209,7 @@ public class HomePresenter {
                     }
 
                     return builder
-                            .addAll(shouts)
+                            .addAll(FBAdHalfPresenter.combineShoutsWithAds(shouts, ads))
                             .build();
                 })
                 .filter(MoreFunctions1.<BaseAdapterItem>listNotEmpty())

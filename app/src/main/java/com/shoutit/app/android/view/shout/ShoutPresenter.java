@@ -7,7 +7,6 @@ import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
-import com.facebook.ads.NativeAd;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -192,9 +191,8 @@ public class ShoutPresenter {
                     }
                 });
 
-        final Observable<BaseAdapterItem> fbAddAdapterItem = facebookHelper.getAdObservable(facebookHelper.getShoutDetailAdManager())
-                .compose(ResponseOrError.onlySuccess())
-                .map(FbAdAdapterItem::new);
+        final Observable<BaseAdapterItem> fbAddAdapterItem = facebookHelper.getShoutDetailAdapterItem()
+                .compose(ObservableExtensions.behaviorRefCount());
 
         allAdapterItemsObservable = Observable.combineLatest(
                 shoutItemObservable,

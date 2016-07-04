@@ -27,6 +27,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.adapteritems.FbAdAdapterItem;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.LinkedAccounts;
 import com.shoutit.app.android.api.model.UpdateFacebookTokenRequest;
@@ -119,6 +120,7 @@ public class FacebookHelper {
 
     private void loadAds() {
         AdSettings.addTestDevice("e206dc0d711d548562ff65e91961aebf");
+        AdSettings.addTestDevice("2527377803eebdb0123194b820f02a5a");
         listAdManager.loadAds(NativeAd.MediaCacheFlag.ALL);
         gridAdManager.loadAds(NativeAd.MediaCacheFlag.ALL);
         shoutDetailAdManager.loadAds(NativeAd.MediaCacheFlag.ALL);
@@ -399,13 +401,13 @@ public class FacebookHelper {
         }
     }
 
-    public Observable<List<NativeAd>> getAdsObservable(boolean isListAd, int adsNumber) {
+    public Observable<List<NativeAd>> getAdsObservable(NativeAdsManager nativeAdsManager, int adsNumber) {
         final List<Observable<ResponseOrError<NativeAd>>> adsObservables = new ArrayList<>();
 
         final ImmutableList.Builder<NativeAd> builder = ImmutableList.builder();
 
         for (int i = 0; i < adsNumber; i++) {
-            adsObservables.add(getAdObservable(getManager(isListAd)));
+            adsObservables.add(getAdObservable(nativeAdsManager));
         }
 
         return Observable.combineLatest(adsObservables, (FuncN<List<NativeAd>>) args -> {
@@ -418,6 +420,18 @@ public class FacebookHelper {
 
             return builder.build();
         });
+    }
+
+    @Nonnull
+    public Observable<ResponseOrError<NativeAd>> getShoutDetailAdObservable() {
+        return getAdObservable(getShoutDetailAdManager());
+    }
+
+    @Nonnull
+    public Observable<FbAdAdapterItem> getShoutDetailAdapterItem() {
+        return getShoutDetailAdObservable()
+                .compose(ResponseOrError.onlySuccess())
+                .map(FbAdAdapterItem::new);
     }
 
     @Nonnull

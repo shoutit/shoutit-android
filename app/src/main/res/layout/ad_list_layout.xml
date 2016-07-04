@@ -52,7 +52,7 @@
             android:maxLines="2"
             android:textColor="@color/black_54"
             android:textSize="14sp"
-            tools:text="Ad title dfdsfsdf dsfdsfdsf dsfdsf sdfdsf dsfdsfdsf dsfdsf dsfdsf" />
+            tools:text="Ad title dfdsfsdf" />
 
         <TextView
             android:id="@+id/ad_sponsored_tv"
@@ -68,7 +68,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="72dp"
             android:layout_below="@+id/ad_sponsored_tv"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="2dp"
@@ -87,7 +87,7 @@
                 android:maxLines="2"
                 android:textColor="@color/black_54"
                 android:textSize="16sp"
-                tools:text="Ad title dfsf sdfdsf dfdsfdsfdsfdsfdsfdsfdsfsdfsdfdsfds" />
+                tools:text="Ad title dfsf sdf dsfdsfdsfdsfdsfdsf dsfdsfdsfdsfdsf" />
 
             <TextView
                 android:id="@+id/ad_action_view"

@@ -7,6 +7,7 @@ import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
+import com.facebook.ads.NativeAd;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -145,9 +146,12 @@ public class SearchShoutsResultsPresenter {
                             return builder.build();
                         }
                     }
-                });
+                })
+                .doOnNext(fbAdHalfPresenter::updatedShoutsCount);
 
-        adapterItems = fbAdHalfPresenter.getShoutsWithAdsObservable(shoutsItems, isLinearLayoutSubject);
+        adapterItems = Observable.combineLatest(shoutsItems,
+                fbAdHalfPresenter.getAdsObservable(isLinearLayoutSubject),
+                FBAdHalfPresenter::combineShoutsWithAds);
 
         progressObservable = shoutsRequest.map(Functions1.returnFalse())
                 .startWith(true);

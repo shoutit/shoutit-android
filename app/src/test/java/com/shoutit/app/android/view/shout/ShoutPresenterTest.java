@@ -4,11 +4,14 @@ import android.content.Context;
 
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.facebook.ads.NativeAd;
+import com.facebook.ads.NativeAdsManager;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.TestUtils;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.adapteritems.FbAdAdapterItem;
 import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
 import com.shoutit.app.android.api.model.ConversationDetails;
 import com.shoutit.app.android.api.model.Shout;
@@ -20,12 +23,15 @@ import com.shoutit.app.android.dao.UsersIdentityDao;
 import com.shoutit.app.android.model.MobilePhoneResponse;
 import com.shoutit.app.android.model.RelatedShoutsPointer;
 import com.shoutit.app.android.model.UserShoutsPointer;
+import com.shoutit.app.android.utils.FBAdHalfPresenter;
+import com.shoutit.app.android.view.loginintro.FacebookHelper;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Response;
@@ -36,6 +42,7 @@ import rx.subjects.PublishSubject;
 
 import static com.google.common.truth.Truth.assert_;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
@@ -58,12 +65,17 @@ public class ShoutPresenterTest {
     ShoutsDao.RelatedShoutsDao relatedShoutsDao;
     @Mock
     ShoutsDao.UserShoutsDao userShoutsDao;
+    @Mock
+    FacebookHelper facebookHelper;
 
     private ShoutPresenter presenter;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
+
+        when(facebookHelper.getAdObservable(any(NativeAdsManager.class)))
+                .thenReturn(Observable.just(ResponseOrError.fromError(new Throwable())));
 
         when(shoutsDao.getShoutObservable(anyString()))
                 .thenReturn(Observable.just(ResponseOrError.fromData(getShout())));
@@ -103,7 +115,11 @@ public class ShoutPresenterTest {
         when(userPreferences.isNormalUser()).thenReturn(true);
         when(userPreferences.getUserOrPage()).thenReturn(TestUtils.getUser());
 
-        presenter = new ShoutPresenter(shoutsDao, "zz", context, Schedulers.immediate(), userPreferences, globalRefreshPresenter);
+        when(facebookHelper.getShoutDetailAdapterItem())
+                .thenReturn(Observable.just(new FbAdAdapterItem(null)));
+
+        presenter = new ShoutPresenter(shoutsDao, "zz", context, Schedulers.immediate(),
+                userPreferences, globalRefreshPresenter, facebookHelper);
     }
 
     @Test

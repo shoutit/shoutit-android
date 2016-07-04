@@ -10,6 +10,7 @@ import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.functions.Functions1;
+import com.facebook.ads.NativeAd;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -32,6 +33,7 @@ import javax.annotation.Nullable;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.subjects.PublishSubject;
@@ -94,9 +96,13 @@ public class DiscoverShoutsPresenter {
                             }
                         }));
                     }
-                });
+                })
+                .doOnNext(fbAdHalfPresenter::updatedShoutsCount);
 
-        mListObservable = fbAdHalfPresenter.getShoutsWithAdsObservable(shoutItems, isLinearLayoutSubject);
+        mListObservable = Observable.combineLatest(
+                shoutItems,
+                fbAdHalfPresenter.getAdsObservable(isLinearLayoutSubject),
+                FBAdHalfPresenter::combineShoutsWithAds);
 
         countObservable = shoutsObservable.compose(ResponseOrError.<ShoutsResponse>onlySuccess())
                 .map(new Func1<ShoutsResponse, Integer>() {
