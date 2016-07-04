@@ -1,6 +1,7 @@
 package com.shoutit.app.android.utils;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.CheckedTextView;
@@ -63,10 +64,10 @@ public class LayoutManagerHelper {
         mLayoutSwitchIcon.setOnClickListener(v -> {
             mLayoutSwitchIcon.setChecked(!mLayoutSwitchIcon.isChecked());
             if (mLayoutSwitchIcon.isChecked()) {
-                mLayoutSwitchIcon.setBackground(mContext.getDrawable(R.drawable.ic_grid_switch));
+                mLayoutSwitchIcon.setBackground(ContextCompat.getDrawable(mContext, R.drawable.ic_grid_switch));
                 setLinearLayoutManager(mRecyclerView, mAdapter, linearLayoutManager);
             } else {
-                mLayoutSwitchIcon.setBackground(mContext.getDrawable(R.drawable.ic_list_switch));
+                mLayoutSwitchIcon.setBackground(ContextCompat.getDrawable(mContext, R.drawable.ic_list_switch));
                 setGridLayoutManager(mRecyclerView, mAdapter, gridLayoutManager);
             }
         });
