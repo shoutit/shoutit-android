@@ -1,12 +1,15 @@
 package com.shoutit.app.android.view.shouts.discover;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
+import com.shoutit.app.android.utils.BookmarkHelper;
 
 import dagger.Module;
 import dagger.Provides;
@@ -28,7 +31,9 @@ public class DiscoverShoutsActivityModule {
                                                                   @UiScheduler Scheduler uiScheduler,
                                                                   DiscoverShoutsDao dao,
                                                                   @ForActivity Context context,
-                                                                  UserPreferences userPreferences) {
-        return new DiscoverShoutsPresenter(networkScheduler, uiScheduler, dao, discoveryId, name, userPreferences, context);
+                                                                  UserPreferences userPreferences,
+                                                                  BookmarksDao bookmarksDao,
+                                                                  BookmarkHelper bookmarkHelper) {
+        return new DiscoverShoutsPresenter(networkScheduler, uiScheduler, dao, discoveryId, name, userPreferences, context, bookmarksDao, bookmarkHelper);
     }
 }

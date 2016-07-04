@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.search.results.shouts;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
@@ -18,10 +19,12 @@ import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.model.FiltersToSubmit;
 import com.shoutit.app.android.model.SearchShoutPointer;
+import com.shoutit.app.android.utils.BookmarkHelper;
 import com.shoutit.app.android.utils.PromotionHelper;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
@@ -60,7 +63,9 @@ public class SearchShoutsResultsPresenter {
                                         @Nonnull final UserPreferences userPreferences,
                                         @Nonnull @ForActivity final Context context,
                                         @UiScheduler Scheduler uiScheduler,
-                                        @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter) {
+                                        @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
+                                        @NonNull BookmarksDao bookmarksDao,
+                                        @NonNull BookmarkHelper bookmarkHelper) {
 
         final boolean isNormalUser = userPreferences.isNormalUser();
         final BaseProfile currentUser = userPreferences.getUserOrPage();
@@ -136,7 +141,11 @@ public class SearchShoutsResultsPresenter {
                                 @Override
                                 public BaseAdapterItem apply(Shout shout) {
                                     final boolean isShoutOwner = shout.getProfile().getUsername().equals(currentUserName);
-                                    return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context, shoutSelectedSubject, PromotionHelper.promotionInfoOrNull(shout));
+                                    final BookmarkHelper.ShoutItemBookmarkHelper shoutItemBookmarkHelper = bookmarkHelper.getShoutItemBookmarkHelper();
+                                    return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context,
+                                            shoutSelectedSubject, PromotionHelper.promotionInfoOrNull(shout),
+                                            bookmarksDao.getBookmarkForShout(shout.getId(), shout.isBookmarked()),
+                                            shoutItemBookmarkHelper.getObserver(), shoutItemBookmarkHelper.getEnableObservable());
                                 }
                             }));
                             return builder.build();

@@ -13,6 +13,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.Gson;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.CategoriesDao;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.dao.DiscoversDao;
@@ -116,4 +117,6 @@ public interface BaseActivityComponent {
     MixPanel mixPanel();
 
     PagesDao pagesDao();
+
+    BookmarksDao bookmarkDao();
 }

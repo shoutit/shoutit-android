@@ -19,10 +19,12 @@ import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.Tag;
 import com.shoutit.app.android.api.model.UserLocation;
+import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.model.LocationPointer;
+import com.shoutit.app.android.utils.BookmarkHelper;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
 import org.junit.Before;
@@ -34,6 +36,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import rx.Observable;
+import rx.observers.Observers;
 import rx.observers.TestSubscriber;
 import rx.schedulers.Schedulers;
 import rx.schedulers.TestScheduler;
@@ -60,6 +63,10 @@ public class HomePresenterTest {
     UserPreferences userPreferences;
     @Mock
     Context context;
+    @Mock
+    BookmarksDao mBookmarksDao;
+    @Mock
+    BookmarkHelper mBookmarkHelper;
 
     private HomePresenter presenter;
     private final TestScheduler scheduler = new TestScheduler();
@@ -75,6 +82,8 @@ public class HomePresenterTest {
 
         globalRefreshPresenter = new ShoutsGlobalRefreshPresenter();
 
+        when(mBookmarkHelper.getShoutItemBookmarkHelper()).thenReturn(new BookmarkHelper.ShoutItemBookmarkHelper(Observers.empty(), Observable.empty()));
+
         when(shoutsDao.getHomeShoutsObservable(any(LocationPointer.class))).thenReturn(shoutsSubject);
         when(shoutsDao.getLoadMoreHomeShoutsObserver(any(LocationPointer.class))).thenReturn(loadMoreShoutsSubject);
 
@@ -87,7 +96,7 @@ public class HomePresenterTest {
         when(userPreferences.isNormalUser()).thenReturn(true);
         when(userPreferences.getUserOrPage()).thenReturn(TestUtils.getUser());
 
-        presenter = new HomePresenter(shoutsDao, discoversDao, userPreferences, context, Schedulers.immediate(), globalRefreshPresenter);
+        presenter = new HomePresenter(shoutsDao, discoversDao, userPreferences, context, Schedulers.immediate(), globalRefreshPresenter, mBookmarksDao, mBookmarkHelper);
     }
 
     @Test
@@ -218,7 +227,7 @@ public class HomePresenterTest {
     private ResponseOrError<ShoutsResponse> shoutsResponse() {
         return ResponseOrError.fromData(new ShoutsResponse(1, "2", null, Lists.newArrayList(
                 new Shout("id", null, null, null, null, null, null, 2L, 2f, null, null, null,
-                        TestUtils.getUser(), category, null, 2, false, null, null, 0, ImmutableList.<ConversationDetails>of(), true, null, null, null)), null));
+                        TestUtils.getUser(), category, null, 2, false, null, null, 0, ImmutableList.<ConversationDetails>of(), true, null, null, null, false)), null));
     }
 
     @Nonnull

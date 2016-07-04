@@ -55,7 +55,7 @@ public class ProfileAdapter extends BaseAdapter {
             case VIEW_TYPE_USER_PAGES_OR_ADMINS:
                 return new ProfileSectionViewHolder(layoutInflater.inflate(R.layout.profile_section_item, parent, false), context, picasso);
             case VIEW_TYPE_SHOUT:
-                return new ShoutGridViewHolder(layoutInflater.inflate(R.layout.shout_item_grid, parent, false), picasso);
+                return new ShoutGridViewHolder(layoutInflater.inflate(ShoutGridViewHolder.getLayoutRes(), parent, false), picasso);
             case VIEW_TYPE_SEE_ALL_SHOUTS:
                 return new ProfileViewHolders.SeeAllButtonViewHolder(layoutInflater.inflate(R.layout.button_gray_with_stroke, parent, false), context);
             case VIEW_TYPE_HEADER:

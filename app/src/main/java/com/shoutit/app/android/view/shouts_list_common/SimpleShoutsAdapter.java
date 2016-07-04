@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.search.results.shouts;
+package com.shoutit.app.android.view.shouts_list_common;
 
 import android.content.Context;
 import android.view.ViewGroup;
@@ -11,7 +11,7 @@ import com.shoutit.app.android.adapters.ChangeableLayoutManagerAdapter;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 import com.shoutit.app.android.view.shouts.ShoutGridViewHolder;
-import com.shoutit.app.android.view.shouts.ShoutLinerViewHolder;
+import com.shoutit.app.android.view.shouts.ShoutLinearViewHolder;
 import com.shoutit.app.android.viewholders.NoDataTextViewHolder;
 import com.squareup.picasso.Picasso;
 
@@ -19,16 +19,16 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-public class SearchShoutsResultsAdapter extends ChangeableLayoutManagerAdapter {
+public class SimpleShoutsAdapter extends ChangeableLayoutManagerAdapter {
     public static final int VIEW_TYPE_NO_RESULTS = 3;
 
     private final Picasso picasso;
     private final Picasso picassoNoTransformer;
 
     @Inject
-    public SearchShoutsResultsAdapter(@ForActivity @Nonnull Context context,
-                                      Picasso picasso,
-                                      @Named("NoAmazonTransformer") Picasso picassoNoTransformer) {
+    public SimpleShoutsAdapter(@ForActivity @Nonnull Context context,
+                               Picasso picasso,
+                               @Named("NoAmazonTransformer") Picasso picassoNoTransformer) {
         super(context);
         this.picasso = picasso;
         this.picassoNoTransformer = picassoNoTransformer;
@@ -40,8 +40,8 @@ public class SearchShoutsResultsAdapter extends ChangeableLayoutManagerAdapter {
         switch (viewType) {
             case VIEW_TYPE_SHOUT:
                 return isLinearLayoutManager ?
-                        new ShoutLinerViewHolder(layoutInflater.inflate(R.layout.home_feed_item_linear, parent, false), context, picasso, picassoNoTransformer) :
-                        new ShoutGridViewHolder(layoutInflater.inflate(R.layout.shout_item_grid, parent, false), picasso);
+                        new ShoutLinearViewHolder(layoutInflater.inflate(R.layout.shout_item_linear, parent, false), context, picasso, picassoNoTransformer) :
+                        new ShoutGridViewHolder(layoutInflater.inflate(ShoutGridViewHolder.getLayoutRes(), parent, false), picasso);
             case VIEW_TYPE_NO_RESULTS:
                 return new NoDataTextViewHolder(layoutInflater.inflate(R.layout.no_data_text_adapter_item, parent, false));
             default:

@@ -18,7 +18,9 @@ import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
+import com.shoutit.app.android.utils.BookmarkHelper;
 import com.shoutit.app.android.utils.PromotionHelper;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
@@ -53,13 +55,15 @@ public class DiscoverShoutsPresenter {
     @Nonnull
     private final PublishSubject<Object> shareMenuItemClicked = PublishSubject.create();
 
-    public DiscoverShoutsPresenter(@NetworkScheduler Scheduler networkScheduler,
-                                   @UiScheduler Scheduler uiScheduler,
-                                   DiscoverShoutsDao discoverShoutsDao,
-                                   final String discoverId,
-                                   final String discoverName,
-                                   UserPreferences userPreferences,
-                                   @ForActivity final Context context) {
+    public DiscoverShoutsPresenter(@NonNull @NetworkScheduler Scheduler networkScheduler,
+                                   @NonNull @UiScheduler Scheduler uiScheduler,
+                                   @NonNull DiscoverShoutsDao discoverShoutsDao,
+                                   @NonNull final String discoverId,
+                                   @NonNull final String discoverName,
+                                   @NonNull UserPreferences userPreferences,
+                                   @NonNull @ForActivity final Context context,
+                                   @NonNull BookmarksDao bookmarksDao,
+                                   @NonNull BookmarkHelper bookmarkHelper) {
         mDiscoverShoutsDao = discoverShoutsDao;
         this.discoverId = discoverId;
 
@@ -86,7 +90,11 @@ public class DiscoverShoutsPresenter {
                             @Override
                             public BaseAdapterItem apply(Shout shout) {
                                 final boolean isShoutOwner = shout.getProfile().getUsername().equals(currentUserName);
-                                return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context, shoutSelectedObserver, PromotionHelper.promotionInfoOrNull(shout));
+                                final BookmarkHelper.ShoutItemBookmarkHelper shoutItemBookmarkHelper = bookmarkHelper.getShoutItemBookmarkHelper();
+                                return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context,
+                                        shoutSelectedObserver, PromotionHelper.promotionInfoOrNull(shout),
+                                        bookmarksDao.getBookmarkForShout(shout.getId(), shout.isBookmarked()),
+                                        shoutItemBookmarkHelper.getObserver(), shoutItemBookmarkHelper.getEnableObservable());
                             }
                         }));
                     }

@@ -20,7 +20,7 @@ public class TestUtils {
     public static Shout getShout() {
         return new Shout("", "", "", "", new UserLocation(
                 0, 0, "", "", "", "", ""), "", "", 0L, 0, "", "", "", getUser(),
-                null, null, 0,false, null, null, 0, ImmutableList.<ConversationDetails>of(), true, null, null, null);
+                null, null, 0,false, null, null, 0, ImmutableList.<ConversationDetails>of(), true, null, null, null, false);
     }
 
     public static ResponseBody getResponseBody() {

@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.home;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.appunite.rx.ObservableExtensions;
@@ -22,10 +23,12 @@ import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.model.LocationPointer;
+import com.shoutit.app.android.utils.BookmarkHelper;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.utils.PromotionHelper;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
@@ -85,7 +88,9 @@ public class HomePresenter {
                          @Nonnull final UserPreferences userPreferences,
                          @ForActivity final Context context,
                          @Nonnull @UiScheduler Scheduler uiScheduler,
-                         @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter) {
+                         @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
+                         @NonNull BookmarksDao bookmarksDao,
+                         @NonNull BookmarkHelper bookmarkHelper) {
         this.uiScheduler = uiScheduler;
 
         final boolean isNormalUser = userPreferences.isNormalUser();
@@ -130,7 +135,12 @@ public class HomePresenter {
                                             public BaseAdapterItem apply(@Nullable Shout shout) {
                                                 assert shout != null;
                                                 final boolean isShoutOwner = shout.getProfile().getUsername().equals(currentUserName);
-                                                return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context, shoutSelectedObserver, PromotionHelper.promotionInfoOrNull(shout));
+                                                final BookmarkHelper.ShoutItemBookmarkHelper shoutItemBookmarkHelper = bookmarkHelper.getShoutItemBookmarkHelper();
+                                                return new ShoutAdapterItem(shout, isShoutOwner,
+                                                        isNormalUser, context, shoutSelectedObserver,
+                                                        PromotionHelper.promotionInfoOrNull(shout),
+                                                        bookmarksDao.getBookmarkForShout(shout.getId(), shout.isBookmarked()),
+                                                        shoutItemBookmarkHelper.getObserver(), shoutItemBookmarkHelper.getEnableObservable());
                                             }
                                         });
 

@@ -115,18 +115,19 @@
                 android:src="@drawable/likeoff"
                 android:layout_gravity="right"
                 android:layout_marginRight="45dp"
-                android:layout_marginTop="2dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 
-            <ImageView
+            <CheckBox
                 android:id="@+id/shout_bookmark"
-                android:src="@drawable/bookmarkoff"
-                android:layout_marginRight="10dp"
-                android:layout_gravity="right"
-                android:visibility="gone"
+                android:background="?selectableItemBackground"
+                android:layout_marginRight="12dp"
+                android:layout_marginEnd="12dp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:button="@drawable/bookmark_button"
+                android:checked="false"/>
 
         </FrameLayout>
 

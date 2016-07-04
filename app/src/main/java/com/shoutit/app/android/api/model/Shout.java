@@ -42,13 +42,14 @@ public class Shout {
     private final String mobile;
     @Nullable
     private final Promotion promotion;
+    private final boolean isBookmarked;
 
     public Shout(@Nonnull String id, String apiUrl, String webUrl, String type,
                  UserLocation location, String title, String text, Long price, float number,
                  String currency, String thumbnail, String videoUrl, User profile,
                  Category category, List<Filter> filters, long datePublished, final boolean isLiked, List<String> images,
                  List<Video> videos, int availableCount, List<ConversationDetails> conversations, boolean isMobileSet,
-                 String mobileHint, String mobile, @Nullable Promotion promotion) {
+                 String mobileHint, String mobile, @Nullable Promotion promotion, boolean isBookmarked) {
         this.id = id;
         this.apiUrl = apiUrl;
         this.webUrl = webUrl;
@@ -74,13 +75,18 @@ public class Shout {
         this.mobileHint = mobileHint;
         this.mobile = mobile;
         this.promotion = promotion;
+        this.isBookmarked = isBookmarked;
     }
 
     public Shout likedShout(final boolean isShoutLiked){
         return new Shout(id, apiUrl, webUrl, type, location, title, text, price,
                 number, currency, thumbnail, videoUrl, profile, category, filters,
                 datePublished, isShoutLiked, images, videos, availableCount, conversations,
-                isMobileSet, mobileHint, mobile, promotion);
+                isMobileSet, mobileHint, mobile, promotion, isBookmarked);
+    }
+
+    public boolean isBookmarked() {
+        return isBookmarked;
     }
 
     @Nonnull

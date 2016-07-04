@@ -1,18 +1,22 @@
 package com.shoutit.app.android.view.shout;
 
 import android.content.res.Resources;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.util.Pair;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.base.Objects;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.utils.BookmarkHelper;
 import com.shoutit.app.android.utils.PriceUtils;
 
 import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import rx.Observable;
 import rx.Observer;
 
 public class ShoutAdapterItems {
@@ -31,19 +35,45 @@ public class ShoutAdapterItems {
         private final Shout shout;
         @Nonnull
         private final Resources mResources;
+        @NonNull
+        private final Observable<Boolean> mBookmarObservable;
+        @NonNull
+        private final Observer<Pair<String, Boolean>> mBookmarkObserver;
+        @NonNull
+        private final Observable<Boolean> mEnableBookmarkObservable;
 
         public MainShoutAdapterItem(@Nonnull Observer<String> addToCartObserver,
                                     @Nonnull Observer<String> onCategoryClickedObserver,
                                     @Nonnull Observer<User> visitProfileObserver,
                                     @Nonnull Observer<Boolean> likeClickedObserver,
                                     @Nonnull Shout shout,
-                                    @Nonnull Resources resources) {
+                                    @Nonnull Resources resources,
+                                    @NonNull Observable<Boolean> bookmarObservable,
+                                    @NonNull Observer<Pair<String, Boolean>> bookmarkObserver,
+                                    @NonNull Observable<Boolean> enableBookmarkObservable) {
             this.addToCartObserver = addToCartObserver;
             this.onCategoryClickedObserver = onCategoryClickedObserver;
             this.visitProfileObserver = visitProfileObserver;
             this.likeClickedObserver = likeClickedObserver;
             this.shout = shout;
             mResources = resources;
+            mBookmarObservable = bookmarObservable;
+            mBookmarkObserver = bookmarkObserver;
+            mEnableBookmarkObservable = enableBookmarkObservable;
+        }
+
+        @NonNull
+        public Observable<Boolean> getEnableBookmarkObservable() {
+            return mEnableBookmarkObservable;
+        }
+
+        public void onBookmarkSelectionChanged(boolean checked) {
+            mBookmarkObserver.onNext(Pair.create(shout.getId(), checked));
+        }
+
+        @NonNull
+        public Observable<Boolean> getBookmarObservable() {
+            return mBookmarObservable;
         }
 
         @Nonnull
