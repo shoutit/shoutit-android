@@ -102,7 +102,7 @@ public class ShoutPresenter {
     public ShoutPresenter(@Nonnull final ShoutsDao shoutsDao,
                           @Nonnull final String shoutId,
                           @Nonnull final ApiService apiService,
-                          @Nonnull@ForActivity final Context context,
+                          @Nonnull @ForActivity final Context context,
                           @Nonnull @UiScheduler final Scheduler uiScheduler,
                           @Nonnull @NetworkScheduler final Scheduler networkScheduler,
                           @Nonnull final UserPreferences userPreferences,
@@ -167,8 +167,14 @@ public class ShoutPresenter {
 
         /** Adapter Items **/
         final Observable<ShoutAdapterItems.MainShoutAdapterItem> shoutItemObservable =
-                successShoutResponse.map(shout -> new ShoutAdapterItems.MainShoutAdapterItem(addToCartSubject, onCategoryClickedSubject,
-                        visitProfileSubject, likeClickedSubject, shout, context.getResources()));
+                successShoutResponse.map(shout -> {
+                    final BookmarkHelper.ShoutItemBookmarkHelper shoutItemBookmarkHelper = bookmarkHelper.getShoutItemBookmarkHelper();
+                    return new ShoutAdapterItems.MainShoutAdapterItem(addToCartSubject, onCategoryClickedSubject,
+                            visitProfileSubject, likeClickedSubject, shout, context.getResources(),
+                            bookmarksDao.getBookmarkForShout(shoutId, shout.isBookmarked()),
+                            shoutItemBookmarkHelper.getObserver(),
+                            shoutItemBookmarkHelper.getEnableObservable());
+                });
 
         final Observable<List<BaseAdapterItem>> userShoutItemsObservable =
                 successUserShoutsObservable.map((Func1<List<Shout>, List<BaseAdapterItem>>) shouts -> {
@@ -189,7 +195,8 @@ public class ShoutPresenter {
                                     return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context,
                                             relatedShoutSelectedSubject, PromotionHelper.promotionInfoOrNull(shout),
                                             bookmarksDao.getBookmarkForShout(shout.getId(), shout.isBookmarked()),
-                                            shoutItemBookmarkHelper.getObserver(), shoutItemBookmarkHelper.getEnableObservable());
+                                            shoutItemBookmarkHelper.getObserver(),
+                                            shoutItemBookmarkHelper.getEnableObservable());
                                 });
 
                         final ImmutableList.Builder<BaseAdapterItem> builder = new ImmutableList.Builder<>();
@@ -206,30 +213,25 @@ public class ShoutPresenter {
                 shoutItemObservable,
                 userShoutItemsObservable.startWith(ImmutableList.<BaseAdapterItem>of()),
                 relatedShoutsItems.startWith(ImmutableList.<BaseAdapterItem>of()),
-                new Func3<ShoutAdapterItems.MainShoutAdapterItem, List<BaseAdapterItem>, List<BaseAdapterItem>, List<BaseAdapterItem>>() {
-                    @Override
-                    public List<BaseAdapterItem> call(ShoutAdapterItems.MainShoutAdapterItem shout,
-                                                      List<BaseAdapterItem> userShouts,
-                                                      List<BaseAdapterItem> relatedShouts) {
-                        final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
+                (Func3<ShoutAdapterItems.MainShoutAdapterItem, List<BaseAdapterItem>, List<BaseAdapterItem>, List<BaseAdapterItem>>) (shout, userShouts, relatedShouts) -> {
+                    final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
 
-                        builder.add(shout);
+                    builder.add(shout);
 
-                        final User user = shout.getShout().getProfile();
-                        if (!userShouts.isEmpty()) {
-                            builder.add(new HeaderAdapterItem(context.getString(R.string.shout_user_shouts_header, user.getFirstName()).toUpperCase()))
-                                    .addAll(userShouts);
-                        }
-
-                        builder.add(new ShoutAdapterItems.VisitProfileAdapterItem(visitProfileSubject, user));
-
-                        if (!relatedShouts.isEmpty()) {
-                            builder.add(new HeaderAdapterItem(context.getString(R.string.shout_related_shouts_header)))
-                                    .add(new ShoutAdapterItems.RelatedContainerAdapterItem(relatedShouts));
-                        }
-
-                        return builder.build();
+                    final User user = shout.getShout().getProfile();
+                    if (!userShouts.isEmpty()) {
+                        builder.add(new HeaderAdapterItem(context.getString(R.string.shout_user_shouts_header, user.getFirstName()).toUpperCase()))
+                                .addAll(userShouts);
                     }
+
+                    builder.add(new ShoutAdapterItems.VisitProfileAdapterItem(visitProfileSubject, user));
+
+                    if (!relatedShouts.isEmpty()) {
+                        builder.add(new HeaderAdapterItem(context.getString(R.string.shout_related_shouts_header)))
+                                .add(new ShoutAdapterItems.RelatedContainerAdapterItem(relatedShouts));
+                    }
+
+                    return builder.build();
                 })
                 .observeOn(uiScheduler);
 
@@ -283,12 +285,7 @@ public class ShoutPresenter {
         /** Others **/
         isUserShoutOwnerObservable = Observable.zip(
                 userNameObservable, userPreferences.getPageOrUserObservable(), Observable.just(userPreferences.isNormalUser()),
-                new Func3<String, BaseProfile, Boolean, Boolean>() {
-                    @Override
-                    public Boolean call(String shoutUser, @Nullable BaseProfile user, Boolean isNormalUser) {
-                        return isNormalUser && user != null && user.getUsername().equals(shoutUser);
-                    }
-                })
+                (shoutUser, user, isNormalUser1) -> isNormalUser1 && user != null && user.getUsername().equals(shoutUser))
                 .take(1)
                 .compose(ObservableExtensions.<Boolean>behaviorRefCount());
 
@@ -305,22 +302,16 @@ public class ShoutPresenter {
         /** Refresh shouts **/
         final Observable<Object> refreshShout = Observable
                 .merge(shoutsGlobalRefreshPresenter.getShoutsGlobalRefreshObservable(), refreshShoutsSubject)
-                .map(new Func1<Object, Object>() {
-                    @Override
-                    public Object call(Object o) {
-                        shoutsDao.getShoutDao(shoutId)
-                                .getRefreshObserver().onNext(null);
-                        return null;
-                    }
+                .map(o -> {
+                    shoutsDao.getShoutDao(shoutId)
+                            .getRefreshObserver().onNext(null);
+                    return null;
                 });
 
         final Observable<Object> refreshUserShouts = shoutsGlobalRefreshPresenter.getShoutsGlobalRefreshObservable()
-                .withLatestFrom(userShoutDaoObservable, new Func2<Object, ShoutsDao.UserShoutsDao, Object>() {
-                    @Override
-                    public Observer<Object> call(Object o, ShoutsDao.UserShoutsDao userShoutsDao) {
-                        userShoutsDao.getRefreshObserver().onNext(null);
-                        return null;
-                    }
+                .withLatestFrom(userShoutDaoObservable, (o, userShoutsDao) -> {
+                    userShoutsDao.getRefreshObserver().onNext(null);
+                    return null;
                 });
 
         final Observable<Object> refreshRelatedShouts = shoutsGlobalRefreshPresenter.getShoutsGlobalRefreshObservable()

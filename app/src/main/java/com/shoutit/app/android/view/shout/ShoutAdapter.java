@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -16,6 +17,9 @@ import android.widget.TextView;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
+import com.jakewharton.rxbinding.view.RxView;
+import com.jakewharton.rxbinding.widget.RxCompoundButton;
 import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
@@ -40,6 +44,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Observable;
 import rx.Subscription;
+import rx.subscriptions.CompositeSubscription;
 
 public class ShoutAdapter extends BaseAdapter {
 
@@ -108,9 +113,12 @@ public class ShoutAdapter extends BaseAdapter {
         View viewPagerContainer;
         @Bind(R.id.shout_like)
         ImageView shoutLikeImageView;
+        @Bind(R.id.shout_bookmark)
+        CheckBox bookmarkCheckbox;
 
         private final Target flagTarget;
         private ShoutAdapterItems.MainShoutAdapterItem item;
+        private CompositeSubscription subscription;
 
         public ShoutViewHolder(@Nonnull View itemView) {
             super(itemView);
@@ -131,6 +139,8 @@ public class ShoutAdapter extends BaseAdapter {
 
         @Override
         public void bind(@Nonnull ShoutAdapterItems.MainShoutAdapterItem item) {
+            unsubscribe();
+
             this.item = item;
             final Shout shout = item.getShout();
             final User user = shout.getProfile();
@@ -142,9 +152,9 @@ public class ShoutAdapter extends BaseAdapter {
                     .error(R.drawable.ic_rect_avatar_placeholder)
                     .into(avatarImageView);
 
-                shoutLikeImageView.setImageResource(shout.isLiked() ? R.drawable.likeon : R.drawable.likeoff);
+            shoutLikeImageView.setImageResource(shout.isLiked() ? R.drawable.likeon : R.drawable.likeoff);
 
-                nameTextView.setText(user.getName());
+            nameTextView.setText(user.getName());
             final UserLocation location = shout.getLocation();
             if (location != null) {
                 userLocationTextView.setText(context.getString(R.string.shout_user_location,
@@ -185,6 +195,25 @@ public class ShoutAdapter extends BaseAdapter {
             }
 
             setUpFilters(shout);
+
+            subscription = new CompositeSubscription(
+                    item.getEnableBookmarkObservable().subscribe(RxView.enabled(bookmarkCheckbox)),
+                    item.getBookmarObservable().subscribe(RxCompoundButton.checked(bookmarkCheckbox)),
+                    RxView.clicks(bookmarkCheckbox).subscribe(aVoid -> {
+                        item.onBookmarkSelectionChanged(bookmarkCheckbox.isChecked());
+                    }));
+        }
+
+        @Override
+        public void onViewRecycled() {
+            super.onViewRecycled();
+            unsubscribe();
+        }
+
+        private void unsubscribe() {
+            if(subscription != null){
+                subscription.unsubscribe();
+            }
         }
 
         private void setUpFilters(Shout shout) {
@@ -204,14 +233,9 @@ public class ShoutAdapter extends BaseAdapter {
                 ((TextView) view.getChildAt(0)).setText(filter.getName());
                 ((TextView) view.getChildAt(1)).setText(filter.getValue().getName());
 
-                assert detailsContainer.getChildCount() >= 2;
+                Preconditions.checkArgument(detailsContainer.getChildCount() >= 2);
                 detailsContainer.addView(view, detailsContainer.getChildCount() - 1);
-                view.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        item.onCategoryClick(filter.getValue().getSlug());
-                    }
-                });
+                view.setOnClickListener(v -> item.onCategoryClick(filter.getValue().getSlug()));
             }
 
             final boolean isLastElementLight = detailsContainer.getChildCount() % 2 != 0;
@@ -363,6 +387,7 @@ public class ShoutAdapter extends BaseAdapter {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(ViewHolderManager.BaseViewHolder holder, int position) {
         holder.bind(items.get(position));
