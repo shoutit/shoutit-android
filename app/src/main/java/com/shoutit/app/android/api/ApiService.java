@@ -588,4 +588,12 @@ public interface ApiService {
     @DELETE("shouts/{id}/like")
     Observable<LikeResponse> unlikeShout(@Path("id") String id);
 
+    /**
+     * Shout bookmark
+     **/
+    @POST("shouts/{id}/bookmark")
+    Observable<ResponseBody> markAsBookmark(@Path("id") String id);
+
+    @DELETE("shouts/{id}/bookmark")
+    Observable<ResponseBody> deleteBookmark(@Path("id") String id);
 }

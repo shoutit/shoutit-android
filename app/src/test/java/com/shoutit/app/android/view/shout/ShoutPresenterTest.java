@@ -204,7 +204,7 @@ public class ShoutPresenterTest {
 
     private Shout getShout() {
         return new Shout("id", null, null, null, null, null, null, 1L, 2, null, null, null,
-                getUser(), null, null, 1,false, null, null, 0, ImmutableList.<ConversationDetails>of(), true, null, null, null);
+                getUser(), null, null, 1,false, null, null, 0, ImmutableList.<ConversationDetails>of(), true, null, null, null, isBookmarked);
     }
 
     private User getUser() {

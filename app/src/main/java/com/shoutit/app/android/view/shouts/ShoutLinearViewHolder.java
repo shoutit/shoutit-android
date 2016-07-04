@@ -2,7 +2,9 @@ package com.shoutit.app.android.view.shouts;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.support.annotation.NonNull;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -29,7 +31,8 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import rx.subscriptions.CompositeSubscription;
 
-public class ShoutLinerViewHolder extends ViewHolderManager.BaseViewHolder<ShoutAdapterItem> implements View.OnClickListener {
+public class ShoutLinearViewHolder extends ViewHolderManager.BaseViewHolder<ShoutAdapterItem> implements View.OnClickListener {
+
     @Bind(R.id.shout_grid_image_view)
     ImageView cardImageView;
     @Bind(R.id.shout_grid_title_tv)
@@ -50,6 +53,8 @@ public class ShoutLinerViewHolder extends ViewHolderManager.BaseViewHolder<Shout
     ImageView countryImageView;
     @Bind(R.id.shout_container)
     View shoutContainer;
+    @Bind(R.id.shout_grid_bookmark)
+    CheckBox mBoomark;
 
     private CompositeSubscription subscription;
     @Nonnull
@@ -58,8 +63,8 @@ public class ShoutLinerViewHolder extends ViewHolderManager.BaseViewHolder<Shout
     private final Picasso picassoNoTransformer;
     private ShoutAdapterItem item;
 
-    public ShoutLinerViewHolder(@Nonnull View itemView, Context context, Picasso picasso,
-                                @Named("NoAmazonTransformer") Picasso picassoNoTransformer) {
+    public ShoutLinearViewHolder(@Nonnull View itemView, @NonNull Context context, Picasso picasso,
+                                 @Named("NoAmazonTransformer") Picasso picassoNoTransformer) {
         super(itemView);
         this.context = context;
         this.picasso = picasso;
@@ -134,8 +139,15 @@ public class ShoutLinerViewHolder extends ViewHolderManager.BaseViewHolder<Shout
                             } else {
                                 context.startActivity(ChatFirstConversationActivity.newIntent(context, true, item.getShout().getId()));
                             }
-                        })
-        );
+                        }),
+                item.getBookmarkObservable()
+                        .subscribe(checked -> mBoomark.setChecked(checked)),
+                item.getEnableObservable()
+                        .subscribe(enable -> {
+                            mBoomark.setEnabled(enable);
+                        }));
+
+        mBoomark.setOnClickListener(v -> item.onBookmarkSelectionChanged(mBoomark.isChecked()));
     }
 
     @Override

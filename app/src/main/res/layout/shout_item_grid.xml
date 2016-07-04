@@ -28,6 +28,16 @@
                 android:src="@drawable/pattern_placeholder"
                 tools:background="@android:color/black"/>
 
+            <CheckBox
+                android:id="@+id/shout_grid_bookmark"
+                android:background="?selectableItemBackground"
+                android:layout_marginEnd="12dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:button="@drawable/bookmark_button"
+                android:checked="false"/>
+
             <TextView
                 android:id="@+id/shout_promoted_label"
                 android:layout_width="wrap_content"
