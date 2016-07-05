@@ -122,6 +122,7 @@ public class FacebookHelper {
     private void loadAds() {
         AdSettings.addTestDevice("e206dc0d711d548562ff65e91961aebf");
         AdSettings.addTestDevice("2527377803eebdb0123194b820f02a5a");
+        AdSettings.addTestDevice("e5c7606e893f5e4e19ce8f03429c8b47");
         listAdManager.loadAds(NativeAd.MediaCacheFlag.ALL);
         gridAdManager.loadAds(NativeAd.MediaCacheFlag.ALL);
         shoutDetailAdManager.loadAds(NativeAd.MediaCacheFlag.ALL);
