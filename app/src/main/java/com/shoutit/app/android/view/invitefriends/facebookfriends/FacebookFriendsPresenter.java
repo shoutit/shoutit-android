@@ -68,7 +68,7 @@ public class FacebookFriendsPresenter extends BaseProfileListPresenter {
                 .compose(ObservableExtensions.behaviorRefCount());
 
         //noinspection ConstantConditions
-        final boolean hasRequiredPermissionInApi = facebookHelper.hasRequiredPermissionInApi(
+        final boolean hasRequiredPermissionInApi = facebookHelper.hasRequiredPermissions(
                 userPreferences.getUser(), FacebookHelper.PERMISSION_USER_FRIENDS);
 
         final Observable<ResponseOrError<ProfilesListResponse>> friendsRequest = dao.getFriendsDao(User.ME)

@@ -197,7 +197,7 @@ public class FacebookHelper {
                                                                          final boolean isPublishPermission) {
         final User user = userPreferences.getUser();
 
-        if (user != null && hasRequiredPermissionLocally(permissionName) && hasRequiredPermissionInApi(user, permissionName)) {
+        if (user != null && hasRequiredPermissions(user, permissionName)) {
             return Observable.just(ResponseOrError.fromData(true));
         } else {
             return Observable
@@ -321,6 +321,10 @@ public class FacebookHelper {
     public boolean hasRequiredPermissionLocally(@Nonnull String permission) {
         return AccessToken.getCurrentAccessToken() != null &&
                 AccessToken.getCurrentAccessToken().getPermissions().contains(permission);
+    }
+
+    public boolean hasRequiredPermissions(@Nonnull User user, @Nonnull String permission) {
+        return hasRequiredPermissionInApi(user, permission) && hasRequiredPermissionLocally(permission);
     }
 
     private boolean shouldRefreshToken(@Nonnull User user) {
