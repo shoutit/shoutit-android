@@ -79,7 +79,7 @@ public class BookmarkedShoutsPresenter implements ShoutListPresenter {
                     @Override
                     public List<BaseAdapterItem> call(ShoutsResponse shoutsResponse) {
                         if (shoutsResponse.getShouts().isEmpty()) {
-                            return ImmutableList.<BaseAdapterItem>of(new NoDataTextAdapterItem(context.getString(R.string.chat_shouts_no_results)));
+                            return ImmutableList.<BaseAdapterItem>of(new NoDataTextAdapterItem(context.getString(R.string.bookmarks_no_bookmarks)));
                         } else {
                             final Iterable<Shout> shouts = Iterables.filter(shoutsResponse.getShouts(), input -> {
                                 assert input != null;
