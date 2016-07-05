@@ -20,16 +20,12 @@ public class ShoutListActivityHelper {
     public static CompositeSubscription setup(RxAppCompatActivity activity, ShoutListPresenter presenter, SimpleShoutsAdapter adapter, View progressBar) {
         return new CompositeSubscription(
                 presenter.getAdapterItemsObservable()
-                        .compose(activity.<List<BaseAdapterItem>>bindToLifecycle())
                         .subscribe(adapter),
                 presenter.getProgressObservable()
-                        .compose(activity.<Boolean>bindToLifecycle())
                         .subscribe(RxView.visibility(progressBar)),
                 presenter.getErrorObservable()
-                        .compose(activity.<Throwable>bindToLifecycle())
                         .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(activity))),
                 presenter.getShoutSelectedObservable()
-                        .compose(activity.<String>bindToLifecycle())
                         .subscribe(shoutId -> {
                             if (Strings.isNullOrEmpty(shoutId)) {
                                 ColoredSnackBar.error(ColoredSnackBar.contentView(activity), activity.getString(R.string.shout_deleted), Snackbar.LENGTH_SHORT).show();
