@@ -25,14 +25,20 @@ import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.model.LocationPointer;
 import com.shoutit.app.android.utils.BookmarkHelper;
+import com.shoutit.app.android.utils.FBAdHalfPresenter;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.List;
+
 import javax.annotation.Nonnull;
 
 import rx.Observable;
@@ -44,9 +50,12 @@ import rx.subjects.TestSubject;
 
 import static com.google.common.truth.Truth.assert_;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(FBAdHalfPresenter.class)
 public class HomePresenterTest {
 
     @Mock
@@ -64,6 +73,8 @@ public class HomePresenterTest {
     @Mock
     Context context;
     @Mock
+    FBAdHalfPresenter fbAdHalfPresenter;
+    @Mock
     BookmarksDao mBookmarksDao;
     @Mock
     BookmarkHelper mBookmarkHelper;
@@ -79,6 +90,7 @@ public class HomePresenterTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
+        PowerMockito.mockStatic(FBAdHalfPresenter.class);
 
         globalRefreshPresenter = new ShoutsGlobalRefreshPresenter();
 
@@ -96,7 +108,14 @@ public class HomePresenterTest {
         when(userPreferences.isNormalUser()).thenReturn(true);
         when(userPreferences.getUserOrPage()).thenReturn(TestUtils.getUser());
 
-        presenter = new HomePresenter(shoutsDao, discoversDao, userPreferences, context, Schedulers.immediate(), globalRefreshPresenter, mBookmarksDao, mBookmarkHelper);
+        when(fbAdHalfPresenter.getAdsObservable(any(Observable.class)))
+                .thenReturn(Observable.empty());
+
+        when(FBAdHalfPresenter.combineShoutsWithAds(anyList(), anyList()))
+                .thenCallRealMethod();
+
+        presenter = new HomePresenter(shoutsDao, discoversDao, userPreferences, context, Schedulers.immediate(),
+                fbAdHalfPresenter, globalRefreshPresenter, mBookmarksDao, mBookmarkHelper);
     }
 
     @Test

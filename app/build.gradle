@@ -155,9 +155,9 @@ android {
     }
 
     android.variantFilter { variant ->
-        if (variant.buildType.name.equals('staging') && variant.getFlavors().get(0).name.equals('dev')) {
+/*        if (variant.buildType.name.equals('staging') && variant.getFlavors().get(0).name.equals('dev')) {
             variant.setIgnore(true);
-        }
+        }*/
         if (variant.buildType.name.equals('release') && variant.getFlavors().get(0).name.equals('dev')) {
             variant.setIgnore(true);
         }
@@ -213,6 +213,7 @@ dependencies {
     compile ('com.facebook.android:facebook-android-sdk:4.12.1') {
         transitive = true;
     }
+    compile 'com.facebook.android:audience-network-sdk:4.12.1'
 
     // Google
     provided 'javax.annotation:jsr250-api:1.0'

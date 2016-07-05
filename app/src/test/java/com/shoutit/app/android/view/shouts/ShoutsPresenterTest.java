@@ -10,6 +10,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
+import com.shoutit.app.android.utils.FBAdHalfPresenter;
 import com.shoutit.app.android.utils.BookmarkHelper;
 import com.shoutit.app.android.view.shouts.discover.DiscoverShoutsPresenter;
 
@@ -18,6 +19,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import rx.Observable;
@@ -27,6 +29,7 @@ import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
 import static com.google.common.truth.Truth.assert_;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -42,6 +45,9 @@ public class ShoutsPresenterTest {
 
     @Mock
     UserPreferences userPreferences;
+
+    @Mock
+    FBAdHalfPresenter fbAdHalfPresenter;
 
     @Mock
     BookmarksDao mBookmarksDao;
@@ -64,7 +70,12 @@ public class ShoutsPresenterTest {
         when(userPreferences.isNormalUser()).thenReturn(true);
         when(userPreferences.getUserOrPage()).thenReturn(TestUtils.getUser());
 
-        mShoutsPresenter = new DiscoverShoutsPresenter(Schedulers.immediate(), Schedulers.immediate(), mDiscoverShoutsDao, "", "", userPreferences, mContext, mBookmarksDao, mBookmarkHelper);
+        when(fbAdHalfPresenter.getAdsObservable(any(Observable.class)))
+                .thenReturn(Observable.just(new ArrayList<>()));
+
+
+        mShoutsPresenter = new DiscoverShoutsPresenter(Schedulers.immediate(), Schedulers.immediate(),
+                mDiscoverShoutsDao, "", "", userPreferences, fbAdHalfPresenter, mContext, mBookmarksDao, mBookmarkHelper);
     }
 
     @Test
