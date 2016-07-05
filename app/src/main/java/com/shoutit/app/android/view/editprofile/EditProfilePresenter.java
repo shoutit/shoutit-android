@@ -45,7 +45,8 @@ import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
 public class EditProfilePresenter {
-    private static final SimpleDateFormat birthdayDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+    private static final SimpleDateFormat birthdayToDisplayDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+    private static final SimpleDateFormat birthdayToSendDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
     private final BehaviorSubject<String> firstNameSubject = BehaviorSubject.create();
     private final BehaviorSubject<String> lastNameSubject = BehaviorSubject.create();
@@ -54,7 +55,8 @@ public class EditProfilePresenter {
     private final BehaviorSubject<String> websiteSubject = BehaviorSubject.create();
     private final BehaviorSubject<String> mobileSubject = BehaviorSubject.create();
     private final BehaviorSubject<String> genderSubject = BehaviorSubject.create();
-    private final BehaviorSubject<String> birthdaySubject = BehaviorSubject.create();
+    private final BehaviorSubject<String> birthdayToSendSubject = BehaviorSubject.create();
+    private final BehaviorSubject<String> birthdayToDisplaySubject = BehaviorSubject.create();
     private final BehaviorSubject<UserLocation> locationSubject = BehaviorSubject.create();
     private final BehaviorSubject<UpdateUserRequest> lastCombinedData = BehaviorSubject.create();
     private final BehaviorSubject<Uri> lastSelectedAvatarUri = BehaviorSubject.create();
@@ -143,13 +145,8 @@ public class EditProfilePresenter {
                 .map(BaseProfile::getCover);
 
         birthdayObservable = Observable.merge(
-                userObservable.map(new Func1<User, String>() {
-                    @Override
-                    public String call(User baseProfile) {
-                        return baseProfile.getBirthday();
-                    }
-                }),
-                birthdaySubject);
+                userObservable.map(user -> convertDateToDefaultLocale(user.getBirthday())),
+                birthdayToDisplaySubject);
 
         /** Errors **/
         firstNameErrorObservable = firstNameSubject
@@ -174,7 +171,7 @@ public class EditProfilePresenter {
                 websiteSubject.startWith((String) null),
                 mobileSubject.startWith((String) null),
                 genderSubject.startWith((String) null),
-                birthdaySubject.startWith((String) null),
+                birthdayToSendSubject.startWith((String) null),
                 locationSubject.startWith((UserLocation) null),
                 new Func9<String, String, String, String, String, String, String, String, UserLocation, UpdateUserRequest>() {
                     @Override
@@ -304,6 +301,16 @@ public class EditProfilePresenter {
                         user.getBirthday() == null)
                 .filter(Functions1.isTrue())
                 .doOnNext(aBoolean -> userPreferences.setProfileAlertAlreadyDisplayed());
+    }
+
+    @Nullable
+    private String convertDateToDefaultLocale(@Nullable String birthday) {
+        if (TextUtils.isEmpty(birthday)) {
+            return null;
+        }
+
+        final long birthdayTimestamp = convertDateToTimestamp(birthday);
+        return birthdayToDisplayDateFormat.format(new Date(birthdayTimestamp));
     }
 
     @NonNull
@@ -485,29 +492,36 @@ public class EditProfilePresenter {
     }
 
     public void showDatePicker() {
-        final String currentDate = birthdaySubject.getValue();
+        final String currentDate = birthdayToSendSubject.getValue();
         long initDate;
 
         if (TextUtils.isEmpty(currentDate)) {
             initDate = System.currentTimeMillis();
         } else {
-            final String[] split = currentDate.split("-");
-            if (split.length != 3) {
-                initDate = System.currentTimeMillis();
-            } else {
-                final Calendar calendar = Calendar.getInstance();
-                calendar.set(Integer.valueOf(split[0]), Integer.valueOf(split[1]), Integer.valueOf(split[2]));
-
-                initDate = calendar.getTimeInMillis();
-            }
+            initDate = convertDateToTimestamp(currentDate);
         }
 
         showDatePickerSubject.onNext(initDate);
     }
 
+    private long convertDateToTimestamp(@Nonnull String date) {
+        final String[] split = date.split("-");
+        if (split.length != 3) {
+            return System.currentTimeMillis();
+        } else {
+            final Calendar calendar = Calendar.getInstance();
+            calendar.set(Integer.valueOf(split[0]), Integer.valueOf(split[1]), Integer.valueOf(split[2]));
+
+            return calendar.getTimeInMillis();
+        }
+    }
+
     public void birthdayChanged(long timeInMillis) {
-        final String birthDay = birthdayDateFormat.format(new Date(timeInMillis));
-        birthdaySubject.onNext(birthDay);
+        final String birthdayToSend = birthdayToSendDateFormat.format(new Date(timeInMillis));
+        birthdayToSendSubject.onNext(birthdayToSend);
+
+        final String birthdayToDisplay = birthdayToDisplayDateFormat.format(new Date(timeInMillis));
+        birthdayToDisplaySubject.onNext(birthdayToDisplay);
     }
 
     public static class State {

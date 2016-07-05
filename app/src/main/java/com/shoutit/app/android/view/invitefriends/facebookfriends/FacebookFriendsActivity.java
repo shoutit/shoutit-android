@@ -3,10 +3,10 @@ package com.shoutit.app.android.view.invitefriends.facebookfriends;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.facebook.CallbackManager;
 import com.shoutit.app.android.App;
@@ -14,7 +14,6 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
-import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.profileslist.BaseProfilesListActivity;
@@ -22,8 +21,6 @@ import com.shoutit.app.android.view.profileslist.BaseProfilesListActivity;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-
-import rx.functions.Func1;
 
 public class FacebookFriendsActivity extends BaseProfilesListActivity {
 
@@ -56,8 +53,8 @@ public class FacebookFriendsActivity extends BaseProfilesListActivity {
         presenter.getPermissionsNotGrantedObservable()
                 .compose(this.<Boolean>bindToLifecycle())
                 .subscribe(ignore -> {
-                    ColoredSnackBar.error(ColoredSnackBar.contentView(FacebookFriendsActivity.this),
-                            R.string.facebook_friends_permission_error, Snackbar.LENGTH_LONG).show();
+                    Toast.makeText(this, R.string.facebook_friends_permission_error, Toast.LENGTH_LONG).show();
+                    finish();
                 });
 
         presenter.getInvitationCodeObservable()

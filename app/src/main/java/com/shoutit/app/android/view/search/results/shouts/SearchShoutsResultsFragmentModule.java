@@ -1,7 +1,6 @@
 package com.shoutit.app.android.view.search.results.shouts;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 
 import com.appunite.rx.dagger.UiScheduler;
 import com.shoutit.app.android.UserPreferences;
@@ -9,6 +8,7 @@ import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
+import com.shoutit.app.android.utils.FBAdHalfPresenter;
 import com.shoutit.app.android.utils.BookmarkHelper;
 import com.shoutit.app.android.view.search.SearchPresenter;
 
@@ -42,9 +42,11 @@ public class SearchShoutsResultsFragmentModule {
                                                                      @UiScheduler Scheduler uiScheduler,
                                                                      UserPreferences userPreferences,
                                                                      ShoutsGlobalRefreshPresenter globalRefreshPresenter,
+                                                                     FBAdHalfPresenter fbAdHalfPresenter,
                                                                      BookmarksDao bookmarksDao,
                                                                      BookmarkHelper bookmarkHelper) {
-        return new SearchShoutsResultsPresenter(dao, searchQuery, searchType, contextualItemId, userPreferences, context, uiScheduler, globalRefreshPresenter, bookmarksDao, bookmarkHelper);
+        return new SearchShoutsResultsPresenter(dao, searchQuery, searchType, contextualItemId,
+                userPreferences, context, uiScheduler, fbAdHalfPresenter, globalRefreshPresenter, bookmarksDao, bookmarkHelper);
     }
 }
 

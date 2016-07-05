@@ -33,12 +33,12 @@ import com.shoutit.app.android.model.UserShoutsPointer;
 import com.shoutit.app.android.utils.BookmarkHelper;
 import com.shoutit.app.android.utils.PromotionHelper;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
+import com.shoutit.app.android.view.loginintro.FacebookHelper;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
 import java.util.List;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import retrofit2.Response;
@@ -46,8 +46,7 @@ import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Func1;
-import rx.functions.Func2;
-import rx.functions.Func3;
+import rx.functions.Func4;
 import rx.subjects.PublishSubject;
 
 public class ShoutPresenter {
@@ -107,6 +106,7 @@ public class ShoutPresenter {
                           @Nonnull @NetworkScheduler final Scheduler networkScheduler,
                           @Nonnull final UserPreferences userPreferences,
                           @Nonnull final ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
+                          @Nonnull FacebookHelper facebookHelper,
                           @NonNull BookmarksDao bookmarksDao,
                           @NonNull BookmarkHelper bookmarkHelper) {
         this.uiScheduler = uiScheduler;
@@ -209,30 +209,39 @@ public class ShoutPresenter {
                     }
                 });
 
+        final Observable<BaseAdapterItem> fbAddAdapterItem = facebookHelper.getShoutDetailAdapterItem()
+                .compose(ObservableExtensions.behaviorRefCount());
+
         allAdapterItemsObservable = Observable.combineLatest(
                 shoutItemObservable,
                 userShoutItemsObservable.startWith(ImmutableList.<BaseAdapterItem>of()),
                 relatedShoutsItems.startWith(ImmutableList.<BaseAdapterItem>of()),
-                (Func3<ShoutAdapterItems.MainShoutAdapterItem, List<BaseAdapterItem>, List<BaseAdapterItem>, List<BaseAdapterItem>>) (shout, userShouts, relatedShouts) -> {
-                    final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
+                fbAddAdapterItem.startWith((BaseAdapterItem) null),
+                (Func4<ShoutAdapterItems.MainShoutAdapterItem, List<BaseAdapterItem>, List<BaseAdapterItem>, BaseAdapterItem, List<BaseAdapterItem>>)
+                        (shout, userShouts, relatedShouts, fbAdItem) -> {
+                            final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
 
-                    builder.add(shout);
+                            builder.add(shout);
 
-                    final User user = shout.getShout().getProfile();
-                    if (!userShouts.isEmpty()) {
-                        builder.add(new HeaderAdapterItem(context.getString(R.string.shout_user_shouts_header, user.getFirstName()).toUpperCase()))
-                                .addAll(userShouts);
-                    }
+                            final User user = shout.getShout().getProfile();
+                            if (!userShouts.isEmpty()) {
+                                builder.add(new HeaderAdapterItem(context.getString(R.string.shout_user_shouts_header, user.getFirstName()).toUpperCase()))
+                                        .addAll(userShouts);
+                            }
 
-                    builder.add(new ShoutAdapterItems.VisitProfileAdapterItem(visitProfileSubject, user));
+                            builder.add(new ShoutAdapterItems.VisitProfileAdapterItem(visitProfileSubject, user));
 
-                    if (!relatedShouts.isEmpty()) {
-                        builder.add(new HeaderAdapterItem(context.getString(R.string.shout_related_shouts_header)))
-                                .add(new ShoutAdapterItems.RelatedContainerAdapterItem(relatedShouts));
-                    }
+                            if (!relatedShouts.isEmpty()) {
+                                builder.add(new HeaderAdapterItem(context.getString(R.string.shout_related_shouts_header)))
+                                        .add(new ShoutAdapterItems.RelatedContainerAdapterItem(relatedShouts));
+                            }
 
-                    return builder.build();
-                })
+                            if (fbAdItem != null) {
+                                builder.add(fbAdItem);
+                            }
+
+                            return builder.build();
+                        })
                 .observeOn(uiScheduler);
 
         /** Like / Unlike Shout **/

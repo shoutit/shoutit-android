@@ -4,11 +4,13 @@ import android.content.Context;
 
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.facebook.ads.NativeAdsManager;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.TestUtils;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.adapteritems.FbAdAdapterItem;
 import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.ConversationDetails;
@@ -23,6 +25,7 @@ import com.shoutit.app.android.model.MobilePhoneResponse;
 import com.shoutit.app.android.model.RelatedShoutsPointer;
 import com.shoutit.app.android.model.UserShoutsPointer;
 import com.shoutit.app.android.utils.BookmarkHelper;
+import com.shoutit.app.android.view.loginintro.FacebookHelper;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -63,6 +66,8 @@ public class ShoutPresenterTest {
     @Mock
     ShoutsDao.UserShoutsDao userShoutsDao;
     @Mock
+    FacebookHelper facebookHelper;
+    @Mock
     ApiService apiService;
     @Mock
     BookmarksDao mBookmarksDao;
@@ -75,6 +80,8 @@ public class ShoutPresenterTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
+        when(facebookHelper.getAdObservable(any(NativeAdsManager.class)))
+                .thenReturn(Observable.just(ResponseOrError.fromError(new Throwable())));
         when(mBookmarkHelper.getShoutItemBookmarkHelper()).thenReturn(new BookmarkHelper.ShoutItemBookmarkHelper(Observers.empty(), Observable.empty()));
 
         when(shoutsDao.getShoutObservable(anyString()))
@@ -115,7 +122,11 @@ public class ShoutPresenterTest {
         when(userPreferences.isNormalUser()).thenReturn(true);
         when(userPreferences.getUserOrPage()).thenReturn(TestUtils.getUser());
 
-        presenter = new ShoutPresenter(shoutsDao, "zz", apiService, context, Schedulers.immediate(), Schedulers.immediate(), userPreferences, globalRefreshPresenter, mBookmarksDao, mBookmarkHelper);
+        when(facebookHelper.getShoutDetailAdapterItem())
+                .thenReturn(Observable.just(new FbAdAdapterItem(null)));
+
+        presenter = new ShoutPresenter(shoutsDao, "zz", apiService, context, Schedulers.immediate(), Schedulers.immediate(),
+                userPreferences, globalRefreshPresenter, facebookHelper, mBookmarksDao, mBookmarkHelper);
     }
 
     @Test
