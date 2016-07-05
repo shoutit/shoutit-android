@@ -153,6 +153,7 @@
     <string name="menu_item_logout">Logout</string>
     <string name="menu_version_name">Shoutit %1$s</string>
     <string name="menu_use_as_format">Use Shoutit as %1$s</string>
+    <string name="menu_item_bookmarks">Saved</string>
 
     <!-- Post Login -->
     <string name="post_login_next">next</string>

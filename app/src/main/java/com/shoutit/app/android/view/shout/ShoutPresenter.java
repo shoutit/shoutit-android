@@ -1,10 +1,12 @@
 package com.shoutit.app.android.view.shout;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
@@ -12,20 +14,23 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
-import com.shoutit.app.android.adapteritems.FbAdAdapterItem;
 import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
+import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.ConversationDetails;
+import com.shoutit.app.android.api.model.LikeResponse;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.BaseShoutsDao;
+import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.model.MobilePhoneResponse;
 import com.shoutit.app.android.model.RelatedShoutsPointer;
 import com.shoutit.app.android.model.UserShoutsPointer;
+import com.shoutit.app.android.utils.BookmarkHelper;
 import com.shoutit.app.android.utils.PromotionHelper;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
@@ -34,7 +39,6 @@ import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 import java.util.List;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import retrofit2.Response;
@@ -42,8 +46,6 @@ import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Func1;
-import rx.functions.Func2;
-import rx.functions.Func3;
 import rx.functions.Func4;
 import rx.subjects.PublishSubject;
 
@@ -73,6 +75,7 @@ public class ShoutPresenter {
     private final Observable<Shout> showPromoteObservable;
     private final Observable<Shout> showPromotedObservable;
 
+    private PublishSubject<Boolean> likeClickedSubject = PublishSubject.create();
     private PublishSubject<String> addToCartSubject = PublishSubject.create();
     private PublishSubject<String> onCategoryClickedSubject = PublishSubject.create();
     private PublishSubject<String> userShoutSelectedSubject = PublishSubject.create();
@@ -92,16 +95,20 @@ public class ShoutPresenter {
     private final PublishSubject<String> sendReportObserver = PublishSubject.create();
     private final PublishSubject<Object> refreshShoutsSubject = PublishSubject.create();
     private final Observable<User> shoutOwnerProfile;
-    private final Observable<Shout> successShoutResponse;
+    protected final Observable<Shout> successShoutResponse;
 
     @Inject
     public ShoutPresenter(@Nonnull final ShoutsDao shoutsDao,
                           @Nonnull final String shoutId,
+                          @Nonnull final ApiService apiService,
                           @Nonnull @ForActivity final Context context,
                           @Nonnull @UiScheduler final Scheduler uiScheduler,
+                          @Nonnull @NetworkScheduler final Scheduler networkScheduler,
                           @Nonnull final UserPreferences userPreferences,
                           @Nonnull final ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
-                          @Nonnull FacebookHelper facebookHelper) {
+                          @Nonnull FacebookHelper facebookHelper,
+                          @NonNull BookmarksDao bookmarksDao,
+                          @NonNull BookmarkHelper bookmarkHelper) {
         this.uiScheduler = uiScheduler;
         mUserPreferences = userPreferences;
 
@@ -160,8 +167,14 @@ public class ShoutPresenter {
 
         /** Adapter Items **/
         final Observable<ShoutAdapterItems.MainShoutAdapterItem> shoutItemObservable =
-                successShoutResponse.map(shout -> new ShoutAdapterItems.MainShoutAdapterItem(addToCartSubject, onCategoryClickedSubject,
-                        visitProfileSubject, shout, context.getResources()));
+                successShoutResponse.map(shout -> {
+                    final BookmarkHelper.ShoutItemBookmarkHelper shoutItemBookmarkHelper = bookmarkHelper.getShoutItemBookmarkHelper();
+                    return new ShoutAdapterItems.MainShoutAdapterItem(addToCartSubject, onCategoryClickedSubject,
+                            visitProfileSubject, likeClickedSubject, shout, context.getResources(),
+                            bookmarksDao.getBookmarkForShout(shoutId, shout.isBookmarked()),
+                            shoutItemBookmarkHelper.getObserver(),
+                            shoutItemBookmarkHelper.getEnableObservable());
+                });
 
         final Observable<List<BaseAdapterItem>> userShoutItemsObservable =
                 successUserShoutsObservable.map((Func1<List<Shout>, List<BaseAdapterItem>>) shouts -> {
@@ -178,7 +191,12 @@ public class ShoutPresenter {
                         final List<BaseAdapterItem> items =
                                 Lists.transform(shouts, (Function<Shout, BaseAdapterItem>) shout -> {
                                     final boolean isShoutOwner = shout.getProfile().getUsername().equals(currentUserName);
-                                    return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context, relatedShoutSelectedSubject, PromotionHelper.promotionInfoOrNull(shout));
+                                    final BookmarkHelper.ShoutItemBookmarkHelper shoutItemBookmarkHelper = bookmarkHelper.getShoutItemBookmarkHelper();
+                                    return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context,
+                                            relatedShoutSelectedSubject, PromotionHelper.promotionInfoOrNull(shout),
+                                            bookmarksDao.getBookmarkForShout(shout.getId(), shout.isBookmarked()),
+                                            shoutItemBookmarkHelper.getObserver(),
+                                            shoutItemBookmarkHelper.getEnableObservable());
                                 });
 
                         final ImmutableList.Builder<BaseAdapterItem> builder = new ImmutableList.Builder<>();
@@ -224,11 +242,43 @@ public class ShoutPresenter {
                 })
                 .observeOn(uiScheduler);
 
+        /** Like / Unlike Shout **/
+
+        final Observable<ResponseOrError<LikeResponse>> likeShoutResponseObservable = likeClickedSubject
+                .filter(Functions1.isFalse())
+                .switchMap(o -> apiService.likeShout(shoutId)
+                        .subscribeOn(networkScheduler)
+                        .observeOn(uiScheduler)
+                        .compose(ResponseOrError.toResponseOrErrorObservable()))
+                .compose(ObservableExtensions.behaviorRefCount());
+
+        final Observable<ResponseOrError<LikeResponse>> unlikeShoutResponseObservable = likeClickedSubject
+                .filter(Functions1.isTrue())
+                .switchMap(o -> apiService.unlikeShout(shoutId)
+                        .subscribeOn(networkScheduler)
+                        .observeOn(uiScheduler)
+                        .compose(ResponseOrError.toResponseOrErrorObservable()))
+                .compose(ObservableExtensions.behaviorRefCount());
+
+        likeShoutResponseObservable
+                .compose(ResponseOrError.onlySuccess())
+                .withLatestFrom(successShoutResponse,
+                        (o, shout) -> shout.likedShout(true))
+                .subscribe(shoutsDao.getShoutDao(shoutId).onShoutLikedObserver());
+
+        unlikeShoutResponseObservable
+                .compose(ResponseOrError.onlySuccess())
+                .withLatestFrom(successShoutResponse,
+                        (o, shout) -> shout.likedShout(false))
+                .subscribe(shoutsDao.getShoutDao(shoutId).onShoutLikedObserver());
+
         /** Errors **/
         errorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
                 ResponseOrError.transform(userShoutsObservable),
                 ResponseOrError.transform(shoutResponse),
-                ResponseOrError.transform(relatedShoutsObservable)))
+                ResponseOrError.transform(relatedShoutsObservable),
+                ResponseOrError.transform(likeShoutResponseObservable),
+                ResponseOrError.transform(unlikeShoutResponseObservable)))
                 .filter(Functions1.isNotNull())
                 .observeOn(uiScheduler);
 
@@ -242,12 +292,7 @@ public class ShoutPresenter {
         /** Others **/
         isUserShoutOwnerObservable = Observable.zip(
                 userNameObservable, userPreferences.getPageOrUserObservable(), Observable.just(userPreferences.isNormalUser()),
-                new Func3<String, BaseProfile, Boolean, Boolean>() {
-                    @Override
-                    public Boolean call(String shoutUser, @Nullable BaseProfile user, Boolean isNormalUser) {
-                        return isNormalUser && user != null && user.getUsername().equals(shoutUser);
-                    }
-                })
+                (shoutUser, user, isNormalUser1) -> isNormalUser1 && user != null && user.getUsername().equals(shoutUser))
                 .take(1)
                 .compose(ObservableExtensions.<Boolean>behaviorRefCount());
 
@@ -264,22 +309,16 @@ public class ShoutPresenter {
         /** Refresh shouts **/
         final Observable<Object> refreshShout = Observable
                 .merge(shoutsGlobalRefreshPresenter.getShoutsGlobalRefreshObservable(), refreshShoutsSubject)
-                .map(new Func1<Object, Object>() {
-                    @Override
-                    public Object call(Object o) {
-                        shoutsDao.getShoutDao(shoutId)
-                                .getRefreshObserver().onNext(null);
-                        return null;
-                    }
+                .map(o -> {
+                    shoutsDao.getShoutDao(shoutId)
+                            .getRefreshObserver().onNext(null);
+                    return null;
                 });
 
         final Observable<Object> refreshUserShouts = shoutsGlobalRefreshPresenter.getShoutsGlobalRefreshObservable()
-                .withLatestFrom(userShoutDaoObservable, new Func2<Object, ShoutsDao.UserShoutsDao, Object>() {
-                    @Override
-                    public Observer<Object> call(Object o, ShoutsDao.UserShoutsDao userShoutsDao) {
-                        userShoutsDao.getRefreshObserver().onNext(null);
-                        return null;
-                    }
+                .withLatestFrom(userShoutDaoObservable, (o, userShoutsDao) -> {
+                    userShoutsDao.getRefreshObserver().onNext(null);
+                    return null;
                 });
 
         final Observable<Object> refreshRelatedShouts = shoutsGlobalRefreshPresenter.getShoutsGlobalRefreshObservable()

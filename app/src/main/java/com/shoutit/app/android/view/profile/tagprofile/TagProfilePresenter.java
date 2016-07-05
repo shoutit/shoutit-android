@@ -23,9 +23,11 @@ import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.TagDetail;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.TagsDao;
 import com.shoutit.app.android.model.TagShoutsPointer;
+import com.shoutit.app.android.utils.BookmarkHelper;
 import com.shoutit.app.android.utils.PromotionHelper;
 import com.shoutit.app.android.view.profile.ProfileAdapterItems;
 import com.shoutit.app.android.view.profile.ProfilePresenter;
@@ -84,10 +86,16 @@ public class TagProfilePresenter implements ProfilePresenter {
     private final String tagName;
 
 
-    public TagProfilePresenter(TagsDao tagsDao, final ShoutsDao shoutsDao, @Nonnull final String tagName,
-                               @UiScheduler final Scheduler uiScheduler, @NetworkScheduler final Scheduler networkScheduler,
-                               final ApiService apiService, @ForActivity final Context context,
-                               UserPreferences userPreferences) {
+    public TagProfilePresenter(@NonNull TagsDao tagsDao,
+                               @NonNull final ShoutsDao shoutsDao,
+                               @Nonnull final String tagName,
+                               @NonNull @UiScheduler final Scheduler uiScheduler,
+                               @NonNull @NetworkScheduler final Scheduler networkScheduler,
+                               @NonNull final ApiService apiService,
+                               @NonNull@ForActivity final Context context,
+                               @NonNull UserPreferences userPreferences,
+                               @NonNull BookmarksDao bookmarksDao,
+                               @NonNull BookmarkHelper bookmarkHelper) {
         this.tagsDao = tagsDao;
         this.tagName = tagName;
         isLoggedInAsNormalUser = userPreferences.isNormalUser();
@@ -218,7 +226,12 @@ public class TagProfilePresenter implements ProfilePresenter {
                             @Nullable
                             @Override
                             public BaseAdapterItem apply(@Nullable Shout shout) {
-                                return new ShoutAdapterItem(shout, false,  false, context, shoutSelectedSubject, PromotionHelper.promotionInfoOrNull(shout));
+                                assert shout != null;
+                                final BookmarkHelper.ShoutItemBookmarkHelper shoutItemBookmarkHelper = bookmarkHelper.getShoutItemBookmarkHelper();
+                                return new ShoutAdapterItem(shout, false,  false, context, shoutSelectedSubject,
+                                        PromotionHelper.promotionInfoOrNull(shout),
+                                        bookmarksDao.getBookmarkForShout(shout.getId(), shout.isBookmarked()),
+                                        shoutItemBookmarkHelper.getObserver(), shoutItemBookmarkHelper.getEnableObservable());
                             }
                         });
 

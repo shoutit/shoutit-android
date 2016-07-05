@@ -59,6 +59,7 @@ import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsAct
 import com.shoutit.app.android.view.videoconversation.VideoConversationActivity;
 
 import java.util.List;
+import java.util.Locale;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

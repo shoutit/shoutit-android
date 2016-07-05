@@ -12,7 +12,6 @@ import android.widget.CheckedTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
@@ -26,6 +25,7 @@ import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.RtlUtils;
 import com.shoutit.app.android.view.admins.AdminsFragment;
+import com.shoutit.app.android.view.bookmarks.BookmarkedShoutsFragment;
 import com.shoutit.app.android.view.conversations.ConversationsPagerFragment;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
 import com.shoutit.app.android.view.credits.CreditsFragment;
@@ -66,6 +66,7 @@ public class MenuHandler {
     public static final String ACTIVITY_HELP = "activity_help";
     public static final String FRAGMENT_PAGES = "fragment_pages";
     public static final String FRAGMENT_ADMINS = "fragment_admins";
+    public static final String FRAGMENT_BOOKMARKS = "fragment_bookmarks";
 
     @Bind(R.id.menu_user_name_tv)
     TextView userNameTextView;
@@ -100,6 +101,9 @@ public class MenuHandler {
     CheckedTextView pagesItem;
     @Bind(R.id.menu_admins)
     CheckedTextView adminsItem;
+    @Bind(R.id.menu_bookmarks)
+    CheckedTextView bookmarks;
+
     @Bind(R.id.menu_use_profile)
     Button useProfile;
 
@@ -129,6 +133,7 @@ public class MenuHandler {
         viewTagViewIdMap.put(ACTIVITY_SETTINGS, R.id.menu_settings);
         viewTagViewIdMap.put(FRAGMENT_PAGES, R.id.menu_pages);
         viewTagViewIdMap.put(FRAGMENT_ADMINS, R.id.menu_admins);
+        viewTagViewIdMap.put(FRAGMENT_BOOKMARKS, R.id.menu_bookmarks);
     }
 
     public MenuHandler(@Nonnull final RxAppCompatActivity rxActivity,
@@ -150,13 +155,13 @@ public class MenuHandler {
     public void initMenu(@Nonnull View view, @IdRes int id) {
         ButterKnife.bind(this, view);
 
-        selectableItems = ImmutableList.of(homeItem, discoverItem, browseItem, chatItem, creditsItem, pagesItem, adminsItem);
+        selectableItems = ImmutableList.of(homeItem, discoverItem, browseItem, chatItem, creditsItem, pagesItem, adminsItem, bookmarks);
 
         userPreferences.getPageOrUserObservable()
                 .filter(user -> user != null)
                 .map(BaseProfile::getStats)
                 .subscribe(stats -> {
-                    if(stats != null) {
+                    if (stats != null) {
                         final int credits = stats.getCredits();
                         creditsBadgeTv.setVisibility(credits > 0 ? View.VISIBLE : View.GONE);
                         creditsBadgeTv.setText(String.valueOf(credits));
@@ -234,7 +239,8 @@ public class MenuHandler {
             R.id.menu_credits,
             R.id.menu_pages,
             R.id.menu_admins,
-            R.id.menu_use_profile
+            R.id.menu_use_profile,
+            R.id.menu_bookmarks
     })
     public void onMenuItemSelected(View view) {
         dispatchClick(view.getId());
@@ -259,6 +265,7 @@ public class MenuHandler {
             case FRAGMENT_DISCOVER:
             case FRAGMENT_BROWSE:
             case FRAGMENT_INVITE_FRIENDS:
+            case FRAGMENT_BOOKMARKS:
                 selectFragment(viewTag);
                 break;
             case FRAGMENT_CREDITS:
@@ -394,6 +401,8 @@ public class MenuHandler {
                 return ConversationsPagerFragment.newInstance(true);
             case FRAGMENT_INVITE_FRIENDS:
                 return InviteFriendsFragment.newInstance();
+            case FRAGMENT_BOOKMARKS:
+                return BookmarkedShoutsFragment.newInstance();
             case FRAGMENT_PAGES:
                 return PagesPagerFragment.newInstance();
             case FRAGMENT_ADMINS:

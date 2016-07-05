@@ -22,6 +22,17 @@
         android:paddingStart="4dp"
         android:paddingTop="4dp">
 
+        <CheckBox
+            android:id="@+id/shout_grid_bookmark"
+            android:background="?selectableItemBackground"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:button="@drawable/bookmark_button"
+            android:checked="false"/>
+
         <ImageView
             android:id="@+id/shout_grid_image_view"
             android:layout_width="@dimen/home_feed_image_size_linear"

@@ -26,6 +26,7 @@ import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.BaseProfileListDao;
+import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
@@ -34,6 +35,7 @@ import com.shoutit.app.android.model.PagesPointer;
 import com.shoutit.app.android.model.ReportBody;
 import com.shoutit.app.android.model.Stats;
 import com.shoutit.app.android.model.UserShoutsPointer;
+import com.shoutit.app.android.utils.BookmarkHelper;
 import com.shoutit.app.android.utils.ListeningHalfPresenter;
 import com.shoutit.app.android.utils.PreferencesHelper;
 import com.shoutit.app.android.utils.PromotionHelper;
@@ -143,7 +145,9 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
                                       @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
                                       @Nonnull ListeningHalfPresenter listeningHalfPresenter,
                                       @Nonnull final ApiService apiService,
-                                      @NonNull PusherHelper pusherHelper) {
+                                      @NonNull PusherHelper pusherHelper,
+                                      @NonNull BookmarksDao bookmarksDao,
+                                      @NonNull BookmarkHelper bookmarkHelper) {
         this.userName = userName;
         this.shoutsDao = shoutsDao;
         this.context = context;
@@ -270,7 +274,11 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
                             @Nullable
                             @Override
                             public BaseAdapterItem apply(Shout shout) {
-                                return new ShoutAdapterItem(shout, false, false, context, shoutSelectedSubject, PromotionHelper.promotionInfoOrNull(shout));
+                                final BookmarkHelper.ShoutItemBookmarkHelper shoutItemBookmarkHelper = bookmarkHelper.getShoutItemBookmarkHelper();
+                                return new ShoutAdapterItem(shout, false, false, context, shoutSelectedSubject,
+                                        PromotionHelper.promotionInfoOrNull(shout),
+                                        bookmarksDao.getBookmarkForShout(shout.getId(), shout.isBookmarked()),
+                                        shoutItemBookmarkHelper.getObserver(), shoutItemBookmarkHelper.getEnableObservable());
                             }
                         });
 

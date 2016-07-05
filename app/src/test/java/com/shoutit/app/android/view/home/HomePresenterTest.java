@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
-import com.facebook.ads.NativeAd;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -20,14 +19,13 @@ import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.Tag;
 import com.shoutit.app.android.api.model.UserLocation;
+import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.model.LocationPointer;
+import com.shoutit.app.android.utils.BookmarkHelper;
 import com.shoutit.app.android.utils.FBAdHalfPresenter;
-import com.shoutit.app.android.utils.LocationUtils;
-import com.shoutit.app.android.utils.PermissionHelper;
-import com.shoutit.app.android.view.loginintro.FacebookHelper;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
 import org.junit.Before;
@@ -39,11 +37,12 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.util.ArrayList;
 import java.util.List;
+
 import javax.annotation.Nonnull;
 
 import rx.Observable;
+import rx.observers.Observers;
 import rx.observers.TestSubscriber;
 import rx.schedulers.Schedulers;
 import rx.schedulers.TestScheduler;
@@ -75,6 +74,10 @@ public class HomePresenterTest {
     Context context;
     @Mock
     FBAdHalfPresenter fbAdHalfPresenter;
+    @Mock
+    BookmarksDao mBookmarksDao;
+    @Mock
+    BookmarkHelper mBookmarkHelper;
 
     private HomePresenter presenter;
     private final TestScheduler scheduler = new TestScheduler();
@@ -90,6 +93,8 @@ public class HomePresenterTest {
         PowerMockito.mockStatic(FBAdHalfPresenter.class);
 
         globalRefreshPresenter = new ShoutsGlobalRefreshPresenter();
+
+        when(mBookmarkHelper.getShoutItemBookmarkHelper()).thenReturn(new BookmarkHelper.ShoutItemBookmarkHelper(Observers.empty(), Observable.empty()));
 
         when(shoutsDao.getHomeShoutsObservable(any(LocationPointer.class))).thenReturn(shoutsSubject);
         when(shoutsDao.getLoadMoreHomeShoutsObserver(any(LocationPointer.class))).thenReturn(loadMoreShoutsSubject);
@@ -109,8 +114,8 @@ public class HomePresenterTest {
         when(FBAdHalfPresenter.combineShoutsWithAds(anyList(), anyList()))
                 .thenCallRealMethod();
 
-        presenter = new HomePresenter(shoutsDao, discoversDao, userPreferences, context,
-                Schedulers.immediate(), fbAdHalfPresenter, globalRefreshPresenter);
+        presenter = new HomePresenter(shoutsDao, discoversDao, userPreferences, context, Schedulers.immediate(),
+                fbAdHalfPresenter, globalRefreshPresenter, mBookmarksDao, mBookmarkHelper);
     }
 
     @Test
@@ -241,7 +246,7 @@ public class HomePresenterTest {
     private ResponseOrError<ShoutsResponse> shoutsResponse() {
         return ResponseOrError.fromData(new ShoutsResponse(1, "2", null, Lists.newArrayList(
                 new Shout("id", null, null, null, null, null, null, 2L, 2f, null, null, null,
-                        TestUtils.getUser(), category, null, 2, null, null, 0, ImmutableList.<ConversationDetails>of(), true, null, null, null)), null));
+                        TestUtils.getUser(), category, null, 2, false, null, null, 0, ImmutableList.<ConversationDetails>of(), true, null, null, null, false)), null));
     }
 
     @Nonnull

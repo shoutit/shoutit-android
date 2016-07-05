@@ -3,36 +3,24 @@ package com.shoutit.app.android.view.chats.chat_shouts;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckedTextView;
 import android.widget.TextView;
 
-import com.appunite.rx.android.adapter.BaseAdapterItem;
-import com.google.common.base.Strings;
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
 import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
-import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.BaseShoutsItemDecoration;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
-import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LayoutManagerHelper;
 import com.shoutit.app.android.utils.LoadMoreHelper;
-import com.shoutit.app.android.utils.MyGridLayoutManager;
-import com.shoutit.app.android.utils.MyLinearLayoutManager;
-import com.shoutit.app.android.view.chats.ChatActivity;
-import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsAdapter;
-import com.shoutit.app.android.view.shout.ShoutActivity;
-
-import java.util.List;
+import com.shoutit.app.android.view.shouts_list_common.ShoutListActivityHelper;
+import com.shoutit.app.android.view.shouts_list_common.SimpleShoutsAdapter;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -40,17 +28,17 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import rx.functions.Action1;
+import rx.subscriptions.CompositeSubscription;
 
 public class ChatShoutsActivity extends BaseActivity {
 
     private static final String EXTRA_CONVERSATION_ID = "conversation_id";
-    
+
     @Inject
-    SearchShoutsResultsAdapter adapter;
+    SimpleShoutsAdapter adapter;
     @Inject
     ChatShoutsPresenter presenter;
-    
+
     @Bind(R.id.base_progress)
     View progressView;
     @Bind(R.id.chat_shouts_recycler_view)
@@ -62,117 +50,63 @@ public class ChatShoutsActivity extends BaseActivity {
     @Bind(R.id.chat_shouts_count_tv)
     TextView headerCountTv;
 
-    
-    private MyGridLayoutManager gridLayoutManager;
-    private MyLinearLayoutManager linearLayoutManager;
+    private LayoutManagerHelper layoutManagerHelper;
+    private CompositeSubscription mCompositeSubscription;
 
     public static Intent newIntent(@Nonnull Context context, @Nonnull String conversationId) {
         return new Intent(context, ChatShoutsActivity.class)
                 .putExtra(EXTRA_CONVERSATION_ID, conversationId);
     }
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_shouts);
         ButterKnife.bind(this);
 
-        gridLayoutManager = new MyGridLayoutManager(this, 2);
-        linearLayoutManager = new MyLinearLayoutManager(this);
+        layoutManagerHelper = new LayoutManagerHelper(this, adapter, recyclerView, layoutSwitchIcon);
 
-        setUpToolbar();
-        initAdapter();
-
-        presenter.getAdapterItemsObservable()
-                .compose(this.<List<BaseAdapterItem>>bindToLifecycle())
-                .subscribe(adapter);
-
-        presenter.getProgressObservable()
-                .compose(this.<Boolean>bindToLifecycle())
-                .subscribe(RxView.visibility(progressView));
-
-        presenter.getErrorObservable()
-                .compose(this.<Throwable>bindToLifecycle())
-                .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(this)));
-
-        presenter.getShoutSelectedObservable()
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String shoutId) {
-                        if (Strings.isNullOrEmpty(shoutId)) {
-                            ColoredSnackBar.error(ColoredSnackBar.contentView(ChatShoutsActivity.this), getString(R.string.shout_deleted), Snackbar.LENGTH_SHORT).show();
-                        } else {
-                            startActivity(ShoutActivity.newIntent(ChatShoutsActivity.this, shoutId));
-                        }
-                    }
-                });
-
-        RxRecyclerView.scrollEvents(recyclerView)
-                .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
-                .filter(LoadMoreHelper.needLoadMore(linearLayoutManager, adapter))
-                .subscribe(presenter.getLoadMoreObserver());
-
-        RxRecyclerView.scrollEvents(recyclerView)
-                .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
-                .filter(LoadMoreHelper.needLoadMore(gridLayoutManager, adapter))
-                .subscribe(presenter.getLoadMoreObserver());
+        mCompositeSubscription = ShoutListActivityHelper.setup(this, presenter, adapter, progressView);
 
         presenter.getCountObservable()
                 .compose(this.<Integer>bindToLifecycle())
-                .subscribe(new Action1<Integer>() {
-                    @Override
-                    public void call(Integer integer) {
-                        headerCountTv.setText(getResources().getQuantityString(
-                                R.plurals.chat_shouts_results, integer, integer));
-                    }
+                .subscribe(integer -> {
+                    headerCountTv.setText(getResources().getQuantityString(
+                            R.plurals.chat_shouts_results, integer, integer));
                 });
 
-        layoutSwitchIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                layoutSwitchIcon.setChecked(!layoutSwitchIcon.isChecked());
-                if (layoutSwitchIcon.isChecked()) {
-                    layoutSwitchIcon.setBackground(getResources().getDrawable(R.drawable.ic_grid_switch));
-                    setLinearLayoutManager();
-                } else {
-                    layoutSwitchIcon.setBackground(getResources().getDrawable(R.drawable.ic_list_switch));
-                    setGridLayoutManager();
-                }
-            }
-        });
-    }
+        RxRecyclerView.scrollEvents(recyclerView)
+                .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
+                .filter(LoadMoreHelper.needLoadMore(layoutManagerHelper.getLinearLayoutManager(), adapter))
+                .subscribe(presenter.getLoadMoreObserver());
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+        RxRecyclerView.scrollEvents(recyclerView)
+                .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
+                .filter(LoadMoreHelper.needLoadMore(layoutManagerHelper.getGridLayoutManager(), adapter))
+                .subscribe(presenter.getLoadMoreObserver());
+
+        layoutManagerHelper.setupLayoutSwitchIcon();
+
+        setUpToolbar();
+        initAdapter();
     }
 
     private void setUpToolbar() {
-        setSupportActionBar(toolbar);
-        final ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle(R.string.chat_shouts_ab_title);
+        toolbar.setTitle(R.string.chat_shouts_ab_title);
+        toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        toolbar.setNavigationOnClickListener(view -> finish());
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mCompositeSubscription.unsubscribe();
     }
 
     private void initAdapter() {
         recyclerView.addItemDecoration(new BaseShoutsItemDecoration(
                 getResources().getDimensionPixelSize(R.dimen.shouts_search_results_side_spacing), this));
-        setGridLayoutManager();
-    }
-
-    private void setLinearLayoutManager() {
-        LayoutManagerHelper.setLinearLayoutManager(recyclerView, adapter, linearLayoutManager);
-    }
-
-    private void setGridLayoutManager() {
-        LayoutManagerHelper.setGridLayoutManager(recyclerView, adapter, gridLayoutManager);
+        layoutManagerHelper.setGridLayoutManager();
     }
 
     @Nonnull

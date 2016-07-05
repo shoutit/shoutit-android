@@ -6,8 +6,10 @@ import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.utils.FBAdHalfPresenter;
+import com.shoutit.app.android.utils.BookmarkHelper;
 
 import dagger.Module;
 import dagger.Provides;
@@ -30,8 +32,10 @@ public class DiscoverShoutsActivityModule {
                                                                   DiscoverShoutsDao dao,
                                                                   @ForActivity Context context,
                                                                   UserPreferences userPreferences,
-                                                                  FBAdHalfPresenter fbAdHalfPresenter) {
-        return new DiscoverShoutsPresenter(networkScheduler, uiScheduler, dao, discoveryId,
-                name, userPreferences, fbAdHalfPresenter, context);
+                                                                  FBAdHalfPresenter fbAdHalfPresenter,
+                                                                  BookmarksDao bookmarksDao,
+                                                                  BookmarkHelper bookmarkHelper) {
+        return new DiscoverShoutsPresenter(networkScheduler, uiScheduler, dao, discoveryId, name,
+                userPreferences, fbAdHalfPresenter, context, bookmarksDao, bookmarkHelper);
     }
 }

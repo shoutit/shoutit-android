@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
-import com.facebook.ads.NativeAd;
 import com.facebook.ads.NativeAdsManager;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -13,17 +12,19 @@ import com.shoutit.app.android.TestUtils;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.FbAdAdapterItem;
 import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
+import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.ConversationDetails;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.dao.UsersIdentityDao;
 import com.shoutit.app.android.model.MobilePhoneResponse;
 import com.shoutit.app.android.model.RelatedShoutsPointer;
 import com.shoutit.app.android.model.UserShoutsPointer;
-import com.shoutit.app.android.utils.FBAdHalfPresenter;
+import com.shoutit.app.android.utils.BookmarkHelper;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
 
 import org.junit.Before;
@@ -31,18 +32,17 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Response;
 import rx.Observable;
+import rx.observers.Observers;
 import rx.observers.TestSubscriber;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 
 import static com.google.common.truth.Truth.assert_;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
@@ -67,6 +67,12 @@ public class ShoutPresenterTest {
     ShoutsDao.UserShoutsDao userShoutsDao;
     @Mock
     FacebookHelper facebookHelper;
+    @Mock
+    ApiService apiService;
+    @Mock
+    BookmarksDao mBookmarksDao;
+    @Mock
+    BookmarkHelper mBookmarkHelper;
 
     private ShoutPresenter presenter;
 
@@ -76,6 +82,7 @@ public class ShoutPresenterTest {
 
         when(facebookHelper.getAdObservable(any(NativeAdsManager.class)))
                 .thenReturn(Observable.just(ResponseOrError.fromError(new Throwable())));
+        when(mBookmarkHelper.getShoutItemBookmarkHelper()).thenReturn(new BookmarkHelper.ShoutItemBookmarkHelper(Observers.empty(), Observable.empty()));
 
         when(shoutsDao.getShoutObservable(anyString()))
                 .thenReturn(Observable.just(ResponseOrError.fromData(getShout())));
@@ -118,8 +125,8 @@ public class ShoutPresenterTest {
         when(facebookHelper.getShoutDetailAdapterItem())
                 .thenReturn(Observable.just(new FbAdAdapterItem(null)));
 
-        presenter = new ShoutPresenter(shoutsDao, "zz", context, Schedulers.immediate(),
-                userPreferences, globalRefreshPresenter, facebookHelper);
+        presenter = new ShoutPresenter(shoutsDao, "zz", apiService, context, Schedulers.immediate(), Schedulers.immediate(),
+                userPreferences, globalRefreshPresenter, facebookHelper, mBookmarksDao, mBookmarkHelper);
     }
 
     @Test
@@ -212,12 +219,12 @@ public class ShoutPresenterTest {
         presenter.getErrorObservable().subscribe(subscriber);
 
         subscriber.assertNoErrors();
-        subscriber.assertValueCount(2);
+        subscriber.assertValueCount(1);
     }
 
     private Shout getShout() {
         return new Shout("id", null, null, null, null, null, null, 1L, 2, null, null, null,
-                getUser(), null, null, 1, null, null, 0, ImmutableList.<ConversationDetails>of(), true, null, null, null);
+                getUser(), null, null, 1,false, null, null, 0, ImmutableList.<ConversationDetails>of(), true, null, null, null, false);
     }
 
     private User getUser() {

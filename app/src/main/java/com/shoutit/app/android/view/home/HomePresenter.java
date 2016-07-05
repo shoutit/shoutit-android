@@ -1,6 +1,8 @@
 package com.shoutit.app.android.view.home;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
@@ -21,11 +23,13 @@ import com.shoutit.app.android.api.model.DiscoverResponse;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.model.LocationPointer;
 import com.shoutit.app.android.utils.FBAdHalfPresenter;
+import com.shoutit.app.android.utils.BookmarkHelper;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.utils.PromotionHelper;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
@@ -40,7 +44,6 @@ import javax.inject.Inject;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
-import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func4;
 import rx.subjects.PublishSubject;
@@ -86,7 +89,9 @@ public class HomePresenter {
                          @ForActivity final Context context,
                          @Nonnull @UiScheduler Scheduler uiScheduler,
                          @Nonnull FBAdHalfPresenter fbAdHalfPresenter,
-                         @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter) {
+                         @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
+                         @NonNull BookmarksDao bookmarksDao,
+                         @NonNull BookmarkHelper bookmarkHelper) {
         this.uiScheduler = uiScheduler;
 
         final boolean isNormalUser = userPreferences.isNormalUser();
@@ -115,10 +120,19 @@ public class HomePresenter {
                             final ShoutsResponse data = shoutsResponse.data();
                             if (!data.getShouts().isEmpty()) {
                                 final Iterable<BaseAdapterItem> items = Iterables
-                                        .transform(data.getShouts(), (Function<Shout, BaseAdapterItem>) shout -> {
-                                            assert shout != null;
-                                            final boolean isShoutOwner = shout.getProfile().getUsername().equals(currentUserName);
-                                            return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context, shoutSelectedObserver, PromotionHelper.promotionInfoOrNull(shout));
+                                        .transform(data.getShouts(), new Function<Shout, BaseAdapterItem>() {
+                                            @javax.annotation.Nullable
+                                            @Override
+                                            public BaseAdapterItem apply(@Nullable Shout shout) {
+                                                assert shout != null;
+                                                final boolean isShoutOwner = shout.getProfile().getUsername().equals(currentUserName);
+                                                final BookmarkHelper.ShoutItemBookmarkHelper shoutItemBookmarkHelper = bookmarkHelper.getShoutItemBookmarkHelper();
+                                                return new ShoutAdapterItem(shout, isShoutOwner,
+                                                        isNormalUser, context, shoutSelectedObserver,
+                                                        PromotionHelper.promotionInfoOrNull(shout),
+                                                        bookmarksDao.getBookmarkForShout(shout.getId(), shout.isBookmarked()),
+                                                        shoutItemBookmarkHelper.getObserver(), shoutItemBookmarkHelper.getEnableObservable());
+                                            }
                                         });
 
                                 builder.addAll(items);

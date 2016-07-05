@@ -18,6 +18,8 @@ import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.BookmarksDao;
+import com.shoutit.app.android.utils.BookmarkHelper;
 import com.shoutit.app.android.utils.PromotionHelper;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
@@ -46,7 +48,9 @@ public class SelectShoutsPresenter {
                                  @UiScheduler Scheduler uiScheduler,
                                  ApiService apiService,
                                  UserPreferences userPreferences,
-                                 @ForActivity final Context context) {
+                                 @ForActivity final Context context,
+                                 @NonNull BookmarksDao bookmarksDao,
+                                 @NonNull BookmarkHelper bookmarkHelper) {
         final BaseProfile user = userPreferences.getUserOrPage();
         assert user != null;
         final Observable<ResponseOrError<ShoutsResponse>> shoutsResponse = apiService.shoutsForUser(user.getUsername(), 0, 100)
@@ -63,7 +67,11 @@ public class SelectShoutsPresenter {
                             @Nullable
                             @Override
                             public BaseAdapterItem apply(Shout input) {
-                                return new ShoutAdapterItem(input, false, false, context, shoutSelectedObserver, PromotionHelper.promotionInfoOrNull(input));
+                                final BookmarkHelper.ShoutItemBookmarkHelper shoutItemBookmarkHelper = bookmarkHelper.getShoutItemBookmarkHelper();
+                                return new ShoutAdapterItem(input, false, false, context, shoutSelectedObserver,
+                                        PromotionHelper.promotionInfoOrNull(input),
+                                        bookmarksDao.getBookmarkForShout(input.getId(), input.isBookmarked()),
+                                        shoutItemBookmarkHelper.getObserver(), shoutItemBookmarkHelper.getEnableObservable());
                             }
                         }));
                     }

@@ -63,6 +63,7 @@ import com.shoutit.app.android.view.videoconversation.CameraToolImplLollipop;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.inject.Named;
@@ -168,6 +169,9 @@ public final class AppModule {
         okHttpClient.interceptors().add(loggingInterceptor);
         loggingInterceptor.setLevel(BuildConfig.DEBUG ?
                 HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE);
+        okHttpClient.writeTimeout(15L, TimeUnit.SECONDS);
+        okHttpClient.readTimeout(15L, TimeUnit.SECONDS);
+        okHttpClient.connectTimeout(15L, TimeUnit.SECONDS);
 
         return okHttpClient.build();
     }

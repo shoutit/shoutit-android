@@ -10,7 +10,6 @@ import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.functions.Functions1;
-import com.facebook.ads.NativeAd;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -19,7 +18,9 @@ import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
+import com.shoutit.app.android.utils.BookmarkHelper;
 import com.shoutit.app.android.utils.FBAdHalfPresenter;
 import com.shoutit.app.android.utils.PromotionHelper;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
@@ -33,7 +34,6 @@ import javax.annotation.Nullable;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
-import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.subjects.PublishSubject;
@@ -65,7 +65,9 @@ public class DiscoverShoutsPresenter {
                                    final String discoverName,
                                    UserPreferences userPreferences,
                                    FBAdHalfPresenter fbAdHalfPresenter,
-                                   @ForActivity final Context context) {
+                                   @ForActivity Context context,
+                                   @NonNull BookmarksDao bookmarksDao,
+                                   @NonNull BookmarkHelper bookmarkHelper) {
         mDiscoverShoutsDao = discoverShoutsDao;
         this.discoverId = discoverId;
 
@@ -92,7 +94,11 @@ public class DiscoverShoutsPresenter {
                             @Override
                             public BaseAdapterItem apply(Shout shout) {
                                 final boolean isShoutOwner = shout.getProfile().getUsername().equals(currentUserName);
-                                return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context, shoutSelectedObserver, PromotionHelper.promotionInfoOrNull(shout));
+                                final BookmarkHelper.ShoutItemBookmarkHelper shoutItemBookmarkHelper = bookmarkHelper.getShoutItemBookmarkHelper();
+                                return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context,
+                                        shoutSelectedObserver, PromotionHelper.promotionInfoOrNull(shout),
+                                        bookmarksDao.getBookmarkForShout(shout.getId(), shout.isBookmarked()),
+                                        shoutItemBookmarkHelper.getObserver(), shoutItemBookmarkHelper.getEnableObservable());
                             }
                         }));
                     }

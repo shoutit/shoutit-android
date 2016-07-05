@@ -8,8 +8,10 @@ import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.TestUtils;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.ShoutsResponse;
+import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.utils.FBAdHalfPresenter;
+import com.shoutit.app.android.utils.BookmarkHelper;
 import com.shoutit.app.android.view.shouts.discover.DiscoverShoutsPresenter;
 
 import org.junit.Before;
@@ -21,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import rx.Observable;
+import rx.observers.Observers;
 import rx.observers.TestSubscriber;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
@@ -46,11 +49,19 @@ public class ShoutsPresenterTest {
     @Mock
     FBAdHalfPresenter fbAdHalfPresenter;
 
+    @Mock
+    BookmarksDao mBookmarksDao;
+
+    @Mock
+    BookmarkHelper mBookmarkHelper;
+
     private BehaviorSubject<ResponseOrError<ShoutsResponse>> mBehaviorSubject;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
+
+        when(mBookmarkHelper.getShoutItemBookmarkHelper()).thenReturn(new BookmarkHelper.ShoutItemBookmarkHelper(Observers.empty(), Observable.empty()));
 
         mBehaviorSubject = BehaviorSubject.create(ResponseOrError.fromData(
                 new ShoutsResponse(0, "", "", ImmutableList.of(TestUtils.getShout()), null)));
@@ -64,7 +75,7 @@ public class ShoutsPresenterTest {
 
 
         mShoutsPresenter = new DiscoverShoutsPresenter(Schedulers.immediate(), Schedulers.immediate(),
-                mDiscoverShoutsDao, "", "", userPreferences, fbAdHalfPresenter, mContext);
+                mDiscoverShoutsDao, "", "", userPreferences, fbAdHalfPresenter, mContext, mBookmarksDao, mBookmarkHelper);
     }
 
     @Test
