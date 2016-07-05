@@ -677,7 +677,7 @@
     <string name="promote_shout_info_premium_text">Your shout will be highlighted in all searches.
     </string>
     <string name="promote_shout_info_footer">
-        <![CDATA[Promote each shout on your Profile individually by clicking <font color=#26ffd700>"Promote"</font>. To promote a shout you ned to have enough Shoutit Credit.]]></string>
+        <![CDATA[Promote each shout on your Profile individually by clicking <font color=#26ffd700>"Promote"</font>. To promote a shout you need to have enough Shoutit Credit.]]></string>
     <string name="promote_shout_info_top_premium">Top Premium</string>
     <string name="promote_shout_info_top">Top</string>
     <string name="promote_shout_info_top_text">Your shout will appear on top of search results.

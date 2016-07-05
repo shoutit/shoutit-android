@@ -228,7 +228,7 @@ public class ShoutPresenterTest {
     }
 
     private User getUser() {
-        return new User("z", null, null, null, null, null, null, null, false, null,
+        return new User("z", null, null, null, "lalala", null, null, null, false, null,
                 null, false, false, false, null, 1, null, 1, null, false, null, null, null, null, null, null, null, null, null, null);
     }
 
