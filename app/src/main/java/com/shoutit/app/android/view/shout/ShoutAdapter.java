@@ -268,7 +268,7 @@ public class ShoutAdapter extends BaseAdapter {
             }
 
             final boolean isLastElementLight = detailsContainer.getChildCount() % 2 != 0;
-            locationContainer.setBackgroundColor(ContextCompat.getColor(context, isLastElementLight ? android.R.color.white : R.color.black_12);
+            locationContainer.setBackgroundColor(ContextCompat.getColor(context, isLastElementLight ? android.R.color.white : R.color.black_12));
         }
 
         @OnClick(R.id.shout_detail_category_row)
