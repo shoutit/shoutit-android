@@ -741,4 +741,7 @@
     <string name="create_page_details_email_hint">Email</string>
     <string name="create_page_details_password_hint">Password</string>
 
+    <!-- Bookmarks -->
+    <string name="bookmarks_no_bookmarks">You don\'t have any bookmarked shouts.</string>
+
 </resources>
