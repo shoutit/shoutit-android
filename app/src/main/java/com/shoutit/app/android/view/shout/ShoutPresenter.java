@@ -48,6 +48,7 @@ import rx.Scheduler;
 import rx.functions.Func1;
 import rx.functions.Func4;
 import rx.subjects.PublishSubject;
+import rx.subscriptions.CompositeSubscription;
 
 public class ShoutPresenter {
 
@@ -85,6 +86,8 @@ public class ShoutPresenter {
     private PublishSubject<Object> onVideoOrEditClickSubject = PublishSubject.create();
     private PublishSubject<Object> shareSubject = PublishSubject.create();
     private PublishSubject<Object> showDeleteDialogSubject = PublishSubject.create();
+
+    private final CompositeSubscription likesSubscription = new CompositeSubscription();
 
     @Nonnull
     private final Scheduler uiScheduler;
@@ -169,10 +172,12 @@ public class ShoutPresenter {
         final Observable<ShoutAdapterItems.MainShoutAdapterItem> shoutItemObservable =
                 successShoutResponse.map(shout -> {
                     final BookmarkHelper.ShoutItemBookmarkHelper shoutItemBookmarkHelper = bookmarkHelper.getShoutItemBookmarkHelper();
+                    final boolean isShoutOwner = shout.getProfile().getUsername().equals(currentUserName);
+
                     return new ShoutAdapterItems.MainShoutAdapterItem(addToCartSubject, onCategoryClickedSubject,
                             visitProfileSubject, likeClickedSubject, shout, context.getResources(),
                             bookmarksDao.getBookmarkForShout(shoutId, shout.isBookmarked()),
-                            shoutItemBookmarkHelper.getObserver(),
+                            shoutItemBookmarkHelper.getObserver(), isShoutOwner, isNormalUser,
                             shoutItemBookmarkHelper.getEnableObservable());
                 });
 
@@ -262,17 +267,21 @@ public class ShoutPresenter {
                         .compose(ResponseOrError.toResponseOrErrorObservable()))
                 .compose(ObservableExtensions.behaviorRefCount());
 
-        likeShoutResponseObservable
-                .compose(ResponseOrError.onlySuccess())
-                .withLatestFrom(successShoutResponse,
-                        (o, shout) -> shout.likedShout(true))
-                .subscribe(shoutsDao.getShoutDao(shoutId).onShoutLikedObserver());
+        likesSubscription.add(
+                likeShoutResponseObservable
+                        .compose(ResponseOrError.onlySuccess())
+                        .withLatestFrom(successShoutResponse,
+                                (o, shout) -> shout.likedShout(true))
+                        .subscribe(shoutsDao.getShoutDao(shoutId).onShoutLikedObserver())
+        );
 
-        unlikeShoutResponseObservable
-                .compose(ResponseOrError.onlySuccess())
-                .withLatestFrom(successShoutResponse,
-                        (o, shout) -> shout.likedShout(false))
-                .subscribe(shoutsDao.getShoutDao(shoutId).onShoutLikedObserver());
+        likesSubscription.add(
+                unlikeShoutResponseObservable
+                        .compose(ResponseOrError.onlySuccess())
+                        .withLatestFrom(successShoutResponse,
+                                (o, shout) -> shout.likedShout(false))
+                        .subscribe(shoutsDao.getShoutDao(shoutId).onShoutLikedObserver())
+        );
 
         /** Errors **/
         errorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
@@ -394,6 +403,10 @@ public class ShoutPresenter {
                 .withLatestFrom(successShoutResponse, (o, shout) -> shout.getWebUrl());
     }
 
+    public void unsubscribe() {
+        likesSubscription.unsubscribe();
+    }
+
     @Nonnull
     public Observable<String> getShareObservable() {
         return shareObservable;
@@ -483,7 +496,6 @@ public class ShoutPresenter {
     @Nonnull
     public Observable<BottomBarData> getBottomBarDataObservable() {
         return allAdapterItemsObservable
-                .take(1)
                 .flatMap(baseAdapterItems -> Observable.combineLatest(
                         isUserShoutOwnerObservable,
                         conversationObservable,
@@ -495,6 +507,7 @@ public class ShoutPresenter {
                                     mUserPreferences.isNormalUser(), shout.isPromoted());
                         }
                 ))
+                .take(1)
                 .observeOn(uiScheduler);
     }
 

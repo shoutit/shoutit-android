@@ -39,6 +39,8 @@ public class ShoutAdapterItems {
         private final Observable<Boolean> mBookmarObservable;
         @NonNull
         private final Observer<Pair<String, Boolean>> mBookmarkObserver;
+        private final boolean isShoutOwner;
+        private final boolean isNormalUser;
         @NonNull
         private final Observable<Boolean> mEnableBookmarkObservable;
 
@@ -50,6 +52,7 @@ public class ShoutAdapterItems {
                                     @Nonnull Resources resources,
                                     @NonNull Observable<Boolean> bookmarObservable,
                                     @NonNull Observer<Pair<String, Boolean>> bookmarkObserver,
+                                    boolean isShoutOwner, boolean isNormalUser,
                                     @NonNull Observable<Boolean> enableBookmarkObservable) {
             this.addToCartObserver = addToCartObserver;
             this.onCategoryClickedObserver = onCategoryClickedObserver;
@@ -59,6 +62,8 @@ public class ShoutAdapterItems {
             mResources = resources;
             mBookmarObservable = bookmarObservable;
             mBookmarkObserver = bookmarkObserver;
+            this.isShoutOwner = isShoutOwner;
+            this.isNormalUser = isNormalUser;
             mEnableBookmarkObservable = enableBookmarkObservable;
         }
 
@@ -95,6 +100,14 @@ public class ShoutAdapterItems {
             }
         }
 
+        public boolean isShoutOwner() {
+            return isShoutOwner;
+        }
+
+        public boolean isNormalUser() {
+            return isNormalUser;
+        }
+
         public void onLikeClicked() {
             likeClickedObserver.onNext(shout.isLiked());
         }
@@ -111,7 +124,7 @@ public class ShoutAdapterItems {
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof SeeAllRelatesAdapterItem && this.equals(item);
+            return item instanceof MainShoutAdapterItem && this.equals(item);
         }
 
         @Override

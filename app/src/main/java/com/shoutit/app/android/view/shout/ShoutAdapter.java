@@ -157,6 +157,8 @@ public class ShoutAdapter extends BaseAdapter {
                     .error(R.drawable.ic_rect_avatar_placeholder)
                     .into(avatarImageView);
 
+            final boolean showLikeIcon = item.isNormalUser() && !item.isShoutOwner();
+            shoutLikeImageView.setVisibility(showLikeIcon ? View.VISIBLE : View.GONE);
             shoutLikeImageView.setImageResource(shout.isLiked() ? R.drawable.likeon : R.drawable.likeoff);
 
             nameTextView.setText(user.getName());
