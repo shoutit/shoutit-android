@@ -311,7 +311,7 @@ public class ProfilesDao {
         }
 
         @Override
-        protected Observable<ProfilesListResponse> getRequest(int pageNumber) {
+        public Observable<ProfilesListResponse> getRequest(int pageNumber) {
             return apiService.facebookFriends(userName, pageNumber, PAGE_SIZE);
         }
     }
@@ -323,7 +323,7 @@ public class ProfilesDao {
         }
 
         @Override
-        protected Observable<ProfilesListResponse> getRequest(int pageNumber) {
+        public Observable<ProfilesListResponse> getRequest(int pageNumber) {
             return apiService.mutualContacts(userName, pageNumber, PAGE_SIZE);
         }
     }
@@ -340,7 +340,7 @@ public class ProfilesDao {
         }
 
         @Override
-        protected Observable<ProfilesListResponse> getRequest(int pageNumber) {
+        public Observable<ProfilesListResponse> getRequest(int pageNumber) {
             if (userLocation != null) {
                 return apiService.usersSuggestion(userLocation.getCountry(), userLocation.getState(), userLocation.getCity(), pageNumber, PAGE_SIZE)
                         .map((Func1<UserSuggestionResponse, ProfilesListResponse>) userSuggestionResponse -> userSuggestionResponse);
@@ -363,7 +363,7 @@ public class ProfilesDao {
         }
 
         @Override
-        protected Observable<ProfilesListResponse> getRequest(final int pageNumber) {
+        public Observable<ProfilesListResponse> getRequest(final int pageNumber) {
             if (userLocation != null) {
                 return apiService.pagesSuggestion(userLocation.getCountry(), userLocation.getState(), userLocation.getCity(), pageNumber, PAGE_SIZE)
                         .map((Func1<PagesSuggestionResponse, ProfilesListResponse>) pagesSuggestionResponse -> pagesSuggestionResponse);
@@ -385,7 +385,7 @@ public class ProfilesDao {
         }
 
         @Override
-        protected Observable<ProfilesListResponse> getRequest(int pageNumber) {
+        public Observable<ProfilesListResponse> getRequest(int pageNumber) {
             return apiService.getAdmins(userName, pageNumber, adminsPointer.getPageSize());
         }
     }
@@ -401,7 +401,7 @@ public class ProfilesDao {
         }
 
         @Override
-        protected Observable<ProfilesListResponse> getRequest(int pageNumber) {
+        public Observable<ProfilesListResponse> getRequest(int pageNumber) {
             return apiService.getPages(userName, pageNumber, pagesPointer.getPageSize());
         }
     }

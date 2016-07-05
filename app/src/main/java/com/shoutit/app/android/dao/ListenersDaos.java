@@ -45,7 +45,7 @@ public class ListenersDaos {
         }
 
         @Override
-        protected Observable<ProfilesListResponse> getRequest(int pageNumber) {
+        public Observable<ProfilesListResponse> getRequest(int pageNumber) {
             return apiService.listeners(userName, pageNumber, PAGE_SIZE);
         }
     }
