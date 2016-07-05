@@ -216,30 +216,32 @@ public class ShoutPresenter {
                 shoutItemObservable,
                 userShoutItemsObservable.startWith(ImmutableList.<BaseAdapterItem>of()),
                 relatedShoutsItems.startWith(ImmutableList.<BaseAdapterItem>of()),
-                fbAddAdapterItem.startWith(ImmutableList.<BaseAdapterItem>of()),
+                fbAddAdapterItem.startWith((BaseAdapterItem) null),
                 (Func4<ShoutAdapterItems.MainShoutAdapterItem, List<BaseAdapterItem>, List<BaseAdapterItem>, BaseAdapterItem, List<BaseAdapterItem>>)
                         (shout, userShouts, relatedShouts, fbAdItem) -> {
-                    final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
+                            final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
 
-                    builder.add(shout);
+                            builder.add(shout);
 
-                    final User user = shout.getShout().getProfile();
-                    if (!userShouts.isEmpty()) {
-                        builder.add(new HeaderAdapterItem(context.getString(R.string.shout_user_shouts_header, user.getFirstName()).toUpperCase()))
-                                .addAll(userShouts);
-                    }
+                            final User user = shout.getShout().getProfile();
+                            if (!userShouts.isEmpty()) {
+                                builder.add(new HeaderAdapterItem(context.getString(R.string.shout_user_shouts_header, user.getFirstName()).toUpperCase()))
+                                        .addAll(userShouts);
+                            }
 
-                    builder.add(new ShoutAdapterItems.VisitProfileAdapterItem(visitProfileSubject, user));
+                            builder.add(new ShoutAdapterItems.VisitProfileAdapterItem(visitProfileSubject, user));
 
-                    if (!relatedShouts.isEmpty()) {
-                        builder.add(new HeaderAdapterItem(context.getString(R.string.shout_related_shouts_header)))
-                                .add(new ShoutAdapterItems.RelatedContainerAdapterItem(relatedShouts));
-                    }
+                            if (!relatedShouts.isEmpty()) {
+                                builder.add(new HeaderAdapterItem(context.getString(R.string.shout_related_shouts_header)))
+                                        .add(new ShoutAdapterItems.RelatedContainerAdapterItem(relatedShouts));
+                            }
 
-                    builder.add(fbAdItem);
+                            if (fbAdItem != null) {
+                                builder.add(fbAdItem);
+                            }
 
-                    return builder.build();
-                })
+                            return builder.build();
+                        })
                 .observeOn(uiScheduler);
 
         /** Like / Unlike Shout **/
