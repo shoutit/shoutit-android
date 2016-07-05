@@ -11,6 +11,7 @@ import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
@@ -32,7 +33,6 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import rx.Observable;
-import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
@@ -68,11 +68,18 @@ public class BookmarkedShoutsPresenter implements ShoutListPresenter {
 
         adapterItemsObservable = requestObservable
                 .compose(ResponseOrError.<ShoutsResponse>onlySuccess())
+                .doOnNext(shoutsResponse -> {
+                    final ImmutableMap.Builder<String, Boolean> builder = ImmutableMap.builder();
+                    for (Shout shout : shoutsResponse.getShouts()) {
+                        builder.put(shout.getId(), shout.isBookmarked());
+                    }
+                    bookmarksDao.updateBookmarkMap(builder.build());
+                })
                 .map(new Func1<ShoutsResponse, List<BaseAdapterItem>>() {
                     @Override
                     public List<BaseAdapterItem> call(ShoutsResponse shoutsResponse) {
                         if (shoutsResponse.getShouts().isEmpty()) {
-                            return ImmutableList.<BaseAdapterItem>of(new NoDataTextAdapterItem(context.getString(R.string.chat_shouts_no_results)));
+                            return ImmutableList.<BaseAdapterItem>of(new NoDataTextAdapterItem(context.getString(R.string.bookmarks_no_bookmarks)));
                         } else {
                             final Iterable<Shout> shouts = Iterables.filter(shoutsResponse.getShouts(), input -> {
                                 assert input != null;

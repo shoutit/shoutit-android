@@ -749,4 +749,7 @@
     <!-- Sponsored -->
     <string name="ad_sponsored">Sponsored</string>
 
+    <!-- Bookmarks -->
+    <string name="bookmarks_no_bookmarks">You don\'t have any bookmarked shouts.</string>
+
 </resources>
