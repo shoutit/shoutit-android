@@ -60,7 +60,7 @@ public class BookmarkedShoutsPresenter implements ShoutListPresenter {
         final BaseProfile currentUser = userPreferences.getUserOrPage();
         final String currentUserName = currentUser != null ? currentUser.getUsername() : null;
 
-        final Observable<ResponseOrError<ShoutsResponse>> requestObservable = apiservice.getBookmarkedShouts(currentUserName)
+        final Observable<ResponseOrError<ShoutsResponse>> requestObservable = apiservice.getBookmarkedShouts()
                 .observeOn(uiScheduler)
                 .subscribeOn(networkScheduler)
                 .compose(ResponseOrError.toResponseOrErrorObservable())
