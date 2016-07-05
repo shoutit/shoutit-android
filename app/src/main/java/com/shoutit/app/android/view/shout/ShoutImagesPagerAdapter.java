@@ -68,12 +68,7 @@ public class ShoutImagesPagerAdapter extends PagerAdapter {
             imageUrl = images.get(position);
             videoIconView.setVisibility(View.GONE);
 
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    openGallery(position);
-                }
-            });
+            view.setOnClickListener(v -> openGallery(position));
 
         } else if (!videos.isEmpty()) {
             final int videoPosition = position - images.size();
@@ -81,12 +76,7 @@ public class ShoutImagesPagerAdapter extends PagerAdapter {
             imageUrl = video.getThumbnailUrl();
             videoIconView.setVisibility(View.VISIBLE);
 
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    playVideo(video);
-                }
-            });
+            view.setOnClickListener(v -> playVideo(video));
         }
 
         loadThumbnail(imageUrl, imageView);
@@ -123,7 +113,8 @@ public class ShoutImagesPagerAdapter extends PagerAdapter {
 
     @Override
     public int getCount() {
-        return images.size() + videos.size();
+        final int size = images.size() + videos.size();
+        return size == 0 ? 1 : size;
     }
 
     @Override
