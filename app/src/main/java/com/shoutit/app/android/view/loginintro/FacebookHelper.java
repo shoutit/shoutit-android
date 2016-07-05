@@ -57,6 +57,7 @@ public class FacebookHelper {
     private static final String TAG = FacebookHelper.class.getSimpleName();
 
     private static final int ADS_NUM_TO_PREFETCH = 8;
+    private static final int ADS_NUM_SHOUT_DETAIL_TO_PREFETCH = 5;
 
     private static final String PERMISSION_EMAIL = "email";
     public static final String PERMISSION_USER_FRIENDS = "user_friends";
@@ -91,7 +92,7 @@ public class FacebookHelper {
                 context, getGridAdId(), ADS_NUM_TO_PREFETCH);
 
         shoutDetailAdManager = new NativeAdsManager(
-                context, getGridAdId(), ADS_NUM_TO_PREFETCH);
+                context, getShoutDetailAdId(), ADS_NUM_SHOUT_DETAIL_TO_PREFETCH);
 
         final NativeAdsManager.Listener adsListener = new NativeAdsManager.Listener() {
             @Override
