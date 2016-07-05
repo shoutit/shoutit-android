@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.pages.my;
 
 
+import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityScope;
@@ -18,12 +19,13 @@ public class SelectListenersActivityModule {
 
     @Provides
     @ActivityScope
-    BaseProfileListPresenter provideProfilesListPresenter(@UiScheduler Scheduler uiScheduler,
-                                                          ListeningHalfPresenter listeningHalfPresenter,
-                                                          UserPreferences userPreferences,
-                                                          ListenersDaos listenersDaos) {
-        return new SelectListenersPresenter(listeningHalfPresenter, uiScheduler,
-                null, userPreferences, listenersDaos);
+    BaseProfileListPresenter provideProfilesWithoutPagesListPresenter(@UiScheduler Scheduler uiScheduler,
+                                                                      @NetworkScheduler Scheduler networkScheduler,
+                                                                      ListeningHalfPresenter listeningHalfPresenter,
+                                                                      UserPreferences userPreferences,
+                                                                      ListenersDaos listenersDaos) {
+        return new SelectListenersWithoutPagesPresenter(listeningHalfPresenter, uiScheduler,
+                networkScheduler, null, userPreferences, listenersDaos);
     }
 }
 

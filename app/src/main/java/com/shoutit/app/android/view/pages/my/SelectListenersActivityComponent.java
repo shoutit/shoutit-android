@@ -6,6 +6,8 @@ import com.shoutit.app.android.dagger.AppComponent;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.view.profileslist.BaseProfileListPresenter;
 
+import javax.inject.Named;
+
 import dagger.Component;
 
 @ActivityScope
@@ -20,6 +22,6 @@ public interface SelectListenersActivityComponent extends BaseActivityComponent 
 
     void inject(SelectListenersActivity activity);
 
-    BaseProfileListPresenter profilesListPresenter();
+    BaseProfileListPresenter profilesWithoutPagesListPresenter();
 }
 
