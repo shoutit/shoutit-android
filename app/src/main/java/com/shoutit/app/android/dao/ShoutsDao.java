@@ -124,10 +124,7 @@ public class ShoutsDao {
                 });
     }
 
-    @Nonnull
-    public LoadingCache<String, ShoutDao> getShoutCache() {
-        return shoutCache;
-    }
+    public void invalidate(){shoutCache.invalidateAll();}
 
     @Nonnull
     public Observable<ResponseOrError<ShoutsResponse>> getHomeShoutsObservable(@Nonnull LocationPointer locationPointer) {

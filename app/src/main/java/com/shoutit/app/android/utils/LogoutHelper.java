@@ -56,7 +56,7 @@ public class LogoutHelper {
         recentSearchesTable.clearRecentSearches();
         FacebookHelper.logOutFromFacebook();
 
-        shoutsDao.getShoutCache().invalidateAll();
-        bookmarksDao.getBookmarksCache().invalidateAll();
+        shoutsDao.invalidate();
+        bookmarksDao.invalidate();
     }
 }
