@@ -280,12 +280,6 @@ public class VideoConversationActivity extends BaseActivity {
         presenter.getMakeCallObservable()
                 .compose(this.<BothParams<Set<String>, Boolean>>bindToLifecycle())
                 .subscribe(makeOutgoingCall());
-
-        presenter.getRejectCallObservable()
-                .compose(bindToLifecycle())
-                .subscribe(o -> {
-                    mTwilio.rejectCall(calledUserTwilioIdentity);
-                });
     }
 
     private void showOrHideVideo(boolean showVideo) {
@@ -517,7 +511,8 @@ public class VideoConversationActivity extends BaseActivity {
             public void onFailedToConnectParticipant(Conversation conversation, Participant participant, TwilioConversationsException e) {
                 LogHelper.logIfDebug(TAG, "onFailedToConnectParticipant");
                 if (e != null) {
-                    LogHelper.logIfDebug(TAG, "onFailedToConnectParticipant " + "mesage: " + e.getMessage()
+                    LogHelper.logIfDebug(TAG, "onF" +
+                            "ailedToConnectParticipant " + "mesage: " + e.getMessage()
                             + " code: " + e.getErrorCode() + " convSid:" + conversation.getSid());
                 }
             }
@@ -738,6 +733,10 @@ public class VideoConversationActivity extends BaseActivity {
 
         if (incomingInvite != null) {
             incomingInvite.reject();
+        }
+
+        if (outgoingInvite != null) {
+            outgoingInvite.cancel();;
         }
 
         if (conversation != null) {

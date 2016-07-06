@@ -1,11 +1,6 @@
 package com.shoutit.app.android.view.videoconversation;
 
-import android.provider.Settings;
-import android.support.v4.util.TimeUtils;
-
 import com.appunite.rx.ResponseOrError;
-import com.appunite.rx.android.MyAndroidSchedulers;
-import com.appunite.rx.android.util.LogTransformer;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.BothParams;
@@ -13,7 +8,6 @@ import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.VideoCallRequest;
 import com.shoutit.app.android.utils.LogHelper;
 
-import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -41,7 +35,6 @@ public class VideoConversationActivityPresenter {
     private final BehaviorSubject<String> calledUserTwilioIdentitySubject = BehaviorSubject.create();
     private final PublishSubject<Object> makeOutgoingCallSubject = PublishSubject.create();
     private final PublishSubject<Object> finishCallRetriesSubject = PublishSubject.create();
-    private final PublishSubject<Object> rejectCallObserver = PublishSubject.create();
     private final PublishSubject<Long> startTimerSubject = PublishSubject.create();
     private final PublishSubject<Object> stopTimerSubject = PublishSubject.create();
 
@@ -128,10 +121,6 @@ public class VideoConversationActivityPresenter {
     @Nonnull
     public Observable<BothParams<Set<String>, Boolean>> getMakeCallObservable() {
         return makeCallObservable;
-    }
-
-    public Observable<Object> getRejectCallObservable() {
-        return rejectCallObserver;
     }
 
     public Observer<Object> getMakeOutgoingCallObserver() {

@@ -51,6 +51,7 @@ public class Twilio {
 
     public static final int ERROR_PARTICIPANT_UNAVAILABLE = 106;
     public static final int ERROR_PARTICIPANT_REJECTED_CALL = 107;
+    public static final int ERROR_PARTICIPANT_IS_BUSY = 108;
 
     private final Context mContext;
     @Nonnull
@@ -125,8 +126,7 @@ public class Twilio {
                                 }));
                     }
                 })
-                .compose(ObservableExtensions.<ResponseOrError<BothParams<CallerProfile, String>>>behaviorRefCount())
-                .mergeWith(Observable.never());
+                .compose(ObservableExtensions.<ResponseOrError<BothParams<CallerProfile, String>>>behaviorRefCount());
 
 
         callerProfileResponse
