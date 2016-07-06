@@ -24,7 +24,7 @@ public class SelectListenersActivity extends BaseProfilesListActivity {
     public static final String RESULT_PROFILE_ID = "result_profile_id";
 
     public static Intent newIntent(Context context) {
-        return newIntent(context);
+        return new Intent(context, SelectListenersActivity.class);
     }
 
     @Override
