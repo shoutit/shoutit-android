@@ -431,6 +431,7 @@ public class VideoConversationActivity extends BaseActivity {
                 smallPreviewCoverView.setVisibility(View.VISIBLE);
                 showOrHideSmallPreview(true);
 
+                LogHelper.logIfDebug(TAG, "Send outgoing invite");
                 outgoingInvite = conversationClient
                         .inviteToConversation(participants, setupLocalMedia(), new ConversationCallback() {
                             @Override
@@ -439,17 +440,17 @@ public class VideoConversationActivity extends BaseActivity {
                                     presenter.finishRetries();
                                     VideoConversationActivity.this.conversation = conversation;
                                     conversation.setConversationListener(conversationListener());
-                                    Log.d(TAG, "Succesfully connected");
+                                    LogHelper.logIfDebug(TAG, "Succesfully connected");
                                 } else if (isLastRetry) {
                                     handleTwilioError(exception);
                                     switchToFullScreenMode(false);
                                     mTwilio.rejectCall(calledUserTwilioIdentity);
-                                    Log.d(TAG, "Failed on last retry with code: " + exception.getErrorCode() + " and message: " + exception.getMessage());
+                                    LogHelper.logIfDebug(TAG, "Failed on last retry with code: " + exception.getErrorCode() + " and message: " + exception.getMessage());
                                 } else if (exception.getErrorCode() == Twilio.ERROR_PARTICIPANT_UNAVAILABLE) {
-                                    Log.d(TAG, "Participant unavailable? with code: " + exception.getErrorCode() + " and message: " + exception.getMessage());
+                                    LogHelper.logIfDebug(TAG, "Participant unavailable? with code: " + exception.getErrorCode() + " and message: " + exception.getMessage());
                                     presenter.retryCall();
                                 } else {
-                                    Log.d(TAG, "Error? with code: " + exception.getErrorCode() + " and message: " + exception.getMessage());
+                                    LogHelper.logIfDebug(TAG, "Error? with code: " + exception.getErrorCode() + " and message: " + exception.getMessage());
                                     switchToFullScreenMode(false);
                                     handleTwilioError(exception);
                                     presenter.finishRetries();
@@ -489,6 +490,7 @@ public class VideoConversationActivity extends BaseActivity {
 
             @Override
             public void onLocalVideoTrackError(LocalMedia localMedia, LocalVideoTrack localVideoTrack, TwilioConversationsException e) {
+                LogHelper.logIfDebug(TAG, "onLocalVideoTrackError");
                 for (VideoRenderer videoRenderer : localVideoTrack.getRenderers()) {
                     localVideoTrack.removeRenderer(videoRenderer);
                 }
@@ -500,6 +502,8 @@ public class VideoConversationActivity extends BaseActivity {
         return new Conversation.Listener() {
             @Override
             public void onParticipantConnected(Conversation conversation, Participant participant) {
+                LogHelper.logIfDebug(TAG, "onParticipantConnected, convSid:" + conversation.getSid());
+
                 smallPreviewWindow.setVisibility(View.VISIBLE);
                 smallPreviewCoverView.setVisibility(shouldShowVideo() ? View.GONE : View.VISIBLE);
                 showOrHideVideo(shouldShowVideo());
@@ -511,10 +515,17 @@ public class VideoConversationActivity extends BaseActivity {
 
             @Override
             public void onFailedToConnectParticipant(Conversation conversation, Participant participant, TwilioConversationsException e) {
+                LogHelper.logIfDebug(TAG, "onFailedToConnectParticipant");
+                if (e != null) {
+                    LogHelper.logIfDebug(TAG, "onFailedToConnectParticipant " + "mesage: " + e.getMessage()
+                            + " code: " + e.getErrorCode() + " convSid:" + conversation.getSid());
+                }
             }
 
             @Override
             public void onParticipantDisconnected(Conversation conversation, Participant participant) {
+                LogHelper.logIfDebug(TAG, "onParticipantDisconnected"  + " convSid:" + conversation.getSid());
+
                 stopVideoTimer();
                 switchToFullScreenMode(false);
                 conversationInfoSubject.onNext(getString(R.string.video_calls_participant_disconected));
@@ -522,6 +533,7 @@ public class VideoConversationActivity extends BaseActivity {
 
             @Override
             public void onConversationEnded(Conversation conversation, TwilioConversationsException e) {
+                LogHelper.logIfDebug(TAG, "onConversationEnded " + "sid " + conversation.getSid());
                 if (e != null) {
                     LogHelper.logIfDebug(TAG, "onConversationEnded with error: " + e.getMessage() + " " + e.getErrorCode());
                 }
@@ -575,16 +587,16 @@ public class VideoConversationActivity extends BaseActivity {
 
             @Override
             public void onTrackEnabled(Conversation conversation, Participant participant, MediaTrack mediaTrack) {
+                LogHelper.logIfDebug(TAG, "onTrackEnabled");
                 if (!isAudioTrack(mediaTrack, participant.getMedia().getAudioTracks())) {
-                    LogHelper.logIfDebug(TAG, "onTrackEnabled");
                     showOrHideParticipantView(true);
                 }
             }
 
             @Override
             public void onTrackDisabled(Conversation conversation, Participant participant, MediaTrack mediaTrack) {
+                LogHelper.logIfDebug(TAG, "onTrackDisabled");
                 if (!isAudioTrack(mediaTrack, participant.getMedia().getAudioTracks())) {
-                    LogHelper.logIfDebug(TAG, "onTrackDisabled");
                     showOrHideParticipantView(false);
                 }
             }

@@ -84,6 +84,7 @@ public class UsersIdentityDao {
         public UserByIdentityDao(@Nonnull String identity) {
 
             userByIdentityObservable = apiService.getUserByIdentity(identity)
+                    .mergeWith(Observable.never())
                     .subscribeOn(networkScheduler)
                     .compose(ResponseOrError.<CallerProfile>toResponseOrErrorObservable())
                     .compose(MoreOperators.<ResponseOrError<CallerProfile>>cacheWithTimeout(networkScheduler));

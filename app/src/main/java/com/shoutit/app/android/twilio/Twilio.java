@@ -232,10 +232,13 @@ public class Twilio {
         return new TwilioConversationsClient.Listener() {
             @Override
             public void onStartListeningForInvites(TwilioConversationsClient conversationsClient) {
+                LogHelper.logIfDebug(TAG, "onStartListeningForInvites");
             }
 
             @Override
             public void onStopListeningForInvites(TwilioConversationsClient conversationsClient) {
+                LogHelper.logIfDebug(TAG, "onStopListeningForInvites");
+
                 if (conversationsClient != null) {
                     conversationsClient.listen();
                 }
@@ -244,6 +247,8 @@ public class Twilio {
 
             @Override
             public void onFailedToStartListening(TwilioConversationsClient conversationsClient, TwilioConversationsException e) {
+                LogHelper.logIfDebug(TAG, "onFailedToStartListening");
+
                 if (e != null && e.getErrorCode() == 100) {
                     initTwilio();
                 }
