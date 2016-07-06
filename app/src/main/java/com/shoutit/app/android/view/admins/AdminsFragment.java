@@ -15,7 +15,6 @@ import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.PreferencesHelper;
-import com.shoutit.app.android.view.chooseprofile.SelectProfileActivity;
 import com.shoutit.app.android.view.pages.my.SelectListenersActivity;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.profileslist.BaseProfileListFragment;
@@ -25,7 +24,6 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -100,7 +98,7 @@ public class AdminsFragment extends BaseProfileListFragment implements AdminsDia
         final String userName = baseProfile.getUsername();
 
         if (preferencesHelper.isMyProfile(userName)) {
-                openProfile(userName);
+            openProfile(userName);
         } else {
             adminsDialog.show(baseProfile, this);
         }
@@ -143,7 +141,7 @@ public class AdminsFragment extends BaseProfileListFragment implements AdminsDia
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE_SELECT_ADMIN) {
+        if (data != null && resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE_SELECT_ADMIN) {
             final String selectedAdminId = checkNotNull(data.getStringExtra(SelectListenersActivity.RESULT_PROFILE_ID));
             presenter.addAdmin(selectedAdminId);
         } else {
