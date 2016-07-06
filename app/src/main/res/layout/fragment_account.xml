@@ -26,6 +26,16 @@
         android:background="@color/black_12" />
 
     <TextView
+        android:id="@+id/account_linked_accounts_tv"
+        style="@style/SettingsItem"
+        android:text="@string/account_linked_accounts" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/black_12" />
+
+    <TextView
         android:id="@+id/account_logout_tv"
         style="@style/SettingsItem"
         android:text="@string/account_logout" />

@@ -28,7 +28,9 @@ import com.shoutit.app.android.api.model.EditShoutRequestWithPrice;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.GuestSignupRequest;
 import com.shoutit.app.android.api.model.InvitationCodeResponse;
-import com.shoutit.app.android.api.model.LikeResponse;
+import com.shoutit.app.android.api.model.IsSuccessResponse;
+import com.shoutit.app.android.api.model.LinkFacebookRequest;
+import com.shoutit.app.android.api.model.LinkGplusRequest;
 import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessagesResponse;
 import com.shoutit.app.android.api.model.NotificationsResponse;
@@ -384,7 +386,6 @@ public interface ApiService {
     @POST("misc/reports")
     Observable<Response<Object>> report(@Body ReportBody reportShoutBody);
 
-
     /**
      * create shout
      */
@@ -417,6 +418,12 @@ public interface ApiService {
 
     @GET("shouts/{id}/call")
     Observable<MobilePhoneResponse> shoutCall(@Path("id") String id);
+
+    @POST("shouts/{id}/like")
+    Observable<IsSuccessResponse> likeShout(@Path("id") String id);
+
+    @DELETE("shouts/{id}/like")
+    Observable<IsSuccessResponse> unlikeShout(@Path("id") String id);
 
     /**
      * Tags
@@ -582,11 +589,21 @@ public interface ApiService {
     @POST("pages")
     Observable<User> createPage(@Body PageCreateRequest pageCreateRequest);
 
-    @POST("shouts/{id}/like")
-    Observable<LikeResponse> likeShout(@Path("id") String id);
+    /**
+     * Linked Accounts
+     */
 
-    @DELETE("shouts/{id}/like")
-    Observable<LikeResponse> unlikeShout(@Path("id") String id);
+    @PATCH("profiles/{username}/link")
+    Observable<IsSuccessResponse> linkFacebook(@Path("username") String username, @Body LinkFacebookRequest request);
+
+    @HTTP(method = "DELETE", path = "profiles/{username}/link", hasBody = true)
+    Observable<IsSuccessResponse> unlinkFacebook(@Path("username") String username, @Body LinkFacebookRequest request);
+
+    @PATCH("profiles/{username}/link")
+    Observable<IsSuccessResponse> linkGoogle(@Path("username") String username, @Body LinkGplusRequest request);
+
+    @HTTP(method = "DELETE", path = "profiles/{username}/link", hasBody = true)
+    Observable<IsSuccessResponse> unlinkGoogle(@Path("username") String username, @Body LinkGplusRequest request);
 
     /**
      * Shout bookmark

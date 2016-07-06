@@ -103,6 +103,32 @@ public class User extends BaseProfile {
                 false, about, mobile, website, getEmail(), conversation, gender, birthday, newStats, linkedAccounts, admin);
     }
 
+    @Nonnull
+    public User withUnlinkedFacebook() {
+        return new User(id, type, apiUrl, webUrl, username, name,
+                firstName, lastName, isActivated, image, cover,
+                isListening, isListener, isPasswordSet, location,
+                listenersCount, bio, dateJoined, listeningCount,
+                false, about, mobile, website, getEmail(), conversation, gender, birthday, getStats(),linkedAccounts.unlinkedFacebook(), admin);
+    }
+
+    @Nonnull
+    public User withUnlinkedGoogle() {
+        return new User(id, type, apiUrl, webUrl, username, name,
+                firstName, lastName, isActivated, image, cover,
+                isListening, isListener, isPasswordSet, location,
+                listenersCount, bio, dateJoined, listeningCount,
+                false, about, mobile, website, getEmail(), conversation, gender, birthday, getStats(),linkedAccounts.unlinkedGoogle(), admin);
+    }
+
+    @Nonnull
+    public User withUpdatedGoogleAccount(@Nonnull String token) {
+        return new User(id, type, apiUrl, webUrl, username, name,
+                firstName, lastName, isActivated, image, cover,
+                isListening, isListener, isPasswordSet, location,
+                listenersCount, bio, dateJoined, listeningCount,
+                false, about, mobile, website, getEmail(), conversation, gender, birthday, getStats(),linkedAccounts.updatedGoogle(token), admin);
+    }
     public boolean isUser(@Nonnull User user) {
         return (USER.equals(user.type));
     }

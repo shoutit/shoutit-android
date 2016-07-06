@@ -53,6 +53,7 @@ public class UserPreferences {
     // locationObservable should be used instead pageOrUserObservable to get location as there is no user for guest
     private final Observable<UserLocation> locationObservable;
     private final Observable<String> tokenObservable;
+    private final Observable<User> userObservable;
 
     @SuppressLint("CommitPrefEdits")
     private final SharedPreferences mPreferences;
@@ -80,6 +81,12 @@ public class UserPreferences {
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .compose(MoreOperators.<String>refresh(tokenRefreshSubject))
+                .observeOn(uiScheduler);
+
+        userObservable = Observable
+                .defer(() -> Observable.just(getUser()))
+                .compose(MoreOperators.<User>refresh(userRefreshSubject))
+                .filter(Functions1.isNotNull())
                 .observeOn(uiScheduler);
     }
 
@@ -268,6 +275,10 @@ public class UserPreferences {
 
     public Observable<String> getTokenObservable() {
         return tokenObservable;
+    }
+
+    public Observable<User> getUserObservable() {
+        return userObservable;
     }
 
     public void saveLocation(@Nullable UserLocation location) {

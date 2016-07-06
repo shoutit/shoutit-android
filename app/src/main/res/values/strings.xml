@@ -199,6 +199,7 @@
     <string name="settings_passwords_not_match">Passwords do not match</string>
     <string name="account_title_change_email">Change email</string>
     <string name="account_title_change_password">Change password</string>
+    <string name="account_title_linked_accounts">Linked Accounts</string>
     <string name="account_error_old_password">Please provide old password</string>
 
     <!-- Shout -->
@@ -225,6 +226,7 @@
     <string name="account_email_changed">Email successfully changed</string>
     <string name="account_wrong_email">Wrong email address</string>
     <string name="account_logout">Log out</string>
+    <string name="account_linked_accounts">Linked Accounts</string>
 
     <!-- Profile -->
     <string name="profile_shuts_button">See all shouts</string>
@@ -740,5 +742,13 @@
     <string name="create_page_details_full_name_hint">Full Name</string>
     <string name="create_page_details_email_hint">Email</string>
     <string name="create_page_details_password_hint">Password</string>
+
+    <!--Linked Accounts-->
+    <string name="linked_accounts_facebook">Facebook</string>
+    <string name="linked_accounts_google">Google</string>
+    <string name="linked_accounts_not_linked">Not Linked</string>
+    <string name="linked_accounts_unlink_facebook">Do you really want to unlink your facebook account ?</string>
+    <string name="linked_accounts_unlink_google">Do you really want to unlink your google account ?</string>
+    <string name="linked_accounts_linked">Linked</string>
 
 </resources>

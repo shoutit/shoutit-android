@@ -1,10 +1,10 @@
 package com.shoutit.app.android.api.model;
 
-public class LikeResponse {
+public class IsSuccessResponse {
 
     private final String success;
 
-    public LikeResponse(final String success) {
+    public IsSuccessResponse(final String success) {
         this.success = success;
     }
 

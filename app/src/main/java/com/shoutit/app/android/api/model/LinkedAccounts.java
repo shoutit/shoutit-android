@@ -9,15 +9,31 @@ import javax.annotation.Nullable;
 public class LinkedAccounts {
     @Nullable
     private final Facebook facebook;
+    @Nullable
+    private final Gplus gplus;
 
-    private LinkedAccounts(@Nullable Facebook facebook) {
+    public LinkedAccounts(@Nullable Facebook facebook, final Gplus gplus) {
         this.facebook = facebook;
+        this.gplus = gplus;
     }
 
+    public LinkedAccounts unlinkedFacebook(){
+        return new LinkedAccounts(null, gplus);
+    }
+
+    public LinkedAccounts unlinkedGoogle(){
+        return new LinkedAccounts(facebook, null);
+    }
+    public LinkedAccounts updatedGoogle(String token){
+        return new LinkedAccounts(facebook, new Gplus(token));
+    }
     @Nullable
     public Facebook getFacebook() {
         return facebook;
     }
+
+    @Nullable
+    public Gplus getGplus() {return  gplus;}
 
     @Override
     public boolean equals(Object o) {
@@ -70,4 +86,32 @@ public class LinkedAccounts {
             return Objects.hashCode(scopes, expiresAt, facebookId);
         }
     }
+
+    public class Gplus {
+        private final String gplusId;
+
+        public String getGplusId() {
+            return gplusId;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            final Gplus gplus = (Gplus) o;
+            return Objects.equal(gplusId, gplus.gplusId);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(gplusId);
+        }
+
+        public Gplus(final String gplusId) {
+            this.gplusId = gplusId;
+
+        }
+    }
+
+
 }

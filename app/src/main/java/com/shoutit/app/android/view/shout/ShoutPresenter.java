@@ -18,7 +18,7 @@ import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.ConversationDetails;
-import com.shoutit.app.android.api.model.LikeResponse;
+import com.shoutit.app.android.api.model.IsSuccessResponse;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
@@ -38,7 +38,6 @@ import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 import java.util.List;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import retrofit2.Response;
@@ -46,7 +45,6 @@ import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Func1;
-import rx.functions.Func2;
 import rx.functions.Func3;
 import rx.subjects.PublishSubject;
 
@@ -237,7 +235,7 @@ public class ShoutPresenter {
 
         /** Like / Unlike Shout **/
 
-        final Observable<ResponseOrError<LikeResponse>> likeShoutResponseObservable = likeClickedSubject
+        final Observable<ResponseOrError<IsSuccessResponse>> likeShoutResponseObservable = likeClickedSubject
                 .filter(Functions1.isFalse())
                 .switchMap(o -> apiService.likeShout(shoutId)
                         .subscribeOn(networkScheduler)
@@ -245,7 +243,7 @@ public class ShoutPresenter {
                         .compose(ResponseOrError.toResponseOrErrorObservable()))
                 .compose(ObservableExtensions.behaviorRefCount());
 
-        final Observable<ResponseOrError<LikeResponse>> unlikeShoutResponseObservable = likeClickedSubject
+        final Observable<ResponseOrError<IsSuccessResponse>> unlikeShoutResponseObservable = likeClickedSubject
                 .filter(Functions1.isTrue())
                 .switchMap(o -> apiService.unlikeShout(shoutId)
                         .subscribeOn(networkScheduler)
