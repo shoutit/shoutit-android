@@ -193,24 +193,9 @@ public class LoginIntroActivity extends BaseActivity {
                         .observeOn(MyAndroidSchedulers.mainThread()));
     }
 
-    private void loginGoogle() {
-        final GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .requestProfile()
-                .requestServerAuthCode("935842257865-s6069gqjq4bvpi4rcbjtdtn2kggrvi06.apps.googleusercontent.com")
-                .build();
-
-        final GoogleApiClient googleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
-
-        final Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient);
-        startActivityForResult(signInIntent, GOOGLE_SIGN_IN);
-    }
-
     @OnClick(R.id.activity_login_gplus_btn)
     public void googleClick() {
-        loginGoogle();
+        GoogleHelper.loginGoogle(this);
     }
 
     @OnClick(R.id.activity_login_facebook_btn)

@@ -123,8 +123,9 @@ public class LinkedAccountsPresenter {
                     }
                 }).compose(ObservableExtensions.behaviorRefCount());
 
-        subscription.add(clickFacebookSubject.withLatestFrom(userPreferences.getUserObservable(),
-                (o, user) -> {
+        subscription.add(clickFacebookSubject
+                .map(o -> {
+                    final User user = userPreferences.getUser();
                     if (user.getLinkedAccounts() != null) {
                         if (user.getLinkedAccounts().getFacebook() != null) {
                             listener.unlinkFacebookDialog();
@@ -133,8 +134,7 @@ public class LinkedAccountsPresenter {
                         }
                     }
                     return null;
-                })
-                .subscribe());
+                }).subscribe());
         /**
          * Google
          */
@@ -164,13 +164,14 @@ public class LinkedAccountsPresenter {
                     }
                 }).compose(ObservableExtensions.behaviorRefCount());
 
-        subscription.add(clickGoogleSubject.withLatestFrom(userPreferences.getUserObservable(),
-                (o, user) -> {
+        subscription.add(clickGoogleSubject
+                .map(o -> {
+                    final User user = userPreferences.getUser();
                     if (user.getLinkedAccounts() != null) {
                         if (user.getLinkedAccounts().getGplus() != null) {
                             listener.unlinkGoogleDialog();
                         } else {
-                            listener.loginGoogle();
+                            listener.triggerSignInGoogle();
                         }
                     }
                     return null;
@@ -188,8 +189,8 @@ public class LinkedAccountsPresenter {
     }
 
     @Nonnull
-    public CompositeSubscription getSubscription() {
-        return subscription;
+    public void unsubscribe() {
+        subscription.unsubscribe();
     }
 
     @Nonnull
@@ -273,7 +274,7 @@ public class LinkedAccountsPresenter {
 
     public interface Listener {
 
-        void loginGoogle();
+        void triggerSignInGoogle();
 
         void unlinkFacebookDialog();
 

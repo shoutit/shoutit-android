@@ -14,18 +14,18 @@ import android.widget.TextView;
 import com.facebook.CallbackManager;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.jakewharton.rxbinding.view.RxView;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.constants.RequestsConstants;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
+import com.shoutit.app.android.view.loginintro.GoogleHelper;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -49,8 +49,6 @@ public class LinkedAccountsFragment extends BaseFragment implements LinkedAccoun
     TextView linkedAccountsProfileGTv;
     @Bind(R.id.main_layout)
     View mainView;
-    @Bind(R.id.progress_bar_linked)
-    View progress;
 
     @Inject
     LinkedAccountsPresenter presenter;
@@ -58,7 +56,7 @@ public class LinkedAccountsFragment extends BaseFragment implements LinkedAccoun
     UserPreferences preferences;
 
     private CallbackManager callbackManager;
-    private String googleId = null;
+    private String googleId;
 
     public static Fragment newInstance() {
         return new LinkedAccountsFragment();
@@ -95,7 +93,7 @@ public class LinkedAccountsFragment extends BaseFragment implements LinkedAccoun
 
         presenter.askForFbTokenObservable()
                 .flatMap(o -> FacebookHelper.getToken(getActivity(), callbackManager))
-                .subscribe(getSuccessAction(), getErrorAction());
+                .subscribe(onGetFacebookTokenSuccessAction(), onGetFacebookTokenFailureAction());
 
         presenter.linkFacebookObservable()
                 .compose(this.bindToLifecycle())
@@ -111,9 +109,7 @@ public class LinkedAccountsFragment extends BaseFragment implements LinkedAccoun
         presenter.linkGoogleObservable()
                 .compose(this.bindToLifecycle())
                 .subscribe(message -> {
-                    if (googleId != null) {
-                        preferences.setUserOrPage(preferences.getUser().withUpdatedGoogleAccount(googleId));
-                    }
+                    preferences.setUserOrPage(preferences.getUser().withUpdatedGoogleAccount(googleId));
                     ColoredSnackBar.success(mainView, message, Snackbar.LENGTH_SHORT).show();
                 });
 
@@ -130,12 +126,12 @@ public class LinkedAccountsFragment extends BaseFragment implements LinkedAccoun
     }
 
     @Nonnull
-    private Action1<String> getSuccessAction(){
+    private Action1<String> onGetFacebookTokenSuccessAction() {
         return token -> presenter.linkFacebookSubject().onNext(token);
     }
 
     @NonNull
-    private Action1<Throwable> getErrorAction() {
+    private Action1<Throwable> onGetFacebookTokenFailureAction() {
         return throwable -> ColoredSnackBar.error(ColoredSnackBar.contentView(getActivity()), throwable,
                 Snackbar.LENGTH_SHORT)
                 .show();
@@ -143,12 +139,15 @@ public class LinkedAccountsFragment extends BaseFragment implements LinkedAccoun
 
     @Override
     public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-        if (requestCode == GOOGLE_SIGN_IN) {
+        if (requestCode == RequestsConstants.GOOGLE_SIGN_IN) {
             final GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             final GoogleSignInAccount acct = result.getSignInAccount();
-            assert acct != null && acct.getId() != null;
-            googleId = acct.getId();
-            presenter.linkGoogleSubject().onNext(acct.getServerAuthCode());
+
+            if (acct != null && acct.getId() != null) {
+                googleId = acct.getId();
+                presenter.linkGoogleSubject().onNext(acct.getServerAuthCode());
+            }
+
         } else {
             final boolean handled = callbackManager.onActivityResult(requestCode, resultCode, data);
             if (!handled) {
@@ -158,19 +157,8 @@ public class LinkedAccountsFragment extends BaseFragment implements LinkedAccoun
     }
 
     @Override
-    public void loginGoogle() {
-        final GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .requestProfile()
-                .requestServerAuthCode("935842257865-s6069gqjq4bvpi4rcbjtdtn2kggrvi06.apps.googleusercontent.com")
-                .build();
-
-        final GoogleApiClient googleApiClient = new GoogleApiClient.Builder(getActivity())
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
-
-        final Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient);
-        startActivityForResult(signInIntent, GOOGLE_SIGN_IN);
+    public void triggerSignInGoogle() {
+        GoogleHelper.loginGoogle(getActivity());
     }
 
     @Override
@@ -183,22 +171,22 @@ public class LinkedAccountsFragment extends BaseFragment implements LinkedAccoun
         showDialog(getString(R.string.linked_accounts_unlink_google), presenter.unlinkGoogleSubject());
     }
 
-    private void showDialog(@Nonnull final String message, @Nonnull PublishSubject<Object> subject){
-        AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
-        alert.setMessage(message);
-        alert.setPositiveButton("yes", (dialog, which) -> {
-            subject.onNext(new Object());
-        });
-        alert.setNegativeButton("no", (dialog, which) -> {
-            dialog.cancel();
-        });
-        alert.show();
+    private void showDialog(@Nonnull final String message, @Nonnull PublishSubject<Object> subject) {
+        new AlertDialog.Builder(getActivity())
+                .setMessage(message)
+                .setPositiveButton("yes", (dialog, which) -> {
+                    subject.onNext(new Object());
+                })
+                .setNegativeButton("no", (dialog, which) -> {
+                    dialog.cancel();
+                })
+                .show();
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        presenter.getSubscription().unsubscribe();
+        presenter.unsubscribe();
     }
 
     @Override
