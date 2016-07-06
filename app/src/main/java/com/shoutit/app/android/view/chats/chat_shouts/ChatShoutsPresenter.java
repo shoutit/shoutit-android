@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.chats.chat_shouts;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
@@ -13,13 +14,17 @@ import com.google.common.collect.Iterables;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.NoDataTextAdapterItem;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.ShoutsDao;
+import com.shoutit.app.android.utils.BookmarkHelper;
+import com.shoutit.app.android.utils.PromotionHelper;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
+import com.shoutit.app.android.view.shouts_list_common.ShoutListPresenter;
 
 import java.util.List;
 
@@ -31,7 +36,7 @@ import rx.Scheduler;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
-public class ChatShoutsPresenter {
+public class ChatShoutsPresenter implements ShoutListPresenter {
 
     private final PublishSubject<String> shoutSelectedSubject = PublishSubject.create();
 
@@ -46,18 +51,20 @@ public class ChatShoutsPresenter {
     @Nonnull
     private final String conversationId;
     @Nonnull
-    private Observable<Integer> resultsCountObservable;
+    private final Observable<Integer> resultsCountObservable;
 
     public ChatShoutsPresenter(@Nonnull @UiScheduler Scheduler uiScheduler,
                                @Nonnull ShoutsDao shoutsDao,
                                @Nonnull String conversationId,
-                               @ForActivity final Context context,
-                               UserPreferences userPreferences) {
+                               @NonNull @ForActivity final Context context,
+                               @NonNull UserPreferences userPreferences,
+                               @NonNull BookmarksDao bookmarksDao,
+                               @NonNull BookmarkHelper helper) {
         this.shoutsDao = shoutsDao;
         this.conversationId = conversationId;
 
         final boolean isNormalUser = userPreferences.isNormalUser();
-        final User currentUser = userPreferences.getUser();
+        final BaseProfile currentUser = userPreferences.getUserOrPage();
         final String currentUserName = currentUser != null ? currentUser.getUsername() : null;
 
         final Observable<ResponseOrError<ShoutsResponse>> requestObservable = shoutsDao
@@ -81,7 +88,12 @@ public class ChatShoutsPresenter {
                             final Iterable<BaseAdapterItem> baseAdapterItems = Iterables.transform(shouts,
                                     (Function<Shout, BaseAdapterItem>) shout -> {
                                         final boolean isShoutOwner = shout.getProfile().getUsername().equals(currentUserName);
-                                        return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context, shoutSelectedSubject);
+                                        final BookmarkHelper.ShoutItemBookmarkHelper shoutItemBookmarkHelper = helper.getShoutItemBookmarkHelper();
+                                        return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser,
+                                                context, shoutSelectedSubject,
+                                                PromotionHelper.promotionInfoOrNull(shout),
+                                                bookmarksDao.getBookmarkForShout(shout.getId(), shout.isBookmarked()),
+                                                shoutItemBookmarkHelper.getObserver(), shoutItemBookmarkHelper.getEnableObservable());
                                     });
                             return ImmutableList.copyOf(baseAdapterItems);
                         }
@@ -98,23 +110,26 @@ public class ChatShoutsPresenter {
         progressObservable = requestObservable
                 .map(Functions1.returnFalse())
                 .startWith(true);
-
     }
 
+    @Override
     public Observable<String> getShoutSelectedObservable() {
         return shoutSelectedSubject;
     }
 
+    @Override
     @Nonnull
     public Observable<Throwable> getErrorObservable() {
         return errorObservable;
     }
 
+    @Override
     @Nonnull
     public Observable<List<BaseAdapterItem>> getAdapterItemsObservable() {
         return adapterItemsObservable;
     }
 
+    @Override
     @Nonnull
     public Observable<Boolean> getProgressObservable() {
         return progressObservable;

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ImageView
         android:id="@+id/publish_media_shout_preview"
@@ -26,12 +26,12 @@
             android:id="@+id/camera_cool_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/cool"/>
+            android:src="@drawable/ic_logo"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="10dp"
             android:text="@string/publish_header"
             android:textColor="@android:color/white"
             android:textSize="22sp"/>
@@ -72,15 +72,33 @@
 
         </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/request_activity_sharing"
-            android:textColor="@android:color/white"
-            android:textSize="12sp"
+            android:layout_marginBottom="4dp"
             android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp"
-            android:textAllCaps="true"/>
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/request_activity_sharing"
+                android:textAllCaps="true"
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
+
+            <ImageView
+                android:id="@+id/camera_published_credits_info_iv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="4dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:paddingTop="4dp"
+                android:src="@drawable/credits_info" />
+
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -89,7 +107,7 @@
             android:layout_gravity="center_horizontal"
             android:orientation="horizontal">
 
-            <CheckBox
+            <android.support.v7.widget.AppCompatCheckBox
                 android:id="@+id/camera_published_facebook_checkbox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -98,13 +116,13 @@
                 android:layout_weight="1"
                 android:paddingLeft="14dp"
                 android:paddingStart="14dp"
+                app:buttonTint="@android:color/white"
                 android:text="@string/request_activity_facebook"
                 android:textColor="@android:color/white"
                 android:textSize="16sp"
-                android:theme="@style/CreateShoutCheckBox"
                 tools:checked="true" />
 
-            <CheckBox
+            <android.support.v7.widget.AppCompatCheckBox
                 android:id="@+id/camera_published_twitter_checkbox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -113,23 +131,25 @@
                 android:layout_weight="1"
                 android:paddingLeft="14dp"
                 android:paddingStart="14dp"
+                app:buttonTint="@android:color/white"
                 android:text="@string/request_activity_twitter"
                 android:textColor="@android:color/white"
                 android:textSize="16sp"
                 android:visibility="gone"
-                tools:visibility="visible"
-                android:theme="@style/CreateShoutCheckBox" />
+                tools:visibility="visible" />
 
         </LinearLayout>
 
-        <Button
+        <TextView
             android:enabled="false"
             android:id="@+id/camera_published_done"
             android:layout_width="246dp"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_marginTop="20dp"
             android:fontFamily="sans-serif"
-            android:padding="22dp"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:background="@drawable/selector_green_button"
             android:text="@string/publish_done"
             android:textAllCaps="false"
             android:textColor="@android:color/white"/>

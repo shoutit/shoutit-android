@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.facebook.CallbackManager;
+import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
@@ -18,8 +19,11 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.IntentHelper;
+import com.shoutit.app.android.view.createshout.DialogsHelper;
 import com.shoutit.app.android.view.invitefriends.contactsfriends.ContactsFriendsActivity;
 import com.shoutit.app.android.view.invitefriends.facebookfriends.FacebookFriendsActivity;
+import com.shoutit.app.android.view.invitefriends.suggestionspages.PagesSuggestionActivity;
+import com.shoutit.app.android.view.invitefriends.suggestionsusers.UserSuggestionActivity;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
 
 import java.util.List;
@@ -28,18 +32,22 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class InviteFriendsFragment extends BaseFragment {
-
-    public static final String SHARE_FACEBOOK_APP_LINK_URL = "https://fb.me/1224908360855680";
 
     private Menu mMenu;
     private CallbackManager callbackManager;
 
     @Inject
     UserPreferences userPreferences;
+    @Inject
+    InviteFriendsPresenter presenter;
+
+    @Bind(R.id.base_progress)
+    View progressView;
 
     @Nonnull
     public static Fragment newInstance() {
@@ -61,6 +69,28 @@ public class InviteFriendsFragment extends BaseFragment {
     }
 
     @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        presenter.getInvitationCodeObservable()
+                .compose(bindToLifecycle())
+                .subscribe(invitationCode -> {
+                    FacebookHelper.showAppInviteDialog(getActivity(),
+                            FacebookHelper.FACEBOOK_SHARE_APP_LINK,
+                            callbackManager,
+                            invitationCode);
+                });
+
+        presenter.getProgressObservable()
+                .compose(bindToLifecycle())
+                .subscribe(RxView.visibility(progressView));
+
+        presenter.getErrorObservable()
+                .compose(bindToLifecycle())
+                .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(getActivity())));
+    }
+
+    @Override
     protected void injectComponent(@Nonnull BaseActivityComponent baseActivityComponent, @Nonnull FragmentModule fragmentModule, @Nullable Bundle savedInstanceState) {
         DaggerInviteFriendsFragmentComponent.builder()
                 .baseActivityComponent(baseActivityComponent)
@@ -69,14 +99,16 @@ public class InviteFriendsFragment extends BaseFragment {
                 .inject(this);
     }
 
-    @OnClick({R.id.invite_friends_users, R.id.invite_friends_pages, R.id.invite_friends_find_facebook, R.id.invite_friends_find_contacts, R.id.invite_friends_invite_facebook, R.id.invite_friends_invite_twitter, R.id.invite_friends_share_app})
+    @OnClick({R.id.invite_friends_users, R.id.invite_friends_pages, R.id.invite_friends_find_facebook,
+            R.id.invite_friends_find_contacts, R.id.invite_friends_invite_facebook,
+            R.id.invite_friends_invite_twitter, R.id.invite_friends_share_app})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.invite_friends_users:
-                startActivity(UserSuggestionActivity.newUserIntent(getActivity()));
+                startActivity(UserSuggestionActivity.newIntent(getActivity()));
                 break;
             case R.id.invite_friends_pages:
-                startActivity(UserSuggestionActivity.newPagesIntent(getActivity()));
+                startActivity(PagesSuggestionActivity.newIntent(getActivity()));
                 break;
             case R.id.invite_friends_find_facebook:
                 if (userPreferences.isNormalUser()) {
@@ -93,7 +125,7 @@ public class InviteFriendsFragment extends BaseFragment {
                 }
                 break;
             case R.id.invite_friends_invite_facebook:
-                FacebookHelper.showAppInviteDialog(getActivity(), SHARE_FACEBOOK_APP_LINK_URL, callbackManager);
+                presenter.initFbFriendInvite();
                 break;
             case R.id.invite_friends_invite_twitter:
                 shareThroughTwitter();
@@ -102,6 +134,16 @@ public class InviteFriendsFragment extends BaseFragment {
                 startActivity(IntentHelper.getShareIntent(getString(R.string.invite_app_invite_text)));
                 break;
         }
+    }
+
+    @OnClick(R.id.invite_friend_find_friends_header)
+    public void onFindFriendInfoClicked() {
+        DialogsHelper.showDialog(getActivity(), R.string.invite_friend_find_friend_dialog);
+    }
+
+    @OnClick(R.id.invite_friend_invite_friends_header)
+    public void onInviteFriendInfoClicked() {
+        DialogsHelper.showDialog(getActivity(), R.string.invite_friend_invite_friend_dialog);
     }
 
     private void showOnlyForLoggedUserError() {

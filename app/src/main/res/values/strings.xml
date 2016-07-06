@@ -7,8 +7,23 @@
     <string name="shout_type_offer">Offer</string>
     <string name="shout_type_request">Request</string>
     <string name="terms_of_service">Terms of Service</string>
-    <string name="facebook_app_id" translatable="false">353625811317277</string>
     <string name="exit_text">Press BACK again to exit</string>
+    <string name="nothing_to_show">Nothing to show</string>
+    <string name="empty_field"/>
+    <plurals name="plural_credits">
+        <item quantity="one">%1$d Credit</item>
+        <item quantity="other">%1$d Credits</item>
+    </plurals>
+    <plurals name="plural_days">
+        <item quantity="one">%1$d Day</item>
+        <item quantity="other">%1$d Days</item>
+    </plurals>
+
+    <!-- FB -->
+    <string name="facebook_app_id" translatable="false">353625811317277</string>
+    <string name="facebook_shout_list_ad_id" translatable="false">353625811317277_1245942718752244</string>
+    <string name="facebook_shout_grid_ad_id" translatable="false">353625811317277_1245949345418248</string>
+    <string name="facebook_shout_detail_ad_id" translatable="false">353625811317277_1249824038364112</string>
 
     <!-- Errors -->
     <string name="error_default">Ooops, something went wrong</string>
@@ -33,7 +48,7 @@
     <string name="image_video_capture_helper_sd_unmounted_title">Error</string>
 
     <!-- Intro -->
-    <string name="intro_welcome">Welcome To Shoutit</string>
+    <string name="intro_welcome">Buy &amp; Sell while Chatting</string>
     <string name="intro_buy">Buy and Sell while Chatting</string>
     <string name="intro_login">Login</string>
     <string name="intro_skip">Skip</string>
@@ -78,13 +93,15 @@
     <string name="register_empty_name">Name cannot be empty</string>
     <string name="register_have_an_account">Have an account?</string>
     <string name="register_log_in">Log in</string>
-    <string name="register_bottom_text1">By Proceeding you also agree to Shoutit’s</string>
-    <string name="register_bottom_text2">Terms of Service</string>
-    <string name="register_bottom_text3">and</string>
-    <string name="register_bottom_text4">Privacy Policy</string>
+    <string name="register_bottom_text">By Proceeding you also agree to Shoutit’s %1$s and %2$s</string>
+    <string name="register_bottom_text_terms_of_service">Terms of Service</string>
+    <string name="register_bottom_text_privacy_policy">Privacy Policy</string>
     <string name="register_forgot_password">Forgot your password?</string>
     <string name="register_next_label">Next</string>
     <string name="register_done_label">Done</string>
+    <string name="register_create_page_text">%1$s for brand or business</string>
+    <string name="register_create_page_highlight">Create a Page</string>
+
 
     <!-- Login Intro -->
     <string name="login_intro_join">Join Now!</string>
@@ -129,11 +146,14 @@
     <string name="menu_item_help">Help</string>
     <string name="menu_item_invite_friends">Invite Friends</string>
     <string name="menu_change_location">Change</string>
+    <string name="menu_shoutit_credit">Shoutit Credit</string>
     <string name="drawer_open">Open</string>
     <string name="drawer_close">Close</string>
     <string name="menu_guest">Guest</string>
     <string name="menu_item_logout">Logout</string>
     <string name="menu_version_name">Shoutit %1$s</string>
+    <string name="menu_use_as_format">Use Shoutit as %1$s</string>
+    <string name="menu_item_bookmarks">Saved</string>
 
     <!-- Post Login -->
     <string name="post_login_next">next</string>
@@ -201,6 +221,8 @@
     <string name="shout_bottom_bar_report">Report</string>
     <string name="shout_visit_profile">VISIT %1$s\'s PROFILE</string>
     <string name="shout_bottom_bar_delete">Delete</string>
+    <string name="shout_bottom_bar_promote">Promote</string>
+    <string name="shout_bottom_bar_promoted">Promoted</string>
     <string name="shout_bottom_bar_edit">Edit</string>
     <string name="shout_choose_video_app">Choose application</string>
 
@@ -248,6 +270,7 @@
     <string name="request_acitvity_post_error">Failed to post request</string>
     <string name="create_request_activity_title_too_short">Title must be at least 6 characters long</string>
     <string name="create_request_activity_price_empty">Price cannot be empty</string>
+    <string name="create_request_share_info">Earn 1 Shoutit Credit for each shout you publicly share on Facebook</string>
 
     <!-- Edit Shout -->
     <string name="edit_shout_option">Option</string>
@@ -272,6 +295,13 @@
     <string name="edit_profile_hint_username">Username</string>
     <string name="edit_profile_hint_bio">Bio</string>
     <string name="edit_profile_header_location">Location</string>
+    <string name="edit_profile_header_birthday">Birthday</string>
+    <string name="edit_profile_header_gender">Gender</string>
+    <string name="edit_profile_header_gender_not_specified">Not specified</string>
+    <string name="edit_profile_header_gender_male">Male</string>
+    <string name="edit_profile_header_gender_female">Female</string>
+    <string name="edit_profile_header_gender_other">Other</string>
+    <string name="edit_profile_header_birthday_hint">01/01/1970</string>
     <string name="edit_profile_location_change">Change</string>
     <string name="edit_profile_hint_website">Website</string>
     <string name="edit_profile_menu_save">Save</string>
@@ -281,11 +311,17 @@
     <string name="edit_profile_hint_last_name">Last Name</string>
     <string name="edit_profile_hint_mobile">Mobile</string>
     <string name="edit_done_btn">Edit</string>
+    <string name="edit_profile_complete_profile_message">Complete your profile to earn 1 Shoutit Credit</string>
+    <string-array name="genders">
+        <item>Male</item>
+        <item>Female</item>
+        <item>Other</item>
+        <item>Not specified</item>
+    </string-array>
 
     <!-- Published -->
     <string name="published_congratulations">Congratulations!</string>
     <string name="published_extra_info">Your %1$s will appear on Shoutit soon.</string>
-    <string name="published_extra_info_with_title">Your %1$s \"%2$s\" will appear on Shoutit soon.</string>
     <string name="published_add_details">Add more details</string>
     <string name="published_create_another_shout">Create another %1$s</string>
     <string name="published_or_label">or</string>
@@ -304,6 +340,8 @@
     <string name="post_signup_suggested_users">Suggested users</string>
     <string name="post_signup_suggested_pages">Suggested pages</string>
     <string name="post_signup_done">Done</string>
+    <string name="post_no_suggested_users">No suggested users</string>
+    <string name="post_no_suggested_pages">No suggested pages</string>
 
     <!-- Search -->
     <string name="search_base_title">Search</string>
@@ -379,6 +417,7 @@
     <string name="option_not_set">Not set</string>
     <string name="edit_shout_mobile_hint">Mobile</string>
     <string name="notifications_message_replacement">sends you a message</string>
+    <string name="notifications_no_notifications">Notifications not found</string>
 
     <!-- Video Calls -->
     <string name="video_calls_no_premissions">Camera and Microphone permissions needed.</string>
@@ -571,6 +610,7 @@
     <string name="user_suggestion_pages">Suggested Pages</string>
     <string name="user_suggestion_users">Suggested Users</string>
 
+
     <!-- Facebook friends -->
     <string name="facebook_friends_ab_title">Facebook friends</string>
     <string name="facebook_friends_no_friends">None of your friends has Shoutit yet. Go ahead and invite them!</string>
@@ -591,11 +631,126 @@
     <string name="invite_friends_twitter">Twitter</string>
     <string name="invite_friends_share">Share Shoutit App</string>
     <string name="invite_text">Join Shoutit on www.shoutit.com</string>
+    <string name="invite_text_fb">Join Shoutit</string>
     <string name="invite_chooser_text">Select app</string>
     <string name="invite_no_twitter_app">You need the Twitter app to be installed</string>
+    <string name="invite_friend_find_friend_dialog">Earn up to 10 Shoutit Credits for finding your friends and listening to them</string>
+    <string name="invite_friend_invite_friend_dialog">Earn 1 Shoutit Credit whenever a friend you invited signs up</string>
 
     <!-- Contacts fiends -->
     <string name="contacts_friends_ab_title">Contacts friends</string>
     <string name="invite_app_invite_text">Buy &amp; Sell while Chatting on #Shoutit App! Get it on shoutit.com/app</string>
     <string name="invite_error">Sorry, cannot send invitation</string>
+
+    <!-- Credits -->
+    <string name="credits_info">Shoutit credit is virtual currency that can be earned and spent while
+        using Shoutit.
+    </string>
+    <string name="credit_balance">Your balance</string>
+    <string name="credit_balance_hint">Click to view Transactions</string>
+    <string name="credit_profile">Complete your Profile</string>
+    <string name="credit_facebook">Sharing on Facebook</string>
+    <string name="credit_invite">Inviting Friends</string>
+    <string name="credit_listen">Listening to friends</string>
+    <string name="credit_promote">Promoting Shouts</string>
+    <string name="credits_spend_on">Spend On</string>
+    <string name="credit_earn_by">Earn By</string>
+
+    <string name="credits_complete_profile">Complete your profile to earn 1 Shoutit Credit</string>
+    <string name="credits_profile_positive">Complete Profile</string>
+    <string name="credits_facebook">Earn 1 Shoutit Credit for each shout you publicly share on
+        Facebook
+    </string>
+    <string name="credits_facebook_positive">Create Shout</string>
+    <string name="credits_invite">Earn 1 Shoutit Credit whenever a friend you invited signs up
+    </string>
+    <string name="credits_invite_positive">Invite Friends</string>
+    <string name="credits_listen">Earn up to 10 Shoutit Credits for finding your friends and
+        listening to them
+    </string>
+    <string name="credits_listen_positive">Find Friends</string>
+    <string name="credits_negative">Got it</string>
+
+    <!-- Promote Shout -->
+    <string name="promote_shout_info_header">Draw more attention to your Shouts by promoting them!
+    </string>
+    <string name="promote_shout_info_premium_header">Premium</string>
+    <string name="promote_shout_info_premium_text">Your shout will be highlighted in all searches.
+    </string>
+    <string name="promote_shout_info_footer">
+        <![CDATA[Promote each shout on your Profile individually by clicking <font color=#26ffd700>"Promote"</font>. To promote a shout you need to have enough Shoutit Credit.]]></string>
+    <string name="promote_shout_info_top_premium">Top Premium</string>
+    <string name="promote_shout_info_top">Top</string>
+    <string name="promote_shout_info_top_text">Your shout will appear on top of search results.
+    </string>
+    <string name="promote_shout_info_top_premium_text">Your shout will be highlighted and appear on
+        top of all searches
+    </string>
+    <string name="promote_shout_info_title">Promoting Shouts</string>
+    <string name="promote_available_credits">Available Shoutit Credit</string>
+    <string name="promote_ab_title">Promote Shout</string>
+    <string name="promote_not_enough_money">You don\'t have enough Shoutit Credit for this action</string>
+    <string name="promote_confirm_text">Confirm buying %1$s for %2$d credits</string>
+    <string name="promote_confirm_button">Confirm</string>
+
+    <!-- Transactions -->
+    <string name="transactions_title">Credit Transactions</string>
+    <string name="menu_item_pages">Pages</string>
+    <string name="menu_item_admins">Admins</string>
+
+    <!-- Shout Media Edit Dialog -->
+    <string name="shout_media_edit_dialog_delete">Delete</string>
+    <string name="shout_media_edit_dialog_change">Change</string>
+    <string name="shout_media_edit_dialog_edit">Edit</string>
+    <string name="shout_media_edit_dialog_title">Edit media</string>
+
+    <!-- Chat participants -->
+    <string name="chat_participants_promote_to_admin">Promote to admin</string>
+    <string name="chat_participants_remove_from_chat">Remove from chat</string>
+    <string name="chat_participants_view_profile">View Profile</string>
+
+    <!-- Chat Blocked -->
+    <string name="chat_blocked_unblock">Unblock user</string>
+
+    <!-- Chat Info -->
+    <string name="chat_info_activity_save">Save</string>
+    <string name="chat_info_activity_shouts">Shouts</string>
+    <string name="chat_info_activity_media">Media</string>
+    <string name="chat_info_activity_participants">Participants</string>
+    <string name="chat_info_activity_blocked">Blocked</string>
+    <string name="chat_info_activity_exit_chat">Exit Chat</string>
+
+    <!-- Pages -->
+    <string name="pages_my_pages_tab">My pages</string>
+    <string name="pages_public_pages_tab">Public pages</string>
+    <string name="pages_empty">No pages here</string>
+    <string name="pages_view_page">View Page</string>
+    <string name="pages_use_page">Use Shoutit as this Page</string>
+    <string name="pages_edit_page">Edit Page</string>
+    <string name="pages_create_page">Create page</string>
+
+    <!-- Admins -->
+    <string name="admins_view_profile">View Profile</string>
+    <string name="admins_remove_admin">Remove Admin</string>
+    <string name="admins_add_admin">Add Admin</string>
+
+    <!-- Create Page Category -->
+    <string name="create_page_category_header_text">
+        Give your brand, product or business a voice on Shoutit and connect easily with your current and potiential customers.\n\nIt\'s free to set up. Just choose a Page type to get started.
+    </string>
+    <string name="create_page_category_title">Create a Page</string>
+    <string name="create_page_details_header">Page Details</string>
+    <string name="create_page_details_name_hint">Name</string>
+    <string name="create_page_details_button">Create Page</string>
+    <string name="create_page_details_your_info_header">Your Info</string>
+    <string name="create_page_details_full_name_hint">Full Name</string>
+    <string name="create_page_details_email_hint">Email</string>
+    <string name="create_page_details_password_hint">Password</string>
+
+    <!-- Sponsored -->
+    <string name="ad_sponsored">Sponsored</string>
+
+    <!-- Bookmarks -->
+    <string name="bookmarks_no_bookmarks">You don\'t have any bookmarked shouts.</string>
+
 </resources>

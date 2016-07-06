@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black_6"
+        android:fillViewport="true"
+        android:paddingEnd="20dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingStart="20dp">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+
+                <TextView android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:layout_marginTop="10dp"
+                          android:text="@string/credits_info"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@android:color/white"
+                    android:elevation="2dp"
+                    android:orientation="vertical">
+
+                    <FrameLayout
+                        android:id="@+id/credit_balance"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:layout_gravity="center"
+                        android:background="?selectableItemBackground">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical|start"
+                            android:layout_marginLeft="12dp"
+                            android:layout_marginStart="12dp"
+                            android:src="@drawable/ic_credits"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="top|start"
+                            android:layout_marginLeft="60dp"
+                            android:layout_marginStart="60dp"
+                            android:layout_marginTop="10dp"
+                            android:text="@string/credit_balance"
+                            android:textColor="@color/black_87"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom|start"
+                            android:layout_marginBottom="10dp"
+                            android:layout_marginLeft="60dp"
+                            android:layout_marginStart="60dp"
+                            android:text="@string/credit_balance_hint"
+                            android:textSize="12sp"/>
+
+                        <TextView
+                            android:id="@+id/credit_number"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical|end"
+                            android:layout_marginBottom="10dp"
+                            android:layout_marginEnd="8dp"
+                            android:layout_marginRight="8dp"
+                            android:layout_marginTop="10dp"
+                            android:textColor="@color/colorAccent"
+                            tools:text="102"/>
+
+                    </FrameLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0.5dp"
+                        android:layout_marginEnd="10dp"
+                        android:layout_marginLeft="48dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginStart="48dp"
+                        android:background="@color/black_20"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/credit_earn_by"
+                    android:textAllCaps="true"
+                    android:textColor="@color/black_54"
+                    android:textSize="14sp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@android:color/white"
+                    android:elevation="2dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/credit_complete_profile"
+                        style="@style/InviteFriendsItem"
+                        android:layout_gravity="center_vertical|start"
+                        android:drawableLeft="@drawable/ic_profile"
+                        android:drawablePadding="16dp"
+                        android:drawableStart="@drawable/ic_profile"
+                        android:text="@string/credit_profile"/>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0.5dp"
+                        android:layout_marginEnd="10dp"
+                        android:layout_marginLeft="48dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginStart="48dp"
+                        android:background="@color/black_20"/>
+
+                    <TextView
+                        android:id="@+id/credit_facebook"
+                        style="@style/InviteFriendsItem"
+                        android:layout_gravity="center_vertical|start"
+                        android:drawableLeft="@drawable/ic_share_blue"
+                        android:drawablePadding="16dp"
+                        android:drawableStart="@drawable/ic_share_blue"
+                        android:text="@string/credit_facebook"/>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0.5dp"
+                        android:layout_marginEnd="10dp"
+                        android:layout_marginLeft="48dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginStart="48dp"
+                        android:background="@color/black_20"/>
+
+                    <TextView
+                        android:id="@+id/credit_invite_friends"
+                        style="@style/InviteFriendsItem"
+                        android:layout_gravity="center_vertical|start"
+                        android:drawableLeft="@drawable/contacts_icon"
+                        android:drawablePadding="16dp"
+                        android:drawableStart="@drawable/contacts_icon"
+                        android:text="@string/credit_invite"/>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0.5dp"
+                        android:layout_marginEnd="10dp"
+                        android:layout_marginLeft="48dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginStart="48dp"
+                        android:background="@color/black_20"/>
+
+                    <TextView
+                        android:id="@+id/credit_listen"
+                        style="@style/InviteFriendsItem"
+                        android:layout_gravity="center_vertical|start"
+                        android:drawableLeft="@drawable/ic_listening_on"
+                        android:drawablePadding="16dp"
+                        android:drawableStart="@drawable/ic_listening_on"
+                        android:text="@string/credit_listen"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/credits_spend_on"
+                    android:textAllCaps="true"
+                    android:textColor="@color/black_54"
+                    android:textSize="14sp"/>
+
+                <LinearLayout
+                    android:id="@+id/credit_promote_shout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@android:color/white"
+                    android:elevation="2dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/InviteFriendsItem"
+                        android:layout_gravity="center_vertical|start"
+                        android:drawableLeft="@drawable/ic_promote_shouts"
+                        android:drawablePadding="16dp"
+                        android:drawableStart="@drawable/ic_promote_shouts"
+                        android:text="@string/credit_promote"/>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0.5dp"
+                        android:layout_marginEnd="10dp"
+                        android:layout_marginLeft="48dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginStart="48dp"
+                        android:background="@color/black_20"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+    </ScrollView>
+
+</LinearLayout>

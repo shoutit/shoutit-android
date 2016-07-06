@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.home;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.appunite.rx.ObservableExtensions;
@@ -8,25 +9,29 @@ import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
+import com.facebook.ads.NativeAd;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.DiscoverChild;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
-import com.shoutit.app.android.api.model.User;
-import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.model.LocationPointer;
+import com.shoutit.app.android.utils.FBAdHalfPresenter;
+import com.shoutit.app.android.utils.BookmarkHelper;
 import com.shoutit.app.android.utils.MoreFunctions1;
+import com.shoutit.app.android.utils.PromotionHelper;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
@@ -40,8 +45,7 @@ import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Func1;
-import rx.functions.Func2;
-import rx.functions.Func3;
+import rx.functions.Func4;
 import rx.subjects.PublishSubject;
 
 public class HomePresenter {
@@ -84,30 +88,23 @@ public class HomePresenter {
                          @Nonnull final UserPreferences userPreferences,
                          @ForActivity final Context context,
                          @Nonnull @UiScheduler Scheduler uiScheduler,
-                         @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter) {
+                         @Nonnull FBAdHalfPresenter fbAdHalfPresenter,
+                         @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
+                         @NonNull BookmarksDao bookmarksDao,
+                         @NonNull BookmarkHelper bookmarkHelper) {
         this.uiScheduler = uiScheduler;
 
         final boolean isNormalUser = userPreferences.isNormalUser();
-        final User currentUser = userPreferences.getUser();
+        final BaseProfile currentUser = userPreferences.getUserOrPage();
         final String currentUserName = currentUser != null ? currentUser.getUsername() : null;
 
         final Observable<LocationPointer> locationObservable = userPreferences.getLocationObservable()
-                .map(new Func1<UserLocation, LocationPointer>() {
-                    @Override
-                    public LocationPointer call(UserLocation userLocation) {
-                        return new LocationPointer(userLocation.getCountry(), userLocation.getCity(), userLocation.getState());
-                    }
-                })
+                .map(userLocation -> new LocationPointer(userLocation.getCountry(), userLocation.getCity(), userLocation.getState()))
                 .compose(ObservableExtensions.<LocationPointer>behaviorRefCount());
 
         /** Shouts **/
         final Observable<ResponseOrError<ShoutsResponse>> shoutsRequestObservable = locationObservable
-                .switchMap(new Func1<LocationPointer, Observable<ResponseOrError<ShoutsResponse>>>() {
-                    @Override
-                    public Observable<ResponseOrError<ShoutsResponse>> call(LocationPointer locationPointer) {
-                        return shoutsDao.getHomeShoutsObservable(locationPointer);
-                    }
-                })
+                .switchMap(shoutsDao::getHomeShoutsObservable)
                 .compose(ObservableExtensions.<ResponseOrError<ShoutsResponse>>behaviorRefCount());
 
 
@@ -129,7 +126,12 @@ public class HomePresenter {
                                             public BaseAdapterItem apply(@Nullable Shout shout) {
                                                 assert shout != null;
                                                 final boolean isShoutOwner = shout.getProfile().getUsername().equals(currentUserName);
-                                                return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context, shoutSelectedObserver);
+                                                final BookmarkHelper.ShoutItemBookmarkHelper shoutItemBookmarkHelper = bookmarkHelper.getShoutItemBookmarkHelper();
+                                                return new ShoutAdapterItem(shout, isShoutOwner,
+                                                        isNormalUser, context, shoutSelectedObserver,
+                                                        PromotionHelper.promotionInfoOrNull(shout),
+                                                        bookmarksDao.getBookmarkForShout(shout.getId(), shout.isBookmarked()),
+                                                        shoutItemBookmarkHelper.getObserver(), shoutItemBookmarkHelper.getEnableObservable());
                                             }
                                         });
 
@@ -143,62 +145,44 @@ public class HomePresenter {
                             return ImmutableList.of();
                         }
                     }
-                });
+                })
+                .doOnNext(fbAdHalfPresenter::updatedShoutsCount);
 
         /** Discovers **/
         final Observable<ResponseOrError<DiscoverResponse>> discoverRequestObservable = locationObservable
-                .switchMap(new Func1<LocationPointer, Observable<ResponseOrError<DiscoverResponse>>>() {
-                    @Override
-                    public Observable<ResponseOrError<DiscoverResponse>> call(LocationPointer locationPointer) {
-                        return discoversDao.getDiscoverObservable(locationPointer);
-                    }
-                })
+                .switchMap(discoversDao::getDiscoverObservable)
                 .compose(ObservableExtensions.<ResponseOrError<DiscoverResponse>>behaviorRefCount());
 
         final Observable<Optional<String>> mainDiscoverIdObservable = discoverRequestObservable
                 .compose(ResponseOrError.<DiscoverResponse>onlySuccess())
-                .filter(new Func1<DiscoverResponse, Boolean>() {
-                    @Override
-                    public Boolean call(DiscoverResponse discoverResponse) {
-                        return discoverResponse != null && discoverResponse.getDiscovers() != null &&
-                                !discoverResponse.getDiscovers().isEmpty();
-                    }
-                })
-                .map(new Func1<DiscoverResponse, Optional<String>>() {
-                    @Override
-                    public Optional<String> call(DiscoverResponse response) {
-                        if (response.getDiscovers() == null || response.getDiscovers().isEmpty()) {
-                            return Optional.absent();
-                        } else {
-                            return Optional.of(response.getDiscovers().get(0).getId());
-                        }
+                .filter(discoverResponse -> discoverResponse != null && discoverResponse.getDiscovers() != null &&
+                        !discoverResponse.getDiscovers().isEmpty())
+                .map((Func1<DiscoverResponse, Optional<String>>) response -> {
+                    if (response.getDiscovers() == null || response.getDiscovers().isEmpty()) {
+                        return Optional.absent();
+                    } else {
+                        return Optional.of(response.getDiscovers().get(0).getId());
                     }
                 });
 
         final Observable<ResponseOrError<DiscoverItemDetailsResponse>> discoverItemDetailsObservable = mainDiscoverIdObservable
                 .filter(MoreFunctions1.<String>isPresent())
-                .switchMap(new Func1<Optional<String>, Observable<ResponseOrError<DiscoverItemDetailsResponse>>>() {
-                    @Override
-                    public Observable<ResponseOrError<DiscoverItemDetailsResponse>> call(Optional<String> discoverId) {
-                        if (discoverId.isPresent()) {
-                            return discoversDao.getDiscoverItemDao(discoverId.get()).getDiscoverItemObservable();
-                        } else {
-                            return Observable.just(ResponseOrError.<DiscoverItemDetailsResponse>fromError(new Throwable()));
-                        }
+                .switchMap(discoverId -> {
+                    if (discoverId.isPresent()) {
+                        return discoversDao.getDiscoverItemDao(discoverId.get()).getDiscoverItemObservable();
+                    } else {
+                        return Observable.just(ResponseOrError.<DiscoverItemDetailsResponse>fromError(new Throwable()));
                     }
                 })
                 .compose(ObservableExtensions.<ResponseOrError<DiscoverItemDetailsResponse>>behaviorRefCount());
 
         final Observable<List<DiscoverChild>> childDiscoversObservable =
                 discoverItemDetailsObservable
-                        .map(new Func1<ResponseOrError<DiscoverItemDetailsResponse>, List<DiscoverChild>>() {
-                            @Override
-                            public List<DiscoverChild> call(ResponseOrError<DiscoverItemDetailsResponse> discoverItemDetailsResponse) {
-                                if (discoverItemDetailsResponse.isData()) {
-                                    return discoverItemDetailsResponse.data().getChildren();
-                                } else {
-                                    return ImmutableList.of();
-                                }
+                        .map((Func1<ResponseOrError<DiscoverItemDetailsResponse>, List<DiscoverChild>>) discoverItemDetailsResponse -> {
+                            if (discoverItemDetailsResponse.isData()) {
+                                return discoverItemDetailsResponse.data().getChildren();
+                            } else {
+                                return ImmutableList.of();
                             }
                         });
 
@@ -219,27 +203,28 @@ public class HomePresenter {
                     }
                 });
 
+        // Layout manager changes
+        linearLayoutManagerObservable = layoutManagerSwitchObserver
+                .scan(false, (prev, o) -> !prev)
+                .skip(1)
+                .observeOn(uiScheduler);
 
         /** Combines adapter items **/
         allAdapterItemsObservable = Observable.combineLatest(
                 locationObservable,
                 allDiscoverAdapterItems,
                 allShoutAdapterItems,
-                new Func3<LocationPointer, List<BaseAdapterItem>, List<BaseAdapterItem>, List<BaseAdapterItem>>() {
-                    @Override
-                    public List<BaseAdapterItem> call(LocationPointer locationPointer,
-                                                      List<BaseAdapterItem> discovers,
-                                                      List<BaseAdapterItem> shouts) {
-                        final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
-                        if (!discovers.isEmpty()) {
-                            builder.add(new DiscoverHeaderAdapterItem(locationPointer.getCity()))
-                                    .add(new DiscoverContainerAdapterItem(discovers, locationPointer));
-                        }
-
-                        return builder
-                                .addAll(shouts)
-                                .build();
+                fbAdHalfPresenter.getAdsObservable(linearLayoutManagerObservable).startWith(ImmutableList.<NativeAd>of()),
+                (Func4<LocationPointer, List<BaseAdapterItem>, List<BaseAdapterItem>, List<NativeAd>, List<BaseAdapterItem>>) (locationPointer, discovers, shouts, ads) -> {
+                    final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
+                    if (!discovers.isEmpty()) {
+                        builder.add(new DiscoverHeaderAdapterItem(locationPointer.getCity()))
+                                .add(new DiscoverContainerAdapterItem(discovers, locationPointer));
                     }
+
+                    return builder
+                            .addAll(FBAdHalfPresenter.combineShoutsWithAds(shouts, ads))
+                            .build();
                 })
                 .filter(MoreFunctions1.<BaseAdapterItem>listNotEmpty())
                 .observeOn(uiScheduler);
@@ -258,34 +243,17 @@ public class HomePresenter {
                 .map(Functions1.returnFalse())
                 .observeOn(uiScheduler);
 
-        // Layout manager changes
-        linearLayoutManagerObservable = layoutManagerSwitchObserver
-                .scan(false, new Func2<Boolean, Object, Boolean>() {
-                    @Override
-                    public Boolean call(Boolean prev, Object o) {
-                        return !prev;
-                    }
-                })
-                .skip(1)
-                .observeOn(uiScheduler);
-
         refreshShoutsObservable = shoutsGlobalRefreshPresenter
                 .getShoutsGlobalRefreshObservable()
-                .withLatestFrom(locationObservable, new Func2<Object, LocationPointer, Object>() {
-                    @Override
-                    public Object call(Object o, LocationPointer locationPointer) {
-                        shoutsDao.getHomeShoutsRefreshObserver(locationPointer).onNext(null);
-                        return null;
-                    }
+                .withLatestFrom(locationObservable, (o, locationPointer) -> {
+                    shoutsDao.getHomeShoutsRefreshObserver(locationPointer).onNext(null);
+                    return null;
                 });
 
         loadMoreObservable = loadMoreShoutsSubject
-                .withLatestFrom(locationObservable, new Func2<Object, LocationPointer, Object>() {
-                    @Override
-                    public Object call(Object o, LocationPointer locationPointer) {
-                        shoutsDao.getLoadMoreHomeShoutsObserver(locationPointer).onNext(null);
-                        return null;
-                    }
+                .withLatestFrom(locationObservable, (o, locationPointer) -> {
+                    shoutsDao.getLoadMoreHomeShoutsObserver(locationPointer).onNext(null);
+                    return null;
                 });
     }
 

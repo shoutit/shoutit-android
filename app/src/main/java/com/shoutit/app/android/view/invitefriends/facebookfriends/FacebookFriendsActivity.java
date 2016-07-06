@@ -3,18 +3,17 @@ package com.shoutit.app.android.view.invitefriends.facebookfriends;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.facebook.CallbackManager;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
-import com.shoutit.app.android.utils.ColoredSnackBar;
-import com.shoutit.app.android.view.invitefriends.InviteFriendsFragment;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.profileslist.BaseProfilesListActivity;
@@ -42,7 +41,8 @@ public class FacebookFriendsActivity extends BaseProfilesListActivity {
         presenter = (FacebookFriendsPresenter) ((FacebookFriendsActivityComponent)
                 getActivityComponent()).profilesListPresenter();
 
-        presenter.getProfileToOpenObservable()
+        presenter.getProfileSelectedObservable()
+                .map(BaseProfile::getUsername)
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(userName -> {
                     startActivityForResult(
@@ -53,21 +53,18 @@ public class FacebookFriendsActivity extends BaseProfilesListActivity {
         presenter.getPermissionsNotGrantedObservable()
                 .compose(this.<Boolean>bindToLifecycle())
                 .subscribe(ignore -> {
-                    ColoredSnackBar.error(ColoredSnackBar.contentView(FacebookFriendsActivity.this),
-                            R.string.facebook_friends_permission_error, Snackbar.LENGTH_LONG).show();
+                    Toast.makeText(this, R.string.facebook_friends_permission_error, Toast.LENGTH_LONG).show();
+                    finish();
                 });
 
-        presenter.getOpenInviteClickedObservable()
+        presenter.getInvitationCodeObservable()
                 .compose(bindToLifecycle())
-                .subscribe(o -> {
-                    FacebookHelper.showAppInviteDialog(this, InviteFriendsFragment.SHARE_FACEBOOK_APP_LINK_URL, callbackManager);
+                .subscribe(invitationCode -> {
+                    FacebookHelper.showAppInviteDialog(this,
+                            FacebookHelper.FACEBOOK_SHARE_APP_LINK,
+                            callbackManager,
+                            invitationCode);
                 });
-
-        presenter.getActionOnlyForLoggedInUser()
-                .compose(bindToLifecycle())
-                .subscribe(ColoredSnackBar.errorSnackBarAction(
-                        ColoredSnackBar.contentView(this),
-                        R.string.error_action_only_for_logged_in_user));
     }
 
     protected void setUpToolbar() {

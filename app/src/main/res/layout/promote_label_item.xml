@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:layout_height="90dp">
+
+    <View
+        android:id="@+id/promote_label_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:background="#26ffd700" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/shape_promote_stroke" />
+
+    <TextView
+        android:id="@+id/promote_label_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/promote_label_badge_tv"
+        android:layout_marginTop="4dp"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:maxLines="3"
+        android:paddingBottom="4dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:textColor="@color/promote_text"
+        tools:text="Your shout will be highlighted in all searches. dfsdf sd dsfdsfds sdfdsf ds dsfdsfdsfdsf dsfdsf dsfdsfdsfdsf sdfdsf dfsdfdsf dsfsdfsdfdsfdsf dsfsdfdsfdsfdsfsfdsf" />
+
+    <TextView
+        android:id="@+id/promote_label_badge_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="28dp"
+        android:background="@drawable/shape_yellow_promote_badge"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:minWidth="120dp"
+        android:paddingBottom="3dp"
+        android:paddingLeft="6dp"
+        android:paddingRight="6dp"
+        android:paddingTop="3dp"
+        android:text="Premium"
+        android:textAllCaps="true"
+        android:textColor="@android:color/white"
+        android:textSize="16sp" />
+
+</RelativeLayout>

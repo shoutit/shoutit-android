@@ -117,6 +117,8 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
                 userPreferences.getUser(), FacebookHelper.PERMISSION_PUBLISH_ACTIONS));
         RtlUtils.setTextDirection(this, facebookCheckbox);
 
+        showShareInfoDialogIfNeeded();
+
         mAdapter = new SimpleCurrencySpinnerAdapter(R.string.request_activity_currency, this);
         mCreateRequestSpinner.setAdapter(mAdapter);
 
@@ -160,6 +162,13 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
         });
     }
 
+    private void showShareInfoDialogIfNeeded() {
+        if (!userPreferences.wasShareDialogAlreadyDisplayed() && !facebookCheckbox.isChecked()) {
+            DialogsHelper.showShareInfoDialog(this);
+            userPreferences.setShareDialogDisplayed();
+        }
+    }
+
     @Override
     protected void onDestroy() {
         mCreateRequestPresenter.unregister();
@@ -186,6 +195,11 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
     @OnClick(R.id.create_request_location_btn)
     public void onLocationClick() {
         startActivityForResult(LocationActivity.newIntent(this), LOCATION_REQUEST);
+    }
+
+    @OnClick(R.id.create_request_credits_info_iv)
+    public void onCreditsInfoClick() {
+        DialogsHelper.showShareInfoDialog(this);
     }
 
     @Override

@@ -46,6 +46,7 @@
     <dimen name="shout_item_padding">6dp</dimen>
     <dimen name="shout_related_item_spacing">1dp</dimen>
     <dimen name="shout_bottom_bar">48dp</dimen>
+    <dimen name="last_item_margin">52dp</dimen>
 
     <!-- Profile fragment -->
     <dimen name="profile_side_spacing">6dp</dimen>
@@ -84,5 +85,8 @@
 
     <!-- Call Dialog -->
     <dimen name="call_dialog_avatar_corners">2dp</dimen>
+
+    <!-- Promote -->
+    <dimen name="promote_label_radius">5dp</dimen>
 
 </resources>

@@ -26,7 +26,6 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import rx.functions.Action1;
 
 public abstract class BaseProfilesListActivity extends BaseActivity {
 
@@ -37,10 +36,10 @@ public abstract class BaseProfilesListActivity extends BaseActivity {
     @Bind(R.id.profiles_list_recycler_view)
     RecyclerView recyclerView;
     @Bind(R.id.base_progress)
-    View progressView;
+    protected View progressView;
 
     @Inject
-    ProfilesListPresenter presenter;
+    BaseProfileListPresenter presenter;
     @Inject
     ProfilesListAdapter adapter;
 
@@ -69,23 +68,31 @@ public abstract class BaseProfilesListActivity extends BaseActivity {
 
         presenter.getListenSuccessObservable()
                 .compose(this.<String>bindToLifecycle())
-                .doOnNext(new Action1<String>() {
-                    @Override
-                    public void call(String s) {
-                        setResult(RESULT_OK);
-                    }
-                })
+                .doOnNext(s -> setResult(RESULT_OK))
                 .subscribe(RxUtils.listenMessageAction(this));
 
         presenter.getUnListenSuccessObservable()
                 .compose(this.<String>bindToLifecycle())
-                .doOnNext(new Action1<String>() {
-                    @Override
-                    public void call(String s) {
-                        setResult(RESULT_OK);
-                    }
-                })
+                .doOnNext(s -> setResult(RESULT_OK))
                 .subscribe(RxUtils.unListenMessageAction(this));
+
+        presenter.getLoadMoreObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
+
+        presenter.getRefreshDataObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
+
+        presenter.getListeningObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
+
+        presenter.getActionOnlyForLoggedInUsers()
+                .compose(bindToLifecycle())
+                .subscribe(ColoredSnackBar.errorSnackBarAction(
+                        ColoredSnackBar.contentView(this),
+                        R.string.error_action_only_for_logged_in_user));
 
         RxRecyclerView.scrollEvents(recyclerView)
                 .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())

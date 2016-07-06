@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
@@ -12,7 +13,6 @@ import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
-import com.shoutit.app.android.utils.RtlUtils;
 import com.shoutit.app.android.view.signin.register.RegisterFragment;
 
 import javax.annotation.Nonnull;
@@ -48,10 +48,13 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void setUpActionBar() {
-        toolbar.setNavigationIcon(RtlUtils.isRtlEnabled(this) ?
-                R.drawable.ic_blue_arrow_rtl : R.drawable.ic_blue_arrow);
+        toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(null);
+        final ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(null);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayUseLogoEnabled(true);
+        actionBar.setLogo(R.drawable.appbar_logo_white);
     }
 
     @Override

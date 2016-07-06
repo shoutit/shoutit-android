@@ -34,13 +34,12 @@ import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.utils.LayoutManagerHelper;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyGridLayoutManager;
-import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.filter.FiltersFragment;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.shout.ShoutActivity;
+import com.shoutit.app.android.view.shouts_list_common.SimpleShoutsAdapter;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -76,7 +75,7 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
     @Inject
     SearchShoutsResultsPresenter presenter;
     @Inject
-    SearchShoutsResultsAdapter adapter;
+    SimpleShoutsAdapter adapter;
 
     private ActionBarDrawerToggle drawerToggle;
     private SearchPresenter.SearchType searchType;
@@ -207,9 +206,11 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
                 if (layoutSwitchIcon.isChecked()) {
                     layoutSwitchIcon.setBackground(getResources().getDrawable(R.drawable.ic_grid_switch));
                     setLinearLayoutManager();
+                    presenter.setLinearLayoutManager(true);
                 } else {
                     layoutSwitchIcon.setBackground(getResources().getDrawable(R.drawable.ic_list_switch));
                     setGridLayoutManager();
+                    presenter.setLinearLayoutManager(false);
                 }
             }
         });

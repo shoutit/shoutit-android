@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.profile.tagprofile;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
@@ -8,8 +9,10 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.dagger.ActivityScope;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.TagsDao;
+import com.shoutit.app.android.utils.BookmarkHelper;
 import com.shoutit.app.android.view.profile.ProfilePresenter;
 
 import javax.annotation.Nonnull;
@@ -33,8 +36,10 @@ public class TagProfileActivityModule {
     public ProfilePresenter provideTagProfilePresenter(TagsDao tagsDao, ShoutsDao shoutsDao, @ForActivity Context context,
                                                        @UiScheduler Scheduler uiScheduler,
                                                        @NetworkScheduler Scheduler networkScheduler, ApiService apiService,
-                                                       UserPreferences userPreferences) {
+                                                       UserPreferences userPreferences,
+                                                       BookmarksDao bookmarksDao,
+                                                       BookmarkHelper bookmarkHelper) {
         return new TagProfilePresenter(tagsDao, shoutsDao, slugName, uiScheduler, networkScheduler,
-                apiService, context, userPreferences);
+                apiService, context, userPreferences, bookmarksDao, bookmarkHelper);
     }
 }

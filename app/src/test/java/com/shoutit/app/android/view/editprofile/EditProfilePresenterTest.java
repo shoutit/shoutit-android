@@ -42,7 +42,7 @@ public class EditProfilePresenterTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        when(userPreferences.getUserObservable()).thenReturn(Observable.just(getUser()));
+        when(userPreferences.getPageOrUserObservable()).thenReturn(Observable.just(getUser()));
 
         when(apiService.updateUser(any(UpdateUserRequest.class)))
                 .thenReturn(Observable.just(getUser()));
@@ -73,6 +73,6 @@ public class EditProfilePresenterTest {
 
     private User getUser() {
         return new User("z", null, null, null, null, null, null, null, false, null,
-                null, false, false, false, null, 1, null, null, null, 1, null, false, null, null, null, null, null, null, null);
+                null, false, false, false, null, 1, null, 1, null, false, null, null, null, null, null, null, null, null, null, null);
     }
 }

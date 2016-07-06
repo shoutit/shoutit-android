@@ -17,7 +17,6 @@ import com.shoutit.app.android.utils.ImageHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.utils.TextHelper;
-import com.shoutit.app.android.view.listenings.ListeningsActivity;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -150,6 +149,10 @@ public class ProfileViewHolders {
         TextView verifyAccountButton;
         @Bind(R.id.profile_notification_badge_tv)
         TextView notificationsBadgeTv;
+        @Bind(R.id.profile_profile_badge_tv)
+        TextView profileBadgeTv;
+        @Bind(R.id.profile_edit_profile_container)
+        View editProfileContainer;
 
         private ProfileAdapterItems.MyUserNameAdapterItem item;
         private Subscription subscription;
@@ -168,6 +171,8 @@ public class ProfileViewHolders {
             userName.setText(user.getName());
             userNick.setText(user.getUsername());
 
+            editProfileContainer.setVisibility(user.isUser() ? View.VISIBLE : View.GONE);
+
             if (user.isOwner() && !user.isActivated()) {
                 verifyAccountButton.setVisibility(View.VISIBLE);
             } else {
@@ -182,6 +187,8 @@ public class ProfileViewHolders {
                             notificationsBadgeTv.setText(String.valueOf(notificationsCount));
                         }
                     });
+
+            profileBadgeTv.setVisibility(item.shouldShowProfileBadge() ? View.VISIBLE : View.GONE);
         }
 
         @OnClick({R.id.profile_notification_badge_tv, R.id.profile_notification_iv})

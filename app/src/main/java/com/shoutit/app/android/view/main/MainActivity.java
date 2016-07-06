@@ -25,7 +25,7 @@ import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
-import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dao.ProfilesDao;
@@ -52,7 +52,6 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
 
 public class MainActivity extends BaseActivity implements OnMenuItemSelectedListener,
@@ -117,6 +116,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
         setUpActionBar();
         setUpDrawer();
+        refreshUser();
 
         if (savedInstanceState == null) {
             getSupportFragmentManager()
@@ -135,6 +135,9 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
         if (mUserPreferences.isNormalUser()) {
             subscribeToStats();
         }
+
+        mixPanel.initMixPanel(); // Workaround for mixpanel people id issue
+        mixPanel.showNotificationIfAvailable(this);
     }
 
     @Override
@@ -150,29 +153,31 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
         }
     }
 
+    private void refreshUser() {
+        if (!mUserPreferences.isNormalUser()) {
+            return;
+        }
+
+        profilesDao.updateUser()
+                .subscribe(user -> {
+                    mUserPreferences.setUserOrPage(user);
+                });
+    }
+
     private void subscribeToStats() {
         mStatsSubscription.add(mPusherHelper.getStatsObservable()
                 .compose(this.<Stats>bindToLifecycle())
-                .subscribe(new Action1<Stats>() {
-                    @Override
-                    public void call(Stats pusherStats) {
-                        menuHandler.setStats(pusherStats.getUnreadConversationsCount(), pusherStats.getUnreadNotifications());
-                    }
+                .subscribe(pusherStats -> {
+                    menuHandler.setStats(pusherStats.getUnreadConversationsCount(), pusherStats.getUnreadNotifications());
                 }));
-        mStatsSubscription.add(mUserPreferences.getUserObservable()
+        mStatsSubscription.add(mUserPreferences.getPageOrUserObservable()
                 .filter(Functions1.isNotNull())
                 .distinctUntilChanged()
-                .compose(this.<User>bindToLifecycle())
-                .subscribe(new Action1<User>() {
-                    @Override
-                    public void call(User user) {
-                        menuHandler.setStats(user.getUnreadConversationsCount(), user.getUnreadNotificationsCount());
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        LogHelper.logThrowable(TAG, "error", throwable);
-                    }
+                .compose(this.<BaseProfile>bindToLifecycle())
+                .subscribe(user -> {
+                    menuHandler.setStats(user.getUnreadConversationsCount(), user.getUnreadNotificationsCount());
+                }, throwable -> {
+                    LogHelper.logThrowable(TAG, "error", throwable);
                 }));
     }
 
@@ -206,6 +211,9 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
         }
     }
 
+    public void changeMenuItem(String tag) {
+        menuHandler.selectMenuItem(tag);
+    }
 
     private boolean showMainSearchActivityOrLetFragmentsHandleIt() {
         final Fragment fragment = Iterables.getLast(getSupportFragmentManager().getFragments());
@@ -256,8 +264,13 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
     @Override
     public void onMenuItemSelected(@Nonnull String fragmentTag) {
-        if (MenuHandler.FRAGMENT_CHATS.equals(fragmentTag) && !mUserPreferences.isNormalUser()) {
-            startActivity(LoginActivity.newIntent(MainActivity.this));
+        if (!mUserPreferences.isNormalUser()) {
+            if (MenuHandler.FRAGMENT_CHATS.equals(fragmentTag) || MenuHandler.FRAGMENT_CREDITS.equals(fragmentTag)) {
+                {
+                    startActivity(LoginActivity.newIntent(MainActivity.this));
+                    return;
+                }
+            }
         }
 
         final FragmentManager fragmentManager = getSupportFragmentManager();
@@ -299,17 +312,15 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        for (Fragment fragment : getSupportFragmentManager().getFragments()) {
-            if (MenuHandler.FRAGMENT_INVITE_FRIENDS.equals(fragment.getTag())) {
-                fragment.onActivityResult(requestCode, resultCode, data);
-                break;
-            }
-        }
-
         if (resultCode == Activity.RESULT_OK && requestCode == REQUST_CODE_PLAY_SERVICES_CHECK) {
             registerToGcm();
         } else {
             super.onActivityResult(requestCode, resultCode, data);
+        }
+
+        for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+            fragment.onActivityResult(requestCode, resultCode, data);
+            break;
         }
     }
 
@@ -320,7 +331,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
             if (permissionsGranted) {
                 ColoredSnackBar.success(findViewById(android.R.id.content), R.string.permission_granted, Snackbar.LENGTH_SHORT).show();
             } else {
-                ColoredSnackBar.error(findViewById(android.R.id.content), R.string.permission_not_granted, Snackbar.LENGTH_SHORT);
+                ColoredSnackBar.error(findViewById(android.R.id.content), R.string.permission_not_granted, Snackbar.LENGTH_SHORT).show();
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);

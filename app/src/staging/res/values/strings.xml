@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Shoutit Staging</string>
     <string name="facebook_app_id" translatable="false">1151546964858487</string>
+
+    <string name="facebook_shout_list_ad_id" translatable="false">1151546964858487_1245960495417133</string>
+    <string name="facebook_shout_grid_ad_id" translatable="false">1151546964858487_1245960432083806</string>
+    <string name="facebook_shout_detail_ad_id" translatable="false">1151546964858487_1249823215030861</string>
 </resources>

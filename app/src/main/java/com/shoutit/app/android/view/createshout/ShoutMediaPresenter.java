@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 import com.appunite.rx.functions.BothParams;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
@@ -29,9 +28,6 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import rx.Observable;
-import rx.functions.Action1;
-import rx.functions.Func2;
-import rx.functions.FuncN;
 import rx.subscriptions.CompositeSubscription;
 
 public class ShoutMediaPresenter {
@@ -39,6 +35,24 @@ public class ShoutMediaPresenter {
     private static final String TAG = ShoutMediaPresenter.class.getSimpleName();
 
     private boolean mIsOffer;
+
+    private void swapImage(int position, String newUrl) {
+        mediaItems.remove(position);
+        mediaItems.forcePut(position, new ImageItem(String.format("file://%1$s", newUrl)));
+        mMediaListener.setImages(mediaItems);
+    }
+
+    private void swapVideo(int position, String newUrl) {
+        mediaItems.remove(position);
+        if (notifyIfCannotAddVideo()) return;
+
+        final File videoThumbnail = getThumbnail(newUrl);
+
+        final int videoLength = MediaUtils.getVideoLength(context, newUrl);
+        putVideoItem(position, newUrl, videoThumbnail, videoLength);
+
+        mMediaListener.setImages(mediaItems);
+    }
 
     public interface Item {
 
@@ -82,17 +96,24 @@ public class ShoutMediaPresenter {
             mThumb = media;
         }
 
-        @Override
-        public void click() {
-            removeItem(this);
-        }
-
         public String getThumb() {
             return mThumb;
         }
     }
 
-    public class ImageItem extends MediaItem {
+    public abstract class AbstractImageItem extends MediaItem {
+
+        public AbstractImageItem(@Nullable String media) {
+            super(media);
+        }
+
+        @Override
+        public void click() {
+            showImageDialog(mediaItems.inverse().get(this), getThumb());
+        }
+    }
+
+    public class ImageItem extends AbstractImageItem {
 
         public ImageItem(@NonNull String media) {
             super(media);
@@ -102,9 +123,10 @@ public class ShoutMediaPresenter {
         public boolean isRemote() {
             return false;
         }
+
     }
 
-    public class RemoteImageItem extends MediaItem {
+    public class RemoteImageItem extends AbstractImageItem {
 
         public RemoteImageItem(@NonNull String media) {
             super(media);
@@ -125,6 +147,11 @@ public class ShoutMediaPresenter {
             super(media);
             this.video = video;
             this.duration = duration;
+        }
+
+        @Override
+        public void click() {
+            showVideoDialog(mediaItems.inverse().get(this));
         }
 
         public String getVideo() {
@@ -188,9 +215,21 @@ public class ShoutMediaPresenter {
         mAmazonHelper = amazonHelper;
     }
 
-    private void removeItem(@NonNull Item imageItem) {
+    private void showImageDialog(int position, String thumb) {
+        mMediaListener.showImageDialog(position, thumb);
+    }
+
+    private void showVideoDialog(int position) {
+        mMediaListener.showVideoDialog(position);
+    }
+
+    public void removeItem(int position) {
+        removeItem(mediaItems.get(position));
+    }
+
+    private void removeItem(@NonNull Item mediaItem) {
         final Integer firstAvailablePosition = MoreObjects.firstNonNull(getFirstAvailablePosition(), mediaItems.values().size());
-        final Integer position = mediaItems.inverse().get(imageItem);
+        final Integer position = mediaItems.inverse().get(mediaItem);
 
         for (int i = position + 1; i < firstAvailablePosition; i++) {
             final Item item = mediaItems.get(i);
@@ -235,25 +274,22 @@ public class ShoutMediaPresenter {
         }
     }
 
-    private void addLocalVideoItem(@NonNull String media) {
-        if (!canAddVideo()) {
-            mMediaListener.onlyOneVideoAllowedAlert();
-            return;
+    public void swapMediaItem(int position, @NonNull String media, boolean isVideo) {
+        if (isVideo) {
+            swapVideo(position, media);
+        } else {
+            swapImage(position, media);
         }
+    }
+
+    private void addLocalVideoItem(@NonNull String media) {
+        if (notifyIfCannotAddVideo()) return;
 
         final Integer position = getFirstAvailablePositionAndCheck();
-        File videoThumbnail = null;
-        try {
-            videoThumbnail = MediaUtils.createVideoThumbnail(context, Uri.parse(media));
-        } catch (IOException e) {
-            mMediaListener.thumbnailCreateError();
-        }
+        final File videoThumbnail = getThumbnail(media);
 
         final int videoLength = MediaUtils.getVideoLength(context, media);
-        mediaItems.put(position, new LocalVideoItem(
-                videoThumbnail != null ? String.format("file://%1$s", videoThumbnail.getAbsolutePath()) : null,
-                media,
-                videoLength));
+        putVideoItem(position, media, videoThumbnail, videoLength);
 
         if (position + 1 < mediaItems.values().size()) {
             mediaItems.put(position + 1, new AddImageItem());
@@ -286,12 +322,7 @@ public class ShoutMediaPresenter {
     }
 
     private boolean canAddVideo() {
-        final boolean hasVideo = Iterables.any(mediaItems.values(), new Predicate<Item>() {
-            @Override
-            public boolean apply(@Nullable Item input) {
-                return input instanceof LocalVideoItem || input instanceof RemoteVideoItem;
-            }
-        });
+        final boolean hasVideo = Iterables.any(mediaItems.values(), input -> input instanceof LocalVideoItem || input instanceof RemoteVideoItem);
         return !hasVideo;
     }
 
@@ -321,12 +352,7 @@ public class ShoutMediaPresenter {
                 final LocalVideoItem localVideoItem = (LocalVideoItem) item;
                 final Observable<String> videoFileObservable = mAmazonHelper.uploadShoutMediaVideoObservable(AmazonHelper.getfileFromPath(localVideoItem.getVideo()));
                 final Observable<String> thumbFileObservable = mAmazonHelper.uploadShoutMediaImageObservable(AmazonHelper.getfileFromPath(localVideoItem.getThumb()));
-                videoObservable = Observable.zip(videoFileObservable, thumbFileObservable, new Func2<String, String, Video>() {
-                    @Override
-                    public Video call(String video, String thumb) {
-                        return Video.createVideo(video, thumb, localVideoItem.getDuration());
-                    }
-                });
+                videoObservable = Observable.zip(videoFileObservable, thumbFileObservable, (video, thumb) -> Video.createVideo(video, thumb, localVideoItem.getDuration()));
             } else if (item instanceof ImageItem) {
                 final ImageItem imageItem = (ImageItem) item;
                 imageObservables.add(mAmazonHelper.uploadShoutMediaImageObservable(AmazonHelper.getfileFromPath(imageItem.getThumb())));
@@ -348,30 +374,21 @@ public class ShoutMediaPresenter {
                 getAllEditedImagesAndComplete(ImmutableList.<String>of(), ImmutableList.<Video>of());
             }
         } else {
-            final Observable<List<String>> images = Observable.zip(imageObservables, new FuncN<List<String>>() {
-
-                @Override
-                public List<String> call(Object... args) {
-                    final List<String> images = Lists.newArrayList();
-                    for (Object url : args) {
-                        images.add((String) url);
-                    }
-                    return images;
+            final Observable<List<String>> images = Observable.zip(imageObservables, args -> {
+                final List<String> images1 = Lists.newArrayList();
+                for (Object url : args) {
+                    images1.add((String) url);
                 }
+                return images1;
             });
 
             if (videoObservable == null) {
-                mCompositeSubscription.add(images.subscribe(new Action1<List<String>>() {
-                    @Override
-                    public void call(List<String> images) {
-                        getAllEditedImagesAndComplete(images, ImmutableList.<Video>of());
-                    }
+                mCompositeSubscription.add(images.subscribe(images1 -> {
+                    getAllEditedImagesAndComplete(images1, ImmutableList.<Video>of());
                 }));
             } else {
                 mCompositeSubscription.add(images.zipWith(
-                        videoObservable, (images1, video) -> {
-                            return BothParams.of(images1, video);
-                        })
+                        videoObservable, BothParams::of)
                         .subscribe(listBothParamsBothParams -> {
                             getAllEditedImagesAndComplete(listBothParamsBothParams.param1(), ImmutableList.of(listBothParamsBothParams.param2()));
                         }, throwable -> {
@@ -379,6 +396,31 @@ public class ShoutMediaPresenter {
                             LogHelper.logThrowableAndCrashlytics(TAG, "Media upload failed", throwable);
                         }));
             }
+        }
+    }
+
+    private void putVideoItem(int position, String newUrl, File videoThumbnail, int videoLength) {
+        mediaItems.put(position, new LocalVideoItem(
+                videoThumbnail != null ? String.format("file://%1$s", videoThumbnail.getAbsolutePath()) : null,
+                newUrl,
+                videoLength));
+    }
+
+    private boolean notifyIfCannotAddVideo() {
+        if (!canAddVideo()) {
+            mMediaListener.onlyOneVideoAllowedAlert();
+            return true;
+        }
+        return false;
+    }
+
+    @Nullable
+    private File getThumbnail(String newUrl) {
+        try {
+            return MediaUtils.createVideoThumbnail(context, Uri.parse(newUrl));
+        } catch (IOException e) {
+            mMediaListener.thumbnailCreateError();
+            return null;
         }
     }
 
@@ -435,5 +477,9 @@ public class ShoutMediaPresenter {
         void showMediaProgress();
 
         void showUploadError(Throwable throwable);
+
+        void showImageDialog(int position, String path);
+
+        void showVideoDialog(int position);
     }
 }

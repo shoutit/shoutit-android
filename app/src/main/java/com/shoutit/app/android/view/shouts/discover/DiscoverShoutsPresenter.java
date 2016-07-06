@@ -14,11 +14,15 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
+import com.shoutit.app.android.utils.BookmarkHelper;
+import com.shoutit.app.android.utils.FBAdHalfPresenter;
+import com.shoutit.app.android.utils.PromotionHelper;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
@@ -51,6 +55,8 @@ public class DiscoverShoutsPresenter {
     private final PublishSubject<Object> searchMenuItemClicked = PublishSubject.create();
     @Nonnull
     private final PublishSubject<Object> shareMenuItemClicked = PublishSubject.create();
+    @Nonnull
+    private final PublishSubject<Boolean> isLinearLayoutSubject = PublishSubject.create();
 
     public DiscoverShoutsPresenter(@NetworkScheduler Scheduler networkScheduler,
                                    @UiScheduler Scheduler uiScheduler,
@@ -58,12 +64,15 @@ public class DiscoverShoutsPresenter {
                                    final String discoverId,
                                    final String discoverName,
                                    UserPreferences userPreferences,
-                                   @ForActivity final Context context) {
+                                   FBAdHalfPresenter fbAdHalfPresenter,
+                                   @ForActivity Context context,
+                                   @NonNull BookmarksDao bookmarksDao,
+                                   @NonNull BookmarkHelper bookmarkHelper) {
         mDiscoverShoutsDao = discoverShoutsDao;
         this.discoverId = discoverId;
 
         final boolean isNormalUser = userPreferences.isNormalUser();
-        final User currentUser = userPreferences.getUser();
+        final BaseProfile currentUser = userPreferences.getUserOrPage();
         final String currentUserName = currentUser != null ? currentUser.getUsername() : null;
 
         final Observable<ResponseOrError<ShoutsResponse>> shoutsObservable = discoverShoutsDao
@@ -76,7 +85,7 @@ public class DiscoverShoutsPresenter {
                 .compose(ResponseOrError.<ShoutsResponse>onlySuccess())
                 .compose(ObservableExtensions.<ShoutsResponse>behaviorRefCount());
 
-        mListObservable = successShoutsObservable
+        final Observable<List<BaseAdapterItem>> shoutItems = successShoutsObservable
                 .map(new Func1<ShoutsResponse, List<BaseAdapterItem>>() {
                     @Override
                     public List<BaseAdapterItem> call(ShoutsResponse shoutsResponse) {
@@ -85,11 +94,21 @@ public class DiscoverShoutsPresenter {
                             @Override
                             public BaseAdapterItem apply(Shout shout) {
                                 final boolean isShoutOwner = shout.getProfile().getUsername().equals(currentUserName);
-                                return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context, shoutSelectedObserver);
+                                final BookmarkHelper.ShoutItemBookmarkHelper shoutItemBookmarkHelper = bookmarkHelper.getShoutItemBookmarkHelper();
+                                return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context,
+                                        shoutSelectedObserver, PromotionHelper.promotionInfoOrNull(shout),
+                                        bookmarksDao.getBookmarkForShout(shout.getId(), shout.isBookmarked()),
+                                        shoutItemBookmarkHelper.getObserver(), shoutItemBookmarkHelper.getEnableObservable());
                             }
                         }));
                     }
-                });
+                })
+                .doOnNext(fbAdHalfPresenter::updatedShoutsCount);
+
+        mListObservable = Observable.combineLatest(
+                shoutItems,
+                fbAdHalfPresenter.getAdsObservable(isLinearLayoutSubject),
+                FBAdHalfPresenter::combineShoutsWithAds);
 
         countObservable = shoutsObservable.compose(ResponseOrError.<ShoutsResponse>onlySuccess())
                 .map(new Func1<ShoutsResponse, Integer>() {
@@ -166,5 +185,9 @@ public class DiscoverShoutsPresenter {
 
     public void onShareClicked() {
         shareMenuItemClicked.onNext(null);
+    }
+
+    public void setLinearLayoutManager(boolean isLinearLayout) {
+        isLinearLayoutSubject.onNext(isLinearLayout);
     }
 }

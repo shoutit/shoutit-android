@@ -2,12 +2,14 @@ package com.shoutit.app.android.view.chats.chats_adapter;
 
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
+import android.text.util.Linkify;
 import android.view.View;
 import android.widget.TextView;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.utils.TextHelper;
 import com.shoutit.app.android.view.chats.message_models.SentTextMessage;
 
 import javax.annotation.Nonnull;

@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.search.results.shouts;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
@@ -13,15 +14,19 @@ import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.NoDataTextAdapterItem;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.model.FiltersToSubmit;
 import com.shoutit.app.android.model.SearchShoutPointer;
+import com.shoutit.app.android.utils.FBAdHalfPresenter;
+import com.shoutit.app.android.utils.BookmarkHelper;
+import com.shoutit.app.android.utils.PromotionHelper;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
@@ -44,6 +49,7 @@ public class SearchShoutsResultsPresenter {
     private final PublishSubject<Object> loadMoreSubject = PublishSubject.create();
     private final PublishSubject<FiltersToSubmit> filtersSelectedSubject = PublishSubject.create();
     private final PublishSubject<Object> shareClickSubject = PublishSubject.create();
+    private final PublishSubject<Boolean> isLinearLayoutSubject = PublishSubject.create();
 
     private final Observable<List<BaseAdapterItem>> adapterItems;
     private final Observable<Boolean> progressObservable;
@@ -59,10 +65,13 @@ public class SearchShoutsResultsPresenter {
                                         @Nonnull final UserPreferences userPreferences,
                                         @Nonnull @ForActivity final Context context,
                                         @UiScheduler Scheduler uiScheduler,
-                                        @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter) {
+                                        @Nonnull FBAdHalfPresenter fbAdHalfPresenter,
+                                        @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
+                                        @NonNull BookmarksDao bookmarksDao,
+                                        @NonNull BookmarkHelper bookmarkHelper) {
 
         final boolean isNormalUser = userPreferences.isNormalUser();
-        final User currentUser = userPreferences.getUser();
+        final BaseProfile currentUser = userPreferences.getUserOrPage();
         final String currentUserName = currentUser != null ? currentUser.getUsername() : null;
 
         final boolean initWithUserLocation = searchType != SearchPresenter.SearchType.PROFILE &&
@@ -122,7 +131,7 @@ public class SearchShoutsResultsPresenter {
                     }
                 });
 
-        adapterItems = successShoutsResponse
+        final Observable<List<BaseAdapterItem>> shoutsItems = successShoutsResponse
                 .map(new Func1<ShoutsResponse, List<BaseAdapterItem>>() {
                     @Override
                     public List<BaseAdapterItem> call(ShoutsResponse shoutsResponse) {
@@ -135,13 +144,22 @@ public class SearchShoutsResultsPresenter {
                                 @Override
                                 public BaseAdapterItem apply(Shout shout) {
                                     final boolean isShoutOwner = shout.getProfile().getUsername().equals(currentUserName);
-                                    return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context, shoutSelectedSubject);
+                                    final BookmarkHelper.ShoutItemBookmarkHelper shoutItemBookmarkHelper = bookmarkHelper.getShoutItemBookmarkHelper();
+                                    return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context,
+                                            shoutSelectedSubject, PromotionHelper.promotionInfoOrNull(shout),
+                                            bookmarksDao.getBookmarkForShout(shout.getId(), shout.isBookmarked()),
+                                            shoutItemBookmarkHelper.getObserver(), shoutItemBookmarkHelper.getEnableObservable());
                                 }
                             }));
                             return builder.build();
                         }
                     }
-                });
+                })
+                .doOnNext(fbAdHalfPresenter::updatedShoutsCount);
+
+        adapterItems = Observable.combineLatest(shoutsItems,
+                fbAdHalfPresenter.getAdsObservable(isLinearLayoutSubject),
+                FBAdHalfPresenter::combineShoutsWithAds);
 
         progressObservable = shoutsRequest.map(Functions1.returnFalse())
                 .startWith(true);
@@ -218,5 +236,9 @@ public class SearchShoutsResultsPresenter {
 
     public void onShareClicked() {
         shareClickSubject.onNext(null);
+    }
+
+    public void setLinearLayoutManager(boolean isLinearLayour) {
+
     }
 }

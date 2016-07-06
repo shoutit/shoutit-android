@@ -21,7 +21,6 @@ import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
-import com.shoutit.app.android.utils.RtlUtils;
 import com.shoutit.app.android.view.about.AboutActivity;
 import com.uservoice.uservoicesdk.UserVoice;
 
@@ -47,7 +46,7 @@ public class ForgotPasswordActivity extends BaseActivity {
     @Bind(R.id.forgot_password_proceed_btn)
     Button mForgotPasswordProceedBtn;
     @Bind(R.id.forgot_password_toolbar)
-    Toolbar mForgotPasswordToolbar;
+    Toolbar toolbar;
     @Bind(R.id.forgot_password_progress)
     FrameLayout mForgotPasswordProgress;
 
@@ -61,9 +60,9 @@ public class ForgotPasswordActivity extends BaseActivity {
         setContentView(R.layout.forgot_password_activity);
         ButterKnife.bind(this);
 
-        mForgotPasswordToolbar.setNavigationIcon(RtlUtils.isRtlEnabled(this) ?
-                R.drawable.ic_blue_arrow_rtl : R.drawable.ic_blue_arrow);
-        mForgotPasswordToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+        toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        toolbar.setLogo(R.drawable.appbar_logo_white);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();

@@ -12,6 +12,7 @@ import com.google.gson.Gson;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.CategoriesDao;
 import com.shoutit.app.android.dao.ConversationMediaDaos;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
@@ -19,7 +20,11 @@ import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ListenersDaos;
 import com.shoutit.app.android.dao.ListeningsDao;
 import com.shoutit.app.android.dao.NotificationsDao;
+import com.shoutit.app.android.dao.PagesDao;
 import com.shoutit.app.android.dao.ProfilesDao;
+import com.shoutit.app.android.dao.PromoteLabelsDao;
+import com.shoutit.app.android.dao.PromoteOptionsDao;
+import com.shoutit.app.android.dao.PublicPagesDaos;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.dao.SortTypesDao;
@@ -78,6 +83,8 @@ public interface AppComponent {
 
     DiscoversDao discoversDao();
 
+    PagesDao pagesDao();
+
     ProfilesDao profilesDao();
 
     SuggestionsDao suggestionsDao();
@@ -91,6 +98,10 @@ public interface AppComponent {
     ListenersDaos listenersDaos();
 
     ListeningsDao listeningsDao();
+
+    PublicPagesDaos publicPagesDaos();
+
+    PromoteOptionsDao promoteOptionsDao();
 
     ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter();
 
@@ -127,4 +138,8 @@ public interface AppComponent {
     LocalMessageBus localMessageBus();
 
     RefreshConversationBus refreshConversationBus();
+
+    PromoteLabelsDao promoteDao();
+
+    BookmarksDao bookmarkDao();
 }

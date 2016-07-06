@@ -14,12 +14,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.MyAndroidSchedulers;
@@ -42,6 +42,7 @@ import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.PriceUtils;
+import com.shoutit.app.android.view.createshout.DialogsHelper;
 import com.shoutit.app.android.view.createshout.publish.PublishShoutActivity;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
 import com.shoutit.app.android.widget.CurrencySpinnerAdapter;
@@ -58,7 +59,6 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Observable;
-import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func0;
 import rx.functions.Func1;
@@ -73,8 +73,6 @@ public class PublishMediaShoutFragment extends Fragment {
 
     @Bind(R.id.publish_media_shout_preview)
     ImageView mPublishMediaShoutPreview;
-    @Bind(R.id.camera_cool_icon)
-    ImageView mPublishMediaCool;
     @Bind(R.id.camera_published_price)
     EditText mCameraPublishedPrice;
     @Bind(R.id.camera_published_currency)
@@ -82,7 +80,7 @@ public class PublishMediaShoutFragment extends Fragment {
     @Bind(R.id.camera_progress)
     View progress;
     @Bind(R.id.camera_published_done)
-    Button mCameraPublishedDone;
+    TextView mCameraPublishedDone;
     @Bind(R.id.fragment_camera_close)
     ImageButton closeButton;
     @Bind(R.id.camera_published_facebook_checkbox)
@@ -157,6 +155,7 @@ public class PublishMediaShoutFragment extends Fragment {
         mCompositeSubscription = new CompositeSubscription();
 
         setUpFacebookCheckbox();
+        showShareInfoDialogIfNeeded();
 
         mCameraPublishedCurrency.setAdapter(mCurrencyAdapter);
         mCameraPublishedCurrency.setEnabled(false);
@@ -187,7 +186,6 @@ public class PublishMediaShoutFragment extends Fragment {
         }
 
         closeButton.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
-        mPublishMediaCool.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
     }
 
     private void setUpFacebookCheckbox() {
@@ -239,6 +237,18 @@ public class PublishMediaShoutFragment extends Fragment {
                             }
                         })
         );
+    }
+
+    private void showShareInfoDialogIfNeeded() {
+        if (!mUserPreferences.wasShareDialogAlreadyDisplayed() && !faceBookCheckbox.isChecked()) {
+            DialogsHelper.showShareInfoDialog(getActivity());
+            mUserPreferences.setShareDialogDisplayed();
+        }
+    }
+
+    @OnClick(R.id.camera_published_credits_info_iv)
+    public void onCreditsInfoClick() {
+        DialogsHelper.showShareInfoDialog(getActivity());
     }
 
     public void showPermissionNotGrantedError() {
@@ -358,7 +368,7 @@ public class PublishMediaShoutFragment extends Fragment {
 
     @SuppressWarnings("unchecked")
     @OnClick(R.id.camera_published_done)
-    public void done() {
+    public void doneClicked() {
         Preconditions.checkNotNull(mCameraPublishedPrice);
 
         final String price = mCameraPublishedPrice.getText().toString();
@@ -367,7 +377,7 @@ public class PublishMediaShoutFragment extends Fragment {
             final long priceInCents = PriceUtils.getPriceInCents(price);
             final PriceUtils.SpinnerCurrency selectedItem = (PriceUtils.SpinnerCurrency) mCameraPublishedCurrency.getSelectedItem();
             mCompositeSubscription.add(
-                    mApiService.editShoutPrice(createdShoutOfferId, new EditShoutPriceRequest(priceInCents, selectedItem.getCode()))
+                    mApiService.editShoutPrice(createdShoutOfferId, new EditShoutPriceRequest(priceInCents, selectedItem.getCode(), faceBookCheckbox.isChecked()))
                             .subscribeOn(Schedulers.io())
                             .observeOn(MyAndroidSchedulers.mainThread())
                             .subscribe(createShoutResponse -> {
@@ -377,7 +387,7 @@ public class PublishMediaShoutFragment extends Fragment {
         } else if (faceBookCheckbox.isChecked()) {
             showProgress(true);
             mCompositeSubscription.add(
-                    mApiService.editShoutPublishToFacebbok(createdShoutOfferId, new EditShoutPublishToFacebook(true))
+                    mApiService.editShoutPublishToFacebook(createdShoutOfferId, new EditShoutPublishToFacebook(true))
                             .subscribeOn(Schedulers.io())
                             .observeOn(MyAndroidSchedulers.mainThread())
                             .subscribe(createShoutResponse -> {

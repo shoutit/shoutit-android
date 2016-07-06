@@ -1,12 +1,13 @@
 package com.shoutit.app.android.view.main;
 
 import android.graphics.Bitmap;
-import android.support.annotation.DrawableRes;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -17,18 +18,23 @@ import com.google.common.collect.ImmutableList;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.utils.BlurTransform;
 import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.RtlUtils;
+import com.shoutit.app.android.view.admins.AdminsFragment;
+import com.shoutit.app.android.view.bookmarks.BookmarkedShoutsFragment;
 import com.shoutit.app.android.view.conversations.ConversationsPagerFragment;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
+import com.shoutit.app.android.view.credits.CreditsFragment;
 import com.shoutit.app.android.view.discover.DiscoverFragment;
 import com.shoutit.app.android.view.home.HomeFragment;
 import com.shoutit.app.android.view.invitefriends.InviteFriendsFragment;
 import com.shoutit.app.android.view.location.LocationActivity;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
+import com.shoutit.app.android.view.pages.PagesPagerFragment;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsFragment;
@@ -55,8 +61,12 @@ public class MenuHandler {
     public static final String FRAGMENT_CHATS = "fragment_chats";
     public static final String FRAGMENT_PUBLIC_CHATS = "fragment_public_chats";
     public static final String FRAGMENT_INVITE_FRIENDS = "fragment_invite_friends";
+    public static final String FRAGMENT_CREDITS = "fragment_credits";
     public static final String ACTIVITY_SETTINGS = "activity_settings";
     public static final String ACTIVITY_HELP = "activity_help";
+    public static final String FRAGMENT_PAGES = "fragment_pages";
+    public static final String FRAGMENT_ADMINS = "fragment_admins";
+    public static final String FRAGMENT_BOOKMARKS = "fragment_bookmarks";
 
     @Bind(R.id.menu_user_name_tv)
     TextView userNameTextView;
@@ -74,6 +84,8 @@ public class MenuHandler {
     TextView notificationsBadgeTv;
     @Bind(R.id.menu_chat_badge)
     TextView chatsBadgeTv;
+    @Bind(R.id.menu_credits_badge)
+    TextView creditsBadgeTv;
 
     @Bind(R.id.menu_home)
     CheckedTextView homeItem;
@@ -83,6 +95,17 @@ public class MenuHandler {
     CheckedTextView browseItem;
     @Bind(R.id.menu_chat)
     CheckedTextView chatItem;
+    @Bind(R.id.menu_credits)
+    CheckedTextView creditsItem;
+    @Bind(R.id.menu_pages)
+    CheckedTextView pagesItem;
+    @Bind(R.id.menu_admins)
+    CheckedTextView adminsItem;
+    @Bind(R.id.menu_bookmarks)
+    CheckedTextView bookmarks;
+
+    @Bind(R.id.menu_use_profile)
+    Button useProfile;
 
     @Nonnull
     private final RxAppCompatActivity rxActivity;
@@ -104,9 +127,13 @@ public class MenuHandler {
         viewTagViewIdMap.put(FRAGMENT_DISCOVER, R.id.menu_discover);
         viewTagViewIdMap.put(FRAGMENT_BROWSE, R.id.menu_browse);
         viewTagViewIdMap.put(FRAGMENT_CHATS, R.id.menu_chat);
+        viewTagViewIdMap.put(FRAGMENT_CREDITS, R.id.menu_credits);
         viewTagViewIdMap.put(FRAGMENT_INVITE_FRIENDS, R.id.menu_invite_friends);
         viewTagViewIdMap.put(ACTIVITY_HELP, R.id.menu_help);
         viewTagViewIdMap.put(ACTIVITY_SETTINGS, R.id.menu_settings);
+        viewTagViewIdMap.put(FRAGMENT_PAGES, R.id.menu_pages);
+        viewTagViewIdMap.put(FRAGMENT_ADMINS, R.id.menu_admins);
+        viewTagViewIdMap.put(FRAGMENT_BOOKMARKS, R.id.menu_bookmarks);
     }
 
     public MenuHandler(@Nonnull final RxAppCompatActivity rxActivity,
@@ -127,7 +154,34 @@ public class MenuHandler {
 
     public void initMenu(@Nonnull View view, @IdRes int id) {
         ButterKnife.bind(this, view);
-        selectableItems = ImmutableList.of(homeItem, discoverItem, browseItem, chatItem);
+
+        selectableItems = ImmutableList.of(homeItem, discoverItem, browseItem, chatItem, creditsItem, pagesItem, adminsItem, bookmarks);
+
+        userPreferences.getPageOrUserObservable()
+                .filter(user -> user != null)
+                .map(BaseProfile::getStats)
+                .subscribe(stats -> {
+                    if (stats != null) {
+                        final int credits = stats.getCredits();
+                        creditsBadgeTv.setVisibility(credits > 0 ? View.VISIBLE : View.GONE);
+                        creditsBadgeTv.setText(String.valueOf(credits));
+                    } else {
+                        creditsBadgeTv.setVisibility(View.GONE);
+                    }
+                });
+
+        userPreferences.getPageOrUserObservable()
+                .filter(user -> user != null)
+                .subscribe(user -> {
+                    pagesItem.setVisibility(user.isUser() ?
+                            View.VISIBLE : View.GONE);
+                    adminsItem.setVisibility(user.isUser() ?
+                            View.GONE : View.VISIBLE);
+                });
+
+
+        useProfile.setVisibility(userPreferences.isLoggedInAsPage() ? View.VISIBLE : View.GONE);
+
         setData(id);
     }
 
@@ -139,6 +193,12 @@ public class MenuHandler {
         presenter.getNameObservable()
                 .compose(rxActivity.<String>bindToLifecycle())
                 .subscribe(RxTextView.text(userNameTextView));
+
+        presenter.getUserNameObservable()
+                .compose(rxActivity.<String>bindToLifecycle())
+                .subscribe(userName -> {
+                    useProfile.setText(String.format(rxActivity.getString(R.string.menu_use_as_format), userName));
+                });
 
         presenter.getCityObservable()
                 .compose(rxActivity.<String>bindToLifecycle())
@@ -164,18 +224,39 @@ public class MenuHandler {
     @NonNull
     private Action1<Integer> loadFlag() {
         final Target roundedBitmapTarget = PicassoHelper.getRoundedBitmapTarget(rxActivity, flagImageView);
-        return new Action1<Integer>() {
-            @Override
-            public void call(@DrawableRes Integer flagId) {
-                picasso.load(flagId)
-                        .into(roundedBitmapTarget);
-            }
-        };
+        return flagId -> picasso.load(flagId)
+                .into(roundedBitmapTarget);
     }
 
-    @OnClick({R.id.menu_home, R.id.menu_discover, R.id.menu_browse, R.id.menu_chat, R.id.menu_settings, R.id.menu_help, R.id.menu_invite_friends})
+    @OnClick({
+            R.id.menu_home,
+            R.id.menu_discover,
+            R.id.menu_browse,
+            R.id.menu_chat,
+            R.id.menu_settings,
+            R.id.menu_help,
+            R.id.menu_invite_friends,
+            R.id.menu_credits,
+            R.id.menu_pages,
+            R.id.menu_admins,
+            R.id.menu_use_profile,
+            R.id.menu_bookmarks
+    })
     public void onMenuItemSelected(View view) {
-        selectMenuItem(viewTagViewIdMap.inverse().get(view.getId()));
+        dispatchClick(view.getId());
+    }
+
+    private void dispatchClick(int id) {
+        switch (id) {
+            case R.id.menu_use_profile: {
+                userPreferences.clearPage();
+                ActivityCompat.finishAffinity(rxActivity);
+                rxActivity.startActivity(MainActivity.newIntent(rxActivity));
+                break;
+            }
+            default:
+                selectMenuItem(viewTagViewIdMap.inverse().get(id));
+        }
     }
 
     public void selectMenuItem(@Nonnull String viewTag) {
@@ -184,9 +265,14 @@ public class MenuHandler {
             case FRAGMENT_DISCOVER:
             case FRAGMENT_BROWSE:
             case FRAGMENT_INVITE_FRIENDS:
+            case FRAGMENT_BOOKMARKS:
                 selectFragment(viewTag);
                 break;
+            case FRAGMENT_CREDITS:
             case FRAGMENT_CHATS:
+            case FRAGMENT_PUBLIC_CHATS:
+            case FRAGMENT_PAGES:
+            case FRAGMENT_ADMINS:
                 if (userPreferences.isNormalUser()) {
                     selectFragment(viewTag);
                 } else {
@@ -209,7 +295,9 @@ public class MenuHandler {
     private void selectFragment(@Nonnull String viewTag) {
         selectItem(viewTagViewIdMap.get(viewTag));
         onMenuItemSelectedListener.onMenuItemSelected(viewTag);
-        setToolbarElevation(viewTagViewIdMap.get(viewTag) != R.id.menu_chat);
+
+        final Integer selectedViewId = viewTagViewIdMap.get(viewTag);
+        setToolbarElevation(selectedViewId != R.id.menu_chat && selectedViewId != R.id.menu_pages);
     }
 
     public void setToolbarElevation(boolean enable) {
@@ -277,34 +365,24 @@ public class MenuHandler {
             }
         };
 
-        return new Action1<String>() {
-            @Override
-            public void call(String coverUrl) {
-                picasso.load(coverUrl)
-                        .fit()
-                        .centerCrop()
-                        .transform(blurTransformation)
-                        .into(coverImageView);
-            }
-        };
+        return coverUrl -> picasso.load(coverUrl)
+                .fit()
+                .centerCrop()
+                .transform(blurTransformation)
+                .into(coverImageView);
     }
 
     @NonNull
     private Action1<String> loadAvatarAction() {
         final int strokeSize = rxActivity.getResources().getDimensionPixelSize(R.dimen.side_menu_avatar_stroke_size);
 
-        return new Action1<String>() {
-            @Override
-            public void call(String avatarUrl) {
-                picasso.load(avatarUrl)
-                        .error(R.drawable.ic_avatar_placeholder)
-                        .placeholder(R.drawable.ic_avatar_placeholder)
-                        .resizeDimen(R.dimen.side_menu_avatar_size, R.dimen.side_menu_avatar_size)
-                        .centerCrop()
-                        .transform(PicassoHelper.getCircularBitmapWithStrokeTarget(strokeSize, "MenuAvatar"))
-                        .into(avatarImageView);
-            }
-        };
+        return avatarUrl -> picasso.load(avatarUrl)
+                .error(R.drawable.ic_avatar_placeholder)
+                .placeholder(R.drawable.ic_avatar_placeholder)
+                .resizeDimen(R.dimen.side_menu_avatar_size, R.dimen.side_menu_avatar_size)
+                .centerCrop()
+                .transform(PicassoHelper.getCircularBitmapWithStrokeTarget(strokeSize, "MenuAvatar"))
+                .into(avatarImageView);
     }
 
     public static Fragment getFragmentForTag(String fragmentTag) {
@@ -317,10 +395,18 @@ public class MenuHandler {
                 return SearchShoutsResultsFragment.newInstance(null, null, SearchPresenter.SearchType.BROWSE);
             case FRAGMENT_CHATS:
                 return ConversationsPagerFragment.newInstance();
+            case FRAGMENT_CREDITS:
+                return CreditsFragment.newInstance();
             case FRAGMENT_PUBLIC_CHATS:
                 return ConversationsPagerFragment.newInstance(true);
             case FRAGMENT_INVITE_FRIENDS:
                 return InviteFriendsFragment.newInstance();
+            case FRAGMENT_BOOKMARKS:
+                return BookmarkedShoutsFragment.newInstance();
+            case FRAGMENT_PAGES:
+                return PagesPagerFragment.newInstance();
+            case FRAGMENT_ADMINS:
+                return AdminsFragment.newInstance();
             default:
                 throw new RuntimeException("Unknown fragment tag");
         }

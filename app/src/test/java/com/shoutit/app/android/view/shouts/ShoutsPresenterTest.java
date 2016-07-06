@@ -8,7 +8,10 @@ import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.TestUtils;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.ShoutsResponse;
+import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
+import com.shoutit.app.android.utils.FBAdHalfPresenter;
+import com.shoutit.app.android.utils.BookmarkHelper;
 import com.shoutit.app.android.view.shouts.discover.DiscoverShoutsPresenter;
 
 import org.junit.Before;
@@ -16,13 +19,17 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import rx.Observable;
+import rx.observers.Observers;
 import rx.observers.TestSubscriber;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
 
 import static com.google.common.truth.Truth.assert_;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -39,20 +46,36 @@ public class ShoutsPresenterTest {
     @Mock
     UserPreferences userPreferences;
 
+    @Mock
+    FBAdHalfPresenter fbAdHalfPresenter;
+
+    @Mock
+    BookmarksDao mBookmarksDao;
+
+    @Mock
+    BookmarkHelper mBookmarkHelper;
+
     private BehaviorSubject<ResponseOrError<ShoutsResponse>> mBehaviorSubject;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
+        when(mBookmarkHelper.getShoutItemBookmarkHelper()).thenReturn(new BookmarkHelper.ShoutItemBookmarkHelper(Observers.empty(), Observable.empty()));
+
         mBehaviorSubject = BehaviorSubject.create(ResponseOrError.fromData(
                 new ShoutsResponse(0, "", "", ImmutableList.of(TestUtils.getShout()), null)));
         when(mDiscoverShoutsDao.getShoutsObservable(anyString())).thenReturn(mBehaviorSubject);
 
         when(userPreferences.isNormalUser()).thenReturn(true);
-        when(userPreferences.getUser()).thenReturn(TestUtils.getUser());
+        when(userPreferences.getUserOrPage()).thenReturn(TestUtils.getUser());
 
-        mShoutsPresenter = new DiscoverShoutsPresenter(Schedulers.immediate(), Schedulers.immediate(), mDiscoverShoutsDao, "", "", userPreferences, mContext);
+        when(fbAdHalfPresenter.getAdsObservable(any(Observable.class)))
+                .thenReturn(Observable.just(new ArrayList<>()));
+
+
+        mShoutsPresenter = new DiscoverShoutsPresenter(Schedulers.immediate(), Schedulers.immediate(),
+                mDiscoverShoutsDao, "", "", userPreferences, fbAdHalfPresenter, mContext, mBookmarksDao, mBookmarkHelper);
     }
 
     @Test

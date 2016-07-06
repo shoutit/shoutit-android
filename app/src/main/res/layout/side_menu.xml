@@ -61,10 +61,57 @@
 
         </LinearLayout>
 
-        <View
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:background="@color/black_12"/>
+            android:layout_height="48dp">
+
+            <View
+                android:layout_alignParentTop="true"
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="@color/black_38"/>
+
+            <CheckedTextView
+                style="@style/SideMenuItem"
+                android:id="@+id/menu_credits"
+                android:paddingLeft="16dp"
+                android:paddingStart="16dp"
+                android:gravity="center_vertical"
+                android:textColor="@color/black_87"
+                android:drawableStart="@drawable/ic_credits"
+                android:drawableLeft="@drawable/ic_credits"
+                android:text="@string/menu_shoutit_credit" />
+
+            <TextView
+                android:id="@+id/menu_credits_badge"
+                tools:text="12"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:textColor="@color/colorAccent"
+                android:layout_marginRight="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <View
+                android:layout_alignParentBottom="true"
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="@color/black_38"/>
+
+        </RelativeLayout>
+
+        <Button
+            android:fontFamily="sans-serif"
+            android:textAllCaps="false"
+            android:id="@+id/menu_use_profile"
+            android:paddingLeft="16dp"
+            android:paddingStart="16dp"
+            style="@style/SideMenuItem"
+            tools:text="Use Shout it as Profile Name" />
 
         <CheckedTextView
             android:id="@+id/menu_home"
@@ -122,6 +169,35 @@
 
         </RelativeLayout>
 
+        <CheckedTextView
+            android:id="@+id/menu_bookmarks"
+            style="@style/SideMenuItem"
+            android:paddingLeft="16dp"
+            android:paddingStart="16dp"
+            android:drawableStart="@drawable/menu_bookmarks"
+            android:drawableLeft="@drawable/menu_bookmarks"
+            android:text="@string/menu_item_bookmarks" />
+
+        <CheckedTextView
+            android:id="@+id/menu_pages"
+            style="@style/SideMenuItem"
+            android:visibility="gone"
+            android:paddingLeft="16dp"
+            android:paddingStart="16dp"
+            android:drawableStart="@drawable/menu_pages"
+            android:drawableLeft="@drawable/menu_pages"
+            android:text="@string/menu_item_pages" />
+
+        <CheckedTextView
+            android:id="@+id/menu_admins"
+            style="@style/SideMenuItem"
+            android:visibility="gone"
+            android:paddingLeft="16dp"
+            android:paddingStart="16dp"
+            android:drawableStart="@drawable/menu_admins"
+            android:drawableLeft="@drawable/menu_admins"
+            android:text="@string/menu_item_admins" />
+
         <View
             android:layout_width="match_parent"
             android:layout_height="0.5dp"
@@ -132,7 +208,7 @@
             android:paddingLeft="16dp"
             android:paddingStart="16dp"
             style="@style/SideMenuItem"
-            android:text="Invite Friends" />
+            android:text="@string/menu_item_invite_friends" />
 
         <CheckedTextView
             android:id="@+id/menu_settings"

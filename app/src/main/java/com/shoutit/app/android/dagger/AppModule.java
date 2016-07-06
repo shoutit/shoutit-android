@@ -37,7 +37,11 @@ import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ListenersDaos;
 import com.shoutit.app.android.dao.ListeningsDao;
 import com.shoutit.app.android.dao.NotificationsDao;
+import com.shoutit.app.android.dao.PagesDao;
 import com.shoutit.app.android.dao.ProfilesDao;
+import com.shoutit.app.android.dao.PromoteLabelsDao;
+import com.shoutit.app.android.dao.PromoteOptionsDao;
+import com.shoutit.app.android.dao.PublicPagesDaos;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.dao.SortTypesDao;
@@ -59,6 +63,7 @@ import com.shoutit.app.android.view.videoconversation.CameraToolImplLollipop;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.inject.Named;
@@ -164,6 +169,9 @@ public final class AppModule {
         okHttpClient.interceptors().add(loggingInterceptor);
         loggingInterceptor.setLevel(BuildConfig.DEBUG ?
                 HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE);
+        okHttpClient.writeTimeout(15L, TimeUnit.SECONDS);
+        okHttpClient.readTimeout(15L, TimeUnit.SECONDS);
+        okHttpClient.connectTimeout(15L, TimeUnit.SECONDS);
 
         return okHttpClient.build();
     }
@@ -303,6 +311,12 @@ public final class AppModule {
         return new ListeningsDao(apiService, networkScheduler);
     }
 
+    @Provides
+    @Singleton
+    PublicPagesDaos publicPagesDaos(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
+        return new PublicPagesDaos(apiService, networkScheduler);
+    }
+
     @Singleton
     @Provides
     public VideoCallsDao provideVideoCallsDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
@@ -329,14 +343,32 @@ public final class AppModule {
 
     @Provides
     @Singleton
+    PromoteLabelsDao promoteDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
+        return new PromoteLabelsDao(apiService, networkScheduler);
+    }
+
+    @Provides
+    @Singleton
+    PromoteOptionsDao promoteOptionsDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
+        return new PromoteOptionsDao(apiService, networkScheduler);
+    }
+
+    @Provides
+    @Singleton
+    PagesDao providePagesDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
+        return new PagesDao(apiService, networkScheduler);
+    }
+
+    @Provides
+    @Singleton
     DbHelper dbHelper(@ForApplication Context context) {
         return new DbHelper(context);
     }
 
     @Provides
     @Singleton
-    PusherHelper providePusher(Gson gson, UserPreferences userPreferences, @UiScheduler Scheduler uiScheduler) {
-        return new PusherHelper(gson, userPreferences, uiScheduler);
+    PusherHelper providePusher(Gson gson, @UiScheduler Scheduler uiScheduler) {
+        return new PusherHelper(gson, uiScheduler);
     }
 
     @Provides

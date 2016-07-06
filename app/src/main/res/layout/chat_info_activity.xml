@@ -56,8 +56,11 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
+                        android:singleLine="true"
+                        android:lines="1"
                         android:layout_marginLeft="6dp"
                         android:layout_marginStart="6dp"
+                        android:visibility="gone"
                         android:hint="@string/chat_info_subject"/>
 
                     <TextView
@@ -72,7 +75,6 @@
                 </LinearLayout>
 
                 <Button
-                    android:visibility="gone"
                     android:id="@+id/chat_info_edit_save"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -80,8 +82,10 @@
                     android:layout_marginBottom="20dp"
                     android:layout_marginTop="6dp"
                     android:background="@android:color/white"
-                    android:text="Save"
-                    android:textColor="@android:color/holo_red_dark"/>
+                    android:text="@string/chat_info_activity_save"
+                    android:textColor="@android:color/holo_red_dark"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -111,7 +115,7 @@
                             android:layout_marginLeft="8dp"
                             android:layout_marginStart="8dp"
                             android:layout_marginTop="10dp"
-                            android:text="Shouts" />
+                            android:text="@string/chat_info_activity_shouts" />
 
                         <TextView
                             android:id="@+id/chat_info_shouts_number"
@@ -149,7 +153,7 @@
                             android:layout_marginLeft="8dp"
                             android:layout_marginStart="8dp"
                             android:layout_marginTop="10dp"
-                            android:text="Media"/>
+                            android:text="@string/chat_info_activity_media"/>
 
                         <TextView
                             android:id="@+id/chat_info_media_number"
@@ -193,7 +197,7 @@
                             android:layout_marginLeft="8dp"
                             android:layout_marginStart="8dp"
                             android:layout_marginTop="10dp"
-                            android:text="Participants"/>
+                            android:text="@string/chat_info_activity_participants"/>
 
                         <TextView
                             android:id="@+id/chat_info_participants"
@@ -209,6 +213,7 @@
                     </FrameLayout>
 
                     <View
+                        android:id="@+id/chat_info_blocked_divider"
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginEnd="10dp"
@@ -230,7 +235,7 @@
                             android:layout_marginLeft="8dp"
                             android:layout_marginStart="8dp"
                             android:layout_marginTop="10dp"
-                            android:text="Blocked"/>
+                            android:text="@string/chat_info_activity_blocked"/>
 
                         <TextView
                             android:id="@+id/chat_info_blocked_number"
@@ -255,7 +260,7 @@
                     android:layout_marginBottom="20dp"
                     android:layout_marginTop="16dp"
                     android:background="@android:color/white"
-                    android:text="Exit Chat"
+                    android:text="@string/chat_info_activity_exit_chat"
                     android:textColor="@android:color/holo_red_dark"/>
 
                 <TextView

@@ -18,7 +18,6 @@ import com.appunite.rx.dagger.UiScheduler;
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
 import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.jakewharton.rxbinding.view.RxView;
-import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
@@ -33,8 +32,6 @@ import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.main.MainActivity;
-import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
-import com.shoutit.app.android.view.profile.tagprofile.TagProfileActivity;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -202,6 +199,7 @@ public class NotificationsActivity extends BaseActivity {
         getMenuInflater().inflate(R.menu.menu_notifications, menu);
         return true;
     }
+
 
     @Override
     protected void onDestroy() {

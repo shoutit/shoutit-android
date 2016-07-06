@@ -53,22 +53,16 @@ public class UserOrPageProfileActivity extends ProfileActivity {
 
         presenter.getWebUrlClickedObservable()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String webUrl) {
-                        startActivity(IntentHelper.websiteIntent(webUrl));
-                    }
+                .subscribe(webUrl -> {
+                    startActivity(IntentHelper.websiteIntent(webUrl));
                 });
 
         presenter.getProfileToOpenObservable()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String userName) {
-                        startActivityForResult(
-                                UserOrPageProfileActivity.newIntent(UserOrPageProfileActivity.this, userName),
-                                REQUEST_PROFILE_OPENED_FROM_PROFILE);
-                    }
+                .subscribe(userName -> {
+                    startActivityForResult(
+                            UserOrPageProfileActivity.newIntent(UserOrPageProfileActivity.this, userName),
+                            REQUEST_PROFILE_OPENED_FROM_PROFILE);
                 });
 
         presenter.getRefreshUserShoutsObservable()
@@ -79,26 +73,27 @@ public class UserOrPageProfileActivity extends ProfileActivity {
                 .compose(bindToLifecycle())
                 .subscribe();
 
+        presenter.getRefreshPagesOrAdminsObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
+
         // User Profile specific subscriptions
         presenter.getUserProfilePresenter().getOnChatIconClickedSubject()
                 .compose(this.<ChatInfo>bindToLifecycle())
-                .subscribe(new Action1<ChatInfo>() {
-                    @Override
-                    public void call(ChatInfo chatInfo) {
-                        if (chatInfo.isUserLoggedIn()) {
-                            final String conversationId = chatInfo.getConversationId();
-                            if (chatInfo.isListener()) {
-                                if (conversationId == null) {
-                                    startActivity(ChatFirstConversationActivity.newIntent(UserOrPageProfileActivity.this, false, chatInfo.getUsername()));
-                                } else {
-                                    startActivity(ChatActivity.newIntent(UserOrPageProfileActivity.this, conversationId));
-                                }
+                .subscribe(chatInfo -> {
+                    if (chatInfo.isUserLoggedIn()) {
+                        final String conversationId = chatInfo.getConversationId();
+                        if (chatInfo.isListener()) {
+                            if (conversationId == null) {
+                                startActivity(ChatFirstConversationActivity.newIntent(UserOrPageProfileActivity.this, false, chatInfo.getUsername()));
                             } else {
-                                Toast.makeText(UserOrPageProfileActivity.this, R.string.profile_not_listening, Toast.LENGTH_SHORT).show();
+                                startActivity(ChatActivity.newIntent(UserOrPageProfileActivity.this, conversationId));
                             }
                         } else {
-                            ColoredSnackBar.error(ColoredSnackBar.contentView(UserOrPageProfileActivity.this), R.string.error_action_only_for_logged_in_user, Snackbar.LENGTH_SHORT).show();
+                            Toast.makeText(UserOrPageProfileActivity.this, R.string.profile_not_listening, Toast.LENGTH_SHORT).show();
                         }
+                    } else {
+                        ColoredSnackBar.error(ColoredSnackBar.contentView(UserOrPageProfileActivity.this), R.string.error_action_only_for_logged_in_user, Snackbar.LENGTH_SHORT).show();
                     }
                 });
 
@@ -109,96 +104,64 @@ public class UserOrPageProfileActivity extends ProfileActivity {
 
         presenter.getMoreMenuOptionClickedSubject()
                 .compose(bindToLifecycle())
-                .subscribe(new Action1<Object>() {
-                    @Override
-                    public void call(Object ignore) {
-                        popupMenu.show();
-                    }
+                .subscribe(ignore -> {
+                    popupMenu.show();
                 });
+
+        presenter.getListeningObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
 
         // My Profile specific subscriptions
         presenter.getMyProfilePresenter()
                 .getEditProfileClickObservable()
                 .compose(bindToLifecycle())
-                .subscribe(new Action1<Object>() {
-                    @Override
-                    public void call(Object ignore) {
-                        startActivityForResult(
-                                EditProfileActivity.newIntent(UserOrPageProfileActivity.this),
-                                REQUEST_CODE_FROM_EDIT_PROFILE);
-                    }
-                });
-
-        presenter.getMyProfilePresenter()
-                .getVerifyAccountClickObservable()
-                .compose(bindToLifecycle())
-                .subscribe(new Action1<Object>() {
-                    @Override
-                    public void call(Object o) {
-                        startActivity(VerifyEmailActivity.newIntent(UserOrPageProfileActivity.this));
-                    }
+                .subscribe(ignore -> {
+                    startActivityForResult(
+                            EditProfileActivity.newIntent(UserOrPageProfileActivity.this),
+                            REQUEST_CODE_FROM_EDIT_PROFILE);
                 });
 
         presenter.getMyProfilePresenter()
                 .getListeningsClickObservable()
                 .compose(bindToLifecycle())
-                .subscribe(new Action1<Object>() {
-                    @Override
-                    public void call(Object o) {
-                        startActivityForResult(ListeningsActivity.newIntent(UserOrPageProfileActivity.this, false),
-                                REQUEST_CODE_PROFILE_UPDATED_FROM_LISTENINGS);
-                    }
+                .subscribe(o -> {
+                    startActivityForResult(ListeningsActivity.newIntent(UserOrPageProfileActivity.this, false),
+                            REQUEST_CODE_PROFILE_UPDATED_FROM_LISTENINGS);
                 });
 
         presenter.getMyProfilePresenter()
                 .getInterestsClickObservable()
                 .compose(bindToLifecycle())
-                .subscribe(new Action1<Object>() {
-                    @Override
-                    public void call(Object o) {
-                        startActivityForResult(ListeningsActivity.newIntent(UserOrPageProfileActivity.this, true),
-                                REQUEST_CODE_PROFILE_UPDATED_FROM_LISTENINGS);
-                    }
+                .subscribe(o -> {
+                    startActivityForResult(ListeningsActivity.newIntent(UserOrPageProfileActivity.this, true),
+                            REQUEST_CODE_PROFILE_UPDATED_FROM_LISTENINGS);
                 });
 
         presenter.getMyProfilePresenter()
                 .getListenersClickObservable()
                 .compose(bindToLifecycle())
-                .subscribe(new Action1<Object>() {
-                    @Override
-                    public void call(Object o) {
-                        startActivityForResult(ListenersActivity.newIntent(UserOrPageProfileActivity.this, User.ME),
-                                REQUEST_CODE_PROFILE_UPDATED_FROM_LISTENINGS);
-                    }
+                .subscribe(o -> {
+                    startActivityForResult(ListenersActivity.newIntent(UserOrPageProfileActivity.this, User.ME),
+                            REQUEST_CODE_PROFILE_UPDATED_FROM_LISTENINGS);
                 });
 
         presenter.getMyProfilePresenter()
                 .getVerifyAccountClickObservable()
                 .compose(bindToLifecycle())
-                .subscribe(new Action1<Object>() {
-                    @Override
-                    public void call(Object o) {
-                        startActivity(VerifyEmailActivity.newIntent(UserOrPageProfileActivity.this));
-                    }
+                .subscribe(o -> {
+                    startActivity(VerifyEmailActivity.newIntent(UserOrPageProfileActivity.this));
                 });
 
         presenter.getMyProfilePresenter().getNotificationsClickObservable()
                 .compose(bindToLifecycle())
-                .subscribe(new Action1<Object>() {
-                    @Override
-                    public void call(Object ignore) {
-                        startActivity(NotificationsActivity.newIntent(UserOrPageProfileActivity.this));
-                    }
+                .subscribe(ignore -> {
+                    startActivity(NotificationsActivity.newIntent(UserOrPageProfileActivity.this));
                 });
 
         presenter.getSearchMenuItemClickObservable()
                 .compose(this.<Intent>bindToLifecycle())
-                .subscribe(new Action1<Intent>() {
-                    @Override
-                    public void call(Intent intent) {
-                        startActivity(intent);
-                    }
-                });
+                .subscribe(this::startActivity);
 
         presenter.getUserProfilePresenter().getActionOnlyForLoggedInUserObservable()
                 .compose(bindToLifecycle())
@@ -208,12 +171,9 @@ public class UserOrPageProfileActivity extends ProfileActivity {
 
         presenter.getSeeAllShoutsObservable()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String userName) {
-                        startActivity(SearchShoutsResultsActivity.newIntent(
-                                UserOrPageProfileActivity.this, null, userName, SearchPresenter.SearchType.PROFILE));
-                    }
+                .subscribe(userName -> {
+                    startActivity(SearchShoutsResultsActivity.newIntent(
+                            UserOrPageProfileActivity.this, null, userName, SearchPresenter.SearchType.PROFILE));
                 });
     }
 

@@ -10,17 +10,9 @@
         android:id="@+id/login_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?actionBarSize"
-        android:navigationIcon="@drawable/ic_blue_arrow"
-        android:theme="@style/WhiteToolbar"
-        android:title="">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:src="@drawable/ic_shoutit_logo"/>
-
-    </android.support.v7.widget.Toolbar>
+        android:theme="@style/AppTheme.BaseToolbarStyle"
+        android:elevation="0dp"
+        android:title=""/>
 
     <View
         android:layout_width="match_parent"

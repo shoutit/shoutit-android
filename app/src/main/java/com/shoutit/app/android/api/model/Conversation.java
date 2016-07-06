@@ -1,14 +1,9 @@
 package com.shoutit.app.android.api.model;
 
-
-import javax.annotation.Nonnull;
-
 public class Conversation {
 
     public static final String ABOUT_SHOUT_TYPE = "about_shout";
-    public static final String CHAT_TYPE = "chat";
     public static final String PUBLIC_CHAT_TYPE = "public_chat";
-
 
     private final String id;
     private final String type;
@@ -31,6 +26,22 @@ public class Conversation {
         return id;
     }
 
+    public String getImage() {
+        return display.getImage();
+    }
+
+    public String getSubTitle() {
+        return display.getSubTitle();
+    }
+
+    public String getTitle() {
+        return display.getTitle();
+    }
+
+    public String getLastMessageSummary() {
+        return display.getLastMessageSummary();
+    }
+
     public String getType() {
         return type;
     }
@@ -43,29 +54,12 @@ public class Conversation {
         return display;
     }
 
-    public boolean isPublicChat() {
-        return PUBLIC_CHAT_TYPE.equals(type);
-    }
-
-    public boolean isShoutChat() {
-        return ABOUT_SHOUT_TYPE.equals(type);
-    }
-
     public long getModifiedAt() {
         return modifiedAt;
     }
 
     public MiniProfile getCreator() {
         return creator;
-    }
-
-    public Conversation withUpdatedLastMessage(@Nonnull String newMessage, long createdAt, boolean isOwnMessage) {
-        return new Conversation(id, type, unreadMessagesCount + (isOwnMessage ? 0 : 1),
-                display.withUpdatedMessage(newMessage), creator, createdAt);
-    }
-
-    public Conversation withIsReadTrue() {
-        return new Conversation(id, type, 0, display, creator, modifiedAt);
     }
 
     public class Display {
@@ -95,10 +89,6 @@ public class Conversation {
 
         public String getLastMessageSummary() {
             return lastMessageSummary;
-        }
-
-        public Display withUpdatedMessage(@Nonnull String newMessage) {
-            return new Display(image, subTitle, title, newMessage);
         }
     }
 }

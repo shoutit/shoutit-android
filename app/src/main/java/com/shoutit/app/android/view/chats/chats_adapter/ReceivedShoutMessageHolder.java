@@ -16,6 +16,7 @@ import javax.annotation.Nonnull;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class ReceivedShoutMessageHolder extends ViewHolderManager.BaseViewHolder<BaseAdapterItem> {
 
@@ -35,6 +36,8 @@ public class ReceivedShoutMessageHolder extends ViewHolderManager.BaseViewHolder
     @Bind(R.id.chats_shout_price)
     TextView mChatsShoutPrice;
 
+    private ReceivedShoutMessage item;
+
     public ReceivedShoutMessageHolder(@Nonnull View itemView, Picasso picasso) {
         super(itemView);
         mItemView = itemView;
@@ -43,27 +46,32 @@ public class ReceivedShoutMessageHolder extends ViewHolderManager.BaseViewHolder
     }
 
     @Override
-    public void bind(@Nonnull BaseAdapterItem item) {
-        final ReceivedShoutMessage message = (ReceivedShoutMessage) item;
+    public void bind(@Nonnull BaseAdapterItem adapterItem) {
+        item = (ReceivedShoutMessage) adapterItem;
 
-        mPicasso.load(message.getShoutImageUrl())
+        mPicasso.load(item.getShoutImageUrl())
                 .resizeDimen(R.dimen.chat_sent_shout_image_width, R.dimen.chat_sent_shout_image_height)
                 .centerCrop()
                 .into(mChatsReceivedShoutImageImageview);
 
-        mChatsReceivedShoutDateTextview.setText(message.getTime());
-        mChatsMessageShoutDescription.setText(message.getDescription());
-        mChatsShoutAuthor.setText(message.getAuthor());
-        mChatsShoutPrice.setText(message.getPrice());
+        mChatsReceivedShoutDateTextview.setText(item.getTime());
+        mChatsMessageShoutDescription.setText(item.getDescription());
+        mChatsShoutAuthor.setText(item.getAuthor());
+        mChatsShoutPrice.setText(item.getPrice());
 
-        AvatarHelper.setAvatar(message.isFirst(), message.getAvatarUrl(), mPicasso, mChatsReceivedAvatar);
+        AvatarHelper.setAvatar(item.isFirst(), item.getAvatarUrl(), mPicasso, mChatsReceivedAvatar);
 
         mItemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                message.click();
+                item.click();
             }
         });
+    }
+
+    @OnClick(R.id.chats_received_avatar)
+    public void onAvatarClicked() {
+        item.onAvatarClicked();
     }
 
     public static ViewHolderManager.BaseViewHolder create(@NonNull View view, Picasso picasso) {

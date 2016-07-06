@@ -1,0 +1,170 @@
+package com.shoutit.app.android.view.shouts;
+
+import android.content.Context;
+import android.graphics.Color;
+import android.support.annotation.NonNull;
+import android.view.View;
+import android.widget.CheckBox;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.appunite.rx.android.adapter.ViewHolderManager;
+import com.google.common.base.Strings;
+import com.jakewharton.rxbinding.view.RxView;
+import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.ConversationDetails;
+import com.shoutit.app.android.api.model.Shout;
+import com.shoutit.app.android.utils.DateTimeUtils;
+import com.shoutit.app.android.utils.PicassoHelper;
+import com.shoutit.app.android.utils.PriceUtils;
+import com.shoutit.app.android.view.chats.ChatActivity;
+import com.shoutit.app.android.view.chats.chatsfirstconversation.ChatFirstConversationActivity;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
+
+import java.util.List;
+
+import javax.annotation.Nonnull;
+import javax.inject.Named;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import rx.subscriptions.CompositeSubscription;
+
+public class ShoutLinearViewHolder extends ViewHolderManager.BaseViewHolder<ShoutAdapterItem> implements View.OnClickListener {
+
+    @Bind(R.id.shout_grid_image_view)
+    ImageView cardImageView;
+    @Bind(R.id.shout_grid_title_tv)
+    TextView titleTextView;
+    @Bind(R.id.home_feed_card_user_tv)
+    TextView nameTextView;
+    @Bind(R.id.shout_grid_price_tv)
+    TextView cardPriceTextView;
+    @Bind(R.id.home_feed_card_chat_iv)
+    View chatIcon;
+    @Bind(R.id.home_feed_card_item_icon_iv)
+    ImageView itemCategoryImageView;
+    @Bind(R.id.home_feed_card_type_label_tv)
+    TextView typeLabelTextView;
+    @Bind(R.id.shout_promoted_label)
+    TextView mShoutPromotedLabel;
+    @Bind(R.id.home_feed_card_country_iv)
+    ImageView countryImageView;
+    @Bind(R.id.shout_container)
+    View shoutContainer;
+    @Bind(R.id.shout_grid_bookmark)
+    CheckBox mBoomark;
+
+    private CompositeSubscription subscription;
+    @Nonnull
+    private final Context context;
+    private final Picasso picasso;
+    private final Picasso picassoNoTransformer;
+    private ShoutAdapterItem item;
+
+    public ShoutLinearViewHolder(@Nonnull View itemView, @NonNull Context context, Picasso picasso,
+                                 @Named("NoAmazonTransformer") Picasso picassoNoTransformer) {
+        super(itemView);
+        this.context = context;
+        this.picasso = picasso;
+        this.picassoNoTransformer = picassoNoTransformer;
+        ButterKnife.bind(this, itemView);
+        itemView.setOnClickListener(this);
+    }
+
+    @Override
+    public void bind(@Nonnull final ShoutAdapterItem item) {
+        this.item = item;
+        recycle();
+
+        if (item.isPromoted()) {
+            mShoutPromotedLabel.setVisibility(View.VISIBLE);
+            mShoutPromotedLabel.setText(item.getLabel());
+            mShoutPromotedLabel.setBackgroundColor(item.getColor());
+            shoutContainer.setBackgroundColor(item.getBgColor());
+        } else {
+            mShoutPromotedLabel.setVisibility(View.GONE);
+            shoutContainer.setBackgroundColor(Color.WHITE);
+        }
+
+        final Shout shout = item.getShout();
+
+        titleTextView.setText(shout.getTitle());
+
+        final String timeAgo = DateTimeUtils.timeAgoFromSecondsToWeek(context, shout.getDatePublishedInMillis());
+        nameTextView.setText(context.getString(R.string.home_user_and_date, shout.getProfile().getName(), timeAgo));
+
+        final String price = PriceUtils.formatPriceWithCurrency(shout.getPrice(),
+                context.getResources(), shout.getCurrency());
+        cardPriceTextView.setText(price);
+
+        typeLabelTextView.setText(shout.getTypeResId());
+
+        picasso.load(Strings.emptyToNull(shout.getThumbnail()))
+                .placeholder(R.drawable.pattern_placeholder)
+                .fit()
+                .centerCrop()
+                .into(cardImageView);
+
+        picassoNoTransformer.load(item.getCategoryIconUrl())
+                .fit()
+                .centerInside()
+                .into(itemCategoryImageView);
+
+        final Target target = PicassoHelper.getRoundedBitmapTarget(context, countryImageView);
+        cardImageView.setTag(target);
+
+        if (item.getCountryResId().isPresent()) {
+            picasso.load(item.getCountryResId().get())
+                    .resizeDimen(R.dimen.home_country_icon, R.dimen.home_country_icon)
+                    .into(target);
+        }
+
+        final List<ConversationDetails> conversations = shout.getConversations();
+        final boolean enableChatIcon = !item.isShoutOwner() && item.isNormalUser();
+        chatIcon.setEnabled(enableChatIcon);
+        chatIcon.setAlpha(enableChatIcon ? 1f : 0.5f);
+
+        subscription = new CompositeSubscription(
+                RxView.clicks(chatIcon)
+                        .subscribe(aVoid -> {
+                            if (!item.isNormalUser()) {
+                                return;
+                            }
+
+                            final boolean hasConversation = conversations != null && !conversations.isEmpty();
+                            if (hasConversation) {
+                                context.startActivity(ChatActivity.newIntent(context, conversations.get(0).getId()));
+                            } else {
+                                context.startActivity(ChatFirstConversationActivity.newIntent(context, true, item.getShout().getId()));
+                            }
+                        }),
+                item.getBookmarkObservable()
+                        .subscribe(checked -> mBoomark.setChecked(checked)),
+                item.getEnableObservable()
+                        .subscribe(enable -> {
+                            mBoomark.setEnabled(enable);
+                        }));
+
+        mBoomark.setOnClickListener(v -> item.onBookmarkSelectionChanged(mBoomark.isChecked()));
+    }
+
+    @Override
+    public void onViewRecycled() {
+        recycle();
+        super.onViewRecycled();
+    }
+
+    private void recycle() {
+        if (subscription != null) {
+            subscription.unsubscribe();
+            subscription = null;
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        item.onShoutSelected();
+    }
+}

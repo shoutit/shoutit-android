@@ -45,20 +45,17 @@ public class ListeningsActivity extends BaseProfilesListActivity {
 
         presenter = (ListeningsPresenter) ((ListeningsActivityComponent) getActivityComponent()).profilesListPresenter();
 
-        presenter.getProfileToOpenObservable()
+        presenter.getOpenProfileObservable()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String userName) {
-                        if (areInterests) {
-                            startActivityForResult(
-                                    TagProfileActivity.newIntent(ListeningsActivity.this, userName),
-                                    REQUEST_OPENED_PROFILE_WAS_LISTENED);
-                        } else {
-                            startActivityForResult(
-                                    UserOrPageProfileActivity.newIntent(ListeningsActivity.this, userName),
-                                    REQUEST_OPENED_PROFILE_WAS_LISTENED);
-                        }
+                .subscribe(userName -> {
+                    if (areInterests) {
+                        startActivityForResult(
+                                TagProfileActivity.newIntent(ListeningsActivity.this, userName),
+                                REQUEST_OPENED_PROFILE_WAS_LISTENED);
+                    } else {
+                        startActivityForResult(
+                                UserOrPageProfileActivity.newIntent(ListeningsActivity.this, userName),
+                                REQUEST_OPENED_PROFILE_WAS_LISTENED);
                     }
                 });
     }

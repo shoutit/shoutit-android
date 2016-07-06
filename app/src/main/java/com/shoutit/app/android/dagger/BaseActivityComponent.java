@@ -13,11 +13,14 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.Gson;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.CategoriesDao;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ListeningsDao;
+import com.shoutit.app.android.dao.PagesDao;
 import com.shoutit.app.android.dao.ProfilesDao;
+import com.shoutit.app.android.dao.PublicPagesDaos;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.SortTypesDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
@@ -28,6 +31,7 @@ import com.shoutit.app.android.db.RecentSearchesTable;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
+import com.shoutit.app.android.view.loginintro.FacebookHelper;
 import com.squareup.picasso.Picasso;
 
 
@@ -85,6 +89,8 @@ public interface BaseActivityComponent {
 
     ListeningsDao listeningsDao();
 
+    PublicPagesDaos publicPagesDaos();
+
     GoogleApiClient googleApiClient();
 
     UserPreferences userPreferences();
@@ -110,4 +116,10 @@ public interface BaseActivityComponent {
     PusherHelper pusherHelper();
 
     MixPanel mixPanel();
+
+    PagesDao pagesDao();
+
+    FacebookHelper facebookHelper();
+
+    BookmarksDao bookmarkDao();
 }

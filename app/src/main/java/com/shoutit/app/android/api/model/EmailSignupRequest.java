@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.shoutit.app.android.api.model.login.BaseLoginRequest;
-import com.shoutit.app.android.api.model.login.LoginUser;
+import com.shoutit.app.android.api.model.login.LoginProfile;
 
 public class EmailSignupRequest extends BaseLoginRequest {
 
@@ -20,9 +20,10 @@ public class EmailSignupRequest extends BaseLoginRequest {
     public EmailSignupRequest(@NonNull String name,
                               @NonNull String email,
                               @NonNull String password,
-                              @Nullable LoginUser user,
-                              @NonNull String mixpanelDistinctId) {
-        super(mixpanelDistinctId, SHOUTIT_SIGNUP, user);
+                              @Nullable LoginProfile user,
+                              @NonNull String mixpanelDistinctId,
+                              @Nullable String invitationCode) {
+        super(mixpanelDistinctId, SHOUTIT_SIGNUP, user, invitationCode);
         this.name = name;
         this.email = email;
         this.password = password;

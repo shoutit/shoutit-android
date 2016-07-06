@@ -1,20 +1,28 @@
 package com.shoutit.app.android.view.editprofile;
 
 import android.Manifest;
+import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +33,7 @@ import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ActivityModule;
@@ -36,10 +45,17 @@ import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.utils.rx.Actions1;
+import com.shoutit.app.android.utils.rx.RxUtils;
 import com.shoutit.app.android.view.createshout.location.LocationActivity;
 import com.shoutit.app.android.view.createshout.location.LocationResultHelper;
+import com.shoutit.app.android.widget.GenderSpinnerAdapter;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -105,7 +121,10 @@ public class EditProfileActivity extends BaseActivity {
     ImageView avatarPhotoIconIv;
     @Bind(R.id.edit_profile_avatar_progressbar)
     ProgressBar avatarProgressbar;
-
+    @Bind(R.id.edit_profile_gender_spinner)
+    Spinner genderSpinner;
+    @Bind(R.id.edit_profile_birthday_tv)
+    TextView birthDayTv;
 
     @Inject
     EditProfilePresenter presenter;
@@ -130,6 +149,11 @@ public class EditProfileActivity extends BaseActivity {
         ButterKnife.bind(this);
 
         setUpToolbar();
+
+        final String[] genders = getResources().getStringArray(R.array.genders);
+        final GenderSpinnerAdapter genderAdapter = new GenderSpinnerAdapter(
+                this, R.layout.spinner_layout, android.R.layout.simple_dropdown_item_1line, genders);
+        genderSpinner.setAdapter(genderAdapter);
 
         presenter.getUserObservable()
                 .compose(this.<User>bindToLifecycle())
@@ -176,6 +200,38 @@ public class EditProfileActivity extends BaseActivity {
                 .map(MoreFunctions1.mapTextChangeEventToString())
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(presenter.getMobileObserver());
+
+        RxUtils.spinnerItemClicks(genderSpinner)
+                .map(onItemClickEvent -> {
+                    final int adapterPosition = onItemClickEvent.position;
+                    switch (adapterPosition) {
+                        case 0:
+                            return User.Gender.MALE.getGenderInApi();
+                        case 1:
+                            return User.Gender.FEMALE.getGenderInApi();
+                        case 2:
+                            return User.Gender.OTHER.getGenderInApi();
+                        case 3:
+                            return User.Gender.NOT_SPECIFIED.getGenderInApi();
+                        default:
+                            throw new RuntimeException("Unknown gender");
+                    }
+                })
+                .compose(bindToLifecycle())
+                .subscribe(presenter.getGenderObserver());
+
+        RxView.clicks(birthDayTv)
+                .compose(bindToLifecycle())
+                .subscribe(new Action1<Void>() {
+                    @Override
+                    public void call(Void aVoid) {
+                        presenter.showDatePicker();
+                    }
+                });
+
+        presenter.getShowDatePickerObservable()
+                .compose(bindToLifecycle())
+                .subscribe(this::showDatePicker);
 
         RxView.clicks(avatarSelectorView)
                 .compose(bindToLifecycle())
@@ -257,6 +313,48 @@ public class EditProfileActivity extends BaseActivity {
         presenter.getUsernameErrorObservable()
                 .compose(this.<Boolean>bindToLifecycle())
                 .subscribe(Actions1.setOrEraseError(usernameInput, getString(R.string.error_field_empty)));
+
+        presenter.getShowCompleteProfileDialogObservable()
+                .compose(bindToLifecycle())
+                .subscribe(ignore -> {
+                    showCompleteProfileDialog();
+                });
+
+        presenter.getBirthdayObservable()
+                .compose(bindToLifecycle())
+                .subscribe(birthDay -> {
+                    birthDayTv.setText(birthDay);
+                });
+    }
+
+    private void showDatePicker(long initDate) {
+        final Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date(initDate));
+
+        new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                calendar.set(year, monthOfYear, dayOfMonth);
+                presenter.birthdayChanged(calendar.getTimeInMillis());
+            }
+        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), Calendar.DAY_OF_MONTH)
+                .show();
+    }
+
+    private void showCompleteProfileDialog() {
+        if (isFinishing()) {
+            return;
+        }
+
+        new AlertDialog.Builder(this)
+                .setMessage(R.string.edit_profile_complete_profile_message)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .show();
     }
 
     @NonNull
@@ -303,17 +401,31 @@ public class EditProfileActivity extends BaseActivity {
 
     @NonNull
     private Action1<User> setUserData() {
-        return new Action1<User>() {
-            @Override
-            public void call(User user) {
-                firstNameEt.setText(user.getFirstName());
-                lastNameEt.setText(user.getLastName());
-                usernameEt.setText(user.getUsername());
-                bioEt.setText(user.getBio());
-                websiteEt.setText(user.getWebsite());
-                mobileEt.setText(user.getMobile());
-            }
+        return user -> {
+            firstNameEt.setText(user.getFirstName());
+            lastNameEt.setText(user.getLastName());
+            usernameEt.setText(user.getUsername());
+            bioEt.setText(user.getBio());
+            websiteEt.setText(user.getWebsite());
+            mobileEt.setText(user.getMobile());
+            final String gender = user.getGender();
+            genderSpinner.setSelection(getAdapterPositionForGender(gender));
+            birthDayTv.setText(user.getBirthday());
         };
+    }
+
+    private int getAdapterPositionForGender(@Nullable String gender) {
+        if (TextUtils.isEmpty(gender)) {
+            return 3;
+        } else if (gender.equals(User.Gender.MALE.getGenderInApi())){
+            return 0;
+        }  else if (gender.equals(User.Gender.FEMALE.getGenderInApi())){
+            return 1;
+        } else if (gender.equals(User.Gender.OTHER.getGenderInApi())){
+            return 2;
+        } else {
+            throw new RuntimeException("Unknwon gender");
+        }
     }
 
     @NonNull

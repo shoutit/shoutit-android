@@ -80,7 +80,7 @@ public class Twilio {
                   @Nonnull final UsersIdentityDao usersIdentityDao,
                   @Nonnull final ApiService apiService,
                   @Nonnull final UserPreferences userPreferences,
-                  @Nonnull@NetworkScheduler final Scheduler networkScheduler,
+                  @Nonnull @NetworkScheduler final Scheduler networkScheduler,
                   @Nonnull @UiScheduler final Scheduler uiScheduler) {
         mContext = context;
         this.userPreferences = userPreferences;

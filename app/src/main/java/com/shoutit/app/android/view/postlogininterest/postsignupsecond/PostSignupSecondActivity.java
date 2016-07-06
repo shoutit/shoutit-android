@@ -15,10 +15,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
-import com.shoutit.app.android.view.main.DaggerMainActivityComponent;
 import com.shoutit.app.android.view.main.MainActivity;
-import com.shoutit.app.android.view.main.MainActivityComponent;
-import com.shoutit.app.android.view.main.MainActivityModule;
 import com.viewpagerindicator.CirclePageIndicator;
 
 import javax.annotation.Nonnull;

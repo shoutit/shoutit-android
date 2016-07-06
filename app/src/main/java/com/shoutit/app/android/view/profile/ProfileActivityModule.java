@@ -1,6 +1,7 @@
 package com.shoutit.app.android.view.profile;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
@@ -8,9 +9,12 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.dagger.ActivityScope;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
+import com.shoutit.app.android.utils.BookmarkHelper;
+import com.shoutit.app.android.utils.ListeningHalfPresenter;
 import com.shoutit.app.android.utils.PreferencesHelper;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
 import com.shoutit.app.android.view.profile.myprofile.MyProfileHalfPresenter;
@@ -40,9 +44,11 @@ public class ProfileActivityModule {
                                                     @NetworkScheduler Scheduler networkScheduler, ApiService apiService,
                                                     PreferencesHelper preferencesHelper, UserProfileHalfPresenter userProfilePresenter,
                                                     MyProfileHalfPresenter myProfilePresenter, ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
-                                                    PusherHelper pusherHelper) {
+                                                    PusherHelper pusherHelper, ListeningHalfPresenter listeningHalfPresenter, BookmarksDao bookmarksDao,
+                                                    BookmarkHelper bookmarkHelper) {
         return new UserOrPageProfilePresenter(userName, shoutsDao, context, preferences, uiScheduler, networkScheduler,
-                profilesDao, myProfilePresenter, userProfilePresenter, preferencesHelper, shoutsGlobalRefreshPresenter, apiService, pusherHelper);
+                profilesDao, myProfilePresenter, userProfilePresenter, preferencesHelper, shoutsGlobalRefreshPresenter,
+                listeningHalfPresenter, apiService, pusherHelper, bookmarksDao, bookmarkHelper);
     }
 
 }

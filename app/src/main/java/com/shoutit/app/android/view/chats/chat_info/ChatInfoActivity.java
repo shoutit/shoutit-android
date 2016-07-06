@@ -71,7 +71,7 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
     @Bind(R.id.chat_info_blocked_number)
     TextView mChatInfoBlockedNumber;
     @Bind(R.id.chat_info_exit_chat)
-    Button mChatInfoEditChat;
+    Button mChatInfoExitChat;
     @Bind(R.id.chat_info_progress)
     FrameLayout mChatInfoProgress;
     @Bind(R.id.chat_info_subject_layout)
@@ -82,7 +82,11 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
     TextView mChatInfoChatCreatedAt;
     @Bind(R.id.chat_info_edit_save)
     Button mChatInfoEditSave;
-    private String mConversationId;
+    @Bind(R.id.chat_info_blocked_layouts)
+    View mBlockedView;
+    @Bind(R.id.chat_info_blocked_divider)
+    View mBlockedDividerView;
+
 
     private String conversationId;
 
@@ -94,12 +98,12 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        conversationId = getIntent().getStringExtra(EXTRA_CONVERSATION_ID);
+        Preconditions.checkNotNull(conversationId);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.chat_info_activity);
         ButterKnife.bind(this);
-
-        conversationId = getIntent().getStringExtra(EXTRA_CONVERSATION_ID);
-        Preconditions.checkNotNull(conversationId);
 
         mChatInfoToolbar.setTitle(R.string.chat_info_title);
         mChatInfoToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
@@ -108,7 +112,7 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
         mChatInfoToolbar.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case R.id.chat_info_add_person: {
-                    startActivity(ChatSelectUsersActivity.newIntent(ChatInfoActivity.this, mConversationId));
+                    startActivity(ChatSelectUsersActivity.newIntent(ChatInfoActivity.this, conversationId));
                     return true;
                 }
                 case R.id.chats_info_report: {
@@ -137,10 +141,9 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
     @Nonnull
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
-        mConversationId = getIntent().getStringExtra(EXTRA_CONVERSATION_ID);
         final ChatInfoComponent build = DaggerChatInfoComponent.builder()
                 .activityModule(new ActivityModule(this))
-                .chatInfoModule(new ChatInfoModule(mConversationId))
+                .chatInfoModule(new ChatInfoModule(conversationId))
                 .appComponent(App.getAppComponent(getApplication()))
                 .build();
         build.inject(this);
@@ -245,12 +248,14 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
         mChatInfoToolbar.getMenu().findItem(R.id.chat_info_add_person).setVisible(isAdmin);
         mChatInfoSubject.setVisibility(isAdmin ? View.VISIBLE : View.GONE);
         mChatInfoSubjectTextView.setVisibility(!isAdmin ? View.VISIBLE : View.GONE);
+        mBlockedView.setVisibility(isAdmin ? View.VISIBLE : View.GONE);
+        mBlockedDividerView.setVisibility(isAdmin ? View.VISIBLE : View.GONE);
     }
 
     @Override
-    public void showSubject(boolean show) {
-        mChatInfoSubjectLayout.setVisibility(show ? View.VISIBLE : View.GONE);
-        mChatInfoEditSave.setVisibility(show ? View.VISIBLE : View.GONE);
+    public void showSubject(boolean isPublicChat, boolean isAdmin) {
+        mChatInfoSubjectLayout.setVisibility(isPublicChat ? View.VISIBLE : View.GONE);
+        mChatInfoEditSave.setVisibility(isAdmin && isPublicChat ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -281,6 +286,11 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
     @Override
     public void reportError() {
         ColoredSnackBar.error(ColoredSnackBar.contentView(this), R.string.chat_info_report_error, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showExitButton(boolean show) {
+        mChatInfoExitChat.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     @OnClick(R.id.chat_info_edit_save)
@@ -324,11 +334,11 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
 
     @OnClick(R.id.chat_info_participants_layouts)
     void clickParticipants() {
-        startActivity(ChatParticipantsActivity.newIntent(this, mConversationId));
+        startActivity(ChatParticipantsActivity.newIntent(this, conversationId));
     }
 
     @OnClick(R.id.chat_info_blocked_layouts)
     void clickBlocked() {
-        startActivity(ChatBlockedUsersActivity.newIntent(this, mConversationId));
+        startActivity(ChatBlockedUsersActivity.newIntent(this, conversationId));
     }
 }
