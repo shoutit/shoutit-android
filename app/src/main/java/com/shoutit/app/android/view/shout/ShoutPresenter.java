@@ -33,6 +33,7 @@ import com.shoutit.app.android.model.UserShoutsPointer;
 import com.shoutit.app.android.utils.BookmarkHelper;
 import com.shoutit.app.android.utils.PromotionHelper;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
+import com.shoutit.app.android.view.loginintro.FacebookHelper;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
 import java.util.List;
@@ -45,8 +46,9 @@ import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Func1;
-import rx.functions.Func3;
+import rx.functions.Func4;
 import rx.subjects.PublishSubject;
+import rx.subscriptions.CompositeSubscription;
 
 public class ShoutPresenter {
 
@@ -85,6 +87,8 @@ public class ShoutPresenter {
     private PublishSubject<Object> shareSubject = PublishSubject.create();
     private PublishSubject<Object> showDeleteDialogSubject = PublishSubject.create();
 
+    private final CompositeSubscription likesSubscription = new CompositeSubscription();
+
     @Nonnull
     private final Scheduler uiScheduler;
     @Nonnull
@@ -105,6 +109,7 @@ public class ShoutPresenter {
                           @Nonnull @NetworkScheduler final Scheduler networkScheduler,
                           @Nonnull final UserPreferences userPreferences,
                           @Nonnull final ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
+                          @Nonnull FacebookHelper facebookHelper,
                           @NonNull BookmarksDao bookmarksDao,
                           @NonNull BookmarkHelper bookmarkHelper) {
         this.uiScheduler = uiScheduler;
@@ -167,10 +172,12 @@ public class ShoutPresenter {
         final Observable<ShoutAdapterItems.MainShoutAdapterItem> shoutItemObservable =
                 successShoutResponse.map(shout -> {
                     final BookmarkHelper.ShoutItemBookmarkHelper shoutItemBookmarkHelper = bookmarkHelper.getShoutItemBookmarkHelper();
+                    final boolean isShoutOwner = shout.getProfile().getUsername().equals(currentUserName);
+
                     return new ShoutAdapterItems.MainShoutAdapterItem(addToCartSubject, onCategoryClickedSubject,
                             visitProfileSubject, likeClickedSubject, shout, context.getResources(),
                             bookmarksDao.getBookmarkForShout(shoutId, shout.isBookmarked()),
-                            shoutItemBookmarkHelper.getObserver(),
+                            shoutItemBookmarkHelper.getObserver(), isShoutOwner, isNormalUser,
                             shoutItemBookmarkHelper.getEnableObservable());
                 });
 
@@ -207,30 +214,39 @@ public class ShoutPresenter {
                     }
                 });
 
+        final Observable<BaseAdapterItem> fbAddAdapterItem = facebookHelper.getShoutDetailAdapterItem()
+                .compose(ObservableExtensions.behaviorRefCount());
+
         allAdapterItemsObservable = Observable.combineLatest(
                 shoutItemObservable,
                 userShoutItemsObservable.startWith(ImmutableList.<BaseAdapterItem>of()),
                 relatedShoutsItems.startWith(ImmutableList.<BaseAdapterItem>of()),
-                (Func3<ShoutAdapterItems.MainShoutAdapterItem, List<BaseAdapterItem>, List<BaseAdapterItem>, List<BaseAdapterItem>>) (shout, userShouts, relatedShouts) -> {
-                    final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
+                fbAddAdapterItem.startWith((BaseAdapterItem) null),
+                (Func4<ShoutAdapterItems.MainShoutAdapterItem, List<BaseAdapterItem>, List<BaseAdapterItem>, BaseAdapterItem, List<BaseAdapterItem>>)
+                        (shout, userShouts, relatedShouts, fbAdItem) -> {
+                            final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
 
-                    builder.add(shout);
+                            builder.add(shout);
 
-                    final User user = shout.getShout().getProfile();
-                    if (!userShouts.isEmpty()) {
-                        builder.add(new HeaderAdapterItem(context.getString(R.string.shout_user_shouts_header, user.getFirstName()).toUpperCase()))
-                                .addAll(userShouts);
-                    }
+                            final User user = shout.getShout().getProfile();
+                            if (!userShouts.isEmpty()) {
+                                builder.add(new HeaderAdapterItem(context.getString(R.string.shout_user_shouts_header, user.getFirstName()).toUpperCase()))
+                                        .addAll(userShouts);
+                            }
 
-                    builder.add(new ShoutAdapterItems.VisitProfileAdapterItem(visitProfileSubject, user));
+                            builder.add(new ShoutAdapterItems.VisitProfileAdapterItem(visitProfileSubject, user));
 
-                    if (!relatedShouts.isEmpty()) {
-                        builder.add(new HeaderAdapterItem(context.getString(R.string.shout_related_shouts_header)))
-                                .add(new ShoutAdapterItems.RelatedContainerAdapterItem(relatedShouts));
-                    }
+                            if (!relatedShouts.isEmpty()) {
+                                builder.add(new HeaderAdapterItem(context.getString(R.string.shout_related_shouts_header)))
+                                        .add(new ShoutAdapterItems.RelatedContainerAdapterItem(relatedShouts));
+                            }
 
-                    return builder.build();
-                })
+                            if (fbAdItem != null) {
+                                builder.add(fbAdItem);
+                            }
+
+                            return builder.build();
+                        })
                 .observeOn(uiScheduler);
 
         /** Like / Unlike Shout **/
@@ -251,17 +267,21 @@ public class ShoutPresenter {
                         .compose(ResponseOrError.toResponseOrErrorObservable()))
                 .compose(ObservableExtensions.behaviorRefCount());
 
-        likeShoutResponseObservable
-                .compose(ResponseOrError.onlySuccess())
-                .withLatestFrom(successShoutResponse,
-                        (o, shout) -> shout.likedShout(true))
-                .subscribe(shoutsDao.getShoutDao(shoutId).onShoutLikedObserver());
+        likesSubscription.add(
+                likeShoutResponseObservable
+                        .compose(ResponseOrError.onlySuccess())
+                        .withLatestFrom(successShoutResponse,
+                                (o, shout) -> shout.likedShout(true))
+                        .subscribe(shoutsDao.getShoutDao(shoutId).onShoutLikedObserver())
+        );
 
-        unlikeShoutResponseObservable
-                .compose(ResponseOrError.onlySuccess())
-                .withLatestFrom(successShoutResponse,
-                        (o, shout) -> shout.likedShout(false))
-                .subscribe(shoutsDao.getShoutDao(shoutId).onShoutLikedObserver());
+        likesSubscription.add(
+                unlikeShoutResponseObservable
+                        .compose(ResponseOrError.onlySuccess())
+                        .withLatestFrom(successShoutResponse,
+                                (o, shout) -> shout.likedShout(false))
+                        .subscribe(shoutsDao.getShoutDao(shoutId).onShoutLikedObserver())
+        );
 
         /** Errors **/
         errorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
@@ -383,6 +403,10 @@ public class ShoutPresenter {
                 .withLatestFrom(successShoutResponse, (o, shout) -> shout.getWebUrl());
     }
 
+    public void unsubscribe() {
+        likesSubscription.unsubscribe();
+    }
+
     @Nonnull
     public Observable<String> getShareObservable() {
         return shareObservable;
@@ -472,7 +496,6 @@ public class ShoutPresenter {
     @Nonnull
     public Observable<BottomBarData> getBottomBarDataObservable() {
         return allAdapterItemsObservable
-                .take(1)
                 .flatMap(baseAdapterItems -> Observable.combineLatest(
                         isUserShoutOwnerObservable,
                         conversationObservable,
@@ -484,6 +507,7 @@ public class ShoutPresenter {
                                     mUserPreferences.isNormalUser(), shout.isPromoted());
                         }
                 ))
+                .take(1)
                 .observeOn(uiScheduler);
     }
 

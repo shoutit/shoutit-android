@@ -614,6 +614,6 @@ public interface ApiService {
     @DELETE("shouts/{id}/bookmark")
     Observable<ResponseBody> deleteBookmark(@Path("id") String id);
 
-    @GET("profiles/{username}/bookmarks")
-    Observable<ShoutsResponse> getBookmarkedShouts(@Path("username") String username);
+    @GET("profiles/me/bookmarks")
+    Observable<ShoutsResponse> getBookmarkedShouts();
 }

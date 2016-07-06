@@ -59,7 +59,6 @@ import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsAct
 import com.shoutit.app.android.view.videoconversation.VideoConversationActivity;
 
 import java.util.List;
-import java.util.Locale;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -458,7 +457,7 @@ public class ShoutActivity extends BaseActivity {
 
         final boolean rtlEnable = RtlUtils.isRtlEnabled(this);
         final int spacing = getResources().getDimensionPixelSize(R.dimen.shout_item_padding);
-        final int bottomSpacing = getResources().getDimensionPixelSize(R.dimen.shout_bottom_bar);
+        final int bottomSpacing = getResources().getDimensionPixelSize(R.dimen.last_item_margin);
         recyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
@@ -538,6 +537,12 @@ public class ShoutActivity extends BaseActivity {
             presenter.refreshShoutsObserver().onNext(null);
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    protected void onDestroy() {
+        presenter.unsubscribe();
+        super.onDestroy();
     }
 
     @Nonnull

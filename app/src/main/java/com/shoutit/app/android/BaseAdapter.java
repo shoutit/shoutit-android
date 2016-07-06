@@ -20,7 +20,7 @@ public abstract class BaseAdapter extends RecyclerView.Adapter<ViewHolderManager
         Action1<List<BaseAdapterItem>>, ChangesDetector.ChangesAdapter {
 
     @Nonnull
-    private final ChangesDetector<BaseAdapterItem, BaseAdapterItem> changesDetector;
+    protected final ChangesDetector<BaseAdapterItem, BaseAdapterItem> changesDetector;
     @Nonnull
     protected final Context context;
     @Nonnull

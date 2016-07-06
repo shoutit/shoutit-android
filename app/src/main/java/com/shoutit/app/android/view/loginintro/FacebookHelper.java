@@ -14,14 +14,20 @@ import com.facebook.FacebookAuthorizationException;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.ads.AdError;
+import com.facebook.ads.AdSettings;
+import com.facebook.ads.NativeAd;
+import com.facebook.ads.NativeAdsManager;
 import com.facebook.applinks.AppLinkData;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.share.model.AppInviteContent;
 import com.facebook.share.widget.AppInviteDialog;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.adapteritems.FbAdAdapterItem;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.LinkedAccounts;
 import com.shoutit.app.android.api.model.UpdateFacebookTokenRequest;
@@ -31,6 +37,7 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -41,11 +48,16 @@ import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Scheduler;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
+import rx.functions.FuncN;
 
 public class FacebookHelper {
 
     private static final String TAG = FacebookHelper.class.getSimpleName();
+
+    private static final int ADS_NUM_TO_PREFETCH = 8;
+    private static final int ADS_NUM_SHOUT_DETAIL_TO_PREFETCH = 5;
 
     private static final String PERMISSION_EMAIL = "email";
     public static final String PERMISSION_USER_FRIENDS = "user_friends";
@@ -58,6 +70,9 @@ public class FacebookHelper {
     private final Context context;
     private final Scheduler networkScheduler;
     private final PusherHelper pusherHelper;
+    private final NativeAdsManager listAdManager;
+    private final NativeAdsManager gridAdManager;
+    private final NativeAdsManager shoutDetailAdManager;
 
     public FacebookHelper(final ApiService apiService,
                           final UserPreferences userPreferences,
@@ -69,10 +84,48 @@ public class FacebookHelper {
         this.context = context;
         this.networkScheduler = networkScheduler;
         this.pusherHelper = pusherHelper;
+
+        listAdManager = new NativeAdsManager(
+                context, getListAdId(), ADS_NUM_TO_PREFETCH);
+
+        gridAdManager = new NativeAdsManager(
+                context, getGridAdId(), ADS_NUM_TO_PREFETCH);
+
+        shoutDetailAdManager = new NativeAdsManager(
+                context, getShoutDetailAdId(), ADS_NUM_SHOUT_DETAIL_TO_PREFETCH);
+
+        final NativeAdsManager.Listener adsListener = new NativeAdsManager.Listener() {
+            @Override
+            public void onAdsLoaded() {
+                LogHelper.logIfDebug(TAG, "onAdsLoaded");
+            }
+
+            @Override
+            public void onAdError(AdError adError) {
+                LogHelper.logThrowableAndCrashlytics(TAG,
+                        "Error while loading FB ad - onAdsError",
+                        new Throwable(adError.getErrorMessage()));
+            }
+        };
+
+        listAdManager.setListener(adsListener);
+        gridAdManager.setListener(adsListener);
+        shoutDetailAdManager.setListener(adsListener);
+
+        loadAds();
     }
 
     public void initFacebook() {
         FacebookSdk.sdkInitialize(context, this::refreshTokenIfNeeded);
+    }
+
+    private void loadAds() {
+        AdSettings.addTestDevice("e206dc0d711d548562ff65e91961aebf");
+        AdSettings.addTestDevice("2527377803eebdb0123194b820f02a5a");
+        AdSettings.addTestDevice("e5c7606e893f5e4e19ce8f03429c8b47");
+        listAdManager.loadAds(NativeAd.MediaCacheFlag.ALL);
+        gridAdManager.loadAds(NativeAd.MediaCacheFlag.ALL);
+        shoutDetailAdManager.loadAds(NativeAd.MediaCacheFlag.ALL);
     }
 
     @Nonnull
@@ -146,7 +199,7 @@ public class FacebookHelper {
                                                                          final boolean isPublishPermission) {
         final User user = userPreferences.getUser();
 
-        if (user != null && hasRequiredPermissionLocally(permissionName) && hasRequiredPermissionInApi(user, permissionName)) {
+        if (user != null && hasRequiredPermissions(user, permissionName)) {
             return Observable.just(ResponseOrError.fromData(true));
         } else {
             return Observable
@@ -272,6 +325,10 @@ public class FacebookHelper {
                 AccessToken.getCurrentAccessToken().getPermissions().contains(permission);
     }
 
+    public boolean hasRequiredPermissions(@Nonnull User user, @Nonnull String permission) {
+        return hasRequiredPermissionInApi(user, permission) && hasRequiredPermissionLocally(permission);
+    }
+
     private boolean shouldRefreshToken(@Nonnull User user) {
         final long currentTimeInSecond = System.currentTimeMillis() / 1000;
         final LinkedAccounts linkedAccounts = user.getLinkedAccounts();
@@ -349,4 +406,97 @@ public class FacebookHelper {
             appInviteDialog.show(content);
         }
     }
+
+    public Observable<List<NativeAd>> getAdsObservable(NativeAdsManager nativeAdsManager, int adsNumber) {
+        final List<Observable<ResponseOrError<NativeAd>>> adsObservables = new ArrayList<>();
+
+        final ImmutableList.Builder<NativeAd> builder = ImmutableList.builder();
+
+        for (int i = 0; i < adsNumber; i++) {
+            adsObservables.add(getAdObservable(nativeAdsManager));
+        }
+
+        return Observable.combineLatest(adsObservables, (FuncN<List<NativeAd>>) args -> {
+            for (int i = 0; i < args.length; i++) {
+                final ResponseOrError<NativeAd> ad = (ResponseOrError<NativeAd>) args[i];
+                if (ad.isData()) {
+                    builder.add(ad.data());
+                }
+            }
+
+            return builder.build();
+        });
+    }
+
+    @Nonnull
+    public Observable<ResponseOrError<NativeAd>> getShoutDetailAdObservable() {
+        return getAdObservable(getShoutDetailAdManager());
+    }
+
+    @Nonnull
+    public Observable<FbAdAdapterItem> getShoutDetailAdapterItem() {
+        return getShoutDetailAdObservable()
+                .compose(ResponseOrError.onlySuccess())
+                .map(FbAdAdapterItem::new);
+    }
+
+    @Nonnull
+    public Observable<ResponseOrError<NativeAd>> getAdObservable(NativeAdsManager manager) {
+        return Observable.create(new Observable.OnSubscribe<NativeAd>() {
+            @Override
+            public void call(Subscriber<? super NativeAd> subscriber) {
+                final NativeAd ad = getAd(manager);
+
+                if (ad == null) {
+                    manager.setListener(new NativeAdsManager.Listener() {
+                        @Override
+                        public void onAdsLoaded() {
+                            subscriber.onNext(getAd(manager));
+                        }
+
+                        @Override
+                        public void onAdError(AdError adError) {
+                            subscriber.onError(new Throwable(adError.getErrorMessage()));
+                            LogHelper.logThrowableAndCrashlytics(TAG, "Cannot load ads", new Throwable(adError.getErrorMessage()));
+                        }
+                    });
+                    manager.loadAds();
+                } else {
+                    subscriber.onNext(ad);
+                }
+            }
+        })
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .compose(ResponseOrError.toResponseOrErrorObservable());
+    }
+
+    @Nullable
+    public NativeAd getAd(NativeAdsManager nativeAdsManager) {
+        return nativeAdsManager.nextNativeAd();
+    }
+
+    @Nonnull
+    public NativeAdsManager getManager(boolean isListAd) {
+        return isListAd ? listAdManager : gridAdManager;
+    }
+
+    public NativeAdsManager getShoutDetailAdManager() {
+        return shoutDetailAdManager;
+    }
+
+    @Nonnull
+    private String getListAdId() {
+        return context.getString(R.string.facebook_shout_list_ad_id);
+    }
+
+    @Nonnull
+    private String getGridAdId() {
+        return context.getString(R.string.facebook_shout_grid_ad_id);
+    }
+
+    @Nonnull
+    private String getShoutDetailAdId() {
+        return context.getString(R.string.facebook_shout_detail_ad_id);
+    }
+
 }

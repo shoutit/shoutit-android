@@ -7,7 +7,6 @@
     <string name="shout_type_offer">Offer</string>
     <string name="shout_type_request">Request</string>
     <string name="terms_of_service">Terms of Service</string>
-    <string name="facebook_app_id" translatable="false">353625811317277</string>
     <string name="exit_text">Press BACK again to exit</string>
     <string name="nothing_to_show">Nothing to show</string>
     <string name="empty_field"/>
@@ -19,6 +18,12 @@
         <item quantity="one">%1$d Day</item>
         <item quantity="other">%1$d Days</item>
     </plurals>
+
+    <!-- FB -->
+    <string name="facebook_app_id" translatable="false">353625811317277</string>
+    <string name="facebook_shout_list_ad_id" translatable="false">353625811317277_1245942718752244</string>
+    <string name="facebook_shout_grid_ad_id" translatable="false">353625811317277_1245949345418248</string>
+    <string name="facebook_shout_detail_ad_id" translatable="false">353625811317277_1249824038364112</string>
 
     <!-- Errors -->
     <string name="error_default">Ooops, something went wrong</string>
@@ -674,7 +679,7 @@
     <string name="promote_shout_info_premium_text">Your shout will be highlighted in all searches.
     </string>
     <string name="promote_shout_info_footer">
-        <![CDATA[Promote each shout on your Profile individually by clicking <font color=#26ffd700>"Promote"</font>. To promote a shout you ned to have enough Shoutit Credit.]]></string>
+        <![CDATA[Promote each shout on your Profile individually by clicking <font color=#26ffd700>"Promote"</font>. To promote a shout you need to have enough Shoutit Credit.]]></string>
     <string name="promote_shout_info_top_premium">Top Premium</string>
     <string name="promote_shout_info_top">Top</string>
     <string name="promote_shout_info_top_text">Your shout will appear on top of search results.
@@ -750,5 +755,10 @@
     <string name="linked_accounts_unlink_facebook">Do you really want to unlink your facebook account ?</string>
     <string name="linked_accounts_unlink_google">Do you really want to unlink your google account ?</string>
     <string name="linked_accounts_linked">Linked</string>
+    <!-- Sponsored -->
+    <string name="ad_sponsored">Sponsored</string>
+
+    <!-- Bookmarks -->
+    <string name="bookmarks_no_bookmarks">You don\'t have any bookmarked shouts.</string>
 
 </resources>

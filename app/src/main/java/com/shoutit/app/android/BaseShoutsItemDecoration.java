@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.shoutit.app.android.adapters.ChangeableLayoutManagerAdapter;
+import com.shoutit.app.android.adapters.FBAdsAdapter;
 import com.shoutit.app.android.utils.MyGridLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.utils.RtlUtils;
@@ -35,7 +36,7 @@ public class BaseShoutsItemDecoration extends RecyclerView.ItemDecoration {
         }
 
         final int viewType = adapter.getItemViewType(position);
-        if (viewType != ChangeableLayoutManagerAdapter.VIEW_TYPE_SHOUT) {
+        if (viewType != ChangeableLayoutManagerAdapter.VIEW_TYPE_SHOUT && viewType != FBAdsAdapter.VIEW_TYPE_AD) {
             return;
         }
 

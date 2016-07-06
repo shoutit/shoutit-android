@@ -66,7 +66,7 @@ public abstract class BaseProfileListDao {
                 .compose(MoreOperators.<ResponseOrError<ProfilesListResponse>>cacheWithTimeout(networkScheduler));
     }
 
-    protected abstract Observable<ProfilesListResponse> getRequest(int pageNumber);
+    public abstract Observable<ProfilesListResponse> getRequest(int pageNumber);
 
     @Nonnull
     public Observer<Object> getLoadMoreObserver() {

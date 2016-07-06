@@ -85,7 +85,6 @@ public class ConversationsPresenter {
     private final Scheduler mNetworkScheduler;
     private final Scheduler mUiScheduler;
     private final Context mContext;
-    private final UserPreferences mUserPreferences;
     private final RefreshConversationBus mRefreshConversationBus;
     private final PusherHelper mPusherHelper;
     private final boolean isMyConversationsList;
@@ -111,9 +110,8 @@ public class ConversationsPresenter {
         mNetworkScheduler = networkScheduler;
         mUiScheduler = uiScheduler;
         mContext = context;
-        mUserPreferences = userPreferences;
         mRefreshConversationBus = refreshConversationBus;
-        mUserId = mUserPreferences.getUserOrThrow().getId();
+        mUserId = userPreferences.getUserOrThrow().getId();
         mPusherHelper = pusherHelper;
         this.isMyConversationsList = isMyConversationsList;
         mLocalMessageBus = localMessageBus;
@@ -159,18 +157,8 @@ public class ConversationsPresenter {
             } else {
                 final List<ConversationItem> list = Lists.newArrayList(conversations);
                 Collections.sort(list, (lhs, rhs) -> lhs.getModifiedAt() >= rhs.getModifiedAt() ? -1 : 1);
-                final ImmutableList<BaseAdapterItem> items = ImmutableList.copyOf(
-                        Iterables.transform(
-                                list,
-                                new Function<ConversationItem, BaseAdapterItem>() {
-                                    @Nullable
-                                    @Override
-                                    public BaseAdapterItem apply(@Nullable ConversationItem input) {
-                                        assert input != null;
-                                        return getConversationItem(input);
-                                    }
-                                }));
-
+                final ImmutableList<BaseAdapterItem> items = ImmutableList
+                        .copyOf(Iterables.transform(list, this::getConversationItem));
                 mListener.setData(items);
             }
         };
@@ -328,6 +316,7 @@ public class ConversationsPresenter {
             mIsPublicChat = isPublicChat;
         }
 
+        @SuppressWarnings("SimplifiableIfStatement")
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
@@ -346,7 +335,6 @@ public class ConversationsPresenter {
                 return false;
             if (time != null ? !time.equals(that.time) : that.time != null) return false;
             return image != null ? image.equals(that.image) : that.image == null;
-
         }
 
         @Override

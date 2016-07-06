@@ -2,6 +2,7 @@ package com.shoutit.app.android.view.shout;
 
 import android.content.Context;
 import android.graphics.Rect;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,19 +23,24 @@ import com.jakewharton.rxbinding.view.RxView;
 import com.jakewharton.rxbinding.widget.RxCompoundButton;
 import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.adapteritems.FbAdAdapterItem;
 import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
 import com.shoutit.app.android.api.model.Filter;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
+import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.DateTimeUtils;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.ResourcesHelper;
+import com.shoutit.app.android.viewholders.FbAdLinearViewHolder;
 import com.shoutit.app.android.viewholders.HeaderViewHolder;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.viewpagerindicator.CirclePageIndicator;
+
+import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -53,6 +59,7 @@ public class ShoutAdapter extends BaseAdapter {
     private static final int VIEW_TYPE_VISIT_PROFILE = 3;
     public static final int VIEW_TYPE_RELATED_SHOUTS_CONTAINER = 4;
     private static final int VIEW_TYPE_HEADER = 5;
+    private static final int VIEW_TYPE_FB_AD = 6;
 
     @Nonnull
     private final Picasso picasso;
@@ -140,10 +147,13 @@ public class ShoutAdapter extends BaseAdapter {
         @Override
         public void bind(@Nonnull ShoutAdapterItems.MainShoutAdapterItem item) {
             unsubscribe();
-
             this.item = item;
             final Shout shout = item.getShout();
             final User user = shout.getProfile();
+            final UserLocation location = shout.getLocation();
+
+            shoutViewPager.setAdapter(imagesPagerAdapter);
+            pageIndicator.setViewPager(shoutViewPager);
 
             picasso.load(user.getImage())
                     .resizeDimen(R.dimen.shout_avatar_size, R.dimen.shout_avatar_size)
@@ -152,15 +162,13 @@ public class ShoutAdapter extends BaseAdapter {
                     .error(R.drawable.ic_rect_avatar_placeholder)
                     .into(avatarImageView);
 
+            final boolean showLikeIcon = item.isNormalUser() && !item.isShoutOwner();
+            shoutLikeImageView.setVisibility(showLikeIcon ? View.VISIBLE : View.GONE);
             shoutLikeImageView.setImageResource(shout.isLiked() ? R.drawable.likeon : R.drawable.likeoff);
 
             nameTextView.setText(user.getName());
-            final UserLocation location = shout.getLocation();
-            if (location != null) {
-                userLocationTextView.setText(context.getString(R.string.shout_user_location,
-                        location.getCity(), location.getCountry()));
-                locationTextView.setText(location.getCity());
-            }
+
+            setUserLocation(location);
 
             labelTextView.setText(shout.getTypeResId());
 
@@ -168,31 +176,17 @@ public class ShoutAdapter extends BaseAdapter {
 
             priceTextView.setText(item.getShoutPrice());
 
-            if (shout.getNumber() == 0) {
-                availableTextView.setText(context.getString(R.string.shout_available, shout.getAvailableCount()));
-            } else {
-                availableTextView.setText(context.getString(R.string.shout_only_available, shout.getAvailableCount()));
-            }
+            setNumber(shout.getNumber(), shout.getAvailableCount());
 
-            shoutViewPager.setAdapter(imagesPagerAdapter);
+            setIndicatorVisibility(shout.getImages(), shout.getVideos());
+            setMedia(shout.getImages(), shout.getVideos());
 
-            pageIndicator.setViewPager(shoutViewPager);
-            boolean hasMoreThanOneItem = shout.getImages().size() + shout.getVideos().size() > 1;
-            pageIndicator.setVisibility(hasMoreThanOneItem ? View.VISIBLE : View.GONE);
-            imagesPagerAdapter.setData(shout.getImages(), shout.getVideos());
-            descriptionTextView.setText(shout.getText());
-            final boolean isDescription = !TextUtils.isEmpty(shout.getText());
-            descriptionHeader.setVisibility(isDescription ? View.VISIBLE : View.GONE);
-            descriptionContainer.setVisibility(isDescription ? View.VISIBLE : View.GONE);
+            setDescription(shout.getText());
 
             dateTextView.setText(DateTimeUtils.getShoutDetailDate(shout.getDatePublishedInMillis()));
             categoryTextView.setText(shout.getCategory().getName());
 
-            final Optional<Integer> flagResId = ResourcesHelper.getCountryResId(context, shout.getLocation());
-            if (flagResId.isPresent()) {
-                picasso.load(flagResId.get())
-                        .into(flagTarget);
-            }
+            setFlag(location);
 
             setUpFilters(shout);
 
@@ -204,6 +198,46 @@ public class ShoutAdapter extends BaseAdapter {
                     }));
         }
 
+        private void setFlag(UserLocation location) {
+            final Optional<Integer> flagResId = ResourcesHelper.getCountryResId(context, location);
+            if (flagResId.isPresent()) {
+                picasso.load(flagResId.get())
+                        .into(flagTarget);
+            }
+        }
+
+        private void setDescription(String text) {
+            descriptionTextView.setText(text);
+            final boolean isDescription = !TextUtils.isEmpty(text);
+            descriptionHeader.setVisibility(isDescription ? View.VISIBLE : View.GONE);
+            descriptionContainer.setVisibility(isDescription ? View.VISIBLE : View.GONE);
+        }
+
+        private void setIndicatorVisibility(List<String> images, List<Video> videos) {
+            boolean hasMoreThanOneItem = images.size() + videos.size() > 1;
+            pageIndicator.setVisibility(hasMoreThanOneItem ? View.VISIBLE : View.GONE);
+        }
+
+        private void setNumber(float number, int availableCount) {
+            if (number == 0) {
+                availableTextView.setText(context.getString(R.string.shout_available, availableCount));
+            } else {
+                availableTextView.setText(context.getString(R.string.shout_only_available, availableCount));
+            }
+        }
+
+        private void setUserLocation(UserLocation location) {
+            if (location != null) {
+                userLocationTextView.setText(context.getString(R.string.shout_user_location,
+                        location.getCity(), location.getCountry()));
+                locationTextView.setText(location.getCity());
+            }
+        }
+
+        private void setMedia(List<String> images, List<Video> videos) {
+            imagesPagerAdapter.setData(images, videos);
+        }
+
         @Override
         public void onViewRecycled() {
             super.onViewRecycled();
@@ -211,7 +245,7 @@ public class ShoutAdapter extends BaseAdapter {
         }
 
         private void unsubscribe() {
-            if(subscription != null){
+            if (subscription != null) {
                 subscription.unsubscribe();
             }
         }
@@ -239,8 +273,7 @@ public class ShoutAdapter extends BaseAdapter {
             }
 
             final boolean isLastElementLight = detailsContainer.getChildCount() % 2 != 0;
-            locationContainer.setBackgroundColor(context.getResources().getColor(
-                    isLastElementLight ? android.R.color.white : R.color.black_12));
+            locationContainer.setBackgroundColor(ContextCompat.getColor(context, isLastElementLight ? android.R.color.white : R.color.black_12));
         }
 
         @OnClick(R.id.shout_detail_category_row)
@@ -382,6 +415,8 @@ public class ShoutAdapter extends BaseAdapter {
                 return new VisitProfileViewHolder(layoutInflater.inflate(R.layout.button_gray_with_stroke, parent, false));
             case VIEW_TYPE_RELATED_SHOUTS_CONTAINER:
                 return new RelatedShoutsContainerViewHolder(layoutInflater.inflate(R.layout.shout_related_shout_container_item, parent, false));
+            case VIEW_TYPE_FB_AD:
+                return new FbAdLinearViewHolder(layoutInflater.inflate(R.layout.ad_list_layout, parent, false), context);
             default:
                 throw new RuntimeException("Unknown view type");
         }
@@ -406,6 +441,8 @@ public class ShoutAdapter extends BaseAdapter {
             return VIEW_TYPE_VISIT_PROFILE;
         } else if (item instanceof ShoutAdapterItems.UserShoutAdapterItem) {
             return VIEW_TYPE_USER_SHOUTS;
+        } else if (item instanceof FbAdAdapterItem) {
+            return VIEW_TYPE_FB_AD;
         } else {
             throw new RuntimeException("Unknown view type: " + item.getClass().getSimpleName());
         }

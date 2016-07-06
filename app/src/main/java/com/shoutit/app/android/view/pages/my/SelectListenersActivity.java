@@ -10,6 +10,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.view.profileslist.BaseProfileListPresenter;
 import com.shoutit.app.android.view.profileslist.BaseProfilesListActivity;
 
 import javax.annotation.Nonnull;
@@ -22,10 +23,8 @@ public class SelectListenersActivity extends BaseProfilesListActivity {
 
     public static final String RESULT_PROFILE_ID = "result_profile_id";
 
-    SelectListenersPresenter presenter;
-
     public static Intent newIntent(Context context) {
-        return new Intent(context, SelectListenersActivity.class);
+        return newIntent(context);
     }
 
     @Override
@@ -33,7 +32,7 @@ public class SelectListenersActivity extends BaseProfilesListActivity {
         super.onCreate(savedInstanceState);
         ButterKnife.bind(this);
 
-        presenter = (SelectListenersPresenter) ((SelectListenersActivityComponent) getActivityComponent()).profilesListPresenter();
+        final BaseProfileListPresenter presenter = getPresenter();
 
         presenter.getProfileSelectedObservable()
                 .compose(this.<BaseProfile>bindToLifecycle())
@@ -41,6 +40,11 @@ public class SelectListenersActivity extends BaseProfilesListActivity {
                     setResult(RESULT_OK, new Intent().putExtra(RESULT_PROFILE_ID, user.getId()));
                     finish();
                 });
+    }
+
+    private BaseProfileListPresenter getPresenter() {
+        final SelectListenersActivityComponent activityComponent = (SelectListenersActivityComponent) getActivityComponent();
+        return activityComponent.profilesWithoutPagesListPresenter();
     }
 
     protected void setUpToolbar() {

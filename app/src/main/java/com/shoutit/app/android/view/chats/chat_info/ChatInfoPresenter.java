@@ -16,16 +16,15 @@ import com.google.common.collect.Iterables;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
-import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.ConversationDetails;
 import com.shoutit.app.android.api.model.EditPublicChatRequest;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.model.ReportBody;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.DateTimeUtils;
 import com.shoutit.app.android.utils.ImageCaptureHelper;
 import com.shoutit.app.android.view.chats.ChatsMediaHelper;
+import com.shoutit.app.android.view.conversations.RefreshConversationBus;
 
 import java.util.List;
 
@@ -52,6 +51,8 @@ public class ChatInfoPresenter {
     private final String mConversationId;
     @NonNull
     private final Resources mResources;
+    @NonNull
+    private final RefreshConversationBus mRefreshConversationBus;
     private final Context mContext;
     private final String mId;
     private final CompositeSubscription mCompositeSubscription = new CompositeSubscription();
@@ -65,6 +66,7 @@ public class ChatInfoPresenter {
                              @NonNull String conversationId,
                              @NonNull UserPreferences userPreferences,
                              @NonNull @ForActivity Resources resources,
+                             @NonNull RefreshConversationBus refreshConversationBus,
                              @ForActivity Context context) {
         mImageCaptureHelper = imageCaptureHelper;
         mApiService = apiService;
@@ -73,6 +75,7 @@ public class ChatInfoPresenter {
         mAmazonHelper = amazonHelper;
         mConversationId = conversationId;
         mResources = resources;
+        mRefreshConversationBus = refreshConversationBus;
         mContext = context;
 
         mId = userPreferences.getUserId();
@@ -209,6 +212,7 @@ public class ChatInfoPresenter {
                 .subscribeOn(mNetworkScheduler)
                 .subscribe(responseBody -> {
                     listener.finishScreen(true);
+                    mRefreshConversationBus.post();
                 }, throwable -> {
                     listener.exitChatError();
                     listener.showProgress(false);
