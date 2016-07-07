@@ -29,6 +29,8 @@ import com.shoutit.app.android.api.model.EditShoutRequestWithPrice;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.GuestSignupRequest;
 import com.shoutit.app.android.api.model.InvitationCodeResponse;
+import com.shoutit.app.android.api.model.LinkFacebookRequest;
+import com.shoutit.app.android.api.model.LinkGplusRequest;
 import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessagesResponse;
 import com.shoutit.app.android.api.model.NotificationsResponse;
@@ -384,7 +386,6 @@ public interface ApiService {
     @POST("misc/reports")
     Observable<Response<Object>> report(@Body ReportBody reportShoutBody);
 
-
     /**
      * create shout
      */
@@ -582,6 +583,25 @@ public interface ApiService {
     @POST("pages")
     Observable<User> createPage(@Body PageCreateRequest pageCreateRequest);
 
+    /**
+     * Linked Accounts
+     */
+
+    @PATCH("profiles/{username}/link")
+    Observable<ApiMessageResponse> linkFacebook(@Path("username") String username, @Body LinkFacebookRequest request);
+
+    @HTTP(method = "DELETE", path = "profiles/{username}/link", hasBody = true)
+    Observable<ApiMessageResponse> unlinkFacebook(@Path("username") String username, @Body LinkFacebookRequest request);
+
+    @PATCH("profiles/{username}/link")
+    Observable<ApiMessageResponse> linkGoogle(@Path("username") String username, @Body LinkGplusRequest request);
+
+    @HTTP(method = "DELETE", path = "profiles/{username}/link", hasBody = true)
+    Observable<ApiMessageResponse> unlinkGoogle(@Path("username") String username, @Body LinkGplusRequest request);
+
+    /**
+     * Shout like
+     **/
     @POST("shouts/{id}/like")
     Observable<ApiMessageResponse> likeShout(@Path("id") String id);
 

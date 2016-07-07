@@ -19,9 +19,7 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookSdk;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
@@ -56,7 +54,7 @@ import rx.schedulers.Schedulers;
 
 public class LoginIntroActivity extends BaseActivity {
 
-    private static final int GOOGLE_SIGN_IN = 0;
+    public static final int GOOGLE_SIGN_IN = 0;
 
     @Bind(R.id.activity_login_toolbar)
     Toolbar toolbar;
@@ -193,24 +191,9 @@ public class LoginIntroActivity extends BaseActivity {
                         .observeOn(MyAndroidSchedulers.mainThread()));
     }
 
-    private void loginGoogle() {
-        final GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .requestProfile()
-                .requestServerAuthCode("935842257865-s6069gqjq4bvpi4rcbjtdtn2kggrvi06.apps.googleusercontent.com")
-                .build();
-
-        final GoogleApiClient googleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
-
-        final Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient);
-        startActivityForResult(signInIntent, GOOGLE_SIGN_IN);
-    }
-
     @OnClick(R.id.activity_login_gplus_btn)
     public void googleClick() {
-        loginGoogle();
+        GoogleHelper.loginGoogle(this, GOOGLE_SIGN_IN);
     }
 
     @OnClick(R.id.activity_login_facebook_btn)

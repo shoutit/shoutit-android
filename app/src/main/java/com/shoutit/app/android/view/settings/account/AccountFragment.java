@@ -63,6 +63,11 @@ public class AccountFragment extends BaseFragment {
         ((AccountActivity) getActivity()).onFragmentSelected(AccountActivity.FRAGMENT_CHANGE_PASSWORD);
     }
 
+    @OnClick(R.id.account_linked_accounts_tv)
+    public void onLinkedAccountsClick() {
+        ((AccountActivity) getActivity()).onFragmentSelected(AccountActivity.FRAGMENT_LINKED_ACCOUNTS);
+    }
+
     @OnClick(R.id.account_logout_tv)
     public void onLogoutClick() {
         logoutHelper.logout();

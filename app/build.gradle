@@ -182,7 +182,7 @@ android {
 
     lintOptions {
         abortOnError true
-        disable 'InvalidPackage','MissingTranslation','StringFormatInvalid'
+        disable 'InvalidPackage', 'MissingTranslation', 'StringFormatInvalid'
     }
 }
 
@@ -210,7 +210,7 @@ dependencies {
     compile 'com.github.clans:fab:1.6.1'
 
     // Facebook
-    compile ('com.facebook.android:facebook-android-sdk:4.12.1') {
+    compile('com.facebook.android:facebook-android-sdk:4.12.1') {
         transitive = true;
     }
     compile 'com.facebook.android:audience-network-sdk:4.12.1'
