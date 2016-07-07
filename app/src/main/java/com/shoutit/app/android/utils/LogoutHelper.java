@@ -2,7 +2,9 @@ package com.shoutit.app.android.utils;
 
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.ProfilesDao;
+import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.db.RecentSearchesTable;
 import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
@@ -19,19 +21,25 @@ public class LogoutHelper {
     private final RecentSearchesTable recentSearchesTable;
     private final PusherHelper mPusherHelper;
     private final ProfilesDao mProfilesDao;
+    private final ShoutsDao shoutsDao;
 
     @Inject
     Twilio twilio;
 
     @Inject
+    BookmarksDao bookmarksDao;
+
+    @Inject
     public LogoutHelper(@Nonnull UserPreferences userPreferences,
                         @Nonnull RecentSearchesTable recentSearchesTable,
                         PusherHelper pusherHelper,
-                        ProfilesDao profilesDao) {
+                        ProfilesDao profilesDao,
+                        ShoutsDao shoutsDao) {
         this.userPreferences = userPreferences;
         this.recentSearchesTable = recentSearchesTable;
         mPusherHelper = pusherHelper;
         mProfilesDao = profilesDao;
+        this.shoutsDao = shoutsDao;
     }
 
     public void logout() {
@@ -47,5 +55,8 @@ public class LogoutHelper {
         userPreferences.logout();
         recentSearchesTable.clearRecentSearches();
         FacebookHelper.logOutFromFacebook();
+
+        shoutsDao.invalidate();
+        bookmarksDao.invalidate();
     }
 }

@@ -152,6 +152,7 @@ public class ShoutAdapter extends BaseAdapter {
             final User user = shout.getProfile();
             final UserLocation location = shout.getLocation();
 
+            int currentItem = shoutViewPager.getCurrentItem();
             shoutViewPager.setAdapter(imagesPagerAdapter);
             pageIndicator.setViewPager(shoutViewPager);
 
@@ -180,6 +181,7 @@ public class ShoutAdapter extends BaseAdapter {
 
             setIndicatorVisibility(shout.getImages(), shout.getVideos());
             setMedia(shout.getImages(), shout.getVideos());
+            shoutViewPager.setCurrentItem(currentItem);
 
             setDescription(shout.getText());
 

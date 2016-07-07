@@ -114,7 +114,7 @@ public class ShoutAdapterItems {
 
         @Override
         public long adapterId() {
-            return BaseAdapterItem.NO_ID;
+            return shout.getId().hashCode();
         }
 
         @Override
@@ -124,7 +124,7 @@ public class ShoutAdapterItems {
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof MainShoutAdapterItem && this.equals(item);
+            return item instanceof MainShoutAdapterItem && equals(item);
         }
 
         @Override
@@ -188,17 +188,17 @@ public class ShoutAdapterItems {
 
         @Override
         public long adapterId() {
-            return BaseAdapterItem.NO_ID;
+            return shout.hashCode();
         }
 
         @Override
         public boolean matches(@Nonnull BaseAdapterItem item) {
-            return item instanceof UserShoutAdapterItem;
+            return item instanceof UserShoutAdapterItem && ((UserShoutAdapterItem) item).shout.getId().equals(shout.getId());
         }
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof UserShoutAdapterItem && this.equals(item);
+            return item instanceof UserShoutAdapterItem && equals(item);
         }
 
         @Override
@@ -240,8 +240,21 @@ public class ShoutAdapterItems {
         }
 
         @Override
+        public boolean equals(final Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            final VisitProfileAdapterItem that = (VisitProfileAdapterItem) o;
+            return Objects.equal(user, that.user);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(user);
+        }
+
+        @Override
         public long adapterId() {
-            return BaseAdapterItem.NO_ID;
+            return user.hashCode();
         }
 
         @Override
@@ -251,7 +264,7 @@ public class ShoutAdapterItems {
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof VisitProfileAdapterItem;
+            return item instanceof VisitProfileAdapterItem && equals(item);
         }
     }
 
@@ -272,10 +285,22 @@ public class ShoutAdapterItems {
             seeAllObserver.onNext(shoutId);
         }
 
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            final SeeAllRelatesAdapterItem that = (SeeAllRelatesAdapterItem) o;
+            return Objects.equal(shoutId, that.shoutId);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(shoutId);
+        }
 
         @Override
         public long adapterId() {
-            return BaseAdapterItem.NO_ID;
+            return shoutId.hashCode();
         }
 
         @Override
@@ -285,7 +310,7 @@ public class ShoutAdapterItems {
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof SeeAllRelatesAdapterItem;
+            return item instanceof SeeAllRelatesAdapterItem && item.equals(this);
         }
     }
 
@@ -302,18 +327,31 @@ public class ShoutAdapterItems {
         }
 
         @Override
+        public boolean equals(final Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            final RelatedContainerAdapterItem that = (RelatedContainerAdapterItem) o;
+            return Objects.equal(items, that.items);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(items);
+        }
+
+        @Override
         public long adapterId() {
-            return BaseAdapterItem.NO_ID;
+            return items.hashCode();
         }
 
         @Override
         public boolean matches(@Nonnull BaseAdapterItem item) {
-            return false;
+            return item instanceof RelatedContainerAdapterItem;
         }
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return false;
+            return item instanceof RelatedContainerAdapterItem && item.equals(this);
         }
     }
 }
