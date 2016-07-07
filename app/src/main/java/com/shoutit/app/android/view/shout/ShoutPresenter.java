@@ -8,6 +8,7 @@ import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
+import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
@@ -16,9 +17,9 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.ConversationDetails;
-import com.shoutit.app.android.api.model.LikeResponse;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.User;
@@ -48,7 +49,6 @@ import rx.Scheduler;
 import rx.functions.Func1;
 import rx.functions.Func4;
 import rx.subjects.PublishSubject;
-import rx.subscriptions.CompositeSubscription;
 
 public class ShoutPresenter {
 
@@ -75,6 +75,7 @@ public class ShoutPresenter {
     private final Observable<String> shareObservable;
     private final Observable<Shout> showPromoteObservable;
     private final Observable<Shout> showPromotedObservable;
+    private final Observable<String> mLikeApiMessage;
 
     private PublishSubject<Boolean> likeClickedSubject = PublishSubject.create();
     private PublishSubject<String> addToCartSubject = PublishSubject.create();
@@ -87,8 +88,6 @@ public class ShoutPresenter {
     private PublishSubject<Object> shareSubject = PublishSubject.create();
     private PublishSubject<Object> showDeleteDialogSubject = PublishSubject.create();
 
-    private final CompositeSubscription likesSubscription = new CompositeSubscription();
-
     @Nonnull
     private final Scheduler uiScheduler;
     @Nonnull
@@ -99,7 +98,6 @@ public class ShoutPresenter {
     private final PublishSubject<Object> callOrPromoteSubject = PublishSubject.create();
     private final PublishSubject<String> sendReportObserver = PublishSubject.create();
     private final PublishSubject<Object> refreshShoutsSubject = PublishSubject.create();
-    private final Observable<User> shoutOwnerProfile;
     protected final Observable<Shout> successShoutResponse;
 
     @Inject
@@ -133,7 +131,7 @@ public class ShoutPresenter {
                 .map(shout -> shout.getProfile().getUsername())
                 .compose(ObservableExtensions.<String>behaviorRefCount());
 
-        shoutOwnerProfile = successShoutResponse
+        final Observable<User> shoutOwnerProfile = successShoutResponse
                 .map(Shout::getProfile);
 
         titleObservable = successShoutResponse
@@ -254,7 +252,7 @@ public class ShoutPresenter {
 
         /** Like / Unlike Shout **/
 
-        final Observable<ResponseOrError<LikeResponse>> likeShoutResponseObservable = likeClickedSubject
+        final Observable<ResponseOrError<ApiMessageResponse>> likeShoutResponseObservable = likeClickedSubject
                 .filter(Functions1.isFalse())
                 .switchMap(o -> apiService.likeShout(shoutId)
                         .subscribeOn(networkScheduler)
@@ -262,7 +260,7 @@ public class ShoutPresenter {
                         .compose(ResponseOrError.toResponseOrErrorObservable()))
                 .compose(ObservableExtensions.behaviorRefCount());
 
-        final Observable<ResponseOrError<LikeResponse>> unlikeShoutResponseObservable = likeClickedSubject
+        final Observable<ResponseOrError<ApiMessageResponse>> unlikeShoutResponseObservable = likeClickedSubject
                 .filter(Functions1.isTrue())
                 .switchMap(o -> apiService.unlikeShout(shoutId)
                         .subscribeOn(networkScheduler)
@@ -270,20 +268,11 @@ public class ShoutPresenter {
                         .compose(ResponseOrError.toResponseOrErrorObservable()))
                 .compose(ObservableExtensions.behaviorRefCount());
 
-        likesSubscription.add(
+        mLikeApiMessage = Observable.merge(
                 likeShoutResponseObservable
-                        .compose(ResponseOrError.onlySuccess())
-                        .withLatestFrom(successShoutResponse,
-                                (o, shout) -> shout.likedShout(true))
-                        .subscribe(shoutsDao.getShoutDao(shoutId).onShoutLikedObserver())
-        );
-
-        likesSubscription.add(
+                        .compose(likeTransformer(shoutsDao, shoutId, true)),
                 unlikeShoutResponseObservable
-                        .compose(ResponseOrError.onlySuccess())
-                        .withLatestFrom(successShoutResponse,
-                                (o, shout) -> shout.likedShout(false))
-                        .subscribe(shoutsDao.getShoutDao(shoutId).onShoutLikedObserver())
+                        .compose(likeTransformer(shoutsDao, shoutId, false))
         );
 
         /** Errors **/
@@ -406,8 +395,13 @@ public class ShoutPresenter {
                 .withLatestFrom(successShoutResponse, (o, shout) -> shout.getWebUrl());
     }
 
-    public void unsubscribe() {
-        likesSubscription.unsubscribe();
+    @NonNull
+    private Observable.Transformer<ResponseOrError<ApiMessageResponse>, String> likeTransformer(@Nonnull final ShoutsDao shoutsDao, @Nonnull final String shoutId, boolean like) {
+        return responseOrErrorObservable -> responseOrErrorObservable
+                .compose(ResponseOrError.onlySuccess())
+                .withLatestFrom(successShoutResponse, BothParams::of)
+                .doOnNext(params -> shoutsDao.getShoutDao(shoutId).onShoutLikedObserver().onNext(params.param2().likedShout(like)))
+                .map(params -> params.param1().getSuccess());
     }
 
     @Nonnull
@@ -571,6 +565,10 @@ public class ShoutPresenter {
     @NonNull
     public Observable<String> getBookmarkSuccesMessageObservable() {
         return mBookmarkHelper.getBookmarkSuccessMessage();
+    }
+
+    public Observable<String> getLikeApiMessage() {
+        return mLikeApiMessage;
     }
 
     public void onShareClicked() {
