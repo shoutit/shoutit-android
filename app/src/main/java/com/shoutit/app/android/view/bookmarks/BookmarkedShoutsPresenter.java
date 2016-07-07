@@ -47,6 +47,8 @@ public class BookmarkedShoutsPresenter implements ShoutListPresenter {
     private final Observable<Throwable> errorObservable;
     @Nonnull
     private final Observable<Boolean> progressObservable;
+    @NonNull
+    private final BookmarkHelper mHelper;
 
     @Inject
     public BookmarkedShoutsPresenter(@Nonnull @UiScheduler Scheduler uiScheduler,
@@ -56,6 +58,7 @@ public class BookmarkedShoutsPresenter implements ShoutListPresenter {
                                      @NonNull UserPreferences userPreferences,
                                      @NonNull BookmarksDao bookmarksDao,
                                      @NonNull BookmarkHelper helper) {
+        mHelper = helper;
         final boolean isNormalUser = userPreferences.isNormalUser();
         final BaseProfile currentUser = userPreferences.getUserOrPage();
         final String currentUserName = currentUser != null ? currentUser.getUsername() : null;
@@ -125,5 +128,11 @@ public class BookmarkedShoutsPresenter implements ShoutListPresenter {
     @Nonnull
     public Observable<Boolean> getProgressObservable() {
         return progressObservable;
+    }
+
+    @Override
+    @NonNull
+    public Observable<String> getBookmarkSuccessMessage() {
+        return mHelper.getBookmarkSuccessMessage();
     }
 }

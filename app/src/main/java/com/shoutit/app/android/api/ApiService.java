@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.shoutit.app.android.api.model.AdminRequest;
+import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.api.model.BlockedProfilesResposne;
 import com.shoutit.app.android.api.model.CallerProfile;
 import com.shoutit.app.android.api.model.Category;
@@ -592,10 +593,10 @@ public interface ApiService {
      * Shout bookmark
      **/
     @POST("shouts/{id}/bookmark")
-    Observable<ResponseBody> markAsBookmark(@Path("id") String id);
+    Observable<ApiMessageResponse> markAsBookmark(@Path("id") String id);
 
     @DELETE("shouts/{id}/bookmark")
-    Observable<ResponseBody> deleteBookmark(@Path("id") String id);
+    Observable<ApiMessageResponse> deleteBookmark(@Path("id") String id);
 
     @GET("profiles/me/bookmarks")
     Observable<ShoutsResponse> getBookmarkedShouts();

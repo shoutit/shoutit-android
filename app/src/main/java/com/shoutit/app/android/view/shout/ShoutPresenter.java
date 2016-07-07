@@ -93,6 +93,8 @@ public class ShoutPresenter {
     private final Scheduler uiScheduler;
     @Nonnull
     private final UserPreferences mUserPreferences;
+    @NonNull
+    private final BookmarkHelper mBookmarkHelper;
     @Nonnull
     private final PublishSubject<Object> callOrPromoteSubject = PublishSubject.create();
     private final PublishSubject<String> sendReportObserver = PublishSubject.create();
@@ -114,6 +116,7 @@ public class ShoutPresenter {
                           @NonNull BookmarkHelper bookmarkHelper) {
         this.uiScheduler = uiScheduler;
         mUserPreferences = userPreferences;
+        mBookmarkHelper = bookmarkHelper;
 
         final boolean isNormalUser = userPreferences.isNormalUser();
         final BaseProfile currentUser = userPreferences.getUserOrPage();
@@ -563,6 +566,11 @@ public class ShoutPresenter {
     @Nonnull
     public Observer<Object> refreshShoutsObserver() {
         return refreshShoutsSubject;
+    }
+
+    @NonNull
+    public Observable<String> getBookmarkSuccesMessageObservable() {
+        return mBookmarkHelper.getBookmarkSuccessMessage();
     }
 
     public void onShareClicked() {

@@ -80,6 +80,8 @@ public class HomePresenter {
 
     @Nonnull
     private final Scheduler uiScheduler;
+    @NonNull
+    private final BookmarkHelper mBookmarkHelper;
 
 
     @Inject
@@ -93,6 +95,7 @@ public class HomePresenter {
                          @NonNull BookmarksDao bookmarksDao,
                          @NonNull BookmarkHelper bookmarkHelper) {
         this.uiScheduler = uiScheduler;
+        mBookmarkHelper = bookmarkHelper;
 
         final boolean isNormalUser = userPreferences.isNormalUser();
         final BaseProfile currentUser = userPreferences.getUserOrPage();
@@ -192,7 +195,7 @@ public class HomePresenter {
                     public List<BaseAdapterItem> call(List<DiscoverChild> discovers) {
                         final List<BaseAdapterItem> items = new ArrayList<>();
                         for (int i = 0; i < discovers.size() && i < MAX_VISIBLE_DISCOVER_ITEMS; i++) {
-                            items.add(new DiscoverAdapterItem(discovers.get(i), onDiscoverSelectedSubject));
+                            items.add(new DiscoverAdapterItem(discovers.get(i)));
                         }
 
                         items.add(new DiscoverShowAllAdapterItem(showAllDiscoversSubject));
@@ -292,6 +295,11 @@ public class HomePresenter {
         return linearLayoutManagerObservable
                 .filter(Functions1.isTrue())
                 .observeOn(uiScheduler);
+    }
+
+    @NonNull
+    public Observable<String> getBookmarkSuccessMessage() {
+        return mBookmarkHelper.getBookmarkSuccessMessage();
     }
 
     @Nonnull
@@ -413,8 +421,7 @@ public class HomePresenter {
         @Nonnull
         private final DiscoverChild discover;
 
-        public DiscoverAdapterItem(@Nonnull DiscoverChild discover,
-                                   @Nonnull Observer<String> onDiscoverSelectedSubject) {
+        public DiscoverAdapterItem(@Nonnull DiscoverChild discover) {
             this.discover = discover;
         }
 

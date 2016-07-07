@@ -1,5 +1,7 @@
 package com.shoutit.app.android.view.shouts_list_common;
 
+import android.support.annotation.NonNull;
+
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 
 import java.util.List;
@@ -20,4 +22,7 @@ public interface ShoutListPresenter {
 
     @Nonnull
     Observable<Boolean> getProgressObservable();
+
+    @NonNull
+    Observable<String> getBookmarkSuccessMessage();
 }

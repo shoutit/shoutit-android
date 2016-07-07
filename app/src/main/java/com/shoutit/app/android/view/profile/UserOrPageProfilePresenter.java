@@ -128,6 +128,8 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
     private final PreferencesHelper preferencesHelper;
     @Nonnull
     private final ListeningHalfPresenter listeningHalfPresenter;
+    @NonNull
+    private final BookmarkHelper mBookmarkHelper;
     @Nullable
     private String loggedInUserName;
     private boolean isNormalUser;
@@ -156,6 +158,7 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
         this.userProfilePresenter = userProfilePresenter;
         this.preferencesHelper = preferencesHelper;
         this.listeningHalfPresenter = listeningHalfPresenter;
+        mBookmarkHelper = bookmarkHelper;
         this.isNormalUser = userPreferences.isNormalUser();
 
         final BaseProfile loggedInUser = userPreferences.getUserOrPage();
@@ -547,6 +550,12 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
     @Override
     public Observable<String> getSeeAllShoutsObservable() {
         return showAllShoutsSubject;
+    }
+
+    @Override
+    @NonNull
+    public Observable<String> getBookmarkSuccesMessageObservable() {
+        return mBookmarkHelper.getBookmarkSuccessMessage();
     }
 
     @Override

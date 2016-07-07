@@ -142,6 +142,10 @@ public abstract class ProfileActivity extends BaseActivity {
                     }
                 });
 
+        presenter.getBookmarkSuccesMessageObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(ColoredSnackBar.successSnackBarAction(ColoredSnackBar.contentView(this)));
+
         presenter.getActionOnlyForLoggedInUserObservable()
                 .compose(bindToLifecycle())
                 .subscribe(ColoredSnackBar.errorSnackBarAction(

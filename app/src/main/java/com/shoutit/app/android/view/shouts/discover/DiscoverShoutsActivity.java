@@ -159,6 +159,10 @@ public class DiscoverShoutsActivity extends BaseActivity {
                     }
                 });
 
+        mShoutsPresenter.getBookmarkSuccessMessage()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(ColoredSnackBar.successSnackBarAction(ColoredSnackBar.contentView(this)));
+
         mShoutsPresenter.getCountObservable()
                 .compose(this.<Integer>bindToLifecycle())
                 .subscribe(new Action1<Integer>() {

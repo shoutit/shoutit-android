@@ -316,6 +316,10 @@ public class ShoutActivity extends BaseActivity {
                     ColoredSnackBar.error(ColoredSnackBar.contentView(ShoutActivity.this), R.string.error_action_only_for_logged_in_user, Snackbar.LENGTH_SHORT).show();
                 });
 
+        presenter.getBookmarkSuccesMessageObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(ColoredSnackBar.successSnackBarAction(ColoredSnackBar.contentView(this)));
+
         presenter.getShareObservable()
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(shareUrl -> {
