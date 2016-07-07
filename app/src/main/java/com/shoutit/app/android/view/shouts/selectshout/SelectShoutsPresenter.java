@@ -42,6 +42,8 @@ public class SelectShoutsPresenter {
 
     @Nonnull
     private final PublishSubject<String> shoutSelectedObserver = PublishSubject.create();
+    @NonNull
+    private final BookmarkHelper mBookmarkHelper;
 
     @Inject
     public SelectShoutsPresenter(@NetworkScheduler Scheduler networkScheduler,
@@ -51,6 +53,7 @@ public class SelectShoutsPresenter {
                                  @ForActivity final Context context,
                                  @NonNull BookmarksDao bookmarksDao,
                                  @NonNull BookmarkHelper bookmarkHelper) {
+        mBookmarkHelper = bookmarkHelper;
         final BaseProfile user = userPreferences.getUserOrPage();
         assert user != null;
         final Observable<ResponseOrError<ShoutsResponse>> shoutsResponse = apiService.shoutsForUser(user.getUsername(), 0, 100)
@@ -85,6 +88,11 @@ public class SelectShoutsPresenter {
     @NonNull
     public Observable<List<BaseAdapterItem>> getSuccessObservable() {
         return mListObservable;
+    }
+
+    @NonNull
+    public Observable<String> getBookmarkSuccessMessage() {
+        return mBookmarkHelper.getBookmarkSuccessMessage();
     }
 
     @NonNull

@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.shoutit.app.android.api.model.AdminRequest;
+import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.api.model.BlockedProfilesResposne;
 import com.shoutit.app.android.api.model.CallerProfile;
 import com.shoutit.app.android.api.model.Category;
@@ -28,7 +29,6 @@ import com.shoutit.app.android.api.model.EditShoutRequestWithPrice;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.GuestSignupRequest;
 import com.shoutit.app.android.api.model.InvitationCodeResponse;
-import com.shoutit.app.android.api.model.LikeResponse;
 import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessagesResponse;
 import com.shoutit.app.android.api.model.NotificationsResponse;
@@ -583,19 +583,19 @@ public interface ApiService {
     Observable<User> createPage(@Body PageCreateRequest pageCreateRequest);
 
     @POST("shouts/{id}/like")
-    Observable<LikeResponse> likeShout(@Path("id") String id);
+    Observable<ApiMessageResponse> likeShout(@Path("id") String id);
 
     @DELETE("shouts/{id}/like")
-    Observable<LikeResponse> unlikeShout(@Path("id") String id);
+    Observable<ApiMessageResponse> unlikeShout(@Path("id") String id);
 
     /**
      * Shout bookmark
      **/
     @POST("shouts/{id}/bookmark")
-    Observable<ResponseBody> markAsBookmark(@Path("id") String id);
+    Observable<ApiMessageResponse> markAsBookmark(@Path("id") String id);
 
     @DELETE("shouts/{id}/bookmark")
-    Observable<ResponseBody> deleteBookmark(@Path("id") String id);
+    Observable<ApiMessageResponse> deleteBookmark(@Path("id") String id);
 
     @GET("profiles/me/bookmarks")
     Observable<ShoutsResponse> getBookmarkedShouts();

@@ -148,11 +148,8 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
 
         presenter.getShoutSelectedObservable()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String shoutId) {
-                        startActivity(ShoutActivity.newIntent(getActivity(), shoutId));
-                    }
+                .subscribe(shoutId -> {
+                    startActivity(ShoutActivity.newIntent(getActivity(), shoutId));
                 });
 
         RxRecyclerView.scrollEvents(recyclerView)
@@ -167,51 +164,43 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
 
         presenter.getCountObservable()
                 .compose(this.<Integer>bindToLifecycle())
-                .subscribe(new Action1<Integer>() {
-                    @Override
-                    public void call(Integer integer) {
-                        headerCountTv.setText(getResources().getQuantityString(
-                                R.plurals.shouts_results_pluaral, integer, integer));
-                    }
+                .subscribe(integer -> {
+                    headerCountTv.setText(getResources().getQuantityString(
+                            R.plurals.shouts_results_pluaral, integer, integer));
                 });
+
+        presenter.getBookmarkSuccessMessage()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(ColoredSnackBar.successSnackBarAction(ColoredSnackBar.contentView(getActivity())));
 
         presenter.getShareClickedObservable()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String shareUrl) {
-                        startActivity(Intent.createChooser(
-                                IntentHelper.getShareIntent(shareUrl),
-                                getString(R.string.search_share_results)));
-                    }
+                .subscribe(shareUrl -> {
+                    startActivity(Intent.createChooser(
+                            IntentHelper.getShareIntent(shareUrl),
+                            getString(R.string.search_share_results)));
                 });
 
         presenter.getRefreshShoutsObservable()
                 .compose(bindToLifecycle())
                 .subscribe();
 
-        filterIv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (shouldShowFilters()) {
-                    drawerLayout.openDrawer(filterLayout);
-                }
+        filterIv.setOnClickListener(v -> {
+            if (shouldShowFilters()) {
+                drawerLayout.openDrawer(filterLayout);
             }
         });
 
-        layoutSwitchIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                layoutSwitchIcon.setChecked(!layoutSwitchIcon.isChecked());
-                if (layoutSwitchIcon.isChecked()) {
-                    layoutSwitchIcon.setBackground(getResources().getDrawable(R.drawable.ic_grid_switch));
-                    setLinearLayoutManager();
-                    presenter.setLinearLayoutManager(true);
-                } else {
-                    layoutSwitchIcon.setBackground(getResources().getDrawable(R.drawable.ic_list_switch));
-                    setGridLayoutManager();
-                    presenter.setLinearLayoutManager(false);
-                }
+        layoutSwitchIcon.setOnClickListener(v -> {
+            layoutSwitchIcon.setChecked(!layoutSwitchIcon.isChecked());
+            if (layoutSwitchIcon.isChecked()) {
+                layoutSwitchIcon.setBackground(getResources().getDrawable(R.drawable.ic_grid_switch));
+                setLinearLayoutManager();
+                presenter.setLinearLayoutManager(true);
+            } else {
+                layoutSwitchIcon.setBackground(getResources().getDrawable(R.drawable.ic_list_switch));
+                setGridLayoutManager();
+                presenter.setLinearLayoutManager(false);
             }
         });
     }

@@ -50,6 +50,8 @@ public class ChatShoutsPresenter implements ShoutListPresenter {
     private final ShoutsDao shoutsDao;
     @Nonnull
     private final String conversationId;
+    @NonNull
+    private final BookmarkHelper mHelper;
     @Nonnull
     private final Observable<Integer> resultsCountObservable;
 
@@ -62,6 +64,7 @@ public class ChatShoutsPresenter implements ShoutListPresenter {
                                @NonNull BookmarkHelper helper) {
         this.shoutsDao = shoutsDao;
         this.conversationId = conversationId;
+        mHelper = helper;
 
         final boolean isNormalUser = userPreferences.isNormalUser();
         final BaseProfile currentUser = userPreferences.getUserOrPage();
@@ -139,6 +142,12 @@ public class ChatShoutsPresenter implements ShoutListPresenter {
         return RxMoreObservers.ignoreCompleted(
                 shoutsDao.getConversationsShoutsDao(conversationId)
                         .getLoadMoreObserver());
+    }
+
+    @Override
+    @NonNull
+    public Observable<String> getBookmarkSuccessMessage() {
+        return mHelper.getBookmarkSuccessMessage();
     }
 
     public Observable<Integer> getCountObservable() {

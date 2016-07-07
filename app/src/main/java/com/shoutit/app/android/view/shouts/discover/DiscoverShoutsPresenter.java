@@ -48,6 +48,8 @@ public class DiscoverShoutsPresenter {
     private final Observable<Integer> countObservable;
     private final DiscoverShoutsDao mDiscoverShoutsDao;
     private final String discoverId;
+    @NonNull
+    private final BookmarkHelper mBookmarkHelper;
 
     @Nonnull
     private final PublishSubject<String> shoutSelectedObserver = PublishSubject.create();
@@ -70,6 +72,7 @@ public class DiscoverShoutsPresenter {
                                    @NonNull BookmarkHelper bookmarkHelper) {
         mDiscoverShoutsDao = discoverShoutsDao;
         this.discoverId = discoverId;
+        mBookmarkHelper = bookmarkHelper;
 
         final boolean isNormalUser = userPreferences.isNormalUser();
         final BaseProfile currentUser = userPreferences.getUserOrPage();
@@ -152,6 +155,11 @@ public class DiscoverShoutsPresenter {
     @Nonnull
     public Observable<BothParams<String, String>> getSearchClickedObservable() {
         return searchClickedObservable;
+    }
+
+    @NonNull
+    public Observable<String> getBookmarkSuccessMessage() {
+        return mBookmarkHelper.getBookmarkSuccessMessage();
     }
 
     @NonNull
