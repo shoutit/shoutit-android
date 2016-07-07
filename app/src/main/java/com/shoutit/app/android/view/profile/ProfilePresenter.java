@@ -69,4 +69,7 @@ public interface ProfilePresenter {
 
     @Nonnull
     Observable<String> getUnListenSuccessObservable();
+
+    @NonNull
+    Observable<String> getBookmarkSuccesMessageObservable();
 }

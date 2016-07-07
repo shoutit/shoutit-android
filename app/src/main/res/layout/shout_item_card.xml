@@ -113,8 +113,9 @@
             <ImageView
                 android:id="@+id/shout_like"
                 android:src="@drawable/likeoff"
-                android:layout_gravity="right"
+                android:layout_gravity="right|end"
                 android:layout_marginRight="45dp"
+                android:layout_marginEnd="45dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 

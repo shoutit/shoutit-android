@@ -74,6 +74,10 @@ public class SelectShoutActivity extends BaseActivity {
                 .compose(this.<List<BaseAdapterItem>>bindToLifecycle())
                 .subscribe(mShoutsAdapter);
 
+        mShoutsPresenter.getBookmarkSuccessMessage()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(ColoredSnackBar.successSnackBarAction(ColoredSnackBar.contentView(this)));
+
         mShoutsPresenter.getFailObservable()
                 .compose(this.<Throwable>bindToLifecycle())
                 .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(this)));

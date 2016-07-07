@@ -124,6 +124,8 @@ public class ShoutsDao {
                 });
     }
 
+    public void invalidate(){shoutCache.invalidateAll();}
+
     @Nonnull
     public Observable<ResponseOrError<ShoutsResponse>> getHomeShoutsObservable(@Nonnull LocationPointer locationPointer) {
         return homeCache.getUnchecked(locationPointer).getShoutsObservable();

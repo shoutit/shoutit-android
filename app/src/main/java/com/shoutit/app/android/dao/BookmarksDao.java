@@ -25,6 +25,8 @@ public class BookmarksDao {
         this.bookmarksCache = CacheBuilder.newBuilder().build();
     }
 
+    public void invalidate(){bookmarksCache.invalidateAll();}
+
     public Observable<Boolean> getBookmarkForShout(@NonNull String shoutId, boolean startingValue) {
         return getWithCallableUnchecked(bookmarksCache, shoutId, () -> BehaviorSubject.create(startingValue));
     }

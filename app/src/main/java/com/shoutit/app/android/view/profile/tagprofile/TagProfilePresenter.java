@@ -84,6 +84,8 @@ public class TagProfilePresenter implements ProfilePresenter {
     private final TagsDao tagsDao;
     @Nonnull
     private final String tagName;
+    @NonNull
+    private final BookmarkHelper mBookmarkHelper;
 
 
     public TagProfilePresenter(@NonNull TagsDao tagsDao,
@@ -98,6 +100,7 @@ public class TagProfilePresenter implements ProfilePresenter {
                                @NonNull BookmarkHelper bookmarkHelper) {
         this.tagsDao = tagsDao;
         this.tagName = tagName;
+        mBookmarkHelper = bookmarkHelper;
         isLoggedInAsNormalUser = userPreferences.isNormalUser();
 
         /** Base Tag **/
@@ -485,6 +488,12 @@ public class TagProfilePresenter implements ProfilePresenter {
     @Override
     public Observable<Object> getMoreMenuOptionClickedSubject() {
         return moreMenuOptionClickedSubject;
+    }
+
+    @Override
+    @NonNull
+    public Observable<String> getBookmarkSuccesMessageObservable() {
+        return mBookmarkHelper.getBookmarkSuccessMessage();
     }
 
     @Nonnull

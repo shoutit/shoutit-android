@@ -10,7 +10,7 @@ import com.appunite.rx.functions.Functions1;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
-import com.shoutit.app.android.api.model.IsSuccessResponse;
+import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.api.model.LinkFacebookRequest;
 import com.shoutit.app.android.api.model.LinkGplusRequest;
 import com.shoutit.app.android.api.model.User;
@@ -37,13 +37,13 @@ public class LinkedAccountsPresenter {
     private CompositeSubscription subscription = new CompositeSubscription();
 
     @Nonnull
-    private Observable<ResponseOrError<IsSuccessResponse>> linkFacebookObservable;
+    private Observable<ResponseOrError<ApiMessageResponse>> linkFacebookObservable;
     @Nonnull
-    private Observable<ResponseOrError<IsSuccessResponse>> unlinkFacebookObservable;
+    private Observable<ResponseOrError<ApiMessageResponse>> unlinkFacebookObservable;
     @Nonnull
-    private Observable<ResponseOrError<IsSuccessResponse>> linkGoogleObservable;
+    private Observable<ResponseOrError<ApiMessageResponse>> linkGoogleObservable;
     @Nonnull
-    private Observable<ResponseOrError<IsSuccessResponse>> unlinkGoogleObservable;
+    private Observable<ResponseOrError<ApiMessageResponse>> unlinkGoogleObservable;
     @Nonnull
     private Observable<String> facebookLinkInfoObservable;
     @Nonnull
@@ -113,9 +113,9 @@ public class LinkedAccountsPresenter {
                 .compose(ObservableExtensions.behaviorRefCount());
 
         unlinkFacebookObservable = unlinkFacebookSubject
-                .switchMap(new Func1<Object, Observable<ResponseOrError<IsSuccessResponse>>>() {
+                .switchMap(new Func1<Object, Observable<ResponseOrError<ApiMessageResponse>>>() {
                     @Override
-                    public Observable<ResponseOrError<IsSuccessResponse>> call(final Object o) {
+                    public Observable<ResponseOrError<ApiMessageResponse>> call(final Object o) {
                         return apiService.unlinkFacebook(userPreferences.getUser().getUsername(), new LinkFacebookRequest(ACCOUNT_FACEBOOK))
                                 .subscribeOn(networkScheduler)
                                 .observeOn(uiScheduler)
@@ -154,9 +154,9 @@ public class LinkedAccountsPresenter {
 
 
         unlinkGoogleObservable = unlinkGoogleSubject
-                .switchMap(new Func1<Object, Observable<ResponseOrError<IsSuccessResponse>>>() {
+                .switchMap(new Func1<Object, Observable<ResponseOrError<ApiMessageResponse>>>() {
                     @Override
-                    public Observable<ResponseOrError<IsSuccessResponse>> call(final Object o) {
+                    public Observable<ResponseOrError<ApiMessageResponse>> call(final Object o) {
                         return apiService.unlinkGoogle(userPreferences.getUser().getUsername(), new LinkGplusRequest(ACCOUNT_GOOGLE))
                                 .subscribeOn(networkScheduler)
                                 .observeOn(uiScheduler)
@@ -188,7 +188,6 @@ public class LinkedAccountsPresenter {
         this.listener = listener;
     }
 
-    @Nonnull
     public void unsubscribe() {
         subscription.unsubscribe();
     }
@@ -232,28 +231,28 @@ public class LinkedAccountsPresenter {
     public Observable<String> unlinkGoogleObservable() {
         return unlinkGoogleObservable
                 .compose(ResponseOrError.onlySuccess())
-                .map(IsSuccessResponse::getSuccess);
+                .map(ApiMessageResponse::getSuccess);
     }
 
     @Nonnull
     public Observable<String> linkGoogleObservable() {
         return linkGoogleObservable
                 .compose(ResponseOrError.onlySuccess())
-                .map(IsSuccessResponse::getSuccess);
+                .map(ApiMessageResponse::getSuccess);
     }
 
     @Nonnull
     public Observable<String> linkFacebookObservable() {
         return linkFacebookObservable
                 .compose(ResponseOrError.onlySuccess())
-                .map(IsSuccessResponse::getSuccess);
+                .map(ApiMessageResponse::getSuccess);
     }
 
     @Nonnull
     public Observable<String> unlinkFacebookObservable() {
         return unlinkFacebookObservable
                 .compose(ResponseOrError.onlySuccess())
-                .map(IsSuccessResponse::getSuccess);
+                .map(ApiMessageResponse::getSuccess);
     }
 
     @Nonnull

@@ -3,15 +3,12 @@ package com.shoutit.app.android.view.shouts_list_common;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 
-import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.base.Strings;
 import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
-
-import java.util.List;
 
 import rx.subscriptions.CompositeSubscription;
 
@@ -23,6 +20,8 @@ public class ShoutListActivityHelper {
                         .subscribe(adapter),
                 presenter.getProgressObservable()
                         .subscribe(RxView.visibility(progressBar)),
+                presenter.getBookmarkSuccessMessage()
+                        .subscribe(ColoredSnackBar.successSnackBarAction(ColoredSnackBar.contentView(activity))),
                 presenter.getErrorObservable()
                         .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(activity))),
                 presenter.getShoutSelectedObservable()
