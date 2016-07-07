@@ -47,8 +47,8 @@ import com.shoutit.app.android.utils.ImageHelper;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.view.createshout.DialogsHelper;
 import com.shoutit.app.android.view.createshout.ShoutMediaPresenter;
-import com.shoutit.app.android.view.createshout.location.LocationActivity;
-import com.shoutit.app.android.view.createshout.location.LocationResultHelper;
+import com.shoutit.app.android.view.location.LocationActivityForResult;
+import com.shoutit.app.android.view.location.LocationResultHelper;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
 import com.shoutit.app.android.widget.CurrencySpinnerAdapter;
 import com.shoutit.app.android.widget.SimpleCurrencySpinnerAdapter;
@@ -215,7 +215,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
 
     @OnClick(R.id.edit_location_btn)
     public void onLocationClick() {
-        startActivityForResult(LocationActivity.newIntent(this), LOCATION_REQUEST);
+        startActivityForResult(LocationActivityForResult.newIntent(this), LOCATION_REQUEST);
     }
 
     @Override

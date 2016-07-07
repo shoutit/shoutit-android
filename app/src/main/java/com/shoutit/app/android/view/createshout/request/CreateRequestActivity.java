@@ -39,8 +39,8 @@ import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.RtlUtils;
 import com.shoutit.app.android.utils.TextWatcherAdapter;
 import com.shoutit.app.android.view.createshout.DialogsHelper;
-import com.shoutit.app.android.view.createshout.location.LocationActivity;
-import com.shoutit.app.android.view.createshout.location.LocationResultHelper;
+import com.shoutit.app.android.view.location.LocationActivityForResult;
+import com.shoutit.app.android.view.location.LocationResultHelper;
 import com.shoutit.app.android.view.createshout.publish.PublishShoutActivity;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
 import com.shoutit.app.android.widget.SimpleCurrencySpinnerAdapter;
@@ -194,7 +194,7 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
 
     @OnClick(R.id.create_request_location_btn)
     public void onLocationClick() {
-        startActivityForResult(LocationActivity.newIntent(this), LOCATION_REQUEST);
+        startActivityForResult(LocationActivityForResult.newIntent(this), LOCATION_REQUEST);
     }
 
     @OnClick(R.id.create_request_credits_info_iv)

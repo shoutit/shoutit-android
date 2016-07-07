@@ -52,14 +52,14 @@ public class LocationAdapter extends BaseAdapter {
         }
     }
 
-    class CurrentLocationViewHolder extends ViewHolderManager.BaseViewHolder<LocationPresenter.CurrentLocationAdapterItem> implements View.OnClickListener {
+    class CurrentLocationViewHolder extends ViewHolderManager.BaseViewHolder<CurrentLocationAdapterItem> implements View.OnClickListener {
 
         @Bind(R.id.location_current_item_header_tv)
         TextView headerTextView;
         @Bind(R.id.location_current_item_place_tv)
         TextView placeTextView;
 
-        private LocationPresenter.CurrentLocationAdapterItem item;
+        private CurrentLocationAdapterItem item;
 
         public CurrentLocationViewHolder(@Nonnull View itemView) {
             super(itemView);
@@ -68,7 +68,7 @@ public class LocationAdapter extends BaseAdapter {
         }
 
         @Override
-        public void bind(@Nonnull LocationPresenter.CurrentLocationAdapterItem item) {
+        public void bind(@Nonnull CurrentLocationAdapterItem item) {
             this.item = item;
             headerTextView.setText(item.getHeaderName());
             placeTextView.setText(context.getString(R.string.location_location,
@@ -103,7 +103,7 @@ public class LocationAdapter extends BaseAdapter {
     @Override
     public int getItemViewType(int position) {
         final BaseAdapterItem item = items.get(position);
-        if (item instanceof LocationPresenter.CurrentLocationAdapterItem) {
+        if (item instanceof CurrentLocationAdapterItem) {
             return VIEW_TYPE_CURRENT_LOCATION;
         } else if (item instanceof LocationPresenter.PlaceAdapterItem) {
             return VIEW_TYPE_PLACE;

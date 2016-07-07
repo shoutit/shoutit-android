@@ -1,5 +1,6 @@
 package com.shoutit.app.android.view.location;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,21 +8,23 @@ import android.support.annotation.NonNull;
 
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
-import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
-import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.KeyboardHelper;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
-public class LocationActivity extends BaseActivity {
+public class LocationActivityForResult extends BaseActivity {
+
+    public static final String EXTRAS_USER_LOCATION = "extras_location";
 
     @Inject
     LocationAdapter adapter;
     @Inject
-    LocationPresenter presenter;
+    LocationForResultPresenter presenter;
 
     private LocationActivityDelegate mLocationActivityDelegate;
 
@@ -34,12 +37,11 @@ public class LocationActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         mLocationActivityDelegate = new LocationActivityDelegate(this, presenter, adapter);
 
-        presenter.getUserUpdateSuccessObservable()
-                .compose(bindToLifecycle())
-                .subscribe(o -> {
-                    ColoredSnackBar.successSnackBarAction(
-                            ColoredSnackBar.contentView(LocationActivity.this),
-                            R.string.location_update_success);
+        presenter.getUpdateUserObservable()
+                .compose(this.<UserLocation>bindToLifecycle())
+                .subscribe(userLocation -> {
+                    KeyboardHelper.hideSoftKeyboard(LocationActivityForResult.this);
+                    setResult(Activity.RESULT_OK, new Intent().putExtra(EXTRAS_USER_LOCATION, userLocation));
                     finish();
                 });
     }

@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.createshout.location;
+package com.shoutit.app.android.view.location;
 
 import android.content.Context;
 import android.location.Location;
@@ -17,9 +17,7 @@ import com.google.android.gms.location.places.AutocompletePrediction;
 import com.google.android.gms.location.places.AutocompletePredictionBuffer;
 import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.common.base.Function;
-import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.R;
@@ -45,7 +43,7 @@ import rx.functions.Func3;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
-public class LocationPresenter {
+public class LocationPresenterDelegate {
 
     private static final long MINIMUM_SEARCH_INPUT = 3;
 
@@ -69,7 +67,6 @@ public class LocationPresenter {
     private final Observable<Throwable> locationErrorObservable;
     @Nonnull
     private final Observable<Throwable> updateLocationErrorObservable;
-
     @Nonnull
     private final GoogleApiClient googleApiClient;
     @Nonnull
@@ -78,15 +75,17 @@ public class LocationPresenter {
     private final Scheduler uiScheduler;
     @Nonnull
     private final ApiService apiService;
-    private final Observable<UserLocation> mUpdateUserObservable;
+    @Nonnull
+    private final Observable<ResponseOrError<UserLocation>> mSelectedPlaceGeocodeResponse;
+
 
     @Inject
-    public LocationPresenter(@Nonnull final GoogleApiClient googleApiClient,
-                             @Nonnull @NetworkScheduler final Scheduler networkScheduler,
-                             @Nonnull @UiScheduler Scheduler uiScheduler,
-                             @Nonnull @ForApplication final Context context,
-                             @Nonnull final ApiService apiService,
-                             @Nonnull final UserPreferences userPreferences) {
+    public LocationPresenterDelegate(@Nonnull final GoogleApiClient googleApiClient,
+                                     @Nonnull @NetworkScheduler final Scheduler networkScheduler,
+                                     @Nonnull @UiScheduler Scheduler uiScheduler,
+                                     @Nonnull @ForApplication final Context context,
+                                     @Nonnull final ApiService apiService,
+                                     @Nonnull final UserPreferences userPreferences) {
         this.googleApiClient = googleApiClient;
         this.networkScheduler = networkScheduler;
         this.uiScheduler = uiScheduler;
@@ -155,7 +154,7 @@ public class LocationPresenter {
                                 @Override
                                 public BaseAdapterItem apply(@Nullable AutocompletePrediction prediction) {
                                     assert prediction != null;
-                                    return new PlaceAdapterItem(
+                                    return new LocationPresenter.PlaceAdapterItem(
                                             prediction.getPlaceId(),
                                             prediction.getFullText(null).toString(),
                                             suggestedLocationSelectedSubject);
@@ -213,25 +212,21 @@ public class LocationPresenter {
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<PlaceBuffer>>behaviorRefCount());
 
-        final Observable<ResponseOrError<UserLocation>> selectedPlaceGeocodeResponse =
-                locationDetailsObservable
-                        .compose(ResponseOrError.<PlaceBuffer>onlySuccess())
-                        .map(places -> places.get(0).getLatLng())
-                        .switchMap(latLng -> {
-                            return getGeoCodeRequest(latLng.latitude, latLng.longitude);  // TODO remove this request if guest user will be handled by API
-                        })
-                        .compose(ObservableExtensions.<ResponseOrError<UserLocation>>behaviorRefCount());
-
-        mUpdateUserObservable = Observable.merge(
-                selectedPlaceGeocodeResponse.compose(ResponseOrError.<UserLocation>onlySuccess()),
-                selectedGpsUserLocation);
+        // TODO remove this request if guest user will be handled by API
+        mSelectedPlaceGeocodeResponse = locationDetailsObservable
+                .compose(ResponseOrError.<PlaceBuffer>onlySuccess())
+                .map(places -> places.get(0).getLatLng())
+                .switchMap(latLng -> {
+                    return getGeoCodeRequest(latLng.latitude, latLng.longitude);  // TODO remove this request if guest user will be handled by API
+                })
+                .compose(ObservableExtensions.<ResponseOrError<UserLocation>>behaviorRefCount());
 
         // Progress and Errors
 
         progressObservable = Observable.merge(
                 progressSubject,
                 locationDetailsObservable.compose(ResponseOrError.<PlaceBuffer>onlyError()).map(Functions1.returnFalse()),
-                selectedPlaceGeocodeResponse.compose(ResponseOrError.<UserLocation>onlyError()).map(Functions1.returnFalse())
+                mSelectedPlaceGeocodeResponse.compose(ResponseOrError.<UserLocation>onlyError()).map(Functions1.returnFalse())
                         .observeOn(uiScheduler));
 
         locationErrorObservable = ResponseOrError.combineErrorsObservable(
@@ -241,7 +236,7 @@ public class LocationPresenter {
 
         updateLocationErrorObservable = ResponseOrError.combineErrorsObservable(
                 ImmutableList.of(
-                        ResponseOrError.transform(selectedPlaceGeocodeResponse)
+                        ResponseOrError.transform(mSelectedPlaceGeocodeResponse)
                 ))
                 .filter(Functions1.isNotNull())
                 .observeOn(uiScheduler);
@@ -260,7 +255,7 @@ public class LocationPresenter {
     }
 
     @NonNull
-    private Action1<Object> showProgressAction(final boolean showProgress) {
+    public Action1<Object> showProgressAction(final boolean showProgress) {
         return ignore -> progressSubject.onNext(showProgress);
     }
 
@@ -294,151 +289,28 @@ public class LocationPresenter {
         return updateLocationErrorObservable;
     }
 
-    @NonNull
-    public Observable<UserLocation> getUpdateUserObservable() {
-        return mUpdateUserObservable;
-    }
-
     public void refreshGpsLocation() {
         gpsLocationRefreshSubject.onNext(null);
     }
 
     @Nonnull
     private Func1<String, Boolean> queryFilter() {
-        return new Func1<String, Boolean>() {
-            @Override
-            public Boolean call(String query) {
-                return googleApiClient.isConnected() &&
-                        query != null &&
-                        query.length() >= MINIMUM_SEARCH_INPUT;
-            }
-        };
+        return query -> googleApiClient.isConnected() &&
+                query != null &&
+                query.length() >= MINIMUM_SEARCH_INPUT;
+    }
+
+    @NonNull
+    public Observable<ResponseOrError<UserLocation>> getSelectedPlaceGeocodeResponse() {
+        return mSelectedPlaceGeocodeResponse;
+    }
+
+    @Nonnull
+    public Observable<UserLocation> getSelectedGpsUserLocation() {
+        return selectedGpsUserLocation;
     }
 
     public void disconnectGoogleApi() {
         googleApiClient.disconnect();
-    }
-
-    // Adapter items
-
-    public static class PlaceAdapterItem implements BaseAdapterItem {
-        @Nonnull
-        private final String placeId;
-        @Nonnull
-        private final String fullText;
-        @Nonnull
-        private final Observer<String> locationSelectedObserver;
-
-        public PlaceAdapterItem(@Nonnull String placeId,
-                                @Nonnull String fullText,
-                                @Nonnull Observer<String> locationSelectedObserver) {
-            this.placeId = placeId;
-            this.fullText = fullText;
-            this.locationSelectedObserver = locationSelectedObserver;
-        }
-
-        @Nonnull
-        public String getFullText() {
-            return fullText;
-        }
-
-        @Override
-        public long adapterId() {
-            return BaseAdapterItem.NO_ID;
-        }
-
-        public void locationSelected() {
-            locationSelectedObserver.onNext(placeId);
-        }
-
-        @Override
-        public boolean matches(@Nonnull BaseAdapterItem item) {
-            return item instanceof PlaceAdapterItem && item.equals(this);
-        }
-
-        @Override
-        public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof PlaceAdapterItem && item.equals(this);
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof PlaceAdapterItem)) return false;
-            final PlaceAdapterItem that = (PlaceAdapterItem) o;
-            return Objects.equal(placeId, that.placeId) &&
-                    Objects.equal(fullText, that.fullText);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hashCode(placeId, fullText);
-        }
-    }
-
-    public static class CurrentLocationAdapterItem implements BaseAdapterItem {
-
-        @Nonnull
-        private final UserLocation userLocation;
-        @Nonnull
-        private final String headerName;
-        private final boolean isGpsLocation;
-        @Nonnull
-        private final Observer<UserLocation> selectedGpsUserLocation;
-
-        public CurrentLocationAdapterItem(@Nonnull UserLocation userLocation,
-                                          @Nonnull String headerName,
-                                          boolean isGpsLocation,
-                                          @Nonnull Observer<UserLocation> selectedGpsUserLocation) {
-            this.userLocation = userLocation;
-            this.headerName = headerName;
-            this.isGpsLocation = isGpsLocation;
-            this.selectedGpsUserLocation = selectedGpsUserLocation;
-        }
-
-        @Override
-        public long adapterId() {
-            return BaseAdapterItem.NO_ID;
-        }
-
-        @Override
-        public boolean matches(@Nonnull BaseAdapterItem item) {
-            return item instanceof CurrentLocationAdapterItem;
-        }
-
-        @Override
-        public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof CurrentLocationAdapterItem && this.equals(item);
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof CurrentLocationAdapterItem)) return false;
-            final CurrentLocationAdapterItem that = (CurrentLocationAdapterItem) o;
-            return Objects.equal(userLocation, that.userLocation) &&
-                    Objects.equal(headerName, that.headerName);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hashCode(userLocation, headerName);
-        }
-
-        @Nonnull
-        public UserLocation getUserLocation() {
-            return userLocation;
-        }
-
-        @Nonnull
-        public String getHeaderName() {
-            return headerName;
-        }
-
-        public void onLocationSelected() {
-            if (isGpsLocation) {
-                selectedGpsUserLocation.onNext(UserLocation.fromGps(userLocation));
-            }
-        }
     }
 }
