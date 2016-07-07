@@ -20,7 +20,6 @@ import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
-import com.shoutit.app.android.constants.RequestsConstants;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.ColoredSnackBar;
@@ -139,7 +138,7 @@ public class LinkedAccountsFragment extends BaseFragment implements LinkedAccoun
 
     @Override
     public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-        if (requestCode == RequestsConstants.GOOGLE_SIGN_IN) {
+        if (requestCode == GOOGLE_SIGN_IN) {
             final GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             final GoogleSignInAccount acct = result.getSignInAccount();
 
@@ -158,7 +157,7 @@ public class LinkedAccountsFragment extends BaseFragment implements LinkedAccoun
 
     @Override
     public void triggerSignInGoogle() {
-        GoogleHelper.loginGoogle(getActivity());
+        GoogleHelper.loginGoogle(getActivity(), GOOGLE_SIGN_IN);
     }
 
     @Override

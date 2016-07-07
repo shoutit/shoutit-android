@@ -13,8 +13,8 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
+import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
-import com.shoutit.app.android.constants.RequestsConstants;
 import com.shoutit.app.android.model.FiltersToSubmit;
 import com.shoutit.app.android.model.LocationPointer;
 import com.shoutit.app.android.model.MobilePhoneResponse;
@@ -224,7 +224,7 @@ public class ShoutsDao {
         Observable<ShoutsResponse> getShoutsRequest(int pageNumber) {
             if (userPreferences.isNormalUser()) {
                 return apiService
-                        .home(RequestsConstants.USER_ME, pageNumber, PAGE_SIZE)
+                        .home(User.ME, pageNumber, PAGE_SIZE)
                         .subscribeOn(networkScheduler);
             } else {
                 return apiService

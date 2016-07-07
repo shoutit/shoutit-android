@@ -6,15 +6,12 @@ import android.content.Intent;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.shoutit.app.android.constants.RequestsConstants;
 
 import javax.annotation.Nonnull;
-import javax.inject.Singleton;
 
-@Singleton
 public class GoogleHelper {
 
-    public static void loginGoogle(@Nonnull final Activity activity) {
+    public static void loginGoogle(@Nonnull final Activity activity, final int googleSignIn) {
         final GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .requestProfile()
@@ -26,6 +23,6 @@ public class GoogleHelper {
                 .build();
 
         final Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient);
-        activity.startActivityForResult(signInIntent, RequestsConstants.GOOGLE_SIGN_IN);
+        activity.startActivityForResult(signInIntent, googleSignIn);
     }
 }

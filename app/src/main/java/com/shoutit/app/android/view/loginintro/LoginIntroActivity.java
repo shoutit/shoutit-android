@@ -19,9 +19,7 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookSdk;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
@@ -56,7 +54,7 @@ import rx.schedulers.Schedulers;
 
 public class LoginIntroActivity extends BaseActivity {
 
-    private static final int GOOGLE_SIGN_IN = 0;
+    public static final int GOOGLE_SIGN_IN = 0;
 
     @Bind(R.id.activity_login_toolbar)
     Toolbar toolbar;
@@ -195,7 +193,7 @@ public class LoginIntroActivity extends BaseActivity {
 
     @OnClick(R.id.activity_login_gplus_btn)
     public void googleClick() {
-        GoogleHelper.loginGoogle(this);
+        GoogleHelper.loginGoogle(this, GOOGLE_SIGN_IN);
     }
 
     @OnClick(R.id.activity_login_facebook_btn)
