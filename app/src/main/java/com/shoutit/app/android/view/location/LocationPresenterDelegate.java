@@ -154,7 +154,7 @@ public class LocationPresenterDelegate {
                                 @Override
                                 public BaseAdapterItem apply(@Nullable AutocompletePrediction prediction) {
                                     assert prediction != null;
-                                    return new LocationPresenter.PlaceAdapterItem(
+                                    return new PlaceAdapterItem(
                                             prediction.getPlaceId(),
                                             prediction.getFullText(null).toString(),
                                             suggestedLocationSelectedSubject);

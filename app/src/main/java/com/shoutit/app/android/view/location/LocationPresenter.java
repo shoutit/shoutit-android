@@ -72,12 +72,12 @@ public class LocationPresenter implements ILocationPresenter {
 
     @Nonnull
     public Observer<String> getQuerySubject() {
-        return mLocationPresenterDelegate.getQuerySubject()
+        return mLocationPresenterDelegate.getQuerySubject();
     }
 
     @Nonnull
     public Observable<Boolean> getQueryProgressObservable() {
-        return mLocationPresenterDelegate.getQueryProgressObservable()
+        return mLocationPresenterDelegate.getQueryProgressObservable();
     }
 
     @Nonnull
