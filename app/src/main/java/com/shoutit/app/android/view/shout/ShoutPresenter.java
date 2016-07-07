@@ -372,13 +372,13 @@ public class ShoutPresenter {
         showPromoteObservable = callOrPromoteObservable
                 .filter(Functions1.isTrue())
                 .withLatestFrom(successShoutResponse, (ignore, shout) -> shout)
-                .filter(shout -> !shout.isPromoted())
+                .filter(shout -> shout.getPromotion() == null)
                 .observeOn(uiScheduler);
 
         showPromotedObservable = callOrPromoteObservable
                 .filter(Functions1.isTrue())
                 .withLatestFrom(successShoutResponse, (ignore, shout) -> shout)
-                .filter(Shout::isPromoted)
+                .filter(shout1 -> shout1.getPromotion() != null)
                 .observeOn(uiScheduler);
 
         deleteShoutResponseObservable = shoutsDao.getDeleteShoutObservable(shoutId)
@@ -504,7 +504,7 @@ public class ShoutPresenter {
                             final boolean hasConversation = conversations != null && !conversations.isEmpty();
                             return new BottomBarData(isUserShoutOwner, hasConversation,
                                     hasConversation ? conversations.get(0).getId() : null,
-                                    mUserPreferences.isNormalUser(), shout.isPromoted());
+                                    mUserPreferences.isNormalUser(), shout.getPromotion() != null);
                         }
                 ))
                 .take(1)

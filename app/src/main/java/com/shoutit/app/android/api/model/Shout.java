@@ -186,10 +186,6 @@ public class Shout {
         return promotion;
     }
 
-    public boolean isPromoted() {
-        return promotion != null && !promotion.isExpired();
-    }
-
     public boolean isLiked() {
         return isLiked;
     }
