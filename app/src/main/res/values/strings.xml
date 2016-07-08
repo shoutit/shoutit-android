@@ -694,6 +694,8 @@
     <string name="promote_not_enough_money">You don\'t have enough Shoutit Credit for this action</string>
     <string name="promote_confirm_text">Confirm buying %1$s for %2$d credits</string>
     <string name="promote_confirm_button">Confirm</string>
+    <string name="promoted_message_no_days">Your shout is promoted.</string>
+    <string name="promoted_message_days">Your shout is promoted until %1$s.</string>
 
     <!-- Transactions -->
     <string name="transactions_title">Credit Transactions</string>

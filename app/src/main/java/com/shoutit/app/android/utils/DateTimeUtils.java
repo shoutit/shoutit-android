@@ -12,6 +12,7 @@ public class DateTimeUtils {
 
     private static SimpleDateFormat sSimpleDateFormat = new SimpleDateFormat("dd - MM - yyyy", Locale.getDefault());
     private static SimpleDateFormat sChatCreatedAtFormat = new SimpleDateFormat("dd MM yyyy", Locale.getDefault());
+    private static SimpleDateFormat sSlashedDateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
     @Nonnull
     public static String timeAgoFromSecondsToWeek(Context context, long datePublishedInMillis) {
@@ -33,5 +34,9 @@ public class DateTimeUtils {
 
     public static String getChatCreatedAtDate(long millis) {
         return sChatCreatedAtFormat.format(new Date(millis));
+    }
+
+    public static String getSlashedDate(long dateInMillis) {
+        return sSlashedDateFormat.format(new Date(dateInMillis));
     }
 }
