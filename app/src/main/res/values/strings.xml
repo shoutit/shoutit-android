@@ -764,4 +764,13 @@
     <!-- Bookmarks -->
     <string name="bookmarks_no_bookmarks">You don\'t have any bookmarked shouts.</string>
 
+    <!-- Business Verification -->
+    <string name="business_ver_name_hint">Business Name</string>
+    <string name="business_ver_contact_person_hint">Contact Person</string>
+    <string name="business_ver_phone_hint">Contact Number</string>
+    <string name="business_ver_email_hint">Business Email</string>
+    <string name="business_ver_docs_header_tv">Add Official Documents with Business information for faster verification</string>
+    <string name="business_ver_bottom_text">Your information including any legal documents will be securley saved and will be used only for the verification process.</string>
+    <string name="business_ver_button">Submit Verification Request</string>
+
 </resources>

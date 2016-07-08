@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="To have your business Page appear as “Verified” on Shoutit we need few extra information from you.
+Pages verification doesn’t take long time and will give your Page more legitmacy on the marketplace."
+            android:textColor="@color/black_87"
+            android:textSize="12sp" />
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/business_ver_name_il"
+            style="@style/BlueInputStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:hintTextAppearance="@style/BlueInputStyle">
+
+            <EditText
+                android:id="@+id/business_ver_name_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/business_ver_name_hint"
+                android:imeOptions="actionNext"
+                android:inputType="textCapWords"
+                android:nextFocusDown="@+id/business_ver_contact_person_et"
+                android:theme="@style/BlueEditText" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/business_ver_contact_person_tl"
+            style="@style/BlueInputStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:hintTextAppearance="@style/BlueInputStyle">
+
+            <EditText
+                android:id="@+id/business_ver_contact_person_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/business_ver_contact_person_hint"
+                android:imeOptions="actionNext"
+                android:inputType="textCapWords"
+                android:nextFocusDown="@+id/business_ver_contact_number_et"
+                android:theme="@style/BlueEditText" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/business_ver_contact_number_tl"
+            style="@style/BlueInputStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:hintTextAppearance="@style/BlueInputStyle">
+
+            <EditText
+                android:id="@+id/business_ver_contact_number_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/business_ver_phone_hint"
+                android:imeOptions="actionNext"
+                android:inputType="phone"
+                android:nextFocusDown="@+id/business_ver_email_et"
+                android:theme="@style/BlueEditText" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/business_ver_email_til"
+            style="@style/BlueInputStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:hintTextAppearance="@style/BlueInputStyle">
+
+            <EditText
+                android:id="@+id/business_ver_email_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/business_ver_email_hint"
+                android:imeOptions="actionDone"
+                android:inputType="textEmailAddress"
+                android:nextFocusDown="@+id/register_password_edittext"
+                android:theme="@style/BlueEditText" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/business_ver_docs_header_tv"
+            android:textColor="@color/black_54"
+            android:textSize="14sp" />
+
+        <LinearLayout
+            android:id="@+id/business_ver_images_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/business_ver_bottom_text"
+            android:textColor="@color/black_54"
+            android:layout_marginTop="16sp"
+            android:textSize="12sp" />
+
+        <Button
+            style="@style/BaseButtonStyle"
+            android:layout_width="match_parent"
+            android:background="@drawable/selector_green_button_with_stroke"
+            android:textAllCaps="false"
+            android:layout_marginTop="16dp"
+            android:textColor="@android:color/white"
+            android:text="@string/business_ver_button"/>
+
+    </LinearLayout>
+
+</ScrollView>
