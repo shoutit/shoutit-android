@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
@@ -26,7 +25,6 @@ import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.view.videoconversation.DialogCallActivity;
 import com.twilio.common.AccessManager;
 import com.twilio.conversations.AudioOutput;
-import com.twilio.conversations.Conversation;
 import com.twilio.conversations.IncomingInvite;
 import com.twilio.conversations.InviteStatus;
 import com.twilio.conversations.LogLevel;
@@ -51,6 +49,8 @@ public class Twilio {
 
     private static final String TAG = Twilio.class.getCanonicalName();
     private static final int TOKEN_ERROR_MAX_RETRIES = 3;
+    private static final int TOKEN_EXPIRED_MAX_RETRIES = 3;
+    private static final int LISTEN_FAIL_MAX_RETRIES = 3;
 
     public static final int ERROR_PARTICIPANT_UNAVAILABLE = 106;
     public static final int ERROR_PARTICIPANT_REJECTED_CALL = 107;
@@ -63,6 +63,8 @@ public class Twilio {
     private IncomingInvite currentInvite;
     private boolean isDuringCall;
     private int tokenErrorRetries;
+    private int tokeExpiredRetries;
+    private int listenFailRetries;
 
     private final Observable<String> successTwilioTokenRequestObservable;
     private final Observable<String> successCalledPersonIdentity;
@@ -212,21 +214,26 @@ public class Twilio {
             @Override
             public void onTokenExpired(AccessManager twilioAccessManager) {
                 userPreferences.setTwilioToken(null);
-                initTwilio();
+
+                if (tokeExpiredRetries < TOKEN_EXPIRED_MAX_RETRIES) {
+                    ++tokeExpiredRetries;
+                    initTwilio();
+                }
             }
 
             @Override
             public void onTokenUpdated(AccessManager twilioAccessManager) {
                 userPreferences.setTwilioToken(twilioAccessManager.getToken());
+                tokenErrorRetries = 0;
+                tokeExpiredRetries = 0;
             }
 
             @Override
             public void onError(AccessManager twilioAccessManager, String s) {
-                if (tokenErrorRetries <= TOKEN_ERROR_MAX_RETRIES) {
+                if (tokenErrorRetries < TOKEN_ERROR_MAX_RETRIES) {
+                    ++tokenErrorRetries;
                     userPreferences.setTwilioToken(null);
                     initTwilio();
-                } else {
-                    tokenErrorRetries = 0;
                 }
                 LogHelper.logThrowableAndCrashlytics(TAG, "accessManagerListener : Error on Token: " + s, new Throwable());
             }
@@ -238,6 +245,7 @@ public class Twilio {
             @Override
             public void onStartListeningForInvites(TwilioConversationsClient conversationsClient) {
                 LogHelper.logIfDebug(TAG, "onStartListeningForInvites");
+                listenFailRetries = 0;
             }
 
             @Override
@@ -254,7 +262,8 @@ public class Twilio {
             public void onFailedToStartListening(TwilioConversationsClient conversationsClient, TwilioConversationsException e) {
                 LogHelper.logIfDebug(TAG, "onFailedToStartListening");
 
-                if (e != null && e.getErrorCode() == 100) {
+                if (e != null && e.getErrorCode() == 100 && listenFailRetries < LISTEN_FAIL_MAX_RETRIES) {
+                    ++listenFailRetries;
                     initTwilio();
                 }
             }
