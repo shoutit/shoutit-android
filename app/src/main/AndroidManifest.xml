@@ -333,6 +333,7 @@
             android:name=".view.videoconversation.DialogCallActivity"
             android:screenOrientation="portrait"
             android:excludeFromRecents="true"
+            android:launchMode="singleInstance"
             android:theme="@style/TranslucentBackground"/>
 
         <activity android:name=".view.chooseprofile.SelectProfileActivity"

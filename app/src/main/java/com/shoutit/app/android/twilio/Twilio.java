@@ -26,11 +26,14 @@ import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.view.videoconversation.DialogCallActivity;
 import com.twilio.common.AccessManager;
 import com.twilio.conversations.AudioOutput;
+import com.twilio.conversations.Conversation;
 import com.twilio.conversations.IncomingInvite;
 import com.twilio.conversations.InviteStatus;
 import com.twilio.conversations.LogLevel;
 import com.twilio.conversations.TwilioConversationsClient;
 import com.twilio.conversations.TwilioConversationsException;
+
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -58,6 +61,7 @@ public class Twilio {
     private final UserPreferences userPreferences;
     private TwilioConversationsClient conversationsClient;
     private IncomingInvite currentInvite;
+    private boolean isDuringCall;
     private int tokenErrorRetries;
 
     private final Observable<String> successTwilioTokenRequestObservable;
@@ -114,6 +118,7 @@ public class Twilio {
                 .subscribe(this::initializeTwilio);
 
         final Observable<ResponseOrError<BothParams<CallerProfile, String>>> callerProfileResponse = profileRefreshSubject
+                .throttleFirst(2, TimeUnit.SECONDS) // Workaround for Twilio mutiple invites
                 .switchMap(new Func1<BothParams<String, String>, Observable<ResponseOrError<BothParams<CallerProfile, String>>>>() {
                     @Override
                     public Observable<ResponseOrError<BothParams<CallerProfile, String>>> call(BothParams<String, String> conversationIdWithIdentity) {
@@ -259,18 +264,27 @@ public class Twilio {
                 LogHelper.logIfDebug(TAG, "onIncomingInvite with conversation sid: " +
                         incomingInvite.getConversationSid() + " and invitation status: " + incomingInvite.getInviteStatus());
 
-                 if (!isDuringTheCall() && incomingInvite.getInviteStatus() == InviteStatus.PENDING) {
-                     LogHelper.logIfDebug(TAG, "starting call");
+                LogHelper.logIfDebug(TAG, "isDuringCall: " + isDuringCall);
+
+                if (!isDuringCall && incomingInvite.getInviteStatus() == InviteStatus.PENDING) {
+                    LogHelper.logIfDebug(TAG, "starting call");
                     currentInvite = incomingInvite;
 
                     final String caller = String.valueOf(incomingInvite.getParticipants());
                     final String callerIdentity = caller.substring(1, caller.length() - 1);
 
                     profileRefreshSubject.onNext(new BothParams<>(incomingInvite.getConversationSid(), callerIdentity));
-                 } else {
-                     LogHelper.logIfDebug(TAG, "is during a call? " + isDuringTheCall());
-                     LogHelper.logIfDebug(TAG, "Cannot start conversation with id: " + incomingInvite.getConversationSid() + " and status: " + incomingInvite.getInviteStatus());
-                 }
+                } else if (isDuringCall) {
+                    LogHelper.logIfDebug(TAG, "invitation during a call");
+                    if (currentInvite == null || !incomingInvite.getInviter().equals(currentInvite.getInviter())) {
+                        incomingInvite.reject();
+                    } else {
+                        LogHelper.logIfDebug(TAG, "Doubled invite");
+                        LogHelper.logIfDebug(TAG, "Cannot start conversation with id: " + incomingInvite.getConversationSid() + " and status: " + incomingInvite.getInviteStatus());
+                    }
+                } else {
+                    LogHelper.logIfDebug(TAG, "Cannot start conversation with id: " + incomingInvite.getConversationSid() + " and status: " + incomingInvite.getInviteStatus());
+                }
             }
 
             @Override
@@ -285,15 +299,15 @@ public class Twilio {
         };
     }
 
-    private boolean isDuringTheCall() {
-        return currentInvite != null && (currentInvite.getInviteStatus() == InviteStatus.ACCEPTED ||
-                currentInvite.getInviteStatus() == InviteStatus.ACCEPTING);
-    }
-
     public void unregisterTwillio(){
         if (TwilioConversationsClient.isInitialized()) {
             TwilioConversationsClient.destroy();
         }
+    }
+
+    public void setDuringCall(boolean duringCall) {
+        LogHelper.logIfDebug(TAG, "Setting during the call to: " + duringCall);
+        isDuringCall = duringCall;
     }
 
     @Nullable

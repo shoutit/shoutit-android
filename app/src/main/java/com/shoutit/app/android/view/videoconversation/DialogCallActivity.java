@@ -107,8 +107,6 @@ public class DialogCallActivity extends BaseActivity {
                         LogHelper.logIfDebug(TAG, "starting conversation with conv sid: " + conversationId);
                         startActivity(VideoConversationActivity.newIntent(callerName, null, callerImageUrl, DialogCallActivity.this));
                     } else {
-                        final String status = mTwilio.getCurrentInvite() != null ? mTwilio.getCurrentInvite().getInviteStatus().name() : "";
-                        LogHelper.logIfDebug(TAG, "starting conversation with conv sid: " + conversationId + " and status: " + status);
                         Toast.makeText(DialogCallActivity.this, R.string.video_call_finished, Toast.LENGTH_SHORT)
                                 .show();
                     }

@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
@@ -91,7 +90,6 @@ public class VideoConversationActivity extends BaseActivity {
     private Conversation conversation;
 
     private OutgoingInvite outgoingInvite;
-    private IncomingInvite incomingInvite;
 
     @Bind(R.id.video_conversation_layout)
     View rootView;
@@ -201,7 +199,6 @@ public class VideoConversationActivity extends BaseActivity {
         setupAudioVideo();
 
         if (isUserCallReceiver) {
-            incomingInvite = mTwilio.getCurrentInvite();
             acceptIncomingCall();
         }
 
@@ -370,6 +367,8 @@ public class VideoConversationActivity extends BaseActivity {
     }
 
     private void acceptIncomingCall() {
+        final IncomingInvite incomingInvite = mTwilio.getCurrentInvite();
+
         if (incomingInvite != null && incomingInvite.getInviteStatus().equals(InviteStatus.PENDING)) {
             LogHelper.logIfDebug(TAG, "VideoConAct started with conf sid: " + incomingInvite.getConversationSid());
 
@@ -379,11 +378,9 @@ public class VideoConversationActivity extends BaseActivity {
                 @Override
                 public void onConversation(Conversation conversation, TwilioConversationsException exception) {
                     if (exception == null) {
-                        VideoConversationActivity
-                                .this
-                                .conversation = conversation;
-                        conversation
-                                .setConversationListener(conversationListener());
+                        VideoConversationActivity.this.conversation = conversation;
+                        mTwilio.setDuringCall(true);
+                        conversation.setConversationListener(conversationListener());
                         showOrHideVideo(shouldShowVideo());
                     } else {
                         conversationErrorSubject.onNext(TextHelper.formatErrorMessage(exception.getMessage()));
@@ -432,6 +429,7 @@ public class VideoConversationActivity extends BaseActivity {
                             public void onConversation(Conversation conversation, TwilioConversationsException exception) {
                                 if (exception == null) {
                                     presenter.finishRetries();
+                                    mTwilio.setDuringCall(true);
                                     VideoConversationActivity.this.conversation = conversation;
                                     conversation.setConversationListener(conversationListener());
                                     LogHelper.logIfDebug(TAG, "Succesfully connected");
@@ -524,6 +522,7 @@ public class VideoConversationActivity extends BaseActivity {
                 stopVideoTimer();
                 switchToFullScreenMode(false);
                 conversationInfoSubject.onNext(getString(R.string.video_calls_participant_disconected));
+                closeConversation();
             }
 
             @Override
@@ -714,6 +713,9 @@ public class VideoConversationActivity extends BaseActivity {
     private void closeConversation() {
         LogHelper.logIfDebug(TAG, "closeConversation()");
 
+        mTwilio.setDuringCall(false);
+        mTwilio.clearCurrentInvite();
+
         smallPreviewWindow.removeAllViews();
         smallPreviewCoverView.setVisibility(View.VISIBLE);
         participantWindow.removeAllViews();
@@ -731,20 +733,14 @@ public class VideoConversationActivity extends BaseActivity {
 
         cameraCapturer.stopPreview();
 
-        if (incomingInvite != null) {
-            incomingInvite.reject();
-        }
-
         if (outgoingInvite != null) {
-            outgoingInvite.cancel();;
+            outgoingInvite.cancel();
         }
 
         if (conversation != null) {
             conversation.disconnect();
             conversation = null;
         }
-
-        mTwilio.clearCurrentInvite();
     }
 
     @Override
