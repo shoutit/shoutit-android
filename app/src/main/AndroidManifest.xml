@@ -189,7 +189,7 @@
         </activity>
         <activity android:name=".view.createshout.request.CreateRequestActivity"
                   android:screenOrientation="portrait"/>
-        <activity android:name=".view.createshout.location.LocationActivity"
+        <activity android:name=".view.location.LocationActivityForResult"
                   android:screenOrientation="portrait"/>
         <activity android:name=".view.createpage.pagecategory.CreatePageCategoryActivity"
                   android:screenOrientation="portrait"/>

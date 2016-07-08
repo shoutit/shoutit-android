@@ -15,7 +15,7 @@ import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.ImageCaptureHelper;
 import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.view.conversations.RefreshConversationBus;
-import com.shoutit.app.android.view.createshout.location.LocationResultHelper;
+import com.shoutit.app.android.view.location.LocationResultHelper;
 import com.shoutit.app.android.view.media.MediaUtils;
 
 import org.junit.Before;

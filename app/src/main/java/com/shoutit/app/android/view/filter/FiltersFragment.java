@@ -21,11 +21,10 @@ import com.shoutit.app.android.model.FiltersToSubmit;
 import com.shoutit.app.android.retainfragment.RetainFragmentHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.KeyboardHelper;
-import com.shoutit.app.android.view.createshout.location.LocationActivity;
-import com.shoutit.app.android.view.createshout.location.LocationResultHelper;
+import com.shoutit.app.android.view.location.LocationActivityForResult;
+import com.shoutit.app.android.view.location.LocationResultHelper;
 import com.shoutit.app.android.view.search.SearchPresenter;
 
-import java.io.Serializable;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -127,10 +126,10 @@ public class FiltersFragment extends BaseFragment {
                     public void call(Object o) {
                         if (getParentFragment() != null) {
                             getParentFragment().startActivityForResult(
-                                    LocationActivity.newIntent(getActivity()), REQUEST_GET_LOCATION);
+                                    LocationActivityForResult.newIntent(getActivity()), REQUEST_GET_LOCATION);
                         } else {
                             startActivityForResult(
-                                    LocationActivity.newIntent(getActivity()), REQUEST_GET_LOCATION);
+                                    LocationActivityForResult.newIntent(getActivity()), REQUEST_GET_LOCATION);
                         }
 
                     }

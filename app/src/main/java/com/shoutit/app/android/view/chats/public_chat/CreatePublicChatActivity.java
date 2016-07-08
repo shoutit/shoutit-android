@@ -29,7 +29,7 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.ImageCaptureHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
-import com.shoutit.app.android.view.createshout.location.LocationActivity;
+import com.shoutit.app.android.view.location.LocationActivityForResult;
 import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;
@@ -132,7 +132,7 @@ public class CreatePublicChatActivity extends BaseActivity implements CreatePubl
 
     @Override
     public void startSelectLocationActivity() {
-        startActivityForResult(LocationActivity.newIntent(this), REQUEST_LOCATION);
+        startActivityForResult(LocationActivityForResult.newIntent(this), REQUEST_LOCATION);
     }
 
     @Override

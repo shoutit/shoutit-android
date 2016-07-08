@@ -17,5 +17,6 @@ import dagger.Component;
 public interface LocationActivityComponent extends BaseActivityComponent {
 
     void inject(LocationActivity activity);
+    void inject(LocationActivityForResult activity);
 }
 
