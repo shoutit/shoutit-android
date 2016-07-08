@@ -281,6 +281,7 @@ public abstract class VideoCallActivity extends BaseActivity {
 
                 stopVideoTimer();
                 switchToFullScreenMode(false);
+                showOrHideSmallPreview(false);
                 showConversationInfo(getString(R.string.video_calls_participant_disconected));
                 closeConversation();
             }
