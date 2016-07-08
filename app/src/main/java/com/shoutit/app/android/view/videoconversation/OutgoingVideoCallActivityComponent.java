@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.shout;
+package com.shoutit.app.android.view.videoconversation;
 
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.ActivityScope;
@@ -7,16 +7,12 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 
 import dagger.Component;
 
-
 @ActivityScope
 @Component(
         dependencies = AppComponent.class,
-        modules = {
-                ActivityModule.class,
-                ShoutActivityModule.class
-        }
+        modules = {ActivityModule.class}
 )
-public interface ShoutActivityComponent extends BaseActivityComponent {
+public interface OutgoingVideoCallActivityComponent extends BaseActivityComponent {
 
-    void inject(ShoutActivity activity);
+    void inject(OutgoingVideoCallActivity activity);
 }

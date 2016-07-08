@@ -4,11 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
+import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.UserPreferences;
@@ -22,15 +24,16 @@ import com.shoutit.app.android.dao.UsersIdentityDao;
 import com.shoutit.app.android.dao.VideoCallsDao;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.view.videoconversation.DialogCallActivity;
-import com.twilio.common.TwilioAccessManager;
-import com.twilio.common.TwilioAccessManagerFactory;
-import com.twilio.common.TwilioAccessManagerListener;
+import com.twilio.common.AccessManager;
 import com.twilio.conversations.AudioOutput;
-import com.twilio.conversations.ConversationsClient;
-import com.twilio.conversations.ConversationsClientListener;
+import com.twilio.conversations.Conversation;
 import com.twilio.conversations.IncomingInvite;
-import com.twilio.conversations.TwilioConversations;
+import com.twilio.conversations.InviteStatus;
+import com.twilio.conversations.LogLevel;
+import com.twilio.conversations.TwilioConversationsClient;
 import com.twilio.conversations.TwilioConversationsException;
+
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -41,7 +44,6 @@ import rx.Observable;
 import rx.Scheduler;
 import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
 @Singleton
@@ -52,13 +54,14 @@ public class Twilio {
 
     public static final int ERROR_PARTICIPANT_UNAVAILABLE = 106;
     public static final int ERROR_PARTICIPANT_REJECTED_CALL = 107;
+    public static final int ERROR_PARTICIPANT_IS_BUSY = 108;
 
     private final Context mContext;
     @Nonnull
     private final UserPreferences userPreferences;
-    private TwilioAccessManager accessManager;
-    private ConversationsClient conversationsClient;
-    private IncomingInvite invite;
+    private TwilioConversationsClient conversationsClient;
+    private IncomingInvite currentInvite;
+    private boolean isDuringCall;
     private int tokenErrorRetries;
 
     private final Observable<String> successTwilioTokenRequestObservable;
@@ -66,9 +69,7 @@ public class Twilio {
     private final Observable<Throwable> errorCalledPersonIdentity;
 
     @Nonnull
-    private final BehaviorSubject<String> callerIdentitySubject = BehaviorSubject.create();
-    @Nonnull
-    private final PublishSubject<Object> profileRefreshSubject = PublishSubject.create();
+    private final PublishSubject<BothParams<String, String>> profileRefreshSubject = PublishSubject.create();
     @Nonnull
     private final PublishSubject<String> initCalledPersonIdentityRequestSubject = PublishSubject.create();
     @Nonnull
@@ -116,21 +117,38 @@ public class Twilio {
                 })
                 .subscribe(this::initializeTwilio);
 
-        final Observable<ResponseOrError<CallerProfile>> callerProfileResponse = profileRefreshSubject
-                .withLatestFrom(callerIdentitySubject,
-                        (o, identity) -> identity)
-                .switchMap(usersIdentityDao::getUserByIdentityObservable)
-                .compose(ObservableExtensions.<ResponseOrError<CallerProfile>>behaviorRefCount());
+        final Observable<ResponseOrError<BothParams<CallerProfile, String>>> callerProfileResponse = profileRefreshSubject
+                .throttleFirst(2, TimeUnit.SECONDS) // Workaround for Twilio mutiple invites
+                .switchMap(new Func1<BothParams<String, String>, Observable<ResponseOrError<BothParams<CallerProfile, String>>>>() {
+                    @Override
+                    public Observable<ResponseOrError<BothParams<CallerProfile, String>>> call(BothParams<String, String> conversationIdWithIdentity) {
+                        return usersIdentityDao.getUserByIdentityObservable(conversationIdWithIdentity.param2())
+                                .compose(ResponseOrError.map(new Func1<CallerProfile, BothParams<CallerProfile, String>>() {
+                                    @Override
+                                    public BothParams<CallerProfile, String> call(CallerProfile callerProfile) {
+                                        return new BothParams<>(callerProfile, conversationIdWithIdentity.param1());
+                                    }
+                                }));
+                    }
+                })
+                .compose(ObservableExtensions.<ResponseOrError<BothParams<CallerProfile, String>>>behaviorRefCount());
+
 
         callerProfileResponse
-                .compose(ResponseOrError.<CallerProfile>onlySuccess())
+                .compose(ResponseOrError.onlySuccess())
                 .filter(Functions1.isNotNull())
                 .observeOn(uiScheduler)
-                .subscribe(callerProfile -> {
-                    Intent intent = DialogCallActivity.newIntent(
-                            callerProfile.getName(), callerProfile.getImage(), mContext);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    mContext.startActivity(intent);
+                .subscribe(new Action1<BothParams<CallerProfile, String>>() {
+                    @Override
+                    public void call(BothParams<CallerProfile, String> callerProfileWithConversationId) {
+                        final CallerProfile callerProfile = callerProfileWithConversationId.param1();
+                        final String conversationId = callerProfileWithConversationId.param2();
+
+                        final Intent intent = DialogCallActivity.newIntent(
+                                callerProfile.getName(), callerProfile.getImage(), conversationId, mContext);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        mContext.startActivity(intent);
+                    }
                 });
 
         rejectCallSubject
@@ -178,41 +196,32 @@ public class Twilio {
     }
 
     private void initializeTwilio(@Nonnull final String accessToken) {
-        TwilioConversations.setLogLevel(TwilioConversations.LogLevel.DEBUG);
+        TwilioConversationsClient.setLogLevel(LogLevel.DEBUG);
 
-        if (!TwilioConversations.isInitialized()) {
-            TwilioConversations.initialize(mContext, new TwilioConversations.InitListener() {
-                @Override
-                public void onInitialized() {
-                    accessManager = TwilioAccessManagerFactory.createAccessManager(mContext, accessToken, accessManagerListener());
-                    conversationsClient = TwilioConversations.createConversationsClient(accessManager, conversationsClientListener());
-                    conversationsClient.setAudioOutput(AudioOutput.SPEAKERPHONE);
-                    conversationsClient.listen();
-                }
-
-                @Override
-                public void onError(Exception e) {
-                    LogHelper.logThrowableAndCrashlytics(TAG, "Failed to initialize the Twilio Conversations SDK with error: ", e);
-                }
-            });
+        if (!TwilioConversationsClient.isInitialized()) {
+            TwilioConversationsClient.initialize(mContext);
+            AccessManager accessManager = AccessManager.create(mContext, accessToken, accessManagerListener());
+            conversationsClient = TwilioConversationsClient.create(accessManager, conversationsClientListener());
+            conversationsClient.setAudioOutput(AudioOutput.SPEAKERPHONE);
+            conversationsClient.listen();
         }
     }
 
-    private TwilioAccessManagerListener accessManagerListener() {
-        return new TwilioAccessManagerListener() {
+    private AccessManager.Listener accessManagerListener() {
+        return new AccessManager.Listener() {
             @Override
-            public void onTokenExpired(TwilioAccessManager twilioAccessManager) {
+            public void onTokenExpired(AccessManager twilioAccessManager) {
                 userPreferences.setTwilioToken(null);
                 initTwilio();
             }
 
             @Override
-            public void onTokenUpdated(TwilioAccessManager twilioAccessManager) {
+            public void onTokenUpdated(AccessManager twilioAccessManager) {
                 userPreferences.setTwilioToken(twilioAccessManager.getToken());
             }
 
             @Override
-            public void onError(TwilioAccessManager twilioAccessManager, String s) {
+            public void onError(AccessManager twilioAccessManager, String s) {
                 if (tokenErrorRetries <= TOKEN_ERROR_MAX_RETRIES) {
                     userPreferences.setTwilioToken(null);
                     initTwilio();
@@ -224,52 +233,89 @@ public class Twilio {
         };
     }
 
-    private ConversationsClientListener conversationsClientListener() {
-        return new ConversationsClientListener() {
+    private TwilioConversationsClient.Listener conversationsClientListener() {
+        return new TwilioConversationsClient.Listener() {
             @Override
-            public void onStartListeningForInvites(ConversationsClient conversationsClient) {
+            public void onStartListeningForInvites(TwilioConversationsClient conversationsClient) {
+                LogHelper.logIfDebug(TAG, "onStartListeningForInvites");
             }
 
             @Override
-            public void onStopListeningForInvites(ConversationsClient conversationsClient) {
-                conversationsClient.listen();
+            public void onStopListeningForInvites(TwilioConversationsClient conversationsClient) {
+                LogHelper.logIfDebug(TAG, "onStopListeningForInvites");
+
+                if (conversationsClient != null) {
+                    conversationsClient.listen();
+                }
+                Twilio.this.conversationsClient.listen();
             }
 
             @Override
-            public void onFailedToStartListening(ConversationsClient conversationsClient, TwilioConversationsException e) {
+            public void onFailedToStartListening(TwilioConversationsClient conversationsClient, TwilioConversationsException e) {
+                LogHelper.logIfDebug(TAG, "onFailedToStartListening");
+
                 if (e != null && e.getErrorCode() == 100) {
                     initTwilio();
                 }
             }
 
             @Override
-            public void onIncomingInvite(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
-                invite = incomingInvite;
-                String caller = String.valueOf(incomingInvite.getParticipants());
+            public void onIncomingInvite(TwilioConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+                LogHelper.logIfDebug(TAG, "onIncomingInvite with conversation sid: " +
+                        incomingInvite.getConversationSid() + " and invitation status: " + incomingInvite.getInviteStatus());
 
-                callerIdentitySubject.onNext(caller.substring(1, caller.length() - 1));
-                profileRefreshSubject.onNext(null);
+                LogHelper.logIfDebug(TAG, "isDuringCall: " + isDuringCall);
+
+                if (!isDuringCall && incomingInvite.getInviteStatus() == InviteStatus.PENDING) {
+                    LogHelper.logIfDebug(TAG, "starting call");
+                    currentInvite = incomingInvite;
+
+                    final String caller = String.valueOf(incomingInvite.getParticipants());
+                    final String callerIdentity = caller.substring(1, caller.length() - 1);
+
+                    profileRefreshSubject.onNext(new BothParams<>(incomingInvite.getConversationSid(), callerIdentity));
+                } else if (isDuringCall) {
+                    LogHelper.logIfDebug(TAG, "invitation during a call");
+                    if (currentInvite == null || !incomingInvite.getInviter().equals(currentInvite.getInviter())) {
+                        incomingInvite.reject();
+                    } else {
+                        LogHelper.logIfDebug(TAG, "Doubled invite");
+                        LogHelper.logIfDebug(TAG, "Cannot start conversation with id: " + incomingInvite.getConversationSid() + " and status: " + incomingInvite.getInviteStatus());
+                    }
+                } else {
+                    LogHelper.logIfDebug(TAG, "Cannot start conversation with id: " + incomingInvite.getConversationSid() + " and status: " + incomingInvite.getInviteStatus());
+                }
             }
 
             @Override
-            public void onIncomingInviteCancelled(ConversationsClient conversationsClient, IncomingInvite incomingInvite) {
-                conversationsClient.listen();
+            public void onIncomingInviteCancelled(TwilioConversationsClient conversationsClient, IncomingInvite incomingInvite) {
+                LogHelper.logIfDebug(TAG, "onIncomingInviteCancelled with conversation sid: " +
+                        incomingInvite.getConversationSid() + " and invitation status: " + incomingInvite.getInviteStatus());
+                if (conversationsClient != null) {
+                    conversationsClient.listen();
+                }
+                Twilio.this.conversationsClient.listen();
             }
         };
     }
 
-    public static void unregisterTwillio() {
-        if (TwilioConversations.isInitialized()) {
-            TwilioConversations.destroy();
+    public void unregisterTwillio(){
+        if (TwilioConversationsClient.isInitialized()) {
+            TwilioConversationsClient.destroy();
         }
     }
 
-    @Nullable
-    public IncomingInvite getInvite() {
-        return invite;
+    public void setDuringCall(boolean duringCall) {
+        LogHelper.logIfDebug(TAG, "Setting during the call to: " + duringCall);
+        isDuringCall = duringCall;
     }
 
-    public ConversationsClient getConversationsClient() {
+    @Nullable
+    public IncomingInvite getCurrentInvite() {
+        return currentInvite;
+    }
+
+    public TwilioConversationsClient getConversationsClient() {
         return conversationsClient;
     }
 
@@ -287,5 +333,12 @@ public class Twilio {
 
     public Observable<Throwable> getErrorCalledPersonIdentity() {
         return errorCalledPersonIdentity;
+    }
+
+    public void clearCurrentInvite() {
+        if (currentInvite != null) {
+            currentInvite.reject();
+            currentInvite = null;
+        }
     }
 }

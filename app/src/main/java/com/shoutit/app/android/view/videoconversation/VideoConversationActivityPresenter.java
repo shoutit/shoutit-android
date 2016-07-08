@@ -1,17 +1,13 @@
 package com.shoutit.app.android.view.videoconversation;
 
-import android.support.v4.util.TimeUtils;
-
 import com.appunite.rx.ResponseOrError;
-import com.appunite.rx.android.MyAndroidSchedulers;
-import com.appunite.rx.android.util.LogTransformer;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.BothParams;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.VideoCallRequest;
+import com.shoutit.app.android.utils.LogHelper;
 
-import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -25,6 +21,7 @@ import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.subjects.BehaviorSubject;
@@ -32,12 +29,12 @@ import rx.subjects.PublishSubject;
 
 public class VideoConversationActivityPresenter {
     private static final int MAX_CALL_RETRIES = 3;
+    private static final SimpleDateFormat displayTimeFormat = new SimpleDateFormat("mm:ss", Locale.getDefault());
 
     private final BehaviorSubject<Set<String>> participantsSubject = BehaviorSubject.create();
     private final BehaviorSubject<String> calledUserTwilioIdentitySubject = BehaviorSubject.create();
     private final PublishSubject<Object> makeOutgoingCallSubject = PublishSubject.create();
     private final PublishSubject<Object> finishCallRetriesSubject = PublishSubject.create();
-    private final PublishSubject<Object> rejectCallObserver = PublishSubject.create();
     private final PublishSubject<Long> startTimerSubject = PublishSubject.create();
     private final PublishSubject<Object> stopTimerSubject = PublishSubject.create();
 
@@ -52,6 +49,12 @@ public class VideoConversationActivityPresenter {
                                               @UiScheduler final Scheduler uiScheduler) {
 
         makeCallObservable = makeOutgoingCallSubject
+                .doOnNext(new Action1<Object>() {
+                    @Override
+                    public void call(Object o) {
+                        LogHelper.logIfDebug("VideoConversation", "makeCallObservable onNext");
+                    }
+                })
                 .scan(-1, new Func2<Integer, Object, Integer>() {
                     @Override
                     public Integer call(Integer integer, Object o) {
@@ -85,7 +88,7 @@ public class VideoConversationActivityPresenter {
                     public Observable<BothParams<Set<String>, Boolean>> call(BothParams<String, Integer> identityWithRetryNumber) {
                         final String identity = identityWithRetryNumber.param1();
                         final boolean isLastRetry = identityWithRetryNumber.param2() == MAX_CALL_RETRIES - 1;
-
+                        LogHelper.logIfDebug("VideoConversation", "video call request started");
                         return apiService.videoCall(new VideoCallRequest(identity, false))
                                 .subscribeOn(networkScheduler)
                                 .observeOn(uiScheduler)
@@ -108,9 +111,7 @@ public class VideoConversationActivityPresenter {
                                 .takeUntil(stopTimerSubject)
                                 .map(aLong -> {
                                     final long duration = System.currentTimeMillis() - initTime;
-                                    final SimpleDateFormat dateFormat = new SimpleDateFormat(
-                                            "mm:ss", Locale.getDefault());
-                                    return dateFormat.format(new Date(duration));
+                                    return displayTimeFormat.format(new Date(duration));
                                 });
                     }
                 })
@@ -120,10 +121,6 @@ public class VideoConversationActivityPresenter {
     @Nonnull
     public Observable<BothParams<Set<String>, Boolean>> getMakeCallObservable() {
         return makeCallObservable;
-    }
-
-    public Observable<Object> getRejectCallObservable() {
-        return rejectCallObserver;
     }
 
     public Observer<Object> getMakeOutgoingCallObserver() {

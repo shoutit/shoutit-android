@@ -59,6 +59,7 @@ public class ChatsPresenter {
 
                 @Override
                 public Observable<MessagesResponse> call(MessagesResponse conversationsResponse) {
+
                     if (conversationsResponse == null || conversationsResponse.getPrevious() != null) {
                         if (conversationsResponse == null) {
                             return mApiService.getMessages(conversationId, PAGE_SIZE)

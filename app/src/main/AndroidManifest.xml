@@ -299,8 +299,15 @@
 
         </activity>
         <activity
-            android:name=".view.videoconversation.VideoConversationActivity"
+            android:name=".view.videoconversation.OutgoingVideoCallActivity"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".view.videoconversation.IncomingVideoCallActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"/>
+
         <activity android:name=".view.gallery.GalleryActivity"/>
         <activity android:name=".view.verifyemail.VerifyEmailActivity"
                   android:screenOrientation="portrait"
@@ -330,8 +337,9 @@
 
         <activity
             android:name=".view.videoconversation.DialogCallActivity"
-            android:launchMode="singleTask"
             android:screenOrientation="portrait"
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance"
             android:theme="@style/TranslucentBackground"/>
 
         <activity android:name=".view.chooseprofile.SelectProfileActivity"
