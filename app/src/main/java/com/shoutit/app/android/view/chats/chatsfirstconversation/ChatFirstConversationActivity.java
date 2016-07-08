@@ -23,7 +23,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
-import com.appunite.rx.functions.BothParams;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
@@ -41,7 +40,6 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.utils.TextWatcherAdapter;
-import com.shoutit.app.android.view.chats.ChatActivity;
 import com.shoutit.app.android.view.chats.ChatsHelper;
 import com.shoutit.app.android.view.chats.chat_info.ChatInfoActivity;
 import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
@@ -50,7 +48,7 @@ import com.shoutit.app.android.view.media.RecordMediaActivity;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.shoutit.app.android.view.shouts.selectshout.SelectShoutActivity;
-import com.shoutit.app.android.view.videoconversation.VideoConversationActivity;
+import com.shoutit.app.android.view.videoconversation.OutgoingVideoCallActivity;
 import com.squareup.picasso.Picasso;
 import com.veinhorn.scrollgalleryview.Constants;
 import com.veinhorn.scrollgalleryview.VideoPlayerActivity;
@@ -160,7 +158,7 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
                     presenter.calledPersonUsernameObservable()
                             .compose(ChatFirstConversationActivity.this.bindToLifecycle())
                             .subscribe(calledUserProfile -> {
-                                startActivity(VideoConversationActivity.newIntent(
+                                startActivity(OutgoingVideoCallActivity.newIntent(
                                         calledUserProfile.getName(),
                                         calledUserProfile.getUsername(),
                                         calledUserProfile.getImage(),

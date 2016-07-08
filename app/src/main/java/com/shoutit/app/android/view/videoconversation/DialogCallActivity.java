@@ -32,7 +32,6 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import rx.functions.Action1;
 
 import static com.appunite.rx.internal.Preconditions.checkNotNull;
 
@@ -105,7 +104,7 @@ public class DialogCallActivity extends BaseActivity {
                 .subscribe(aVoid -> {
                     if (canAnswerTheCall()) {
                         LogHelper.logIfDebug(TAG, "starting conversation with conv sid: " + conversationId);
-                        startActivity(VideoConversationActivity.newIntent(callerName, null, callerImageUrl, DialogCallActivity.this));
+                        startActivity(IncomingVideoCallActivity.newIntent(callerName, callerImageUrl, DialogCallActivity.this));
                     } else {
                         Toast.makeText(DialogCallActivity.this, R.string.video_call_finished, Toast.LENGTH_SHORT)
                                 .show();
@@ -155,7 +154,7 @@ public class DialogCallActivity extends BaseActivity {
     @Nonnull
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
-        final VideoConversationComponent component = DaggerVideoConversationComponent
+        final DialogCallActivityComponent component = DaggerDialogCallActivityComponent
                 .builder()
                 .activityModule(new ActivityModule(this))
                 .appComponent(App.getAppComponent(getApplication()))

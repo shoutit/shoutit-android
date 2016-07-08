@@ -5,7 +5,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
@@ -22,16 +21,12 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.functions.Functions1;
 import com.jakewharton.rxbinding.view.RxView;
 import com.jakewharton.rxbinding.widget.RxTextView;
-import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
-import com.shoutit.app.android.dagger.ActivityModule;
-import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LogHelper;
@@ -41,15 +36,10 @@ import com.shoutit.app.android.widget.CheckableImageButton;
 import com.squareup.picasso.Picasso;
 import com.twilio.conversations.AudioTrack;
 import com.twilio.conversations.CameraCapturer;
-import com.twilio.conversations.CapturerErrorListener;
 import com.twilio.conversations.Conversation;
-import com.twilio.conversations.ConversationCallback;
-import com.twilio.conversations.IncomingInvite;
-import com.twilio.conversations.InviteStatus;
 import com.twilio.conversations.LocalMedia;
 import com.twilio.conversations.LocalVideoTrack;
 import com.twilio.conversations.MediaTrack;
-import com.twilio.conversations.OutgoingInvite;
 import com.twilio.conversations.Participant;
 import com.twilio.conversations.TwilioConversationsClient;
 import com.twilio.conversations.TwilioConversationsException;
@@ -57,39 +47,25 @@ import com.twilio.conversations.VideoRenderer;
 import com.twilio.conversations.VideoTrack;
 import com.twilio.conversations.VideoViewRenderer;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import rx.functions.Action1;
 import rx.subjects.PublishSubject;
 
 import static com.appunite.rx.internal.Preconditions.checkNotNull;
 
-public class VideoConversationActivity extends BaseActivity {
+public abstract class VideoCallActivity extends BaseActivity {
 
+    protected static final String ARGS_CALLED_USER_IMAGE = "called_user_image";
+    protected static final String ARGS_PARTICIPANT_NAME = "participant_name";
 
-    private static final String ARGS_CALLED_USER_IMAGE = "args_person_to_call_image";
-    private static final String ARGS_CALLED_USER_USERNAME = "args_person_to_call_username";
-    private static final String ARGS_CALLER = "args_caller";
     private static final int CAMERA_MIC_PERMISSION_REQUEST_CODE = 1;
-    private static final String TAG = VideoConversationActivity.class.getSimpleName();
-
-
-    private VideoViewRenderer participantVideoRenderer;
-    private VideoViewRenderer localVideoRenderer;
-    private TwilioConversationsClient conversationClient;
-    private CameraCapturer cameraCapturer;
-    private Conversation conversation;
-
-    private OutgoingInvite outgoingInvite;
+    protected static final String TAG = VideoCallActivity.class.getSimpleName();
 
     @Bind(R.id.video_conversation_layout)
     View rootView;
@@ -134,22 +110,14 @@ public class VideoConversationActivity extends BaseActivity {
     @Inject
     Picasso picasso;
 
-    private String calledUserUsername;
-    private String calledUserTwilioIdentity;
-
+    private VideoViewRenderer participantVideoRenderer;
+    private VideoViewRenderer localVideoRenderer;
+    private CameraCapturer cameraCapturer;
     private PublishSubject<String> conversationInfoSubject = PublishSubject.create();
     private PublishSubject<String> conversationErrorSubject = PublishSubject.create();
-    private boolean isUserCallReceiver;
 
-    public static Intent newIntent(@Nullable String callerName,
-                                   @Nullable String calledUserUsername,
-                                   @Nullable String calledUserImage,
-                                   @Nonnull Context context) {
-        return new Intent(context, VideoConversationActivity.class)
-                .putExtra(ARGS_CALLED_USER_USERNAME, calledUserUsername)
-                .putExtra(ARGS_CALLED_USER_IMAGE, calledUserImage)
-                .putExtra(ARGS_CALLER, callerName);
-    }
+    protected TwilioConversationsClient conversationClient;
+    protected Conversation conversation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,23 +128,10 @@ public class VideoConversationActivity extends BaseActivity {
         initData(getIntent());
     }
 
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        finish();
-        final String calledUserUsername = intent.getStringExtra(ARGS_CALLED_USER_USERNAME);
-        final String callerName = intent.getStringExtra(ARGS_CALLER);
-        final String calledUserImage = intent.getStringExtra(ARGS_CALLED_USER_IMAGE);
-
-        startActivity(VideoConversationActivity.newIntent(callerName, calledUserUsername, calledUserImage, this));
-    }
-
     private void initData(@Nonnull Intent intent) {
         checkNotNull(intent);
 
-        calledUserUsername = intent.getStringExtra(ARGS_CALLED_USER_USERNAME);
-        isUserCallReceiver = calledUserUsername == null;
-        final String callerName = intent.getStringExtra(ARGS_CALLER);
+        final String callerName = intent.getStringExtra(ARGS_PARTICIPANT_NAME);
         participantNameTv.setText(callerName);
 
         final String calledUserImage = intent.getStringExtra(ARGS_CALLED_USER_IMAGE);
@@ -192,24 +147,11 @@ public class VideoConversationActivity extends BaseActivity {
         }
     }
 
-    private void initializeVideoConversations() {
+    protected void initializeVideoConversations() {
 
         conversationInfo.bringToFront();
         conversationClient = mTwilio.getConversationsClient();
         setupAudioVideo();
-
-        if (isUserCallReceiver) {
-            acceptIncomingCall();
-        }
-
-        RxView.clicks(callButton)
-                .throttleFirst(5, TimeUnit.SECONDS)
-                .compose(this.<Void>bindToLifecycle())
-                .filter(ignore -> calledUserUsername != null)
-                .subscribe(ignore -> {
-                    mTwilio.initCalledPersonTwilioIdentityRequest(calledUserUsername);
-                    conversationInfoSubject.onNext(getString(R.string.video_call_calling));
-                });
 
         RxView.clicks(dismissCallButton)
                 .throttleFirst(1, TimeUnit.SECONDS)
@@ -245,18 +187,7 @@ public class VideoConversationActivity extends BaseActivity {
         presenter
                 .getTimerObservable()
                 .compose(bindToLifecycle())
-                .subscribe(time -> {
-                    conversationInfoSubject.onNext(time);
-                });
-
-        mTwilio.getSuccessCalledPersonIdentity()
-                .take(1)
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(calledUserIdentity -> {
-                    calledUserTwilioIdentity = calledUserIdentity;
-                    presenter.getCalledUserTwilioIdentityObserver().onNext(calledUserIdentity);
-                    initOutgoingCall();
-                });
+                .subscribe(this::showConversationInfo);
 
         conversationInfoSubject
                 .filter(Functions1.isNotNull())
@@ -273,13 +204,160 @@ public class VideoConversationActivity extends BaseActivity {
         mTwilio.getErrorCalledPersonIdentity()
                 .compose(this.<Throwable>bindToLifecycle())
                 .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(this)));
-
-        presenter.getMakeCallObservable()
-                .compose(this.<BothParams<Set<String>, Boolean>>bindToLifecycle())
-                .subscribe(makeOutgoingCall());
     }
 
-    private void showOrHideVideo(boolean showVideo) {
+    protected LocalMedia setupLocalMedia() {
+        final LocalMedia localMedia = new LocalMedia(localMediaListener());
+        final LocalVideoTrack localVideoTrack = new LocalVideoTrack(cameraCapturer);
+        localMedia.addLocalVideoTrack(localVideoTrack);
+
+        return localMedia;
+    }
+
+    protected void showError(String errorMessage) {
+        conversationErrorSubject.onNext(errorMessage);
+    }
+
+    protected void showConversationInfo(String message) {
+        conversationInfoSubject.onNext(message);
+    }
+
+    private LocalMedia.Listener localMediaListener() {
+        return new LocalMedia.Listener() {
+            @Override
+            public void onLocalVideoTrackAdded(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
+                LogHelper.logIfDebug(TAG, "onLocalVideoTrackAdded");
+                localVideoRenderer = new VideoViewRenderer(VideoCallActivity.this, smallPreviewWindow);
+                localVideoTrack.addRenderer(localVideoRenderer);
+                showOrHideVideo(shouldShowVideo());
+            }
+
+            @Override
+            public void onLocalVideoTrackRemoved(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
+                LogHelper.logIfDebug(TAG, "onLocalVideoTrackRemoved");
+                for (VideoRenderer videoRenderer : localVideoTrack.getRenderers()) {
+                    localVideoTrack.removeRenderer(videoRenderer);
+                }
+            }
+
+            @Override
+            public void onLocalVideoTrackError(LocalMedia localMedia, LocalVideoTrack localVideoTrack, TwilioConversationsException e) {
+                LogHelper.logIfDebug(TAG, "onLocalVideoTrackError");
+                for (VideoRenderer videoRenderer : localVideoTrack.getRenderers()) {
+                    localVideoTrack.removeRenderer(videoRenderer);
+                }
+            }
+        };
+    }
+
+    protected Conversation.Listener conversationListener() {
+        return new Conversation.Listener() {
+            @Override
+            public void onParticipantConnected(Conversation conversation, Participant participant) {
+                LogHelper.logIfDebug(TAG, "onParticipantConnected, convSid:" + conversation.getSid());
+
+                smallPreviewWindow.setVisibility(View.VISIBLE);
+                smallPreviewCoverView.setVisibility(shouldShowVideo() ? View.GONE : View.VISIBLE);
+                showOrHideVideo(shouldShowVideo());
+                startVideoTimer();
+                muteMicrophoneIfNeeded();
+
+                participant.setParticipantListener(participantListener());
+            }
+
+            @Override
+            public void onFailedToConnectParticipant(Conversation conversation, Participant participant, TwilioConversationsException e) {
+                LogHelper.logIfDebug(TAG, "onFailedToConnectParticipant");
+                if (e != null) {
+                    LogHelper.logIfDebug(TAG, "onF" +
+                            "ailedToConnectParticipant " + "mesage: " + e.getMessage()
+                            + " code: " + e.getErrorCode() + " convSid:" + conversation.getSid());
+                }
+            }
+
+            @Override
+            public void onParticipantDisconnected(Conversation conversation, Participant participant) {
+                LogHelper.logIfDebug(TAG, "onParticipantDisconnected"  + " convSid:" + conversation.getSid());
+
+                stopVideoTimer();
+                switchToFullScreenMode(false);
+                showConversationInfo(getString(R.string.video_calls_participant_disconected));
+                closeConversation();
+            }
+
+            @Override
+            public void onConversationEnded(Conversation conversation, TwilioConversationsException e) {
+                LogHelper.logIfDebug(TAG, "onConversationEnded " + "sid " + conversation.getSid());
+                if (e != null) {
+                    LogHelper.logIfDebug(TAG, "onConversationEnded with error: " + e.getMessage() + " " + e.getErrorCode());
+                }
+                stopVideoTimer();
+                closeConversation();
+            }
+        };
+    }
+
+    private Participant.Listener participantListener() {
+        return new Participant.Listener() {
+            @Override
+            public void onVideoTrackAdded(Conversation conversation, Participant participant, VideoTrack videoTrack) {
+                LogHelper.logIfDebug(TAG, "onVideoTrackAdded");
+                showOrHideParticipantView(videoTrack.isEnabled());
+                participantVideoRenderer = new VideoViewRenderer(VideoCallActivity.this, participantWindow);
+                participantVideoRenderer.setObserver(new VideoRenderer.Observer() {
+
+                    @Override
+                    public void onFirstFrame() {
+                    }
+
+                    @Override
+                    public void onFrameDimensionsChanged(int width, int height, int rotation) {
+                    }
+                });
+                videoTrack.addRenderer(participantVideoRenderer);
+            }
+
+            @Override
+            public void onVideoTrackRemoved(Conversation conversation, Participant participant, VideoTrack videoTrack) {
+                LogHelper.logIfDebug(TAG, "onVideoTrackRemoved");
+                videoTrack.removeRenderer(participantVideoRenderer);
+            }
+
+            @Override
+            public void onAudioTrackAdded(Conversation conversation, Participant participant, AudioTrack audioTrack) {
+            }
+
+            @Override
+            public void onAudioTrackRemoved(Conversation conversation, Participant participant, AudioTrack audioTrack) {
+            }
+
+            @Override
+            public void onTrackEnabled(Conversation conversation, Participant participant, MediaTrack mediaTrack) {
+                LogHelper.logIfDebug(TAG, "onTrackEnabled");
+                if (!isAudioTrack(mediaTrack, participant.getMedia().getAudioTracks())) {
+                    showOrHideParticipantView(true);
+                }
+            }
+
+            @Override
+            public void onTrackDisabled(Conversation conversation, Participant participant, MediaTrack mediaTrack) {
+                LogHelper.logIfDebug(TAG, "onTrackDisabled");
+                if (!isAudioTrack(mediaTrack, participant.getMedia().getAudioTracks())) {
+                    showOrHideParticipantView(false);
+                }
+            }
+        };
+    }
+
+    private void stopVideoTimer() {
+        presenter.stopTimer();
+    }
+
+    private void startVideoTimer() {
+        presenter.startTimer();
+    }
+
+    protected void showOrHideVideo(boolean showVideo) {
         LogHelper.logIfDebug(TAG, "Show camera preview:" + showVideo);
         if (conversation != null && conversation.getLocalMedia() != null &&
                 conversation.getLocalMedia().getLocalVideoTracks() != null) {
@@ -294,15 +372,7 @@ public class VideoConversationActivity extends BaseActivity {
         }
     }
 
-    private boolean isCalling() {
-        return conversation == null && !isUserCallReceiver && outgoingInvite != null;
-    }
-
-    private boolean shouldShowVideo() {
-        return !hideVideoButton.isChecked();
-    }
-
-    private void switchToFullScreenMode(boolean fullscreen) {
+    protected void switchToFullScreenMode(boolean fullscreen) {
         if (conversation == null) {
             return;
         }
@@ -354,249 +424,6 @@ public class VideoConversationActivity extends BaseActivity {
         animatorSet.start();
     }
 
-    private CapturerErrorListener capturerErrorListener() {
-        return e -> conversationErrorSubject.onNext(getString(R.string.video_calls_camera_issue));
-    }
-
-    private LocalMedia setupLocalMedia() {
-        final LocalMedia localMedia = new LocalMedia(localMediaListener());
-        final LocalVideoTrack localVideoTrack = new LocalVideoTrack(cameraCapturer);
-        localMedia.addLocalVideoTrack(localVideoTrack);
-
-        return localMedia;
-    }
-
-    private void acceptIncomingCall() {
-        final IncomingInvite incomingInvite = mTwilio.getCurrentInvite();
-
-        if (incomingInvite != null && incomingInvite.getInviteStatus().equals(InviteStatus.PENDING)) {
-            LogHelper.logIfDebug(TAG, "VideoConAct started with conf sid: " + incomingInvite.getConversationSid());
-
-            callButton.setVisibility(View.GONE);
-
-            incomingInvite.accept(setupLocalMedia(), new ConversationCallback() {
-                @Override
-                public void onConversation(Conversation conversation, TwilioConversationsException exception) {
-                    if (exception == null) {
-                        VideoConversationActivity.this.conversation = conversation;
-                        mTwilio.setDuringCall(true);
-                        conversation.setConversationListener(conversationListener());
-                        showOrHideVideo(shouldShowVideo());
-                    } else {
-                        conversationErrorSubject.onNext(TextHelper.formatErrorMessage(exception.getMessage()));
-                    }
-                }
-            });
-        } else {
-            ColoredSnackBar.error(ColoredSnackBar.contentView(this), R.string.video_call_error, Snackbar.LENGTH_SHORT).show();
-        }
-    }
-
-    private void initOutgoingCall() {
-
-        if (calledUserTwilioIdentity != null && conversationClient != null) {
-            callButton.setVisibility(View.GONE);
-
-            final Set<String> participants = new HashSet<>();
-            participants.add(calledUserTwilioIdentity);
-
-            presenter.getParticipantsObserver().onNext(participants);
-            presenter.getMakeOutgoingCallObserver().onNext(null);
-        } else {
-            ColoredSnackBar.error(ColoredSnackBar.contentView(this),
-                    R.string.video_calls_cannot_start_conversation,
-                    Snackbar.LENGTH_SHORT)
-                    .show();
-        }
-    }
-
-    @NonNull
-    private Action1<BothParams<Set<String>, Boolean>> makeOutgoingCall() {
-        return new Action1<BothParams<Set<String>, Boolean>>() {
-            @Override
-            public void call(BothParams<Set<String>, Boolean> participantsWithIsLastRetry) {
-                final Set<String> participants = participantsWithIsLastRetry.param1();
-                final Boolean isLastRetry = participantsWithIsLastRetry.param2();
-
-                smallPreviewWindow.setVisibility(View.VISIBLE);
-                smallPreviewCoverView.setVisibility(View.VISIBLE);
-                showOrHideSmallPreview(true);
-
-                LogHelper.logIfDebug(TAG, "Send outgoing invite");
-                outgoingInvite = conversationClient
-                        .inviteToConversation(participants, setupLocalMedia(), new ConversationCallback() {
-                            @Override
-                            public void onConversation(Conversation conversation, TwilioConversationsException exception) {
-                                if (exception == null) {
-                                    presenter.finishRetries();
-                                    mTwilio.setDuringCall(true);
-                                    VideoConversationActivity.this.conversation = conversation;
-                                    conversation.setConversationListener(conversationListener());
-                                    LogHelper.logIfDebug(TAG, "Succesfully connected");
-                                } else if (isLastRetry) {
-                                    handleTwilioError(exception);
-                                    switchToFullScreenMode(false);
-                                    mTwilio.rejectCall(calledUserTwilioIdentity);
-                                    LogHelper.logIfDebug(TAG, "Failed on last retry with code: " + exception.getErrorCode() + " and message: " + exception.getMessage());
-                                } else if (exception.getErrorCode() == Twilio.ERROR_PARTICIPANT_UNAVAILABLE) {
-                                    LogHelper.logIfDebug(TAG, "Participant unavailable? with code: " + exception.getErrorCode() + " and message: " + exception.getMessage());
-                                    presenter.retryCall();
-                                } else {
-                                    LogHelper.logIfDebug(TAG, "Error? with code: " + exception.getErrorCode() + " and message: " + exception.getMessage());
-                                    switchToFullScreenMode(false);
-                                    handleTwilioError(exception);
-                                    presenter.finishRetries();
-                                    mTwilio.rejectCall(calledUserTwilioIdentity);
-                                }
-                            }
-                        });
-            }
-        };
-    }
-
-    private void handleTwilioError(TwilioConversationsException exception) {
-        if (exception.getErrorCode() == Twilio.ERROR_PARTICIPANT_REJECTED_CALL) {
-            conversationInfoSubject.onNext(getString(R.string.video_calls_participant_reject));
-        } else {
-            conversationInfoSubject.onNext(TextHelper.formatErrorMessage(exception.getMessage()));
-        }
-    }
-
-    private LocalMedia.Listener localMediaListener() {
-        return new LocalMedia.Listener() {
-            @Override
-            public void onLocalVideoTrackAdded(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
-                LogHelper.logIfDebug(TAG, "onLocalVideoTrackAdded");
-                localVideoRenderer = new VideoViewRenderer(VideoConversationActivity.this, smallPreviewWindow);
-                localVideoTrack.addRenderer(localVideoRenderer);
-                showOrHideVideo(shouldShowVideo());
-            }
-
-            @Override
-            public void onLocalVideoTrackRemoved(LocalMedia localMedia, LocalVideoTrack localVideoTrack) {
-                LogHelper.logIfDebug(TAG, "onLocalVideoTrackRemoved");
-                for (VideoRenderer videoRenderer : localVideoTrack.getRenderers()) {
-                    localVideoTrack.removeRenderer(videoRenderer);
-                }
-            }
-
-            @Override
-            public void onLocalVideoTrackError(LocalMedia localMedia, LocalVideoTrack localVideoTrack, TwilioConversationsException e) {
-                LogHelper.logIfDebug(TAG, "onLocalVideoTrackError");
-                for (VideoRenderer videoRenderer : localVideoTrack.getRenderers()) {
-                    localVideoTrack.removeRenderer(videoRenderer);
-                }
-            }
-        };
-    }
-
-    private Conversation.Listener conversationListener() {
-        return new Conversation.Listener() {
-            @Override
-            public void onParticipantConnected(Conversation conversation, Participant participant) {
-                LogHelper.logIfDebug(TAG, "onParticipantConnected, convSid:" + conversation.getSid());
-
-                smallPreviewWindow.setVisibility(View.VISIBLE);
-                smallPreviewCoverView.setVisibility(shouldShowVideo() ? View.GONE : View.VISIBLE);
-                showOrHideVideo(shouldShowVideo());
-                startVideoTimer();
-                muteMicrophoneIfNeeded();
-
-                participant.setParticipantListener(participantListener());
-            }
-
-            @Override
-            public void onFailedToConnectParticipant(Conversation conversation, Participant participant, TwilioConversationsException e) {
-                LogHelper.logIfDebug(TAG, "onFailedToConnectParticipant");
-                if (e != null) {
-                    LogHelper.logIfDebug(TAG, "onF" +
-                            "ailedToConnectParticipant " + "mesage: " + e.getMessage()
-                            + " code: " + e.getErrorCode() + " convSid:" + conversation.getSid());
-                }
-            }
-
-            @Override
-            public void onParticipantDisconnected(Conversation conversation, Participant participant) {
-                LogHelper.logIfDebug(TAG, "onParticipantDisconnected"  + " convSid:" + conversation.getSid());
-
-                stopVideoTimer();
-                switchToFullScreenMode(false);
-                conversationInfoSubject.onNext(getString(R.string.video_calls_participant_disconected));
-                closeConversation();
-            }
-
-            @Override
-            public void onConversationEnded(Conversation conversation, TwilioConversationsException e) {
-                LogHelper.logIfDebug(TAG, "onConversationEnded " + "sid " + conversation.getSid());
-                if (e != null) {
-                    LogHelper.logIfDebug(TAG, "onConversationEnded with error: " + e.getMessage() + " " + e.getErrorCode());
-                }
-                stopVideoTimer();
-                closeConversation();
-            }
-        };
-    }
-
-    private void stopVideoTimer() {
-        presenter.stopTimer();
-    }
-
-    private void startVideoTimer() {
-        presenter.startTimer();
-    }
-
-    private Participant.Listener participantListener() {
-        return new Participant.Listener() {
-            @Override
-            public void onVideoTrackAdded(Conversation conversation, Participant participant, VideoTrack videoTrack) {
-                LogHelper.logIfDebug(TAG, "onVideoTrackAdded");
-                showOrHideParticipantView(videoTrack.isEnabled());
-                participantVideoRenderer = new VideoViewRenderer(VideoConversationActivity.this, participantWindow);
-                participantVideoRenderer.setObserver(new VideoRenderer.Observer() {
-
-                    @Override
-                    public void onFirstFrame() {
-                    }
-
-                    @Override
-                    public void onFrameDimensionsChanged(int width, int height, int rotation) {
-                    }
-                });
-                videoTrack.addRenderer(participantVideoRenderer);
-            }
-
-            @Override
-            public void onVideoTrackRemoved(Conversation conversation, Participant participant, VideoTrack videoTrack) {
-                LogHelper.logIfDebug(TAG, "onVideoTrackRemoved");
-                videoTrack.removeRenderer(participantVideoRenderer);
-            }
-
-            @Override
-            public void onAudioTrackAdded(Conversation conversation, Participant participant, AudioTrack audioTrack) {
-            }
-
-            @Override
-            public void onAudioTrackRemoved(Conversation conversation, Participant participant, AudioTrack audioTrack) {
-            }
-
-            @Override
-            public void onTrackEnabled(Conversation conversation, Participant participant, MediaTrack mediaTrack) {
-                LogHelper.logIfDebug(TAG, "onTrackEnabled");
-                if (!isAudioTrack(mediaTrack, participant.getMedia().getAudioTracks())) {
-                    showOrHideParticipantView(true);
-                }
-            }
-
-            @Override
-            public void onTrackDisabled(Conversation conversation, Participant participant, MediaTrack mediaTrack) {
-                LogHelper.logIfDebug(TAG, "onTrackDisabled");
-                if (!isAudioTrack(mediaTrack, participant.getMedia().getAudioTracks())) {
-                    showOrHideParticipantView(false);
-                }
-            }
-        };
-    }
-
     private boolean isAudioTrack(@Nonnull MediaTrack mediaTrack, @Nonnull List<AudioTrack> audioTracks) {
         for (AudioTrack track : audioTracks) {
             if (track.getTrackId().equals(mediaTrack.getTrackId())) {
@@ -608,14 +435,11 @@ public class VideoConversationActivity extends BaseActivity {
     }
 
     private void setupAudioVideo() {
-
-        if (isFrontCameraAvailable()) {
-            cameraCapturer = CameraCapturer.create(VideoConversationActivity.this,
-                    CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA, capturerErrorListener());
-        } else {
-            cameraCapturer = CameraCapturer.create(VideoConversationActivity.this,
-                    CameraCapturer.CameraSource.CAMERA_SOURCE_BACK_CAMERA, capturerErrorListener());
-        }
+        cameraCapturer = CameraCapturer.create(this,
+                isFrontCameraAvailable() ?
+                        CameraCapturer.CameraSource.CAMERA_SOURCE_FRONT_CAMERA :
+                        CameraCapturer.CameraSource.CAMERA_SOURCE_BACK_CAMERA,
+                e -> showError(getString(R.string.video_calls_camera_issue)));
 
         setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
         startPreview();
@@ -633,7 +457,7 @@ public class VideoConversationActivity extends BaseActivity {
         try {
             return cameraTool.isFrontCameraAvailable();
         } catch (CameraTool.CameraException e) {
-            conversationErrorSubject.onNext(e.toString());
+            showError(e.toString());
             return false;
         }
     }
@@ -702,7 +526,7 @@ public class VideoConversationActivity extends BaseActivity {
         stopPreview();
     }
 
-    private void showOrHideSmallPreview(boolean show) {
+    protected void showOrHideSmallPreview(boolean show) {
         smallPreviewCoverView.setVisibility(show ? View.GONE : View.VISIBLE);
     }
 
@@ -710,7 +534,7 @@ public class VideoConversationActivity extends BaseActivity {
         participantImageView.setVisibility(show ? View.GONE : View.VISIBLE);
     }
 
-    private void closeConversation() {
+    protected void closeConversation() {
         LogHelper.logIfDebug(TAG, "closeConversation()");
 
         mTwilio.setDuringCall(false);
@@ -733,33 +557,24 @@ public class VideoConversationActivity extends BaseActivity {
 
         cameraCapturer.stopPreview();
 
-        if (outgoingInvite != null) {
-            outgoingInvite.cancel();
-        }
-
         if (conversation != null) {
             conversation.disconnect();
             conversation = null;
         }
     }
 
+    protected abstract boolean isCalling();
+
+    protected abstract boolean isCaller();
+
+    protected boolean shouldShowVideo() {
+        return !hideVideoButton.isChecked();
+    }
+
     @Override
     protected void onDestroy() {
         closeConversation();
         super.onDestroy();
-    }
-
-    @Nonnull
-    @Override
-    public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
-        final VideoConversationComponent component = DaggerVideoConversationComponent
-                .builder()
-                .activityModule(new ActivityModule(this))
-                .appComponent(App.getAppComponent(getApplication()))
-                .build();
-        component.inject(this);
-
-        return component;
     }
 }
 

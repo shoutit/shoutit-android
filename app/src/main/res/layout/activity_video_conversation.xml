@@ -4,7 +4,7 @@
     android:id="@+id/video_conversation_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.shoutit.app.android.view.videoconversation.VideoConversationActivity">
+    tools:context=".view.videoconversation.VideoCallActivity">
 
     <include layout="@layout/video_conversation_content_layout" />
 

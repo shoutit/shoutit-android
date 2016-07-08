@@ -56,7 +56,7 @@ import com.shoutit.app.android.view.promote.promoted.PromotedActivity;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.main.MainSearchActivity;
 import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsActivity;
-import com.shoutit.app.android.view.videoconversation.VideoConversationActivity;
+import com.shoutit.app.android.view.videoconversation.OutgoingVideoCallActivity;
 
 import java.util.List;
 
@@ -297,7 +297,7 @@ public class ShoutActivity extends BaseActivity {
         presenter.getVideoCallClickedObservable()
                 .compose(bindToLifecycle())
                 .subscribe(shoutOwnerProfile -> {
-                    startActivity(VideoConversationActivity.newIntent(
+                    startActivity(OutgoingVideoCallActivity.newIntent(
                             shoutOwnerProfile.getName(),
                             shoutOwnerProfile.getUsername(),
                             shoutOwnerProfile.getImage(),
