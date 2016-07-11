@@ -470,7 +470,7 @@
     <string name="verify_email_resend">"إعادة إرسال"</string>
     <string name="verify_verified">"تم تفعيل حسابك بنجاح"</string>
     <string name="verify_not_verified">"حسابك غير مفعل بعد"</string>
-    <string name="profile_verify_account">"فعل حسابك"</string>
+    <string name="profile_user_verify_account">"فعل حسابك"</string>
     <string name="verify_email_title">"التحقق من البريد الإلكتروني"</string>
     <string name="video_calls_cannot_start_conversation">"عذراً, لايمكن بدء مكالمة فيديو حالياً.
         يرجى المحاولة لاحقاً"

@@ -585,8 +585,9 @@ public interface ApiService {
     @POST("pages")
     Observable<User> createPage(@Body PageCreateRequest pageCreateRequest);
 
-    @POST
-    Observable<BusinessVerificationResponse> verifyBusiness(@Body VerifyBusinessRequest body);
+    @POST("pages/{username}/verification")
+    Observable<BusinessVerificationResponse> verifyBusiness(@Path("username") String userName,
+                                                            @Body VerifyBusinessRequest body);
 
     /**
      * Linked Accounts

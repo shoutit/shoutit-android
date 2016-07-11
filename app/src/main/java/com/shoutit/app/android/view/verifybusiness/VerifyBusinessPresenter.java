@@ -19,6 +19,7 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.VerifyBusinessRequest;
 import com.shoutit.app.android.dagger.ForActivity;
@@ -48,6 +49,7 @@ public class VerifyBusinessPresenter {
             2, new BlankItem()
     ));
 
+    @NonNull
     private final FileHelper fileHelper;
     @NonNull
     private final AmazonHelper amazonHelper;
@@ -58,10 +60,11 @@ public class VerifyBusinessPresenter {
     private final Resources resources;
     @NonNull
     private final ApiService apiService;
-
-    private Listener listener;
     @NonNull
     private final CompositeSubscription subscriptions = new CompositeSubscription();
+
+    private final String currentPageUserName;
+    private Listener listener;
 
     @Inject
     public VerifyBusinessPresenter(@NonNull FileHelper fileHelper,
@@ -69,7 +72,8 @@ public class VerifyBusinessPresenter {
                                    @NonNull @UiScheduler Scheduler uiScheduler,
                                    @NonNull @NetworkScheduler Scheduler networkScheduler,
                                    @ForActivity Resources resources,
-                                   @NonNull ApiService apiService) {
+                                   @NonNull ApiService apiService,
+                                   @NonNull UserPreferences userPreferences) {
 
         this.fileHelper = fileHelper;
         this.amazonHelper = amazonHelper;
@@ -77,6 +81,9 @@ public class VerifyBusinessPresenter {
         this.networkScheduler = networkScheduler;
         this.resources = resources;
         this.apiService = apiService;
+
+        //noinspection ConstantConditions
+        currentPageUserName = userPreferences.getUserOrPage().getUsername();
     }
 
     public void register(@NonNull Listener listener) {
@@ -87,6 +94,24 @@ public class VerifyBusinessPresenter {
     public void unregister() {
         listener = null;
         subscriptions.unsubscribe();
+    }
+
+    private void addImageItem(@NonNull String imageUrl) {
+        final int position = getFirstAvailablePositionAndCheck();
+
+        if (position + 1 < mediaItems.values().size()) {
+            mediaItems.put(position + 1, new AddImageItem());
+        }
+
+        mediaItems.put(position, new ImageItem(imageUrl));
+
+        listener.setImages(mediaItems);
+    }
+
+    public void swapImage(int position, String newUrl) {
+        mediaItems.remove(position);
+        mediaItems.forcePut(position, new ImageItem(newUrl));
+        listener.setImages(mediaItems);
     }
 
     private int getFirstAvailablePositionAndCheck() {
@@ -125,24 +150,17 @@ public class VerifyBusinessPresenter {
         listener.setImages(mediaItems);
     }
 
-    public void swapImage(int position, String newUrl) {
-        mediaItems.remove(position);
-        mediaItems.forcePut(position, new ImageItem(newUrl));
-        listener.setImages(mediaItems);
-    }
-
     public void startImageChooser(int position) {
         lastSelectedPosition.onNext(position);
-        listener.showProgress();
         listener.startImageChooser();
     }
 
-    public void uploadImageToAmazon(Uri uri) {
+    public void uploadToAmazonAndAddItem(Uri uri) {
         listener.showProgress();
 
         final Observable<ResponseOrError<File>> prepareFileToUpload = Observable.just(uri)
                 .subscribeOn(networkScheduler)
-                .switchMap(fileHelper.scaleAndCompressImage(ImageHelper.DEFAULT_MAX_IMAGE_SIZE))
+                .switchMap(fileHelper.scaleAndCompressImage(ImageHelper.MAX_BUSINESS_DOCUMENT_SIZE))
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<File>>behaviorRefCount());
 
@@ -158,7 +176,15 @@ public class VerifyBusinessPresenter {
                         .withLatestFrom(lastSelectedPosition, BothParams::of)
                         .subscribe(imageUrlWithItemPosition -> {
                             listener.hideProgress();
-                            swapImage(imageUrlWithItemPosition.param2(), imageUrlWithItemPosition.param1());
+
+                            final String imageUrl = imageUrlWithItemPosition.param1();
+                            final Integer itemPosition = imageUrlWithItemPosition.param2();
+
+                            if (mediaItems.get(itemPosition) instanceof ImageItem) {
+                                swapImage(itemPosition, imageUrl);
+                            } else {
+                                addImageItem(imageUrl);
+                            }
                         })
         );
 
@@ -188,7 +214,7 @@ public class VerifyBusinessPresenter {
         listener.showProgress();
 
         subscriptions.add(
-                apiService.verifyBusiness(new VerifyBusinessRequest(
+                apiService.verifyBusiness(currentPageUserName, new VerifyBusinessRequest(
                         name, email, person, number, builder.build()))
                         .subscribeOn(networkScheduler)
                         .observeOn(uiScheduler)
@@ -205,13 +231,13 @@ public class VerifyBusinessPresenter {
     }
 
     private boolean areDateValid(String name, String person, String number, String email) {
-        final boolean isNameValid = Strings.isNullOrEmpty(name);
+        final boolean isNameValid = !Strings.isNullOrEmpty(name);
         listener.showNameError(isNameValid ? null : resources.getString(R.string.error_field_empty));
 
-        final boolean isPersonValid = Strings.isNullOrEmpty(person);
+        final boolean isPersonValid = !Strings.isNullOrEmpty(person);
         listener.showPersonError(isPersonValid ? null : resources.getString(R.string.error_field_empty));
 
-        final boolean isNumberValid = Strings.isNullOrEmpty(number);
+        final boolean isNumberValid = !Strings.isNullOrEmpty(number);
         listener.showNumberError(isNumberValid ? null : resources.getString(R.string.error_field_empty));
 
         final boolean isEmailValid = Validators.isEmailValid(email);

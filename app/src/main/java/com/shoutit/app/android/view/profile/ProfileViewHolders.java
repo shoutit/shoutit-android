@@ -173,19 +173,27 @@ public class ProfileViewHolders {
 
             editProfileContainer.setVisibility(user.isUser() ? View.VISIBLE : View.GONE);
 
-            if (user.isOwner() && !user.isActivated()) {
+            if (user.isUser() && !user.isActivated()) {
+                verifyAccountButton.setText(R.string.profile_user_verify_account);
                 verifyAccountButton.setVisibility(View.VISIBLE);
+            } else if (!user.isUser()){
+                if (!user.isActivated()) {
+                    verifyAccountButton.setText(R.string.profile_page_activate_page);
+                    verifyAccountButton.setVisibility(View.VISIBLE);
+                } else if (!user.isVerified()) {
+                    verifyAccountButton.setText(R.string.profile_page_verify_page);
+                    verifyAccountButton.setVisibility(View.VISIBLE);
+                } else {
+                    verifyAccountButton.setVisibility(View.GONE);
+                }
             } else {
                 verifyAccountButton.setVisibility(View.GONE);
             }
 
             subscription = item.getNotificationsUnreadObservable()
-                    .subscribe(new Action1<Integer>() {
-                        @Override
-                        public void call(Integer notificationsCount) {
-                            notificationsBadgeTv.setVisibility(notificationsCount > 0 ? View.VISIBLE : View.GONE);
-                            notificationsBadgeTv.setText(String.valueOf(notificationsCount));
-                        }
+                    .subscribe(notificationsCount -> {
+                        notificationsBadgeTv.setVisibility(notificationsCount > 0 ? View.VISIBLE : View.GONE);
+                        notificationsBadgeTv.setText(String.valueOf(notificationsCount));
                     });
 
             profileBadgeTv.setVisibility(item.shouldShowProfileBadge() ? View.VISIBLE : View.GONE);

@@ -114,6 +114,6 @@
         android:layout_marginRight="16dp"
         android:visibility="gone"
         tools:visibility="visible"
-        android:text="@string/profile_verify_account"/>
+        android:text="@string/profile_user_verify_account"/>
 
 </LinearLayout>

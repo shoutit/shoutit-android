@@ -19,7 +19,7 @@ import java.io.IOException;
 import javax.annotation.Nonnull;
 
 public class ImageHelper {
-    public static final int DEFAULT_MAX_IMAGE_SIZE = 1024 * 768;
+    public static final int MAX_BUSINESS_DOCUMENT_SIZE = 2080 * 1300;
     public static final int MAX_AVATAR_SIZE = 720 * 720;
     public static final int MAX_COVER_SIZE = 1024 * 768;
 

@@ -274,14 +274,14 @@ public class ProfileAdapterItems {
         @Nonnull
         private final Observer<Object> notificationsClickObserver;
         @Nonnull
-        private final Observer<Object> verifyAccountClickObserver;
+        private final Observer<User> verifyAccountClickObserver;
         @Nonnull
         private final Observable<Integer> notificationsUnreadObservable;
         private final boolean shouldShowProfileBadge;
 
         public MyUserNameAdapterItem(@Nonnull User user, @NonNull Observer<Object> editProfileClickObserver,
                                      @Nonnull Observer<Object> notificationsClickObserver,
-                                     @Nonnull Observer<Object> verifyAccountClickObserver,
+                                     @Nonnull Observer<User> verifyAccountClickObserver,
                                      @Nonnull Observable<Integer> notificationsUnreadObservable,
                                      boolean shouldShowProfileBadge) {
             super(user);
@@ -321,7 +321,7 @@ public class ProfileAdapterItems {
         }
 
         public void onVerifyAccountClick() {
-            verifyAccountClickObserver.onNext(null);
+            verifyAccountClickObserver.onNext(user);
         }
 
         public boolean shouldShowProfileBadge() {

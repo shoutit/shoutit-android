@@ -499,7 +499,10 @@
     <string name="verify_email_resend">Resend</string>
     <string name="verify_verified">Your account has been successfully verified</string>
     <string name="verify_not_verified">Your account isn\'t verified yet</string>
-    <string name="profile_verify_account">Verify your account</string>
+    <string name="profile_user_verify_account">Verify your account</string>
+    <string name="profile_page_activate_page">Activate your page</string>
+    <string name="profile_page_verify_page">Verify your business</string>
+    <string name="profile_page_verify_info">To activate your page, your personal account should be verified first. Click the activation link in the email you have received when you signed up.</string>
     <string name="verify_email_title">Email Verification</string>
     <string name="video_calls_cannot_start_conversation">Sorry, cannot start this video call. Please try again later.</string>
 
@@ -775,5 +778,6 @@
     <string name="business_ver_button">Submit Verification Request</string>
     <string name="business_no_images_error">You need to add at least one image</string>
     <string name="business_ver_sucess">Verification completed</string>
+    <string name="business_ver_ab_title">Business Verification</string>
 
 </resources>

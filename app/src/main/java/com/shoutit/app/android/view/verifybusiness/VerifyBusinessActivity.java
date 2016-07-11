@@ -1,13 +1,17 @@
 package com.shoutit.app.android.view.verifybusiness;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -25,7 +29,6 @@ import com.shoutit.app.android.dagger.DaggerBaseEmptyActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.ImageCaptureHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
-import com.shoutit.app.android.view.createshout.ShoutMediaPresenter;
 import com.squareup.picasso.Picasso;
 
 import java.util.Map;
@@ -35,6 +38,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
+import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class VerifyBusinessActivity extends BaseActivity implements VerifyBusinessPresenter.Listener {
@@ -66,6 +70,8 @@ public class VerifyBusinessActivity extends BaseActivity implements VerifyBusine
     LinearLayout imagesContainer;
     @Bind(R.id.base_progress)
     View progressView;
+    @Bind(R.id.business_ver_toolbar)
+    Toolbar toolbar;
 
     @Inject
     VerifyBusinessPresenter presenter;
@@ -78,12 +84,37 @@ public class VerifyBusinessActivity extends BaseActivity implements VerifyBusine
     @Inject
     EditImageDialog editImageDialog;
 
+    public static Intent newIntent(Context context) {
+        return new Intent(context, VerifyBusinessActivity.class);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_buisness_verification);
+        ButterKnife.bind(this);
+
+        setupToolbar();
 
         presenter.register(this);
+    }
+
+    private void setupToolbar() {
+        setSupportActionBar(toolbar);
+        final ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setTitle(R.string.business_ver_ab_title);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @OnClick(R.id.business_ver_confirm_btn)
@@ -131,7 +162,7 @@ public class VerifyBusinessActivity extends BaseActivity implements VerifyBusine
                         .centerCrop()
                         .fit()
                         .into(imageView);
-            } else if (item instanceof ShoutMediaPresenter.BlankItem) {
+            } else if (item instanceof VerifyBusinessPresenter.BlankItem) {
                 view = layoutInflater.inflate(R.layout.edit_media_blank, imagesContainer, false);
             } else {
                 throw new RuntimeException("Unknown item " + item.getClass().getSimpleName());
@@ -177,12 +208,10 @@ public class VerifyBusinessActivity extends BaseActivity implements VerifyBusine
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_IMAGE_PICK) {
             uri = imageCaptureHelper.onResult(resultCode, data);
             if (uri.isPresent()) {
-                presenter.uploadImageToAmazon(uri.get());
+                presenter.uploadToAmazonAndAddItem(uri.get());
             } else {
                 showError(getString(R.string.error_image_upload));
             }
-        } else if (requestCode == REQUEST_CODE_IMAGE_PICK) {
-            showError(getString(R.string.error_image_upload));
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }

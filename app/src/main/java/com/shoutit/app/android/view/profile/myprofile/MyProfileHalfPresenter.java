@@ -23,7 +23,7 @@ public class MyProfileHalfPresenter {
     @Nonnull
     private final PublishSubject<Object> notificationsClickObserver = PublishSubject.create();
     @Nonnull
-    private final PublishSubject<Object> verifyAccountClickObserver = PublishSubject.create();
+    private final PublishSubject<User> verifyAccountClickObserver = PublishSubject.create();
     private final Context context;
     private final UserPreferences userPreferences;
     @Nonnull
@@ -73,7 +73,7 @@ public class MyProfileHalfPresenter {
     }
 
     @Nonnull
-    public Observable<Object> getVerifyAccountClickObservable() {
+    public Observable<User> getVerifyAccountClickObservable() {
         return verifyAccountClickObserver;
     }
 
