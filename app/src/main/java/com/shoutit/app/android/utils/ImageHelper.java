@@ -19,6 +19,7 @@ import java.io.IOException;
 import javax.annotation.Nonnull;
 
 public class ImageHelper {
+    public static final int DEFAULT_MAX_IMAGE_SIZE = 1024 * 768;
     public static final int MAX_AVATAR_SIZE = 720 * 720;
     public static final int MAX_COVER_SIZE = 1024 * 768;
 
@@ -39,7 +40,7 @@ public class ImageHelper {
     }
 
     @Nullable
-    public static Bitmap prepareImageToUpload(@NonNull String filePath, int maxImageSize) {
+    public static Bitmap scaleImage(@NonNull String filePath, int maxImageSize) {
         final Bitmap bitmap = downSampleIfNeeded(filePath, maxImageSize);
         if (bitmap == null) {
             return null;
