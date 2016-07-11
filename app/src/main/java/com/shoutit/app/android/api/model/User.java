@@ -133,10 +133,12 @@ public class User extends BaseProfile {
         return (USER.equals(user.type));
     }
 
+    @NonNull
     public String getId() {
         return id;
     }
 
+    @NonNull
     public String getType() {
         return type;
     }
@@ -149,18 +151,22 @@ public class User extends BaseProfile {
         return webUrl;
     }
 
+    @NonNull
     public String getUsername() {
         return username;
     }
 
+    @NonNull
     public String getName() {
         return name;
     }
 
+    @NonNull
     public String getFirstName() {
         return firstName;
     }
 
+    @NonNull
     public String getLastName() {
         return lastName;
     }

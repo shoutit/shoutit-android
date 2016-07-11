@@ -63,9 +63,9 @@ public class MenuHandlerPresenter {
                     }
                 });
 
-        userNameObservable = Observable.just(userPreferences.getUser())
+        userNameObservable = Observable.defer(() -> Observable.just(userPreferences.getUser()))
                 .filter(Functions1.isNotNull())
-                .map(BaseProfile::getName);
+                .map(User::getName);
 
         final Observable<UserLocation> locationObservable = userPreferences.getLocationObservable()
                 .observeOn(uiScheduler)

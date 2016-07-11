@@ -2,7 +2,7 @@ package com.shoutit.app.android.view.pages;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
-import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.api.model.Page;
 
 import javax.annotation.Nonnull;
 
@@ -11,18 +11,18 @@ import rx.Observer;
 public class PageAdapterItem extends BaseNoIDAdapterItem {
 
     @Nonnull
-    private final User page;
+    private final Page page;
     @Nonnull
-    private final Observer<User> pageSelectedObserver;
+    private final Observer<Page> pageSelectedObserver;
 
-    public PageAdapterItem(@Nonnull User page,
-                           @Nonnull Observer<User> pageSelectedObserver) {
+    public PageAdapterItem(@Nonnull Page page,
+                           @Nonnull Observer<Page> pageSelectedObserver) {
         this.page = page;
         this.pageSelectedObserver = pageSelectedObserver;
     }
 
     @Nonnull
-    public User getPage() {
+    public Page getPage() {
         return page;
     }
 

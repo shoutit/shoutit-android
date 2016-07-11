@@ -168,14 +168,26 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
 
         /** User **/
         final Observable<ResponseOrError<User>> userRequestObservable = profilesDao.getProfileObservable(userName)
+                .compose(ResponseOrError.map(new Func1<BaseProfile, User>() {
+                    @Override
+                    public User call(BaseProfile baseProfile) {
+                        return (User) baseProfile;
+                    }
+                }))
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<User>>behaviorRefCount());
 
         userUpdatesObservable = userProfilePresenter.getUserUpdatesObservable()
                 .map(userResponseOrError -> {
+                    final ResponseOrError<BaseProfile> baseProfileResponseOrError;
+                    if (userResponseOrError.isData()) {
+                        baseProfileResponseOrError = ResponseOrError.fromData(userResponseOrError.data());
+                    } else {
+                        baseProfileResponseOrError = ResponseOrError.fromError(userResponseOrError.error());
+                    }
                     profilesDao.getProfileDao(userName)
                             .updatedProfileLocallyObserver()
-                            .onNext(userResponseOrError);
+                            .onNext(baseProfileResponseOrError);
                     return null;
                 });
 

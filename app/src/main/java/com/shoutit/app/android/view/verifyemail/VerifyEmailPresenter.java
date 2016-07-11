@@ -60,6 +60,12 @@ public class VerifyEmailPresenter {
 
         final Observable<ResponseOrError<User>> profileObservable = profilesDao.getProfileDao(User.ME)
                 .getProfileObservable()
+                .compose(ResponseOrError.map(new Func1<BaseProfile, User>() {
+                    @Override
+                    public User call(BaseProfile baseProfile) {
+                        return (User) baseProfile;
+                    }
+                }))
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<User>>behaviorRefCount());
 
