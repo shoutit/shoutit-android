@@ -365,6 +365,10 @@
         <activity android:name=".view.pages.my.SelectListenersActivity"
             android:screenOrientation="portrait"/>
 
+        <activity android:name=".view.verifybusiness.VerifyBusinessActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"/>
+
         <receiver
             android:name="com.mixpanel.android.mpmetrics.GCMReceiver"
             android:permission="com.google.android.c2dm.permission.SEND">

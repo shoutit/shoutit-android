@@ -210,7 +210,7 @@ public class EditProfilePresenter {
         /** Upload cover **/
         final Observable<ResponseOrError<File>> coverFileToUploadObservable = lastSelectedCoverUri
                 .subscribeOn(networkScheduler)
-                .switchMap(transformImage(ImageHelper.MAX_COVER_SIZE))
+                .switchMap(fileHelper.scaleAndCompressImage(ImageHelper.MAX_COVER_SIZE))
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<File>>behaviorRefCount());
 
@@ -234,7 +234,7 @@ public class EditProfilePresenter {
         /** Upload avatar **/
         final Observable<ResponseOrError<File>> avatarFileToUploadObservable = lastSelectedAvatarUri
                 .subscribeOn(networkScheduler)
-                .switchMap(transformImage(ImageHelper.MAX_AVATAR_SIZE))
+                .switchMap(fileHelper.scaleAndCompressImage(ImageHelper.MAX_AVATAR_SIZE))
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<File>>behaviorRefCount());
 
@@ -335,22 +335,6 @@ public class EditProfilePresenter {
                         .subscribeOn(networkScheduler)
                         .observeOn(uiScheduler)
                         .compose(ResponseOrError.<String>toResponseOrErrorObservable());
-            }
-        };
-    }
-
-    @NonNull
-    private Func1<Uri, Observable<ResponseOrError<File>>> transformImage(final int maxImageSize) {
-        return new Func1<Uri, Observable<ResponseOrError<File>>>() {
-            @Override
-            public Observable<ResponseOrError<File>> call(Uri imageUri) {
-                try {
-                    final String tempFile = fileHelper.createTempFileAndStoreUri(imageUri);
-                    final Bitmap bitmapToUpload = ImageHelper.prepareImageToUpload(tempFile, maxImageSize);
-                    return fileHelper.saveBitmapToTempFileObservable(bitmapToUpload);
-                } catch (IOException e) {
-                    return Observable.just(ResponseOrError.<File>fromError(e));
-                }
             }
         };
     }

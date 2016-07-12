@@ -30,6 +30,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.AuthInterceptor;
 import com.shoutit.app.android.constants.AmazonConstants;
+import com.shoutit.app.android.dao.BusinessVerificationDaos;
 import com.shoutit.app.android.dao.CategoriesDao;
 import com.shoutit.app.android.dao.ConversationMediaDaos;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
@@ -339,6 +340,12 @@ public final class AppModule {
     @Singleton
     SortTypesDao sortTypesDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
         return new SortTypesDao(apiService, networkScheduler);
+    }
+
+    @Provides
+    @Singleton
+    BusinessVerificationDaos businessVerificationDaos(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
+        return new BusinessVerificationDaos(apiService, networkScheduler);
     }
 
     @Provides

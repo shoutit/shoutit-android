@@ -14,19 +14,29 @@
         android:layout_marginLeft="80dp"
         android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/profile_user_name"
+        <LinearLayout
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:paddingTop="6dp"
-            android:ellipsize="end"
-            android:layout_gravity="center_vertical"
-            android:maxLines="1"
-            android:textColor="@color/profile_name"
-            android:textSize="16sp"
-            style="@style/ShoutitRtlTextStyle"
-            tools:text="tymek tym sdfsdf" />
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/profile_user_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:drawableEnd="@drawable/ic_verified"
+                tools:drawableRight="@drawable/ic_verified"
+                android:drawablePadding="6dp"
+                android:ellipsize="end"
+                android:layout_gravity="center_vertical"
+                android:maxLines="1"
+                android:textColor="@color/profile_name"
+                android:textSize="16sp"
+                style="@style/ShoutitRtlTextStyle"
+                tools:text="tymek tym sdfsdf" />
+
+        </LinearLayout>
 
         <FrameLayout
             android:layout_width="wrap_content"
@@ -96,15 +106,26 @@
         android:paddingLeft="80dp"
         android:paddingStart="80dp"
         android:textColor="@color/black_54"
+        android:layout_marginBottom="12dp"
         android:textSize="12sp"
         tools:text="Doris90" />
+
+    <TextView
+        android:id="@+id/profile_verification_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|end"
+        android:layout_marginRight="16dp"
+        android:layout_marginEnd="16dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        tools:text="Request status: Pending"/>
 
     <TextView
         android:id="@+id/profile_verify_account"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:textAllCaps="true"
-        android:layout_marginTop="14dp"
         android:gravity="center"
         android:background="@drawable/selector_verify_account"
         android:textColor="@color/profile_verify"
@@ -114,6 +135,6 @@
         android:layout_marginRight="16dp"
         android:visibility="gone"
         tools:visibility="visible"
-        android:text="@string/profile_verify_account"/>
+        android:text="@string/profile_user_verify_account"/>
 
 </LinearLayout>

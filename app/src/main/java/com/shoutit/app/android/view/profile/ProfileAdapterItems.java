@@ -9,6 +9,7 @@ import com.google.common.base.Objects;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
 import com.shoutit.app.android.api.model.BaseProfile;
+import com.shoutit.app.android.api.model.BusinessVerificationResponse;
 import com.shoutit.app.android.api.model.ConversationDetails;
 import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.api.model.RelatedTagsResponse;
@@ -274,22 +275,26 @@ public class ProfileAdapterItems {
         @Nonnull
         private final Observer<Object> notificationsClickObserver;
         @Nonnull
-        private final Observer<Object> verifyAccountClickObserver;
+        private final Observer<User> verifyAccountClickObserver;
         @Nonnull
         private final Observable<Integer> notificationsUnreadObservable;
         private final boolean shouldShowProfileBadge;
+        @Nonnull
+        private final Observable<BusinessVerificationResponse> pageVerificationObservable;
 
         public MyUserNameAdapterItem(@Nonnull User user, @NonNull Observer<Object> editProfileClickObserver,
                                      @Nonnull Observer<Object> notificationsClickObserver,
-                                     @Nonnull Observer<Object> verifyAccountClickObserver,
+                                     @Nonnull Observer<User> verifyAccountClickObserver,
                                      @Nonnull Observable<Integer> notificationsUnreadObservable,
-                                     boolean shouldShowProfileBadge) {
+                                     boolean shouldShowProfileBadge,
+                                     @Nonnull Observable<BusinessVerificationResponse> pageVerificationObservable) {
             super(user);
             this.editProfileClickObserver = editProfileClickObserver;
             this.notificationsClickObserver = notificationsClickObserver;
             this.verifyAccountClickObserver = verifyAccountClickObserver;
             this.notificationsUnreadObservable = notificationsUnreadObservable;
             this.shouldShowProfileBadge = shouldShowProfileBadge;
+            this.pageVerificationObservable = pageVerificationObservable;
         }
 
         @Override
@@ -308,6 +313,11 @@ public class ProfileAdapterItems {
         }
 
         @Nonnull
+        public Observable<BusinessVerificationResponse> getPageVerificationObservable() {
+            return pageVerificationObservable;
+        }
+
+        @Nonnull
         public User getUser() {
             return user;
         }
@@ -321,7 +331,7 @@ public class ProfileAdapterItems {
         }
 
         public void onVerifyAccountClick() {
-            verifyAccountClickObserver.onNext(null);
+            verifyAccountClickObserver.onNext(user);
         }
 
         public boolean shouldShowProfileBadge() {
