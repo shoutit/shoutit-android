@@ -11,12 +11,10 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
-import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
+import com.shoutit.app.android.view.profile.user.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.profileslist.BaseProfilesListActivity;
 
 import javax.annotation.Nonnull;
-
-import rx.functions.Func1;
 
 public class PagesSuggestionActivity extends BaseProfilesListActivity {
 

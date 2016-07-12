@@ -211,7 +211,7 @@ public class ProfilesDao {
         private PublishSubject<ResponseOrError<BaseProfile>> updatedProfileLocallySubject = PublishSubject.create();
 
         public ProfileDao(@Nonnull final String userName) {
-            profileObservable = apiService.getProfile(userName)
+            profileObservable = apiService.getUser(userName)
                     .subscribeOn(networkScheduler)
                     .compose(MoreOperators.<BaseProfile>refresh(refreshSubject))
                     .compose(ResponseOrError.<BaseProfile>toResponseOrErrorObservable())

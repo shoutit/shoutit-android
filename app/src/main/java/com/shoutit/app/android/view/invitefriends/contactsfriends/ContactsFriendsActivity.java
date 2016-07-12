@@ -14,13 +14,11 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PermissionHelper;
-import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
+import com.shoutit.app.android.view.profile.user.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.profileslist.BaseProfilesListActivity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import rx.functions.Func1;
 
 public class ContactsFriendsActivity extends BaseProfilesListActivity {
 

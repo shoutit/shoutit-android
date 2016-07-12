@@ -35,7 +35,7 @@ import com.shoutit.app.android.view.invitefriends.InviteFriendsFragment;
 import com.shoutit.app.android.view.location.LocationActivity;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.pages.PagesPagerFragment;
-import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
+import com.shoutit.app.android.view.profile.user.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsFragment;
 import com.shoutit.app.android.view.settings.SettingsActivity;

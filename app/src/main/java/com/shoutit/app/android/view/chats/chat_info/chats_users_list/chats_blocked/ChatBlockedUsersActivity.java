@@ -20,7 +20,7 @@ import com.shoutit.app.android.view.chats.chat_info.chats_users_list.ChatUsersLi
 import com.shoutit.app.android.view.chats.chat_info.chats_users_list.ChatUsersListComponent;
 import com.shoutit.app.android.view.chats.chat_info.chats_users_list.ChatUsersListModule;
 import com.shoutit.app.android.view.chats.chat_info.chats_users_list.DaggerChatUsersListComponent;
-import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
+import com.shoutit.app.android.view.profile.user.UserOrPageProfileActivity;
 
 import java.util.List;
 

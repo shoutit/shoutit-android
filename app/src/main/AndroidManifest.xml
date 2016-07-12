@@ -258,7 +258,7 @@
 
         </activity>
         <activity
-            android:name=".view.profile.UserOrPageProfileActivity"
+            android:name=".view.profile.user.UserOrPageProfileActivity"
             android:screenOrientation="portrait"
             android:theme="@style/TranslucentStatusBar">
 
@@ -279,7 +279,11 @@
             android:screenOrientation="portrait"
             android:theme="@style/TranslucentStatusBar"/>
         <activity
-            android:name=".view.editprofile.EditProfileActivity"
+            android:name=".view.profile.user.editprofile.EditProfileActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden"/>
+        <activity
+            android:name=".view.profile.page.edit.EditPageActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden"/>
         <activity

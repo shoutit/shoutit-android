@@ -21,7 +21,7 @@ import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.utils.rx.RxUtils;
 import com.shoutit.app.android.view.listenings.ProfilesListAdapter;
-import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
+import com.shoutit.app.android.view.profile.user.UserOrPageProfileActivity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

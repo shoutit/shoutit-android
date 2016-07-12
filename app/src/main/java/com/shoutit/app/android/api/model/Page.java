@@ -12,12 +12,32 @@ public class Page extends BaseProfile {
 
     // DetailedProfile of the currently logged in admin
     private final User admin;
+    private final String about;
+    private final String description;
+    private final String phone;
+    private final String founded;
+    private final String impressum;
+    private final String overview;
+    private final String mission;
+    private final String generalInfo;
+    private final boolean isVerified;
+    private final boolean isPublished;
 
     public Page(String id, String type, String username, String name, String firstName,
                 String lastName, boolean isActivated, String image, String cover, boolean isListening,
-                int listenersCount, UserLocation location, Stats stats, boolean isOwner, String email, User admin) {
+                int listenersCount, UserLocation location, Stats stats, boolean isOwner, String email, User admin, String about, String description, String phone, String founded, String impressum, String overview, String mission, String generalInfo, boolean isVerified, boolean isPublished) {
         super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount, location, isOwner, stats, email);
         this.admin = admin;
+        this.about = about;
+        this.description = description;
+        this.phone = phone;
+        this.founded = founded;
+        this.impressum = impressum;
+        this.overview = overview;
+        this.mission = mission;
+        this.generalInfo = generalInfo;
+        this.isVerified = isVerified;
+        this.isPublished = isPublished;
     }
 
     @NonNull
@@ -27,14 +47,14 @@ public class Page extends BaseProfile {
         int newListenersCount = newIsListening ? listenersCount + 1 : listenersCount - 1;
 
         return new Page(id, type, username, name, firstName, lastName, isActivated, image, cover,
-                newIsListening, newListenersCount, location, getStats(), isOwner, getEmail(), admin);
+                newIsListening, newListenersCount, location, getStats(), isOwner, getEmail(), admin, about, description, phone, founded, impressum, overview, mission, generalInfo, isVerified, isPublished);
     }
 
     @Nonnull
     @Override
     public BaseProfile withUpdatedStats(@Nonnull Stats newStats) {
         return new Page(id, type, username, name, firstName, lastName, isActivated, image, cover,
-                isListening, listenersCount, location, newStats, isOwner, getEmail(), admin);
+                isListening, listenersCount, location, newStats, isOwner, getEmail(), admin, about, description, phone, founded, impressum, overview, mission, generalInfo, isVerified, isPublished);
     }
 
     public User getAdmin() {
@@ -64,5 +84,45 @@ public class Page extends BaseProfile {
     public int hashCode() {
         return Objects.hashCode(id, type, username, name, firstName, lastName, isActivated,
                 image, cover, isListening, listenersCount, getStats(), admin);
+    }
+
+    public String getAbout() {
+        return about;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public String getFounded() {
+        return founded;
+    }
+
+    public String getImpressum() {
+        return impressum;
+    }
+
+    public String getOverview() {
+        return overview;
+    }
+
+    public String getMission() {
+        return mission;
+    }
+
+    public String getGeneralInfo() {
+        return generalInfo;
+    }
+
+    public boolean isVerified() {
+        return isVerified;
+    }
+
+    public boolean isPublished() {
+        return isPublished;
     }
 }

@@ -35,6 +35,7 @@ import com.shoutit.app.android.api.model.LinkGplusRequest;
 import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessagesResponse;
 import com.shoutit.app.android.api.model.NotificationsResponse;
+import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.api.model.PageCategory;
 import com.shoutit.app.android.api.model.PageCreateRequest;
 import com.shoutit.app.android.api.model.PagesResponse;
@@ -90,6 +91,7 @@ import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.HTTP;
+import retrofit2.http.Header;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -293,6 +295,9 @@ public interface ApiService {
     Observable<User> updateUser(@Body UpdateUserRequest updateUserRequest);
 
     @PATCH("profiles/me")
+    Observable<Page> updatePage(@Header(Headers.AUTHORIZATION_PAGE_ID) String pageId, @Body Page page);
+
+    @PATCH("profiles/me")
     Observable<User> registerGcmToken(@Body RegisterDeviceRequest registerDeviceRequest);
 
     @PATCH("profiles/me")
@@ -303,9 +308,6 @@ public interface ApiService {
 
     @DELETE("profiles/{username}/listen")
     Observable<ResponseBody> unlistenProfile(@Path("username") String username);
-
-    @GET("profiles/{user_name}")
-    Observable<User> getProfile(@Path("user_name") String userName);
 
     @GET("profiles")
     Observable<SearchProfileResponse> searchProfiles(@Query("search") String searchQuery,

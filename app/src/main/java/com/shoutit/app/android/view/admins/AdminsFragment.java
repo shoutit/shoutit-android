@@ -16,7 +16,7 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.PreferencesHelper;
 import com.shoutit.app.android.view.pages.my.SelectListenersActivity;
-import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
+import com.shoutit.app.android.view.profile.user.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.profileslist.BaseProfileListFragment;
 
 import java.util.List;

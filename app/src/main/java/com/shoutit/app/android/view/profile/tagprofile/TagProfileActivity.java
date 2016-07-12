@@ -9,7 +9,7 @@ import com.shoutit.app.android.App;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
-import com.shoutit.app.android.view.profile.ProfileActivity;
+import com.shoutit.app.android.view.profile.user.ProfileActivity;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsActivity;
 

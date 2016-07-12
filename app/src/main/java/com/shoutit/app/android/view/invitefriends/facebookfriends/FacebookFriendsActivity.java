@@ -15,7 +15,7 @@ import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
-import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
+import com.shoutit.app.android.view.profile.user.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.profileslist.BaseProfilesListActivity;
 
 import javax.annotation.Nonnull;

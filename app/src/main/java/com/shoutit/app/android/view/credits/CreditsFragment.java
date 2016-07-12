@@ -23,7 +23,7 @@ import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
 import com.shoutit.app.android.view.credits.transactions.TransactionsActivity;
 import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.main.MenuHandler;
-import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
+import com.shoutit.app.android.view.profile.user.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.promote.PromoteShoutInfoActivity;
 
 import javax.annotation.Nonnull;

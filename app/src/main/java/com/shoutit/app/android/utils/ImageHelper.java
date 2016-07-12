@@ -41,14 +41,10 @@ public class ImageHelper {
     @Nullable
     public static Bitmap prepareImageToUpload(@NonNull String filePath, int maxImageSize) {
         final Bitmap bitmap = downSampleIfNeeded(filePath, maxImageSize);
-        if (bitmap == null) {
-            return null;
-        }
-
         return adjustImageOrientation(bitmap, filePath);
     }
 
-    @Nullable
+    @NonNull
     private static Bitmap downSampleIfNeeded(@NonNull String filePath, int maxImageSize) {
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;

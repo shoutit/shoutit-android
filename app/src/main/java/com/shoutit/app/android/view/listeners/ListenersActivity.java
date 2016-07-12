@@ -12,15 +12,13 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.view.profileslist.BaseProfilesListActivity;
 import com.shoutit.app.android.view.listenings.ProfilesListAdapter;
-import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
+import com.shoutit.app.android.view.profile.user.UserOrPageProfileActivity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
-import rx.functions.Action1;
-import rx.functions.Func1;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

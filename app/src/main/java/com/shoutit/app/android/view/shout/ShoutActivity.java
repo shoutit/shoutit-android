@@ -13,7 +13,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -51,7 +50,7 @@ import com.shoutit.app.android.view.chats.chatsfirstconversation.ChatFirstConver
 import com.shoutit.app.android.view.conversations.ConversationsActivity;
 import com.shoutit.app.android.view.createshout.edit.EditShoutActivity;
 import com.shoutit.app.android.view.main.MainActivity;
-import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
+import com.shoutit.app.android.view.profile.user.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.profile.tagprofile.TagProfileActivity;
 import com.shoutit.app.android.view.promote.PromoteActivity;
 import com.shoutit.app.android.view.promote.promoted.PromotedActivity;
