@@ -30,6 +30,7 @@
     <string name="error_connection">Ooops, probably there is no Internet connection</string>
     <string name="error_field_empty">Field cannot be empty</string>
     <string name="error_wrong_email_or_password">Wrong email or password</string>
+    <string name="error_wrong_email">Incorrect email address</string>
     <string name="error_action_only_for_logged_in_user">Only for logged in users</string>
     <string name="error_image_upload">Sorry, cannot upload image. Please try again</string>
 
@@ -258,6 +259,7 @@
     <string name="profile_user_shouts">%1$s SHOUTS</string>
     <string name="profile_report_succes">Successfully reported</string>
     <string name="profile_not_listening">This user is not listening to you.</string>
+    <string name="profile_verify_status">Request status: %1$s</string>
 
     <!-- Request Shout -->
     <string name="request_activity_title">Create Request</string>
@@ -435,6 +437,7 @@
     <string name="video_calls_connected">Connected with %s</string>
     <string name="video_calls_participant_disconected">Participant finished the conversation</string>
     <string name="video_call_error">Sorry, cannot start conversation. Try again later.</string>
+    <string name="video_call_finished">Video call has been finished</string>
     <string name="no_phone_number_error">Phone number is not currently available.</string>
     <string name="call_dialog_positive_button">Call</string>
     <string name="dialog_cancel_button">Cancel</string>
@@ -497,7 +500,10 @@
     <string name="verify_email_resend">Resend</string>
     <string name="verify_verified">Your account has been successfully verified</string>
     <string name="verify_not_verified">Your account isn\'t verified yet</string>
-    <string name="profile_verify_account">Verify your account</string>
+    <string name="profile_user_verify_account">Verify your account</string>
+    <string name="profile_page_activate_page">Activate your page</string>
+    <string name="profile_page_verify_page">Verify your business</string>
+    <string name="profile_page_verify_info">To activate your page, your personal account should be verified first. Click the activation link in the email you have received when you signed up.</string>
     <string name="verify_email_title">Email Verification</string>
     <string name="video_calls_cannot_start_conversation">Sorry, cannot start this video call. Please try again later.</string>
 
@@ -693,6 +699,8 @@
     <string name="promote_not_enough_money">You don\'t have enough Shoutit Credit for this action</string>
     <string name="promote_confirm_text">Confirm buying %1$s for %2$d credits</string>
     <string name="promote_confirm_button">Confirm</string>
+    <string name="promoted_message_no_days">Your shout is promoted.</string>
+    <string name="promoted_message_days">Your shout is promoted until %1$s.</string>
 
     <!-- Transactions -->
     <string name="transactions_title">Credit Transactions</string>
@@ -760,5 +768,17 @@
 
     <!-- Bookmarks -->
     <string name="bookmarks_no_bookmarks">You don\'t have any bookmarked shouts.</string>
+
+    <!-- Business Verification -->
+    <string name="business_ver_name_hint">Business Name</string>
+    <string name="business_ver_contact_person_hint">Contact Person</string>
+    <string name="business_ver_phone_hint">Contact Number</string>
+    <string name="business_ver_email_hint">Business Email</string>
+    <string name="business_ver_docs_header_tv">Add Official Documents with Business information for faster verification</string>
+    <string name="business_ver_bottom_text">Your information including any legal documents will be securley saved and will be used only for the verification process.</string>
+    <string name="business_ver_button">Submit Verification Request</string>
+    <string name="business_no_images_error">You need to add at least one image</string>
+    <string name="business_ver_sucess">Verification completed</string>
+    <string name="business_ver_ab_title">Business Verification</string>
 
 </resources>

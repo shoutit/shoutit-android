@@ -2,6 +2,7 @@ package com.shoutit.app.android.view.profile.user;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.Resources;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.google.common.base.Optional;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.BusinessVerificationResponse;
 import com.shoutit.app.android.api.model.TagDetail;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.utils.ImageHelper;
@@ -28,8 +30,8 @@ import javax.annotation.Nonnull;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import rx.Subscription;
 import rx.functions.Action1;
+import rx.subscriptions.CompositeSubscription;
 
 public class ProfileViewHolders {
 
@@ -153,12 +155,17 @@ public class ProfileViewHolders {
         TextView profileBadgeTv;
         @Bind(R.id.profile_edit_profile_container)
         View editProfileContainer;
+        @Bind(R.id.profile_verification_status)
+        TextView verificationStatusTv;
 
         private ProfileAdapterItems.MyUserNameAdapterItem item;
-        private Subscription subscription;
+        private CompositeSubscription subscriptions;
+        private final Resources resources;
 
-        public MyProfileUserNameViewHolder(@Nonnull View itemView) {
+        public MyProfileUserNameViewHolder(@Nonnull View itemView,
+                                           Resources resources) {
             super(itemView);
+            this.resources = resources;
             ButterKnife.bind(this, itemView);
         }
 
@@ -173,20 +180,44 @@ public class ProfileViewHolders {
 
             editProfileContainer.setVisibility(user.isUser() ? View.VISIBLE : View.GONE);
 
-            if (user.isOwner() && !user.isActivated()) {
+            if (user.isUser() && !user.isActivated()) {
+                verifyAccountButton.setText(R.string.profile_user_verify_account);
                 verifyAccountButton.setVisibility(View.VISIBLE);
+            } else if (!user.isUser()){
+                if (!user.isActivated()) {
+                    verifyAccountButton.setText(R.string.profile_page_activate_page);
+                    verifyAccountButton.setVisibility(View.VISIBLE);
+                    verificationStatusTv.setVisibility(View.VISIBLE);
+                } else if (!user.isVerified()) {
+                    verifyAccountButton.setText(R.string.profile_page_verify_page);
+                    verifyAccountButton.setVisibility(View.VISIBLE);
+                    verificationStatusTv.setVisibility(View.VISIBLE);
+                } else {
+                    verifyAccountButton.setVisibility(View.GONE);
+                    verificationStatusTv.setVisibility(View.GONE);
+                }
             } else {
                 verifyAccountButton.setVisibility(View.GONE);
+                verificationStatusTv.setVisibility(View.GONE);
             }
 
-            subscription = item.getNotificationsUnreadObservable()
-                    .subscribe(new Action1<Integer>() {
-                        @Override
-                        public void call(Integer notificationsCount) {
-                            notificationsBadgeTv.setVisibility(notificationsCount > 0 ? View.VISIBLE : View.GONE);
-                            notificationsBadgeTv.setText(String.valueOf(notificationsCount));
-                        }
-                    });
+            final boolean isVerifiedPage = user.isUser() && user.isVerified();
+            ImageHelper.setEndCompoundRelativeDrawable(userName, isVerifiedPage ? R.drawable.ic_verified : 0);
+
+            subscriptions = new CompositeSubscription(
+
+                    item.getNotificationsUnreadObservable()
+                            .subscribe(notificationsCount -> {
+                                notificationsBadgeTv.setVisibility(notificationsCount > 0 ? View.VISIBLE : View.GONE);
+                                notificationsBadgeTv.setText(String.valueOf(notificationsCount));
+                            }),
+
+                    item.getPageVerificationObservable()
+                            .subscribe(verificationResponse -> {
+                                verificationStatusTv.setText(resources.getString(
+                                        R.string.profile_verify_status, verificationResponse.getStatus()));
+                            })
+            );
 
             profileBadgeTv.setVisibility(item.shouldShowProfileBadge() ? View.VISIBLE : View.GONE);
         }
@@ -213,9 +244,9 @@ public class ProfileViewHolders {
         }
 
         private void recycle() {
-            if (subscription != null) {
-                subscription.unsubscribe();
-                subscription = null;
+            if (subscriptions != null) {
+                subscriptions.unsubscribe();
+                subscriptions = null;
             }
         }
     }
@@ -295,6 +326,9 @@ public class ProfileViewHolders {
             userName.setText(user.getName());
             userNick.setText(user.getUsername());
             listeningToYouTextView.setVisibility(user.isListener() ? View.VISIBLE : View.GONE);
+
+            final boolean isVerifiedPage = user.isUser() && user.isVerified();
+            ImageHelper.setEndCompoundRelativeDrawable(userName, isVerifiedPage ? R.drawable.ic_verified : 0);
         }
 
         @OnClick(R.id.profile_menu_more_iv)

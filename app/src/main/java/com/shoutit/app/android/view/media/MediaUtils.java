@@ -1,22 +1,16 @@
 package com.shoutit.app.android.view.media;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Environment;
-
-import android.os.ParcelFileDescriptor;
-import android.provider.MediaStore;
 
 import com.shoutit.app.android.utils.FileHelper;
 import com.shoutit.app.android.utils.ImageHelper;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -64,7 +58,7 @@ public class MediaUtils {
 
     public static File createFileFromUri(Context context, Uri imageUri, int maxImageSize) throws Exception {
         final String tempFile = FileHelper.createTempFileAndStoreUri(context, imageUri);
-        final Bitmap bitmapToUpload = ImageHelper.prepareImageToUpload(tempFile, maxImageSize);
+        final Bitmap bitmapToUpload = ImageHelper.scaleImage(tempFile, maxImageSize);
         return FileHelper.saveBitmapToTempFile(context, bitmapToUpload);
     }
 }

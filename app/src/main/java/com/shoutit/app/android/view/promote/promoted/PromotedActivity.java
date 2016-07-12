@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.text.format.DateUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -25,6 +26,9 @@ import com.shoutit.app.android.api.model.Promotion;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.utils.DateTimeUtils;
+
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -139,8 +143,14 @@ public class PromotedActivity extends BaseActivity {
                 null : getResources().getQuantityString(
                 R.plurals.plural_days, promotion.getDays(), promotion.getDays()));
 
-        labelTextTv.setText(label.getDescription());
+        if (promotion.getDays() != null) {
+            final String date = DateTimeUtils.getSlashedDate(promotion.getExpiresAt() * 1000L);
+            labelTextTv.setText(getString(R.string.promoted_message_days, date));
+        } else {
+            labelTextTv.setText(getString(R.string.promoted_message_no_days));
+        }
 
+        //noinspection ConstantConditions
         creditsTv.setText(String.valueOf(user.getStats().getCredits()));
     }
 }

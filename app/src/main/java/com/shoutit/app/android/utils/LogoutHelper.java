@@ -43,7 +43,7 @@ public class LogoutHelper {
     }
 
     public void logout() {
-        Twilio.unregisterTwillio();
+        twilio.unregisterTwillio();
 
         mProfilesDao.registerToGcmAction(null);
 

@@ -172,7 +172,7 @@ public class NotificationHelper {
     @Nullable
     private Bitmap getLargeIcon(@Nullable String imageUrl) throws IOException {
         if (TextUtils.isEmpty(imageUrl)) {
-            return BitmapFactory.decodeResource(mContext.getResources(), R.mipmap.ic_launcher);
+            return BitmapFactory.decodeResource(mContext.getResources(), R.drawable.notification_large);
         } else {
             return picasso.load(imageUrl)
                     .resizeDimen(R.dimen.notification_large_icon, R.dimen.notification_large_icon)

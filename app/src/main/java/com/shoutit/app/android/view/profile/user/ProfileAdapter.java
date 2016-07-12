@@ -43,7 +43,7 @@ public class ProfileAdapter extends BaseAdapter {
     public ViewHolderManager.BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         switch (viewType) {
             case VIEW_TYPE_MY_PROFILE_USER_NAME:
-                return new ProfileViewHolders.MyProfileUserNameViewHolder(layoutInflater.inflate(R.layout.my_profile_name_item, parent, false));
+                return new ProfileViewHolders.MyProfileUserNameViewHolder(layoutInflater.inflate(R.layout.my_profile_name_item, parent, false), context.getResources());
             case VIEW_TYPE_USER_NAME:
                 return new ProfileViewHolders.UserProfileUserNameViewHolder(layoutInflater.inflate(R.layout.user_profile_name_item, parent, false));
             case VIEW_TYPE_MY_PROFILE_THREE_ICONS:

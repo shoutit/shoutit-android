@@ -48,7 +48,7 @@ import com.shoutit.app.android.view.media.RecordMediaActivity;
 import com.shoutit.app.android.view.profile.user.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.shoutit.app.android.view.shouts.selectshout.SelectShoutActivity;
-import com.shoutit.app.android.view.videoconversation.VideoConversationActivity;
+import com.shoutit.app.android.view.videoconversation.OutgoingVideoCallActivity;
 import com.squareup.picasso.Picasso;
 import com.veinhorn.scrollgalleryview.Constants;
 import com.veinhorn.scrollgalleryview.VideoPlayerActivity;
@@ -158,7 +158,7 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
                     presenter.calledPersonUsernameObservable()
                             .compose(ChatFirstConversationActivity.this.bindToLifecycle())
                             .subscribe(calledUserProfile -> {
-                                startActivity(VideoConversationActivity.newIntent(
+                                startActivity(OutgoingVideoCallActivity.newIntent(
                                         calledUserProfile.getName(),
                                         calledUserProfile.getUsername(),
                                         calledUserProfile.getImage(),

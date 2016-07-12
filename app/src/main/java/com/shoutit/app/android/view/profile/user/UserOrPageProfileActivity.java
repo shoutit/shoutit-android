@@ -19,11 +19,13 @@ import com.shoutit.app.android.view.ReportDialog;
 import com.shoutit.app.android.view.chats.ChatActivity;
 import com.shoutit.app.android.view.chats.chatsfirstconversation.ChatFirstConversationActivity;
 import com.shoutit.app.android.view.profile.user.editprofile.EditProfileActivity;
+import com.shoutit.app.android.view.createshout.DialogsHelper;
 import com.shoutit.app.android.view.listeners.ListenersActivity;
 import com.shoutit.app.android.view.listenings.ListeningsActivity;
 import com.shoutit.app.android.view.notifications.NotificationsActivity;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsActivity;
+import com.shoutit.app.android.view.verifybusiness.VerifyBusinessActivity;
 import com.shoutit.app.android.view.verifyemail.VerifyEmailActivity;
 
 import javax.annotation.Nonnull;
@@ -149,8 +151,14 @@ public class UserOrPageProfileActivity extends ProfileActivity {
         presenter.getMyProfilePresenter()
                 .getVerifyAccountClickObservable()
                 .compose(bindToLifecycle())
-                .subscribe(o -> {
-                    startActivity(VerifyEmailActivity.newIntent(UserOrPageProfileActivity.this));
+                .subscribe(user -> {
+                    if (user.isUser()) {
+                        startActivity(VerifyEmailActivity.newIntent(UserOrPageProfileActivity.this));
+                    } else if (!user.isActivated()){
+                        showActivatePageDialog();
+                    } else if (!user.isVerified()) {
+                        startActivity(VerifyBusinessActivity.newIntent(this));
+                    }
                 });
 
         presenter.getMyProfilePresenter().getNotificationsClickObservable()
@@ -175,6 +183,10 @@ public class UserOrPageProfileActivity extends ProfileActivity {
                     startActivity(SearchShoutsResultsActivity.newIntent(
                             UserOrPageProfileActivity.this, null, userName, SearchPresenter.SearchType.PROFILE));
                 });
+    }
+
+    private void showActivatePageDialog() {
+        DialogsHelper.showDialog(this, R.string.profile_page_verify_info);
     }
 
     @Override

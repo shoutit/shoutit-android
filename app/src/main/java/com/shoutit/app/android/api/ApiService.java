@@ -7,6 +7,7 @@ import com.shoutit.app.android.api.model.AdminRequest;
 import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.BlockedProfilesResposne;
+import com.shoutit.app.android.api.model.BusinessVerificationResponse;
 import com.shoutit.app.android.api.model.CallerProfile;
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.ChangePasswordRequest;
@@ -71,6 +72,7 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserIdentity;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.UserSuggestionResponse;
+import com.shoutit.app.android.api.model.VerifyBusinessRequest;
 import com.shoutit.app.android.api.model.VerifyEmailRequest;
 import com.shoutit.app.android.api.model.VerifyEmailResponse;
 import com.shoutit.app.android.api.model.VideoCallRequest;
@@ -585,6 +587,13 @@ public interface ApiService {
 
     @POST("pages")
     Observable<User> createPage(@Body PageCreateRequest pageCreateRequest);
+
+    @POST("pages/{username}/verification")
+    Observable<BusinessVerificationResponse> verifyBusiness(@Path("username") String userName,
+                                                            @Body VerifyBusinessRequest body);
+
+    @GET("pages/{username}/verification")
+    Observable<BusinessVerificationResponse> getBusinessVerification(@Path("username") String userName);
 
     /**
      * Linked Accounts

@@ -14,12 +14,14 @@ public class Promotion {
     @Nullable
     private final Integer days;
     private final boolean isExpired;
+    private final int expiresAt;
 
-    public Promotion(@Nonnull String id, Label label, @Nullable Integer days, boolean isExpired) {
+    public Promotion(@Nonnull String id, Label label, @Nullable Integer days, boolean isExpired, int expiresAt) {
         this.id = id;
         this.label = label;
         this.days = days;
         this.isExpired = isExpired;
+        this.expiresAt = expiresAt;
     }
 
     @Nonnull
@@ -40,6 +42,10 @@ public class Promotion {
         return isExpired;
     }
 
+    public int getExpiresAt() {
+        return expiresAt;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -48,11 +54,12 @@ public class Promotion {
         return isExpired == promotion.isExpired &&
                 Objects.equal(id, promotion.id) &&
                 Objects.equal(label, promotion.label) &&
+                Objects.equal(expiresAt, promotion.expiresAt) &&
                 Objects.equal(days, promotion.days);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id, label, days, isExpired);
+        return Objects.hashCode(id, label, days, isExpired, expiresAt);
     }
 }

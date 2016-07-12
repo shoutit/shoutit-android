@@ -13,8 +13,7 @@ import dagger.Component;
         dependencies = AppComponent.class,
         modules = {ActivityModule.class}
 )
-public interface VideoConversationComponent extends BaseActivityComponent {
+public interface IncomingVideoCallActivityComponent extends BaseActivityComponent {
 
-    void inject(VideoConversationActivity activity);
-    void inject(DialogCallActivity activity);
+    void inject(IncomingVideoCallActivity activity);
 }
