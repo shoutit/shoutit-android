@@ -589,6 +589,9 @@ public interface ApiService {
     Observable<BusinessVerificationResponse> verifyBusiness(@Path("username") String userName,
                                                             @Body VerifyBusinessRequest body);
 
+    @GET("pages/{username}/verification")
+    Observable<BusinessVerificationResponse> getBusinessVerification(@Path("username") String userName);
+
     /**
      * Linked Accounts
      */

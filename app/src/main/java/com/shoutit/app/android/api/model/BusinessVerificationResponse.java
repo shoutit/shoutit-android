@@ -22,4 +22,8 @@ public class BusinessVerificationResponse {
         this.contactNumber = contactNumber;
         this.images = images;
     }
+
+    public String getStatus() {
+        return status;
+    }
 }

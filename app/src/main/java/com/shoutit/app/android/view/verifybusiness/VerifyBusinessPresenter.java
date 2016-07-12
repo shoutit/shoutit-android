@@ -21,8 +21,10 @@ import com.google.common.collect.ImmutableMap;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.BusinessVerificationResponse;
 import com.shoutit.app.android.api.model.VerifyBusinessRequest;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.BusinessVerificationDaos;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.FileHelper;
 import com.shoutit.app.android.utils.ImageHelper;
@@ -57,9 +59,12 @@ public class VerifyBusinessPresenter {
     private final Scheduler uiScheduler;
     @NonNull
     private final Scheduler networkScheduler;
+    @NonNull
     private final Resources resources;
     @NonNull
     private final ApiService apiService;
+    @NonNull
+    private final BusinessVerificationDaos verificationDao;
     @NonNull
     private final CompositeSubscription subscriptions = new CompositeSubscription();
 
@@ -71,9 +76,10 @@ public class VerifyBusinessPresenter {
                                    @NonNull AmazonHelper amazonHelper,
                                    @NonNull @UiScheduler Scheduler uiScheduler,
                                    @NonNull @NetworkScheduler Scheduler networkScheduler,
-                                   @ForActivity Resources resources,
+                                   @ForActivity @NonNull Resources resources,
                                    @NonNull ApiService apiService,
-                                   @NonNull UserPreferences userPreferences) {
+                                   @NonNull UserPreferences userPreferences,
+                                   @NonNull BusinessVerificationDaos verificationDao) {
 
         this.fileHelper = fileHelper;
         this.amazonHelper = amazonHelper;
@@ -81,6 +87,7 @@ public class VerifyBusinessPresenter {
         this.networkScheduler = networkScheduler;
         this.resources = resources;
         this.apiService = apiService;
+        this.verificationDao = verificationDao;
 
         //noinspection ConstantConditions
         currentPageUserName = userPreferences.getUserOrPage().getUsername();
@@ -213,12 +220,16 @@ public class VerifyBusinessPresenter {
 
         listener.showProgress();
 
-        subscriptions.add(
-                apiService.verifyBusiness(currentPageUserName, new VerifyBusinessRequest(
+        final Observable<ResponseOrError<BusinessVerificationResponse>> verifyRequest = apiService
+                .verifyBusiness(currentPageUserName, new VerifyBusinessRequest(
                         name, email, person, number, builder.build()))
-                        .subscribeOn(networkScheduler)
-                        .observeOn(uiScheduler)
-                        .compose(ResponseOrError.toResponseOrErrorObservable())
+                .subscribeOn(networkScheduler)
+                .observeOn(uiScheduler)
+                .compose(ResponseOrError.toResponseOrErrorObservable())
+                .compose(ObservableExtensions.behaviorRefCount());
+
+        subscriptions.add(
+                verifyRequest
                         .subscribe(response -> {
                             listener.hideProgress();
                             if (response.isData()) {
@@ -227,6 +238,13 @@ public class VerifyBusinessPresenter {
                                 listener.showError(response.error());
                             }
                         })
+        );
+
+        subscriptions.add(
+                verifyRequest
+                        .compose(ResponseOrError.onlySuccess())
+                        .subscribe(verificationDao.getDao(currentPageUserName)
+                                .getVerificationResponseResultsObserver())
         );
     }
 

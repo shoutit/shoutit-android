@@ -106,15 +106,26 @@
         android:paddingLeft="80dp"
         android:paddingStart="80dp"
         android:textColor="@color/black_54"
+        android:layout_marginBottom="10dp"
         android:textSize="12sp"
         tools:text="Doris90" />
+
+    <TextView
+        android:id="@+id/profile_verification_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|end"
+        android:layout_marginRight="16dp"
+        android:layout_marginEnd="16dp"
+        android:visibility="invisible"
+        tools:visibility="visible"
+        tools:text="Request status: Pending"/>
 
     <TextView
         android:id="@+id/profile_verify_account"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:textAllCaps="true"
-        android:layout_marginTop="14dp"
         android:gravity="center"
         android:background="@drawable/selector_verify_account"
         android:textColor="@color/profile_verify"
