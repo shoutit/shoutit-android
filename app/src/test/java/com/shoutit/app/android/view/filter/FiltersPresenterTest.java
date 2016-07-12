@@ -168,7 +168,7 @@ public class FiltersPresenterTest {
     }
 
     private List<Category> getCategories() {
-        final List<CategoryFilter.FilterValue> filterValues = Lists.newArrayList(new CategoryFilter.FilterValue("name", "slug"));
+        final List<CategoryFilter.FilterValue> filterValues = Lists.newArrayList(new CategoryFilter.FilterValue(null, "name", "slug"));
         final List<CategoryFilter> categoryFilters = Lists.newArrayList(new CategoryFilter("name", "slug", filterValues));
         return Lists.newArrayList(new Category("name", "slug", null, null, categoryFilters));
     }

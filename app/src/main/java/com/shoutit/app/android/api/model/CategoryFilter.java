@@ -27,42 +27,6 @@ public class CategoryFilter {
         this.values = values;
     }
 
-    public static class FilterValue {
-        @Nonnull
-        private final String name;
-        @Nonnull
-        private final String slug;
-
-        public FilterValue(@Nonnull String name, @Nonnull String slug) {
-            this.name = name;
-            this.slug = slug;
-        }
-
-        @Nonnull
-        public String getName() {
-            return name;
-        }
-
-        @Nonnull
-        public String getSlug() {
-            return slug;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof FilterValue)) return false;
-            final FilterValue that = (FilterValue) o;
-            return Objects.equal(name, that.name) &&
-                    Objects.equal(slug, that.slug);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hashCode(name, slug);
-        }
-    }
-
     @Nonnull
     public String getName() {
         return name;

@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableMultimap;
 import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.CategoryFilter;
+import com.shoutit.app.android.api.model.FilterValue;
 import com.shoutit.app.android.api.model.SortType;
 import com.shoutit.app.android.api.model.UserLocation;
 
@@ -27,16 +28,16 @@ public class FiltersAdapterItems {
         @Nonnull
         private final CategoryFilter categoryFilter;
         @Nonnull
-        private final CategoryFilter.FilterValue filterValue;
+        private final FilterValue filterValue;
         @Nonnull
         private final Observer<FiltersPresenter.AdapterFilterValue> selectedFilterValuesObserver;
         @Nonnull
-        private final Observable<ImmutableMultimap<String, CategoryFilter.FilterValue>> selectedValuesMapObservable;
+        private final Observable<ImmutableMultimap<String, FilterValue>> selectedValuesMapObservable;
 
         public FilterValueAdapterItem(@Nonnull CategoryFilter categoryFilter,
-                                      @Nonnull CategoryFilter.FilterValue filterValue,
+                                      @Nonnull FilterValue filterValue,
                                       @Nonnull Observer<FiltersPresenter.AdapterFilterValue> selectedFilterValuesObserver,
-                                      @Nonnull Observable<ImmutableMultimap<String, CategoryFilter.FilterValue>> selectedValuesMapObservable) {
+                                      @Nonnull Observable<ImmutableMultimap<String, FilterValue>> selectedValuesMapObservable) {
             this.categoryFilter = categoryFilter;
             this.filterValue = filterValue;
             this.selectedFilterValuesObserver = selectedFilterValuesObserver;
@@ -49,7 +50,7 @@ public class FiltersAdapterItems {
         }
 
         @Nonnull
-        public Observable<ImmutableMultimap<String, CategoryFilter.FilterValue>> getSelectedValuesMapObservable() {
+        public Observable<ImmutableMultimap<String, FilterValue>> getSelectedValuesMapObservable() {
             return selectedValuesMapObservable;
         }
 
@@ -65,7 +66,7 @@ public class FiltersAdapterItems {
         }
 
         @Nonnull
-        public CategoryFilter.FilterValue getFilterValue() {
+        public FilterValue getFilterValue() {
             return filterValue;
         }
 
@@ -95,12 +96,12 @@ public class FiltersAdapterItems {
         @Nonnull
         private final Observer<BothParams<String, Boolean>> filterVisibilityChangedObserver;
         @Nonnull
-        private final Observable<ImmutableMultimap<String, CategoryFilter.FilterValue>> selectedValuesMapObservable;
+        private final Observable<ImmutableMultimap<String, FilterValue>> selectedValuesMapObservable;
         private boolean hasVisibleValues = false;
 
         public FilterAdapterItem(@Nonnull CategoryFilter categoryFilter,
                                  @Nonnull Observer<BothParams<String, Boolean>> filterVisibilityChangedObserver,
-                                 @Nonnull Observable<ImmutableMultimap<String, CategoryFilter.FilterValue>> selectedValuesMapObservable,
+                                 @Nonnull Observable<ImmutableMultimap<String, FilterValue>> selectedValuesMapObservable,
                                  boolean hasVisibleValues) {
             this.categoryFilter = categoryFilter;
             this.filterVisibilityChangedObserver = filterVisibilityChangedObserver;
@@ -129,7 +130,7 @@ public class FiltersAdapterItems {
         }
 
         @Nonnull
-        public Observable<ImmutableMultimap<String, CategoryFilter.FilterValue>> getSelectedValuesMapObservable() {
+        public Observable<ImmutableMultimap<String, FilterValue>> getSelectedValuesMapObservable() {
             return selectedValuesMapObservable;
         }
 
@@ -139,10 +140,10 @@ public class FiltersAdapterItems {
         }
 
         @Nonnull
-        public String getSelectedValues(@Nonnull Collection<CategoryFilter.FilterValue> selectedValues) {
+        public String getSelectedValues(@Nonnull Collection<FilterValue> selectedValues) {
             String separator = "";
             final StringBuilder builder = new StringBuilder();
-            for (CategoryFilter.FilterValue value : selectedValues) {
+            for (FilterValue value : selectedValues) {
                 builder.append(separator).append(value.getName());
                 separator = ", ";
             }
