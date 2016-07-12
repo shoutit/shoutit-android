@@ -10,22 +10,18 @@ import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.BusinessVerificationResponse;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
 import rx.subjects.PublishSubject;
 
-@Singleton
 public class BusinessVerificationDaos {
 
     private final LoadingCache<String, BusinessVerificationDao> cache;
     private final ApiService apiService;
     private final Scheduler networkScheduler;
 
-    @Inject
     public BusinessVerificationDaos(ApiService apiService,
                                    @NetworkScheduler Scheduler networkScheduler) {
         this.apiService = apiService;

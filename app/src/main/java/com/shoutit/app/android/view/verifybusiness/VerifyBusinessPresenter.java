@@ -95,12 +95,44 @@ public class VerifyBusinessPresenter {
 
     public void register(@NonNull Listener listener) {
         this.listener = listener;
-        listener.setImages(mediaItems);
+        fetchVerification();
     }
 
-    public void unregister() {
-        listener = null;
-        subscriptions.unsubscribe();
+    private void fetchVerification() {
+        listener.showProgress();
+
+        subscriptions.add(
+                verificationDao.getDao(currentPageUserName)
+                        .getVerificationObservable()
+                        .take(1)
+                        .observeOn(uiScheduler)
+                        .subscribe(responseOrError -> {
+                            listener.hideProgress();
+
+                            if (responseOrError.isData()) {
+                                setUpData(responseOrError.data());
+                            } else {
+                                listener.showError(responseOrError.error());
+                            }
+                        })
+        );
+    }
+
+    public void setUpData(@NonNull BusinessVerificationResponse verificationResponse) {
+        clear();
+
+        for (String imageUrl : verificationResponse.getImages()) {
+            addImageItem(imageUrl);
+        }
+
+        listener.setImages(mediaItems);
+        listener.setData(verificationResponse);
+    }
+
+    private void clear() {
+        mediaItems.forcePut(0, new AddImageItem());
+        mediaItems.forcePut(1, new BlankItem());
+        mediaItems.forcePut(2, new BlankItem());
     }
 
     private void addImageItem(@NonNull String imageUrl) {
@@ -233,18 +265,13 @@ public class VerifyBusinessPresenter {
                         .subscribe(response -> {
                             listener.hideProgress();
                             if (response.isData()) {
+                                verificationDao.getDao(currentPageUserName)
+                                        .getVerificationResponseResultsObserver().onNext(response.data());
                                 listener.showSuccessAndFinish();
                             } else {
                                 listener.showError(response.error());
                             }
                         })
-        );
-
-        subscriptions.add(
-                verifyRequest
-                        .compose(ResponseOrError.onlySuccess())
-                        .subscribe(verificationDao.getDao(currentPageUserName)
-                                .getVerificationResponseResultsObserver())
         );
     }
 
@@ -282,6 +309,11 @@ public class VerifyBusinessPresenter {
                 .subscribeOn(networkScheduler)
                 .observeOn(uiScheduler)
                 .compose(ResponseOrError.<String>toResponseOrErrorObservable());
+    }
+
+    public void unregister() {
+        listener = null;
+        subscriptions.unsubscribe();
     }
 
     public class ImageItem implements Item {
@@ -353,5 +385,7 @@ public class VerifyBusinessPresenter {
         void showNumberError(String error);
 
         void showEmailError(String error);
+
+        void setData(BusinessVerificationResponse verificationResponse);
     }
 }

@@ -259,7 +259,7 @@
     <string name="profile_user_shouts">%1$s SHOUTS</string>
     <string name="profile_report_succes">Successfully reported</string>
     <string name="profile_not_listening">This user is not listening to you.</string>
-    <string name="profile_verify_status">Request status %1$s</string>
+    <string name="profile_verify_status">Request status: %1$s</string>
 
     <!-- Request Shout -->
     <string name="request_activity_title">Create Request</string>

@@ -22,6 +22,7 @@ import com.google.common.base.Optional;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.BusinessVerificationResponse;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.BaseEmptyActivityComponent;
@@ -142,6 +143,14 @@ public class VerifyBusinessActivity extends BaseActivity implements VerifyBusine
     protected void onDestroy() {
         presenter.unregister();
         super.onDestroy();
+    }
+
+    @Override
+    public void setData(BusinessVerificationResponse verificationResponse) {
+        nameEt.setText(verificationResponse.getBusinessName());
+        emailEt.setText(verificationResponse.getBusinessEmail());
+        contactNumberEt.setText(verificationResponse.getContactNumber());
+        contactPersonEt.setText(verificationResponse.getContactPerson());
     }
 
     @Override

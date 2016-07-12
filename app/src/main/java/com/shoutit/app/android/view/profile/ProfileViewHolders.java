@@ -194,11 +194,11 @@ public class ProfileViewHolders {
                     verificationStatusTv.setVisibility(View.VISIBLE);
                 } else {
                     verifyAccountButton.setVisibility(View.GONE);
-                    verificationStatusTv.setVisibility(View.INVISIBLE);
+                    verificationStatusTv.setVisibility(View.GONE);
                 }
             } else {
                 verifyAccountButton.setVisibility(View.GONE);
-                verificationStatusTv.setVisibility(View.INVISIBLE);
+                verificationStatusTv.setVisibility(View.GONE);
             }
 
             final boolean isVerifiedPage = user.isUser() && user.isVerified();

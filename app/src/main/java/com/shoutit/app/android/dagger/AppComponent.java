@@ -13,6 +13,7 @@ import com.shoutit.app.android.App;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.dao.BookmarksDao;
+import com.shoutit.app.android.dao.BusinessVerificationDaos;
 import com.shoutit.app.android.dao.CategoriesDao;
 import com.shoutit.app.android.dao.ConversationMediaDaos;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
@@ -142,4 +143,6 @@ public interface AppComponent {
     PromoteLabelsDao promoteDao();
 
     BookmarksDao bookmarkDao();
+
+    BusinessVerificationDaos businessVerificationDaos();
 }
