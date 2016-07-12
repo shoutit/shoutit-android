@@ -39,6 +39,14 @@ public class ImageHelper {
         }
     }
 
+    public static void setEndCompoundRelativeDrawable(@Nonnull TextView textView, @DrawableRes int drawableId) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            textView.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, drawableId, 0);
+        } else {
+            textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, drawableId, 0);
+        }
+    }
+
     @Nullable
     public static Bitmap scaleImage(@NonNull String filePath, int maxImageSize) {
         final Bitmap bitmap = downSampleIfNeeded(filePath, maxImageSize);

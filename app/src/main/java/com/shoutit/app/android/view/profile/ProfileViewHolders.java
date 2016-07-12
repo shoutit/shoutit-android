@@ -190,6 +190,9 @@ public class ProfileViewHolders {
                 verifyAccountButton.setVisibility(View.GONE);
             }
 
+            final boolean isVerifiedPage = user.isUser() && user.isVerified();
+            ImageHelper.setEndCompoundRelativeDrawable(userName, isVerifiedPage ? R.drawable.ic_verified : 0);
+
             subscription = item.getNotificationsUnreadObservable()
                     .subscribe(notificationsCount -> {
                         notificationsBadgeTv.setVisibility(notificationsCount > 0 ? View.VISIBLE : View.GONE);
@@ -303,6 +306,9 @@ public class ProfileViewHolders {
             userName.setText(user.getName());
             userNick.setText(user.getUsername());
             listeningToYouTextView.setVisibility(user.isListener() ? View.VISIBLE : View.GONE);
+
+            final boolean isVerifiedPage = user.isUser() && user.isVerified();
+            ImageHelper.setEndCompoundRelativeDrawable(userName, isVerifiedPage ? R.drawable.ic_verified : 0);
         }
 
         @OnClick(R.id.profile_menu_more_iv)
