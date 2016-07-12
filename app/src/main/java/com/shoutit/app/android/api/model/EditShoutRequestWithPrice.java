@@ -9,7 +9,7 @@ public class EditShoutRequestWithPrice extends EditShoutRequest {
 
     public EditShoutRequestWithPrice(String title, String description, UserLocationSimple location,
                                      long price, String currency, String category,
-                                     List<FilterValue> filters, List<String> images, List<Video> videos,
+                                     List<Filter> filters, List<String> images, List<Video> videos,
                                      String mobile) {
         super(title, description, location, category, filters, images, videos, mobile);
         this.price = price;

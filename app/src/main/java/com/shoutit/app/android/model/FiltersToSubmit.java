@@ -7,7 +7,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 import com.google.common.primitives.Ints;
-import com.shoutit.app.android.api.model.CategoryFilter;
+import com.shoutit.app.android.api.model.FilterValue;
 import com.shoutit.app.android.api.model.SortType;
 import com.shoutit.app.android.api.model.UserLocation;
 
@@ -31,12 +31,12 @@ public class FiltersToSubmit {
     @Nonnull
     private final SortType sortType;
     @Nullable
-    private final Multimap<String, CategoryFilter.FilterValue> selectedFilters;
+    private final Multimap<String, FilterValue> selectedFilters;
     @Nullable
     private final String categorySlug;
 
     public FiltersToSubmit(@Nullable String minPriceInCents, @Nullable String maxPriceInCents, @Nonnull UserLocation userLocation, Integer distance,
-                           @Nonnull String shoutType, @Nonnull SortType sortType, @Nullable Multimap<String, CategoryFilter.FilterValue> selectedFilters,
+                           @Nonnull String shoutType, @Nonnull SortType sortType, @Nullable Multimap<String, FilterValue> selectedFilters,
                            @Nullable String categorySlug) {
         this.sortType = sortType;
         this.categorySlug = categorySlug;
@@ -123,10 +123,10 @@ public class FiltersToSubmit {
         final Map<String, String> queryMap = new HashMap<>();
         for (String filterSlug : selectedFilters.keySet()) {
             final StringBuilder stringBuilder = new StringBuilder();
-            final Collection<CategoryFilter.FilterValue> filterValues = selectedFilters.get(filterSlug);
+            final Collection<FilterValue> filterValues = selectedFilters.get(filterSlug);
 
             String separator = "";
-            for (CategoryFilter.FilterValue value : filterValues) {
+            for (FilterValue value : filterValues) {
                 stringBuilder.append(separator).append(value.getSlug());
                 separator = ",";
             }

@@ -38,6 +38,8 @@ import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.CategoryFilter;
+import com.shoutit.app.android.api.model.Filter;
+import com.shoutit.app.android.api.model.FilterValue;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ActivityModule;
@@ -50,10 +52,10 @@ import com.shoutit.app.android.view.createshout.ShoutMediaPresenter;
 import com.shoutit.app.android.view.location.LocationActivityForResult;
 import com.shoutit.app.android.view.location.LocationResultHelper;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
+import com.shoutit.app.android.widget.BaseSpinnerAdapter;
+import com.shoutit.app.android.widget.CategorySpinnerAdapter;
 import com.shoutit.app.android.widget.CurrencySpinnerAdapter;
 import com.shoutit.app.android.widget.SimpleCurrencySpinnerAdapter;
-import com.shoutit.app.android.widget.SimpleSpinnerAdapter;
-import com.shoutit.app.android.widget.SpinnerAdapter;
 import com.shoutit.app.android.widget.StateSpinner;
 import com.squareup.picasso.Picasso;
 
@@ -126,7 +128,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     Picasso mPicassoNoTransformer;
 
     private CurrencySpinnerAdapter mCurrencyAdapter;
-    private SpinnerAdapter mCategoryAdapter;
+    private CategorySpinnerAdapter mCategoryAdapter;
     private PublishSubject<Pair<String, Boolean>> mediaSwappedSubject = PublishSubject.create();
 
     public static Intent newIntent(@NonNull String id, @NonNull Context context) {
@@ -160,15 +162,15 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
         mCurrencyAdapter = new SimpleCurrencySpinnerAdapter(R.string.request_activity_currency, this);
         mEditCurrencySpinner.setAdapter(mCurrencyAdapter);
 
-        mCategoryAdapter = new SimpleSpinnerAdapter(R.string.edit_shout_category, this);
+        mCategoryAdapter = new CategorySpinnerAdapter(this, android.R.layout.simple_list_item_1);
         mEditCategorySpinner.setAdapter(mCategoryAdapter);
         mEditCategorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
             @SuppressWarnings("unchecked")
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                final Pair<String, String> item = (Pair<String, String>) mEditCategorySpinner.getItemAtPosition(position);
-                mEditShoutPresenter.categorySelected(item.first);
+                final Category item = (Category) mEditCategorySpinner.getItemAtPosition(position);
+                mEditShoutPresenter.categorySelected(item.getSlug());
             }
 
             @Override
@@ -316,8 +318,8 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     }
 
     @Override
-    public void setCategories(@NonNull List<Pair<String, String>> list) {
-        mCategoryAdapter.setData(list);
+    public void setCategories(@NonNull List<Category> list) {
+        mCategoryAdapter.bindData(list);
     }
 
     @Override
@@ -328,31 +330,38 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
 
         for (CategoryFilter categoryFilter : options) {
             final String name = categoryFilter.getName();
-            final List<CategoryFilter.FilterValue> optionsList = categoryFilter.getValues();
+            final List<FilterValue> optionsList = categoryFilter.getValues();
 
             final View view = layoutInflater.inflate(R.layout.options_layout, mEditShoutContainer, false);
             final TextView title = (TextView) view.findViewById(R.id.option_title);
             final Spinner spinner = (Spinner) view.findViewById(R.id.option_spinner);
 
-            final List<Pair<String, String>> optionsPairs = ImmutableList.copyOf(Iterables.transform(optionsList,
-                    new Function<CategoryFilter.FilterValue, Pair<String, String>>() {
+            final BaseSpinnerAdapter<Filter> adapter = new BaseSpinnerAdapter<Filter>(this, android.R.layout.simple_list_item_1) {
+                @Override
+                protected String getDisplayName(int position) {
+                    return getItem(position).getValue().getName();
+                }
+            };
+            spinner.setAdapter(adapter);
+
+            final List<Filter> filters = ImmutableList.copyOf(Iterables.transform(optionsList,
+                    new Function<FilterValue, Filter>() {
                         @Nullable
                         @Override
-                        public Pair<String, String> apply(@Nullable CategoryFilter.FilterValue input) {
-                            assert input != null;
-                            return Pair.create(input.getSlug(), input.getName());
+                        public Filter apply(@Nullable FilterValue filterValue) {
+                            assert filterValue != null;
+                            return new Filter(categoryFilter.getName(), categoryFilter.getSlug(), filterValue);
                         }
                     }));
 
-            final SpinnerAdapter adapter = new SimpleSpinnerAdapter(R.string.edit_shout_option, this);
-            spinner.setAdapter(adapter);
-
-            adapter.setData(ImmutableList.<Pair<String, String>>builder()
-                    .add(new Pair<>("", getString(R.string.option_not_set)))
-                    .addAll(optionsPairs)
+            adapter.bindData(ImmutableList.<Filter>builder()
+                    .add(new Filter("", "", new FilterValue("", getString(R.string.option_not_set), "")))
+                    .addAll(filters)
                     .build());
+
             if (setStartSelection && categoryFilter.getSelectedValue() != null) {
-                spinner.setSelection(adapter.getPosition(categoryFilter.getSelectedValue().getSlug()));
+                final Filter filter = new Filter(categoryFilter.getName(), categoryFilter.getSlug(), categoryFilter.getSelectedValue());
+                spinner.setSelection(adapter.getItemPosition(filter));
             }
 
             title.setText(name);
@@ -363,16 +372,16 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     }
 
     @SuppressWarnings("unchecked")
-    private List<Pair<String, String>> getSelectedOptions() {
+    private List<Filter> getSelectedOptions() {
         final int childCount = mEditShoutContainer.getChildCount();
-        final List<Pair<String, String>> list = Lists.newArrayList();
+        final List<Filter> list = Lists.newArrayList();
         for (int i = 0; i < childCount; i++) {
             final View view = mEditShoutContainer.getChildAt(i);
             final StateSpinner spinner = (StateSpinner) view.findViewById(R.id.option_spinner);
 
-            final Pair<String, String> selectedItem = (Pair<String, String>) spinner.getSelectedItem();
-            if (selectedItem != null && !Strings.isNullOrEmpty(selectedItem.first)) {
-                list.add(Pair.create((String) view.getTag(), selectedItem.first));
+            final Filter selectedOption = (Filter) spinner.getSelectedItem();
+            if (selectedOption != null && !Strings.isNullOrEmpty(selectedOption.getSlug())) {
+                list.add(selectedOption);
             }
         }
         return ImmutableList.copyOf(list);
@@ -400,7 +409,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
                     .fit()
                     .into(mEditCategoryIcon);
 
-            mEditCategorySpinner.setSelection(mCategoryAdapter.getPosition(category.getSlug()));
+            mEditCategorySpinner.setSelection(mCategoryAdapter.getItemPosition(category));
         }
     }
 
@@ -477,7 +486,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
                 mEditShoutDescription.getText().toString(),
                 mEditBudget.getText().toString(),
                 ((PriceUtils.SpinnerCurrency) mEditCurrencySpinner.getSelectedItem()).getCode(),
-                ((Pair<String, String>) mEditCategorySpinner.getSelectedItem()).first,
+                (Category) mEditCategorySpinner.getSelectedItem(),
                 getSelectedOptions(), images, videos, (Strings.isNullOrEmpty(mobile) || mobile.endsWith(".")) ? null : mobile);
         mEditShoutPresenter.dataReady(requestData);
     }

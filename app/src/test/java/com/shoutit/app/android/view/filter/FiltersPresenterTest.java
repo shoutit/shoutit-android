@@ -9,6 +9,7 @@ import com.google.common.collect.Lists;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.CategoryFilter;
+import com.shoutit.app.android.api.model.FilterValue;
 import com.shoutit.app.android.api.model.SortType;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dao.CategoriesDao;
@@ -168,7 +169,7 @@ public class FiltersPresenterTest {
     }
 
     private List<Category> getCategories() {
-        final List<CategoryFilter.FilterValue> filterValues = Lists.newArrayList(new CategoryFilter.FilterValue("name", "slug"));
+        final List<FilterValue> filterValues = Lists.newArrayList(new FilterValue(null, "name", "slug"));
         final List<CategoryFilter> categoryFilters = Lists.newArrayList(new CategoryFilter("name", "slug", filterValues));
         return Lists.newArrayList(new Category("name", "slug", null, null, categoryFilters));
     }
