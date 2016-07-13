@@ -6,8 +6,10 @@ import android.support.annotation.NonNull;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
+import com.shoutit.app.android.api.model.ConversationDetails;
 import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.api.model.ProfileType;
+import com.shoutit.app.android.view.profile.ChatInfo;
 
 import javax.annotation.Nonnull;
 
@@ -205,7 +207,7 @@ public class ProfileAdapterItems {
         }
     }
 
-    public static class MyProfileThreeIconsAdapterItem extends ProfileAdapterItems.ThreeIconsAdapterItem {
+    public static class MyProfileThreeIconsAdapterItem extends ThreeIconsAdapterItem {
 
         @Nonnull
         private final Observer<Object> listeningsClickObserver;
@@ -237,7 +239,7 @@ public class ProfileAdapterItems {
         }
     }
 
-    public static class UserThreeIconsAdapterItem extends ProfileAdapterItems.ThreeIconsAdapterItem {
+    public static class UserThreeIconsAdapterItem extends ThreeIconsAdapterItem {
 
         private final boolean isNormalUser;
         @Nonnull
@@ -247,11 +249,11 @@ public class ProfileAdapterItems {
         @Nonnull
         private final Observer<Page> onListenActionClickedObserver;
 
-        public UserThreeIconsAdapterItem(@Nonnull Page user, boolean isNormalUser,
+        public UserThreeIconsAdapterItem(@Nonnull Page page, boolean isNormalUser,
                                          @Nonnull Observer<Object> actionOnlyForLoggedInUserObserver,
                                          @Nonnull Observer<ChatInfo> onChatIconClickedObserver,
                                          @Nonnull Observer<Page> onListenActionClickedObserver) {
-            super(user);
+            super(page);
             this.isNormalUser = isNormalUser;
             this.actionOnlyForLoggedInUserObserver = actionOnlyForLoggedInUserObserver;
             this.onChatIconClickedObserver = onChatIconClickedObserver;
@@ -263,6 +265,9 @@ public class ProfileAdapterItems {
         }
 
         public void onChatActionClicked() {
+            final ConversationDetails conversation = user.getConversation();
+            onChatIconClickedObserver.onNext(new ChatInfo(user.getUsername(),
+                    conversation != null ? conversation.getId() : null, user.isListener(), isNormalUser));
         }
 
         public void onListenActionClicked() {

@@ -19,6 +19,7 @@ import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.view.ReportDialog;
 import com.shoutit.app.android.view.chats.ChatActivity;
 import com.shoutit.app.android.view.chats.chatsfirstconversation.ChatFirstConversationActivity;
+import com.shoutit.app.android.view.profile.ChatInfo;
 import com.shoutit.app.android.view.profile.ProfileIntentHelper;
 import com.shoutit.app.android.view.profile.user.editprofile.EditProfileActivity;
 import com.shoutit.app.android.view.createshout.DialogsHelper;

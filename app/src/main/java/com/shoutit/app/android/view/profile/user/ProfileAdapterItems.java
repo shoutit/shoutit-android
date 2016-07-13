@@ -10,6 +10,7 @@ import com.shoutit.app.android.api.model.BusinessVerificationResponse;
 import com.shoutit.app.android.api.model.ConversationDetails;
 import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.view.profile.ChatInfo;
 
 import javax.annotation.Nonnull;
 

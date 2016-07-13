@@ -35,8 +35,6 @@ public class User extends BaseProfile {
 
     private final String apiUrl;
     private final String webUrl;
-    // whever the profile is listening to you
-    private final boolean isListener;
     private final boolean isPasswordSet;
     private final String bio;
     private final int dateJoined;
@@ -44,7 +42,6 @@ public class User extends BaseProfile {
     private final String about;
     private final String mobile;
     private final String website;
-    private final ConversationDetails conversation;
     @Nullable
     private final String gender;
     @Nullable
@@ -58,12 +55,13 @@ public class User extends BaseProfile {
                 String name, String firstName, String lastName, boolean isActivated, String image,
                 String cover, boolean isListening, boolean isListener, boolean isPasswordSet, @Nullable UserLocation location,
                 int listenersCount, String bio, int dateJoined,
-                Listening listeningCount, boolean isOwner, String about, String mobile, String website, String email, ConversationDetails conversation,
-                @Nullable String gender, @Nullable String birthday, @Nullable Stats stats, @Nullable LinkedAccounts linkedAccounts, @Nullable User admin, boolean isVerified) {
-        super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount, location, isOwner, stats, email, linkedAccounts);
+                Listening listeningCount, boolean isOwner, String about, String mobile,
+                String website, String email, ConversationDetails conversation,
+                @Nullable String gender, @Nullable String birthday, @Nullable Stats stats,
+                @Nullable LinkedAccounts linkedAccounts, @Nullable User admin, boolean isVerified) {
+        super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount, location, isOwner, stats, email, linkedAccounts, conversation, isListener);
         this.apiUrl = apiUrl;
         this.webUrl = webUrl;
-        this.isListener = isListener;
         this.isPasswordSet = isPasswordSet;
         this.bio = bio;
         this.dateJoined = dateJoined;
@@ -74,7 +72,6 @@ public class User extends BaseProfile {
         this.about = about;
         this.mobile = mobile;
         this.website = website;
-        this.conversation = conversation;
         this.gender = gender;
         this.birthday = birthday;
     }
@@ -282,7 +279,6 @@ public class User extends BaseProfile {
                 Objects.equal(cover, user.cover) &&
                 Objects.equal(location, user.location) &&
                 Objects.equal(bio, user.bio) &&
-                Objects.equal(isListener, user.isListener) &&
                 Objects.equal(birthday, user.birthday) &&
                 Objects.equal(gender, user.gender) &&
                 Objects.equal(linkedAccounts, user.linkedAccounts) &&
@@ -295,7 +291,7 @@ public class User extends BaseProfile {
     public int hashCode() {
         return Objects.hashCode(id, type, apiUrl, webUrl, username, name, firstName, lastName,
                 isActivated, image, cover, isListening, isPasswordSet, location, listenersCount,
-                bio, dateJoined, listeningCount, isListener, isOwner, website,
+                bio, dateJoined, listeningCount, isOwner, website,
                 linkedAccounts, birthday, gender, admin, isVerified);
     }
 }
