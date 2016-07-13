@@ -17,6 +17,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.common.collect.Maps;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.dagger.ForApplication;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.view.main.MainActivity;
@@ -41,6 +42,7 @@ public class NotificationHelper {
     private static final String GCM_ICON_FIELD = "icon";
     private static final String GCM_DATA_FIELD = "data";
     private static final String GCM_APP_URL_FIELD = "app_url";
+    private static final String GCM_PUSHED_FOR_FIELD = "pushed_for";
     private static final String GCM_EVENT_NAME = "event_name";
 
     private static final String EVENT_INCOMING_CALL = "incoming_video_call";
@@ -51,6 +53,7 @@ public class NotificationHelper {
 
     private final Context mContext;
     private final Picasso picasso;
+    private final UserPreferences userPreferences;
 
     private static final Map<String, Integer> notificationIdsMap = Maps.newHashMap();
 
@@ -61,9 +64,10 @@ public class NotificationHelper {
     }
 
     @Inject
-    public NotificationHelper(@ForApplication Context context, Picasso picasso) {
+    public NotificationHelper(@ForApplication Context context, Picasso picasso, UserPreferences userPreferences) {
         mContext = context;
         this.picasso = picasso;
+        this.userPreferences = userPreferences;
     }
 
     @NonNull
@@ -87,23 +91,32 @@ public class NotificationHelper {
                 bundle.getString(GCM_TITLE_FIELD) : mContext.getString(R.string.app_name);
         final String body = bundle.getString(GCM_BODY_FIELD);
         final String iconUrl = bundle.getString(GCM_ICON_FIELD);
+        final String pushedFor = bundle.getString(GCM_PUSHED_FOR_FIELD);
         final String eventName = bundle.getString(GCM_EVENT_NAME);
         final String dataJson = bundle.getString(GCM_DATA_FIELD);
 
-        showNotification(dataJson, title, body, iconUrl, eventName);
+        showNotification(dataJson, title, body, iconUrl, eventName, pushedFor);
     }
 
-    private void showNotification(String dataJson, String title, String body, String iconUrl, String eventName) {
-        final Bitmap largeIcon = getLargeIconOrNull(iconUrl);
+    private void showNotification(String dataJson, String title, String body, String iconUrl, String eventName, String pushedFor) {
+        if (checkIfNotificationIsForCurrentUser(pushedFor)) {
+            final Bitmap largeIcon = getLargeIconOrNull(iconUrl);
 
-        final Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            final Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-        final PendingIntent pendingIntent = getPendingIntent(dataJson);
+            final PendingIntent pendingIntent = getPendingIntent(dataJson);
 
-        final Notification notification = getNotification(title, body, largeIcon, defaultSoundUri, pendingIntent);
+            final Notification notification = getNotification(title, body, largeIcon, defaultSoundUri, pendingIntent);
 
-        ((NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE))
-                .notify(getNotificationId(eventName), notification);
+            ((NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE))
+                    .notify(getNotificationId(eventName), notification);
+        }
+    }
+
+    private boolean checkIfNotificationIsForCurrentUser(String pushedFor) {
+        final BaseProfile userOrPage = userPreferences.getUserOrPage();
+        assert userOrPage != null;
+        return pushedFor.equals(userOrPage.getId());
     }
 
     @NonNull
@@ -156,10 +169,15 @@ public class NotificationHelper {
 
     @Nullable
     private String getAppUrl(String dataJson) {
+        return getStringFromJson(dataJson, GCM_APP_URL_FIELD);
+    }
+
+    @Nullable
+    private String getStringFromJson(String dataJson, String field) {
         if (dataJson != null) {
             try {
                 final JSONObject dataObject = new JSONObject(dataJson);
-                return dataObject.optString(GCM_APP_URL_FIELD);
+                return dataObject.optString(field);
             } catch (JSONException e) {
                 LogHelper.logThrowableAndCrashlytics(TAG, "Cannot parse data field from push", e);
                 return null;
