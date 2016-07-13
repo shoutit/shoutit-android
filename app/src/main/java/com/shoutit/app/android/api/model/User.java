@@ -49,9 +49,6 @@ public class User extends BaseProfile {
     private final String gender;
     @Nullable
     private final String birthday; // Formatted like YYYY-MM-DD
-    @Nullable
-    private final LinkedAccounts linkedAccounts;
-
 
     @Nullable
     private final User admin; // Field only for Page user.
@@ -62,8 +59,8 @@ public class User extends BaseProfile {
                 String cover, boolean isListening, boolean isListener, boolean isPasswordSet, @Nullable UserLocation location,
                 int listenersCount, String bio, int dateJoined,
                 Listening listeningCount, boolean isOwner, String about, String mobile, String website, String email, ConversationDetails conversation,
-                @Nullable String gender, @Nullable String birthday, @Nullable Stats stats, @Nullable LinkedAccounts linkedAccounts, User admin, boolean isVerified) {
-        super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount, location, isOwner, stats, email);
+                @Nullable String gender, @Nullable String birthday, @Nullable Stats stats, @Nullable LinkedAccounts linkedAccounts, @Nullable User admin, boolean isVerified) {
+        super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount, location, isOwner, stats, email, linkedAccounts);
         this.apiUrl = apiUrl;
         this.webUrl = webUrl;
         this.isListener = isListener;
@@ -80,7 +77,6 @@ public class User extends BaseProfile {
         this.conversation = conversation;
         this.gender = gender;
         this.birthday = birthday;
-        this.linkedAccounts = linkedAccounts;
     }
 
     @NonNull
@@ -111,7 +107,7 @@ public class User extends BaseProfile {
                 firstName, lastName, isActivated, image, cover,
                 isListening, isListener, isPasswordSet, location,
                 listenersCount, bio, dateJoined, listeningCount,
-                isOwner, about, mobile, website, getEmail(), conversation, gender, birthday, getStats(),linkedAccounts.unlinkedFacebook(), admin, isVerified);
+                isOwner, about, mobile, website, getEmail(), conversation, gender, birthday, getStats(), linkedAccounts.unlinkedFacebook(), admin, isVerified);
     }
 
     @Nonnull
@@ -120,7 +116,7 @@ public class User extends BaseProfile {
                 firstName, lastName, isActivated, image, cover,
                 isListening, isListener, isPasswordSet, location,
                 listenersCount, bio, dateJoined, listeningCount,
-                isOwner, about, mobile, website, getEmail(), conversation, gender, birthday, getStats(),linkedAccounts.unlinkedGoogle(), admin, isVerified);
+                isOwner, about, mobile, website, getEmail(), conversation, gender, birthday, getStats(), linkedAccounts.unlinkedGoogle(), admin, isVerified);
     }
 
     @Nonnull
@@ -129,8 +125,9 @@ public class User extends BaseProfile {
                 firstName, lastName, isActivated, image, cover,
                 isListening, isListener, isPasswordSet, location,
                 listenersCount, bio, dateJoined, listeningCount,
-                isOwner, about, mobile, website, getEmail(), conversation, gender, birthday, getStats(),linkedAccounts.updatedGoogle(token), admin, isVerified);
+                isOwner, about, mobile, website, getEmail(), conversation, gender, birthday, getStats(), linkedAccounts.updatedGoogle(token), admin, isVerified);
     }
+
     public boolean isUser(@Nonnull User user) {
         return (USER.equals(user.type));
     }

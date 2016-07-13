@@ -37,11 +37,13 @@ public class BaseProfile implements ProfileType {
     private final Stats stats;
     @NonNull
     private final String email;
+    @javax.annotation.Nullable
+    protected final LinkedAccounts linkedAccounts;
 
     public BaseProfile(@NonNull String id, @NonNull String type, @NonNull String username, @NonNull String name,
                        @NonNull String firstName, @NonNull String lastName, boolean isActivated, @Nullable String image,
                        @Nullable String cover, boolean isListening, int listenersCount, @Nullable UserLocation location,
-                       boolean isOwner, @Nullable Stats stats, @NonNull String email) {
+                       boolean isOwner, @Nullable Stats stats, @NonNull String email, @Nullable LinkedAccounts linkedAccounts) {
         this.id = id;
         this.type = type;
         this.username = username;
@@ -57,6 +59,7 @@ public class BaseProfile implements ProfileType {
         this.isOwner = isOwner;
         this.stats = stats;
         this.email = email;
+        this.linkedAccounts = linkedAccounts;
     }
 
     public boolean isUser() {
@@ -135,14 +138,14 @@ public class BaseProfile implements ProfileType {
         boolean newIsListening = !isListening;
         int newListenersCount = newIsListening ? listenersCount + 1 : listenersCount - 1;
         return new BaseProfile(id, type, username, name, firstName, lastName, isActivated,
-                image, cover, newIsListening, newListenersCount, location, isOwner, stats, email);
+                image, cover, newIsListening, newListenersCount, location, isOwner, stats, email, linkedAccounts);
     }
 
     @Nonnull
     public BaseProfile withUpdatedStats(@Nonnull Stats newStats) {
         return new BaseProfile(id, type, username, name, firstName, lastName, isActivated,
                 image, cover, isListening, listenersCount,
-                location, isOwner, newStats, getEmail());
+                location, isOwner, newStats, getEmail(), linkedAccounts);
     }
 
     @Nullable
@@ -194,6 +197,11 @@ public class BaseProfile implements ProfileType {
                 Objects.equal(location, profile.location) &&
                 Objects.equal(isOwner, profile.isOwner) &&
                 Objects.equal(cover, profile.cover);
+    }
+
+    @Nullable
+    public LinkedAccounts getLinkedAccounts() {
+        return linkedAccounts;
     }
 
     @Override

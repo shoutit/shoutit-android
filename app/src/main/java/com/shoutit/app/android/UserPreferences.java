@@ -51,12 +51,14 @@ public class UserPreferences {
     private final PublishSubject<Object> locationRefreshSubject = PublishSubject.create();
     private final PublishSubject<Object> tokenRefreshSubject = PublishSubject.create();
     private final PublishSubject<Object> twilioTokenRefreshSubject = PublishSubject.create();
+    private final PublishSubject<Object> pageIdRefreshSubject = PublishSubject.create();
     private final Observable<String> twilioTokenObservable;
     private final Observable<BaseProfile> pageOrUserObservable;
     // locationObservable should be used instead pageOrUserObservable to get location as there is no user for guest
     private final Observable<UserLocation> locationObservable;
     private final Observable<String> tokenObservable;
     private final Observable<User> userObservable;
+    private final Observable<String> pageIdObservable;
 
     @SuppressLint("CommitPrefEdits")
     private final SharedPreferences mPreferences;
@@ -96,6 +98,11 @@ public class UserPreferences {
                 .defer(() -> Observable.just(getTwilioToken()))
                 .compose(MoreOperators.<String>refresh(twilioTokenRefreshSubject))
                 .observeOn(uiScheduler);
+
+        pageIdObservable = Observable
+                .defer(() -> Observable.just(getPageId().orNull())
+                .compose(MoreOperators.<String>refresh(pageIdRefreshSubject))
+                .observeOn(uiScheduler));
     }
 
     public void setLoggedIn(@NonNull String authToken,
@@ -379,16 +386,18 @@ public class UserPreferences {
     }
 
     public void clearPage() {
-        editPage(null, null);
         setPrimaryUserAsUser();
+        editPage(null, null);
         setTwilioToken(null);
     }
 
+    @SuppressLint("CommitPrefEdits")
     private void editPage(String id, String name) {
         mPreferences.edit()
                 .putString(PAGE_ID, id)
                 .putString(PAGE_USER_NAME, name)
-                .apply();
+                .commit();
+        pageIdRefreshSubject.onNext(new Object());
     }
 
     public Optional<String> getPageId() {
@@ -405,5 +414,9 @@ public class UserPreferences {
 
     public Observable<String> getTwilioTokenObservable() {
         return twilioTokenObservable;
+    }
+
+    public Observable<String> getPageIdObservable() {
+        return pageIdObservable;
     }
 }

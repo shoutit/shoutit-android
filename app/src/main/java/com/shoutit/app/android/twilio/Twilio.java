@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
@@ -195,6 +196,7 @@ public class Twilio {
     public void initTwilio() {
         unregisterTwillio();
         initTwilioSubject.onNext(null);
+        Log.i("dupa", "twilio init");
     }
 
     private void initializeTwilio(@Nonnull final String accessToken) {

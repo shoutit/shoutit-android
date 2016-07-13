@@ -49,7 +49,7 @@ public class LogoutHelper {
 
         final User user = userPreferences.getUser();
         assert user != null;
-        mPusherHelper.unsubscribeProfileChannel(user.getId());
+        mPusherHelper.unsubscribeProfileChannel();
         mPusherHelper.disconnect();
 
         userPreferences.logout();
