@@ -50,6 +50,8 @@ public class UserPreferences {
     private final PublishSubject<Object> userRefreshSubject = PublishSubject.create();
     private final PublishSubject<Object> locationRefreshSubject = PublishSubject.create();
     private final PublishSubject<Object> tokenRefreshSubject = PublishSubject.create();
+    private final PublishSubject<Object> twilioTokenRefreshSubject = PublishSubject.create();
+    private final Observable<String> twilioTokenObservable;
     private final Observable<BaseProfile> pageOrUserObservable;
     // locationObservable should be used instead pageOrUserObservable to get location as there is no user for guest
     private final Observable<UserLocation> locationObservable;
@@ -88,6 +90,11 @@ public class UserPreferences {
                 .defer(() -> Observable.just(getUser()))
                 .compose(MoreOperators.<User>refresh(userRefreshSubject))
                 .filter(Functions1.isNotNull())
+                .observeOn(uiScheduler);
+
+        twilioTokenObservable = Observable
+                .defer(() -> Observable.just(getTwilioToken()))
+                .compose(MoreOperators.<String>refresh(twilioTokenRefreshSubject))
                 .observeOn(uiScheduler);
     }
 
@@ -326,6 +333,7 @@ public class UserPreferences {
         mPreferences.edit()
                 .putString(TWILIO_TOKEN, twilioToken)
                 .commit();
+        twilioTokenRefreshSubject.onNext(twilioToken);
     }
 
     @Nullable
@@ -373,6 +381,7 @@ public class UserPreferences {
     public void clearPage() {
         editPage(null, null);
         setPrimaryUserAsUser();
+        setTwilioToken(null);
     }
 
     private void editPage(String id, String name) {
@@ -392,5 +401,9 @@ public class UserPreferences {
 
     public String getUserId() {
         return Preconditions.checkNotNull(getUserOrPage()).getId();
+    }
+
+    public Observable<String> getTwilioTokenObservable() {
+        return twilioTokenObservable;
     }
 }

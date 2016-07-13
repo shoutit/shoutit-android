@@ -8,6 +8,7 @@ import com.adobe.creativesdk.aviary.IAviaryClientCredentials;
 import com.adobe.creativesdk.foundation.AdobeCSDKFoundation;
 import com.appunite.appunitegcm.AppuniteGcm;
 import com.appunite.rx.dagger.NetworkScheduler;
+import com.appunite.rx.functions.Functions1;
 import com.appunite.rx.observables.NetworkObservableProvider;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
@@ -38,7 +39,9 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import io.fabric.sdk.android.Fabric;
+import rx.Observable;
 import rx.Scheduler;
+import rx.functions.Func2;
 import rx.plugins.RxJavaErrorHandler;
 import rx.plugins.RxJavaPlugins;
 
@@ -117,8 +120,9 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
     }
 
     private void initTwilio() {
-        userPreferences.getTokenObservable()
-                .filter(userToken -> userToken != null && !userPreferences.isGuest())
+        Observable.combineLatest(userPreferences.getTokenObservable().filter(userToken -> userToken != null && !userPreferences.isGuest()),
+                userPreferences.getTwilioTokenObservable().filter(Functions1.isNull()).startWith((String) null),
+                (Func2<String, String, Object>) (s, s2) -> s)
                 .subscribe(ignore -> {
                     mTwilio.initTwilio();
                 });
