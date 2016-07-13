@@ -55,6 +55,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import rx.functions.Action1;
 import rx.subjects.PublishSubject;
 
 import static com.appunite.rx.internal.Preconditions.checkNotNull;
@@ -98,6 +99,8 @@ public abstract class VideoCallActivity extends BaseActivity {
     View actionButtonsContainer;
     @Bind(R.id.video_conversation_content_local_window_cover)
     View smallPreviewCoverView;
+    @Bind(R.id.video_conversation_camera_switch_iv)
+    View cameraSwitchView;
 
     @Inject
     UserPreferences preferences;
@@ -152,6 +155,14 @@ public abstract class VideoCallActivity extends BaseActivity {
         conversationInfo.bringToFront();
         conversationClient = mTwilio.getConversationsClient();
         setupAudioVideo();
+
+        RxView.clicks(cameraSwitchView)
+                .compose(bindToLifecycle())
+                .subscribe(aVoid -> {
+                    if (cameraCapturer != null) {
+                        cameraCapturer.switchCamera();
+                    }
+                });
 
         RxView.clicks(dismissCallButton)
                 .throttleFirst(1, TimeUnit.SECONDS)
@@ -382,25 +393,27 @@ public abstract class VideoCallActivity extends BaseActivity {
         final int endPosition = fullscreen ? -conversationInfoView.getHeight() : 0;
         final ObjectAnimator topViewAnimator = ObjectAnimator.ofFloat(
                 conversationInfoView, "translationY", startPosition, endPosition);
-        topViewAnimator.setDuration(250);
         topViewAnimator.setInterpolator(new AccelerateInterpolator());
 
         final int bottomStartPosition = fullscreen ? 0 : actionButtonsContainer.getHeight();
         final int bottomEndPosition = fullscreen ? actionButtonsContainer.getHeight() : 0;
         final ObjectAnimator bottomViewAnimator = ObjectAnimator.ofFloat(
                 actionButtonsContainer, "translationY", bottomStartPosition, bottomEndPosition);
-        bottomViewAnimator.setDuration(250);
         bottomViewAnimator.setInterpolator(new AccelerateInterpolator());
 
         final int startAlpha = fullscreen ? 0 : 1;
         final int endAlpha = fullscreen ? 1 : 0;
         final ObjectAnimator waterMarkAnimator = ObjectAnimator.ofFloat(watermarkView, "alpha", startAlpha, endAlpha);
-        waterMarkAnimator.setDuration(250);
-        waterMarkAnimator.addListener(new AnimatorListenerAdapter() {
+        final ObjectAnimator cameraSwitcherAnimator = ObjectAnimator.ofFloat(cameraSwitchView, "alpha", startAlpha, endAlpha);
+        final AnimatorSet cameraAndWatermarkAnimator = new AnimatorSet();
+        cameraAndWatermarkAnimator.playTogether(waterMarkAnimator, cameraSwitcherAnimator);
+
+        cameraAndWatermarkAnimator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
                 if (fullscreen) {
                     watermarkView.setVisibility(View.VISIBLE);
+                    cameraSwitchView.setVisibility(View.VISIBLE);
                 } else {
                     conversationInfoView.setVisibility(View.VISIBLE);
                     actionButtonsContainer.setVisibility(View.VISIBLE);
@@ -412,6 +425,7 @@ public abstract class VideoCallActivity extends BaseActivity {
             public void onAnimationEnd(Animator animation) {
                 if (!fullscreen) {
                     watermarkView.setVisibility(View.GONE);
+                    cameraSwitchView.setVisibility(View.GONE);
                 } else {
                     conversationInfoView.setVisibility(View.GONE);
                     actionButtonsContainer.setVisibility(View.GONE);
@@ -421,7 +435,8 @@ public abstract class VideoCallActivity extends BaseActivity {
         });
 
         final AnimatorSet animatorSet = new AnimatorSet();
-        animatorSet.playTogether(topViewAnimator, bottomViewAnimator, waterMarkAnimator);
+        animatorSet.setDuration(250);
+        animatorSet.playTogether(topViewAnimator, bottomViewAnimator, cameraAndWatermarkAnimator);
         animatorSet.start();
     }
 
