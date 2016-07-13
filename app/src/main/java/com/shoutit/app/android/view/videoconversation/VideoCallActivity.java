@@ -31,7 +31,6 @@ import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
-import com.shoutit.app.android.utils.TextHelper;
 import com.shoutit.app.android.widget.CheckableImageButton;
 import com.squareup.picasso.Picasso;
 import com.twilio.conversations.AudioTrack;
@@ -249,6 +248,7 @@ public abstract class VideoCallActivity extends BaseActivity {
                 for (VideoRenderer videoRenderer : localVideoTrack.getRenderers()) {
                     localVideoTrack.removeRenderer(videoRenderer);
                 }
+                showOrHideVideo(false);
             }
 
             @Override
@@ -257,6 +257,7 @@ public abstract class VideoCallActivity extends BaseActivity {
                 for (VideoRenderer videoRenderer : localVideoTrack.getRenderers()) {
                     localVideoTrack.removeRenderer(videoRenderer);
                 }
+                showOrHideVideo(false);
             }
         };
     }
@@ -371,8 +372,7 @@ public abstract class VideoCallActivity extends BaseActivity {
 
     protected void showOrHideVideo(boolean showVideo) {
         LogHelper.logIfDebug(TAG, "Show camera preview:" + showVideo);
-        if (conversation != null && conversation.getLocalMedia() != null &&
-                conversation.getLocalMedia().getLocalVideoTracks() != null) {
+        if (isDuringConversationAndLocalVideoLoaded()) {
             final LocalVideoTrack track = conversation.getLocalMedia().getLocalVideoTracks().get(0);
             track.enable(showVideo);
             showOrHideSmallPreview(showVideo);
@@ -382,6 +382,11 @@ public abstract class VideoCallActivity extends BaseActivity {
         } else {
             showOrHideParticipantView(showVideo);
         }
+    }
+
+    private boolean isDuringConversationAndLocalVideoLoaded() {
+        return conversation != null && conversation.getLocalMedia() != null &&
+                conversation.getLocalMedia().getLocalVideoTracks() != null;
     }
 
     protected void switchToFullScreenMode(boolean fullscreen) {

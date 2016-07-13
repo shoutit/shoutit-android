@@ -309,11 +309,13 @@
         <activity
             android:name=".view.videoconversation.OutgoingVideoCallActivity"
             android:launchMode="singleTop"
+            android:excludeFromRecents="true"
             android:screenOrientation="portrait"/>
 
         <activity
             android:name=".view.videoconversation.IncomingVideoCallActivity"
             android:launchMode="singleTop"
+            android:excludeFromRecents="true"
             android:screenOrientation="portrait"/>
 
         <activity android:name=".view.gallery.GalleryActivity"/>
