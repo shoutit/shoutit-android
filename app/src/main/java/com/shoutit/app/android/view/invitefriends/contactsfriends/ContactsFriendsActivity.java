@@ -14,13 +14,11 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PermissionHelper;
-import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
+import com.shoutit.app.android.view.profile.ProfileIntentHelper;
 import com.shoutit.app.android.view.profileslist.BaseProfilesListActivity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import rx.functions.Func1;
 
 public class ContactsFriendsActivity extends BaseProfilesListActivity {
 
@@ -39,11 +37,10 @@ public class ContactsFriendsActivity extends BaseProfilesListActivity {
                 getActivityComponent()).profilesListPresenter();
 
         presenter.getProfileSelectedObservable()
-                .map(BaseProfile::getUsername)
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(userName -> {
+                .compose(this.<BaseProfile>bindToLifecycle())
+                .subscribe(baseProfile -> {
                     startActivityForResult(
-                            UserOrPageProfileActivity.newIntent(ContactsFriendsActivity.this, userName),
+                            ProfileIntentHelper.newIntent(ContactsFriendsActivity.this, baseProfile),
                             REQUEST_OPENED_PROFILE_WAS_LISTENED);
                 });
 
@@ -57,7 +54,7 @@ public class ContactsFriendsActivity extends BaseProfilesListActivity {
                 REQUEST_CODE_CONTACTS_PERMISSION,
                 ColoredSnackBar.contentView(this),
                 R.string.permission_contacts_explanation,
-                new String[] {Manifest.permission.READ_CONTACTS})) {
+                new String[]{Manifest.permission.READ_CONTACTS})) {
 
             presenter.fetchContacts();
         }

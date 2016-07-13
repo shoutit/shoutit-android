@@ -15,12 +15,13 @@ public class ReceivedShoutMessage extends ReceivedMessage {
     private final String userName;
     private final Listener mListener;
     private final String mShoutId;
+    private final boolean mIsPage;
 
 
     public ReceivedShoutMessage(boolean isFirst, String shoutImageUrl, String time,
                                 String price, String description, String author,
                                 String avatarUrl, String userName,
-                                Listener listener, String shoutId) {
+                                Listener listener, String shoutId, boolean isPage) {
         super(isFirst, avatarUrl);
         this.shoutImageUrl = shoutImageUrl;
         this.time = time;
@@ -30,6 +31,7 @@ public class ReceivedShoutMessage extends ReceivedMessage {
         this.userName = userName;
         mListener = listener;
         mShoutId = shoutId;
+        mIsPage = isPage;
     }
 
     public String getShoutImageUrl() {
@@ -99,6 +101,6 @@ public class ReceivedShoutMessage extends ReceivedMessage {
     }
 
     public void onAvatarClicked() {
-        mListener.onProfileClicked(userName);
+        mListener.onProfileClicked(userName, mIsPage);
     }
 }

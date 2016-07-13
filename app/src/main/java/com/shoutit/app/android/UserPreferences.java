@@ -14,6 +14,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.shoutit.app.android.api.model.BaseProfile;
+import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForApplication;
@@ -187,7 +188,7 @@ public class UserPreferences {
                         .commit();
             } else {
                 mPreferences.edit()
-                        .putString(KEY_PAGE, gson.toJson(userOrPage, User.class)) // temporary it is the same model as User
+                        .putString(KEY_PAGE, gson.toJson(userOrPage, Page.class))
                         .commit();
             }
             refreshUser();
@@ -229,12 +230,17 @@ public class UserPreferences {
     }
 
     public User getUser() {
-        return getUserByType(KEY_USER);
+        return (User) getUserByType(KEY_USER);
     }
 
-    private User getUserByType(String key) {
+    private BaseProfile getUserByType(String key) {
         final String userJson = mPreferences.getString(key, null);
-        return gson.fromJson(userJson, User.class);
+        final BaseProfile baseProfile = gson.fromJson(userJson, BaseProfile.class);
+        if (baseProfile.isUser()) {
+            return gson.fromJson(userJson, User.class);
+        } else {
+            return gson.fromJson(userJson, Page.class);
+        }
     }
 
     @NonNull
@@ -359,7 +365,7 @@ public class UserPreferences {
         setUserOrPage(updatedUser);
     }
 
-    public void setPage(User page) {
+    public void setPage(Page page) {
         setUserOrPage(page);
         editPage(page.getId(), page.getUsername());
     }

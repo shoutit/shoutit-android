@@ -30,7 +30,7 @@ public class BlockedDialog {
         mContext = context;
     }
 
-    public void show(String id, String name, @Nonnull String userName, final ChatBlockedUsersPresenter presenter) {
+    public void show(String id, String name, @Nonnull String userName, boolean isPage, final ChatBlockedUsersPresenter presenter) {
 
         final View view = LayoutInflater.from(mContext).inflate(R.layout.chat_blocked_dialog, null, false);
 
@@ -51,7 +51,7 @@ public class BlockedDialog {
         viewProfileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                presenter.showProfile(userName);
+                presenter.showProfile(userName, isPage);
                 alertDialog.dismiss();
             }
         });

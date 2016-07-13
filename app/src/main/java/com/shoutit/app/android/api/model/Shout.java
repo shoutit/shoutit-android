@@ -28,7 +28,7 @@ public class Shout {
     private final String currency;
     private final String thumbnail;
     private final String videoUrl;
-    private final User profile;
+    private final BaseProfile profile;
     private final Category category;
     private final long datePublished;
     private final boolean isLiked;
@@ -46,7 +46,7 @@ public class Shout {
 
     public Shout(@Nonnull String id, String apiUrl, String webUrl, String type,
                  UserLocation location, String title, String text, Long price, float number,
-                 String currency, String thumbnail, String videoUrl, User profile,
+                 String currency, String thumbnail, String videoUrl, BaseProfile profile,
                  Category category, List<Filter> filters, long datePublished, final boolean isLiked, List<String> images,
                  List<Video> videos, int availableCount, List<ConversationDetails> conversations, boolean isMobileSet,
                  String mobileHint, String mobile, @Nullable Promotion promotion, boolean isBookmarked) {
@@ -137,7 +137,7 @@ public class Shout {
         return thumbnail;
     }
 
-    public User getProfile() {
+    public BaseProfile getProfile() {
         return profile;
     }
 

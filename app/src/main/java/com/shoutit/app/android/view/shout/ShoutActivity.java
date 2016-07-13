@@ -13,7 +13,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -35,8 +34,8 @@ import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.Promotion;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.model.MobilePhoneResponse;
@@ -51,7 +50,7 @@ import com.shoutit.app.android.view.chats.chatsfirstconversation.ChatFirstConver
 import com.shoutit.app.android.view.conversations.ConversationsActivity;
 import com.shoutit.app.android.view.createshout.edit.EditShoutActivity;
 import com.shoutit.app.android.view.main.MainActivity;
-import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
+import com.shoutit.app.android.view.profile.ProfileIntentHelper;
 import com.shoutit.app.android.view.profile.tagprofile.TagProfileActivity;
 import com.shoutit.app.android.view.promote.PromoteActivity;
 import com.shoutit.app.android.view.promote.promoted.PromotedActivity;
@@ -167,9 +166,9 @@ public class ShoutActivity extends BaseActivity {
                 });
 
         presenter.getVisitProfileObservable()
-                .compose(this.<User>bindToLifecycle())
+                .compose(this.<BaseProfile>bindToLifecycle())
                 .subscribe(user -> {
-                    startActivity(UserOrPageProfileActivity.newIntent(ShoutActivity.this, user.getUsername()));
+                    startActivity(ProfileIntentHelper.newIntent(ShoutActivity.this, user));
                 });
 
         presenter.getAddToCartSubject()

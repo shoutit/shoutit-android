@@ -16,9 +16,10 @@ public class ReceivedProfileMessage extends ReceivedMessage {
     private final String cover;
     private final int listenersCount;
     private final Listener listener;
+    private final boolean mIsPage;
 
     public ReceivedProfileMessage(boolean isFirst, String time, String avatarUrl, String id, String username, String name,
-                                  String image, String cover, int listenersCount, Listener listener) {
+                                  String image, String cover, int listenersCount, Listener listener, boolean isPage) {
         super(isFirst, avatarUrl);
         this.time = time;
         this.id = id;
@@ -28,6 +29,7 @@ public class ReceivedProfileMessage extends ReceivedMessage {
         this.cover = cover;
         this.listenersCount = listenersCount;
         this.listener = listener;
+        mIsPage = isPage;
     }
 
     public String getTime() {
@@ -51,7 +53,7 @@ public class ReceivedProfileMessage extends ReceivedMessage {
     }
 
     public void click(){
-        listener.onProfileClicked(username);
+        listener.onProfileClicked(username, mIsPage);
     }
 
     @Override

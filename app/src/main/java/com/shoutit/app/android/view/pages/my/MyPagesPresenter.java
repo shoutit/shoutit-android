@@ -12,8 +12,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.adapteritems.NoDataTextAdapterItem;
+import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.api.model.PagesResponse;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.PagesDao;
 import com.shoutit.app.android.view.pages.PageAdapterItem;
@@ -39,7 +39,7 @@ public class MyPagesPresenter {
     private Observable<Boolean> progressObservable;
     private Observable<Throwable> errorObservable;
 
-    private final PublishSubject<User> pageSelectedSubject = PublishSubject.create();
+    private final PublishSubject<Page> pageSelectedSubject = PublishSubject.create();
     protected final PublishSubject<Object> loadMoreSubject = PublishSubject.create();
 
     @Inject
@@ -56,16 +56,16 @@ public class MyPagesPresenter {
         pagesObservable = requestObservable
                 .compose(ResponseOrError.onlySuccess())
                 .map((Func1<PagesResponse, List<BaseAdapterItem>>) pagesResponse -> {
-                    final List<User> pages = pagesResponse.getResults();
+                    final List<Page> pages = pagesResponse.getResults();
 
                     if (pages.isEmpty()) {
                         return ImmutableList.of(new NoDataTextAdapterItem(resources.getString(R.string.pages_empty)));
                     } else {
                         return ImmutableList.copyOf(
-                                Lists.transform(pages, new Function<User, BaseAdapterItem>() {
+                                Lists.transform(pages, new Function<Page, BaseAdapterItem>() {
                                     @Nullable
                                     @Override
-                                    public BaseAdapterItem apply(User page) {
+                                    public BaseAdapterItem apply(Page page) {
                                         return new PageAdapterItem(page, pageSelectedSubject);
                                     }
                                 }));
@@ -101,7 +101,7 @@ public class MyPagesPresenter {
         return errorObservable;
     }
 
-    public Observable<User> getPageSelectedObservable() {
+    public Observable<Page> getPageSelectedObservable() {
         return pageSelectedSubject;
     }
 

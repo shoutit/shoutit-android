@@ -140,19 +140,19 @@ public class FileHelper {
 
     @NonNull
     public Func1<Uri, Observable<ResponseOrError<File>>> scaleAndCompressImage(final int maxImageSize) {
-        return imageUri -> {
-            try {
-                return scaleAndCompressImage(maxImageSize, imageUri);
-            } catch (IOException e) {
-                return Observable.just(ResponseOrError.<File>fromError(e));
-            }
-        };
+        return imageUri -> scaleAndCompressImage(maxImageSize, imageUri);
     }
 
     @NonNull
-    public Observable<ResponseOrError<File>> scaleAndCompressImage(final int maxImageSize, Uri imageUri) throws IOException {
-        final String tempFile = createTempFileAndStoreUri(imageUri);
-        final Bitmap bitmapToUpload = ImageHelper.scaleImage(tempFile, maxImageSize);
-        return saveBitmapToTempFileObservable(bitmapToUpload);
+    public Observable<ResponseOrError<File>> scaleAndCompressImage(final int maxImageSize, Uri imageUri) {
+        return Observable.defer(() -> {
+            try {
+                final String tempFile = createTempFileAndStoreUri(imageUri);
+                final Bitmap bitmapToUpload = ImageHelper.scaleImage(tempFile, maxImageSize);
+                return saveBitmapToTempFileObservable(bitmapToUpload);
+            } catch (IOException e) {
+                return Observable.just(ResponseOrError.<File>fromError(e));
+            }
+        });
     }
 }

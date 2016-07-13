@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 
 import com.shoutit.app.android.api.model.AdminRequest;
 import com.shoutit.app.android.api.model.ApiMessageResponse;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.BlockedProfilesResposne;
 import com.shoutit.app.android.api.model.BusinessVerificationResponse;
 import com.shoutit.app.android.api.model.CallerProfile;
@@ -35,6 +36,7 @@ import com.shoutit.app.android.api.model.LinkGplusRequest;
 import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessagesResponse;
 import com.shoutit.app.android.api.model.NotificationsResponse;
+import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.api.model.PageCategory;
 import com.shoutit.app.android.api.model.PageCreateRequest;
 import com.shoutit.app.android.api.model.PagesResponse;
@@ -64,6 +66,7 @@ import com.shoutit.app.android.api.model.TransactionRsponse;
 import com.shoutit.app.android.api.model.TwilioResponse;
 import com.shoutit.app.android.api.model.UpdateFacebookTokenRequest;
 import com.shoutit.app.android.api.model.UpdateLocationRequest;
+import com.shoutit.app.android.api.model.UpdatePage;
 import com.shoutit.app.android.api.model.UpdateUserRequest;
 import com.shoutit.app.android.api.model.UploadContactsRequest;
 import com.shoutit.app.android.api.model.User;
@@ -91,6 +94,7 @@ import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.HTTP;
+import retrofit2.http.Header;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -277,13 +281,13 @@ public interface ApiService {
      * Profile
      **/
     @GET("profiles/{user_name}")
-    Observable<User> getUser(@Path("user_name") String userName);
+    Observable<BaseProfile> getUser(@Path("user_name") String userName);
 
     @GET("profiles/me")
-    Observable<User> getMyUser();
+    Observable<BaseProfile> getMyUser();
 
     @PATCH("profiles/me")
-    Observable<User> updateUserLocation(@Body UpdateLocationRequest updateLocationRequest);
+    Observable<BaseProfile> updateUserLocation(@Body UpdateLocationRequest updateLocationRequest);
 
     @GET("profiles/{user_name}/home")
     Observable<ShoutsResponse> home(@Path("user_name") String userName,
@@ -292,6 +296,12 @@ public interface ApiService {
 
     @PATCH("profiles/me")
     Observable<User> updateUser(@Body UpdateUserRequest updateUserRequest);
+
+    @PATCH("profiles/me")
+    Observable<Page> updatePage(@Header(Headers.AUTHORIZATION_PAGE_ID) String pageId, @Body UpdatePage page);
+
+    @PATCH("profiles/me")
+    Observable<Page> updatePage(@Body UpdatePage page);
 
     @PATCH("profiles/me")
     Observable<User> registerGcmToken(@Body RegisterDeviceRequest registerDeviceRequest);
@@ -304,9 +314,6 @@ public interface ApiService {
 
     @DELETE("profiles/{username}/listen")
     Observable<ResponseBody> unlistenProfile(@Path("username") String username);
-
-    @GET("profiles/{user_name}")
-    Observable<User> getProfile(@Path("user_name") String userName);
 
     @GET("profiles")
     Observable<SearchProfileResponse> searchProfiles(@Query("search") String searchQuery,

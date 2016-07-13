@@ -17,7 +17,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
-import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
+import com.shoutit.app.android.view.profile.ProfileIntentHelper;
 
 import java.util.List;
 
@@ -110,12 +110,12 @@ public class ChatParticipantsActivity extends BaseActivity implements ChatPartic
 
     @SuppressLint("InflateParams")
     @Override
-    public void showDialog(String id, boolean isBlocked, boolean isAdmin, String name, String userName) {
-        dialog.show(id, isBlocked, isAdmin, name, userName, mChatParticipantsPresenter);
+    public void showDialog(String id, boolean isBlocked, boolean isAdmin, boolean isPage, String name, String userName) {
+        dialog.show(id, isBlocked, isAdmin, isPage, name, userName, mChatParticipantsPresenter);
     }
 
     @Override
-    public void showProfile(String userName) {
-        startActivity(UserOrPageProfileActivity.newIntent(this, userName));
+    public void showProfile(String userName, boolean isPage) {
+        startActivity(ProfileIntentHelper.newIntent(this, userName, isPage));
     }
 }

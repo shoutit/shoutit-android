@@ -20,9 +20,10 @@ public class SentProfileMessage extends BaseNoIDAdapterItem {
     private final String cover;
     private final int listenersCount;
     private final Listener listener;
+    private final boolean mIsPage;
 
     public SentProfileMessage(String time, @Nonnull String id, @Nonnull String username, @Nonnull String name,
-                              String image, String cover, int listenersCount, Listener listener) {
+                              String image, String cover, int listenersCount, Listener listener, boolean isPage) {
         this.time = time;
         this.id = id;
         this.username = username;
@@ -31,6 +32,7 @@ public class SentProfileMessage extends BaseNoIDAdapterItem {
         this.cover = cover;
         this.listenersCount = listenersCount;
         this.listener = listener;
+        mIsPage = isPage;
     }
 
     @Nonnull
@@ -56,7 +58,7 @@ public class SentProfileMessage extends BaseNoIDAdapterItem {
     }
 
     public void click(){
-        listener.onProfileClicked(username);
+        listener.onProfileClicked(username, mIsPage);
     }
 
     @Override

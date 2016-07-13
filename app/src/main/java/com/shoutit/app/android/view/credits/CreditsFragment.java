@@ -23,7 +23,7 @@ import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
 import com.shoutit.app.android.view.credits.transactions.TransactionsActivity;
 import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.main.MenuHandler;
-import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
+import com.shoutit.app.android.view.profile.user.UserProfileActivity;
 import com.shoutit.app.android.view.promote.PromoteShoutInfoActivity;
 
 import javax.annotation.Nonnull;
@@ -84,7 +84,7 @@ public class CreditsFragment extends BaseFragment {
                 startActivity(TransactionsActivity.newInstance(getActivity()));
                 break;
             case R.id.credit_complete_profile:
-                showDialogAndStartActivity(getString(R.string.credits_complete_profile), getString(R.string.credits_profile_positive), UserOrPageProfileActivity.newIntent(getActivity(), User.ME));
+                showDialogAndStartActivity(getString(R.string.credits_complete_profile), getString(R.string.credits_profile_positive), UserProfileActivity.newIntent(getActivity(), User.ME));
                 break;
             case R.id.credit_facebook:
                 showDialogAndStartActivity(getString(R.string.credits_facebook), getString(R.string.credits_facebook_positive), CreateShoutDialogActivity.getIntent(getActivity()));

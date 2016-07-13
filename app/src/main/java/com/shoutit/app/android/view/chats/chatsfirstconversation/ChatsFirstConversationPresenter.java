@@ -130,7 +130,7 @@ public class ChatsFirstConversationPresenter {
         getConversationInfo(user);
     }
 
-    private void setupUserForVideoChat(@Nonnull User user) {
+    private void setupUserForVideoChat(@Nonnull BaseProfile user) {
         chatParticipantProfileSubject.onNext(new ConversationProfile(
                 user.getId(), user.getName(), user.getUsername(), user.getType(), user.getImage()));
         mListener.showVideoChatIcon();
@@ -148,9 +148,9 @@ public class ChatsFirstConversationPresenter {
         mSubscribe.add(mApiService.getUser(mIdForCreation)
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
-                .subscribe(new Action1<User>() {
+                .subscribe(new Action1<BaseProfile>() {
                     @Override
-                    public void call(User user) {
+                    public void call(BaseProfile user) {
                         //noinspection ConstantConditions
                         mListener.setToolbarInfo(ConversationsUtils.getChatWithString(
                                 ImmutableList.of(new ConversationProfile(
@@ -176,7 +176,7 @@ public class ChatsFirstConversationPresenter {
                         final String thumbnail = Strings.emptyToNull(shout.getThumbnail());
                         final String type = shout.getType().equals(Shout.TYPE_OFFER) ? mContext.getString(R.string.chat_offer) : mContext.getString(R.string.chat_request);
                         final String price = PriceUtils.formatPriceWithCurrency(shout.getPrice(), mResources, shout.getCurrency());
-                        final User shoutOwner = shout.getProfile();
+                        final BaseProfile shoutOwner = shout.getProfile();
                         final String authorAndTime = shoutOwner.getName() + " - " + DateUtils.getRelativeTimeSpanString(mContext, shout.getDatePublishedInMillis());
                         final String id = shout.getId();
 

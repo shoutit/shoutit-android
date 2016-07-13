@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/edit_page_toolbar"
+        android:background="@color/default_bg_color"
+        android:fillViewport="true">
+
+        <android.support.design.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="20dp">
+
+                <FrameLayout
+                    android:id="@+id/edit_page_cover_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/edit_page_cover_iv"
+                        android:layout_width="match_parent"
+                        android:layout_height="202dp"
+                        android:background="@drawable/pattern_placeholder"/>
+
+                    <ImageView
+                        android:id="@+id/edit_page_cover_photo_icon_iv"
+                        android:layout_width="match_parent"
+                        android:layout_height="202dp"
+                        android:background="@color/edit_profile_cover_dim"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_camera_large"/>
+
+                    <View
+                        android:id="@+id/edit_page_cover_selector"
+                        android:layout_width="match_parent"
+                        android:layout_height="202dp"
+                        android:background="?selectableItemBackground"/>
+
+                    <ProgressBar
+                        android:id="@+id/edit_page_cover_progressbar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:clickable="true"
+                        android:visibility="gone"/>
+
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@+id/edit_page_cover_container"
+                    android:orientation="vertical"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:paddingTop="50dp">
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/edit_page_name_til"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:theme="@style/BlueEditText"
+                        app:errorEnabled="true"
+                        app:hintTextAppearance="@style/ProfileInputStyle">
+
+                        <EditText
+                            android:id="@+id/edit_page_name_et"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/edit_page_name"
+                            android:imeOptions="actionNext"
+                            android:nextFocusDown="@+id/edit_page_username_et"
+                            android:singleLine="true"
+                            android:textSize="16sp"/>
+
+                    </android.support.design.widget.TextInputLayout>
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/edit_page_about_til"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:theme="@style/BlueEditText"
+                        app:errorEnabled="true"
+                        app:hintTextAppearance="@style/ProfileInputStyle">
+
+                        <EditText
+                            android:id="@+id/edit_page_about_et"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/edit_page_about"
+                            android:imeOptions="actionNext"
+                            android:inputType="textUri"
+                            android:nextFocusDown="@+id/edit_page_mobile_et"
+                            android:textSize="16sp"/>
+
+                    </android.support.design.widget.TextInputLayout>
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/edit_page_description_til"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:theme="@style/BlueEditText"
+                        app:errorEnabled="true"
+                        app:hintTextAppearance="@style/ProfileInputStyle">
+
+                        <EditText
+                            android:id="@+id/edit_page_description_et"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/edit_page_description"
+                            android:imeOptions="actionDone"
+                            android:inputType="phone"
+                            android:textSize="16sp"/>
+
+                    </android.support.design.widget.TextInputLayout>
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/edit_page_phone_til"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:theme="@style/BlueEditText"
+                        app:errorEnabled="true"
+                        app:hintTextAppearance="@style/ProfileInputStyle">
+
+                        <EditText
+                            android:id="@+id/edit_page_phone_et"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/edit_page_phone"
+                            android:imeOptions="actionDone"
+                            android:inputType="phone"
+                            android:singleLine="true"
+                            android:textSize="16sp"/>
+
+                    </android.support.design.widget.TextInputLayout>
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/edit_page_founded_til"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:theme="@style/BlueEditText"
+                        app:errorEnabled="true"
+                        app:hintTextAppearance="@style/ProfileInputStyle">
+
+                        <EditText
+                            android:id="@+id/edit_page_founded_et"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/edit_page_founded"
+                            android:imeOptions="actionDone"
+                            android:inputType="phone"
+                            android:singleLine="true"
+                            android:textSize="16sp"/>
+
+                    </android.support.design.widget.TextInputLayout>
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/edit_page_impressum_til"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:theme="@style/BlueEditText"
+                        app:errorEnabled="true"
+                        app:hintTextAppearance="@style/ProfileInputStyle">
+
+                        <EditText
+                            android:id="@+id/edit_page_impressum_et"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/edit_page_impressum"
+                            android:imeOptions="actionDone"
+                            android:inputType="phone"
+                            android:textSize="16sp"/>
+
+                    </android.support.design.widget.TextInputLayout>
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/edit_page_overview_til"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:theme="@style/BlueEditText"
+                        app:errorEnabled="true"
+                        app:hintTextAppearance="@style/ProfileInputStyle">
+
+                        <EditText
+                            android:id="@+id/edit_page_overview_et"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/edit_page_overview"
+                            android:imeOptions="actionDone"
+                            android:inputType="phone"
+                            android:textSize="16sp"/>
+
+                    </android.support.design.widget.TextInputLayout>
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/edit_page_mission_til"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:theme="@style/BlueEditText"
+                        app:errorEnabled="true"
+                        app:hintTextAppearance="@style/ProfileInputStyle">
+
+                        <EditText
+                            android:id="@+id/edit_page_mission_et"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/edit_page_mission"
+                            android:imeOptions="actionDone"
+                            android:inputType="phone"
+                            android:textSize="16sp"/>
+
+                    </android.support.design.widget.TextInputLayout>
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/edit_page_general_info_til"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:theme="@style/BlueEditText"
+                        app:errorEnabled="true"
+                        app:hintTextAppearance="@style/ProfileInputStyle">
+
+                        <EditText
+                            android:id="@+id/edit_page_general_info_et"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/edit_page_general_info"
+                            android:imeOptions="actionDone"
+                            android:inputType="phone"
+                            android:textSize="16sp"/>
+
+                    </android.support.design.widget.TextInputLayout>
+
+                    <FrameLayout android:layout_width="match_parent"
+                                 android:layout_height="wrap_content">
+
+                        <TextView android:layout_width="wrap_content"
+                                  android:layout_height="wrap_content"
+                                  android:layout_marginStart="3dp"
+                                  android:layout_marginLeft="3dp"
+                                  android:text="@string/edit_page_published"/>
+
+                        <CheckBox
+                            android:id="@+id/edit_page_published"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end"/>
+
+                    </FrameLayout>
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+            <ImageView
+                android:id="@+id/edit_page_avatar_iv"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_rect_avatar_placeholder"
+                app:layout_anchor="@id/edit_page_cover_iv"
+                app:layout_anchorGravity="bottom|start"/>
+
+            <ImageView
+                android:id="@+id/edit_page_avatar_photo_icon_iv"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/shape_avatar_dim"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_camera"
+                app:layout_anchor="@id/edit_page_cover_iv"
+                app:layout_anchorGravity="bottom|start"/>
+
+            <View
+                android:id="@+id/edit_page_selector_view"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:background="?selectableItemBackground"
+                app:layout_anchor="@id/edit_page_cover_iv"
+                app:layout_anchorGravity="bottom|start"/>
+
+            <ProgressBar
+                android:id="@+id/edit_page_avatar_progressbar"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginLeft="12dp"
+                android:layout_marginStart="12dp"
+                android:clickable="true"
+                android:padding="10dp"
+                android:visibility="gone"
+                app:layout_anchor="@id/edit_page_cover_iv"
+                app:layout_anchorGravity="bottom|start"/>
+
+        </android.support.design.widget.CoordinatorLayout>
+
+    </ScrollView>
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/edit_page_toolbar"
+        style="@style/AppTheme.BaseToolbarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize"
+        android:elevation="0dp"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:layout_below="@+id/edit_page_toolbar"
+        android:background="@drawable/toolbar_drop_shadow"/>
+
+    <include layout="@layout/base_progress"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:layout_below="@+id/edit_page_toolbar"/>
+
+</RelativeLayout>

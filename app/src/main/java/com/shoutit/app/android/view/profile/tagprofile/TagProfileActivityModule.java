@@ -1,7 +1,6 @@
 package com.shoutit.app.android.view.profile.tagprofile;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
@@ -13,7 +12,7 @@ import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.TagsDao;
 import com.shoutit.app.android.utils.BookmarkHelper;
-import com.shoutit.app.android.view.profile.ProfilePresenter;
+import com.shoutit.app.android.view.profile.user.ProfilePresenter;
 
 import javax.annotation.Nonnull;
 

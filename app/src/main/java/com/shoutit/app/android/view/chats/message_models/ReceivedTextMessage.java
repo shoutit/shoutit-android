@@ -15,14 +15,16 @@ public class ReceivedTextMessage extends ReceivedMessage {
     private final String userName;
     @Nonnull
     private final Listener listener;
+    private final boolean mIsPage;
 
     public ReceivedTextMessage(boolean isFirst, String time, String message, String avatarUrl,
-                               @Nonnull String userName, @Nonnull Listener listener) {
+                               @Nonnull String userName, @Nonnull Listener listener, boolean isPage) {
         super(isFirst, avatarUrl);
         this.time = time;
         this.message = message;
         this.userName = userName;
         this.listener = listener;
+        mIsPage = isPage;
     }
 
     public String getTime() {
@@ -68,6 +70,6 @@ public class ReceivedTextMessage extends ReceivedMessage {
     }
 
     public void onAvatarClicked() {
-        listener.onProfileClicked(userName);
+        listener.onProfileClicked(userName, mIsPage);
     }
 }

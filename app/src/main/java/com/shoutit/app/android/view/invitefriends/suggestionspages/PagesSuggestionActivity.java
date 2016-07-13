@@ -11,12 +11,10 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
-import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
+import com.shoutit.app.android.view.profile.page.PageProfileActivity;
 import com.shoutit.app.android.view.profileslist.BaseProfilesListActivity;
 
 import javax.annotation.Nonnull;
-
-import rx.functions.Func1;
 
 public class PagesSuggestionActivity extends BaseProfilesListActivity {
 
@@ -36,7 +34,7 @@ public class PagesSuggestionActivity extends BaseProfilesListActivity {
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(userName -> {
                     startActivityForResult(
-                            UserOrPageProfileActivity.newIntent(PagesSuggestionActivity.this, userName),
+                            PageProfileActivity.newIntent(PagesSuggestionActivity.this, userName),
                             REQUEST_OPENED_PROFILE_WAS_LISTENED);
                 });
     }

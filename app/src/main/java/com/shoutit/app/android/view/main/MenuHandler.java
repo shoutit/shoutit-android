@@ -35,7 +35,7 @@ import com.shoutit.app.android.view.invitefriends.InviteFriendsFragment;
 import com.shoutit.app.android.view.location.LocationActivity;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.pages.PagesPagerFragment;
-import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
+import com.shoutit.app.android.view.profile.ProfileIntentHelper;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsFragment;
 import com.shoutit.app.android.view.settings.SettingsActivity;
@@ -331,7 +331,7 @@ public class MenuHandler {
     @OnClick({R.id.menu_avatar_iv, R.id.menu_user_name_tv})
     public void startUserProfile() {
         if (userPreferences.isNormalUser()) {
-            rxActivity.startActivity(UserOrPageProfileActivity.newIntent(rxActivity, User.ME));
+            rxActivity.startActivity(ProfileIntentHelper.newIntent(rxActivity, User.ME, userPreferences.isLoggedInAsPage()));
         } else {
             showLoginActivity();
         }

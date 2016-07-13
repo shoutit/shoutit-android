@@ -12,6 +12,7 @@ import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.BlockedProfilesResposne;
 import com.shoutit.app.android.api.model.ConversationProfile;
 import com.shoutit.app.android.api.model.ProfileRequest;
+import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.view.chats.chat_info.chats_users_list.ChatListProfileItem;
 
 import java.util.List;
@@ -81,7 +82,7 @@ public class ChatBlockedUsersPresenter {
                 return new ChatListProfileItem(profile.getId(), profile.getName(), profile.getImage(), new ChatListProfileItem.OnItemClicked() {
                     @Override
                     public void onItemClicked(String id, String name) {
-                        mListener.showDialog(id, name, profile.getUsername());
+                        mListener.showDialog(id, name, profile.getUsername(), profile.isPage());
                     }
                 });
             }
@@ -111,8 +112,8 @@ public class ChatBlockedUsersPresenter {
         mCompositeSubscription.unsubscribe();
     }
 
-    public void showProfile(String userName) {
-        mListener.showProfile(userName);
+    public void showProfile(String userName, boolean isPage) {
+        mListener.showProfile(userName, isPage);
     }
 
     public void showUnblockConfirmDialog(String id, String name) {
@@ -127,9 +128,9 @@ public class ChatBlockedUsersPresenter {
 
         void showProgress(boolean show);
 
-        void showDialog(String id, String name, String userName);
+        void showDialog(String id, String name, String userName, boolean isPage);
 
-        void showProfile(String userName);
+        void showProfile(String userName, boolean isPage);
 
         void showUnblockConfirmDialog(String id, String name);
     }

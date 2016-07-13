@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -23,7 +22,7 @@ import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.utils.rx.RxUtils;
-import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
+import com.shoutit.app.android.view.profile.user.UserProfileActivity;
 
 import java.util.List;
 
@@ -94,7 +93,7 @@ public class SearchProfilesResultsActivity extends BaseActivity {
                     @Override
                     public void call(String userName) {
                         startActivityForResult(
-                                UserOrPageProfileActivity.newIntent(SearchProfilesResultsActivity.this, userName),
+                                UserProfileActivity.newIntent(SearchProfilesResultsActivity.this, userName),
                                 REQUEST_PROFILE_OPENED);
                     }
                 });

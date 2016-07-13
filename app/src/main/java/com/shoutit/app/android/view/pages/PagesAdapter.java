@@ -11,6 +11,7 @@ import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.adapteritems.NoDataTextAdapterItem;
+import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.PicassoHelper;
@@ -93,7 +94,7 @@ public class PagesAdapter extends BaseAdapter {
         public void bind(@Nonnull PageAdapterItem pageAdapterItem) {
             item = pageAdapterItem;
 
-            final User page = pageAdapterItem.getPage();
+            final Page page = pageAdapterItem.getPage();
 
             picasso.load(page.getImage())
                     .placeholder(R.drawable.ic_rect_avatar_placeholder)

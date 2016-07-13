@@ -16,7 +16,7 @@ import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
-import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.ColoredSnackBar;
@@ -24,7 +24,8 @@ import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.pages.PagesAdapter;
-import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
+import com.shoutit.app.android.view.profile.page.PageProfileActivity;
+import com.shoutit.app.android.view.profile.page.edit.EditPageActivity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -106,7 +107,7 @@ public class MyPagesFragment extends BaseFragment implements MyPagesDialog.Pages
         }
     }
 
-    private void showOptionsDialog(@Nonnull User page) {
+    private void showOptionsDialog(@Nonnull Page page) {
         dialog.show(page, this);
     }
 
@@ -124,17 +125,17 @@ public class MyPagesFragment extends BaseFragment implements MyPagesDialog.Pages
     @Override
     public void showProfile(String userName) {
         getParentFragment().startActivityForResult(
-                UserOrPageProfileActivity.newIntent(getActivity(), userName),
+                PageProfileActivity.newIntent(getActivity(), userName),
                 REQUEST_OPENED_PROFILE_WAS_LISTENED);
     }
 
     @Override
     public void editPage(String userName) {
-        // TODO
+        startActivity(EditPageActivity.newIntentNotLoggedInPage(getActivity(), userName));
     }
 
     @Override
-    public void useShoutItAsPage(User page) {
+    public void useShoutItAsPage(Page page) {
         mUserPreferences.setPage(page);
 
         ActivityCompat.finishAffinity(getActivity());

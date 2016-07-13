@@ -1,6 +1,7 @@
 package com.shoutit.app.android.api.model;
 
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.common.base.Objects;
@@ -9,14 +10,23 @@ import com.shoutit.app.android.model.Stats;
 import javax.annotation.Nonnull;
 
 public class BaseProfile implements ProfileType {
+
+    @NonNull
     protected final String id;
+    @NonNull
     protected final String type;
+    @NonNull
     protected final String username;
+    @NonNull
     protected final String name;
+    @NonNull
     protected final String firstName;
+    @NonNull
     protected final String lastName;
     protected final boolean isActivated;
+    @Nullable
     protected final String image;
+    @Nullable
     protected final String cover;
     protected final boolean isListening;
     protected final int listenersCount;
@@ -25,12 +35,13 @@ public class BaseProfile implements ProfileType {
     protected boolean isOwner;
     @Nullable
     private final Stats stats;
+    @NonNull
     private final String email;
 
-    public BaseProfile(String id, String type, String username, String name,
-                       String firstName, String lastName, boolean isActivated, String image,
-                       String cover, boolean isListening, int listenersCount, @Nullable UserLocation location,
-                       boolean isOwner, @Nullable Stats stats, String email) {
+    public BaseProfile(@NonNull String id, @NonNull String type, @NonNull String username, @NonNull String name,
+                       @NonNull String firstName, @NonNull String lastName, boolean isActivated, @Nullable String image,
+                       @Nullable String cover, boolean isListening, int listenersCount, @Nullable UserLocation location,
+                       boolean isOwner, @Nullable Stats stats, @NonNull String email) {
         this.id = id;
         this.type = type;
         this.username = username;
@@ -56,30 +67,36 @@ public class BaseProfile implements ProfileType {
         return PAGE.equals(type);
     }
 
+    @NonNull
     @Override
     public String getId() {
         return id;
     }
 
+    @NonNull
     @Override
     public String getType() {
         return type;
     }
 
+    @NonNull
     @Override
     public String getUsername() {
         return username;
     }
 
+    @NonNull
     @Override
     public String getName() {
         return name;
     }
 
+    @NonNull
     public String getFirstName() {
         return firstName;
     }
 
+    @NonNull
     public String getLastName() {
         return lastName;
     }
@@ -88,11 +105,13 @@ public class BaseProfile implements ProfileType {
         return isActivated;
     }
 
+    @Nullable
     @Override
     public String getImage() {
         return image;
     }
 
+    @Nullable
     public String getCover() {
         return cover;
     }
@@ -147,6 +166,7 @@ public class BaseProfile implements ProfileType {
         }
     }
 
+    @NonNull
     public String getEmail() {
         return email;
     }
