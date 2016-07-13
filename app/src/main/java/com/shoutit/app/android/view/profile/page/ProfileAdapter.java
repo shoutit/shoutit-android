@@ -12,7 +12,6 @@ import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 import com.shoutit.app.android.view.shouts.ShoutGridViewHolder;
 import com.shoutit.app.android.viewholders.HeaderViewHolder;
-import com.shoutit.app.android.viewholders.ProfileSectionViewHolder;
 import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;

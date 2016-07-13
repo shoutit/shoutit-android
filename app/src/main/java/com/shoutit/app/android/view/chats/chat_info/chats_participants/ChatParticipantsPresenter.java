@@ -13,7 +13,7 @@ import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.ConversationDetails;
 import com.shoutit.app.android.api.model.ConversationProfile;
 import com.shoutit.app.android.api.model.ProfileRequest;
-import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.api.model.ProfileType;
 
 import java.util.List;
 
@@ -88,10 +88,11 @@ public class ChatParticipantsPresenter {
                     @Override
                     public void onItemClicked(String id, boolean isBlocked, boolean isAdmin, String name) {
                         assert profile != null;
+                        final boolean isPage = profile.getType().equals(ProfileType.PAGE);
                         if (!profile.getId().equals(mId) && isUserAdmin) {
-                            mListener.showDialog(id, isBlocked, isAdmin, name, profile.getUsername());
+                            mListener.showDialog(id, isBlocked, isAdmin, isPage, name, profile.getUsername());
                         } else {
-                            mListener.showProfile(profile.getUsername());
+                            mListener.showProfile(profile.getUsername(), isPage);
                         }
                     }
                 });
@@ -158,8 +159,8 @@ public class ChatParticipantsPresenter {
         mCompositeSubscription.unsubscribe();
     }
 
-    public void showProfile(@NonNull String userName) {
-        mListener.showProfile(userName);
+    public void showProfile(@NonNull String userName, boolean isPage) {
+        mListener.showProfile(userName, isPage);
     }
 
     public interface Listener {
@@ -170,8 +171,8 @@ public class ChatParticipantsPresenter {
 
         void showProgress(boolean show);
 
-        void showDialog(String id, boolean isBlocked, boolean isAdmin, String name, String userName);
+        void showDialog(String id, boolean isBlocked, boolean isAdmin, boolean isPage, String name, String userName);
 
-        void showProfile(String username);
+        void showProfile(String username, boolean isPage);
     }
 }

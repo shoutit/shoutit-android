@@ -42,19 +42,21 @@ public class MessageAttachment {
         private final int listenersCount;
         private final String image;
         private final String cover;
+        private final String type;
 
         public static MessageProfile messageToSend(@Nonnull String profileId) {
-            return new MessageProfile(profileId, null, null, 0, null, null);
+            return new MessageProfile(profileId, null, null, 0, null, null, null);
         }
 
         public MessageProfile(@Nonnull String id, String username, String name,
-                              int listenersCount, String image, String cover) {
+                              int listenersCount, String image, String cover, String type) {
             this.id = id;
             this.username = username;
             this.name = name;
             this.listenersCount = listenersCount;
             this.image = image;
             this.cover = cover;
+            this.type = type;
         }
 
         @Nonnull
@@ -80,6 +82,10 @@ public class MessageAttachment {
 
         public String getName() {
             return name;
+        }
+
+        public boolean isPage(){
+            return type.equals(ProfileType.PAGE);
         }
     }
 

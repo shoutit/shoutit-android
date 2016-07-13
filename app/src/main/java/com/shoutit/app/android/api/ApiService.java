@@ -66,6 +66,7 @@ import com.shoutit.app.android.api.model.TransactionRsponse;
 import com.shoutit.app.android.api.model.TwilioResponse;
 import com.shoutit.app.android.api.model.UpdateFacebookTokenRequest;
 import com.shoutit.app.android.api.model.UpdateLocationRequest;
+import com.shoutit.app.android.api.model.UpdatePage;
 import com.shoutit.app.android.api.model.UpdateUserRequest;
 import com.shoutit.app.android.api.model.UploadContactsRequest;
 import com.shoutit.app.android.api.model.User;
@@ -297,7 +298,10 @@ public interface ApiService {
     Observable<User> updateUser(@Body UpdateUserRequest updateUserRequest);
 
     @PATCH("profiles/me")
-    Observable<Page> updatePage(@Header(Headers.AUTHORIZATION_PAGE_ID) String pageId, @Body Page page);
+    Observable<Page> updatePage(@Header(Headers.AUTHORIZATION_PAGE_ID) String pageId, @Body UpdatePage page);
+
+    @PATCH("profiles/me")
+    Observable<Page> updatePage(@Body UpdatePage page);
 
     @PATCH("profiles/me")
     Observable<User> registerGcmToken(@Body RegisterDeviceRequest registerDeviceRequest);

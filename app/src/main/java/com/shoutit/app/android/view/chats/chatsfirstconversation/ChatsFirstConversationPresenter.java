@@ -176,7 +176,7 @@ public class ChatsFirstConversationPresenter {
                         final String thumbnail = Strings.emptyToNull(shout.getThumbnail());
                         final String type = shout.getType().equals(Shout.TYPE_OFFER) ? mContext.getString(R.string.chat_offer) : mContext.getString(R.string.chat_request);
                         final String price = PriceUtils.formatPriceWithCurrency(shout.getPrice(), mResources, shout.getCurrency());
-                        final User shoutOwner = shout.getProfile();
+                        final BaseProfile shoutOwner = shout.getProfile();
                         final String authorAndTime = shoutOwner.getName() + " - " + DateUtils.getRelativeTimeSpanString(mContext, shout.getDatePublishedInMillis());
                         final String id = shout.getId();
 

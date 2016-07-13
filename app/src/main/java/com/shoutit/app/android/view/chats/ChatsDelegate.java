@@ -258,10 +258,11 @@ public class ChatsDelegate {
 
     private BaseAdapterItem getReceivedItem(Message message, boolean isFirst, String time) {
         final List<MessageAttachment> attachments = message.getAttachments();
-        final String avatarUrl = message.getProfile().getImage();
+        final ConversationProfile profile = message.getProfile();
+        final String avatarUrl = profile.getImage();
         if (attachments.isEmpty()) {
             return new ReceivedTextMessage(isFirst, time, message.getText(), avatarUrl,
-                    message.getProfile().getUsername(), mListener);
+                    profile.getUsername(), mListener, profile.isPage());
         } else {
             final MessageAttachment messageAttachment = attachments.get(0);
             final String type = messageAttachment.getType();
@@ -269,16 +270,16 @@ public class ChatsDelegate {
                 final List<String> images = messageAttachment.getImages();
                 if (images != null && !images.isEmpty()) {
                     return new ReceivedImageMessage(isFirst, time, images.get(0), avatarUrl,
-                            message.getProfile().getUsername(), mListener);
+                            profile.getUsername(), mListener, profile.isPage());
                 } else {
                     final Video video = messageAttachment.getVideos().get(0);
                     return new ReceivedVideoMessage(isFirst, video.getThumbnailUrl(), time, avatarUrl,
-                            message.getProfile().getUsername(), mListener, video.getUrl());
+                            profile.getUsername(), mListener, video.getUrl(), profile.isPage());
                 }
             } else if (MessageAttachment.ATTACHMENT_TYPE_LOCATION.equals(type)) {
                 final MessageAttachment.MessageLocation location = messageAttachment.getLocation();
-                return new ReceivedLocationMessage(isFirst, time, avatarUrl, message.getProfile().getUsername(),
-                        mListener, location.getLatitude(), location.getLongitude());
+                return new ReceivedLocationMessage(isFirst, time, avatarUrl, profile.getUsername(),
+                        mListener, location.getLatitude(), location.getLongitude(), profile.isPage());
             } else if (MessageAttachment.ATTACHMENT_TYPE_SHOUT.equals(type)) {
                 final MessageAttachment.AttachtmentShout shout = messageAttachment.getShout();
                 return new ReceivedShoutMessage(
@@ -289,13 +290,13 @@ public class ChatsDelegate {
                         shout.getText(),
                         shout.getUser().getName(),
                         shout.getUser().getUsername(),
-                        avatarUrl, mListener, shout.getId());
+                        avatarUrl, mListener, shout.getId(), profile.isPage());
             } else if (MessageAttachment.ATTACHMENT_TYPE_PROFILE.equals(type)) {
-                final MessageAttachment.MessageProfile profile = messageAttachment.getProfile();
+                final MessageAttachment.MessageProfile messageAttachmentProfile = messageAttachment.getProfile();
 
-                return new ReceivedProfileMessage(isFirst, time, avatarUrl, profile.getId(),
-                        profile.getUsername(), profile.getName(),
-                        profile.getImage(), profile.getCover(), profile.getListenersCount(), mListener);
+                return new ReceivedProfileMessage(isFirst, time, avatarUrl, messageAttachmentProfile.getId(),
+                        messageAttachmentProfile.getUsername(), messageAttachmentProfile.getName(),
+                        messageAttachmentProfile.getImage(), messageAttachmentProfile.getCover(), messageAttachmentProfile.getListenersCount(), mListener, profile.isPage());
             } else {
                 throw new RuntimeException(type);
             }
@@ -326,7 +327,7 @@ public class ChatsDelegate {
             } else if (MessageAttachment.ATTACHMENT_TYPE_PROFILE.equals(type)) {
                 final MessageAttachment.MessageProfile profile = messageAttachment.getProfile();
                 return new SentProfileMessage(time, profile.getId(), profile.getUsername(), profile.getName(),
-                        profile.getImage(), profile.getCover(), profile.getListenersCount(), mListener);
+                        profile.getImage(), profile.getCover(), profile.getListenersCount(), mListener, profile.isPage());
             } else {
                 throw new RuntimeException(type);
             }

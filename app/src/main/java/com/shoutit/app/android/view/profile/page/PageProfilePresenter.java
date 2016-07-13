@@ -60,7 +60,7 @@ import rx.functions.Func1;
 import rx.functions.Func4;
 import rx.subjects.PublishSubject;
 
-public class UserOrPageProfilePresenter implements ProfilePresenter {
+public class PageProfilePresenter implements ProfilePresenter {
     private static final int SHOUTS_PAGE_SIZE = 4;
     private static final int ADMINS_AND_PAGES_PAGE_SIZE = 3;
 
@@ -135,22 +135,22 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
     private String loggedInUserName;
     private boolean isNormalUser;
 
-    public UserOrPageProfilePresenter(@Nonnull final String userName,
-                                      @Nonnull final ShoutsDao shoutsDao,
-                                      @Nonnull @ForActivity final Context context,
-                                      @Nonnull final UserPreferences userPreferences,
-                                      @Nonnull @UiScheduler final Scheduler uiScheduler,
-                                      @Nonnull @NetworkScheduler final Scheduler networkScheduler,
-                                      @Nonnull final ProfilesDao profilesDao,
-                                      @Nonnull MyProfileHalfPresenter myProfilePresenter,
-                                      @Nonnull UserProfileHalfPresenter userProfilePresenter,
-                                      @Nonnull PreferencesHelper preferencesHelper,
-                                      @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
-                                      @Nonnull ListeningHalfPresenter listeningHalfPresenter,
-                                      @Nonnull final ApiService apiService,
-                                      @NonNull PusherHelper pusherHelper,
-                                      @NonNull BookmarksDao bookmarksDao,
-                                      @NonNull BookmarkHelper bookmarkHelper) {
+    public PageProfilePresenter(@Nonnull final String userName,
+                                @Nonnull final ShoutsDao shoutsDao,
+                                @Nonnull @ForActivity final Context context,
+                                @Nonnull final UserPreferences userPreferences,
+                                @Nonnull @UiScheduler final Scheduler uiScheduler,
+                                @Nonnull @NetworkScheduler final Scheduler networkScheduler,
+                                @Nonnull final ProfilesDao profilesDao,
+                                @Nonnull MyProfileHalfPresenter myProfilePresenter,
+                                @Nonnull UserProfileHalfPresenter userProfilePresenter,
+                                @Nonnull PreferencesHelper preferencesHelper,
+                                @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
+                                @Nonnull ListeningHalfPresenter listeningHalfPresenter,
+                                @Nonnull final ApiService apiService,
+                                @NonNull PusherHelper pusherHelper,
+                                @NonNull BookmarksDao bookmarksDao,
+                                @NonNull BookmarkHelper bookmarkHelper) {
         this.userName = userName;
         this.shoutsDao = shoutsDao;
         this.context = context;
@@ -379,7 +379,8 @@ public class UserOrPageProfilePresenter implements ProfilePresenter {
         return (user, shouts, pages, admins) -> {
             final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
 
-            if (user.isOwner()) {
+
+            if (preferencesHelper.isMyProfile(user.getUsername())) {
                 builder.add(myProfilePresenter.getUserNameAdapterItem(user, notificationsUnreadObservable))
                         .add(myProfilePresenter.getThreeIconsAdapterItem(user));
             } else {

@@ -258,7 +258,7 @@
 
         </activity>
         <activity
-            android:name=".view.profile.user.UserOrPageProfileActivity"
+            android:name=".view.profile.user.UserProfileActivity"
             android:screenOrientation="portrait"
             android:theme="@style/TranslucentStatusBar">
 
@@ -274,6 +274,10 @@
             </intent-filter>
 
         </activity>
+        <activity
+            android:name=".view.profile.page.PageProfileActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/TranslucentStatusBar"/>
         <activity
             android:name=".view.profile.tagprofile.TagProfileActivity"
             android:screenOrientation="portrait"

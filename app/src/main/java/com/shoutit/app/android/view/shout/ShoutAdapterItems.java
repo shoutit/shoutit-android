@@ -7,6 +7,7 @@ import android.support.v4.util.Pair;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.base.Objects;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.utils.BookmarkHelper;
@@ -28,7 +29,7 @@ public class ShoutAdapterItems {
         @Nonnull
         private final Observer<String> onCategoryClickedObserver;
         @Nonnull
-        private final Observer<User> visitProfileObserver;
+        private final Observer<BaseProfile> visitProfileObserver;
         @Nonnull
         private final Observer<Boolean> likeClickedObserver;
         @Nonnull
@@ -46,7 +47,7 @@ public class ShoutAdapterItems {
 
         public MainShoutAdapterItem(@Nonnull Observer<String> addToCartObserver,
                                     @Nonnull Observer<String> onCategoryClickedObserver,
-                                    @Nonnull Observer<User> visitProfileObserver,
+                                    @Nonnull Observer<BaseProfile> visitProfileObserver,
                                     @Nonnull Observer<Boolean> likeClickedObserver,
                                     @Nonnull Shout shout,
                                     @Nonnull Resources resources,
@@ -217,11 +218,11 @@ public class ShoutAdapterItems {
 
     public static class VisitProfileAdapterItem implements BaseAdapterItem {
         @Nonnull
-        private final Observer<User> visitProfileObserver;
+        private final Observer<BaseProfile> visitProfileObserver;
         @Nonnull
-        private final User user;
+        private final BaseProfile user;
 
-        public VisitProfileAdapterItem(@Nonnull Observer<User> visitProfileObserver, @Nonnull User user) {
+        public VisitProfileAdapterItem(@Nonnull Observer<BaseProfile> visitProfileObserver, @Nonnull BaseProfile user) {
             this.visitProfileObserver = visitProfileObserver;
             this.user = user;
         }

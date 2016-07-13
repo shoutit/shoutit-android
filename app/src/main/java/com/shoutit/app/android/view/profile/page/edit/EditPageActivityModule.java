@@ -27,4 +27,9 @@ public class EditPageActivityModule {
         }
     }
 
+    @Provides
+    public boolean isLoggedIn(){
+        return !mNotLoggedIn;
+    }
+
 }

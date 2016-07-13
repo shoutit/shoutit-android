@@ -781,4 +781,17 @@
     <string name="business_ver_sucess">Verification completed</string>
     <string name="business_ver_ab_title">Business Verification</string>
 
+    <!-- Edit Page -->
+    <string name="edit_page_name">Name</string>
+    <string name="edit_page_about">About</string>
+    <string name="edit_page_description">Description</string>
+    <string name="edit_page_phone">Phone</string>
+    <string name="edit_page_founded">Founded</string>
+    <string name="edit_page_impressum">Impressum</string>
+    <string name="edit_page_overview">Overview</string>
+    <string name="edit_page_mission">Mission</string>
+    <string name="edit_page_published">Published</string>
+    <string name="edit_page_general_info">General Info</string>
+    <string name="edit_page_title">Edit Page</string>
+
 </resources>

@@ -1,6 +1,5 @@
 package com.shoutit.app.android.view.profile.user.editprofile;
 
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -27,7 +26,6 @@ import com.shoutit.app.android.utils.rx.Actions1;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -39,8 +37,6 @@ import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Func1;
-import rx.functions.Func2;
-import rx.functions.Func9;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
@@ -80,10 +76,6 @@ public class EditProfilePresenter {
     @Nonnull
     private final ApiService apiService;
     @Nonnull
-    private final FileHelper fileHelper;
-    @Nonnull
-    private final AmazonHelper amazonHelper;
-    @Nonnull
     private final Scheduler networkScheduler;
     @Nonnull
     private final Scheduler uiScheduler;
@@ -116,8 +108,6 @@ public class EditProfilePresenter {
                                 @Nonnull @UiScheduler final Scheduler uiScheduler,
                                 @Nullable final State state) {
         this.apiService = apiService;
-        this.fileHelper = fileHelper;
-        this.amazonHelper = amazonHelper;
         this.networkScheduler = networkScheduler;
         this.uiScheduler = uiScheduler;
 
@@ -173,25 +163,12 @@ public class EditProfilePresenter {
                 genderSubject.startWith((String) null),
                 birthdayToSendSubject.startWith((String) null),
                 locationSubject.startWith((UserLocation) null),
-                new Func9<String, String, String, String, String, String, String, String, UserLocation, UpdateUserRequest>() {
-                    @Override
-                    public UpdateUserRequest call(String username, String firstName, String lastName, String bio,
-                                                  String website, String mobile, String gender,
-                                                  String birthday, UserLocation userLocation) {
-                        return UpdateUserRequest.updateProfile(username, firstName, lastName, bio,
-                                website, mobile, gender, birthday, userLocation);
-                    }
-                })
+                UpdateUserRequest::updateProfile)
                 .subscribe(lastCombinedData);
 
         /** Update profile data **/
         final Observable<ResponseOrError<User>> updateRequest = saveClickSubject
-                .withLatestFrom(hasAnyErrorObservable, new Func2<Object, Boolean, Boolean>() {
-                    @Override
-                    public Boolean call(Object ignore, Boolean hasAnyError) {
-                        return hasAnyError;
-                    }
-                })
+                .withLatestFrom(hasAnyErrorObservable, (ignore, hasAnyError) -> hasAnyError)
                 .filter(Functions1.isFalse())
                 .switchMap(new Func1<Boolean, Observable<UpdateUserRequest>>() {
                     @Override
@@ -217,17 +194,12 @@ public class EditProfilePresenter {
         final Observable<ResponseOrError<String>> uploadCoverToAmazonObservable = coverFileToUploadObservable
                 .compose(ResponseOrError.<File>onlySuccess())
                 .filter(Functions1.isNotNull())
-                .switchMap(uploadToAmazon())
+                .switchMap(amazonHelper.uploadImageToAmazonFunction(networkScheduler, uiScheduler))
                 .compose(ObservableExtensions.<ResponseOrError<String>>behaviorRefCount());
 
         final Observable<ResponseOrError<User>> uploadCoverToApiObservable = uploadCoverToAmazonObservable
                 .compose(ResponseOrError.<String>onlySuccess())
-                .map(new Func1<String, UpdateUserRequest>() {
-                    @Override
-                    public UpdateUserRequest call(String imageUrl) {
-                        return UpdateUserRequest.updateWithCoverUrl(imageUrl);
-                    }
-                })
+                .map(UpdateUserRequest::updateWithCoverUrl)
                 .switchMap(updateUserInApi())
                 .compose(ObservableExtensions.<ResponseOrError<User>>behaviorRefCount());
 
@@ -241,7 +213,7 @@ public class EditProfilePresenter {
         final Observable<ResponseOrError<String>> uploadAvatarToAmazonObservable = avatarFileToUploadObservable
                 .compose(ResponseOrError.<File>onlySuccess())
                 .filter(Functions1.isNotNull())
-                .switchMap(uploadToAmazon())
+                .switchMap(amazonHelper.uploadImageToAmazonFunction(networkScheduler, uiScheduler))
                 .compose(ObservableExtensions.<ResponseOrError<String>>behaviorRefCount());
 
         final Observable<ResponseOrError<User>> uploadAvatarToApiObservable = uploadAvatarToAmazonObservable
@@ -297,8 +269,8 @@ public class EditProfilePresenter {
                 .filter(user -> !userPreferences.wasProfileAlertAlreadyDisplayed())
                 .map(user ->
                         TextUtils.isEmpty(user.getImage()) ||
-                        TextUtils.isEmpty(user.getGender()) ||
-                        user.getBirthday() == null)
+                                TextUtils.isEmpty(user.getGender()) ||
+                                user.getBirthday() == null)
                 .filter(Functions1.isTrue())
                 .doOnNext(aBoolean -> userPreferences.setProfileAlertAlreadyDisplayed());
     }
@@ -315,28 +287,10 @@ public class EditProfilePresenter {
 
     @NonNull
     private Func1<UpdateUserRequest, Observable<ResponseOrError<User>>> updateUserInApi() {
-        return new Func1<UpdateUserRequest, Observable<ResponseOrError<User>>>() {
-            @Override
-            public Observable<ResponseOrError<User>> call(UpdateUserRequest updateUserRequest) {
-                return apiService.updateUser(updateUserRequest)
-                        .subscribeOn(networkScheduler)
-                        .observeOn(uiScheduler)
-                        .compose(ResponseOrError.<User>toResponseOrErrorObservable());
-            }
-        };
-    }
-
-    @NonNull
-    private Func1<File, Observable<ResponseOrError<String>>> uploadToAmazon() {
-        return new Func1<File, Observable<ResponseOrError<String>>>() {
-            @Override
-            public Observable<ResponseOrError<String>> call(File fileToUpload) {
-                return amazonHelper.uploadUserImageObservable(fileToUpload)
-                        .subscribeOn(networkScheduler)
-                        .observeOn(uiScheduler)
-                        .compose(ResponseOrError.<String>toResponseOrErrorObservable());
-            }
-        };
+        return updateUserRequest -> apiService.updateUser(updateUserRequest)
+                .subscribeOn(networkScheduler)
+                .observeOn(uiScheduler)
+                .compose(ResponseOrError.<User>toResponseOrErrorObservable());
     }
 
     @Nonnull

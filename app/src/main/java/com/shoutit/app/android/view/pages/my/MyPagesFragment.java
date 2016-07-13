@@ -24,7 +24,8 @@ import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.pages.PagesAdapter;
-import com.shoutit.app.android.view.profile.user.UserOrPageProfileActivity;
+import com.shoutit.app.android.view.profile.page.PageProfileActivity;
+import com.shoutit.app.android.view.profile.page.edit.EditPageActivity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -124,13 +125,13 @@ public class MyPagesFragment extends BaseFragment implements MyPagesDialog.Pages
     @Override
     public void showProfile(String userName) {
         getParentFragment().startActivityForResult(
-                UserOrPageProfileActivity.newIntent(getActivity(), userName),
+                PageProfileActivity.newIntent(getActivity(), userName),
                 REQUEST_OPENED_PROFILE_WAS_LISTENED);
     }
 
     @Override
     public void editPage(String userName) {
-        // TODO
+        startActivity(EditPageActivity.newIntentNotLoggedInPage(getActivity(), userName));
     }
 
     @Override

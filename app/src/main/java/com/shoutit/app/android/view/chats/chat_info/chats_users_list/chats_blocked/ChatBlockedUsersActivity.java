@@ -20,7 +20,7 @@ import com.shoutit.app.android.view.chats.chat_info.chats_users_list.ChatUsersLi
 import com.shoutit.app.android.view.chats.chat_info.chats_users_list.ChatUsersListComponent;
 import com.shoutit.app.android.view.chats.chat_info.chats_users_list.ChatUsersListModule;
 import com.shoutit.app.android.view.chats.chat_info.chats_users_list.DaggerChatUsersListComponent;
-import com.shoutit.app.android.view.profile.user.UserOrPageProfileActivity;
+import com.shoutit.app.android.view.profile.ProfileIntentHelper;
 
 import java.util.List;
 
@@ -114,8 +114,8 @@ public class ChatBlockedUsersActivity extends BaseActivity implements ChatBlocke
     }
 
     @Override
-    public void showProfile(String userName) {
-        startActivity(UserOrPageProfileActivity.newIntent(this, userName));
+    public void showProfile(String userName, boolean isPage) {
+        startActivity(ProfileIntentHelper.newIntent(this, userName, isPage));
     }
 
     @Override
@@ -124,7 +124,7 @@ public class ChatBlockedUsersActivity extends BaseActivity implements ChatBlocke
     }
 
     @Override
-    public void showDialog(String id, String name, String userName) {
-        blockedDialog.show(id, name, userName, mChatParticipantsPresenter);
+    public void showDialog(String id, String name, String userName, boolean isPage) {
+        blockedDialog.show(id, name, userName, isPage, mChatParticipantsPresenter);
     }
 }

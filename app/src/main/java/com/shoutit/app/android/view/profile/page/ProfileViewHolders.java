@@ -172,8 +172,6 @@ public class ProfileViewHolders {
             userName.setText(user.getName());
             userNick.setText(user.getUsername());
 
-            editProfileContainer.setVisibility(user.isUser() ? View.VISIBLE : View.GONE);
-
             if (user.isOwner() && !user.isActivated()) {
                 verifyAccountButton.setVisibility(View.VISIBLE);
             } else {

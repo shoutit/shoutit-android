@@ -7,11 +7,12 @@ import android.support.v7.app.ActionBar;
 
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
-import com.shoutit.app.android.view.profileslist.BaseProfilesListActivity;
-import com.shoutit.app.android.view.profile.user.UserOrPageProfileActivity;
+import com.shoutit.app.android.view.profile.ProfileIntentHelper;
 import com.shoutit.app.android.view.profile.tagprofile.TagProfileActivity;
+import com.shoutit.app.android.view.profileslist.BaseProfilesListActivity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -45,15 +46,15 @@ public class ListeningsActivity extends BaseProfilesListActivity {
         presenter = (ListeningsPresenter) ((ListeningsActivityComponent) getActivityComponent()).profilesListPresenter();
 
         presenter.getOpenProfileObservable()
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(userName -> {
+                .compose(this.<BaseProfile>bindToLifecycle())
+                .subscribe(baseProfile -> {
                     if (areInterests) {
                         startActivityForResult(
-                                TagProfileActivity.newIntent(ListeningsActivity.this, userName),
+                                TagProfileActivity.newIntent(ListeningsActivity.this, baseProfile.getName()),
                                 REQUEST_OPENED_PROFILE_WAS_LISTENED);
                     } else {
                         startActivityForResult(
-                                UserOrPageProfileActivity.newIntent(ListeningsActivity.this, userName),
+                                ProfileIntentHelper.newIntent(ListeningsActivity.this, baseProfile),
                                 REQUEST_OPENED_PROFILE_WAS_LISTENED);
                     }
                 });

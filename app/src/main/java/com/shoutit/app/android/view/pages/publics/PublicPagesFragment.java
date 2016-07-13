@@ -21,7 +21,7 @@ import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.utils.rx.RxUtils;
 import com.shoutit.app.android.view.listenings.ProfilesListAdapter;
-import com.shoutit.app.android.view.profile.user.UserOrPageProfileActivity;
+import com.shoutit.app.android.view.profile.page.PageProfileActivity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -109,7 +109,7 @@ public class PublicPagesFragment extends BaseFragment {
 
     private void showPageProfile(@Nonnull String userName) {
         getParentFragment().startActivityForResult(
-                UserOrPageProfileActivity.newIntent(getActivity(), userName),
+                PageProfileActivity.newIntent(getActivity(), userName),
                 REQUEST_OPENED_PROFILE_WAS_LISTENED);
     }
 

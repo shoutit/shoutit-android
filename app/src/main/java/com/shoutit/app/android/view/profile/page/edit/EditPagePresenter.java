@@ -2,15 +2,24 @@ package com.shoutit.app.android.view.profile.page.edit;
 
 import android.net.Uri;
 
+import com.appunite.rx.ObservableExtensions;
+import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.google.common.base.Optional;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.Page;
+import com.shoutit.app.android.api.model.UpdatePage;
+import com.shoutit.app.android.utils.AmazonHelper;
+import com.shoutit.app.android.utils.FileHelper;
+import com.shoutit.app.android.utils.ImageHelper;
+
+import java.io.File;
 
 import javax.inject.Inject;
 
+import rx.Observable;
 import rx.Scheduler;
 import rx.subscriptions.CompositeSubscription;
 
@@ -21,22 +30,33 @@ public class EditPagePresenter {
     private final Scheduler mNetworkScheduler;
     private final Scheduler mUiScheduler;
     private final PageDataProvider mPageDataProvider;
+    private final boolean mIsLoggedIn;
+    private final FileHelper mFileHelper;
+    private final AmazonHelper mAmazonHelper;
 
     private Listener mListener;
     private CompositeSubscription mCompositeSubscription;
     private Page mPage;
+    private String avatar;
+    private String cover;
 
     @Inject
     public EditPagePresenter(UserPreferences userPreferences,
                              ApiService apiService,
                              @NetworkScheduler Scheduler networkScheduler,
                              @UiScheduler Scheduler uiScheduler,
-                             PageDataProvider pageDataProvider) {
+                             PageDataProvider pageDataProvider,
+                             boolean isLoggedIn,
+                             FileHelper fileHelper,
+                             AmazonHelper amazonHelper) {
         mUserPreferences = userPreferences;
         mApiService = apiService;
         mNetworkScheduler = networkScheduler;
         mUiScheduler = uiScheduler;
         mPageDataProvider = pageDataProvider;
+        mIsLoggedIn = isLoggedIn;
+        mFileHelper = fileHelper;
+        mAmazonHelper = amazonHelper;
     }
 
     public void register(Listener listener) {
@@ -60,6 +80,8 @@ public class EditPagePresenter {
                     final String overview = page.getOverview();
                     final String mission = page.getMission();
                     final String generalInfo = page.getGeneralInfo();
+                    final String image = page.getImage();
+                    final String cover = page.getCover();
 
                     mListener.setName(name);
                     mListener.setAbout(about);
@@ -71,6 +93,8 @@ public class EditPagePresenter {
                     mListener.setOverview(overview);
                     mListener.setMission(mission);
                     mListener.setGeneralInfo(generalInfo);
+                    mListener.setCover(cover);
+                    mListener.setAvatar(image);
                 }, throwable -> {
                     mListener.setProgress(false);
                     mListener.error();
@@ -78,24 +102,7 @@ public class EditPagePresenter {
     }
 
     public void editFinished(EditData editData) {
-        //TODO verification
-        final Page newPage = new Page(mPage.getId(),
-                mPage.getType(),
-                mPage.getUsername(),
-                mPage.getName(),
-                mPage.getFirstName(),
-                mPage.getLastName(),
-                mPage.isActivated(),
-                mPage.getImage(),
-                mPage.getCover(),
-                mPage.isListening(),
-                mPage.getListenersCount(),
-                mPage.getLocation(),
-                mPage.getStats(),
-                mPage.isOwner(),
-                mPage.getEmail(),
-                mPage.getAdmin(),
-                editData.about,
+        final UpdatePage newPage = new UpdatePage(editData.about,
                 editData.description,
                 editData.phone,
                 editData.founded,
@@ -103,11 +110,14 @@ public class EditPagePresenter {
                 editData.overview,
                 editData.mission,
                 editData.generalInfo,
+                cover != null ? cover : mPage.getCover(),
+                avatar != null ? avatar : mPage.getImage(),
                 mPage.isVerified(),
                 editData.published);
 
         mListener.setProgress(true);
-        mCompositeSubscription.add(mApiService.updatePage(mPage.getId(), newPage)
+
+        mCompositeSubscription.add(getPageObservable(newPage)
                 .observeOn(mUiScheduler)
                 .subscribeOn(mNetworkScheduler)
                 .subscribe(page -> {
@@ -120,17 +130,78 @@ public class EditPagePresenter {
                 }));
     }
 
+    private Observable<Page> getPageObservable(UpdatePage newPage) {
+        final Observable<Page> pageObservable;
+        if (!mIsLoggedIn) {
+            pageObservable = mApiService.updatePage(mPage.getId(), newPage);
+        } else {
+            pageObservable = mApiService.updatePage(newPage);
+        }
+        return pageObservable;
+    }
+
     public void unregister() {
         mCompositeSubscription.unsubscribe();
     }
 
     public void avatarChosen(Optional<Uri> uriOptional) {
+        if (uriOptional.isPresent()) {
+            mListener.setProgress(true);
+            final Observable<ResponseOrError<File>> fileObservable = mFileHelper.scaleAndCompressImage(ImageHelper.MAX_AVATAR_SIZE, uriOptional.get())
+                    .subscribeOn(mNetworkScheduler)
+                    .observeOn(mUiScheduler)
+                    .compose(ObservableExtensions.behaviorRefCount());
 
-        // TODO
+            fileObservable
+                    .compose(ResponseOrError.onlyError())
+                    .subscribe(throwable -> {
+                        mListener.setProgress(false);
+                        mListener.error();
+                    });
+
+            fileObservable
+                    .compose(ResponseOrError.onlySuccess())
+                    .switchMap(mAmazonHelper.uploadImageToAmazonFunction(mNetworkScheduler, mUiScheduler))
+                    .subscribe(fileResponseOrError -> {
+                        mListener.setProgress(false);
+                        if (fileResponseOrError.isData()) {
+                            avatar = fileResponseOrError.data();
+                            mListener.setAvatar(avatar);
+                        } else {
+                            mListener.error();
+                        }
+                    });
+        }
     }
 
     public void coverChosen(Optional<Uri> uriOptional) {
-        // TODO
+        if (uriOptional.isPresent()) {
+            mListener.setProgress(true);
+            final Observable<ResponseOrError<File>> fileObservable = mFileHelper.scaleAndCompressImage(ImageHelper.MAX_COVER_SIZE, uriOptional.get())
+                    .subscribeOn(mNetworkScheduler)
+                    .observeOn(mUiScheduler)
+                    .compose(ObservableExtensions.behaviorRefCount());
+
+            fileObservable
+                    .compose(ResponseOrError.onlyError())
+                    .subscribe(throwable -> {
+                        mListener.setProgress(false);
+                        mListener.error();
+                    });
+
+            fileObservable
+                    .compose(ResponseOrError.onlySuccess())
+                    .switchMap(mAmazonHelper.uploadImageToAmazonFunction(mNetworkScheduler, mUiScheduler))
+                    .subscribe(fileResponseOrError -> {
+                        mListener.setProgress(false);
+                        if (fileResponseOrError.isData()) {
+                            cover = fileResponseOrError.data();
+                            mListener.setCover(cover);
+                        } else {
+                            mListener.error();
+                        }
+                    });
+        }
     }
 
     public interface Listener {
@@ -157,9 +228,13 @@ public class EditPagePresenter {
 
         void setProgress(boolean show);
 
+        void setAvatar(String url);
+
         void finish();
 
         void error();
+
+        void setCover(String data);
     }
 
     public static class EditData {

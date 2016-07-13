@@ -16,7 +16,7 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.PreferencesHelper;
 import com.shoutit.app.android.view.pages.my.SelectListenersActivity;
-import com.shoutit.app.android.view.profile.user.UserOrPageProfileActivity;
+import com.shoutit.app.android.view.profile.user.UserProfileActivity;
 import com.shoutit.app.android.view.profileslist.BaseProfileListFragment;
 
 import java.util.List;
@@ -126,7 +126,7 @@ public class AdminsFragment extends BaseProfileListFragment implements AdminsDia
     }
 
     private void openProfile(@Nonnull String userName) {
-        startActivityForResult(UserOrPageProfileActivity.newIntent(getActivity(), userName), REQUEST_OPENED_PROFILE_WAS_LISTENED);
+        startActivityForResult(UserProfileActivity.newIntent(getActivity(), userName), REQUEST_OPENED_PROFILE_WAS_LISTENED);
     }
 
     @Override

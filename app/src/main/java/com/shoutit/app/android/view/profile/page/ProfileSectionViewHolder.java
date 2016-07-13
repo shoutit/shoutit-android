@@ -1,4 +1,4 @@
-package com.shoutit.app.android.viewholders;
+package com.shoutit.app.android.view.profile.page;
 
 import android.content.Context;
 import android.view.View;
@@ -10,7 +10,6 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.TextHelper;
-import com.shoutit.app.android.view.profile.user.ProfileAdapterItems;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 

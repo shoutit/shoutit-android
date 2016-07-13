@@ -10,9 +10,9 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.view.profile.ProfileIntentHelper;
 import com.shoutit.app.android.view.profileslist.BaseProfilesListActivity;
 import com.shoutit.app.android.view.listenings.ProfilesListAdapter;
-import com.shoutit.app.android.view.profile.user.UserOrPageProfileActivity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -44,11 +44,10 @@ public class ListenersActivity extends BaseProfilesListActivity {
         presenter = (ListenersPresenter) ((ListenersActivityComponent) getActivityComponent()).profilesListPresenter();
 
         presenter.getProfileSelectedObservable()
-                .map(BaseProfile::getUsername)
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(userName -> {
+                .compose(this.<BaseProfile>bindToLifecycle())
+                .subscribe(baseProfile -> {
                         startActivityForResult(
-                                UserOrPageProfileActivity.newIntent(ListenersActivity.this, userName),
+                                ProfileIntentHelper.newIntent(ListenersActivity.this, baseProfile.getUsername(), baseProfile.isPage()),
                                 REQUEST_OPENED_PROFILE_WAS_LISTENED);
                 });
     }

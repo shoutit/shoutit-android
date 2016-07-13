@@ -25,6 +25,7 @@ import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.adapteritems.FbAdAdapterItem;
 import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.Filter;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.User;
@@ -149,7 +150,7 @@ public class ShoutAdapter extends BaseAdapter {
             unsubscribe();
             this.item = item;
             final Shout shout = item.getShout();
-            final User user = shout.getProfile();
+            final BaseProfile user = shout.getProfile();
             final UserLocation location = shout.getLocation();
 
             int currentItem = shoutViewPager.getCurrentItem();

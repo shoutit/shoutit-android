@@ -69,7 +69,7 @@ public class ShoutPresenter {
     private final Observable<Response<Object>> reportShoutObservable;
     private final Observable<List<ConversationDetails>> conversationObservable;
     private final Observable<Object> refreshShoutsObservable;
-    private final Observable<User> videoCallClickedObservable;
+    private final Observable<BaseProfile> videoCallClickedObservable;
     private final Observable<Boolean> editShoutClickedObservable;
     private final Observable<Object> onlyForLoggedInUserObservable;
     private final Observable<String> shareObservable;
@@ -83,7 +83,7 @@ public class ShoutPresenter {
     private PublishSubject<String> userShoutSelectedSubject = PublishSubject.create();
     private PublishSubject<String> relatedShoutSelectedSubject = PublishSubject.create();
     private PublishSubject<String> seeAllRelatedShoutSubject = PublishSubject.create();
-    private PublishSubject<User> visitProfileSubject = PublishSubject.create();
+    private PublishSubject<BaseProfile> visitProfileSubject = PublishSubject.create();
     private PublishSubject<Object> onVideoOrEditClickSubject = PublishSubject.create();
     private PublishSubject<Object> shareSubject = PublishSubject.create();
     private PublishSubject<Object> showDeleteDialogSubject = PublishSubject.create();
@@ -131,7 +131,7 @@ public class ShoutPresenter {
                 .map(shout -> shout.getProfile().getUsername())
                 .compose(ObservableExtensions.<String>behaviorRefCount());
 
-        final Observable<User> shoutOwnerProfile = successShoutResponse
+        final Observable<BaseProfile> shoutOwnerProfile = successShoutResponse
                 .map(Shout::getProfile);
 
         titleObservable = successShoutResponse
@@ -229,13 +229,13 @@ public class ShoutPresenter {
 
                             builder.add(shout);
 
-                            final User user = shout.getShout().getProfile();
+                            final BaseProfile baseProfile = shout.getShout().getProfile();
                             if (!userShouts.isEmpty()) {
-                                builder.add(new HeaderAdapterItem(context.getString(R.string.shout_user_shouts_header, user.getFirstName()).toUpperCase()))
+                                builder.add(new HeaderAdapterItem(context.getString(R.string.shout_user_shouts_header, baseProfile.getFirstName()).toUpperCase()))
                                         .addAll(userShouts);
                             }
 
-                            builder.add(new ShoutAdapterItems.VisitProfileAdapterItem(visitProfileSubject, user));
+                            builder.add(new ShoutAdapterItems.VisitProfileAdapterItem(visitProfileSubject, baseProfile));
 
                             if (!relatedShouts.isEmpty()) {
                                 builder.add(new HeaderAdapterItem(context.getString(R.string.shout_related_shouts_header)))
@@ -420,7 +420,7 @@ public class ShoutPresenter {
     }
 
     @Nonnull
-    public Observable<User> getVideoCallClickedObservable() {
+    public Observable<BaseProfile> getVideoCallClickedObservable() {
         return videoCallClickedObservable;
     }
 
@@ -476,7 +476,7 @@ public class ShoutPresenter {
     }
 
     @Nonnull
-    public Observable<User> getVisitProfileObservable() {
+    public Observable<BaseProfile> getVisitProfileObservable() {
         return visitProfileSubject;
     }
 

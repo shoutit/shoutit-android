@@ -44,7 +44,7 @@ public class ProfileActivityModule {
                                                     MyProfileHalfPresenter myProfilePresenter, ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
                                                     PusherHelper pusherHelper, ListeningHalfPresenter listeningHalfPresenter, BookmarksDao bookmarksDao,
                                                     BookmarkHelper bookmarkHelper) {
-        return new UserOrPageProfilePresenter(userName, shoutsDao, context, preferences, uiScheduler, networkScheduler,
+        return new PageProfilePresenter(userName, shoutsDao, context, preferences, uiScheduler, networkScheduler,
                 profilesDao, myProfilePresenter, userProfilePresenter, preferencesHelper, shoutsGlobalRefreshPresenter,
                 listeningHalfPresenter, apiService, pusherHelper, bookmarksDao, bookmarkHelper);
     }

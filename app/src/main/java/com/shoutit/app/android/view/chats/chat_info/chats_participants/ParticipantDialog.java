@@ -33,7 +33,7 @@ public class ParticipantDialog {
         mContext = context;
     }
 
-    public void show(final String id, final boolean isBlocked, boolean isAdmin,
+    public void show(final String id, final boolean isBlocked, boolean isAdmin, boolean isPage,
                      String name, @Nonnull String userName, final ChatParticipantsPresenter presenter) {
 
         final View view = LayoutInflater.from(mContext).inflate(R.layout.chat_participant_action_dialog, null, false);
@@ -72,7 +72,7 @@ public class ParticipantDialog {
         mViewProfileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                presenter.showProfile(userName);
+                presenter.showProfile(userName, isPage);
                 alertDialog.dismiss();
             }
         });

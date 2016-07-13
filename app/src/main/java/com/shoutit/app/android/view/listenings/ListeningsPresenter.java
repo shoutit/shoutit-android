@@ -51,12 +51,8 @@ public class ListeningsPresenter extends BaseProfileListPresenter {
     }
 
     @Nonnull
-    public Observable<String> getOpenProfileObservable() {
-        if (listeningsType.equals(ListeningsPresenter.ListeningsType.INTERESTS)) {
-            return profileSelectedSubject.map(BaseProfile::getName);
-        } else {
-            return profileSelectedSubject.map(BaseProfile::getUsername);
-        }
+    public Observable<BaseProfile> getOpenProfileObservable() {
+        return profileSelectedSubject;
     }
 
     @Override
