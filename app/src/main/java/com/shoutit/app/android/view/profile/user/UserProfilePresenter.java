@@ -40,6 +40,7 @@ import com.shoutit.app.android.utils.ListeningHalfPresenter;
 import com.shoutit.app.android.utils.PreferencesHelper;
 import com.shoutit.app.android.utils.PromotionHelper;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
+import com.shoutit.app.android.view.profile.BaseProfileAdapterItems;
 import com.shoutit.app.android.view.profile.user.myprofile.MyProfileHalfPresenter;
 import com.shoutit.app.android.view.profile.user.userprofile.UserProfileHalfPresenter;
 import com.shoutit.app.android.view.search.SearchPresenter;
@@ -101,7 +102,7 @@ public class UserProfilePresenter implements ProfilePresenter {
     @Nonnull
     private final PublishSubject<String> shoutSelectedSubject = PublishSubject.create();
     @Nonnull
-    private final PublishSubject<String> profileToOpenSubject = PublishSubject.create();
+    private final PublishSubject<ProfileType> profileToOpenSubject = PublishSubject.create();
     @Nonnull
     private final PublishSubject<Object> actionOnlyForLoggedInUserSubject = PublishSubject.create();
     @Nonnull
@@ -398,7 +399,7 @@ public class UserProfilePresenter implements ProfilePresenter {
                 builder.add(new HeaderAdapterItem(user.isOwner() ?
                         myProfilePresenter.getShoutsHeaderTitle() : userProfilePresenter.getShoutsHeaderTitle(user)))
                         .addAll(shouts)
-                        .add(new ProfileAdapterItems.SeeAllUserShoutsAdapterItem(
+                        .add(new BaseProfileAdapterItems.SeeAllUserShoutsAdapterItem(
                                 showAllShoutsSubject, user.getUsername()));
             }
 
@@ -425,18 +426,18 @@ public class UserProfilePresenter implements ProfilePresenter {
         }
     }
 
-    private ProfileAdapterItems.ProfileSectionAdapterItem getSectionAdapterItemForPosition(int position,
-                                                                                           List<BaseProfile> items, @Nullable String loggedInUserName) {
+    private BaseProfileAdapterItems.ProfileSectionAdapterItem getSectionAdapterItemForPosition(int position,
+                                                                                               List<BaseProfile> items, @Nullable String loggedInUserName) {
         if (position == 0) {
-            return new ProfileAdapterItems.ProfileSectionAdapterItem(true, false, items.get(position),
+            return new BaseProfileAdapterItems.ProfileSectionAdapterItem(true, false, items.get(position),
                     listeningHalfPresenter.getListenProfileSubject(), profileToOpenSubject,
                     actionOnlyForLoggedInUserSubject, loggedInUserName, isNormalUser, items.size() == 1);
         } else if (position == items.size() - 1) {
-            return new ProfileAdapterItems.ProfileSectionAdapterItem(false, true, items.get(position),
+            return new BaseProfileAdapterItems.ProfileSectionAdapterItem(false, true, items.get(position),
                     listeningHalfPresenter.getListenProfileSubject(), profileToOpenSubject,
                     actionOnlyForLoggedInUserSubject, loggedInUserName, isNormalUser, false);
         } else {
-            return new ProfileAdapterItems.ProfileSectionAdapterItem(false, false, items.get(position),
+            return new BaseProfileAdapterItems.ProfileSectionAdapterItem(false, false, items.get(position),
                     listeningHalfPresenter.getListenProfileSubject(), profileToOpenSubject,
                     actionOnlyForLoggedInUserSubject, loggedInUserName, isNormalUser, false);
         }
@@ -537,7 +538,7 @@ public class UserProfilePresenter implements ProfilePresenter {
 
     @Nonnull
     @Override
-    public Observable<String> getProfileToOpenObservable() {
+    public Observable<ProfileType> getProfileToOpenObservable() {
         return profileToOpenSubject;
     }
 

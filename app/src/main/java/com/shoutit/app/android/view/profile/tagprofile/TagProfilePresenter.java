@@ -17,6 +17,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.api.model.RelatedTagsResponse;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
@@ -29,7 +30,7 @@ import com.shoutit.app.android.dao.TagsDao;
 import com.shoutit.app.android.model.TagShoutsPointer;
 import com.shoutit.app.android.utils.BookmarkHelper;
 import com.shoutit.app.android.utils.PromotionHelper;
-import com.shoutit.app.android.view.profile.user.ProfileAdapterItems;
+import com.shoutit.app.android.view.profile.BaseProfileAdapterItems;
 import com.shoutit.app.android.view.profile.user.ProfilePresenter;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.subsearch.SubSearchActivity;
@@ -63,7 +64,7 @@ public class TagProfilePresenter implements ProfilePresenter {
     private final PublishSubject<Throwable> errorSubject = PublishSubject.create();
     private final PublishSubject<Object> moreMenuOptionClickedSubject = PublishSubject.create();
     private final PublishSubject<Object> actionOnlyForLoggedInUserSubject = PublishSubject.create();
-    private final PublishSubject<String> profileToOpenSubject = PublishSubject.create();
+    private final PublishSubject<ProfileType> profileToOpenSubject = PublishSubject.create();
     private final PublishSubject<String> showAllShoutsSubject = PublishSubject.create();
     private final PublishSubject<Object> shareInitSubject = PublishSubject.create();
     private final PublishSubject<Object> searchMenuItemClickSubject = PublishSubject.create();
@@ -157,11 +158,11 @@ public class TagProfilePresenter implements ProfilePresenter {
         final Observable<TagDetail> successTagRequestObservable = tagRequestObservable
                 .compose(ResponseOrError.<TagDetail>onlySuccess());
 
-        final Observable<ProfileAdapterItems.TagInfoAdapterItem> tagAdapterItem = successTagRequestObservable
-                .map(new Func1<TagDetail, ProfileAdapterItems.TagInfoAdapterItem>() {
+        final Observable<BaseProfileAdapterItems.TagInfoAdapterItem> tagAdapterItem = successTagRequestObservable
+                .map(new Func1<TagDetail, BaseProfileAdapterItems.TagInfoAdapterItem>() {
                     @Override
-                    public ProfileAdapterItems.TagInfoAdapterItem call(TagDetail tagDetail) {
-                        return new ProfileAdapterItems.TagInfoAdapterItem(tagDetail, isLoggedInAsNormalUser,
+                    public BaseProfileAdapterItems.TagInfoAdapterItem call(TagDetail tagDetail) {
+                        return new BaseProfileAdapterItems.TagInfoAdapterItem(tagDetail, isLoggedInAsNormalUser,
                                 actionOnlyForLoggedInUserSubject, onListenActionClickedSubject, moreMenuOptionClickedSubject);
                     }
                 });
@@ -321,9 +322,9 @@ public class TagProfilePresenter implements ProfilePresenter {
                 tagAdapterItem,
                 successRelatedTags,
                 shoutsSuccessResponse.startWith(ImmutableList.<List<BaseAdapterItem>>of()),
-                new Func3<ProfileAdapterItems.TagInfoAdapterItem, List<BaseAdapterItem>, List<BaseAdapterItem>, List<BaseAdapterItem>>() {
+                new Func3<BaseProfileAdapterItems.TagInfoAdapterItem, List<BaseAdapterItem>, List<BaseAdapterItem>, List<BaseAdapterItem>>() {
                     @Override
-                    public List<BaseAdapterItem> call(ProfileAdapterItems.TagInfoAdapterItem tagItem,
+                    public List<BaseAdapterItem> call(BaseProfileAdapterItems.TagInfoAdapterItem tagItem,
                                                       List<BaseAdapterItem> relatedTags,
                                                       List<BaseAdapterItem> shouts) {
                         final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
@@ -339,7 +340,7 @@ public class TagProfilePresenter implements ProfilePresenter {
                             builder.add(new HeaderAdapterItem(
                                     context.getString(R.string.tag_profile_shouts, tagItem.getTagDetail().getName()).toUpperCase()))
                             .addAll(shouts)
-                            .add(new ProfileAdapterItems.SeeAllUserShoutsAdapterItem(
+                            .add(new BaseProfileAdapterItems.SeeAllUserShoutsAdapterItem(
                                     showAllShoutsSubject, tagName));
                         }
 
@@ -383,17 +384,17 @@ public class TagProfilePresenter implements ProfilePresenter {
 
     }
 
-    private ProfileAdapterItems.RelatedTagAdapterItem getRelatedTagdapterItemForPosition(int position, TagDetail tag,
-                                                                                         RelatedTagsResponse relatedTagsResponse,
-                                                                                         int tagsNumberToDisplay) {
+    private BaseProfileAdapterItems.RelatedTagAdapterItem getRelatedTagdapterItemForPosition(int position, TagDetail tag,
+                                                                                             RelatedTagsResponse relatedTagsResponse,
+                                                                                             int tagsNumberToDisplay) {
         if (position == 0) {
-            return new ProfileAdapterItems.RelatedTagAdapterItem(true, false, tag, relatedTagsResponse,
+            return new BaseProfileAdapterItems.RelatedTagAdapterItem(true, false, tag, relatedTagsResponse,
                     onListenRelatedTagClickedSubject, profileToOpenSubject, actionOnlyForLoggedInUserSubject, isLoggedInAsNormalUser, tagsNumberToDisplay == 1);
         } else if (position == tagsNumberToDisplay - 1) {
-            return new ProfileAdapterItems.RelatedTagAdapterItem(false, true, tag, relatedTagsResponse,
+            return new BaseProfileAdapterItems.RelatedTagAdapterItem(false, true, tag, relatedTagsResponse,
                     onListenRelatedTagClickedSubject, profileToOpenSubject, actionOnlyForLoggedInUserSubject, isLoggedInAsNormalUser, false);
         } else {
-            return new ProfileAdapterItems.RelatedTagAdapterItem(false, false, tag, relatedTagsResponse,
+            return new BaseProfileAdapterItems.RelatedTagAdapterItem(false, false, tag, relatedTagsResponse,
                     onListenRelatedTagClickedSubject, profileToOpenSubject, actionOnlyForLoggedInUserSubject, isLoggedInAsNormalUser, false);
         }
     }
@@ -474,7 +475,7 @@ public class TagProfilePresenter implements ProfilePresenter {
 
     @Nonnull
     @Override
-    public Observable<String> getProfileToOpenObservable() {
+    public Observable<ProfileType> getProfileToOpenObservable() {
         return profileToOpenSubject;
     }
 

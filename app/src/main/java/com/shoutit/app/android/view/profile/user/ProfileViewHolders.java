@@ -19,6 +19,7 @@ import com.shoutit.app.android.utils.ImageHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.utils.TextHelper;
+import com.shoutit.app.android.view.profile.BaseProfileAdapterItems;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -114,13 +115,13 @@ public class ProfileViewHolders {
         }
     }
 
-    public static class SeeAllButtonViewHolder extends ViewHolderManager.BaseViewHolder<ProfileAdapterItems.SeeAllUserShoutsAdapterItem> implements View.OnClickListener {
+    public static class SeeAllButtonViewHolder extends ViewHolderManager.BaseViewHolder<BaseProfileAdapterItems.SeeAllUserShoutsAdapterItem> implements View.OnClickListener {
 
         private final Context context;
         @Bind(R.id.button_gray_btn)
         Button seeAllButton;
 
-        private ProfileAdapterItems.SeeAllUserShoutsAdapterItem item;
+        private BaseProfileAdapterItems.SeeAllUserShoutsAdapterItem item;
 
         public SeeAllButtonViewHolder(@Nonnull View itemView, Context context) {
             super(itemView);
@@ -130,7 +131,7 @@ public class ProfileViewHolders {
         }
 
         @Override
-        public void bind(@Nonnull ProfileAdapterItems.SeeAllUserShoutsAdapterItem item) {
+        public void bind(@Nonnull BaseProfileAdapterItems.SeeAllUserShoutsAdapterItem item) {
             this.item = item;
             seeAllButton.setText(context.getString(R.string.profile_see_all_shouts).toUpperCase());
         }
@@ -392,7 +393,7 @@ public class ProfileViewHolders {
         }
     }
 
-    public static class TagViewHolder extends ViewHolderManager.BaseViewHolder<ProfileAdapterItems.TagInfoAdapterItem> {
+    public static class TagViewHolder extends ViewHolderManager.BaseViewHolder<BaseProfileAdapterItems.TagInfoAdapterItem> {
 
         @Bind(R.id.profile_user_name)
         TextView tagName;
@@ -403,7 +404,7 @@ public class ProfileViewHolders {
         @Bind(R.id.profile_listen_tv)
         TextView listenTextView;
 
-        private ProfileAdapterItems.TagInfoAdapterItem item;
+        private BaseProfileAdapterItems.TagInfoAdapterItem item;
         private final Context context;
 
         public TagViewHolder(View view, Context context) {
@@ -413,7 +414,7 @@ public class ProfileViewHolders {
         }
 
         @Override
-        public void bind(@Nonnull ProfileAdapterItems.TagInfoAdapterItem item) {
+        public void bind(@Nonnull BaseProfileAdapterItems.TagInfoAdapterItem item) {
             this.item = item;
             final TagDetail tag = item.getTagDetail();
             tagName.setText(tag.getName());
