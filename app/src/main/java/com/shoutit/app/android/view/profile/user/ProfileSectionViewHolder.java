@@ -10,6 +10,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.TextHelper;
+import com.shoutit.app.android.view.profile.BaseProfileAdapterItems;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -19,7 +20,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class ProfileSectionViewHolder extends ViewHolderManager.BaseViewHolder<ProfileAdapterItems.BaseProfileSectionItem<ProfileType>> {
+public class ProfileSectionViewHolder extends ViewHolderManager.BaseViewHolder<BaseProfileAdapterItems.BaseProfileSectionItem<ProfileType>> {
     private final Context context;
     private final Picasso picasso;
     @Bind(R.id.profile_section_iv)
@@ -33,7 +34,7 @@ public class ProfileSectionViewHolder extends ViewHolderManager.BaseViewHolder<P
     @Bind(R.id.profile_section_container)
     View container;
 
-    private ProfileAdapterItems.BaseProfileSectionItem<ProfileType> item;
+    private BaseProfileAdapterItems.BaseProfileSectionItem<ProfileType> item;
     private final Target target;
 
     public ProfileSectionViewHolder(View itemView, Context context, Picasso picasso) {
@@ -47,7 +48,7 @@ public class ProfileSectionViewHolder extends ViewHolderManager.BaseViewHolder<P
     }
 
     @Override
-    public void bind(@Nonnull ProfileAdapterItems.BaseProfileSectionItem<ProfileType> item) {
+    public void bind(@Nonnull BaseProfileAdapterItems.BaseProfileSectionItem<ProfileType> item) {
         this.item = item;
         final ProfileType sectionItem = item.getSectionItem();
 

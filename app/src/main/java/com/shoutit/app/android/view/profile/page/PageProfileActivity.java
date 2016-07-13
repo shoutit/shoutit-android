@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
@@ -21,6 +22,7 @@ import com.shoutit.app.android.view.chats.chatsfirstconversation.ChatFirstConver
 import com.shoutit.app.android.view.listeners.ListenersActivity;
 import com.shoutit.app.android.view.listenings.ListeningsActivity;
 import com.shoutit.app.android.view.notifications.NotificationsActivity;
+import com.shoutit.app.android.view.profile.ProfileIntentHelper;
 import com.shoutit.app.android.view.profile.page.edit.EditPageActivity;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsActivity;
@@ -58,10 +60,10 @@ public class PageProfileActivity extends ProfileActivity {
                 });
 
         presenter.getProfileToOpenObservable()
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(userName -> {
+                .compose(this.<ProfileType>bindToLifecycle())
+                .subscribe(profile -> {
                     startActivityForResult(
-                            PageProfileActivity.newIntent(PageProfileActivity.this, userName),
+                            ProfileIntentHelper.newIntent(this, profile.getUsername(), ProfileType.PAGE.equals(profile.getType())),
                             REQUEST_PROFILE_OPENED_FROM_PROFILE);
                 });
 

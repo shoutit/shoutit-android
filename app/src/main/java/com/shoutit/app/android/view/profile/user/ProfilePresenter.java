@@ -4,6 +4,7 @@ package com.shoutit.app.android.view.profile.user;
 import android.support.annotation.NonNull;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.shoutit.app.android.api.model.ProfileType;
 
 import java.util.List;
 
@@ -48,7 +49,7 @@ public interface ProfilePresenter {
     Observable<String> getShoutSelectedObservable();
 
     @Nonnull
-    Observable<String> getProfileToOpenObservable();
+    Observable<ProfileType> getProfileToOpenObservable();
 
     @Nonnull
     Observer<Object> getShareInitObserver();

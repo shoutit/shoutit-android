@@ -9,6 +9,7 @@ import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.view.profile.BaseProfileAdapterItems;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 import com.shoutit.app.android.view.shouts.ShoutGridViewHolder;
 import com.shoutit.app.android.viewholders.HeaderViewHolder;
@@ -81,13 +82,13 @@ public class ProfileAdapter extends BaseAdapter {
             return VIEW_TYPE_MY_PROFILE_THREE_ICONS;
         } else if (item instanceof ShoutAdapterItem) {
             return VIEW_TYPE_SHOUT;
-        } else if (item instanceof ProfileAdapterItems.BaseProfileSectionItem) {
+        } else if (item instanceof BaseProfileAdapterItems.BaseProfileSectionItem) {
             return VIEW_TYPE_USER_PAGES_OR_ADMINS;
-        } else if (item instanceof ProfileAdapterItems.SeeAllUserShoutsAdapterItem) {
+        } else if (item instanceof BaseProfileAdapterItems.SeeAllUserShoutsAdapterItem) {
             return VIEW_TYPE_SEE_ALL_SHOUTS;
         } else if (item instanceof HeaderAdapterItem) {
             return VIEW_TYPE_HEADER;
-        } else if (item instanceof ProfileAdapterItems.TagInfoAdapterItem) {
+        } else if (item instanceof BaseProfileAdapterItems.TagInfoAdapterItem) {
             return VIEW_TYPE_TAG_INFO;
         } else {
             throw new RuntimeException("Unknown adapter view type: " + item.getClass().getSimpleName());
