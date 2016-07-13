@@ -67,7 +67,8 @@ public class DialogCallActivity extends BaseActivity {
         return new Intent(context, DialogCallActivity.class)
                 .putExtra(CONVERSATION_ID, conversationId)
                 .putExtra(CALLER_NAME, callerName)
-                .putExtra(CALLER_IMAGE_URL, imageUrl);
+                .putExtra(CALLER_IMAGE_URL, imageUrl)
+                .addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
     }
 
     @Override
@@ -83,6 +84,7 @@ public class DialogCallActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        overridePendingTransition(0, 0);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dialog_call);
         ButterKnife.bind(this);
