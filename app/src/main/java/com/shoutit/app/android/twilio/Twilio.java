@@ -121,7 +121,6 @@ public class Twilio {
                 .subscribe(this::initializeTwilio);
 
         final Observable<ResponseOrError<BothParams<CallerProfile, String>>> callerProfileResponse = profileRefreshSubject
-                .throttleFirst(2, TimeUnit.SECONDS) // Workaround for Twilio mutiple invites
                 .switchMap(new Func1<BothParams<String, String>, Observable<ResponseOrError<BothParams<CallerProfile, String>>>>() {
                     @Override
                     public Observable<ResponseOrError<BothParams<CallerProfile, String>>> call(BothParams<String, String> conversationIdWithIdentity) {
@@ -138,6 +137,7 @@ public class Twilio {
 
 
         callerProfileResponse
+                .throttleFirst(4, TimeUnit.SECONDS) // Workaround for Twilio mutiple invites
                 .compose(ResponseOrError.onlySuccess())
                 .filter(Functions1.isNotNull())
                 .observeOn(uiScheduler)

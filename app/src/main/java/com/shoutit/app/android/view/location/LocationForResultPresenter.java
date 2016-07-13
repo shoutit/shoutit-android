@@ -17,13 +17,13 @@ import rx.Observer;
 public class LocationForResultPresenter implements ILocationPresenter {
 
     private final LocationPresenterDelegate mLocationPresenterDelegate;
-    private final Observable<UserLocation> mUpdateUserObservable;
+    private final Observable<UserLocation> mUpdateLocationObservable;
 
     @Inject
     public LocationForResultPresenter(LocationPresenterDelegate locationPresenterDelegate) {
         mLocationPresenterDelegate = locationPresenterDelegate;
 
-        mUpdateUserObservable = Observable.merge(
+        mUpdateLocationObservable = Observable.merge(
                 mLocationPresenterDelegate.getSelectedPlaceGeocodeResponse().compose(ResponseOrError.<UserLocation>onlySuccess()),
                 mLocationPresenterDelegate.getSelectedGpsUserLocation());
     }
@@ -65,8 +65,8 @@ public class LocationForResultPresenter implements ILocationPresenter {
     }
 
     @NonNull
-    public Observable<UserLocation> getUpdateUserObservable() {
-        return mUpdateUserObservable;
+    public Observable<UserLocation> getUpdateLocationObservable() {
+        return mUpdateLocationObservable;
     }
 
     @Override

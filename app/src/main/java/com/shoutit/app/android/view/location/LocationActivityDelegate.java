@@ -9,7 +9,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
@@ -44,6 +43,7 @@ public class LocationActivityDelegate {
     ProgressBar queryProgressBar;
     @Bind(R.id.location_progress_bar)
     FrameLayout progressBar;
+
     private final RxAppCompatActivity mActivity;
     private final ILocationPresenter mPresenter;
     private final LocationAdapter mAdapter;
@@ -55,12 +55,13 @@ public class LocationActivityDelegate {
     }
 
     public void onCreate() {
-        final View view = LayoutInflater.from(mActivity).inflate(
-                R.layout.activity_location,
-                (ViewGroup) mActivity.findViewById(android.R.id.content));
-        mActivity.setContentView(view);
+        final View view = LayoutInflater
+                .from(mActivity)
+                .inflate(R.layout.activity_location, null);
 
+        mActivity.setContentView(view);
         ButterKnife.bind(this, view);
+
         setUpActionbar();
 
         askForLocationPermissions();
