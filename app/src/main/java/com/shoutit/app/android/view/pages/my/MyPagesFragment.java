@@ -137,6 +137,7 @@ public class MyPagesFragment extends BaseFragment implements MyPagesDialog.Pages
     @Override
     public void useShoutItAsPage(Page page) {
         mUserPreferences.setPage(page);
+        mUserPreferences.setTwilioToken(null);
 
         ActivityCompat.finishAffinity(getActivity());
         startActivity(MainActivity.newIntent(getActivity()));
