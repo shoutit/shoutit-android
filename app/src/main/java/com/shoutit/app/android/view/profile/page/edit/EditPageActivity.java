@@ -13,17 +13,21 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.google.common.base.Optional;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.ImageCaptureHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.ToolbarUtils;
+import com.shoutit.app.android.view.location.LocationActivityForResult;
+import com.shoutit.app.android.view.location.LocationHelper;
 import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;
@@ -37,6 +41,10 @@ import butterknife.OnClick;
 public class EditPageActivity extends BaseActivity implements EditPagePresenter.Listener {
 
     private static final String EXTRA_USERNAME = "extra_username";
+    @Bind(R.id.edit_page_flag_iv)
+    ImageView mEditPageFlagIv;
+    @Bind(R.id.edit_page_location_tv)
+    TextView mEditPageLocationTv;
 
     public static Intent newIntentLoggedInPage(Context context) {
         return new Intent(context, EditPageActivity.class);
@@ -49,6 +57,7 @@ public class EditPageActivity extends BaseActivity implements EditPagePresenter.
     private static final int REQUEST_CODE_CAPTURE_IMAGE_FOR_AVATAR = 0;
     private static final int REQUEST_CODE_CAPTURE_IMAGE_FOR_COVER = 1;
     private static final int REQUEST_CODE_PERMISSION = 2;
+    private static final int REQUEST_CODE_LOCATION = 3;
 
     @Inject
     EditPagePresenter mEditPagePresenter;
@@ -243,6 +252,11 @@ public class EditPageActivity extends BaseActivity implements EditPagePresenter.
     }
 
     @Override
+    public void setUpLocation(UserLocation location) {
+        LocationHelper.setupLocation(location, EditPageActivity.this, mEditPageLocationTv, mEditPageFlagIv, mPicasso);
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != RESULT_OK) {
             return;
@@ -254,6 +268,10 @@ public class EditPageActivity extends BaseActivity implements EditPagePresenter.
                 break;
             case REQUEST_CODE_CAPTURE_IMAGE_FOR_COVER:
                 mEditPagePresenter.coverChosen(avatarCaptureHelper.onResult(resultCode, data));
+                break;
+            case REQUEST_CODE_LOCATION:
+                final UserLocation userLocation = LocationHelper.getLocationFromIntent(data);
+                mEditPagePresenter.onLocationChanged(userLocation);
                 break;
             default:
                 super.onActivityResult(requestCode, resultCode, data);
@@ -286,5 +304,12 @@ public class EditPageActivity extends BaseActivity implements EditPagePresenter.
         return PermissionHelper.checkPermissions(this, REQUEST_CODE_PERMISSION, ColoredSnackBar.contentView(this),
                 R.string.permission_location_explanation,
                 new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA});
+    }
+
+    @OnClick(R.id.edit_page_change_location_tv)
+    void startSelectLocation() {
+        startActivityForResult(LocationActivityForResult.newIntent(
+                EditPageActivity.this),
+                REQUEST_CODE_LOCATION);
     }
 }

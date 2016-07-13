@@ -40,7 +40,7 @@ import com.shoutit.app.android.utils.RtlUtils;
 import com.shoutit.app.android.utils.TextWatcherAdapter;
 import com.shoutit.app.android.view.createshout.DialogsHelper;
 import com.shoutit.app.android.view.location.LocationActivityForResult;
-import com.shoutit.app.android.view.location.LocationResultHelper;
+import com.shoutit.app.android.view.location.LocationHelper;
 import com.shoutit.app.android.view.createshout.publish.PublishShoutActivity;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
 import com.shoutit.app.android.widget.SimpleCurrencySpinnerAdapter;
@@ -205,7 +205,7 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == LOCATION_REQUEST && resultCode == Activity.RESULT_OK) {
-            final UserLocation userLocation = LocationResultHelper.getLocationFromIntent(data);
+            final UserLocation userLocation = LocationHelper.getLocationFromIntent(data);
             mCreateRequestPresenter.updateLocation(userLocation);
             changedLocation = userLocation;
         } else {

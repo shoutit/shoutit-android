@@ -50,7 +50,7 @@ import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.view.createshout.DialogsHelper;
 import com.shoutit.app.android.view.createshout.ShoutMediaPresenter;
 import com.shoutit.app.android.view.location.LocationActivityForResult;
-import com.shoutit.app.android.view.location.LocationResultHelper;
+import com.shoutit.app.android.view.location.LocationHelper;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
 import com.shoutit.app.android.widget.BaseSpinnerAdapter;
 import com.shoutit.app.android.widget.CategorySpinnerAdapter;
@@ -223,7 +223,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == LOCATION_REQUEST && resultCode == RESULT_OK) {
-            final UserLocation userLocation = LocationResultHelper.getLocationFromIntent(data);
+            final UserLocation userLocation = LocationHelper.getLocationFromIntent(data);
             mEditShoutPresenter.updateLocation(userLocation);
         } else if (requestCode == MEDIA_REQUEST_CODE && resultCode == RESULT_OK) {
             final Bundle extras = data.getExtras();

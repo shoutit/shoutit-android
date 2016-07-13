@@ -44,7 +44,7 @@ import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.utils.rx.Actions1;
 import com.shoutit.app.android.utils.rx.RxUtils;
 import com.shoutit.app.android.view.location.LocationActivityForResult;
-import com.shoutit.app.android.view.location.LocationResultHelper;
+import com.shoutit.app.android.view.location.LocationHelper;
 import com.shoutit.app.android.widget.GenderSpinnerAdapter;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -357,19 +357,7 @@ public class EditProfileActivity extends BaseActivity {
         return new Action1<UserLocation>() {
             @Override
             public void call(UserLocation userLocation) {
-                lastLocation = userLocation;
-                locationTv.setText(getString(R.string.edit_profile_country,
-                        Strings.nullToEmpty(userLocation.getCity()),
-                        Strings.nullToEmpty(userLocation.getCountry())));
-
-                final Optional<Integer> countryResId = ResourcesHelper
-                        .getCountryResId(EditProfileActivity.this, userLocation);
-                final Target flagTarget = PicassoHelper
-                        .getRoundedBitmapTarget(EditProfileActivity.this, flagIv);
-                if (countryResId.isPresent()) {
-                    picasso.load(countryResId.get())
-                            .into(flagTarget);
-                }
+                LocationHelper.setupLocation(userLocation, EditProfileActivity.this, locationTv, flagIv, picasso);
             }
         };
     }
@@ -507,7 +495,7 @@ public class EditProfileActivity extends BaseActivity {
                 }
                 break;
             case REQUEST_CODE_LOCATION:
-                final UserLocation userLocation = LocationResultHelper.getLocationFromIntent(data);
+                final UserLocation userLocation = LocationHelper.getLocationFromIntent(data);
                 presenter.onLocationChanged(userLocation);
                 break;
             default:

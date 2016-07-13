@@ -15,7 +15,7 @@ import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.ImageCaptureHelper;
 import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.view.conversations.RefreshConversationBus;
-import com.shoutit.app.android.view.location.LocationResultHelper;
+import com.shoutit.app.android.view.location.LocationHelper;
 import com.shoutit.app.android.view.media.MediaUtils;
 
 import org.junit.Before;
@@ -42,7 +42,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({LocationResultHelper.class, ResourcesHelper.class, MediaUtils.class})
+@PrepareForTest({LocationHelper.class, ResourcesHelper.class, MediaUtils.class})
 public class CreatePublicChatPresenterTest {
 
     @Mock
@@ -69,7 +69,7 @@ public class CreatePublicChatPresenterTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        PowerMockito.mockStatic(LocationResultHelper.class);
+        PowerMockito.mockStatic(LocationHelper.class);
         PowerMockito.mockStatic(ResourcesHelper.class);
         PowerMockito.mockStatic(MediaUtils.class);
         when(MediaUtils.createFileFromUri(any(Context.class), any(Uri.class), anyInt())).thenReturn(new File(""));
@@ -134,7 +134,7 @@ public class CreatePublicChatPresenterTest {
     @Test
     public void whenLocationSelected_locationChanged() {
         //given
-        when(LocationResultHelper.getLocationFromIntent(any(Intent.class))).thenReturn(new UserLocation(0, 0, "", "", "", "", ""));
+        when(LocationHelper.getLocationFromIntent(any(Intent.class))).thenReturn(new UserLocation(0, 0, "", "", "", "", ""));
         when(ResourcesHelper.getCountryResId(any(Context.class), any(UserLocation.class))).thenReturn(Optional.of(1));
         mCreatePublicChatPresenter.register(listener);
 

@@ -14,9 +14,10 @@ public class UpdatePage {
     private final String image;
     private final boolean isVerified;
     private final boolean isPublished;
+    private final UserLocation location;
 
 
-    public UpdatePage(String about, String description, String phone, String founded, String impressum, String overview, String mission, String generalInfo, String cover, String image, boolean isVerified, boolean isPublished) {
+    public UpdatePage(String about, String description, String phone, String founded, String impressum, String overview, String mission, String generalInfo, String cover, String image, boolean isVerified, boolean isPublished, UserLocation location) {
         this.about = about;
         this.description = description;
         this.phone = phone;
@@ -29,6 +30,7 @@ public class UpdatePage {
         this.image = image;
         this.isVerified = isVerified;
         this.isPublished = isPublished;
+        this.location = location;
     }
 
     public String getAbout() {
