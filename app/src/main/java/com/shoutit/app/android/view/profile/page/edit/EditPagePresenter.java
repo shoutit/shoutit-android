@@ -11,6 +11,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.api.model.UpdatePage;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.FileHelper;
 import com.shoutit.app.android.utils.ImageHelper;
@@ -39,6 +40,7 @@ public class EditPagePresenter {
     private Page mPage;
     private String avatar;
     private String cover;
+    private UserLocation mLocation;
 
     @Inject
     public EditPagePresenter(UserPreferences userPreferences,
@@ -82,6 +84,7 @@ public class EditPagePresenter {
                     final String generalInfo = page.getGeneralInfo();
                     final String image = page.getImage();
                     final String cover = page.getCover();
+                    final UserLocation location = page.getLocation();
 
                     mListener.setName(name);
                     mListener.setAbout(about);
@@ -95,6 +98,7 @@ public class EditPagePresenter {
                     mListener.setGeneralInfo(generalInfo);
                     mListener.setCover(cover);
                     mListener.setAvatar(image);
+                    mListener.setUpLocation(location);
                 }, throwable -> {
                     mListener.setProgress(false);
                     mListener.error();
@@ -113,7 +117,8 @@ public class EditPagePresenter {
                 cover != null ? cover : mPage.getCover(),
                 avatar != null ? avatar : mPage.getImage(),
                 mPage.isVerified(),
-                editData.published);
+                editData.published,
+                mLocation != null ? mLocation : mPage.getLocation());
 
         mListener.setProgress(true);
 
@@ -204,6 +209,11 @@ public class EditPagePresenter {
         }
     }
 
+    public void onLocationChanged(UserLocation userLocation) {
+        mLocation = userLocation;
+        mListener.setUpLocation(userLocation);
+    }
+
     public interface Listener {
 
         void setGeneralInfo(String generalInfo);
@@ -235,6 +245,8 @@ public class EditPagePresenter {
         void error();
 
         void setCover(String data);
+
+        void setUpLocation(UserLocation location);
     }
 
     public static class EditData {

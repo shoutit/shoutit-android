@@ -23,7 +23,7 @@ import com.shoutit.app.android.utils.ImageCaptureHelper;
 import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.view.chats.ChatsMediaHelper;
 import com.shoutit.app.android.view.conversations.RefreshConversationBus;
-import com.shoutit.app.android.view.location.LocationResultHelper;
+import com.shoutit.app.android.view.location.LocationHelper;
 
 import javax.inject.Inject;
 
@@ -150,7 +150,7 @@ public class CreatePublicChatPresenter {
 
     public void onLocationActivityFinished(int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
-            final UserLocation location = LocationResultHelper.getLocationFromIntent(data);
+            final UserLocation location = LocationHelper.getLocationFromIntent(data);
             setLocation(location);
         }
     }
