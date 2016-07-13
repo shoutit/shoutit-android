@@ -13,15 +13,16 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.PagesSuggestionResponse;
 import com.shoutit.app.android.api.model.ProfilesListResponse;
 import com.shoutit.app.android.api.model.RegisterDeviceRequest;
 import com.shoutit.app.android.api.model.SearchProfileResponse;
 import com.shoutit.app.android.api.model.User;
-import com.shoutit.app.android.model.AdminsPointer;
-import com.shoutit.app.android.model.PagesPointer;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.UserSuggestionResponse;
+import com.shoutit.app.android.model.AdminsPointer;
+import com.shoutit.app.android.model.PagesPointer;
 import com.shoutit.app.android.utils.LogHelper;
 
 import javax.annotation.Nonnull;
@@ -160,7 +161,7 @@ public class ProfilesDao {
     }
 
     @Nonnull
-    public Observable<ResponseOrError<User>> getProfileObservable(@Nonnull String userName) {
+    public Observable<ResponseOrError<BaseProfile>> getProfileObservable(@Nonnull String userName) {
         return profilesCache.getUnchecked(userName).getProfileObservable();
     }
 
@@ -203,23 +204,23 @@ public class ProfilesDao {
 
     public class ProfileDao {
         @Nonnull
-        private Observable<ResponseOrError<User>> profileObservable;
+        private Observable<ResponseOrError<BaseProfile>> profileObservable;
         @Nonnull
         private PublishSubject<Object> refreshSubject = PublishSubject.create();
         @Nonnull
-        private PublishSubject<ResponseOrError<User>> updatedProfileLocallySubject = PublishSubject.create();
+        private PublishSubject<ResponseOrError<BaseProfile>> updatedProfileLocallySubject = PublishSubject.create();
 
         public ProfileDao(@Nonnull final String userName) {
             profileObservable = apiService.getProfile(userName)
                     .subscribeOn(networkScheduler)
-                    .compose(MoreOperators.<User>refresh(refreshSubject))
-                    .compose(ResponseOrError.<User>toResponseOrErrorObservable())
+                    .compose(MoreOperators.<BaseProfile>refresh(refreshSubject))
+                    .compose(ResponseOrError.<BaseProfile>toResponseOrErrorObservable())
                     .mergeWith(updatedProfileLocallySubject)
-                    .compose(MoreOperators.<ResponseOrError<User>>cacheWithTimeout(networkScheduler));
+                    .compose(MoreOperators.<ResponseOrError<BaseProfile>>cacheWithTimeout(networkScheduler));
         }
 
         @Nonnull
-        public Observable<ResponseOrError<User>> getProfileObservable() {
+        public Observable<ResponseOrError<BaseProfile>> getProfileObservable() {
             return profileObservable;
         }
 
@@ -229,7 +230,7 @@ public class ProfilesDao {
         }
 
         @Nonnull
-        public Observer<ResponseOrError<User>> updatedProfileLocallyObserver() {
+        public Observer<ResponseOrError<BaseProfile>> updatedProfileLocallyObserver() {
             return updatedProfileLocallySubject;
         }
     }
@@ -441,11 +442,11 @@ public class ProfilesDao {
     }
 
     @Nonnull
-    public Observable<User> updateUser() {
+    public Observable<BaseProfile> updateUser() {
         return apiService.getMyUser()
                 .subscribeOn(networkScheduler)
-                .compose(ResponseOrError.<User>toResponseOrErrorObservable())
-                .compose(ResponseOrError.<User>onlySuccess());
+                .compose(ResponseOrError.<BaseProfile>toResponseOrErrorObservable())
+                .compose(ResponseOrError.<BaseProfile>onlySuccess());
     }
 
     public class MergeSearchProfileResponses implements Func2<SearchProfileResponse, SearchProfileResponse, SearchProfileResponse> {

@@ -16,7 +16,7 @@ import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
-import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.ColoredSnackBar;
@@ -106,7 +106,7 @@ public class MyPagesFragment extends BaseFragment implements MyPagesDialog.Pages
         }
     }
 
-    private void showOptionsDialog(@Nonnull User page) {
+    private void showOptionsDialog(@Nonnull Page page) {
         dialog.show(page, this);
     }
 
@@ -134,7 +134,7 @@ public class MyPagesFragment extends BaseFragment implements MyPagesDialog.Pages
     }
 
     @Override
-    public void useShoutItAsPage(User page) {
+    public void useShoutItAsPage(Page page) {
         mUserPreferences.setPage(page);
 
         ActivityCompat.finishAffinity(getActivity());

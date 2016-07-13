@@ -130,7 +130,7 @@ public class ChatsFirstConversationPresenter {
         getConversationInfo(user);
     }
 
-    private void setupUserForVideoChat(@Nonnull User user) {
+    private void setupUserForVideoChat(@Nonnull BaseProfile user) {
         chatParticipantProfileSubject.onNext(new ConversationProfile(
                 user.getId(), user.getName(), user.getUsername(), user.getType(), user.getImage()));
         mListener.showVideoChatIcon();
@@ -148,9 +148,9 @@ public class ChatsFirstConversationPresenter {
         mSubscribe.add(mApiService.getUser(mIdForCreation)
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
-                .subscribe(new Action1<User>() {
+                .subscribe(new Action1<BaseProfile>() {
                     @Override
-                    public void call(User user) {
+                    public void call(BaseProfile user) {
                         //noinspection ConstantConditions
                         mListener.setToolbarInfo(ConversationsUtils.getChatWithString(
                                 ImmutableList.of(new ConversationProfile(

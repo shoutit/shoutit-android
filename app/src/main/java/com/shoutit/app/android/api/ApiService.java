@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 
 import com.shoutit.app.android.api.model.AdminRequest;
 import com.shoutit.app.android.api.model.ApiMessageResponse;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.BlockedProfilesResposne;
 import com.shoutit.app.android.api.model.BusinessVerificationResponse;
 import com.shoutit.app.android.api.model.CallerProfile;
@@ -277,13 +278,13 @@ public interface ApiService {
      * Profile
      **/
     @GET("profiles/{user_name}")
-    Observable<User> getUser(@Path("user_name") String userName);
+    Observable<BaseProfile> getUser(@Path("user_name") String userName);
 
     @GET("profiles/me")
-    Observable<User> getMyUser();
+    Observable<BaseProfile> getMyUser();
 
     @PATCH("profiles/me")
-    Observable<User> updateUserLocation(@Body UpdateLocationRequest updateLocationRequest);
+    Observable<BaseProfile> updateUserLocation(@Body UpdateLocationRequest updateLocationRequest);
 
     @GET("profiles/{user_name}/home")
     Observable<ShoutsResponse> home(@Path("user_name") String userName,

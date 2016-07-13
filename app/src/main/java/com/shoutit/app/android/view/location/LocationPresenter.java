@@ -10,6 +10,7 @@ import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.UpdateLocationRequest;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
@@ -43,7 +44,7 @@ public class LocationPresenter implements ILocationPresenter {
         mUserPreferences = userPreferences;
         mLocationPresenterDelegate = locationPresenterDelegate;
 
-        final Observable<ResponseOrError<User>> updateUserObservable = Observable.merge(
+        final Observable<ResponseOrError<BaseProfile>> updateUserObservable = Observable.merge(
                 mLocationPresenterDelegate.getSelectedPlaceGeocodeResponse().compose(ResponseOrError.<UserLocation>onlySuccess()),
                 mLocationPresenterDelegate.getSelectedGpsUserLocation())
                 .switchMap(userLocation -> {
@@ -52,12 +53,12 @@ public class LocationPresenter implements ILocationPresenter {
                     return apiService.updateUserLocation(new UpdateLocationRequest(userLocation))
                             .subscribeOn(networkScheduler)
                             .observeOn(uiScheduler)
-                            .compose(ResponseOrError.<User>toResponseOrErrorObservable());
+                            .compose(ResponseOrError.<BaseProfile>toResponseOrErrorObservable());
                 })
-                .compose(ObservableExtensions.<ResponseOrError<User>>behaviorRefCount());
+                .compose(ObservableExtensions.<ResponseOrError<BaseProfile>>behaviorRefCount());
 
         userUpdateSuccessObservable = updateUserObservable
-                .compose(ResponseOrError.<User>onlySuccess())
+                .compose(ResponseOrError.<BaseProfile>onlySuccess())
                 .doOnNext(mLocationPresenterDelegate.showProgressAction(false))
                 .doOnNext(saveToPreferencesAction())
                 .observeOn(uiScheduler)
@@ -66,7 +67,7 @@ public class LocationPresenter implements ILocationPresenter {
     }
 
     @NonNull
-    private Action1<User> saveToPreferencesAction() {
+    private Action1<BaseProfile> saveToPreferencesAction() {
         return mUserPreferences::setUserOrPage;
     }
 
