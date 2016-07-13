@@ -9,7 +9,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
-import com.shoutit.app.android.view.profile.user.ChatInfo;
+import com.shoutit.app.android.view.profile.ChatInfo;
 import com.shoutit.app.android.view.profile.user.ProfileAdapterItems;
 
 import java.util.concurrent.TimeUnit;

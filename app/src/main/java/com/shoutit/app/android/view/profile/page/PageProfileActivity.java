@@ -22,6 +22,7 @@ import com.shoutit.app.android.view.chats.chatsfirstconversation.ChatFirstConver
 import com.shoutit.app.android.view.listeners.ListenersActivity;
 import com.shoutit.app.android.view.listenings.ListeningsActivity;
 import com.shoutit.app.android.view.notifications.NotificationsActivity;
+import com.shoutit.app.android.view.profile.ChatInfo;
 import com.shoutit.app.android.view.profile.ProfileIntentHelper;
 import com.shoutit.app.android.view.profile.page.edit.EditPageActivity;
 import com.shoutit.app.android.view.search.SearchPresenter;

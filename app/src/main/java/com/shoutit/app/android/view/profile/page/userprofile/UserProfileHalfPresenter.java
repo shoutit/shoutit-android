@@ -7,10 +7,11 @@ import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
-import com.shoutit.app.android.view.profile.page.ChatInfo;
+import com.shoutit.app.android.view.profile.ChatInfo;
 import com.shoutit.app.android.view.profile.page.ProfileAdapterItems;
 
 import java.util.concurrent.TimeUnit;
@@ -42,7 +43,7 @@ public class UserProfileHalfPresenter {
     private final PublishSubject<String> unListenSuccess = PublishSubject.create();
 
     @Nonnull
-    private final Observable<ResponseOrError<User>> userUpdatesObservable;
+    private final Observable<ResponseOrError<BaseProfile>> userUpdatesObservable;
     @Nonnull
     private final Context context;
 
@@ -53,7 +54,37 @@ public class UserProfileHalfPresenter {
                                     @Nonnull @ForActivity Context context) {
         this.context = context;
 
-        userUpdatesObservable = Observable.empty();
+        userUpdatesObservable = onListenActionClickedSubject
+                .throttleFirst(1, TimeUnit.SECONDS)
+                .switchMap(new Func1<BaseProfile, Observable<ResponseOrError<BaseProfile>>>() {
+                    @Override
+                    public Observable<ResponseOrError<BaseProfile>> call(final BaseProfile user) {
+                        final Observable<ResponseOrError<ResponseBody>> request;
+                        if (user.isListening()) {
+                            request = apiService.unlistenProfile(user.getUsername())
+                                    .subscribeOn(networkScheduler)
+                                    .observeOn(uiScheduler)
+                                    .doOnNext(responseBody -> unListenSuccess.onNext(user.getName()))
+                                    .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
+                        } else {
+                            request = apiService.listenProfile(user.getUsername())
+                                    .subscribeOn(networkScheduler)
+                                    .observeOn(uiScheduler)
+                                    .doOnNext(responseBody -> listenSuccess.onNext(user.getName()))
+                                    .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
+                        }
+
+                        return request.map(response -> {
+                            if (response.isData()) {
+                                return ResponseOrError.fromData(user.getListenedProfile());
+                            } else {
+                                errorSubject.onNext(new Throwable());
+                                // On error return current user in order to select/deselect already deselected/selected 'listenProfile' icon
+                                return ResponseOrError.fromData(user);
+                            }
+                        });
+                    }
+                });
     }
 
     @Nonnull
@@ -76,7 +107,7 @@ public class UserProfileHalfPresenter {
     }
 
     @Nonnull
-    public Observable<ResponseOrError<User>> getUserUpdatesObservable() {
+    public Observable<ResponseOrError<BaseProfile>> getUserUpdatesObservable() {
         return userUpdatesObservable;
     }
 

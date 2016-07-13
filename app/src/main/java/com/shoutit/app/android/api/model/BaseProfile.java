@@ -39,11 +39,15 @@ public class BaseProfile implements ProfileType {
     private final String email;
     @javax.annotation.Nullable
     protected final LinkedAccounts linkedAccounts;
+    @Nullable
+    protected final ConversationDetails conversation;
+    // whenever the profile is listening to you
+    protected final boolean isListener;
 
     public BaseProfile(@NonNull String id, @NonNull String type, @NonNull String username, @NonNull String name,
                        @NonNull String firstName, @NonNull String lastName, boolean isActivated, @Nullable String image,
                        @Nullable String cover, boolean isListening, int listenersCount, @Nullable UserLocation location,
-                       boolean isOwner, @Nullable Stats stats, @NonNull String email, @Nullable LinkedAccounts linkedAccounts) {
+                       boolean isOwner, @Nullable Stats stats, @NonNull String email, @Nullable LinkedAccounts linkedAccounts, ConversationDetails conversation, boolean isListener) {
         this.id = id;
         this.type = type;
         this.username = username;
@@ -60,6 +64,8 @@ public class BaseProfile implements ProfileType {
         this.stats = stats;
         this.email = email;
         this.linkedAccounts = linkedAccounts;
+        this.conversation = conversation;
+        this.isListener = isListener;
     }
 
     public boolean isUser() {
@@ -133,19 +139,23 @@ public class BaseProfile implements ProfileType {
         return isOwner;
     }
 
+    public boolean isListener() {
+        return isListener;
+    }
+
     @Nonnull
     public BaseProfile getListenedProfile() {
         boolean newIsListening = !isListening;
         int newListenersCount = newIsListening ? listenersCount + 1 : listenersCount - 1;
         return new BaseProfile(id, type, username, name, firstName, lastName, isActivated,
-                image, cover, newIsListening, newListenersCount, location, isOwner, stats, email, linkedAccounts);
+                image, cover, newIsListening, newListenersCount, location, isOwner, stats, email, linkedAccounts, conversation, isListener);
     }
 
     @Nonnull
     public BaseProfile withUpdatedStats(@Nonnull Stats newStats) {
         return new BaseProfile(id, type, username, name, firstName, lastName, isActivated,
                 image, cover, isListening, listenersCount,
-                location, isOwner, newStats, getEmail(), linkedAccounts);
+                location, isOwner, newStats, getEmail(), linkedAccounts, conversation, isListener);
     }
 
     @Nullable
@@ -179,6 +189,11 @@ public class BaseProfile implements ProfileType {
         return location;
     }
 
+    @Nullable
+    public ConversationDetails getConversation() {
+        return conversation;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -186,6 +201,7 @@ public class BaseProfile implements ProfileType {
         final BaseProfile profile = (BaseProfile) o;
         return isActivated == profile.isActivated &&
                 isListening == profile.isListening &&
+                isListener == profile.isListener &&
                 listenersCount == profile.listenersCount &&
                 Objects.equal(id, profile.id) &&
                 Objects.equal(type, profile.type) &&
@@ -196,6 +212,7 @@ public class BaseProfile implements ProfileType {
                 Objects.equal(image, profile.image) &&
                 Objects.equal(location, profile.location) &&
                 Objects.equal(isOwner, profile.isOwner) &&
+                Objects.equal(conversation, profile.conversation) &&
                 Objects.equal(cover, profile.cover);
     }
 
@@ -207,6 +224,7 @@ public class BaseProfile implements ProfileType {
     @Override
     public int hashCode() {
         return Objects.hashCode(id, type, username, name, firstName, lastName,
-                isActivated, image, cover, isListening, listenersCount, location, isOwner);
+                isActivated, image, cover, isListening, listenersCount, location, isOwner,
+                conversation, isListener);
     }
 }

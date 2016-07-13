@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.profile.user;
+package com.shoutit.app.android.view.profile;
 
 import android.support.annotation.NonNull;
 

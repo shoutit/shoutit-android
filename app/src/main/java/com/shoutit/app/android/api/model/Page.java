@@ -25,8 +25,12 @@ public class Page extends BaseProfile {
 
     public Page(String id, String type, String username, String name, String firstName,
                 String lastName, boolean isActivated, String image, String cover, boolean isListening,
-                int listenersCount, UserLocation location, Stats stats, boolean isOwner, String email, User admin, String about, String description, String phone, String founded, String impressum, String overview, String mission, String generalInfo, boolean isVerified, boolean isPublished, LinkedAccounts linkedAccounts) {
-        super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount, location, isOwner, stats, email, linkedAccounts);
+                int listenersCount, UserLocation location, Stats stats, boolean isOwner, String email,
+                User admin, String about, String description, String phone, String founded,
+                String impressum, String overview, String mission, String generalInfo, boolean isVerified,
+                boolean isPublished, LinkedAccounts linkedAccounts, ConversationDetails conversation,
+                boolean isListener) {
+        super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount, location, isOwner, stats, email, linkedAccounts, conversation, isListener);
         this.admin = admin;
         this.about = about;
         this.description = description;
@@ -47,14 +51,18 @@ public class Page extends BaseProfile {
         int newListenersCount = newIsListening ? listenersCount + 1 : listenersCount - 1;
 
         return new Page(id, type, username, name, firstName, lastName, isActivated, image, cover,
-                newIsListening, newListenersCount, location, getStats(), isOwner, getEmail(), admin, about, description, phone, founded, impressum, overview, mission, generalInfo, isVerified, isPublished, linkedAccounts);
+                newIsListening, newListenersCount, location, getStats(), isOwner, getEmail(),
+                admin, about, description, phone, founded, impressum, overview, mission, generalInfo,
+                isVerified, isPublished, linkedAccounts, conversation, isListener);
     }
 
     @Nonnull
     @Override
     public BaseProfile withUpdatedStats(@Nonnull Stats newStats) {
         return new Page(id, type, username, name, firstName, lastName, isActivated, image, cover,
-                isListening, listenersCount, location, newStats, isOwner, getEmail(), admin, about, description, phone, founded, impressum, overview, mission, generalInfo, isVerified, isPublished, linkedAccounts);
+                isListening, listenersCount, location, newStats, isOwner, getEmail(), admin, about,
+                description, phone, founded, impressum, overview, mission, generalInfo, isVerified,
+                isPublished, linkedAccounts, conversation, isListener);
     }
 
     public User getAdmin() {
