@@ -36,8 +36,9 @@ public class LocationActivityForResult extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mLocationActivityDelegate = new LocationActivityDelegate(this, presenter, adapter);
+        mLocationActivityDelegate.onCreate();
 
-        presenter.getUpdateUserObservable()
+        presenter.getUpdateLocationObservable()
                 .compose(this.<UserLocation>bindToLifecycle())
                 .subscribe(userLocation -> {
                     KeyboardHelper.hideSoftKeyboard(LocationActivityForResult.this);

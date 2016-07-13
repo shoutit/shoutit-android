@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.widget.Toast;
 
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
@@ -26,20 +27,19 @@ public class LocationActivity extends BaseActivity {
     private LocationActivityDelegate mLocationActivityDelegate;
 
     public static Intent newIntent(@Nonnull Context context) {
-        return new Intent(context, LocationActivityForResult.class);
+        return new Intent(context, LocationActivity.class);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mLocationActivityDelegate = new LocationActivityDelegate(this, presenter, adapter);
+        mLocationActivityDelegate.onCreate();
 
         presenter.getUserUpdateSuccessObservable()
                 .compose(bindToLifecycle())
                 .subscribe(o -> {
-                    ColoredSnackBar.successSnackBarAction(
-                            ColoredSnackBar.contentView(LocationActivity.this),
-                            R.string.location_update_success);
+                    Toast.makeText(this, R.string.location_update_success, Toast.LENGTH_SHORT).show();
                     finish();
                 });
     }
