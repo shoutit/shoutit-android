@@ -29,6 +29,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.FbAdAdapterItem;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.LinkedAccounts;
 import com.shoutit.app.android.api.model.UpdateFacebookTokenRequest;
 import com.shoutit.app.android.api.model.User;
@@ -306,7 +307,7 @@ public class FacebookHelper {
         return permissions.contains(permissionName);
     }
 
-    public boolean hasRequiredPermissionInApi(@Nonnull User user, @Nonnull String permissionName) {
+    public boolean hasRequiredPermissionInApi(@Nonnull BaseProfile user, @Nonnull String permissionName) {
         if (user.getLinkedAccounts() != null &&
                 user.getLinkedAccounts().getFacebook() != null) {
             final List<String> scopes = user.getLinkedAccounts().getFacebook().getScopes();

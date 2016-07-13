@@ -37,6 +37,7 @@ import com.uservoice.uservoicesdk.UserVoice;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 import io.fabric.sdk.android.Fabric;
 import rx.Observable;
@@ -63,7 +64,7 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
     @Inject
     LocationManager locationManager;
     @Inject
-    PusherHelper mPusherHelper;
+    Provider<PusherHelper> mPusherHelperProvider;
     @Inject
     NetworkObservableProvider mNetworkObservableProvider;
     @Inject
@@ -78,6 +79,9 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
     NotificationHelper notificationHelper;
     @Inject
     FacebookHelper facebookHelper;
+
+    private PusherHelper mCurrentUserPusherHelper;
+    private PusherHelper mUserPusherHelper;
 
     @Override
     public void onCreate() {
@@ -136,38 +140,61 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
     }
 
     private void setUpPusher() {
-        userPreferences.getTokenObservable()
-                .filter(token -> token != null && !userPreferences.isGuest())
+        Observable.combineLatest(
+                userPreferences.getTokenObservable().filter(token -> token != null && !userPreferences.isGuest()),
+                userPreferences.getPageIdObservable(),
+                (s, s2) -> s)
                 .subscribe(token -> {
-                    final BaseProfile user = userPreferences.getUser();
-                    if (user != null) {
-                        initPusher(token, user);
+                    final BaseProfile baseProfile = userPreferences.getUserOrPage();
+                    if (baseProfile != null) {
+                        initPusher(token, baseProfile);
+                    }
+                });
+
+        userPreferences.getTokenObservable()
+                .switchMap(s -> userPreferences.getPageIdObservable())
+                .subscribe(pageId -> {
+                    if (pageId != null) {
+                        mUserPusherHelper = mPusherHelperProvider.get();
+                        mUserPusherHelper.init(userPreferences.getAuthToken().get(), userPreferences.getUser());
+                        mUserPusherHelper.connect();
+                        mUserPusherHelper.subscribeProfileChannel();
+                    } else {
+                        if(mUserPusherHelper != null) {
+                            mUserPusherHelper.unsubscribeProfileChannel();
+                            mUserPusherHelper.disconnect();
+                        }
                     }
                 });
 
         mStackCounterManager.register(this)
                 .subscribe(foreground -> {
-                    if (userPreferences.isNormalUser() && mPusherHelper.isInit()) {
-                        if (foreground && mPusherHelper.shouldConnect()) {
-                            mPusherHelper.connect();
+                    if (userPreferences.isNormalUser() && mCurrentUserPusherHelper != null && mCurrentUserPusherHelper.isInit()) {
+                        if (foreground && mCurrentUserPusherHelper.shouldConnect()) {
+                            mCurrentUserPusherHelper.connect();
                         } else if (!foreground) {
-                            mPusherHelper.disconnect();
+                            mCurrentUserPusherHelper.disconnect();
                         }
                     }
                 });
     }
 
     private void initPusher(@Nonnull String token, @Nonnull BaseProfile user) {
-        mPusherHelper.init(token, user);
-        if (mPusherHelper.shouldConnect()) {
-            mPusherHelper.connect();
-            mPusherHelper.subscribeProfileChannel();
-            mPusherHelper.getUserUpdatedObservable()
+        if(mCurrentUserPusherHelper != null){
+            mCurrentUserPusherHelper.disconnect();
+            mCurrentUserPusherHelper.unsubscribeProfileChannel();
+        }
+        mCurrentUserPusherHelper = mPusherHelperProvider.get();
+        mCurrentUserPusherHelper.init(token, user);
+        if (mCurrentUserPusherHelper.shouldConnect()) {
+            mCurrentUserPusherHelper.connect();
+            mCurrentUserPusherHelper.subscribeProfileChannel();
+            mCurrentUserPusherHelper.getUserUpdatedObservable()
                     .subscribe(user1 -> {
                         userPreferences.setUserOrPage(user1);
                     });
 
-            mPusherHelper.getStatsObservable()
+            mCurrentUserPusherHelper.getStatsObservable()
                     .subscribe(stats -> {
                         userPreferences.updateStats(stats);
                     });
@@ -175,7 +202,7 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
             mNetworkObservableProvider.networkObservable()
                     .filter(NetworkObservableProvider.NetworkStatus::isNetwork)
                     .subscribe(networkStatus -> {
-                        mPusherHelper.connect();
+                        mCurrentUserPusherHelper.connect();
                     });
         }
     }

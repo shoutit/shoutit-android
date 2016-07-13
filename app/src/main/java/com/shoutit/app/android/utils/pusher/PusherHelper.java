@@ -113,16 +113,16 @@ public class PusherHelper {
                 });
     }
 
-    public Observable<User> getUserUpdatedObservable() {
+    public Observable<BaseProfile> getUserUpdatedObservable() {
         return Observable
-                .create(new Observable.OnSubscribe<User>() {
+                .create(new Observable.OnSubscribe<BaseProfile>() {
                     @Override
-                    public void call(final Subscriber<? super User> subscriber) {
+                    public void call(final Subscriber<? super BaseProfile> subscriber) {
                         getProfileChannel().bind(EVENT_PROFILE_UPDATE, new PresenceChannelEventListenerAdapter() {
 
                             @Override
                             public void onEvent(String channelName, String eventName, String data) {
-                                final User user = mGson.fromJson(data, User.class);
+                                final BaseProfile user = mGson.fromJson(data, BaseProfile.class);
                                 subscriber.onNext(user);
                             }
                         });
@@ -231,9 +231,9 @@ public class PusherHelper {
         mPusher.unsubscribe(getConversationChannelName(conversationId));
     }
 
-    public void unsubscribeProfileChannel(@NonNull String userId) {
-        log("unsubscribe profile channel : " + userId);
-        mPusher.unsubscribe(PusherHelper.getProfileChannelName(userId));
+    public void unsubscribeProfileChannel() {
+        log("unsubscribe profile channel : " + mUser.getId());
+        mPusher.unsubscribe(PusherHelper.getProfileChannelName(mUser.getId()));
     }
 
     @Nonnull
