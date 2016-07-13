@@ -201,7 +201,7 @@ public class ProfileViewHolders {
                 verificationStatusTv.setVisibility(View.GONE);
             }
 
-            final boolean isVerifiedPage = user.isUser() && user.isVerified();
+            final boolean isVerifiedPage = !user.isUser() && user.isVerified();
             ImageHelper.setEndCompoundRelativeDrawable(userName, isVerifiedPage ? R.drawable.ic_verified : 0);
 
             subscriptions = new CompositeSubscription(
