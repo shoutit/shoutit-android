@@ -16,6 +16,7 @@ import com.shoutit.app.android.utils.BookmarkHelper;
 import com.shoutit.app.android.utils.ListeningHalfPresenter;
 import com.shoutit.app.android.utils.PreferencesHelper;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
+import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
 import com.shoutit.app.android.view.profile.user.myprofile.MyProfileHalfPresenter;
 import com.shoutit.app.android.view.profile.user.userprofile.UserProfileHalfPresenter;
 
@@ -43,7 +44,7 @@ public class ProfileActivityModule {
                                                     @NetworkScheduler Scheduler networkScheduler, ApiService apiService,
                                                     PreferencesHelper preferencesHelper, UserProfileHalfPresenter userProfilePresenter,
                                                     MyProfileHalfPresenter myProfilePresenter, ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
-                                                    PusherHelper pusherHelper, ListeningHalfPresenter listeningHalfPresenter, BookmarksDao bookmarksDao,
+                                                    PusherHelperHolder pusherHelper, ListeningHalfPresenter listeningHalfPresenter, BookmarksDao bookmarksDao,
                                                     BookmarkHelper bookmarkHelper) {
         return new UserProfilePresenter(userName, shoutsDao, context, preferences, uiScheduler, networkScheduler,
                 profilesDao, myProfilePresenter, userProfilePresenter, preferencesHelper, shoutsGlobalRefreshPresenter,

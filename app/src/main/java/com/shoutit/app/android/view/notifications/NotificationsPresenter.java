@@ -19,6 +19,7 @@ import com.shoutit.app.android.api.model.NotificationsResponse;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.NotificationsDao;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
+import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
 
 import java.util.ArrayList;
@@ -67,9 +68,10 @@ public class NotificationsPresenter {
                                   @Nonnull @UiScheduler final Scheduler uiScheduler,
                                   @Nonnull @NetworkScheduler final Scheduler networkScheduler,
                                   @Nonnull final ApiService apiService,
-                                  @Nonnull PusherHelper pusherHelper,
+                                  @Nonnull PusherHelperHolder pusherHelperHolder,
                                   @Nonnull @ForActivity Resources resources) {
         this.dao = dao;
+        final PusherHelper pusherHelper = pusherHelperHolder.getPusherHelper();
 
         final Observable<ResponseOrError<NotificationsResponse>> notificationsObservable = dao
                 .getNotificationsObservable()

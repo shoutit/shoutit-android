@@ -34,6 +34,7 @@ import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
+import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
 import com.shoutit.app.android.utils.pusher.TypingInfo;
 import com.shoutit.app.android.view.chats.ChatsDelegate;
 import com.shoutit.app.android.view.chats.LocalMessageBus;
@@ -91,7 +92,7 @@ public class ChatsFirstConversationPresenter {
                                            @ForActivity Resources resources,
                                            @ForActivity Context context,
                                            AmazonHelper amazonHelper,
-                                           PusherHelper pusher,
+                                           PusherHelperHolder pusher,
                                            String idForCreation,
                                            ShoutsDao shoutsDao,
                                            ProfilesDao profilesDao,
@@ -103,7 +104,7 @@ public class ChatsFirstConversationPresenter {
         mUserPreferences = userPreferences;
         mResources = resources;
         mContext = context;
-        mPusher = pusher;
+        mPusher = pusher.getPusherHelper();
         mIdForCreation = idForCreation;
         mShoutsDao = shoutsDao;
         mProfilesDao = profilesDao;

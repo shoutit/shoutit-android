@@ -33,6 +33,7 @@ import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
+import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
 import com.shoutit.app.android.utils.pusher.TypingInfo;
 import com.shoutit.app.android.view.chats.message_models.TypingItem;
 
@@ -114,7 +115,7 @@ public class ChatsPresenter {
                           @ForActivity Resources resources,
                           @ForActivity Context context,
                           AmazonHelper amazonHelper,
-                          PusherHelper pusher,
+                          PusherHelperHolder pusher,
                           LocalMessageBus bus) {
         this.conversationId = conversationId;
         mApiService = apiService;
@@ -123,7 +124,7 @@ public class ChatsPresenter {
         mUserPreferences = userPreferences;
         mResources = resources;
         mContext = context;
-        mPusher = pusher;
+        mPusher = pusher.getPusherHelper();
 
         //noinspection ConstantConditions
         calledPersonNameAndUsernameObservable = chatParticipantUsernameSubject

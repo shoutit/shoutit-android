@@ -55,6 +55,7 @@ import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.utils.AmazonRequestTransfomer;
 import com.shoutit.app.android.utils.VersionUtils;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
+import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
 import com.shoutit.app.android.view.chats.LocalMessageBus;
 import com.shoutit.app.android.view.conversations.RefreshConversationBus;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
@@ -68,6 +69,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import dagger.Lazy;
@@ -373,10 +375,25 @@ public final class AppModule {
     }
 
     @Provides
-    @Singleton
     PusherHelper providePusher(Gson gson, @UiScheduler Scheduler uiScheduler) {
         return new PusherHelper(gson, uiScheduler);
     }
+
+    @Provides
+    @Singleton
+    PusherHelperHolder providePusherHolder(Provider<PusherHelper> pusherHelperProvider) {
+        return new PusherHelperHolder(pusherHelperProvider);
+    }
+
+    @Provides
+    @Singleton
+    @Named("user")
+    PusherHelperHolder provideUserPusherHolder(Provider<PusherHelper> pusherHelperProvider) {
+        return new PusherHelperHolder(pusherHelperProvider);
+    }
+
+
+
 
     @Provides
     @Singleton
@@ -402,7 +419,7 @@ public final class AppModule {
     @Singleton
     FacebookHelper provideFacebookHelper(ApiService apiService, UserPreferences userPreferences,
                                          @ForApplication Context context, @NetworkScheduler Scheduler networkScheduler,
-                                         PusherHelper pusherHelper) {
+                                         PusherHelperHolder pusherHelper) {
         return new FacebookHelper(apiService, userPreferences, context, networkScheduler, pusherHelper);
     }
 
