@@ -199,7 +199,7 @@ public class PusherHelper {
                 .observeOn(uiScheduler);
     }
 
-    public PresenceChannel getProfileChannel() {
+    private PresenceChannel getProfileChannel() {
         final String id = mUser.getId();
         log("get profile channel id : " + id + userLogInfo());
 

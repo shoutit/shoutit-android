@@ -170,6 +170,10 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
                         pusherHelper.init(userPreferences.getAuthToken().get(), userPreferences.getUser());
                         pusherHelper.connect();
                         pusherHelper.subscribeProfileChannel();
+                        pusherHelper.getStatsObservable()
+                                .subscribe(stats -> {
+                                    userPreferences.updateUserStats(stats);
+                                });
                     } else {
                         final PusherHelper pusherHelper = mUserPusherHelper.getPusherHelper();
                         if (pusherHelper != null) {

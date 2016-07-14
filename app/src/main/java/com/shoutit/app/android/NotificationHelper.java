@@ -99,24 +99,23 @@ public class NotificationHelper {
     }
 
     private void showNotification(String dataJson, String title, String body, String iconUrl, String eventName, String pushedFor) {
-        if (checkIfNotificationIsForCurrentUser(pushedFor)) {
-            final Bitmap largeIcon = getLargeIconOrNull(iconUrl);
+        final Bitmap largeIcon = getLargeIconOrNull(iconUrl);
 
-            final Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        final Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-            final PendingIntent pendingIntent = getPendingIntent(dataJson);
+        final PendingIntent pendingIntent = getPendingIntent(dataJson, checkIfNotificationIsForCurrentUser(pushedFor));
 
-            final Notification notification = getNotification(title, body, largeIcon, defaultSoundUri, pendingIntent);
+        final Notification notification = getNotification(title, body, largeIcon, defaultSoundUri, pendingIntent);
 
-            ((NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE))
-                    .notify(getNotificationId(eventName), notification);
-        }
+        ((NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE))
+                .notify(getNotificationId(eventName), notification);
     }
 
     private boolean checkIfNotificationIsForCurrentUser(String pushedFor) {
         final BaseProfile userOrPage = userPreferences.getUserOrPage();
         assert userOrPage != null;
-        return pushedFor.equals(userOrPage.getId());
+        final String id = userOrPage.getId();
+        return pushedFor.equals(id);
     }
 
     @NonNull
@@ -134,14 +133,15 @@ public class NotificationHelper {
     }
 
     @NonNull
-    private PendingIntent getPendingIntent(String dataJson) {
-        final String appUrl = getAppUrl(dataJson);
-        final Intent intent = getIntent(appUrl);
-
+    private PendingIntent getPendingIntent(String dataJson, boolean isForCurrentUser) {
         final TaskStackBuilder stackBuilder = TaskStackBuilder
                 .create(mContext)
-                .addNextIntent(MainActivity.newIntent(mContext))
-                .addNextIntent(intent);
+                .addNextIntent(MainActivity.newIntent(mContext));
+        if (isForCurrentUser) {
+            final String appUrl = getAppUrl(dataJson);
+            final Intent intent = getIntent(appUrl);
+            stackBuilder.addNextIntent(intent);
+        }
 
         return stackBuilder.getPendingIntent(0, PendingIntent.FLAG_ONE_SHOT);
     }
