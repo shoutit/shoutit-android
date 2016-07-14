@@ -47,7 +47,7 @@ public class EditImageShoutDialog {
 
         mShoutMediaEditDialogEdit.setOnClickListener(v -> {
             mediaSwappedSubject
-                    .first()
+                    .take(1)
                     .subscribe(stringBooleanPair -> {
                         presenter.swapMediaItem(position, stringBooleanPair.first, stringBooleanPair.second);
                     });
@@ -60,7 +60,7 @@ public class EditImageShoutDialog {
 
         mShoutMediaEditDialogChange.setOnClickListener(v -> {
             mediaSwappedSubject
-                    .first()
+                    .take(1)
                     .subscribe(stringBooleanPair -> {
                         presenter.swapMediaItem(position, stringBooleanPair.first, stringBooleanPair.second);
                     });

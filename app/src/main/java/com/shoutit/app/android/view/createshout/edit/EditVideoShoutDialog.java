@@ -42,7 +42,7 @@ public class EditVideoShoutDialog {
 
         mShoutMediaEditDialogChange.setOnClickListener(v -> {
             mediaSwappedSubject
-                    .first()
+                    .take(1)
                     .subscribe(stringBooleanPair -> {
                         presenter.swapMediaItem(position, stringBooleanPair.first, stringBooleanPair.second);
                     });

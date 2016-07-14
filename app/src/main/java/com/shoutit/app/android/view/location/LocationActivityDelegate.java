@@ -56,7 +56,7 @@ public class LocationActivityDelegate {
     }
 
     public void onCreate() {
-        final View view = LayoutInflater
+        @SuppressLint("InflateParams") final View view = LayoutInflater
                 .from(mActivity)
                 .inflate(R.layout.activity_location, null);
 

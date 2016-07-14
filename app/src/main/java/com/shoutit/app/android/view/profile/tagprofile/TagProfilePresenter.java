@@ -203,7 +203,7 @@ public class TagProfilePresenter implements ProfilePresenter {
         /** Shouts **/
         final Observable<ResponseOrError<ShoutsResponse>> shoutsRequestObservable = userPreferences
                 .getLocationObservable()
-                .first()
+                .take(1)
                 .filter(Functions1.isNotNull())
                 .switchMap(new Func1<UserLocation, Observable<ResponseOrError<ShoutsResponse>>>() {
                     @Override

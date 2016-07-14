@@ -89,7 +89,7 @@ public class SearchShoutsResultsPresenter {
                     if (initWithUserLocation1) {
                         return userPreferences.getLocationObservable()
                                 .filter(Functions1.isNotNull())
-                                .first();
+                                .take(1);
                     } else {
                         return Observable.just(null);
                     }

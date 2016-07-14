@@ -130,7 +130,7 @@ public class LoginIntroActivity extends BaseActivity {
             assert acct != null;
             final String authCode = acct.getServerAuthCode();
             mObservable
-                    .first()
+                    .take(1)
                     .map(new Func1<UserLocation, BothParams<String, UserLocation>>() {
                         @Override
                         public BothParams<String, UserLocation> call(UserLocation location) {

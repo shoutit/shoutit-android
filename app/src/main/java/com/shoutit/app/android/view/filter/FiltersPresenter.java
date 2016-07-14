@@ -180,7 +180,7 @@ public class FiltersPresenter {
                                 return categoriesMap.get(categorySlug);
                             }
                         })
-                .startWith(initCategoryObservable.first())
+                .startWith(initCategoryObservable.take(1))
                 .compose(MoreOperators.<Category>refresh(resetClickedSubject))
                 .compose(ObservableExtensions.<Category>behaviorRefCount());
 

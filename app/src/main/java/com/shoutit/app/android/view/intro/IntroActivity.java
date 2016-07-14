@@ -109,7 +109,7 @@ public class IntroActivity extends BaseActivity {
         mUserPreferences.setGuest(true);
 
         progress.setVisibility(View.VISIBLE);
-        mLocationObservable.first()
+        mLocationObservable.take(1)
                 .flatMap(location -> FacebookHelper.getPromotionalCodeObservable(IntroActivity.this)
                         .flatMap(invitationCode -> mApiService.loginGuest(
                                 new GuestSignupRequest(LoginProfile.loginUser(location), mixPanel.getDistinctId(), invitationCode))

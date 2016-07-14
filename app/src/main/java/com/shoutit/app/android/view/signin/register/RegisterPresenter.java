@@ -66,7 +66,7 @@ public class RegisterPresenter {
         final Observable<ResponseOrError<SignResponse>> responseOrErrorObservable = mProceedSubject
                 .map(o -> areValuesCorrect())
                 .filter(Functions1.isTrue())
-                .switchMap(aBoolean -> mLocationObservable.filter(Functions1.isNotNull()).first())
+                .switchMap(aBoolean -> mLocationObservable.filter(Functions1.isNotNull()).take(1))
                 .switchMap(new Func1<UserLocation, Observable<EmailSignupRequest>>() {
                     @Override
                     public Observable<EmailSignupRequest> call(final UserLocation location) {
@@ -74,7 +74,7 @@ public class RegisterPresenter {
                                 FacebookHelper.getPromotionalCodeObservable(context),
                                 (name, email, password, invitationCode) -> new EmailSignupRequest(
                                         name, email, password, LoginProfile.loginUser(location), mixPanel.getDistinctId(), invitationCode))
-                                .first();
+                                .take(1);
                     }
                 })
                 .switchMap(signupRequest -> apiService.signup(signupRequest)

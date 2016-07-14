@@ -102,7 +102,7 @@ public class LocationPresenterDelegate {
 
         final Observable<BaseAdapterItem> currentlySelectedLocationObservable = userPreferences
                 .getLocationObservable()
-                .first()
+                .take(1)
                 .filter(Functions1.isNotNull())
                 .map((Func1<UserLocation, BaseAdapterItem>) userLocation -> new CurrentLocationAdapterItem(
                         userLocation, context.getString(R.string.location_header_selected_location),
