@@ -134,8 +134,9 @@ public class UserProfilePresenter implements ProfilePresenter {
     @Nullable
     private String loggedInUserName;
     private boolean isNormalUser;
+    private final boolean isMyProfile;
 
-    public UserProfilePresenter(@Nonnull final String userName,
+    public UserProfilePresenter(@Nonnull String username,
                                 @Nonnull final ShoutsDao shoutsDao,
                                 @Nonnull @ForActivity final Context context,
                                 @Nonnull final UserPreferences userPreferences,
@@ -151,7 +152,6 @@ public class UserProfilePresenter implements ProfilePresenter {
                                 @NonNull PusherHelperHolder pusherHelper,
                                 @NonNull BookmarksDao bookmarksDao,
                                 @NonNull BookmarkHelper bookmarkHelper) {
-        this.userName = userName;
         this.shoutsDao = shoutsDao;
         this.context = context;
         this.profilesDao = profilesDao;
@@ -166,6 +166,12 @@ public class UserProfilePresenter implements ProfilePresenter {
         if (loggedInUser != null) {
             loggedInUserName = loggedInUser.getUsername();
         }
+
+        isMyProfile = preferencesHelper.isMyProfile(username);
+        if (isMyProfile) {
+            username = BaseProfile.ME;
+        }
+        this.userName = username;
 
         /** User **/
         final Observable<ResponseOrError<User>> userRequestObservable = profilesDao.getProfileObservable(userName)
@@ -367,7 +373,6 @@ public class UserProfilePresenter implements ProfilePresenter {
                         return null;
                     }
                 });
-
         notificationsUnreadObservable = userPreferences.getPageOrUserObservable()
                 .filter(Functions1.isNotNull())
                 .map(BaseProfile::getUnreadNotificationsCount)

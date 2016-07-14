@@ -2,6 +2,9 @@ package com.shoutit.app.android.api.model;
 
 public class UpdatePage {
 
+    private final String name;
+    private final String username;
+    private final String website;
     private final String about;
     private final String description;
     private final String phone;
@@ -17,7 +20,13 @@ public class UpdatePage {
     private final UserLocation location;
 
 
-    public UpdatePage(String about, String description, String phone, String founded, String impressum, String overview, String mission, String generalInfo, String cover, String image, boolean isVerified, boolean isPublished, UserLocation location) {
+    public UpdatePage(String name, String username, String website, String about, String description,
+                      String phone, String founded, String impressum, String overview, String mission,
+                      String generalInfo, String cover, String image, boolean isVerified,
+                      boolean isPublished, UserLocation location) {
+        this.name = name;
+        this.username = username;
+        this.website = website;
         this.about = about;
         this.description = description;
         this.phone = phone;

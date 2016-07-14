@@ -19,6 +19,7 @@ import com.google.common.base.Optional;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
@@ -38,6 +39,8 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class EditPageActivity extends BaseActivity implements EditPagePresenter.Listener {
 
     private static final String EXTRA_USERNAME = "extra_username";
@@ -46,11 +49,7 @@ public class EditPageActivity extends BaseActivity implements EditPagePresenter.
     @Bind(R.id.edit_page_location_tv)
     TextView mEditPageLocationTv;
 
-    public static Intent newIntentLoggedInPage(Context context) {
-        return new Intent(context, EditPageActivity.class);
-    }
-
-    public static Intent newIntentNotLoggedInPage(Context context, String username) {
+    public static Intent newIntent(Context context, @Nonnull String username) {
         return new Intent(context, EditPageActivity.class).putExtra(EXTRA_USERNAME, username);
     }
 
@@ -81,6 +80,14 @@ public class EditPageActivity extends BaseActivity implements EditPagePresenter.
     EditText mEditPageNameEt;
     @Bind(R.id.edit_page_name_til)
     TextInputLayout mEditPageNameTil;
+    @Bind(R.id.edit_page_username_et)
+    EditText mUsernameEt;
+    @Bind(R.id.edit_page_username_til)
+    TextInputLayout mUsernameTil;
+    @Bind(R.id.edit_page_website_et)
+    EditText mWebsiteEt;
+    @Bind(R.id.edit_page_website_til)
+    TextInputLayout mWebsiteTil;
     @Bind(R.id.edit_page_about_et)
     EditText mEditPageAboutEt;
     @Bind(R.id.edit_page_about_til)
@@ -140,6 +147,8 @@ public class EditPageActivity extends BaseActivity implements EditPagePresenter.
         mEditPageToolbar.setOnMenuItemClickListener(item -> {
             mEditPagePresenter.editFinished(new EditPagePresenter.EditData(
                     mEditPageNameEt.getText().toString(),
+                    mUsernameEt.getText().toString(),
+                    mWebsiteEt.getText().toString(),
                     mEditPageAboutEt.getText().toString(),
                     mEditPagePublished.isChecked(),
                     mEditPageDescriptionEt.getText().toString(),
@@ -162,14 +171,13 @@ public class EditPageActivity extends BaseActivity implements EditPagePresenter.
     @Nonnull
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
-        final Intent intent = getIntent();
-        final boolean hasExtra = intent.hasExtra(EXTRA_USERNAME);
-        final String username = hasExtra ? intent.getStringExtra(EXTRA_USERNAME) : null;
+        final String username = checkNotNull(getIntent().getStringExtra(EXTRA_USERNAME));
+
         final EditPageActivityComponent build = DaggerEditPageActivityComponent
                 .builder()
                 .activityModule(new ActivityModule(this))
                 .appComponent(App.getAppComponent(getApplication()))
-                .editPageActivityModule(new EditPageActivityModule(username, hasExtra))
+                .editPageActivityModule(new EditPageActivityModule(username))
                 .build();
         build.inject(this);
         return build;
@@ -226,6 +234,16 @@ public class EditPageActivity extends BaseActivity implements EditPagePresenter.
     }
 
     @Override
+    public void setUsername(String username) {
+        mUsernameEt.setText(username);
+    }
+
+    @Override
+    public void setWebsite(String website) {
+        mWebsiteEt.setText(website);
+    }
+
+    @Override
     public void setProgress(boolean show) {
         mBaseProgress.setVisibility(show ? View.VISIBLE : View.GONE);
     }
@@ -239,8 +257,14 @@ public class EditPageActivity extends BaseActivity implements EditPagePresenter.
     }
 
     @Override
-    public void error() {
-        ColoredSnackBar.error(ColoredSnackBar.contentView(this), R.string.error_default, Snackbar.LENGTH_SHORT).show();
+    public void finishAndSetResult() {
+        setResult(RESULT_OK);
+        finish();
+    }
+
+    @Override
+    public void error(Throwable throwable) {
+        ColoredSnackBar.error(ColoredSnackBar.contentView(this), throwable).show();
     }
 
     @Override
@@ -254,6 +278,11 @@ public class EditPageActivity extends BaseActivity implements EditPagePresenter.
     @Override
     public void setUpLocation(UserLocation location) {
         LocationHelper.setupLocation(location, EditPageActivity.this, mEditPageLocationTv, mEditPageFlagIv, mPicasso);
+    }
+
+    @Override
+    public void imageUploadError() {
+        ColoredSnackBar.error(ColoredSnackBar.contentView(this), R.string.error_image_upload, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override

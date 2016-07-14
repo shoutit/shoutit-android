@@ -21,6 +21,7 @@ import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.utils.rx.RxUtils;
 import com.shoutit.app.android.view.listenings.ProfilesListAdapter;
+import com.shoutit.app.android.view.pages.PagesPagerFragment;
 import com.shoutit.app.android.view.profile.page.PageProfileActivity;
 
 import javax.annotation.Nonnull;
@@ -126,7 +127,8 @@ public class PublicPagesFragment extends BaseFragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == Activity.RESULT_OK && (requestCode == REQUEST_OPENED_PROFILE_WAS_LISTENED)) {
+        if (resultCode == Activity.RESULT_OK &&
+                (requestCode == REQUEST_OPENED_PROFILE_WAS_LISTENED) || requestCode == PagesPagerFragment.REQUEST_CODE_PAGE_EDITED) {
             // Need to refresh items if returned from other profile which was listened/unlistened.
             presenter.refreshData();
         } else {

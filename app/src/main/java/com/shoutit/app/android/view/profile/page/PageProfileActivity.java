@@ -119,8 +119,8 @@ public class PageProfileActivity extends ProfileActivity {
         presenter.getMyProfilePresenter()
                 .getEditProfileClickObservable()
                 .compose(bindToLifecycle())
-                .subscribe(ignore -> {
-                    startActivity(EditPageActivity.newIntentLoggedInPage(PageProfileActivity.this));
+                .subscribe(userName -> {
+                    startActivity(EditPageActivity.newIntent(PageProfileActivity.this, userName));
                 });
 
         presenter.getMyProfilePresenter()

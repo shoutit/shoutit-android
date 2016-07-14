@@ -29,8 +29,10 @@ public class Page extends BaseProfile {
                 User admin, String about, String description, String phone, String founded,
                 String impressum, String overview, String mission, String generalInfo, boolean isVerified,
                 boolean isPublished, LinkedAccounts linkedAccounts, ConversationDetails conversation,
-                boolean isListener) {
-        super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount, location, isOwner, stats, email, linkedAccounts, conversation, isListener);
+                boolean isListener, String website) {
+        super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening,
+                listenersCount, location, isOwner, stats, email, linkedAccounts, conversation,
+                isListener, website);
         this.admin = admin;
         this.about = about;
         this.description = description;
@@ -53,7 +55,7 @@ public class Page extends BaseProfile {
         return new Page(id, type, username, name, firstName, lastName, isActivated, image, cover,
                 newIsListening, newListenersCount, location, getStats(), isOwner, getEmail(),
                 admin, about, description, phone, founded, impressum, overview, mission, generalInfo,
-                isVerified, isPublished, linkedAccounts, conversation, isListener);
+                isVerified, isPublished, linkedAccounts, conversation, isListener, website);
     }
 
     @Nonnull
@@ -62,36 +64,11 @@ public class Page extends BaseProfile {
         return new Page(id, type, username, name, firstName, lastName, isActivated, image, cover,
                 isListening, listenersCount, location, newStats, isOwner, getEmail(), admin, about,
                 description, phone, founded, impressum, overview, mission, generalInfo, isVerified,
-                isPublished, linkedAccounts, conversation, isListener);
+                isPublished, linkedAccounts, conversation, isListener, website);
     }
 
     public User getAdmin() {
         return admin;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Page)) return false;
-        final Page page = (Page) o;
-        return isActivated == page.isActivated &&
-                isListening == page.isListening &&
-                listenersCount == page.listenersCount &&
-                Objects.equal(id, page.id) &&
-                Objects.equal(type, page.type) &&
-                Objects.equal(username, page.username) &&
-                Objects.equal(name, page.name) &&
-                Objects.equal(firstName, page.firstName) &&
-                Objects.equal(lastName, page.lastName) &&
-                Objects.equal(image, page.image) &&
-                Objects.equal(admin, page.admin) &&
-                Objects.equal(cover, page.cover);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id, type, username, name, firstName, lastName, isActivated,
-                image, cover, isListening, listenersCount, getStats(), admin);
     }
 
     public String getAbout() {
@@ -132,5 +109,30 @@ public class Page extends BaseProfile {
 
     public boolean isPublished() {
         return isPublished;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Page)) return false;
+        if (!super.equals(o)) return false;
+        final Page page = (Page) o;
+        return isVerified == page.isVerified &&
+                isPublished == page.isPublished &&
+                Objects.equal(admin, page.admin) &&
+                Objects.equal(about, page.about) &&
+                Objects.equal(description, page.description) &&
+                Objects.equal(phone, page.phone) &&
+                Objects.equal(founded, page.founded) &&
+                Objects.equal(impressum, page.impressum) &&
+                Objects.equal(overview, page.overview) &&
+                Objects.equal(mission, page.mission) &&
+                Objects.equal(generalInfo, page.generalInfo);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(super.hashCode(), admin, about, description, phone,
+                founded, impressum, overview, mission, generalInfo, isVerified, isPublished);
     }
 }

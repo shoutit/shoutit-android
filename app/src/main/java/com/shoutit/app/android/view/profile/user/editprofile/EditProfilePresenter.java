@@ -18,10 +18,12 @@ import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.UpdateUserRequest;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
+import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.FileHelper;
 import com.shoutit.app.android.utils.ImageHelper;
 import com.shoutit.app.android.utils.MoreFunctions1;
+import com.shoutit.app.android.utils.PreferencesHelper;
 import com.shoutit.app.android.utils.rx.Actions1;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
 
@@ -36,6 +38,7 @@ import javax.annotation.Nonnull;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
@@ -74,11 +77,15 @@ public class EditProfilePresenter {
     private final Observable<Boolean> showCompleteProfileDialogObservable;
 
     @Nonnull
+    private final UserPreferences userPreferences;
+    @Nonnull
     private final ApiService apiService;
     @Nonnull
     private final Scheduler networkScheduler;
     @Nonnull
     private final Scheduler uiScheduler;
+    @Nonnull
+    private final ProfilesDao profilesDao;
     @Nonnull
     private final Observable<Boolean> avatarProgressObservable;
     @Nonnull
@@ -106,10 +113,13 @@ public class EditProfilePresenter {
                                 @Nonnull final AmazonHelper amazonHelper,
                                 @Nonnull @NetworkScheduler final Scheduler networkScheduler,
                                 @Nonnull @UiScheduler final Scheduler uiScheduler,
+                                @Nonnull ProfilesDao profilesDao,
                                 @Nullable final State state) {
+        this.userPreferences = userPreferences;
         this.apiService = apiService;
         this.networkScheduler = networkScheduler;
         this.uiScheduler = uiScheduler;
+        this.profilesDao = profilesDao;
 
         if (state != null) {
             locationSubject.onNext(state.getUserLocation());
@@ -290,6 +300,11 @@ public class EditProfilePresenter {
         return updateUserRequest -> apiService.updateUser(updateUserRequest)
                 .subscribeOn(networkScheduler)
                 .observeOn(uiScheduler)
+                .doOnNext(user -> {
+                    userPreferences.setUserOrPage(user);
+                    profilesDao.getProfileDao(BaseProfile.ME).updatedProfileLocallyObserver()
+                            .onNext(ResponseOrError.fromData(user));
+                })
                 .compose(ResponseOrError.<User>toResponseOrErrorObservable());
     }
 

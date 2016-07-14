@@ -783,6 +783,8 @@
 
     <!-- Edit Page -->
     <string name="edit_page_name">Name</string>
+    <string name="edit_page_username">Username</string>
+    <string name="edit_page_website">Website</string>
     <string name="edit_page_about">About</string>
     <string name="edit_page_description">Description</string>
     <string name="edit_page_phone">Phone</string>

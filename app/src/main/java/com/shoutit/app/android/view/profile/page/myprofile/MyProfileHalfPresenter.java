@@ -1,12 +1,9 @@
 package com.shoutit.app.android.view.profile.page.myprofile;
 
 import android.content.Context;
-import android.text.TextUtils;
 
 import com.shoutit.app.android.R;
-import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.Page;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.view.profile.page.ProfileAdapterItems;
 
@@ -19,13 +16,12 @@ import rx.subjects.PublishSubject;
 public class MyProfileHalfPresenter {
 
     @Nonnull
-    private final PublishSubject<Object> editProfileClickObserver = PublishSubject.create();
+    private final PublishSubject<String> editProfileClickObserver = PublishSubject.create();
     @Nonnull
     private final PublishSubject<Object> notificationsClickObserver = PublishSubject.create();
     @Nonnull
     private final PublishSubject<Object> verifyAccountClickObserver = PublishSubject.create();
     private final Context context;
-    private final UserPreferences userPreferences;
     @Nonnull
     private final PublishSubject<Object> listeningsClickObserver = PublishSubject.create();
     @Nonnull
@@ -34,10 +30,8 @@ public class MyProfileHalfPresenter {
     private final PublishSubject<Object> listenersClickObserver = PublishSubject.create();
 
     @Inject
-    public MyProfileHalfPresenter(@ForActivity Context context,
-                                  UserPreferences userPreferences) {
+    public MyProfileHalfPresenter(@ForActivity Context context) {
         this.context = context;
-        this.userPreferences = userPreferences;
     }
 
     public ProfileAdapterItems.NameAdapterItem getUserNameAdapterItem(@Nonnull Page user,
@@ -60,7 +54,7 @@ public class MyProfileHalfPresenter {
     }
 
     @Nonnull
-    public Observable<Object> getEditProfileClickObservable() {
+    public Observable<String> getEditProfileClickObservable() {
         return editProfileClickObserver;
     }
 

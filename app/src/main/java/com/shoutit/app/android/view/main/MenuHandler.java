@@ -349,7 +349,10 @@ public class MenuHandler {
     @OnClick({R.id.menu_avatar_iv, R.id.menu_user_name_tv})
     public void startUserProfile() {
         if (userPreferences.isNormalUser()) {
-            rxActivity.startActivity(ProfileIntentHelper.newIntent(rxActivity, User.ME, userPreferences.isLoggedInAsPage()));
+            //noinspection ConstantConditions
+            rxActivity.startActivity(ProfileIntentHelper.newIntent(rxActivity,
+                    userPreferences.getUserOrPage().getUsername(),
+                    userPreferences.isLoggedInAsPage()));
         } else {
             showLoginActivity();
         }
