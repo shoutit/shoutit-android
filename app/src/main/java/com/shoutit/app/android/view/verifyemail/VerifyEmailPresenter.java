@@ -72,7 +72,7 @@ public class VerifyEmailPresenter {
         final Observable<User> profilesSuccessObservable = profileObservable
                 .compose(ResponseOrError.<User>onlySuccess());
 
-        emailObservable = profilesSuccessObservable.first()
+        emailObservable = profilesSuccessObservable.take(1)
                 .map((Func1<User, BaseProfile>) user -> user)
                 .startWith(userPreferences.getUserOrPage())
                 .filter(Functions1.isNotNull())

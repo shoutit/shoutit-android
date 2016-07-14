@@ -83,7 +83,7 @@ public class LoginPresenter {
                                         return new EmailLoginRequest(email, password, LoginProfile.loginUser(location), mixPanel.getDistinctId());
                                     }
                                 })
-                                .first();
+                                .take(1);
                     }
                 })
                 .doOnNext(showProgressAction())

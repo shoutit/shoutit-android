@@ -121,7 +121,7 @@ public class EditProfilePresenter {
                 .compose(ObservableExtensions.<User>behaviorRefCount());
 
         userInputsObservable = userObservable
-                .first()
+                .take(1)
                 .filter(user -> state == null);
 
         locationObservable = Observable.merge(
@@ -173,7 +173,7 @@ public class EditProfilePresenter {
                 .switchMap(new Func1<Boolean, Observable<UpdateUserRequest>>() {
                     @Override
                     public Observable<UpdateUserRequest> call(Boolean ignore) {
-                        return lastCombinedData.first();
+                        return lastCombinedData.take(1);
                     }
                 })
                 .doOnNext(Actions1.progressOnNext(progressSubject, true))

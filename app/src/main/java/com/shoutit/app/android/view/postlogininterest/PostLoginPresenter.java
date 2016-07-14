@@ -75,7 +75,7 @@ public class PostLoginPresenter {
                     public Observable<ResponseOrError<Object>> call(Object o) {
                         return mStringSelectionHelper
                                 .getSelectedItems()
-                                .first()
+                                .take(1)
                                 .flatMap(new Func1<Set<String>, Observable<ResponseOrError<Object>>>() {
                                     @Override
                                     public Observable<ResponseOrError<Object>> call(Set<String> strings) {

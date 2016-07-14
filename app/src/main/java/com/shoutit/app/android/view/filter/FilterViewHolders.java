@@ -320,7 +320,7 @@ public class FilterViewHolders {
                                     }),
 
                             item.getSortTypeObservable()
-                                    .first()
+                                    .take(1)
                                     .subscribe(new Action1<SortType>() {
                                         @Override
                                         public void call(SortType sortType) {

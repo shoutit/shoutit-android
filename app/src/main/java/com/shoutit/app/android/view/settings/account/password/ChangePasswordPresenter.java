@@ -141,7 +141,7 @@ public class ChangePasswordPresenter {
                 .switchMap(new Func1<Boolean, Observable<ChangePasswordRequest>>() {
                     @Override
                     public Observable<ChangePasswordRequest> call(Boolean ignore) {
-                        return lastCredentialsObservable.first();
+                        return lastCredentialsObservable.take(1);
                     }
                 })
                 .switchMap(new Func1<ChangePasswordRequest, Observable<ResponseOrError<ResponseBody>>>() {
