@@ -199,9 +199,9 @@ public class PusherHelper {
                 .observeOn(uiScheduler);
     }
 
-    public PresenceChannel getProfileChannel() {
+    private PresenceChannel getProfileChannel() {
         final String id = mUser.getId();
-        log("get profile channel id : " + id);
+        log("get profile channel id : " + id + userLogInfo());
 
         final PresenceChannel presenceChannel = mPusher.getPresenceChannel(PusherHelper.getProfileChannelName(id));
 
@@ -227,18 +227,18 @@ public class PusherHelper {
     }
 
     public void unsubscribeConversationChannel(@NonNull String conversationId) {
-        log("unsubscribe conversation channel : " + conversationId);
+        log("unsubscribe conversation channel : " + conversationId + userLogInfo());
         mPusher.unsubscribe(getConversationChannelName(conversationId));
     }
 
     public void unsubscribeProfileChannel() {
-        log("unsubscribe profile channel : " + mUser.getId());
+        log("unsubscribe profile channel : " + mUser.getId() + userLogInfo());
         mPusher.unsubscribe(PusherHelper.getProfileChannelName(mUser.getId()));
     }
 
     @Nonnull
     public PresenceChannel subscribeConversationChannel(@NonNull String conversationId) {
-        log("subscribe conversation channel : " + conversationId);
+        log("subscribe conversation channel : " + conversationId  + userLogInfo());
         final PresenceChannel presenceChannel = mPusher.getPresenceChannel(PusherHelper.getConversationChannelName(conversationId));
 
         if (presenceChannel == null || !presenceChannel.isSubscribed()) {
@@ -256,23 +256,29 @@ public class PusherHelper {
         return new ConnectionEventListener() {
             @Override
             public void onConnectionStateChange(ConnectionStateChange connectionStateChange) {
-                Log.i(TAG, connectionStateChange.getCurrentState().name());
+                Log.i(TAG, connectionStateChange.getCurrentState().name() + userLogInfo());
             }
 
             @Override
             public void onError(String s, String s1, Exception e) {
-                Log.e(TAG, "pusher message", e);
+                Log.e(TAG, "pusher message" + userLogInfo(), e);
             }
         };
     }
 
+    @NonNull
+    private String userLogInfo() {
+        return " user : " + mUser.getId() + " is page " + mUser.isPage();
+    }
+
     public PresenceChannel subscribeProfileChannel() {
         final String id = mUser.getId();
-        log("subscribe profile channel : " + id);
+        log("subscribe profile channel : " + id  + userLogInfo());
         return mPusher.subscribePresence(PusherHelper.getProfileChannelName(id));
     }
 
     public void connect() {
+        log("connect called : " + userLogInfo());
         mPusher.connect(getEventListener());
     }
 
@@ -289,7 +295,7 @@ public class PusherHelper {
     }
 
     public void disconnect() {
-        log("disconnect");
+        log("disconnect" + userLogInfo());
         mPusher.disconnect();
     }
 
@@ -312,7 +318,7 @@ public class PusherHelper {
     }
 
     private void logMessage(Object message, String channel) {
-        log(channel + " : " + message.toString());
+        log(channel + " : " + message.toString()  + userLogInfo());
     }
 
     private void log(String msg) {

@@ -22,6 +22,7 @@ import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
+import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
 import com.shoutit.app.android.utils.pusher.TypingInfo;
 import com.shoutit.app.android.view.chats.message_models.DateItem;
 import com.shoutit.app.android.view.chats.message_models.InfoItem;
@@ -81,11 +82,11 @@ public class ChatsDelegate {
     private final LocalMessageBus mBus;
 
 
-    public ChatsDelegate(PusherHelper pusher, Scheduler uiScheduler, Scheduler networkScheduler,
+    public ChatsDelegate(PusherHelperHolder pusher, Scheduler uiScheduler, Scheduler networkScheduler,
                          ApiService apiService, Resources resources, UserPreferences userPreferences,
                          Context context, AmazonHelper amazonHelper, PublishSubject<PusherMessage> newMessagesSubject,
                          LocalMessageBus bus) {
-        mPusher = pusher;
+        mPusher = pusher.getPusherHelper();
         mUiScheduler = uiScheduler;
         mNetworkScheduler = networkScheduler;
         mApiService = apiService;

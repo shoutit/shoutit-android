@@ -37,6 +37,7 @@ import com.shoutit.app.android.dagger.ForApplication;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
+import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -79,12 +80,12 @@ public class FacebookHelper {
                           final UserPreferences userPreferences,
                           @ForApplication Context context,
                           @NetworkScheduler final Scheduler networkScheduler,
-                          PusherHelper pusherHelper) {
+                          PusherHelperHolder pusherHelper) {
         this.apiService = apiService;
         this.userPreferences = userPreferences;
         this.context = context;
         this.networkScheduler = networkScheduler;
-        this.pusherHelper = pusherHelper;
+        this.pusherHelper = pusherHelper.getPusherHelper();
 
         listAdManager = new NativeAdsManager(
                 context, getListAdId(), ADS_NUM_TO_PREFETCH);

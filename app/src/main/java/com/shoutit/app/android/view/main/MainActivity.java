@@ -39,6 +39,7 @@ import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.PlayServicesHelper;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
+import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
 import com.shoutit.app.android.view.discover.DiscoverActivity;
 import com.shoutit.app.android.view.discover.OnNewDiscoverSelectedListener;
 import com.shoutit.app.android.view.home.HomeFragment;
@@ -84,7 +85,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
     @Inject
     MixPanel mixPanel;
     @Inject
-    PusherHelper mPusherHelper;
+    PusherHelperHolder mPusherHelper;
     @Inject
     ApiService apiService;
     @Inject
@@ -165,7 +166,8 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
     }
 
     private void subscribeToStats() {
-        mStatsSubscription.add(mPusherHelper.getStatsObservable()
+        final PusherHelper pusherHelper = mPusherHelper.getPusherHelper();
+        mStatsSubscription.add(pusherHelper.getStatsObservable()
                 .compose(this.<Stats>bindToLifecycle())
                 .subscribe(pusherStats -> {
                     menuHandler.setStats(pusherStats.getUnreadConversationsCount(), pusherStats.getUnreadNotifications());

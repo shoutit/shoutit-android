@@ -25,6 +25,7 @@ import com.shoutit.app.android.api.model.ConversationsResponse;
 import com.shoutit.app.android.api.model.PusherConversationUpdate;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
+import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
 import com.shoutit.app.android.view.chats.LocalMessageBus;
 
 import java.util.Collections;
@@ -102,7 +103,7 @@ public class ConversationsPresenter {
                                   @UiScheduler Scheduler uiScheduler,
                                   @ForActivity Context context,
                                   UserPreferences userPreferences,
-                                  PusherHelper pusherHelper,
+                                  PusherHelperHolder pusherHelper,
                                   boolean isMyConversationsList,
                                   LocalMessageBus localMessageBus,
                                   RefreshConversationBus refreshConversationBus) {
@@ -112,7 +113,7 @@ public class ConversationsPresenter {
         mContext = context;
         mRefreshConversationBus = refreshConversationBus;
         mUserId = userPreferences.getUserOrThrow().getId();
-        mPusherHelper = pusherHelper;
+        mPusherHelper = pusherHelper.getPusherHelper();
         this.isMyConversationsList = isMyConversationsList;
         mLocalMessageBus = localMessageBus;
     }

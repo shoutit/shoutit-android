@@ -28,7 +28,9 @@ import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.AviaryContants;
 import com.shoutit.app.android.utils.LogHelper;
+import com.shoutit.app.android.utils.ProcessUtils;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
+import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
 import com.shoutit.app.android.utils.stackcounter.StackCounterManager;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
 import com.squareup.leakcanary.LeakCanary;
@@ -37,6 +39,7 @@ import com.uservoice.uservoicesdk.UserVoice;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 
 import io.fabric.sdk.android.Fabric;
@@ -80,12 +83,20 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
     @Inject
     FacebookHelper facebookHelper;
 
-    private PusherHelper mCurrentUserPusherHelper;
-    private PusherHelper mUserPusherHelper;
+    @Inject
+    PusherHelperHolder mCurrentUserPusherHelper;
+    @Inject
+    @Named("user")
+    PusherHelperHolder mUserPusherHelper;
 
     @Override
     public void onCreate() {
         super.onCreate();
+
+        if (!ProcessUtils.isInMainProcess(this)) {
+            return;
+        }
+
         MultiDex.install(this);
 
         initFabric();
@@ -155,46 +166,63 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
                 .switchMap(s -> userPreferences.getPageIdObservable())
                 .subscribe(pageId -> {
                     if (pageId != null) {
-                        mUserPusherHelper = mPusherHelperProvider.get();
-                        mUserPusherHelper.init(userPreferences.getAuthToken().get(), userPreferences.getUser());
-                        mUserPusherHelper.connect();
-                        mUserPusherHelper.subscribeProfileChannel();
+                        final PusherHelper pusherHelper = mUserPusherHelper.newInstance();
+                        pusherHelper.init(userPreferences.getAuthToken().get(), userPreferences.getUser());
+                        pusherHelper.connect();
+                        pusherHelper.subscribeProfileChannel();
+                        pusherHelper.getStatsObservable()
+                                .subscribe(stats -> {
+                                    userPreferences.updateUserStats(stats);
+                                });
                     } else {
-                        if(mUserPusherHelper != null) {
-                            mUserPusherHelper.unsubscribeProfileChannel();
-                            mUserPusherHelper.disconnect();
+                        final PusherHelper pusherHelper = mUserPusherHelper.getPusherHelper();
+                        if (pusherHelper != null) {
+                            pusherHelper.unsubscribeProfileChannel();
+                            pusherHelper.disconnect();
                         }
                     }
                 });
 
         mStackCounterManager.register(this)
                 .subscribe(foreground -> {
-                    if (userPreferences.isNormalUser() && mCurrentUserPusherHelper != null && mCurrentUserPusherHelper.isInit()) {
-                        if (foreground && mCurrentUserPusherHelper.shouldConnect()) {
-                            mCurrentUserPusherHelper.connect();
+                    final PusherHelper pusherHelper = mCurrentUserPusherHelper.getPusherHelper();
+                    if (userPreferences.isNormalUser() && pusherHelper != null && pusherHelper.isInit()) {
+                        if (foreground && pusherHelper.shouldConnect()) {
+                            pusherHelper.connect();
                         } else if (!foreground) {
-                            mCurrentUserPusherHelper.disconnect();
+                            pusherHelper.disconnect();
+                        }
+                    }
+
+                    final PusherHelper userPusherHelper = mUserPusherHelper.getPusherHelper();
+                    if (userPreferences.isNormalUser() && userPusherHelper != null && userPusherHelper.isInit()) {
+                        if (foreground && userPusherHelper.shouldConnect()) {
+                            userPusherHelper.connect();
+                        } else if (!foreground) {
+                            userPusherHelper.disconnect();
                         }
                     }
                 });
     }
 
     private void initPusher(@Nonnull String token, @Nonnull BaseProfile user) {
-        if(mCurrentUserPusherHelper != null){
-            mCurrentUserPusherHelper.disconnect();
-            mCurrentUserPusherHelper.unsubscribeProfileChannel();
+        final PusherHelper pusherHelper = mCurrentUserPusherHelper.getPusherHelper();
+        if (pusherHelper != null) {
+            pusherHelper.disconnect();
+            pusherHelper.unsubscribeProfileChannel();
         }
-        mCurrentUserPusherHelper = mPusherHelperProvider.get();
-        mCurrentUserPusherHelper.init(token, user);
-        if (mCurrentUserPusherHelper.shouldConnect()) {
-            mCurrentUserPusherHelper.connect();
-            mCurrentUserPusherHelper.subscribeProfileChannel();
-            mCurrentUserPusherHelper.getUserUpdatedObservable()
+
+        final PusherHelper newPusherHelper = mCurrentUserPusherHelper.newInstance();
+        newPusherHelper.init(token, user);
+        if (newPusherHelper.shouldConnect()) {
+            newPusherHelper.connect();
+            newPusherHelper.subscribeProfileChannel();
+            newPusherHelper.getUserUpdatedObservable()
                     .subscribe(user1 -> {
                         userPreferences.setUserOrPage(user1);
                     });
 
-            mCurrentUserPusherHelper.getStatsObservable()
+            newPusherHelper.getStatsObservable()
                     .subscribe(stats -> {
                         userPreferences.updateStats(stats);
                     });
@@ -202,7 +230,7 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
             mNetworkObservableProvider.networkObservable()
                     .filter(NetworkObservableProvider.NetworkStatus::isNetwork)
                     .subscribe(networkStatus -> {
-                        mCurrentUserPusherHelper.connect();
+                        newPusherHelper.connect();
                     });
         }
     }

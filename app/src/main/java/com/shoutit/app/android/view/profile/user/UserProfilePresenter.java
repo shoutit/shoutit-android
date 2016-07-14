@@ -39,7 +39,7 @@ import com.shoutit.app.android.utils.BookmarkHelper;
 import com.shoutit.app.android.utils.ListeningHalfPresenter;
 import com.shoutit.app.android.utils.PreferencesHelper;
 import com.shoutit.app.android.utils.PromotionHelper;
-import com.shoutit.app.android.utils.pusher.PusherHelper;
+import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
 import com.shoutit.app.android.view.profile.BaseProfileAdapterItems;
 import com.shoutit.app.android.view.profile.user.myprofile.MyProfileHalfPresenter;
 import com.shoutit.app.android.view.profile.user.userprofile.UserProfileHalfPresenter;
@@ -148,7 +148,7 @@ public class UserProfilePresenter implements ProfilePresenter {
                                 @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
                                 @Nonnull ListeningHalfPresenter listeningHalfPresenter,
                                 @Nonnull final ApiService apiService,
-                                @NonNull PusherHelper pusherHelper,
+                                @NonNull PusherHelperHolder pusherHelper,
                                 @NonNull BookmarksDao bookmarksDao,
                                 @NonNull BookmarkHelper bookmarkHelper) {
         this.userName = userName;
@@ -371,7 +371,7 @@ public class UserProfilePresenter implements ProfilePresenter {
         notificationsUnreadObservable = userPreferences.getPageOrUserObservable()
                 .filter(Functions1.isNotNull())
                 .map(BaseProfile::getUnreadNotificationsCount)
-                .mergeWith(pusherHelper.getStatsObservable()
+                .mergeWith(pusherHelper.getPusherHelper().getStatsObservable()
                         .map(Stats::getUnreadNotifications));
     }
 

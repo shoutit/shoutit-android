@@ -101,8 +101,8 @@ public class UserPreferences {
 
         pageIdObservable = Observable
                 .defer(() -> Observable.just(getPageId().orNull())
-                .compose(MoreOperators.<String>refresh(pageIdRefreshSubject))
-                .observeOn(uiScheduler));
+                        .compose(MoreOperators.<String>refresh(pageIdRefreshSubject))
+                        .observeOn(uiScheduler));
     }
 
     public void setLoggedIn(@NonNull String authToken,
@@ -382,6 +382,16 @@ public class UserPreferences {
         }
 
         final BaseProfile updatedUser = user.withUpdatedStats(pusherStats);
+        setUserOrPage(updatedUser);
+    }
+
+    public void updateUserStats(@Nonnull Stats pusherStats) {
+        final User user = getUser();
+        if (user == null) {
+            return;
+        }
+
+        final User updatedUser = user.withUpdatedStats(pusherStats);
         setUserOrPage(updatedUser);
     }
 

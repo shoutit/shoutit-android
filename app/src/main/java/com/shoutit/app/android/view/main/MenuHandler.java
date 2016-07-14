@@ -20,6 +20,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.model.Stats;
 import com.shoutit.app.android.utils.BlurTransform;
 import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
@@ -86,6 +87,8 @@ public class MenuHandler {
     TextView chatsBadgeTv;
     @Bind(R.id.menu_credits_badge)
     TextView creditsBadgeTv;
+    @Bind(R.id.menu_use_profile_badge)
+    TextView useProfileBadeTv;
 
     @Bind(R.id.menu_home)
     CheckedTextView homeItem;
@@ -106,6 +109,8 @@ public class MenuHandler {
 
     @Bind(R.id.menu_use_profile)
     Button useProfile;
+    @Bind(R.id.menu_use_profile_container)
+    View useProfileContainer;
 
     @Nonnull
     private final RxAppCompatActivity rxActivity;
@@ -169,7 +174,6 @@ public class MenuHandler {
                         creditsBadgeTv.setVisibility(View.GONE);
                     }
                 });
-
         userPreferences.getPageOrUserObservable()
                 .filter(user -> user != null)
                 .subscribe(user -> {
@@ -179,8 +183,22 @@ public class MenuHandler {
                             View.GONE : View.VISIBLE);
                 });
 
-
-        useProfile.setVisibility(userPreferences.isLoggedInAsPage() ? View.VISIBLE : View.GONE);
+        final boolean loggedInAsPage = userPreferences.isLoggedInAsPage();
+        useProfileContainer.setVisibility(loggedInAsPage ? View.VISIBLE : View.GONE);
+        if (loggedInAsPage) {
+            userPreferences.getUserObservable()
+                    .filter(user -> user != null)
+                    .map(BaseProfile::getStats)
+                    .subscribe(stats -> {
+                        if (stats != null) {
+                            final int statsCount = stats.getUnreadConversationsCount() + stats.getUnreadNotifications();
+                            useProfileBadeTv.setVisibility(statsCount > 0 ? View.VISIBLE : View.GONE);
+                            useProfileBadeTv.setText(String.valueOf(statsCount));
+                        } else {
+                            useProfileBadeTv.setVisibility(View.GONE);
+                        }
+                    });
+        }
 
         setData(id);
     }

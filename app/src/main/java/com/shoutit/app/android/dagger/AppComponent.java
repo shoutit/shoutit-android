@@ -37,6 +37,7 @@ import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
+import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
 import com.shoutit.app.android.view.chats.LocalMessageBus;
 import com.shoutit.app.android.view.conversations.RefreshConversationBus;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
@@ -122,7 +123,10 @@ public interface AppComponent {
 
     DbHelper dbHelper();
 
-    PusherHelper pusher();
+    PusherHelperHolder pusher();
+
+    @Named("user")
+    PusherHelperHolder userPusher();
 
     VideoCallsDao videoCallsDao();
 

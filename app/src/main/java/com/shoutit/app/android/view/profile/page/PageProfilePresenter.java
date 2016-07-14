@@ -40,7 +40,7 @@ import com.shoutit.app.android.utils.BookmarkHelper;
 import com.shoutit.app.android.utils.ListeningHalfPresenter;
 import com.shoutit.app.android.utils.PreferencesHelper;
 import com.shoutit.app.android.utils.PromotionHelper;
-import com.shoutit.app.android.utils.pusher.PusherHelper;
+import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
 import com.shoutit.app.android.view.profile.BaseProfileAdapterItems;
 import com.shoutit.app.android.view.profile.page.myprofile.MyProfileHalfPresenter;
 import com.shoutit.app.android.view.profile.page.userprofile.UserProfileHalfPresenter;
@@ -149,7 +149,7 @@ public class PageProfilePresenter implements ProfilePresenter {
                                 @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
                                 @Nonnull ListeningHalfPresenter listeningHalfPresenter,
                                 @Nonnull final ApiService apiService,
-                                @NonNull PusherHelper pusherHelper,
+                                @NonNull PusherHelperHolder pusherHelper,
                                 @NonNull BookmarksDao bookmarksDao,
                                 @NonNull BookmarkHelper bookmarkHelper) {
         this.userName = userName;
@@ -372,7 +372,7 @@ public class PageProfilePresenter implements ProfilePresenter {
         notificationsUnreadObservable = userPreferences.getPageOrUserObservable()
                 .filter(Functions1.isNotNull())
                 .map(BaseProfile::getUnreadNotificationsCount)
-                .mergeWith(pusherHelper.getStatsObservable()
+                .mergeWith(pusherHelper.getPusherHelper().getStatsObservable()
                         .map(Stats::getUnreadNotifications));
     }
 
@@ -429,7 +429,7 @@ public class PageProfilePresenter implements ProfilePresenter {
     }
 
     private BaseProfileAdapterItems.ProfileSectionAdapterItem getSectionAdapterItemForPosition(int position,
-                                                                                           List<BaseProfile> items, @Nullable String loggedInUserName) {
+                                                                                               List<BaseProfile> items, @Nullable String loggedInUserName) {
         if (position == 0) {
             return new BaseProfileAdapterItems.ProfileSectionAdapterItem(true, false, items.get(position),
                     listeningHalfPresenter.getListenProfileSubject(), profileToOpenSubject,
