@@ -10,7 +10,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class User extends BaseProfile {
-    public static final String ME = "me";
     public static final String USER = "user";
     public static final String PAGE = "page";
 
@@ -41,7 +40,6 @@ public class User extends BaseProfile {
     private final Listening listeningCount;
     private final String about;
     private final String mobile;
-    private final String website;
     @Nullable
     private final String gender;
     @Nullable
@@ -59,7 +57,7 @@ public class User extends BaseProfile {
                 String website, String email, ConversationDetails conversation,
                 @Nullable String gender, @Nullable String birthday, @Nullable Stats stats,
                 @Nullable LinkedAccounts linkedAccounts, @Nullable User admin, boolean isVerified) {
-        super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount, location, isOwner, stats, email, linkedAccounts, conversation, isListener);
+        super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount, location, isOwner, stats, email, linkedAccounts, conversation, isListener, null);
         this.apiUrl = apiUrl;
         this.webUrl = webUrl;
         this.isPasswordSet = isPasswordSet;
@@ -71,7 +69,6 @@ public class User extends BaseProfile {
         this.isOwner = isOwner;
         this.about = about;
         this.mobile = mobile;
-        this.website = website;
         this.gender = gender;
         this.birthday = birthday;
     }
@@ -223,10 +220,6 @@ public class User extends BaseProfile {
         return about;
     }
 
-    public String getWebsite() {
-        return website;
-    }
-
     public ConversationDetails getConversation() {
         return conversation;
     }
@@ -259,39 +252,25 @@ public class User extends BaseProfile {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof User)) return false;
+        if (!super.equals(o)) return false;
         final User user = (User) o;
-        return isActivated == user.isActivated &&
-                isListening == user.isListening &&
-                isPasswordSet == user.isPasswordSet &&
-                listenersCount == user.listenersCount &&
+        return isPasswordSet == user.isPasswordSet &&
                 dateJoined == user.dateJoined &&
-                isOwner == user.isOwner &&
-                Objects.equal(id, user.id) &&
-                Objects.equal(type, user.type) &&
+                isVerified == user.isVerified &&
                 Objects.equal(apiUrl, user.apiUrl) &&
                 Objects.equal(webUrl, user.webUrl) &&
-                Objects.equal(website, user.website) &&
-                Objects.equal(username, user.username) &&
-                Objects.equal(name, user.name) &&
-                Objects.equal(firstName, user.firstName) &&
-                Objects.equal(lastName, user.lastName) &&
-                Objects.equal(image, user.image) &&
-                Objects.equal(cover, user.cover) &&
-                Objects.equal(location, user.location) &&
                 Objects.equal(bio, user.bio) &&
-                Objects.equal(birthday, user.birthday) &&
-                Objects.equal(gender, user.gender) &&
-                Objects.equal(linkedAccounts, user.linkedAccounts) &&
                 Objects.equal(listeningCount, user.listeningCount) &&
-                Objects.equal(isVerified, user.isVerified) &&
+                Objects.equal(about, user.about) &&
+                Objects.equal(mobile, user.mobile) &&
+                Objects.equal(gender, user.gender) &&
+                Objects.equal(birthday, user.birthday) &&
                 Objects.equal(admin, user.admin);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id, type, apiUrl, webUrl, username, name, firstName, lastName,
-                isActivated, image, cover, isListening, isPasswordSet, location, listenersCount,
-                bio, dateJoined, listeningCount, isOwner, website,
-                linkedAccounts, birthday, gender, admin, isVerified);
+        return Objects.hashCode(super.hashCode(), apiUrl, webUrl, isPasswordSet, bio,
+                dateJoined, listeningCount, about, mobile, gender, birthday, admin, isVerified);
     }
 }

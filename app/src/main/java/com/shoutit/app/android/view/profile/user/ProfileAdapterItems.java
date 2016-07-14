@@ -95,7 +95,7 @@ public class ProfileAdapterItems {
 
 
 
-    public static class MyUserNameAdapterItem extends ProfileAdapterItems.NameAdapterItem {
+    public static class MyUserNameAdapterItem extends NameAdapterItem {
 
         @NonNull
         private final Observer<Object> editProfileClickObserver;
@@ -126,12 +126,12 @@ public class ProfileAdapterItems {
 
         @Override
         public boolean matches(@Nonnull BaseAdapterItem item) {
-            return item instanceof ProfileAdapterItems.NameAdapterItem && !user.equals(item);
+            return item instanceof MyUserNameAdapterItem && user.getId().equals(((MyUserNameAdapterItem) item).user.getId());
         }
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof ProfileAdapterItems.NameAdapterItem && user.equals(item);
+            return item instanceof MyUserNameAdapterItem && user.equals(((MyUserNameAdapterItem) item).getUser());
         }
 
         @Nonnull

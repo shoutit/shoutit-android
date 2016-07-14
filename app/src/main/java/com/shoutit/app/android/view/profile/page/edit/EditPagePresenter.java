@@ -9,15 +9,19 @@ import com.appunite.rx.dagger.UiScheduler;
 import com.google.common.base.Optional;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.api.model.UpdatePage;
 import com.shoutit.app.android.api.model.UserLocation;
+import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.FileHelper;
 import com.shoutit.app.android.utils.ImageHelper;
+import com.shoutit.app.android.utils.PreferencesHelper;
 
 import java.io.File;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import rx.Observable;
@@ -30,8 +34,8 @@ public class EditPagePresenter {
     private final ApiService mApiService;
     private final Scheduler mNetworkScheduler;
     private final Scheduler mUiScheduler;
-    private final PageDataProvider mPageDataProvider;
-    private final boolean mIsLoggedIn;
+    @Nonnull
+    private final ProfilesDao mProfilesDao;
     private final FileHelper mFileHelper;
     private final AmazonHelper mAmazonHelper;
 
@@ -41,72 +45,84 @@ public class EditPagePresenter {
     private String avatar;
     private String cover;
     private UserLocation mLocation;
+    private final String pageToEditUsername;
+    private final boolean isMyProfile;
 
     @Inject
     public EditPagePresenter(UserPreferences userPreferences,
                              ApiService apiService,
                              @NetworkScheduler Scheduler networkScheduler,
                              @UiScheduler Scheduler uiScheduler,
-                             PageDataProvider pageDataProvider,
-                             boolean isLoggedIn,
+                             @Nonnull final ProfilesDao profilesDao,
+                             @Nonnull String pageToEditUsername,
+                             @Nonnull PreferencesHelper preferencesHelper,
                              FileHelper fileHelper,
                              AmazonHelper amazonHelper) {
         mUserPreferences = userPreferences;
         mApiService = apiService;
         mNetworkScheduler = networkScheduler;
         mUiScheduler = uiScheduler;
-        mPageDataProvider = pageDataProvider;
-        mIsLoggedIn = isLoggedIn;
+        mProfilesDao = profilesDao;
         mFileHelper = fileHelper;
         mAmazonHelper = amazonHelper;
+
+        isMyProfile = preferencesHelper.isMyProfile(pageToEditUsername);
+        if (isMyProfile) {
+            pageToEditUsername = BaseProfile.ME;
+        }
+
+        this.pageToEditUsername = pageToEditUsername;
     }
 
     public void register(Listener listener) {
+
+        final Observable<ResponseOrError<BaseProfile>> profileRequest = mProfilesDao
+                .getProfileObservable(pageToEditUsername)
+                .subscribeOn(mNetworkScheduler)
+                .observeOn(mUiScheduler)
+                .compose(ObservableExtensions.behaviorRefCount());
+
         mCompositeSubscription = new CompositeSubscription();
         mListener = listener;
         mListener.setProgress(true);
-        mCompositeSubscription.add(mPageDataProvider.getPage()
-                .subscribeOn(mNetworkScheduler)
-                .observeOn(mUiScheduler)
+
+        mCompositeSubscription.add(profileRequest
+                .compose(ResponseOrError.onlySuccess())
                 .subscribe(page -> {
-                    mPage = page;
+                    mPage = (Page) page;
                     mListener.setProgress(false);
 
-                    final String name = page.getName();
-                    final String about = page.getAbout();
-                    final boolean published = page.isPublished();
-                    final String description = page.getDescription();
-                    final String phone = page.getPhone();
-                    final String founded = page.getFounded();
-                    final String impressum = page.getImpressum();
-                    final String overview = page.getOverview();
-                    final String mission = page.getMission();
-                    final String generalInfo = page.getGeneralInfo();
-                    final String image = page.getImage();
-                    final String cover = page.getCover();
-                    final UserLocation location = page.getLocation();
+                    mListener.setName(mPage.getName());
+                    mListener.setUsername(mPage.getUsername());
+                    mListener.setWebsite(mPage.getWebsite());
+                    mListener.setAbout(mPage.getAbout());
+                    mListener.setPublished(mPage.isPublished());
+                    mListener.setDescription(mPage.getDescription());
+                    mListener.setPhone(mPage.getPhone());
+                    mListener.setFounded(mPage.getFounded());
+                    mListener.setImpressum(mPage.getImpressum());
+                    mListener.setOverview(mPage.getOverview());
+                    mListener.setMission(mPage.getMission());
+                    mListener.setGeneralInfo(mPage.getGeneralInfo());
+                    mListener.setCover(mPage.getCover());
+                    mListener.setAvatar(mPage.getImage());
+                    mListener.setUpLocation(mPage.getLocation());
+                }));
 
-                    mListener.setName(name);
-                    mListener.setAbout(about);
-                    mListener.setPublished(published);
-                    mListener.setDescription(description);
-                    mListener.setPhone(phone);
-                    mListener.setFounded(founded);
-                    mListener.setImpressum(impressum);
-                    mListener.setOverview(overview);
-                    mListener.setMission(mission);
-                    mListener.setGeneralInfo(generalInfo);
-                    mListener.setCover(cover);
-                    mListener.setAvatar(image);
-                    mListener.setUpLocation(location);
-                }, throwable -> {
+        mCompositeSubscription.add(profileRequest
+                .compose(ResponseOrError.onlyError())
+                .subscribe(throwable -> {
                     mListener.setProgress(false);
-                    mListener.error();
+                    mListener.error(throwable);
                 }));
     }
 
     public void editFinished(EditData editData) {
-        final UpdatePage newPage = new UpdatePage(editData.about,
+        final UpdatePage newPage = new UpdatePage(
+                editData.name,
+                editData.username,
+                editData.website,
+                editData.about,
                 editData.description,
                 editData.phone,
                 editData.founded,
@@ -122,22 +138,30 @@ public class EditPagePresenter {
 
         mListener.setProgress(true);
 
-        mCompositeSubscription.add(getPageObservable(newPage)
+        mCompositeSubscription.add(getPageUpdateObservable(newPage)
                 .observeOn(mUiScheduler)
                 .subscribeOn(mNetworkScheduler)
                 .subscribe(page -> {
-                    mUserPreferences.setUserOrPage(page);
+                    if (isMyProfile) {
+                        mUserPreferences.setUserOrPage(page);
+                    }
+                    mProfilesDao.getProfileDao(page.getUsername())
+                            .updatedProfileLocallyObserver().onNext(ResponseOrError.fromData(page));
+                    // In case of edited username
+                    mProfilesDao.getProfileDao(pageToEditUsername)
+                            .updatedProfileLocallyObserver().onNext(ResponseOrError.fromData(page));
+
                     mListener.setProgress(false);
-                    mListener.finish();
+                    mListener.finishAndSetResult();
                 }, throwable -> {
                     mListener.setProgress(false);
-                    mListener.error();
+                    mListener.error(throwable);
                 }));
     }
 
-    private Observable<Page> getPageObservable(UpdatePage newPage) {
+    private Observable<Page> getPageUpdateObservable(UpdatePage newPage) {
         final Observable<Page> pageObservable;
-        if (!mIsLoggedIn) {
+        if (!mUserPreferences.isLoggedInAsPage()) {
             pageObservable = mApiService.updatePage(mPage.getId(), newPage);
         } else {
             pageObservable = mApiService.updatePage(newPage);
@@ -161,7 +185,7 @@ public class EditPagePresenter {
                     .compose(ResponseOrError.onlyError())
                     .subscribe(throwable -> {
                         mListener.setProgress(false);
-                        mListener.error();
+                        mListener.error(throwable);
                     });
 
             fileObservable
@@ -173,7 +197,7 @@ public class EditPagePresenter {
                             avatar = fileResponseOrError.data();
                             mListener.setAvatar(avatar);
                         } else {
-                            mListener.error();
+                            mListener.imageUploadError();
                         }
                     });
         }
@@ -191,7 +215,7 @@ public class EditPagePresenter {
                     .compose(ResponseOrError.onlyError())
                     .subscribe(throwable -> {
                         mListener.setProgress(false);
-                        mListener.error();
+                        mListener.error(throwable);
                     });
 
             fileObservable
@@ -203,7 +227,7 @@ public class EditPagePresenter {
                             cover = fileResponseOrError.data();
                             mListener.setCover(cover);
                         } else {
-                            mListener.error();
+                            mListener.imageUploadError();
                         }
                     });
         }
@@ -236,22 +260,30 @@ public class EditPagePresenter {
 
         void setName(String name);
 
+        void setUsername(String username);
+
+        void setWebsite(String website);
+
         void setProgress(boolean show);
 
         void setAvatar(String url);
 
-        void finish();
+        void finishAndSetResult();
 
-        void error();
+        void error(Throwable throwable);
 
         void setCover(String data);
 
         void setUpLocation(UserLocation location);
+
+        void imageUploadError();
     }
 
     public static class EditData {
 
         final String name;
+        final String username;
+        final String website;
         final String about;
         final boolean published;
         final String description;
@@ -263,6 +295,8 @@ public class EditPagePresenter {
         final String generalInfo;
 
         public EditData(String name,
+                        String username,
+                        String website,
                         String about,
                         boolean published,
                         String description,
@@ -273,6 +307,8 @@ public class EditPagePresenter {
                         String mission,
                         String generalInfo) {
             this.name = name;
+            this.username = username;
+            this.website = website;
             this.about = about;
             this.published = published;
             this.description = description;

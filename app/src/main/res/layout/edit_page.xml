@@ -85,6 +85,26 @@
 
                     </android.support.design.widget.TextInputLayout>
 
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/edit_page_username_til"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:theme="@style/BlueEditText"
+                        app:errorEnabled="true"
+                        app:hintTextAppearance="@style/ProfileInputStyle">
+
+                        <EditText
+                            android:id="@+id/edit_page_username_et"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/edit_page_username"
+                            android:imeOptions="actionNext"
+                            android:nextFocusDown="@+id/edit_page_website_et"
+                            android:singleLine="true"
+                            android:textSize="16sp"/>
+
+                    </android.support.design.widget.TextInputLayout>
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -140,6 +160,27 @@
                     </LinearLayout>
 
                     <android.support.design.widget.TextInputLayout
+                        android:id="@+id/edit_page_website_til"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:theme="@style/BlueEditText"
+                        app:errorEnabled="true"
+                        app:hintTextAppearance="@style/ProfileInputStyle">
+
+                        <EditText
+                            android:id="@+id/edit_page_website_et"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/edit_page_website"
+                            android:inputType="textUri"
+                            android:imeOptions="actionNext"
+                            android:nextFocusDown="@+id/edit_page_about_et"
+                            android:singleLine="true"
+                            android:textSize="16sp"/>
+
+                    </android.support.design.widget.TextInputLayout>
+
+                    <android.support.design.widget.TextInputLayout
                         android:id="@+id/edit_page_about_til"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -153,7 +194,7 @@
                             android:layout_height="wrap_content"
                             android:hint="@string/edit_page_about"
                             android:imeOptions="actionNext"
-                            android:nextFocusDown="@+id/edit_page_mobile_et"
+                            android:nextFocusDown="@+id/edit_page_description_et"
                             android:textSize="16sp"/>
 
                     </android.support.design.widget.TextInputLayout>

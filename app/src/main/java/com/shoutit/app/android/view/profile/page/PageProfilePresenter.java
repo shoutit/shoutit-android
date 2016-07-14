@@ -135,8 +135,9 @@ public class PageProfilePresenter implements ProfilePresenter {
     @Nullable
     private String loggedInUserName;
     private boolean isNormalUser;
+    private final boolean isMyProfile;
 
-    public PageProfilePresenter(@Nonnull final String userName,
+    public PageProfilePresenter(@Nonnull String username,
                                 @Nonnull final ShoutsDao shoutsDao,
                                 @Nonnull @ForActivity final Context context,
                                 @Nonnull final UserPreferences userPreferences,
@@ -152,7 +153,6 @@ public class PageProfilePresenter implements ProfilePresenter {
                                 @NonNull PusherHelper pusherHelper,
                                 @NonNull BookmarksDao bookmarksDao,
                                 @NonNull BookmarkHelper bookmarkHelper) {
-        this.userName = userName;
         this.shoutsDao = shoutsDao;
         this.context = context;
         this.profilesDao = profilesDao;
@@ -167,6 +167,12 @@ public class PageProfilePresenter implements ProfilePresenter {
         if (loggedInUser != null) {
             loggedInUserName = loggedInUser.getUsername();
         }
+
+        isMyProfile = preferencesHelper.isMyProfile(username);
+        if (isMyProfile) {
+            username = BaseProfile.ME;
+        }
+        this.userName = username;
 
         /** User **/
         final Observable<ResponseOrError<Page>> userRequestObservable = profilesDao.getProfileObservable(userName)
@@ -381,7 +387,7 @@ public class PageProfilePresenter implements ProfilePresenter {
             final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
 
 
-            if (preferencesHelper.isMyProfile(user.getUsername())) {
+            if (isMyProfile) {
                 builder.add(myProfilePresenter.getUserNameAdapterItem(user, notificationsUnreadObservable))
                         .add(myProfilePresenter.getThreeIconsAdapterItem(user));
             } else {

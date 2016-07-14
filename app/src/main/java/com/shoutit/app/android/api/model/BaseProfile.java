@@ -10,6 +10,7 @@ import com.shoutit.app.android.model.Stats;
 import javax.annotation.Nonnull;
 
 public class BaseProfile implements ProfileType {
+    public static final String ME = "me";
 
     @NonNull
     protected final String id;
@@ -43,11 +44,14 @@ public class BaseProfile implements ProfileType {
     protected final ConversationDetails conversation;
     // whenever the profile is listening to you
     protected final boolean isListener;
+    @Nullable
+    protected final String website;
 
     public BaseProfile(@NonNull String id, @NonNull String type, @NonNull String username, @NonNull String name,
                        @NonNull String firstName, @NonNull String lastName, boolean isActivated, @Nullable String image,
                        @Nullable String cover, boolean isListening, int listenersCount, @Nullable UserLocation location,
-                       boolean isOwner, @Nullable Stats stats, @NonNull String email, @Nullable LinkedAccounts linkedAccounts, ConversationDetails conversation, boolean isListener) {
+                       boolean isOwner, @Nullable Stats stats, @NonNull String email, @Nullable LinkedAccounts linkedAccounts,
+                       @Nullable ConversationDetails conversation, boolean isListener, @Nullable String website) {
         this.id = id;
         this.type = type;
         this.username = username;
@@ -66,6 +70,7 @@ public class BaseProfile implements ProfileType {
         this.linkedAccounts = linkedAccounts;
         this.conversation = conversation;
         this.isListener = isListener;
+        this.website = website;
     }
 
     public boolean isUser() {
@@ -143,19 +148,25 @@ public class BaseProfile implements ProfileType {
         return isListener;
     }
 
+    @Nullable
+    public String getWebsite() {
+        return website;
+    }
+
     @Nonnull
     public BaseProfile getListenedProfile() {
         boolean newIsListening = !isListening;
         int newListenersCount = newIsListening ? listenersCount + 1 : listenersCount - 1;
         return new BaseProfile(id, type, username, name, firstName, lastName, isActivated,
-                image, cover, newIsListening, newListenersCount, location, isOwner, stats, email, linkedAccounts, conversation, isListener);
+                image, cover, newIsListening, newListenersCount, location, isOwner, stats,
+                email, linkedAccounts, conversation, isListener, website);
     }
 
     @Nonnull
     public BaseProfile withUpdatedStats(@Nonnull Stats newStats) {
         return new BaseProfile(id, type, username, name, firstName, lastName, isActivated,
                 image, cover, isListening, listenersCount,
-                location, isOwner, newStats, getEmail(), linkedAccounts, conversation, isListener);
+                location, isOwner, newStats, getEmail(), linkedAccounts, conversation, isListener, website);
     }
 
     @Nullable
@@ -194,37 +205,41 @@ public class BaseProfile implements ProfileType {
         return conversation;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof BaseProfile)) return false;
-        final BaseProfile profile = (BaseProfile) o;
-        return isActivated == profile.isActivated &&
-                isListening == profile.isListening &&
-                isListener == profile.isListener &&
-                listenersCount == profile.listenersCount &&
-                Objects.equal(id, profile.id) &&
-                Objects.equal(type, profile.type) &&
-                Objects.equal(username, profile.username) &&
-                Objects.equal(name, profile.name) &&
-                Objects.equal(firstName, profile.firstName) &&
-                Objects.equal(lastName, profile.lastName) &&
-                Objects.equal(image, profile.image) &&
-                Objects.equal(location, profile.location) &&
-                Objects.equal(isOwner, profile.isOwner) &&
-                Objects.equal(conversation, profile.conversation) &&
-                Objects.equal(cover, profile.cover);
-    }
-
     @Nullable
     public LinkedAccounts getLinkedAccounts() {
         return linkedAccounts;
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof BaseProfile)) return false;
+        final BaseProfile that = (BaseProfile) o;
+        return isActivated == that.isActivated &&
+                isListening == that.isListening &&
+                listenersCount == that.listenersCount &&
+                isOwner == that.isOwner &&
+                isListener == that.isListener &&
+                Objects.equal(id, that.id) &&
+                Objects.equal(type, that.type) &&
+                Objects.equal(username, that.username) &&
+                Objects.equal(name, that.name) &&
+                Objects.equal(firstName, that.firstName) &&
+                Objects.equal(lastName, that.lastName) &&
+                Objects.equal(image, that.image) &&
+                Objects.equal(cover, that.cover) &&
+                Objects.equal(location, that.location) &&
+                Objects.equal(stats, that.stats) &&
+                Objects.equal(email, that.email) &&
+                Objects.equal(linkedAccounts, that.linkedAccounts) &&
+                Objects.equal(conversation, that.conversation) &&
+                Objects.equal(website, that.website);
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hashCode(id, type, username, name, firstName, lastName,
-                isActivated, image, cover, isListening, listenersCount, location, isOwner,
-                conversation, isListener);
+                isActivated, image, cover, isListening, listenersCount, location,
+                isOwner, stats, email, linkedAccounts, conversation, isListener, website);
     }
 }

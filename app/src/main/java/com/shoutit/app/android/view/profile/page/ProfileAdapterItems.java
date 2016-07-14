@@ -88,10 +88,10 @@ public class ProfileAdapterItems {
         }
     }
 
-    public static class MyUserNameAdapterItem extends ProfileAdapterItems.NameAdapterItem {
+    public static class MyUserNameAdapterItem extends NameAdapterItem {
 
         @NonNull
-        private final Observer<Object> editProfileClickObserver;
+        private final Observer<String> editProfileClickObserver;
         @Nonnull
         private final Observer<Object> notificationsClickObserver;
         @Nonnull
@@ -100,7 +100,7 @@ public class ProfileAdapterItems {
         private final Observable<Integer> notificationsUnreadObservable;
         private final boolean shouldShowProfileBadge;
 
-        public MyUserNameAdapterItem(@Nonnull Page user, @NonNull Observer<Object> editProfileClickObserver,
+        public MyUserNameAdapterItem(@Nonnull Page user, @NonNull Observer<String> editProfileClickObserver,
                                      @Nonnull Observer<Object> notificationsClickObserver,
                                      @Nonnull Observer<Object> verifyAccountClickObserver,
                                      @Nonnull Observable<Integer> notificationsUnreadObservable,
@@ -115,12 +115,12 @@ public class ProfileAdapterItems {
 
         @Override
         public boolean matches(@Nonnull BaseAdapterItem item) {
-            return item instanceof ProfileAdapterItems.NameAdapterItem && !user.equals(item);
+            return item instanceof MyUserNameAdapterItem && user.getId().equals(((NameAdapterItem) item).user.getId());
         }
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof ProfileAdapterItems.NameAdapterItem && user.equals(item);
+            return item instanceof MyUserNameAdapterItem && user.equals(((MyUserNameAdapterItem) item).getUser());
         }
 
         @Nonnull
@@ -134,7 +134,7 @@ public class ProfileAdapterItems {
         }
 
         public void onEditProfileClicked() {
-            editProfileClickObserver.onNext(null);
+            editProfileClickObserver.onNext(user.getUsername());
         }
 
         public void onShowNotificationClicked() {

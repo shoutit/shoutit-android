@@ -30,6 +30,8 @@ import rx.Observable;
 
 public class PagesPagerFragment extends BaseFragment {
 
+    public static final int REQUEST_CODE_PAGE_EDITED = 5;
+
     @Bind(R.id.pages_pager_tablayout)
     TabLayout tabLayout;
     @Bind(R.id.pages_view_pager)
