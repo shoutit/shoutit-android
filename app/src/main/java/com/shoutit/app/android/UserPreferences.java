@@ -243,14 +243,19 @@ public class UserPreferences {
         setUserOrPage(getUser());
     }
 
+    @Nullable
     public User getUser() {
         return (User) getUserByType(KEY_USER);
     }
 
+    @Nullable
     private BaseProfile getUserByType(String key) {
         final String userJson = mPreferences.getString(key, null);
         final BaseProfile baseProfile = gson.fromJson(userJson, BaseProfile.class);
-        if (baseProfile.isUser()) {
+
+        if (baseProfile == null) {
+            return null;
+        } else if (baseProfile.isUser()) {
             return gson.fromJson(userJson, User.class);
         } else {
             return gson.fromJson(userJson, Page.class);
