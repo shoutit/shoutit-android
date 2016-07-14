@@ -386,7 +386,8 @@ public abstract class VideoCallActivity extends BaseActivity {
 
     private boolean isDuringConversationAndLocalVideoLoaded() {
         return conversation != null && conversation.getLocalMedia() != null &&
-                conversation.getLocalMedia().getLocalVideoTracks() != null;
+                conversation.getLocalMedia().getLocalVideoTracks() != null &&
+                !conversation.getLocalMedia().getLocalVideoTracks().isEmpty();
     }
 
     protected void switchToFullScreenMode(boolean fullscreen) {
