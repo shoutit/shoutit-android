@@ -56,7 +56,7 @@ public class EditProfilePresenterTest {
                 .thenReturn(Observable.just("fileUrl"));
 
         presenter = new EditProfilePresenter(userPreferences, apiService,
-                fileHelper, amazonHelper, Schedulers.immediate(), Schedulers.immediate(), null);
+                fileHelper, amazonHelper, Schedulers.immediate(), Schedulers.immediate(), null, null);
     }
 
     // TODO write some tests
