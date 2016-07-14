@@ -14,7 +14,7 @@ public class ProcessUtils {
 
     public static boolean isInMainProcess(@Nonnull App application) {
         final String processName = getProcessName(application);
-        return processName == null || !processName.endsWith(":cds");
+        return processName == null || (!processName.endsWith(":cds") && !processName.endsWith(":leakcanary"));
     }
 
     @Nullable
@@ -31,5 +31,4 @@ public class ProcessUtils {
         }
         return null;
     }
-
 }
