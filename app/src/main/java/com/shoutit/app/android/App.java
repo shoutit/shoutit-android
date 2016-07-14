@@ -33,6 +33,7 @@ import com.shoutit.app.android.utils.pusher.PusherHelper;
 import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
 import com.shoutit.app.android.utils.stackcounter.StackCounterManager;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
+import com.squareup.leakcanary.LeakCanary;
 import com.uservoice.uservoicesdk.Config;
 import com.uservoice.uservoicesdk.UserVoice;
 
@@ -103,7 +104,7 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
         logRxJavaErrors();
 
         if (BuildConfig.BUILD_TYPE.contains("debug")) {
-//            LeakCanary.install(this);
+            LeakCanary.install(this);
         }
 
         setupGraph();
