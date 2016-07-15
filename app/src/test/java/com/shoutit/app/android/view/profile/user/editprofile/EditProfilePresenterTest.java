@@ -42,7 +42,7 @@ public class EditProfilePresenterTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        when(userPreferences.getPageOrUserObservable()).thenReturn(Observable.just(getUser()));
+        when(userPreferences.getUserObservable()).thenReturn(Observable.just(getUser()));
 
         when(apiService.updateUser(any(UpdateUserRequest.class)))
                 .thenReturn(Observable.just(getUser()));
