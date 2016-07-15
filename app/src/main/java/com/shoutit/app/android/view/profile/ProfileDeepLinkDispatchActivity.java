@@ -7,8 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
 import com.shoutit.app.android.api.model.BaseProfile;
-import com.shoutit.app.android.view.profile.page.PageProfileActivity;
-import com.shoutit.app.android.view.profile.user.UserProfileActivity;
 
 public class ProfileDeepLinkDispatchActivity extends AppCompatActivity {
 
@@ -18,12 +16,10 @@ public class ProfileDeepLinkDispatchActivity extends AppCompatActivity {
         final Intent intent = getIntent();
         final Uri data = intent.getData();
         final String type = data.getQueryParameter("type");
+
         final String username = data.getQueryParameter("username");
-        if (BaseProfile.PAGE.equals(type)) {
-            startActivity(PageProfileActivity.newIntent(this, username));
-        } else {
-            startActivity(UserProfileActivity.newIntent(this, username));
-        }
+        startActivity(ProfileIntentHelper.newIntent(this, username, BaseProfile.PAGE.equals(type)));
+
         finish();
     }
 }

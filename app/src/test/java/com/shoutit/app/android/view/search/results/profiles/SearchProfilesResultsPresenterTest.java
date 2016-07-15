@@ -5,6 +5,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.SearchProfileResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dao.ProfilesDao;
@@ -79,14 +80,14 @@ public class SearchProfilesResultsPresenterTest {
         subscriber.assertNoErrors();
         subscriber.assertValueCount(1);
         final SearchProfilesResultsPresenter.ProfileAdapterItem item = getLastItem(subscriber);
-        final User profileBeforeUpdate = item.getProfile();
+        final BaseProfile profileBeforeUpdate = item.getProfile();
 
         item.onProfileListened();
         testScheduler.triggerActions();
 
         subscriber.assertValueCount(2);
         final SearchProfilesResultsPresenter.ProfileAdapterItem updatedResponse = getLastItem(subscriber);
-        final User updatedProfile = updatedResponse.getProfile();
+        final BaseProfile updatedProfile = updatedResponse.getProfile();
         assert_().that(updatedProfile.isListening()).isEqualTo(!profileBeforeUpdate.isListening());
         assert_().that(updatedProfile.getListenersCount()).isEqualTo(profileBeforeUpdate.getListenersCount() + 1);
     }
@@ -102,7 +103,7 @@ public class SearchProfilesResultsPresenterTest {
         subscriber.assertNoErrors();
         subscriber.assertValueCount(1);
         final SearchProfilesResultsPresenter.ProfileAdapterItem item = getLastItem(subscriber);
-        final User profileBeforeUpdate = item.getProfile();
+        final BaseProfile profileBeforeUpdate = item.getProfile();
 
         item.onProfileListened();
         testScheduler.triggerActions();
@@ -111,7 +112,7 @@ public class SearchProfilesResultsPresenterTest {
 
         subscriber.assertValueCount(3);
         final SearchProfilesResultsPresenter.ProfileAdapterItem updatedResponse = getLastItem(subscriber);
-        final User updatedProfile = updatedResponse.getProfile();
+        final BaseProfile updatedProfile = updatedResponse.getProfile();
         assert_().that(updatedProfile.isListening()).isEqualTo(profileBeforeUpdate.isListening());
         assert_().that(updatedProfile.getListenersCount()).isEqualTo(profileBeforeUpdate.getListenersCount());
     }

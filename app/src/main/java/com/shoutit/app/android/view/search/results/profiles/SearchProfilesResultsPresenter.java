@@ -13,6 +13,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
 import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.api.model.SearchProfileResponse;
 import com.shoutit.app.android.api.model.Shout;
@@ -44,7 +45,7 @@ public class SearchProfilesResultsPresenter {
 
     private final PublishSubject<Throwable> errorSubject = PublishSubject.create();
     private final PublishSubject<ProfileToListenWithLastResponse> profileListenedSubject = PublishSubject.create();
-    private final PublishSubject<String> profileToOpenSubject = PublishSubject.create();
+    private final PublishSubject<BaseProfile> profileToOpenSubject = PublishSubject.create();
     private final PublishSubject<Object> actionOnlyForLoggedInUserSubject = PublishSubject.create();
     @Nonnull
     private final PublishSubject<String> listenSuccess = PublishSubject.create();
@@ -82,10 +83,10 @@ public class SearchProfilesResultsPresenter {
                         } else {
                             return ImmutableList.copyOf(
                                     Lists.transform(searchProfileResponse.getResults(),
-                                            new Function<User, BaseAdapterItem>() {
+                                            new Function<BaseProfile, BaseAdapterItem>() {
                                                 @Nullable
                                                 @Override
-                                                public BaseAdapterItem apply(@Nullable User input) {
+                                                public BaseAdapterItem apply(@Nullable BaseProfile input) {
                                                     return new ProfileAdapterItem(searchProfileResponse, input,
                                                             profileListenedSubject, profileToOpenSubject,
                                                             actionOnlyForLoggedInUserSubject);
@@ -179,7 +180,7 @@ public class SearchProfilesResultsPresenter {
         return adapterItemsObservable;
     }
 
-    public Observable<String> getProfileToOpenObservable() {
+    public Observable<BaseProfile> getProfileToOpenObservable() {
         return profileToOpenSubject;
     }
 
@@ -214,15 +215,15 @@ public class SearchProfilesResultsPresenter {
     public class ProfileAdapterItem extends BaseNoIDAdapterItem {
 
         private final SearchProfileResponse lastResponse;
-        private final User profile;
+        private final BaseProfile profile;
         private final Observer<ProfileToListenWithLastResponse> profileListenedObserver;
-        private Observer<String> profileToOpenObserver;
+        private Observer<BaseProfile> profileToOpenObserver;
         private Observer<Object> actionOnlyForLoggedInUserObserver;
 
         public ProfileAdapterItem(SearchProfileResponse lastResponse,
-                                  User profile,
+                                  BaseProfile profile,
                                   Observer<ProfileToListenWithLastResponse> profileListenedObserver,
-                                  Observer<String> profileToOpenObserver,
+                                  Observer<BaseProfile> profileToOpenObserver,
                                   Observer<Object> actionOnlyForLoggedInUserObserver) {
             this.lastResponse = lastResponse;
             this.profile = profile;
@@ -231,7 +232,7 @@ public class SearchProfilesResultsPresenter {
             this.actionOnlyForLoggedInUserObserver = actionOnlyForLoggedInUserObserver;
         }
 
-        public User getProfile() {
+        public BaseProfile getProfile() {
             return profile;
         }
 
@@ -240,7 +241,7 @@ public class SearchProfilesResultsPresenter {
         }
 
         public void onProfileItemSelected() {
-            profileToOpenObserver.onNext(profile.getUsername());
+            profileToOpenObserver.onNext(profile);
         }
 
         public void onActionOnlyForLoggedInUser() {
@@ -271,17 +272,17 @@ public class SearchProfilesResultsPresenter {
     public static class ProfileToListenWithLastResponse {
 
         @Nonnull
-        private final User profile;
+        private final BaseProfile profile;
         @Nonnull
         private final SearchProfileResponse response;
 
-        public ProfileToListenWithLastResponse(@Nonnull User profile, @Nonnull SearchProfileResponse response) {
+        public ProfileToListenWithLastResponse(@Nonnull BaseProfile profile, @Nonnull SearchProfileResponse response) {
             this.profile = profile;
             this.response = response;
         }
 
         @Nonnull
-        public User getProfile() {
+        public BaseProfile getProfile() {
             return profile;
         }
 

@@ -11,6 +11,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.view.profile.ProfileIntentHelper;
 import com.shoutit.app.android.view.profile.user.UserProfileActivity;
 import com.shoutit.app.android.view.profileslist.BaseProfilesListActivity;
 
@@ -30,11 +31,10 @@ public class UserSuggestionActivity extends BaseProfilesListActivity {
                 getActivityComponent()).profilesListPresenter();
 
         presenter.getProfileSelectedObservable()
-                .map(BaseProfile::getUsername)
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(userName -> {
+                .compose(this.<BaseProfile>bindToLifecycle())
+                .subscribe(baseProfile -> {
                     startActivityForResult(
-                            UserProfileActivity.newIntent(UserSuggestionActivity.this, userName),
+                            ProfileIntentHelper.newIntent(UserSuggestionActivity.this, baseProfile),
                             REQUEST_OPENED_PROFILE_WAS_LISTENED);
                 });
     }
