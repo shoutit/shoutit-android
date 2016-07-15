@@ -35,7 +35,7 @@ if (keystoreProperties.exists()) {
 
 def baseVersionName = "3.0.0"
 
-project.ext.versionCode = 82
+project.ext.versionCode = 85
 
 if (project.hasProperty("versionSuffix")) {
     project.ext.versionChangeSuffix = project.versionSuffix
