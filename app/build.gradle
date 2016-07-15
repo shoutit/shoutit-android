@@ -256,7 +256,7 @@ dependencies {
         transitive = true;
     }
     compile 'com.commonsware.cwac:cam2:0.5.3'
-    compile 'com.pusher:pusher-java-client:1.2.0'
+    compile 'com.github.pusher:pusher-websocket-java:f33bc9ac42'
     compile "com.mixpanel.android:mixpanel-android:4.8.7"
     compile 'com.adobe.creativesdk.foundation:auth:0.9.7'
     compile 'com.adobe.creativesdk:image:4.4.8'
