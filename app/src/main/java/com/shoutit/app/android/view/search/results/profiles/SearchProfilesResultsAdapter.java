@@ -11,6 +11,7 @@ import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.PicassoHelper;
@@ -62,7 +63,7 @@ public class SearchProfilesResultsAdapter extends BaseAdapter {
         @Override
         public void bind(@Nonnull SearchProfilesResultsPresenter.ProfileAdapterItem item) {
             this.item = item;
-            final User profile = item.getProfile();
+            final BaseProfile profile = item.getProfile();
 
             picasso.load(profile.getImage())
                     .placeholder(R.drawable.ic_rect_avatar_placeholder)

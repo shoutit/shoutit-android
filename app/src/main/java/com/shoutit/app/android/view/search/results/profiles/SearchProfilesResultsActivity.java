@@ -15,13 +15,16 @@ import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.utils.rx.RxUtils;
+import com.shoutit.app.android.view.profile.ProfileIntentHelper;
 import com.shoutit.app.android.view.profile.user.UserProfileActivity;
 
 import java.util.List;
@@ -88,14 +91,11 @@ public class SearchProfilesResultsActivity extends BaseActivity {
                         R.string.error_action_only_for_logged_in_user));
 
         presenter.getProfileToOpenObservable()
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String userName) {
-                        startActivityForResult(
-                                UserProfileActivity.newIntent(SearchProfilesResultsActivity.this, userName),
-                                REQUEST_PROFILE_OPENED);
-                    }
+                .compose(this.<BaseProfile>bindToLifecycle())
+                .subscribe(profile -> {
+                    startActivityForResult(
+                            ProfileIntentHelper.newIntent(SearchProfilesResultsActivity.this, profile),
+                            REQUEST_PROFILE_OPENED);
                 });
 
         presenter.getListenSuccessObservable()
