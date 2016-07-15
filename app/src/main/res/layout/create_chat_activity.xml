@@ -64,6 +64,9 @@
                         android:id="@+id/create_chat_subject"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:singleLine="true"
+                        android:maxLines="1"
+                        tools:text="dsfdsf sdfdsfdsfs dsfdsf dsfdsf sdf sdf sdfdsf sdf sd"
                         android:hint="@string/create_public_chat_subject"/>
 
                 </LinearLayout>
