@@ -260,6 +260,11 @@
         <activity
             android:name=".view.profile.user.UserProfileActivity"
             android:screenOrientation="portrait"
+            android:theme="@style/TranslucentStatusBar"/>
+
+        <activity
+            android:name=".view.profile.ProfileDeepLinkDispatchActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/TranslucentStatusBar">
 
             <intent-filter>
