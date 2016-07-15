@@ -15,11 +15,11 @@ import com.pusher.client.connection.ConnectionState;
 import com.pusher.client.connection.ConnectionStateChange;
 import com.pusher.client.util.HttpAuthorizer;
 import com.shoutit.app.android.BuildConfig;
+import com.shoutit.app.android.api.Headers;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.NotificationsResponse;
 import com.shoutit.app.android.api.model.PusherConversationUpdate;
 import com.shoutit.app.android.api.model.PusherMessage;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.model.Stats;
 import com.shoutit.app.android.utils.BuildTypeUtils;
 import com.shoutit.app.android.view.chats.PresenceChannelEventListenerAdapter;
@@ -65,7 +65,11 @@ public class PusherHelper {
         mUser = user;
         if (mPusher == null) {
             final HttpAuthorizer authorizer = new HttpAuthorizer(BuildConfig.API_URL + "pusher/auth");
-            authorizer.setHeaders(ImmutableMap.of("Authorization", "Bearer " + token));
+            if (user.isPage()) {
+                authorizer.setHeaders(ImmutableMap.of(Headers.AUTHORIZATION, Headers.TOKEN_PREFIX + token, Headers.AUTHORIZATION_PAGE_ID, user.getId()));
+            } else {
+                authorizer.setHeaders(ImmutableMap.of(Headers.AUTHORIZATION, Headers.TOKEN_PREFIX + token));
+            }
             final PusherOptions options = new PusherOptions().setAuthorizer(authorizer);
             mPusher = new Pusher(getKey(), options);
         }
@@ -238,7 +242,7 @@ public class PusherHelper {
 
     @Nonnull
     public PresenceChannel subscribeConversationChannel(@NonNull String conversationId) {
-        log("subscribe conversation channel : " + conversationId  + userLogInfo());
+        log("subscribe conversation channel : " + conversationId + userLogInfo());
         final PresenceChannel presenceChannel = mPusher.getPresenceChannel(PusherHelper.getConversationChannelName(conversationId));
 
         if (presenceChannel == null || !presenceChannel.isSubscribed()) {
@@ -273,7 +277,7 @@ public class PusherHelper {
 
     public PresenceChannel subscribeProfileChannel() {
         final String id = mUser.getId();
-        log("subscribe profile channel : " + id  + userLogInfo());
+        log("subscribe profile channel : " + id + userLogInfo());
         return mPusher.subscribePresence(PusherHelper.getProfileChannelName(id));
     }
 
@@ -318,7 +322,7 @@ public class PusherHelper {
     }
 
     private void logMessage(Object message, String channel) {
-        log(channel + " : " + message.toString()  + userLogInfo());
+        log(channel + " : " + message.toString() + userLogInfo());
     }
 
     private void log(String msg) {
