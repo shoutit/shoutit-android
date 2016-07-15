@@ -15,6 +15,7 @@ import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.TextHelper;
+import com.shoutit.app.android.view.chats.chats_adapter.AvatarHelper;
 import com.shoutit.app.android.viewholders.NoDataTextViewHolder;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -96,7 +97,7 @@ public class PostSignupSecondAdapter extends BaseAdapter {
             final BaseProfile baseProfile = item.getBaseprofile();
 
             picasso.load(baseProfile.getImage())
-                    .placeholder(R.drawable.ic_rect_avatar_placeholder)
+                    .placeholder(AvatarHelper.getPlaceholderId(baseProfile.getType()))
                     .into(target);
 
             nameTextView.setText(baseProfile.getName());

@@ -69,9 +69,10 @@ public class ChatUsersListAdapter extends BaseAdapter {
         @Override
         public void bind(@Nonnull BaseAdapterItem item) {
             final ChatListProfileItem profileItem = (ChatListProfileItem) item;
+
             mPicasso.load(profileItem.getImage())
-                    .placeholder(R.drawable.ic_rect_avatar_placeholder)
-                    .error(R.drawable.ic_rect_avatar_placeholder)
+                    .placeholder(R.drawable.default_profile)
+                    .error(R.drawable.default_profile)
                     .fit()
                     .centerCrop()
                     .into(mChatBlockedParticipantItemImage);

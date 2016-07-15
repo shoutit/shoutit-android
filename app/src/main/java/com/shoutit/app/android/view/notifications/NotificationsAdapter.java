@@ -90,7 +90,7 @@ public class NotificationsAdapter extends BaseAdapter {
             textTv.setText(spannedText);
 
             picasso.load(Strings.emptyToNull(displayInfo.getImage()))
-                    .placeholder(R.drawable.ic_rect_avatar_placeholder)
+                    .placeholder(R.drawable.default_profile)
                     .into(target);
         }
 

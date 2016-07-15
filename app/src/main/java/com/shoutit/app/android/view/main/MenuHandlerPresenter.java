@@ -24,7 +24,7 @@ import rx.Scheduler;
 public class MenuHandlerPresenter {
 
     @Nonnull
-    private final Observable<String> avatarObservable;
+    private final Observable<BaseProfile> avatarObservable;
     @Nonnull
     private final Observable<String> coverObservable;
     @Nonnull
@@ -47,8 +47,7 @@ public class MenuHandlerPresenter {
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<BaseProfile>behaviorRefCount());
 
-        avatarObservable = userOrPageObservable
-                .map(user -> Strings.emptyToNull(user.getImage()));
+        avatarObservable = userOrPageObservable;
 
         coverObservable = userOrPageObservable
                 .map(user -> Strings.emptyToNull(user.getCover()))
@@ -86,7 +85,7 @@ public class MenuHandlerPresenter {
     }
 
     @Nonnull
-    public Observable<String> getAvatarObservable() {
+    public Observable<BaseProfile> getAvatarObservable() {
         return avatarObservable;
     }
 

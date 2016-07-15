@@ -35,6 +35,7 @@ import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.DateTimeUtils;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.ResourcesHelper;
+import com.shoutit.app.android.view.chats.chats_adapter.AvatarHelper;
 import com.shoutit.app.android.viewholders.FbAdLinearViewHolder;
 import com.shoutit.app.android.viewholders.HeaderViewHolder;
 import com.squareup.picasso.Picasso;
@@ -160,8 +161,8 @@ public class ShoutAdapter extends BaseAdapter {
             picasso.load(user.getImage())
                     .resizeDimen(R.dimen.shout_avatar_size, R.dimen.shout_avatar_size)
                     .centerCrop()
-                    .placeholder(R.drawable.ic_rect_avatar_placeholder)
-                    .error(R.drawable.ic_rect_avatar_placeholder)
+                    .placeholder(AvatarHelper.getPlaceholderId(user.getType()))
+                    .error(AvatarHelper.getPlaceholderId(user.getType()))
                     .into(avatarImageView);
 
             final boolean showLikeIcon = item.isNormalUser() && !item.isShoutOwner();

@@ -251,6 +251,8 @@ public class EditPageActivity extends BaseActivity implements EditPagePresenter.
     @Override
     public void setAvatar(String url) {
         mPicasso.load(url)
+                .noPlaceholder()
+                .error(R.drawable.default_page)
                 .centerCrop()
                 .fit()
                 .into(mEditPageAvatarIv);
