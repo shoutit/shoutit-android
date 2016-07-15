@@ -97,7 +97,7 @@ public class PagesAdapter extends BaseAdapter {
             final Page page = pageAdapterItem.getPage();
 
             picasso.load(page.getImage())
-                    .placeholder(R.drawable.ic_rect_avatar_placeholder)
+                    .placeholder(R.drawable.default_page)
                     .into(target);
 
             pageNameTv.setText(page.getName());

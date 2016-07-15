@@ -69,7 +69,7 @@ public class TagProfileActivity extends ProfileActivity {
 
     @Override
     protected int getAvatarPlaceholder() {
-        return R.drawable.ic_tag_avatar;
+        return R.drawable.default_tag;
     }
 
     @Nonnull

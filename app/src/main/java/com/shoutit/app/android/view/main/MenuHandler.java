@@ -27,6 +27,7 @@ import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.RtlUtils;
 import com.shoutit.app.android.view.admins.AdminsFragment;
 import com.shoutit.app.android.view.bookmarks.BookmarkedShoutsFragment;
+import com.shoutit.app.android.view.chats.chats_adapter.AvatarHelper;
 import com.shoutit.app.android.view.conversations.ConversationsPagerFragment;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
 import com.shoutit.app.android.view.credits.CreditsFragment;
@@ -223,7 +224,7 @@ public class MenuHandler {
                 .subscribe(RxTextView.text(locationTextView));
 
         presenter.getAvatarObservable()
-                .compose(rxActivity.<String>bindToLifecycle())
+                .compose(rxActivity.<BaseProfile>bindToLifecycle())
                 .subscribe(loadAvatarAction());
 
         presenter.getCoverObservable()
@@ -394,12 +395,12 @@ public class MenuHandler {
     }
 
     @NonNull
-    private Action1<String> loadAvatarAction() {
+    private Action1<BaseProfile> loadAvatarAction() {
         final int strokeSize = rxActivity.getResources().getDimensionPixelSize(R.dimen.side_menu_avatar_stroke_size);
 
-        return avatarUrl -> picasso.load(avatarUrl)
-                .error(R.drawable.ic_avatar_placeholder)
-                .placeholder(R.drawable.ic_avatar_placeholder)
+        return baseProfile -> picasso.load(baseProfile.getImage())
+                .error(AvatarHelper.getCirclePlaceholderId(baseProfile.getType()))
+                .placeholder(AvatarHelper.getCirclePlaceholderId(baseProfile.getType()))
                 .resizeDimen(R.dimen.side_menu_avatar_size, R.dimen.side_menu_avatar_size)
                 .centerCrop()
                 .transform(PicassoHelper.getCircularBitmapWithStrokeTarget(strokeSize, "MenuAvatar"))

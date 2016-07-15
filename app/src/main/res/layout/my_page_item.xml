@@ -23,7 +23,7 @@
             android:layout_marginRight="20dp"
             android:layout_marginStart="12dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_rect_avatar_placeholder" />
+            android:src="@drawable/default_page" />
 
         <LinearLayout
             android:layout_width="0dp"

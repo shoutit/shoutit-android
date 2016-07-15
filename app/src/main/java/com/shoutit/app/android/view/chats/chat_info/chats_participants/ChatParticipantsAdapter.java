@@ -74,9 +74,10 @@ public class ChatParticipantsAdapter extends BaseAdapter {
         @Override
         public void bind(@Nonnull BaseAdapterItem item) {
             final ProfileItem profileItem = (ProfileItem) item;
+
             mPicasso.load(profileItem.getImage())
-                    .placeholder(R.drawable.ic_rect_avatar_placeholder)
-                    .error(R.drawable.ic_rect_avatar_placeholder)
+                    .placeholder(R.drawable.default_profile)
+                    .error(R.drawable.default_profile)
                     .fit()
                     .centerCrop()
                     .into(mChatParticipantItemImage);

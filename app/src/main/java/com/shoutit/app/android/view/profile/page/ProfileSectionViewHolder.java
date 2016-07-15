@@ -10,6 +10,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.TextHelper;
+import com.shoutit.app.android.view.chats.chats_adapter.AvatarHelper;
 import com.shoutit.app.android.view.profile.BaseProfileAdapterItems;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -62,9 +63,8 @@ public class ProfileSectionViewHolder extends ViewHolderManager.BaseViewHolder<B
             container.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.shape_page_middle));
         }
 
-        final boolean isTagProfile = ProfileType.TAG.equals(sectionItem.getType());
         picasso.load(sectionItem.getImage())
-                .placeholder(isTagProfile ? R.drawable.ic_tag_placeholder : R.drawable.ic_rect_avatar_placeholder)
+                .placeholder(AvatarHelper.getPlaceholderId(sectionItem.getType()))
                 .into(target);
 
         nameTextView.setText(sectionItem.getName());

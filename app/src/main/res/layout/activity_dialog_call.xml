@@ -32,7 +32,7 @@
                 android:layout_marginEnd="8dp"
                 android:layout_marginRight="8dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/ic_rect_avatar_placeholder" />
+                android:src="@drawable/default_profile" />
 
             <TextView
                 android:id="@+id/dialog_call_info"

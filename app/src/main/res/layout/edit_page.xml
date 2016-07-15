@@ -356,7 +356,7 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginStart="8dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/ic_rect_avatar_placeholder"
+                android:src="@drawable/default_page"
                 app:layout_anchor="@id/edit_page_cover_iv"
                 app:layout_anchorGravity="bottom|start"/>
 
@@ -366,7 +366,6 @@
                 android:layout_height="64dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginStart="8dp"
-                android:background="@drawable/shape_avatar_dim"
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_camera"
                 app:layout_anchor="@id/edit_page_cover_iv"

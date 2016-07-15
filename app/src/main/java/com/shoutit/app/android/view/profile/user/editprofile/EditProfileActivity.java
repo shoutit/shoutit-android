@@ -46,6 +46,7 @@ import com.shoutit.app.android.utils.rx.RxUtils;
 import com.shoutit.app.android.view.location.LocationActivityForResult;
 import com.shoutit.app.android.view.location.LocationHelper;
 import com.shoutit.app.android.widget.GenderSpinnerAdapter;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -436,7 +437,7 @@ public class EditProfileActivity extends BaseActivity {
             public void call(String url) {
                 picasso.load(url)
                         .noPlaceholder()
-                        .error(R.drawable.ic_rect_avatar_placeholder)
+                        .error(R.drawable.default_profile)
                         .fit()
                         .centerCrop()
                         .transform(PicassoHelper.roundedWithStrokeTransformation(strokeSize, false, corners, "ProfileAvatar"))

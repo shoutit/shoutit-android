@@ -126,7 +126,7 @@ public class EditProfilePresenter {
         }
 
         /** User Data **/
-        final Observable<User> userObservable = Observable.just(userPreferences.getUser())
+        final Observable<User> userObservable = userPreferences.getUserObservable()
                 .filter(Functions1.isNotNull())
                 .compose(ObservableExtensions.<User>behaviorRefCount());
 

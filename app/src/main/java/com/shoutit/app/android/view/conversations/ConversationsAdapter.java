@@ -57,8 +57,8 @@ public class ConversationsAdapter extends BaseAdapter {
                     (ConversationsPresenter.ConversationAdapterItem) item;
 
             mPicasso.load(adapterItem.getImage())
-                    .placeholder(R.drawable.ic_rect_avatar_placeholder)
-                    .error(R.drawable.ic_rect_avatar_placeholder)
+                    .placeholder(R.drawable.default_profile)
+                    .error(R.drawable.default_profile)
                     .into(mImageIv);
 
             final String title = adapterItem.getTitle();

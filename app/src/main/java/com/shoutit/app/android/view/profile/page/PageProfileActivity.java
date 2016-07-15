@@ -209,7 +209,7 @@ public class PageProfileActivity extends ProfileActivity {
 
     @Override
     protected int getAvatarPlaceholder() {
-        return R.drawable.ic_rect_avatar_placeholder;
+        return R.drawable.default_page;
     }
 
     @Nonnull
