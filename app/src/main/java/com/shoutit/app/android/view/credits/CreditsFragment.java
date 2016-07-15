@@ -15,6 +15,7 @@ import com.google.common.base.Preconditions;
 import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
@@ -23,6 +24,7 @@ import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
 import com.shoutit.app.android.view.credits.transactions.TransactionsActivity;
 import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.main.MenuHandler;
+import com.shoutit.app.android.view.profile.ProfileIntentHelper;
 import com.shoutit.app.android.view.profile.user.UserProfileActivity;
 import com.shoutit.app.android.view.promote.PromoteShoutInfoActivity;
 
@@ -84,7 +86,7 @@ public class CreditsFragment extends BaseFragment {
                 startActivity(TransactionsActivity.newInstance(getActivity()));
                 break;
             case R.id.credit_complete_profile:
-                showDialogAndStartActivity(getString(R.string.credits_complete_profile), getString(R.string.credits_profile_positive), UserProfileActivity.newIntent(getActivity(), User.ME));
+                showDialogAndStartActivity(getString(R.string.credits_complete_profile), getString(R.string.credits_profile_positive), ProfileIntentHelper.newIntent(getActivity(), BaseProfile.ME, mUserPreferences.isLoggedInAsPage()));
                 break;
             case R.id.credit_facebook:
                 showDialogAndStartActivity(getString(R.string.credits_facebook), getString(R.string.credits_facebook_positive), CreateShoutDialogActivity.getIntent(getActivity()));
