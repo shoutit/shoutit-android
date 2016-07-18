@@ -2,7 +2,6 @@ package com.shoutit.app.android.view.shout;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
 import android.view.LayoutInflater;
@@ -16,7 +15,6 @@ import com.google.gson.Gson;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ForActivity;
-import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.view.gallery.GalleryActivity;
 import com.squareup.picasso.Picasso;
 import com.veinhorn.scrollgalleryview.Constants;
@@ -63,9 +61,11 @@ public class ShoutImagesPagerAdapter extends PagerAdapter {
         final ImageView videoIconView = (ImageView) view.findViewById(R.id.shout_video_icon_iv);
 
         String imageUrl = null;
+        String viewTag = "emptyView";
 
         if (isImageItem(position)) {
             imageUrl = images.get(position);
+            viewTag = imageUrl;
             videoIconView.setVisibility(View.GONE);
 
             view.setOnClickListener(v -> openGallery(position));
@@ -73,6 +73,7 @@ public class ShoutImagesPagerAdapter extends PagerAdapter {
         } else if (!videos.isEmpty()) {
             final int videoPosition = position - images.size();
             final Video video = videos.get(videoPosition);
+            viewTag = video.getUrl();
             imageUrl = video.getThumbnailUrl();
             videoIconView.setVisibility(View.VISIBLE);
 
@@ -83,6 +84,7 @@ public class ShoutImagesPagerAdapter extends PagerAdapter {
 
         container.addView(view);
 
+        view.setTag(viewTag);
         return view;
     }
 
@@ -119,11 +121,16 @@ public class ShoutImagesPagerAdapter extends PagerAdapter {
 
     @Override
     public boolean isViewFromObject(View view, Object object) {
-        return view == object;
+        return view == object && view.getTag().equals(((View) object).getTag());
     }
 
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
         container.removeView((FrameLayout) object);
+    }
+
+    @Override
+    public int getItemPosition(Object object) {
+        return POSITION_NONE;
     }
 }
