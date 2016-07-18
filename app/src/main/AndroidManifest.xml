@@ -275,7 +275,7 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                    android:host="tag"
+                    android:host="profile"
                     android:scheme="shoutit"/>
             </intent-filter>
 

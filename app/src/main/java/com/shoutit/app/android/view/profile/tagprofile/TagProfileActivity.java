@@ -50,9 +50,9 @@ public class TagProfileActivity extends ProfileActivity {
 
         presenter.getSeeAllShoutsObservable()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(tagProfileName -> {
+                .subscribe(tagSlug -> {
                     startActivity(SearchShoutsResultsActivity.newIntent(
-                            TagProfileActivity.this, null, tagProfileName, SearchPresenter.SearchType.TAG_PROFILE));
+                            TagProfileActivity.this, null, tagSlug, SearchPresenter.SearchType.TAG_PROFILE));
                 });
     }
 

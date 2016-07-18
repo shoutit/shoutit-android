@@ -377,8 +377,8 @@ public class TagProfilePresenter implements ProfilePresenter {
                     @Override
                     public Intent call(Object o, TagDetail tagDetail) {
                         return SubSearchActivity.newIntent(context,
-                                SearchPresenter.SearchType.TAG_PROFILE, tagDetail.getUsername(),
-                                tagDetail.getName());
+                                SearchPresenter.SearchType.TAG_PROFILE, tagDetail.getSlug(),
+                                tagDetail.getSlug());
                     }
                 });
 
@@ -405,7 +405,7 @@ public class TagProfilePresenter implements ProfilePresenter {
         final TagDetail tagToUpdate = listenedTagWithRelatedTags.getTagInSection();
 
         for (int i = 0; i < tags.size(); i++) {
-            if (tags.get(i).getName().equals(tagToUpdate.getName())) {
+            if (tags.get(i).getSlug().equals(tagToUpdate.getSlug())) {
                 final List<TagDetail> updatedTags = new ArrayList<>(tags);
                 updatedTags.set(i, tagToUpdate.toListenedTag());
 
