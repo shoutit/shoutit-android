@@ -23,6 +23,7 @@ import com.shoutit.app.android.api.model.ChatMessage;
 import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.ConversationsResponse;
 import com.shoutit.app.android.api.model.PusherConversationUpdate;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
 import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
@@ -40,11 +41,11 @@ import javax.inject.Inject;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
-import rx.Subscription;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.subjects.PublishSubject;
+import rx.subscriptions.CompositeSubscription;
 
 public class ConversationsPresenter {
 
@@ -86,6 +87,7 @@ public class ConversationsPresenter {
     private final Scheduler mNetworkScheduler;
     private final Scheduler mUiScheduler;
     private final Context mContext;
+    private final UserPreferences userPreferences;
     private final RefreshConversationBus mRefreshConversationBus;
     private final PusherHelper mPusherHelper;
     private final boolean isMyConversationsList;
@@ -93,9 +95,10 @@ public class ConversationsPresenter {
     private final PublishSubject<Object> requestSubject = PublishSubject.create();
     private final String mUserId;
     private Listener mListener;
-    private Subscription mSubscription;
+    private CompositeSubscription mSubscriptions = new CompositeSubscription();
     private boolean showProgress = true;
     private final PublishSubject<ConversationAction> conversationActionSubject = PublishSubject.create();
+    private final PublishSubject<Object> refreshPublicChatsOnLocationChangeSubject = PublishSubject.create();
 
     @Inject
     public ConversationsPresenter(@NonNull ApiService apiService,
@@ -111,6 +114,7 @@ public class ConversationsPresenter {
         mNetworkScheduler = networkScheduler;
         mUiScheduler = uiScheduler;
         mContext = context;
+        this.userPreferences = userPreferences;
         mRefreshConversationBus = refreshConversationBus;
         mUserId = userPreferences.getUserOrThrow().getId();
         mPusherHelper = pusherHelper.getPusherHelper();
@@ -131,12 +135,20 @@ public class ConversationsPresenter {
 
         mListener.showProgress(showProgress);
 
-        final Observable<List<ConversationItem>> conversationsListObservable = getListObservable();
+        final Observable<List<ConversationItem>> conversationsListObservable = getConversationListObservable();
 
-        mSubscription = conversationsListObservable
-                .subscribe(
-                        getConversationsSuccessCallback(),
-                        getConversationsErrorCallback());
+        mSubscriptions.add(
+                conversationsListObservable
+                        .compose(MoreOperators.refresh(refreshPublicChatsOnLocationChangeSubject))
+                        .subscribe(
+                                getConversationsSuccessCallback(),
+                                getConversationsErrorCallback()));
+
+        mSubscriptions.add(userPreferences
+                .getLocationObservable()
+                .distinctUntilChanged()
+                .filter(location -> isPublicConversations())
+                .subscribe(refreshPublicChatsOnLocationChangeSubject));
     }
 
     @NonNull
@@ -166,7 +178,7 @@ public class ConversationsPresenter {
     }
 
     @NonNull
-    private Observable<List<ConversationItem>> getListObservable() {
+    private Observable<List<ConversationItem>> getConversationListObservable() {
         final Observable<ConversationAction> conversationUpdateObservable = getPusherConversations();
 
         final Observable<Map<String, ConversationItem>> requestObservable = getRemoteConversations();
@@ -254,6 +266,10 @@ public class ConversationsPresenter {
                         .toMap((Func1<ConversationItem, String>) ConversationItem::getId));
     }
 
+    private boolean isPublicConversations() {
+        return !isMyConversationsList;
+    }
+
     @NonNull
     private BaseAdapterItem getConversationItem(@NonNull ConversationItem conversation) {
         final String elapsedTime = DateUtils.getRelativeTimeSpanString(mContext, conversation.getModifiedAt() * 1000).toString();
@@ -270,7 +286,7 @@ public class ConversationsPresenter {
 
     public void unregister() {
         mListener = null;
-        mSubscription.unsubscribe();
+        mSubscriptions.unsubscribe();
     }
 
     public interface Listener {

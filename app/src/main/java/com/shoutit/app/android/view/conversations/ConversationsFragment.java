@@ -117,6 +117,7 @@ public class ConversationsFragment extends BaseFragment implements Conversations
 
     @Override
     public void setData(@NonNull List<BaseAdapterItem> items) {
+        mConversationEmptyText.setVisibility(View.GONE);
         mConversationRecyclerview.setVisibility(View.VISIBLE);
         adapter.call(items);
     }

@@ -88,8 +88,7 @@ public class SearchShoutsResultsPresenter {
                 .flatMap(initWithUserLocation1 -> {
                     if (initWithUserLocation1) {
                         return userPreferences.getLocationObservable()
-                                .filter(Functions1.isNotNull())
-                                .take(1);
+                                .filter(Functions1.isNotNull());
                     } else {
                         return Observable.just(null);
                     }
