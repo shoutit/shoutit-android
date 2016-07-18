@@ -117,9 +117,7 @@ public class UserPreferences {
         editor.apply();
         tokenRefreshSubject.onNext(new Object());
         refreshUser();
-        if (user.getLocation() != null) {
-            saveLocation(user.getLocation());
-        }
+        saveLocation(user.getLocation());
     }
 
     public void setPageLoggedIn(@Nullable String authToken,
@@ -145,9 +143,7 @@ public class UserPreferences {
 
         tokenRefreshSubject.onNext(new Object());
         refreshUser();
-        if (page.getLocation() != null) {
-            saveLocation(page.getLocation());
-        }
+        saveLocation(page.getLocation());
     }
 
     @SuppressLint("CommitPrefEdits")
@@ -162,6 +158,7 @@ public class UserPreferences {
                 .putBoolean(IS_GUEST, true);
         editor.commit();
         tokenRefreshSubject.onNext(new Object());
+        saveLocation(user.getLocation());
     }
 
     @SuppressLint("CommitPrefEdits")
@@ -208,9 +205,7 @@ public class UserPreferences {
             refreshUser();
         }
 
-        if (userOrPage.getLocation() != null) {
-            saveLocation(userOrPage.getLocation());
-        }
+        saveLocation(userOrPage.getLocation());
     }
 
     public boolean isUserLoggedIn() {
