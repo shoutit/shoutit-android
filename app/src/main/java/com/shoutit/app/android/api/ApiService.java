@@ -61,6 +61,7 @@ import com.shoutit.app.android.api.model.SortType;
 import com.shoutit.app.android.api.model.Suggestion;
 import com.shoutit.app.android.api.model.SuggestionsResponse;
 import com.shoutit.app.android.api.model.TagDetail;
+import com.shoutit.app.android.api.model.TagsListResponse;
 import com.shoutit.app.android.api.model.TagsRequest;
 import com.shoutit.app.android.api.model.TransactionRsponse;
 import com.shoutit.app.android.api.model.TwilioResponse;
@@ -179,7 +180,7 @@ public interface ApiService {
     Observable<ShoutsResponse> searchTagShouts(@Query("search") String query,
                                                @Query("page") Integer page,
                                                @Query("page_size") Integer pageSize,
-                                               @Query("tags") String tagNameOrCategorySlug,
+                                               @Query("tags") String tagSlug,
                                                @Query("country") String countryCode,
                                                @Query("city") String city,
                                                @Query("state") String state,
@@ -326,9 +327,9 @@ public interface ApiService {
                                                         @Query("page_size") Integer pageSize);
 
     @GET("profiles/{username}/interests")
-    Observable<ProfilesListResponse> tagsListenings(@Path("username") String userName,
-                                                    @Query("page") Integer page,
-                                                    @Query("page_size") Integer pageSize);
+    Observable<TagsListResponse> tagsListenings(@Path("username") String userName,
+                                                @Query("page") Integer page,
+                                                @Query("page_size") Integer pageSize);
 
     @GET("profiles/{user_name}/listeners")
     Observable<ProfilesListResponse> listeners(@Path("user_name") String userName,
@@ -431,17 +432,17 @@ public interface ApiService {
     /**
      * Tags
      **/
-    @GET("tags/{name}")
-    Observable<TagDetail> tagDetail(@Path("name") String tagName);
+    @GET("tags/{slug}")
+    Observable<TagDetail> tagDetail(@Path("slug") String tagSlug);
 
-    @POST("tags/{name}/listen")
-    Observable<ResponseBody> listenTag(@Path("name") String tagName);
+    @POST("tags/{slug}/listen")
+    Observable<ResponseBody> listenTag(@Path("slug") String tagSlug);
 
-    @DELETE("tags/{name}/listen")
-    Observable<ResponseBody> unlistenTag(@Path("name") String tagName);
+    @DELETE("tags/{slug}/listen")
+    Observable<ResponseBody> unlistenTag(@Path("slug") String tagSlug);
 
-    @GET("tags/{name}/related")
-    Observable<RelatedTagsResponse> relatedTags(@Path("name") String tagName);
+    @GET("tags/{slug}/related")
+    Observable<RelatedTagsResponse> relatedTags(@Path("slug") String tagSlug);
 
     @POST("tags/batch_listen")
     Observable<Object> batchListen(@Body TagsRequest request);

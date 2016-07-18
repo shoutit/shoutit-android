@@ -1,5 +1,6 @@
 package com.shoutit.app.android.dagger;
 
+import com.shoutit.app.android.view.interests.InterestsActivity;
 import com.shoutit.app.android.view.verifybusiness.VerifyBusinessActivity;
 
 import dagger.Component;
@@ -18,4 +19,6 @@ import dagger.Component;
 public interface BaseEmptyActivityComponent extends BaseActivityComponent {
 
         void inject(VerifyBusinessActivity activity);
+
+        void inject(InterestsActivity activity);
 }

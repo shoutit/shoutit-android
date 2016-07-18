@@ -7,7 +7,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.dao.BaseProfileListDao;
 import com.shoutit.app.android.dao.ListeningsDao;
-import com.shoutit.app.android.model.ListeningsPointer;
+import com.shoutit.app.android.utils.ListeningHalfPresenter;
 import com.shoutit.app.android.view.profileslist.BaseProfileListPresenter;
 
 import javax.annotation.Nonnull;
@@ -19,25 +19,17 @@ public class ListeningsPresenter extends BaseProfileListPresenter {
 
     @Nonnull
     private final Observable<BaseProfileListDao> daoObservable;
-    @Nonnull
-    private final ListeningsType listeningsType;
-
-    public enum ListeningsType {
-        USERS_AND_PAGES, INTERESTS
-    }
 
     public ListeningsPresenter(@UiScheduler final Scheduler uiScheduler,
                                @Nonnull final ListeningsDao listeningsDao,
-                               @Nonnull final ListeningsType listeningsType,
-                               ListenUserOrPageHalfPresenter listeningHalfPresenter,
+                               ListeningHalfPresenter listeningHalfPresenter,
                                UserPreferences userPreferences) {
         super(listeningHalfPresenter, uiScheduler, null, userPreferences);
-        this.listeningsType = listeningsType;
 
         @SuppressWarnings("ConstantConditions") final String username = userPreferences.getUserOrPage().getUsername();
 
         daoObservable = Observable.just(
-                listeningsDao.getDao(new ListeningsPointer(listeningsType, username)))
+                listeningsDao.getDao(username))
                 .compose(ObservableExtensions.behaviorRefCount());
 
         init();
@@ -46,8 +38,8 @@ public class ListeningsPresenter extends BaseProfileListPresenter {
     @Override
     protected BaseAdapterItem createAdapterItem(BaseProfile profile) {
         return new ListeningsProfileAdapterItem(
-                profile, profileSelectedSubject, getListeningHalfPresenter().getListenProfileSubject(),
-                listeningsType, actionOnlyForLoggedInUsers, true, false);
+                profile, profileSelectedSubject, getListeningHalfPresenter().getListenProfileSubject()
+                , actionOnlyForLoggedInUsers, true, false);
     }
 
     @Nonnull

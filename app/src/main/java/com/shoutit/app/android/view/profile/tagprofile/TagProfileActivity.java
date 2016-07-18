@@ -50,9 +50,9 @@ public class TagProfileActivity extends ProfileActivity {
 
         presenter.getSeeAllShoutsObservable()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(tagProfileName -> {
+                .subscribe(tagSlug -> {
                     startActivity(SearchShoutsResultsActivity.newIntent(
-                            TagProfileActivity.this, null, tagProfileName, SearchPresenter.SearchType.TAG_PROFILE));
+                            TagProfileActivity.this, null, tagSlug, SearchPresenter.SearchType.TAG_PROFILE));
                 });
     }
 
@@ -76,12 +76,12 @@ public class TagProfileActivity extends ProfileActivity {
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
         final Intent intent = checkNotNull(getIntent());
-        final String userName = checkNotNull(intent.getStringExtra(KEY_PROFILE_ID));
+        final String tagSlug = checkNotNull(intent.getStringExtra(KEY_PROFILE_ID));
 
         final TagProfileActivityComponent component = DaggerTagProfileActivityComponent
                 .builder()
                 .activityModule(new ActivityModule(this))
-                .tagProfileActivityModule(new TagProfileActivityModule(userName))
+                .tagProfileActivityModule(new TagProfileActivityModule(tagSlug))
                 .appComponent(App.getAppComponent(getApplication()))
                 .build();
         component.inject(this);

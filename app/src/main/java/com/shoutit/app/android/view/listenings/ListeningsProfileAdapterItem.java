@@ -14,21 +14,17 @@ public class ListeningsProfileAdapterItem extends BaseProfileAdapterItem {
     private final BaseProfile profile;
     @Nonnull
     private final Observer<BaseProfile> openProfileObserver;
-    @Nonnull
-    private final ListeningsPresenter.ListeningsType listeningsType;
 
 
     public ListeningsProfileAdapterItem(@Nonnull BaseProfile profile,
                                         @Nonnull Observer<BaseProfile> openProfileObserver,
                                         @Nonnull Observer<BaseProfile> profileListenedObserver,
-                                        @Nonnull ListeningsPresenter.ListeningsType listeningsType,
                                         @Nonnull Observer<Object> actionOnlyForLoggedInUsers,
                                         boolean isNormalUser,
                                         boolean isProfileMine) {
         super(profile, profileListenedObserver, actionOnlyForLoggedInUsers, isNormalUser, isProfileMine);
         this.profile = profile;
         this.openProfileObserver = openProfileObserver;
-        this.listeningsType = listeningsType;
     }
 
     @Override
@@ -37,11 +33,7 @@ public class ListeningsProfileAdapterItem extends BaseProfileAdapterItem {
     }
 
     private String getProfileId() {
-        if (listeningsType.equals(ListeningsPresenter.ListeningsType.INTERESTS)) {
-            return profile.getName();
-        } else {
-            return profile.getUsername();
-        }
+        return profile.getUsername();
     }
 
     @Override

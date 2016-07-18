@@ -47,6 +47,7 @@ import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.dao.SortTypesDao;
 import com.shoutit.app.android.dao.SuggestionsDao;
+import com.shoutit.app.android.dao.TagListDaos;
 import com.shoutit.app.android.dao.TagsDao;
 import com.shoutit.app.android.dao.UsersIdentityDao;
 import com.shoutit.app.android.dao.VideoCallsDao;
@@ -366,6 +367,12 @@ public final class AppModule {
     @Singleton
     PagesDao providePagesDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
         return new PagesDao(apiService, networkScheduler);
+    }
+
+    @Provides
+    @Singleton
+    TagListDaos provideTagsListDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
+        return new TagListDaos(apiService, networkScheduler);
     }
 
     @Provides

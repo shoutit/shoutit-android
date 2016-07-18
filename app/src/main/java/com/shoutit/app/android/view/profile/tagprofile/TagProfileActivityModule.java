@@ -24,10 +24,10 @@ import rx.Scheduler;
 public class TagProfileActivityModule {
 
     @Nonnull
-    private final String slugName;
+    private final String tagSlug;
 
-    public TagProfileActivityModule(@Nonnull String slugName) {
-        this.slugName = slugName;
+    public TagProfileActivityModule(@Nonnull String tagSlug) {
+        this.tagSlug = tagSlug;
     }
 
     @Provides
@@ -38,7 +38,7 @@ public class TagProfileActivityModule {
                                                        UserPreferences userPreferences,
                                                        BookmarksDao bookmarksDao,
                                                        BookmarkHelper bookmarkHelper) {
-        return new TagProfilePresenter(tagsDao, shoutsDao, slugName, uiScheduler, networkScheduler,
+        return new TagProfilePresenter(tagsDao, shoutsDao, tagSlug, uiScheduler, networkScheduler,
                 apiService, context, userPreferences, bookmarksDao, bookmarkHelper);
     }
 }
