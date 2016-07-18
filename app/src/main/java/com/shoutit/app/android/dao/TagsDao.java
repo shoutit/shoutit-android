@@ -7,6 +7,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.ProfilesListResponse;
 import com.shoutit.app.android.api.model.RelatedTagsResponse;
 import com.shoutit.app.android.api.model.TagDetail;
 import com.shoutit.app.android.api.model.User;
@@ -36,8 +37,8 @@ public class TagsDao {
         tagsCache = CacheBuilder.newBuilder()
                 .build(new CacheLoader<String, TagDao>() {
                     @Override
-                    public TagDao load(@Nonnull String tagName) throws Exception {
-                        return new TagDao(tagName);
+                    public TagDao load(@Nonnull String tagSlug) throws Exception {
+                        return new TagDao(tagSlug);
                     }
                 });
 
@@ -51,8 +52,8 @@ public class TagsDao {
     }
 
     @Nonnull
-    public Observable<ResponseOrError<TagDetail>> getTagObservable(@Nonnull String tagName) {
-        return tagsCache.getUnchecked(tagName).getTagObservable();
+    public Observable<ResponseOrError<TagDetail>> getTagObservable(@Nonnull String tagSlug) {
+        return tagsCache.getUnchecked(tagSlug).getTagObservable();
     }
 
     @Nonnull
@@ -86,8 +87,8 @@ public class TagsDao {
         @Nonnull
         private PublishSubject<Object> refreshSubject = PublishSubject.create();
 
-        public TagDao(@Nonnull final String tagName) {
-            tagObservable = apiService.tagDetail(tagName)
+        public TagDao(@Nonnull final String tagSlug) {
+            tagObservable = apiService.tagDetail(tagSlug)
                     .subscribeOn(networkScheduler)
                     .compose(MoreOperators.<TagDetail>refresh(refreshSubject))
                     .compose(ResponseOrError.<TagDetail>toResponseOrErrorObservable())

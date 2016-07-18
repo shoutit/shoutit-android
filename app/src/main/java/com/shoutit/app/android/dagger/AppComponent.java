@@ -30,6 +30,7 @@ import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.dao.SortTypesDao;
 import com.shoutit.app.android.dao.SuggestionsDao;
+import com.shoutit.app.android.dao.TagListDaos;
 import com.shoutit.app.android.dao.TagsDao;
 import com.shoutit.app.android.dao.VideoCallsDao;
 import com.shoutit.app.android.db.DbHelper;
@@ -84,6 +85,8 @@ public interface AppComponent {
     TagsDao tagsDao();
 
     DiscoversDao discoversDao();
+
+    TagListDaos tagListDaos();
 
     PagesDao pagesDao();
 

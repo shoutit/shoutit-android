@@ -20,6 +20,7 @@ import com.shoutit.app.android.view.ReportDialog;
 import com.shoutit.app.android.view.chats.ChatActivity;
 import com.shoutit.app.android.view.chats.chatsfirstconversation.ChatFirstConversationActivity;
 import com.shoutit.app.android.view.profile.ChatInfo;
+import com.shoutit.app.android.view.interests.InterestsActivity;
 import com.shoutit.app.android.view.profile.ProfileIntentHelper;
 import com.shoutit.app.android.view.profile.user.editprofile.EditProfileActivity;
 import com.shoutit.app.android.view.createshout.DialogsHelper;
@@ -131,7 +132,7 @@ public class UserProfileActivity extends ProfileActivity {
                 .getListeningsClickObservable()
                 .compose(bindToLifecycle())
                 .subscribe(o -> {
-                    startActivityForResult(ListeningsActivity.newIntent(UserProfileActivity.this, false),
+                    startActivityForResult(ListeningsActivity.newIntent(UserProfileActivity.this),
                             REQUEST_CODE_PROFILE_UPDATED_FROM_LISTENINGS);
                 });
 
@@ -139,7 +140,7 @@ public class UserProfileActivity extends ProfileActivity {
                 .getInterestsClickObservable()
                 .compose(bindToLifecycle())
                 .subscribe(o -> {
-                    startActivityForResult(ListeningsActivity.newIntent(UserProfileActivity.this, true),
+                    startActivityForResult(InterestsActivity.newIntent(UserProfileActivity.this),
                             REQUEST_CODE_PROFILE_UPDATED_FROM_LISTENINGS);
                 });
 

@@ -12,11 +12,8 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.ProfilesListResponse;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dao.ListenersDaos;
 import com.shoutit.app.android.dao.ListeningsDao;
-import com.shoutit.app.android.model.ListeningsPointer;
-import com.shoutit.app.android.view.listenings.ListeningsPresenter;
 
 import java.util.List;
 
@@ -25,7 +22,6 @@ import javax.annotation.Nonnull;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
-import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
 public class SelectProfilePresenter {
@@ -51,7 +47,7 @@ public class SelectProfilePresenter {
         final String userName = userPreferences.getUser().getUsername();
 
         final Observable<ResponseOrError<ProfilesListResponse>> listeningsObservable = listeningsDao
-                .getDao(new ListeningsPointer(ListeningsPresenter.ListeningsType.USERS_AND_PAGES, userName))
+                .getDao(userName)
                 .getProfilesObservable()
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<ProfilesListResponse>>behaviorRefCount());
@@ -64,21 +60,11 @@ public class SelectProfilePresenter {
 
         listeningsAdapterItems = listeningsObservable
                 .compose(ResponseOrError.<ProfilesListResponse>onlySuccess())
-                .map(new Func1<ProfilesListResponse, List<BaseAdapterItem>>() {
-                    @Override
-                    public List<BaseAdapterItem> call(ProfilesListResponse listeningResponse) {
-                        return itemsToAdapterItem(listeningResponse.getResults());
-                    }
-                });
+                .map(listeningResponse -> itemsToAdapterItem(listeningResponse.getResults()));
 
         listenersAdapterItems = listenersObservable
                 .compose(ResponseOrError.<ProfilesListResponse>onlySuccess())
-                .map(new Func1<ProfilesListResponse, List<BaseAdapterItem>>() {
-                    @Override
-                    public List<BaseAdapterItem> call(ProfilesListResponse listenersResponse) {
-                        return itemsToAdapterItem(listenersResponse.getResults());
-                    }
-                });
+                .map(listenersResponse -> itemsToAdapterItem(listenersResponse.getResults()));
 
         errorObservable = ResponseOrError.combineErrorsObservable(
                 ImmutableList.of(

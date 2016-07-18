@@ -91,7 +91,7 @@ public class TagProfilePresenter implements ProfilePresenter {
 
     public TagProfilePresenter(@NonNull TagsDao tagsDao,
                                @NonNull final ShoutsDao shoutsDao,
-                               @Nonnull final String tagName,
+                               @Nonnull final String tagSlug,
                                @NonNull @UiScheduler final Scheduler uiScheduler,
                                @NonNull @NetworkScheduler final Scheduler networkScheduler,
                                @NonNull final ApiService apiService,
@@ -100,12 +100,12 @@ public class TagProfilePresenter implements ProfilePresenter {
                                @NonNull BookmarksDao bookmarksDao,
                                @NonNull BookmarkHelper bookmarkHelper) {
         this.tagsDao = tagsDao;
-        this.tagName = tagName;
+        this.tagName = tagSlug;
         mBookmarkHelper = bookmarkHelper;
         isLoggedInAsNormalUser = userPreferences.isNormalUser();
 
         /** Base Tag **/
-        final Observable<ResponseOrError<TagDetail>> tagRequestObservable = tagsDao.getTagObservable(tagName)
+        final Observable<ResponseOrError<TagDetail>> tagRequestObservable = tagsDao.getTagObservable(tagSlug)
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<TagDetail>>behaviorRefCount());
 
@@ -153,7 +153,7 @@ public class TagProfilePresenter implements ProfilePresenter {
                         });
                     }
                 })
-                .subscribe(tagsDao.getUpdatedTagObserver(tagName));
+                .subscribe(tagsDao.getUpdatedTagObserver(tagSlug));
 
         final Observable<TagDetail> successTagRequestObservable = tagRequestObservable
                 .compose(ResponseOrError.<TagDetail>onlySuccess());
@@ -208,7 +208,7 @@ public class TagProfilePresenter implements ProfilePresenter {
                 .switchMap(new Func1<UserLocation, Observable<ResponseOrError<ShoutsResponse>>>() {
                     @Override
                     public Observable<ResponseOrError<ShoutsResponse>> call(UserLocation userLocation) {
-                        return shoutsDao.getTagsShoutsObservable(new TagShoutsPointer(SHOUTS_PAGE_SIZE, tagName, userLocation.getLocationPointer()))
+                        return shoutsDao.getTagsShoutsObservable(new TagShoutsPointer(SHOUTS_PAGE_SIZE, tagSlug, userLocation.getLocationPointer()))
                                 .observeOn(uiScheduler);
                     }
                 })
@@ -245,7 +245,7 @@ public class TagProfilePresenter implements ProfilePresenter {
 
         /** Related Tags **/
         final Observable<ResponseOrError<RelatedTagsResponse>> relatedTagsRequest = tagsDao
-                .getRelatedTagsObservable(tagName)
+                .getRelatedTagsObservable(tagSlug)
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<RelatedTagsResponse>>behaviorRefCount());
 
@@ -314,7 +314,7 @@ public class TagProfilePresenter implements ProfilePresenter {
                         });
                     }
                 })
-                .subscribe(tagsDao.getUpdatedRelatedTagsObserver(tagName));
+                .subscribe(tagsDao.getUpdatedRelatedTagsObserver(tagSlug));
 
 
         /** All adapter items **/
@@ -341,7 +341,7 @@ public class TagProfilePresenter implements ProfilePresenter {
                                     context.getString(R.string.tag_profile_shouts, tagItem.getTagDetail().getName()).toUpperCase()))
                             .addAll(shouts)
                             .add(new BaseProfileAdapterItems.SeeAllUserShoutsAdapterItem(
-                                    showAllShoutsSubject, tagName));
+                                    showAllShoutsSubject, tagSlug));
                         }
 
                         return builder.build();
