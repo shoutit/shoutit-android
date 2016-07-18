@@ -120,8 +120,8 @@ public class TagsDao {
         @Nonnull
         private PublishSubject<Object> refreshSubject = PublishSubject.create();
 
-        public RelatedTagsDao(@Nonnull final String tagName) {
-            tagsObservable = apiService.relatedTags(tagName)
+        public RelatedTagsDao(@Nonnull final String slug) {
+            tagsObservable = apiService.relatedTags(slug)
                     .subscribeOn(networkScheduler)
                     .compose(MoreOperators.<RelatedTagsResponse>refresh(refreshSubject))
                     .compose(ResponseOrError.<RelatedTagsResponse>toResponseOrErrorObservable())

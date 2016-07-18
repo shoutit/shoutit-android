@@ -116,7 +116,7 @@ public class TagProfilePresenter implements ProfilePresenter {
                     public Observable<ResponseOrError<TagDetail>> call(final TagDetail tagDetail) {
                         final Observable<ResponseOrError<ResponseBody>> request;
                         if (tagDetail.isListening()) {
-                            request = apiService.unlistenTag(tagDetail.getName())
+                            request = apiService.unlistenTag(tagDetail.getSlug())
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
                                     .doOnNext(new Action1<ResponseBody>() {
@@ -127,7 +127,7 @@ public class TagProfilePresenter implements ProfilePresenter {
                                     })
                                     .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
                         } else {
-                            request = apiService.listenTag(tagDetail.getName())
+                            request = apiService.listenTag(tagDetail.getSlug())
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
                                     .doOnNext(new Action1<ResponseBody>() {
@@ -277,7 +277,7 @@ public class TagProfilePresenter implements ProfilePresenter {
 
                         final Observable<ResponseOrError<ResponseBody>> request;
                         if (tagDetail.isListening()) {
-                            request = apiService.unlistenTag(tagDetail.getName())
+                            request = apiService.unlistenTag(tagDetail.getSlug())
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
                                     .doOnNext(new Action1<ResponseBody>() {
@@ -288,7 +288,7 @@ public class TagProfilePresenter implements ProfilePresenter {
                                     })
                                     .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
                         } else {
-                            request = apiService.listenTag(tagDetail.getName())
+                            request = apiService.listenTag(tagDetail.getSlug())
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
                                     .doOnNext(new Action1<ResponseBody>() {
