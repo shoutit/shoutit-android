@@ -108,7 +108,7 @@ public class HomePresenterTest {
         when(userPreferences.isNormalUser()).thenReturn(true);
         when(userPreferences.getUserOrPage()).thenReturn(TestUtils.getUser());
 
-        when(fbAdHalfPresenter.getAdsObservable(any(Observable.class)))
+        when(fbAdHalfPresenter.getAdsObservable())
                 .thenReturn(Observable.empty());
 
         when(FBAdHalfPresenter.combineShoutsWithAds(anyList(), anyList()))

@@ -73,7 +73,6 @@ public class FacebookHelper {
     private final Scheduler networkScheduler;
     private final PusherHelper pusherHelper;
     private final NativeAdsManager listAdManager;
-    private final NativeAdsManager gridAdManager;
     private final NativeAdsManager shoutDetailAdManager;
 
     public FacebookHelper(final ApiService apiService,
@@ -89,9 +88,6 @@ public class FacebookHelper {
 
         listAdManager = new NativeAdsManager(
                 context, getListAdId(), ADS_NUM_TO_PREFETCH);
-
-        gridAdManager = new NativeAdsManager(
-                context, getGridAdId(), ADS_NUM_TO_PREFETCH);
 
         shoutDetailAdManager = new NativeAdsManager(
                 context, getShoutDetailAdId(), ADS_NUM_SHOUT_DETAIL_TO_PREFETCH);
@@ -111,7 +107,6 @@ public class FacebookHelper {
         };
 
         listAdManager.setListener(adsListener);
-        gridAdManager.setListener(adsListener);
         shoutDetailAdManager.setListener(adsListener);
 
         loadAds();
@@ -126,7 +121,6 @@ public class FacebookHelper {
         AdSettings.addTestDevice("2527377803eebdb0123194b820f02a5a");
         AdSettings.addTestDevice("e5c7606e893f5e4e19ce8f03429c8b47");
         listAdManager.loadAds(NativeAd.MediaCacheFlag.ALL);
-        gridAdManager.loadAds(NativeAd.MediaCacheFlag.ALL);
         shoutDetailAdManager.loadAds(NativeAd.MediaCacheFlag.ALL);
     }
 
@@ -478,8 +472,8 @@ public class FacebookHelper {
     }
 
     @Nonnull
-    public NativeAdsManager getManager(boolean isListAd) {
-        return isListAd ? listAdManager : gridAdManager;
+    public NativeAdsManager getListAdManager() {
+        return listAdManager;
     }
 
     public NativeAdsManager getShoutDetailAdManager() {
@@ -489,11 +483,6 @@ public class FacebookHelper {
     @Nonnull
     private String getListAdId() {
         return context.getString(R.string.facebook_shout_list_ad_id);
-    }
-
-    @Nonnull
-    private String getGridAdId() {
-        return context.getString(R.string.facebook_shout_grid_ad_id);
     }
 
     @Nonnull

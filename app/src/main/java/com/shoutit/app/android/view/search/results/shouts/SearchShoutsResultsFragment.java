@@ -196,11 +196,9 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
             if (layoutSwitchIcon.isChecked()) {
                 layoutSwitchIcon.setBackground(getResources().getDrawable(R.drawable.ic_grid_switch));
                 setLinearLayoutManager();
-                presenter.setLinearLayoutManager(true);
             } else {
                 layoutSwitchIcon.setBackground(getResources().getDrawable(R.drawable.ic_list_switch));
                 setGridLayoutManager();
-                presenter.setLinearLayoutManager(false);
             }
         });
     }
