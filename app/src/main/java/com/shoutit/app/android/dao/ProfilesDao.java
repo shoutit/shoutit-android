@@ -1,11 +1,12 @@
 package com.shoutit.app.android.dao;
 
+import android.support.annotation.NonNull;
+
 import com.appunite.appunitegcm.AppuniteGcm;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.operators.MoreOperators;
 import com.appunite.rx.operators.OperatorMergeNextToken;
-import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -52,9 +53,9 @@ public class ProfilesDao {
     @Nonnull
     private final LoadingCache<PagesPointer, PagesDao> pagesCache;
     @Nonnull
-    private final LoadingCache<FriendsSuggestionPointer, UsersSuggestionDao> usersSuggestionCache;
+    private final LoadingCache<UserLocation, UsersSuggestionDao> usersSuggestionCache;
     @Nonnull
-    private final LoadingCache<FriendsSuggestionPointer, PagesSuggestionDao> pagesSuggestionCache;
+    private final LoadingCache<UserLocation, PagesSuggestionDao> pagesSuggestionCache;
 
     @Nonnull
     private final ApiService apiService;
@@ -103,18 +104,18 @@ public class ProfilesDao {
                 });
 
         usersSuggestionCache = CacheBuilder.newBuilder()
-                .build(new CacheLoader<FriendsSuggestionPointer, UsersSuggestionDao>() {
+                .build(new CacheLoader<UserLocation, UsersSuggestionDao>() {
                     @Override
-                    public UsersSuggestionDao load(final FriendsSuggestionPointer pointer) throws Exception {
-                        return new UsersSuggestionDao(pointer);
+                    public UsersSuggestionDao load(@NonNull final UserLocation userLocation) throws Exception {
+                        return new UsersSuggestionDao(userLocation);
                     }
                 });
 
         pagesSuggestionCache = CacheBuilder.newBuilder()
-                .build(new CacheLoader<FriendsSuggestionPointer, PagesSuggestionDao>() {
+                .build(new CacheLoader<UserLocation, PagesSuggestionDao>() {
                     @Override
-                    public PagesSuggestionDao load(final FriendsSuggestionPointer pointer) throws Exception {
-                        return new PagesSuggestionDao(pointer);
+                    public PagesSuggestionDao load(@NonNull final UserLocation userLocation) throws Exception {
+                        return new PagesSuggestionDao(userLocation);
                     }
                 });
 
@@ -136,12 +137,12 @@ public class ProfilesDao {
     }
 
     @Nonnull
-    public UsersSuggestionDao getUsersSuggestionDao(@Nonnull FriendsSuggestionPointer pointer) {
+    public UsersSuggestionDao getUsersSuggestionDao(@Nonnull UserLocation pointer) {
         return usersSuggestionCache.getUnchecked(pointer);
     }
 
     @Nonnull
-    public PagesSuggestionDao getPagesSuggestionDao(@Nonnull FriendsSuggestionPointer pointer) {
+    public PagesSuggestionDao getPagesSuggestionDao(@Nonnull UserLocation pointer) {
         return pagesSuggestionCache.getUnchecked(pointer);
     }
 
@@ -332,12 +333,10 @@ public class ProfilesDao {
     public class UsersSuggestionDao extends BaseProfileListDao {
 
         private final UserLocation userLocation;
-        private FriendsSuggestionPointer pointer;
 
-        public UsersSuggestionDao(@Nonnull FriendsSuggestionPointer pointer) {
-            super(pointer.getUserName(), networkScheduler);
-            this.pointer = pointer;
-            userLocation = pointer.getUserLocation();
+        public UsersSuggestionDao(@Nonnull UserLocation userLocation) {
+            super(null, networkScheduler);
+            this.userLocation = userLocation;
         }
 
         @Override
@@ -355,12 +354,10 @@ public class ProfilesDao {
     public class PagesSuggestionDao extends BaseProfileListDao {
 
         private final UserLocation userLocation;
-        private FriendsSuggestionPointer pointer;
 
-        public PagesSuggestionDao(@Nonnull FriendsSuggestionPointer pointer) {
-            super(pointer.getUserName(), networkScheduler);
-            this.pointer = pointer;
-            userLocation = pointer.getUserLocation();
+        public PagesSuggestionDao(@Nonnull UserLocation userLocation) {
+            super(null, networkScheduler);
+            this.userLocation = userLocation;
         }
 
         @Override
@@ -404,40 +401,6 @@ public class ProfilesDao {
         @Override
         public Observable<ProfilesListResponse> getRequest(int pageNumber) {
             return apiService.getPages(userName, pageNumber, pagesPointer.getPageSize());
-        }
-    }
-
-    public static class FriendsSuggestionPointer {
-        @android.support.annotation.Nullable
-        private final UserLocation userLocation;
-        private final String userName;
-
-        public FriendsSuggestionPointer(@android.support.annotation.Nullable UserLocation userLocation, String userName) {
-            this.userLocation = userLocation;
-            this.userName = userName;
-        }
-
-        @android.support.annotation.Nullable
-        public UserLocation getUserLocation() {
-            return userLocation;
-        }
-
-        public String getUserName() {
-            return userName;
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            final FriendsSuggestionPointer that = (FriendsSuggestionPointer) o;
-            return Objects.equal(userLocation, that.userLocation) &&
-                    Objects.equal(userName, that.userName);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hashCode(userLocation, userName);
         }
     }
 

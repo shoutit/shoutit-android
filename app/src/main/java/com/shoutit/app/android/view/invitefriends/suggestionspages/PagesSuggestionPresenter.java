@@ -7,6 +7,7 @@ import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.BaseProfileListDao;
 import com.shoutit.app.android.dao.ProfilesDao;
@@ -29,12 +30,8 @@ public class PagesSuggestionPresenter extends BaseProfileListPresenter {
                                     @Nonnull UserPreferences userPreferences) {
         super(listeningHalfPresenter, uiScheduler, resources.getString(R.string.post_no_suggested_pages), userPreferences);
 
-        final Observable<ProfilesDao.FriendsSuggestionPointer> pointerObservable = userPreferences
-                .getPageOrUserObservable()
-                .filter(Functions1.isNotNull())
-                .map(baseProfile -> new ProfilesDao.FriendsSuggestionPointer(baseProfile.getLocation(), baseProfile.getUsername()));
-
-        daoObservable = pointerObservable
+        daoObservable = userPreferences
+                .getLocationObservable()
                 .filter(Functions1.isNotNull())
                 .map(dao::getPagesSuggestionDao)
                 .compose(ObservableExtensions.behaviorRefCount());
