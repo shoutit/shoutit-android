@@ -33,6 +33,7 @@ public class GalleryActivity extends BaseActivity {
     private static final String KEY_IMAGES_JSON = "key_images_json";
     private static final String KEY_VIDEOS_JSON = "key_videos";
     private static final String KEY_POSITION = "key_position";
+    private static final String KEY_HIDE_THUMBNAILS = "hide_thumbnails";
 
     @Bind(R.id.gallery_view)
     ScrollGalleryView galleryView;
@@ -46,13 +47,20 @@ public class GalleryActivity extends BaseActivity {
     Gson gson;
 
     public static Intent newIntent(@Nonnull Context context,
-                                   @Nonnull String imagesJson,
-                                   @Nonnull String videosJson,
+                                   @Nonnull String listOfImagesUrlsJson,
+                                   @Nonnull String listOfVideosJson,
                                    int position) {
         return new Intent(context, GalleryActivity.class)
-                .putExtra(KEY_IMAGES_JSON, imagesJson)
-                .putExtra(KEY_VIDEOS_JSON, videosJson)
+                .putExtra(KEY_IMAGES_JSON, listOfImagesUrlsJson)
+                .putExtra(KEY_VIDEOS_JSON, listOfVideosJson)
                 .putExtra(KEY_POSITION, position);
+    }
+
+    public static Intent singleImageIntent(@Nonnull Context context,
+                                           @Nonnull String listOfImagesUrlsJson) {
+        return new Intent(context, GalleryActivity.class)
+                .putExtra(KEY_IMAGES_JSON, listOfImagesUrlsJson)
+                .putExtra(KEY_HIDE_THUMBNAILS, true);
     }
 
     @Override
@@ -65,6 +73,7 @@ public class GalleryActivity extends BaseActivity {
         final String imagesJson = intent.getStringExtra(KEY_IMAGES_JSON);
         final String videosJson = intent.getStringExtra(KEY_VIDEOS_JSON);
         final int position = intent.getIntExtra(KEY_POSITION, 0);
+        final boolean hideThumbnails = intent.getBooleanExtra(KEY_HIDE_THUMBNAILS, false);
 
         final List<String> imagesList = gson.fromJson(imagesJson, new TypeToken<List<String>>() {
         }.getType());
@@ -76,13 +85,16 @@ public class GalleryActivity extends BaseActivity {
                 .setFragmentManager(getSupportFragmentManager());
 
         for (String imageUrl : imagesList) {
+            galleryView.hideThumbnails(hideThumbnails);
             galleryView.addMedia(MediaInfo.mediaLoader(
                     new MediaLoaders.ImagesLoader(imageUrl, picasso, picassoWithoutAmazonTransformer, getResources())));
         }
 
-        for (Video video : videosList) {
-            galleryView.addMedia(MediaInfo.mediaLoader(
-                    new MediaLoaders.VideosLoader(picassoWithoutAmazonTransformer, video.getUrl(), video.getThumbnailUrl())));
+        if (videosList != null) {
+            for (Video video : videosList) {
+                galleryView.addMedia(MediaInfo.mediaLoader(
+                        new MediaLoaders.VideosLoader(picassoWithoutAmazonTransformer, video.getUrl(), video.getThumbnailUrl())));
+            }
         }
 
         galleryView.setCurrentItem(position);
