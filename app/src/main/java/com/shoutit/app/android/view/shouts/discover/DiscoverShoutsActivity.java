@@ -30,7 +30,6 @@ import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.LayoutManagerHelper;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyGridLayoutManager;
-import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.conversations.ConversationsActivity;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
@@ -236,12 +235,10 @@ public class DiscoverShoutsActivity extends BaseActivity {
 
     private void setLinearLayoutManager() {
         LayoutManagerHelper.setLinearLayoutManager(mRecyclerView, mShoutsAdapter, linearLayoutManager);
-        mShoutsPresenter.setLinearLayoutManager(true);
     }
 
     private void setGridLayoutManager() {
         LayoutManagerHelper.setGridLayoutManager(mRecyclerView, mShoutsAdapter, gridLayoutManager);
-        mShoutsPresenter.setLinearLayoutManager(false);
     }
 
     @NonNull

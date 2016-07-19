@@ -57,8 +57,6 @@ public class DiscoverShoutsPresenter {
     private final PublishSubject<Object> searchMenuItemClicked = PublishSubject.create();
     @Nonnull
     private final PublishSubject<Object> shareMenuItemClicked = PublishSubject.create();
-    @Nonnull
-    private final PublishSubject<Boolean> isLinearLayoutSubject = PublishSubject.create();
 
     public DiscoverShoutsPresenter(@NetworkScheduler Scheduler networkScheduler,
                                    @UiScheduler Scheduler uiScheduler,
@@ -110,7 +108,7 @@ public class DiscoverShoutsPresenter {
 
         mListObservable = Observable.combineLatest(
                 shoutItems,
-                fbAdHalfPresenter.getAdsObservable(isLinearLayoutSubject),
+                fbAdHalfPresenter.getAdsObservable(),
                 FBAdHalfPresenter::combineShoutsWithAds);
 
         countObservable = shoutsObservable.compose(ResponseOrError.<ShoutsResponse>onlySuccess())
@@ -193,9 +191,5 @@ public class DiscoverShoutsPresenter {
 
     public void onShareClicked() {
         shareMenuItemClicked.onNext(null);
-    }
-
-    public void setLinearLayoutManager(boolean isLinearLayout) {
-        isLinearLayoutSubject.onNext(isLinearLayout);
     }
 }

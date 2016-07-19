@@ -17,7 +17,6 @@ import com.shoutit.app.android.adapteritems.NoDataTextAdapterItem;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
-import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.BaseShoutsDao;
 import com.shoutit.app.android.dao.BookmarksDao;
@@ -136,9 +135,8 @@ public class SearchShoutsResultsPresenter {
                 })
                 .doOnNext(fbAdHalfPresenter::updatedShoutsCount);
 
-        final PublishSubject<Boolean> isLinearLayoutSubject = PublishSubject.create();
         adapterItems = Observable.combineLatest(shoutsItems,
-                fbAdHalfPresenter.getAdsObservable(isLinearLayoutSubject),
+                fbAdHalfPresenter.getAdsObservable(),
                 FBAdHalfPresenter::combineShoutsWithAds);
 
         progressObservable = shoutsRequest.map(Functions1.returnFalse())
@@ -205,9 +203,5 @@ public class SearchShoutsResultsPresenter {
 
     public void onShareClicked() {
         shareClickSubject.onNext(null);
-    }
-
-    public void setLinearLayoutManager(boolean isLinearLayour) {
-
     }
 }
