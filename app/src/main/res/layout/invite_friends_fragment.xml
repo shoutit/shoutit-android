@@ -111,7 +111,7 @@
                         android:layout_gravity="center_vertical|start"
                         android:drawablePadding="16dp"
                         android:drawableStart="@drawable/contacts_icon"
-                        android:drawableLeft="@drawable/facebook_icon"
+                        android:drawableLeft="@drawable/contacts_icon"
                         android:text="@string/invite_friends_contacts"/>
 
                 </LinearLayout>
@@ -147,6 +147,24 @@
                         android:drawableStart="@drawable/facebook_icon"
                         android:drawableLeft="@drawable/facebook_icon"
                         android:text="@string/invite_friends_facebook_header"/>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0.5dp"
+                        android:layout_marginEnd="10dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginLeft="48dp"
+                        android:layout_marginStart="48dp"
+                        android:background="@color/black_20"/>
+
+                    <TextView
+                        style="@style/InviteFriendsItem"
+                        android:id="@+id/invite_friends_invite_contacts"
+                        android:layout_gravity="center_vertical|start"
+                        android:drawablePadding="16dp"
+                        android:drawableStart="@drawable/contacts_icon"
+                        android:drawableLeft="@drawable/contacts_icon"
+                        android:text="@string/invite_friends_contacts"/>
 
                     <View
                         android:layout_width="match_parent"

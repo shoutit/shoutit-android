@@ -20,7 +20,7 @@ import com.shoutit.app.android.dao.BaseProfileListDao;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.utils.ListeningHalfPresenter;
 import com.shoutit.app.android.utils.PreferencesHelper;
-import com.shoutit.app.android.view.invitefriends.InviteFriendsPresenter;
+import com.shoutit.app.android.view.invitefriends.InviteFacebookFriendsPresenter;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
 import com.shoutit.app.android.view.profileslist.BaseProfileListPresenter;
 import com.shoutit.app.android.view.profileslist.ProfileListAdapterItem;
@@ -47,7 +47,7 @@ public class FacebookFriendsPresenter extends BaseProfileListPresenter {
     private final Observable<Boolean> progressObservable;
 
     private final ProfilesDao dao;
-    private final InviteFriendsPresenter inviteFriendsPresenter;
+    private final InviteFacebookFriendsPresenter inviteFriendsPresenter;
     private final Observable<BaseProfileListDao> daoObservable;
 
     public FacebookFriendsPresenter(final FacebookHelper facebookHelper,
@@ -58,7 +58,7 @@ public class FacebookFriendsPresenter extends BaseProfileListPresenter {
                                     @UiScheduler final Scheduler uiScheduler,
                                     ListeningHalfPresenter listeningHalfPresenter,
                                     PreferencesHelper preferencesHelper,
-                                    InviteFriendsPresenter inviteFriendsPresenter,
+                                    InviteFacebookFriendsPresenter inviteFriendsPresenter,
                                     String placeholderText) {
         super(listeningHalfPresenter, uiScheduler, placeholderText, userPreferences);
         this.dao = dao;

@@ -16,7 +16,7 @@ import rx.Observer;
 import rx.Scheduler;
 import rx.subjects.PublishSubject;
 
-public class InviteFriendsPresenter {
+public class InviteFacebookFriendsPresenter {
 
     private final PublishSubject<Object> initFBFriendInvite = PublishSubject.create();
 
@@ -28,9 +28,9 @@ public class InviteFriendsPresenter {
     private final Observable<Throwable> errorObservable;
 
     @Inject
-    public InviteFriendsPresenter(ApiService apiService,
-                                  @UiScheduler Scheduler uiScheduler,
-                                  @NetworkScheduler Scheduler networkScheduler) {
+    public InviteFacebookFriendsPresenter(ApiService apiService,
+                                          @UiScheduler Scheduler uiScheduler,
+                                          @NetworkScheduler Scheduler networkScheduler) {
 
         final Observable<ResponseOrError<InvitationCodeResponse>> invitationCodeRequest = initFBFriendInvite
                 .switchMap(o -> apiService.getInvitationCode()

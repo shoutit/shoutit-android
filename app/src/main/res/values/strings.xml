@@ -796,4 +796,7 @@
     <string name="edit_page_general_info">General Info</string>
     <string name="edit_page_title">Edit Page</string>
 
+    <!-- Invite Contacts -->
+    <string name="invite_contacts_ab_title">Invite Friends</string>
+
 </resources>
