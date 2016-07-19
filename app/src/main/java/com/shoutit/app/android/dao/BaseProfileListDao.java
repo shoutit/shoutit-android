@@ -1,5 +1,7 @@
 package com.shoutit.app.android.dao;
 
+import android.support.annotation.Nullable;
+
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.operators.MoreOperators;
@@ -25,10 +27,10 @@ public abstract class BaseProfileListDao {
     private final PublishSubject<ResponseOrError<ProfilesListResponse>> updatedProfilesLocallySubject = PublishSubject.create();
     @Nonnull
     private final PublishSubject<Object> loadMoreShoutsSubject = PublishSubject.create();
-    @Nonnull
+    @Nullable
     protected final String userName;
 
-    public BaseProfileListDao(@Nonnull final String userName,
+    public BaseProfileListDao(@Nullable final String userName,
                               @Nonnull @NetworkScheduler Scheduler networkScheduler) {
         this.userName = userName;
         final OperatorMergeNextToken<ProfilesListResponse, Object> loadMoreOperator =
