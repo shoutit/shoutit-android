@@ -121,6 +121,8 @@ public class PageProfilePresenter implements ProfilePresenter {
     @Nonnull
     private final Context context;
     @Nonnull
+    private final UserPreferences userPreferences;
+    @Nonnull
     private final ProfilesDao profilesDao;
     @Nonnull
     private final MyProfileHalfPresenter myProfilePresenter;
@@ -130,6 +132,8 @@ public class PageProfilePresenter implements ProfilePresenter {
     private final PreferencesHelper preferencesHelper;
     @Nonnull
     private final ListeningHalfPresenter listeningHalfPresenter;
+    @NonNull
+    private final PusherHelperHolder pusherHelper;
     @NonNull
     private final BookmarkHelper mBookmarkHelper;
     @Nullable
@@ -155,11 +159,13 @@ public class PageProfilePresenter implements ProfilePresenter {
                                 @NonNull BookmarkHelper bookmarkHelper) {
         this.shoutsDao = shoutsDao;
         this.context = context;
+        this.userPreferences = userPreferences;
         this.profilesDao = profilesDao;
         this.myProfilePresenter = myProfilePresenter;
         this.userProfilePresenter = userProfilePresenter;
         this.preferencesHelper = preferencesHelper;
         this.listeningHalfPresenter = listeningHalfPresenter;
+        this.pusherHelper = pusherHelper;
         mBookmarkHelper = bookmarkHelper;
         this.isNormalUser = userPreferences.isNormalUser();
 
@@ -375,11 +381,19 @@ public class PageProfilePresenter implements ProfilePresenter {
                     }
                 });
 
-        notificationsUnreadObservable = userPreferences.getPageOrUserObservable()
-                .filter(Functions1.isNotNull())
-                .map(BaseProfile::getUnreadNotificationsCount)
-                .mergeWith(pusherHelper.getPusherHelper().getStatsObservable()
-                        .map(Stats::getUnreadNotifications));
+        notificationsUnreadObservable = getNotificationsUnreadObservable();
+    }
+
+    private Observable<Integer> getNotificationsUnreadObservable() {
+        if (isMyProfile) {
+            return userPreferences.getPageOrUserObservable()
+                    .filter(Functions1.isNotNull())
+                    .map(BaseProfile::getUnreadNotificationsCount)
+                    .mergeWith(pusherHelper.getPusherHelper().getStatsObservable()
+                            .map(Stats::getUnreadNotifications));
+        } else {
+            return Observable.never();
+        }
     }
 
     private Func4<Page, List<BaseAdapterItem>, List<BaseProfile>, List<BaseProfile>, List<BaseAdapterItem>> combineAdapterItems() {

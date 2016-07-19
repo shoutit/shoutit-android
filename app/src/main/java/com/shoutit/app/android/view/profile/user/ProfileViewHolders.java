@@ -181,22 +181,9 @@ public class ProfileViewHolders {
 
             editProfileContainer.setVisibility(user.isUser() ? View.VISIBLE : View.GONE);
 
-            if (user.isUser() && !user.isActivated()) {
+            if (!user.isActivated()) {
                 verifyAccountButton.setText(R.string.profile_user_verify_account);
                 verifyAccountButton.setVisibility(View.VISIBLE);
-            } else if (!user.isUser()){
-                if (!user.isActivated()) {
-                    verifyAccountButton.setText(R.string.profile_page_activate_page);
-                    verifyAccountButton.setVisibility(View.VISIBLE);
-                    verificationStatusTv.setVisibility(View.VISIBLE);
-                } else if (!user.isVerified()) {
-                    verifyAccountButton.setText(R.string.profile_page_verify_page);
-                    verifyAccountButton.setVisibility(View.VISIBLE);
-                    verificationStatusTv.setVisibility(View.VISIBLE);
-                } else {
-                    verifyAccountButton.setVisibility(View.GONE);
-                    verificationStatusTv.setVisibility(View.GONE);
-                }
             } else {
                 verifyAccountButton.setVisibility(View.GONE);
                 verificationStatusTv.setVisibility(View.GONE);

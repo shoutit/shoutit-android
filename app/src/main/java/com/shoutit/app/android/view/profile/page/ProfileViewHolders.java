@@ -2,6 +2,7 @@ package com.shoutit.app.android.view.profile.page;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.Resources;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -31,6 +32,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Subscription;
 import rx.functions.Action1;
+import rx.subscriptions.CompositeSubscription;
 
 public class ProfileViewHolders {
 
@@ -85,14 +87,7 @@ public class ProfileViewHolders {
             websiteTextView.setText(website);
             webContainer.setVisibility(TextUtils.isEmpty(website) ? View.GONE : View.VISIBLE);
 
-            if (false) {
-                joinedContainer.setVisibility(View.VISIBLE);
-                dateJoinedTextView.setText(context.getString(
-                        R.string.profile_joined_date,
-                        dateFormat.format(new Date(0))));
-            } else {
-                joinedContainer.setVisibility(View.GONE);
-            }
+            joinedContainer.setVisibility(View.GONE);
 
             if (user.getLocation() != null && !TextUtils.isEmpty(user.getLocation().getCountry())) {
                 locationContainer.setVisibility(View.VISIBLE);
@@ -154,12 +149,16 @@ public class ProfileViewHolders {
         TextView profileBadgeTv;
         @Bind(R.id.profile_edit_profile_container)
         View editProfileContainer;
+        @Bind(R.id.profile_verification_status)
+        TextView verificationStatusTv;
 
         private ProfileAdapterItems.MyUserNameAdapterItem item;
-        private Subscription subscription;
+        private CompositeSubscription subscriptions;
 
-        public MyProfileUserNameViewHolder(@Nonnull View itemView) {
+        private final Resources resources;
+        public MyProfileUserNameViewHolder(@Nonnull View itemView, Resources resources) {
             super(itemView);
+            this.resources = resources;
             ButterKnife.bind(this, itemView);
         }
 
@@ -172,20 +171,33 @@ public class ProfileViewHolders {
             userName.setText(user.getName());
             userNick.setText(user.getUsername());
 
-            if (user.isOwner() && !user.isActivated()) {
+            if (!user.isActivated()) {
+                verifyAccountButton.setText(R.string.profile_page_activate_page);
                 verifyAccountButton.setVisibility(View.VISIBLE);
+                verificationStatusTv.setVisibility(View.VISIBLE);
+            } else if (!user.isVerified()) {
+                verifyAccountButton.setText(R.string.profile_page_verify_page);
+                verifyAccountButton.setVisibility(View.VISIBLE);
+                verificationStatusTv.setVisibility(View.VISIBLE);
             } else {
                 verifyAccountButton.setVisibility(View.GONE);
+                verificationStatusTv.setVisibility(View.GONE);
             }
 
-            subscription = item.getNotificationsUnreadObservable()
-                    .subscribe(new Action1<Integer>() {
-                        @Override
-                        public void call(Integer notificationsCount) {
-                            notificationsBadgeTv.setVisibility(notificationsCount > 0 ? View.VISIBLE : View.GONE);
-                            notificationsBadgeTv.setText(String.valueOf(notificationsCount));
-                        }
-                    });
+            subscriptions = new CompositeSubscription(
+
+                    item.getNotificationsUnreadObservable()
+                            .subscribe(notificationsCount -> {
+                                notificationsBadgeTv.setVisibility(notificationsCount > 0 ? View.VISIBLE : View.GONE);
+                                notificationsBadgeTv.setText(String.valueOf(notificationsCount));
+                            }),
+
+                    item.getPageVerificationObservable()
+                            .subscribe(verificationResponse -> {
+                                verificationStatusTv.setText(resources.getString(
+                                        R.string.profile_verify_status, verificationResponse.getStatus()));
+                            })
+            );
 
             profileBadgeTv.setVisibility(item.shouldShowProfileBadge() ? View.VISIBLE : View.GONE);
         }
@@ -212,9 +224,9 @@ public class ProfileViewHolders {
         }
 
         private void recycle() {
-            if (subscription != null) {
-                subscription.unsubscribe();
-                subscription = null;
+            if (subscriptions != null) {
+                subscriptions.unsubscribe();
+                subscriptions = null;
             }
         }
     }
