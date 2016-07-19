@@ -6,9 +6,12 @@ import android.support.annotation.NonNull;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
+import com.shoutit.app.android.api.model.BaseProfile;
+import com.shoutit.app.android.api.model.BusinessVerificationResponse;
 import com.shoutit.app.android.api.model.ConversationDetails;
 import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.api.model.ProfileType;
+import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.view.profile.ChatInfo;
 
 import javax.annotation.Nonnull;
@@ -95,27 +98,31 @@ public class ProfileAdapterItems {
         @Nonnull
         private final Observer<Object> notificationsClickObserver;
         @Nonnull
-        private final Observer<Object> verifyAccountClickObserver;
+        private final Observer<Page> verifyAccountClickObserver;
         @Nonnull
         private final Observable<Integer> notificationsUnreadObservable;
         private final boolean shouldShowProfileBadge;
+        @Nonnull
+        private final Observable<BusinessVerificationResponse> pageVerificationObservable;
 
-        public MyUserNameAdapterItem(@Nonnull Page user, @NonNull Observer<String> editProfileClickObserver,
+        public MyUserNameAdapterItem(@Nonnull Page page, @NonNull Observer<String> editProfileClickObserver,
                                      @Nonnull Observer<Object> notificationsClickObserver,
-                                     @Nonnull Observer<Object> verifyAccountClickObserver,
+                                     @Nonnull Observer<Page> verifyAccountClickObserver,
                                      @Nonnull Observable<Integer> notificationsUnreadObservable,
-                                     boolean shouldShowProfileBadge) {
-            super(user);
+                                     boolean shouldShowProfileBadge,
+                                     @Nonnull Observable<BusinessVerificationResponse> pageVerificationObservable) {
+            super(page);
             this.editProfileClickObserver = editProfileClickObserver;
             this.notificationsClickObserver = notificationsClickObserver;
             this.verifyAccountClickObserver = verifyAccountClickObserver;
             this.notificationsUnreadObservable = notificationsUnreadObservable;
             this.shouldShowProfileBadge = shouldShowProfileBadge;
+            this.pageVerificationObservable = pageVerificationObservable;
         }
 
         @Override
         public boolean matches(@Nonnull BaseAdapterItem item) {
-            return item instanceof MyUserNameAdapterItem && user.getId().equals(((NameAdapterItem) item).user.getId());
+            return item instanceof MyUserNameAdapterItem && user.getId().equals(((MyUserNameAdapterItem) item).user.getId());
         }
 
         @Override
@@ -129,24 +136,24 @@ public class ProfileAdapterItems {
         }
 
         @Nonnull
-        public Page getUser() {
-            return user;
+        public Observable<BusinessVerificationResponse> getPageVerificationObservable() {
+            return pageVerificationObservable;
         }
 
         public void onEditProfileClicked() {
             editProfileClickObserver.onNext(user.getUsername());
         }
 
-        public void onShowNotificationClicked() {
-            notificationsClickObserver.onNext(null);
-        }
-
         public void onVerifyAccountClick() {
-            verifyAccountClickObserver.onNext(null);
+            verifyAccountClickObserver.onNext(user);
         }
 
         public boolean shouldShowProfileBadge() {
             return shouldShowProfileBadge;
+        }
+
+        public void onShowNotificationClicked() {
+            notificationsClickObserver.onNext(null);
         }
     }
 

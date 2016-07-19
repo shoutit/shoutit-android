@@ -51,12 +51,10 @@ public class MyProfileHalfPresenter {
 
         //noinspection ConstantConditions
         final BaseProfile currentProfile = userPreferences.getUserOrPage();
-        assert currentProfile != null;
-        final String myUsername = currentProfile.getUsername();
-
-        if (currentProfile.isUser()) {
+        if (currentProfile == null || currentProfile.isUser()) {
             pageVerificationObservable = Observable.empty();
         } else {
+            final String myUsername = currentProfile.getUsername();
             pageVerificationObservable = businessVerificationDaos
                     .getDao(myUsername)
                     .getVerificationObservable()
