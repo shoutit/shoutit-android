@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.text.format.DateUtils;
 
+import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
@@ -49,7 +50,7 @@ import rx.subscriptions.CompositeSubscription;
 
 public class ConversationsPresenter {
 
-    private static final int PAGE_SIZE = 20;
+    public static final int PAGE_SIZE = 20;
 
     final OperatorMergeNextToken<ConversationsResponse, Object> loadMoreOperator =
             OperatorMergeNextToken.create(new Func1<ConversationsResponse, Observable<ConversationsResponse>>() {

@@ -16,6 +16,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.DiscoverChild;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
@@ -361,7 +362,7 @@ public class HomePresenter {
         }
     }
 
-    public class ShoutHeaderAdapterItem implements BaseAdapterItem {
+    public class ShoutHeaderAdapterItem extends BaseNoIDAdapterItem {
 
         private final boolean isUserLoggedIn;
         private final String userCity;
@@ -372,11 +373,6 @@ public class HomePresenter {
             this.isUserLoggedIn = isUserLoggedIn;
             this.userCity = userCity;
             this.layoutManagerSwitchObserver = layoutManagerSwitchObserver;
-        }
-
-        @Override
-        public long adapterId() {
-            return BaseAdapterItem.NO_ID;
         }
 
         @Override
@@ -416,18 +412,13 @@ public class HomePresenter {
         }
     }
 
-    public class DiscoverAdapterItem implements BaseAdapterItem {
+    public class DiscoverAdapterItem extends BaseNoIDAdapterItem {
 
         @Nonnull
         private final DiscoverChild discover;
 
         public DiscoverAdapterItem(@Nonnull DiscoverChild discover) {
             this.discover = discover;
-        }
-
-        @Override
-        public long adapterId() {
-            return BaseAdapterItem.NO_ID;
         }
 
         @Override
@@ -505,7 +496,7 @@ public class HomePresenter {
         }
     }
 
-    public class DiscoverContainerAdapterItem implements BaseAdapterItem {
+    public class DiscoverContainerAdapterItem extends BaseNoIDAdapterItem {
 
         @Nonnull
         private final List<BaseAdapterItem> adapterItems;
@@ -516,11 +507,6 @@ public class HomePresenter {
                                             @Nonnull LocationPointer locationPointer) {
             this.adapterItems = adapterItems;
             this.locationPointer = locationPointer;
-        }
-
-        @Override
-        public long adapterId() {
-            return BaseAdapterItem.NO_ID;
         }
 
         @Override
@@ -543,7 +529,8 @@ public class HomePresenter {
             if (this == o) return true;
             if (!(o instanceof DiscoverContainerAdapterItem)) return false;
             final DiscoverContainerAdapterItem that = (DiscoverContainerAdapterItem) o;
-            return Objects.equal(locationPointer, that.locationPointer);
+            return Objects.equal(adapterItems, that.adapterItems) &&
+                    Objects.equal(locationPointer, that.locationPointer);
         }
 
         @Override
