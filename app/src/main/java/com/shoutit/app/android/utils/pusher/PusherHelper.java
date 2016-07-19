@@ -286,10 +286,10 @@ public class PusherHelper {
         mPusher.connect(getEventListener());
     }
 
-    public void sendTyping(@NonNull String conversationId, @NonNull String userId, @NonNull String userName) {
+    public void sendTyping(@NonNull String conversationId, @NonNull String userId, @NonNull String name) {
         final PresenceChannel presenceChannel = mPusher.getPresenceChannel(getConversationChannelName(conversationId));
         if (presenceChannel != null && presenceChannel.isSubscribed() && mPusher.getConnection().getState() != ConnectionState.CONNECTING) {
-            final String typing = mGson.toJson(new TypingPusherModel(userId, userName));
+            final String typing = mGson.toJson(new TypingPusherModel(userId, name));
             presenceChannel.trigger("client-is_typing", typing);
         }
     }
