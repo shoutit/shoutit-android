@@ -120,6 +120,9 @@ public class ConversationsFragment extends BaseFragment implements Conversations
         mConversationEmptyText.setVisibility(View.GONE);
         mConversationRecyclerview.setVisibility(View.VISIBLE);
         adapter.call(items);
+        if (items.size() <= ConversationsPresenter.PAGE_SIZE) {
+            mConversationRecyclerview.scrollToPosition(0); // Workaround for scrolled down recyclerview on location changed
+        }
     }
 
     @Override
