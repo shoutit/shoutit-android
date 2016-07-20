@@ -11,6 +11,9 @@ import android.provider.Settings;
 
 import com.amazonaws.services.s3.util.Mimetypes;
 import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
+import com.google.gson.Gson;
+import com.shoutit.app.android.view.gallery.GalleryActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,5 +83,10 @@ public class IntentHelper {
         }
 
         return intentsList;
+    }
+
+    public static Intent singleImageGalleryIntent(Context context, @Nonnull String imageUrl) {
+        final String imageJson = new Gson().toJson(Lists.newArrayList(imageUrl));
+        return GalleryActivity.singleImageIntent(context, imageJson);
     }
 }

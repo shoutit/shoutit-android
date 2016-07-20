@@ -41,6 +41,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
@@ -48,6 +49,7 @@ import com.shoutit.app.android.utils.TextWatcherAdapter;
 import com.shoutit.app.android.view.chats.chat_info.ChatInfoActivity;
 import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
 import com.shoutit.app.android.view.chooseprofile.SelectProfileActivity;
+import com.shoutit.app.android.view.gallery.GalleryActivity;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
 import com.shoutit.app.android.view.profile.ProfileIntentHelper;
@@ -310,10 +312,7 @@ public class ChatActivity extends BaseActivity implements Listener {
 
     @Override
     public void onImageClicked(String url) {
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.parse(url), "image/*");
-        startActivity(intent);
+        startActivity(IntentHelper.singleImageGalleryIntent(this, url));
     }
 
     @Override

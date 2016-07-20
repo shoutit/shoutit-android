@@ -38,6 +38,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.utils.TextWatcherAdapter;
 import com.shoutit.app.android.view.chats.ChatsHelper;
@@ -272,10 +273,7 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
 
     @Override
     public void onImageClicked(String url) {
-        Intent intent = new Intent();
-        intent.setAction(android.content.Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.parse(url), "image/*");
-        startActivity(intent);
+        startActivity(IntentHelper.singleImageGalleryIntent(this, url));
     }
 
     @Override
