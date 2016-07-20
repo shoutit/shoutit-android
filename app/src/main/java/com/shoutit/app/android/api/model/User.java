@@ -101,7 +101,8 @@ public class User extends BaseProfile {
                 firstName, lastName, isActivated, image, cover,
                 isListening, isListener, isPasswordSet, location,
                 listenersCount, bio, dateJoined, listeningCount,
-                isOwner, about, mobile, website, getEmail(), conversation, gender, birthday, getStats(), linkedAccounts.unlinkedFacebook(), admin, isVerified);
+                isOwner, about, mobile, website, getEmail(), conversation, gender, birthday,
+                getStats(), linkedAccounts.unlinkedFacebook(), admin, isVerified);
     }
 
     @Nonnull
@@ -110,7 +111,8 @@ public class User extends BaseProfile {
                 firstName, lastName, isActivated, image, cover,
                 isListening, isListener, isPasswordSet, location,
                 listenersCount, bio, dateJoined, listeningCount,
-                isOwner, about, mobile, website, getEmail(), conversation, gender, birthday, getStats(), linkedAccounts.unlinkedGoogle(), admin, isVerified);
+                isOwner, about, mobile, website, getEmail(), conversation, gender, birthday,
+                getStats(), linkedAccounts.unlinkedGoogle(), admin, isVerified);
     }
 
     @Nonnull
@@ -119,7 +121,8 @@ public class User extends BaseProfile {
                 firstName, lastName, isActivated, image, cover,
                 isListening, isListener, isPasswordSet, location,
                 listenersCount, bio, dateJoined, listeningCount,
-                isOwner, about, mobile, website, getEmail(), conversation, gender, birthday, getStats(), linkedAccounts.updatedGoogle(token), admin, isVerified);
+                isOwner, about, mobile, website, getEmail(), conversation, gender, birthday,
+                getStats(), linkedAccounts.updatedGoogle(token), admin, isVerified);
     }
 
     public boolean isUser(@Nonnull User user) {

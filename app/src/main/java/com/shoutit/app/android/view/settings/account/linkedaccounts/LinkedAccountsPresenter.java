@@ -11,9 +11,9 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.ApiMessageResponse;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.LinkFacebookRequest;
 import com.shoutit.app.android.api.model.LinkGplusRequest;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
 
@@ -24,7 +24,6 @@ import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Func1;
-import rx.functions.Func2;
 import rx.subjects.PublishSubject;
 import rx.subscriptions.CompositeSubscription;
 
@@ -33,6 +32,7 @@ public class LinkedAccountsPresenter {
     private final static String ACCOUNT_FACEBOOK = "facebook";
     private final static String ACCOUNT_GOOGLE = "gplus";
 
+    private final Observable<Throwable> linkgGoogleFailedObservable;
     @Nonnull
     private CompositeSubscription subscription = new CompositeSubscription();
 
@@ -74,10 +74,16 @@ public class LinkedAccountsPresenter {
                                    @Nonnull @ForActivity Resources resources,
                                    @Nonnull final UserPreferences userPreferences) {
 
-        facebookLinkInfoObservable = userPreferences.getUserObservable()
-                .map(user -> {
-                    if (user.getLinkedAccounts() != null) {
-                        if (user.getLinkedAccounts().getFacebook() != null) {
+        //noinspection ConstantConditions
+        final String myUsername = userPreferences.getUserOrPage().getUsername();
+
+        final Observable<BaseProfile> profileObservable = userPreferences.getPageOrUserObservable()
+                .compose(ObservableExtensions.behaviorRefCount());
+
+        facebookLinkInfoObservable = profileObservable
+                .map(pageOrUser -> {
+                    if (pageOrUser.getLinkedAccounts() != null) {
+                        if (pageOrUser.getLinkedAccounts().getFacebook() != null) {
                             return resources.getString(R.string.linked_accounts_linked);
                         } else {
                             return resources.getString(R.string.linked_accounts_not_linked);
@@ -85,10 +91,10 @@ public class LinkedAccountsPresenter {
                     } else return null;
                 });
 
-        googleLinkInfoObservable = userPreferences.getUserObservable()
-                .map(user -> {
-                    if (user.getLinkedAccounts() != null) {
-                        if (user.getLinkedAccounts().getGplus() != null) {
+        googleLinkInfoObservable = profileObservable
+                .map(pageOrUser -> {
+                    if (pageOrUser.getLinkedAccounts() != null) {
+                        if (pageOrUser.getLinkedAccounts().getGplus() != null) {
                             return resources.getString(R.string.linked_accounts_linked);
                         } else {
                             return resources.getString(R.string.linked_accounts_not_linked);
@@ -106,7 +112,7 @@ public class LinkedAccountsPresenter {
                     }
                 })
                 .filter(Functions1.isNotNull())
-                .switchMap(request -> apiService.linkFacebook(userPreferences.getUser().getUsername(), request)
+                .switchMap(request -> apiService.linkFacebook(myUsername, request)
                         .subscribeOn(networkScheduler)
                         .observeOn(uiScheduler)
                         .compose(ResponseOrError.toResponseOrErrorObservable()))
@@ -116,7 +122,7 @@ public class LinkedAccountsPresenter {
                 .switchMap(new Func1<Object, Observable<ResponseOrError<ApiMessageResponse>>>() {
                     @Override
                     public Observable<ResponseOrError<ApiMessageResponse>> call(final Object o) {
-                        return apiService.unlinkFacebook(userPreferences.getUser().getUsername(), new LinkFacebookRequest(ACCOUNT_FACEBOOK))
+                        return apiService.unlinkFacebook(myUsername, new LinkFacebookRequest(ACCOUNT_FACEBOOK))
                                 .subscribeOn(networkScheduler)
                                 .observeOn(uiScheduler)
                                 .compose(ResponseOrError.toResponseOrErrorObservable());
@@ -125,9 +131,9 @@ public class LinkedAccountsPresenter {
 
         subscription.add(clickFacebookSubject
                 .map(o -> {
-                    final User user = userPreferences.getUser();
-                    if (user.getLinkedAccounts() != null) {
-                        if (user.getLinkedAccounts().getFacebook() != null) {
+                    final BaseProfile userOrPage = userPreferences.getUserOrPage();
+                    if (userOrPage.getLinkedAccounts() != null) {
+                        if (userOrPage.getLinkedAccounts().getFacebook() != null) {
                             listener.unlinkFacebookDialog();
                         } else {
                             askForFbTokenSubject.onNext(new Object());
@@ -138,15 +144,8 @@ public class LinkedAccountsPresenter {
         /**
          * Google
          */
-        linkGoogleObservable = linkGoogleSubject.withLatestFrom(userPreferences.getUserObservable(),
-                new Func2<String, User, LinkGplusRequest>() {
-                    @Override
-                    public LinkGplusRequest call(final String token, final User user) {
-                        return new LinkGplusRequest(ACCOUNT_GOOGLE, token);
-                    }
-                })
-                .filter(Functions1.isNotNull())
-                .switchMap(body -> apiService.linkGoogle(userPreferences.getUser().getUsername(), body)
+        linkGoogleObservable = linkGoogleSubject
+                .switchMap(token -> apiService.linkGoogle(myUsername, new LinkGplusRequest(ACCOUNT_GOOGLE, token))
                         .subscribeOn(networkScheduler)
                         .observeOn(uiScheduler)
                         .compose(ResponseOrError.toResponseOrErrorObservable()))
@@ -157,7 +156,7 @@ public class LinkedAccountsPresenter {
                 .switchMap(new Func1<Object, Observable<ResponseOrError<ApiMessageResponse>>>() {
                     @Override
                     public Observable<ResponseOrError<ApiMessageResponse>> call(final Object o) {
-                        return apiService.unlinkGoogle(userPreferences.getUser().getUsername(), new LinkGplusRequest(ACCOUNT_GOOGLE))
+                        return apiService.unlinkGoogle(myUsername, new LinkGplusRequest(ACCOUNT_GOOGLE))
                                 .subscribeOn(networkScheduler)
                                 .observeOn(uiScheduler)
                                 .compose(ResponseOrError.toResponseOrErrorObservable());
@@ -166,9 +165,9 @@ public class LinkedAccountsPresenter {
 
         subscription.add(clickGoogleSubject
                 .map(o -> {
-                    final User user = userPreferences.getUser();
-                    if (user.getLinkedAccounts() != null) {
-                        if (user.getLinkedAccounts().getGplus() != null) {
+                    final BaseProfile profile = userPreferences.getUserOrPage();
+                    if (profile.getLinkedAccounts() != null) {
+                        if (profile.getLinkedAccounts().getGplus() != null) {
                             listener.unlinkGoogleDialog();
                         } else {
                             listener.triggerSignInGoogle();
@@ -182,6 +181,9 @@ public class LinkedAccountsPresenter {
                 linkGoogleObservable.compose(ResponseOrError.onlyError()),
                 unlinkFacebookObservable.compose(ResponseOrError.onlyError()),
                 unlinkGoogleObservable.compose(ResponseOrError.onlyError()));
+
+        linkgGoogleFailedObservable = linkGoogleObservable
+                .compose(ResponseOrError.onlyError());
     }
 
     public void register(@Nonnull final Listener listener) {
@@ -190,6 +192,10 @@ public class LinkedAccountsPresenter {
 
     public void unsubscribe() {
         subscription.unsubscribe();
+    }
+
+    public Observable<Throwable> getLinkgGoogleFailedObservable() {
+        return linkgGoogleFailedObservable;
     }
 
     @Nonnull

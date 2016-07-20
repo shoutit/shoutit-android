@@ -101,27 +101,36 @@ public class LinkedAccountsFragment extends BaseFragment implements LinkedAccoun
         presenter.unlinkFacebookObservable()
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(message -> {
-                    preferences.setUserOrPage(preferences.getUser().withUnlinkedFacebook());
+                    //noinspection ConstantConditions
+                    preferences.setUserOrPage(preferences.getUserOrPage().withUnlinkedFacebook());
                     ColoredSnackBar.success(mainView, message, Snackbar.LENGTH_SHORT).show();
                 });
 
         presenter.linkGoogleObservable()
                 .compose(this.bindToLifecycle())
                 .subscribe(message -> {
-                    preferences.setUserOrPage(preferences.getUser().withUpdatedGoogleAccount(googleId));
+                    //noinspection ConstantConditions
+                    preferences.setUserOrPage(preferences.getUserOrPage().withUpdatedGoogleAccount(googleId));
                     ColoredSnackBar.success(mainView, message, Snackbar.LENGTH_SHORT).show();
                 });
 
         presenter.unlinkGoogleObservable()
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(message -> {
-                    preferences.setUserOrPage(preferences.getUser().withUnlinkedGoogle());
+                    //noinspection ConstantConditions
+                    preferences.setUserOrPage(preferences.getUserOrPage().withUnlinkedGoogle());
                     ColoredSnackBar.success(mainView, message, Snackbar.LENGTH_SHORT).show();
                 });
 
         presenter.errorObservable()
                 .compose(this.<Throwable>bindToLifecycle())
                 .subscribe(ColoredSnackBar.errorSnackBarAction(mainView));
+
+        presenter.getLinkgGoogleFailedObservable()
+                .compose(bindToLifecycle())
+                .subscribe(throwable -> {
+                    GoogleHelper.logOutGoogle(getActivity());
+                });
     }
 
     @Nonnull

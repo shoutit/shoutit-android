@@ -35,9 +35,9 @@ public class BaseProfile implements ProfileType {
     protected final UserLocation location;
     protected boolean isOwner;
     @Nullable
-    private final Stats stats;
+    protected final Stats stats;
     @NonNull
-    private final String email;
+    protected final String email;
     @javax.annotation.Nullable
     protected final LinkedAccounts linkedAccounts;
     @Nullable
@@ -167,6 +167,27 @@ public class BaseProfile implements ProfileType {
         return new BaseProfile(id, type, username, name, firstName, lastName, isActivated,
                 image, cover, isListening, listenersCount,
                 location, isOwner, newStats, getEmail(), linkedAccounts, conversation, isListener, website);
+    }
+
+    @Nonnull
+    public BaseProfile withUnlinkedFacebook() {
+        return new BaseProfile(id, type, username, name, firstName, lastName, isActivated,
+                image, cover, isListening, listenersCount,
+                location, isOwner, stats, getEmail(), linkedAccounts.unlinkedFacebook(), conversation, isListener, website);
+    }
+
+    @Nonnull
+    public BaseProfile withUnlinkedGoogle() {
+        return new BaseProfile(id, type, username, name, firstName, lastName, isActivated,
+                image, cover, isListening, listenersCount,
+                location, isOwner, stats, getEmail(), linkedAccounts.unlinkedGoogle(), conversation, isListener, website);
+    }
+
+    @Nonnull
+    public BaseProfile withUpdatedGoogleAccount(@Nonnull String token) {
+        return new BaseProfile(id, type, username, name, firstName, lastName, isActivated,
+                image, cover, isListening, listenersCount,
+                location, isOwner, stats, getEmail(), linkedAccounts.updatedGoogle(token), conversation, isListener, website);
     }
 
     @Nullable
