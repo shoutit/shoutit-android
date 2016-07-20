@@ -19,8 +19,6 @@ import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.BaseProfile;
-import com.shoutit.app.android.api.model.User;
-import com.shoutit.app.android.model.Stats;
 import com.shoutit.app.android.utils.BlurTransform;
 import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
@@ -33,7 +31,7 @@ import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
 import com.shoutit.app.android.view.credits.CreditsFragment;
 import com.shoutit.app.android.view.discover.DiscoverFragment;
 import com.shoutit.app.android.view.home.HomeFragment;
-import com.shoutit.app.android.view.invitefriends.InviteFriendsFragment;
+import com.shoutit.app.android.view.invitefriends.InviteFacebookFriendsFragment;
 import com.shoutit.app.android.view.location.LocationActivity;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.pages.PagesPagerFragment;
@@ -422,7 +420,7 @@ public class MenuHandler {
             case FRAGMENT_PUBLIC_CHATS:
                 return ConversationsPagerFragment.newInstance(true);
             case FRAGMENT_INVITE_FRIENDS:
-                return InviteFriendsFragment.newInstance();
+                return InviteFacebookFriendsFragment.newInstance();
             case FRAGMENT_BOOKMARKS:
                 return BookmarkedShoutsFragment.newInstance();
             case FRAGMENT_PAGES:

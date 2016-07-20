@@ -21,6 +21,7 @@ import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.view.createshout.DialogsHelper;
 import com.shoutit.app.android.view.invitefriends.contactsfriends.ContactsFriendsActivity;
+import com.shoutit.app.android.view.invitefriends.contactsinvite.InviteContactsActivity;
 import com.shoutit.app.android.view.invitefriends.facebookfriends.FacebookFriendsActivity;
 import com.shoutit.app.android.view.invitefriends.suggestionspages.PagesSuggestionActivity;
 import com.shoutit.app.android.view.invitefriends.suggestionsusers.UserSuggestionActivity;
@@ -36,7 +37,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class InviteFriendsFragment extends BaseFragment {
+public class InviteFacebookFriendsFragment extends BaseFragment {
 
     private Menu mMenu;
     private CallbackManager callbackManager;
@@ -44,14 +45,14 @@ public class InviteFriendsFragment extends BaseFragment {
     @Inject
     UserPreferences userPreferences;
     @Inject
-    InviteFriendsPresenter presenter;
+    InviteFacebookFriendsPresenter presenter;
 
     @Bind(R.id.base_progress)
     View progressView;
 
     @Nonnull
     public static Fragment newInstance() {
-        return new InviteFriendsFragment();
+        return new InviteFacebookFriendsFragment();
     }
 
     @Override
@@ -92,7 +93,7 @@ public class InviteFriendsFragment extends BaseFragment {
 
     @Override
     protected void injectComponent(@Nonnull BaseActivityComponent baseActivityComponent, @Nonnull FragmentModule fragmentModule, @Nullable Bundle savedInstanceState) {
-        DaggerInviteFriendsFragmentComponent.builder()
+        DaggerInviteFacebookFriendsFragmentComponent.builder()
                 .baseActivityComponent(baseActivityComponent)
                 .fragmentModule(fragmentModule)
                 .build()
@@ -101,7 +102,7 @@ public class InviteFriendsFragment extends BaseFragment {
 
     @OnClick({R.id.invite_friends_users, R.id.invite_friends_pages, R.id.invite_friends_find_facebook,
             R.id.invite_friends_find_contacts, R.id.invite_friends_invite_facebook,
-            R.id.invite_friends_invite_twitter, R.id.invite_friends_share_app})
+            R.id.invite_friends_invite_twitter, R.id.invite_friends_share_app, R.id.invite_friends_invite_contacts})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.invite_friends_users:
@@ -132,6 +133,9 @@ public class InviteFriendsFragment extends BaseFragment {
                 break;
             case R.id.invite_friends_share_app:
                 startActivity(IntentHelper.getShareIntent(getString(R.string.invite_app_invite_text)));
+                break;
+            case R.id.invite_friends_invite_contacts:
+                startActivity(InviteContactsActivity.newIntent(getActivity()));
                 break;
         }
     }
