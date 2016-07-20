@@ -9,7 +9,7 @@ import com.shoutit.app.android.db.RecentSearchesTable;
 import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
 import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
-import com.shoutit.app.android.view.loginintro.FacebookHelper;
+import com.shoutit.app.android.facebook.FacebookHelper;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -52,8 +52,6 @@ public class LogoutHelper {
 
         mProfilesDao.registerToGcmAction(null);
 
-        final User user = userPreferences.getUser();
-        assert user != null;
         mPusherHelper.unsubscribeProfileChannel();
         mPusherHelper.disconnect();
 

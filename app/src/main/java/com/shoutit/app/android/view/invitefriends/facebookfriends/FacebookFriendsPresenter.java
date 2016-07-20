@@ -21,7 +21,7 @@ import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.utils.ListeningHalfPresenter;
 import com.shoutit.app.android.utils.PreferencesHelper;
 import com.shoutit.app.android.view.invitefriends.InviteFriendsPresenter;
-import com.shoutit.app.android.view.loginintro.FacebookHelper;
+import com.shoutit.app.android.facebook.FacebookHelper;
 import com.shoutit.app.android.view.profileslist.BaseProfileListPresenter;
 import com.shoutit.app.android.view.profileslist.ProfileListAdapterItem;
 
@@ -69,7 +69,7 @@ public class FacebookFriendsPresenter extends BaseProfileListPresenter {
 
         //noinspection ConstantConditions
         final boolean hasRequiredPermissionInApi = facebookHelper.hasRequiredPermissions(
-                userPreferences.getUser(), FacebookHelper.PERMISSION_USER_FRIENDS);
+                userPreferences.getUserOrPage(), new String[]{FacebookHelper.PERMISSION_USER_FRIENDS});
 
         final Observable<ResponseOrError<ProfilesListResponse>> friendsRequest = dao.getFriendsDao(User.ME)
                 .getProfilesObservable()
@@ -86,7 +86,7 @@ public class FacebookFriendsPresenter extends BaseProfileListPresenter {
                         return Observable.just(ResponseOrError.fromData(true));
                     } else {
                         return facebookHelper.askForPermissionIfNeeded(
-                                activity, FacebookHelper.PERMISSION_USER_FRIENDS, callbackManager, false);
+                                activity, new String[]{FacebookHelper.PERMISSION_USER_FRIENDS}, callbackManager, false);
                     }
                 })
                 .observeOn(uiScheduler)

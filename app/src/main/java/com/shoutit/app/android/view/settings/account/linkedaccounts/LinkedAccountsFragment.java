@@ -9,6 +9,7 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.facebook.CallbackManager;
@@ -22,9 +23,12 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
+import com.shoutit.app.android.facebook.FacebookHelper;
+import com.shoutit.app.android.facebook.FacebookPages;
 import com.shoutit.app.android.utils.ColoredSnackBar;
-import com.shoutit.app.android.view.loginintro.FacebookHelper;
 import com.shoutit.app.android.view.loginintro.GoogleHelper;
+
+import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -38,21 +42,31 @@ public class LinkedAccountsFragment extends BaseFragment implements LinkedAccoun
 
     private static final int GOOGLE_SIGN_IN = 0;
 
-    @Bind(R.id.linked_accounts_facebook_tv)
-    TextView linkedAccountsFacebookTv;
+    @Bind(R.id.linked_accounts_facebook)
+    View facebookView;
     @Bind(R.id.linked_accounts_profile_fb_tv)
-    TextView linkedAccountsProfileFbTv;
-    @Bind(R.id.linked_accounts_google_tv)
-    TextView linkedAccountsGoogleTv;
+    TextView fbProfileTv;
+    @Bind(R.id.linked_accounts_google)
+    View googleView;
     @Bind(R.id.linked_accounts_profile_g_tv)
-    TextView linkedAccountsProfileGTv;
+    TextView googleProfileTv;
+    @Bind(R.id.linked_accounts_facebook_page)
+    View facebookPageView;
+    @Bind(R.id.linked_accounts_profile_fbpage_tv)
+    TextView facebookPageProfileTv;
     @Bind(R.id.main_layout)
     View mainView;
+    @Bind(R.id.base_progress)
+    View progressView;
 
     @Inject
     LinkedAccountsPresenter presenter;
     @Inject
     UserPreferences preferences;
+    @Inject
+    FacebookHelper facebookHelper;
+    @Inject
+    LayoutInflater inflater;
 
     private CallbackManager callbackManager;
     private String googleId;
@@ -61,9 +75,11 @@ public class LinkedAccountsFragment extends BaseFragment implements LinkedAccoun
         return new LinkedAccountsFragment();
     }
 
-    @android.support.annotation.Nullable
+    @Nullable
     @Override
-    public View onCreateView(final LayoutInflater inflater, @android.support.annotation.Nullable final ViewGroup container, @android.support.annotation.Nullable final Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflater,
+                             @Nullable final ViewGroup container,
+                             @Nullable final Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_linked_accounts, container, false);
     }
 
@@ -74,25 +90,50 @@ public class LinkedAccountsFragment extends BaseFragment implements LinkedAccoun
 
         callbackManager = CallbackManager.Factory.create();
 
-        RxView.clicks(linkedAccountsFacebookTv)
+        RxView.clicks(facebookView)
                 .compose(this.bindToLifecycle())
                 .subscribe(presenter.clickFacebookSubject());
 
-        RxView.clicks(linkedAccountsGoogleTv)
+        RxView.clicks(googleView)
                 .compose(this.bindToLifecycle())
                 .subscribe(presenter.clickGoogleSubject());
 
+        RxView.clicks(facebookPageView)
+                .compose(bindToLifecycle())
+                .subscribe(presenter.clickFacebookPageSubject());
+
         presenter.facebookLinkedInfoObservable()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(RxTextView.text(linkedAccountsProfileFbTv));
+                .subscribe(RxTextView.text(fbProfileTv));
 
         presenter.googleLinkedInfoObservable()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(RxTextView.text(linkedAccountsProfileGTv));
+                .subscribe(RxTextView.text(googleProfileTv));
+
+        presenter.getFacebookPageLinkInfoObservable()
+                .compose(bindToLifecycle())
+                .subscribe(RxTextView.text(facebookPageProfileTv));
 
         presenter.askForFbTokenObservable()
-                .flatMap(o -> FacebookHelper.getToken(getActivity(), callbackManager))
+                .compose(bindToLifecycle())
+                .switchMap(o -> FacebookHelper.getToken(getActivity(), callbackManager))
                 .subscribe(onGetFacebookTokenSuccessAction(), onGetFacebookTokenFailureAction());
+
+        presenter.askForPagesPermissionsObservable()
+                .compose(bindToLifecycle())
+                .switchMap(o -> facebookHelper.askForPermissionIfNeeded(
+                                getActivity(), FacebookHelper.PAGES_PERMISSIONS, callbackManager, true))
+                .subscribe(responseOrError -> {
+                    if (responseOrError.isData()) {
+                        presenter.showPagesList();
+                    } else {
+                        ColoredSnackBar.error(ColoredSnackBar.contentView(getActivity()), responseOrError.error()).show();
+                    }
+                });
+
+        presenter.getPagesListSuccessObservable()
+                .compose(bindToLifecycle())
+                .subscribe(this::showFacebookPagesDialog);
 
         presenter.linkFacebookObservable()
                 .compose(this.bindToLifecycle())
@@ -131,6 +172,45 @@ public class LinkedAccountsFragment extends BaseFragment implements LinkedAccoun
                 .subscribe(throwable -> {
                     GoogleHelper.logOutGoogle(getActivity());
                 });
+
+        presenter.getProgressObservable()
+                .compose(bindToLifecycle())
+                .subscribe(RxView.visibility(progressView));
+    }
+
+    private void showFacebookPagesDialog(FacebookPages facebookPages) {
+        final List<FacebookPages.FacebookPage> pages = facebookPages.getData();
+
+        class FacebookPagesAdapter extends BaseAdapter {
+
+            @Override
+            public int getCount() {
+                return pages.size();
+            }
+
+            @Override
+            public FacebookPages.FacebookPage getItem(int position) {
+                return pages.get(position);
+            }
+
+            @Override
+            public long getItemId(int position) {
+                return position;
+            }
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                return inflater.inflate(android.R.layout.select_dialog_singlechoice, parent, false);
+            }
+        }
+
+        new AlertDialog.Builder(getActivity())
+                .setTitle("Select Facebook Page")
+                .setSingleChoiceItems(new FacebookPagesAdapter(), -1, (dialog, which) -> {
+                    presenter.linkFacebookPageSubject(pages.get(which));
+                    dialog.dismiss();
+                })
+                .show();
     }
 
     @Nonnull
@@ -177,6 +257,11 @@ public class LinkedAccountsFragment extends BaseFragment implements LinkedAccoun
     @Override
     public void unlinkGoogleDialog() {
         showDialog(getString(R.string.linked_accounts_unlink_google), presenter.unlinkGoogleSubject());
+    }
+
+    @Override
+    public void unLinkFacebookPageDialog() {
+        showDialog(getString(R.string.linked_accounts_unlink_facebook_page), presenter.unlinkFacebookPageSubject());
     }
 
     private void showDialog(@Nonnull final String message, @Nonnull PublishSubject<Object> subject) {

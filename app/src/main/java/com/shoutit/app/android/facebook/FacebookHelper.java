@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.loginintro;
+package com.shoutit.app.android.facebook;
 
 import android.app.Activity;
 import android.content.Context;
@@ -14,6 +14,9 @@ import com.facebook.FacebookAuthorizationException;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
 import com.facebook.ads.AdError;
 import com.facebook.ads.AdSettings;
 import com.facebook.ads.NativeAd;
@@ -25,6 +28,8 @@ import com.facebook.share.model.AppInviteContent;
 import com.facebook.share.widget.AppInviteDialog;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.FbAdAdapterItem;
@@ -32,14 +37,13 @@ import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.LinkedAccounts;
 import com.shoutit.app.android.api.model.UpdateFacebookTokenRequest;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForApplication;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LogHelper;
-import com.shoutit.app.android.utils.pusher.PusherHelper;
 import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -64,6 +68,11 @@ public class FacebookHelper {
     private static final String PERMISSION_EMAIL = "email";
     public static final String PERMISSION_USER_FRIENDS = "user_friends";
     public static final String PERMISSION_PUBLISH_ACTIONS = "publish_actions";
+    public static final String PERMISSION_MANAGE_PAGES = "manage_pages";
+    public static final String PERMISSION_PUBLISH_PAGES = "publish_pages";
+
+    public static final String[] PAGES_PERMISSIONS = new String[]{
+            PERMISSION_MANAGE_PAGES, PERMISSION_PUBLISH_PAGES};
 
     public static final String FACEBOOK_SHARE_APP_LINK = "https://fb.me/1224908360855680";
 
@@ -71,7 +80,8 @@ public class FacebookHelper {
     private final UserPreferences userPreferences;
     private final Context context;
     private final Scheduler networkScheduler;
-    private final PusherHelper pusherHelper;
+    private final Gson gson;
+    private final PusherHelperHolder pusherHelperHolder;
     private final NativeAdsManager listAdManager;
     private final NativeAdsManager gridAdManager;
     private final NativeAdsManager shoutDetailAdManager;
@@ -80,12 +90,14 @@ public class FacebookHelper {
                           final UserPreferences userPreferences,
                           @ForApplication Context context,
                           @NetworkScheduler final Scheduler networkScheduler,
-                          PusherHelperHolder pusherHelper) {
+                          PusherHelperHolder pusherHelperHolder,
+                          Gson gson) {
         this.apiService = apiService;
         this.userPreferences = userPreferences;
         this.context = context;
         this.networkScheduler = networkScheduler;
-        this.pusherHelper = pusherHelper.getPusherHelper();
+        this.gson = gson;
+        this.pusherHelperHolder = pusherHelperHolder;
 
         listAdManager = new NativeAdsManager(
                 context, getListAdId(), ADS_NUM_TO_PREFETCH);
@@ -152,7 +164,7 @@ public class FacebookHelper {
     }
 
     private void refreshTokenIfNeeded() {
-        final User currentUser = userPreferences.getUser();
+        final BaseProfile currentUser = userPreferences.getUserOrPage();
         if (currentUser == null || !shouldRefreshToken(currentUser)) {
             return;
         }
@@ -192,16 +204,16 @@ public class FacebookHelper {
 
     /**
      * @param activity
-     * @param permissionName
+     * @param permissions
      * @return true if permission granted, false otherwise
      */
     public Observable<ResponseOrError<Boolean>> askForPermissionIfNeeded(@Nonnull final Activity activity,
-                                                                         @Nonnull final String permissionName,
+                                                                         @Nonnull final String[] permissions,
                                                                          @Nonnull final CallbackManager callbackManager,
                                                                          final boolean isPublishPermission) {
-        final User user = userPreferences.getUser();
+        final BaseProfile profile = userPreferences.getUserOrPage();
 
-        if (user != null && hasRequiredPermissions(user, permissionName)) {
+        if (profile != null && hasRequiredPermissions(profile, permissions)) {
             return Observable.just(ResponseOrError.fromData(true));
         } else {
             return Observable
@@ -217,24 +229,26 @@ public class FacebookHelper {
                                 permissions.add(PERMISSION_EMAIL);
 
                                 if (!isPublishPermission) {
-                                    permissions.add(permissionName);
+                                    for (String permission : permissions) {
+                                        permissions.add(permission);
+                                    }
                                 }
 
                                 loginManager.logInWithReadPermissions(activity, permissions);
 
                             } else if (!isPublishPermission) {
-                                loginManager.logInWithReadPermissions(activity, Collections.singleton(permissionName));
+                                loginManager.logInWithReadPermissions(activity, Arrays.asList(permissions));
                             }
 
                             if (isPublishPermission) {
-                                loginManager.logInWithPublishPermissions(activity, Collections.singleton(permissionName));
+                                loginManager.logInWithPublishPermissions(activity, Arrays.asList(permissions));
                             }
 
                             loginManager.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
                                 @Override
                                 public void onSuccess(LoginResult loginResult) {
-                                    if (isPermissionGranted(permissionName) && !subscriber.isUnsubscribed()) {
-                                        LogHelper.logIfDebug(TAG, "Persmission " + permissionName + " has been granted");
+                                    if (hasRequiredPermissionLocally(permissions) && !subscriber.isUnsubscribed()) {
+                                        LogHelper.logIfDebug(TAG, "Persmission " + permissionToLog(permissions) + " has been granted");
                                         subscriber.onNext(true);
                                     }
                                 }
@@ -252,7 +266,7 @@ public class FacebookHelper {
                                     LogHelper.logIfDebug(TAG, "Error while asking for permission: " + error.getMessage());
                                     if (error instanceof FacebookAuthorizationException &&
                                             AccessToken.getCurrentAccessToken() != null) {
-                                        // Case when app has token from other user and tries to log in
+                                        // Case when app has token from other profile and tries to log in
                                         // as different one.
                                         loginManager.logOut();
                                     }
@@ -271,7 +285,7 @@ public class FacebookHelper {
                             if (isPermissionGranted) {
                                 return updateFacebookTokenInApi(AccessToken.getCurrentAccessToken().getToken())
                                         .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable())
-                                        .compose(ResponseOrError.switchMap(waitForUserToBeUpdatedInApi(permissionName)));
+                                        .compose(ResponseOrError.switchMap(waitForUserToBeUpdatedInApi(permissions)));
                             } else {
                                 return Observable.just(ResponseOrError.fromData(false));
                             }
@@ -280,58 +294,80 @@ public class FacebookHelper {
         }
     }
 
+    private String permissionToLog(String[] permissions) {
+        final StringBuilder builder = new StringBuilder();
+        for (String permission : permissions) {
+            builder.append(permission).append(", ");
+        }
+
+        return builder.toString();
+    }
+
     @NonNull
-    private Func1<ResponseBody, Observable<ResponseOrError<Boolean>>> waitForUserToBeUpdatedInApi(@Nonnull final String requiredPermissionName) {
+    private Func1<ResponseBody, Observable<ResponseOrError<Boolean>>> waitForUserToBeUpdatedInApi(@Nonnull final String[] requiredPermissions) {
         return responseBody -> {
             LogHelper.logIfDebug(TAG, "Waiting for user to be updated in API");
-            return pusherHelper.getUserUpdatedObservable()
+            return pusherHelperHolder.getPusherHelper().getUserUpdatedObservable()
                     .filter(user -> {
                         userPreferences.setUserOrPage(user);
                         LogHelper.logIfDebug(TAG, "Pusher event: User updated in API");
 
-                        return hasRequiredPermissionInApi(user, requiredPermissionName);
+                        return hasRequiredPermissionInApi(user, requiredPermissions);
                     })
                     .map(user -> ResponseOrError.fromData(true));
         };
     }
 
     private boolean isLoggedInToFacebook() {
-        final User user = userPreferences.getUser();
+        final BaseProfile user = userPreferences.getUserOrPage();
         return user != null &&
                 user.getLinkedAccounts() != null &&
                 user.getLinkedAccounts().getFacebook() != null
                 && AccessToken.getCurrentAccessToken() != null;
     }
 
-    private boolean isPermissionGranted(@Nonnull String permissionName) {
-        final Set<String> permissions = AccessToken.getCurrentAccessToken().getPermissions();
-        return permissions.contains(permissionName);
-    }
-
-    public boolean hasRequiredPermissionInApi(@Nonnull BaseProfile user, @Nonnull String permissionName) {
+    public boolean hasRequiredPermissionInApi(@Nonnull BaseProfile user, @Nonnull String[] permissions) {
         if (user.getLinkedAccounts() != null &&
                 user.getLinkedAccounts().getFacebook() != null) {
             final List<String> scopes = user.getLinkedAccounts().getFacebook().getScopes();
+
+            final int permissionsToCheck = permissions.length;
+            int permissionsGranted = 0;
+
             for (String scope : scopes) {
-                if (scope.equals(permissionName)) {
-                    return true;
+                for (String permission : permissions) {
+                    if (scope.equals(permission)) {
+                        ++permissionsGranted;
+                    }
                 }
             }
+
+            return permissionsGranted >= permissionsToCheck;
         }
 
         return false;
     }
 
-    public boolean hasRequiredPermissionLocally(@Nonnull String permission) {
-        return AccessToken.getCurrentAccessToken() != null &&
-                AccessToken.getCurrentAccessToken().getPermissions().contains(permission);
+    public boolean hasRequiredPermissionLocally(@Nonnull String[] permissions) {
+        if (AccessToken.getCurrentAccessToken() == null) {
+            return false;
+        }
+
+        final Set<String> fbPermissions = AccessToken.getCurrentAccessToken().getPermissions();
+        for (String permission : permissions) {
+            if (!fbPermissions.contains(permission)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
-    public boolean hasRequiredPermissions(@Nonnull User user, @Nonnull String permission) {
-        return hasRequiredPermissionInApi(user, permission) && hasRequiredPermissionLocally(permission);
+    public boolean hasRequiredPermissions(@Nonnull BaseProfile profile, @Nonnull String[] permissions) {
+        return hasRequiredPermissionInApi(profile, permissions) && hasRequiredPermissionLocally(permissions);
     }
 
-    private boolean shouldRefreshToken(@Nonnull User user) {
+    private boolean shouldRefreshToken(@Nonnull BaseProfile user) {
         final long currentTimeInSecond = System.currentTimeMillis() / 1000;
         final LinkedAccounts linkedAccounts = user.getLinkedAccounts();
 
@@ -470,6 +506,37 @@ public class FacebookHelper {
         })
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .compose(ResponseOrError.toResponseOrErrorObservable());
+    }
+
+    public Observable<FacebookPages> getPagesListObservable() {
+        return Observable.create(new Observable.OnSubscribe<FacebookPages>() {
+            @Override
+            public void call(Subscriber<? super FacebookPages> subscriber) {
+                new GraphRequest(
+                        AccessToken.getCurrentAccessToken(),
+                        "/{user-id}/accounts",
+                        null,
+                        HttpMethod.GET,
+                        new GraphRequest.Callback() {
+                            public void onCompleted(GraphResponse response) {
+                                try {
+                                    final FacebookPages facebookPages = gson.fromJson(
+                                            response.getRawResponse(), FacebookPages.class);
+
+                                    if (!subscriber.isUnsubscribed()) {
+                                        subscriber.onNext(facebookPages);
+                                        subscriber.onCompleted();
+                                    }
+                                } catch (JsonSyntaxException e) {
+                                    if (!subscriber.isUnsubscribed()) {
+                                        subscriber.onError(e);
+                                    }
+                                }
+                            }
+                        }
+                ).executeAndWait();
+            }
+        }).subscribeOn(networkScheduler);
     }
 
     @Nullable

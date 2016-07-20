@@ -44,7 +44,7 @@ import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.view.createshout.DialogsHelper;
 import com.shoutit.app.android.view.createshout.publish.PublishShoutActivity;
-import com.shoutit.app.android.view.loginintro.FacebookHelper;
+import com.shoutit.app.android.facebook.FacebookHelper;
 import com.shoutit.app.android.widget.CurrencySpinnerAdapter;
 
 import java.io.File;
@@ -191,7 +191,7 @@ public class PublishMediaShoutFragment extends Fragment {
     private void setUpFacebookCheckbox() {
         //noinspection ConstantConditions
         faceBookCheckbox.setChecked(mFacebookHelper.hasRequiredPermissionInApi(
-                mUserPreferences.getUser(), FacebookHelper.PERMISSION_PUBLISH_ACTIONS));
+                mUserPreferences.getUserOrPage(), new String[]{FacebookHelper.PERMISSION_PUBLISH_ACTIONS}));
 
         mCompositeSubscription.add(
                 RxView.clicks(faceBookCheckbox)
@@ -208,7 +208,7 @@ public class PublishMediaShoutFragment extends Fragment {
                                 showProgress(true);
 
                                 return mFacebookHelper.askForPermissionIfNeeded(getActivity(),
-                                        FacebookHelper.PERMISSION_PUBLISH_ACTIONS, mCallbackManager, true)
+                                        new String[]{FacebookHelper.PERMISSION_PUBLISH_ACTIONS}, mCallbackManager, true)
                                         .observeOn(MyAndroidSchedulers.mainThread());
                             }
                         })

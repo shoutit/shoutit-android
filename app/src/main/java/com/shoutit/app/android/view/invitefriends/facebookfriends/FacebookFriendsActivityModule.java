@@ -11,7 +11,7 @@ import com.shoutit.app.android.utils.ListeningHalfPresenter;
 import com.shoutit.app.android.view.invitefriends.InviteFriendsPresenter;
 import com.shoutit.app.android.view.listenings.ProfilesListAdapter;
 import com.shoutit.app.android.utils.PreferencesHelper;
-import com.shoutit.app.android.view.loginintro.FacebookHelper;
+import com.shoutit.app.android.facebook.FacebookHelper;
 import com.shoutit.app.android.view.profileslist.BaseProfileListPresenter;
 import com.squareup.picasso.Picasso;
 

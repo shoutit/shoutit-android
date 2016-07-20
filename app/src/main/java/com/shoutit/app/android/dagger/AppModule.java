@@ -59,7 +59,7 @@ import com.shoutit.app.android.utils.pusher.PusherHelper;
 import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
 import com.shoutit.app.android.view.chats.LocalMessageBus;
 import com.shoutit.app.android.view.conversations.RefreshConversationBus;
-import com.shoutit.app.android.view.loginintro.FacebookHelper;
+import com.shoutit.app.android.facebook.FacebookHelper;
 import com.shoutit.app.android.view.videoconversation.CameraTool;
 import com.shoutit.app.android.view.videoconversation.CameraToolImpl;
 import com.shoutit.app.android.view.videoconversation.CameraToolImplLollipop;
@@ -399,9 +399,6 @@ public final class AppModule {
         return new PusherHelperHolder(pusherHelperProvider);
     }
 
-
-
-
     @Provides
     @Singleton
     NetworkObservableProvider provideNetworkObservableProvider(@ForApplication Context context) {
@@ -426,8 +423,8 @@ public final class AppModule {
     @Singleton
     FacebookHelper provideFacebookHelper(ApiService apiService, UserPreferences userPreferences,
                                          @ForApplication Context context, @NetworkScheduler Scheduler networkScheduler,
-                                         PusherHelperHolder pusherHelper) {
-        return new FacebookHelper(apiService, userPreferences, context, networkScheduler, pusherHelper);
+                                         PusherHelperHolder pusherHelper, Gson gson) {
+        return new FacebookHelper(apiService, userPreferences, context, networkScheduler, pusherHelper, gson);
     }
 
     @Provides

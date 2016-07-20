@@ -44,7 +44,7 @@ public class SelectProfilePresenter {
                                   @UiScheduler Scheduler uiScheduler,
                                   @Nonnull UserPreferences userPreferences) {
 
-        final String userName = userPreferences.getUser().getUsername();
+        final String userName = userPreferences.getUserOrPage().getUsername();
 
         final Observable<ResponseOrError<ProfilesListResponse>> listeningsObservable = listeningsDao
                 .getDao(userName)
