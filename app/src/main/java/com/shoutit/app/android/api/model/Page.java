@@ -67,36 +67,6 @@ public class Page extends BaseProfile {
                 isPublished, linkedAccounts, conversation, isListener, website);
     }
 
-    @Nonnull
-    public Page withUnlinkedFacebook() {
-        return new Page(id, type, username, name, firstName, lastName,
-                isActivated, image, cover, isListening, listenersCount,
-                location, stats, isOwner, email,
-                admin, about, description, phone,
-                founded, impressum, overview, mission, generalInfo, isVerified, isPublished,
-                linkedAccounts.unlinkedFacebook(), conversation, isListener, website);
-    }
-
-    @Nonnull
-    public Page withUnlinkedGoogle() {
-        return new Page(id, type, username, name, firstName, lastName,
-                isActivated, image, cover, isListening, listenersCount,
-                location, stats, isOwner, email,
-                admin, about, description, phone,
-                founded, impressum, overview, mission, generalInfo, isVerified, isPublished,
-                linkedAccounts.unlinkedGoogle(), conversation, isListener, website);
-    }
-
-    @Nonnull
-    public Page withUpdatedGoogleAccount(@Nonnull String token) {
-        return new Page(id, type, username, name, firstName, lastName,
-                isActivated, image, cover, isListening, listenersCount,
-                location, stats, isOwner, email,
-                admin, about, description, phone,
-                founded, impressum, overview, mission, generalInfo, isVerified, isPublished,
-                linkedAccounts.updatedGoogle(token), conversation, isListener, website);
-    }
-
     public User getAdmin() {
         return admin;
     }

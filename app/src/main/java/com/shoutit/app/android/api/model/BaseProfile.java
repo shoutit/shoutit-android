@@ -169,27 +169,6 @@ public class BaseProfile implements ProfileType {
                 location, isOwner, newStats, getEmail(), linkedAccounts, conversation, isListener, website);
     }
 
-    @Nonnull
-    public BaseProfile withUnlinkedFacebook() {
-        return new BaseProfile(id, type, username, name, firstName, lastName, isActivated,
-                image, cover, isListening, listenersCount,
-                location, isOwner, stats, getEmail(), linkedAccounts.unlinkedFacebook(), conversation, isListener, website);
-    }
-
-    @Nonnull
-    public BaseProfile withUnlinkedGoogle() {
-        return new BaseProfile(id, type, username, name, firstName, lastName, isActivated,
-                image, cover, isListening, listenersCount,
-                location, isOwner, stats, getEmail(), linkedAccounts.unlinkedGoogle(), conversation, isListener, website);
-    }
-
-    @Nonnull
-    public BaseProfile withUpdatedGoogleAccount(@Nonnull String token) {
-        return new BaseProfile(id, type, username, name, firstName, lastName, isActivated,
-                image, cover, isListening, listenersCount,
-                location, isOwner, stats, getEmail(), linkedAccounts.updatedGoogle(token), conversation, isListener, website);
-    }
-
     @Nullable
     public Stats getStats() {
         return stats;

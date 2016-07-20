@@ -260,7 +260,8 @@ public class LinkedAccountsPresenter {
                 unlinkFacebookObservable.compose(ResponseOrError.onlyError()),
                 unlinkGoogleObservable.compose(ResponseOrError.onlyError()),
                 unlinkFacebookPageObservable.compose(ResponseOrError.onlyError()),
-                linkFacebookPageObservable.compose(ResponseOrError.onlyError()))
+                linkFacebookPageObservable.compose(ResponseOrError.onlyError()),
+                pagesObservable.compose(ResponseOrError.onlyError()))
                 .filter(Functions1.isNotNull());
 
         linkgGoogleFailedObservable = linkGoogleObservable
@@ -335,36 +336,14 @@ public class LinkedAccountsPresenter {
     }
 
     @Nonnull
-    public Observable<String> unlinkGoogleObservable() {
-        return unlinkGoogleObservable
-                .compose(ResponseOrError.onlySuccess())
-                .map(ApiMessageResponse::getSuccess);
-    }
-
-    @Nonnull
-    public Observable<String> linkGoogleObservable() {
-        return linkGoogleObservable
-                .compose(ResponseOrError.onlySuccess())
-                .map(ApiMessageResponse::getSuccess);
-    }
-
-    @Nonnull
-    public Observable<String> linkFacebookObservable() {
-        return linkFacebookObservable
-                .compose(ResponseOrError.onlySuccess())
-                .map(ApiMessageResponse::getSuccess);
-    }
-
-    @Nonnull
-    public Observable<String> unlinkFacebookObservable() {
-        return unlinkFacebookObservable
-                .compose(ResponseOrError.onlySuccess())
-                .map(ApiMessageResponse::getSuccess);
-    }
-
-    @Nonnull
-    public Observable<String> unlinkFacebookPageObservable() {
-        return unlinkFacebookPageObservable
+    public Observable<String> apiMessageObservable() {
+        return Observable.merge(
+                unlinkGoogleObservable,
+                linkGoogleObservable,
+                unlinkFacebookObservable,
+                linkFacebookObservable,
+                linkFacebookPageObservable,
+                unlinkFacebookPageObservable)
                 .compose(ResponseOrError.onlySuccess())
                 .map(ApiMessageResponse::getSuccess);
     }

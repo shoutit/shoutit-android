@@ -617,11 +617,11 @@ public interface ApiService {
     @HTTP(method = "DELETE", path = "profiles/{username}/link", hasBody = true)
     Observable<ApiMessageResponse> unlinkGoogle(@Path("username") String username, @Body LinkGplusRequest request);
 
-    @GET("profiles/{user_name}/facebook_page")
+    @POST("profiles/{user_name}/facebook_page")
     Observable<ApiMessageResponse> linkFacebookPage(@Path("user_name") String userName,
                                                           @Body LinkFacebookPageRequest body);
 
-    @HTTP(method = "DELETE", path = "profiles/{username}/facebook_page", hasBody = true)
+    @HTTP(method = "DELETE", path = "profiles/{user_name}/facebook_page", hasBody = true)
     Observable<ApiMessageResponse> unlinkFacebookPage(@Path("user_name") String userName,
                                                           @Body LinkFacebookPageRequest body);
 

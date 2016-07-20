@@ -514,7 +514,7 @@ public class FacebookHelper {
             public void call(Subscriber<? super FacebookPages> subscriber) {
                 new GraphRequest(
                         AccessToken.getCurrentAccessToken(),
-                        "/{user-id}/accounts",
+                        "/me/accounts",
                         null,
                         HttpMethod.GET,
                         new GraphRequest.Callback() {
@@ -527,7 +527,7 @@ public class FacebookHelper {
                                         subscriber.onNext(facebookPages);
                                         subscriber.onCompleted();
                                     }
-                                } catch (JsonSyntaxException e) {
+                                } catch (Exception e) {
                                     if (!subscriber.isUnsubscribed()) {
                                         subscriber.onError(e);
                                     }

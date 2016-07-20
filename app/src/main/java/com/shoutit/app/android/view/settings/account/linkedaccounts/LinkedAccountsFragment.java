@@ -35,6 +35,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.subjects.PublishSubject;
 
@@ -123,6 +124,8 @@ public class LinkedAccountsFragment extends BaseFragment implements LinkedAccoun
                 .compose(bindToLifecycle())
                 .switchMap(o -> facebookHelper.askForPermissionIfNeeded(
                                 getActivity(), FacebookHelper.PAGES_PERMISSIONS, callbackManager, true))
+                .take(1)
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(responseOrError -> {
                     if (responseOrError.isData()) {
                         presenter.showPagesList();
@@ -135,33 +138,9 @@ public class LinkedAccountsFragment extends BaseFragment implements LinkedAccoun
                 .compose(bindToLifecycle())
                 .subscribe(this::showFacebookPagesDialog);
 
-        presenter.linkFacebookObservable()
-                .compose(this.bindToLifecycle())
-                .subscribe(ColoredSnackBar.successSnackBarAction(mainView));
-
-        presenter.unlinkFacebookObservable()
+        presenter.apiMessageObservable()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(message -> {
-                    //noinspection ConstantConditions
-                    preferences.setUserOrPage(preferences.getUserOrPage().withUnlinkedFacebook());
-                    ColoredSnackBar.success(mainView, message, Snackbar.LENGTH_SHORT).show();
-                });
-
-        presenter.linkGoogleObservable()
-                .compose(this.bindToLifecycle())
-                .subscribe(message -> {
-                    //noinspection ConstantConditions
-                    preferences.setUserOrPage(preferences.getUserOrPage().withUpdatedGoogleAccount(googleId));
-                    ColoredSnackBar.success(mainView, message, Snackbar.LENGTH_SHORT).show();
-                });
-
-        presenter.unlinkGoogleObservable()
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(message -> {
-                    //noinspection ConstantConditions
-                    preferences.setUserOrPage(preferences.getUserOrPage().withUnlinkedGoogle());
-                    ColoredSnackBar.success(mainView, message, Snackbar.LENGTH_SHORT).show();
-                });
+                .subscribe(ColoredSnackBar.successSnackBarAction(ColoredSnackBar.contentView(getActivity())));
 
         presenter.errorObservable()
                 .compose(this.<Throwable>bindToLifecycle())
@@ -176,9 +155,19 @@ public class LinkedAccountsFragment extends BaseFragment implements LinkedAccoun
         presenter.getProgressObservable()
                 .compose(bindToLifecycle())
                 .subscribe(RxView.visibility(progressView));
+
+        presenter.getPagesListEmptyObservable()
+                .compose(bindToLifecycle())
+                .subscribe(o -> {
+                    Snackbar.make(ColoredSnackBar.contentView(getActivity()), R.string.linked_account_no_pages, Snackbar.LENGTH_LONG).show();
+                });
     }
 
     private void showFacebookPagesDialog(FacebookPages facebookPages) {
+        if (getActivity().isFinishing()) {
+            return;
+        }
+
         final List<FacebookPages.FacebookPage> pages = facebookPages.getData();
 
         class FacebookPagesAdapter extends BaseAdapter {
@@ -200,7 +189,10 @@ public class LinkedAccountsFragment extends BaseFragment implements LinkedAccoun
 
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
-                return inflater.inflate(android.R.layout.select_dialog_singlechoice, parent, false);
+                final TextView view = (TextView) inflater.inflate(android.R.layout.select_dialog_singlechoice, parent, false);
+                view.setText(getItem(position).getName());
+
+                return view;
             }
         }
 
