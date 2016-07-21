@@ -31,8 +31,6 @@ public class FBAdHalfPresenter {
 
     @Nonnull
     private final Observable<List<NativeAd>> listAdsObservable;
-    @Nonnull
-    private final Observable<List<NativeAd>> gridAdsObservable;
 
     @Inject
     public FBAdHalfPresenter(FacebookHelper facebookHelper,
@@ -40,17 +38,13 @@ public class FBAdHalfPresenter {
         this.facebookHelper = facebookHelper;
         this.uiScheduler = uiScheduler;
 
-        listAdsObservable = getAdsFetchObservable(facebookHelper.getManager(true))
-                .cache(1);
-
-        gridAdsObservable = getAdsFetchObservable(facebookHelper.getManager(false))
+        listAdsObservable = getAdsFetchObservable(facebookHelper.getListAdManager())
                 .cache(1);
     }
 
     @Nonnull
-    public Observable<List<NativeAd>> getAdsObservable(@Nonnull Observable<Boolean> isLinearLayoutObservable) {
-        return isLinearLayoutObservable.startWith(true)
-                .switchMap(isLinearLayout -> isLinearLayout ? listAdsObservable : gridAdsObservable);
+    public Observable<List<NativeAd>> getAdsObservable() {
+                return listAdsObservable;
     }
 
     @Nonnull

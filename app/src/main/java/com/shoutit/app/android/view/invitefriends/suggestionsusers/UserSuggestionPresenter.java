@@ -30,12 +30,8 @@ public class UserSuggestionPresenter extends BaseProfileListPresenter {
                                    @Nonnull UserPreferences userPreferences) {
         super(listeningHalfPresenter, uiScheduler, resources.getString(R.string.post_no_suggested_users), userPreferences);
 
-        final Observable<ProfilesDao.FriendsSuggestionPointer> pointerObservable = userPreferences
-                .getPageOrUserObservable()
-                .filter(Functions1.isNotNull())
-                .map(baseProfile -> new ProfilesDao.FriendsSuggestionPointer(baseProfile.getLocation(), baseProfile.getUsername()));
-
-        daoObservable = pointerObservable
+        daoObservable = userPreferences
+                .getLocationObservable()
                 .filter(Functions1.isNotNull())
                 .map(dao::getUsersSuggestionDao)
                 .compose(ObservableExtensions.behaviorRefCount());

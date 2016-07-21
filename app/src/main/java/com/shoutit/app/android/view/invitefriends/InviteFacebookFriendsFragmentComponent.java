@@ -14,7 +14,7 @@ import dagger.Component;
                 FragmentModule.class
         }
 )
-public interface InviteFriendsFragmentComponent extends BaseFragmentComponent {
+public interface InviteFacebookFriendsFragmentComponent extends BaseFragmentComponent {
 
-    void inject(InviteFriendsFragment fragment);
+    void inject(InviteFacebookFriendsFragment fragment);
 }

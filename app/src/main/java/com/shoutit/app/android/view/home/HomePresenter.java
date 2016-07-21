@@ -218,7 +218,7 @@ public class HomePresenter {
                 locationObservable,
                 allDiscoverAdapterItems,
                 allShoutAdapterItems,
-                fbAdHalfPresenter.getAdsObservable(linearLayoutManagerObservable).startWith(ImmutableList.<NativeAd>of()),
+                fbAdHalfPresenter.getAdsObservable().startWith(ImmutableList.<NativeAd>of()),
                 (Func4<LocationPointer, List<BaseAdapterItem>, List<BaseAdapterItem>, List<NativeAd>, List<BaseAdapterItem>>) (locationPointer, discovers, shouts, ads) -> {
                     final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
                     if (!discovers.isEmpty()) {

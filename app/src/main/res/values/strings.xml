@@ -22,7 +22,6 @@
     <!-- FB -->
     <string name="facebook_app_id" translatable="false">353625811317277</string>
     <string name="facebook_shout_list_ad_id" translatable="false">353625811317277_1245942718752244</string>
-    <string name="facebook_shout_grid_ad_id" translatable="false">353625811317277_1245949345418248</string>
     <string name="facebook_shout_detail_ad_id" translatable="false">353625811317277_1249824038364112</string>
 
     <!-- Errors -->
@@ -800,5 +799,8 @@
     <string name="edit_page_published">Published</string>
     <string name="edit_page_general_info">General Info</string>
     <string name="edit_page_title">Edit Page</string>
+
+    <!-- Invite Contacts -->
+    <string name="invite_contacts_ab_title">Invite Friends</string>
 
 </resources>

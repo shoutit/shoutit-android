@@ -336,7 +336,7 @@ public class ChatsDelegate {
     }
 
     public void sendTyping(String conversationId) {
-        mPusher.sendTyping(conversationId, mUser.getId(), mUser.getUsername());
+        mPusher.sendTyping(conversationId, mUser.getId(), mUser.getName());
     }
 
     public PostMessage getShoutMessage(@Nonnull String shoutId) {

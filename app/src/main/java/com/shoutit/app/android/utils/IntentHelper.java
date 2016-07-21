@@ -50,6 +50,17 @@ public class IntentHelper {
                 .setData(Uri.parse("package:" + context.getPackageName()));
     }
 
+    public static Intent getSmsIntent(@Nonnull String phoneNumber, @Nonnull String text) {
+        final Uri uri = Uri.parse("smsto:" + phoneNumber);
+        return new Intent(Intent.ACTION_SENDTO, uri)
+                .putExtra("sms_body", text);
+    }
+
+    public static Intent getEmailIntent(@Nonnull String emailAddress, @Nonnull String text) {
+        return new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", emailAddress, null))
+                .putExtra(Intent.EXTRA_TEXT, text);
+    }
+
     @Nonnull
     public static List<Intent> getTwitterShareIntent(@Nonnull PackageManager packageManager,
                                                          @Nonnull String shareText) {
