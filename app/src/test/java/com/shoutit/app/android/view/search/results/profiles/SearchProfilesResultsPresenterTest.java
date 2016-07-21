@@ -5,7 +5,9 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.api.model.BaseProfile;
+import com.shoutit.app.android.api.model.ListenResponse;
 import com.shoutit.app.android.api.model.SearchProfileResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dao.ProfilesDao;
@@ -45,9 +47,9 @@ public class SearchProfilesResultsPresenterTest {
         when(userPreferences.isNormalUser())
                 .thenReturn(true);
         when(apiService.unlistenProfile(anyString()))
-                .thenReturn(Observable.just(ResponseBody.create(null, "z")));
+                .thenReturn(Observable.just(new ListenResponse("lala", 2)));
         when(apiService.listenProfile(anyString()))
-                .thenReturn(Observable.just(ResponseBody.create(null, "z")));
+                .thenReturn(Observable.just(new ListenResponse("lala", 2)));
         when(apiService.searchProfiles(anyString(), anyInt(), anyInt()))
                 .thenReturn(Observable.just(getSearchResponse()));
 
