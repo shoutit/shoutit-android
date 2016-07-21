@@ -14,8 +14,10 @@ import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.utils.ApiMessagesHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.view.profile.ProfileIntentHelper;
 
@@ -117,5 +119,10 @@ public class ChatParticipantsActivity extends BaseActivity implements ChatPartic
     @Override
     public void showProfile(String userName, boolean isPage) {
         startActivity(ProfileIntentHelper.newIntent(this, userName, isPage));
+    }
+
+    @Override
+    public void displayApiMessage(ApiMessageResponse apiMessageResponse) {
+        ApiMessagesHelper.showApiMessage(this, apiMessageResponse);
     }
 }

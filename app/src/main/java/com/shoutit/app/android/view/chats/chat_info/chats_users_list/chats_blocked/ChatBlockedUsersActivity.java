@@ -13,8 +13,10 @@ import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.utils.ApiMessagesHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.view.chats.chat_info.chats_users_list.ChatUsersListAdapter;
 import com.shoutit.app.android.view.chats.chat_info.chats_users_list.ChatUsersListComponent;
@@ -121,6 +123,11 @@ public class ChatBlockedUsersActivity extends BaseActivity implements ChatBlocke
     @Override
     public void showUnblockConfirmDialog(String id, String name) {
         unblockDialog.show(id, name, mChatParticipantsPresenter);
+    }
+
+    @Override
+    public void showApiMessage(ApiMessageResponse apiMessageResponse) {
+        ApiMessagesHelper.showApiMessage(this, apiMessageResponse);
     }
 
     @Override

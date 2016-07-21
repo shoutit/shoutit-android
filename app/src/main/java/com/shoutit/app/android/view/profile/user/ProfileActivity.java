@@ -24,11 +24,11 @@ import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.ApiMessageResponse;
+import com.shoutit.app.android.utils.ApiMessagesHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.RtlUtils;
-import com.shoutit.app.android.utils.rx.RxUtils;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.squareup.picasso.Picasso;
 
@@ -156,12 +156,12 @@ public abstract class ProfileActivity extends BaseActivity {
         presenter.getListenSuccessObservable()
                 .doOnNext(s -> setResult(RESULT_OK, null))
                 .compose(this.<ApiMessageResponse>bindToLifecycle())
-                .subscribe(RxUtils.apiMessageAction(this));
+                .subscribe(ApiMessagesHelper.apiMessageAction(this));
 
         presenter.getUnListenSuccessObservable()
                 .doOnNext(s -> setResult(RESULT_OK, null))
                 .compose(this.<ApiMessageResponse>bindToLifecycle())
-                .subscribe(RxUtils.apiMessageAction(this));
+                .subscribe(ApiMessagesHelper.apiMessageAction(this));
 
     }
 

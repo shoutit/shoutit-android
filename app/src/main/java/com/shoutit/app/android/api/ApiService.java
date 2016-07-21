@@ -273,7 +273,7 @@ public interface ApiService {
     Observable<ResponseBody> resetPassword(@Body ResetPasswordRequest request);
 
     @POST("auth/change_password")
-    Observable<ResponseBody> changePassword(@Body ChangePasswordRequest changePasswordRequest);
+    Observable<ApiMessageResponse> changePassword(@Body ChangePasswordRequest changePasswordRequest);
 
     @POST("auth/verify_email")
     Observable<VerifyEmailResponse> verifyEmail(@Body VerifyEmailRequest verifyEmailRequest);
@@ -483,10 +483,10 @@ public interface ApiService {
     Observable<ResponseBody> deleteConversation(@Path("id") String conversationId);
 
     @POST("conversations/{id}/add_profile")
-    Observable<ResponseBody> addProfile(@Path("id") String conversationId, @Body ProfileRequest removeProfileRequest);
+    Observable<ApiMessageResponse> addProfile(@Path("id") String conversationId, @Body ProfileRequest removeProfileRequest);
 
     @POST("conversations/{id}/remove_profile")
-    Observable<ResponseBody> removeProfile(@Path("id") String conversationId, @Body ProfileRequest removeProfileRequest);
+    Observable<ApiMessageResponse> removeProfile(@Path("id") String conversationId, @Body ProfileRequest removeProfileRequest);
 
     @POST("messages/{id}/read")
     Observable<ResponseBody> readMessage(@Path("id") String messageId);
@@ -505,13 +505,13 @@ public interface ApiService {
                                                             @Query("page_size") Integer pageSize);
 
     @POST("conversations/{id}/promote_admin")
-    Observable<ResponseBody> promoteAdmin(@Path("id") String conversationId, @Body ProfileRequest profileRequest);
+    Observable<ApiMessageResponse> promoteAdmin(@Path("id") String conversationId, @Body ProfileRequest profileRequest);
 
     @POST("conversations/{id}/block_profile")
-    Observable<ResponseBody> blockProfile(@Path("id") String conversationId, @Body ProfileRequest profileRequest);
+    Observable<ApiMessageResponse> blockProfile(@Path("id") String conversationId, @Body ProfileRequest profileRequest);
 
     @POST("conversations/{id}/unblock_profile")
-    Observable<ResponseBody> unblockProfile(@Path("id") String conversationId, @Body ProfileRequest profileRequest);
+    Observable<ApiMessageResponse> unblockProfile(@Path("id") String conversationId, @Body ProfileRequest profileRequest);
 
     @GET("conversations/{id}/blocked")
     Observable<BlockedProfilesResposne> getBlockedProfiles(@Path("id") String conversationId);
@@ -584,11 +584,11 @@ public interface ApiService {
                                                @Query("page_size") Integer pageSize);
 
     @HTTP(method = "DELETE", path = "pages/{username}/admin", hasBody = true)
-    Observable<ResponseBody> deleteAdmin(@Path("username") String userName,
+    Observable<ApiMessageResponse> deleteAdmin(@Path("username") String userName,
                                          @Body AdminRequest adminRequest);
 
     @POST("pages/{username}/admin")
-    Observable<ResponseBody> addAdmin(@Path("username") String pageUserName,
+    Observable<ApiMessageResponse> addAdmin(@Path("username") String pageUserName,
                                       @Body AdminRequest addAdminRequest);
 
     @POST("pages")

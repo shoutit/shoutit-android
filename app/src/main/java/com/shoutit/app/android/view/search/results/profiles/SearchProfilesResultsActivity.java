@@ -17,14 +17,13 @@ import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.api.model.BaseProfile;
-import com.shoutit.app.android.api.model.ListenResponse;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.utils.ApiMessagesHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
-import com.shoutit.app.android.utils.rx.RxUtils;
 import com.shoutit.app.android.view.profile.ProfileIntentHelper;
 
 import java.util.List;
@@ -99,11 +98,11 @@ public class SearchProfilesResultsActivity extends BaseActivity {
 
         presenter.getListenSuccessObservable()
                 .compose(this.<ApiMessageResponse>bindToLifecycle())
-                .subscribe(RxUtils.apiMessageAction(this));
+                .subscribe(ApiMessagesHelper.apiMessageAction(this));
 
         presenter.getUnListenSuccessObservable()
                 .compose(this.<ApiMessageResponse>bindToLifecycle())
-                .subscribe(RxUtils.apiMessageAction(this));
+                .subscribe(ApiMessagesHelper.apiMessageAction(this));
 
         RxRecyclerView.scrollEvents(recyclerView)
                 .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())

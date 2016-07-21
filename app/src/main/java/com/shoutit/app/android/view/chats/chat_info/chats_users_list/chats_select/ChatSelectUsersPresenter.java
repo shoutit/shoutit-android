@@ -10,6 +10,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.ProfileRequest;
 import com.shoutit.app.android.api.model.ProfilesListResponse;
@@ -100,17 +101,11 @@ public class ChatSelectUsersPresenter {
         mCompositeSubscription.add(mApiService.addProfile(mConversationId, new ProfileRequest(id))
                 .observeOn(mUiScheduler)
                 .subscribeOn(mNetworkScheduler)
-                .subscribe(new Action1<ResponseBody>() {
-                    @Override
-                    public void call(ResponseBody responseBody) {
-                        mListener.finishScreen();
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        mListener.showProgress(false);
-                        mListener.error();
-                    }
+                .subscribe(apiMessageResponse -> {
+                    mListener.finishScreen(apiMessageResponse);
+                }, throwable -> {
+                    mListener.showProgress(false);
+                    mListener.error();
                 }));
     }
 
@@ -128,6 +123,6 @@ public class ChatSelectUsersPresenter {
 
         void showDialog(String id, String name);
 
-        void finishScreen();
+        void finishScreen(ApiMessageResponse apiMessageResponse);
     }
 }

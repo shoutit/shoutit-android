@@ -10,6 +10,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.api.model.ConversationDetails;
 import com.shoutit.app.android.api.model.ConversationProfile;
 import com.shoutit.app.android.api.model.ProfileRequest;
@@ -136,22 +137,17 @@ public class ChatParticipantsPresenter {
         userAction(mApiService.removeProfile(mConversationId, new ProfileRequest(id)));
     }
 
-    private void userAction(@NonNull Observable<ResponseBody> observable) {
+    private void userAction(@NonNull Observable<ApiMessageResponse> observable) {
         mListener.showProgress(true);
         mCompositeSubscription.add(observable
                 .observeOn(mUiScheduler)
                 .subscribeOn(mNetworkScheduler)
-                .subscribe(new Action1<ResponseBody>() {
-                    @Override
-                    public void call(ResponseBody responseBody) {
-                        getConversation();
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        mListener.showProgress(false);
-                        mListener.error();
-                    }
+                .subscribe(apiMessageResponse -> {
+                    getConversation();
+                    mListener.displayApiMessage(apiMessageResponse);
+                }, throwable -> {
+                    mListener.showProgress(false);
+                    mListener.error();
                 }));
     }
 
@@ -174,5 +170,7 @@ public class ChatParticipantsPresenter {
         void showDialog(String id, boolean isBlocked, boolean isAdmin, boolean isPage, String name, String userName);
 
         void showProfile(String username, boolean isPage);
+
+        void displayApiMessage(ApiMessageResponse apiMessageResponse);
     }
 }

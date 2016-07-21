@@ -17,10 +17,10 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
+import com.shoutit.app.android.utils.ApiMessagesHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
-import com.shoutit.app.android.utils.rx.RxUtils;
 import com.shoutit.app.android.view.listenings.ProfilesListAdapter;
 import com.shoutit.app.android.view.pages.PagesPagerFragment;
 import com.shoutit.app.android.view.profile.page.PageProfileActivity;
@@ -80,11 +80,11 @@ public class PublicPagesFragment extends BaseFragment {
 
         presenter.getListenSuccessObservable()
                 .compose(this.<ApiMessageResponse>bindToLifecycle())
-                .subscribe(RxUtils.apiMessageAction(getActivity()));
+                .subscribe(ApiMessagesHelper.apiMessageAction(getActivity()));
 
         presenter.getUnListenSuccessObservable()
                 .compose(this.<ApiMessageResponse>bindToLifecycle())
-                .subscribe(RxUtils.apiMessageAction(getActivity()));
+                .subscribe(ApiMessagesHelper.apiMessageAction(getActivity()));
 
         presenter.getLoadMoreObservable()
                 .compose(bindToLifecycle())
