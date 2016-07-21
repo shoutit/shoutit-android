@@ -23,7 +23,7 @@ import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.ResourcesHelper;
-import com.shoutit.app.android.view.loginintro.FacebookHelper;
+import com.shoutit.app.android.facebook.FacebookHelper;
 
 import java.util.List;
 
@@ -170,7 +170,7 @@ public class CreateRequestPresenter {
 
         pendingSubscriptions.add(
                 facebookHelper.askForPermissionIfNeeded(activity,
-                        FacebookHelper.PERMISSION_PUBLISH_ACTIONS, callbackManager, true)
+                        new String[]{FacebookHelper.PERMISSION_PUBLISH_ACTIONS}, callbackManager, true)
                         .observeOn(mUiScheduler)
                         .subscribe(new Action1<ResponseOrError<Boolean>>() {
                             @Override

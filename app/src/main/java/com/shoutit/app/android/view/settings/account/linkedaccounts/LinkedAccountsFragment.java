@@ -6,9 +6,11 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.facebook.CallbackManager;
@@ -22,15 +24,19 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
+import com.shoutit.app.android.facebook.FacebookHelper;
+import com.shoutit.app.android.facebook.FacebookPages;
 import com.shoutit.app.android.utils.ColoredSnackBar;
-import com.shoutit.app.android.view.loginintro.FacebookHelper;
 import com.shoutit.app.android.view.loginintro.GoogleHelper;
+
+import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.subjects.PublishSubject;
 
@@ -38,32 +44,43 @@ public class LinkedAccountsFragment extends BaseFragment implements LinkedAccoun
 
     private static final int GOOGLE_SIGN_IN = 0;
 
-    @Bind(R.id.linked_accounts_facebook_tv)
-    TextView linkedAccountsFacebookTv;
+    @Bind(R.id.linked_accounts_facebook)
+    View facebookView;
     @Bind(R.id.linked_accounts_profile_fb_tv)
-    TextView linkedAccountsProfileFbTv;
-    @Bind(R.id.linked_accounts_google_tv)
-    TextView linkedAccountsGoogleTv;
+    TextView fbProfileTv;
+    @Bind(R.id.linked_accounts_google)
+    View googleView;
     @Bind(R.id.linked_accounts_profile_g_tv)
-    TextView linkedAccountsProfileGTv;
+    TextView googleProfileTv;
+    @Bind(R.id.linked_accounts_facebook_page)
+    View facebookPageView;
+    @Bind(R.id.linked_accounts_profile_fbpage_tv)
+    TextView facebookPageProfileTv;
     @Bind(R.id.main_layout)
     View mainView;
+    @Bind(R.id.base_progress)
+    View progressView;
 
     @Inject
     LinkedAccountsPresenter presenter;
     @Inject
     UserPreferences preferences;
+    @Inject
+    FacebookHelper facebookHelper;
+    @Inject
+    LayoutInflater inflater;
 
     private CallbackManager callbackManager;
-    private String googleId;
 
     public static Fragment newInstance() {
         return new LinkedAccountsFragment();
     }
 
-    @android.support.annotation.Nullable
+    @Nullable
     @Override
-    public View onCreateView(final LayoutInflater inflater, @android.support.annotation.Nullable final ViewGroup container, @android.support.annotation.Nullable final Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflater,
+                             @Nullable final ViewGroup container,
+                             @Nullable final Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_linked_accounts, container, false);
     }
 
@@ -74,54 +91,118 @@ public class LinkedAccountsFragment extends BaseFragment implements LinkedAccoun
 
         callbackManager = CallbackManager.Factory.create();
 
-        RxView.clicks(linkedAccountsFacebookTv)
+        RxView.clicks(facebookView)
                 .compose(this.bindToLifecycle())
                 .subscribe(presenter.clickFacebookSubject());
 
-        RxView.clicks(linkedAccountsGoogleTv)
+        RxView.clicks(googleView)
                 .compose(this.bindToLifecycle())
                 .subscribe(presenter.clickGoogleSubject());
 
+        RxView.clicks(facebookPageView)
+                .compose(bindToLifecycle())
+                .subscribe(presenter.clickFacebookPageSubject());
+
         presenter.facebookLinkedInfoObservable()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(RxTextView.text(linkedAccountsProfileFbTv));
+                .subscribe(RxTextView.text(fbProfileTv));
 
         presenter.googleLinkedInfoObservable()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(RxTextView.text(linkedAccountsProfileGTv));
+                .subscribe(RxTextView.text(googleProfileTv));
+
+        presenter.getFacebookPageLinkInfoObservable()
+                .compose(bindToLifecycle())
+                .subscribe(RxTextView.text(facebookPageProfileTv));
 
         presenter.askForFbTokenObservable()
-                .flatMap(o -> FacebookHelper.getToken(getActivity(), callbackManager))
+                .compose(bindToLifecycle())
+                .switchMap(o -> FacebookHelper.getToken(getActivity(), callbackManager))
                 .subscribe(onGetFacebookTokenSuccessAction(), onGetFacebookTokenFailureAction());
 
-        presenter.linkFacebookObservable()
-                .compose(this.bindToLifecycle())
-                .subscribe(ColoredSnackBar.successSnackBarAction(mainView));
+        presenter.askForPagesPermissionsObservable()
+                .compose(bindToLifecycle())
+                .switchMap(o -> facebookHelper.askForPermissionIfNeeded(
+                                getActivity(), FacebookHelper.PAGES_PERMISSIONS, callbackManager, true))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(responseOrError -> {
+                    if (responseOrError.isData()) {
+                        presenter.showPagesList();
+                    } else {
+                        progressView.setVisibility(View.GONE);
+                        ColoredSnackBar.error(ColoredSnackBar.contentView(getActivity()), responseOrError.error()).show();
+                    }
+                });
 
-        presenter.unlinkFacebookObservable()
+        presenter.getPagesListSuccessObservable()
+                .compose(bindToLifecycle())
+                .subscribe(this::showFacebookPagesDialog);
+
+        presenter.apiMessageObservable()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(message -> {
-                    preferences.setUserOrPage(preferences.getUser().withUnlinkedFacebook());
-                    ColoredSnackBar.success(mainView, message, Snackbar.LENGTH_SHORT).show();
-                });
-
-        presenter.linkGoogleObservable()
-                .compose(this.bindToLifecycle())
-                .subscribe(message -> {
-                    preferences.setUserOrPage(preferences.getUser().withUpdatedGoogleAccount(googleId));
-                    ColoredSnackBar.success(mainView, message, Snackbar.LENGTH_SHORT).show();
-                });
-
-        presenter.unlinkGoogleObservable()
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(message -> {
-                    preferences.setUserOrPage(preferences.getUser().withUnlinkedGoogle());
-                    ColoredSnackBar.success(mainView, message, Snackbar.LENGTH_SHORT).show();
-                });
+                .subscribe(ColoredSnackBar.successSnackBarAction(ColoredSnackBar.contentView(getActivity())));
 
         presenter.errorObservable()
                 .compose(this.<Throwable>bindToLifecycle())
                 .subscribe(ColoredSnackBar.errorSnackBarAction(mainView));
+
+        presenter.getLinkgGoogleFailedObservable()
+                .compose(bindToLifecycle())
+                .subscribe(throwable -> {
+                    GoogleHelper.logOutGoogle(getActivity());
+                });
+
+        presenter.getProgressObservable()
+                .compose(bindToLifecycle())
+                .subscribe(RxView.visibility(progressView));
+
+        presenter.getPagesListEmptyObservable()
+                .compose(bindToLifecycle())
+                .subscribe(o -> {
+                    Snackbar.make(ColoredSnackBar.contentView(getActivity()), R.string.linked_account_no_pages, Snackbar.LENGTH_LONG).show();
+                });
+    }
+
+    private void showFacebookPagesDialog(FacebookPages facebookPages) {
+        if (getActivity().isFinishing()) {
+            return;
+        }
+
+        final List<FacebookPages.FacebookPage> pages = facebookPages.getData();
+
+        class FacebookPagesAdapter extends BaseAdapter {
+
+            @Override
+            public int getCount() {
+                return pages.size();
+            }
+
+            @Override
+            public FacebookPages.FacebookPage getItem(int position) {
+                return pages.get(position);
+            }
+
+            @Override
+            public long getItemId(int position) {
+                return position;
+            }
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                final TextView view = (TextView) inflater.inflate(android.R.layout.select_dialog_singlechoice, parent, false);
+                view.setText(getItem(position).getName());
+
+                return view;
+            }
+        }
+
+        new AlertDialog.Builder(getActivity())
+                .setTitle(getString(R.string.linked_account_select_page))
+                .setSingleChoiceItems(new FacebookPagesAdapter(), -1, (dialog, which) -> {
+                    presenter.linkFacebookPageSubject(pages.get(which));
+                    dialog.dismiss();
+                })
+                .show();
     }
 
     @Nonnull
@@ -143,7 +224,6 @@ public class LinkedAccountsFragment extends BaseFragment implements LinkedAccoun
             final GoogleSignInAccount acct = result.getSignInAccount();
 
             if (acct != null && acct.getId() != null) {
-                googleId = acct.getId();
                 presenter.linkGoogleSubject().onNext(acct.getServerAuthCode());
             }
 
@@ -168,6 +248,11 @@ public class LinkedAccountsFragment extends BaseFragment implements LinkedAccoun
     @Override
     public void unlinkGoogleDialog() {
         showDialog(getString(R.string.linked_accounts_unlink_google), presenter.unlinkGoogleSubject());
+    }
+
+    @Override
+    public void unLinkFacebookPageDialog() {
+        showDialog(getString(R.string.linked_accounts_unlink_facebook_page), presenter.unlinkFacebookPageSubject());
     }
 
     private void showDialog(@Nonnull final String message, @Nonnull PublishSubject<Object> subject) {

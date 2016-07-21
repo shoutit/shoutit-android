@@ -42,7 +42,7 @@ import com.shoutit.app.android.view.createshout.DialogsHelper;
 import com.shoutit.app.android.view.location.LocationActivityForResult;
 import com.shoutit.app.android.view.location.LocationHelper;
 import com.shoutit.app.android.view.createshout.publish.PublishShoutActivity;
-import com.shoutit.app.android.view.loginintro.FacebookHelper;
+import com.shoutit.app.android.facebook.FacebookHelper;
 import com.shoutit.app.android.widget.SimpleCurrencySpinnerAdapter;
 
 import java.util.List;
@@ -114,7 +114,7 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
 
         //noinspection ConstantConditions
         facebookCheckbox.setChecked(facebookHelper.hasRequiredPermissionInApi(
-                userPreferences.getUser(), FacebookHelper.PERMISSION_PUBLISH_ACTIONS));
+                userPreferences.getUserOrPage(), new String[]{FacebookHelper.PERMISSION_PUBLISH_ACTIONS}));
         RtlUtils.setTextDirection(this, facebookCheckbox);
 
         showShareInfoDialogIfNeeded();

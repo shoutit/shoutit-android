@@ -19,6 +19,7 @@ import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.BaseProfile;
+import com.shoutit.app.android.facebook.FacebookHelper;
 import com.shoutit.app.android.utils.BlurTransform;
 import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
@@ -267,6 +268,7 @@ public class MenuHandler {
         switch (id) {
             case R.id.menu_use_profile: {
                 userPreferences.clearPage();
+                FacebookHelper.logOutFromFacebook();
                 ActivityCompat.finishAffinity(rxActivity);
                 rxActivity.startActivity(MainActivity.newIntent(rxActivity));
                 break;

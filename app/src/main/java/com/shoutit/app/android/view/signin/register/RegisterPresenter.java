@@ -21,7 +21,7 @@ import com.shoutit.app.android.utils.LoginUtils;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.utils.Validators;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
-import com.shoutit.app.android.view.loginintro.FacebookHelper;
+import com.shoutit.app.android.facebook.FacebookHelper;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;

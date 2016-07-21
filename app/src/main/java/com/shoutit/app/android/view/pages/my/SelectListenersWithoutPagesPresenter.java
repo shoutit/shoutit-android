@@ -57,7 +57,7 @@ public class SelectListenersWithoutPagesPresenter extends BaseProfileListPresent
                                                 @Nonnull ListenersDaos listenersDaos) {
         super(listeningHalfPresenter, uiScheduler, placeholderText, userPreferences);
 
-        final String username = userPreferences.getUser().getUsername();
+        final String username = userPreferences.getUserOrPage().getUsername();
 
         daoObservable = Observable.just(new ListenersWithoutPagesDao(username, networkScheduler, listenersDaos.getDao(username)));
 

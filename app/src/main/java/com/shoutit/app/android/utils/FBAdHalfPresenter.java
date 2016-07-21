@@ -7,7 +7,7 @@ import com.facebook.ads.NativeAd;
 import com.facebook.ads.NativeAdsManager;
 import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.adapteritems.FbAdAdapterItem;
-import com.shoutit.app.android.view.loginintro.FacebookHelper;
+import com.shoutit.app.android.facebook.FacebookHelper;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -19,6 +19,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
+import com.shoutit.app.android.facebook.FacebookHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
@@ -139,6 +140,7 @@ public class MyPagesFragment extends BaseFragment implements MyPagesDialog.Pages
 
     @Override
     public void useShoutItAsPage(Page page) {
+        FacebookHelper.logOutFromFacebook();
         mUserPreferences.setPage(page);
         mUserPreferences.setTwilioToken(null);
 
