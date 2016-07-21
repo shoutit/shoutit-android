@@ -5,12 +5,12 @@ import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.BaseProfile;
+import com.shoutit.app.android.api.model.ListenResponse;
 import com.shoutit.app.android.api.model.ProfilesListResponse;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
-import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Scheduler;
 import rx.subjects.PublishSubject;
@@ -18,8 +18,8 @@ import rx.subjects.PublishSubject;
 public class ListeningHalfPresenter {
 
     private final PublishSubject<Throwable> errorSubject = PublishSubject.create();
-    private final PublishSubject<String> listenSuccess = PublishSubject.create();
-    private final PublishSubject<String> unListenSuccess = PublishSubject.create();
+    private final PublishSubject<ListenResponse> listenSuccess = PublishSubject.create();
+    private final PublishSubject<ListenResponse> unListenSuccess = PublishSubject.create();
     private final PublishSubject<BaseProfile> listenProfileSubject = PublishSubject.create();
 
     @Nonnull
@@ -44,19 +44,19 @@ public class ListeningHalfPresenter {
 
                     final boolean isListeningToProfile = profileToListenWithLastResponse.getProfile().isListening();
 
-                    Observable<ResponseOrError<ResponseBody>> listenRequestObservable;
+                    Observable<ResponseOrError<ListenResponse>> listenRequestObservable;
                     if (isListeningToProfile) {
                         listenRequestObservable = getUnlistenRequest(profileToListenWithLastResponse.getProfile())
                                 .subscribeOn(networkScheduler)
                                 .observeOn(uiScheduler)
-                                .doOnNext(responseBody -> unListenSuccess.onNext(profileToListenWithLastResponse.getProfile().getName()))
-                                .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
+                                .doOnNext(unListenSuccess::onNext)
+                                .compose(ResponseOrError.<ListenResponse>toResponseOrErrorObservable());
                     } else {
                         listenRequestObservable = getListenRequest(profileToListenWithLastResponse.getProfile())
                                 .subscribeOn(networkScheduler)
                                 .observeOn(uiScheduler)
-                                .doOnNext(responseBody -> listenSuccess.onNext(profileToListenWithLastResponse.getProfile().getName()))
-                                .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
+                                .doOnNext(listenSuccess::onNext)
+                                .compose(ResponseOrError.<ListenResponse>toResponseOrErrorObservable());
                     }
 
                     return listenRequestObservable
@@ -83,12 +83,12 @@ public class ListeningHalfPresenter {
     }
 
     @Nonnull
-    public PublishSubject<String> getListenSuccess() {
+    public PublishSubject<ListenResponse> getListenSuccess() {
         return listenSuccess;
     }
 
     @Nonnull
-    public PublishSubject<String> getUnListenSuccess() {
+    public PublishSubject<ListenResponse> getUnListenSuccess() {
         return unListenSuccess;
     }
 
@@ -98,12 +98,12 @@ public class ListeningHalfPresenter {
     }
 
     @Nonnull
-    public Observable<ResponseBody> getListenRequest(@Nonnull BaseProfile baseProfile) {
+    public Observable<ListenResponse> getListenRequest(@Nonnull BaseProfile baseProfile) {
         return apiService.listenProfile(baseProfile.getUsername());
     }
 
     @Nonnull
-    public Observable<ResponseBody> getUnlistenRequest(@Nonnull BaseProfile baseProfile) {
+    public Observable<ListenResponse> getUnlistenRequest(@Nonnull BaseProfile baseProfile) {
         return apiService.unlistenProfile(baseProfile.getUsername());
     }
 }

@@ -4,6 +4,7 @@ import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.ListenResponse;
 import com.shoutit.app.android.api.model.TagDetail;
 import com.shoutit.app.android.api.model.TagsListResponse;
 import com.shoutit.app.android.utils.ProfilesHelper;
@@ -19,8 +20,8 @@ import rx.subjects.PublishSubject;
 public class ListenTagsHalfPresenter {
 
     private final PublishSubject<Throwable> errorSubject = PublishSubject.create();
-    private final PublishSubject<String> listenSuccess = PublishSubject.create();
-    private final PublishSubject<String> unListenSuccess = PublishSubject.create();
+    private final PublishSubject<ListenResponse> listenSuccess = PublishSubject.create();
+    private final PublishSubject<ListenResponse> unListenSuccess = PublishSubject.create();
     private final PublishSubject<TagDetail> listenTagSubject = PublishSubject.create();
 
     @Nonnull
@@ -45,19 +46,19 @@ public class ListenTagsHalfPresenter {
 
                     final boolean isListeningToTag = tagToListenWithLastResponse.getTagDetail().isListening();
 
-                    Observable<ResponseOrError<ResponseBody>> listenRequestObservable;
+                    Observable<ResponseOrError<ListenResponse>> listenRequestObservable;
                     if (isListeningToTag) {
                         listenRequestObservable = apiService.unlistenTag(tagToListenWithLastResponse.getTagDetail().getSlug())
                                 .subscribeOn(networkScheduler)
                                 .observeOn(uiScheduler)
-                                .doOnNext(responseBody -> unListenSuccess.onNext(tagToListenWithLastResponse.getTagDetail().getName()))
-                                .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
+                                .doOnNext(unListenSuccess::onNext)
+                                .compose(ResponseOrError.<ListenResponse>toResponseOrErrorObservable());
                     } else {
                         listenRequestObservable = apiService.listenTag(tagToListenWithLastResponse.getTagDetail().getSlug())
                                 .subscribeOn(networkScheduler)
                                 .observeOn(uiScheduler)
-                                .doOnNext(responseBody -> listenSuccess.onNext(tagToListenWithLastResponse.getTagDetail().getName()))
-                                .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
+                                .doOnNext(listenSuccess::onNext)
+                                .compose(ResponseOrError.<ListenResponse>toResponseOrErrorObservable());
                     }
 
                     return listenRequestObservable
@@ -80,12 +81,12 @@ public class ListenTagsHalfPresenter {
     }
 
     @Nonnull
-    public PublishSubject<String> getListenSuccess() {
+    public PublishSubject<ListenResponse> getListenSuccess() {
         return listenSuccess;
     }
 
     @Nonnull
-    public PublishSubject<String> getUnListenSuccess() {
+    public PublishSubject<ListenResponse> getUnListenSuccess() {
         return unListenSuccess;
     }
 

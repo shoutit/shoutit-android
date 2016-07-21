@@ -23,6 +23,7 @@ import com.jakewharton.rxbinding.view.RxView;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
@@ -153,24 +154,14 @@ public abstract class ProfileActivity extends BaseActivity {
                         R.string.error_action_only_for_logged_in_user));
 
         presenter.getListenSuccessObservable()
-                .doOnNext(new Action1<String>() {
-                    @Override
-                    public void call(String s) {
-                        setResult(RESULT_OK, null);
-                    }
-                })
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(RxUtils.listenMessageAction(this));
+                .doOnNext(s -> setResult(RESULT_OK, null))
+                .compose(this.<ApiMessageResponse>bindToLifecycle())
+                .subscribe(RxUtils.apiMessageAction(this));
 
         presenter.getUnListenSuccessObservable()
-                .doOnNext(new Action1<String>() {
-                    @Override
-                    public void call(String s) {
-                        setResult(RESULT_OK, null);
-                    }
-                })
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(RxUtils.unListenMessageAction(this));
+                .doOnNext(s -> setResult(RESULT_OK, null))
+                .compose(this.<ApiMessageResponse>bindToLifecycle())
+                .subscribe(RxUtils.apiMessageAction(this));
 
     }
 

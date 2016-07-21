@@ -15,17 +15,17 @@ import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.api.model.BaseProfile;
+import com.shoutit.app.android.api.model.ListenResponse;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
-import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.utils.rx.RxUtils;
 import com.shoutit.app.android.view.profile.ProfileIntentHelper;
-import com.shoutit.app.android.view.profile.user.UserProfileActivity;
 
 import java.util.List;
 
@@ -35,7 +35,6 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import rx.functions.Action1;
 
 import static com.appunite.rx.internal.Preconditions.checkNotNull;
 
@@ -99,12 +98,12 @@ public class SearchProfilesResultsActivity extends BaseActivity {
                 });
 
         presenter.getListenSuccessObservable()
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(RxUtils.listenMessageAction(this));
+                .compose(this.<ApiMessageResponse>bindToLifecycle())
+                .subscribe(RxUtils.apiMessageAction(this));
 
         presenter.getUnListenSuccessObservable()
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(RxUtils.unListenMessageAction(this));
+                .compose(this.<ApiMessageResponse>bindToLifecycle())
+                .subscribe(RxUtils.apiMessageAction(this));
 
         RxRecyclerView.scrollEvents(recyclerView)
                 .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())

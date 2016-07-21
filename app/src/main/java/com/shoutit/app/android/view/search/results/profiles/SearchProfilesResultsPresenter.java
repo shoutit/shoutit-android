@@ -14,13 +14,12 @@ import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
 import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.BaseProfile;
+import com.shoutit.app.android.api.model.ListenResponse;
 import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.api.model.SearchProfileResponse;
-import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
-import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,11 +28,9 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
-import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
@@ -48,9 +45,9 @@ public class SearchProfilesResultsPresenter {
     private final PublishSubject<BaseProfile> profileToOpenSubject = PublishSubject.create();
     private final PublishSubject<Object> actionOnlyForLoggedInUserSubject = PublishSubject.create();
     @Nonnull
-    private final PublishSubject<String> listenSuccess = PublishSubject.create();
+    private final PublishSubject<ListenResponse> listenSuccess = PublishSubject.create();
     @Nonnull
-    private final PublishSubject<String> unListenSuccess = PublishSubject.create();
+    private final PublishSubject<ListenResponse> unListenSuccess = PublishSubject.create();
 
     private final ProfilesDao dao;
     @Nonnull
@@ -111,42 +108,29 @@ public class SearchProfilesResultsPresenter {
                         final String userName = profileToListenWithLastResponse.getProfile().getUsername();
                         final boolean isListeningToProfile = profileToListenWithLastResponse.getProfile().isListening();
 
-                        Observable<ResponseOrError<ResponseBody>> listenRequestObservable;
+                        Observable<ResponseOrError<ListenResponse>> listenRequestObservable;
                         if (isListeningToProfile) {
                             listenRequestObservable = apiService.unlistenProfile(userName)
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
-                                    .doOnNext(new Action1<ResponseBody>() {
-                                        @Override
-                                        public void call(ResponseBody responseBody) {
-                                            unListenSuccess.onNext(profileToListenWithLastResponse.getProfile().getName());
-                                        }
-                                    })
-                                    .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
+                                    .doOnNext(unListenSuccess::onNext)
+                                    .compose(ResponseOrError.<ListenResponse>toResponseOrErrorObservable());
                         } else {
                             listenRequestObservable = apiService.listenProfile(userName)
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
-                                    .doOnNext(new Action1<ResponseBody>() {
-                                        @Override
-                                        public void call(ResponseBody responseBody) {
-                                            listenSuccess.onNext(profileToListenWithLastResponse.getProfile().getName());
-                                        }
-                                    })
-                                    .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
+                                    .doOnNext(listenSuccess::onNext)
+                                    .compose(ResponseOrError.<ListenResponse>toResponseOrErrorObservable());
                         }
 
                         return listenRequestObservable
-                                .map(new Func1<ResponseOrError<ResponseBody>, ResponseOrError<SearchProfileResponse>>() {
-                                    @Override
-                                    public ResponseOrError<SearchProfileResponse> call(ResponseOrError<ResponseBody> response) {
-                                        if (response.isData()) {
-                                            return ResponseOrError.fromData(updateLastResponse(profileToListenWithLastResponse));
-                                        } else {
-                                            errorSubject.onNext(new Throwable());
-                                            // On error return current user in order to select/deselect already deselected/selected item to listenProfile
-                                            return ResponseOrError.fromData(profileToListenWithLastResponse.getResponse());
-                                        }
+                                .map(response -> {
+                                    if (response.isData()) {
+                                        return ResponseOrError.fromData(updateLastResponse(profileToListenWithLastResponse));
+                                    } else {
+                                        errorSubject.onNext(new Throwable());
+                                        // On error return current user in order to select/deselect already deselected/selected item to listenProfile
+                                        return ResponseOrError.fromData(profileToListenWithLastResponse.getResponse());
                                     }
                                 });
                     }
@@ -155,12 +139,12 @@ public class SearchProfilesResultsPresenter {
     }
 
     @Nonnull
-    public Observable<String> getListenSuccessObservable() {
+    public Observable<ListenResponse> getListenSuccessObservable() {
         return listenSuccess;
     }
 
     @Nonnull
-    public Observable<String> getUnListenSuccessObservable() {
+    public Observable<ListenResponse> getUnListenSuccessObservable() {
         return unListenSuccess;
     }
 

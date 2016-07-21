@@ -514,8 +514,6 @@
     <string name="google_api_key" translatable="false">AIzaSyBWHadI_MPYQgDLqI4RXhymEs42YEtgTEE</string>
     <string name="font_roboto_regular">sans-serif</string>
     <string name="font_roboto_medium">sans-serif</string>
-    <string name="listen_success">You have successfully started listening to %1$s</string>
-    <string name="unlisten_success">You have successfully stopped listening to %1$s</string>
     <string name="home_user_and_date">%1$s - %2$s</string>
     <string name="location_location">%1$s, %2$s</string>
     <string name="shout_user_location">%1$s, %2$s</string>

@@ -17,6 +17,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.ListenResponse;
 import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.api.model.RelatedTagsResponse;
 import com.shoutit.app.android.api.model.Shout;
@@ -43,11 +44,9 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
-import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.functions.Func3;
@@ -68,8 +67,8 @@ public class TagProfilePresenter implements ProfilePresenter {
     private final PublishSubject<String> showAllShoutsSubject = PublishSubject.create();
     private final PublishSubject<Object> shareInitSubject = PublishSubject.create();
     private final PublishSubject<Object> searchMenuItemClickSubject = PublishSubject.create();
-    private final PublishSubject<String> listenSuccess = PublishSubject.create();
-    private final PublishSubject<String> unListenSuccess = PublishSubject.create();
+    private final PublishSubject<ListenResponse> listenSuccess = PublishSubject.create();
+    private final PublishSubject<ListenResponse> unListenSuccess = PublishSubject.create();
 
     private final Observable<String> shareObservable;
     private final Observable<String> avatarObservable;
@@ -114,41 +113,28 @@ public class TagProfilePresenter implements ProfilePresenter {
                 .switchMap(new Func1<TagDetail, Observable<ResponseOrError<TagDetail>>>() {
                     @Override
                     public Observable<ResponseOrError<TagDetail>> call(final TagDetail tagDetail) {
-                        final Observable<ResponseOrError<ResponseBody>> request;
+                        final Observable<ResponseOrError<ListenResponse>> request;
                         if (tagDetail.isListening()) {
                             request = apiService.unlistenTag(tagDetail.getSlug())
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
-                                    .doOnNext(new Action1<ResponseBody>() {
-                                        @Override
-                                        public void call(ResponseBody responseBody) {
-                                            unListenSuccess.onNext(tagDetail.getName());
-                                        }
-                                    })
-                                    .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
+                                    .doOnNext(unListenSuccess::onNext)
+                                    .compose(ResponseOrError.<ListenResponse>toResponseOrErrorObservable());
                         } else {
                             request = apiService.listenTag(tagDetail.getSlug())
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
-                                    .doOnNext(new Action1<ResponseBody>() {
-                                        @Override
-                                        public void call(ResponseBody responseBody) {
-                                            listenSuccess.onNext(tagDetail.getName());
-                                        }
-                                    })
-                                    .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
+                                    .doOnNext(listenSuccess::onNext)
+                                    .compose(ResponseOrError.<ListenResponse>toResponseOrErrorObservable());
                         }
 
-                        return request.map(new Func1<ResponseOrError<ResponseBody>, ResponseOrError<TagDetail>>() {
-                            @Override
-                            public ResponseOrError<TagDetail> call(ResponseOrError<ResponseBody> response) {
-                                if (response.isData()) {
-                                    return ResponseOrError.fromData(tagDetail.toListenedTag());
-                                } else {
-                                    errorSubject.onNext(new Throwable());
-                                    // On error return current user in order to select/deselect already deselected/selected 'listenProfile' icon
-                                    return ResponseOrError.fromData(tagDetail.toListenedTag());
-                                }
+                        return request.map(response -> {
+                            if (response.isData()) {
+                                return ResponseOrError.fromData(tagDetail.toListenedTag());
+                            } else {
+                                errorSubject.onNext(new Throwable());
+                                // On error return current user in order to select/deselect already deselected/selected 'listenProfile' icon
+                                return ResponseOrError.fromData(tagDetail.toListenedTag());
                             }
                         });
                     }
@@ -275,41 +261,28 @@ public class TagProfilePresenter implements ProfilePresenter {
                     public Observable<ResponseOrError<RelatedTagsResponse>> call(final ListenedTagWithRelatedTags listenedTagWithRelatedTags) {
                         final TagDetail tagDetail = listenedTagWithRelatedTags.getTagInSection();
 
-                        final Observable<ResponseOrError<ResponseBody>> request;
+                        final Observable<ResponseOrError<ListenResponse>> request;
                         if (tagDetail.isListening()) {
                             request = apiService.unlistenTag(tagDetail.getSlug())
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
-                                    .doOnNext(new Action1<ResponseBody>() {
-                                        @Override
-                                        public void call(ResponseBody responseBody) {
-                                            unListenSuccess.onNext(tagDetail.getName());
-                                        }
-                                    })
-                                    .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
+                                    .doOnNext(unListenSuccess::onNext)
+                                    .compose(ResponseOrError.<ListenResponse>toResponseOrErrorObservable());
                         } else {
                             request = apiService.listenTag(tagDetail.getSlug())
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
-                                    .doOnNext(new Action1<ResponseBody>() {
-                                        @Override
-                                        public void call(ResponseBody responseBody) {
-                                            listenSuccess.onNext(tagDetail.getName());
-                                        }
-                                    })
-                                    .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
+                                    .doOnNext(listenSuccess::onNext)
+                                    .compose(ResponseOrError.<ListenResponse>toResponseOrErrorObservable());
                         }
 
-                        return request.map(new Func1<ResponseOrError<ResponseBody>, ResponseOrError<RelatedTagsResponse>>() {
-                            @Override
-                            public ResponseOrError<RelatedTagsResponse> call(ResponseOrError<ResponseBody> response) {
-                                if (response.isData()) {
-                                    return ResponseOrError.fromData(updateRelatedTagsWithListenings(listenedTagWithRelatedTags));
-                                } else {
-                                    errorSubject.onNext(new Throwable());
-                                    // On error return current tag in order to select/deselect already deselected/selected 'listenTagProfile' icon
-                                    return ResponseOrError.fromData(listenedTagWithRelatedTags.getRelatedTagsResponse());
-                                }
+                        return request.map(response -> {
+                            if (response.isData()) {
+                                return ResponseOrError.fromData(updateRelatedTagsWithListenings(listenedTagWithRelatedTags));
+                            } else {
+                                errorSubject.onNext(new Throwable());
+                                // On error return current tag in order to select/deselect already deselected/selected 'listenTagProfile' icon
+                                return ResponseOrError.fromData(listenedTagWithRelatedTags.getRelatedTagsResponse());
                             }
                         });
                     }
@@ -517,13 +490,13 @@ public class TagProfilePresenter implements ProfilePresenter {
 
     @Nonnull
     @Override
-    public Observable<String> getListenSuccessObservable() {
+    public Observable<ListenResponse> getListenSuccessObservable() {
         return listenSuccess;
     }
 
     @Nonnull
     @Override
-    public Observable<String> getUnListenSuccessObservable() {
+    public Observable<ListenResponse> getUnListenSuccessObservable() {
         return unListenSuccess;
     }
 

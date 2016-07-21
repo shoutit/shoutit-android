@@ -453,8 +453,6 @@
 
 <!-- Conversations -->
 <string name="conversations_empty">"لا توجد محادثات"</string>
-<string name="listen_success">"لقد بدأت بالاستماع إلى %1$s بنجاح"</string>
-<string name="unlisten_success">"لقد توقفت عن الاستماع إلى %1$s بنجاح"</string>
 <string name="permission_contacts_explanation">"نحتاج صلاحية جهات الاتصال لنتحقق من منهم يستخدم شاوت ات
 "</string>
 <string name="shout_deleted">"هذا الإعلان ملغي"</string>

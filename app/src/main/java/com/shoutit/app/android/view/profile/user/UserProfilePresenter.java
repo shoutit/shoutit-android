@@ -19,6 +19,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.BaseProfile;
+import com.shoutit.app.android.api.model.ListenResponse;
 import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.api.model.ProfilesListResponse;
 import com.shoutit.app.android.api.model.Shout;
@@ -606,7 +607,7 @@ public class UserProfilePresenter implements ProfilePresenter {
 
     @Nonnull
     @Override
-    public Observable<String> getListenSuccessObservable() {
+    public Observable<ListenResponse> getListenSuccessObservable() {
         return userProfilePresenter.getListenSuccessObservable()
                 .mergeWith(listeningHalfPresenter.getListenSuccess());
     }
@@ -618,7 +619,7 @@ public class UserProfilePresenter implements ProfilePresenter {
 
     @Nonnull
     @Override
-    public Observable<String> getUnListenSuccessObservable() {
+    public Observable<ListenResponse> getUnListenSuccessObservable() {
         return userProfilePresenter.getUnListenSuccessObservable()
                 .mergeWith(listeningHalfPresenter.getUnListenSuccess());
     }

@@ -6,6 +6,7 @@ import android.support.design.widget.Snackbar;
 import android.widget.Spinner;
 
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 
 import rx.Observable;
@@ -18,26 +19,9 @@ public class RxUtils {
     }
 
     @NonNull
-    public static Action1<String> listenMessageAction(@NonNull final Activity activity) {
-        return new Action1<String>() {
-            @Override
-            public void call(String name) {
-                ColoredSnackBar
-                        .success(ColoredSnackBar.contentView(activity), activity.getString(R.string.listen_success, name), Snackbar.LENGTH_SHORT)
-                        .show();
-            }
-        };
-    }
-
-    @NonNull
-    public static Action1<String> unListenMessageAction(@NonNull final Activity activity) {
-        return new Action1<String>() {
-            @Override
-            public void call(String name) {
-                ColoredSnackBar
-                        .success(ColoredSnackBar.contentView(activity), activity.getString(R.string.unlisten_success, name), Snackbar.LENGTH_SHORT)
-                        .show();
-            }
-        };
+    public static Action1<ApiMessageResponse> apiMessageAction(@NonNull final Activity activity) {
+        return apiMessageResponse -> ColoredSnackBar
+                .success(ColoredSnackBar.contentView(activity), apiMessageResponse.getSuccess(), Snackbar.LENGTH_SHORT)
+                .show();
     }
 }

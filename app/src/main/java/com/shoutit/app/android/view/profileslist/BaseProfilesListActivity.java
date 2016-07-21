@@ -13,6 +13,7 @@ import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
@@ -67,14 +68,14 @@ public abstract class BaseProfilesListActivity extends BaseActivity {
                 .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(this)));
 
         presenter.getListenSuccessObservable()
-                .compose(this.<String>bindToLifecycle())
+                .compose(this.<ApiMessageResponse>bindToLifecycle())
                 .doOnNext(s -> setResult(RESULT_OK))
-                .subscribe(RxUtils.listenMessageAction(this));
+                .subscribe(RxUtils.apiMessageAction(this));
 
         presenter.getUnListenSuccessObservable()
-                .compose(this.<String>bindToLifecycle())
+                .compose(this.<ApiMessageResponse>bindToLifecycle())
                 .doOnNext(s -> setResult(RESULT_OK))
-                .subscribe(RxUtils.unListenMessageAction(this));
+                .subscribe(RxUtils.apiMessageAction(this));
 
         presenter.getLoadMoreObservable()
                 .compose(bindToLifecycle())

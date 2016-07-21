@@ -33,6 +33,7 @@ import com.shoutit.app.android.api.model.GuestSignupRequest;
 import com.shoutit.app.android.api.model.InvitationCodeResponse;
 import com.shoutit.app.android.api.model.LinkFacebookRequest;
 import com.shoutit.app.android.api.model.LinkGplusRequest;
+import com.shoutit.app.android.api.model.ListenResponse;
 import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessagesResponse;
 import com.shoutit.app.android.api.model.NotificationsResponse;
@@ -311,10 +312,10 @@ public interface ApiService {
     Observable<User> unregisterGcmToken(@Body RequestBody registerDeviceRequest);
 
     @POST("profiles/{username}/listen")
-    Observable<ResponseBody> listenProfile(@Path("username") String username);
+    Observable<ListenResponse> listenProfile(@Path("username") String username);
 
     @DELETE("profiles/{username}/listen")
-    Observable<ResponseBody> unlistenProfile(@Path("username") String username);
+    Observable<ListenResponse> unlistenProfile(@Path("username") String username);
 
     @GET("profiles")
     Observable<SearchProfileResponse> searchProfiles(@Query("search") String searchQuery,
@@ -436,10 +437,10 @@ public interface ApiService {
     Observable<TagDetail> tagDetail(@Path("slug") String tagSlug);
 
     @POST("tags/{slug}/listen")
-    Observable<ResponseBody> listenTag(@Path("slug") String tagSlug);
+    Observable<ListenResponse> listenTag(@Path("slug") String tagSlug);
 
     @DELETE("tags/{slug}/listen")
-    Observable<ResponseBody> unlistenTag(@Path("slug") String tagSlug);
+    Observable<ListenResponse> unlistenTag(@Path("slug") String tagSlug);
 
     @GET("tags/{slug}/related")
     Observable<RelatedTagsResponse> relatedTags(@Path("slug") String tagSlug);

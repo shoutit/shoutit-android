@@ -3,6 +3,7 @@ package com.shoutit.app.android.view.profileslist;
 import android.support.annotation.NonNull;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.shoutit.app.android.api.model.ListenResponse;
 import com.shoutit.app.android.utils.ListeningHalfPresenter;
 
 import java.util.List;
@@ -39,12 +40,12 @@ public abstract class ProfilesListPresenter {
     abstract protected Observer<Object> getLoadMoreObserver();
 
     @Nonnull
-    public Observable<String> getListenSuccessObservable() {
+    public Observable<ListenResponse> getListenSuccessObservable() {
         return listeningHalfPresenter.getListenSuccess();
     }
 
     @Nonnull
-    public Observable<String> getUnListenSuccessObservable() {
+    public Observable<ListenResponse> getUnListenSuccessObservable() {
         return listeningHalfPresenter.getUnListenSuccess();
     }
 }

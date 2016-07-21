@@ -4,6 +4,7 @@ package com.shoutit.app.android.view.profile.user;
 import android.support.annotation.NonNull;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.shoutit.app.android.api.model.ListenResponse;
 import com.shoutit.app.android.api.model.ProfileType;
 
 import java.util.List;
@@ -66,10 +67,10 @@ public interface ProfilePresenter {
     Observer<String> sendReportObserver();
 
     @Nonnull
-    Observable<String> getListenSuccessObservable();
+    Observable<ListenResponse> getListenSuccessObservable();
 
     @Nonnull
-    Observable<String> getUnListenSuccessObservable();
+    Observable<ListenResponse> getUnListenSuccessObservable();
 
     @NonNull
     Observable<String> getBookmarkSuccesMessageObservable();
