@@ -222,6 +222,7 @@ public interface ApiService {
 
     @GET("shouts")
     Observable<ShoutsResponse> tagShouts(@Query("tags") String tagName,
+                                         @Query("country") String country,
                                          @Query("page") Integer page,
                                          @Query("page_size") Integer pageSize);
 

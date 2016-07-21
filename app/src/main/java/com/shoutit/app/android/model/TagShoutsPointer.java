@@ -27,6 +27,11 @@ public class TagShoutsPointer {
         return tagName;
     }
 
+    @Nonnull
+    public String getCountry() {
+        return locationPointer.getCountryCode();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
