@@ -33,9 +33,9 @@ if (keystoreProperties.exists()) {
     props.load(new FileInputStream(keystoreProperties))
 }
 
-def baseVersionName = "3.0.1"
+def baseVersionName = "3.0.2"
 
-project.ext.versionCode = 86
+project.ext.versionCode = 87
 
 if (project.hasProperty("versionSuffix")) {
     project.ext.versionChangeSuffix = project.versionSuffix
