@@ -262,8 +262,8 @@ public class VerifyBusinessActivity extends BaseActivity implements VerifyBusine
     }
 
     @Override
-    public void showSuccessAndFinish() {
-        Toast.makeText(this, R.string.business_ver_sucess, Toast.LENGTH_SHORT).show();
+    public void showSuccessAndFinish(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
         finish();
     }
 

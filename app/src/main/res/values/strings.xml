@@ -335,7 +335,6 @@
 
     <!-- Forgot Password -->
     <string name="forgot_password_send">Reset password</string>
-    <string name="forgot_password_fail">Failed to reset password</string>
 
     <!-- Post Signup Second -->
     <string name="post_signup_next">Next</string>
@@ -775,7 +774,6 @@
     <string name="business_ver_bottom_text">Your information including any legal documents will be securley saved and will be used only for the verification process.</string>
     <string name="business_ver_button">Submit Verification Request</string>
     <string name="business_no_images_error">You need to add at least one image</string>
-    <string name="business_ver_sucess">Verification completed</string>
     <string name="business_ver_ab_title">Business Verification</string>
 
     <!-- Edit Page -->

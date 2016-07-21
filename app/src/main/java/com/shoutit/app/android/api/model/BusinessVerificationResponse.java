@@ -8,7 +8,7 @@ import java.util.List;
 public class BusinessVerificationResponse {
 
     @Nullable
-    private final String message;
+    private final String success;
     @Nullable
     private final String status;
     @Nullable
@@ -22,10 +22,10 @@ public class BusinessVerificationResponse {
     @NonNull
     private final List<String> images;
 
-    public BusinessVerificationResponse(@Nullable String message, @Nullable String status, @Nullable String businessName,
+    public BusinessVerificationResponse(@Nullable String success, @Nullable String status, @Nullable String businessName,
                                         @Nullable String businessEmail, @Nullable String contactPerson, @Nullable String contactNumber,
                                         @NonNull List<String> images) {
-        this.message = message;
+        this.success = success;
         this.status = status;
         this.businessName = businessName;
         this.businessEmail = businessEmail;
@@ -40,8 +40,8 @@ public class BusinessVerificationResponse {
     }
 
     @Nullable
-    public String getMessage() {
-        return message;
+    public String getSuccess() {
+        return success;
     }
 
     @Nullable

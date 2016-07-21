@@ -17,9 +17,11 @@ import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.utils.ApiMessagesHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.view.about.AboutActivity;
 import com.uservoice.uservoicesdk.UserVoice;
@@ -81,28 +83,11 @@ public class ForgotPasswordActivity extends BaseActivity {
                     mSubscription = service.resetPassword(new ResetPasswordRequest(mail))
                             .subscribeOn(Schedulers.io())
                             .observeOn(MyAndroidSchedulers.mainThread())
-                            .doOnTerminate(new Action0() {
-                                @Override
-                                public void call() {
-                                    mForgotPasswordProgress.setVisibility(View.GONE);
-                                }
-                            })
-                            .subscribe(new Action1<ResponseBody>() {
-                                @Override
-                                public void call(ResponseBody responseBody) {
-                                    finish();
-                                }
-                            }, new Action1<Throwable>() {
-                                @Override
-                                public void call(Throwable throwable) {
-                                    ColoredSnackBar
-                                            .error(
-                                                    ColoredSnackBar.contentView(ForgotPasswordActivity.this),
-                                                    R.string.forgot_password_fail,
-                                                    Toast.LENGTH_SHORT)
-                                            .show();
-                                }
-                            });
+                            .doOnTerminate(() -> mForgotPasswordProgress.setVisibility(View.GONE))
+                            .subscribe(apiMessageResponse -> {
+                                ApiMessagesHelper.showApiMessageToast(ForgotPasswordActivity.this, apiMessageResponse);
+                                finish();
+                            }, ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(ForgotPasswordActivity.this)));
                 }
             }
         });

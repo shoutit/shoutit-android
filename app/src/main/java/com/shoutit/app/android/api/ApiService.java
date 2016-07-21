@@ -270,7 +270,7 @@ public interface ApiService {
      **/
 
     @POST("auth/reset_password")
-    Observable<ResponseBody> resetPassword(@Body ResetPasswordRequest request);
+    Observable<ApiMessageResponse> resetPassword(@Body ResetPasswordRequest request);
 
     @POST("auth/change_password")
     Observable<ApiMessageResponse> changePassword(@Body ChangePasswordRequest changePasswordRequest);
@@ -343,7 +343,7 @@ public interface ApiService {
                                                      @Query("page_size") Integer pageSize);
 
     @PATCH("profiles/{user_name}/contacts")
-    Observable<ResponseBody> uploadContacts(@Path("user_name") String userName,
+    Observable<ApiMessageResponse> uploadContacts(@Path("user_name") String userName,
                                             @Body UploadContactsRequest uploadContactsRequest);
 
     @GET("profiles/{user_name}/mutual_contacts")
