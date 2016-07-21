@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.api.model.SignResponse;
@@ -67,7 +68,7 @@ public class LoginPresenterTest {
         mResponseSubject = BehaviorSubject.create(new SignResponse("a", "b", "c", true, user));
         when(mApiService.login(any(EmailLoginRequest.class))).thenReturn(mResponseSubject);
         when(mApiService.resetPassword(any(ResetPasswordRequest.class))).thenReturn(
-                Observable.just((ResponseBody) new RealResponseBody(new Headers.Builder().build(), null)));
+                Observable.just(new ApiMessageResponse("df")));
         when(locationManager.updateUserLocationObservable()).thenReturn(Observable.just((UserLocation) null));
 
         when(mUserPreferences.getLocationObservable())
