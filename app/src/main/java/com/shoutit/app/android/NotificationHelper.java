@@ -16,8 +16,11 @@ import android.support.v4.app.TaskStackBuilder;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.google.common.base.Optional;
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.shoutit.app.android.api.model.BaseProfile;
+import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForApplication;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.view.main.MainActivity;
@@ -92,13 +95,15 @@ public class NotificationHelper {
         final String body = bundle.getString(GCM_BODY_FIELD);
         final String iconUrl = bundle.getString(GCM_ICON_FIELD);
         final String pushedFor = bundle.getString(GCM_PUSHED_FOR_FIELD);
+        final Optional<String> optionalPusherFor = Strings.isNullOrEmpty(pushedFor) ?
+                Optional.absent() : Optional.of(pushedFor);
         final String eventName = bundle.getString(GCM_EVENT_NAME);
         final String dataJson = bundle.getString(GCM_DATA_FIELD);
 
-        showNotification(dataJson, title, body, iconUrl, eventName, pushedFor);
+        showNotification(dataJson, title, body, iconUrl, eventName, optionalPusherFor);
     }
 
-    private void showNotification(String dataJson, String title, String body, String iconUrl, String eventName, String pushedFor) {
+    private void showNotification(String dataJson, String title, String body, String iconUrl, String eventName, Optional<String> pushedFor) {
         final Bitmap largeIcon = getLargeIconOrNull(iconUrl);
 
         final Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -111,11 +116,18 @@ public class NotificationHelper {
                 .notify(getNotificationId(eventName), notification);
     }
 
-    private boolean checkIfNotificationIsForCurrentUser(String pushedFor) {
+    private boolean checkIfNotificationIsForCurrentUser(Optional<String> pushedFor) {
         final BaseProfile userOrPage = userPreferences.getUserOrPage();
-        assert userOrPage != null;
-        final String id = userOrPage.getId();
-        return pushedFor.equals(id);
+        final User guestUser = userPreferences.getGuestUser();
+        String userId = null;
+
+        if (userOrPage != null) {
+            userId = userOrPage.getId();
+        } else if (guestUser != null) {
+            userId = guestUser.getId();
+        }
+
+        return !pushedFor.isPresent() || pushedFor.get().equals(userId);
     }
 
     @NonNull
