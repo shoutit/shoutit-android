@@ -249,10 +249,25 @@ public class LinkedAccountsPresenter {
         /****/
 
         progressObservable = Observable.merge(
-                fetchPagesListSubject.map(Functions1.returnTrue()),
-                linkFacebookPageSubject.map(Functions1.returnTrue()),
-                pagesObservable.map(Functions1.returnFalse()),
-                linkFacebookPageObservable.map(Functions1.returnFalse()));
+                Observable.merge(
+                        askForPagesPermissions,
+                        fetchPagesListSubject,
+                        linkFacebookSubject,
+                        unlinkFacebookSubject,
+                        linkGoogleSubject,
+                        unlinkGoogleSubject,
+                        linkFacebookPageSubject,
+                        unlinkFacebookPageSubject)
+                        .map(Functions1.returnTrue()),
+                Observable.merge(
+                        pagesObservable,
+                        linkFacebookObservable,
+                        unlinkFacebookObservable,
+                        linkGoogleObservable,
+                        unlinkGoogleObservable,
+                        unlinkFacebookPageObservable,
+                        linkFacebookPageObservable)
+                        .map(Functions1.returnFalse()));
 
         errorObservable = Observable.merge(
                 linkFacebookObservable.compose(ResponseOrError.onlyError()),

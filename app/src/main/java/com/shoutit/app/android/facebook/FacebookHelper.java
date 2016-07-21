@@ -314,7 +314,8 @@ public class FacebookHelper {
 
                         return hasRequiredPermissionInApi(user, requiredPermissions);
                     })
-                    .map(user -> ResponseOrError.fromData(true));
+                    .map(user -> ResponseOrError.fromData(true))
+                    .takeUntil(responseOrError -> responseOrError.isData() && responseOrError.data());
         };
     }
 
@@ -530,6 +531,7 @@ public class FacebookHelper {
                                 } catch (Exception e) {
                                     if (!subscriber.isUnsubscribed()) {
                                         subscriber.onError(e);
+                                        subscriber.onCompleted();
                                     }
                                 }
                             }

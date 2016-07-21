@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,7 +71,6 @@ public class LinkedAccountsFragment extends BaseFragment implements LinkedAccoun
     LayoutInflater inflater;
 
     private CallbackManager callbackManager;
-    private String googleId;
 
     public static Fragment newInstance() {
         return new LinkedAccountsFragment();
@@ -124,12 +124,12 @@ public class LinkedAccountsFragment extends BaseFragment implements LinkedAccoun
                 .compose(bindToLifecycle())
                 .switchMap(o -> facebookHelper.askForPermissionIfNeeded(
                                 getActivity(), FacebookHelper.PAGES_PERMISSIONS, callbackManager, true))
-                .take(1)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(responseOrError -> {
                     if (responseOrError.isData()) {
                         presenter.showPagesList();
                     } else {
+                        progressView.setVisibility(View.GONE);
                         ColoredSnackBar.error(ColoredSnackBar.contentView(getActivity()), responseOrError.error()).show();
                     }
                 });
@@ -197,7 +197,7 @@ public class LinkedAccountsFragment extends BaseFragment implements LinkedAccoun
         }
 
         new AlertDialog.Builder(getActivity())
-                .setTitle("Select Facebook Page")
+                .setTitle(getString(R.string.linked_account_select_page))
                 .setSingleChoiceItems(new FacebookPagesAdapter(), -1, (dialog, which) -> {
                     presenter.linkFacebookPageSubject(pages.get(which));
                     dialog.dismiss();
@@ -224,7 +224,6 @@ public class LinkedAccountsFragment extends BaseFragment implements LinkedAccoun
             final GoogleSignInAccount acct = result.getSignInAccount();
 
             if (acct != null && acct.getId() != null) {
-                googleId = acct.getId();
                 presenter.linkGoogleSubject().onNext(acct.getServerAuthCode());
             }
 

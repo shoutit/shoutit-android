@@ -766,6 +766,7 @@
     <string name="linked_accounts_unlink_facebook_page">Do you really want to unlink your facebook page account ?</string>
     <string name="linked_accounts_linked">Linked</string>
     <string name="linked_account_no_pages">You have no Pages in your Facebook account</string>
+    <string name="linked_account_select_page">Select Facebook Page</string>
 
     <!-- Sponsored -->
     <string name="ad_sponsored">Sponsored</string>
