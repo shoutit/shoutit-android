@@ -27,7 +27,7 @@ import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.SystemUIUtils;
-import com.shoutit.app.android.view.loginintro.FacebookHelper;
+import com.shoutit.app.android.facebook.FacebookHelper;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.main.MainActivity;
 import com.uservoice.uservoicesdk.UserVoice;

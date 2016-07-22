@@ -25,7 +25,7 @@ import com.shoutit.app.android.view.invitefriends.contactsinvite.InviteContactsA
 import com.shoutit.app.android.view.invitefriends.facebookfriends.FacebookFriendsActivity;
 import com.shoutit.app.android.view.invitefriends.suggestionspages.PagesSuggestionActivity;
 import com.shoutit.app.android.view.invitefriends.suggestionsusers.UserSuggestionActivity;
-import com.shoutit.app.android.view.loginintro.FacebookHelper;
+import com.shoutit.app.android.facebook.FacebookHelper;
 
 import java.util.List;
 

@@ -31,6 +31,7 @@ import com.shoutit.app.android.api.model.EditShoutRequestWithPrice;
 import com.shoutit.app.android.api.model.EmailSignupRequest;
 import com.shoutit.app.android.api.model.GuestSignupRequest;
 import com.shoutit.app.android.api.model.InvitationCodeResponse;
+import com.shoutit.app.android.api.model.LinkFacebookPageRequest;
 import com.shoutit.app.android.api.model.LinkFacebookRequest;
 import com.shoutit.app.android.api.model.LinkGplusRequest;
 import com.shoutit.app.android.api.model.ListenResponse;
@@ -223,6 +224,7 @@ public interface ApiService {
 
     @GET("shouts")
     Observable<ShoutsResponse> tagShouts(@Query("tags") String tagName,
+                                         @Query("country") String country,
                                          @Query("page") Integer page,
                                          @Query("page_size") Integer pageSize);
 
@@ -616,6 +618,14 @@ public interface ApiService {
 
     @HTTP(method = "DELETE", path = "profiles/{username}/link", hasBody = true)
     Observable<ApiMessageResponse> unlinkGoogle(@Path("username") String username, @Body LinkGplusRequest request);
+
+    @POST("profiles/{user_name}/facebook_page")
+    Observable<ApiMessageResponse> linkFacebookPage(@Path("user_name") String userName,
+                                                          @Body LinkFacebookPageRequest body);
+
+    @HTTP(method = "DELETE", path = "profiles/{user_name}/facebook_page", hasBody = true)
+    Observable<ApiMessageResponse> unlinkFacebookPage(@Path("user_name") String userName,
+                                                          @Body LinkFacebookPageRequest body);
 
     /**
      * Shout like

@@ -400,7 +400,7 @@ public class ShoutsDao {
         @Override
         Observable<ShoutsResponse> getShoutsRequest(int pageNumber) {
             return apiService
-                    .tagShouts(pointer.getTagName(), pageNumber, pointer.getPageSize());
+                    .tagShouts(pointer.getTagName(), pointer.getCountry(), pageNumber, pointer.getPageSize());
         }
     }
 
@@ -457,8 +457,8 @@ public class ShoutsDao {
                                 filtersToSubmit.getFiltersQueryMap());
                     } else {
                         return apiService.searchTagShouts(query, pageNumber, PAGE_SIZE, contextItemId,
-                                country, city, state,
-                                null, null, DEFAULT_SEARCH_DISTANCE, null, null, null, null);
+                                country, null, null,
+                                null, null, null, null, null, null, null);
                     }
                 case CATEGORY:
                     if (filtersToSubmit != null) {

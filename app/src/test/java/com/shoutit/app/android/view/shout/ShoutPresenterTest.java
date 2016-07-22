@@ -25,7 +25,7 @@ import com.shoutit.app.android.model.MobilePhoneResponse;
 import com.shoutit.app.android.model.RelatedShoutsPointer;
 import com.shoutit.app.android.model.UserShoutsPointer;
 import com.shoutit.app.android.utils.BookmarkHelper;
-import com.shoutit.app.android.view.loginintro.FacebookHelper;
+import com.shoutit.app.android.facebook.FacebookHelper;
 
 import org.junit.Before;
 import org.junit.Test;

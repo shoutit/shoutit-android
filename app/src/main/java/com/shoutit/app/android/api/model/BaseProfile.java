@@ -35,9 +35,9 @@ public class BaseProfile implements ProfileType {
     protected final UserLocation location;
     protected boolean isOwner;
     @Nullable
-    private final Stats stats;
+    protected final Stats stats;
     @NonNull
-    private final String email;
+    protected final String email;
     @javax.annotation.Nullable
     protected final LinkedAccounts linkedAccounts;
     @Nullable

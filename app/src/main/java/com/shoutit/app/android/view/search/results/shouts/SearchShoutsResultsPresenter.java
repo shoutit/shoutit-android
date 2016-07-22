@@ -76,8 +76,7 @@ public class SearchShoutsResultsPresenter {
         final BaseProfile currentUser = userPreferences.getUserOrPage();
         final String currentUserName = currentUser != null ? currentUser.getUsername() : null;
 
-        final boolean initWithUserLocation = searchType != SearchPresenter.SearchType.PROFILE &&
-                searchType != SearchPresenter.SearchType.TAG_PROFILE;
+        final boolean initWithUserLocation = searchType != SearchPresenter.SearchType.PROFILE;
 
         final Observable<ShoutsDao.SearchShoutsDao> daoWithFilters = filtersSelectedSubject
                 .map(filtersToSubmit -> dao.getSearchShoutsDao(new SearchShoutPointer(

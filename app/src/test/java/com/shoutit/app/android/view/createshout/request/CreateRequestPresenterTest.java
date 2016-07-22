@@ -12,7 +12,7 @@ import com.shoutit.app.android.api.model.Currency;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.utils.ResourcesHelper;
-import com.shoutit.app.android.view.loginintro.FacebookHelper;
+import com.shoutit.app.android.facebook.FacebookHelper;
 
 import org.junit.Before;
 import org.junit.Test;
