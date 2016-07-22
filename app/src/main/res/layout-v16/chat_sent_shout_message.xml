@@ -48,6 +48,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:lines="1"
+            android:textIsSelectable="true"
             android:paddingLeft="2dp"
             android:paddingRight="2dp"
             tools:text="Cotton wool line with cap and other cool things like computers" />

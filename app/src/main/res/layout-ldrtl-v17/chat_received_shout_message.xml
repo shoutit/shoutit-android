@@ -61,6 +61,7 @@
             android:layout_height="wrap_content"
             android:lines="1"
             android:textDirection="rtl"
+            android:textIsSelectable="true"
             android:paddingLeft="2dp"
             android:paddingRight="2dp"
             tools:text="Cotton wool line " />

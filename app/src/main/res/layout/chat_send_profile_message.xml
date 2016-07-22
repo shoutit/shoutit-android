@@ -48,6 +48,7 @@
             android:lines="1"
             android:paddingLeft="2dp"
             android:paddingRight="2dp"
+            android:textIsSelectable="true"
             tools:text="John Cena sdfsdfds fdsfdsfadsfad sfadsfasfasdfasdfsadfadsfdsfes" />
 
         <TextView

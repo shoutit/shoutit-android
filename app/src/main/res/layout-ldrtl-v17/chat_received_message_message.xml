@@ -32,6 +32,7 @@
             android:paddingBottom="20dp"
             android:autoLink="email|phone|web"
             android:textSize="16sp"
+            android:textIsSelectable="true"
             android:textDirection="rtl"
             tools:text="This is a one liner message This is a one liner message This is a one liner message This is a one liner message This is a one liner message This is a one liner message This is a one liner message" />
 

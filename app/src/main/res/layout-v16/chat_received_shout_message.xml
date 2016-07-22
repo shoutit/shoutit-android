@@ -60,6 +60,7 @@
             android:lines="1"
             android:paddingLeft="2dp"
             android:paddingRight="2dp"
+            android:textIsSelectable="true"
             tools:text="Cotton wool line with cap and other cool things like computers" />
 
         <LinearLayout
