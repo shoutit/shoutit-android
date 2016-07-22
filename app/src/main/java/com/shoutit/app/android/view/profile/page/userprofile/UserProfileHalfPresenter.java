@@ -8,6 +8,7 @@ import com.appunite.rx.dagger.UiScheduler;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.BaseProfile;
+import com.shoutit.app.android.api.model.ListenResponse;
 import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
@@ -38,9 +39,9 @@ public class UserProfileHalfPresenter {
     @Nonnull
     protected final PublishSubject<Throwable> errorSubject = PublishSubject.create();
     @Nonnull
-    private final PublishSubject<String> listenSuccess = PublishSubject.create();
+    private final PublishSubject<ListenResponse> listenSuccess = PublishSubject.create();
     @Nonnull
-    private final PublishSubject<String> unListenSuccess = PublishSubject.create();
+    private final PublishSubject<ListenResponse> unListenSuccess = PublishSubject.create();
 
     @Nonnull
     private final Observable<ResponseOrError<BaseProfile>> userUpdatesObservable;
@@ -59,19 +60,19 @@ public class UserProfileHalfPresenter {
                 .switchMap(new Func1<BaseProfile, Observable<ResponseOrError<BaseProfile>>>() {
                     @Override
                     public Observable<ResponseOrError<BaseProfile>> call(final BaseProfile user) {
-                        final Observable<ResponseOrError<ResponseBody>> request;
+                        final Observable<ResponseOrError<ListenResponse>> request;
                         if (user.isListening()) {
                             request = apiService.unlistenProfile(user.getUsername())
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
-                                    .doOnNext(responseBody -> unListenSuccess.onNext(user.getName()))
-                                    .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
+                                    .doOnNext(unListenSuccess::onNext)
+                                    .compose(ResponseOrError.<ListenResponse>toResponseOrErrorObservable());
                         } else {
                             request = apiService.listenProfile(user.getUsername())
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
-                                    .doOnNext(responseBody -> listenSuccess.onNext(user.getName()))
-                                    .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
+                                    .doOnNext(listenSuccess::onNext)
+                                    .compose(ResponseOrError.<ListenResponse>toResponseOrErrorObservable());
                         }
 
                         return request.map(response -> {
@@ -88,12 +89,12 @@ public class UserProfileHalfPresenter {
     }
 
     @Nonnull
-    public Observable<String> getListenSuccessObservable() {
+    public Observable<ListenResponse> getListenSuccessObservable() {
         return listenSuccess;
     }
 
     @Nonnull
-    public Observable<String> getUnListenSuccessObservable() {
+    public Observable<ListenResponse> getUnListenSuccessObservable() {
         return unListenSuccess;
     }
 

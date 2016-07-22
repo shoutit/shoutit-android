@@ -34,6 +34,7 @@ import com.shoutit.app.android.api.model.InvitationCodeResponse;
 import com.shoutit.app.android.api.model.LinkFacebookPageRequest;
 import com.shoutit.app.android.api.model.LinkFacebookRequest;
 import com.shoutit.app.android.api.model.LinkGplusRequest;
+import com.shoutit.app.android.api.model.ListenResponse;
 import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessagesResponse;
 import com.shoutit.app.android.api.model.NotificationsResponse;
@@ -271,10 +272,10 @@ public interface ApiService {
      **/
 
     @POST("auth/reset_password")
-    Observable<ResponseBody> resetPassword(@Body ResetPasswordRequest request);
+    Observable<ApiMessageResponse> resetPassword(@Body ResetPasswordRequest request);
 
     @POST("auth/change_password")
-    Observable<ResponseBody> changePassword(@Body ChangePasswordRequest changePasswordRequest);
+    Observable<ApiMessageResponse> changePassword(@Body ChangePasswordRequest changePasswordRequest);
 
     @POST("auth/verify_email")
     Observable<VerifyEmailResponse> verifyEmail(@Body VerifyEmailRequest verifyEmailRequest);
@@ -313,10 +314,10 @@ public interface ApiService {
     Observable<User> unregisterGcmToken(@Body RequestBody registerDeviceRequest);
 
     @POST("profiles/{username}/listen")
-    Observable<ResponseBody> listenProfile(@Path("username") String username);
+    Observable<ListenResponse> listenProfile(@Path("username") String username);
 
     @DELETE("profiles/{username}/listen")
-    Observable<ResponseBody> unlistenProfile(@Path("username") String username);
+    Observable<ListenResponse> unlistenProfile(@Path("username") String username);
 
     @GET("profiles")
     Observable<SearchProfileResponse> searchProfiles(@Query("search") String searchQuery,
@@ -344,7 +345,7 @@ public interface ApiService {
                                                      @Query("page_size") Integer pageSize);
 
     @PATCH("profiles/{user_name}/contacts")
-    Observable<ResponseBody> uploadContacts(@Path("user_name") String userName,
+    Observable<ApiMessageResponse> uploadContacts(@Path("user_name") String userName,
                                             @Body UploadContactsRequest uploadContactsRequest);
 
     @GET("profiles/{user_name}/mutual_contacts")
@@ -438,10 +439,10 @@ public interface ApiService {
     Observable<TagDetail> tagDetail(@Path("slug") String tagSlug);
 
     @POST("tags/{slug}/listen")
-    Observable<ResponseBody> listenTag(@Path("slug") String tagSlug);
+    Observable<ListenResponse> listenTag(@Path("slug") String tagSlug);
 
     @DELETE("tags/{slug}/listen")
-    Observable<ResponseBody> unlistenTag(@Path("slug") String tagSlug);
+    Observable<ListenResponse> unlistenTag(@Path("slug") String tagSlug);
 
     @GET("tags/{slug}/related")
     Observable<RelatedTagsResponse> relatedTags(@Path("slug") String tagSlug);
@@ -484,10 +485,10 @@ public interface ApiService {
     Observable<ResponseBody> deleteConversation(@Path("id") String conversationId);
 
     @POST("conversations/{id}/add_profile")
-    Observable<ResponseBody> addProfile(@Path("id") String conversationId, @Body ProfileRequest removeProfileRequest);
+    Observable<ApiMessageResponse> addProfile(@Path("id") String conversationId, @Body ProfileRequest removeProfileRequest);
 
     @POST("conversations/{id}/remove_profile")
-    Observable<ResponseBody> removeProfile(@Path("id") String conversationId, @Body ProfileRequest removeProfileRequest);
+    Observable<ApiMessageResponse> removeProfile(@Path("id") String conversationId, @Body ProfileRequest removeProfileRequest);
 
     @POST("messages/{id}/read")
     Observable<ResponseBody> readMessage(@Path("id") String messageId);
@@ -506,13 +507,13 @@ public interface ApiService {
                                                             @Query("page_size") Integer pageSize);
 
     @POST("conversations/{id}/promote_admin")
-    Observable<ResponseBody> promoteAdmin(@Path("id") String conversationId, @Body ProfileRequest profileRequest);
+    Observable<ApiMessageResponse> promoteAdmin(@Path("id") String conversationId, @Body ProfileRequest profileRequest);
 
     @POST("conversations/{id}/block_profile")
-    Observable<ResponseBody> blockProfile(@Path("id") String conversationId, @Body ProfileRequest profileRequest);
+    Observable<ApiMessageResponse> blockProfile(@Path("id") String conversationId, @Body ProfileRequest profileRequest);
 
     @POST("conversations/{id}/unblock_profile")
-    Observable<ResponseBody> unblockProfile(@Path("id") String conversationId, @Body ProfileRequest profileRequest);
+    Observable<ApiMessageResponse> unblockProfile(@Path("id") String conversationId, @Body ProfileRequest profileRequest);
 
     @GET("conversations/{id}/blocked")
     Observable<BlockedProfilesResposne> getBlockedProfiles(@Path("id") String conversationId);
@@ -585,11 +586,11 @@ public interface ApiService {
                                                @Query("page_size") Integer pageSize);
 
     @HTTP(method = "DELETE", path = "pages/{username}/admin", hasBody = true)
-    Observable<ResponseBody> deleteAdmin(@Path("username") String userName,
+    Observable<ApiMessageResponse> deleteAdmin(@Path("username") String userName,
                                          @Body AdminRequest adminRequest);
 
     @POST("pages/{username}/admin")
-    Observable<ResponseBody> addAdmin(@Path("username") String pageUserName,
+    Observable<ApiMessageResponse> addAdmin(@Path("username") String pageUserName,
                                       @Body AdminRequest addAdminRequest);
 
     @POST("pages")

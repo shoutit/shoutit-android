@@ -11,6 +11,7 @@ import com.google.common.collect.Lists;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.NoDataTextAdapterItem;
 import com.shoutit.app.android.api.model.BaseProfile;
+import com.shoutit.app.android.api.model.ListenResponse;
 import com.shoutit.app.android.api.model.ProfilesListResponse;
 import com.shoutit.app.android.dao.BaseProfileListDao;
 import com.shoutit.app.android.utils.ListeningHalfPresenter;
@@ -167,12 +168,12 @@ public abstract class BaseProfileListPresenter {
     }
 
     @Nonnull
-    public Observable<String> getListenSuccessObservable() {
+    public Observable<ListenResponse> getListenSuccessObservable() {
         return listeningHalfPresenter.getListenSuccess();
     }
 
     @Nonnull
-    public Observable<String> getUnListenSuccessObservable() {
+    public Observable<ListenResponse> getUnListenSuccessObservable() {
         return listeningHalfPresenter.getUnListenSuccess();
     }
 

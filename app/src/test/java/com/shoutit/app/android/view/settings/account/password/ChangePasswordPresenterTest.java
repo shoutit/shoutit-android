@@ -2,6 +2,7 @@ package com.shoutit.app.android.view.settings.account.password;
 
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.api.model.ChangePasswordRequest;
 import com.shoutit.app.android.api.model.User;
 
@@ -32,7 +33,7 @@ public class ChangePasswordPresenterTest {
         MockitoAnnotations.initMocks(this);
 
         when(apiService.changePassword(any(ChangePasswordRequest.class)))
-                .thenReturn(Observable.just(ResponseBody.create(null, "z")));
+                .thenReturn(Observable.just(new ApiMessageResponse("zz")));
 
         when(userPreferences.getUser())
                 .thenReturn(new User("z", null, null, null, null, null, null, null, false, null,

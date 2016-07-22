@@ -14,6 +14,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
+import com.shoutit.app.android.utils.ApiMessagesHelper;
 import com.shoutit.app.android.utils.PreferencesHelper;
 import com.shoutit.app.android.view.pages.my.SelectListenersActivity;
 import com.shoutit.app.android.view.profile.user.UserProfileActivity;
@@ -63,11 +64,11 @@ public class AdminsFragment extends BaseProfileListFragment implements AdminsDia
 
         presenter.getSuccessRemoveAdminObservable()
                 .compose(bindToLifecycle())
-                .subscribe();
+                .subscribe(ApiMessagesHelper.apiMessageAction(getActivity()));
 
         presenter.getSuccessAddAdminObservable()
                 .compose(bindToLifecycle())
-                .subscribe();
+                .subscribe(ApiMessagesHelper.apiMessageAction(getActivity()));
     }
 
     @Override

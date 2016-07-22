@@ -12,6 +12,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.utils.ApiMessagesHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.view.profile.ProfileIntentHelper;
@@ -46,7 +47,8 @@ public class ContactsFriendsActivity extends BaseProfilesListActivity {
 
         presenter.getSuccessFetchContacts()
                 .compose(bindToLifecycle())
-                .subscribe(responseBodyResponseOrError -> {
+                .subscribe(apiMessageResponse -> {
+                    ApiMessagesHelper.showApiMessage(this, apiMessageResponse);
                     presenter.refreshData();
                 });
 

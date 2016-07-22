@@ -335,7 +335,6 @@
 
     <!-- Forgot Password -->
     <string name="forgot_password_send">Reset password</string>
-    <string name="forgot_password_fail">Failed to reset password</string>
 
     <!-- Post Signup Second -->
     <string name="post_signup_next">Next</string>
@@ -514,8 +513,6 @@
     <string name="google_api_key" translatable="false">AIzaSyBWHadI_MPYQgDLqI4RXhymEs42YEtgTEE</string>
     <string name="font_roboto_regular">sans-serif</string>
     <string name="font_roboto_medium">sans-serif</string>
-    <string name="listen_success">You have successfully started listening to %1$s</string>
-    <string name="unlisten_success">You have successfully stopped listening to %1$s</string>
     <string name="home_user_and_date">%1$s - %2$s</string>
     <string name="location_location">%1$s, %2$s</string>
     <string name="shout_user_location">%1$s, %2$s</string>
@@ -782,7 +779,6 @@
     <string name="business_ver_bottom_text">Your information including any legal documents will be securley saved and will be used only for the verification process.</string>
     <string name="business_ver_button">Submit Verification Request</string>
     <string name="business_no_images_error">You need to add at least one image</string>
-    <string name="business_ver_sucess">Verification completed</string>
     <string name="business_ver_ab_title">Business Verification</string>
 
     <!-- Edit Page -->

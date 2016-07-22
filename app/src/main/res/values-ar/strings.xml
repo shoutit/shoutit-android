@@ -291,7 +291,6 @@
 
 <!-- Forgot Password -->
 <string name="forgot_password_send">"إعادة ضبط كلمة المرور"</string>
-<string name="forgot_password_fail">"خطأ في إعادة ضبط كلمة المرور"</string>
 
 <!-- Post Signup Second -->
 <string name="post_signup_next">"التالي"</string>
@@ -453,8 +452,6 @@
 
 <!-- Conversations -->
 <string name="conversations_empty">"لا توجد محادثات"</string>
-<string name="listen_success">"لقد بدأت بالاستماع إلى %1$s بنجاح"</string>
-<string name="unlisten_success">"لقد توقفت عن الاستماع إلى %1$s بنجاح"</string>
 <string name="permission_contacts_explanation">"نحتاج صلاحية جهات الاتصال لنتحقق من منهم يستخدم شاوت ات
 "</string>
 <string name="shout_deleted">"هذا الإعلان ملغي"</string>
@@ -726,7 +723,6 @@
 <string name="business_ver_bottom_text">"معلوماتك المتضمنة أي وثائق رسمية ستحفظ بأمان وستستخدم فقط من أجل عملية التحقق."</string>
 <string name="business_ver_button">"إرسال طلب التحقق"</string>
 <string name="business_no_images_error">"يجب أن تضيف صورة واحدة على الأقل"</string>
-<string name="business_ver_sucess">"تم التحقق"</string>
 <string name="business_ver_ab_title">"التحقق من العمل"</string>
 
 <!-- Edit Page -->

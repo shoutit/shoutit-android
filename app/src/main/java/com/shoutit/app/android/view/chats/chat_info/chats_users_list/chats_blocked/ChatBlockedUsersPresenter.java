@@ -9,6 +9,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.api.model.BlockedProfilesResposne;
 import com.shoutit.app.android.api.model.ConversationProfile;
 import com.shoutit.app.android.api.model.ProfileRequest;
@@ -94,10 +95,11 @@ public class ChatBlockedUsersPresenter {
         mCompositeSubscription.add(mApiService.unblockProfile(mConversationId, new ProfileRequest(id))
                 .observeOn(mUiScheduler)
                 .subscribeOn(mNetworkScheduler)
-                .subscribe(new Action1<ResponseBody>() {
+                .subscribe(new Action1<ApiMessageResponse>() {
                     @Override
-                    public void call(ResponseBody responseBody) {
+                    public void call(ApiMessageResponse apiMessageResponse) {
                         getConversation();
+                        mListener.showApiMessage(apiMessageResponse);
                     }
                 }, new Action1<Throwable>() {
                     @Override
@@ -133,5 +135,7 @@ public class ChatBlockedUsersPresenter {
         void showProfile(String userName, boolean isPage);
 
         void showUnblockConfirmDialog(String id, String name);
+
+        void showApiMessage(ApiMessageResponse apiMessageResponse);
     }
 }

@@ -13,8 +13,10 @@ import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.utils.ApiMessagesHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.view.chats.chat_info.chats_users_list.ChatUsersListAdapter;
 import com.shoutit.app.android.view.chats.chat_info.chats_users_list.ChatUsersListComponent;
@@ -116,7 +118,8 @@ public class ChatSelectUsersActivity extends BaseActivity implements ChatSelectU
     }
 
     @Override
-    public void finishScreen() {
+    public void finishScreen(ApiMessageResponse apiMessageResponse) {
+        ApiMessagesHelper.showApiMessageToast(this, apiMessageResponse);
         finish();
     }
 }

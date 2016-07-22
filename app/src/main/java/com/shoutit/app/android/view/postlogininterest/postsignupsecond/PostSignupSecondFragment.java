@@ -10,13 +10,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
-import com.appunite.rx.functions.Functions1;
-import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
-import com.shoutit.app.android.utils.rx.RxUtils;
+import com.shoutit.app.android.utils.ApiMessagesHelper;
 
 import java.util.List;
 
@@ -58,12 +57,12 @@ public abstract class PostSignupSecondFragment extends BaseFragment {
                 .subscribe(adapter);
 
         presenter.getListenSuccessObservable()
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(RxUtils.listenMessageAction(getActivity()));
+                .compose(this.<ApiMessageResponse>bindToLifecycle())
+                .subscribe(ApiMessagesHelper.apiMessageAction(getActivity()));
 
         presenter.getUnListenSuccessObservable()
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(RxUtils.unListenMessageAction(getActivity()));
+                .compose(this.<ApiMessageResponse>bindToLifecycle())
+                .subscribe(ApiMessagesHelper.apiMessageAction(getActivity()));
     }
 
     private void setupAdapter() {

@@ -14,11 +14,12 @@ import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.ApiMessageResponse;
+import com.shoutit.app.android.utils.ApiMessagesHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
-import com.shoutit.app.android.utils.rx.RxUtils;
 import com.shoutit.app.android.view.listenings.ProfilesListAdapter;
 
 import java.util.List;
@@ -69,12 +70,12 @@ public abstract class BaseProfileListFragment extends BaseFragment {
                 .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(getActivity())));
 
         presenter.getListenSuccessObservable()
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(RxUtils.listenMessageAction(getActivity()));
+                .compose(this.<ApiMessageResponse>bindToLifecycle())
+                .subscribe(ApiMessagesHelper.apiMessageAction(getActivity()));
 
         presenter.getUnListenSuccessObservable()
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(RxUtils.unListenMessageAction(getActivity()));
+                .compose(this.<ApiMessageResponse>bindToLifecycle())
+                .subscribe(ApiMessagesHelper.apiMessageAction(getActivity()));
 
         presenter.getLoadMoreObservable()
                 .compose(bindToLifecycle())

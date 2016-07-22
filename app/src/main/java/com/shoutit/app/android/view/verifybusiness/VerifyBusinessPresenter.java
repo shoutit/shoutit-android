@@ -267,7 +267,7 @@ public class VerifyBusinessPresenter {
                             if (response.isData()) {
                                 verificationDao.getDao(currentPageUserName)
                                         .getVerificationResponseResultsObserver().onNext(response.data());
-                                listener.showSuccessAndFinish();
+                                listener.showSuccessAndFinish(response.data().getSuccess());
                             } else {
                                 listener.showError(response.error());
                             }
@@ -376,7 +376,7 @@ public class VerifyBusinessPresenter {
 
         void showError(String message);
 
-        void showSuccessAndFinish();
+        void showSuccessAndFinish(String message);
 
         void showNameError(String error);
 

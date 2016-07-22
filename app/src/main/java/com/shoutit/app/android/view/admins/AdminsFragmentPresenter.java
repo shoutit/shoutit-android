@@ -11,6 +11,7 @@ import com.appunite.rx.functions.Functions1;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.AdminRequest;
+import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dao.BaseProfileListDao;
 import com.shoutit.app.android.dao.ProfilesDao;
@@ -35,13 +36,13 @@ public class AdminsFragmentPresenter extends BaseProfileListPresenter {
     @Nonnull
     private final PublishSubject<String> addAdminSubject = PublishSubject.create();
     @Nonnull
-    private final Observable<ResponseBody> successRemoveAdminObservable;
+    private final Observable<ApiMessageResponse> successRemoveAdminObservable;
     @Nonnull
     private final Observable<Boolean> progressObservable;
     @Nonnull
     private final Observable<Throwable> errorObservable;
     @Nonnull
-    private final Observable<ResponseBody> successAddAdminObservable;
+    private final Observable<ApiMessageResponse> successAddAdminObservable;
 
     public AdminsFragmentPresenter(@Nonnull ListeningHalfPresenter listeningHalfPresenter,
                                    @Nonnull ProfilesDao profilesDao,
@@ -57,7 +58,7 @@ public class AdminsFragmentPresenter extends BaseProfileListPresenter {
         daoObservable = Observable.just(profilesDao.getAdminsDao(new AdminsPointer(User.ME, PAGE_SIZE)))
                 .compose(ObservableExtensions.behaviorRefCount());
         
-        final Observable<ResponseOrError<ResponseBody>> removeAdminObservable = removeAdminSubject
+        final Observable<ResponseOrError<ApiMessageResponse>> removeAdminObservable = removeAdminSubject
                 .switchMap(userId -> apiService.deleteAdmin(pageUserName, new AdminRequest(userId))
                         .subscribeOn(networkScheduler)
                         .observeOn(uiScheduler)
@@ -67,7 +68,7 @@ public class AdminsFragmentPresenter extends BaseProfileListPresenter {
         successRemoveAdminObservable = removeAdminObservable.compose(ResponseOrError.onlySuccess())
                 .doOnNext(responseBody -> refreshData());
 
-        final Observable<ResponseOrError<ResponseBody>> addAdminObservable = addAdminSubject
+        final Observable<ResponseOrError<ApiMessageResponse>> addAdminObservable = addAdminSubject
                 .switchMap(userId -> apiService.addAdmin(pageUserName, new AdminRequest(userId))
                         .subscribeOn(networkScheduler)
                         .observeOn(uiScheduler)
@@ -109,12 +110,12 @@ public class AdminsFragmentPresenter extends BaseProfileListPresenter {
     }
 
     @Nonnull
-    public Observable<ResponseBody> getSuccessRemoveAdminObservable() {
+    public Observable<ApiMessageResponse> getSuccessRemoveAdminObservable() {
         return successRemoveAdminObservable;
     }
 
     @Nonnull
-    public Observable<ResponseBody> getSuccessAddAdminObservable() {
+    public Observable<ApiMessageResponse> getSuccessAddAdminObservable() {
         return successAddAdminObservable;
     }
 

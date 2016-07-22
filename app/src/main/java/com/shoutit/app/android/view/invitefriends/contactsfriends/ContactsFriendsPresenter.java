@@ -7,6 +7,7 @@ import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.api.model.UploadContactsRequest;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dao.BaseProfileListDao;
@@ -29,7 +30,7 @@ public class ContactsFriendsPresenter extends BaseProfileListPresenter {
     private final Observable<Throwable> errorObservable;
     private final Observable<Boolean> progressObservable;
     private final Observable<BaseProfileListDao> daoObservable;
-    private final Observable<ResponseBody> successFetchContacts;
+    private final Observable<ApiMessageResponse> successFetchContacts;
 
     public ContactsFriendsPresenter(@Nonnull PhoneContactsHelper phoneContactsHelper,
                                     @Nonnull ApiService apiService,
@@ -43,7 +44,7 @@ public class ContactsFriendsPresenter extends BaseProfileListPresenter {
 
         daoObservable = Observable.just(dao.getContactsDao(User.ME));
 
-        final Observable<ResponseOrError<ResponseBody>> uploadContactsRequest =
+        final Observable<ResponseOrError<ApiMessageResponse>> uploadContactsRequest =
                 fetchLocalContactSubject
                         .switchMap(initFetch -> Observable.just(phoneContactsHelper.getAllPhoneContacts()))
                         .subscribeOn(networkScheduler)
@@ -65,7 +66,7 @@ public class ContactsFriendsPresenter extends BaseProfileListPresenter {
         init();
     }
 
-    public Observable<ResponseBody> getSuccessFetchContacts() {
+    public Observable<ApiMessageResponse> getSuccessFetchContacts() {
         return successFetchContacts;
     }
 
