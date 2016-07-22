@@ -66,6 +66,7 @@
                 android:layout_height="wrap_content"
                 android:lines="1"
                 android:ellipsize="end"
+                android:textIsSelectable="true"
                 android:textDirection="locale"
                 tools:text="John Smithdsfdsfdsf" />
 

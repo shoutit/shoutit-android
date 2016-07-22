@@ -46,6 +46,7 @@
             android:id="@+id/chats_message_shout_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textIsSelectable="true"
             android:paddingLeft="2dp"
             android:paddingRight="2dp"
             android:lines="1"
