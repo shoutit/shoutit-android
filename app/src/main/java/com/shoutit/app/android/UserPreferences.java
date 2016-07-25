@@ -33,6 +33,8 @@ public class UserPreferences {
 
     private static final String AUTH_TOKEN = "token";
     private static final String REFRESH_TOKEN = "refresh_token";
+    private static final String TOKEN_EXPIRES_IN = "token_expires_in";
+    private static final String TOKEN_SAVE_DATE = "token_save_date";
     private static final String KEY_USER = "user";
     private static final String KEY_GUEST_USER = "guest_user";
     private static final String KEY_LOCATION = "location";
@@ -106,12 +108,15 @@ public class UserPreferences {
     }
 
     public void setLoggedIn(@NonNull String authToken,
+                            int tokenExpiresIn,
                             @NonNull String refreshToken,
                             @Nonnull User user) {
         final SharedPreferences.Editor editor = mPreferences.edit();
         editor
                 .putString(AUTH_TOKEN, authToken)
                 .putString(REFRESH_TOKEN, refreshToken)
+                .putInt(TOKEN_EXPIRES_IN, tokenExpiresIn)
+                .putLong(TOKEN_SAVE_DATE, System.currentTimeMillis())
                 .putString(KEY_USER, gson.toJson(user))
                 .putBoolean(IS_GUEST, false);
         editor.apply();
@@ -122,11 +127,16 @@ public class UserPreferences {
 
     public void setPageLoggedIn(@Nullable String authToken,
                                 @Nullable String refreshToken,
-                                @Nonnull User page) {
+                                @Nonnull User page,
+                                int tokenExpiresIn) {
         final SharedPreferences.Editor editor = mPreferences.edit();
 
         if (!Strings.isNullOrEmpty(authToken)) {
             editor.putString(AUTH_TOKEN, authToken);
+        }
+
+        if (tokenExpiresIn > 0) {
+            editor.putInt(TOKEN_EXPIRES_IN, tokenExpiresIn);
         }
 
         if (!Strings.isNullOrEmpty(refreshToken)) {
@@ -147,13 +157,18 @@ public class UserPreferences {
     }
 
     @SuppressLint("CommitPrefEdits")
-    public void setGuestLoggedIn(@Nonnull User user, @NonNull String authToken, @NonNull String refreshToken) {
+    public void setGuestLoggedIn(@Nonnull User user,
+                                 @NonNull String authToken,
+                                 int tokenExpiresIn,
+                                 @NonNull String refreshToken) {
         final SharedPreferences.Editor editor = mPreferences.edit();
         final String guestUser = gson.toJson(user, User.class);
 
         editor
                 .putString(KEY_GUEST_USER, guestUser)
                 .putString(AUTH_TOKEN, authToken)
+                .putInt(TOKEN_EXPIRES_IN, tokenExpiresIn)
+                .putLong(TOKEN_SAVE_DATE, System.currentTimeMillis())
                 .putString(REFRESH_TOKEN, refreshToken)
                 .putBoolean(IS_GUEST, true);
         editor.commit();
@@ -428,5 +443,17 @@ public class UserPreferences {
 
     public Observable<String> getPageIdObservable() {
         return pageIdObservable;
+    }
+
+    public long getTokenExpiresInAsMillis() {
+        return mPreferences.getInt(TOKEN_EXPIRES_IN, -1) * 1000;
+    }
+
+    public long getTokenSaveDate() {
+        return mPreferences.getLong(TOKEN_SAVE_DATE, 0);
+    }
+
+    public String getRefreshToken() {
+        return mPreferences.getString(REFRESH_TOKEN, null);
     }
 }

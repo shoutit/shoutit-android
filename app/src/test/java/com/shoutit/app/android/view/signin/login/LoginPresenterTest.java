@@ -19,9 +19,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import okhttp3.Headers;
-import okhttp3.ResponseBody;
-import okhttp3.internal.http.RealResponseBody;
 import rx.Observable;
 import rx.observers.TestObserver;
 import rx.observers.TestSubscriber;
@@ -65,7 +62,7 @@ public class LoginPresenterTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        mResponseSubject = BehaviorSubject.create(new SignResponse("a", "b", "c", true, user));
+        mResponseSubject = BehaviorSubject.create(new SignResponse("a", "b", "c", expiresIn, true, user));
         when(mApiService.login(any(EmailLoginRequest.class))).thenReturn(mResponseSubject);
         when(mApiService.resetPassword(any(ResetPasswordRequest.class))).thenReturn(
                 Observable.just(new ApiMessageResponse("df")));

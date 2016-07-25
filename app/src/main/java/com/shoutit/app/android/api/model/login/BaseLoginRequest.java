@@ -3,13 +3,15 @@ package com.shoutit.app.android.api.model.login;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.shoutit.app.android.api.ApiConsts;
+
 import javax.annotation.Nonnull;
 
 @SuppressWarnings({"unused", "FieldCanBeLocal"})
 public class BaseLoginRequest {
 
-    private final String clientId = "shoutit-android";
-    private final String clientSecret = "319d412a371643ccaa9166163c34387f";
+    private final String clientId = ApiConsts.CLIENT_ID;
+    private final String clientSecret = ApiConsts.CLIENT_SECRET;
     private final String mixpanelDistinctId;
     private final String grantType;
     @Nullable

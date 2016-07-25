@@ -1,27 +1,46 @@
 package com.shoutit.app.android.api;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.google.common.base.Optional;
 import com.shoutit.app.android.BuildConfig;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.model.RefreshTokenRequest;
+import com.shoutit.app.android.api.model.SignResponse;
+import com.shoutit.app.android.dagger.ForApplication;
+import com.shoutit.app.android.utils.LanguageHelper;
+import com.shoutit.app.android.utils.LogHelper;
+import com.shoutit.app.android.utils.TokenUtils;
+import com.shoutit.app.android.view.intro.IntroActivity;
 
 import java.io.IOException;
-import java.util.Locale;
 
 import okhttp3.Interceptor;
+import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.Response;
-import retrofit2.http.HEAD;
+import retrofit2.Call;
 
 public class AuthInterceptor implements Interceptor {
 
-    private final UserPreferences userPreferences;
+    private static final String TAG = AuthInterceptor.class.getSimpleName();
 
-    public AuthInterceptor(@NetworkScheduler UserPreferences userPreferences) {
+    private final UserPreferences userPreferences;
+    private final Context context;
+    private final RefreshTokenApiService refreshTokenApiService;
+    private final Object lockObject = new Object();
+
+    public AuthInterceptor(@NetworkScheduler UserPreferences userPreferences,
+                           @ForApplication Context context,
+                           RefreshTokenApiService refreshTokenApiService) {
         this.userPreferences = userPreferences;
+        this.context = context;
+        this.refreshTokenApiService = refreshTokenApiService;
     }
 
     @Override
@@ -29,12 +48,38 @@ public class AuthInterceptor implements Interceptor {
         final Request original = chain.request();
 
         final Request.Builder authorizationBuilder = original.newBuilder()
-                .header(Headers.ACCEPT_LANGUAGE, languageTag(Locale.getDefault()));
+                .header(Headers.ACCEPT_LANGUAGE, LanguageHelper.getAcceptLanguage());
 
-        final String token = userPreferences.getAuthToken().orNull();
+        String token = userPreferences.getAuthToken().orNull();
         if (TextUtils.isEmpty(token)) {
             return chain.proceed(authorizationBuilder.build());
         } else {
+            synchronized (lockObject) {
+                final boolean tokenExpired = TokenUtils.isTokenExpired(userPreferences);
+
+                if (tokenExpired) {
+                    LogHelper.logIfDebug(TAG, "Token expired");
+                    final retrofit2.Response<SignResponse> refreshTokenResponse = refreshToken(token);
+
+                    if (refreshTokenResponse.isSuccess()) {
+                        LogHelper.logIfDebug(TAG, "Token refreshed");
+                        final SignResponse signResponse = refreshTokenResponse.body();
+                        userPreferences.setLoggedIn(signResponse.getAccessToken(), signResponse.getExpiresIn(),
+                                signResponse.getRefreshToken(), signResponse.getProfile());
+                        token = userPreferences.getAuthToken().orNull();
+                    } else {
+                        LogHelper.logThrowableAndCrashlytics(TAG, "Token refresh failed. Logging out user.",
+                                new Throwable("Failed to refresh token with error response: " + refreshTokenResponse.errorBody().string()));
+                        userPreferences.logout();
+                        context.startActivity(IntroActivity.newIntent(context)
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                                .putExtra(IntroActivity.EXTRA_REFRESH_TOKEN_FAILED, true));
+
+                        return ignoredRequest(chain);
+                    }
+                }
+            }
+
             authorizationBuilder.addHeader(Headers.AUTHORIZATION, Headers.TOKEN_PREFIX + token);
             authorizationBuilder.addHeader(Headers.USER_AGENT, getUserAgent());
             final Optional<String> pageId = userPreferences.getPageId();
@@ -46,46 +91,19 @@ public class AuthInterceptor implements Interceptor {
         }
     }
 
-    private String languageTag(Locale locale) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            return locale.toLanguageTag();
-        }
+    private Response ignoredRequest(Chain chain) {
+        return new Response.Builder()
+                .code(600)
+                .protocol(Protocol.HTTP_1_1)
+                .request(chain.request())
+                .build();
+    }
 
-        final char SEP = '-';
-        String language = locale.getLanguage();
-        String region = locale.getCountry();
-        String variant = locale.getVariant();
-
-        if (language.equals("no") && region.equals("NO") && variant.equals("NY")) {
-            language = "nn";
-            region = "NO";
-            variant = "";
-        }
-
-        if (language.isEmpty() || !language.matches("\\p{Alpha}{2,8}")) {
-            language = "und";
-        } else if (language.equals("iw")) {
-            language = "he";
-        } else if (language.equals("in")) {
-            language = "id";
-        } else if (language.equals("ji")) {
-            language = "yi";
-        }
-        if (!region.matches("\\p{Alpha}{2}|\\p{Digit}{3}")) {
-            region = "";
-        }
-        if (!variant.matches("\\p{Alnum}{5,8}|\\p{Digit}\\p{Alnum}{3}")) {
-            variant = "";
-        }
-
-        StringBuilder bcp47Tag = new StringBuilder(language);
-        if (!region.isEmpty()) {
-            bcp47Tag.append(SEP).append(region);
-        }
-        if (!variant.isEmpty()) {
-            bcp47Tag.append(SEP).append(variant);
-        }
-        return bcp47Tag.toString();
+    private retrofit2.Response<SignResponse> refreshToken(@NonNull String currentToken) throws IOException {
+        final String refreshToken = userPreferences.getRefreshToken();
+        final Call<SignResponse> signResponseCall = refreshTokenApiService.refreshToken(
+                Headers.TOKEN_PREFIX + currentToken, new RefreshTokenRequest(refreshToken));
+        return signResponseCall.execute();
     }
 
     private String getUserAgent() {

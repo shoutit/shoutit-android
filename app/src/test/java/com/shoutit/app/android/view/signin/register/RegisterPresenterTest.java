@@ -79,7 +79,7 @@ public class RegisterPresenterTest {
         when(location.getLatitude()).thenReturn(1d);
         when(location.getLongitude()).thenReturn(1d);
 
-        mResponseSubject = BehaviorSubject.create(new SignResponse("a", "b", "c", true, user));
+        mResponseSubject = BehaviorSubject.create(new SignResponse("a", "b", "c", expiresIn, true, user));
         mLocationObservable = BehaviorSubject.create();
 
         when(mApiService.signup(any(EmailSignupRequest.class))).thenReturn(mResponseSubject);

@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
 import android.view.View;
+import android.widget.Toast;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.android.MyAndroidSchedulers;
@@ -45,6 +46,7 @@ import rx.schedulers.Schedulers;
 public class IntroActivity extends BaseActivity {
 
     private static final int REQUEST_CODE_LOCATION = 1;
+    public static final String EXTRA_REFRESH_TOKEN_FAILED = "refresh_token_failed";
 
     @Bind(R.id.activity_intro_view_pager)
     ViewPager viewPager;
@@ -79,6 +81,10 @@ public class IntroActivity extends BaseActivity {
         ButterKnife.bind(this);
         ((IntroActivityComponent) getActivityComponent()).inject(this);
         SystemUIUtils.setFullscreen(this);
+
+        if (getIntent().getBooleanExtra(EXTRA_REFRESH_TOKEN_FAILED, false)) {
+            Toast.makeText(this, R.string.error_refreshing_token_failed, Toast.LENGTH_LONG).show();
+        }
 
         viewPager.setAdapter(pagerAdapter);
         circlePageIndicator.setViewPager(viewPager);
@@ -117,7 +123,10 @@ public class IntroActivity extends BaseActivity {
                                 .observeOn(MyAndroidSchedulers.mainThread())))
                 .doOnTerminate(() -> progress.setVisibility(View.GONE))
                 .subscribe(signResponse -> {
-                    mUserPreferences.setGuestLoggedIn(signResponse.getProfile(), signResponse.getAccessToken(), signResponse.getRefreshToken());
+                    mUserPreferences.setGuestLoggedIn(signResponse.getProfile(),
+                            signResponse.getAccessToken(),
+                            signResponse.getExpiresIn(),
+                            signResponse.getRefreshToken());
                     finish();
                     startActivity(MainActivity.newIntent(IntroActivity.this));
                 }, throwable -> {

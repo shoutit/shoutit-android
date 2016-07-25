@@ -94,6 +94,7 @@ public class CreatePageDetailsPresenter {
                         .subscribe(signResponse -> {
                             onCreateSuccess(signResponse.getAccessToken(),
                                     signResponse.getRefreshToken(),
+                                    signResponse.getExpiresIn(),
                                     signResponse.getProfile());
                         }, this::onError));
             } else {
@@ -103,7 +104,7 @@ public class CreatePageDetailsPresenter {
                         .subscribeOn(mNetworkScheduler)
                         .observeOn(mUiScheduler)
                         .subscribe(page -> {
-                            onCreateSuccess(null, null, page);
+                            onCreateSuccess(null, null, 0, page);
                         }, this::onError));
             }
         }
@@ -116,8 +117,9 @@ public class CreatePageDetailsPresenter {
 
     private void onCreateSuccess(@Nullable String accessToken,
                                  @Nullable String refreshToken,
+                                 int tokenExpiresIn,
                                  @Nonnull User page) {
-        mUserPreferences.setPageLoggedIn(accessToken, refreshToken, page);
+        mUserPreferences.setPageLoggedIn(accessToken, refreshToken, page, tokenExpiresIn);
         mUserPreferences.setGcmPushToken(null);
         mListener.showProgress(false);
         mListener.startMainActivity();
