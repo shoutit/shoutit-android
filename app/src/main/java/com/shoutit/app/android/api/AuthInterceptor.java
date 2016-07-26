@@ -50,37 +50,40 @@ public class AuthInterceptor implements Interceptor {
         final Request.Builder authorizationBuilder = original.newBuilder()
                 .header(Headers.ACCEPT_LANGUAGE, LanguageHelper.getAcceptLanguage());
 
-        String token = userPreferences.getAuthToken().orNull();
+        final String token = userPreferences.getAuthToken().orNull();
         if (TextUtils.isEmpty(token)) {
             return chain.proceed(authorizationBuilder.build());
         } else {
-            synchronized (lockObject) {
-                final boolean tokenExpired = TokenUtils.isTokenExpired(userPreferences);
+            final boolean isTokenExpired = TokenUtils.isTokenExpired(userPreferences);
 
-                if (tokenExpired) {
-                    LogHelper.logIfDebug(TAG, "Token expired");
-                    final retrofit2.Response<SignResponse> refreshTokenResponse = refreshToken(token);
+            if (isTokenExpired) {
+                synchronized (lockObject) {
+                    final boolean tokenExpired = TokenUtils.isTokenExpired(userPreferences);
 
-                    if (refreshTokenResponse.isSuccess()) {
-                        LogHelper.logIfDebug(TAG, "Token refreshed");
-                        final SignResponse signResponse = refreshTokenResponse.body();
-                        userPreferences.setLoggedIn(signResponse.getAccessToken(), signResponse.getExpiresIn(),
-                                signResponse.getRefreshToken(), signResponse.getProfile());
-                        token = userPreferences.getAuthToken().orNull();
-                    } else {
-                        LogHelper.logThrowableAndCrashlytics(TAG, "Token refresh failed. Logging out user.",
-                                new Throwable("Failed to refresh token with error response: " + refreshTokenResponse.errorBody().string()));
-                        userPreferences.logout();
-                        context.startActivity(IntroActivity.newIntent(context)
-                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                                .putExtra(IntroActivity.EXTRA_REFRESH_TOKEN_FAILED, true));
+                    if (tokenExpired) {
+                        LogHelper.logIfDebug(TAG, "Token expired");
+                        final retrofit2.Response<SignResponse> refreshTokenResponse = refreshToken(token);
 
-                        return ignoredRequest(chain);
+                        if (refreshTokenResponse.isSuccess()) {
+                            final SignResponse signResponse = refreshTokenResponse.body();
+                            userPreferences.setLoggedIn(signResponse.getAccessToken(), signResponse.getExpiresIn(),
+                                    signResponse.getRefreshToken(), signResponse.getProfile());
+                            LogHelper.logIfDebug(TAG, "Token refreshed");
+                        } else {
+                            LogHelper.logThrowableAndCrashlytics(TAG, "Token refresh failed. Logging out user.",
+                                    new Throwable("Failed to refresh token with error response: " + refreshTokenResponse.errorBody().string()));
+                            userPreferences.logout();
+                            context.startActivity(IntroActivity.newIntent(context)
+                                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                                    .putExtra(IntroActivity.EXTRA_REFRESH_TOKEN_FAILED, true));
+
+                            return ignoredRequest(chain);
+                        }
                     }
                 }
             }
 
-            authorizationBuilder.addHeader(Headers.AUTHORIZATION, Headers.TOKEN_PREFIX + token);
+            authorizationBuilder.addHeader(Headers.AUTHORIZATION, Headers.TOKEN_PREFIX + userPreferences.getAuthToken().orNull());
             authorizationBuilder.addHeader(Headers.USER_AGENT, getUserAgent());
             final Optional<String> pageId = userPreferences.getPageId();
             if (pageId.isPresent()) {

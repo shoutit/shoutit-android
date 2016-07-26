@@ -107,6 +107,7 @@ public class UserPreferences {
                         .observeOn(uiScheduler));
     }
 
+    @SuppressLint("CommitPrefEdits")
     public void setLoggedIn(@NonNull String authToken,
                             int tokenExpiresIn,
                             @NonNull String refreshToken,
@@ -119,7 +120,7 @@ public class UserPreferences {
                 .putLong(TOKEN_SAVE_DATE, System.currentTimeMillis())
                 .putString(KEY_USER, gson.toJson(user))
                 .putBoolean(IS_GUEST, false);
-        editor.apply();
+        editor.commit();
         tokenRefreshSubject.onNext(new Object());
         refreshUser();
         saveLocation(user.getLocation());
