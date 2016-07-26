@@ -6,7 +6,6 @@
     <string name="price_free">FREE</string>
     <string name="shout_type_offer">Offer</string>
     <string name="shout_type_request">Request</string>
-    <string name="terms_of_service">Terms of Service</string>
     <string name="exit_text">Press BACK again to exit</string>
     <string name="nothing_to_show">Nothing to show</string>
     <string name="empty_field"/>
@@ -28,7 +27,6 @@
     <string name="error_default">Ooops, something went wrong</string>
     <string name="error_connection">Ooops, probably there is no Internet connection</string>
     <string name="error_field_empty">Field cannot be empty</string>
-    <string name="error_wrong_email_or_password">Wrong email or password</string>
     <string name="error_wrong_email">Incorrect email address</string>
     <string name="error_action_only_for_logged_in_user">Only for logged in users</string>
     <string name="error_image_upload">Sorry, cannot upload image. Please try again</string>
@@ -36,7 +34,6 @@
 
     <!-- Permissions -->
     <string name="permission_location_explanation">We need your location to prepare appropriate content</string>
-    <string name="permission_camera_explanation">Permissions needed to get your photos</string>
     <string name="permission_granted">Permissions have been granted</string>
     <string name="permission_not_granted">Permissions not granted</string>
     <string name="permission_camera_create_shout_explanation">Permissions needed to take photos and record videos.</string>
@@ -77,10 +74,8 @@
     <string name="login_password_hint">Password</string>
     <string name="login_btn_text">Log in</string>
     <string name="login_sign_up_text">Sign up</string>
-    <string name="login_error">Wrong data</string>
     <string name="login_empty_mail">Mail cannot be empty.</string>
     <string name="login_empty_password">Password cannot be empty.</string>
-    <string name="login_success_reset_password">Password reset email will be sent soon.</string>
     <string name="login_error_empty_email">Email or username cannot be empty</string>
 
     <!-- Register -->
@@ -88,7 +83,6 @@
     <string name="register_name">Name</string>
     <string name="register_email">Email</string>
     <string name="register_password">Password</string>
-    <string name="register_login_text">Have an account? Log in</string>
     <string name="register_empty_mail">Email cannot be empty.</string>
     <string name="register_empty_password">Password must have at least 6 and no more than 20 characters.</string>
     <string name="register_empty_name">Name cannot be empty</string>
@@ -151,7 +145,6 @@
     <string name="drawer_open">Open</string>
     <string name="drawer_close">Close</string>
     <string name="menu_guest">Guest</string>
-    <string name="menu_item_logout">Logout</string>
     <string name="menu_version_name">Shoutit %1$s</string>
     <string name="menu_use_as_format">Use Shoutit as %1$s</string>
     <string name="menu_item_bookmarks">Bookmarks</string>
@@ -174,8 +167,6 @@
     <string name="shout_date">Date</string>
     <string name="shout_category">Category</string>
     <string name="shout_location">Location</string>
-    <string name="shout_model">Model</string>
-    <string name="shout_color">Color</string>
     <string name="shout_share">Share shout</string>
 
     <!-- Discover Shouts -->
@@ -226,7 +217,6 @@
     <string name="shout_bottom_bar_promote">Promote</string>
     <string name="shout_bottom_bar_promoted">Promoted</string>
     <string name="shout_bottom_bar_edit">Edit</string>
-    <string name="shout_choose_video_app">Choose application</string>
 
     <!-- Account -->
     <string name="account_email_changed">Email successfully changed</string>
@@ -235,7 +225,6 @@
     <string name="account_linked_accounts">Linked Accounts</string>
 
     <!-- Profile -->
-    <string name="profile_shuts_button">See all shouts</string>
     <string name="profile_my_shouts_header">My shouts</string>
     <string name="profile_listening_label">Listening</string>
     <string name="profile_interests_label">Interests</string>
@@ -251,7 +240,6 @@
     <string name="profile_listeners">%1$s Listeners</string>
     <string name="profile_listeners_label">Listeners</string>
     <string name="profile_see_all_shouts">See all shouts</string>
-    <string name="profile_user_shouts_header">%1$s shouts</string>
     <string name="profile_chat_label">Chat</string>
     <string name="profile_listen_label">Listen</string>
     <string name="profile_stop_listening_label">Stop Listening</string>
@@ -265,26 +253,20 @@
     <string name="request_activity_title">Create Request</string>
     <string name="request_activity_what_are_you_looking_for">What are you looking for?</string>
     <string name="request_activity_budget">What is your budget?</string>
-    <string name="request_activity_when">When do you want it</string>
     <string name="request_activity_where">Where?</string>
     <string name="request_activity_change_location">Change</string>
     <string name="request_activity_btn">Let us help!</string>
     <string name="request_activity_currency">Currency</string>
     <string name="request_acitvity_currency_error">Failed to load currencies</string>
-    <string name="request_acitvity_post_error">Failed to post request</string>
     <string name="create_request_activity_title_too_short">Title must be at least 6 characters long</string>
-    <string name="create_request_activity_price_empty">Price cannot be empty</string>
     <string name="create_request_share_info">Earn 1 Shoutit Credit for each shout you publicly share on Facebook</string>
 
     <!-- Edit Shout -->
-    <string name="edit_shout_option">Option</string>
-    <string name="edit_shout_category">Category</string>
     <string name="edit_shout_categories_error">Failed to load categories</string>
     <string name="edit_shout_currencies_error">Failed to load currency</string>
     <string name="edit_shout_body_error">Failed to load shout</string>
     <string name="edit_shout_description_hint">Description</string>
     <string name="edit_shout_location">Location</string>
-    <string name="edit_shout_price_hint">Price</string>
     <string name="edit_shout_title_hint">Title</string>
     <string name="edit_shout_title">Edit %s</string>
     <string name="edit_currency_info">If negotiable leave it empty. Set it to 0 if Free</string>
@@ -295,17 +277,11 @@
     <string name="publish_menu_share">Share Shout</string>
 
     <!-- Edit Profile -->
-    <string name="edit_profile_hint_name">Name</string>
     <string name="edit_profile_hint_username">Username</string>
     <string name="edit_profile_hint_bio">Bio</string>
     <string name="edit_profile_header_location">Location</string>
     <string name="edit_profile_header_birthday">Birthday</string>
     <string name="edit_profile_header_gender">Gender</string>
-    <string name="edit_profile_header_gender_not_specified">Not specified</string>
-    <string name="edit_profile_header_gender_male">Male</string>
-    <string name="edit_profile_header_gender_female">Female</string>
-    <string name="edit_profile_header_gender_other">Other</string>
-    <string name="edit_profile_header_birthday_hint">01/01/1970</string>
     <string name="edit_profile_location_change">Change</string>
     <string name="edit_profile_hint_website">Website</string>
     <string name="edit_profile_menu_save">Save</string>
@@ -372,7 +348,6 @@
     <string name="search_shout_results_header_title">All Results for \'%1$s\'</string>
     <string name="search_shout_results_header_title_location">All Results for your location</string>
     <string name="search_shout_results_all_results">All Results</string>
-    <string name="search_shouts_results_header_count">%1$d Results</string>
     <string name="search_results_no_results">No results found</string>
     <string name="search_share_results">Share results</string>
 
@@ -402,7 +377,6 @@
     <string name="chats_attatchments_shout">Shout</string>
     <string name="chats_attatchments_location">Location</string>
     <string name="chat_edit_text_hint">Type a message</string>
-    <string name="chats_delete_conversatin">Do you want to delete this conversation?</string>
     <string name="chat_typing">%1$s is typing</string>
     <string name="chat_shout_chat">Shout Chat</string>
     <string name="chat_offer">Offer</string>
@@ -413,13 +387,10 @@
     <string name="notifications_title">Notifications</string>
     <string name="notifications_menu_mark">Mark all as read</string>
     <string name="notifications_menu_settings">Notifications Settings</string>
-    <string name="notifications_listening_to_you">started listening to you</string>
-    <string name="create_request_description">Title</string>
     <string name="create_request_price">Price</string>
     <string name="edit_shout_add_pictures_label">Add pictures and videos</string>
     <string name="option_not_set">Not set</string>
     <string name="edit_shout_mobile_hint">Mobile</string>
-    <string name="notifications_message_replacement">sends you a message</string>
     <string name="notifications_no_notifications">Notifications not found</string>
 
     <!-- Video Calls -->
@@ -430,10 +401,6 @@
     <string name="video_calls_accept_call">"Accept"</string>
     <string name="video_calls_reject_call">"Reject"</string>
     <string name="video_calls_participant_reject">Participant rejected the call</string>
-    <string name="video_calls_cannot_connect">Problem with connection. Try later</string>
-    <string name="video_calls_conversation_ended">Conversation has ended</string>
-    <string name="video_calls_connecting">Connecting…</string>
-    <string name="video_calls_connected">Connected with %s</string>
     <string name="video_calls_participant_disconected">Participant finished the conversation</string>
     <string name="video_call_error">Sorry, cannot start conversation. Try again later.</string>
     <string name="video_call_finished">Video call has been finished</string>
@@ -526,7 +493,6 @@
     <string name="conversation_create_public_chat">Create public chat</string>
     <string name="chats_attatchments_media">Media</string>
     <string name="chats_attatchments_profile">Profile</string>
-    <string name="chat_menu_delete">Delete Conversation</string>
     <string name="chats_chat_info">Chat Info</string>
     <string name="chat_picture_confirmation">Are you sure you want to attach picture?</string>
     <string name="chat_video_confirmation">Are you sure you want to attach video?</string>
@@ -536,7 +502,6 @@
     <string name="chat_dialog_attach">Attach</string>
     <string name="chat_dialog_title">Confirmation</string>
     <string name="notifications_badge">You\'ve got new notification</string>
-    <string name="conversations_create_public_chat">Create public chat</string>
 
     <!-- Create Public Chat -->
     <string name="create_public_chat_title">Create Public Chat</string>
@@ -551,9 +516,6 @@
     <!-- Listenings -->
     <string name="listenings_empty">You have no items here yet.</string>
     <string name="listenings_ab_title">Listenings</string>
-    <string name="listers_ab_title">Listeners</string>
-    <string name="listening_tab_user">Users</string>
-    <string name="listening_tab_pages">Pages</string>
     <string name="listenings_interests_ab_title">Interests</string>
 
     <!-- Listeners -->
@@ -634,7 +596,6 @@
     <string name="invite_friends_facebook_header">Facebook</string>
     <string name="invite_friends_twitter">Twitter</string>
     <string name="invite_friends_share">Share Shoutit App</string>
-    <string name="invite_text">Join Shoutit on www.shoutit.com</string>
     <string name="invite_text_fb">Join Shoutit</string>
     <string name="invite_chooser_text">Select app</string>
     <string name="invite_no_twitter_app">You need the Twitter app to be installed</string>
@@ -738,7 +699,6 @@
     <!-- Admins -->
     <string name="admins_view_profile">View Profile</string>
     <string name="admins_remove_admin">Remove Admin</string>
-    <string name="admins_add_admin">Add Admin</string>
 
     <!-- Create Page Category -->
     <string name="create_page_category_header_text">
