@@ -27,6 +27,7 @@ import rx.subjects.BehaviorSubject;
 
 import static com.google.common.truth.Truth.assert_;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -62,7 +63,7 @@ public class LoginPresenterTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        mResponseSubject = BehaviorSubject.create(new SignResponse("a", "b", "c", expiresIn, true, user));
+        mResponseSubject = BehaviorSubject.create(new SignResponse("a", "b", "c", 0, true, user));
         when(mApiService.login(any(EmailLoginRequest.class))).thenReturn(mResponseSubject);
         when(mApiService.resetPassword(any(ResetPasswordRequest.class))).thenReturn(
                 Observable.just(new ApiMessageResponse("df")));
@@ -90,7 +91,7 @@ public class LoginPresenterTest {
     public void testLoginSuccessfulAndTokenSet() {
         loginSuccessful();
 
-        verify(mUserPreferences).setLoggedIn(anyString(), anyString(), any(User.class));
+        verify(mUserPreferences).setLoggedIn(anyString(), anyInt(), anyString(), any(User.class));
     }
 
     private void loginSuccessful() {
