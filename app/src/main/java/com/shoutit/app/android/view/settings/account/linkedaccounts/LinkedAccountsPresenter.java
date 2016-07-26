@@ -123,7 +123,7 @@ public class LinkedAccountsPresenter {
                 .map(pageOrUser -> {
                     if (pageOrUser.getLinkedAccounts() != null) {
                         if (pageOrUser.getLinkedAccounts().getFacebookPage() != null) {
-                            return resources.getString(R.string.linked_accounts_linked);
+                            return pageOrUser.getLinkedAccounts().getFacebookPage().getName();
                         } else {
                             return resources.getString(R.string.linked_accounts_not_linked);
                         }
