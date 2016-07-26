@@ -51,6 +51,7 @@ public class ReceivedShoutMessageHolder extends ViewHolderManager.BaseViewHolder
 
         mPicasso.load(item.getShoutImageUrl())
                 .resizeDimen(R.dimen.chat_sent_shout_image_width, R.dimen.chat_sent_shout_image_height)
+                .placeholder(R.drawable.pattern_placeholder)
                 .centerCrop()
                 .into(mChatsReceivedShoutImageImageview);
 

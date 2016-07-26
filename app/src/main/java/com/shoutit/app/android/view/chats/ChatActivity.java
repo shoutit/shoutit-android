@@ -3,6 +3,7 @@ package com.shoutit.app.android.view.chats;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -189,6 +190,17 @@ public class ChatActivity extends BaseActivity implements Listener {
 
         mChatsRecyclerview.setAdapter(chatsAdapter);
         mChatsRecyclerview.setLayoutManager(new MyLinearLayoutManager(this));
+        mChatsRecyclerview.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+                final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) view.getLayoutParams();
+                final int position = params.getViewAdapterPosition();
+
+                if (position == parent.getAdapter().getItemCount() - 1) {
+                    outRect.bottom = getResources().getDimensionPixelSize(R.dimen.chat_last_item_decoration);
+                }
+            }
+        });
 
         RxRecyclerView.scrollEvents(mChatsRecyclerview)
                 .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())

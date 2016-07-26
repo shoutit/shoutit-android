@@ -19,7 +19,6 @@
 
     <LinearLayout
         android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
         android:layout_width="160dp"
         android:background="@drawable/message_background_other"
         android:paddingLeft="2dp"
@@ -58,6 +57,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:lines="1"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:ellipsize="end"
             android:paddingLeft="2dp"
             android:paddingRight="2dp"
             android:textIsSelectable="true"
