@@ -95,7 +95,7 @@ public class RegisterPresenter {
         mSuccessObservable = responseOrErrorObservable
                 .compose(ResponseOrError.<SignResponse>onlySuccess())
                 .doOnNext(signResponse -> {
-                    userPreferences.setLoggedIn(signResponse.getAccessToken(),
+                    userPreferences.setLoggedIn(signResponse.getAccessToken(), signResponse.getExpiresIn(),
                             signResponse.getRefreshToken(), signResponse.getProfile());
                     userPreferences.setShouldAskForInterestTrue();
                 });

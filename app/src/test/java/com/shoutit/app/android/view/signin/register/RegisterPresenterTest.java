@@ -32,6 +32,7 @@ import rx.subjects.BehaviorSubject;
 
 import static com.google.common.truth.Truth.assert_;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -79,7 +80,7 @@ public class RegisterPresenterTest {
         when(location.getLatitude()).thenReturn(1d);
         when(location.getLongitude()).thenReturn(1d);
 
-        mResponseSubject = BehaviorSubject.create(new SignResponse("a", "b", "c", true, user));
+        mResponseSubject = BehaviorSubject.create(new SignResponse("a", "b", "c", 0, true, user));
         mLocationObservable = BehaviorSubject.create();
 
         when(mApiService.signup(any(EmailSignupRequest.class))).thenReturn(mResponseSubject);
@@ -110,7 +111,7 @@ public class RegisterPresenterTest {
     public void testRegisterSuccessfulAndTokenSet() {
         registerSuccessful();
 
-        verify(mUserPreferences).setLoggedIn(anyString(), anyString(), any(User.class));
+        verify(mUserPreferences).setLoggedIn(anyString(), anyInt(), anyString(), any(User.class));
     }
 
     private void registerSuccessful() {

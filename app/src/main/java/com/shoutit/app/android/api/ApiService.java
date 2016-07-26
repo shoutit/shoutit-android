@@ -50,6 +50,7 @@ import com.shoutit.app.android.api.model.PromoteLabel;
 import com.shoutit.app.android.api.model.PromoteOption;
 import com.shoutit.app.android.api.model.PromoteRequest;
 import com.shoutit.app.android.api.model.PromoteResponse;
+import com.shoutit.app.android.api.model.RefreshTokenRequest;
 import com.shoutit.app.android.api.model.RegisterDeviceRequest;
 import com.shoutit.app.android.api.model.RelatedTagsResponse;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
@@ -92,6 +93,7 @@ import java.util.Map;
 
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
+import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;

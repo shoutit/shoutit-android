@@ -193,6 +193,11 @@ public class Twilio {
     }
 
     public void initTwilio() {
+        if (listenFailRetries >= LISTEN_FAIL_MAX_RETRIES || tokenErrorRetries >= TOKEN_ERROR_MAX_RETRIES ||
+                tokeExpiredRetries >= TOKEN_EXPIRED_MAX_RETRIES) {
+            return;
+        }
+
         unregisterTwillio();
         initTwilioSubject.onNext(null);
     }

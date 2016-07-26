@@ -29,6 +29,7 @@ import com.shoutit.app.android.BuildConfig;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.AuthInterceptor;
+import com.shoutit.app.android.api.RefreshTokenApiService;
 import com.shoutit.app.android.constants.AmazonConstants;
 import com.shoutit.app.android.dao.BusinessVerificationDaos;
 import com.shoutit.app.android.dao.CategoriesDao;
@@ -52,6 +53,7 @@ import com.shoutit.app.android.dao.TagsDao;
 import com.shoutit.app.android.dao.UsersIdentityDao;
 import com.shoutit.app.android.dao.VideoCallsDao;
 import com.shoutit.app.android.db.DbHelper;
+import com.shoutit.app.android.facebook.FacebookHelper;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.utils.AmazonRequestTransfomer;
 import com.shoutit.app.android.utils.VersionUtils;
@@ -59,7 +61,6 @@ import com.shoutit.app.android.utils.pusher.PusherHelper;
 import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
 import com.shoutit.app.android.view.chats.LocalMessageBus;
 import com.shoutit.app.android.view.conversations.RefreshConversationBus;
-import com.shoutit.app.android.facebook.FacebookHelper;
 import com.shoutit.app.android.view.videoconversation.CameraTool;
 import com.shoutit.app.android.view.videoconversation.CameraToolImpl;
 import com.shoutit.app.android.view.videoconversation.CameraToolImplLollipop;
@@ -194,6 +195,23 @@ public final class AppModule {
 
     @Provides
     @Singleton
+    RefreshTokenApiService provideRefreshTokenApiService(Gson gson) {
+        final HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+        loggingInterceptor.setLevel(BuildConfig.DEBUG ? HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE);
+        final OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(loggingInterceptor)
+                .build();
+
+        return new Retrofit.Builder()
+                .baseUrl(BuildConfig.API_URL)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .client(okHttpClient)
+                .build()
+                .create(RefreshTokenApiService.class);
+    }
+
+    @Provides
+    @Singleton
     Optional<Cache> provideCache(@ForApplication Context context) {
         final File httpCacheDir = new File(context.getCacheDir(), "cache");
         final long httpCacheSize = 100 * 1024 * 1024; // 100 MiB
@@ -202,8 +220,10 @@ public final class AppModule {
 
     @Singleton
     @Provides
-    AuthInterceptor prvideAuthInterceptor(UserPreferences userPreferences) {
-        return new AuthInterceptor(userPreferences);
+    AuthInterceptor prvideAuthInterceptor(UserPreferences userPreferences,
+                                          @ForApplication Context context,
+                                          RefreshTokenApiService apiService) {
+        return new AuthInterceptor(userPreferences, context, apiService);
     }
 
     @Singleton

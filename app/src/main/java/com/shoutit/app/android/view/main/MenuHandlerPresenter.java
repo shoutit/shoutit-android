@@ -53,7 +53,7 @@ public class MenuHandlerPresenter {
                 .map(user -> Strings.emptyToNull(user.getCover()))
                 .filter(Functions1.isNotNull());
 
-        nameObservable = userOrPageObservable
+        nameObservable = userPreferences.getPageOrUserObservable()
                 .map(user -> {
                     if (userPreferences.isGuest()) {
                         return context.getString(R.string.menu_guest);

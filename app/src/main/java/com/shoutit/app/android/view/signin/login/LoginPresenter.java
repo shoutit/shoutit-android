@@ -106,13 +106,10 @@ public class LoginPresenter {
 
         mSuccessObservable = loginRequestObservable
                 .compose(ResponseOrError.<SignResponse>onlySuccess())
-                .doOnNext(new Action1<SignResponse>() {
-                    @Override
-                    public void call(SignResponse signResponse) {
-                        userPreferences.setLoggedIn(signResponse.getAccessToken(),
-                                signResponse.getRefreshToken(), signResponse.getProfile());
-                        userPreferences.setGcmPushToken(null);
-                    }
+                .doOnNext(signResponse -> {
+                    userPreferences.setLoggedIn(signResponse.getAccessToken(), signResponse.getExpiresIn(),
+                            signResponse.getRefreshToken(), signResponse.getProfile());
+                    userPreferences.setGcmPushToken(null);
                 });
 
         // Errors
