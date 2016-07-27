@@ -30,6 +30,7 @@ import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
+import com.shoutit.app.android.utils.UpNavigationHelper;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.main.MainActivity;
 
@@ -181,7 +182,7 @@ public class NotificationsActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
+                new UpNavigationHelper(this).onUpButtonClicked();
                 return true;
             case R.id.notifications_menu_mark:
                 presenter.markAllNotificationsAsRead();

@@ -14,6 +14,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.utils.UpNavigationHelper;
 import com.shoutit.app.android.view.conversations.ConversationsActivity;
 import com.shoutit.app.android.view.signin.LoginActivity;
 
@@ -82,7 +83,7 @@ public class DiscoverActivity extends BaseActivity implements OnNewDiscoverSelec
                 if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
                     getSupportFragmentManager().popBackStack();
                 } else {
-                    finish();
+                    new UpNavigationHelper(this).onUpButtonClicked();
                 }
                 return true;
             case R.id.base_menu_search:

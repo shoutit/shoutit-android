@@ -47,6 +47,7 @@ import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.utils.TextWatcherAdapter;
+import com.shoutit.app.android.utils.UpNavigationHelper;
 import com.shoutit.app.android.view.chats.chat_info.ChatInfoActivity;
 import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
 import com.shoutit.app.android.view.chooseprofile.SelectProfileActivity;
@@ -157,7 +158,9 @@ public class ChatActivity extends BaseActivity implements Listener {
         }
 
         mChatsToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
-        mChatsToolbar.setNavigationOnClickListener(view -> finish());
+        mChatsToolbar.setNavigationOnClickListener(view -> {
+            new UpNavigationHelper(this).onUpButtonClicked();
+        });
         mChatsToolbar.inflateMenu(R.menu.chats_menu);
         mChatsToolbar.setOnMenuItemClickListener(item -> {
             final int itemId = item.getItemId();
