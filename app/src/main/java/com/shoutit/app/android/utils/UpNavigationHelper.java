@@ -17,15 +17,11 @@ public class UpNavigationHelper {
     }
 
     public void onUpButtonClicked() {
-        if (DeepLinksHelper.isFromDeeplink(activity.getIntent())) {
+        if (DeepLinksHelper.isFromDeeplink(activity.getIntent()) && activity.isTaskRoot()) {
             final Intent upIntent = NavUtils.getParentActivityIntent(activity);
-            if (NavUtils.shouldUpRecreateTask(activity, upIntent)) {
-                TaskStackBuilder.create(activity)
-                        .addNextIntentWithParentStack(upIntent)
-                        .startActivities();
-            } else {
-                NavUtils.navigateUpTo(activity, upIntent);
-            }
+            TaskStackBuilder.create(activity)
+                    .addNextIntentWithParentStack(upIntent)
+                    .startActivities();
         } else {
             handleActivityFinish();
         }
