@@ -1,6 +1,7 @@
 package com.shoutit.app.android.facebook;
 
 import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -17,10 +18,12 @@ import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
+import com.facebook.LoggingBehavior;
 import com.facebook.ads.AdError;
 import com.facebook.ads.AdSettings;
 import com.facebook.ads.NativeAd;
 import com.facebook.ads.NativeAdsManager;
+import com.facebook.appevents.AppEventsLogger;
 import com.facebook.applinks.AppLinkData;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
@@ -38,6 +41,7 @@ import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.LinkedAccounts;
 import com.shoutit.app.android.api.model.UpdateFacebookTokenRequest;
 import com.shoutit.app.android.dagger.ForApplication;
+import com.shoutit.app.android.utils.BuildTypeUtils;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
@@ -125,7 +129,16 @@ public class FacebookHelper {
     }
 
     public void initFacebook() {
-        FacebookSdk.sdkInitialize(context, this::refreshTokenIfNeeded);
+        if (BuildTypeUtils.isStagingOrDebug()) {
+            FacebookSdk.addLoggingBehavior(LoggingBehavior.REQUESTS);
+            FacebookSdk.addLoggingBehavior(LoggingBehavior.APP_EVENTS);
+            FacebookSdk.addLoggingBehavior(LoggingBehavior.GRAPH_API_DEBUG_INFO);
+            FacebookSdk.setIsDebugEnabled(true);
+        }
+        FacebookSdk.sdkInitialize(context, () -> {
+            refreshTokenIfNeeded();
+            AppEventsLogger.activateApp((Application) context);
+        });
     }
 
     private void loadAds() {
