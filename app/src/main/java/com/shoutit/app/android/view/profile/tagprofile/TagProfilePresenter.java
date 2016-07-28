@@ -130,11 +130,11 @@ public class TagProfilePresenter implements ProfilePresenter {
 
                         return request.map(response -> {
                             if (response.isData()) {
-                                return ResponseOrError.fromData(tagDetail.toListenedTag());
+                                return ResponseOrError.fromData(tagDetail.toListenedTag(response.data().getNewListenersCount()));
                             } else {
                                 errorSubject.onNext(new Throwable());
                                 // On error return current user in order to select/deselect already deselected/selected 'listenProfile' icon
-                                return ResponseOrError.fromData(tagDetail.toListenedTag());
+                                return ResponseOrError.fromData(tagDetail.toListenedTag(response.data().getNewListenersCount()));
                             }
                         });
                     }
@@ -278,7 +278,7 @@ public class TagProfilePresenter implements ProfilePresenter {
 
                         return request.map(response -> {
                             if (response.isData()) {
-                                return ResponseOrError.fromData(updateRelatedTagsWithListenings(listenedTagWithRelatedTags));
+                                return ResponseOrError.fromData(updateRelatedTagsWithListenings(listenedTagWithRelatedTags, response.data()));
                             } else {
                                 errorSubject.onNext(new Throwable());
                                 // On error return current tag in order to select/deselect already deselected/selected 'listenTagProfile' icon
@@ -373,14 +373,15 @@ public class TagProfilePresenter implements ProfilePresenter {
     }
 
     @Nonnull
-    private RelatedTagsResponse updateRelatedTagsWithListenings(@Nonnull ListenedTagWithRelatedTags listenedTagWithRelatedTags) {
+    private RelatedTagsResponse updateRelatedTagsWithListenings(@Nonnull ListenedTagWithRelatedTags listenedTagWithRelatedTags,
+                                                                ListenResponse listenResponse) {
         final List<TagDetail> tags = listenedTagWithRelatedTags.getRelatedTagsResponse().getResults();
         final TagDetail tagToUpdate = listenedTagWithRelatedTags.getTagInSection();
 
         for (int i = 0; i < tags.size(); i++) {
             if (tags.get(i).getSlug().equals(tagToUpdate.getSlug())) {
                 final List<TagDetail> updatedTags = new ArrayList<>(tags);
-                updatedTags.set(i, tagToUpdate.toListenedTag());
+                updatedTags.set(i, tagToUpdate.toListenedTag(listenResponse.getNewListenersCount()));
 
                 return new RelatedTagsResponse(updatedTags);
             }

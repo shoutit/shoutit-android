@@ -81,9 +81,8 @@ public class TagDetail implements ProfileType {
         return cover;
     }
 
-    public TagDetail toListenedTag() {
+    public TagDetail toListenedTag(int newListenersCount) {
         final boolean newIsListening = !isListening;
-        int newListenersCount = newIsListening ? listenersCount + 1 : listenersCount - 1;
         return new TagDetail(id, slug, name, apiUrl, image, cover, webUrl, newListenersCount, newIsListening);
     }
 

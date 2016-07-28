@@ -48,9 +48,8 @@ public class Page extends BaseProfile {
 
     @NonNull
     @Override
-    public BaseProfile getListenedProfile() {
+    public BaseProfile getListenedProfile(int newListenersCount) {
         boolean newIsListening = !isListening;
-        int newListenersCount = newIsListening ? listenersCount + 1 : listenersCount - 1;
 
         return new Page(id, type, username, name, firstName, lastName, isActivated, image, cover,
                 newIsListening, newListenersCount, location, getStats(), isOwner, getEmail(),

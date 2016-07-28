@@ -1,10 +1,14 @@
 package com.shoutit.app.android.view.search.results.profiles;
 
-import com.appunite.rx.dagger.NetworkScheduler;
+import android.content.res.Resources;
+
 import com.appunite.rx.dagger.UiScheduler;
 import com.shoutit.app.android.UserPreferences;
-import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.dagger.ActivityScope;
+import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ProfilesDao;
+import com.shoutit.app.android.utils.ListeningHalfPresenter;
+import com.shoutit.app.android.view.profileslist.BaseProfileListPresenter;
 
 import dagger.Module;
 import dagger.Provides;
@@ -20,10 +24,13 @@ public class SearchProfilesResultsActivityModule {
     }
 
     @Provides
-    SearchProfilesResultsPresenter provideSearchProfilesResultsPresenter(ProfilesDao dao, ApiService apiService,
-                                                                         @UiScheduler Scheduler uiScheduler,
-                                                                         @NetworkScheduler Scheduler networkScheduler,
-                                                                         UserPreferences userPreferences) {
-        return new SearchProfilesResultsPresenter(dao, searchQuery, apiService, uiScheduler, networkScheduler, userPreferences);
+    @ActivityScope
+    BaseProfileListPresenter provideProfilesWithoutPagesListPresenter(ProfilesDao dao,
+                                                                      @UiScheduler Scheduler uiScheduler,
+                                                                      ListeningHalfPresenter listeningHalfPresenter,
+                                                                      UserPreferences userPreferences,
+                                                                      @ForActivity Resources resources) {
+        return new SearchProfilesResultsPresenter(dao, searchQuery, uiScheduler,
+                userPreferences, resources, listeningHalfPresenter);
     }
 }

@@ -154,9 +154,8 @@ public class BaseProfile implements ProfileType {
     }
 
     @Nonnull
-    public BaseProfile getListenedProfile() {
+    public BaseProfile getListenedProfile(int newListenersCount) {
         boolean newIsListening = !isListening;
-        int newListenersCount = newIsListening ? listenersCount + 1 : listenersCount - 1;
         return new BaseProfile(id, type, username, name, firstName, lastName, isActivated,
                 image, cover, newIsListening, newListenersCount, location, isOwner, stats,
                 email, linkedAccounts, conversation, isListener, website);

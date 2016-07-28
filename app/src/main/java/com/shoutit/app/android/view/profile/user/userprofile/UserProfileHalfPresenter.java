@@ -18,7 +18,6 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
-import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Scheduler;
 import rx.functions.Func1;
@@ -75,7 +74,7 @@ public class UserProfileHalfPresenter {
 
                         return request.map(response -> {
                             if (response.isData()) {
-                                return ResponseOrError.fromData(user.getListenedProfile());
+                                return ResponseOrError.fromData(user.getListenedProfile(response.data().getNewListenersCount()));
                             } else {
                                 errorSubject.onNext(new Throwable());
                                 // On error return current user in order to select/deselect already deselected/selected 'listenProfile' icon

@@ -62,7 +62,7 @@ public class ListeningHalfPresenter {
                     return listenRequestObservable
                             .map(response -> {
                                 if (response.isData()) {
-                                    return ResponseOrError.fromData(updateResponseWithListenedProfiles(profileToListenWithLastResponse));
+                                    return ResponseOrError.fromData(updateResponseWithListenedProfiles(profileToListenWithLastResponse, response.data()));
                                 } else {
                                     errorSubject.onNext(new Throwable());
                                     // On error return current user in order to select/deselect already deselected/selected item
@@ -73,8 +73,9 @@ public class ListeningHalfPresenter {
                 .observeOn(uiScheduler);
     }
 
-    protected ProfilesListResponse updateResponseWithListenedProfiles(@Nonnull ProfilesHelper.ProfileToListenWithLastResponse profileToListenWithLastResponse) {
-        return ProfilesHelper.updateLastResponseWithListenedProfiles(profileToListenWithLastResponse);
+    protected ProfilesListResponse updateResponseWithListenedProfiles(@Nonnull ProfilesHelper.ProfileToListenWithLastResponse profileToListenWithLastResponse,
+                                                                      @Nonnull ListenResponse data) {
+        return ProfilesHelper.updateLastResponseWithListenedProfiles(profileToListenWithLastResponse, data);
     }
 
     @Nonnull

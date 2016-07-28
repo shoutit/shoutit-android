@@ -123,9 +123,9 @@ public class PostSignupSecondPresenter {
                                 .map(response -> {
                                     if (response.isData()) {
                                         if (ProfileType.USER.equals(baseProfile.getType())) {
-                                            return ResponseOrError.fromData(suggestionsResponse.withUpdatedUser(baseProfile.getListenedProfile()));
+                                            return ResponseOrError.fromData(suggestionsResponse.withUpdatedUser(baseProfile.getListenedProfile(response.data().getNewListenersCount())));
                                         } else {
-                                            return ResponseOrError.fromData(suggestionsResponse.withUpdatedPage(baseProfile.getListenedProfile()));
+                                            return ResponseOrError.fromData(suggestionsResponse.withUpdatedPage(baseProfile.getListenedProfile(response.data().getNewListenersCount())));
                                         }
                                     } else {
                                         errorSubject.onNext(new Throwable());

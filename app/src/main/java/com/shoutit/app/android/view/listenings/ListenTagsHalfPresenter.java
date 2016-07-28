@@ -64,7 +64,7 @@ public class ListenTagsHalfPresenter {
                     return listenRequestObservable
                             .map(response -> {
                                 if (response.isData()) {
-                                    return ResponseOrError.fromData(ProfilesHelper.updateLastResponseWithListenedTag(tagToListenWithLastResponse));
+                                    return ResponseOrError.fromData(ProfilesHelper.updateLastResponseWithListenedTag(tagToListenWithLastResponse, response.data()));
                                 } else {
                                     errorSubject.onNext(new Throwable());
                                     // On error return current user in order to select/deselect already deselected/selected item
