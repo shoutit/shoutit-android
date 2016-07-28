@@ -3,6 +3,7 @@
     <string name="app_name">Shoutit</string>
 
     <!-- Global strings -->
+    <string name="shoutit_scheme" translatable="false">shoutit</string>
     <string name="price_free">FREE</string>
     <string name="shout_type_offer">Offer</string>
     <string name="shout_type_request">Request</string>
