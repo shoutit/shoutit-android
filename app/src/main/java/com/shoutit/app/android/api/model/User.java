@@ -75,9 +75,9 @@ public class User extends BaseProfile {
 
     @NonNull
     @Override
-    public User getListenedProfile() {
+    public User getListenedProfile(int newListenersCount) {
         boolean newIsListening = !isListening;
-        int newListenersCount = newIsListening ? listenersCount + 1 : listenersCount - 1;
+
         return new User(id, type, apiUrl, webUrl, username, name,
                 firstName, lastName, isActivated, image, cover,
                 newIsListening, isListener, isPasswordSet, location,

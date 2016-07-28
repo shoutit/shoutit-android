@@ -54,7 +54,6 @@ import com.shoutit.app.android.api.model.RefreshTokenRequest;
 import com.shoutit.app.android.api.model.RegisterDeviceRequest;
 import com.shoutit.app.android.api.model.RelatedTagsResponse;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
-import com.shoutit.app.android.api.model.SearchProfileResponse;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutResponse;
 import com.shoutit.app.android.api.model.ShoutsResponse;
@@ -322,7 +321,7 @@ public interface ApiService {
     Observable<ListenResponse> unlistenProfile(@Path("username") String username);
 
     @GET("profiles")
-    Observable<SearchProfileResponse> searchProfiles(@Query("search") String searchQuery,
+    Observable<ProfilesListResponse> searchProfiles(@Query("search") String searchQuery,
                                                      @Query("page") Integer page,
                                                      @Query("page_size") Integer pageSize);
 

@@ -10,7 +10,6 @@ import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.ListenResponse;
 import com.shoutit.app.android.api.model.Page;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.view.profile.ChatInfo;
 import com.shoutit.app.android.view.profile.page.ProfileAdapterItems;
@@ -20,7 +19,6 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
-import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Scheduler;
 import rx.functions.Func1;
@@ -77,7 +75,7 @@ public class UserProfileHalfPresenter {
 
                         return request.map(response -> {
                             if (response.isData()) {
-                                return ResponseOrError.fromData(user.getListenedProfile());
+                                return ResponseOrError.fromData(user.getListenedProfile(response.data().getNewListenersCount()));
                             } else {
                                 errorSubject.onNext(new Throwable());
                                 // On error return current user in order to select/deselect already deselected/selected 'listenProfile' icon
