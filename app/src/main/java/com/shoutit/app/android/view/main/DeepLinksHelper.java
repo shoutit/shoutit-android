@@ -66,4 +66,8 @@ public class DeepLinksHelper {
             }
         }
     }
+
+    public static boolean isFromDeeplink(Intent intent) {
+        return intent.getData() != null;
+    }
 }

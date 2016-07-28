@@ -11,6 +11,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.NavUtils;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
@@ -44,6 +46,7 @@ import com.shoutit.app.android.utils.ImageHelper;
 import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.RtlUtils;
+import com.shoutit.app.android.utils.UpNavigationHelper;
 import com.shoutit.app.android.view.ReportDialog;
 import com.shoutit.app.android.view.chats.ChatActivity;
 import com.shoutit.app.android.view.chats.chatsfirstconversation.ChatFirstConversationActivity;
@@ -481,8 +484,13 @@ public class ShoutActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                setResult(RESULT_OK);
-                finish();
+                new UpNavigationHelper(this) {
+                    @Override
+                    public void handleActivityFinish() {
+                        setResult(RESULT_OK);
+                        super.handleActivityFinish();
+                    }
+                }.onUpButtonClicked();
                 return true;
             case R.id.shouts_search:
                 startActivity(MainSearchActivity.newIntent(this));

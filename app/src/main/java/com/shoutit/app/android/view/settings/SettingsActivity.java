@@ -17,6 +17,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.IntentHelper;
+import com.shoutit.app.android.utils.UpNavigationHelper;
 import com.shoutit.app.android.view.about.AboutActivity;
 import com.shoutit.app.android.view.settings.account.AccountActivity;
 
@@ -59,7 +60,7 @@ public class SettingsActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
+                new UpNavigationHelper(this).onUpButtonClicked();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
