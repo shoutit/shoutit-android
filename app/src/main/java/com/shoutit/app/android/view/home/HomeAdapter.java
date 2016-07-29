@@ -3,6 +3,8 @@ package com.shoutit.app.android.view.home;
 import android.content.Context;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
+import com.shoutit.app.android.utils.MyLinearLayoutManager;
+
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;

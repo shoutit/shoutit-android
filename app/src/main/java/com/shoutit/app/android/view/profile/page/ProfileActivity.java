@@ -27,6 +27,7 @@ import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.utils.ApiMessagesHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.IntentHelper;
+import com.shoutit.app.android.utils.MyGridLayoutManager;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.RtlUtils;
 import com.shoutit.app.android.utils.UpNavigationHelper;
@@ -198,8 +199,8 @@ public abstract class ProfileActivity extends BaseActivity {
 
     private void setUpAdapter() {
         final boolean rtlEnable = RtlUtils.isRtlEnabled(this);
-        final GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
-        gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+        final GridLayoutManager gridLayoutManager = new MyGridLayoutManager(this, 2);
+        gridLayoutManager.setSpanSizeLookup(new MyGridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
                 final int viewType = adapter.getItemViewType(position);

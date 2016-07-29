@@ -4,7 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
-import android.support.v7.widget.LinearLayoutManager;
+import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -67,7 +67,7 @@ public class LocationActivityDelegate {
 
         askForLocationPermissions();
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(mActivity));
+        recyclerView.setLayoutManager(new MyLinearLayoutManager(mActivity));
         recyclerView.setAdapter(mAdapter);
 
         RxTextView.textChangeEvents(searchEditText)

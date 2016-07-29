@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import com.shoutit.app.android.utils.MyLinearLayoutManager;
+
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -33,6 +35,7 @@ import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.DateTimeUtils;
+import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.view.chats.chats_adapter.AvatarHelper;
@@ -377,7 +380,7 @@ public class ShoutAdapter extends BaseAdapter {
                     outRect.right = itemSpacing;
                 }
             };
-            final LinearLayoutManager layoutManager = new LinearLayoutManager(
+            final LinearLayoutManager layoutManager = new MyLinearLayoutManager(
                     context, LinearLayoutManager.HORIZONTAL, false);
             recyclerView.addItemDecoration(itemDecoration);
             recyclerView.setLayoutManager(layoutManager);

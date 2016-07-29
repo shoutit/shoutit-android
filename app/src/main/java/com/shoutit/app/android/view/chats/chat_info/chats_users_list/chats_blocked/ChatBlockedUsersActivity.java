@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v7.widget.LinearLayoutManager;
+import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -18,6 +18,7 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ApiMessagesHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.chats.chat_info.chats_users_list.ChatUsersListAdapter;
 import com.shoutit.app.android.view.chats.chat_info.chats_users_list.ChatUsersListComponent;
 import com.shoutit.app.android.view.chats.chat_info.chats_users_list.ChatUsersListModule;
@@ -75,7 +76,7 @@ public class ChatBlockedUsersActivity extends BaseActivity implements ChatBlocke
             }
         });
 
-        mChatParticipantRecyclerview.setLayoutManager(new LinearLayoutManager(this));
+        mChatParticipantRecyclerview.setLayoutManager(new MyLinearLayoutManager(this));
         mChatParticipantRecyclerview.setAdapter(adapter);
 
         mChatParticipantsPresenter.register(this);

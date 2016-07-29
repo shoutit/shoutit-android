@@ -42,7 +42,7 @@ public class LayoutManagerHelper {
     public static void setGridLayoutManager(@Nonnull RecyclerView recyclerView,
                                             @Nonnull final ChangeableLayoutManagerAdapter adapter,
                                             @Nonnull final MyGridLayoutManager gridLayoutManager) {
-        gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+        gridLayoutManager.setSpanSizeLookup(new MyGridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
                 if (adapter.getItemViewType(position) == ChangeableLayoutManagerAdapter.VIEW_TYPE_SHOUT ||

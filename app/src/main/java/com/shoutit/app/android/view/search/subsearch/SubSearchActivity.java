@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
+import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -84,7 +84,7 @@ public class SubSearchActivity extends BaseActivity implements SearchView.OnQuer
             wasViewRotated = true;
         }
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(new MyLinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
         presenter.getSubSearchSubmittedObservable()

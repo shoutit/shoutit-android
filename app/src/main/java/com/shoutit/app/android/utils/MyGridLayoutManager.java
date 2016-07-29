@@ -7,6 +7,7 @@ public class MyGridLayoutManager extends GridLayoutManager implements MyLayoutMa
 
     public MyGridLayoutManager(Context context, int spanCount) {
         super(context, spanCount);
+        setRecycleChildrenOnDetach(true);
     }
 
 }

@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.LinearLayoutManager;
+import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -59,7 +59,7 @@ public class InviteContactsActivity extends BaseActivity {
 
         setUpToolbar();
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(new MyLinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
         presenter.getContactSelectedObservable()
