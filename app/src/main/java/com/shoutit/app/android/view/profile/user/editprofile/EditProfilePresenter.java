@@ -135,8 +135,9 @@ public class EditProfilePresenter {
                 .filter(user -> state == null);
 
         locationObservable = Observable.merge(
-                userInputsObservable.map(BaseProfile::getLocation),
-                locationSubject);
+                userPreferences.getLocationObservable(),
+                locationSubject)
+                .filter(Functions1.isNotNull());
 
         avatarObservable = userObservable
                 .map(BaseProfile::getImage);
