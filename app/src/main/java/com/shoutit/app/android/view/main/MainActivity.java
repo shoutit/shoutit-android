@@ -11,8 +11,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.NavUtils;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -33,7 +31,6 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.mixpanel.MixPanel;
-import com.shoutit.app.android.model.Stats;
 import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.BackPressedHelper;
 import com.shoutit.app.android.utils.BuildTypeUtils;
@@ -42,7 +39,6 @@ import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.PlayServicesHelper;
-import com.shoutit.app.android.utils.pusher.PusherHelper;
 import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
 import com.shoutit.app.android.view.discover.DiscoverActivity;
 import com.shoutit.app.android.view.discover.OnNewDiscoverSelectedListener;
@@ -167,18 +163,13 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
         }
 
         profilesDao.updateUser()
+                .compose(bindToLifecycle())
                 .subscribe(user -> {
                     mUserPreferences.setUserOrPage(user);
                 });
     }
 
     private void subscribeToStats() {
-        final PusherHelper pusherHelper = mPusherHelper.getPusherHelper();
-        mStatsSubscription.add(pusherHelper.getStatsObservable()
-                .compose(this.<Stats>bindToLifecycle())
-                .subscribe(pusherStats -> {
-                    menuHandler.setStats(pusherStats.getUnreadConversationsCount(), pusherStats.getUnreadNotifications());
-                }));
         mStatsSubscription.add(mUserPreferences.getPageOrUserObservable()
                 .filter(Functions1.isNotNull())
                 .distinctUntilChanged()
