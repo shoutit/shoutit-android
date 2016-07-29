@@ -577,7 +577,7 @@ public abstract class VideoCallActivity extends BaseActivity {
             participantVideoRenderer = null;
         }
 
-        cameraCapturer.stopPreview();
+        stopPreview();
 
         if (conversation != null) {
             conversation.disconnect();
