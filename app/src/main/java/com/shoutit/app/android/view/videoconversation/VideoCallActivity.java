@@ -562,6 +562,8 @@ public abstract class VideoCallActivity extends BaseActivity {
         mTwilio.setDuringCall(false);
         mTwilio.clearCurrentInvite();
 
+        stopPreview();
+
         smallPreviewWindow.removeAllViews();
         smallPreviewCoverView.setVisibility(View.VISIBLE);
         participantWindow.removeAllViews();
@@ -576,8 +578,6 @@ public abstract class VideoCallActivity extends BaseActivity {
             participantVideoRenderer.release();
             participantVideoRenderer = null;
         }
-
-        cameraCapturer.stopPreview();
 
         if (conversation != null) {
             conversation.disconnect();
