@@ -46,6 +46,8 @@ public class ReceivedImageMessageHolder extends ViewHolderManager.BaseViewHolder
         mPicasso.load(item.getUrl())
                 .fit()
                 .centerCrop()
+                .placeholder(R.drawable.pattern_placeholder)
+                .error(R.drawable.pattern_placeholder)
                 .into(mCjatsReceivedImageImageview);
         mCjatsReceivedImageTextview.setText(item.getTime());
 

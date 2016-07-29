@@ -41,6 +41,8 @@ public class SentImageMessageHolder extends ViewHolderManager.BaseViewHolder<Bas
         mPicasso.load(message.getUrl())
                 .fit()
                 .centerCrop()
+                .placeholder(R.drawable.pattern_placeholder)
+                .error(R.drawable.pattern_placeholder)
                 .into(mCjatsSentImageImageview);
         mCjatsSentImageTextview.setText(message.getTime());
 
