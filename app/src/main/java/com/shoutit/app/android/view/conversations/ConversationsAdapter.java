@@ -70,6 +70,8 @@ public class ConversationsAdapter extends BaseAdapter {
             setText(mSubtitleTv, subTitle);
 
             mLastMessageTv.setText(adapterItem.getMessage());
+            mLastMessageTv.setVisibility(Strings.isNullOrEmpty(adapterItem.getMessage()) ?
+                    View.GONE : View.VISIBLE);
             mTimeTv.setText(adapterItem.getTime());
 
             mItemView.setBackgroundColor(adapterItem.isUnread() ?
