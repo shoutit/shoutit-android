@@ -1,5 +1,6 @@
 package com.shoutit.app.android.view.main;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +12,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -34,6 +36,7 @@ import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.model.Stats;
 import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.BackPressedHelper;
+import com.shoutit.app.android.utils.BuildTypeUtils;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.utils.LogHelper;
@@ -65,6 +68,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
     public static final int REQUST_CODE_CAMERA_PERMISSION = 1;
     public static final int REQUST_CODE_CALL_PHONE_PERMISSION = 2;
     public static final int REQUST_CODE_PLAY_SERVICES_CHECK = 3;
+    public static final int REQUST_CODE_LEAK_CANARY_PERMISSION = 4;
 
     public static Intent newIntent(@Nonnull Context context) {
         return new Intent(context, MainActivity.class);
@@ -140,6 +144,8 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
         mixPanel.initMixPanel(); // Workaround for mixpanel people id issue
         mixPanel.showNotificationIfAvailable(this);
+
+        askForStoragePermissionForLeakCanary();
     }
 
     @Override
@@ -298,6 +304,14 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
     @Override
     public void onSeeAllDiscovers() {
         menuHandler.setDiscoverMenuItem();
+    }
+
+    private void askForStoragePermissionForLeakCanary() {
+        if (BuildTypeUtils.isDebug()) {
+            PermissionHelper.checkPermissions(this, REQUST_CODE_LEAK_CANARY_PERMISSION, ColoredSnackBar.contentView(this),
+                    R.string.permission_location_explanation,
+                    new String[] {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE});
+        }
     }
 
     protected void onSaveInstanceState(Bundle outState) {
