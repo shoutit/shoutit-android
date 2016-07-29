@@ -134,8 +134,6 @@ public class PageProfilePresenter implements ProfilePresenter {
     @Nonnull
     private final ListeningHalfPresenter listeningHalfPresenter;
     @NonNull
-    private final PusherHelperHolder pusherHelper;
-    @NonNull
     private final BookmarkHelper mBookmarkHelper;
     @Nullable
     private String loggedInUserName;
@@ -166,7 +164,6 @@ public class PageProfilePresenter implements ProfilePresenter {
         this.userProfilePresenter = userProfilePresenter;
         this.preferencesHelper = preferencesHelper;
         this.listeningHalfPresenter = listeningHalfPresenter;
-        this.pusherHelper = pusherHelper;
         mBookmarkHelper = bookmarkHelper;
         this.isNormalUser = userPreferences.isNormalUser();
 
@@ -389,9 +386,7 @@ public class PageProfilePresenter implements ProfilePresenter {
         if (isMyProfile) {
             return userPreferences.getPageOrUserObservable()
                     .filter(Functions1.isNotNull())
-                    .map(BaseProfile::getUnreadNotificationsCount)
-                    .mergeWith(pusherHelper.getPusherHelper().getStatsObservable()
-                            .map(Stats::getUnreadNotifications));
+                    .map(BaseProfile::getUnreadNotificationsCount);
         } else {
             return Observable.never();
         }

@@ -9,6 +9,7 @@ import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.utils.LogHelper;
 
 import java.util.List;
 
@@ -48,5 +49,11 @@ public abstract class BaseAdapter extends RecyclerView.Adapter<ViewHolderManager
     @Override
     public void onBindViewHolder(ViewHolderManager.BaseViewHolder holder, int position) {
         holder.bind(items.get(position));
+    }
+
+    @Override
+    public void onViewRecycled(ViewHolderManager.BaseViewHolder holder) {
+        holder.onViewRecycled();
+        super.onViewRecycled(holder);
     }
 }

@@ -165,6 +165,7 @@ public class MenuHandler {
         userPreferences.getPageOrUserObservable()
                 .filter(user -> user != null)
                 .map(BaseProfile::getStats)
+                .compose(rxActivity.bindToLifecycle())
                 .subscribe(stats -> {
                     if (stats != null) {
                         final int credits = stats.getCredits();
@@ -176,6 +177,7 @@ public class MenuHandler {
                 });
         userPreferences.getPageOrUserObservable()
                 .filter(user -> user != null)
+                .compose(rxActivity.bindToLifecycle())
                 .subscribe(user -> {
                     pagesItem.setVisibility(user.isUser() ?
                             View.VISIBLE : View.GONE);
@@ -189,6 +191,7 @@ public class MenuHandler {
             userPreferences.getUserObservable()
                     .filter(user -> user != null)
                     .map(BaseProfile::getStats)
+                    .compose(rxActivity.bindToLifecycle())
                     .subscribe(stats -> {
                         if (stats != null) {
                             final int statsCount = stats.getUnreadConversationsCount() + stats.getUnreadNotifications();

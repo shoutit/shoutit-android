@@ -19,6 +19,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.MyGridLayoutManager;
 import com.shoutit.app.android.utils.RtlUtils;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.shoutit.app.android.view.shouts.discover.DiscoverShoutsActivity;
@@ -143,8 +144,8 @@ public class DiscoverFragment extends BaseFragment {
     }
 
     private void setUpAdapter() {
-        final GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 2);
-        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+        final GridLayoutManager layoutManager = new MyGridLayoutManager(getContext(), 2);
+        layoutManager.setSpanSizeLookup(new MyGridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
                 final int viewType = adapter.getItemViewType(position);

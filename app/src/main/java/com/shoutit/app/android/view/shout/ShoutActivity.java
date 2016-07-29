@@ -16,6 +16,7 @@ import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
+import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
@@ -44,6 +45,7 @@ import com.shoutit.app.android.model.MobilePhoneResponse;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.ImageHelper;
 import com.shoutit.app.android.utils.IntentHelper;
+import com.shoutit.app.android.utils.MyGridLayoutManager;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.RtlUtils;
 import com.shoutit.app.android.utils.UpNavigationHelper;
@@ -415,8 +417,8 @@ public class ShoutActivity extends BaseActivity {
     }
 
     private void setUpAdapter() {
-        final GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
-        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+        final GridLayoutManager layoutManager = new MyGridLayoutManager(this, 2);
+        layoutManager.setSpanSizeLookup(new MyGridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
                 if (adapter.getItemViewType(position) == ShoutAdapter.VIEW_TYPE_USER_SHOUTS) {

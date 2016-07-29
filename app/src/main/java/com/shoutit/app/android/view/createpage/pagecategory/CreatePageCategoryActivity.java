@@ -21,6 +21,7 @@ import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.utils.MyGridLayoutManager;
 import com.shoutit.app.android.utils.ToolbarUtils;
 import com.shoutit.app.android.utils.adapter.BaseViewHolderManager;
 import com.shoutit.app.android.utils.adapter.EmptyViewHolder;
@@ -107,8 +108,8 @@ public class CreatePageCategoryActivity extends BaseActivity implements CreatePa
 
     @NonNull
     private GridLayoutManager getGridLayoutManager() {
-        final GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
-        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+        final GridLayoutManager layoutManager = new MyGridLayoutManager(this, 2);
+        layoutManager.setSpanSizeLookup(new MyGridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
                 final int viewType = mAdapter.getItemViewType(position);
