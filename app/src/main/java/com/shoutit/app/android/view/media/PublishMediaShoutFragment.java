@@ -212,29 +212,23 @@ public class PublishMediaShoutFragment extends Fragment {
                                         .observeOn(MyAndroidSchedulers.mainThread());
                             }
                         })
-                        .subscribe(new Action1<ResponseOrError<Boolean>>() {
-                            @Override
-                            public void call(ResponseOrError<Boolean> responseOrError) {
-                                showProgress(false);
+                        .subscribe(responseOrError -> {
+                            showProgress(false);
 
-                                if (responseOrError.isData()) {
-                                    final Boolean isPermissionGranted = responseOrError.data();
-                                    if (!isPermissionGranted) {
-                                        faceBookCheckbox.setChecked(false);
-                                        showPermissionNotGrantedError();
-                                    }
-                                } else {
+                            if (responseOrError.isData()) {
+                                final Boolean isPermissionGranted = responseOrError.data();
+                                if (!isPermissionGranted) {
                                     faceBookCheckbox.setChecked(false);
-                                    showApiError(responseOrError.error());
+                                    showPermissionNotGrantedError();
                                 }
-                            }
-                        }, new Action1<Throwable>() {
-                            @Override
-                            public void call(Throwable throwable) {
-                                showProgress(false);
+                            } else {
                                 faceBookCheckbox.setChecked(false);
-                                showApiError(throwable);
+                                showApiError(responseOrError.error());
                             }
+                        }, throwable -> {
+                            showProgress(false);
+                            faceBookCheckbox.setChecked(false);
+                            showApiError(throwable);
                         })
         );
     }
@@ -317,34 +311,14 @@ public class PublishMediaShoutFragment extends Fragment {
                         mPublishMediaShoutPreview.setImageURI(Uri.fromFile(file));
                     }
                 })
-                .flatMap(new Func1<File, Observable<String>>() {
-                    @Override
-                    public Observable<String> call(File file) {
-                        return mAmazonHelper.uploadShoutMediaImageObservable(file)
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(MyAndroidSchedulers.mainThread());
-                    }
-                })
-                .flatMap(new Func1<String, Observable<BothParams<String, String>>>() {
-                    @Override
-                    public Observable<BothParams<String, String>> call(final String thumb) {
-                        return mAmazonHelper.uploadShoutMediaVideoObservable(new File(mFile))
-                                .map(new Func1<String, BothParams<String, String>>() {
-                                    @Override
-                                    public BothParams<String, String> call(String file) {
-                                        return BothParams.of(thumb, file);
-                                    }
-                                });
-                    }
-                })
-                .flatMap(new Func1<BothParams<String, String>, Observable<CreateShoutResponse>>() {
-                    @Override
-                    public Observable<CreateShoutResponse> call(BothParams<String, String> urls) {
-                        return mApiService.createShoutOffer(CreateOfferShoutWithImageRequest.withVideo(urls.param1(), urls.param2()))
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(MyAndroidSchedulers.mainThread());
-                    }
-                });
+                .flatMap(file -> mAmazonHelper.uploadShoutMediaImageObservable(file)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(MyAndroidSchedulers.mainThread()))
+                .flatMap(thumb -> mAmazonHelper.uploadShoutMediaVideoObservable(new File(mFile))
+                        .map((Func1<String, BothParams<String, String>>) file -> BothParams.of(thumb, file)))
+                .flatMap(urls -> mApiService.createShoutOffer(CreateOfferShoutWithImageRequest.withVideo(urls.param1(), urls.param2()))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(MyAndroidSchedulers.mainThread()));
     }
 
     private void downloadCurrencies() {
@@ -352,17 +326,11 @@ public class PublishMediaShoutFragment extends Fragment {
                 .subscribeOn(Schedulers.io())
                 .observeOn(MyAndroidSchedulers.mainThread())
                 .subscribe(
-                        new Action1<List<Currency>>() {
-                            @Override
-                            public void call(List<Currency> currencies) {
-                                mCurrencyAdapter.setData(PriceUtils.transformCurrencyToPair(currencies));
-                            }
-                        }, new Action1<Throwable>() {
-                            @Override
-                            public void call(Throwable throwable) {
-                                Log.e(TAG, "error", throwable);
-                                showApiError(throwable);
-                            }
+                        currencies -> {
+                            mCurrencyAdapter.setData(PriceUtils.transformCurrencyToPair(currencies));
+                        }, throwable -> {
+                            Log.e(TAG, "error", throwable);
+                            showApiError(throwable);
                         }));
     }
 

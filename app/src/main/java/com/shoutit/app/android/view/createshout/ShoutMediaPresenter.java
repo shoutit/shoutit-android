@@ -385,6 +385,9 @@ public class ShoutMediaPresenter {
             if (videoObservable == null) {
                 mCompositeSubscription.add(images.subscribe(images1 -> {
                     getAllEditedImagesAndComplete(images1, ImmutableList.<Video>of());
+                }, throwable -> {
+                    mMediaListener.showUploadError(throwable);
+                    LogHelper.logThrowableAndCrashlytics(TAG, "Media upload failed", throwable);
                 }));
             } else {
                 mCompositeSubscription.add(images.zipWith(
