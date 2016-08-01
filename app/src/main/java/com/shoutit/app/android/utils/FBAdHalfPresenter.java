@@ -25,7 +25,6 @@ public class FBAdHalfPresenter {
     private static final int AD_POSITION_CYCLE = 25;
 
     private final FacebookHelper facebookHelper;
-    private final Scheduler uiScheduler;
 
     private final BehaviorSubject<Integer> shoutsCount = BehaviorSubject.create();
 
@@ -36,10 +35,10 @@ public class FBAdHalfPresenter {
     public FBAdHalfPresenter(FacebookHelper facebookHelper,
                              @UiScheduler Scheduler uiScheduler) {
         this.facebookHelper = facebookHelper;
-        this.uiScheduler = uiScheduler;
 
         listAdsObservable = getAdsFetchObservable(facebookHelper.getListAdManager())
-                .cache(1);
+                .cache(1)
+                .observeOn(uiScheduler);
     }
 
     @Nonnull
@@ -67,8 +66,7 @@ public class FBAdHalfPresenter {
                                 .addAll(newAds)
                                 .build();
                     }
-                })
-                .subscribeOn(uiScheduler);
+                });
     }
 
     @Nonnull

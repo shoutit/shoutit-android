@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 
 import com.appunite.rx.ResponseOrError;
+import com.appunite.rx.android.MyAndroidSchedulers;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -32,7 +33,6 @@ import com.facebook.share.widget.AppInviteDialog;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.FbAdAdapterItem;
@@ -58,9 +58,9 @@ import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Scheduler;
 import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.functions.FuncN;
+import rx.internal.util.RxRingBuffer;
 
 public class FacebookHelper {
 
@@ -458,20 +458,25 @@ public class FacebookHelper {
 
         final ImmutableList.Builder<NativeAd> builder = ImmutableList.builder();
 
-        for (int i = 0; i < adsNumber; i++) {
+        for (int i = 0; i < Math.min(RxRingBuffer.SIZE, adsNumber); i++) {
             adsObservables.add(getAdObservable(nativeAdsManager));
         }
 
-        return Observable.combineLatest(adsObservables, (FuncN<List<NativeAd>>) args -> {
-            for (int i = 0; i < args.length; i++) {
-                final ResponseOrError<NativeAd> ad = (ResponseOrError<NativeAd>) args[i];
+        if (adsObservables.size() >= RxRingBuffer.SIZE) {
+            LogHelper.logThrowableAndCrashlytics(TAG, "Trying to load more ads than RxRingBuffer size: " + adsObservables.size(),
+                    new Throwable("Trying to load more ads than RxRingBuffer size: " + adsObservables.size()));
+        }
+
+        return Observable.combineLatest(adsObservables, (FuncN<List<NativeAd>>) ads -> {
+            for (Object arg : ads) {
+                final ResponseOrError<NativeAd> ad = (ResponseOrError<NativeAd>) arg;
                 if (ad.isData()) {
                     builder.add(ad.data());
                 }
             }
 
             return builder.build();
-        });
+        }).first();
     }
 
     @Nonnull
@@ -488,32 +493,32 @@ public class FacebookHelper {
 
     @Nonnull
     public Observable<ResponseOrError<NativeAd>> getAdObservable(NativeAdsManager manager) {
-        return Observable.create(new Observable.OnSubscribe<NativeAd>() {
+        return Observable.create(new Observable.OnSubscribe<ResponseOrError<NativeAd>>() {
             @Override
-            public void call(Subscriber<? super NativeAd> subscriber) {
+            public void call(Subscriber<? super ResponseOrError<NativeAd>> subscriber) {
                 final NativeAd ad = getAd(manager);
 
                 if (ad == null) {
                     manager.setListener(new NativeAdsManager.Listener() {
                         @Override
                         public void onAdsLoaded() {
-                            subscriber.onNext(getAd(manager));
+                            subscriber.onNext(ResponseOrError.fromData(getAd(manager)));
+                            subscriber.onCompleted();
                         }
 
                         @Override
                         public void onAdError(AdError adError) {
-                            subscriber.onError(new Throwable(adError.getErrorMessage()));
+                            subscriber.onNext(ResponseOrError.<NativeAd>fromError(new Throwable(adError.getErrorMessage())));
+                            subscriber.onCompleted();
                             LogHelper.logThrowableAndCrashlytics(TAG, "Cannot load ads", new Throwable(adError.getErrorMessage()));
                         }
                     });
                     manager.loadAds();
                 } else {
-                    subscriber.onNext(ad);
+                    subscriber.onNext(ResponseOrError.fromData(ad));
                 }
             }
-        })
-                .subscribeOn(AndroidSchedulers.mainThread())
-                .compose(ResponseOrError.toResponseOrErrorObservable());
+        }).subscribeOn(MyAndroidSchedulers.mainThread());
     }
 
     public Observable<FacebookPages> getPagesListObservable() {
