@@ -65,15 +65,11 @@ public class Category {
         if (this == o) return true;
         if (!(o instanceof Category)) return false;
         final Category category = (Category) o;
-        return Objects.equal(name, category.name) &&
-                Objects.equal(slug, category.slug) &&
-                Objects.equal(icon, category.icon) &&
-                Objects.equal(image, category.image) &&
-                Objects.equal(filters, category.filters);
+        return Objects.equal(slug, category.slug);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(name, slug, icon, image, filters);
+        return Objects.hashCode(slug);
     }
 }

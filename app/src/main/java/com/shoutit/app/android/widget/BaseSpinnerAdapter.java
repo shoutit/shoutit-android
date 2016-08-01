@@ -19,7 +19,7 @@ import javax.annotation.Nonnull;
 public abstract class BaseSpinnerAdapter<T> extends BaseAdapter {
     private final LayoutInflater mLayoutInflater;
     private final int layoutId;
-    private List<T> mItems = ImmutableList.of();
+    private List<T> items = ImmutableList.of();
 
     public BaseSpinnerAdapter(Context context, @LayoutRes int layoutId) {
         this.layoutId = layoutId;
@@ -27,7 +27,7 @@ public abstract class BaseSpinnerAdapter<T> extends BaseAdapter {
     }
 
     public void bindData(@Nonnull Collection<T> newItems) {
-        mItems = ImmutableList.<T>builder()
+        items = ImmutableList.<T>builder()
                 .addAll(newItems)
                 .build();
         notifyDataSetChanged();
@@ -37,12 +37,12 @@ public abstract class BaseSpinnerAdapter<T> extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return mItems.size();
+        return items.size();
     }
 
     @Override
     public T getItem(int position) {
-        return mItems.get(position);
+        return items.get(position);
     }
 
     @Override
@@ -78,8 +78,8 @@ public abstract class BaseSpinnerAdapter<T> extends BaseAdapter {
     }
 
     public int getItemPosition(@Nonnull T item) {
-        for (int i = 0; i <= mItems.size(); i++) {
-            if (mItems.get(i).equals(item)) {
+        for (int i = 0; i < getCount(); i++) {
+            if (items.get(i).equals(item)) {
                 return i;
             }
         }

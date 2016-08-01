@@ -39,13 +39,12 @@ public class Filter {
         if (this == o) return true;
         if (!(o instanceof Filter)) return false;
         final Filter filter = (Filter) o;
-        return Objects.equal(name, filter.name) &&
-                Objects.equal(slug, filter.slug) &&
-                Objects.equal(value, filter.value);
+        return Objects.equal(slug, filter.slug);
+
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(name, slug, value);
+        return Objects.hashCode(slug);
     }
 }
