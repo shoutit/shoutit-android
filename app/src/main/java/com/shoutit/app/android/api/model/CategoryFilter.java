@@ -47,14 +47,13 @@ public class CategoryFilter {
         if (this == o) return true;
         if (!(o instanceof CategoryFilter)) return false;
         final CategoryFilter filter = (CategoryFilter) o;
-        return Objects.equal(name, filter.name) &&
-                Objects.equal(slug, filter.slug) &&
-                Objects.equal(values, filter.values);
+        return Objects.equal(slug, filter.slug);
+
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(name, slug, values);
+        return Objects.hashCode(slug);
     }
 
     @Nullable
