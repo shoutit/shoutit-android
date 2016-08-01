@@ -258,8 +258,8 @@ public class ShoutAdapter extends BaseAdapter {
         }
 
         private void setUpFilters(Shout shout) {
-            if (detailsContainer.getChildCount() > initDetailsContainerChildsCount) {
-                return;
+            for (int i = initDetailsContainerChildsCount - 1; i < detailsContainer.getChildCount() - 1; i++) {
+                detailsContainer.removeViewAt(i);
             }
 
             for (int i = 0; i < shout.getFilters().size(); i++) {
