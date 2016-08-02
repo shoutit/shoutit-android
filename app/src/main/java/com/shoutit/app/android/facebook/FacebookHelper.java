@@ -56,11 +56,14 @@ import javax.annotation.Nonnull;
 
 import okhttp3.ResponseBody;
 import rx.Observable;
+import rx.Observer;
 import rx.Scheduler;
 import rx.Subscriber;
+import rx.functions.Action2;
 import rx.functions.Func1;
 import rx.functions.FuncN;
 import rx.internal.util.RxRingBuffer;
+import rx.observables.SyncOnSubscribe;
 
 public class FacebookHelper {
 
@@ -108,7 +111,14 @@ public class FacebookHelper {
         shoutDetailAdManager = new NativeAdsManager(
                 context, getShoutDetailAdId(), ADS_NUM_SHOUT_DETAIL_TO_PREFETCH);
 
-        final NativeAdsManager.Listener adsListener = new NativeAdsManager.Listener() {
+        listAdManager.setListener(getAdsListener());
+        shoutDetailAdManager.setListener(getAdsListener());
+
+        loadAds();
+    }
+
+    private NativeAdsManager.Listener getAdsListener() {
+        return new NativeAdsManager.Listener() {
             @Override
             public void onAdsLoaded() {
                 LogHelper.logIfDebug(TAG, "onAdsLoaded");
@@ -121,11 +131,6 @@ public class FacebookHelper {
                         new Throwable(adError.getErrorMessage()));
             }
         };
-
-        listAdManager.setListener(adsListener);
-        shoutDetailAdManager.setListener(adsListener);
-
-        loadAds();
     }
 
     public void initFacebook() {
@@ -453,13 +458,13 @@ public class FacebookHelper {
         }
     }
 
-    public Observable<List<NativeAd>> getAdsObservable(NativeAdsManager nativeAdsManager, int adsNumber) {
+    public Observable<List<NativeAd>> getAdsObservable(int adsToLoadNumber) {
         final List<Observable<ResponseOrError<NativeAd>>> adsObservables = new ArrayList<>();
 
         final ImmutableList.Builder<NativeAd> builder = ImmutableList.builder();
 
-        for (int i = 0; i < Math.min(RxRingBuffer.SIZE, adsNumber); i++) {
-            adsObservables.add(getAdObservable(nativeAdsManager));
+        for (int i = 0; i < Math.min(RxRingBuffer.SIZE, adsToLoadNumber); i++) {
+            adsObservables.add(getAdObservable(listAdManager));
         }
 
         if (adsObservables.size() >= RxRingBuffer.SIZE) {
@@ -493,32 +498,36 @@ public class FacebookHelper {
 
     @Nonnull
     public Observable<ResponseOrError<NativeAd>> getAdObservable(NativeAdsManager manager) {
-        return Observable.create(new Observable.OnSubscribe<ResponseOrError<NativeAd>>() {
-            @Override
-            public void call(Subscriber<? super ResponseOrError<NativeAd>> subscriber) {
-                final NativeAd ad = getAd(manager);
+        return Observable
+                .create(SyncOnSubscribe.createSingleState(() -> null, new Action2<Object, Observer<? super ResponseOrError<NativeAd>>>() {
+                    @Override
+                    public void call(Object o, Observer<? super ResponseOrError<NativeAd>> observer) {
+                        final NativeAd ad = getAd(manager);
 
-                if (ad == null) {
-                    manager.setListener(new NativeAdsManager.Listener() {
-                        @Override
-                        public void onAdsLoaded() {
-                            subscriber.onNext(ResponseOrError.fromData(getAd(manager)));
-                            subscriber.onCompleted();
-                        }
+                        if (ad == null) {
+                            manager.setListener(new NativeAdsManager.Listener() {
+                                @Override
+                                public void onAdsLoaded() {
+                                    observer.onNext(ResponseOrError.fromData(getAd(manager)));
+                                    observer.onCompleted();
+                                }
 
-                        @Override
-                        public void onAdError(AdError adError) {
-                            subscriber.onNext(ResponseOrError.<NativeAd>fromError(new Throwable(adError.getErrorMessage())));
-                            subscriber.onCompleted();
-                            LogHelper.logThrowableAndCrashlytics(TAG, "Cannot load ads", new Throwable(adError.getErrorMessage()));
+                                @Override
+                                public void onAdError(AdError adError) {
+                                    observer.onNext(ResponseOrError.<NativeAd>fromError(new Throwable(adError.getErrorMessage())));
+                                    observer.onCompleted();
+                                    LogHelper.logThrowableAndCrashlytics(TAG, "Cannot load ads", new Throwable(adError.getErrorMessage()));
+                                }
+                            });
+                            manager.loadAds();
+                        } else {
+                            observer.onNext(ResponseOrError.fromData(ad));
+                            observer.onCompleted();
                         }
-                    });
-                    manager.loadAds();
-                } else {
-                    subscriber.onNext(ResponseOrError.fromData(ad));
-                }
-            }
-        }).subscribeOn(MyAndroidSchedulers.mainThread());
+                    }
+                }))
+                .doOnUnsubscribe(() -> manager.setListener(null))
+                .subscribeOn(MyAndroidSchedulers.mainThread());
     }
 
     public Observable<FacebookPages> getPagesListObservable() {
@@ -556,11 +565,6 @@ public class FacebookHelper {
     @Nullable
     public NativeAd getAd(NativeAdsManager nativeAdsManager) {
         return nativeAdsManager.nextNativeAd();
-    }
-
-    @Nonnull
-    public NativeAdsManager getListAdManager() {
-        return listAdManager;
     }
 
     public NativeAdsManager getShoutDetailAdManager() {

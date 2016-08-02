@@ -47,7 +47,6 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
-import rx.functions.Action1;
 
 import static com.appunite.rx.internal.Preconditions.checkNotNull;
 
@@ -153,14 +152,18 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
                 });
 
         RxRecyclerView.scrollEvents(recyclerView)
-                .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
                 .filter(LoadMoreHelper.needLoadMore(linearLayoutManager, adapter))
+                .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
                 .subscribe(presenter.getLoadMoreObserver());
 
         RxRecyclerView.scrollEvents(recyclerView)
-                .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
                 .filter(LoadMoreHelper.needLoadMore(gridLayoutManager, adapter))
+                .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
                 .subscribe(presenter.getLoadMoreObserver());
+
+        presenter.getLoadMoreObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
 
         presenter.getCountObservable()
                 .compose(this.<Integer>bindToLifecycle())
