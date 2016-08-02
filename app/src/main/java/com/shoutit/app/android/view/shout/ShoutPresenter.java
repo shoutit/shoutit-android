@@ -288,12 +288,12 @@ public class ShoutPresenter {
 
         errorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
                 ResponseOrError.transform(userShoutsObservable),
-                ResponseOrError.transform(shoutResponse.filter(this::ignoreNotFoundError)),
+                ResponseOrError.transform(shoutResponse),
                 ResponseOrError.transform(relatedShoutsObservable),
                 ResponseOrError.transform(likeShoutResponseObservable),
                 ResponseOrError.transform(unlikeShoutResponseObservable)))
                 .filter(Functions1.isNotNull())
-                .takeUntil(shoutNotFoundErrorObservable)
+                .filter(this::ignoreNotFoundError)
                 .observeOn(uiScheduler);
 
         /** Progress **/
@@ -407,12 +407,10 @@ public class ShoutPresenter {
                 .withLatestFrom(successShoutResponse, (o, shout) -> shout.getWebUrl());
     }
 
-    private Boolean ignoreNotFoundError(ResponseOrError<Shout> shoutResponse) {
-        if (shoutResponse.isError()) {
-            if (shoutResponse.error() instanceof HttpException) {
-                final HttpException error = (HttpException) shoutResponse.error();
-                return error.code() != 404;
-            }
+    private Boolean ignoreNotFoundError(Throwable throwable) {
+        if (throwable instanceof HttpException) {
+            final HttpException error = (HttpException) throwable;
+            return error.code() != 404;
         }
 
         return true;
