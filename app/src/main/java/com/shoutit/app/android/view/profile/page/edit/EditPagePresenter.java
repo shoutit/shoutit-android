@@ -142,9 +142,6 @@ public class EditPagePresenter {
                 .observeOn(mUiScheduler)
                 .subscribeOn(mNetworkScheduler)
                 .subscribe(page -> {
-                    if (isMyProfile) {
-                        mUserPreferences.setUserOrPage(page);
-                    }
                     mProfilesDao.getProfileDao(page.getUsername())
                             .updatedProfileLocallyObserver().onNext(ResponseOrError.fromData(page));
                     // In case of edited username

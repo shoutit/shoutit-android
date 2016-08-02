@@ -204,11 +204,6 @@ public class PageProfilePresenter implements ProfilePresenter {
                 });
 
         final Observable<Page> userSuccessObservable = userRequestObservable.compose(ResponseOrError.<Page>onlySuccess())
-                .doOnNext(user -> {
-                    if (User.ME.equals(userName)) {
-                        userPreferences.setUserOrPage(user);
-                    }
-                })
                 .compose(ObservableExtensions.<Page>behaviorRefCount());
 
         final Observable<Boolean> isUserProfile = userSuccessObservable

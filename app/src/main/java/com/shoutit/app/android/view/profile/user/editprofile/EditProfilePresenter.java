@@ -238,10 +238,7 @@ public class EditProfilePresenter {
                 uploadCoverToApiObservable.compose(ResponseOrError.<User>onlySuccess()),
                 uploadAvatarToApiObservable.compose(ResponseOrError.<User>onlySuccess()),
                 successObservable)
-                .map(user -> {
-                    userPreferences.setUserOrPage(user);
-                    return null;
-                })
+                .map(Functions1.toObject())
                 .observeOn(uiScheduler);
 
         /** Progress **/
@@ -302,7 +299,6 @@ public class EditProfilePresenter {
                 .subscribeOn(networkScheduler)
                 .observeOn(uiScheduler)
                 .doOnNext(user -> {
-                    userPreferences.setUserOrPage(user);
                     profilesDao.getProfileDao(BaseProfile.ME).updatedProfileLocallyObserver()
                             .onNext(ResponseOrError.fromData(user));
                 })
