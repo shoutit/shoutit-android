@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Shoutit Debug</string>
+    <string name="shoutit_scheme" translatable="false">shoutit-stage</string>
+    <string name="facebook_app_id" translatable="false">1151546964858487</string>
+
+    <string name="facebook_shout_list_ad_id" translatable="false">1151546964858487_1245960432083806</string>
+    <string name="facebook_shout_detail_ad_id" translatable="false">1151546964858487_1249823215030861</string>
+</resources>

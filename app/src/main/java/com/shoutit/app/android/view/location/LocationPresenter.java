@@ -68,7 +68,7 @@ public class LocationPresenter implements ILocationPresenter {
 
     @NonNull
     private Action1<BaseProfile> saveToPreferencesAction() {
-        return mUserPreferences::setUserOrPage;
+        return baseProfile -> mUserPreferences.saveLocation(baseProfile.getLocation());
     }
 
     @Nonnull
