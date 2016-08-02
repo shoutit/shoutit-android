@@ -68,4 +68,6 @@ public class ErrorHandler {
     private static String defaultMessage(Context context) {
         return context.getString(R.string.error_default);
     }
+
+
 }

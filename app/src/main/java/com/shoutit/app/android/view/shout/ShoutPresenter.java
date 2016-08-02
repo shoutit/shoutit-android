@@ -41,6 +41,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
+import retrofit2.HttpException;
 import retrofit2.Response;
 import rx.Observable;
 import rx.Observer;
@@ -75,6 +76,7 @@ public class ShoutPresenter {
     private final Observable<Shout> showPromoteObservable;
     private final Observable<Shout> showPromotedObservable;
     private final Observable<String> mLikeApiMessage;
+    private final Observable<Throwable> shoutNotFoundErrorObservable;
 
     private PublishSubject<Boolean> likeClickedSubject = PublishSubject.create();
     private PublishSubject<String> addToCartSubject = PublishSubject.create();
@@ -275,18 +277,29 @@ public class ShoutPresenter {
         );
 
         /** Errors **/
+
+        shoutNotFoundErrorObservable = shoutResponse.compose(ResponseOrError.onlyError())
+                .filter(throwable -> throwable instanceof HttpException)
+                .filter(throwable -> {
+                    final HttpException httpException = (HttpException) throwable;
+                    return httpException.code() == 404;
+                })
+                .observeOn(uiScheduler);
+
         errorObservable = ResponseOrError.combineErrorsObservable(ImmutableList.of(
                 ResponseOrError.transform(userShoutsObservable),
-                ResponseOrError.transform(shoutResponse),
+                ResponseOrError.transform(shoutResponse.filter(this::ignoreNotFoundError)),
                 ResponseOrError.transform(relatedShoutsObservable),
                 ResponseOrError.transform(likeShoutResponseObservable),
                 ResponseOrError.transform(unlikeShoutResponseObservable)))
                 .filter(Functions1.isNotNull())
+                .takeUntil(shoutNotFoundErrorObservable)
                 .observeOn(uiScheduler);
 
         /** Progress **/
         progressObservable = Observable.merge(
                 errorObservable.map(Functions1.returnFalse()),
+                shoutNotFoundErrorObservable.map(Functions1.returnFalse()),
                 allAdapterItemsObservable.map(Functions1.returnFalse()))
                 .startWith(true)
                 .observeOn(uiScheduler);
@@ -392,6 +405,17 @@ public class ShoutPresenter {
 
         shareObservable = shareSubject
                 .withLatestFrom(successShoutResponse, (o, shout) -> shout.getWebUrl());
+    }
+
+    private Boolean ignoreNotFoundError(ResponseOrError<Shout> shoutResponse) {
+        if (shoutResponse.isError()) {
+            if (shoutResponse.error() instanceof HttpException) {
+                final HttpException error = (HttpException) shoutResponse.error();
+                return error.code() != 404;
+            }
+        }
+
+        return true;
     }
 
     @NonNull
@@ -564,6 +588,10 @@ public class ShoutPresenter {
     @NonNull
     public Observable<String> getBookmarkSuccesMessageObservable() {
         return mBookmarkHelper.getBookmarkSuccessMessage();
+    }
+
+    public Observable<Throwable> getShoutNotFoundErrorObservable() {
+        return shoutNotFoundErrorObservable;
     }
 
     public Observable<String> getLikeApiMessage() {
