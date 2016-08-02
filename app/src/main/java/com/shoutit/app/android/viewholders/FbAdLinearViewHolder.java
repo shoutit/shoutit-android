@@ -36,6 +36,7 @@ public class FbAdLinearViewHolder extends ViewHolderManager.BaseViewHolder<FbAdA
     MediaView mediaView;
 
     private final Context context;
+    private NativeAd ad;
 
     public FbAdLinearViewHolder(@Nonnull View itemView,
                                 Context context) {
@@ -46,7 +47,7 @@ public class FbAdLinearViewHolder extends ViewHolderManager.BaseViewHolder<FbAdA
 
     @Override
     public void bind(@Nonnull FbAdAdapterItem item) {
-        final NativeAd ad = item.getAd();
+        ad = item.getAd();
 
         titleTv.setText(ad.getAdTitle());
         textTv.setText(ad.getAdBody());
@@ -61,5 +62,11 @@ public class FbAdLinearViewHolder extends ViewHolderManager.BaseViewHolder<FbAdA
         addChoiceContainer.addView(adChoicesView);
 
         ad.registerViewForInteraction(adContainer);
+    }
+
+    @Override
+    public void onViewRecycled() {
+        ad.unregisterView();
+        super.onViewRecycled();
     }
 }

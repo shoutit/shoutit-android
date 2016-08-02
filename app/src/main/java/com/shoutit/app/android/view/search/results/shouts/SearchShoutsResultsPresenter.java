@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.appunite.rx.android.util.LogTransformer;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
@@ -38,7 +39,6 @@ import javax.annotation.Nullable;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
-import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.subjects.PublishSubject;
@@ -56,6 +56,7 @@ public class SearchShoutsResultsPresenter {
     private final Observable<Integer> countObservable;
     private final Observable<String> shareClickedObservable;
     private final Observable<Object> refreshShoutsObservable;
+    private final Observable<Object> loadMoreObservable;
     @NonNull
     private final BookmarkHelper mBookmarkHelper;
 
@@ -143,10 +144,11 @@ public class SearchShoutsResultsPresenter {
 
         errorObservable = shoutsRequest.compose(ResponseOrError.<ShoutsResponse>onlyError());
 
-        loadMoreSubject
+        loadMoreObservable = loadMoreSubject
                 .withLatestFrom(daoObservable, (Func2<Object, ShoutsDao.SearchShoutsDao, Observer<Object>>) (o, searchShoutsDao) -> searchShoutsDao.getLoadMoreObserver())
-                .subscribe(loadMoreObserver -> {
+                .map(loadMoreObserver -> {
                     loadMoreObserver.onNext(null);
+                    return null;
                 });
 
         shareClickedObservable = shareClickSubject.withLatestFrom(successShoutsResponse,
@@ -157,6 +159,10 @@ public class SearchShoutsResultsPresenter {
                     searchShoutsDao.getRefreshObserver().onNext(null);
                     return null;
                 });
+    }
+
+    public Observable<Object> getLoadMoreObservable() {
+        return loadMoreObservable;
     }
 
     public Observable<Object> getRefreshShoutsObservable() {

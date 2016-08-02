@@ -39,6 +39,8 @@ public class FBAdsAdapter extends ChangeableLayoutManagerAdapter {
         @Bind(R.id.ad_media_view)
         MediaView mediaView;
 
+        private NativeAd ad;
+
         public FbAdGridViewHolder(@Nonnull View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -46,7 +48,7 @@ public class FBAdsAdapter extends ChangeableLayoutManagerAdapter {
 
         @Override
         public void bind(@Nonnull FbAdAdapterItem item) {
-            final NativeAd ad = item.getAd();
+            ad = item.getAd();
             ad.unregisterView();
 
             titleTv.setText(ad.getAdTitle());
@@ -58,6 +60,12 @@ public class FBAdsAdapter extends ChangeableLayoutManagerAdapter {
             addChoiceContainer.addView(adChoicesView);
 
             ad.registerViewForInteraction(adContainer);
+        }
+
+        @Override
+        public void onViewRecycled() {
+            ad.unregisterView();
+            super.onViewRecycled();
         }
     }
 

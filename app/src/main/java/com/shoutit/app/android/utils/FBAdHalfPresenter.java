@@ -4,7 +4,6 @@ import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.BothParams;
 import com.facebook.ads.NativeAd;
-import com.facebook.ads.NativeAdsManager;
 import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.adapteritems.FbAdAdapterItem;
 import com.shoutit.app.android.facebook.FacebookHelper;
@@ -24,8 +23,6 @@ public class FBAdHalfPresenter {
 
     private static final int AD_POSITION_CYCLE = 25;
 
-    private final FacebookHelper facebookHelper;
-
     private final BehaviorSubject<Integer> shoutsCount = BehaviorSubject.create();
 
     @Nonnull
@@ -34,21 +31,8 @@ public class FBAdHalfPresenter {
     @Inject
     public FBAdHalfPresenter(FacebookHelper facebookHelper,
                              @UiScheduler Scheduler uiScheduler) {
-        this.facebookHelper = facebookHelper;
 
-        listAdsObservable = getAdsFetchObservable(facebookHelper.getListAdManager())
-                .cache(1)
-                .observeOn(uiScheduler);
-    }
-
-    @Nonnull
-    public Observable<List<NativeAd>> getAdsObservable() {
-                return listAdsObservable;
-    }
-
-    @Nonnull
-    private Observable<List<NativeAd>> getAdsFetchObservable(NativeAdsManager nativeAdsManager) {
-        return shoutsCount
+        listAdsObservable = shoutsCount
                 .scan(BothParams.of(0, 0), (oldShoutsCountWithOldAdsToLoad, newShoutsCount) -> {
                     final Integer prevShoutsCount = oldShoutsCountWithOldAdsToLoad.param1();
 
@@ -57,7 +41,7 @@ public class FBAdHalfPresenter {
                 })
                 .map(BothParams::param2)
                 .filter(adsToLoad -> adsToLoad > 0)
-                .switchMap(adsToLoad -> facebookHelper.getAdsObservable(nativeAdsManager, adsToLoad))
+                .switchMap(facebookHelper::getAdsObservable)
                 .scan(new ArrayList<>(), new Func2<List<NativeAd>, List<NativeAd>, List<NativeAd>>() {
                     @Override
                     public List<NativeAd> call(List<NativeAd> adsList, List<NativeAd> newAds) {
@@ -66,7 +50,13 @@ public class FBAdHalfPresenter {
                                 .addAll(newAds)
                                 .build();
                     }
-                });
+                })
+                .observeOn(uiScheduler);
+    }
+
+    @Nonnull
+    public Observable<List<NativeAd>> getAdsObservable() {
+        return listAdsObservable;
     }
 
     @Nonnull
