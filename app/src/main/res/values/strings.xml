@@ -169,6 +169,7 @@
     <string name="shout_category">Category</string>
     <string name="shout_location">Location</string>
     <string name="shout_share">Share shout</string>
+    <string name="shout_not_found">This shout doesn\'t exist anymore</string>
 
     <!-- Discover Shouts -->
     <string name="discover_shouts_share">Share</string>

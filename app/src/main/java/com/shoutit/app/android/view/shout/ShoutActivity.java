@@ -11,12 +11,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.NavUtils;
-import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
-import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
@@ -100,6 +97,8 @@ public class ShoutActivity extends BaseActivity {
     TextView chatOrChatsTextView;
     @Bind(R.id.shout_bottom_bar_more)
     TextView showMoreIcon;
+    @Bind(R.id.shout_item_not_exist_tv)
+    TextView shoutNotExistTv;
 
     @Inject
     ShoutPresenter presenter;
@@ -138,6 +137,14 @@ public class ShoutActivity extends BaseActivity {
         presenter.getErrorObservable()
                 .compose(this.<Throwable>bindToLifecycle())
                 .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(this)));
+
+        presenter.getShoutNotFoundErrorObservable()
+                .compose(bindToLifecycle())
+                .subscribe(throwable -> {
+                    shoutNotExistTv.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.GONE);
+                    bottomBar.setVisibility(View.GONE);
+                });
 
         presenter.getProgressObservable()
                 .compose(this.<Boolean>bindToLifecycle())
