@@ -6,6 +6,7 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
+import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -114,11 +115,15 @@ public class ChatsDelegate {
     public Observable<PusherMessage> getPusherMessageObservable(PresenceChannel presenceChannel) {
         return mPusher.getNewMessageObservable(presenceChannel)
                 .flatMap(pusherMessage -> {
-                    final String id = pusherMessage.getProfile().getId();
-                    if (mUser.getId().equals(id)) {
+                    final ConversationProfile profile = pusherMessage.getProfile();
+
+                    if (profile == null || mUser.getId().equals(profile.getId())) {
                         return Observable.just(pusherMessage);
                     } else {
                         return mApiService.readMessage(pusherMessage.getId())
+                                .subscribeOn(mNetworkScheduler)
+                                .compose(ResponseOrError.toResponseOrErrorObservable())
+                                .compose(ResponseOrError.onlySuccess())
                                 .map(new Func1<ResponseBody, PusherMessage>() {
                                     @Override
                                     public PusherMessage call(ResponseBody responseBody) {
