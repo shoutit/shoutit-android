@@ -4,6 +4,7 @@ package com.shoutit.app.android.dao;
 import android.support.annotation.NonNull;
 
 import com.appunite.rx.ResponseOrError;
+import com.appunite.rx.android.util.LogTransformer;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.operators.MoreOperators;
 import com.google.common.cache.CacheBuilder;
@@ -264,8 +265,7 @@ public class ShoutsDao {
                     .mergeWith(Observable.<Shout>never())
                     .compose(MoreOperators.<Shout>refresh(refreshShoutsSubject))
                     .mergeWith(updateShoutLocally)
-                    .compose(ResponseOrError.<Shout>toResponseOrErrorObservable())
-                    .compose(MoreOperators.<ResponseOrError<Shout>>cacheWithTimeout(networkScheduler));
+                    .compose(ResponseOrError.<Shout>toResponseOrErrorObservable());
 
             shoutMobileObservable = apiService.shoutCall(shoutId)
                     .subscribeOn(networkScheduler)
