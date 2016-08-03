@@ -72,6 +72,7 @@
     <dimen name="chat_sent_msg_item_margin_left">52dp</dimen>
     <dimen name="chat_sent_default_item_margin">8dp</dimen>
     <dimen name="chat_last_item_decoration">8dp</dimen>
+    <dimen name="chat_item_time_right_margin">2dp</dimen>
 
     <!-- Notifications -->
     <dimen name="notifications_avatar_corners">4dp</dimen>

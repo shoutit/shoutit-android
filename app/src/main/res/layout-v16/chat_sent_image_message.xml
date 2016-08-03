@@ -30,6 +30,8 @@
             android:layout_alignBottom="@+id/cjats_sent_image_imageview"
             android:layout_alignRight="@+id/cjats_sent_image_imageview"
             android:background="@drawable/chat_time_gradient"
+            android:paddingEnd="@dimen/chat_item_time_right_margin"
+            android:paddingRight="@dimen/chat_item_time_right_margin"
             android:textColor="@android:color/white"
             tools:text="18:04" />
 

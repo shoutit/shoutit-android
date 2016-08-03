@@ -48,6 +48,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end|top"
                 android:layoutDirection="locale"
+                android:paddingEnd="@dimen/chat_item_time_right_margin"
+                android:paddingRight="@dimen/chat_item_time_right_margin"
+                android:layout_marginTop="2dp"
                 android:background="@drawable/chat_time_gradient"
                 android:textColor="@android:color/white"
                 tools:text="18:04" />

@@ -35,6 +35,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end|top"
+                android:paddingLeft="@dimen/chat_item_time_right_margin"
+                android:paddingStart="@dimen/chat_item_time_right_margin"
+                android:layout_marginTop="@dimen/chat_item_time_right_margin"
                 android:background="@drawable/chat_time_gradient"
                 android:textColor="@android:color/white"
                 tools:text="18:04" />

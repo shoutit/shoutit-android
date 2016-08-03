@@ -53,6 +53,8 @@
         android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
         android:id="@+id/chats_received_video_textview"
+        android:paddingEnd="@dimen/chat_item_time_right_margin"
+        android:paddingRight="@dimen/chat_item_time_right_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
