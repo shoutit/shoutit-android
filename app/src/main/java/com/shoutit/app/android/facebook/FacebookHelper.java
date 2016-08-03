@@ -499,33 +499,39 @@ public class FacebookHelper {
     @Nonnull
     public Observable<ResponseOrError<NativeAd>> getAdObservable(NativeAdsManager manager) {
         return Observable
-                .create(SyncOnSubscribe.createSingleState(() -> null, new Action2<Object, Observer<? super ResponseOrError<NativeAd>>>() {
+                .create(new Observable.OnSubscribe<ResponseOrError<NativeAd>>() {
                     @Override
-                    public void call(Object o, Observer<? super ResponseOrError<NativeAd>> observer) {
+                    public void call(Subscriber<? super ResponseOrError<NativeAd>> subscriber) {
                         final NativeAd ad = getAd(manager);
 
                         if (ad == null) {
                             manager.setListener(new NativeAdsManager.Listener() {
                                 @Override
                                 public void onAdsLoaded() {
-                                    observer.onNext(ResponseOrError.fromData(getAd(manager)));
-                                    observer.onCompleted();
+                                    if (!subscriber.isUnsubscribed()) {
+                                        subscriber.onNext(ResponseOrError.fromData(getAd(manager)));
+                                        subscriber.onCompleted();
+                                    }
                                 }
 
                                 @Override
                                 public void onAdError(AdError adError) {
-                                    observer.onNext(ResponseOrError.<NativeAd>fromError(new Throwable(adError.getErrorMessage())));
-                                    observer.onCompleted();
-                                    LogHelper.logThrowableAndCrashlytics(TAG, "Cannot load ads", new Throwable(adError.getErrorMessage()));
+                                    if (!subscriber.isUnsubscribed()) {
+                                        subscriber.onNext(ResponseOrError.<NativeAd>fromError(new Throwable(adError.getErrorMessage())));
+                                        subscriber.onCompleted();
+                                        LogHelper.logThrowableAndCrashlytics(TAG, "Cannot load ads", new Throwable(adError.getErrorMessage()));
+                                    }
                                 }
                             });
                             manager.loadAds();
                         } else {
-                            observer.onNext(ResponseOrError.fromData(ad));
-                            observer.onCompleted();
+                            if (!subscriber.isUnsubscribed()) {
+                                subscriber.onNext(ResponseOrError.fromData(ad));
+                                subscriber.onCompleted();
+                            }
                         }
                     }
-                }))
+                })
                 .doOnUnsubscribe(() -> manager.setListener(null))
                 .subscribeOn(MyAndroidSchedulers.mainThread());
     }
