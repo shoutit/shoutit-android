@@ -1,9 +1,12 @@
 package com.shoutit.app.android.api.model;
 
+import android.support.annotation.Nullable;
+
 import java.util.List;
 
 public class PusherMessage implements ChatMessage {
 
+    @Nullable
     private final ConversationProfile profile;
     private final String conversationId;
     private final String id;
@@ -12,7 +15,7 @@ public class PusherMessage implements ChatMessage {
     private final long createdAt;
 
 
-    public PusherMessage(ConversationProfile profile, String conversationId, String id, String text, List<MessageAttachment> attachments, long createdAt) {
+    public PusherMessage(@Nullable ConversationProfile profile, String conversationId, String id, String text, List<MessageAttachment> attachments, long createdAt) {
         this.profile = profile;
         this.conversationId = conversationId;
         this.id = id;
@@ -42,6 +45,7 @@ public class PusherMessage implements ChatMessage {
     }
 
     @Override
+    @Nullable
     public ConversationProfile getProfile() {
         return profile;
     }
