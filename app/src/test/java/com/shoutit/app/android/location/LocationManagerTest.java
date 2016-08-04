@@ -75,6 +75,7 @@ public class LocationManagerTest {
 
         when(LocationUtils.getLastLocationObservable(any(GoogleApiClient.class), any(Context.class), any(Scheduler.class)))
                 .thenReturn(Observable.just(new LocationUtils.LocationInfo(gpsLocation, true, true)));
+
         when(LocationUtils.convertCoordinatesForRequest(anyDouble(), anyDouble()))
                 .thenReturn("lala");
 
