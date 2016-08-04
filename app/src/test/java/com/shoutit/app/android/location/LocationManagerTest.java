@@ -76,7 +76,7 @@ public class LocationManagerTest {
         when(gpsLocation.getLongitude()).thenReturn(2d);
 
         when(LocationUtils.getLastLocationObservable(any(GoogleApiClient.class), any(Context.class), any(Scheduler.class)))
-                .thenReturn(Observable.just(gpsLocation));
+                .thenReturn(Observable.just(new LocationUtils.LocationInfo(gpsLocation, true, true)));
 
         when(PermissionHelper.hasPermission(any(Context.class), anyString())).thenReturn(true);
         when(LocationUtils.isLocationDifferenceMoreThanDelta(anyDouble(), anyDouble(), anyDouble(), anyDouble(), anyDouble()))
