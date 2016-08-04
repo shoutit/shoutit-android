@@ -49,6 +49,7 @@ public class RegisterPresenter {
     private final Observable<String> mEmailNotEmpty;
     private final Observable<String> mNameNotEmpty;
     private final Observable<Boolean> wrongEmailErrorObservable;
+    private final Observable<Boolean> mProgressObservable;
 
     @Inject
     public RegisterPresenter(@NonNull final ApiService apiService,
@@ -104,6 +105,10 @@ public class RegisterPresenter {
 
         wrongEmailErrorObservable = mProceedSubject
                 .map(o -> !isEmailCorrect());
+
+        mProgressObservable = responseOrErrorObservable
+                .map(Functions1.returnFalse())
+                .mergeWith(mProceedSubject.map(o -> areValuesCorrect()).filter(Functions1.isTrue()));
     }
 
     private boolean areValuesCorrect() {
@@ -192,5 +197,9 @@ public class RegisterPresenter {
     @NonNull
     public Observable<String> getNameNotEmpty() {
         return mNameNotEmpty;
+    }
+
+    public Observable<Boolean> getProgressObservable() {
+        return mProgressObservable;
     }
 }

@@ -182,4 +182,6 @@
 
     </ScrollView>
 
+    <include layout="@layout/base_progress"/>
+
 </FrameLayout>
