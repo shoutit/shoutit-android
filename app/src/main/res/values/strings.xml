@@ -32,6 +32,7 @@
     <string name="error_action_only_for_logged_in_user">Only for logged in users</string>
     <string name="error_image_upload">Sorry, cannot upload image. Please try again</string>
     <string name="error_refreshing_token_failed">Something went wrong. Please try to log in again</string>
+    <string name="error_location_disabled">Probably your location service is off. Please turn it on in order to fetch your location.</string>
 
     <!-- Permissions -->
     <string name="permission_location_explanation">We need your location to prepare appropriate content</string>
@@ -131,6 +132,7 @@
     <string name="location_search_hint">Type an address</string>
     <string name="location_header">My current location (automatic updates)</string>
     <string name="location_header_selected_location">Current location</string>
+    <string name="location_permissions_required">Location permissions required</string>
 
     <!-- Side Menu -->
     <string name="menu_create_shout">Create Shout</string>

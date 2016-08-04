@@ -62,9 +62,9 @@ public class LocationManager {
                 .compose(ResponseOrError.<UserLocation>onlySuccess());
 
         final Observable<Location> gpsLocationObservable = LocationUtils
-                .getLocationObservable(googleApiClient, context, networkScheduler)
-                .compose(ObservableExtensions.<Location>behaviorRefCount())
-                .doOnNext(location -> googleApiClient.disconnect());
+                .getLastLocationObservable(googleApiClient, context, networkScheduler)
+                .map(LocationUtils.LocationInfo::getLocation)
+                .compose(ObservableExtensions.<Location>behaviorRefCount());
 
         final Observable<UserLocation> successGpsLocationObservable = gpsLocationObservable
                 .filter(Functions1.isNotNull())
@@ -84,7 +84,7 @@ public class LocationManager {
                 .defer(() -> {
                     if (userPreferences.automaticLocationTrackingEnabled() && hasLocationPermissions(context)) {
                         return Observable.merge(successGpsLocationObservable, locationFromIpOrGpsFailObservable);
-                    } else if (userPreferences.automaticLocationTrackingEnabled()) {
+                    } else if (userPreferences.automaticLocationTrackingEnabled() || userPreferences.getLocation() == null) {
                         return locationFromIPObservable;
                     } else {
                         return Observable.never();

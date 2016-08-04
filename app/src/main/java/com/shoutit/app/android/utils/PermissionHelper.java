@@ -17,6 +17,9 @@ import javax.annotation.Nonnull;
 
 public class PermissionHelper {
 
+    /**
+     * @return true if already has permissions. In other case returns false and asks user for permissions.
+     */
     public static boolean checkPermissions(final Activity activity, final int requestCode,
                                            View snackBarParent, @StringRes int explanationTextId,
                                            @NonNull String[] permissions) {

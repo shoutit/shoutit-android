@@ -12,7 +12,6 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.UpdateLocationRequest;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 
 import java.util.List;
@@ -113,5 +112,22 @@ public class LocationPresenter implements ILocationPresenter {
 
     public void disconnectGoogleApi() {
         mLocationPresenterDelegate.disconnectGoogleApi();
+    }
+
+    @Nonnull
+    @Override
+    public Observable<Object> askForLocationPermissionsObservable() {
+        return mLocationPresenterDelegate.askForLocationPermissionsObservable();
+    }
+
+    @Nonnull
+    @Override
+    public Observable<Object> askForLocationEnableObservable() {
+        return mLocationPresenterDelegate.getAskForLocationEnableObservable();
+    }
+
+    @Override
+    public void locationSettingsChanged() {
+        mLocationPresenterDelegate.refreshGpsLocation();
     }
 }

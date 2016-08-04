@@ -18,6 +18,8 @@ import com.google.android.gms.location.places.AutocompletePredictionBuffer;
 import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.common.base.Function;
+import com.google.common.base.Objects;
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.R;
@@ -59,6 +61,10 @@ public class LocationPresenterDelegate {
     private PublishSubject<Boolean> progressSubject = PublishSubject.create();
     @Nonnull
     private PublishSubject<UserLocation> selectedGpsUserLocation = PublishSubject.create();
+    @NonNull
+    private PublishSubject<Object> askForLocationPermissionsSubject = PublishSubject.create();
+    @NonNull
+    private PublishSubject<Object> askForLocationEnableSubject = PublishSubject.create();
     @Nonnull
     private final Observable<List<BaseAdapterItem>> allAdapterItemsObservable;
     @Nonnull
@@ -93,10 +99,11 @@ public class LocationPresenterDelegate {
 
         // Fetch gps location
 
-        final Observable<Location> gpsLocationObservable = LocationUtils
-                .getLocationObservable(googleApiClient, context, networkScheduler)
-                .compose(MoreOperators.<Location>refresh(gpsLocationRefreshSubject))
-                .filter(Functions1.isNotNull());
+        final Observable<LocationUtils.LocationInfo> gpsLocationObservable = LocationUtils
+                .getLastLocationObservable(googleApiClient, context, networkScheduler)
+                .mergeWith(LocationUtils.getLocationFromUpdatesObservable(googleApiClient, context))
+                .compose(MoreOperators.<LocationUtils.LocationInfo>refresh(gpsLocationRefreshSubject))
+                .compose(ObservableExtensions.behaviorRefCount());
 
         // Currently selected manual location
 
@@ -112,12 +119,19 @@ public class LocationPresenterDelegate {
         // Current GPS location
 
         final Observable<BaseAdapterItem> currentGpsLocationObservable = gpsLocationObservable
-                .filter(Functions1.isNotNull())
-                .switchMap(location -> getGeoCodeRequest(location.getLatitude(), location.getLongitude())
-                        .compose(ResponseOrError.<UserLocation>onlySuccess()))
-                .map((Func1<UserLocation, BaseAdapterItem>) userLocation -> new CurrentLocationAdapterItem(
-                        userLocation, context.getString(R.string.location_header),
-                        true, selectedGpsUserLocation));
+                .switchMap(locationInfo -> {
+                    final Location location = locationInfo.getLocation();
+                    if (location == null) {
+                        return Observable.just(new UserLocationWithInfo(Optional.<UserLocation>absent(), locationInfo));
+                    } else {
+                        return getGeoCodeRequest(location.getLatitude(), location.getLongitude())
+                                .compose(ResponseOrError.<UserLocation>onlySuccess())
+                                .map(userLocation -> new UserLocationWithInfo(Optional.of(userLocation), locationInfo));
+                    }
+                })
+                .map((Func1<UserLocationWithInfo, BaseAdapterItem>) userLocationWithInfo -> new CurrentLocationAutomaticUpdatesAdapterItem(
+                        userLocationWithInfo, context.getString(R.string.location_header),
+                        selectedGpsUserLocation, askForLocationPermissionsSubject, askForLocationEnableSubject));
 
 
         // Locations suggestions from query
@@ -312,5 +326,53 @@ public class LocationPresenterDelegate {
 
     public void disconnectGoogleApi() {
         googleApiClient.disconnect();
+    }
+
+    @NonNull
+    public Observable<Object> askForLocationPermissionsObservable() {
+        return askForLocationPermissionsSubject;
+    }
+
+    @NonNull
+    public Observable<Object> getAskForLocationEnableObservable() {
+        return askForLocationEnableSubject;
+    }
+
+    public static class UserLocationWithInfo {
+
+        @Nonnull
+        private final Optional<UserLocation> userLocation;
+        @Nonnull
+        private final LocationUtils.LocationInfo locationInfo;
+
+        private UserLocationWithInfo(@NonNull Optional<UserLocation> userLocation,
+                                     @NonNull LocationUtils.LocationInfo locationInfo) {
+            this.userLocation = userLocation;
+            this.locationInfo = locationInfo;
+        }
+
+        @NonNull
+        public Optional<UserLocation> getUserLocation() {
+            return userLocation;
+        }
+
+        @NonNull
+        public LocationUtils.LocationInfo getLocationInfo() {
+            return locationInfo;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof UserLocationWithInfo)) return false;
+            final UserLocationWithInfo that = (UserLocationWithInfo) o;
+            return Objects.equal(userLocation, that.userLocation) &&
+                    Objects.equal(locationInfo, that.locationInfo);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(userLocation, locationInfo);
+        }
     }
 }
