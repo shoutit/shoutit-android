@@ -78,4 +78,21 @@ public class LocationForResultPresenter implements ILocationPresenter {
     public void disconnectGoogleApi() {
         mLocationPresenterDelegate.disconnectGoogleApi();
     }
+
+    @NonNull
+    @Override
+    public Observable<Object> askForLocationPermissionsObservable() {
+        return mLocationPresenterDelegate.askForLocationPermissionsObservable();
+    }
+
+    @NonNull
+    @Override
+    public Observable<Object> askForLocationEnableObservable() {
+        return mLocationPresenterDelegate.getAskForLocationEnableObservable();
+    }
+
+    @Override
+    public void locationSettingsChanged() {
+        mLocationPresenterDelegate.refreshGpsLocation();
+    }
 }

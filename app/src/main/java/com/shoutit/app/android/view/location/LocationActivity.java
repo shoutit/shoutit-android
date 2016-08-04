@@ -45,6 +45,18 @@ public class LocationActivity extends BaseActivity {
     }
 
     @Override
+    protected void onResume() {
+        mLocationActivityDelegate.onResume();
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        mLocationActivityDelegate.onPause();
+        super.onPause();
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (!mLocationActivityDelegate.onRequestPermissionsResult(requestCode, permissions, grantResults)) {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);

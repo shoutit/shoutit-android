@@ -30,7 +30,7 @@ public class LogHelper {
     }
 
     public static void logIfDebug(@Nonnull String tag, @Nonnull String msg) {
-        if (BuildConfig.DEBUG) {
+        if (BuildTypeUtils.isStagingOrDebug()) {
             Log.d(tag, msg);
         }
     }

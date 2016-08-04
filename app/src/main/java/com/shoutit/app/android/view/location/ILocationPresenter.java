@@ -31,4 +31,12 @@ public interface ILocationPresenter {
     void refreshGpsLocation();
 
     void disconnectGoogleApi();
+
+    @Nonnull
+    Observable<Object> askForLocationPermissionsObservable();
+
+    @Nonnull
+    Observable<Object> askForLocationEnableObservable();
+
+    void locationSettingsChanged();
 }

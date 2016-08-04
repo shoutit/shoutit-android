@@ -2,8 +2,16 @@ package com.shoutit.app.android.view.location;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.location.LocationManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+
+import com.shoutit.app.android.api.model.Tag;
+import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -21,6 +29,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.utils.PermissionHelper;
+import com.shoutit.app.android.view.createshout.DialogsHelper;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
 import java.util.List;
@@ -28,9 +37,11 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import rx.functions.Action1;
 
 public class LocationActivityDelegate {
 
+    private static final String TAG = LocationActivityDelegate.class.getSimpleName();
     private static final long TYPING_THRESHOLD_MS = 500;
     private static final int REQUEST_CODE_LOCATION = 0;
 
@@ -48,6 +59,7 @@ public class LocationActivityDelegate {
     private final RxAppCompatActivity mActivity;
     private final ILocationPresenter mPresenter;
     private final LocationAdapter mAdapter;
+    private BroadcastReceiver locationReceiver;
 
     public LocationActivityDelegate(RxAppCompatActivity activity, ILocationPresenter presenter, LocationAdapter adapter) {
         mActivity = activity;
@@ -65,7 +77,13 @@ public class LocationActivityDelegate {
 
         setUpActionbar();
 
-        askForLocationPermissions();
+        locationReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                LogHelper.logIfDebug(TAG, "locationReceiver onReceive: " + intent.toString());
+                mPresenter.locationSettingsChanged();
+            }
+        };
 
         recyclerView.setLayoutManager(new MyLinearLayoutManager(mActivity));
         recyclerView.setAdapter(mAdapter);
@@ -99,6 +117,28 @@ public class LocationActivityDelegate {
                 .subscribe(ColoredSnackBar.errorSnackBarAction(
                         ColoredSnackBar.contentView(mActivity),
                         R.string.location_update_error));
+
+        mPresenter.askForLocationPermissionsObservable()
+                .compose(mActivity.bindToLifecycle())
+                .subscribe(o -> {
+                    askForLocationPermissions();
+                });
+
+        mPresenter.askForLocationEnableObservable()
+                .compose(mActivity.bindToLifecycle())
+                .subscribe(o -> askForLocationToBeEnabled());
+    }
+
+    public void onResume() {
+        mActivity.registerReceiver(locationReceiver, new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION));
+    }
+
+    public void onPause() {
+        mActivity.unregisterReceiver(locationReceiver);
+    }
+
+    private void askForLocationToBeEnabled() {
+        DialogsHelper.showDialog(mActivity, R.string.error_location_disabled);
     }
 
     public void onDestroy() {
@@ -128,9 +168,11 @@ public class LocationActivityDelegate {
     }
 
     private void askForLocationPermissions() {
-        PermissionHelper.checkPermissions(mActivity, REQUEST_CODE_LOCATION,
+        if (PermissionHelper.checkPermissions(mActivity, REQUEST_CODE_LOCATION,
                 mActivity.findViewById(android.R.id.content), R.string.permission_location_explanation,
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION});
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION})) {
+            mPresenter.refreshGpsLocation();
+        }
     }
 
 }
