@@ -125,16 +125,23 @@ public class LoginIntroActivity extends BaseActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == GOOGLE_SIGN_IN && resultCode == RESULT_OK) {
-            final GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            final GoogleSignInAccount acct = result.getSignInAccount();
-            assert acct != null;
-            final String authCode = acct.getServerAuthCode();
-            mObservable
-                    .take(1)
-                    .map(location -> BothParams.of(authCode, location))
-                    .flatMap(getCallGoogleApi())
-                    .subscribe(getSuccessAction(), getErrorAction());
+        if (requestCode == GOOGLE_SIGN_IN ) {
+            if (resultCode == RESULT_OK) {
+                final GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+                final GoogleSignInAccount acct = result.getSignInAccount();
+                assert acct != null;
+                final String authCode = acct.getServerAuthCode();
+                mObservable
+                        .take(1)
+                        .map(location -> BothParams.of(authCode, location))
+                        .flatMap(getCallGoogleApi())
+                        .subscribe(getSuccessAction(), getErrorAction());
+            } else {
+                ColoredSnackBar.error(ColoredSnackBar.contentView(LoginIntroActivity.this),
+                        getString(R.string.login_intro_fail),
+                        Snackbar.LENGTH_SHORT)
+                        .show();
+            }
         } else {
             final boolean handled = mCallbackManager.onActivityResult(requestCode, resultCode, data);
             if (!handled) {
