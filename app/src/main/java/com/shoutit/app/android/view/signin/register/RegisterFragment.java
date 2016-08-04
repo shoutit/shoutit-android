@@ -20,10 +20,8 @@ import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.SignResponse;
-import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
-import com.shoutit.app.android.data.AssetsConstants;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.utils.RegisterUtils;
@@ -34,7 +32,6 @@ import com.shoutit.app.android.view.createpage.pagecategory.CreatePageCategoryAc
 import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.signin.LoginActivityComponent;
 import com.shoutit.app.android.view.signin.login.LoginFragment;
-import com.shoutit.app.android.view.webview.HtmlAssetViewerActivity;
 import com.uservoice.uservoicesdk.UserVoice;
 
 import java.util.concurrent.TimeUnit;
@@ -108,10 +105,6 @@ public class RegisterFragment extends BaseFragment {
                 .beginTransaction()
                 .replace(R.id.login_sign_layout, LoginFragment.newInstance())
                 .commit());
-
-        registerPresenter.getLocationObservable()
-                .compose(this.<UserLocation>bindToLifecycle())
-                .subscribe();
 
         registerPresenter.getEmailEmpty()
                 .compose(this.<String>bindToLifecycle())

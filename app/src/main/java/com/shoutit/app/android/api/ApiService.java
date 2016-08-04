@@ -370,9 +370,6 @@ public interface ApiService {
     @GET("misc/geocode")
     Observable<UserLocation> geocode(@Query("latlng") String latlng); // format like latlng=40.722100,-74.046900
 
-    @GET("misc/geocode?latlng=0,0")
-    Observable<UserLocation> geocodeDefault();
-
     @GET("misc/suggestions?type=users,pages")
     Observable<SuggestionsResponse> suggestions(@Query("country") String country,
                                                 @Query("state") String state,

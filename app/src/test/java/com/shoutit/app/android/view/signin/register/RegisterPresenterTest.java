@@ -45,8 +45,6 @@ public class RegisterPresenterTest {
 
     private BehaviorSubject<SignResponse> mResponseSubject;
 
-    private BehaviorSubject<UserLocation> mLocationObservable;
-
     @Mock
     UserLocation location;
 
@@ -81,10 +79,8 @@ public class RegisterPresenterTest {
         when(location.getLongitude()).thenReturn(1d);
 
         mResponseSubject = BehaviorSubject.create(new SignResponse("a", "b", "c", 0, true, user));
-        mLocationObservable = BehaviorSubject.create();
 
         when(mApiService.signup(any(EmailSignupRequest.class))).thenReturn(mResponseSubject);
-        when(locationManager.updateUserLocationObservable()).thenReturn(mLocationObservable);
 
         when(mUserPreferences.getLocationObservable())
                 .thenReturn(Observable.just(location));
@@ -261,34 +257,5 @@ public class RegisterPresenterTest {
         assert_().that(failObserver.getOnNextEvents()).isEmpty();
 
         assert_().that(emptyNameObserver.getOnNextEvents()).hasSize(1);
-    }
-
-    @Test
-    public void testWhenNewLocationIsPassed_locationPassedToRequest() {
-        mRegisterPresenter.getLocationObservable().subscribe();
-        mLocationObservable.onNext(location);
-
-        final TestObserver<Object> successObserver = new TestObserver<>();
-        final TestObserver<Object> failObserver = new TestObserver<>();
-        mRegisterPresenter.successObservable().subscribe(successObserver);
-        mRegisterPresenter.failObservable().subscribe(failObserver);
-
-        mRegisterPresenter.getEmailObserver().onNext("test@z.com");
-        mRegisterPresenter.getPasswordObserver().onNext("testtest");
-        mRegisterPresenter.getNameObserver().onNext("test");
-        mRegisterPresenter.getProceedObserver().onNext(new Object());
-
-        assert_().that(successObserver.getOnErrorEvents()).isEmpty();
-        assert_().that(successObserver.getOnNextEvents()).hasSize(1);
-
-        assert_().that(failObserver.getOnNextEvents()).isEmpty();
-        assert_().that(failObserver.getOnNextEvents()).isEmpty();
-
-        final ArgumentCaptor<EmailSignupRequest> argumentCaptor = ArgumentCaptor.forClass(EmailSignupRequest.class);
-        verify(mApiService).signup(argumentCaptor.capture());
-
-        final UserLocationSimple location = argumentCaptor.getValue().getProfile().getLocation();
-        assert_().that(location.getLatitude()).isEqualTo(1d);
-        assert_().that(location.getLongitude()).isEqualTo(1d);
     }
 }
