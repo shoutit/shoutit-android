@@ -12,9 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.android.MyAndroidSchedulers;
-import com.appunite.rx.functions.BothParams;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookSdk;
 import com.google.android.gms.auth.api.Auth;
@@ -26,7 +24,6 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.SignResponse;
-import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.login.FacebookLogin;
 import com.shoutit.app.android.api.model.login.GoogleLogin;
 import com.shoutit.app.android.api.model.login.LoginProfile;
@@ -46,12 +43,9 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import rx.Observable;
-import rx.functions.Action0;
 import rx.functions.Action1;
-import rx.functions.Func1;
-import rx.functions.Func2;
 import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 
 public class LoginIntroActivity extends BaseActivity {
 
@@ -71,7 +65,7 @@ public class LoginIntroActivity extends BaseActivity {
     MixPanel mixPanel;
 
     private CallbackManager mCallbackManager;
-    private Observable<UserLocation> mObservable;
+    private final CompositeSubscription subscriptions = new CompositeSubscription();
 
     @Nonnull
     public static Intent newIntent(Context from) {
@@ -87,14 +81,6 @@ public class LoginIntroActivity extends BaseActivity {
         initFacebook();
 
         setUpActionBar();
-
-        mObservable = mUserPreferences.getLocationObservable()
-                .compose(this.<UserLocation>bindToLifecycle())
-                .startWith((UserLocation) null)
-                .compose(ObservableExtensions.<UserLocation>behaviorRefCount());
-
-        mObservable.compose(bindToLifecycle())
-                .subscribe();
     }
 
     private void initFacebook() {
@@ -125,17 +111,21 @@ public class LoginIntroActivity extends BaseActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == GOOGLE_SIGN_IN ) {
+        if (requestCode == GOOGLE_SIGN_IN) {
             if (resultCode == RESULT_OK) {
                 final GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
                 final GoogleSignInAccount acct = result.getSignInAccount();
                 assert acct != null;
                 final String authCode = acct.getServerAuthCode();
-                mObservable
-                        .take(1)
-                        .map(location -> BothParams.of(authCode, location))
-                        .flatMap(getCallGoogleApi())
-                        .subscribe(getSuccessAction(), getErrorAction());
+
+                subscriptions.add(
+                        FacebookHelper.getPromotionalCodeObservable(LoginIntroActivity.this)
+                                .flatMap(invitationCode -> mApiService.googleLogin(new GoogleLogin(
+                                        authCode, LoginProfile.loginUser(mUserPreferences.getLocation()), mixPanel.getDistinctId(), invitationCode))
+                                        .subscribeOn(Schedulers.io())
+                                        .observeOn(MyAndroidSchedulers.mainThread()))
+                                .subscribe(getSuccessAction(), getErrorAction())
+                );
             } else {
                 ColoredSnackBar.error(ColoredSnackBar.contentView(LoginIntroActivity.this),
                         getString(R.string.login_intro_fail),
@@ -168,24 +158,6 @@ public class LoginIntroActivity extends BaseActivity {
         };
     }
 
-    @NonNull
-    private Func1<BothParams<String, UserLocation>, Observable<SignResponse>> getCallGoogleApi() {
-        return bothParams -> FacebookHelper.getPromotionalCodeObservable(LoginIntroActivity.this)
-                .flatMap(invitationCode -> mApiService.googleLogin(new GoogleLogin(
-                        bothParams.param1(), LoginProfile.loginUser(bothParams.param2()), mixPanel.getDistinctId(), invitationCode))
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(MyAndroidSchedulers.mainThread()));
-    }
-
-    @NonNull
-    private Func1<BothParams<String, UserLocation>, Observable<SignResponse>> getCallFacebookApi() {
-        return bothParams -> FacebookHelper.getPromotionalCodeObservable(LoginIntroActivity.this)
-                .flatMap(invitationCode -> mApiService.facebookLogin(new FacebookLogin(
-                        bothParams.param1(), LoginProfile.loginUser(bothParams.param2()), mixPanel.getDistinctId(), invitationCode))
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(MyAndroidSchedulers.mainThread()));
-    }
-
     @OnClick(R.id.activity_login_gplus_btn)
     public void googleClick() {
         GoogleHelper.loginGoogle(this, GOOGLE_SIGN_IN);
@@ -193,27 +165,17 @@ public class LoginIntroActivity extends BaseActivity {
 
     @OnClick(R.id.activity_login_facebook_btn)
     public void facebookClick() {
-        FacebookHelper.getToken(this, mCallbackManager)
-                .withLatestFrom(mObservable, new Func2<String, UserLocation, BothParams<String, UserLocation>>() {
-                    @Override
-                    public BothParams<String, UserLocation> call(String s, UserLocation location) {
-                        return BothParams.of(s, location);
-                    }
-                })
-                .flatMap(getCallFacebookApi())
-                .doOnSubscribe(new Action0() {
-                    @Override
-                    public void call() {
-                        progress.setVisibility(View.VISIBLE);
-                    }
-                })
-                .finallyDo(new Action0() {
-                    @Override
-                    public void call() {
-                        progress.setVisibility(View.GONE);
-                    }
-                })
-                .subscribe(getSuccessAction(), getErrorAction());
+        subscriptions.add(
+                FacebookHelper.getToken(this, mCallbackManager)
+                        .switchMap(token -> FacebookHelper.getPromotionalCodeObservable(LoginIntroActivity.this)
+                                .switchMap(invitationCode -> mApiService.facebookLogin(new FacebookLogin(
+                                        token, LoginProfile.loginUser(mUserPreferences.getLocation()), mixPanel.getDistinctId(), invitationCode))
+                                        .subscribeOn(Schedulers.io())
+                                        .observeOn(MyAndroidSchedulers.mainThread())))
+                        .doOnSubscribe(() -> progress.setVisibility(View.VISIBLE))
+                        .finallyDo(() -> progress.setVisibility(View.GONE))
+                        .subscribe(getSuccessAction(), getErrorAction())
+        );
     }
 
     @OnClick(R.id.activity_login_signup)
@@ -234,6 +196,12 @@ public class LoginIntroActivity extends BaseActivity {
     @OnClick(R.id.activity_login_about)
     public void onAboutClick() {
         startActivity(AboutActivity.newIntent(this));
+    }
+
+    @Override
+    protected void onDestroy() {
+        subscriptions.unsubscribe();
+        super.onDestroy();
     }
 
     @Nonnull

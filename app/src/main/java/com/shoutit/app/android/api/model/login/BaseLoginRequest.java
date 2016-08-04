@@ -16,6 +16,7 @@ public class BaseLoginRequest {
     private final String grantType;
     @Nullable
     private final String invitationCode;
+    @Nullable
     private final LoginProfile profile;
 
     public BaseLoginRequest(@Nonnull String mixpanelDistinctId,
@@ -44,6 +45,7 @@ public class BaseLoginRequest {
         return grantType;
     }
 
+    @Nullable
     public LoginProfile getProfile() {
         return profile;
     }
