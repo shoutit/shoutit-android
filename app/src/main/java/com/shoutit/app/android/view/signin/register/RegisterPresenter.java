@@ -42,7 +42,6 @@ public class RegisterPresenter {
     private final BehaviorSubject<String> mNameSubject = BehaviorSubject.create();
     private final PublishSubject<Object> mProceedSubject = PublishSubject.create();
     private final Observable<String> mPasswordEmpty;
-    private final Observable<UserLocation> mLocationObservable;
     private final Observable<String> mEmailEmpty;
     private final Observable<String> mNameEmpty;
     private final Observable<String> mPasswordNotEmpty;
@@ -58,15 +57,10 @@ public class RegisterPresenter {
                              @Nonnull final MixPanel mixPanel,
                              @ForActivity Context context) {
 
-        mLocationObservable = userPreferences
-                .getLocationObservable()
-                .startWith((UserLocation) null)
-                .compose(ObservableExtensions.<UserLocation>behaviorRefCount());
-
         final Observable<ResponseOrError<SignResponse>> responseOrErrorObservable = mProceedSubject
                 .map(o -> areValuesCorrect())
                 .filter(Functions1.isTrue())
-                .switchMap(aBoolean -> mLocationObservable.filter(Functions1.isNotNull()).take(1))
+                .map(aBoolean -> userPreferences.getLocation())
                 .switchMap(new Func1<UserLocation, Observable<EmailSignupRequest>>() {
                     @Override
                     public Observable<EmailSignupRequest> call(final UserLocation location) {
@@ -167,11 +161,6 @@ public class RegisterPresenter {
     @NonNull
     public Observable<String> getEmailEmpty() {
         return mEmailEmpty;
-    }
-
-    @NonNull
-    public Observable<UserLocation> getLocationObservable() {
-        return mLocationObservable;
     }
 
     @NonNull

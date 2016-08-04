@@ -24,7 +24,6 @@ import com.shoutit.app.android.utils.PermissionHelper;
 import javax.annotation.Nonnull;
 
 import rx.Observable;
-import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -34,8 +33,6 @@ public class LocationManager {
 
     private static final double LOCATION_MAX_DELTA_METERS = 1000 * 5;
 
-    @Nonnull
-    private final PublishSubject<Object> refreshGetLocationSubject = PublishSubject.create();
     @Nonnull
     private final Observable<UserLocation> updateLocationObservable;
 
@@ -55,12 +52,6 @@ public class LocationManager {
         this.apiService = apiService;
         this.networkScheduler = networkScheduler;
 
-        final Observable<UserLocation> locationFromIPObservable = apiService.geocodeDefault()
-                .subscribeOn(networkScheduler)
-                .compose(ResponseOrError.<UserLocation>toResponseOrErrorObservable())
-                .compose(MoreOperators.<UserLocation>repeatOnError(networkScheduler))
-                .compose(ResponseOrError.<UserLocation>onlySuccess());
-
         final Observable<Location> gpsLocationObservable = LocationUtils
                 .getLastLocationObservable(googleApiClient, context, networkScheduler)
                 .map(LocationUtils.LocationInfo::getLocation)
@@ -75,22 +66,15 @@ public class LocationManager {
                         .compose(ResponseOrError.<UserLocation>toResponseOrErrorObservable())
                         .compose(ResponseOrError.<UserLocation>onlySuccess()));
 
-        final Observable<UserLocation> locationFromIpOrGpsFailObservable = gpsLocationObservable
-                .filter(Functions1.isNull())
-                .switchMap(location -> locationFromIPObservable);
-
         final PublishSubject<UserLocation> updateUserSubject = PublishSubject.create();
         updateLocationObservable = Observable
                 .defer(() -> {
                     if (userPreferences.automaticLocationTrackingEnabled() && hasLocationPermissions(context)) {
-                        return Observable.merge(successGpsLocationObservable, locationFromIpOrGpsFailObservable);
-                    } else if (userPreferences.automaticLocationTrackingEnabled() || userPreferences.getLocation() == null) {
-                        return locationFromIPObservable;
+                        return successGpsLocationObservable;
                     } else {
                         return Observable.never();
                     }
                 })
-                .compose(MoreOperators.<UserLocation>refresh(refreshGetLocationSubject))
                 .filter(Functions1.isNotNull())
                 .filter(locationChangedFilter())
                 .lift(MoreOperators.callOnNext(updateUserSubject))
@@ -136,11 +120,6 @@ public class LocationManager {
 
     private boolean hasLocationPermissions(@ForApplication Context context) {
         return PermissionHelper.hasPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
-    }
-
-    @Nonnull
-    public Observer<Object> getRefreshGetLocationSubject() {
-        return refreshGetLocationSubject;
     }
 
     @Nonnull

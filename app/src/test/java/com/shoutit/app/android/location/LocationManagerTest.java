@@ -69,7 +69,6 @@ public class LocationManagerTest {
         when(userPreferences.getLocation()).thenReturn(getCurrentLocation());
 
         when(apiService.geocode(anyString())).thenReturn(locationFromGpsSubject);
-        when(apiService.geocodeDefault()).thenReturn(locationFromIPSubject);
         when(apiService.updateUserLocation(any(UpdateLocationRequest.class))).thenReturn(Observable.just(user));
 
         when(gpsLocation.getLatitude()).thenReturn(1d);
