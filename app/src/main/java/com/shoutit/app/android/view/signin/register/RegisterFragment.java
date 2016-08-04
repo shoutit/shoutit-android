@@ -77,6 +77,9 @@ public class RegisterFragment extends BaseFragment {
     @Bind(R.id.register_create_page)
     TextView mRegisterCreatePage;
 
+    @Bind(R.id.base_progress)
+    View progressView;
+
     @Inject
     RegisterPresenter registerPresenter;
 
@@ -129,6 +132,10 @@ public class RegisterFragment extends BaseFragment {
         registerPresenter.getNameNotEmpty()
                 .compose(this.<String>bindToLifecycle())
                 .subscribe(Actions1.hideError(nameInputLayout));
+
+        registerPresenter.getProgressObservable()
+                .compose(bindToLifecycle())
+                .subscribe(RxView.visibility(progressView));
 
         registerPresenter.failObservable()
                 .compose(this.<Throwable>bindToLifecycle())
