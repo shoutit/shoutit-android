@@ -13,7 +13,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.appunite.rx.android.MyAndroidSchedulers;
-import com.appunite.rx.functions.BothParams;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookSdk;
 import com.google.android.gms.auth.api.Auth;
@@ -25,7 +24,6 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.SignResponse;
-import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.login.FacebookLogin;
 import com.shoutit.app.android.api.model.login.GoogleLogin;
 import com.shoutit.app.android.api.model.login.LoginProfile;
@@ -45,9 +43,7 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import rx.Observable;
 import rx.functions.Action1;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
@@ -115,20 +111,27 @@ public class LoginIntroActivity extends BaseActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == GOOGLE_SIGN_IN && resultCode == RESULT_OK) {
-            final GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            final GoogleSignInAccount acct = result.getSignInAccount();
-            assert acct != null;
-            final String authCode = acct.getServerAuthCode();
+        if (requestCode == GOOGLE_SIGN_IN) {
+            if (resultCode == RESULT_OK) {
+                final GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+                final GoogleSignInAccount acct = result.getSignInAccount();
+                assert acct != null;
+                final String authCode = acct.getServerAuthCode();
 
-            subscriptions.add(
-                    FacebookHelper.getPromotionalCodeObservable(LoginIntroActivity.this)
-                            .flatMap(invitationCode -> mApiService.googleLogin(new GoogleLogin(
-                                    authCode, LoginProfile.loginUser(mUserPreferences.getLocation()), mixPanel.getDistinctId(), invitationCode))
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(MyAndroidSchedulers.mainThread()))
-                            .subscribe(getSuccessAction(), getErrorAction())
-            );
+                subscriptions.add(
+                        FacebookHelper.getPromotionalCodeObservable(LoginIntroActivity.this)
+                                .flatMap(invitationCode -> mApiService.googleLogin(new GoogleLogin(
+                                        authCode, LoginProfile.loginUser(mUserPreferences.getLocation()), mixPanel.getDistinctId(), invitationCode))
+                                        .subscribeOn(Schedulers.io())
+                                        .observeOn(MyAndroidSchedulers.mainThread()))
+                                .subscribe(getSuccessAction(), getErrorAction())
+                );
+            } else {
+                ColoredSnackBar.error(ColoredSnackBar.contentView(LoginIntroActivity.this),
+                        getString(R.string.login_intro_fail),
+                        Snackbar.LENGTH_SHORT)
+                        .show();
+            }
         } else {
             final boolean handled = mCallbackManager.onActivityResult(requestCode, resultCode, data);
             if (!handled) {
