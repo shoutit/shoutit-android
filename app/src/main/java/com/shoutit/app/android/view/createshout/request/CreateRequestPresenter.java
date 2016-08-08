@@ -11,6 +11,7 @@ import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.facebook.CallbackManager;
 import com.google.common.base.Strings;
+import com.shoutit.app.android.AppPreferences;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.CreateRequestShoutRequest;
@@ -62,6 +63,7 @@ public class CreateRequestPresenter {
     @NonNull
     private final ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter;
     private final FacebookHelper facebookHelper;
+    private final AppPreferences appPreferences;
     private Listener mListener;
     private UserLocation mUserLocation;
     private Subscription locationSubscription;
@@ -74,13 +76,15 @@ public class CreateRequestPresenter {
                                   @NetworkScheduler Scheduler networkScheduler,
                                   @UiScheduler Scheduler uiScheduler,
                                   @NonNull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
-                                  FacebookHelper facebookHelper) {
+                                  FacebookHelper facebookHelper,
+                                  AppPreferences appPreferences) {
         mContext = context;
         mApiService = apiService;
         mNetworkScheduler = networkScheduler;
         mUiScheduler = uiScheduler;
         this.shoutsGlobalRefreshPresenter = shoutsGlobalRefreshPresenter;
         this.facebookHelper = facebookHelper;
+        this.appPreferences = appPreferences;
         mLocationObservable = userPreferences.getLocationObservable()
                 .compose(ObservableExtensions.<UserLocation>behaviorRefCount());
     }
@@ -153,6 +157,7 @@ public class CreateRequestPresenter {
                     public void call(CreateShoutResponse responseBody) {
                         mListener.hideProgress();
                         mListener.finishActivity(responseBody.getId(), responseBody.getWebUrl(), responseBody.getTitle());
+                        appPreferences.increaseCreatedShouts();
                         shoutsGlobalRefreshPresenter.refreshShouts();
                     }
                 }, new Action1<Throwable>() {

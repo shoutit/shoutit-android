@@ -10,6 +10,7 @@ import com.appunite.rx.dagger.UiScheduler;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.Gson;
 import com.shoutit.app.android.App;
+import com.shoutit.app.android.AppPreferences;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.dao.BookmarksDao;
@@ -116,6 +117,8 @@ public interface AppComponent {
     GoogleApiClient googleApiClient();
 
     UserPreferences userPreferences();
+
+    AppPreferences appPreferences();
 
     LocationManager locationManager();
 
