@@ -399,6 +399,23 @@
         <activity android:name=".view.invitefriends.contactsinvite.InviteContactsActivity"
             android:screenOrientation="portrait"/>
 
+        <activity
+            android:name=".view.webview.WebViewActivity"
+            android:screenOrientation="portrait">
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="static"
+                    android:scheme="@string/shoutit_scheme" />
+            </intent-filter>
+
+        </activity>
+
         <!-- Mixpanel -->
         <activity android:name="com.mixpanel.android.surveys.SurveyActivity"
             android:theme="@style/com_mixpanel_android_SurveyActivityTheme"/>
