@@ -30,12 +30,12 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.App;
+import com.shoutit.app.android.AppPreferences;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.CreateOfferShoutWithImageRequest;
 import com.shoutit.app.android.api.model.CreateShoutResponse;
-import com.shoutit.app.android.api.model.Currency;
 import com.shoutit.app.android.api.model.EditShoutPriceRequest;
 import com.shoutit.app.android.api.model.EditShoutPublishToFacebook;
 import com.shoutit.app.android.utils.AmazonHelper;
@@ -49,7 +49,6 @@ import com.shoutit.app.android.widget.CurrencySpinnerAdapter;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -97,6 +96,9 @@ public class PublishMediaShoutFragment extends Fragment {
 
     @Inject
     UserPreferences mUserPreferences;
+
+    @Inject
+    AppPreferences mAppPreferences;
 
     private CurrencySpinnerAdapter mCurrencyAdapter;
 
@@ -272,6 +274,7 @@ public class PublishMediaShoutFragment extends Fragment {
                             createdShoutOfferId = createShoutResponse.getId();
                             mWebUrl = createShoutResponse.getWebUrl();
                             mCameraPublishedDone.setEnabled(true);
+                            mAppPreferences.increaseCreatedShouts();
                         }, throwable -> {
                             Log.e(TAG, "error", throwable);
                             showApiError(throwable);

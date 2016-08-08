@@ -763,5 +763,13 @@
 
     <!-- Invite Contacts -->
     <string name="invite_contacts_ab_title">Invite Friends</string>
+    <string name="app_rate_dialog_positive_btn">Yes!</string>
+    <string name="app_rate_dialog_negative_btn">Not really</string>
+    <string name="second_app_rate_dialog_positive_btn">OK, sure!</string>
+    <string name="second_app_rate_dialog_negative_btn">No, thanks</string>
+    <string name="app_rate_dialog_text_for_openings">Enjoying Shoutit Marketplace?</string>
+    <string name="app_rate_dialog_text_for_shouts">Do you think Shoutit is helpful?</string>
+    <string name="app_rate_second_dialog_rate">How about a rating on the Play store?</string>
+    <string name="app_rate_second_dialog_feedback">Would you mind giving us some feedback?</string>
 
 </resources>

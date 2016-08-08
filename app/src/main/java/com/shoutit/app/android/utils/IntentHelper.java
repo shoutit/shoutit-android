@@ -3,6 +3,7 @@ package com.shoutit.app.android.utils;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
@@ -88,5 +89,33 @@ public class IntentHelper {
     public static Intent singleImageGalleryIntent(Context context, @Nonnull String imageUrl) {
         final String imageJson = new Gson().toJson(Lists.newArrayList(imageUrl));
         return GalleryActivity.singleImageIntent(context, imageJson);
+    }
+
+    public static void showAppInPlayStore(Context context) {
+        final Intent rateIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + context.getPackageName()));
+        boolean marketFound = false;
+
+        final List<ResolveInfo> otherApps = context.getPackageManager().queryIntentActivities(rateIntent, 0);
+        for (ResolveInfo otherApp: otherApps) {
+            if (otherApp.activityInfo.applicationInfo.packageName.equals("com.android.vending")) {
+
+                final ActivityInfo otherAppActivity = otherApp.activityInfo;
+                final ComponentName componentName = new ComponentName(
+                        otherAppActivity.applicationInfo.packageName,
+                        otherAppActivity.name
+                );
+                rateIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                rateIntent.setComponent(componentName);
+                context.startActivity(rateIntent);
+                marketFound = true;
+                break;
+
+            }
+        }
+
+        if (!marketFound) {
+            final Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id="+context.getPackageName()));
+            context.startActivity(webIntent);
+        }
     }
 }

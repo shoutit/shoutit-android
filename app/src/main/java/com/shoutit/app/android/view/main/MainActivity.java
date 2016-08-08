@@ -14,6 +14,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,6 +23,7 @@ import com.appunite.appunitegcm.AppuniteGcm;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.App;
+import com.shoutit.app.android.AppPreferences;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
@@ -35,6 +37,7 @@ import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.BackPressedHelper;
 import com.shoutit.app.android.utils.BuildTypeUtils;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
@@ -47,6 +50,7 @@ import com.shoutit.app.android.view.intro.IntroActivity;
 import com.shoutit.app.android.view.postlogininterest.PostLoginInterestActivity;
 import com.shoutit.app.android.view.search.main.MainSearchActivity;
 import com.shoutit.app.android.view.signin.LoginActivity;
+import com.uservoice.uservoicesdk.UserVoice;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -91,6 +95,8 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
     ApiService apiService;
     @Inject
     DeepLinksHelper deepLinksHelper;
+    @Inject
+    AppPreferences appPreferences;
 
     private ActionBarDrawerToggle drawerToggle;
     private BackPressedHelper mBackPressedHelper;
@@ -121,6 +127,8 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
         refreshUser();
 
         if (savedInstanceState == null) {
+            appPreferences.increaseAppOpenings();
+
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.activity_main_fragment_container, HomeFragment.newInstance())
@@ -142,6 +150,59 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
         mixPanel.showNotificationIfAvailable(this);
 
         askForStoragePermissionForLeakCanary();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        showRateDialogIfNeeded();
+    }
+
+    private void showRateDialogIfNeeded() {
+        final boolean shouldShowRateDialogForAppOpening = appPreferences.shouldShowRateDialogForAppOpening();
+        final boolean shouldShowRateDialogForShoutCreate = appPreferences.shouldShowRateDialogForShoutCreate();
+
+        if ((shouldShowRateDialogForAppOpening || shouldShowRateDialogForShoutCreate) && !isFinishing()) {
+            final int mainMessageResId = shouldShowRateDialogForAppOpening ?
+                    R.string.app_rate_dialog_text_for_openings : R.string.app_rate_dialog_text_for_shouts;
+
+            new AlertDialog.Builder(this)
+                    .setMessage(mainMessageResId)
+                    .setPositiveButton(R.string.app_rate_dialog_positive_btn, (dialog, which) -> {
+                        dialog.dismiss();
+                        showSecondRateDialog(true);
+                    })
+                    .setNegativeButton(R.string.app_rate_dialog_negative_btn, (dialog, which) -> {
+                        dialog.dismiss();
+                        showSecondRateDialog(false);
+                        appPreferences.resetCounters();
+                    })
+                    .setCancelable(false)
+                    .show();
+        }
+    }
+
+    private void showSecondRateDialog(boolean wasAnswerPositive) {
+        final int messageResId = wasAnswerPositive ?
+                R.string.app_rate_second_dialog_rate : R.string.app_rate_second_dialog_feedback;
+
+        new AlertDialog.Builder(this)
+                .setMessage(messageResId)
+                .setPositiveButton(R.string.second_app_rate_dialog_positive_btn, (dialog, which) -> {
+                    if (wasAnswerPositive) {
+                        IntentHelper.showAppInPlayStore(MainActivity.this);
+                        appPreferences.setRateDialogShown();
+                    } else {
+                        UserVoice.launchUserVoice(this);
+                    }
+                    dialog.dismiss();
+                })
+                .setNegativeButton(R.string.second_app_rate_dialog_negative_btn, (dialog, which) -> {
+                    appPreferences.resetCounters();
+                    dialog.dismiss();
+                })
+                .setCancelable(false)
+                .show();
     }
 
     @Override
