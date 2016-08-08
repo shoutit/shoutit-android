@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.google.common.collect.ImmutableList;
+import com.shoutit.app.android.AppPreferences;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.CreateRequestShoutWithPriceRequest;
@@ -64,6 +65,9 @@ public class CreateRequestPresenterTest {
     @Mock
     ApiService mApiService;
 
+    @Mock
+    AppPreferences appPreferences;
+
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -75,7 +79,8 @@ public class CreateRequestPresenterTest {
         when(mUserPreferences.getLocationObservable()).thenReturn(Observable.just(getUserLocation()));
         when(mListener.getRequestData()).thenReturn(new CreateRequestPresenter.RequestData("123456", "5", "a"));
 
-        mCreateRequestPresenter = new CreateRequestPresenter(mUserPreferences, mContext, mApiService, Schedulers.immediate(), Schedulers.immediate(), globalRefreshPresenter, facebookHelper);
+        mCreateRequestPresenter = new CreateRequestPresenter(mUserPreferences, mContext, mApiService,
+                Schedulers.immediate(), Schedulers.immediate(), globalRefreshPresenter, facebookHelper, appPreferences);
     }
 
     @NonNull
