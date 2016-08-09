@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -15,11 +16,14 @@ import com.commonsware.cwac.cam2.CameraController;
 import com.commonsware.cwac.cam2.CameraEngine;
 import com.commonsware.cwac.cam2.CameraSelectionCriteria;
 import com.commonsware.cwac.cam2.Facing;
+import com.commonsware.cwac.cam2.FlashMode;
 import com.commonsware.cwac.cam2.FocusMode;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PermissionHelper;
+import com.shoutit.app.android.utils.VersionUtils;
 
 import java.util.List;
 
@@ -97,6 +101,7 @@ public class RecordMediaActivity extends AbstractCameraActivity
         }
 
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     }
 
     @Override
@@ -165,7 +170,7 @@ public class RecordMediaActivity extends AbstractCameraActivity
 
     private void initCamera() {
         FocusMode focusMode = (FocusMode) getIntent().getSerializableExtra(EXTRA_FOCUS_MODE);
-        CameraController ctrlClassic = new CameraController(focusMode, true, isVideo());
+        CameraController ctrlClassic = new CameraController(focusMode, null, true, isVideo());
 
         cameraFragment.setController(ctrlClassic);
         cameraFragment.setMirrorPreview(getIntent().getBooleanExtra(EXTRA_MIRROR_PREVIEW, false));
@@ -174,17 +179,18 @@ public class RecordMediaActivity extends AbstractCameraActivity
 
         if ((!shCameraInfo.isHasFrontFacingCamera() && !shCameraInfo.isHasBackFacingCamera())
                 || shCameraInfo.getNumberOfCameras() == 0) {
-            Toast.makeText(this, "no camera", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "No camera found", Toast.LENGTH_LONG).show();
             finish();
             return;
         }
 
-        CameraSelectionCriteria criteria =
+        final CameraSelectionCriteria criteria =
                 new CameraSelectionCriteria.Builder().facing(Facing.BACK).facingExactMatch(false).build();
 
-        ctrlClassic.setEngine(CameraEngine.buildInstance(RecordMediaActivity.this, true),
-                criteria);
+        ctrlClassic.setEngine(CameraEngine.buildInstance(RecordMediaActivity.this, CameraEngine.ID.CLASSIC), criteria);
         ctrlClassic.getEngine().setDebug(getIntent().getBooleanExtra(EXTRA_DEBUG_ENABLED, true));
+        ctrlClassic.getEngine().setPreferredFlashModes(Lists.newArrayList(FlashMode.AUTO));
+        ctrlClassic.setQuality(1);
 
         if (!cameraFragment.isVisible()) {
             getFragmentManager().beginTransaction().show(cameraFragment).commit();
