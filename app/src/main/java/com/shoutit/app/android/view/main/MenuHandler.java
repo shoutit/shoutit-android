@@ -12,8 +12,6 @@ import android.widget.CheckedTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.R;
@@ -46,7 +44,10 @@ import com.squareup.picasso.Transformation;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 import com.uservoice.uservoicesdk.UserVoice;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 
@@ -125,13 +126,14 @@ public class MenuHandler {
 
     private List<CheckedTextView> selectableItems = ImmutableList.of();
 
-    private static BiMap<String, Integer> viewTagViewIdMap = HashBiMap.create();
+    private static Map<String, Integer> viewTagViewIdMap = new LinkedHashMap<>();
 
     static {
         viewTagViewIdMap.put(FRAGMENT_HOME, R.id.menu_home);
         viewTagViewIdMap.put(FRAGMENT_DISCOVER, R.id.menu_discover);
         viewTagViewIdMap.put(FRAGMENT_BROWSE, R.id.menu_browse);
         viewTagViewIdMap.put(FRAGMENT_CHATS, R.id.menu_chat);
+        viewTagViewIdMap.put(FRAGMENT_PUBLIC_CHATS, R.id.menu_chat);
         viewTagViewIdMap.put(FRAGMENT_CREDITS, R.id.menu_credits);
         viewTagViewIdMap.put(FRAGMENT_INVITE_FRIENDS, R.id.menu_invite_friends);
         viewTagViewIdMap.put(ACTIVITY_HELP, R.id.menu_help);
@@ -267,8 +269,8 @@ public class MenuHandler {
         dispatchClick(view.getId());
     }
 
-    private void dispatchClick(int id) {
-        switch (id) {
+    private void dispatchClick(int viewId) {
+        switch (viewId) {
             case R.id.menu_use_profile: {
                 userPreferences.clearPage();
                 FacebookHelper.logOutFromFacebook();
@@ -277,7 +279,12 @@ public class MenuHandler {
                 break;
             }
             default:
-                selectMenuItem(viewTagViewIdMap.inverse().get(id));
+                for (Map.Entry<String, Integer> entry : viewTagViewIdMap.entrySet()) {
+                    if (entry.getValue() == viewId) {
+                        selectMenuItem(entry.getKey());
+                        break;
+                    }
+                }
         }
     }
 
