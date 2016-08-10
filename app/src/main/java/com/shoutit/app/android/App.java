@@ -15,6 +15,9 @@ import com.crashlytics.android.core.CrashlyticsCore;
 import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
 import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler;
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
+import com.google.android.gms.location.places.NearbyAlertRequest;
+import com.newrelic.agent.android.NewRelic;
+import com.newrelic.agent.android.logging.AgentLog;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.constants.UserVoiceConstants;
@@ -27,6 +30,7 @@ import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.AviaryContants;
+import com.shoutit.app.android.utils.BuildTypeUtils;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.ProcessUtils;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
@@ -100,7 +104,11 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
         MultiDex.install(this);
 
         initFabric();
+
+        initNewRelic();
+
         initUserVoice();
+
         logRxJavaErrors();
 
         if (BuildConfig.BUILD_TYPE.contains("debug")) {
@@ -124,6 +132,14 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
         facebookHelper.initFacebook();
 
         AdobeCSDKFoundation.initializeCSDKFoundation(this);
+    }
+
+    private void initNewRelic() {
+        NewRelic.withApplicationToken("AA52f20a8d2726a5f9d33f69160e55aa21aa557c54")
+                .withLogLevel(BuildConfig.DEBUG ? AgentLog.INFO : AgentLog.ERROR)
+                .withLoggingEnabled(BuildConfig.DEBUG)
+                .withCrashReportingEnabled(false)
+                .start(this);
     }
 
     private void setUpMixPanel() {
