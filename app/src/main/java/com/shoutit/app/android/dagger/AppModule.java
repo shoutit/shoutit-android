@@ -29,6 +29,7 @@ import com.shoutit.app.android.BuildConfig;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.AuthInterceptor;
+import com.shoutit.app.android.api.NewRelicNetworkInterceptor;
 import com.shoutit.app.android.api.RefreshTokenApiService;
 import com.shoutit.app.android.constants.AmazonConstants;
 import com.shoutit.app.android.dao.BusinessVerificationDaos;
@@ -172,6 +173,9 @@ public final class AppModule {
 
         final HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
         okHttpClient.interceptors().add(loggingInterceptor);
+
+        okHttpClient.networkInterceptors().add(new NewRelicNetworkInterceptor());
+
         loggingInterceptor.setLevel(BuildConfig.DEBUG ?
                 HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE);
         okHttpClient.writeTimeout(15L, TimeUnit.SECONDS);
@@ -458,4 +462,5 @@ public final class AppModule {
     RefreshConversationBus provideRefreshConversationBus() {
         return new RefreshConversationBus();
     }
+
 }
