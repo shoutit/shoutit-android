@@ -134,8 +134,13 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
         AdobeCSDKFoundation.initializeCSDKFoundation(this);
     }
 
+
     private void initNewRelic() {
-        NewRelic.withApplicationToken("AA52f20a8d2726a5f9d33f69160e55aa21aa557c54")
+        if (BuildTypeUtils.isDebug()) {
+            return;
+        }
+
+        NewRelic.withApplicationToken(getString(R.string.newrelic_api_key))
                 .withLogLevel(BuildConfig.DEBUG ? AgentLog.INFO : AgentLog.ERROR)
                 .withLoggingEnabled(BuildConfig.DEBUG)
                 .withCrashReportingEnabled(false)
