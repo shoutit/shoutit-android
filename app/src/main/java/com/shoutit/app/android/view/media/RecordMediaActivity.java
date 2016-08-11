@@ -4,14 +4,13 @@ import android.Manifest;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentActivity;
 import android.widget.Toast;
 
-import com.commonsware.cwac.cam2.AbstractCameraActivity;
 import com.commonsware.cwac.cam2.CameraController;
 import com.commonsware.cwac.cam2.CameraEngine;
 import com.commonsware.cwac.cam2.CameraSelectionCriteria;
@@ -23,11 +22,10 @@ import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PermissionHelper;
-import com.shoutit.app.android.utils.VersionUtils;
 
 import java.util.List;
 
-public class RecordMediaActivity extends AbstractCameraActivity
+public class RecordMediaActivity extends FragmentActivity
         implements CameraFragment.CameraFragmentListener {
 
     private static final String TAG_CAMERA = CameraFragment.class.getCanonicalName();
@@ -59,7 +57,7 @@ public class RecordMediaActivity extends AbstractCameraActivity
                 .putExtra(EXTRA_USE_EDITOR, useEditor);
     }
 
-    @Override
+ /*   @Override
     protected boolean needsOverlay() {
         return false;
     }
@@ -87,10 +85,12 @@ public class RecordMediaActivity extends AbstractCameraActivity
     @Override
     protected void configEngine(CameraEngine cameraEngine) {
         // do nothing
-    }
+    }*/
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
         final Bundle extras = getIntent().getExtras();
         if (extras != null) {
             isActivityForResult = extras.getBoolean(EXTRA_IS_FOR_RESULT);
@@ -100,13 +100,11 @@ public class RecordMediaActivity extends AbstractCameraActivity
             useEditor = extras.getBoolean(EXTRA_USE_EDITOR);
         }
 
-        super.onCreate(savedInstanceState);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        init();
     }
 
-    @Override
     protected void init() {
-        if (!hasPermissions()) {
+        if (!checkPermissions()) {
             return;
         }
 
@@ -126,7 +124,7 @@ public class RecordMediaActivity extends AbstractCameraActivity
         }
     }
 
-    private boolean hasPermissions() {
+    private boolean checkPermissions() {
         return PermissionHelper.checkPermissions(
                 this, REQUEST_CODE_PERMISSIONS, ColoredSnackBar.contentView(this),
                 R.string.permission_camera_create_shout_explanation,
@@ -169,11 +167,10 @@ public class RecordMediaActivity extends AbstractCameraActivity
     }
 
     private void initCamera() {
-        FocusMode focusMode = (FocusMode) getIntent().getSerializableExtra(EXTRA_FOCUS_MODE);
-        CameraController ctrlClassic = new CameraController(focusMode, null, true, isVideo());
+        CameraController ctrlClassic = new CameraController(FocusMode.CONTINUOUS, null, true, false);
 
         cameraFragment.setController(ctrlClassic);
-        cameraFragment.setMirrorPreview(getIntent().getBooleanExtra(EXTRA_MIRROR_PREVIEW, false));
+        cameraFragment.setMirrorPreview(false);
 
         SHCameraInfo shCameraInfo = SHCameraInfo.getInstance();
 
@@ -188,7 +185,7 @@ public class RecordMediaActivity extends AbstractCameraActivity
                 new CameraSelectionCriteria.Builder().facing(Facing.BACK).facingExactMatch(false).build();
 
         ctrlClassic.setEngine(CameraEngine.buildInstance(RecordMediaActivity.this, CameraEngine.ID.CLASSIC), criteria);
-        ctrlClassic.getEngine().setDebug(getIntent().getBooleanExtra(EXTRA_DEBUG_ENABLED, true));
+        ctrlClassic.getEngine().setDebug(true);
         ctrlClassic.getEngine().setPreferredFlashModes(Lists.newArrayList(FlashMode.AUTO));
         ctrlClassic.setQuality(1);
 
@@ -204,11 +201,6 @@ public class RecordMediaActivity extends AbstractCameraActivity
         if (fragment != null) {
             fragment.onActivityResult(requestCode, resultCode, data);
         }
-    }
-
-    @Override
-    public void onEventMainThread(CameraController.ControllerDestroyedEvent event) {
-        // dont destroy
     }
 
     @Override
