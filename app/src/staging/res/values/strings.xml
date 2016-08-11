@@ -5,4 +5,7 @@
 
     <string name="facebook_shout_list_ad_id" translatable="false">1151546964858487_1245960432083806</string>
     <string name="facebook_shout_detail_ad_id" translatable="false">1151546964858487_1249823215030861</string>
+
+    <!-- NewRelic -->
+    <string name="newrelic_api_key" translatable="false">AA52f20a8d2726a5f9d33f69160e55aa21aa557c54</string>
 </resources>
