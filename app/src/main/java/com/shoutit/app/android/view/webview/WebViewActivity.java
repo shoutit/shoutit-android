@@ -22,6 +22,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class WebViewActivity extends AppCompatActivity {
 
+    private static final String SHOUTIT_DOMAIN = "shoutit.com";
+
     @Bind(R.id.activity_webview_toolbar)
     Toolbar toolbar;
     @Bind(R.id.activity_webview_webview)
@@ -48,8 +50,11 @@ public class WebViewActivity extends AppCompatActivity {
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                if (URLUtil.isNetworkUrl(url)) {
+                final boolean isNetworkUrl = URLUtil.isNetworkUrl(url);
+                if (isNetworkUrl && url.contains(SHOUTIT_DOMAIN)) {
                     return false;
+                } else if (isNetworkUrl) {
+                    return true;
                 } else {
                     final Intent uriIntent = new Intent(Intent.ACTION_VIEW)
                             .setData(Uri.parse(url));
