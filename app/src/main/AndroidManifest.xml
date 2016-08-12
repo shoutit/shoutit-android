@@ -32,15 +32,7 @@
         android:supportsRtl="true"
         android:allowTaskReparenting="true"
         android:theme="@style/AppTheme">
-        <activity
-            android:name=".view.media.RecordMediaActivity"
-            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-            android:screenOrientation="portrait"
-            android:theme="@style/TransparentStatusBar"/>
-        <activity
-            android:name=".view.media.VideoCompressActivity"
-            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-            android:screenOrientation="portrait"/>
+
         <activity
             android:name=".view.main.MainActivity"
             android:launchMode="singleTask"
@@ -72,9 +64,6 @@
                     android:scheme="@string/shoutit_scheme"/>
                 <data
                     android:host="public_chats"
-                    android:scheme="@string/shoutit_scheme"/>
-                <data
-                    android:host="create_shout"
                     android:scheme="@string/shoutit_scheme"/>
             </intent-filter>
 
@@ -173,6 +162,7 @@
                   android:screenOrientation="portrait"/>
         <activity android:name=".view.shouts.discover.DiscoverShoutsActivity"
                   android:screenOrientation="portrait"/>
+
         <activity
             android:name=".view.settings.SettingsActivity"
             android:screenOrientation="portrait"
@@ -190,8 +180,37 @@
             </intent-filter>
 
         </activity>
+
         <activity android:name=".view.createshout.request.CreateRequestActivity"
                   android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".view.media.RecordMediaActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:screenOrientation="portrait"
+            android:theme="@style/TransparentStatusBar"/>
+
+        <activity
+            android:name=".view.media.VideoCompressActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".view.CreateShoutDeepLinkDispatchActivity"
+            android:screenOrientation="portrait">
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                    android:host="create_shout"
+                    android:scheme="@string/shoutit_scheme"/>
+            </intent-filter>
+
+        </activity>
+
         <activity android:name=".view.location.LocationActivityForResult"
                   android:screenOrientation="portrait"/>
         <activity android:name=".view.createpage.pagecategory.CreatePageCategoryActivity"
@@ -402,7 +421,8 @@
 
         <activity
             android:name=".view.webview.WebViewActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:parentActivityName=".view.main.MainActivity">
 
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

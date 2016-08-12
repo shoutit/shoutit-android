@@ -10,8 +10,6 @@ import com.shoutit.app.android.view.main.DeepLinksHelper;
 
 public class UpNavigationHelper {
 
-    public static final String EXTRA_IS_INAPP_DEEPLINK = "is_inapp_deeplink";
-
     private final Activity activity;
 
     public UpNavigationHelper(Activity activity) {
@@ -19,8 +17,7 @@ public class UpNavigationHelper {
     }
 
     public void onUpButtonClicked() {
-        if (DeepLinksHelper.isFromDeeplink(activity.getIntent()) &&
-                !activity.getIntent().getBooleanExtra(EXTRA_IS_INAPP_DEEPLINK, false)) {
+        if (DeepLinksHelper.isFromDeeplink(activity.getIntent()) && activity.isTaskRoot()) {
             final Intent upIntent = NavUtils.getParentActivityIntent(activity);
             TaskStackBuilder.create(activity)
                     .addNextIntentWithParentStack(upIntent)
