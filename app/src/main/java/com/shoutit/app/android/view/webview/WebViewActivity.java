@@ -14,6 +14,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.utils.IntentHelper;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -54,11 +55,10 @@ public class WebViewActivity extends AppCompatActivity {
                 if (isNetworkUrl && url.contains(SHOUTIT_DOMAIN)) {
                     return false;
                 } else if (isNetworkUrl) {
+                    startActivity(IntentHelper.websiteIntent(url));
                     return true;
                 } else {
-                    final Intent uriIntent = new Intent(Intent.ACTION_VIEW)
-                            .setData(Uri.parse(url));
-                    startActivity(uriIntent);
+                    startActivity(IntentHelper.internalAppLinkIntent(url));
                     return true;
                 }
             }
