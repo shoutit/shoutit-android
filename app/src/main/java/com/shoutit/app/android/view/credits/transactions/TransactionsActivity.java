@@ -22,6 +22,7 @@ import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.utils.ToolbarUtils;
+import com.shoutit.app.android.utils.UpNavigationHelper;
 
 import java.util.List;
 
@@ -104,6 +105,8 @@ public class TransactionsActivity extends BaseActivity implements TransactionsPr
 
     @Override
     public void startActivity(String appUrl) {
-        startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(appUrl)));
+        startActivity(new Intent(Intent.ACTION_VIEW)
+                .setData(Uri.parse(appUrl))
+                .putExtra(UpNavigationHelper.EXTRA_IS_INAPP_DEEPLINK, true));
     }
 }
