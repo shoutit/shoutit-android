@@ -1,6 +1,5 @@
 package com.shoutit.app.android.view.webview;
 
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -15,6 +14,7 @@ import android.webkit.WebViewClient;
 
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.utils.IntentHelper;
+import com.shoutit.app.android.utils.UpNavigationHelper;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -58,7 +58,7 @@ public class WebViewActivity extends AppCompatActivity {
                     startActivity(IntentHelper.websiteIntent(url));
                     return true;
                 } else {
-                    startActivity(IntentHelper.internalAppLinkIntent(url));
+                    startActivity(IntentHelper.appLinkIntent(url));
                     return true;
                 }
             }
@@ -86,7 +86,8 @@ public class WebViewActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
+                new UpNavigationHelper(this)
+                        .onUpButtonClicked();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

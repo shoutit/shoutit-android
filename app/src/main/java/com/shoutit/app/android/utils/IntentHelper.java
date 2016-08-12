@@ -68,6 +68,10 @@ public class IntentHelper {
                 .putExtra(UpNavigationHelper.EXTRA_IS_INAPP_DEEPLINK, true);
     }
 
+    public static Intent appLinkIntent(@NonNull String url) {
+        return new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+    }
+
     @Nonnull
     public static List<Intent> getTwitterShareIntent(@Nonnull PackageManager packageManager,
                                                          @Nonnull String shareText) {

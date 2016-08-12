@@ -19,8 +19,7 @@ public class UpNavigationHelper {
     }
 
     public void onUpButtonClicked() {
-        if (DeepLinksHelper.isFromDeeplink(activity.getIntent()) &&
-                !activity.getIntent().getBooleanExtra(EXTRA_IS_INAPP_DEEPLINK, false)) {
+        if (DeepLinksHelper.isFromDeeplink(activity.getIntent()) && activity.isTaskRoot()) {
             final Intent upIntent = NavUtils.getParentActivityIntent(activity);
             TaskStackBuilder.create(activity)
                     .addNextIntentWithParentStack(upIntent)

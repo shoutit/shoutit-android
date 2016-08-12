@@ -1,5 +1,6 @@
 package com.shoutit.app.android.dagger;
 
+import com.shoutit.app.android.view.CreateShoutDeepLinkDispatchActivity;
 import com.shoutit.app.android.view.interests.InterestsActivity;
 import com.shoutit.app.android.view.invitefriends.contactsinvite.InviteContactsActivity;
 import com.shoutit.app.android.view.verifybusiness.VerifyBusinessActivity;
@@ -24,4 +25,6 @@ public interface BaseEmptyActivityComponent extends BaseActivityComponent {
         void inject(InterestsActivity activity);
 
         void inject(InviteContactsActivity activity);
+
+        void inject(CreateShoutDeepLinkDispatchActivity activity);
 }
