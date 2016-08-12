@@ -57,36 +57,6 @@ public class RecordMediaActivity extends FragmentActivity
                 .putExtra(EXTRA_USE_EDITOR, useEditor);
     }
 
- /*   @Override
-    protected boolean needsOverlay() {
-        return false;
-    }
-
-    @Override
-    protected boolean needsActionBar() {
-        return false;
-    }
-
-    @Override
-    protected boolean isVideo() {
-        return false;
-    }
-
-    @Override
-    protected com.commonsware.cwac.cam2.CameraFragment buildFragment() {
-        return null;
-    }
-
-    @Override
-    protected String[] getNeededPermissions() {
-        return new String[]{};
-    }
-
-    @Override
-    protected void configEngine(CameraEngine cameraEngine) {
-        // do nothing
-    }*/
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -218,6 +188,4 @@ public class RecordMediaActivity extends FragmentActivity
             }
         }
     }
-
-
 }

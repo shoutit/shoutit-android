@@ -14,6 +14,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.utils.IntentHelper;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -21,6 +22,8 @@ import butterknife.ButterKnife;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class WebViewActivity extends AppCompatActivity {
+
+    private static final String SHOUTIT_DOMAIN = "shoutit.com";
 
     @Bind(R.id.activity_webview_toolbar)
     Toolbar toolbar;
@@ -48,12 +51,14 @@ public class WebViewActivity extends AppCompatActivity {
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                if (URLUtil.isNetworkUrl(url)) {
+                final boolean isNetworkUrl = URLUtil.isNetworkUrl(url);
+                if (isNetworkUrl && url.contains(SHOUTIT_DOMAIN)) {
                     return false;
+                } else if (isNetworkUrl) {
+                    startActivity(IntentHelper.websiteIntent(url));
+                    return true;
                 } else {
-                    final Intent uriIntent = new Intent(Intent.ACTION_VIEW)
-                            .setData(Uri.parse(url));
-                    startActivity(uriIntent);
+                    startActivity(IntentHelper.internalAppLinkIntent(url));
                     return true;
                 }
             }

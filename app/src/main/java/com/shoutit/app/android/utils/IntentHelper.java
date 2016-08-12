@@ -9,6 +9,7 @@ import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 
 import com.amazonaws.services.s3.util.Mimetypes;
 import com.google.common.base.Optional;
@@ -60,6 +61,11 @@ public class IntentHelper {
     public static Intent getEmailIntent(@Nonnull String emailAddress, @Nonnull String text) {
         return new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", emailAddress, null))
                 .putExtra(Intent.EXTRA_TEXT, text);
+    }
+
+    public static Intent internalAppLinkIntent(@NonNull String url) {
+        return new Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                .putExtra(UpNavigationHelper.EXTRA_IS_INAPP_DEEPLINK, true);
     }
 
     @Nonnull
