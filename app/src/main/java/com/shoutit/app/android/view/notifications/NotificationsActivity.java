@@ -116,8 +116,7 @@ public class NotificationsActivity extends BaseActivity {
                             startActivity(MainActivity.newIntent(NotificationsActivity.this));
                             finishAffinity();
                         } else {
-                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(appUrl))
-                                    .putExtra(UpNavigationHelper.EXTRA_IS_INAPP_DEEPLINK, true));
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(appUrl)));
                         }
                     }
                 });

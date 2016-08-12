@@ -10,8 +10,6 @@ import com.shoutit.app.android.view.main.DeepLinksHelper;
 
 public class UpNavigationHelper {
 
-    public static final String EXTRA_IS_INAPP_DEEPLINK = "is_inapp_deeplink";
-
     private final Activity activity;
 
     public UpNavigationHelper(Activity activity) {
