@@ -63,8 +63,9 @@ public class IntentHelper {
                 .putExtra(Intent.EXTRA_TEXT, text);
     }
 
-    public static Intent appLinkIntent(@NonNull String url) {
-        return new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+    public static Intent inAppDeepLinkIntent(@NonNull String appUrl) {
+        return new Intent(Intent.ACTION_VIEW, Uri.parse(appUrl))
+                .putExtra(UpNavigationHelper.IN_APP_DEEP_LINK, true);
     }
 
     @Nonnull
