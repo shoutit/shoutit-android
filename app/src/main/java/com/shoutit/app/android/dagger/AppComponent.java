@@ -56,9 +56,10 @@ import rx.Scheduler;
         modules = {
                 AppModule.class,
                 BaseModule.class,
+                DaoModule.class
         }
 )
-public interface AppComponent {
+public interface AppComponent extends DaoComponent {
 
     void inject(App app);
 
@@ -80,39 +81,7 @@ public interface AppComponent {
 
     ApiService getApiService();
 
-    ShoutsDao shoutsDao();
-
-    TagsDao tagsDao();
-
-    DiscoversDao discoversDao();
-
-    TagListDaos tagListDaos();
-
-    PagesDao pagesDao();
-
-    ProfilesDao profilesDao();
-
-    SuggestionsDao suggestionsDao();
-
-    DiscoverShoutsDao discoverShoutsDao();
-
-    CategoriesDao categoriesDao();
-
-    SortTypesDao sortTypesDao();
-
-    ListenersDaos listenersDaos();
-
-    ListeningsDao listeningsDao();
-
-    PublicPagesDaos publicPagesDaos();
-
-    PromoteOptionsDao promoteOptionsDao();
-
     ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter();
-
-    NotificationsDao notificationsDao();
-
-    ConversationMediaDaos conversationMediaDaos();
 
     GoogleApiClient googleApiClient();
 
@@ -133,8 +102,6 @@ public interface AppComponent {
     @Named("user")
     PusherHelperHolder userPusher();
 
-    VideoCallsDao videoCallsDao();
-
     Twilio twilio();
 
     MixPanel mixPanel();
@@ -148,10 +115,4 @@ public interface AppComponent {
     LocalMessageBus localMessageBus();
 
     RefreshConversationBus refreshConversationBus();
-
-    PromoteLabelsDao promoteDao();
-
-    BookmarksDao bookmarkDao();
-
-    BusinessVerificationDaos businessVerificationDaos();
 }
