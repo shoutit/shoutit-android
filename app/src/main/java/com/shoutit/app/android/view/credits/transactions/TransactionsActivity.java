@@ -2,7 +2,6 @@ package com.shoutit.app.android.view.credits.transactions;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +17,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
@@ -105,7 +105,6 @@ public class TransactionsActivity extends BaseActivity implements TransactionsPr
 
     @Override
     public void startActivity(String appUrl) {
-        startActivity(new Intent(Intent.ACTION_VIEW)
-                .setData(Uri.parse(appUrl)));
+        startActivity(IntentHelper.inAppDeepLinkIntent(appUrl));
     }
 }

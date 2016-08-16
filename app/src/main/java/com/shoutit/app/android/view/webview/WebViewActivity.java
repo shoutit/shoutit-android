@@ -58,7 +58,7 @@ public class WebViewActivity extends AppCompatActivity {
                     startActivity(IntentHelper.websiteIntent(url));
                     return true;
                 } else {
-                    startActivity(IntentHelper.appLinkIntent(url));
+                    startActivity(IntentHelper.inAppDeepLinkIntent(url));
                     return true;
                 }
             }

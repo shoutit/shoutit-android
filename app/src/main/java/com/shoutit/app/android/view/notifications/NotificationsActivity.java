@@ -2,7 +2,6 @@ package com.shoutit.app.android.view.notifications;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
@@ -116,7 +115,7 @@ public class NotificationsActivity extends BaseActivity {
                             startActivity(MainActivity.newIntent(NotificationsActivity.this));
                             finishAffinity();
                         } else {
-                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(appUrl)));
+                            startActivity(IntentHelper.inAppDeepLinkIntent(appUrl));
                         }
                     }
                 });
