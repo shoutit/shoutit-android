@@ -18,8 +18,7 @@ import com.facebook.FacebookSdk;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.shoutit.app.android.App;
-import com.shoutit.app.android.BaseActivity;
+import com.shoutit.app.android.BaseDaggerActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
@@ -27,8 +26,7 @@ import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.login.FacebookLogin;
 import com.shoutit.app.android.api.model.login.GoogleLogin;
 import com.shoutit.app.android.api.model.login.LoginProfile;
-import com.shoutit.app.android.dagger.ActivityModule;
-import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.dagger.BaseDaggerActivityComponent;
 import com.shoutit.app.android.facebook.FacebookHelper;
 import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.utils.ColoredSnackBar;
@@ -47,7 +45,7 @@ import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
-public class LoginIntroActivity extends BaseActivity {
+public class LoginIntroActivity extends BaseDaggerActivity {
 
     public static final int GOOGLE_SIGN_IN = 0;
 
@@ -204,14 +202,8 @@ public class LoginIntroActivity extends BaseActivity {
         super.onDestroy();
     }
 
-    @Nonnull
     @Override
-    public BaseActivityComponent createActivityComponent(@javax.annotation.Nullable Bundle savedInstanceState) {
-        final LoginIntroActivityComponent component = DaggerLoginIntroActivityComponent.builder()
-                .activityModule(new ActivityModule(this))
-                .appComponent(App.getAppComponent(getApplication()))
-                .build();
+    protected void injectComponent(BaseDaggerActivityComponent component) {
         component.inject(this);
-        return component;
     }
 }

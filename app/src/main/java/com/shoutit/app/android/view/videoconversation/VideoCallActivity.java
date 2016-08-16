@@ -24,7 +24,7 @@ import android.widget.TextView;
 import com.appunite.rx.functions.Functions1;
 import com.jakewharton.rxbinding.view.RxView;
 import com.jakewharton.rxbinding.widget.RxTextView;
-import com.shoutit.app.android.BaseActivity;
+import com.shoutit.app.android.BaseDaggerActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.twilio.Twilio;
@@ -59,7 +59,7 @@ import rx.subjects.PublishSubject;
 
 import static com.appunite.rx.internal.Preconditions.checkNotNull;
 
-public abstract class VideoCallActivity extends BaseActivity {
+public abstract class VideoCallActivity extends BaseDaggerActivity {
 
     protected static final String ARGS_CALLED_USER_IMAGE = "called_user_image";
     protected static final String ARGS_PARTICIPANT_NAME = "participant_name";

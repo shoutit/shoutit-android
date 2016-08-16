@@ -12,11 +12,10 @@ import android.view.ViewGroup;
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
 import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.jakewharton.rxbinding.view.RxView;
-import com.shoutit.app.android.BaseFragment;
+import com.shoutit.app.android.BaseDaggerFragment;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.ApiMessageResponse;
-import com.shoutit.app.android.dagger.BaseActivityComponent;
-import com.shoutit.app.android.dagger.FragmentModule;
+import com.shoutit.app.android.dagger.BaseDaggerFragmentComponent;
 import com.shoutit.app.android.utils.ApiMessagesHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LoadMoreHelper;
@@ -26,13 +25,12 @@ import com.shoutit.app.android.view.pages.PagesPagerFragment;
 import com.shoutit.app.android.view.profile.page.PageProfileActivity;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
 
 
-public class PublicPagesFragment extends BaseFragment {
+public class PublicPagesFragment extends BaseDaggerFragment {
 
     public static final int REQUEST_OPENED_PROFILE_WAS_LISTENED = 1;
 
@@ -116,17 +114,6 @@ public class PublicPagesFragment extends BaseFragment {
     }
 
     @Override
-    protected void injectComponent(@Nonnull BaseActivityComponent baseActivityComponent,
-                                   @Nonnull FragmentModule fragmentModule,
-                                   @Nullable Bundle savedInstanceState) {
-        DaggerPublicPagesFragmentComponent.builder()
-                .baseActivityComponent(baseActivityComponent)
-                .fragmentModule(fragmentModule)
-                .build()
-                .inject(this);
-    }
-
-    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK &&
                 (requestCode == REQUEST_OPENED_PROFILE_WAS_LISTENED) || requestCode == PagesPagerFragment.REQUEST_CODE_PAGE_EDITED) {
@@ -135,6 +122,11 @@ public class PublicPagesFragment extends BaseFragment {
         } else {
             super.onActivityResult(requestCode, requestCode, data);
         }
+    }
+
+    @Override
+    protected void inject(BaseDaggerFragmentComponent component) {
+        component.inject(this);
     }
 }
 

@@ -8,10 +8,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckedTextView;
 
+import com.shoutit.app.android.BaseDaggerFragment;
 import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.BaseShoutsItemDecoration;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.dagger.BaseDaggerFragmentComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.LayoutManagerHelper;
 import com.shoutit.app.android.view.shouts_list_common.ShoutListActivityHelper;
@@ -25,7 +27,7 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import rx.subscriptions.CompositeSubscription;
 
-public class BookmarkedShoutsFragment extends BaseFragment {
+public class BookmarkedShoutsFragment extends BaseDaggerFragment {
 
     @Inject
     SimpleShoutsAdapter adapter;
@@ -47,12 +49,8 @@ public class BookmarkedShoutsFragment extends BaseFragment {
     }
 
     @Override
-    protected void injectComponent(@Nonnull BaseActivityComponent baseActivityComponent, @Nonnull FragmentModule fragmentModule, @Nullable Bundle savedInstanceState) {
-        DaggerBookmarkedShoutsFragmentComponent.builder()
-                .baseActivityComponent(baseActivityComponent)
-                .fragmentModule(fragmentModule)
-                .build()
-                .inject(this);
+    protected void inject(BaseDaggerFragmentComponent component) {
+        component.inject(this);
     }
 
     @android.support.annotation.Nullable

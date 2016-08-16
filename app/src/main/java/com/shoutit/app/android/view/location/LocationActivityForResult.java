@@ -6,18 +6,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-import com.shoutit.app.android.App;
-import com.shoutit.app.android.BaseActivity;
+import com.shoutit.app.android.BaseDaggerActivity;
 import com.shoutit.app.android.api.model.UserLocation;
-import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.dagger.BaseDaggerActivityComponent;
 import com.shoutit.app.android.utils.KeyboardHelper;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
-public class LocationActivityForResult extends BaseActivity {
+public class LocationActivityForResult extends BaseDaggerActivity {
 
     public static final String EXTRAS_USER_LOCATION = "extras_location";
 
@@ -75,13 +74,11 @@ public class LocationActivityForResult extends BaseActivity {
     @Nonnull
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
-        LocationActivityComponent component = DaggerLocationActivityComponent
-                .builder()
-                .activityModule(new ActivityModule(this))
-                .appComponent(App.getAppComponent(getApplication()))
-                .build();
-        component.inject(this);
+        return null;
+    }
 
-        return component;
+    @Override
+    protected void injectComponent(BaseDaggerActivityComponent component) {
+        component.inject(this);
     }
 }

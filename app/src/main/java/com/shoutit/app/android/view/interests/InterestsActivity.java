@@ -19,8 +19,8 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
-import com.shoutit.app.android.dagger.BaseEmptyActivityComponent;
-import com.shoutit.app.android.dagger.DaggerBaseEmptyActivityComponent;
+import com.shoutit.app.android.dagger.BaseDaggerActivityComponent;
+import com.shoutit.app.android.dagger.DaggerBaseDaggerActivityComponent;
 import com.shoutit.app.android.utils.ApiMessagesHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LoadMoreHelper;
@@ -148,7 +148,7 @@ public class InterestsActivity extends BaseActivity {
     @Nonnull
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
-        final BaseEmptyActivityComponent component = DaggerBaseEmptyActivityComponent
+        final BaseDaggerActivityComponent component = DaggerBaseDaggerActivityComponent
                 .builder()
                 .activityModule(new ActivityModule(this))
                 .appComponent(App.getAppComponent(getApplication()))

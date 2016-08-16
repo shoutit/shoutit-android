@@ -12,23 +12,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.shoutit.app.android.App;
-import com.shoutit.app.android.BaseFragment;
+import com.shoutit.app.android.BaseDaggerFragment;
 import com.shoutit.app.android.R;
-import com.shoutit.app.android.dagger.BaseActivityComponent;
-import com.shoutit.app.android.dagger.FragmentModule;
+import com.shoutit.app.android.dagger.BaseDaggerFragmentComponent;
 import com.shoutit.app.android.view.createpage.pagecategory.CreatePageCategoryActivity;
 
 import java.util.List;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
-import rx.Observable;
 
-public class PagesPagerFragment extends BaseFragment {
+public class PagesPagerFragment extends BaseDaggerFragment {
 
     public static final int REQUEST_CODE_PAGE_EDITED = 5;
 
@@ -96,13 +91,7 @@ public class PagesPagerFragment extends BaseFragment {
     }
 
     @Override
-    protected void injectComponent(@Nonnull BaseActivityComponent baseActivityComponent,
-                                   @Nonnull FragmentModule fragmentModule,
-                                   @Nullable Bundle savedInstanceState) {
-        DaggerPagesPagerFragmentComponent.builder()
-                .baseActivityComponent(baseActivityComponent)
-                .fragmentModule(fragmentModule)
-                .build()
-                .inject(this);
+    protected void inject(BaseDaggerFragmentComponent component) {
+        component.inject(this);
     }
 }

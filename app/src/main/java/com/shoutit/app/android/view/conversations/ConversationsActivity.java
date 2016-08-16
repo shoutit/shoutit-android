@@ -9,9 +9,11 @@ import android.view.View;
 
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
+import com.shoutit.app.android.BaseDaggerActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.dagger.BaseDaggerActivityComponent;
 import com.shoutit.app.android.view.chats.public_chat.CreatePublicChatActivity;
 
 import javax.annotation.Nonnull;
@@ -20,7 +22,7 @@ import javax.annotation.Nullable;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class ConversationsActivity extends BaseActivity {
+public class ConversationsActivity extends BaseDaggerActivity {
 
     @Bind(R.id.conversation_toolbar)
     Toolbar toolbar;
@@ -64,16 +66,8 @@ public class ConversationsActivity extends BaseActivity {
         });
     }
 
-    @Nonnull
     @Override
-    public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
-        final ConversationsActivityComponent component = DaggerConversationsActivityComponent
-                .builder()
-                .activityModule(new ActivityModule(this))
-                .appComponent(App.getAppComponent(getApplication()))
-                .build();
+    protected void injectComponent(BaseDaggerActivityComponent component) {
         component.inject(this);
-
-        return component;
     }
 }

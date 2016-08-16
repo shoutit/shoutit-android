@@ -10,10 +10,12 @@ import android.view.MenuItem;
 
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
+import com.shoutit.app.android.BaseDaggerActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.dagger.BaseDaggerActivityComponent;
 import com.shoutit.app.android.utils.UpNavigationHelper;
 import com.shoutit.app.android.view.conversations.ConversationsActivity;
 import com.shoutit.app.android.view.signin.LoginActivity;
@@ -26,7 +28,7 @@ import butterknife.ButterKnife;
 
 import static com.appunite.rx.internal.Preconditions.checkNotNull;
 
-public class DiscoverActivity extends BaseActivity implements OnNewDiscoverSelectedListener {
+public class DiscoverActivity extends BaseDaggerActivity implements OnNewDiscoverSelectedListener {
     private static final String KEY_DISCOVER_ID = "discover_id";
 
     @Bind(R.id.activity_discover_toolbar)
@@ -108,16 +110,8 @@ public class DiscoverActivity extends BaseActivity implements OnNewDiscoverSelec
                 .commit();
     }
 
-    @Nonnull
     @Override
-    public BaseActivityComponent createActivityComponent(@javax.annotation.Nullable Bundle savedInstanceState) {
-        final DiscoverActivityComponent component = DaggerDiscoverActivityComponent
-                .builder()
-                .activityModule(new ActivityModule(this))
-                .appComponent(App.getAppComponent(getApplication()))
-                .build();
+    protected void injectComponent(BaseDaggerActivityComponent component) {
         component.inject(this);
-
-        return component;
     }
 }

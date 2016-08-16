@@ -12,12 +12,14 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.google.common.base.Preconditions;
+import com.shoutit.app.android.BaseDaggerFragment;
 import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.dagger.BaseDaggerFragmentComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
@@ -35,7 +37,7 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.OnClick;
 
-public class CreditsFragment extends BaseFragment {
+public class CreditsFragment extends BaseDaggerFragment {
 
     public static Fragment newInstance() {
         return new CreditsFragment();
@@ -69,17 +71,6 @@ public class CreditsFragment extends BaseFragment {
                     mCreditNumber.setText(String.valueOf(stats.getCredits()));
                 });
     }
-
-    @Override
-    protected void injectComponent(@Nonnull BaseActivityComponent baseActivityComponent, @Nonnull FragmentModule fragmentModule, @Nullable Bundle savedInstanceState) {
-        DaggerCreditsFragmentComponent
-                .builder()
-                .baseActivityComponent(baseActivityComponent)
-                .fragmentModule(fragmentModule)
-                .build()
-                .inject(this);
-    }
-
 
     @OnClick({R.id.credit_balance, R.id.credit_complete_profile, R.id.credit_facebook, R.id.credit_invite_friends, R.id.credit_listen, R.id.credit_promote_shout})
     public void onClick(View view) {
@@ -124,5 +115,10 @@ public class CreditsFragment extends BaseFragment {
             final MainActivity activity = (MainActivity) getActivity();
             activity.changeMenuItem(fragmentTag);
         });
+    }
+
+    @Override
+    protected void inject(BaseDaggerFragmentComponent component) {
+        component.inject(this);
     }
 }
