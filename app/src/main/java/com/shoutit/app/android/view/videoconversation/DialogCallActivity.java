@@ -13,12 +13,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jakewharton.rxbinding.view.RxView;
-import com.shoutit.app.android.App;
-import com.shoutit.app.android.BaseActivity;
+import com.shoutit.app.android.BaseDaggerActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
-import com.shoutit.app.android.dagger.ActivityModule;
-import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.dagger.BaseDaggerActivityComponent;
 import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
@@ -35,7 +33,7 @@ import butterknife.ButterKnife;
 
 import static com.appunite.rx.internal.Preconditions.checkNotNull;
 
-public class DialogCallActivity extends BaseActivity {
+public class DialogCallActivity extends BaseDaggerActivity {
 
     private final String TAG = DialogCallActivity.class.getSimpleName();
     private static final String CALLER_NAME = "caller_name";
@@ -153,16 +151,8 @@ public class DialogCallActivity extends BaseActivity {
         }
     }
 
-    @Nonnull
     @Override
-    public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
-        final DialogCallActivityComponent component = DaggerDialogCallActivityComponent
-                .builder()
-                .activityModule(new ActivityModule(this))
-                .appComponent(App.getAppComponent(getApplication()))
-                .build();
+    protected void injectComponent(BaseDaggerActivityComponent component) {
         component.inject(this);
-
-        return component;
     }
 }

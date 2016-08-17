@@ -10,25 +10,19 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.text.format.DateUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
-import com.shoutit.app.android.App;
-import com.shoutit.app.android.BaseActivity;
+import com.shoutit.app.android.BaseDaggerActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.Label;
 import com.shoutit.app.android.api.model.Promotion;
-import com.shoutit.app.android.api.model.User;
-import com.shoutit.app.android.dagger.ActivityModule;
-import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.dagger.BaseDaggerActivityComponent;
 import com.shoutit.app.android.utils.DateTimeUtils;
-
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -39,7 +33,7 @@ import butterknife.ButterKnife;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class PromotedActivity extends BaseActivity {
+public class PromotedActivity extends BaseDaggerActivity {
 
     private static final String KEY_PROMOTION_JSON = "promotion_json";
     private static final String KEY_SHOUT_TITLE = "shout_title";
@@ -109,19 +103,6 @@ public class PromotedActivity extends BaseActivity {
         }
     }
 
-    @Nonnull
-    @Override
-    public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
-        final PromotedActivityComponent component = DaggerPromotedActivityComponent
-                .builder()
-                .activityModule(new ActivityModule(this))
-                .appComponent(App.getAppComponent(getApplication()))
-                .build();
-        component.inject(this);
-
-        return component;
-    }
-
     public void bindData(String shoutTitle, @Nonnull Promotion promotion, @Nonnull BaseProfile user) {
         final Label label = promotion.getLabel();
 
@@ -152,5 +133,10 @@ public class PromotedActivity extends BaseActivity {
 
         //noinspection ConstantConditions
         creditsTv.setText(String.valueOf(user.getStats().getCredits()));
+    }
+
+    @Override
+    protected void injectComponent(BaseDaggerActivityComponent component) {
+        component.inject(this);
     }
 }

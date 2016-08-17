@@ -3,7 +3,6 @@ package com.shoutit.app.android.view.search.categories;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,22 +10,21 @@ import android.view.ViewGroup;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.jakewharton.rxbinding.view.RxView;
-import com.shoutit.app.android.BaseFragment;
+import com.shoutit.app.android.BaseDaggerFragment;
 import com.shoutit.app.android.R;
-import com.shoutit.app.android.dagger.BaseActivityComponent;
-import com.shoutit.app.android.dagger.FragmentModule;
+import com.shoutit.app.android.dagger.BaseDaggerFragmentComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.MyLinearLayoutManager;
 
 import java.util.List;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
 import rx.functions.Action1;
 
-public class SearchCategoriesFragment extends BaseFragment {
+public class SearchCategoriesFragment extends BaseDaggerFragment {
 
     @Bind(R.id.base_progress)
     View progressView;
@@ -78,13 +76,7 @@ public class SearchCategoriesFragment extends BaseFragment {
     }
 
     @Override
-    protected void injectComponent(@Nonnull BaseActivityComponent baseActivityComponent,
-                                   @Nonnull FragmentModule fragmentModule,
-                                   @Nullable Bundle savedInstanceState) {
-        DaggerSearchCategoriesFragmentComponent.builder()
-                .baseActivityComponent(baseActivityComponent)
-                .fragmentModule(fragmentModule)
-                .build()
-                .inject(this);
+    protected void inject(BaseDaggerFragmentComponent component) {
+        component.inject(this);
     }
 }

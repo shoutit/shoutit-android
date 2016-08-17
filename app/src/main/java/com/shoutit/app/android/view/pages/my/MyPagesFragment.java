@@ -13,12 +13,11 @@ import android.view.ViewGroup;
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
 import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.jakewharton.rxbinding.view.RxView;
-import com.shoutit.app.android.BaseFragment;
+import com.shoutit.app.android.BaseDaggerFragment;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.Page;
-import com.shoutit.app.android.dagger.BaseActivityComponent;
-import com.shoutit.app.android.dagger.FragmentModule;
+import com.shoutit.app.android.dagger.BaseDaggerFragmentComponent;
 import com.shoutit.app.android.facebook.FacebookHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LoadMoreHelper;
@@ -30,12 +29,11 @@ import com.shoutit.app.android.view.profile.page.PageProfileActivity;
 import com.shoutit.app.android.view.profile.page.edit.EditPageActivity;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
 
-public class MyPagesFragment extends BaseFragment implements MyPagesDialog.PagesDialogListener {
+public class MyPagesFragment extends BaseDaggerFragment implements MyPagesDialog.PagesDialogListener {
 
     private static final int REQUEST_OPENED_PROFILE_WAS_LISTENED = 1;
 
@@ -115,14 +113,8 @@ public class MyPagesFragment extends BaseFragment implements MyPagesDialog.Pages
     }
 
     @Override
-    protected void injectComponent(@Nonnull BaseActivityComponent baseActivityComponent,
-                                   @Nonnull FragmentModule fragmentModule,
-                                   @Nullable Bundle savedInstanceState) {
-        DaggerPagesFragmentComponent.builder()
-                .baseActivityComponent(baseActivityComponent)
-                .fragmentModule(fragmentModule)
-                .build()
-                .inject(this);
+    protected void inject(BaseDaggerFragmentComponent component) {
+        component.inject(this);
     }
 
     @Override

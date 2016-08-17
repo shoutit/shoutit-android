@@ -5,6 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+
+import com.shoutit.app.android.BaseDaggerActivity;
+import com.shoutit.app.android.dagger.BaseDaggerActivityComponent;
+import com.shoutit.app.android.dagger.DaggerBaseDaggerActivityComponent;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -18,8 +22,6 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.Contact;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
-import com.shoutit.app.android.dagger.BaseEmptyActivityComponent;
-import com.shoutit.app.android.dagger.DaggerBaseEmptyActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
@@ -31,7 +33,7 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class InviteContactsActivity extends BaseActivity {
+public class InviteContactsActivity extends BaseDaggerActivity {
 
     private static final int REQUEST_CODE_CONTACTS_PERMISSION = 1;
 
@@ -128,16 +130,8 @@ public class InviteContactsActivity extends BaseActivity {
         }
     }
 
-    @Nonnull
     @Override
-    public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
-        final BaseEmptyActivityComponent component = DaggerBaseEmptyActivityComponent
-                .builder()
-                .activityModule(new ActivityModule(this))
-                .appComponent(App.getAppComponent(getApplication()))
-                .build();
+    protected void injectComponent(BaseDaggerActivityComponent component) {
         component.inject(this);
-
-        return component;
     }
 }

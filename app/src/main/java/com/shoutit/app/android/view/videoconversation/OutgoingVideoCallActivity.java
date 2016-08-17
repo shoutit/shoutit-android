@@ -9,10 +9,8 @@ import android.view.View;
 
 import com.appunite.rx.functions.BothParams;
 import com.jakewharton.rxbinding.view.RxView;
-import com.shoutit.app.android.App;
 import com.shoutit.app.android.R;
-import com.shoutit.app.android.dagger.ActivityModule;
-import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.dagger.BaseDaggerActivityComponent;
 import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LogHelper;
@@ -179,16 +177,8 @@ public class OutgoingVideoCallActivity extends VideoCallActivity {
         }
     }
 
-    @Nonnull
     @Override
-    public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
-        final OutgoingVideoCallActivityComponent component = DaggerOutgoingVideoCallActivityComponent
-                .builder()
-                .activityModule(new ActivityModule(this))
-                .appComponent(App.getAppComponent(getApplication()))
-                .build();
+    protected void injectComponent(BaseDaggerActivityComponent component) {
         component.inject(this);
-
-        return component;
     }
 }

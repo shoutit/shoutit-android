@@ -10,15 +10,13 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.appunite.rx.android.MyAndroidSchedulers;
-import com.shoutit.app.android.App;
-import com.shoutit.app.android.BaseActivity;
+import com.shoutit.app.android.BaseDaggerActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.GuestSignupRequest;
 import com.shoutit.app.android.api.model.login.LoginProfile;
-import com.shoutit.app.android.dagger.ActivityModule;
-import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.dagger.BaseDaggerActivityComponent;
 import com.shoutit.app.android.facebook.FacebookHelper;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.mixpanel.MixPanel;
@@ -29,7 +27,6 @@ import com.shoutit.app.android.view.main.MainActivity;
 import com.uservoice.uservoicesdk.UserVoice;
 import com.viewpagerindicator.CirclePageIndicator;
 
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import butterknife.Bind;
@@ -38,7 +35,7 @@ import butterknife.OnClick;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
-public class IntroActivity extends BaseActivity {
+public class IntroActivity extends BaseDaggerActivity {
 
     public static final String EXTRA_REFRESH_TOKEN_FAILED = "refresh_token_failed";
 
@@ -73,7 +70,7 @@ public class IntroActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_intro);
         ButterKnife.bind(this);
-        ((IntroActivityComponent) getActivityComponent()).inject(this);
+
         SystemUIUtils.setFullscreen(this);
 
         if (getIntent().getBooleanExtra(EXTRA_REFRESH_TOKEN_FAILED, false)) {
@@ -126,13 +123,8 @@ public class IntroActivity extends BaseActivity {
         startActivity(LoginIntroActivity.newIntent(this));
     }
 
-    @Nonnull
     @Override
-    public BaseActivityComponent createActivityComponent(@javax.annotation.Nullable Bundle savedInstanceState) {
-        return DaggerIntroActivityComponent
-                .builder()
-                .activityModule(new ActivityModule(this))
-                .appComponent(App.getAppComponent(getApplication()))
-                .build();
+    protected void injectComponent(BaseDaggerActivityComponent component) {
+        component.inject(this);
     }
 }

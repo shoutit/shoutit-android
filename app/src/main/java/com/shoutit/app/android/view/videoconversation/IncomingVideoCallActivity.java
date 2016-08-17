@@ -2,14 +2,11 @@ package com.shoutit.app.android.view.videoconversation;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 
-import com.shoutit.app.android.App;
 import com.shoutit.app.android.R;
-import com.shoutit.app.android.dagger.ActivityModule;
-import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.dagger.BaseDaggerActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.TextHelper;
@@ -84,17 +81,9 @@ public class IncomingVideoCallActivity extends VideoCallActivity {
         return false;
     }
 
-    @Nonnull
+
     @Override
-    public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
-        final IncomingVideoCallActivityComponent component = DaggerIncomingVideoCallActivityComponent
-                .builder()
-                .activityModule(new ActivityModule(this))
-                .appComponent(App.getAppComponent(getApplication()))
-                .build();
+    protected void injectComponent(BaseDaggerActivityComponent component) {
         component.inject(this);
-
-        return component;
     }
-
 }
