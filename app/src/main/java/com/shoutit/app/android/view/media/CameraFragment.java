@@ -34,7 +34,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.adobe.creativesdk.aviary.AdobeImageIntent;
 import com.appunite.rx.internal.Preconditions;
 import com.commonsware.cwac.cam2.CameraController;
 import com.commonsware.cwac.cam2.CameraEngine;
@@ -865,13 +864,11 @@ public class CameraFragment extends Fragment {
                         .show();
             }
         } else {
-            if (useEditor) {
-                final Intent imageEditorIntent = new AdobeImageIntent.Builder(getActivity())
-                        .setData(Uri.parse(imageOutput))
-                        .build();
-                startActivityForResult(imageEditorIntent, REQUEST_CODE_IMAGE_EDITOR);
-            } else {
-                if(imageOutput != null) {
+         /*   // TODO When new library for editing will be ready, pass correct intent
+            if (useEditor = false) {
+                //startActivityForResult(imageEditorIntent, REQUEST_CODE_IMAGE_EDITOR);
+            } else {*/
+                if (imageOutput != null) {
                     onPictureConfirmed(Uri.parse(imageOutput));
                 } else {
                     ColoredSnackBar.error(
@@ -880,7 +877,7 @@ public class CameraFragment extends Fragment {
                             Snackbar.LENGTH_SHORT)
                             .show();
                 }
-            }
+            //}
         }
     }
 
