@@ -6,13 +6,13 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.appunite.rx.android.MyAndroidSchedulers;
 import com.facebook.CallbackManager;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -36,7 +36,6 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.subjects.PublishSubject;
 
@@ -124,7 +123,7 @@ public class LinkedAccountsFragment extends BaseFragment implements LinkedAccoun
                 .compose(bindToLifecycle())
                 .switchMap(o -> facebookHelper.askForPermissionIfNeeded(
                                 getActivity(), FacebookHelper.PAGES_PERMISSIONS, callbackManager, true))
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(MyAndroidSchedulers.mainThread())
                 .subscribe(responseOrError -> {
                     if (responseOrError.isData()) {
                         presenter.showPagesList();

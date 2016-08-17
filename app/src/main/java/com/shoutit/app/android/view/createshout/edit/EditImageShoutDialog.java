@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 
-import com.adobe.creativesdk.aviary.AdobeImageIntent;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.view.createshout.ShoutMediaPresenter;
@@ -45,16 +44,19 @@ public class EditImageShoutDialog {
                 .create();
         ButterKnife.bind(this, view);
 
+        mShoutMediaEditDialogEdit.setVisibility(View.GONE); // TODO remove it after changing library for editing
         mShoutMediaEditDialogEdit.setOnClickListener(v -> {
             mediaSwappedSubject
                     .take(1)
                     .subscribe(stringBooleanPair -> {
                         presenter.swapMediaItem(position, stringBooleanPair.first, stringBooleanPair.second);
                     });
-            final Intent imageEditorIntent = new AdobeImageIntent.Builder(mContext)
+
+            // TODO When new library for editing will be ready, pass correct intent
+          /*  final Intent imageEditorIntent = new AdobeImageIntent.Builder(mContext)
                     .setData(Uri.parse(path))
                     .build();
-            mContext.startActivityForResult(imageEditorIntent, EditShoutActivity.MEDIA_EDIT_EDTOR_REQUEST_CODE);
+            mContext.startActivityForResult(imageEditorIntent, EditShoutActivity.MEDIA_EDIT_EDTOR_REQUEST_CODE);*/
             alertDialog.dismiss();
         });
 

@@ -2,26 +2,18 @@ package com.shoutit.app.android.view.verifybusiness;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.support.v4.util.Pair;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 
-import com.adobe.creativesdk.aviary.AdobeImageIntent;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ForActivity;
-import com.shoutit.app.android.view.createshout.ShoutMediaPresenter;
-import com.shoutit.app.android.view.createshout.edit.EditShoutActivity;
-import com.shoutit.app.android.view.media.RecordMediaActivity;
 
 import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import rx.subjects.PublishSubject;
 
 
 public class EditImageDialog {

@@ -4,8 +4,6 @@ import android.app.Application;
 import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
 
-import com.adobe.creativesdk.aviary.IAviaryClientCredentials;
-import com.adobe.creativesdk.foundation.AdobeCSDKFoundation;
 import com.appunite.appunitegcm.AppuniteGcm;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.functions.Functions1;
@@ -29,7 +27,6 @@ import com.shoutit.app.android.facebook.FacebookHelper;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.twilio.Twilio;
-import com.shoutit.app.android.utils.AviaryContants;
 import com.shoutit.app.android.utils.BuildTypeUtils;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.ProcessUtils;
@@ -53,7 +50,7 @@ import rx.plugins.RxJavaErrorHandler;
 import rx.plugins.RxJavaPlugins;
 
 
-public class App extends MultiDexApplication implements IAviaryClientCredentials {
+public class App extends MultiDexApplication {
 
     private static final String GCM_TOKEN = "935842257865";
     private static final String TAG = App.class.getCanonicalName();
@@ -129,8 +126,6 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
         initTwilio();
 
         facebookHelper.initFacebook();
-
-        AdobeCSDKFoundation.initializeCSDKFoundation(this);
     }
 
 
@@ -306,20 +301,5 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
     private void fetchLocation() {
         locationManager.updateUserLocationObservable()
                 .subscribe();
-    }
-
-    @Override
-    public String getClientID() {
-        return AviaryContants.CREATIVE_SDK_CLIENT_ID;
-    }
-
-    @Override
-    public String getClientSecret() {
-        return AviaryContants.CREATIVE_SDK_CLIENT_SECRET;
-    }
-
-    @Override
-    public String getBillingKey() {
-        return null;
     }
 }
