@@ -12,7 +12,6 @@ import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.adapteritems.NoDataTextAdapterItem;
 import com.shoutit.app.android.api.model.Page;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.TextHelper;
@@ -108,7 +107,7 @@ public class PagesAdapter extends BaseAdapter {
             }
 
             if (page.getStats() != null) {
-                badgeTv.setText(String.valueOf(page.getStats().getUnreadNotifications()));
+                badgeTv.setText(String.valueOf(page.getStats().getTotalUnreadCount()));
             }
 
             listenersTv.setText(context.getString(R.string.profile_listeners,
