@@ -196,8 +196,6 @@
 <string name="account_logout">"تسجيل الخروج"</string>
 
 <!-- Profile -->
-
-<!-- Profile -->
 <string name="profile_my_shouts_header">"إعلاناتي"</string>
 <string name="profile_listening_label">"استماعات"</string>
 <string name="profile_interests_label">"اهتمامات"</string>
@@ -233,8 +231,6 @@
 <string name="create_request_activity_title_too_short">"يجب أن لايقل العنوان عن 6 أحرف"</string>
 
 <!-- Edit Shout -->
-
-<!-- Edit Shout -->
 <string name="edit_shout_categories_error">"حصل خطأ في تحميل التصنيفات"</string>
 <string name="edit_shout_currencies_error">"حصل خطأ في تحميل العملات"</string>
 <string name="edit_shout_body_error">"حصل خطأ في تحميل الإعلان"</string>
@@ -248,8 +244,6 @@
 
 <!-- Publish -->
 <string name="publish_menu_share">"مشاركة الإعلان"</string>
-
-<!-- Edit Profile -->
 
 <!-- Edit Profile -->
 <string name="edit_profile_hint_username">"إسم المستخدم"</string>
