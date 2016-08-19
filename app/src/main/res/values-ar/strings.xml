@@ -63,7 +63,6 @@
 <string name="register_name">"الإسم"</string>
 <string name="register_email">"البريد الإلكتروني"</string>
 <string name="register_password">"كلمة المرور"</string>
-<string name="register_login_text">"هل يوجد لديك حساب؟ تسجيل الدخول"</string>
 <string name="register_empty_mail">"لايمكن ترك البريد الإلكتروني فارغ"</string>
 <string name="register_empty_password">"يجب أن تتكون كلمة المرور من 6 أحرف على الأقل و 20 على الأكثر"</string>
 <string name="register_empty_name">"لايمكن ترك الإسم فارغ"</string>
@@ -119,7 +118,6 @@
 <string name="drawer_open">"فتح"</string>
 <string name="drawer_close">"إغلاق"</string>
 <string name="menu_guest">"ضيف"</string>
-<string name="menu_item_logout">"تسجيل الخروج"</string>
 <string name="menu_version_name">"شاوت ات %1$s"</string>
 
 <!-- Post Login -->
@@ -140,8 +138,6 @@
 <string name="shout_date">"التاريخ"</string>
 <string name="shout_category">"التصنيف"</string>
 <string name="shout_location">"الموقع"</string>
-<string name="shout_model">"النموذج"</string>
-<string name="shout_color">"اللون"</string>
 <string name="shout_share">"مشاركة الإعلان"</string>
 
 <!-- Discover Shouts -->
@@ -193,7 +189,6 @@
 <string name="shout_visit_profile">"زيارة صفحة %1$s"</string>
 <string name="shout_bottom_bar_delete">"حذف"</string>
 <string name="shout_bottom_bar_edit">"تعديل"</string>
-<string name="shout_choose_video_app">"إختر تطبيق"</string>
 
 <!-- Account -->
 <string name="account_email_changed">"تم تغيير البريد الإلكتروني بنجاح"</string>
@@ -201,7 +196,6 @@
 <string name="account_logout">"تسجيل الخروج"</string>
 
 <!-- Profile -->
-<string name="profile_shuts_button">"رؤية كافة الإعلانات"</string>
 
 <!-- Profile -->
 <string name="profile_my_shouts_header">"إعلاناتي"</string>
@@ -219,7 +213,6 @@
 <string name="profile_listeners">"%1$s مستمعون"</string>
 <string name="profile_listeners_label">"مستمعون"</string>
 <string name="profile_see_all_shouts">"رؤية كافة الإعلانات"</string>
-<string name="profile_user_shouts_header">"%1$s إعلانات"</string>
 <string name="profile_chat_label">"محادثة"</string>
 <string name="profile_listen_label">"استماع"</string>
 <string name="profile_stop_listening_label">"الغاء الإستماع"</string>
@@ -232,19 +225,14 @@
 <string name="request_activity_title">"إنشاء طلب"</string>
 <string name="request_activity_what_are_you_looking_for">"عن ماذا تبحث؟"</string>
 <string name="request_activity_budget">"ماهي ميزانيتك"</string>
-<string name="request_activity_when">"متى تريده"</string>
 <string name="request_activity_where">"أين؟"</string>
 <string name="request_activity_change_location">"تغيير"</string>
 <string name="request_activity_btn">"دعنا نساعدك!"</string>
 <string name="request_activity_currency">"العملة"</string>
 <string name="request_acitvity_currency_error">"خطأ في تحميل العملات"</string>
-<string name="request_acitvity_post_error">"خطأ في نشر الطلب"</string>
 <string name="create_request_activity_title_too_short">"يجب أن لايقل العنوان عن 6 أحرف"</string>
-<string name="create_request_activity_price_empty">"يجب إدخال سعر"</string>
 
 <!-- Edit Shout -->
-<string name="edit_shout_option">"التفاصيل"</string>
-<string name="edit_shout_category">"التصنيف"</string>
 
 <!-- Edit Shout -->
 <string name="edit_shout_categories_error">"حصل خطأ في تحميل التصنيفات"</string>
@@ -252,7 +240,6 @@
 <string name="edit_shout_body_error">"حصل خطأ في تحميل الإعلان"</string>
 <string name="edit_shout_description_hint">"التفاصيل"</string>
 <string name="edit_shout_location">"الموقع"</string>
-<string name="edit_shout_price_hint">"السعر"</string>
 <string name="edit_shout_title_hint">"العنوان"</string>
 <string name="edit_shout_title">"تعديل %s"</string>
 <string name="edit_currency_info">"إذا قابل للتفاوض اتركها فارغة, إذا كان مجاناً ضع 0"</string>
@@ -263,7 +250,6 @@
 <string name="publish_menu_share">"مشاركة الإعلان"</string>
 
 <!-- Edit Profile -->
-<string name="edit_profile_hint_name">"الإسم"</string>
 
 <!-- Edit Profile -->
 <string name="edit_profile_hint_username">"إسم المستخدم"</string>
@@ -292,7 +278,6 @@
 
 <!-- Forgot Password -->
 <string name="forgot_password_send">"إعادة ضبط كلمة المرور"</string>
-<string name="forgot_password_fail">"خطأ في إعادة ضبط كلمة المرور"</string>
 
 <!-- Post Signup Second -->
 <string name="post_signup_next">"التالي"</string>
@@ -327,7 +312,6 @@
 <string name="search_shout_results_header_title">"كافة النتائج ل '%1$s'"</string>
 <string name="search_shout_results_header_title_location">"كافة النتائج في موقعك"</string>
 <string name="search_shout_results_all_results">"كافة النتائج"</string>
-<string name="search_shouts_results_header_count">"%1$d نتيجة"</string>
 <string name="search_results_no_results">"لايوجد نتائج"</string>
 <string name="search_share_results">"شارك النتائج"</string>
 
@@ -357,7 +341,6 @@
 <string name="chats_attatchments_shout">"إعلان"</string>
 <string name="chats_attatchments_location">"الموقع"</string>
 <string name="chat_edit_text_hint">"اكتب رسالة"</string>
-<string name="chats_delete_conversatin">"هل ترغب بحذف هذه المحادثة؟"</string>
 <string name="chat_typing">"%1$s يكتب الآن"</string>
 <string name="chat_shout_chat">"محادثة الإعلان"</string>
 <string name="chat_offer">"عرض"</string>
@@ -368,13 +351,10 @@
 <string name="notifications_title">"الإشعارات"</string>
 <string name="notifications_menu_mark">"تحديد الكل كمقروء"</string>
 <string name="notifications_menu_settings">"إعدادات الإشعارات"</string>
-<string name="notifications_listening_to_you">"بدأ بالإستماع اليك"</string>
-<string name="create_request_description">"العنوان"</string>
 <string name="create_request_price">"السعر"</string>
 <string name="edit_shout_add_pictures_label">"إضافة صور وفيديو"</string>
 <string name="option_not_set">"غير محدد"</string>
 <string name="edit_shout_mobile_hint">"رقم الموبايل"</string>
-<string name="notifications_message_replacement">"أرسل لك رسالة"</string>
 
 <!-- Video Calls -->
 <string name="video_calls_no_premissions">"يحتاج الى تصريح إستخدام المايكروفون والكاميرا."</string>
@@ -384,10 +364,6 @@
 <string name="video_calls_accept_call">"إجابة"</string>
 <string name="video_calls_reject_call">"رفض"</string>
 <string name="video_calls_participant_reject">"تم رفض المكالمة"</string>
-<string name="video_calls_cannot_connect">"خطأ في الإتصال. حاول لاحقاً"</string>
-<string name="video_calls_conversation_ended">"المكالمة انتهت"</string>
-<string name="video_calls_connecting">"جار الاتصال..."</string>
-<string name="video_calls_connected">"متصل مع %s"</string>
 <string name="video_calls_participant_disconected">"تم إنهاء المكالمة"</string>
 <string name="video_call_error">"عذراً, لايمكن بدء المحادثة. يرجى المحاولة لاحقاً"</string>
 <string name="no_phone_number_error">"رقم الموبايل غير متاح حاليا"</string>
@@ -454,8 +430,6 @@
 
 <!-- Conversations -->
 <string name="conversations_empty">"لا توجد محادثات"</string>
-<string name="listen_success">"لقد بدأت بالاستماع إلى %1$s بنجاح"</string>
-<string name="unlisten_success">"لقد توقفت عن الاستماع إلى %1$s بنجاح"</string>
 <string name="permission_contacts_explanation">"نحتاج صلاحية جهات الاتصال لنتحقق من منهم يستخدم شاوت ات
 "</string>
 <string name="shout_deleted">"هذا الإعلان ملغي"</string>
@@ -466,7 +440,6 @@
 <string name="conversation_create_public_chat">"إنشاء محادثة عامة"</string>
 <string name="chats_attatchments_media">"وسائط متعددة"</string>
 <string name="chats_attatchments_profile">"ملف شخصي"</string>
-<string name="chat_menu_delete">"حذف المحادثة"</string>
 <string name="chats_chat_info">"معلومات المحادثة"</string>
 <string name="chat_picture_confirmation">"هل انت متأكد من ارفاق الصورة؟"</string>
 <string name="chat_video_confirmation">"هل انت متأكد من ارفاق الفيديو؟"</string>
@@ -476,7 +449,6 @@
 <string name="chat_dialog_attach">"ارفاق"</string>
 <string name="chat_dialog_title">"موافقة"</string>
 <string name="notifications_badge">"لديك إشعار جديد"</string>
-<string name="conversations_create_public_chat">"إنشاء محادثة عامة"</string>
 
 <!-- Create Public Chat -->
 <string name="create_public_chat_title">"إنشاء محادثة عامة"</string>
@@ -491,9 +463,6 @@
 <!-- Listenings -->
 <string name="listenings_empty">"لا توجد استماعات"</string>
 <string name="listenings_ab_title">"استماعات"</string>
-<string name="listers_ab_title">"مستمعين"</string>
-<string name="listening_tab_user">"المستخدمين"</string>
-<string name="listening_tab_pages">"الصفحات"</string>
 <string name="listenings_interests_ab_title">"إهتمامات"</string>
 
 <!-- Listeners -->
@@ -598,10 +567,6 @@
 <string name="create_request_share_info">"إحصل على 1 شاوت ات كريديت لكل إعلان تقوم بنشره على العام في الفيس بوك"</string>
 <string name="edit_profile_header_birthday">"تاريخ الميلاد"</string>
 <string name="edit_profile_header_gender">"الجنس"</string>
-<string name="edit_profile_header_gender_not_specified">"غير محدد"</string>
-<string name="edit_profile_header_gender_male">"ذكر"</string>
-<string name="edit_profile_header_gender_female">"انثى"</string>
-<string name="edit_profile_header_gender_other">"غير ذلك"</string>
 <string name="edit_profile_complete_profile_message">"أكمل ملفك الشخصي وإحصل على 1 شاوت ات كريديت"</string>
 <string name="video_call_calling">"مكالمة…"</string>
 <string name="facebook_friends_invite_text">"أصدقاءك ليسو بالقائمة؟ أرسل لهم دعوة!"</string>
@@ -707,7 +672,6 @@
 <!-- Admins -->
 <string name="admins_view_profile">"عرض الملف الشخصية"</string>
 <string name="admins_remove_admin">"إزالة مدير"</string>
-<string name="admins_add_admin">"إضافة مدير"</string>
 
 <!-- Create Page Category -->
 <string name="create_page_category_header_text">"اعطي صوتا لشركتك او عملك على شاوت ات و كن قريبا من عملائك الحاليين و الجدد. التسجيل و انشاء الصفحات مجاني. اختر تصنيف عملك او شركتك وسجل الآن."</string>
@@ -743,7 +707,6 @@
 <string name="business_ver_bottom_text">"معلوماتك المتضمنة أي وثائق رسمية ستحفظ بأمان وستستخدم فقط من أجل عملية التحقق."</string>
 <string name="business_ver_button">"إرسال طلب التحقق"</string>
 <string name="business_no_images_error">"يجب أن تضيف صورة واحدة على الأقل"</string>
-<string name="business_ver_sucess">"تم التحقق"</string>
 <string name="business_ver_ab_title">"التحقق من العمل"</string>
 
 <!-- Edit Page -->
