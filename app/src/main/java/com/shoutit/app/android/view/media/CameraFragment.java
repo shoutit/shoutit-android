@@ -338,6 +338,16 @@ public class CameraFragment extends Fragment {
 
     @SuppressWarnings("unused")
     public void onEventMainThread(CameraEngine.PictureTakenEvent event) {
+/*        if(event.exception == null) {
+            if(this.getIntent().getBooleanExtra("cwac_cam2_confirm", true)) {
+                this.confirmFrag.setImage(event.getImageContext(), Float.valueOf(this.getIntent().getExtras().getFloat("cwac_cam2_confirmation_quality")));
+                this.getFragmentManager().beginTransaction().hide(this.cameraFrag).show(this.confirmFrag).commit();
+            } else {
+                this.completeRequest(event.getImageContext(), true);
+            }
+        } else {
+            this.finish();
+        }*/
         showConfirmImage();
     }
 
