@@ -6,20 +6,17 @@
 <string name="price_free">"مجاناً"</string>
 <string name="shout_type_offer">"عرض"</string>
 <string name="shout_type_request">"طلب"</string>
-<string name="terms_of_service">"شروط الخدمة"</string>
 <string name="exit_text">"اضغط رجوع مرة أخرى للخروج"</string>
 
 <!-- Errors -->
 <string name="error_default">"عذراً, حدث خطأ"</string>
 <string name="error_connection">"عذراً, لايوجد اتصال بالإنترنت"</string>
 <string name="error_field_empty">"لايمكن ترك الحقل فارغ"</string>
-<string name="error_wrong_email_or_password">"بريد إلكتروني أو كلمة مرور خطأ"</string>
 <string name="error_action_only_for_logged_in_user">"فقط للمستخدمين المسجلين"</string>
 <string name="error_image_upload">"عذراً, لايمكن تحميل الصورة. يرجى المحاولة مرة اخرى"</string>
 
 <!-- Permissions -->
 <string name="permission_location_explanation">"نحن بحاجة موقعك لإعداد المحتوى المناسب"</string>
-<string name="permission_camera_explanation">"يتحاج تصريح للحصول على الصور"</string>
 <string name="permission_granted">"تم منح التصريح"</string>
 <string name="permission_not_granted">"لم يتم منح التصريح"</string>
 
@@ -57,10 +54,8 @@
 <string name="login_password_hint">"كلمة المرور"</string>
 <string name="login_btn_text">"تسجيل الدخول"</string>
 <string name="login_sign_up_text">"إنشاء حساب"</string>
-<string name="login_error">"معلومات خطأ"</string>
 <string name="login_empty_mail">"لايمكن ترك البريد الإلكتروني فارغ"</string>
 <string name="login_empty_password">"لايمكن ترك كلمة المرور فارغة"</string>
-<string name="login_success_reset_password">"سيتم ارسال رابط الاستعادة عبر البريد الإلكتروني"</string>
 <string name="login_error_empty_email">"لايمكن ترك إسم المستخدم أو البريد الإلكتروني فارغ"</string>
 
 <!-- Register -->
