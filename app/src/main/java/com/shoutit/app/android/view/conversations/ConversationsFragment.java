@@ -7,7 +7,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -25,7 +24,6 @@ import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.chats.ChatActivity;
-import com.shoutit.app.android.view.main.MainActivityComponent;
 
 import java.util.List;
 
@@ -71,6 +69,7 @@ public class ConversationsFragment extends BaseFragment implements Conversations
                                    @Nonnull FragmentModule fragmentModule,
                                    @Nullable Bundle savedInstanceState) {
 
+
         final boolean isMyConversations = getArguments().getBoolean(KEY_IS_MY_CONVERSATIONS);
 
         final ConversationsFragmentComponent component = DaggerConversationsFragmentComponent
@@ -78,7 +77,6 @@ public class ConversationsFragment extends BaseFragment implements Conversations
                 .fragmentModule(new FragmentModule(this))
                 .converstationsFragmentModule(new ConverstationsFragmentModule(isMyConversations))
                 .baseActivityComponent(baseActivityComponent)
-                .busComponent((BusComponent) baseActivityComponent)
                 .build();
         component.inject(this);
     }

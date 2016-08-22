@@ -71,12 +71,6 @@ public class LocationActivityForResult extends BaseDaggerActivity {
         mLocationActivityDelegate.onDestroy();
     }
 
-    @Nonnull
-    @Override
-    public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
-        return null;
-    }
-
     @Override
     protected void injectComponent(BaseDaggerActivityComponent component) {
         component.inject(this);
