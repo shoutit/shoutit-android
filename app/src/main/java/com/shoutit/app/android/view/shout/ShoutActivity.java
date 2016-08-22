@@ -39,6 +39,7 @@ import com.shoutit.app.android.api.model.Promotion;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.model.MobilePhoneResponse;
+import com.shoutit.app.android.utils.AppseeHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.ImageHelper;
 import com.shoutit.app.android.utils.IntentHelper;
@@ -121,6 +122,8 @@ public class ShoutActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shout);
         ButterKnife.bind(this);
+
+        AppseeHelper.start(this);
 
         setUpActionBar();
         setUpBottomBar();

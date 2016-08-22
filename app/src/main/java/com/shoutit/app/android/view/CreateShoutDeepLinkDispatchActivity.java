@@ -12,6 +12,7 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.BaseDaggerActivityComponent;
 import com.shoutit.app.android.dagger.DaggerBaseDaggerActivityComponent;
 import com.shoutit.app.android.data.DeepLinksContants;
+import com.shoutit.app.android.utils.AppseeHelper;
 import com.shoutit.app.android.view.createshout.request.CreateRequestActivity;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
@@ -27,6 +28,8 @@ public class CreateShoutDeepLinkDispatchActivity extends BaseActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        AppseeHelper.start(this);
 
         if (!userPreferences.isNormalUser()) {
             startActivity(LoginIntroActivity.newIntent(this));

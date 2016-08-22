@@ -34,6 +34,7 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.twilio.Twilio;
+import com.shoutit.app.android.utils.AppseeHelper;
 import com.shoutit.app.android.utils.BackPressedHelper;
 import com.shoutit.app.android.utils.BuildTypeUtils;
 import com.shoutit.app.android.utils.ColoredSnackBar;
@@ -107,6 +108,8 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        AppseeHelper.start(this);
 
         mBackPressedHelper = new BackPressedHelper(this);
 

@@ -13,6 +13,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.utils.AppseeHelper;
 import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.UpNavigationHelper;
 
@@ -35,6 +36,8 @@ public class WebViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web_view);
         ButterKnife.bind(this);
+
+        AppseeHelper.start(this);
 
         final Uri uri = checkNotNull(getIntent().getData());
         final String pageUrl = checkNotNull(uri.getQueryParameter("page"));

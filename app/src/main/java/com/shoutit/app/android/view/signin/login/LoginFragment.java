@@ -21,6 +21,7 @@ import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
+import com.shoutit.app.android.utils.AppseeHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.rx.Actions1;
 import com.shoutit.app.android.view.about.AboutActivity;
@@ -85,6 +86,9 @@ public class LoginFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        AppseeHelper.markViewAsSensitive(emailInputLayout);
+        AppseeHelper.markViewAsSensitive(passwordInputLayout);
 
         passwordEdittext.setTransformationMethod(new PasswordTransformationMethod());
 

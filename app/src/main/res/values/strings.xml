@@ -22,6 +22,9 @@
     <!-- NewRelic -->
     <string name="newrelic_api_key" translatable="false">AAa1d7a1015f94d533c54162c2a91f97f739b178cc</string>
 
+    <!-- Appsee -->
+    <string name="app_see_api_key" translatable="false">67b28ab63f414eb68e5dffdcbe7b538f</string>
+
     <!-- FB -->
     <string name="facebook_app_id" translatable="false">353625811317277</string>
     <string name="facebook_shout_list_ad_id" translatable="false">353625811317277_1245942718752244</string>

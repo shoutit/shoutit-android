@@ -7,4 +7,7 @@
 
     <!-- NewRelic -->
     <string name="newrelic_api_key" translatable="false">AA52f20a8d2726a5f9d33f69160e55aa21aa557c54</string>
+
+    <!-- Appsee -->
+    <string name="app_see_api_key" translatable="false">9f4cb11447d049d58b062f1e803a0975</string>
 </resources>

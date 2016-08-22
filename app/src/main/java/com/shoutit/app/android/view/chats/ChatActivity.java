@@ -41,6 +41,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.utils.AppseeHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.LoadMoreHelper;
@@ -145,6 +146,8 @@ public class ChatActivity extends BaseActivity implements Listener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chats);
         ButterKnife.bind(this);
+
+        AppseeHelper.start(this);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             // It doesn't work from xml

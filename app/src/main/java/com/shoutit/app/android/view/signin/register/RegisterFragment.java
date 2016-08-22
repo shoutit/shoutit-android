@@ -22,6 +22,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
+import com.shoutit.app.android.utils.AppseeHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.utils.RegisterUtils;
@@ -99,6 +100,9 @@ public class RegisterFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        AppseeHelper.markViewAsSensitive(emailInputLayout);
+        AppseeHelper.markViewAsSensitive(passwordInputLayout);
 
         passwordEdittext.setTransformationMethod(new PasswordTransformationMethod());
 

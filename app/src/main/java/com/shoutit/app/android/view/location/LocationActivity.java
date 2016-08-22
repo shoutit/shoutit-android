@@ -9,6 +9,7 @@ import android.widget.Toast;
 import com.shoutit.app.android.BaseDaggerActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseDaggerActivityComponent;
+import com.shoutit.app.android.utils.AppseeHelper;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -29,6 +30,9 @@ public class LocationActivity extends BaseDaggerActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        AppseeHelper.start(this);
+
         mLocationActivityDelegate = new LocationActivityDelegate(this, presenter, adapter);
         mLocationActivityDelegate.onCreate();
 

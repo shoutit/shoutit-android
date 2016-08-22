@@ -1,9 +1,17 @@
 package com.shoutit.app.android;
 
+import android.animation.AnimatorListenerAdapter;
 import android.app.Application;
 import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
 
+import com.appsee.Appsee;
+import com.appsee.AppseeListener;
+import com.appsee.AppseeScreenDetectedInfo;
+import com.appsee.AppseeSessionEndedInfo;
+import com.appsee.AppseeSessionEndingInfo;
+import com.appsee.AppseeSessionStartedInfo;
+import com.appsee.AppseeSessionStartingInfo;
 import com.appunite.appunitegcm.AppuniteGcm;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.functions.Functions1;
@@ -17,6 +25,7 @@ import com.newrelic.agent.android.NewRelic;
 import com.newrelic.agent.android.logging.AgentLog;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.BaseProfile;
+import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.constants.UserVoiceConstants;
 import com.shoutit.app.android.dagger.AppComponent;
 import com.shoutit.app.android.dagger.AppModule;
@@ -27,6 +36,8 @@ import com.shoutit.app.android.facebook.FacebookHelper;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.twilio.Twilio;
+import com.shoutit.app.android.utils.AppseeHelper;
+import com.shoutit.app.android.utils.AppseeListenerAdapter;
 import com.shoutit.app.android.utils.BuildTypeUtils;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.ProcessUtils;
@@ -45,6 +56,8 @@ import javax.inject.Provider;
 import io.fabric.sdk.android.Fabric;
 import rx.Observable;
 import rx.Scheduler;
+import rx.functions.Action1;
+import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.plugins.RxJavaErrorHandler;
 import rx.plugins.RxJavaPlugins;
@@ -101,7 +114,11 @@ public class App extends MultiDexApplication {
 
         initFabric();
 
+        setupGraph();
+
         initNewRelic();
+
+        initAppsee();
 
         initUserVoice();
 
@@ -110,8 +127,6 @@ public class App extends MultiDexApplication {
         if (BuildConfig.BUILD_TYPE.contains("debug")) {
             LeakCanary.install(this);
         }
-
-        setupGraph();
 
         fetchLocation();
 
@@ -126,6 +141,31 @@ public class App extends MultiDexApplication {
         initTwilio();
 
         facebookHelper.initFacebook();
+    }
+
+    private void initAppsee() {
+        Appsee.addAppseeListener(new AppseeListenerAdapter() {
+            @Override
+            public void onAppseeSessionStarted(AppseeSessionStartedInfo appseeSessionStartedInfo) {
+                final String crashlyticsAppseeId = Appsee.generate3rdPartyId("Crashlytics", false);
+                Crashlytics.getInstance().core.setString("AppseeSessionUrl",
+                        "https://dashboard.appsee.com/3rdparty/crashlytics/" + crashlyticsAppseeId);
+            }
+
+        });
+
+        Appsee.setDebugToLogcat(BuildConfig.DEBUG);
+
+        userPreferences.getPageOrUserObservable()
+                .filter(Functions1.isNotNull())
+                .map(BaseProfile::getId)
+                .distinctUntilChanged()
+                .subscribe(Appsee::setUserId);
+
+        final User guestUser = userPreferences.getGuestUser();
+        if (userPreferences.isGuest() && guestUser != null) {
+            Appsee.setUserId(guestUser.getId());
+        }
     }
 
 
