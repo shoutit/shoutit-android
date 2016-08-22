@@ -18,9 +18,13 @@ public class ProfileDeepLinkDispatchActivity extends AppCompatActivity {
         final String type = data.getQueryParameter("type");
 
         final String username = data.getQueryParameter("username");
-        startActivity(ProfileIntentHelper.newIntent(this, username, BaseProfile.PAGE.equals(type))
-                .setData(data)
-                .putExtras(intent.getExtras()));
+        final Intent profileIntent = ProfileIntentHelper.newIntent(this, username, BaseProfile.PAGE.equals(type))
+                .setData(data);
+        if (intent.getExtras() != null) {
+            profileIntent.putExtras(intent.getExtras());
+        }
+
+        startActivity(profileIntent);
 
         finish();
     }
