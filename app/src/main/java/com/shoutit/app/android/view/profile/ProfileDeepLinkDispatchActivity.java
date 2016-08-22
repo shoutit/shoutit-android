@@ -7,12 +7,16 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
 import com.shoutit.app.android.api.model.BaseProfile;
+import com.shoutit.app.android.utils.AppseeHelper;
 
 public class ProfileDeepLinkDispatchActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        AppseeHelper.start(this);
+
         final Intent intent = getIntent();
         final Uri data = intent.getData();
         final String type = data.getQueryParameter("type");

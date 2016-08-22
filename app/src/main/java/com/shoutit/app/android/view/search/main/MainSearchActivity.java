@@ -22,6 +22,7 @@ import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.utils.AppseeHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.utils.RtlUtils;
@@ -75,6 +76,8 @@ public class MainSearchActivity extends BaseActivity implements SearchView.OnQue
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         ButterKnife.bind(this);
+
+        AppseeHelper.start(this);
 
         setUpToolbar();
 

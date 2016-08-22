@@ -287,6 +287,9 @@ dependencies {
     compile project(":appuniteGcm")
     compile project(":ScrollViewGallery")
     compile 'com.newrelic.agent.android:android-agent:5.+'
+    compile ('com.appsee:appsee-android:+') {
+        transitive = true;
+    }
 
 }
 

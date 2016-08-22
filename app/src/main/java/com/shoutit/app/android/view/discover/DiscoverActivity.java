@@ -16,6 +16,7 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.BaseDaggerActivityComponent;
+import com.shoutit.app.android.utils.AppseeHelper;
 import com.shoutit.app.android.utils.UpNavigationHelper;
 import com.shoutit.app.android.view.conversations.ConversationsActivity;
 import com.shoutit.app.android.view.signin.LoginActivity;
@@ -47,6 +48,8 @@ public class DiscoverActivity extends BaseDaggerActivity implements OnNewDiscove
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_discover);
         ButterKnife.bind(this);
+
+        AppseeHelper.start(this);
 
         setUpActionBar();
 

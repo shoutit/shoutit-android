@@ -18,6 +18,7 @@ import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
 import com.shoutit.app.android.dagger.BaseDaggerActivityComponent;
 import com.shoutit.app.android.utils.ApiMessagesHelper;
+import com.shoutit.app.android.utils.AppseeHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.view.about.AboutActivity;
 import com.uservoice.uservoicesdk.UserVoice;
@@ -53,6 +54,9 @@ public class ForgotPasswordActivity extends BaseDaggerActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.forgot_password_activity);
         ButterKnife.bind(this);
+
+        AppseeHelper.markViewAsSensitive(mForgotPasswordEmailEdittext);
+        AppseeHelper.markViewAsSensitive(mForgotPasswordEdittextLayout);
 
         toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
         toolbar.setLogo(R.drawable.appbar_logo_white);

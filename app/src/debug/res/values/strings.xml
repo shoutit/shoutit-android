@@ -5,4 +5,8 @@
 
     <string name="facebook_shout_list_ad_id" translatable="false">1151546964858487_1245960432083806</string>
     <string name="facebook_shout_detail_ad_id" translatable="false">1151546964858487_1249823215030861</string>
+
+
+    <!-- Appsee -->
+    <string name="app_see_api_key" translatable="false">ec274d5916bd4a72b3ae0eb776adec88</string>
 </resources>
