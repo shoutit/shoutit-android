@@ -293,7 +293,7 @@ public class ShoutsDao {
         }
 
         @Nonnull
-        public Observer<Shout> onShoutLikedObserver() {
+        public Observer<Shout> updateShoutLocally() {
             return RxMoreObservers.ignoreCompleted(updateShoutLocally);
         }
 

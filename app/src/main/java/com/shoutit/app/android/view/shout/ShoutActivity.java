@@ -325,6 +325,10 @@ public class ShoutActivity extends BaseActivity {
                     startActivity(PromotedActivity.newIntent(
                             ShoutActivity.this, promotionJson, shout.getTitle()));
                 });
+
+        presenter.getMarkAsObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
     }
 
     private void startCall(String phoneNumber) {

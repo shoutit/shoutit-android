@@ -410,6 +410,9 @@ public interface ApiService {
     Observable<CreateShoutResponse> createShoutOffer(@Body CreateOfferShoutWithImageRequest request);
 
     @PATCH("shouts/{id}")
+    Observable<Shout> markAs(@Path("id") String id, @Body MarkShoutAsRequest request);
+
+    @PATCH("shouts/{id}")
     Observable<CreateShoutResponse> editShout(@Path("id") String id, @Body EditShoutRequest request);
 
     @PATCH("shouts/{id}")

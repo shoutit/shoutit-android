@@ -203,6 +203,23 @@
                 />
 
         </LinearLayout>
+        
+        <TextView
+            android:id="@+id/shout_mark_as_tv"
+            android:layout_width="match_parent"
+            android:layout_below="@+id/shouts_price_tv"
+            android:layout_height="40dp"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            tools:text="@string/shout_mark_as_sold"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="14sp"
+            android:textColor="@color/colorPrimary"
+            android:textAllCaps="true"
+            android:background="@drawable/selector_stroke_button"/>
 
     </RelativeLayout>
 
