@@ -32,6 +32,8 @@ import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
 import com.shoutit.app.android.facebook.FacebookHelper;
+import com.shoutit.app.android.view.chats.LocalMessageBus;
+import com.shoutit.app.android.view.conversations.RefreshConversationBus;
 import com.squareup.picasso.Picasso;
 
 
@@ -125,4 +127,8 @@ public interface BaseActivityComponent {
     FacebookHelper facebookHelper();
 
     BookmarksDao bookmarkDao();
+
+    LocalMessageBus localMessageBus();
+
+    RefreshConversationBus refreshConversationBus();
 }
