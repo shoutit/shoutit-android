@@ -25,7 +25,6 @@ import com.shoutit.app.android.dagger.BaseDaggerActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.LoadMoreHelper;
-import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.utils.UpNavigationHelper;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
@@ -41,7 +40,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Observable;
 import rx.Scheduler;
-import rx.Subscription;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
@@ -66,8 +64,6 @@ public class NotificationsActivity extends BaseDaggerActivity {
     @UiScheduler
     Scheduler uiScheduler;
 
-    private Subscription subscription;
-
     public static Intent newIntent(Context context) {
         return new Intent(context, NotificationsActivity.class);
     }
@@ -90,7 +86,7 @@ public class NotificationsActivity extends BaseDaggerActivity {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
 
-        subscription = presenter.getAdapterItemsObservable()
+        presenter.getAdapterItemsObservable()
                 .compose(this.<List<BaseAdapterItem>>bindToLifecycle())
                 .subscribe(adapter);
 
@@ -132,14 +128,14 @@ public class NotificationsActivity extends BaseDaggerActivity {
                 });
 
         RxRecyclerView.scrollEvents(recyclerView)
-                .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
-                .filter(LoadMoreHelper.needLoadMore((MyLayoutManager) recyclerView.getLayoutManager(), adapter))
+                .filter(LoadMoreHelper.needLoadMore(layoutManager, adapter))
                 .map(new Func1<RecyclerViewScrollEvent, NotificationsResponse>() {
                     @Override
                     public NotificationsResponse call(RecyclerViewScrollEvent recyclerViewScrollEvent) {
                         return null;
                     }
                 })
+                .compose(this.<NotificationsResponse>bindToLifecycle())
                 .subscribe(presenter.loadMoreObserver());
     }
 
@@ -196,17 +192,14 @@ public class NotificationsActivity extends BaseDaggerActivity {
         return true;
     }
 
-
-    @Override
-    protected void onDestroy() {
-        if (subscription != null) {
-            subscription.unsubscribe();
-        }
-        super.onDestroy();
-    }
-
     @Override
     protected void injectComponent(BaseDaggerActivityComponent component) {
         component.inject(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        presenter.unsubscribe();
+        super.onDestroy();
     }
 }

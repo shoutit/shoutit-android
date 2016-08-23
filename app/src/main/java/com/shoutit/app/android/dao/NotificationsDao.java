@@ -3,6 +3,7 @@ package com.shoutit.app.android.dao;
 import android.support.annotation.NonNull;
 
 import com.appunite.rx.ResponseOrError;
+import com.appunite.rx.android.util.LogTransformer;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.operators.MoreOperators;
 import com.appunite.rx.operators.OperatorMergeNextToken;
@@ -10,6 +11,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.NotificationsResponse;
+
+import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Observer;
@@ -29,6 +32,7 @@ public class NotificationsDao {
     @NonNull
     private final PublishSubject<NotificationsResponse> loadMoreSubject = PublishSubject.create();
 
+    @Inject
     public NotificationsDao(final ApiService apiService, @NetworkScheduler final Scheduler networkScheduler) {
 
         final OperatorMergeNextToken<NotificationsResponse, NotificationsResponse> loadMoreOperator = OperatorMergeNextToken
@@ -66,10 +70,11 @@ public class NotificationsDao {
                     }
                 });
 
-        notificationsObservable = loadMoreSubject.startWith((NotificationsResponse) null)
+        notificationsObservable = loadMoreSubject
+                .startWith((NotificationsResponse) null)
                 .lift(loadMoreOperator)
-                .compose(ResponseOrError.<NotificationsResponse>toResponseOrErrorObservable())
-                .compose(MoreOperators.<ResponseOrError<NotificationsResponse>>refresh(refreshSubject));
+                .compose(MoreOperators.<NotificationsResponse>refresh(refreshSubject))
+                .compose(ResponseOrError.<NotificationsResponse>toResponseOrErrorObservable());
     }
 
     @NonNull
@@ -79,6 +84,10 @@ public class NotificationsDao {
 
     @NonNull
     public Observer<NotificationsResponse> getLoadMoreObserver() {
+        return loadMoreSubject;
+    }
+
+    public Observer<NotificationsResponse> updateDataLocallyObserver() {
         return loadMoreSubject;
     }
 

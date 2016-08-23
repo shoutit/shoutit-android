@@ -10,7 +10,6 @@ import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ListenersDaos;
 import com.shoutit.app.android.dao.ListeningsDao;
-import com.shoutit.app.android.dao.NotificationsDao;
 import com.shoutit.app.android.dao.PagesDao;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.dao.PromoteLabelsDao;
@@ -152,12 +151,5 @@ public class DaoModule {
     public DiscoversDao provideDiscoversDao(ApiService apiService,
                                             @NetworkScheduler Scheduler networkScheduler) {
         return new DiscoversDao(apiService, networkScheduler);
-    }
-
-    @Singleton
-    @Provides
-    public NotificationsDao notificationsDao(ApiService apiService,
-                                             @NetworkScheduler Scheduler networkScheduler) {
-        return new NotificationsDao(apiService, networkScheduler);
     }
 }
