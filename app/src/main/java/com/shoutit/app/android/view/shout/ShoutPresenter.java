@@ -281,9 +281,8 @@ public class ShoutPresenter {
                         .compose(likeTransformer(shoutsDao, shoutId, false))
         );
 
-        /** Mark As **/
+        /** Mark/Unmark Shout As Sold **/
         markAsObservable = markAsSubject
-                .throttleFirst(1, TimeUnit.SECONDS)
                 .switchMap(shout -> apiService.markAs(shout.getId(), new MarkShoutAsRequest(!shout.isSold()))
                         .subscribeOn(networkScheduler)
                         .observeOn(uiScheduler)
@@ -294,7 +293,8 @@ public class ShoutPresenter {
                                 .updateShoutLocally().onNext(response.data());
                     }
                     return response;
-                });
+                })
+                .compose(ObservableExtensions.behaviorRefCount());
 
         /** Errors **/
 
