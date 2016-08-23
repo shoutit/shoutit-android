@@ -40,6 +40,8 @@ public class ShoutAdapterItems {
         private final Observable<Boolean> mBookmarObservable;
         @NonNull
         private final Observer<Pair<String, Boolean>> mBookmarkObserver;
+        @NonNull
+        private final Observer<Shout> markAsObserver;
         private final boolean isShoutOwner;
         private final boolean isNormalUser;
         @NonNull
@@ -53,6 +55,7 @@ public class ShoutAdapterItems {
                                     @Nonnull Resources resources,
                                     @NonNull Observable<Boolean> bookmarObservable,
                                     @NonNull Observer<Pair<String, Boolean>> bookmarkObserver,
+                                    @NonNull Observer<Shout> markAsObserver,
                                     boolean isShoutOwner, boolean isNormalUser,
                                     @NonNull Observable<Boolean> enableBookmarkObservable) {
             this.addToCartObserver = addToCartObserver;
@@ -63,6 +66,7 @@ public class ShoutAdapterItems {
             mResources = resources;
             mBookmarObservable = bookmarObservable;
             mBookmarkObserver = bookmarkObserver;
+            this.markAsObserver = markAsObserver;
             this.isShoutOwner = isShoutOwner;
             this.isNormalUser = isNormalUser;
             mEnableBookmarkObservable = enableBookmarkObservable;
@@ -147,6 +151,10 @@ public class ShoutAdapterItems {
 
         public void onHeaderClick() {
             visitProfileObserver.onNext(shout.getProfile());
+        }
+
+        public void onMarkAsClick() {
+            markAsObserver.onNext(shout);
         }
     }
 

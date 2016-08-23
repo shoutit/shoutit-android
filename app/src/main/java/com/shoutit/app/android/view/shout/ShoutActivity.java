@@ -22,7 +22,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -86,8 +85,8 @@ public class ShoutActivity extends BaseActivity {
     Toolbar toolbar;
     @Bind(R.id.shout_recycler_view)
     RecyclerView recyclerView;
-    @Bind(R.id.shout_progress_bar)
-    ProgressBar progressBar;
+    @Bind(R.id.base_progress)
+    View progressView;
     @Bind(R.id.shout_bottom_toolbar)
     View bottomBar;
     @Bind(R.id.shout_bottom_bar_call_or_promote)
@@ -151,7 +150,7 @@ public class ShoutActivity extends BaseActivity {
 
         presenter.getProgressObservable()
                 .compose(this.<Boolean>bindToLifecycle())
-                .subscribe(RxView.visibility(progressBar));
+                .subscribe(RxView.visibility(progressView));
 
         presenter.getRelatedShoutSelectedObservable()
                 .compose(this.<String>bindToLifecycle())
@@ -325,6 +324,10 @@ public class ShoutActivity extends BaseActivity {
                     startActivity(PromotedActivity.newIntent(
                             ShoutActivity.this, promotionJson, shout.getTitle()));
                 });
+
+        presenter.getMarkAsObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
     }
 
     private void startCall(String phoneNumber) {

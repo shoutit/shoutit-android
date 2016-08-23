@@ -17,11 +17,13 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.MarkShoutAsRequest;
 import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.ConversationDetails;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
+import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.BaseShoutsDao;
 import com.shoutit.app.android.dao.BookmarksDao;
@@ -37,6 +39,7 @@ import com.shoutit.app.android.facebook.FacebookHelper;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -88,6 +91,7 @@ public class ShoutPresenter {
     private PublishSubject<Object> onVideoOrEditClickSubject = PublishSubject.create();
     private PublishSubject<Object> shareSubject = PublishSubject.create();
     private PublishSubject<Object> showDeleteDialogSubject = PublishSubject.create();
+    private PublishSubject<Shout> markAsSubject = PublishSubject.create();
 
     @Nonnull
     private final Scheduler uiScheduler;
@@ -100,6 +104,7 @@ public class ShoutPresenter {
     private final PublishSubject<String> sendReportObserver = PublishSubject.create();
     private final PublishSubject<Object> refreshShoutsSubject = PublishSubject.create();
     protected final Observable<Shout> successShoutResponse;
+    private final Observable<ResponseOrError<Shout>> markAsObservable;
 
     @Inject
     public ShoutPresenter(@Nonnull final ShoutsDao shoutsDao,
@@ -179,7 +184,7 @@ public class ShoutPresenter {
                     return new ShoutAdapterItems.MainShoutAdapterItem(addToCartSubject, onCategoryClickedSubject,
                             visitProfileSubject, likeClickedSubject, shout, context.getResources(),
                             bookmarksDao.getBookmarkForShout(shoutId, shout.isBookmarked()),
-                            shoutItemBookmarkHelper.getObserver(), isShoutOwner, isNormalUser,
+                            shoutItemBookmarkHelper.getObserver(), markAsSubject, isShoutOwner, isNormalUser,
                             shoutItemBookmarkHelper.getEnableObservable());
                 });
 
@@ -276,6 +281,21 @@ public class ShoutPresenter {
                         .compose(likeTransformer(shoutsDao, shoutId, false))
         );
 
+        /** Mark/Unmark Shout As Sold **/
+        markAsObservable = markAsSubject
+                .switchMap(shout -> apiService.markAs(shout.getId(), new MarkShoutAsRequest(!shout.isSold()))
+                        .subscribeOn(networkScheduler)
+                        .observeOn(uiScheduler)
+                        .compose(ResponseOrError.<Shout>toResponseOrErrorObservable()))
+                .map(response -> {
+                    if (response.isData()) {
+                        shoutsDao.getShoutDao(shoutId)
+                                .updateShoutLocally().onNext(response.data());
+                    }
+                    return response;
+                })
+                .compose(ObservableExtensions.behaviorRefCount());
+
         /** Errors **/
 
         shoutNotFoundErrorObservable = shoutResponse.compose(ResponseOrError.onlyError())
@@ -291,6 +311,7 @@ public class ShoutPresenter {
                 ResponseOrError.transform(shoutResponse),
                 ResponseOrError.transform(relatedShoutsObservable),
                 ResponseOrError.transform(likeShoutResponseObservable),
+                ResponseOrError.transform(markAsObservable),
                 ResponseOrError.transform(unlikeShoutResponseObservable)))
                 .filter(Functions1.isNotNull())
                 .filter(this::ignoreNotFoundError)
@@ -300,6 +321,8 @@ public class ShoutPresenter {
         progressObservable = Observable.merge(
                 errorObservable.map(Functions1.returnFalse()),
                 shoutNotFoundErrorObservable.map(Functions1.returnFalse()),
+                markAsSubject.map(Functions1.returnTrue()),
+                markAsObservable.map(Functions1.returnFalse()),
                 allAdapterItemsObservable.map(Functions1.returnFalse()))
                 .startWith(true)
                 .observeOn(uiScheduler);
@@ -405,6 +428,7 @@ public class ShoutPresenter {
 
         shareObservable = shareSubject
                 .withLatestFrom(successShoutResponse, (o, shout) -> shout.getWebUrl());
+
     }
 
     private Boolean ignoreNotFoundError(Throwable throwable) {
@@ -421,7 +445,7 @@ public class ShoutPresenter {
         return responseOrErrorObservable -> responseOrErrorObservable
                 .compose(ResponseOrError.onlySuccess())
                 .withLatestFrom(successShoutResponse, BothParams::of)
-                .doOnNext(params -> shoutsDao.getShoutDao(shoutId).onShoutLikedObserver().onNext(params.param2().likedShout(like)))
+                .doOnNext(params -> shoutsDao.getShoutDao(shoutId).updateShoutLocally().onNext(params.param2().likedShout(like)))
                 .map(params -> params.param1().getSuccess());
     }
 
@@ -586,6 +610,10 @@ public class ShoutPresenter {
     @NonNull
     public Observable<String> getBookmarkSuccesMessageObservable() {
         return mBookmarkHelper.getBookmarkSuccessMessage();
+    }
+
+    public Observable<ResponseOrError<Shout>> getMarkAsObservable() {
+        return markAsObservable;
     }
 
     public Observable<Throwable> getShoutNotFoundErrorObservable() {

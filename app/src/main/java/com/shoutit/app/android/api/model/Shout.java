@@ -43,13 +43,14 @@ public class Shout {
     @Nullable
     private final Promotion promotion;
     private final boolean isBookmarked;
+    private final boolean isSold;
 
     public Shout(@Nonnull String id, String apiUrl, String webUrl, String type,
                  UserLocation location, String title, String text, Long price, float number,
                  String currency, String thumbnail, String videoUrl, BaseProfile profile,
                  Category category, List<Filter> filters, long datePublished, final boolean isLiked, List<String> images,
                  List<Video> videos, int availableCount, List<ConversationDetails> conversations, boolean isMobileSet,
-                 String mobileHint, String mobile, @Nullable Promotion promotion, boolean isBookmarked) {
+                 String mobileHint, String mobile, @Nullable Promotion promotion, boolean isBookmarked, boolean isSold) {
         this.id = id;
         this.apiUrl = apiUrl;
         this.webUrl = webUrl;
@@ -76,13 +77,14 @@ public class Shout {
         this.mobile = mobile;
         this.promotion = promotion;
         this.isBookmarked = isBookmarked;
+        this.isSold = isSold;
     }
 
     public Shout likedShout(final boolean isShoutLiked){
         return new Shout(id, apiUrl, webUrl, type, location, title, text, price,
                 number, currency, thumbnail, videoUrl, profile, category, filters,
                 datePublished, isShoutLiked, images, videos, availableCount, conversations,
-                isMobileSet, mobileHint, mobile, promotion, isBookmarked);
+                isMobileSet, mobileHint, mobile, promotion, isBookmarked, isSold);
     }
 
     public boolean isBookmarked() {
@@ -111,6 +113,10 @@ public class Shout {
         return TYPE_OFFER.equalsIgnoreCase(type) ?
                 R.string.shout_type_offer :
                 R.string.shout_type_request;
+    }
+
+    public boolean isOffer() {
+        return TYPE_OFFER.equalsIgnoreCase(type);
     }
 
     public UserLocation getLocation() {
@@ -173,6 +179,10 @@ public class Shout {
         return isMobileSet;
     }
 
+    public boolean isSold() {
+        return isSold;
+    }
+
     public List<ConversationDetails> getConversations() {
         return conversations;
     }
@@ -219,6 +229,7 @@ public class Shout {
                 Objects.equal(conversations, shout.conversations) &&
                 Objects.equal(mobileHint, shout.mobileHint) &&
                 Objects.equal(mobile, shout.mobile) &&
+                Objects.equal(isSold, shout.isSold) &&
                 Objects.equal(promotion, shout.promotion);
     }
 
@@ -226,6 +237,7 @@ public class Shout {
     public int hashCode() {
         return Objects.hashCode(id, apiUrl, webUrl, type, location, title, text, price, number,
                 currency, thumbnail, videoUrl, profile, category, datePublished, isLiked, images,
-                videos, filters, availableCount, isMobileSet, conversations, mobileHint, mobile, promotion);
+                videos, filters, availableCount, isMobileSet, conversations, mobileHint, mobile,
+                promotion, isSold);
     }
 }

@@ -127,6 +127,8 @@ public class ShoutAdapter extends BaseAdapter {
         ImageView shoutLikeImageView;
         @Bind(R.id.shout_bookmark)
         CheckBox bookmarkCheckbox;
+        @Bind(R.id.shout_mark_as_tv)
+        TextView markAsTv;
 
         private final Target flagTarget;
         private ShoutAdapterItems.MainShoutAdapterItem item;
@@ -160,6 +162,16 @@ public class ShoutAdapter extends BaseAdapter {
             int currentItem = shoutViewPager.getCurrentItem();
             shoutViewPager.setAdapter(imagesPagerAdapter);
             pageIndicator.setViewPager(shoutViewPager);
+
+            markAsTv.setVisibility(item.isShoutOwner() ? View.VISIBLE : View.GONE);
+            if (shout.isOffer()) {
+                markAsTv.setText(shout.isSold() ?
+                        R.string.shout_unmark_as_sold : R.string.shout_mark_as_sold);
+            } else {
+                markAsTv.setText(shout.isSold() ?
+                        R.string.shout_unmark_as_fulfilled : R.string.shout_mark_as_fulfilled);
+            }
+            markAsTv.setAlpha(shout.isSold() ? 0.7f : 1f);
 
             picasso.load(user.getImage())
                     .resizeDimen(R.dimen.shout_avatar_size, R.dimen.shout_avatar_size)
@@ -286,6 +298,11 @@ public class ShoutAdapter extends BaseAdapter {
         @OnClick(R.id.shout_detail_category_row)
         public void onCategoryClick() {
             item.onCategoryClick(item.getShout().getCategory().getSlug());
+        }
+
+        @OnClick(R.id.shout_mark_as_tv)
+        public void onMarkAsClick() {
+            item.onMarkAsClick();
         }
 
         @OnClick(R.id.shout_user_header)
