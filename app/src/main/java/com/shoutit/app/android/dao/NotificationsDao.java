@@ -71,7 +71,6 @@ public class NotificationsDao {
                 });
 
         notificationsObservable = loadMoreSubject
-                .compose(LogTransformer.transformer("lol", "loadMoreS"))
                 .startWith((NotificationsResponse) null)
                 .lift(loadMoreOperator)
                 .compose(MoreOperators.<NotificationsResponse>refresh(refreshSubject))
