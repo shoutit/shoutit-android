@@ -573,7 +573,7 @@ public class CameraFragment extends Fragment {
         PictureTransaction.Builder builder = new PictureTransaction.Builder();
 
         if (output != null) {
-            builder.toUri(getActivity(), output, true, false);
+            builder.toUri(getActivity(), output, true, true);
         }
 
         ctlr.setQuality(1);
