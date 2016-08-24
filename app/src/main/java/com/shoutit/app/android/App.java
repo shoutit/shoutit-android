@@ -1,17 +1,11 @@
 package com.shoutit.app.android;
 
-import android.animation.AnimatorListenerAdapter;
 import android.app.Application;
 import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
 
 import com.appsee.Appsee;
-import com.appsee.AppseeListener;
-import com.appsee.AppseeScreenDetectedInfo;
-import com.appsee.AppseeSessionEndedInfo;
-import com.appsee.AppseeSessionEndingInfo;
 import com.appsee.AppseeSessionStartedInfo;
-import com.appsee.AppseeSessionStartingInfo;
 import com.appunite.appunitegcm.AppuniteGcm;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.functions.Functions1;
@@ -36,7 +30,6 @@ import com.shoutit.app.android.facebook.FacebookHelper;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.twilio.Twilio;
-import com.shoutit.app.android.utils.AppseeHelper;
 import com.shoutit.app.android.utils.AppseeListenerAdapter;
 import com.shoutit.app.android.utils.BuildTypeUtils;
 import com.shoutit.app.android.utils.LogHelper;
@@ -56,8 +49,6 @@ import javax.inject.Provider;
 import io.fabric.sdk.android.Fabric;
 import rx.Observable;
 import rx.Scheduler;
-import rx.functions.Action1;
-import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.plugins.RxJavaErrorHandler;
 import rx.plugins.RxJavaPlugins;
