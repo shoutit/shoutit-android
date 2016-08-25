@@ -65,7 +65,7 @@ public class NotificationsDao {
                                 return Observable.just(previousResponse).zipWith(apiRequest, new MergeNotificationsResponses());
                             }
                         } else {
-                            return Observable.never();
+                            return Observable.just(previousResponse);
                         }
                     }
                 });
