@@ -330,10 +330,8 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
     public void onMenuItemSelected(@Nonnull String fragmentTag) {
         if (!mUserPreferences.isNormalUser()) {
             if (MenuHandler.FRAGMENT_CHATS.equals(fragmentTag) || MenuHandler.FRAGMENT_CREDITS.equals(fragmentTag)) {
-                {
-                    startActivity(LoginActivity.newIntent(MainActivity.this));
-                    return;
-                }
+                startActivity(LoginActivity.newIntent(MainActivity.this));
+                return;
             }
         }
 

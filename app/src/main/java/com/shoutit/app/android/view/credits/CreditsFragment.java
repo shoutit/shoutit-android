@@ -29,6 +29,7 @@ import com.shoutit.app.android.view.main.MenuHandler;
 import com.shoutit.app.android.view.profile.ProfileIntentHelper;
 import com.shoutit.app.android.view.profile.user.UserProfileActivity;
 import com.shoutit.app.android.view.promote.PromoteShoutInfoActivity;
+import com.shoutit.app.android.view.signin.LoginActivity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -61,6 +62,12 @@ public class CreditsFragment extends BaseDaggerFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        if (!mUserPreferences.isNormalUser()) {
+            startActivity(LoginActivity.newIntent(getActivity()));
+            getActivity().finish();
+            return;
+        }
 
         final BaseProfile profile = mUserPreferences.getUserOrPage();
         final int credits = Preconditions.checkNotNull(profile.getStats(), "null stats object for: " + profile.getUsername()).getCredits();
