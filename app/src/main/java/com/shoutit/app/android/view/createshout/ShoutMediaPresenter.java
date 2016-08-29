@@ -195,13 +195,15 @@ public class ShoutMediaPresenter {
         }
     }
 
-    private final BiMap<Integer, Item> mediaItems = HashBiMap.create(ImmutableMap.of(
+    private final Map<Integer, Item> initMediaItems = ImmutableMap.of(
             0, new AddImageItem(),
             1, new BlankItem(),
             2, new BlankItem(),
             3, new BlankItem(),
             4, new BlankItem()
-    ));
+    );
+
+    private BiMap<Integer, Item> mediaItems = HashBiMap.create(initMediaItems);
 
     private MediaListener mMediaListener;
 
@@ -244,7 +246,7 @@ public class ShoutMediaPresenter {
     }
 
     public void setUp(List<String> images, List<Video> videos, boolean isOffer) {
-        clear();
+        clearMediaItems();
 
         mIsOffer = isOffer;
         for (String image : images) {
@@ -258,12 +260,8 @@ public class ShoutMediaPresenter {
         mMediaListener.setImages(mediaItems);
     }
 
-    private void clear() {
-        mediaItems.forcePut(0, new AddImageItem());
-        mediaItems.forcePut(1, new BlankItem());
-        mediaItems.forcePut(2, new BlankItem());
-        mediaItems.forcePut(3, new BlankItem());
-        mediaItems.forcePut(4, new BlankItem());
+    private void clearMediaItems() {
+        mediaItems = HashBiMap.create(initMediaItems);
     }
 
     public void addMediaItem(@NonNull String media, boolean isVideo) {
