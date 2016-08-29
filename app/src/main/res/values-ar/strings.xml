@@ -45,7 +45,7 @@
 <string name="home_menu_chat">"المحادثات"</string>
 <string name="home_menu_search">"البحث"</string>
 <string name="home_see_all">"اظهار الكل"</string>
-<string name="home_shouts_header_logged">"مستجدات"</string>
+<string name="my_feed_header">"مستجدات"</string>
 <string name="home_shouts_header_guest">"الإعلانات في %1$s"</string>
 <string name="home_discover_header">"إكتشف %1$s"</string>
 

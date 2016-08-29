@@ -19,7 +19,6 @@ import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.adapters.FBAdsAdapter;
 import com.shoutit.app.android.dagger.ForActivity;
-import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 import com.shoutit.app.android.view.shouts.ShoutGridViewHolder;
 import com.shoutit.app.android.view.shouts.ShoutLinearViewHolder;
@@ -150,7 +149,7 @@ public class HomeAdapter extends FBAdsAdapter {
             recycle();
 
             headerTextView.setText(item.isUserLoggedIn() ?
-                    context.getString(R.string.home_shouts_header_logged) :
+                    context.getString(R.string.my_feed_header) :
                     context.getString(R.string.home_shouts_header_guest, item.getUserCity()));
 
             layoutManagerSwitchView.setImageDrawable(context.getResources().getDrawable(

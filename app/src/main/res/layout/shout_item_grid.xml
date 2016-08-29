@@ -57,15 +57,14 @@
 
         </FrameLayout>
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="42dp"
-            android:paddingBottom="5dp"
-            android:paddingEnd="9dp"
-            android:paddingLeft="8dp"
-            android:paddingRight="9dp"
-            android:paddingStart="8dp"
-            android:paddingTop="5dp">
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/shout_grid_title_tv"
@@ -75,7 +74,7 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:textColor="#8a000000"
-                android:textSize="12sp"
+                android:textSize="14sp"
                 tools:text="Merino Wool Can Go till he dafdsfdsfdsfdsfdsff"/>
 
             <TextView
@@ -93,7 +92,8 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:textColor="#61000000"
-                android:textSize="12sp"
+                android:textSize="14sp"
+                android:layout_marginTop="2dp"
                 tools:text="John Smith dfdsfsadfadsfdsafdsafsdafdasfadsfdas"/>
 
             <TextView
@@ -105,11 +105,12 @@
                 android:layout_below="@+id/shout_grid_title_tv"
                 android:layout_centerVertical="true"
                 android:maxLines="1"
-                android:textColor="#4caf50"
-                android:textSize="12sp"
+                android:textSize="14sp"
+                android:layout_marginTop="4dp"
+                android:textColor="@android:color/black"
                 tools:text="$44ewe USD"/>
 
-        </RelativeLayout>
+        </LinearLayout>
 
     </LinearLayout>
 
