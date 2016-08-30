@@ -47,6 +47,7 @@ import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
 import com.shoutit.app.android.view.discover.DiscoverActivity;
 import com.shoutit.app.android.view.discover.OnNewDiscoverSelectedListener;
 import com.shoutit.app.android.view.home.HomeFragment;
+import com.shoutit.app.android.view.home.HomePagerFragment;
 import com.shoutit.app.android.view.intro.IntroActivity;
 import com.shoutit.app.android.view.postlogininterest.PostLoginInterestActivity;
 import com.shoutit.app.android.view.search.main.MainSearchActivity;
@@ -134,7 +135,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
             getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.activity_main_fragment_container, HomeFragment.newInstance())
+                    .replace(R.id.activity_main_fragment_container, HomePagerFragment.newInstance())
                     .commit();
             menuHandler.initMenu(drawerLayout);
             registerToGcm();

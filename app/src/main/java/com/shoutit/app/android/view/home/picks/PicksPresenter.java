@@ -32,6 +32,7 @@ import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.model.LocationPointer;
 import com.shoutit.app.android.utils.MoreFunctions1;
+import com.shoutit.app.android.utils.PromotionHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -100,6 +101,7 @@ public class PicksPresenter {
         /** Discovers **/
         final Observable<ResponseOrError<DiscoverResponse>> discoverRequestObservable = locationObservable
                 .switchMap(discoversDao::getDiscoverObservable)
+                .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<DiscoverResponse>>behaviorRefCount());
 
         final Observable<Optional<String>> mainDiscoverIdObservable = discoverRequestObservable
@@ -123,7 +125,9 @@ public class PicksPresenter {
                         return Observable.just(ResponseOrError.<DiscoverItemDetailsResponse>fromError(new Throwable()));
                     }
                 })
+                .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<DiscoverItemDetailsResponse>>behaviorRefCount());
+
 
         final Observable<List<DiscoverChild>> childDiscoversObservable =
                 discoverItemDetailsObservable
@@ -178,7 +182,7 @@ public class PicksPresenter {
 
                         for (Shout shout : shoutsResponse.getShouts()) {
                             builder.add(new BaseShoutAdapterItem(shout, resources,
-                                    shoutSelectedSubject, promotionInfoOrNull(shout)));
+                                    shoutSelectedSubject, PromotionHelper.promotionsInfoOrNull(shout)));
                         }
 
                         return builder.build();
@@ -201,7 +205,7 @@ public class PicksPresenter {
 
                             if (!discoverAdapterItems.isEmpty()) {
                                 builder.add(new PicksAdapterItems.DiscoverHeaderAdapterItem(locationPointer.getCity(), viewAllDiscoversSubject));
-                                builder.addAll(discoverAdapterItems);
+                                builder.add(new PicksAdapterItems.DiscoverContainerAdapterItem(discoverAdapterItems, locationPointer));
                             }
 
                             if (!chatAdapterItems.isEmpty()) {
@@ -243,24 +247,7 @@ public class PicksPresenter {
                 null, false, false, null, null, false, null);
     }
 
-    @Nullable
-    public static BaseShoutAdapterItem.PromotionInfo promotionInfoOrNull(@NonNull Shout shout) {
-        final boolean hasPromotion = hasPromotion(shout);
-        if (hasPromotion) {
-            return promotionInfo(shout.getPromotion());
-        } else {
-            return null;
-        }
-    }
 
-    private static boolean hasPromotion(Shout shout) {
-        return shout.getPromotion() != null && !shout.getPromotion().isExpired();
-    }
-
-    private static BaseShoutAdapterItem.PromotionInfo promotionInfo(Promotion promotion) {
-        final Label label = promotion.getLabel();
-        return new BaseShoutAdapterItem.PromotionInfo(Color.parseColor(label.getBgColor()), Color.parseColor(label.getColor()), label.getName());
-    }
 
     public Observable<List<BaseAdapterItem>> getAllAdapterItemsObservable() {
         return allAdapterItemsObservable;

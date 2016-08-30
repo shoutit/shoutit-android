@@ -76,6 +76,9 @@
     <string name="home_see_all">See All</string>
     <string name="home_shouts_header_guest">SHOUTS IN %1$s</string>
     <string name="home_discover_header">Discover %1$s</string>
+    <string name="home_tab_my_feed">My Feed</string>
+    <string name="home_tab_picks">Shoutit Picks</string>
+    <string name="home_tab_discover">Discover</string>
 
     <!-- MyFeed -->
     <string name="my_feed_header">My Feed</string>

@@ -30,6 +30,7 @@ import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
 import com.shoutit.app.android.view.credits.CreditsFragment;
 import com.shoutit.app.android.view.discover.DiscoverFragment;
 import com.shoutit.app.android.view.home.HomeFragment;
+import com.shoutit.app.android.view.home.HomePagerFragment;
 import com.shoutit.app.android.view.invitefriends.InviteFacebookFriendsFragment;
 import com.shoutit.app.android.view.location.LocationActivity;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
@@ -420,7 +421,7 @@ public class MenuHandler {
     public static Fragment getFragmentForTag(String fragmentTag) {
         switch (fragmentTag) {
             case FRAGMENT_HOME:
-                return HomeFragment.newInstance();
+                return HomePagerFragment.newInstance();
             case FRAGMENT_DISCOVER:
                 return DiscoverFragment.newInstance();
             case FRAGMENT_BROWSE:

@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.shoutit.app.android.adapteritems.BaseShoutAdapterItem;
 import com.shoutit.app.android.api.model.Label;
 import com.shoutit.app.android.api.model.Promotion;
 import com.shoutit.app.android.api.model.Shout;
@@ -28,5 +29,24 @@ public class PromotionHelper {
         } else {
             return null;
         }
+    }
+
+    @Nullable
+    public static BaseShoutAdapterItem.PromotionInfo promotionsInfoOrNull(@NonNull Shout shout) {
+        final boolean hasPromotion = hasPromotions(shout);
+        if (hasPromotion) {
+            return promotionInfos(shout.getPromotion());
+        } else {
+            return null;
+        }
+    }
+
+    private static boolean hasPromotions(Shout shout) {
+        return shout.getPromotion() != null && !shout.getPromotion().isExpired();
+    }
+
+    private static BaseShoutAdapterItem.PromotionInfo promotionInfos(Promotion promotion) {
+        final Label label = promotion.getLabel();
+        return new BaseShoutAdapterItem.PromotionInfo(Color.parseColor(label.getBgColor()), Color.parseColor(label.getColor()), label.getName());
     }
 }

@@ -25,6 +25,7 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -45,6 +46,7 @@ public class PicksAdapter extends BaseAdapter {
     private final PicksDiscoversAdapter homeDiscoversAdapter;
     private final Picasso picasso;
 
+    @Inject
     public PicksAdapter(@ForActivity @Nonnull Context context,
                         Picasso picasso) {
         super(context);

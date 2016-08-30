@@ -3,4 +3,4 @@
     android:id="@+id/picks_discover_recycler_view"
     android:overScrollMode="never"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/home_discover_card_height" />
+    android:layout_height="@dimen/picks_discover_item_height" />
