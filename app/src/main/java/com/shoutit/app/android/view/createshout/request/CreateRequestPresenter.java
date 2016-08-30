@@ -132,7 +132,7 @@ public class CreateRequestPresenter {
 
     public void confirmClicked(boolean publishToFacebook) {
         final RequestData requestData = mListener.getRequestData();
-        if (!checkValidity(requestData)) return;
+        if (!areDataValid(requestData)) return;
 
         mListener.showProgress();
 
@@ -177,39 +177,40 @@ public class CreateRequestPresenter {
                 facebookHelper.askForPermissionIfNeeded(activity,
                         new String[]{FacebookHelper.PERMISSION_PUBLISH_ACTIONS}, callbackManager, true)
                         .observeOn(mUiScheduler)
-                        .subscribe(new Action1<ResponseOrError<Boolean>>() {
-                            @Override
-                            public void call(ResponseOrError<Boolean> responseOrError) {
-                                mListener.hideProgress();
+                        .subscribe(responseOrError -> {
+                            mListener.hideProgress();
 
-                                if (responseOrError.isData()) {
-                                    final Boolean isPermissionGranted = responseOrError.data();
-                                    if (!isPermissionGranted) {
-                                        mListener.uncheckFacebookCheckbox();
-                                        mListener.showPermissionNotGranted();
-                                    }
-                                } else {
+                            if (responseOrError.isData()) {
+                                final Boolean isPermissionGranted = responseOrError.data();
+                                if (!isPermissionGranted) {
                                     mListener.uncheckFacebookCheckbox();
-                                    mListener.showApiError(responseOrError.error());
+                                    mListener.showPermissionNotGranted();
                                 }
-                            }
-                        }, new Action1<Throwable>() {
-                            @Override
-                            public void call(Throwable throwable) {
-                                mListener.hideProgress();
+                            } else {
                                 mListener.uncheckFacebookCheckbox();
-                                mListener.showApiError(throwable);
+                                mListener.showApiError(responseOrError.error());
                             }
+                        }, throwable -> {
+                            mListener.hideProgress();
+                            mListener.uncheckFacebookCheckbox();
+                            mListener.showApiError(throwable);
                         })
         );
 
     }
 
-    private boolean checkValidity(RequestData requestData) {
+    private boolean areDataValid(RequestData requestData) {
         final boolean erroredTitle = requestData.mDescription.length() < 6;
         mListener.showTitleTooShortError(erroredTitle);
 
-        return !erroredTitle;
+        boolean missingCurrency = false;
+        if (!Strings.isNullOrEmpty(requestData.mBudget) &&
+                Strings.isNullOrEmpty(requestData.mCurrencyId)) {
+            missingCurrency = true;
+            mListener.showCurrenciesErrorPrompt();
+        }
+
+        return !erroredTitle && !missingCurrency;
     }
 
     public void updateLocation(@NonNull UserLocation userLocation) {
@@ -246,6 +247,8 @@ public class CreateRequestPresenter {
         void setCurrencies(@NonNull List<PriceUtils.SpinnerCurrency> list);
 
         void showCurrenciesError();
+
+        void showCurrenciesErrorPrompt();
 
         void setCurrenciesEnabled(boolean enabled);
 

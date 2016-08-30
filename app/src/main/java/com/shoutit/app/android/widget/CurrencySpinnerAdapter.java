@@ -20,15 +20,17 @@ public class CurrencySpinnerAdapter extends BaseAdapter {
 
     private final LayoutInflater mLayoutInflater;
     private final int mLayout;
+    private final String mStartingText;
     private final int mDropdownLayout;
     private List<PriceUtils.SpinnerCurrency> list;
 
-    public CurrencySpinnerAdapter(@StringRes int startingText,
+    public CurrencySpinnerAdapter(@StringRes int startingTextId,
                                   Context context,
                                   @LayoutRes int layout,
                                   @LayoutRes int dropdownLayout) {
+        mStartingText = context.getString(startingTextId);
         mDropdownLayout = dropdownLayout;
-        list = ImmutableList.of(new PriceUtils.SpinnerCurrency(context.getString(startingText), context.getString(startingText)));
+        list = ImmutableList.of(new PriceUtils.SpinnerCurrency(mStartingText, mStartingText));
         mLayout = layout;
         mLayoutInflater = LayoutInflater.from(context);
     }
@@ -67,5 +69,9 @@ public class CurrencySpinnerAdapter extends BaseAdapter {
     public void setData(@NonNull List<PriceUtils.SpinnerCurrency> list) {
         this.list = list;
         notifyDataSetChanged();
+    }
+
+    public String getStartingText() {
+        return mStartingText;
     }
 }
