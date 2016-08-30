@@ -110,7 +110,7 @@ public class CreateRequestPresenterTest {
 
     @Test
     public void testWhenButtonClicked_DataSentToApi() {
-        when(mListener.getRequestData()).thenReturn(new CreateRequestPresenter.RequestData("123456", "5", ""));
+        when(mListener.getRequestData()).thenReturn(new CreateRequestPresenter.RequestData("123456", "5", "z"));
         when(mApiService.createShoutRequest(any(CreateRequestShoutWithPriceRequest.class))).thenReturn(Observable.just(emptyCreateShoutResponse()));
         mCreateRequestPresenter.registerListener(mListener);
 
@@ -121,7 +121,7 @@ public class CreateRequestPresenterTest {
 
     @Test
     public void testWhenButtonClickedAndRequestSuccessful_progressShownAndHidden() {
-        when(mListener.getRequestData()).thenReturn(new CreateRequestPresenter.RequestData("123456", "5", ""));
+        when(mListener.getRequestData()).thenReturn(new CreateRequestPresenter.RequestData("123456", "5", "z"));
         when(mApiService.createShoutRequest(any(CreateRequestShoutWithPriceRequest.class))).thenReturn(Observable.just(emptyCreateShoutResponse()));
         mCreateRequestPresenter.registerListener(mListener);
 
@@ -133,7 +133,7 @@ public class CreateRequestPresenterTest {
 
     @Test
     public void testWhenButtonClickedAndRequestFailed_progressShownAndHiddenAndErrorShown() {
-        when(mListener.getRequestData()).thenReturn(new CreateRequestPresenter.RequestData("123456", "5", ""));
+        when(mListener.getRequestData()).thenReturn(new CreateRequestPresenter.RequestData("123456", "5", "z"));
 
         when(mApiService.createShoutRequest(any(CreateRequestShoutWithPriceRequest.class))).thenReturn(Observable.<CreateShoutResponse>error(new RuntimeException("")));
         mCreateRequestPresenter.registerListener(mListener);
