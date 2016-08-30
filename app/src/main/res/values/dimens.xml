@@ -7,16 +7,15 @@
     <dimen name="default_button_height">40dp</dimen>
     <dimen name="toolbar_elevation">4dp</dimen>
     <dimen name="notification_large_icon">64dp</dimen>
-    <dimen name="item_card_height">200dp</dimen>
+    <dimen name="item_card_height">220dp</dimen>
 
     <!-- Home -->
     <dimen name="home_discover_image_height">90dp</dimen>
     <dimen name="home_feed_image_height">156dp</dimen>
     <dimen name="home_discover_card_width">120dp</dimen>
-    <dimen name="home_discover_card_height">126dp</dimen>
+    <dimen name="picks_discover_item_height">126dp</dimen>
     <dimen name="home_grid_side_spacing">8dp</dimen>
     <dimen name="home_linear_side_spacing">8dp</dimen>
-    <dimen name="home_discover_item_spacing">4dp</dimen>
     <dimen name="home_feed_image_size_linear">100dp</dimen>
     <dimen name="home_country_icon">30dp</dimen>
 

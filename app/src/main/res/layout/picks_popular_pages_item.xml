@@ -39,9 +39,11 @@
         android:layout_height="wrap_content"
         android:paddingLeft="12dp"
         android:paddingRight="12dp"
+        android:baselineAligned="false"
         android:orientation="horizontal">
 
         <include
+            android:id="@+id/popular_pages_first_page"
             layout="@layout/dark_card_item"
             android:layout_width="0dp"
             android:layout_height="@dimen/item_card_height"
@@ -50,6 +52,7 @@
             android:layout_weight="1" />
 
         <include
+            android:id="@+id/popular_pages_second_page"
             layout="@layout/dark_card_item"
             android:layout_width="0dp"
             android:layout_height="@dimen/item_card_height"

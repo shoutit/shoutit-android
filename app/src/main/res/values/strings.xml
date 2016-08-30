@@ -75,10 +75,19 @@
     <string name="home_menu_search">Search</string>
     <string name="home_see_all">See All</string>
     <string name="home_shouts_header_guest">SHOUTS IN %1$s</string>
-    <string name="home_discover_header">DISCOVER %1$s</string>
+    <string name="home_discover_header">Discover %1$s</string>
 
     <!-- MyFeed -->
     <string name="my_feed_header">My Feed</string>
+
+    <!-- Picks -->
+    <string name="picks_public_chats">Public Chats</string>
+    <string name="picks_view_all_chats">View All Chats</string>
+    <string name="picks_trending_shouts">Trending Shouts</string>
+    <string name="picks_view_all_shouts">View All Shouts</string>
+    <string name="picks_popular_pages">Popular Pages</string>
+    <string name="picks_view_all_pages">View All Pages</string>
+    <string name="picks_start_searching">Start searching new favourites</string>
 
     <!-- Login -->
     <string name="login_email_hint">Email or Username</string>
@@ -786,12 +795,5 @@
     <string name="app_rate_second_dialog_rate">How about a rating on the Play store?</string>
     <string name="app_rate_second_dialog_feedback">Would you mind giving us some feedback?</string>
     <string name="my_feed_empty_text">It looks like there are no Shouts in yours area. Be the first one to offer or request something</string>
-
-    <!-- Picks -->
-    <string name="picks_view_all_chats">View All Chats</string>
-    <string name="picks_public_chats">Public Chats</string>
-    <string name="picks_popular_pages">Popular Pages</string>
-    <string name="picks_view_all_pages">View All Pages</string>
-
 
 </resources>

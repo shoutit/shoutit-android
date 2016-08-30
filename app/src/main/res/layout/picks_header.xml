@@ -9,6 +9,7 @@
     android:background="@color/default_bg_color">
 
     <TextView
+        android:id="@+id/picks_header_title_tv"
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="wrap_content"
@@ -20,6 +21,7 @@
         android:textSize="20sp" />
 
     <TextView
+        android:id="@+id/picks_header_view_all"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/picks_view_all_chats"

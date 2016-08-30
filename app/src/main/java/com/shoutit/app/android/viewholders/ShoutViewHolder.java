@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.shouts;
+package com.shoutit.app.android.viewholders;
 
 import android.graphics.Color;
 import android.support.annotation.LayoutRes;
@@ -11,16 +11,17 @@ import android.widget.TextView;
 import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.google.common.base.Strings;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.adapteritems.BaseShoutAdapterItem;
 import com.shoutit.app.android.api.model.Shout;
+import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import rx.subscriptions.CompositeSubscription;
 
-public class ShoutGridViewHolder extends ViewHolderManager.BaseViewHolder<ShoutAdapterItem> implements View.OnClickListener {
+public class ShoutViewHolder extends ViewHolderManager.BaseViewHolder<BaseShoutAdapterItem> implements View.OnClickListener {
 
     @Bind(R.id.shout_grid_image_view)
     ImageView cardImageView;
@@ -36,14 +37,14 @@ public class ShoutGridViewHolder extends ViewHolderManager.BaseViewHolder<ShoutA
     View mShoutContainer;
 
     private final Picasso picasso;
-    private ShoutAdapterItem item;
+    private BaseShoutAdapterItem item;
 
     @LayoutRes
     public static int getLayoutRes() {
         return R.layout.shout_item_grid;
     }
 
-    public ShoutGridViewHolder(@Nonnull View itemView, Picasso picasso) {
+    public ShoutViewHolder(@Nonnull View itemView, Picasso picasso) {
         super(itemView);
         this.picasso = picasso;
         ButterKnife.bind(this, itemView);
@@ -51,7 +52,7 @@ public class ShoutGridViewHolder extends ViewHolderManager.BaseViewHolder<ShoutA
     }
 
     @Override
-    public void bind(@Nonnull ShoutAdapterItem item) {
+    public void bind(@Nonnull BaseShoutAdapterItem item) {
         this.item = item;
         final Shout shout = item.getShout();
         titleTextView.setText(shout.getTitle());

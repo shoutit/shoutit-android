@@ -53,8 +53,6 @@ public class ShoutLinearViewHolder extends ViewHolderManager.BaseViewHolder<Shou
     ImageView countryImageView;
     @Bind(R.id.shout_container)
     View shoutContainer;
-    @Bind(R.id.shout_grid_bookmark)
-    CheckBox mBoomark;
 
     private CompositeSubscription subscription;
     @Nonnull
@@ -139,15 +137,7 @@ public class ShoutLinearViewHolder extends ViewHolderManager.BaseViewHolder<Shou
                             } else {
                                 context.startActivity(ChatFirstConversationActivity.newIntent(context, true, item.getShout().getId()));
                             }
-                        }),
-                item.getBookmarkObservable()
-                        .subscribe(checked -> mBoomark.setChecked(checked)),
-                item.getEnableObservable()
-                        .subscribe(enable -> {
-                            mBoomark.setEnabled(enable);
                         }));
-
-        mBoomark.setOnClickListener(v -> item.onBookmarkSelectionChanged(mBoomark.isChecked()));
     }
 
     @Override

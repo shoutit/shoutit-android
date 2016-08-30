@@ -44,7 +44,7 @@ public class HomeAdapter extends FBAdsAdapter {
     public static final int VIEW_TYPE_EMPTY_SHOUTS_ITEM = 5;
 
     @Nonnull
-    private final HomeDiscoversAdapter homeDiscoversAdapter;
+    private final PicksDiscoversAdapter homeDiscoversAdapter;
     @Nonnull
     private final Picasso picasso;
     @Nonnull
@@ -54,7 +54,7 @@ public class HomeAdapter extends FBAdsAdapter {
 
     @Inject
     public HomeAdapter(@ForActivity @Nonnull Context context,
-                       @Nonnull HomeDiscoversAdapter homeDiscoversAdapter,
+                       @Nonnull PicksDiscoversAdapter homeDiscoversAdapter,
                        @Nonnull Picasso picasso,
                        @NonNull @Named("NoAmazonTransformer") Picasso picassoNoTransformer,
                        @Nonnull @UiScheduler Scheduler uiScheduler) {
@@ -81,7 +81,7 @@ public class HomeAdapter extends FBAdsAdapter {
     }
 
     class DiscoverContainerViewHolder extends ViewHolderManager.BaseViewHolder<HomePresenter.DiscoverContainerAdapterItem> {
-        @Bind(R.id.fragment_home_discover_recycler_view)
+        @Bind(R.id.picks_discover_recycler_view)
         RecyclerView recyclerView;
 
         private Subscription subscription;
@@ -209,7 +209,7 @@ public class HomeAdapter extends FBAdsAdapter {
             case VIEW_TYPE_DISCOVER_HEADER:
                 return new DiscoverHeaderViewHolder(layoutInflater.inflate(R.layout.home_discover_header, parent, false));
             case VIEW_TYPE_DISCOVER_ITEMS_CONTAINER:
-                return new DiscoverContainerViewHolder(layoutInflater.inflate(R.layout.home_discover_container_item, parent, false));
+                return new DiscoverContainerViewHolder(layoutInflater.inflate(R.layout.picks_discover_container_item, parent, false));
             case VIEW_TYPE_SHOUT_HEADER:
                 return new ShoutHeaderViewHolder(layoutInflater.inflate(R.layout.home_feed_header_item, parent, false));
             case VIEW_TYPE_SHOUT:

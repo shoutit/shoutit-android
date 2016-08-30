@@ -5,7 +5,7 @@
     <dimen name="home_discover_image_height">120dp</dimen>
     <dimen name="home_feed_image_height">186dp</dimen>
     <dimen name="home_discover_card_width">150dp</dimen>
-    <dimen name="home_discover_card_height">156dp</dimen>
+    <dimen name="picks_discover_item_height">156dp</dimen>
     <dimen name="home_linear_side_spacing">8dp</dimen>
     <dimen name="home_discover_item_spacing">6dp</dimen>
     <dimen name="home_feed_image_size_linear">140dp</dimen>
