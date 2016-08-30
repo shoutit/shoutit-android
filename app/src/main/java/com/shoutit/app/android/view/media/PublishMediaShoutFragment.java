@@ -12,6 +12,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -73,9 +74,9 @@ public class PublishMediaShoutFragment extends Fragment {
     @Bind(R.id.publish_media_shout_preview)
     ImageView mPublishMediaShoutPreview;
     @Bind(R.id.camera_published_price)
-    EditText mCameraPublishedPrice;
+    EditText mPriceEt;
     @Bind(R.id.camera_published_currency)
-    Spinner mCameraPublishedCurrency;
+    Spinner mCurrencySpinner;
     @Bind(R.id.camera_progress)
     View progress;
     @Bind(R.id.camera_published_done)
@@ -159,10 +160,10 @@ public class PublishMediaShoutFragment extends Fragment {
         setUpFacebookCheckbox();
         showShareInfoDialogIfNeeded();
 
-        mCameraPublishedCurrency.setAdapter(mCurrencyAdapter);
-        mCameraPublishedCurrency.setEnabled(false);
+        mCurrencySpinner.setAdapter(mCurrencyAdapter);
+        mCurrencySpinner.setEnabled(false);
 
-        mCameraPublishedPrice.addTextChangedListener(new TextWatcher() {
+        mPriceEt.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -175,7 +176,7 @@ public class PublishMediaShoutFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                mCameraPublishedCurrency.setEnabled(s.length() != 0);
+                mCurrencySpinner.setEnabled(s.length() != 0);
             }
         });
 
@@ -325,28 +326,49 @@ public class PublishMediaShoutFragment extends Fragment {
     }
 
     private void downloadCurrencies() {
+        mCurrencySpinner.setEnabled(false);
         mCompositeSubscription.add(mApiService.getCurrencies()
                 .subscribeOn(Schedulers.io())
                 .observeOn(MyAndroidSchedulers.mainThread())
                 .subscribe(
                         currencies -> {
                             mCurrencyAdapter.setData(PriceUtils.transformCurrencyToPair(currencies));
+                            removeRetryCurrenciesListener();
+                            mCurrencySpinner.setEnabled(!Strings.isNullOrEmpty(mPriceEt.getText().toString()));
                         }, throwable -> {
                             Log.e(TAG, "error", throwable);
                             showApiError(throwable);
+                            setRetryCurrenciesListener();
+                            mCurrencySpinner.setEnabled(!Strings.isNullOrEmpty(mPriceEt.getText().toString()));
                         }));
+    }
+
+    public void setRetryCurrenciesListener() {
+        mCurrencySpinner.setEnabled(!Strings.isNullOrEmpty(mPriceEt.getText().toString()));
+        mCurrencySpinner.setOnTouchListener((v, event) -> {
+            downloadCurrencies();
+            return true;
+        });
+    }
+
+    public void removeRetryCurrenciesListener() {
+        mCurrencySpinner.setOnTouchListener(null);
     }
 
     @SuppressWarnings("unchecked")
     @OnClick(R.id.camera_published_done)
     public void doneClicked() {
-        Preconditions.checkNotNull(mCameraPublishedPrice);
+        Preconditions.checkNotNull(mPriceEt);
 
-        final String price = mCameraPublishedPrice.getText().toString();
+        if (!areDataValid()) {
+            return;
+        }
+
+        final String price = mPriceEt.getText().toString();
         if (!Strings.isNullOrEmpty(price)) {
             showProgress(true);
             final long priceInCents = PriceUtils.getPriceInCents(price);
-            final PriceUtils.SpinnerCurrency selectedItem = (PriceUtils.SpinnerCurrency) mCameraPublishedCurrency.getSelectedItem();
+            final PriceUtils.SpinnerCurrency selectedItem = (PriceUtils.SpinnerCurrency) mCurrencySpinner.getSelectedItem();
             mCompositeSubscription.add(
                     mApiService.editShoutPrice(createdShoutOfferId, new EditShoutPriceRequest(priceInCents, selectedItem.getCode(), faceBookCheckbox.isChecked()))
                             .subscribeOn(Schedulers.io())
@@ -368,6 +390,20 @@ public class PublishMediaShoutFragment extends Fragment {
         } else {
             finishActivity();
         }
+    }
+
+    private boolean areDataValid() {
+        if (!Strings.isNullOrEmpty(mPriceEt.getText().toString())) {
+            String currencyCode = ((PriceUtils.SpinnerCurrency) mCurrencySpinner.getSelectedItem()).getCode();
+            currencyCode = currencyCode.equals(mCurrencyAdapter.getStartingText()) ? null : currencyCode;
+
+            if (Strings.isNullOrEmpty(currencyCode)) {
+                ColoredSnackBar.error(ColoredSnackBar.contentView(getActivity()), getString(R.string.request_acitvity_currency_prompt_error), Snackbar.LENGTH_SHORT).show();
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @NonNull
