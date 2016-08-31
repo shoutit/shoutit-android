@@ -183,7 +183,7 @@
     <string name="home_no_shouts_logged_in_user">Nothing in your feed click here to add some interests</string>
 
     <!-- Discover -->
-    <string name="discover_shouts_header">Discover shouts</string>
+    <string name="discover_shouts_header">Discover Shouts</string>
     <string name="discover_see_all_button">See all shouts</string>
 
     <!-- Shout -->

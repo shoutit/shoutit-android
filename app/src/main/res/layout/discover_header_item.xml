@@ -1,29 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="@dimen/discover_header_height"
-    xmlns:tools="http://schemas.android.com/tools"
-    card_view:cardCornerRadius="2dp"
-    card_view:cardElevation="2dp"
-    card_view:cardUseCompatPadding="true">
-
-    <ImageView
-        android:id="@+id/discover_header_iv"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:src="@drawable/discover_header_bg"/>
+    android:orientation="vertical"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp">
 
     <TextView
         android:id="@+id/discover_header_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:layout_gravity="center"
-        tools:text="Discover"
-        android:textColor="@color/black_54"
-        android:textSize="24sp"
-        android:gravity="center"/>
+        android:layout_weight="1"
+        android:gravity="center"
+        android:textColor="@color/black_87"
+        android:textSize="30sp"
+        tools:text="Discover" />
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/black_54"
+        android:layout_marginBottom="12dp"/>
 
-</android.support.v7.widget.CardView>
+</LinearLayout>

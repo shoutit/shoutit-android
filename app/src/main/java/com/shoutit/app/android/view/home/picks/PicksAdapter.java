@@ -18,7 +18,6 @@ import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.home.PicksDiscoversAdapter;
-import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 import com.shoutit.app.android.viewholders.ShoutViewHolder;
 import com.squareup.picasso.Picasso;
 
@@ -166,13 +165,13 @@ public class PicksAdapter extends BaseAdapter {
             super(itemView);
             ButterKnife.bind(this, itemView);
 
-            firstPageIv = ButterKnife.findById(firstPageContainer, R.id.dark_card_image);
-            firstPageTitleTv = ButterKnife.findById(firstPageContainer, R.id.dark_card_title);
-            firstPageSubtitleTv = ButterKnife.findById(firstPageContainer, R.id.dark_card_subtitle);
+            firstPageIv = ButterKnife.findById(firstPageContainer, R.id.discover_card_image);
+            firstPageTitleTv = ButterKnife.findById(firstPageContainer, R.id.discover_card_title);
+            firstPageSubtitleTv = ButterKnife.findById(firstPageContainer, R.id.discover_card_shouts);
 
-            secondPageIv = ButterKnife.findById(secondPageContainer, R.id.dark_card_image);
-            secondPageTitleTv = ButterKnife.findById(secondPageContainer, R.id.dark_card_title);
-            secondPageSubtitleTv = ButterKnife.findById(secondPageContainer, R.id.dark_card_subtitle);
+            secondPageIv = ButterKnife.findById(secondPageContainer, R.id.discover_card_image);
+            secondPageTitleTv = ButterKnife.findById(secondPageContainer, R.id.discover_card_title);
+            secondPageSubtitleTv = ButterKnife.findById(secondPageContainer, R.id.discover_card_shouts);
         }
 
         @Override

@@ -1,7 +1,6 @@
 package com.shoutit.app.android.view.discover;
 
 import android.content.Intent;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -18,9 +17,9 @@ import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
+import com.shoutit.app.android.utils.BaseItemDecoration;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.MyGridLayoutManager;
-import com.shoutit.app.android.utils.RtlUtils;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.shoutit.app.android.view.shouts.discover.DiscoverShoutsActivity;
 
@@ -158,31 +157,8 @@ public class DiscoverFragment extends BaseFragment {
             }
         });
 
-        final int spacing = getResources().getDimensionPixelSize(R.dimen.discover_grid_spacing);
-
-        final boolean rtlEnable = RtlUtils.isRtlEnabled(getActivity());
-        recyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
-            @Override
-            public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
-                int position = parent.getChildAdapterPosition(view);
-
-                if (position == RecyclerView.NO_POSITION) {
-                    return;
-                }
-
-                final int viewType = parent.getAdapter().getItemViewType(position);
-                if (viewType != DiscoverAdapter.VIEW_TYPE_SHOUT && viewType != DiscoverAdapter.VIEW_TYPE_DISCOVER) {
-                    return;
-                }
-
-                if (rtlEnable ? position % 2 == 1 : position % 2 == 0) {
-                    outRect.right = spacing;
-                } else {
-                    outRect.left = spacing;
-                }
-                outRect.bottom = spacing;
-            }
-        });
+        final int spacing = getResources().getDimensionPixelSize(R.dimen.home_grid_side_spacing);
+        recyclerView.addItemDecoration(new BaseItemDecoration(spacing, getActivity()));
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
     }

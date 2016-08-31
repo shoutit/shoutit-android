@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.view.discover.DiscoverFragment;
 import com.shoutit.app.android.view.home.myfeed.MyFeedFragment;
 import com.shoutit.app.android.view.home.picks.PicksFragment;
 
@@ -38,7 +39,7 @@ public class HomePagerAdapter extends FragmentPagerAdapter {
             case 1:
                 return PicksFragment.newInstance();
             case 2:
-                return PicksFragment.newInstance();
+                return DiscoverFragment.newInstance();
             default:
                 throw new RuntimeException("Wrong position: " + position);
         }

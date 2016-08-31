@@ -1,10 +1,12 @@
 package com.shoutit.app.android.viewholders;
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.support.annotation.LayoutRes;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -13,7 +15,6 @@ import com.google.common.base.Strings;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.adapteritems.BaseShoutAdapterItem;
 import com.shoutit.app.android.api.model.Shout;
-import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;
@@ -35,9 +36,12 @@ public class ShoutViewHolder extends ViewHolderManager.BaseViewHolder<BaseShoutA
     TextView mShoutPromotedLabel;
     @Bind(R.id.shout_container)
     View mShoutContainer;
+    @Bind(R.id.shout_card_type)
+    TextView shoutTypeTv;
 
     private final Picasso picasso;
     private BaseShoutAdapterItem item;
+    private final Context context;
 
     @LayoutRes
     public static int getLayoutRes() {
@@ -49,6 +53,7 @@ public class ShoutViewHolder extends ViewHolderManager.BaseViewHolder<BaseShoutA
         this.picasso = picasso;
         ButterKnife.bind(this, itemView);
         itemView.setOnClickListener(this);
+        context = itemView.getContext();
     }
 
     @Override
@@ -59,6 +64,9 @@ public class ShoutViewHolder extends ViewHolderManager.BaseViewHolder<BaseShoutA
         titleTextView.setVisibility(TextUtils.isEmpty(shout.getTitle()) ? View.GONE : View.VISIBLE);
         nameTextView.setText(shout.getProfile().getName());
         cardPriceTextView.setText(item.getShoutPrice());
+
+        shoutTypeTv.setText(shout.isOffer() ? R.string.shout_type_offer : R.string.shout_type_request);
+        shoutTypeTv.setTextColor(ContextCompat.getColor(context, shout.isOffer() ? R.color.shout_type_offer : R.color.shout_type_request));
 
         picasso.load(Strings.emptyToNull(shout.getThumbnail()))
                 .placeholder(R.drawable.pattern_placeholder)

@@ -15,7 +15,7 @@
         android:orientation="vertical">
 
         <ImageView
-            android:id="@+id/dark_card_image"
+            android:id="@+id/discover_card_image"
             android:layout_width="match_parent"
             android:layout_height="140dp"
             android:scaleType="centerCrop"
@@ -26,23 +26,23 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
-            android:background="@color/background_light_gray"
+            android:background="@android:color/white"
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/dark_card_title"
+                android:id="@+id/discover_card_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginStart="10dp"
                 android:ellipsize="end"
+                android:textColor="@color/black_87"
                 android:maxLines="1"
-                android:textColor="@android:color/white"
                 android:textSize="16sp"
                 tools:text="Mobile" />
 
             <TextView
-                android:id="@+id/dark_card_subtitle"
+                android:id="@+id/discover_card_shouts"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
@@ -50,7 +50,7 @@
                 android:layout_marginTop="2dp"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="@color/gray_text"
+                android:textColor="@color/black_54"
                 android:textSize="16sp"
                 tools:text="Mobile" />
 

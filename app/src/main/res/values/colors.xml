@@ -24,6 +24,8 @@
     <color name="background_gray">#333333</color>
     <color name="background_light_gray">#3f3f3f</color>
     <color name="gray_text">#747474</color>
+    <color name="shout_type_request">#DF5238</color>
+    <color name="shout_type_offer">#40C4FF</color>
 
     <!-- Intro -->
     <color name="intro_gradient_start">#35dd69</color>

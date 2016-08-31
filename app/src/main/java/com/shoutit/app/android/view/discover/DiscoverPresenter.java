@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
+import com.shoutit.app.android.adapteritems.BaseShoutAdapterItem;
 import com.shoutit.app.android.api.model.DiscoverChild;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
@@ -182,7 +183,7 @@ public class DiscoverPresenter {
 
                         final List<Shout> shouts = shoutsResponse.getShouts();
                         for (int i = 0; i < Math.min(shouts.size(), MAX_DISPLAYED_SHOUTS); i++) {
-                            items.add(new ShoutAdapterItem(shouts.get(i), shoutSelectedObserver));
+                            items.add(new BaseShoutAdapterItem(shouts.get(i), context.getResources(), shoutSelectedObserver, null));
                         }
 
                         return ImmutableList.copyOf(items);
@@ -213,7 +214,6 @@ public class DiscoverPresenter {
                         if (!shouts.isEmpty()) {
                             builder.add(new ShoutHeaderAdapterItem());
                             builder.addAll(shouts);
-                            builder.add(new ShowMoreButtonAdapterItem(discoverId, showMoreObserver));
                         }
 
                         return builder.build();
@@ -413,101 +413,6 @@ public class DiscoverPresenter {
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
             return item instanceof ShoutHeaderAdapterItem;
-        }
-    }
-
-    public class ShoutAdapterItem implements BaseAdapterItem {
-
-        @Nonnull
-        private final Shout shout;
-        @Nonnull
-        private final Observer<String> shoutSelectedObserver;
-
-        public ShoutAdapterItem(@Nonnull Shout shout, @Nonnull Observer<String> shoutSelectedObserver) {
-            this.shout = shout;
-            this.shoutSelectedObserver = shoutSelectedObserver;
-        }
-
-        @Override
-        public long adapterId() {
-            return BaseAdapterItem.NO_ID;
-        }
-
-        @Override
-        public boolean matches(@Nonnull BaseAdapterItem item) {
-            return item instanceof ShoutAdapterItem &&
-                    shout.getId().equals(((ShoutAdapterItem) item).getShout().getId());
-        }
-
-        @Override
-        public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof ShoutAdapterItem &&
-                    this.equals(item);
-        }
-
-        @Nonnull
-        public Shout getShout() {
-            return shout;
-        }
-
-        @Nullable
-        public String getShoutPrice() {
-            final Long price = shout.getPrice();
-            if (price == null) {
-                return null;
-            } else {
-                return PriceUtils.formatPriceWithCurrency(shout.getPrice(), mResources, shout.getCurrency());
-            }
-        }
-
-        public void onShoutSelected() {
-            shoutSelectedObserver.onNext(shout.getId());
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof ShoutAdapterItem)) return false;
-            final ShoutAdapterItem that = (ShoutAdapterItem) o;
-            return Objects.equal(shout, that.shout);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hashCode(shout);
-        }
-    }
-
-    public class ShowMoreButtonAdapterItem implements BaseAdapterItem {
-
-        @Nonnull
-        private final String discoverId;
-        @Nonnull
-        private final Observer<String> showMoreObserver;
-
-        public ShowMoreButtonAdapterItem(@Nonnull String discoverId,
-                                         @Nonnull Observer<String> showMoreObserver) {
-            this.discoverId = discoverId;
-            this.showMoreObserver = showMoreObserver;
-        }
-
-        @Override
-        public long adapterId() {
-            return BaseAdapterItem.NO_ID;
-        }
-
-        @Override
-        public boolean matches(@Nonnull BaseAdapterItem item) {
-            return item instanceof ShowMoreButtonAdapterItem;
-        }
-
-        @Override
-        public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof ShowMoreButtonAdapterItem;
-        }
-
-        public void showMoreClicked() {
-            showMoreObserver.onNext(discoverId);
         }
     }
 

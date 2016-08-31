@@ -12,9 +12,12 @@ import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.google.common.base.Strings;
 import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.adapteritems.BaseShoutAdapterItem;
 import com.shoutit.app.android.api.model.DiscoverChild;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.view.shouts.ShoutGridViewHolder;
+import com.shoutit.app.android.viewholders.ShoutViewHolder;
 import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;
@@ -29,7 +32,6 @@ public class DiscoverAdapter extends BaseAdapter {
     public static final int VIEW_TYPE_DISCOVER = 2;
     public static final int VIEW_TYPE_SHOUT_HEADER = 3;
     public static final int VIEW_TYPE_SHOUT = 4;
-    public static final int VIEW_TYPE_BUTTON = 5;
 
     @Nonnull
     private final Picasso picasso;
@@ -44,8 +46,6 @@ public class DiscoverAdapter extends BaseAdapter {
     class HeaderViewHolder extends ViewHolderManager.BaseViewHolder<DiscoverPresenter.HeaderAdapterItem> {
         @Bind(R.id.discover_header_title)
         TextView titleTextView;
-        @Bind(R.id.discover_header_iv)
-        ImageView cardImageView;
 
         private final int shadowYOffset;
         private final int shadowRadius;
@@ -71,22 +71,18 @@ public class DiscoverAdapter extends BaseAdapter {
                 titleTextView.setShadowLayer(shadowRadius, shadowXOffset, shadowYOffset, context.getResources().getColor(R.color.black_87));
             }
 
-            picasso.load(Strings.emptyToNull(item.getImage()))
-                    .placeholder(R.drawable.discover_header_bg)
-                    .error(R.drawable.discover_header_bg)
-                    .fit()
-                    .centerCrop()
-                    .into(cardImageView);
-
             titleTextView.setText(item.getTitle());
         }
     }
 
     class DiscoverViewHolder extends ViewHolderManager.BaseViewHolder<DiscoverPresenter.DiscoverAdapterItem> implements View.OnClickListener {
-        @Bind(R.id.discover_item_iv)
+        @Bind(R.id.discover_card_image)
         ImageView imageView;
-        @Bind(R.id.discover_item_tv)
+        @Bind(R.id.discover_card_title)
         TextView titleTextView;
+        @Bind(R.id.discover_card_shouts)
+        TextView subTitleTv;
+
         private DiscoverPresenter.DiscoverAdapterItem item;
 
 
@@ -109,6 +105,7 @@ public class DiscoverAdapter extends BaseAdapter {
                     .into(imageView);
 
             titleTextView.setText(discover.getTitle());
+            subTitleTv.setText(discover.getSubtitle());
         }
 
         @Override
@@ -130,84 +127,17 @@ public class DiscoverAdapter extends BaseAdapter {
         }
     }
 
-    class ShoutViewHolder extends ViewHolderManager.BaseViewHolder<DiscoverPresenter.ShoutAdapterItem> implements View.OnClickListener {
-        @Bind(R.id.discover_shout_card_image_view)
-        ImageView cardImageView;
-        @Bind(R.id.discover_shout_card_title_tv)
-        TextView titleTextView;
-        @Bind(R.id.discover_shout_card_name_tv)
-        TextView shoutNameTextView;
-        @Bind(R.id.discover_shout_card_price_tv)
-        TextView shoutPriceTextView;
-        private DiscoverPresenter.ShoutAdapterItem item;
-
-        public ShoutViewHolder(@Nonnull View itemView) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
-            itemView.setOnClickListener(this);
-        }
-
-        @Override
-        public void bind(@Nonnull DiscoverPresenter.ShoutAdapterItem item) {
-            this.item = item;
-            final Shout shout = item.getShout();
-
-            picasso.load(Strings.emptyToNull(shout.getThumbnail()))
-                    .placeholder(R.drawable.pattern_placeholder)
-                    .error(R.drawable.pattern_placeholder)
-                    .fit()
-                    .centerCrop()
-                    .into(cardImageView);
-
-            titleTextView.setText(shout.getTitle());
-            titleTextView.setVisibility(TextUtils.isEmpty(shout.getTitle()) ? View.GONE : View.VISIBLE);
-            shoutNameTextView.setText(shout.getProfile().getName());
-
-            shoutPriceTextView.setText(item.getShoutPrice());
-        }
-
-        @Override
-        public void onClick(View v) {
-            item.onShoutSelected();
-        }
-    }
-
-
-    class ButtonViewHolder extends ViewHolderManager.BaseViewHolder<DiscoverPresenter.ShowMoreButtonAdapterItem> implements View.OnClickListener {
-
-        private DiscoverPresenter.ShowMoreButtonAdapterItem item;
-
-        public ButtonViewHolder(@Nonnull View itemView) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
-            itemView.setOnClickListener(this);
-        }
-
-        @Override
-        public void bind(@Nonnull DiscoverPresenter.ShowMoreButtonAdapterItem item) {
-            this.item = item;
-        }
-
-        @Override
-        public void onClick(View v) {
-            item.showMoreClicked();
-        }
-    }
-
-
     @Override
     public ViewHolderManager.BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         switch (viewType) {
             case VIEW_TYPE_HEADER:
                 return new HeaderViewHolder(layoutInflater.inflate(R.layout.discover_header_item, parent, false));
             case VIEW_TYPE_DISCOVER:
-                return new DiscoverViewHolder(layoutInflater.inflate(R.layout.discover_item, parent, false));
+                return new DiscoverViewHolder(layoutInflater.inflate(R.layout.discover_card, parent, false));
             case VIEW_TYPE_SHOUT_HEADER:
                 return new ShoutHeaderViewHolder(layoutInflater.inflate(R.layout.discover_shouts_header, parent, false));
             case VIEW_TYPE_SHOUT:
-                return new ShoutViewHolder(layoutInflater.inflate(R.layout.discover_shout_item, parent, false));
-            case VIEW_TYPE_BUTTON:
-                return new ButtonViewHolder(layoutInflater.inflate(R.layout.discover_see_all_button_item, parent, false));
+                return new ShoutViewHolder(layoutInflater.inflate(ShoutGridViewHolder.getLayoutRes(), parent, false), picasso);
             default:
                 throw new RuntimeException("Unknown view type");
         }
@@ -228,10 +158,8 @@ public class DiscoverAdapter extends BaseAdapter {
             return VIEW_TYPE_DISCOVER;
         } else if (item instanceof DiscoverPresenter.ShoutHeaderAdapterItem) {
             return VIEW_TYPE_SHOUT_HEADER;
-        } else if (item instanceof DiscoverPresenter.ShoutAdapterItem) {
+        } else if (item instanceof BaseShoutAdapterItem) {
             return VIEW_TYPE_SHOUT;
-        } else if (item instanceof DiscoverPresenter.ShowMoreButtonAdapterItem) {
-            return VIEW_TYPE_BUTTON;
         } else {
             throw new RuntimeException("Unknown view type");
         }

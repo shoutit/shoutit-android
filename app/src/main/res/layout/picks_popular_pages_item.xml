@@ -44,7 +44,7 @@
 
         <include
             android:id="@+id/popular_pages_first_page"
-            layout="@layout/dark_card_item"
+            layout="@layout/discover_card"
             android:layout_width="0dp"
             android:layout_height="@dimen/item_card_height"
             android:layout_marginEnd="8dp"
@@ -53,7 +53,7 @@
 
         <include
             android:id="@+id/popular_pages_second_page"
-            layout="@layout/dark_card_item"
+            layout="@layout/discover_card"
             android:layout_width="0dp"
             android:layout_height="@dimen/item_card_height"
             android:layout_weight="1" />
