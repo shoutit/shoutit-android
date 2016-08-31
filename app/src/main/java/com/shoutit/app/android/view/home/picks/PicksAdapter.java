@@ -12,12 +12,12 @@ import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.adapteritems.BaseShoutAdapterItem;
 import com.shoutit.app.android.api.model.Conversation;
 import com.shoutit.app.android.api.model.Page;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.home.PicksDiscoversAdapter;
-import com.shoutit.app.android.view.home.HomePresenter;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 import com.shoutit.app.android.viewholders.ShoutViewHolder;
 import com.squareup.picasso.Picasso;
@@ -30,8 +30,6 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import rx.Observable;
-import rx.Subscription;
 
 public class PicksAdapter extends BaseAdapter {
     private static final int VIEW_TYPE_DISCOVER_HEADER = 1;
@@ -43,7 +41,7 @@ public class PicksAdapter extends BaseAdapter {
     private static final int VIEW_TYPE_SEARCH_FAVOURITES = 7;
 
     @Nonnull
-    private final PicksDiscoversAdapter homeDiscoversAdapter;
+    private final PicksDiscoversAdapter picksDiscoversAdapter;
     private final Picasso picasso;
 
     @Inject
@@ -51,7 +49,7 @@ public class PicksAdapter extends BaseAdapter {
                         Picasso picasso) {
         super(context);
         this.picasso = picasso;
-        homeDiscoversAdapter = new PicksDiscoversAdapter(picasso, context);
+        picksDiscoversAdapter = new PicksDiscoversAdapter(picasso, context);
     }
 
     class DiscoverHeaderViewHolder extends ViewHolderManager.BaseViewHolder<PicksAdapterItems.DiscoverHeaderAdapterItem> {
@@ -77,11 +75,9 @@ public class PicksAdapter extends BaseAdapter {
         }
     }
 
-    class DiscoverContainerViewHolder extends ViewHolderManager.BaseViewHolder<HomePresenter.DiscoverContainerAdapterItem> {
+    class DiscoverContainerViewHolder extends ViewHolderManager.BaseViewHolder<PicksAdapterItems.DiscoverContainerAdapterItem> {
         @Bind(R.id.picks_discover_recycler_view)
         RecyclerView recyclerView;
-
-        private Subscription subscription;
 
         public DiscoverContainerViewHolder(@Nonnull View itemView) {
             super(itemView);
@@ -93,26 +89,9 @@ public class PicksAdapter extends BaseAdapter {
         }
 
         @Override
-        public void bind(@Nonnull HomePresenter.DiscoverContainerAdapterItem item) {
-            recycle();
-
-            recyclerView.setAdapter(homeDiscoversAdapter);
-
-            subscription = Observable.just(item.getAdapterItems())
-                    .subscribe(homeDiscoversAdapter);
-        }
-
-        @Override
-        public void onViewRecycled() {
-            recycle();
-            super.onViewRecycled();
-        }
-
-        private void recycle() {
-            if (subscription != null) {
-                subscription.unsubscribe();
-                subscription = null;
-            }
+        public void bind(@Nonnull PicksAdapterItems.DiscoverContainerAdapterItem item) {
+            recyclerView.setAdapter(picksDiscoversAdapter);
+            picksDiscoversAdapter.setData(item.getAdapterItems());
         }
     }
 
@@ -270,7 +249,7 @@ public class PicksAdapter extends BaseAdapter {
             return VIEW_TYPE_PUBLIC_CHAT;
         } else if (item instanceof PicksAdapterItems.PopularPagesAdapterItem) {
             return VIEW_TYPE_POPULAR_PAGES;
-        } else if (item instanceof ShoutAdapterItem) {
+        } else if (item instanceof BaseShoutAdapterItem) {
             return VIEW_TYPE_TRENDING_SHOUT;
         } else if (item instanceof PicksAdapterItems.StartSearchingAdapterItem) {
             return VIEW_TYPE_SEARCH_FAVOURITES;

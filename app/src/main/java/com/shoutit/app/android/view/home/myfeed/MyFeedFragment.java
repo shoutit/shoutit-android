@@ -8,11 +8,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
+import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.BaseDaggerFragment;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseDaggerFragmentComponent;
+import com.shoutit.app.android.utils.BaseItemDecoration;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyGridLayoutManager;
 
 import javax.inject.Inject;
@@ -45,8 +49,11 @@ public class MyFeedFragment extends BaseDaggerFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        recyclerView.setLayoutManager(new MyGridLayoutManager(getActivity(), 2));
+        final MyGridLayoutManager layoutManager = new MyGridLayoutManager(getActivity(), 2);
+        recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
+        recyclerView.addItemDecoration(new BaseItemDecoration(
+                getResources().getDimensionPixelSize(R.dimen.home_grid_side_spacing), getActivity()));
 
         presenter.getShoutsAdapterItems()
                 .compose(bindToLifecycle())
@@ -59,6 +66,19 @@ public class MyFeedFragment extends BaseDaggerFragment {
         presenter.getProgressObservable()
                 .compose(bindToLifecycle())
                 .subscribe(RxView.visibility(progressView));
+
+        presenter.getRefreshShoutsObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
+
+        presenter.getLoadMoreObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
+
+        RxRecyclerView.scrollEvents(recyclerView)
+                .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
+                .filter(LoadMoreHelper.needLoadMore(layoutManager, adapter))
+                .subscribe(presenter.getLoadMoreShouts());
     }
 
     @Override

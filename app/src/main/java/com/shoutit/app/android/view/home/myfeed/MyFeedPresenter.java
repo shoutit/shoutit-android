@@ -17,9 +17,11 @@ import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ShoutsDao;
+import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.model.LocationPointer;
 import com.shoutit.app.android.utils.FBAdHalfPresenter;
 import com.shoutit.app.android.utils.PromotionHelper;
+import com.shoutit.app.android.utils.rx.RxMoreObservers;
 
 import java.util.List;
 
@@ -27,25 +29,29 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import rx.Observable;
+import rx.Observer;
 import rx.Scheduler;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
 public class MyFeedPresenter {
 
-    @Nonnull
     private final PublishSubject<String> shoutSelectedObserver = PublishSubject.create();
+    private final PublishSubject<Object> loadMoreShoutsSubject = PublishSubject.create();
 
     private final Observable<List<BaseAdapterItem>> shoutsAdapterItems;
     private final Observable<Boolean> progressObservable;
     private final Observable<Throwable> errorObservable;
+    private final Observable<Object> refreshShoutsObservable;
+    private final Observable<Object> loadMoreObservable;
 
     @Inject
     public MyFeedPresenter(@Nonnull final ShoutsDao shoutsDao,
                            UserPreferences userPreferences,
                            FBAdHalfPresenter fbAdHalfPresenter,
                            @ForActivity Resources resources,
-                           @UiScheduler Scheduler uiScheduler) {
+                           @UiScheduler Scheduler uiScheduler,
+                           ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter) {
 
         final Observable<LocationPointer> locationObservable = userPreferences.getLocationObservable()
                 .map(userLocation -> new LocationPointer(userLocation.getCountry(), userLocation.getCity(), userLocation.getState()))
@@ -82,12 +88,30 @@ public class MyFeedPresenter {
                 .doOnNext(fbAdHalfPresenter::updatedShoutsCount);
 
         progressObservable = shoutsRequestObservable
-                .map(Functions1.returnTrue())
+                .map(Functions1.returnFalse())
                 .startWith(true);
 
         errorObservable = shoutsRequestObservable
                 .compose(ResponseOrError.onlyError());
 
+        refreshShoutsObservable = shoutsGlobalRefreshPresenter
+                .getShoutsGlobalRefreshObservable()
+                .withLatestFrom(locationObservable, (o, locationPointer) -> {
+                    shoutsDao.getHomeShoutsRefreshObserver(locationPointer).onNext(null);
+                    return null;
+                });
+
+        loadMoreObservable = loadMoreShoutsSubject
+                .withLatestFrom(locationObservable, (o, locationPointer) -> {
+                    shoutsDao.getLoadMoreHomeShoutsObserver(locationPointer).onNext(null);
+                    return null;
+                });
+
+    }
+
+    @Nonnull
+    public Observable<Object> getRefreshShoutsObservable() {
+        return refreshShoutsObservable;
     }
 
     public Observable<List<BaseAdapterItem>> getShoutsAdapterItems() {
@@ -105,5 +129,15 @@ public class MyFeedPresenter {
     @Nonnull
     public Observable<String> getShoutSelectedObservable() {
         return shoutSelectedObserver;
+    }
+
+    @Nonnull
+    public Observer<Object> getLoadMoreShouts() {
+        return RxMoreObservers.ignoreCompleted(loadMoreShoutsSubject);
+    }
+
+    @Nonnull
+    public Observable<Object> getLoadMoreObservable() {
+        return loadMoreObservable;
     }
 }

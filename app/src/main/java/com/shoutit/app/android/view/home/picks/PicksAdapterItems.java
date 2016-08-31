@@ -115,11 +115,11 @@ public class PicksAdapterItems {
     public static class DiscoverContainerAdapterItem extends BaseNoIDAdapterItem {
 
         @Nonnull
-        private final List<DiscoverAdapterItem> adapterItems;
+        private final List<BaseAdapterItem> adapterItems;
         @Nonnull
         private final LocationPointer locationPointer;
 
-        public DiscoverContainerAdapterItem(@Nonnull List<DiscoverAdapterItem> adapterItems,
+        public DiscoverContainerAdapterItem(@Nonnull List<BaseAdapterItem> adapterItems,
                                             @Nonnull LocationPointer locationPointer) {
             this.adapterItems = adapterItems;
             this.locationPointer = locationPointer;
@@ -136,7 +136,7 @@ public class PicksAdapterItems {
         }
 
         @Nonnull
-        public List<DiscoverAdapterItem> getAdapterItems() {
+        public List<BaseAdapterItem> getAdapterItems() {
             return adapterItems;
         }
 

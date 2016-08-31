@@ -37,6 +37,10 @@ public abstract class BaseAdapter extends RecyclerView.Adapter<ViewHolderManager
 
     @Override
     public void call(List<BaseAdapterItem> items) {
+        setData(items);
+    }
+
+    public void setData(List<BaseAdapterItem> items) {
         this.items = items;
         changesDetector.newData(this, items, false);
     }

@@ -3,6 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_marginLeft="@dimen/home_linear_side_spacing"
+    android:layout_marginRight="@dimen/home_linear_side_spacing"
     android:orientation="horizontal">
 
     <ImageView

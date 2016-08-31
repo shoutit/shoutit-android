@@ -12,6 +12,7 @@ import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.DiscoverChild;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.view.home.picks.PicksAdapterItems;
 import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;
@@ -32,12 +33,12 @@ public class PicksDiscoversAdapter extends BaseAdapter {
         this.picasso = picasso;
     }
 
-    class DiscoverItemViewHolder extends ViewHolderManager.BaseViewHolder<HomePresenter.DiscoverAdapterItem> implements View.OnClickListener {
+    class DiscoverItemViewHolder extends ViewHolderManager.BaseViewHolder<PicksAdapterItems.DiscoverAdapterItem> implements View.OnClickListener {
         @Bind(R.id.picks_discover_item_iv)
         ImageView discoverIv;
         @Bind(R.id.picks_discover_item_name_tv)
         TextView discoverTv;
-        private HomePresenter.DiscoverAdapterItem item;
+        private PicksAdapterItems.DiscoverAdapterItem item;
 
         public DiscoverItemViewHolder(View itemView) {
             super(itemView);
@@ -46,7 +47,7 @@ public class PicksDiscoversAdapter extends BaseAdapter {
         }
 
         @Override
-        public void bind(@Nonnull HomePresenter.DiscoverAdapterItem item) {
+        public void bind(@Nonnull PicksAdapterItems.DiscoverAdapterItem item) {
             this.item = item;
             final DiscoverChild discover = item.getDiscover();
             discoverTv.setText(discover.getTitle());

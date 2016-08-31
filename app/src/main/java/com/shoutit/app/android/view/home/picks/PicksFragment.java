@@ -13,6 +13,7 @@ import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.BaseDaggerFragment;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseDaggerFragmentComponent;
+import com.shoutit.app.android.utils.BaseItemDecoration;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.MyGridLayoutManager;
 import com.shoutit.app.android.view.discover.DiscoverActivity;
@@ -84,6 +85,8 @@ public class PicksFragment extends BaseDaggerFragment {
                 return itemViewType == PicksAdapter.VIEW_TYPE_TRENDING_SHOUT ? 1 : 2;
             }
         });
+        recyclerView.addItemDecoration(new BaseItemDecoration(
+                getResources().getDimensionPixelSize(R.dimen.home_grid_side_spacing), getActivity()));
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
     }

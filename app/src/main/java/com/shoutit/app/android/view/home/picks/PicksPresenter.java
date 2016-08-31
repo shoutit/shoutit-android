@@ -139,16 +139,16 @@ public class PicksPresenter {
                             }
                         });
 
-        final Observable<List<PicksAdapterItems.DiscoverAdapterItem>> allDiscoverItems =
-                childDiscoversObservable.map(new Func1<List<DiscoverChild>, List<PicksAdapterItems.DiscoverAdapterItem>>() {
+        final Observable<List<BaseAdapterItem>> allDiscoverItems =
+                childDiscoversObservable.map(new Func1<List<DiscoverChild>, List<BaseAdapterItem>>() {
                     @Override
-                    public List<PicksAdapterItems.DiscoverAdapterItem> call(List<DiscoverChild> discovers) {
+                    public List<BaseAdapterItem> call(List<DiscoverChild> discovers) {
                         final List<PicksAdapterItems.DiscoverAdapterItem> items = new ArrayList<>();
                         for (int i = 0; i < discovers.size() && i < MAX_VISIBLE_DISCOVER_ITEMS; i++) {
                             items.add(new PicksAdapterItems.DiscoverAdapterItem(discovers.get(i), discoverSelectedSubject));
                         }
 
-                        return new ImmutableList.Builder<PicksAdapterItems.DiscoverAdapterItem>()
+                        return new ImmutableList.Builder<BaseAdapterItem>()
                                 .addAll(items)
                                 .build();
                     }
@@ -180,9 +180,10 @@ public class PicksPresenter {
                     public List<BaseShoutAdapterItem> call(ShoutsResponse shoutsResponse) {
                         final ImmutableList.Builder<BaseShoutAdapterItem> builder = new ImmutableList.Builder<>();
 
-                        for (Shout shout : shoutsResponse.getShouts()) {
-                            builder.add(new BaseShoutAdapterItem(shout, resources,
-                                    shoutSelectedSubject, PromotionHelper.promotionsInfoOrNull(shout)));
+                        final List<Shout> shouts = shoutsResponse.getShouts();
+                        for (int i = 0; i < 4; i++) {
+                            builder.add(new BaseShoutAdapterItem(shouts.get(i), resources,
+                                    shoutSelectedSubject, PromotionHelper.promotionsInfoOrNull(shouts.get(i))));
                         }
 
                         return builder.build();
@@ -198,7 +199,7 @@ public class PicksPresenter {
                 popularPagesItems,
                 trendingShoutsItems,
                 locationObservable,
-                (Func5<List<PicksAdapterItems.DiscoverAdapterItem>, List<PicksAdapterItems.ChatAdapterItem>,
+                (Func5<List<BaseAdapterItem>, List<PicksAdapterItems.ChatAdapterItem>,
                         PicksAdapterItems.PopularPagesAdapterItem, List<BaseShoutAdapterItem>, LocationPointer, List<BaseAdapterItem>>)
                         (discoverAdapterItems, chatAdapterItems, popularPagesAdapterItem, trendingShoutsAdapterItems, locationPointer) -> {
                             final ImmutableList.Builder<BaseAdapterItem> builder = new ImmutableList.Builder<>();
@@ -242,7 +243,7 @@ public class PicksPresenter {
     }
 
     private Page getMockedPage() {
-        return new Page("id", null, null, null, "userrname", null, false, "http://placekitten.com/200/300",
+        return new Page("id", null, null, "name", "userrname", null, false, "http://placekitten.com/200/300",
                 "", false, 2, null, null, false, null, null, null, null, null, null, null, null, null,
                 null, false, false, null, null, false, null);
     }
