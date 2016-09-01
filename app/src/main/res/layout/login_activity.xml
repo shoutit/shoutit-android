@@ -21,10 +21,9 @@
         android:background="@drawable/toolbar_drop_shadow"/>
 
     <FrameLayout
-        android:id="@+id/login_sign_layout"
+        android:id="@+id/login_fragments_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/login_bottom_actions_container"
         android:layout_below="@+id/login_toolbar"/>
 
 </RelativeLayout>

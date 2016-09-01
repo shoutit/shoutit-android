@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -13,7 +15,8 @@ import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
-import com.shoutit.app.android.view.signin.register.RegisterFragment;
+import com.shoutit.app.android.view.authorization.loginsignup.LogInSignUpFragment;
+import com.shoutit.app.android.view.authorization.signup.SignUpFragment;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -22,6 +25,11 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 public class LoginActivity extends BaseActivity {
+
+    public static final String FRAGMENT_SIGNUP = "signup";
+    public static final String FRAGMENT_SIGNUP_CHOOSE = "signup_choose";
+    public static final String FRAGMENT_SIGNUP_SELECT_INETERESTS = "select_interests";
+    public static final String FRAGMENT_SIGNUP_SELECT_USERS = "select_users";
 
     @Bind(R.id.login_toolbar)
     Toolbar toolbar;
@@ -42,8 +50,33 @@ public class LoginActivity extends BaseActivity {
         if (savedInstanceState == null) {
             getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.login_sign_layout, RegisterFragment.newInstance())
+                    .replace(R.id.login_fragments_container, LogInSignUpFragment.newInstance())
                     .commit();
+        }
+    }
+
+    public void showFragment(String tag, boolean addToBackStack) {
+        final FragmentTransaction transaction = getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.login_fragments_container, getFragment(tag), tag);
+
+        if (addToBackStack) {
+            transaction.addToBackStack(null);
+        }
+
+        transaction.commit();
+    }
+
+    private Fragment getFragment(@Nonnull String tag) {
+        switch (tag) {
+            case FRAGMENT_SIGNUP:
+                return SignUpFragment.newInstance();
+            case FRAGMENT_SIGNUP_CHOOSE:
+            case FRAGMENT_SIGNUP_SELECT_INETERESTS:
+            case FRAGMENT_SIGNUP_SELECT_USERS:
+            default:
+                // TODO remove it
+                return SignUpFragment.newInstance();
         }
     }
 

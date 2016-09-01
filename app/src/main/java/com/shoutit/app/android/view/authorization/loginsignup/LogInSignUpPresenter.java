@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.authorization;
+package com.shoutit.app.android.view.authorization.loginsignup;
 
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
@@ -28,10 +28,15 @@ public class LogInSignUpPresenter {
 
     public interface LogInDelegate {
         void showProgress(boolean show);
+
         void showEmailError(String message);
+
         void showPasswordError(String message);
+
         void showApiError(Throwable throwable);
+
         void showSignUpScreen();
+
         void showHomeScreen();
     }
 
@@ -99,6 +104,9 @@ public class LogInSignUpPresenter {
                     if (signResponse.isNewSignup()) {
                         delegate.showSignUpScreen();
                     } else {
+                        userPreferences.setLoggedIn(signResponse.getAccessToken(), signResponse.getExpiresIn(),
+                                signResponse.getRefreshToken(), signResponse.getProfile());
+                        userPreferences.setGcmPushToken(null);
                         delegate.showHomeScreen();
                     }
                 }, throwable -> {
@@ -110,7 +118,7 @@ public class LogInSignUpPresenter {
 
     private boolean areDataValid(@Nullable String email, @Nullable String password) {
         boolean isEmailValid = Validators.isEmailValid(email);
-        boolean isPasswordValid =  !Strings.isNullOrEmpty(password) &&
+        boolean isPasswordValid = !Strings.isNullOrEmpty(password) &&
                 password.length() >= MIN_PASSWORD_CHARS && password.length() <= MAX_PASSWORD_CHARS;
 
         delegate.showEmailError(isEmailValid ? null : resources.getString(R.string.register_empty_mail));

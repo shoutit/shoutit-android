@@ -86,6 +86,9 @@
     <string name="login_empty_password">Password cannot be empty.</string>
     <string name="login_error_empty_email">Email or username cannot be empty</string>
 
+    <!-- Signup -->
+    <string name="signup_header">Please, fill in your name to let others know who you are</string>
+
     <!-- Register -->
     <string name="register_sign_up_btn_text">Sign up</string>
     <string name="register_name">Name</string>
@@ -783,5 +786,13 @@
     <string name="app_rate_dialog_text_for_shouts">Do you think Shoutit is helpful?</string>
     <string name="app_rate_second_dialog_rate">How about a rating on the Play store?</string>
     <string name="app_rate_second_dialog_feedback">Would you mind giving us some feedback?</string>
+    <string name="signup_your_name">Your name:</string>
+    <string name="signup_signup_btn">Sign up</string>
+    <string name="signup_choose_welcome">Welcome, %1$s</string>
+    <string name="signup_choose_not_now">Not now</string>
+    <string name="signup_choose_create_page">Create page</string>
+    <string name="signup_choose_continue">continue with user profile</string>
+    <string name="signup_choose_for_business">for your business or cause</string>
+    <string name="signup_choose_more_info">More information about pages</string>
 
 </resources>
