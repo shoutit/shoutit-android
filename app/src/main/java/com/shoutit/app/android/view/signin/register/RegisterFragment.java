@@ -32,7 +32,6 @@ import com.shoutit.app.android.view.about.AboutActivity;
 import com.shoutit.app.android.view.createpage.pagecategory.CreatePageCategoryActivity;
 import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.signin.LoginActivityComponent;
-import com.shoutit.app.android.view.signin.login.LoginFragment;
 import com.uservoice.uservoicesdk.UserVoice;
 
 import java.util.concurrent.TimeUnit;

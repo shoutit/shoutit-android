@@ -34,7 +34,7 @@ import static org.mockito.Mockito.when;
 
 public class LoginPresenterTest {
 
-    private LoginPresenter mLoginPresenter;
+    private LogInSignUpPresenter mLoginPresenter;
 
     private BehaviorSubject<SignResponse> mResponseSubject;
 
@@ -78,7 +78,7 @@ public class LoginPresenterTest {
         when(editor.clear())
                 .thenReturn(editor);
 
-        mLoginPresenter = new LoginPresenter(mApiService, mUserPreferences,
+        mLoginPresenter = new LogInSignUpPresenter(mApiService, mUserPreferences,
                 Schedulers.immediate(), Schedulers.immediate(), mixPanel);
     }
 

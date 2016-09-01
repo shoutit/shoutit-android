@@ -99,7 +99,7 @@
     <string name="register_bottom_text">By Proceeding you also agree to Shoutit’s %1$s and %2$s</string>
     <string name="register_bottom_text_terms_of_service">Terms of Service</string>
     <string name="register_bottom_text_privacy_policy">Privacy Policy</string>
-    <string name="register_forgot_password">Forgot your password?</string>
+    <string name="register_forgot_password">Forgot password</string>
     <string name="register_next_label">Next</string>
     <string name="register_done_label">Done</string>
     <string name="register_create_page_text">%1$s for brand or business</string>

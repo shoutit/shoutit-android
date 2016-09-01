@@ -1,5 +1,6 @@
 package com.shoutit.app.android.dagger;
 
+import com.shoutit.app.android.view.authorization.LogInSignUpFragment;
 import com.shoutit.app.android.view.bookmarks.BookmarkedShoutsFragment;
 import com.shoutit.app.android.view.credits.CreditsFragment;
 import com.shoutit.app.android.view.invitefriends.InviteFacebookFriendsFragment;
@@ -21,6 +22,7 @@ import dagger.Component;
 public interface BaseDaggerFragmentComponent extends BaseFragmentComponent {
 
     void inject(BookmarkedShoutsFragment fragment);
+    void inject(LogInSignUpFragment fragment);
     void inject(SearchCategoriesFragment fragment);
     void inject(PagesPagerFragment fragment);
     void inject(PublicPagesFragment fragment);

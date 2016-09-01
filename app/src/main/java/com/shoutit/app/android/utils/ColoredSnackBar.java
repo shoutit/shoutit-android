@@ -1,6 +1,7 @@
 package com.shoutit.app.android.utils;
 
 import android.app.Activity;
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
@@ -62,6 +63,10 @@ public class ColoredSnackBar {
     @Nonnull
     public static Snackbar error(@Nonnull View view, @Nonnull Throwable throwable) {
         return ColoredSnackBar.error(view, ErrorHandler.getErrorMessage(throwable, view.getContext()), Snackbar.LENGTH_LONG);
+    }
+
+    public static void showError(@Nonnull Activity activity, @Nonnull Throwable throwable) {
+        error(contentView(activity), throwable).show();
     }
 
     @Nonnull
