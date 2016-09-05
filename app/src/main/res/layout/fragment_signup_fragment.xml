@@ -3,38 +3,32 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/default_bg_color"
     android:orientation="vertical">
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:background="@android:color/white"
+        android:layout_height="72dp"
+        android:fontFamily="sans-serif-light"
         android:gravity="center"
-        android:padding="16dp"
+        android:paddingLeft="46dp"
+        android:paddingRight="46dp"
+        android:ellipsize="end"
         android:text="@string/signup_header"
-        android:textSize="18sp" />
+        android:textColor="@color/signup_info"
+        android:textSize="14sp" />
 
-    <include layout="@layout/shadow_item" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="30dp"
-        android:text="@string/signup_your_name"
-        android:textColor="@color/black_54"
-        android:textSize="18sp" />
+    <include layout="@layout/shadow_line" />
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/signup_name_til"
-        style="@style/BlueInputStyle"
+        style="@style/BaseTextInputStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
-        app:hintTextAppearance="@style/BlueInputStyle">
+        android:layout_marginTop="18dp"
+        app:hintTextAppearance="@style/BaseTextInputStyle">
 
         <EditText
             android:id="@+id/signup_name_et"
@@ -43,17 +37,19 @@
             android:hint="@string/signup_your_name"
             android:imeActionLabel="@string/login_done_label"
             android:imeOptions="actionDone"
+            android:theme="@style/BaseEditTextStyle"
             android:singleLine="true" />
 
     </android.support.design.widget.TextInputLayout>
 
     <Button
         android:id="@+id/signup_signup_btn"
-        style="@style/BaseButtonStyle"
+        style="@style/SignupButtons"
         android:layout_width="match_parent"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="14dp"
+        android:layout_marginLeft="18dp"
+        android:layout_marginRight="18dp"
+        android:layout_marginTop="28dp"
+        android:fitsSystemWindows="true"
         android:background="@drawable/selector_green_button_with_stroke"
         android:text="@string/signup_signup_btn"
         android:textColor="@android:color/white" />

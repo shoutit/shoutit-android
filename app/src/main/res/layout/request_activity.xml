@@ -35,7 +35,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
-                    app:hintTextAppearance="@style/BlueInputStyle">
+                    app:hintTextAppearance="@style/BaseTextInputStyle">
 
                     <EditText
                         android:singleLine="true"
@@ -57,7 +57,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        app:hintTextAppearance="@style/BlueInputStyle">
+                        app:hintTextAppearance="@style/BaseTextInputStyle">
 
                         <EditText
                             android:id="@+id/create_request_budget"

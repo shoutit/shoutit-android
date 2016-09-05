@@ -86,9 +86,6 @@
     <string name="login_empty_password">Password cannot be empty.</string>
     <string name="login_error_empty_email">Email or username cannot be empty</string>
 
-    <!-- Signup -->
-    <string name="signup_header">Please, fill in your name to let others know who you are</string>
-
     <!-- Register -->
     <string name="register_sign_up_btn_text">Sign up</string>
     <string name="register_name">Name</string>
@@ -794,5 +791,12 @@
     <string name="signup_choose_continue">continue with user profile</string>
     <string name="signup_choose_for_business">for your business or cause</string>
     <string name="signup_choose_more_info">More information about pages</string>
+
+    <!-- Login/Signup -->
+    <string name="login_signup_prompt">Please fill the form and tap «Next Step» for Log In or Sign Up!</string>
+    <string name="login_signup_btn">Log in / sign up</string>
+
+    <!-- Signup -->
+    <string name="signup_header">Please, fill in your name to let others know who you are</string>
 
 </resources>

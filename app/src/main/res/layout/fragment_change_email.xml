@@ -8,7 +8,7 @@
 
     <android.support.design.widget.TextInputLayout
         android:theme="@style/BlueEditText"
-        app:hintTextAppearance="@style/BlueInputStyle"
+        app:hintTextAppearance="@style/BaseTextInputStyle"
         android:id="@+id/account_change_email_til"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"

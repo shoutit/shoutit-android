@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.BaseDaggerFragment;
@@ -18,6 +19,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseDaggerFragmentComponent;
 import com.shoutit.app.android.utils.AppseeHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.RegisterUtils;
 import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.signin.LoginActivity;
 import com.shoutit.app.android.view.signin.forgotpassword.ForgotPasswordActivity;
@@ -44,6 +46,8 @@ public class LogInSignUpFragment extends BaseDaggerFragment implements LogInSign
     TextInputLayout passwordInputLayout;
     @Bind(R.id.register_proceed_btn)
     Button proceedBtn;
+    @Bind(R.id.login_bottom_text)
+    TextView termsAndPrivacyTV;
 
     @Inject
     LogInSignUpPresenter presenter;
@@ -64,6 +68,8 @@ public class LogInSignUpFragment extends BaseDaggerFragment implements LogInSign
 
         AppseeHelper.markViewAsSensitive(emailInputLayout);
         AppseeHelper.markViewAsSensitive(passwordInputLayout);
+
+        RegisterUtils.setUpSpans(getActivity(), termsAndPrivacyTV);
 
         passwordEt.setTransformationMethod(new PasswordTransformationMethod());
 

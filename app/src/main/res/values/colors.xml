@@ -44,9 +44,6 @@
     <color name="menu_bg">#F4F4F4</color>
     <color name="menu_change">#40C4FF</color>
 
-    <!-- Register -->
-    <color name="register_underline">#40C4FF</color>
-
     <!-- Discover -->
     <color name="discover_button">#1f000000</color>
     <color name="discover_button_pressed">#5e000000</color>
@@ -119,6 +116,9 @@
 
     <!-- Create Page Category -->
     <color name="create_page_category_item_background">#3334dd68</color>
+
+    <!-- Sign up -->
+    <color name="signup_info">#8F8F8F</color>
 
 
 </resources>

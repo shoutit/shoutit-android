@@ -75,6 +75,7 @@
         <activity
             android:name=".view.signin.LoginActivity"
             android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@style/LoginActivityTheme"/>
         <activity
             android:name="com.facebook.FacebookActivity"

@@ -18,8 +18,8 @@ public class SpanUtils {
         return clickableStyledSpan(wholeText, clickablePart, ImmutableList.of(new ForegroundColorSpan(color)), onClickListener);
     }
 
-    public static SpannableString clickableColoredUnderlinedSpan(CharSequence wholeText, CharSequence clickablePart, int color, OnClickListener onClickListener) {
-        return clickableStyledSpan(wholeText, clickablePart, ImmutableList.of(new UnderlineSpan(), new ForegroundColorSpan(color)), onClickListener);
+    public static SpannableString clickableColoredUnderlinedSpan(CharSequence wholeText, CharSequence clickablePart, OnClickListener onClickListener) {
+        return clickableStyledSpan(wholeText, clickablePart, ImmutableList.of(new UnderlineSpan()), onClickListener);
     }
 
     public static SpannableString clickableStyledSpan(CharSequence wholeText, CharSequence clickablePart, List<Object> stylesSpan, OnClickListener onClickListener) {

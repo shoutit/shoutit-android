@@ -41,11 +41,11 @@ Pages verification doesn’t take long time and will give your Page more legitma
 
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/business_ver_name_il"
-                    style="@style/BlueInputStyle"
+                    style="@style/BaseTextInputStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    app:hintTextAppearance="@style/BlueInputStyle">
+                    app:hintTextAppearance="@style/BaseTextInputStyle">
 
                     <EditText
                         android:id="@+id/business_ver_name_et"
@@ -61,11 +61,11 @@ Pages verification doesn’t take long time and will give your Page more legitma
 
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/business_ver_contact_person_tl"
-                    style="@style/BlueInputStyle"
+                    style="@style/BaseTextInputStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    app:hintTextAppearance="@style/BlueInputStyle">
+                    app:hintTextAppearance="@style/BaseTextInputStyle">
 
                     <EditText
                         android:id="@+id/business_ver_contact_person_et"
@@ -81,11 +81,11 @@ Pages verification doesn’t take long time and will give your Page more legitma
 
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/business_ver_contact_number_tl"
-                    style="@style/BlueInputStyle"
+                    style="@style/BaseTextInputStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    app:hintTextAppearance="@style/BlueInputStyle">
+                    app:hintTextAppearance="@style/BaseTextInputStyle">
 
                     <EditText
                         android:id="@+id/business_ver_contact_number_et"
@@ -101,11 +101,11 @@ Pages verification doesn’t take long time and will give your Page more legitma
 
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/business_ver_email_til"
-                    style="@style/BlueInputStyle"
+                    style="@style/BaseTextInputStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    app:hintTextAppearance="@style/BlueInputStyle">
+                    app:hintTextAppearance="@style/BaseTextInputStyle">
 
                     <EditText
                         android:id="@+id/business_ver_email_et"

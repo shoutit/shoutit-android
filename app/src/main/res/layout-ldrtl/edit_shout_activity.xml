@@ -58,7 +58,7 @@
                     android:id="@+id/edit_description_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:hintTextAppearance="@style/BlueInputStyle">
+                    app:hintTextAppearance="@style/BaseTextInputStyle">
 
                     <EditText
                         android:singleLine="true"
@@ -84,7 +84,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        app:hintTextAppearance="@style/BlueInputStyle">
+                        app:hintTextAppearance="@style/BaseTextInputStyle">
 
                         <EditText
                             android:id="@+id/edit_budget"
@@ -136,7 +136,7 @@
                     android:layout_marginTop="6dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:hintTextAppearance="@style/BlueInputStyle">
+                    app:hintTextAppearance="@style/BaseTextInputStyle">
 
                     <EditText
                         android:id="@+id/edit_shout_description"
@@ -197,7 +197,7 @@
                     android:layout_marginTop="6dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:hintTextAppearance="@style/BlueInputStyle">
+                    app:hintTextAppearance="@style/BaseTextInputStyle">
 
                     <EditText
                         android:id="@+id/edit_shout_mobile"

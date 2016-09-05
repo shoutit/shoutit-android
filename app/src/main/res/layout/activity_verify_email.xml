@@ -40,7 +40,7 @@
 
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/verify_email_text_input"
-                    style="@style/BlueInputStyle"
+                    style="@style/BaseTextInputStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="-3dp"
