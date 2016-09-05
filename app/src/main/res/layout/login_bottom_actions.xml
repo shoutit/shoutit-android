@@ -3,27 +3,24 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/login_bottom_actions_container"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="8dp"
+    android:layout_height="56dp"
+    android:gravity="center_vertical"
     android:layout_alignParentBottom="true"
     android:orientation="horizontal">
 
     <TextView
         android:id="@+id/activity_login_feedback"
         style="@style/LoginBottomButtons"
-        android:gravity="left|start|top"
         android:text="@string/login_intro_feedback" />
 
     <TextView
         android:id="@+id/activity_login_help"
         style="@style/LoginBottomButtons"
-        android:gravity="center|top"
         android:text="@string/login_intro_help" />
 
     <TextView
         android:id="@+id/activity_login_about"
         style="@style/LoginBottomButtons"
-        android:gravity="right|end|top"
         android:text="@string/login_intro_about" />
 
 </LinearLayout>

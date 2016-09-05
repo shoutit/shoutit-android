@@ -44,13 +44,12 @@
 
     <Button
         android:id="@+id/signup_signup_btn"
-        style="@style/SignupButtons"
+        style="@style/GreenButton"
         android:layout_width="match_parent"
         android:layout_marginLeft="18dp"
         android:layout_marginRight="18dp"
         android:layout_marginTop="28dp"
         android:fitsSystemWindows="true"
-        android:background="@drawable/selector_green_button_with_stroke"
         android:text="@string/signup_signup_btn"
         android:textColor="@android:color/white" />
 

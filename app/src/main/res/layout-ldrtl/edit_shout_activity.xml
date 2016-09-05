@@ -69,7 +69,7 @@
                         android:layout_marginStart="-4dp"
                         android:gravity="start"
                         android:hint="@string/edit_shout_title_hint"
-                        android:theme="@style/BlueEditText" />
+                        android:theme="@style/BaseEditTextStyle" />
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -94,7 +94,7 @@
                             android:gravity="start"
                             android:hint="@string/create_request_price"
                             android:inputType="numberDecimal"
-                            android:theme="@style/BlueEditText" />
+                            android:theme="@style/BaseEditTextStyle" />
                     </android.support.design.widget.TextInputLayout>
 
                     <ImageView
@@ -145,7 +145,7 @@
                         android:layout_marginLeft="-4dp"
                         android:gravity="start"
                         android:hint="@string/edit_shout_description_hint"
-                        android:theme="@style/BlueEditText" />
+                        android:theme="@style/BaseEditTextStyle" />
                 </android.support.design.widget.TextInputLayout>
 
                 <LinearLayout

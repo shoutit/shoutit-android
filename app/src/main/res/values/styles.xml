@@ -8,12 +8,16 @@
         <item name="actionBarStyle">@style/AppTheme.BaseToolbarStyle</item>
     </style>
 
-    <style name="FacebookButton" parent="AppTheme">
-        <item name="colorButtonNormal">@color/login_facebook_button</item>
+    <style name="FacebookButton" parent="SignupButtons">
+        <item name="android:background">@drawable/button_facebook</item>
     </style>
 
-    <style name="GoogleButton" parent="AppTheme">
-        <item name="colorButtonNormal">@color/login_google_button</item>
+    <style name="GreenButton" parent="SignupButtons">
+        <item name="android:background">@drawable/selector_green_button</item>
+    </style>
+
+    <style name="GoogleButton" parent="SignupButtons">
+        <item name="android:background">@drawable/button_google</item>
     </style>
 
     <style name="LoginButton" parent="AppTheme">
@@ -70,7 +74,7 @@
     </style>
 
     <style name="SignupButtons">
-        <item name="android:layout_height">52dp</item>
+        <item name="android:layout_height">50dp</item>
         <item name="android:textSize">14sp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textAllCaps">true</item>
@@ -80,9 +84,10 @@
         <item name="android:layout_height">30dp</item>
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_weight">1</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:textColor">@color/black_54</item>
-        <item name="android:background">?selectableItemBackgroundBorderless</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">?selectableItemBackground</item>
     </style>
 
     <style name="WhiteToolbar" parent="Theme.AppCompat.Light.NoActionBar">
@@ -91,6 +96,13 @@
         <item name="android:background">@android:color/white</item>
         <item name="colorControlActivated">@color/accent_blue</item> <!-- Cursor color -->
         <item name="android:textColorSecondary">@color/accent_blue</item>
+    </style>
+
+    <style name="WhiteLogoToolbar" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@android:color/white</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="android:background">@android:color/white</item>
+        <item name="colorControlActivated">@color/black_54</item> <!-- Cursor color -->
     </style>
 
     <style name="SideMenuItem">
@@ -125,6 +137,13 @@
     <style name="BaseEditTextStyle" parent="ThemeOverlay.AppCompat">
         <item name="colorControlActivated">@color/colorPrimary</item>
         <item name="colorControlHighlight">@color/colorPrimary</item>
+        <item name="colorControlNormal">@color/black_20</item>
+        <item name="android:paddingBottom">16dp</item>
+    </style>
+
+    <style name="BlueEditText" parent="ThemeOverlay.AppCompat">
+        <item name="colorControlActivated">@color/accent_blue</item>
+        <item name="colorControlHighlight">@color/accent_blue</item>
         <item name="colorControlNormal">@color/black_20</item>
         <item name="android:paddingBottom">16dp</item>
     </style>

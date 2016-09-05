@@ -21,6 +21,7 @@
     <color name="base_item_selected_color">#0f000000</color>
     <color name="accent_red">#ff5252</color>
     <color name="green_tab_text_color">#b2ffffff</color>
+    <color name="white">#ffffff</color>
 
     <!-- Intro -->
     <color name="intro_gradient_start">#35dd69</color>
@@ -32,7 +33,7 @@
 
     <!-- Login -->
     <color name="login_facebook_button">#3A589A</color>
-    <color name="login_google_button">#DF5238</color>
+    <color name="login_google_button">#DF5843</color>
     <color name="login_signup_button">#58585A</color>
     <color name="login_forgot_password">#40C4FF</color>
 
