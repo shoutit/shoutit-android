@@ -29,7 +29,7 @@ import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
 import com.shoutit.app.android.view.discover.DiscoverActivity;
 import com.shoutit.app.android.view.main.OnSeeAllDiscoversListener;
-import com.shoutit.app.android.view.postlogininterest.PostLoginInterestActivity;
+import com.shoutit.app.android.view.postlogininterest.PostSignUpActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 
 import java.util.List;
@@ -174,7 +174,7 @@ public class HomeFragment extends BaseFragment {
                 .subscribe(new Action1<Object>() {
                     @Override
                     public void call(Object o) {
-                        startActivity(PostLoginInterestActivity.newIntent(getActivity()));
+                        startActivity(PostSignUpActivity.newIntent(getActivity()));
                         getActivity().finish();
                     }
                 });

@@ -92,7 +92,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/PreferenceStyle"/>
         <activity
-            android:name=".view.postlogininterest.PostLoginInterestActivity"
+            android:name=".view.postlogininterest.PostSignUpActivity"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".view.postlogininterest.postsignupsecond.PostSignupSecondActivity"

@@ -11,6 +11,7 @@ import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Observer;
@@ -57,6 +58,7 @@ public class SelectionHelper<T> {
     private final PublishSubject<BothParams<T, Boolean>> toggleSubject = PublishSubject.create();
     private final Observable<Set<T>> mSelectedItems;
 
+    @Inject
     public SelectionHelper() {
         final Observable<ItemAction> selected = toggleSubject.map(new Func1<BothParams<T, Boolean>, ItemAction>() {
             @Override

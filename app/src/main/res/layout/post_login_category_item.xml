@@ -1,37 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/category_item_container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginLeft="14dp"
-    android:layout_marginBottom="4dp"
-    android:gravity="start"
-    android:layout_marginTop="4dp"
-    android:layout_marginRight="14dp">
-
-    <ImageView
-        tools:src="@drawable/ky"
-        android:id="@+id/post_login_category_img"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_gravity="center_vertical"/>
-
-    <TextView
-        tools:text="Cars"
-        android:id="@+id/post_login_category_text"
-        android:layout_width="0dp"
-        android:layout_weight="1"
-        android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:fontFamily="@string/font_roboto_regular"
-        android:layout_gravity="center_vertical"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp" />
+    android:layout_height="52dp"
+    android:background="@color/white"
+    android:gravity="center_vertical">
 
     <CheckBox
         android:id="@+id/post_login_category_checkbox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|end|right" />
+        android:layout_width="24dp"
+        android:layout_height="match_parent"
+        android:layout_marginRight="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginStart="30dp"
+        android:layout_gravity="center"
+        android:button="@drawable/selector_checkbox_interests"
+        android:checked="true" />
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/post_login_category_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textSize="16sp"
+        android:fontFamily="sans-serif-light"
+        android:layout_marginEnd="30dp"
+        android:paddingRight="30dp"
+        android:gravity="center_vertical"
+        android:textColor="@color/textBlackPrimary"
+        android:layout_toRightOf="@+id/post_login_category_checkbox"
+        android:layout_toEndOf="@+id/post_login_category_checkbox"
+        tools:text="Cars" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentTop="true"
+        android:background="@color/base_divider"/>
+
+</RelativeLayout>

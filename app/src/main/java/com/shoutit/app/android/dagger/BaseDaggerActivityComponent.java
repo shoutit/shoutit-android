@@ -12,6 +12,7 @@ import com.shoutit.app.android.view.location.LocationActivity;
 import com.shoutit.app.android.view.location.LocationActivityForResult;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.notifications.NotificationsActivity;
+import com.shoutit.app.android.view.postlogininterest.PostSignUpActivity;
 import com.shoutit.app.android.view.promote.promoted.PromotedActivity;
 import com.shoutit.app.android.view.settings.SettingsActivity;
 import com.shoutit.app.android.view.settings.account.AccountActivity;
@@ -39,6 +40,7 @@ import dagger.Component;
 public interface BaseDaggerActivityComponent extends BaseActivityComponent {
 
         void inject(VerifyBusinessActivity activity);
+        void inject(PostSignUpActivity activity);
         void inject(OutgoingVideoCallActivity activity);
         void inject(IncomingVideoCallActivity activity);
         void inject(DialogCallActivity activity);
@@ -54,16 +56,10 @@ public interface BaseDaggerActivityComponent extends BaseActivityComponent {
         void inject(LocationActivityForResult activity);
         void inject(IntroActivity activity);
         void inject(DiscoverActivity activity);
-
         void inject(TransactionsActivity activity);
-
         void inject(CreatePageCategoryActivity activity);
-
         void inject(ConversationsActivity activity);
-
         void inject(InterestsActivity activity);
-
         void inject(InviteContactsActivity activity);
-
         void inject(CreateShoutDeepLinkDispatchActivity activity);
 }

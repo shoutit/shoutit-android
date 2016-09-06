@@ -800,4 +800,8 @@
     <!-- Signup -->
     <string name="signup_header">Please, fill in your name to let others know who you are</string>
 
+    <!-- Post Signup -->
+    <string name="post_signup_iterests_header">What interests you the most?</string>
+    <string name="post_signup_interests_subheader">Choose what you are interested in and related shouts (listings) will be displayed on your home screen.</string>
+
 </resources>

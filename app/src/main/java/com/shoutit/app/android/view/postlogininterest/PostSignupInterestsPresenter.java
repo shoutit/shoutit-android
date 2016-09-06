@@ -1,5 +1,6 @@
 package com.shoutit.app.android.view.postlogininterest;
 
+import android.content.res.Resources;
 import android.support.annotation.NonNull;
 
 import com.appunite.rx.ObservableExtensions;
@@ -8,12 +9,17 @@ import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.BothParams;
+import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.shoutit.app.android.R;
+import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
+import com.shoutit.app.android.adapteritems.HeaderItem;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.TagsRequest;
+import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.CategoriesDao;
 
 import java.util.List;
@@ -31,7 +37,7 @@ import rx.functions.Func1;
 import rx.observers.Observers;
 import rx.subjects.PublishSubject;
 
-public class PostLoginPresenter {
+public class PostSignupInterestsPresenter {
 
     private final Observable<List<BaseAdapterItem>> mCategoryItems;
     private final Observable<Throwable> mError;
@@ -39,34 +45,40 @@ public class PostLoginPresenter {
     private final PublishSubject<Object> clickedSubject = PublishSubject.create();
     private final Observable<Throwable> mErrorCategoriesObservable;
     private final Observable<Object> mSuccessCategoriesObservable;
+    private final Observable<Boolean> progressObservable;
 
     @Inject
-    public PostLoginPresenter(CategoriesDao dao,
-                              final ApiService apiService,
-                              @NetworkScheduler final Scheduler networkScheduler,
-                              @UiScheduler final Scheduler uiScheduler,
-                              SelectionHelper<String> selectionHelper) {
+    public PostSignupInterestsPresenter(CategoriesDao dao,
+                                        final ApiService apiService,
+                                        @NetworkScheduler final Scheduler networkScheduler,
+                                        @UiScheduler final Scheduler uiScheduler,
+                                        SelectionHelper<String> selectionHelper,
+                                        @ForActivity Resources resources) {
         mStringSelectionHelper = selectionHelper;
 
-        final Observable<ResponseOrError<List<Category>>> listObservableResponseOrError = dao
+        final Observable<ResponseOrError<List<Category>>> categoriesRequest = dao
                 .categoriesObservable()
                 .subscribeOn(networkScheduler)
-                .observeOn(uiScheduler);
-        final Observable<List<Category>> success = listObservableResponseOrError.compose(ResponseOrError.<List<Category>>onlySuccess());
+                .observeOn(uiScheduler)
+                .compose(ObservableExtensions.behaviorRefCount());
 
-        mError = listObservableResponseOrError.compose(ResponseOrError.<List<Category>>onlyError());
+        final Observable<List<Category>> successRequest = categoriesRequest.compose(ResponseOrError.<List<Category>>onlySuccess());
 
-        mCategoryItems = success.map(new Func1<List<Category>, List<BaseAdapterItem>>() {
-            @Override
-            public List<BaseAdapterItem> call(List<Category> categories) {
-                return ImmutableList.copyOf(Iterables.transform(categories, new Function<Category, BaseAdapterItem>() {
-                    @Nullable
-                    @Override
-                    public CategoryItem apply(Category input) {
-                        return new CategoryItem(input.getIcon(), input.getName(), input.getSlug());
-                    }
-                }));
-            }
+        mError = categoriesRequest.compose(ResponseOrError.<List<Category>>onlyError());
+
+        mCategoryItems = successRequest.map((Func1<List<Category>, List<BaseAdapterItem>>) categories -> {
+            final ImmutableList.Builder<BaseAdapterItem> builder = new ImmutableList.Builder<>();
+            builder.add(new HeaderItem(resources.getString(R.string.post_signup_interests_subheader)));
+
+            builder.addAll(Iterables.transform(categories, new Function<Category, BaseAdapterItem>() {
+                @Nullable
+                @Override
+                public CategoryItem apply(Category input) {
+                    return new CategoryItem(input.getIcon(), input.getName(), input.getSlug());
+                }
+            }));
+
+            return builder.build();
         });
 
         final Observable<ResponseOrError<Object>> sendObservable = clickedSubject
@@ -98,10 +110,16 @@ public class PostLoginPresenter {
 
         mErrorCategoriesObservable = sendObservable.compose(ResponseOrError.onlyError());
         mSuccessCategoriesObservable = sendObservable.compose(ResponseOrError.onlySuccess());
+
+        progressObservable = Observable.merge(
+                categoriesRequest.map(Functions1.returnFalse()),
+                sendObservable.map(Functions1.returnFalse()),
+                clickedSubject.map(Functions1.returnTrue())
+        ).startWith(true);
     }
 
     @NonNull
-    public Observable<List<BaseAdapterItem>> getCategoriesList() {
+    public Observable<List<BaseAdapterItem>> getCategoriesItems() {
         return mCategoryItems;
     }
 
@@ -121,8 +139,13 @@ public class PostLoginPresenter {
     }
 
     @NonNull
-    public SelectionHelper<String> getStringSelectionHelper() {
-        return mStringSelectionHelper;
+    public Observable<Boolean> hasAnySelectedCategoriesObservable() {
+        return mStringSelectionHelper.getSelectedItems()
+                .map(selectedItems -> !selectedItems.isEmpty());
+    }
+
+    public Observable<Boolean> getProgressObservable() {
+        return progressObservable;
     }
 
     @NonNull
@@ -208,4 +231,6 @@ public class PostLoginPresenter {
             return equals(item);
         }
     }
+
+
 }
