@@ -49,7 +49,7 @@ public class LoginIntroActivity extends BaseDaggerActivity {
 
     public static final int GOOGLE_SIGN_IN = 0;
 
-    @Bind(R.id.activity_login_toolbar)
+    @Bind(R.id.signups_toolbar)
     Toolbar toolbar;
 
     @Bind(R.id.activity_login_progress_layout)
@@ -75,6 +75,8 @@ public class LoginIntroActivity extends BaseDaggerActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_intro);
         ButterKnife.bind(this);
+
+        toolbar.setElevation(0);
 
         initFacebook();
 

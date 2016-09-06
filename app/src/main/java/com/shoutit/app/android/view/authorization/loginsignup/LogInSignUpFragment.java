@@ -5,12 +5,15 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.NestedScrollView;
+import android.support.v7.app.AppCompatActivity;
 import android.text.method.PasswordTransformationMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.jakewharton.rxbinding.view.RxView;
@@ -20,6 +23,7 @@ import com.shoutit.app.android.dagger.BaseDaggerFragmentComponent;
 import com.shoutit.app.android.utils.AppseeHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.RegisterUtils;
+import com.shoutit.app.android.view.authorization.signup.SignUpFragment;
 import com.shoutit.app.android.view.main.MainActivity;
 import com.shoutit.app.android.view.signin.LoginActivity;
 import com.shoutit.app.android.view.signin.forgotpassword.ForgotPasswordActivity;
@@ -125,7 +129,7 @@ public class LogInSignUpFragment extends BaseDaggerFragment implements LogInSign
 
     @Override
     public void showSignUpScreen() {
-        ((LoginActivity) getActivity()).showFragment(LoginActivity.FRAGMENT_SIGNUP, false);
+        ((LoginActivity) getActivity()).showFragment(SignUpFragment.newInstance(), false);
     }
 
     @Override

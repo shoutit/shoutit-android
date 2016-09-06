@@ -3,42 +3,48 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/default_bg_color"
+    android:background="@color/white"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/white"
+        android:minHeight="100dp"
+        android:background="@color/white"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="8dp"
+        android:gravity="center">
 
         <TextView
             android:id="@+id/signup_choose_name_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="2dp"
             android:gravity="center"
             android:text="@string/signup_choose_welcome"
             android:textColor="@color/black_87"
-            android:textSize="20sp" />
+            android:textSize="18sp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="@string/signup_header"
-            android:textSize="18sp" />
+            android:paddingLeft="60dp"
+            android:paddingRight="60dp"
+            android:textColor="@color/textBlackSecondary"
+            android:fontFamily="sans-serif-light"
+            android:text="@string/signup_choose_header"
+            android:textSize="14sp" />
 
     </LinearLayout>
 
-    <include layout="@layout/shadow_item" />
+    <include layout="@layout/shadow_line" />
 
     <LinearLayout
         android:id="@+id/signup_choose_contunue_as_user"
         style="@style/BaseButtonStyle"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="74dp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginTop="74dp"
@@ -56,7 +62,8 @@
             android:text="@string/signup_choose_not_now"
             android:textAllCaps="true"
             android:textColor="@android:color/white"
-            android:textSize="18sp" />
+            android:fontFamily="sans-serif-medium"
+            android:textSize="16sp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -66,7 +73,7 @@
             android:singleLine="true"
             android:text="@string/signup_choose_continue"
             android:textColor="@android:color/white"
-            android:textSize="16sp" />
+            android:textSize="14sp" />
 
     </LinearLayout>
 
@@ -74,10 +81,10 @@
         android:id="@+id/signup_choose_create_page"
         style="@style/BaseButtonStyle"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="74dp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="10dp"
         android:background="#333333"
         android:gravity="center"
         android:orientation="vertical"
@@ -91,8 +98,9 @@
             android:singleLine="true"
             android:text="@string/signup_choose_create_page"
             android:textAllCaps="true"
-            android:textColor="@android:color/white"
-            android:textSize="18sp" />
+            android:fontFamily="sans-serif-medium"
+            android:textSize="16sp"
+            android:textColor="@android:color/white" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -102,7 +110,7 @@
             android:singleLine="true"
             android:text="@string/signup_choose_for_business"
             android:textColor="@android:color/white"
-            android:textSize="16sp" />
+            android:textSize="14sp" />
 
     </LinearLayout>
 
@@ -111,14 +119,14 @@
         android:layout_height="0dp"
         android:layout_weight="1"/>
 
-    <include layout="@layout/shadow_item" />
+    <include layout="@layout/shadow_line_rotated" />
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="56dp"
         android:text="@string/signup_choose_more_info"
         android:gravity="center"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:textColor="@color/colorPrimary"/>
 
 </LinearLayout>

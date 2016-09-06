@@ -15,6 +15,7 @@ import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.view.authorization.SignUpChooseFragment;
 import com.shoutit.app.android.view.authorization.loginsignup.LogInSignUpFragment;
 import com.shoutit.app.android.view.authorization.signup.SignUpFragment;
 
@@ -26,12 +27,7 @@ import butterknife.ButterKnife;
 
 public class LoginActivity extends BaseActivity {
 
-    public static final String FRAGMENT_SIGNUP = "signup";
-    public static final String FRAGMENT_SIGNUP_CHOOSE = "signup_choose";
-    public static final String FRAGMENT_SIGNUP_SELECT_INETERESTS = "select_interests";
-    public static final String FRAGMENT_SIGNUP_SELECT_USERS = "select_users";
-
-    @Bind(R.id.login_toolbar)
+    @Bind(R.id.signups_toolbar)
     Toolbar toolbar;
 
     @Nonnull
@@ -55,10 +51,10 @@ public class LoginActivity extends BaseActivity {
         }
     }
 
-    public void showFragment(String tag, boolean addToBackStack) {
+    public void showFragment(Fragment fragment, boolean addToBackStack) {
         final FragmentTransaction transaction = getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.login_fragments_container, getFragment(tag), tag);
+                .replace(R.id.login_fragments_container, fragment);
 
         if (addToBackStack) {
             transaction.addToBackStack(null);
@@ -67,27 +63,12 @@ public class LoginActivity extends BaseActivity {
         transaction.commit();
     }
 
-    private Fragment getFragment(@Nonnull String tag) {
-        switch (tag) {
-            case FRAGMENT_SIGNUP:
-                return SignUpFragment.newInstance();
-            case FRAGMENT_SIGNUP_CHOOSE:
-            case FRAGMENT_SIGNUP_SELECT_INETERESTS:
-            case FRAGMENT_SIGNUP_SELECT_USERS:
-            default:
-                // TODO remove it
-                return SignUpFragment.newInstance();
-        }
-    }
-
     private void setUpActionBar() {
         toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
         setSupportActionBar(toolbar);
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(null);
         actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setDisplayUseLogoEnabled(true);
-        actionBar.setLogo(R.drawable.appbar_logo_white);
     }
 
     @Override

@@ -786,6 +786,7 @@
     <string name="signup_your_name">Your name:</string>
     <string name="signup_signup_btn">Sign up</string>
     <string name="signup_choose_welcome">Welcome, %1$s</string>
+    <string name="signup_choose_header">Do you want to create a Page for your business or cause?</string>
     <string name="signup_choose_not_now">Not now</string>
     <string name="signup_choose_create_page">Create page</string>
     <string name="signup_choose_continue">continue with user profile</string>

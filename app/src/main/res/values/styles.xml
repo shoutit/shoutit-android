@@ -9,7 +9,7 @@
     </style>
 
     <style name="FacebookButton" parent="SignupButtons">
-        <item name="android:background">@drawable/button_facebook</item>
+        <item name="android:background">@drawable/selector_fb_button</item>
     </style>
 
     <style name="GreenButton" parent="SignupButtons">
@@ -17,7 +17,7 @@
     </style>
 
     <style name="GoogleButton" parent="SignupButtons">
-        <item name="android:background">@drawable/button_google</item>
+        <item name="android:background">@drawable/selector_google_button</item>
     </style>
 
     <style name="LoginButton" parent="AppTheme">
@@ -73,7 +73,7 @@
         <item name="android:textAllCaps">true</item>
     </style>
 
-    <style name="SignupButtons">
+    <style name="SignupButtons" parent="Base.Widget.AppCompat.Button">
         <item name="android:layout_height">50dp</item>
         <item name="android:textSize">14sp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
@@ -102,6 +102,7 @@
         <item name="colorPrimary">@android:color/white</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="android:background">@android:color/white</item>
+        <item name="elevation">0dp</item>
         <item name="colorControlActivated">@color/black_54</item> <!-- Cursor color -->
     </style>
 

@@ -5,6 +5,7 @@
     android:layout_height="match_parent">
 
     <ScrollView
+        android:id="@+id/login_signup_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true">
@@ -33,6 +34,7 @@
                 android:layout_height="0dp"
                 android:layout_marginTop="60dp"
                 android:layout_weight="1"
+                android:isScrollContainer="true"
                 android:orientation="vertical">
 
                 <android.support.design.widget.TextInputLayout
@@ -106,7 +108,6 @@
                     android:layout_marginTop="32dp"
                     android:background="@drawable/selector_green_button_with_stroke"
                     android:text="@string/login_signup_btn"
-                    android:fitsSystemWindows="true"
                     android:textColor="@android:color/white" />
 
                 <TextView

@@ -121,7 +121,11 @@ public class LogInSignUpPresenter {
         boolean isPasswordValid = !Strings.isNullOrEmpty(password) &&
                 password.length() >= MIN_PASSWORD_CHARS && password.length() <= MAX_PASSWORD_CHARS;
 
-        delegate.showEmailError(isEmailValid ? null : resources.getString(R.string.register_empty_mail));
+        if (Strings.isNullOrEmpty(email)) {
+            delegate.showEmailError(isEmailValid ? null : resources.getString(R.string.register_empty_mail));
+        } else {
+            delegate.showEmailError(isEmailValid ? null : resources.getString(R.string.error_wrong_email));
+        }
         delegate.showPasswordError(isPasswordValid ? null : resources.getString(R.string.register_empty_password));
 
         return isEmailValid && isPasswordValid;

@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.shoutit.app.android.BaseDaggerFragment;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseDaggerFragmentComponent;
+import com.shoutit.app.android.view.postlogininterest.PostLoginInterestActivity;
 import com.shoutit.app.android.view.signin.LoginActivity;
 
 import javax.annotation.Nonnull;
@@ -52,7 +53,7 @@ public class SignUpChooseFragment extends BaseDaggerFragment {
 
     @OnClick(R.id.signup_choose_contunue_as_user)
     public void continueAsUserClicked() {
-        ((LoginActivity) getActivity()).showFragment(LoginActivity.FRAGMENT_SIGNUP_SELECT_USERS, false);
+        startActivity(PostLoginInterestActivity.newIntent(getActivity()));
     }
 
     @OnClick(R.id.signup_choose_create_page)

@@ -4,26 +4,15 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/default_bg_color">
+    android:background="@color/white">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/login_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?actionBarSize"
-        android:theme="@style/AppTheme.BaseToolbarStyle"
-        android:elevation="0dp"
-        android:title=""/>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="4dp"
-        android:layout_below="@id/login_toolbar"
-        android:background="@drawable/toolbar_drop_shadow"/>
+    <include layout="@layout/toolbar_signups"
+        android:id="@+id/signups_toolbar_container"/>
 
     <FrameLayout
         android:id="@+id/login_fragments_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/login_toolbar"/>
+        android:layout_below="@+id/signups_toolbar_container"/>
 
 </RelativeLayout>

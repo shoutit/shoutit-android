@@ -65,10 +65,10 @@
             <Button
                 android:id="@+id/activity_login_facebook_btn"
                 style="@style/FacebookButton"
-                android:layout_marginLeft="18dp"
-                android:layout_marginRight="18dp"
                 android:layout_width="match_parent"
                 android:layout_marginBottom="10dp"
+                android:layout_marginLeft="18dp"
+                android:layout_marginRight="18dp"
                 android:paddingLeft="22dp"
                 android:paddingStart="22dp"
                 android:text="@string/login_intro_facebook"
@@ -77,25 +77,23 @@
             <Button
                 android:id="@+id/activity_login_gplus_btn"
                 style="@style/GoogleButton"
-                android:layout_marginLeft="18dp"
-                android:layout_marginRight="18dp"
                 android:layout_width="match_parent"
                 android:layout_marginBottom="10dp"
+                android:layout_marginLeft="18dp"
+                android:layout_marginRight="18dp"
                 android:paddingLeft="22dp"
                 android:paddingStart="22dp"
                 android:text="@string/login_intro_google"
-                android:textColor="@android:color/white"
-                android:theme="@style/GoogleButton" />
+                android:textColor="@android:color/white" />
 
             <Button
                 android:id="@+id/activity_login_signup"
                 style="@style/GreenButton"
+                android:layout_width="match_parent"
                 android:layout_marginLeft="18dp"
                 android:layout_marginRight="18dp"
-                android:layout_width="match_parent"
                 android:text="@string/login_intro_signup"
-                android:textColor="@android:color/white"
-                android:theme="@style/LoginButton" />
+                android:textColor="@android:color/white" />
 
             <View
                 android:layout_width="match_parent"
@@ -112,13 +110,7 @@
 
     </ScrollView>
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/activity_login_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?actionBarSize"
-        android:theme="@style/WhiteLogoToolbar"
-        android:title=""
-        app:elevation="0dp" />
+    <include layout="@layout/toolbar_signups"/>
 
     <FrameLayout
         android:id="@+id/activity_login_progress_layout"

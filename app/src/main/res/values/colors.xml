@@ -2,8 +2,10 @@
 <resources>
     <!-- Base theme colors -->
     <color name="colorPrimary">#35dd69</color>
-    <color name="colorPrimaryDark">#289f43</color>
+    <color name="colorPrimaryDark">#3B3B3B</color>
     <color name="colorAccent">#35dd69</color>
+    <color name="textBlackPrimary">#1D1D1D</color>
+    <color name="textBlackSecondary">#8F8F8F</color>
 
     <!-- Global values -->
     <color name="default_bg_color">#f7f7f7</color>
@@ -22,6 +24,7 @@
     <color name="accent_red">#ff5252</color>
     <color name="green_tab_text_color">#b2ffffff</color>
     <color name="white">#ffffff</color>
+    <color name="green_pressed">#289f43</color>
 
     <!-- Intro -->
     <color name="intro_gradient_start">#35dd69</color>
@@ -34,6 +37,7 @@
     <!-- Login -->
     <color name="login_facebook_button">#3A589A</color>
     <color name="login_google_button">#DF5843</color>
+    <color name="login_google_button_pressed">#df5a43</color>
     <color name="login_signup_button">#58585A</color>
     <color name="login_forgot_password">#40C4FF</color>
 
