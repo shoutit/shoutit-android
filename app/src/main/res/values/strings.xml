@@ -18,6 +18,8 @@
         <item quantity="one">%1$d Day</item>
         <item quantity="other">%1$d Days</item>
     </plurals>
+    <string name="listening">Listening</string>
+    <string name="listen">Listen</string>
 
     <!-- NewRelic -->
     <string name="newrelic_api_key" translatable="false">AAa1d7a1015f94d533c54162c2a91f97f739b178cc</string>
@@ -803,5 +805,6 @@
     <!-- Post Signup -->
     <string name="post_signup_iterests_header">What interests you the most?</string>
     <string name="post_signup_interests_subheader">Choose what you are interested in and related shouts (listings) will be displayed on your home screen.</string>
+
 
 </resources>

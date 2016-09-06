@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.postlogininterest;
+package com.shoutit.app.android.view.postsignup.interests;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.functions.BothParams;

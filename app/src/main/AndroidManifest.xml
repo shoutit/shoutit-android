@@ -92,13 +92,8 @@
             android:screenOrientation="portrait"
             android:theme="@style/PreferenceStyle"/>
         <activity
-            android:name=".view.postlogininterest.PostSignUpActivity"
+            android:name=".view.postsignup.PostSignUpActivity"
             android:screenOrientation="portrait"/>
-        <activity
-            android:name=".view.postlogininterest.postsignupsecond.PostSignupSecondActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/TranslucentStatusBar"
-        />
         <activity android:name=".view.location.LocationActivity"
                   android:screenOrientation="portrait"/>
         <activity android:name=".view.promote.PromoteShoutInfoActivity"

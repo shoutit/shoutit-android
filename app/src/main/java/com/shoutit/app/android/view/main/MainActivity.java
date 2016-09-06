@@ -48,7 +48,7 @@ import com.shoutit.app.android.view.discover.DiscoverActivity;
 import com.shoutit.app.android.view.discover.OnNewDiscoverSelectedListener;
 import com.shoutit.app.android.view.home.HomeFragment;
 import com.shoutit.app.android.view.intro.IntroActivity;
-import com.shoutit.app.android.view.postlogininterest.PostSignUpActivity;
+import com.shoutit.app.android.view.postsignup.PostSignUpActivity;
 import com.shoutit.app.android.view.search.main.MainSearchActivity;
 import com.shoutit.app.android.view.signin.LoginActivity;
 import com.uservoice.uservoicesdk.UserVoice;

@@ -24,7 +24,7 @@
             android:src="@drawable/ab_logo" />
 
         <TextView
-            android:id="@+id/post_signup_next_done_tv"
+            android:id="@+id/post_signup_next_tv"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:background="?selectableItemBackground"
@@ -40,7 +40,27 @@
             android:fontFamily="sans-serif-meidum"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:text="Next"/>
+            android:text="@string/post_signup_next"/>
+
+        <TextView
+            android:id="@+id/post_signup_done_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="?selectableItemBackground"
+            android:textAllCaps="true"
+            android:gravity="center"
+            android:textSize="14sp"
+            android:paddingRight="16dp"
+            android:paddingEnd="16dp"
+            android:paddingLeft="6dp"
+            android:paddingStart="6dp"
+            android:textColor="@color/post_signup_next_disabled"
+            android:enabled="false"
+            android:fontFamily="sans-serif-meidum"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:visibility="gone"
+            android:text="@string/post_signup_done"/>
 
         <View
             android:layout_width="match_parent"

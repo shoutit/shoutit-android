@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.postlogininterest;
+package com.shoutit.app.android.view.postsignup.interests;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,7 +15,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseDaggerFragmentComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
-import com.shoutit.app.android.view.postlogininterest.postsignupsecond.PostSignupSecondActivity;
+import com.shoutit.app.android.view.postsignup.PostSignUpActivity;
 
 import java.util.List;
 
@@ -64,7 +64,7 @@ public class PostSignUpInterestsFragment extends BaseDaggerFragment {
         presenter.getSuccessCategoriesObservable()
                 .compose(bindToLifecycle())
                 .subscribe(o -> {
-                    startActivity(PostSignupSecondActivity.newIntent(getActivity()));
+                    ((PostSignUpActivity) getActivity()).showUsersFragment();
                 });
 
         presenter.getPostCategoriesError()

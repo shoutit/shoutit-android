@@ -26,6 +26,7 @@
     <color name="white">#ffffff</color>
     <color name="green_pressed">#289f43</color>
     <color name="base_divider">#1e2a2a2a</color>
+    <color name="dark_gray">#424242</color>
 
     <!-- Intro -->
     <color name="intro_gradient_start">#35dd69</color>

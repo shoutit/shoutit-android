@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.postlogininterest;
+package com.shoutit.app.android.view.postsignup;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.collect.ImmutableList;
@@ -8,6 +8,8 @@ import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.CategoryFilter;
 import com.shoutit.app.android.api.model.TagsRequest;
 import com.shoutit.app.android.dao.CategoriesDao;
+import com.shoutit.app.android.view.postsignup.interests.PostSignupInterestsPresenter;
+import com.shoutit.app.android.view.postsignup.interests.SelectionHelper;
 
 import junit.framework.TestCase;
 

@@ -1,7 +1,8 @@
-package com.shoutit.app.android.view.postlogininterest;
+package com.shoutit.app.android.view.postsignup;
 
 import com.appunite.rx.functions.BothParams;
 import com.google.common.collect.Iterables;
+import com.shoutit.app.android.view.postsignup.interests.SelectionHelper;
 
 import junit.framework.TestCase;
 

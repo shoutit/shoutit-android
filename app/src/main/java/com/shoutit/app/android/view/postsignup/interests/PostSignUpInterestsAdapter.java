@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.postlogininterest;
+package com.shoutit.app.android.view.postsignup.interests;
 
 import android.content.Context;
 import android.support.v4.content.ContextCompat;

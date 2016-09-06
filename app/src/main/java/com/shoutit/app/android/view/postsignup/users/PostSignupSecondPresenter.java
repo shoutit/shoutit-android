@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.postlogininterest.postsignupsecond;
+package com.shoutit.app.android.view.postsignup.users;
 
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
@@ -40,7 +40,6 @@ import rx.subjects.PublishSubject;
 public class PostSignupSecondPresenter {
     private static final int PAGE_SIZE = 6;
 
-    private final Observable<List<BaseAdapterItem>> suggestedPagesObservable;
     private final Observable<List<BaseAdapterItem>> suggestedUsersObservable;
     private final Observable<Throwable> errorObservable;
 
@@ -76,15 +75,6 @@ public class PostSignupSecondPresenter {
                     @Override
                     public List<BaseProfile> call(SuggestionsResponse suggestionsResponse) {
                         return suggestionsResponse.getUsers();
-                    }
-                })
-                .map(toAdapterItems());
-
-        suggestedPagesObservable = successSuggestionsObservable
-                .map(new Func1<SuggestionsResponse, List<BaseProfile>>() {
-                    @Override
-                    public List<BaseProfile> call(SuggestionsResponse suggestionsResponse) {
-                        return suggestionsResponse.getPages();
                     }
                 })
                 .map(toAdapterItems());
@@ -175,10 +165,6 @@ public class PostSignupSecondPresenter {
                 }
             }
         };
-    }
-
-    public Observable<List<BaseAdapterItem>> getSuggestedPagesObservable() {
-        return suggestedPagesObservable;
     }
 
     public Observable<List<BaseAdapterItem>> getSuggestedUsersObservable() {

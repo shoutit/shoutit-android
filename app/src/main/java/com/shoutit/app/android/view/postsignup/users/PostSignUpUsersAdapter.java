@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.postlogininterest.postsignupsecond;
+package com.shoutit.app.android.view.postsignup.users;
 
 import android.content.Context;
 import android.view.View;
@@ -10,12 +10,14 @@ import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
 import com.shoutit.app.android.adapteritems.NoDataTextAdapterItem;
 import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.TextHelper;
 import com.shoutit.app.android.view.chats.chats_adapter.AvatarHelper;
+import com.shoutit.app.android.viewholders.HeaderViewHolder;
 import com.shoutit.app.android.viewholders.NoDataTextViewHolder;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -27,16 +29,17 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class PostSignupSecondAdapter extends BaseAdapter {
+public class PostSignUpUsersAdapter extends BaseAdapter {
 
     private static final int VIEW_TYPE_SUGGESTIONS = 1;
     private static final int VIEW_TYPE_NO_DATA = 2;
+    private static final int VIEW_TYPE_HEADER = 3;
 
     @Nonnull
     private final Picasso picasso;
 
     @Inject
-    public PostSignupSecondAdapter(@ForActivity @Nonnull Context context, @Nonnull Picasso picasso) {
+    public PostSignUpUsersAdapter(@ForActivity @Nonnull Context context, @Nonnull Picasso picasso) {
         super(context);
         this.picasso = picasso;
     }
@@ -48,6 +51,8 @@ public class PostSignupSecondAdapter extends BaseAdapter {
                 return new SuggestionViewHolder(layoutInflater.inflate(R.layout.search_results_profile_item, parent, false), context, picasso);
             case VIEW_TYPE_NO_DATA:
                 return new NoDataTextViewHolder(layoutInflater.inflate(R.layout.no_data_text_adapter_item, parent, false));
+            case VIEW_TYPE_HEADER:
+                return new HeaderViewHolder(layoutInflater.inflate(R.layout.post_signup_header, parent, false));
             default:
                 throw new RuntimeException("Unknown view type:" + viewType);
         }
@@ -60,6 +65,8 @@ public class PostSignupSecondAdapter extends BaseAdapter {
             return VIEW_TYPE_SUGGESTIONS;
         } else if (item instanceof NoDataTextAdapterItem) {
             return VIEW_TYPE_NO_DATA;
+        } else if (item instanceof HeaderAdapterItem) {
+            return VIEW_TYPE_HEADER;
         } else {
             throw new RuntimeException("Unknown view type: " + item.getClass().getSimpleName());
         }

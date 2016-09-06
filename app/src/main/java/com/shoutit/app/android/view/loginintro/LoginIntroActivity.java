@@ -32,7 +32,6 @@ import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.view.about.AboutActivity;
 import com.shoutit.app.android.view.main.MainActivity;
-import com.shoutit.app.android.view.postlogininterest.PostSignUpActivity;
 import com.shoutit.app.android.view.signin.LoginActivity;
 import com.uservoice.uservoicesdk.UserVoice;
 

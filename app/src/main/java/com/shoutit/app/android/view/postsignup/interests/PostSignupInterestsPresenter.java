@@ -1,4 +1,4 @@
-package com.shoutit.app.android.view.postlogininterest;
+package com.shoutit.app.android.view.postsignup.interests;
 
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
@@ -14,7 +14,6 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.R;
-import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
 import com.shoutit.app.android.adapteritems.HeaderItem;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.Category;

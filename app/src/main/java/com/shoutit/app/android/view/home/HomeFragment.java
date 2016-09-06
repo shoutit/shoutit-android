@@ -29,7 +29,7 @@ import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
 import com.shoutit.app.android.view.discover.DiscoverActivity;
 import com.shoutit.app.android.view.main.OnSeeAllDiscoversListener;
-import com.shoutit.app.android.view.postlogininterest.PostSignUpActivity;
+import com.shoutit.app.android.view.postsignup.PostSignUpActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 
 import java.util.List;

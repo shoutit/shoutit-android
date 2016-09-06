@@ -12,7 +12,7 @@ import com.shoutit.app.android.view.location.LocationActivity;
 import com.shoutit.app.android.view.location.LocationActivityForResult;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.notifications.NotificationsActivity;
-import com.shoutit.app.android.view.postlogininterest.PostSignUpActivity;
+import com.shoutit.app.android.view.postsignup.PostSignUpActivity;
 import com.shoutit.app.android.view.promote.promoted.PromotedActivity;
 import com.shoutit.app.android.view.settings.SettingsActivity;
 import com.shoutit.app.android.view.settings.account.AccountActivity;

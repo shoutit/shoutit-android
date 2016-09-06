@@ -11,7 +11,7 @@ import android.widget.TextView;
 import com.shoutit.app.android.BaseDaggerFragment;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseDaggerFragmentComponent;
-import com.shoutit.app.android.view.postlogininterest.PostSignUpActivity;
+import com.shoutit.app.android.view.postsignup.PostSignUpActivity;
 
 import javax.annotation.Nonnull;
 
