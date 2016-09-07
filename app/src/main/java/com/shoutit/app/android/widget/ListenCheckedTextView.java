@@ -28,4 +28,8 @@ public class ListenCheckedTextView extends CheckedTextView {
         super.setChecked(checked);
         setText(checked ? R.string.listening : R.string.listen);
     }
+
+    public void setListened(boolean listened) {
+        setChecked(listened);
+    }
 }

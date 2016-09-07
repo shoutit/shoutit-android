@@ -19,8 +19,8 @@ import com.shoutit.app.android.utils.TextHelper;
 import com.shoutit.app.android.view.chats.chats_adapter.AvatarHelper;
 import com.shoutit.app.android.viewholders.HeaderViewHolder;
 import com.shoutit.app.android.viewholders.NoDataTextViewHolder;
+import com.shoutit.app.android.widget.ListenCheckedTextView;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -61,7 +61,7 @@ public class PostSignUpUsersAdapter extends BaseAdapter {
     @Override
     public int getItemViewType(int position) {
         final BaseAdapterItem item = items.get(position);
-        if (item instanceof PostSignupSecondPresenter.SuggestionAdapterItem) {
+        if (item instanceof PostSignUpUserPresenter.SuggestionAdapterItem) {
             return VIEW_TYPE_SUGGESTIONS;
         } else if (item instanceof NoDataTextAdapterItem) {
             return VIEW_TYPE_NO_DATA;
@@ -72,7 +72,7 @@ public class PostSignUpUsersAdapter extends BaseAdapter {
         }
     }
 
-    public class SuggestionViewHolder extends ViewHolderManager.BaseViewHolder<PostSignupSecondPresenter.SuggestionAdapterItem> {
+    public class SuggestionViewHolder extends ViewHolderManager.BaseViewHolder<PostSignUpUserPresenter.SuggestionAdapterItem> {
         private final Context context;
         private final Picasso picasso;
 
@@ -82,45 +82,39 @@ public class PostSignUpUsersAdapter extends BaseAdapter {
         TextView nameTextView;
         @Bind(R.id.profile_section_listeners_tv)
         TextView listenerTextView;
-        @Bind(R.id.profile_section_listening_iv)
-        ImageView listeningImageView;
+        @Bind(R.id.listen_btn)
+        ListenCheckedTextView listenTv;
 
-        private PostSignupSecondPresenter.SuggestionAdapterItem item;
-        private final Target target;
+        private PostSignUpUserPresenter.SuggestionAdapterItem item;
 
         public SuggestionViewHolder(View itemView, Context context, Picasso picasso) {
             super(itemView);
             this.context = context;
             this.picasso = picasso;
             ButterKnife.bind(this, itemView);
-
-            target = PicassoHelper.getRoundedBitmapTarget(context, avatarImageView,
-                    context.getResources().getDimensionPixelSize(R.dimen.profile_section_avatar_corners));
         }
 
         @Override
-        public void bind(@Nonnull PostSignupSecondPresenter.SuggestionAdapterItem item) {
+        public void bind(@Nonnull PostSignUpUserPresenter.SuggestionAdapterItem item) {
             this.item = item;
             final BaseProfile baseProfile = item.getBaseprofile();
 
             picasso.load(baseProfile.getImage())
-                    .placeholder(AvatarHelper.getPlaceholderId(baseProfile.getType()))
-                    .into(target);
+                    .fit()
+                    .centerCrop()
+                    .transform(PicassoHelper.getCircularBitmapTransformation(0, "circleAvatar"))
+                    .placeholder(AvatarHelper.getCirclePlaceholderId(baseProfile.getType()))
+                    .into(avatarImageView);
 
             nameTextView.setText(baseProfile.getName());
             listenerTextView.setText(context.getString(R.string.profile_listeners,
                     TextHelper.formatListenersNumber(baseProfile.getListenersCount())));
-            setListeningIcon(baseProfile.isListening());
+            listenTv.setListened(baseProfile.isListening());
         }
 
-        private void setListeningIcon(boolean isListening) {
-            listeningImageView.setImageDrawable(context.getResources().getDrawable(
-                    isListening ? R.drawable.ic_listening_on : R.drawable.ic_listening_off));
-        }
-
-        @OnClick(R.id.profile_section_listening_iv)
+        @OnClick(R.id.listen_btn)
         public void onListenClicked() {
-            setListeningIcon(!item.getBaseprofile().isListening());
+            listenTv.setListened(!item.getBaseprofile().isListening());
             item.onItemClicked();
         }
     }

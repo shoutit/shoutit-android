@@ -22,6 +22,7 @@ import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
 import com.shoutit.app.android.view.chats.LocalMessageBus;
 import com.shoutit.app.android.view.conversations.RefreshConversationBus;
+import com.shoutit.app.android.view.postsignup.PostSignUpBus;
 import com.shoutit.app.android.view.videoconversation.CameraTool;
 import com.squareup.picasso.Picasso;
 
@@ -95,4 +96,6 @@ public interface AppComponent extends DaoComponent {
     LocalMessageBus localMessageBus();
 
     RefreshConversationBus refreshConversationBus();
+
+    PostSignUpBus postSignUpBus();
 }

@@ -302,7 +302,7 @@ public abstract class ProfileActivity extends BaseActivity {
                         .error(getAvatarPlaceholder())
                         .fit()
                         .centerCrop()
-                        .transform(PicassoHelper.roundedWithStrokeTransformation(strokeSize, false, corners, "ProfileAvatar"))
+                        .transform(PicassoHelper.roundedTransformation(strokeSize, false, corners, "ProfileAvatar"))
                         .into(avatarImageView);
             }
         };

@@ -20,9 +20,9 @@ import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.TagsRequest;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.CategoriesDao;
+import com.shoutit.app.android.view.postsignup.PostSignUpBus;
 
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -52,7 +52,8 @@ public class PostSignupInterestsPresenter {
                                         @NetworkScheduler final Scheduler networkScheduler,
                                         @UiScheduler final Scheduler uiScheduler,
                                         SelectionHelper<String> selectionHelper,
-                                        @ForActivity Resources resources) {
+                                        @ForActivity Resources resources,
+                                        PostSignUpBus bus) {
         mStringSelectionHelper = selectionHelper;
 
         final Observable<ResponseOrError<List<Category>>> categoriesRequest = dao
@@ -80,31 +81,24 @@ public class PostSignupInterestsPresenter {
             return builder.build();
         });
 
-        final Observable<ResponseOrError<Object>> sendObservable = clickedSubject
-                .flatMap(new Func1<Object, Observable<ResponseOrError<Object>>>() {
-                    @Override
-                    public Observable<ResponseOrError<Object>> call(Object o) {
-                        return mStringSelectionHelper
-                                .getSelectedItems()
-                                .take(1)
-                                .flatMap(new Func1<Set<String>, Observable<ResponseOrError<Object>>>() {
-                                    @Override
-                                    public Observable<ResponseOrError<Object>> call(Set<String> strings) {
-                                        final ImmutableList<TagsRequest.TagToListen> tagToListens = ImmutableList.copyOf(Iterables.transform(strings, new Function<String, TagsRequest.TagToListen>() {
-                                            @Nullable
-                                            @Override
-                                            public TagsRequest.TagToListen apply(@Nullable String input) {
-                                                return new TagsRequest.TagToListen(input);
-                                            }
-                                        }));
-                                        return apiService.batchListen(new TagsRequest(tagToListens))
-                                                .subscribeOn(networkScheduler)
-                                                .observeOn(uiScheduler)
-                                                .compose(ResponseOrError.toResponseOrErrorObservable());
-                                    }
-                                });
-                    }
-                })
+        final Observable<ResponseOrError<Object>> sendObservable = bus.getNextClickObservable()
+                .switchMap(o -> mStringSelectionHelper
+                        .getSelectedItems()
+                        .take(1)
+                        .flatMap(strings -> {
+                            final ImmutableList<TagsRequest.TagToListen> tagToListens = ImmutableList.copyOf(
+                                    Iterables.transform(strings, new Function<String, TagsRequest.TagToListen>() {
+                                        @Nullable
+                                        @Override
+                                        public TagsRequest.TagToListen apply(@Nullable String input) {
+                                            return new TagsRequest.TagToListen(input);
+                                        }
+                                    }));
+                            return apiService.batchListen(new TagsRequest(tagToListens))
+                                    .subscribeOn(networkScheduler)
+                                    .observeOn(uiScheduler)
+                                    .compose(ResponseOrError.toResponseOrErrorObservable());
+                        }))
                 .compose(ObservableExtensions.<ResponseOrError<Object>>behaviorRefCount());
 
         mErrorCategoriesObservable = sendObservable.compose(ResponseOrError.onlyError());

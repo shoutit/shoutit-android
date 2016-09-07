@@ -27,11 +27,11 @@ import butterknife.Bind;
 public class PostSignUpUsersFragment extends BaseDaggerFragment {
 
     @Inject
-    PostSignupSecondPresenter presenter;
+    PostSignUpUserPresenter presenter;
     @Inject
     PostSignUpUsersAdapter adapter;
 
-    @Bind(R.id.post_signup_second_recyclerview)
+    @Bind(R.id.post_signup_users_recyclerview)
     RecyclerView recyclerView;
     @Bind(R.id.base_progress)
     View progressView;
@@ -43,7 +43,7 @@ public class PostSignUpUsersFragment extends BaseDaggerFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.post_signup_second_card, container, false);
+        return inflater.inflate(R.layout.fragment_post_signup_users, container, false);
     }
 
     @Override
@@ -64,14 +64,13 @@ public class PostSignUpUsersFragment extends BaseDaggerFragment {
                 .compose(this.<ApiMessageResponse>bindToLifecycle())
                 .subscribe(ApiMessagesHelper.apiMessageAction(getActivity()));
 
-
         presenter.getProgressObservable()
                 .compose(this.<Boolean>bindToLifecycle())
                 .subscribe(RxView.visibility(progressView));
 
         presenter.getErrorObservable()
                 .compose(this.<Throwable>bindToLifecycle())
-                .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(this)));
+                .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(getActivity())));
     }
 
     private void setupAdapter() {

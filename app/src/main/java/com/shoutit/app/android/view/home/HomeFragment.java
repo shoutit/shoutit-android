@@ -82,6 +82,8 @@ public class HomeFragment extends BaseFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        startActivity(PostSignUpActivity.newIntent(getActivity()));
+
         gridLayoutManager = new MyGridLayoutManager(context, 2);
         linearLayoutManager = new MyLinearLayoutManager(context);
 

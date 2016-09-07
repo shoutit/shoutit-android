@@ -29,6 +29,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Observer;
@@ -37,7 +38,7 @@ import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.subjects.PublishSubject;
 
-public class PostSignupSecondPresenter {
+public class PostSignUpUserPresenter {
     private static final int PAGE_SIZE = 6;
 
     private final Observable<List<BaseAdapterItem>> suggestedUsersObservable;
@@ -51,12 +52,13 @@ public class PostSignupSecondPresenter {
 
     private Resources resources;
 
-    public PostSignupSecondPresenter(@Nonnull SuggestionsDao suggestionsDao,
-                                     @Nonnull final ApiService apiService,
-                                     @Nonnull UserPreferences userPreferences,
-                                     @NetworkScheduler final Scheduler networkScheduler,
-                                     @UiScheduler final Scheduler uiScheduler,
-                                     @Nonnull @ForActivity Resources resources) {
+    @Inject
+    public PostSignUpUserPresenter(@Nonnull SuggestionsDao suggestionsDao,
+                                   @Nonnull final ApiService apiService,
+                                   @Nonnull UserPreferences userPreferences,
+                                   @NetworkScheduler final Scheduler networkScheduler,
+                                   @UiScheduler final Scheduler uiScheduler,
+                                   @Nonnull @ForActivity Resources resources) {
         this.resources = resources;
 
         final SuggestionsDao.SuggestionsPointer suggestionsPointer =

@@ -44,7 +44,6 @@ import com.squareup.picasso.Transformation;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 import com.uservoice.uservoicesdk.UserVoice;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -413,7 +412,7 @@ public class MenuHandler {
                 .placeholder(AvatarHelper.getCirclePlaceholderId(baseProfile.getType()))
                 .resizeDimen(R.dimen.side_menu_avatar_size, R.dimen.side_menu_avatar_size)
                 .centerCrop()
-                .transform(PicassoHelper.getCircularBitmapWithStrokeTarget(strokeSize, "MenuAvatar"))
+                .transform(PicassoHelper.getCircularBitmapTransformation(strokeSize, "MenuAvatar"))
                 .into(avatarImageView);
     }
 

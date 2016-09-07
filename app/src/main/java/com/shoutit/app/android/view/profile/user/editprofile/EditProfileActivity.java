@@ -25,7 +25,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Strings;
 import com.jakewharton.rxbinding.view.RxView;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.App;
@@ -40,15 +39,12 @@ import com.shoutit.app.android.utils.ImageCaptureHelper;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
-import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.utils.rx.Actions1;
 import com.shoutit.app.android.utils.rx.RxUtils;
 import com.shoutit.app.android.view.location.LocationActivityForResult;
 import com.shoutit.app.android.view.location.LocationHelper;
 import com.shoutit.app.android.widget.GenderSpinnerAdapter;
-import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -440,7 +436,7 @@ public class EditProfileActivity extends BaseActivity {
                         .error(R.drawable.default_profile)
                         .fit()
                         .centerCrop()
-                        .transform(PicassoHelper.roundedWithStrokeTransformation(strokeSize, false, corners, "ProfileAvatar"))
+                        .transform(PicassoHelper.roundedTransformation(strokeSize, false, corners, "ProfileAvatar"))
                         .into(avatarIv);
             }
         };

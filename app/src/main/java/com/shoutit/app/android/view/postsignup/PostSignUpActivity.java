@@ -19,6 +19,7 @@ import com.shoutit.app.android.view.postsignup.interests.PostSignUpInterestsFrag
 import com.shoutit.app.android.view.postsignup.users.PostSignUpUsersFragment;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -32,6 +33,9 @@ public class PostSignUpActivity extends BaseDaggerActivity {
     TextView doneButtonTv;
     @Bind(R.id.signups_toolbar)
     Toolbar toolbar;
+
+    @Inject
+    PostSignUpBus bus;
 
     @Nonnull
     public static Intent newIntent(@Nonnull Context context) {
@@ -60,6 +64,13 @@ public class PostSignUpActivity extends BaseDaggerActivity {
                 showNextButton();
             }
         });
+
+        bus.getInterestsUploadedObservable()
+                .compose(bindToLifecycle())
+                .subscribe(o -> {
+                    showUsersFragment();
+                    showDoneButton();
+                });
     }
 
     private void setUpActionbar() {
@@ -86,15 +97,9 @@ public class PostSignUpActivity extends BaseDaggerActivity {
     }
 
 
-    @OnClick(R.id.post_signup_next_done_tv)
+    @OnClick(R.id.post_signup_next_tv)
     public void onNextClicked() {
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.post_signup_container, PostSignUpUsersFragment.newInstance())
-                .addToBackStack(null)
-                .commit();
-
-        showDoneButton();
+        bus.nextClicked();
     }
 
     @OnClick(R.id.post_signup_done_tv)
@@ -118,15 +123,18 @@ public class PostSignUpActivity extends BaseDaggerActivity {
                 this, enable ? R.color.colorPrimary : R.color.post_signup_next_disabled));
     }
 
-    @Override
-    protected void injectComponent(BaseDaggerActivityComponent component) {
-        component.inject(this);
-    }
 
     public void showUsersFragment() {
         getSupportFragmentManager()
                 .beginTransaction()
+                .setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_left, R.anim.slide_in_right, R.anim.slide_out_right)
                 .replace(R.id.post_signup_container, PostSignUpUsersFragment.newInstance())
+                .addToBackStack(null)
                 .commit();
+    }
+
+    @Override
+    protected void injectComponent(BaseDaggerActivityComponent component) {
+        component.inject(this);
     }
 }

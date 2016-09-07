@@ -16,6 +16,7 @@ import com.shoutit.app.android.dagger.BaseDaggerFragmentComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.postsignup.PostSignUpActivity;
+import com.shoutit.app.android.view.postsignup.PostSignUpBus;
 
 import java.util.List;
 
@@ -34,7 +35,9 @@ public class PostSignUpInterestsFragment extends BaseDaggerFragment {
     PostSignUpInterestsAdapter adapter;
     @Inject
     PostSignupInterestsPresenter presenter;
-    
+    @Inject
+    PostSignUpBus bus;
+
     public static Fragment newInstance() {
         return new PostSignUpInterestsFragment();
     }
@@ -63,9 +66,7 @@ public class PostSignUpInterestsFragment extends BaseDaggerFragment {
 
         presenter.getSuccessCategoriesObservable()
                 .compose(bindToLifecycle())
-                .subscribe(o -> {
-                    ((PostSignUpActivity) getActivity()).showUsersFragment();
-                });
+                .subscribe(bus.getInterestsUploadedObserver());
 
         presenter.getPostCategoriesError()
                 .compose(this.<Throwable>bindToLifecycle())

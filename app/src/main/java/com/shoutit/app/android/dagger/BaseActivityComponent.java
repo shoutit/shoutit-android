@@ -34,6 +34,7 @@ import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
 import com.shoutit.app.android.facebook.FacebookHelper;
 import com.shoutit.app.android.view.chats.LocalMessageBus;
 import com.shoutit.app.android.view.conversations.RefreshConversationBus;
+import com.shoutit.app.android.view.postsignup.PostSignUpBus;
 import com.squareup.picasso.Picasso;
 
 
@@ -131,4 +132,6 @@ public interface BaseActivityComponent {
     LocalMessageBus localMessageBus();
 
     RefreshConversationBus refreshConversationBus();
+
+    PostSignUpBus postSignUpBus();
 }

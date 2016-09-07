@@ -85,7 +85,7 @@ public class PicassoHelper {
         return new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                imageView.setImageBitmap(getRoundedBitmapWithStroke(bitmap, strokeSize, isCircular, radius));
+                imageView.setImageBitmap(getRoundedBitmap(bitmap, strokeSize, isCircular, radius));
             }
 
             @Override
@@ -104,19 +104,19 @@ public class PicassoHelper {
         };
     }
 
-    public static Transformation getCircularBitmapWithStrokeTarget(final int strokeSize,
-                                                                   final String transformationKey) {
-        return roundedWithStrokeTransformation(strokeSize, true, 0, transformationKey);
+    public static Transformation getCircularBitmapTransformation(final int strokeSize,
+                                                                 final String transformationKey) {
+        return roundedTransformation(strokeSize, true, 0, transformationKey);
     }
 
-    public static Transformation roundedWithStrokeTransformation(final int strokeSize,
-                                                                 final boolean isCircular,
-                                                                 final int radius,
-                                                                 final String transformationKey) {
+    public static Transformation roundedTransformation(final int strokeSize,
+                                                       final boolean isCircular,
+                                                       final int radius,
+                                                       final String transformationKey) {
         return new Transformation() {
             @Override
             public Bitmap transform(Bitmap source) {
-                final Bitmap output = getRoundedBitmapWithStroke(source, strokeSize, isCircular, radius);
+                final Bitmap output = getRoundedBitmap(source, strokeSize, isCircular, radius);
                 source.recycle();
                 return output;
             }
@@ -128,7 +128,7 @@ public class PicassoHelper {
         };
     }
 
-    public static Bitmap getRoundedBitmapWithStroke(Bitmap bitmap, int strokeSize, boolean isCircular, int radius) {
+    public static Bitmap getRoundedBitmap(Bitmap bitmap, int strokeSize, boolean isCircular, int radius) {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
 
@@ -151,11 +151,13 @@ public class PicassoHelper {
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(bitmap, strokeSize, strokeSize, paint);
 
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setColor(Color.WHITE);
-        paint.setStrokeWidth(strokeSize);
-        canvas.drawRoundRect(imageBounds, radius, radius, paint);
+        if (strokeSize > 0) {
+            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setColor(Color.WHITE);
+            paint.setStrokeWidth(strokeSize);
+            canvas.drawRoundRect(imageBounds, radius, radius, paint);
+        }
 
         return output;
     }

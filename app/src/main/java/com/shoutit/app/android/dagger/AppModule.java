@@ -42,6 +42,7 @@ import com.shoutit.app.android.utils.pusher.PusherHelper;
 import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
 import com.shoutit.app.android.view.chats.LocalMessageBus;
 import com.shoutit.app.android.view.conversations.RefreshConversationBus;
+import com.shoutit.app.android.view.postsignup.PostSignUpBus;
 import com.shoutit.app.android.view.videoconversation.CameraTool;
 import com.shoutit.app.android.view.videoconversation.CameraToolImpl;
 import com.shoutit.app.android.view.videoconversation.CameraToolImplLollipop;
@@ -313,5 +314,11 @@ public final class AppModule {
     @Singleton
     RefreshConversationBus provideRefreshConversationBus() {
         return new RefreshConversationBus();
+    }
+
+    @Provides
+    @Singleton
+    PostSignUpBus provideBus() {
+        return new PostSignUpBus();
     }
 }
