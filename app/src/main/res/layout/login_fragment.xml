@@ -38,44 +38,26 @@
 
             </android.support.design.widget.TextInputLayout>
 
-            <FrameLayout
-                android:layout_marginTop="10dp"
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/register_password_edittext_layout"
+                style="@style/BlueInputStyle"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                app:hintTextAppearance="@style/BlueInputStyle">
 
-                <android.support.design.widget.TextInputLayout
-                    android:layout_marginRight="24dp"
-                    android:layout_marginEnd="24dp"
-                    android:id="@+id/register_password_edittext_layout"
-                    style="@style/BlueInputStyle"
-                    app:hintTextAppearance="@style/BlueInputStyle"
+                <EditText
+                    android:id="@+id/register_password_edittext"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:hint="@string/login_password_hint"
+                    android:imeActionLabel="@string/login_done_label"
+                    android:imeOptions="actionDone"
+                    android:inputType="textFilter"
+                    android:singleLine="true"
+                    android:theme="@style/BlueEditText" />
 
-                    <EditText
-                        android:id="@+id/register_password_edittext"
-                        android:inputType="textFilter"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:theme="@style/BlueEditText"
-                        android:imeActionLabel="@string/login_done_label"
-                        android:singleLine="true"
-                        android:hint="@string/login_password_hint"
-                        android:imeOptions="actionDone"/>
-
-                </android.support.design.widget.TextInputLayout>
-
-                <CheckBox
-                    android:id="@+id/login_lock_password"
-                    android:checked="true"
-                    android:background="?selectableItemBackground"
-                    android:button="@drawable/selector_password_lock"
-                    android:layout_marginTop="4dp"
-                    android:layout_gravity="end|center_vertical"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-            </FrameLayout>
+            </android.support.design.widget.TextInputLayout>
 
             <Button
                 style="@style/BaseButtonStyle"

@@ -389,6 +389,9 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
         }
 
         for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+            if (fragment == null) {
+                continue;
+            }
             fragment.onActivityResult(requestCode, resultCode, data);
             break;
         }
