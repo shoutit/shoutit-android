@@ -784,4 +784,10 @@
     <string name="app_rate_second_dialog_rate">How about a rating on the Play store?</string>
     <string name="app_rate_second_dialog_feedback">Would you mind giving us some feedback?</string>
 
+    <!-- Create shout dialog -->
+    <string name="create_shout_dialog_offer_text">any product or a service on Shoutit marketplace</string>
+    <string name="create_shout_dialog_request_text">it and wait to be contacted by someone who has it</string>
+    <string name="create_shout_dialog_close">Close</string>
+    <string name="create_shout_dialog_title">What are you posting?</string>
+
 </resources>

@@ -1,47 +1,132 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/dialog_background"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="horizontal"
+    tools:background="@color/black_54">
 
-    <LinearLayout
-        android:clickable="true"
-        android:layout_width="300dp"
+    <View
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:background="@drawable/white_rounded_bg"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:layout_weight="0.05" />
 
-        <TextView
-            android:layout_width="wrap_content"
+    <android.support.v7.widget.CardView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.9"
+        card_view:cardCornerRadius="2dp"
+        card_view:cardElevation="4dp"
+        card_view:cardUseCompatPadding="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="12dp"
-            android:text="@string/create_shout_dialog_header" />
+            android:layout_gravity="center"
+            android:background="@drawable/white_rounded_bg"
+            android:clickable="true"
+            android:gravity="center"
+            android:orientation="vertical">
 
-        <Button
-            android:id="@+id/create_shout_offer"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_margin="10dp"
-            android:background="@color/shout_offer_popup"
-            android:fontFamily="sans-serif-medium"
-            android:text="@string/create_shout_dialog_offer"
-            android:textAllCaps="true"
-            android:textColor="@android:color/white"
-            android:textSize="14sp" />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="24dp"
+                android:src="@drawable/logo_create_dialog" />
 
-        <Button
-            android:id="@+id/create_shout_request"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_margin="10dp"
-            android:background="@color/shout_request_popup"
-            android:fontFamily="sans-serif-medium"
-            android:text="@string/create_shout_dialog_request"
-            android:textAllCaps="true"
-            android:textColor="@android:color/white"
-            android:textSize="14sp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/create_shout_dialog_title"
+                android:textColor="@color/black_87"
+                android:textSize="20sp" />
 
-    </LinearLayout>
-</FrameLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="@color/black_38" />
+
+            <TextView
+                android:id="@+id/create_shout_offer"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/shape_gray_button"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center"
+                android:minWidth="270dp"
+                android:text="@string/shout_type_offer"
+                android:textAllCaps="true"
+                android:textColor="@android:color/white"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="22dp"
+                android:layout_marginTop="4dp"
+                android:fontFamily="sans-serif-light"
+                android:gravity="center"
+                android:text="@string/create_shout_dialog_offer_text"
+                android:textColor="@color/blackTextSecondary"
+                android:textSize="14sp" />
+
+
+            <TextView
+                android:id="@+id/create_shout_request"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:background="@drawable/selector_green_button"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center"
+                android:minWidth="270dp"
+                android:text="@string/shout_type_request"
+                android:textAllCaps="true"
+                android:textColor="@android:color/white"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="22dp"
+                android:layout_marginTop="4dp"
+                android:fontFamily="sans-serif-light"
+                android:gravity="center"
+                android:text="@string/create_shout_dialog_request_text"
+                android:textColor="@color/blackTextSecondary"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/create_shout_close"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_gravity="right|end"
+                android:layout_marginBottom="4dp"
+                android:layout_marginEnd="12dp"
+                android:layout_marginRight="12dp"
+                android:layout_marginTop="4dp"
+                android:background="?selectableItemBackground"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center_vertical"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:text="@string/create_shout_dialog_close"
+                android:textAllCaps="true"
+                android:textColor="@color/black_87"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.05" />
+</LinearLayout>

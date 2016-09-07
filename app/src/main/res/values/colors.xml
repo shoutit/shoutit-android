@@ -21,6 +21,8 @@
     <color name="base_item_selected_color">#0f000000</color>
     <color name="accent_red">#ff5252</color>
     <color name="green_tab_text_color">#b2ffffff</color>
+    <color name="dark_gray">#424242</color>
+    <color name="blackTextSecondary">#8F8F8F</color>
 
     <!-- Intro -->
     <color name="intro_gradient_start">#35dd69</color>

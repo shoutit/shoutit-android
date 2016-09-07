@@ -59,6 +59,11 @@ public class CreateShoutDialogActivity extends BaseActivity {
         finish();
     }
 
+    @OnClick(R.id.create_shout_close)
+    public void onCloseClick() {
+        finish();
+    }
+
     @OnClick(R.id.dialog_background)
     public void clickOnDialogBackground() {
         finish();
