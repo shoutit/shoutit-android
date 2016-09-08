@@ -191,17 +191,6 @@ public class RegisterFragment extends BaseFragment {
         mRegisterCreatePage.setText(createPageSpan);
     }
 
-    @OnCheckedChanged(R.id.register_lock_password)
-    public void lock(boolean checked) {
-        if (checked) {
-            passwordEdittext.setTransformationMethod(new PasswordTransformationMethod());
-        } else {
-            passwordEdittext.setTransformationMethod(null);
-
-        }
-        passwordEdittext.setSelection(passwordEdittext.length());
-    }
-
     @Override
     protected void injectComponent(@Nonnull BaseActivityComponent baseActivityComponent, @Nonnull FragmentModule fragmentModule, @Nullable Bundle savedInstanceState) {
         DaggerRegisterFragmentComponent

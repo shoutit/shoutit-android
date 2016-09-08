@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorListenerAdapter;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
-import android.support.v7.widget.TintManager;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
@@ -152,11 +151,6 @@ public class ErrorTextInputLayout extends LinearLayout {
                             view.setVisibility(GONE);
                         }
                     }).start();
-
-            // Restore the 'original' tint, using colorControlNormal and colorControlActivated
-            final TintManager tintManager = TintManager.get(getContext());
-            ViewCompat.setBackgroundTintList(mEditText,
-                    tintManager.getTintList(android.support.design.R.drawable.abc_edit_text_material));
         }
     }
 }

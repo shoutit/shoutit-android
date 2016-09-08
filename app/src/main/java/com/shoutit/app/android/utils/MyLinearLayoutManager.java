@@ -8,10 +8,12 @@ public class MyLinearLayoutManager extends LinearLayoutManager implements MyLayo
     public MyLinearLayoutManager(Context context) {
         super(context);
         setRecycleChildrenOnDetach(true);
+        setAutoMeasureEnabled(true);
     }
 
     public MyLinearLayoutManager(Context context, int horizontal, boolean b) {
         super(context, horizontal, b);
         setRecycleChildrenOnDetach(true);
+        setAutoMeasureEnabled(true);
     }
 }

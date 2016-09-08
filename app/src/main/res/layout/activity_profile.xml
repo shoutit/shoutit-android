@@ -27,6 +27,12 @@
             app:title=""
             app:titleEnabled="false">
 
+            <!-- This view is workaround for collapsingtoolbat bug -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/profile_cover_height"
+                android:fitsSystemWindows="true" />
+
             <ImageView
                 android:id="@+id/profile_fragment_cover_image_view"
                 android:layout_width="match_parent"

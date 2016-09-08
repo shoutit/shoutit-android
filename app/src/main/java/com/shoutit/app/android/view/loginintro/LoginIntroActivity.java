@@ -92,8 +92,6 @@ public class LoginIntroActivity extends BaseDaggerActivity {
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(null);
         actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setDisplayUseLogoEnabled(true);
-        actionBar.setLogo(R.drawable.appbar_logo_white);
     }
 
     @Override

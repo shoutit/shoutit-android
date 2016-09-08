@@ -38,7 +38,6 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
-import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -175,17 +174,6 @@ public class LoginFragment extends BaseFragment {
                     }
                 });
 
-    }
-
-    @OnCheckedChanged(R.id.login_lock_password)
-    public void lock(boolean checked) {
-        if (checked) {
-            passwordEdittext.setTransformationMethod(new PasswordTransformationMethod());
-        } else {
-            passwordEdittext.setTransformationMethod(null);
-
-        }
-        passwordEdittext.setSelection(passwordEdittext.length());
     }
 
     @Override
