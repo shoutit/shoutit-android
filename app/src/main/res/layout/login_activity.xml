@@ -10,7 +10,7 @@
         android:id="@+id/login_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?actionBarSize"
-        android:theme="@style/AppTheme.BaseToolbarStyle">
+        style="@style/AppTheme.BaseToolbarStyle">
 
         <ImageView
             android:id="@+id/activity_main_logo"
