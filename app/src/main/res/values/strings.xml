@@ -30,6 +30,9 @@
     <string name="facebook_shout_list_ad_id" translatable="false">353625811317277_1245942718752244</string>
     <string name="facebook_shout_detail_ad_id" translatable="false">353625811317277_1249824038364112</string>
 
+    <!-- Google -->
+    <string name="google_api_keyy" translatable="false">AIzaSyBWHadI_MPYQgDLqI4RXhymEs42YEtgTEE</string>
+
     <!-- Errors -->
     <string name="error_default">Ooops, something went wrong</string>
     <string name="error_connection">Ooops, probably there is no Internet connection</string>
@@ -494,7 +497,6 @@
 
     <!-- Global strings -->
     <string name="price_with_currency">%1$s %2$s</string>
-    <string name="google_api_key" translatable="false">AIzaSyBWHadI_MPYQgDLqI4RXhymEs42YEtgTEE</string>
     <string name="font_roboto_regular">sans-serif</string>
     <string name="font_roboto_medium">sans-serif</string>
     <string name="home_user_and_date">%1$s - %2$s</string>
