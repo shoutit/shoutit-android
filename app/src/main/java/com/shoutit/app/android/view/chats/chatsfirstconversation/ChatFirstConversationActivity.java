@@ -140,7 +140,7 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
             inputContainer.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
         }
 
-        mChatsToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        mChatsToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
         mChatsToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

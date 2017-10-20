@@ -82,8 +82,8 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
     ProfilesDao profilesDao;
     @Inject
     Twilio twilio;
-    @Inject
-    MixPanel mixPanel;
+//    @Inject
+//    MixPanel mixPanel;
     @Inject
     PusherHelper mPusherHelper;
     @Inject
@@ -136,7 +136,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
             subscribeToStats();
         }
 
-        mixPanel.showNotificationIfAvailable(this);
+//        mixPanel.showNotificationIfAvailable(this);
     }
 
     @Override
@@ -292,7 +292,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
     @Override
     protected void onDestroy() {
-        mixPanel.flush();
+//        mixPanel.flush();
         mStatsSubscription.unsubscribe();
         super.onDestroy();
         mBackPressedHelper.removeCallbacks();

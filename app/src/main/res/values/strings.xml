@@ -491,7 +491,6 @@
 
     <!-- Global strings -->
     <string name="price_with_currency">%1$s %2$s</string>
-    <string name="google_api_key" translatable="false">AIzaSyBWHadI_MPYQgDLqI4RXhymEs42YEtgTEE</string>
     <string name="font_roboto_regular">sans-serif</string>
     <string name="font_roboto_medium">sans-serif</string>
     <string name="listen_success">You have successfully started listening to %1$s</string>

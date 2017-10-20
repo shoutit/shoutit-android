@@ -4,8 +4,8 @@ import android.app.Application;
 import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
 
-import com.adobe.creativesdk.aviary.IAviaryClientCredentials;
 import com.adobe.creativesdk.foundation.AdobeCSDKFoundation;
+import com.adobe.creativesdk.foundation.auth.IAdobeAuthClientCredentials;
 import com.appunite.appunitegcm.AppuniteGcm;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.observables.NetworkObservableProvider;
@@ -43,7 +43,7 @@ import rx.plugins.RxJavaErrorHandler;
 import rx.plugins.RxJavaPlugins;
 
 
-public class App extends MultiDexApplication implements IAviaryClientCredentials {
+public class App extends MultiDexApplication implements IAdobeAuthClientCredentials {
 
     private static final String GCM_TOKEN = "935842257865";
     private static final String TAG = App.class.getCanonicalName();
@@ -252,7 +252,12 @@ public class App extends MultiDexApplication implements IAviaryClientCredentials
     }
 
     @Override
-    public String getBillingKey() {
+    public String[] getAdditionalScopesList() {
+        return new String[0];
+    }
+
+    @Override
+    public String getRedirectURI() {
         return null;
     }
 }

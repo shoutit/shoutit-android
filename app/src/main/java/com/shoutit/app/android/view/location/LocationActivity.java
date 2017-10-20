@@ -127,7 +127,7 @@ public class LocationActivity extends BaseActivity {
 
     private void setUpActionbar() {
         toolbar.setTitle(R.string.location_toolbar_title);
-        toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -153,7 +153,7 @@ public class ChatActivity extends BaseActivity implements Listener {
             return;
         }
 
-        mChatsToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        mChatsToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
         mChatsToolbar.setNavigationOnClickListener(view -> finish());
         mChatsToolbar.inflateMenu(R.menu.chats_menu);
         mChatsToolbar.setOnMenuItemClickListener(item -> {

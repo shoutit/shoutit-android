@@ -12,6 +12,7 @@ import com.shoutit.app.android.api.model.SortType;
 import com.shoutit.app.android.api.model.UserLocation;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -114,10 +115,10 @@ public class FiltersToSubmit {
         return distance == null;
     }
 
-    @Nullable
+    @Nonnull
     public Map<String, String> getFiltersQueryMap() {
         if (selectedFilters == null) {
-            return null;
+            return Collections.emptyMap();
         }
 
         final Map<String, String> queryMap = new HashMap<>();

@@ -369,23 +369,12 @@
             android:name="io.fabric.ApiKey"
             android:value="b058b2dcbf8b8f864860fe9fe12789317aba9da1"/>
 
-        <!-- Maps, Places -->
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_api_key"/>
-
         <meta-data android:name="com.mixpanel.android.MPConfig.ResourcePackageName"
                    android:value="com.shoutit.app.android"/>
 
         <service
             android:name="com.amazonaws.mobileconnectors.s3.transferutility.TransferService"
             android:enabled="true"/>
-
-        <provider
-            android:name="com.adobe.creativesdk.aviary.internal.cds.CdsProvider"
-            android:authorities="${applicationId}.CdsProvider"
-            android:exported="false" />
-
     </application>
 
 

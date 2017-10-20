@@ -239,7 +239,7 @@ public class ShoutActivity extends BaseActivity {
                 .subscribe(new Action1<Response<Object>>() {
                     @Override
                     public void call(Response<Object> responseBody) {
-                        if (responseBody.isSuccess()) {
+                        if (responseBody.isSuccessful()) {
                             setResult(RESULT_OK);
                             finish();
                             Toast.makeText(ShoutActivity.this, R.string.delete_shout_success, Toast.LENGTH_SHORT).show();
@@ -279,7 +279,7 @@ public class ShoutActivity extends BaseActivity {
                 .subscribe(new Action1<Response<Object>>() {
                     @Override
                     public void call(Response<Object> objectResponse) {
-                        if (objectResponse.isSuccess()) {
+                        if (objectResponse.isSuccessful()) {
                             ColoredSnackBar.success(findViewById(android.R.id.content), R.string.report_send_success, Snackbar.LENGTH_SHORT).show();
                         } else {
                             ColoredSnackBar.error(findViewById(android.R.id.content), R.string.error_default, Snackbar.LENGTH_SHORT);
