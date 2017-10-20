@@ -200,7 +200,7 @@ dependencies {
     compile 'com.github.clans:fab:1.6.1'
 
     // Facebook
-    compile 'com.facebook.android:facebook-android-sdk:4.6.0'
+    compile 'com.facebook.android:facebook-android-sdk:4.27.0'
 
     // Google
     provided 'javax.annotation:jsr250-api:1.0'
@@ -208,10 +208,10 @@ dependencies {
     compile 'com.google.dagger:dagger:2.0.1'
     compile 'com.google.code.gson:gson:2.5'
     compile 'com.google.code.findbugs:jsr305:2.0.1'
-    compile 'com.google.android.gms:play-services-location:9.4.0'
+    compile 'com.google.android.gms:play-services-location:11.4.0'
     compile 'com.google.guava:guava:18.0'
-    compile 'com.google.android.gms:play-services-auth:9.4.0'
-    compile 'com.google.android.gms:play-services-places:9.4.0'
+    compile 'com.google.android.gms:play-services-auth:11.4.0'
+    compile 'com.google.android.gms:play-services-places:11.4.0'
 
     // Square
     compile 'com.jakewharton:butterknife:7.0.1'
