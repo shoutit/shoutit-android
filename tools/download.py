@@ -6,8 +6,10 @@ __author__ = 'Jacek Marchwicki <jacek.marchwicki@gmail.com>'
 
 
 import argparse
-import subprocess
 import urlparse
+import urllib2
+import tarfile
+import StringIO
 
 
 def main():
@@ -17,7 +19,7 @@ def main():
     parser.add_argument('--key-version', dest='key_version', required=False, nargs="?",
                         type=str, help='key_version')
     parser.add_argument('--base-url', dest='base_url', nargs="?",
-                        type=str, help='base url', default="https://auto-close.appspot.com/")
+                        type=str, help='base url', default="https://builds.appunite.com/")
     args = parser.parse_args()
 
     if args.key_version:
@@ -25,9 +27,31 @@ def main():
     else:
         request = "build/keys?token=%s" % (args.token, )
 
-    path = urlparse.urljoin(args.base_url, request)
-    command = "curl --location --silent \"%s\" | tar -jxvf -" % (path)
-    subprocess.check_call(command, shell=True)
+    url = urlparse.urljoin(args.base_url, request)
+    tar = download(url)
+    untar(tar)
+
+handler = urllib2.HTTPSHandler(debuglevel=0)
+opener = urllib2.build_opener(handler)
+
+def untar(content):
+    stream = StringIO.StringIO(content)
+    tar = tarfile.open(fileobj=stream, mode='r|bz2')
+    tar.extractall()
+    tar.list()
+    tar.close()
+
+def download(url):
+    request = urllib2.Request(url.encode('utf-8'))
+    return execute_http(request)
+
+def execute_http(request):
+    try:
+        response = opener.open(request)
+        return response.read()
+    except urllib2.HTTPError as e:
+        print >> sys.stderr, "Response from server: %s" % e.read()
+        raise e
 
 
 if __name__ == '__main__':
