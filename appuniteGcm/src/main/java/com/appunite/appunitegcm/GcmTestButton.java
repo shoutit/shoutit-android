@@ -2,9 +2,9 @@ package com.appunite.appunitegcm;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.widget.Button;
+import android.support.v7.widget.AppCompatButton;
 
-public class GcmTestButton extends Button {
+public class GcmTestButton extends AppCompatButton {
 
     private GcmPushHandler gcmPushHandler;
 

@@ -1,12 +1,12 @@
 package com.shoutit.app.android.widget;
 
 import android.content.Context;
+import android.support.v7.widget.AppCompatImageButton;
 import android.util.AttributeSet;
-import android.widget.ImageButton;
 
 import com.shoutit.app.android.R;
 
-public class FlashlightButton extends ImageButton {
+public class FlashlightButton extends AppCompatImageButton {
 
     public interface OnFlashStateChanged {
 
