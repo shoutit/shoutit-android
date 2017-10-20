@@ -244,8 +244,8 @@ dependencies {
         transitive = true;
     }
     compile 'com.commonsware.cwac:cam2:0.5.3'
-    compile 'com.pusher:pusher-java-client:1.1.2'
-    compile "com.mixpanel.android:mixpanel-android:4.8.7"
+    compile 'com.pusher:pusher-java-client:1.5.0'
+    compile "com.mixpanel.android:mixpanel-android:5.2.1"
     compile 'com.adobe.creativesdk.foundation:auth:0.9.1251'
     compile 'com.adobe.creativesdk:image:4.8.4'
     compile project(":FFmpegAndroid")
