@@ -1,21 +1,43 @@
-image: jacekmarchwicki/android
-
 before_script:
-  - export VERSION_SUFFIX="$(git rev-parse --short HEAD).$(git rev-list HEAD --count)$(echo "-${CI_BUILD_REF_NAME}" | sed 's/^-master$//')"
-  - printf "org.gradle.jvmargs=-XX:MaxPermSize=2g\ncommitId=${CI_BUILD_REF}\nversionSuffix=${VERSION_SUFFIX}\ndisablePreDex=true\n" > gradle.properties
-  - python tools/download.py --token P8uXtUgTeNDYEIvw5gXUWjDM --key-version agxzfmF1dG8tY2xvc2VyGAsSC1Byb2plY3RLZXlzGICAgMDuv6EKDA
-  - git submodule update --init --recursive
-  - git submodule foreach --recursive git clean -x -f -d
-  - /opt/tools/android-accept-licenses.sh "android update sdk --all --no-ui --filter extra-android-m2repository,extra-google-m2repository,build-tools-25.0.2,build-tools-25.0.2,android-23,extra-android-support,extra-android-m2repository,extra-google-google_play_services"
-  - /opt/tools/android-accept-licenses.sh "android update sdk --all --no-ui --filter extra-android-m2repository,extra-google-m2repository"
+  # download keys
+  - python tools/download.py --token ${AUTO_CLOSE_TOKEN} --key-version agxzfmF1dG8tY2xvc2VyGAsSC1Byb2plY3RLZXlzGICAgKDI0JMKDA
+
+  # setup version name and code
+  - export VERSION_NAME="$(git describe --match 'v*.*.*' --always)-$(git rev-list HEAD --count)$(git status | grep 'clean' --quiet || echo '-draft')"
+  - export VERSION_CODE="$(git rev-list HEAD --count)"
+  - echo "Building version $VERSION_NAME ($VERSION_CODE)"
+
+  # setup version name and code for build.gradle script
+  - printf "org.gradle.jvmargs=-XX:MaxPermSize=8g\nversionName=${VERSION_NAME}\nversionCode=${VERSION_CODE}\ndisablePreDex=true\nautoCloseToken=${AUTO_CLOSE_TOKEN}\n" > gradle.properties
+
+  # setup android sdk and licenses
+  - mkdir -p "${ANDROID_HOME}/licenses"
+  - echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > "${ANDROID_HOME}/licenses/android-sdk-license"
+  - echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > "${ANDROID_HOME}/licenses/android-sdk-preview-license"
+  - echo -e "\nd975f751698a77b662f1254ddbeed3901e976f5a" > "${ANDROID_HOME}/licenses/intel-android-extra-license"
+
+  # client build will start when adding tag v*.*.*
+  - export FOR_CLIENT="$([[ "${CI_BUILD_TAG}" =~ ^v([0-9]+\.)*[0-9]+$ ]] && echo "TRUE")"
+  # testers will receive builds from master, for client or any tag
+  - export FOR_TESTERS="$([[ "${CI_BUILD_REF_NAME}" == "master" || "${FOR_CLIENT}" || "${CI_BUILD_TAG}" ]] && echo "TRUE")"
 
 build:
+  # docker image for build
+  image: jacekmarchwicki/android:ubuntu-16-04-java7-8
+
   script:
-    - ./gradlew --parallel --stacktrace build
-    - ./gradlew signingReport
-    - "./upload.sh"
-    - python tools/upload.py --token P8uXtUgTeNDYEIvw5gXUWjDM --build-name "$(git rev-parse --short HEAD)-$(git rev-parse --abbrev-ref HEAD)" app/build/outputs/apk/
+    # build application and run additional upload to play store and upload to fabric
+    - ./gradlew --parallel --stacktrace build javadoc assembleProdDebugAndroidTest signingReport $(test "${FOR_TESTERS}" && echo "uploadArchives")  $(test "${FOR_TESTERS}" && echo "crashlyticsUploadDistributionProdRelease") $(test "${FOR_CLIENT}" && echo "publishRelease")
+
+    # Upload to auto-close
+    - if [[ "${FOR_TESTERS}" ]]; then python tools/upload.py --token ${AUTO_CLOSE_TOKEN} --build-name "${VERSION_NAME}" --auto-close $(test "${FOR_CLIENT}" && echo "--final") app/build/outputs/ app/build/reports/; fi
+  cache:
+    key: "$CI_BUILD_NAME"
+    paths:
+      - .gradle/
+      - .android/
+  variables:
+    GRADLE_USER_HOME: ${CI_PROJECT_DIR}/.gradle
+    ANDROID_HOME: ${CI_PROJECT_DIR}/.android
   tags:
     - docker
-  except:
-    - tags

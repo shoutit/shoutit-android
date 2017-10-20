@@ -38,14 +38,14 @@ if (keystoreProperties.exists()) {
     props.load(new FileInputStream(keystoreProperties))
 }
 
-def baseVersionName = "2.6.0"
-
-project.ext.versionCode = 79
-
-if (project.hasProperty("versionSuffix")) {
-    project.ext.versionChangeSuffix = project.versionSuffix
-} else {
-    project.ext.versionChangeSuffix = "-snapshot"
+if (!project.hasProperty("versionName")) {
+    project.ext.versionName = "2.6.0"
+}
+if (!project.hasProperty("versionCode")) {
+    project.ext.versionCode = "79"
+}
+if (!project.hasProperty("autoCloseToken")) {
+    project.ext.autoCloseToken = "wrong-token"
 }
 
 android {
@@ -60,8 +60,8 @@ android {
         applicationId "com.shoutit.app.android"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode project.ext.versionCode
-        versionName "${baseVersionName}-${project.ext.versionChangeSuffix}"
+        versionCode project.ext.versionCode.toInteger()
+        versionName project.ext.versionName
         renderscriptTargetApi 25
         multiDexEnabled true
         testInstrumentationRunner "com.android.test.runner.MultiDexTestRunner"
