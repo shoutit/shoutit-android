@@ -6,7 +6,7 @@ before_script:
   - python tools/download.py --token P8uXtUgTeNDYEIvw5gXUWjDM --key-version agxzfmF1dG8tY2xvc2VyGAsSC1Byb2plY3RLZXlzGICAgMDuv6EKDA
   - git submodule update --init --recursive
   - git submodule foreach --recursive git clean -x -f -d
-  - /opt/tools/android-accept-licenses.sh "android update sdk --all --no-ui --filter extra-android-m2repository,extra-google-m2repository,build-tools-23.0.1,build-tools-23.0.2,android-23,extra-android-support,extra-android-m2repository,extra-google-google_play_services"
+  - /opt/tools/android-accept-licenses.sh "android update sdk --all --no-ui --filter extra-android-m2repository,extra-google-m2repository,build-tools-25.0.2,build-tools-25.0.2,android-23,extra-android-support,extra-android-m2repository,extra-google-google_play_services"
   - /opt/tools/android-accept-licenses.sh "android update sdk --all --no-ui --filter extra-android-m2repository,extra-google-m2repository"
 
 build:
