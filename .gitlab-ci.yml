@@ -27,7 +27,7 @@ build:
 
   script:
     # build application and run additional upload to play store and upload to fabric
-    - ./gradlew --parallel --stacktrace build assembleProdDebugAndroidTest signingReport $(test "${FOR_TESTERS}" && echo "uploadArchives")  $(test "${FOR_TESTERS}" && echo "crashlyticsUploadDistributionProdRelease") $(test "${FOR_CLIENT}" && echo "publishRelease")
+    - ./gradlew --parallel --stacktrace build assembleDebDebugAndroidTest signingReport $(test "${FOR_TESTERS}" && echo "uploadArchives")  $(test "${FOR_TESTERS}" && echo "crashlyticsUploadDistributionProdRelease") $(test "${FOR_CLIENT}" && echo "publishRelease")
 
     # Upload to auto-close
     - if [[ "${FOR_TESTERS}" ]]; then python tools/upload.py --token ${AUTO_CLOSE_TOKEN} --build-name "${VERSION_NAME}" --auto-close $(test "${FOR_CLIENT}" && echo "--final") app/build/outputs/ app/build/reports/; fi
