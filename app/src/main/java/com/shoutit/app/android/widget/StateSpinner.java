@@ -4,10 +4,10 @@ import android.content.Context;
 import android.database.DataSetObserver;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.v7.widget.AppCompatSpinner;
 import android.util.AttributeSet;
-import android.widget.Spinner;
 
-public class StateSpinner extends Spinner {
+public class StateSpinner extends AppCompatSpinner {
 
     public StateSpinner(Context context, AttributeSet attrs, int defStyleAttr, int mode) {
         super(context, attrs, defStyleAttr, mode);
@@ -70,7 +70,7 @@ public class StateSpinner extends Spinner {
         public StateSpinnerSavedState(Parcel source) {
             super(source);
             mSelectedItemId = source.readLong();
-            mSuperState = source.readParcelable(Spinner.BaseSavedState.class.getClassLoader());
+            mSuperState = source.readParcelable(AppCompatSpinner.BaseSavedState.class.getClassLoader());
         }
 
         public StateSpinnerSavedState(Parcelable superState, long selectedItemId) {

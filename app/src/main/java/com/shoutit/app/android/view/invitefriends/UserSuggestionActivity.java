@@ -55,7 +55,7 @@ public class UserSuggestionActivity extends BaseActivity {
         final int type = getIntent().getIntExtra(EXTRA_TYPE, -1);
         Preconditions.checkArgument(type >= 0);
 
-        mToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        mToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

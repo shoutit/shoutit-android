@@ -1,7 +1,6 @@
 package com.shoutit.app.android.utils;
 
 import android.content.Context;
-import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
@@ -16,7 +15,6 @@ public class ResourcesHelper {
         return context.getResources().getIdentifier(resourceName.toLowerCase(), "drawable", context.getPackageName());
     }
 
-    @IdRes
     @NonNull
     public static Optional<Integer> getCountryResId(@Nonnull Context context, @Nonnull UserLocation location) {
         if (location != null && !TextUtils.isEmpty(location.getCountry())) {

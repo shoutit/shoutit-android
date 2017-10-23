@@ -123,7 +123,7 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
         mCreateRequestSpinner.setAdapter(mAdapter);
 
         mRequestActivityToolbar.setTitle(getString(R.string.request_activity_title));
-        mRequestActivityToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        mRequestActivityToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
         mRequestActivityToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

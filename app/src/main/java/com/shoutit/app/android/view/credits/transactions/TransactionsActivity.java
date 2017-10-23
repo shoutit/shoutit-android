@@ -71,7 +71,7 @@ public class TransactionsActivity extends BaseActivity implements TransactionsPr
         mTransactionsRecyclerview.setLayoutManager(new MyLinearLayoutManager(this));
 
         mTransactionsToolbar.setTitle(R.string.transactions_title);
-        mTransactionsToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        mTransactionsToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
         mTransactionsToolbar.setNavigationOnClickListener(view -> finish());
 
         RxRecyclerView.scrollEvents(mTransactionsRecyclerview)

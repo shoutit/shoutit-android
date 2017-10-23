@@ -78,7 +78,7 @@ public class CreatePublicChatActivity extends BaseActivity implements CreatePubl
         ButterKnife.bind(this);
 
         mToolbar.setTitle(R.string.create_public_chat_title);
-        mToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        mToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

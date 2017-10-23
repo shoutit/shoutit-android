@@ -5,10 +5,10 @@ buildscript {
         maven { url "https://jitpack.io" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.0'
+        classpath 'com.android.tools.build:gradle:2.3.3'
         classpath 'io.fabric.tools:gradle:1.21.2'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
-        classpath 'com.google.gms:google-services:2.0.0-alpha9'
+        classpath 'com.google.gms:google-services:3.0.0'
         classpath 'me.tatarka:gradle-retrolambda:3.3.0-beta3'
     }
 }
@@ -20,6 +20,11 @@ repositories {
     maven { url 'https://maven.fabric.io/public' }
     maven { url 'http://clojars.org/repo' }
     maven { url "https://jitpack.io" }
+    maven { url 'http://maven.localytics.com/public' }
+    maven {
+        name 'maven.aviary.com'
+        url uri("http://maven.aviary.com/repo/release")
+    }
 }
 
 apply plugin: 'com.android.application'
@@ -33,19 +38,19 @@ if (keystoreProperties.exists()) {
     props.load(new FileInputStream(keystoreProperties))
 }
 
-def baseVersionName = "2.6.0"
-
-project.ext.versionCode = 79
-
-if (project.hasProperty("versionSuffix")) {
-    project.ext.versionChangeSuffix = project.versionSuffix
-} else {
-    project.ext.versionChangeSuffix = "-snapshot"
+if (!project.hasProperty("versionName")) {
+    project.ext.versionName = "2.6.0"
+}
+if (!project.hasProperty("versionCode")) {
+    project.ext.versionCode = "79"
+}
+if (!project.hasProperty("autoCloseToken")) {
+    project.ext.autoCloseToken = "wrong-token"
 }
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    compileSdkVersion 25
+    buildToolsVersion '25.0.2'
 
     dexOptions {
         dexInProcess true
@@ -54,12 +59,13 @@ android {
     defaultConfig {
         applicationId "com.shoutit.app.android"
         minSdkVersion 16
-        targetSdkVersion 23
-        versionCode project.ext.versionCode
-        versionName "${baseVersionName}-${project.ext.versionChangeSuffix}"
-        renderscriptTargetApi 23
+        targetSdkVersion 25
+        versionCode project.ext.versionCode.toInteger()
+        versionName project.ext.versionName
+        renderscriptTargetApi 25
         multiDexEnabled true
         testInstrumentationRunner "com.android.test.runner.MultiDexTestRunner"
+        manifestPlaceholders = [appPackageName: "${applicationId}"]
     }
 
     compileOptions {
@@ -168,15 +174,17 @@ android {
 
     lintOptions {
         abortOnError true
-        disable 'InvalidPackage','MissingTranslation','StringFormatInvalid'
+        disable 'InvalidPackage','MissingTranslation','StringFormatInvalid','RestrictedApi'
     }
 }
 
 configurations.all {
-    resolutionStrategy.force 'com.android.support:support-annotations:23.1.1'
+    resolutionStrategy.force 'com.android.support:support-annotations:25.3.1'
     resolutionStrategy.force 'com.google.guava:guava:18.0'
-    resolutionStrategy.force 'com.android.support:support-v4:23.1.1'
-    resolutionStrategy.force 'com.android.support:appcompat-v7:23.1.1'
+    resolutionStrategy.force 'com.android.support:support-v4:25.3.1'
+    resolutionStrategy.force 'com.android.support:appcompat-v7:25.3.1'
+    resolutionStrategy.force 'com.android.support:palette-v7:25.3.1'
+    resolutionStrategy.force 'com.android.support:support-v13:25.3.1'
     resolutionStrategy.force 'io.reactivex:rxjava:1.1.0'
 }
 
@@ -184,17 +192,17 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     // Supports
-    compile 'com.android.support:support-v4:23.1.1'
-    compile 'com.android.support:appcompat-v7:23.1.1'
-    compile 'com.android.support:design:23.1.1'
-    compile 'com.android.support:cardview-v7:23.1.1'
-    compile 'com.android.support:recyclerview-v7:23.1.1'
-    compile 'com.android.support:support-annotations:23.1.1'
+    compile 'com.android.support:support-v4:25.3.1'
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:design:25.3.1'
+    compile 'com.android.support:cardview-v7:25.3.1'
+    compile 'com.android.support:recyclerview-v7:25.3.1'
+    compile 'com.android.support:support-annotations:25.3.1'
     compile 'com.android.support:multidex:1.0.1'
     compile 'com.github.clans:fab:1.6.1'
 
     // Facebook
-    compile 'com.facebook.android:facebook-android-sdk:4.6.0'
+    compile 'com.facebook.android:facebook-android-sdk:4.27.0'
 
     // Google
     provided 'javax.annotation:jsr250-api:1.0'
@@ -202,19 +210,20 @@ dependencies {
     compile 'com.google.dagger:dagger:2.0.1'
     compile 'com.google.code.gson:gson:2.5'
     compile 'com.google.code.findbugs:jsr305:2.0.1'
-    compile 'com.google.android.gms:play-services-location:8.4.0'
+    compile 'com.google.android.gms:play-services-location:11.4.0'
     compile 'com.google.guava:guava:18.0'
-    compile 'com.google.android.gms:play-services-auth:8.4.0'
+    compile 'com.google.android.gms:play-services-auth:11.4.0'
+    compile 'com.google.android.gms:play-services-places:11.4.0'
 
     // Square
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
-    compile 'com.squareup.retrofit2:retrofit:2.0.0-beta3'
-    compile 'com.squareup.okhttp3:okhttp-urlconnection:3.0.1'
-    compile 'com.squareup.okhttp3:logging-interceptor:3.0.1'
+    compile 'com.squareup.retrofit2:retrofit:2.2.0'
+    compile 'com.squareup.okhttp3:okhttp-urlconnection:3.6.0'
+    compile 'com.squareup.okhttp3:logging-interceptor:3.6.0'
     compile 'com.jakewharton.picasso:picasso2-okhttp3-downloader:1.0.2'
-    compile 'com.squareup.retrofit2:converter-gson:2.0.0-beta3'
-    compile 'com.squareup.retrofit2:adapter-rxjava:2.0.0-beta3'
+    compile 'com.squareup.retrofit2:converter-gson:2.2.0'
+    compile 'com.squareup.retrofit2:adapter-rxjava:2.2.0'
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
     stagingCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
@@ -223,8 +232,8 @@ dependencies {
     // RX
     compile 'com.trello:rxlifecycle:0.3.0'
     compile 'com.trello:rxlifecycle-components:0.3.0'
-    compile 'com.jakewharton.rxbinding:rxbinding:0.3.0'
-    compile 'com.jakewharton.rxbinding:rxbinding-recyclerview-v7:0.3.0'
+    compile 'com.jakewharton.rxbinding:rxbinding:0.4.0'
+    compile 'com.jakewharton.rxbinding:rxbinding-recyclerview-v7:0.4.0'
 
     compile 'com.github.jacek-marchwicki.rx-java-extensions:rx-extensions:9906cc7974'
     compile 'com.github.jacek-marchwicki.rx-java-extensions:rx-android-extensions:9906cc7974'
@@ -237,10 +246,10 @@ dependencies {
         transitive = true;
     }
     compile 'com.commonsware.cwac:cam2:0.5.3'
-    compile 'com.pusher:pusher-java-client:1.1.2'
-    compile "com.mixpanel.android:mixpanel-android:4.8.7"
-    compile 'com.adobe.creativesdk.foundation:auth:0.9.7'
-    compile 'com.adobe.creativesdk:image:4.4.8'
+    compile 'com.pusher:pusher-java-client:1.5.0'
+    compile "com.mixpanel.android:mixpanel-android:5.2.1"
+    compile 'com.adobe.creativesdk.foundation:auth:0.9.1251'
+    compile 'com.adobe.creativesdk:image:4.8.4'
     compile project(":FFmpegAndroid")
     compile project(":appuniteGcm")
     compile project(":ScrollViewGallery")

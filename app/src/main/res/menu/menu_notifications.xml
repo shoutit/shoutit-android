@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <item
-        android:icon="@drawable/abc_ic_menu_moreoverflow_mtrl_alpha"
+        android:icon="@drawable/abc_ic_menu_overflow_material"
         android:title=""
         app:showAsAction="ifRoom"
         tools:ignore="PrivateResource">

@@ -15,7 +15,6 @@ import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.android.MyAndroidSchedulers;
 import com.appunite.rx.functions.BothParams;
 import com.facebook.CallbackManager;
-import com.facebook.FacebookSdk;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -98,7 +97,6 @@ public class LoginIntroActivity extends BaseActivity {
     }
 
     private void initFacebook() {
-        FacebookSdk.sdkInitialize(getApplicationContext());
         mCallbackManager = CallbackManager.Factory.create();
     }
 
