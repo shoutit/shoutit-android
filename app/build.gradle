@@ -7,7 +7,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.3'
-        classpath 'io.fabric.tools:gradle:1.21.2'
+        classpath 'io.fabric.tools:gradle:1.21.6'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
         classpath 'com.google.gms:google-services:3.0.0'
         classpath 'me.tatarka:gradle-retrolambda:3.3.0-beta3'
@@ -267,9 +267,7 @@ dependencies {
     // other
     compile 'com.uservoice:uservoice-android-sdk:1.2.4'
     compile 'fr.avianey.com.viewpagerindicator:library:2.4.1@aar'
-    compile('com.crashlytics.sdk.android:crashlytics:2.5.1@aar') {
-        transitive = true;
-    }
+    compile 'com.crashlytics.sdk.android:crashlytics:2.6.7'
     compile 'com.commonsware.cwac:cam2:0.5.3'
     compile 'com.pusher:pusher-java-client:1.5.0'
     compile "com.mixpanel.android:mixpanel-android:5.2.1"
@@ -314,6 +312,14 @@ dependencies {
         transitive = true;
     }
 
+}
+
+// Add dependencies to crashlytics, signingReport and google play upload so they will not finish before building the app
+tasks.whenTaskAdded { task ->
+    if (task.name.startsWith('crashlyticsUploadDistribution') ||
+            task.name == 'signingReport') {
+        task.dependsOn build
+    }
 }
 
 apply plugin: 'com.google.gms.google-services'
