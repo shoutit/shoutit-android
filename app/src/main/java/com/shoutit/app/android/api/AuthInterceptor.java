@@ -32,6 +32,7 @@ public class AuthInterceptor implements Interceptor {
         } else {
             final Request request = original.newBuilder()
                     .header("Authorization", TOKEN_PREFIX + token)
+                    .header("USER_DEVICE_ID", userPreferences.getDeviceId())
                     .build();
 
             return chain.proceed(request);
