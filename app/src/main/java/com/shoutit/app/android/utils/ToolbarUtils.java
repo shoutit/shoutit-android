@@ -11,7 +11,7 @@ public class ToolbarUtils {
 
     public static void setupToolbar(@NonNull Toolbar toolbar, @StringRes int title, @NonNull Activity activity) {
         toolbar.setTitle(title);
-        toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
         toolbar.setNavigationOnClickListener(view -> activity.finish());
     }
 

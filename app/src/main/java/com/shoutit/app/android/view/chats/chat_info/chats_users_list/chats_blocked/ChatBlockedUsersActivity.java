@@ -68,7 +68,7 @@ public class ChatBlockedUsersActivity extends BaseActivity implements ChatBlocke
         ButterKnife.bind(this);
 
         mChatParticipantToolbar.setTitle(R.string.chat_blocked_users_title);
-        mChatParticipantToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        mChatParticipantToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
         mChatParticipantToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

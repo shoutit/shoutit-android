@@ -27,6 +27,8 @@ import com.shoutit.app.android.model.UserShoutsPointer;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
 import com.shoutit.app.android.view.search.SearchPresenter;
 
+import java.util.Collections;
+
 import javax.annotation.Nonnull;
 
 import retrofit2.Response;
@@ -233,7 +235,7 @@ public class ShoutsDao {
                 return apiService
                         .shoutsForLocation(mLocationPointer.getCountryCode(),
                                 mLocationPointer.getCity(), mLocationPointer.getState(), pageNumber, PAGE_SIZE,
-                                null, null, null, null, null, null, null)
+                                null, null, null, null, null, null, Collections.emptyMap())
                         .subscribeOn(networkScheduler);
             }
         }
@@ -443,7 +445,7 @@ public class ShoutsDao {
                     } else {
                         return apiService.searchShouts(query, pageNumber, PAGE_SIZE,
                                 country, city, state,
-                                null, null, DEFAULT_SEARCH_DISTANCE, null, null, null, null);
+                                null, null, DEFAULT_SEARCH_DISTANCE, null, null, null, Collections.emptyMap());
                     }
                 case RELATED_SHOUTS:
                     return apiService.shoutsRelated(contextItemId, pageNumber, PAGE_SIZE);
@@ -457,8 +459,8 @@ public class ShoutsDao {
                                 filtersToSubmit.getFiltersQueryMap());
                     } else {
                         return apiService.searchTagShouts(query, pageNumber, PAGE_SIZE, contextItemId,
-                                country, null, null,
-                                null, null, null, null, null, null, null);
+                                country, city, state,
+                                null, null, DEFAULT_SEARCH_DISTANCE, null, null, null, Collections.emptyMap());
                     }
                 case CATEGORY:
                     if (filtersToSubmit != null) {
@@ -471,7 +473,7 @@ public class ShoutsDao {
                     } else {
                         return apiService.searchCategoriesShouts(query, pageNumber, PAGE_SIZE,
                                 country, city, state,
-                                null, null, DEFAULT_SEARCH_DISTANCE, null, null, contextItemId, null);
+                                null, null, DEFAULT_SEARCH_DISTANCE, null, null, contextItemId, Collections.emptyMap());
                     }
                 case DISCOVER:
                     if (filtersToSubmit != null) {
@@ -482,7 +484,7 @@ public class ShoutsDao {
                                 filtersToSubmit.getFiltersQueryMap());
                     } else {
                         return apiService.searchDiscoverShouts(query, pageNumber, PAGE_SIZE, contextItemId,
-                                null, null, DEFAULT_SEARCH_DISTANCE, null, null, null, null);
+                                null, null, DEFAULT_SEARCH_DISTANCE, null, null, null, Collections.emptyMap());
                     }
                 case BROWSE:
                     if (filtersToSubmit != null) {
@@ -494,7 +496,7 @@ public class ShoutsDao {
                                 filtersToSubmit.getFiltersQueryMap());
                     } else {
                         return apiService.shoutsForLocation(country, city, state, pageNumber, PAGE_SIZE,
-                                null, null, DEFAULT_SEARCH_DISTANCE, null, null, null, null);
+                                null, null, DEFAULT_SEARCH_DISTANCE, null, null, null, Collections.emptyMap());
                     }
                 default:
                     throw new RuntimeException("Unknwon profile type: " + SearchPresenter.SearchType.values()[searchType.ordinal()]);

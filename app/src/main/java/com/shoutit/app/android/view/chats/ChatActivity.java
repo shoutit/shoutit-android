@@ -52,7 +52,6 @@ import com.shoutit.app.android.utils.UpNavigationHelper;
 import com.shoutit.app.android.view.chats.chat_info.ChatInfoActivity;
 import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
 import com.shoutit.app.android.view.chooseprofile.SelectProfileActivity;
-import com.shoutit.app.android.view.gallery.GalleryActivity;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
 import com.shoutit.app.android.view.profile.ProfileIntentHelper;
@@ -160,10 +159,8 @@ public class ChatActivity extends BaseActivity implements Listener {
             return;
         }
 
-        mChatsToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
-        mChatsToolbar.setNavigationOnClickListener(view -> {
-            new UpNavigationHelper(this).onUpButtonClicked();
-        });
+        mChatsToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
+        mChatsToolbar.setNavigationOnClickListener(view -> new UpNavigationHelper(this).onUpButtonClicked());
         mChatsToolbar.inflateMenu(R.menu.chats_menu);
         mChatsToolbar.setOnMenuItemClickListener(item -> {
             final int itemId = item.getItemId();

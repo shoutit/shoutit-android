@@ -45,7 +45,7 @@ public class SearchProfilesResultsActivity extends BaseProfilesListActivity {
     @SuppressLint("PrivateResource")
     protected void setUpToolbar() {
         toolbar.setTitle(getString(R.string.search_profiles_results));
-        toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
         toolbar.setNavigationOnClickListener(v -> finish());
     }
 

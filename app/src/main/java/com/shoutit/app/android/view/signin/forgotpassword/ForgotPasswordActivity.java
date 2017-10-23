@@ -58,33 +58,25 @@ public class ForgotPasswordActivity extends BaseDaggerActivity {
         AppseeHelper.markViewAsSensitive(mForgotPasswordEmailEdittext);
         AppseeHelper.markViewAsSensitive(mForgotPasswordEdittextLayout);
 
-        toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
         toolbar.setLogo(R.drawable.appbar_logo_white);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        toolbar.setNavigationOnClickListener(v -> finish());
 
-        mForgotPasswordProceedBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final String mail = mForgotPasswordEmailEdittext.getText().toString();
-                if (Strings.isNullOrEmpty(mail)) {
-                    mForgotPasswordEdittextLayout.setError(getString(R.string.login_empty_mail));
-                } else {
-                    mForgotPasswordEdittextLayout.setError(null);
-                    mForgotPasswordProgress.setVisibility(View.VISIBLE);
-                    mSubscription = service.resetPassword(new ResetPasswordRequest(mail))
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(MyAndroidSchedulers.mainThread())
-                            .doOnTerminate(() -> mForgotPasswordProgress.setVisibility(View.GONE))
-                            .subscribe(apiMessageResponse -> {
-                                ApiMessagesHelper.showApiMessageToast(ForgotPasswordActivity.this, apiMessageResponse);
-                                finish();
-                            }, ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(ForgotPasswordActivity.this)));
-                }
+        mForgotPasswordProceedBtn.setOnClickListener(v -> {
+            final String mail = mForgotPasswordEmailEdittext.getText().toString();
+            if (Strings.isNullOrEmpty(mail)) {
+                mForgotPasswordEdittextLayout.setError(getString(R.string.login_empty_mail));
+            } else {
+                mForgotPasswordEdittextLayout.setError(null);
+                mForgotPasswordProgress.setVisibility(View.VISIBLE);
+                mSubscription = service.resetPassword(new ResetPasswordRequest(mail))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(MyAndroidSchedulers.mainThread())
+                        .doOnTerminate(() -> mForgotPasswordProgress.setVisibility(View.GONE))
+                        .subscribe(apiMessageResponse -> {
+                            ApiMessagesHelper.showApiMessageToast(ForgotPasswordActivity.this, apiMessageResponse);
+                            finish();
+                        }, ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(ForgotPasswordActivity.this)));
             }
         });
     }

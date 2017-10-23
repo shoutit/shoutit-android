@@ -48,7 +48,7 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void setUpActionBar() {
-        toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
         setSupportActionBar(toolbar);
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(null);

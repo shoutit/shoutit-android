@@ -93,7 +93,7 @@ public class ChatShoutsActivity extends BaseActivity {
 
     private void setUpToolbar() {
         toolbar.setTitle(R.string.chat_shouts_ab_title);
-        toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
         toolbar.setNavigationOnClickListener(view -> finish());
     }
 

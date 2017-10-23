@@ -225,13 +225,16 @@ public class ShoutActivity extends BaseActivity {
 
         presenter.getDeleteShoutResponseObservable()
                 .compose(this.<Response<Object>>bindToLifecycle())
-                .subscribe(responseBody -> {
-                    if (responseBody.isSuccess()) {
-                        setResult(RESULT_OK);
-                        finish();
-                        Toast.makeText(ShoutActivity.this, R.string.delete_shout_success, Toast.LENGTH_SHORT).show();
-                    } else {
-                        Snackbar.make(findViewById(android.R.id.content), R.string.delete_shout_error, Snackbar.LENGTH_SHORT).show();
+                .subscribe(new Action1<Response<Object>>() {
+                    @Override
+                    public void call(Response<Object> responseBody) {
+                        if (responseBody.isSuccessful()) {
+                            setResult(RESULT_OK);
+                            finish();
+                            Toast.makeText(ShoutActivity.this, R.string.delete_shout_success, Toast.LENGTH_SHORT).show();
+                        } else {
+                            Snackbar.make(findViewById(android.R.id.content), R.string.delete_shout_error, Snackbar.LENGTH_SHORT).show();
+                        }
                     }
                 }, throwable -> {
                     Snackbar.make(findViewById(android.R.id.content), R.string.delete_shout_error, Snackbar.LENGTH_SHORT).show();
@@ -254,7 +257,7 @@ public class ShoutActivity extends BaseActivity {
         presenter.getReportShoutObservable()
                 .compose(this.<Response<Object>>bindToLifecycle())
                 .subscribe(objectResponse -> {
-                    if (objectResponse.isSuccess()) {
+                    if (objectResponse.isSuccessful()) {
                         ColoredSnackBar.success(findViewById(android.R.id.content), R.string.report_send_success, Snackbar.LENGTH_SHORT).show();
                     } else {
                         ColoredSnackBar.error(findViewById(android.R.id.content), R.string.error_default, Snackbar.LENGTH_SHORT);

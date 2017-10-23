@@ -14,7 +14,6 @@ import android.view.View;
 
 import com.appunite.rx.android.MyAndroidSchedulers;
 import com.facebook.CallbackManager;
-import com.facebook.FacebookSdk;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
@@ -82,12 +81,11 @@ public class LoginIntroActivity extends BaseDaggerActivity {
     }
 
     private void initFacebook() {
-        FacebookSdk.sdkInitialize(getApplicationContext());
         mCallbackManager = CallbackManager.Factory.create();
     }
 
     private void setUpActionBar() {
-        toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
         setSupportActionBar(toolbar);
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(null);

@@ -6,11 +6,11 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.text.TextPaint;
 import android.util.AttributeSet;
-import android.widget.TextView;
+import android.support.v7.widget.AppCompatTextView;
 
 import com.shoutit.app.android.R;
 
-public class LinedTextView extends TextView {
+public class LinedTextView extends AppCompatTextView {
 
     private Paint mPaint;
     private int internalPadding;

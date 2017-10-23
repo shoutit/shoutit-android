@@ -1,12 +1,10 @@
 package com.shoutit.app.android.widget;
 
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.os.Build;
+import android.support.v7.widget.AppCompatImageButton;
 import android.util.AttributeSet;
-import android.widget.ImageButton;
 
-public class CheckableImageButton extends ImageButton {
+public class CheckableImageButton extends AppCompatImageButton {
 
     private boolean mChecked;
 
@@ -20,11 +18,6 @@ public class CheckableImageButton extends ImageButton {
 
     public CheckableImageButton(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public CheckableImageButton(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
     }
 
     @Override

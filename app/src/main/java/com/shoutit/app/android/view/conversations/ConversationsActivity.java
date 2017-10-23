@@ -50,7 +50,7 @@ public class ConversationsActivity extends BaseDaggerActivity {
     private void setUpToolbar() {
         setSupportActionBar(toolbar);
         toolbar.setTitle(R.string.conversation_title);
-        toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -148,7 +148,7 @@ public class LocationActivityDelegate {
     @SuppressLint("PrivateResource")
     private void setUpActionbar() {
         toolbar.setTitle(R.string.location_toolbar_title);
-        toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
         toolbar.setNavigationOnClickListener(view -> mActivity.finish());
     }
 

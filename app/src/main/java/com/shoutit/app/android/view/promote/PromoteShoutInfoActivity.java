@@ -32,7 +32,7 @@ public class PromoteShoutInfoActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         mConversationToolbar.setTitle(R.string.promote_shout_info_title);
-        mConversationToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        mConversationToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
         mConversationToolbar.setNavigationOnClickListener(view -> finish());
 
         mPromoteShoutInfoFooter.setText(Html.fromHtml(getString(R.string.promote_shout_info_footer)));

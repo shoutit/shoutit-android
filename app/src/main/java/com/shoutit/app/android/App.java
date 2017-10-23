@@ -6,6 +6,8 @@ import android.support.multidex.MultiDexApplication;
 
 import com.appsee.Appsee;
 import com.appsee.AppseeSessionStartedInfo;
+import com.adobe.creativesdk.foundation.AdobeCSDKFoundation;
+import com.adobe.creativesdk.foundation.auth.IAdobeAuthClientCredentials;
 import com.appunite.appunitegcm.AppuniteGcm;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.functions.Functions1;
@@ -54,7 +56,7 @@ import rx.plugins.RxJavaErrorHandler;
 import rx.plugins.RxJavaPlugins;
 
 
-public class App extends MultiDexApplication {
+public class App extends MultiDexApplication implements IAdobeAuthClientCredentials {
 
     private static final String GCM_TOKEN = "935842257865";
     private static final String TAG = App.class.getCanonicalName();
@@ -332,5 +334,25 @@ public class App extends MultiDexApplication {
     private void fetchLocation() {
         locationManager.updateUserLocationObservable()
                 .subscribe();
+    }
+
+    @Override
+    public String getClientID() {
+        return AviaryContants.CREATIVE_SDK_CLIENT_ID;
+    }
+
+    @Override
+    public String getClientSecret() {
+        return AviaryContants.CREATIVE_SDK_CLIENT_SECRET;
+    }
+
+    @Override
+    public String[] getAdditionalScopesList() {
+        return new String[0];
+    }
+
+    @Override
+    public String getRedirectURI() {
+        return null;
     }
 }

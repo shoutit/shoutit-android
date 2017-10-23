@@ -2,7 +2,6 @@ package com.shoutit.app.android.view.shouts;
 
 import android.content.Context;
 import android.support.annotation.ColorInt;
-import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.Pair;
@@ -157,7 +156,6 @@ public class ShoutAdapterItem implements BaseAdapterItem {
         }
     }
 
-    @IdRes
     @NonNull
     public Optional<Integer> getCountryResId() {
         return ResourcesHelper.getCountryResId(context, shout.getLocation());

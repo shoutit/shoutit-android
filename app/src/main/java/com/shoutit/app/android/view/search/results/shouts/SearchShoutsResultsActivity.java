@@ -100,7 +100,7 @@ public class SearchShoutsResultsActivity extends BaseActivity {
     @SuppressLint("PrivateResource")
     private void setUpToolbar(String title) {
         toolbar.setTitle(title);
-        toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
         setSupportActionBar(toolbar);
     }
 

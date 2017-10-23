@@ -106,7 +106,7 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
         ButterKnife.bind(this);
 
         mChatInfoToolbar.setTitle(R.string.chat_info_title);
-        mChatInfoToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        mChatInfoToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
         mChatInfoToolbar.setNavigationOnClickListener(view -> finish());
         mChatInfoToolbar.inflateMenu(R.menu.chat_info_menu);
         mChatInfoToolbar.setOnMenuItemClickListener(item -> {

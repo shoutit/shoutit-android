@@ -187,7 +187,7 @@ public class DiscoverShoutsActivity extends BaseActivity {
     private void setUpToolbar(String name) {
         mToolbar.setTitle(getString(R.string.discover_shouts_title, name));
         mToolbar.inflateMenu(R.menu.shouts_menu);
-        mToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        mToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
