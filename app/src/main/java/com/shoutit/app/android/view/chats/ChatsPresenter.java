@@ -166,10 +166,8 @@ public class ChatsPresenter {
                             final String price = PriceUtils.formatPriceWithCurrency(about.getPrice(), mResources, about.getCurrency());
                             final String authorAndTime = about.getProfile().getName() + " - " + DateUtils.getRelativeTimeSpanString(mContext, about.getDatePublished() * 1000);
                             mListener.setAboutShoutData(title, thumbnail, type, price, authorAndTime, id);
-                            mListener.showVideoChatIcon();
                         }
                     }
-                    setupUserForVideoChat(conversationResponse);
                 }, getOnError()));
     }
 
@@ -221,23 +219,6 @@ public class ChatsPresenter {
                 }, throwable -> {
                     mChatsDelegate.messagesError(throwable, mListener);
                 }));
-    }
-
-    private void setupUserForVideoChat(@NonNull ConversationDetails conversation) {
-        final List<ConversationProfile> profiles = conversation.getProfiles();
-        if (profiles.size() == 2 && !conversation.isPublicChat()) {
-            final ConversationProfile participant;
-            //noinspection ConstantConditions
-            if (profiles.get(0).getUsername()
-                    .equals(mUserPreferences.getUser().getUsername())) {
-                participant = profiles.get(1);
-            } else {
-                participant = profiles.get(0);
-            }
-
-            chatParticipantUsernameSubject.onNext(participant);
-            mListener.showVideoChatIcon();
-        }
     }
 
     @NonNull

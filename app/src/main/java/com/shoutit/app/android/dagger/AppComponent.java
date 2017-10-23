@@ -27,16 +27,13 @@ import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.dao.SortTypesDao;
 import com.shoutit.app.android.dao.SuggestionsDao;
 import com.shoutit.app.android.dao.TagsDao;
-import com.shoutit.app.android.dao.VideoCallsDao;
 import com.shoutit.app.android.db.DbHelper;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.mixpanel.MixPanel;
-import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
 import com.shoutit.app.android.view.chats.LocalMessageBus;
 import com.shoutit.app.android.view.conversations.RefreshConversationBus;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
-import com.shoutit.app.android.view.videoconversation.CameraTool;
 import com.squareup.picasso.Picasso;
 
 import javax.inject.Named;
@@ -116,13 +113,7 @@ public interface AppComponent {
 
     PusherHelper pusher();
 
-    VideoCallsDao videoCallsDao();
-
-    Twilio twilio();
-
     MixPanel mixPanel();
-
-    CameraTool cameraTool();
 
     SharedPreferences sharedPreferences();
 

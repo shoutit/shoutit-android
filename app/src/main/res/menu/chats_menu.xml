@@ -10,13 +10,6 @@
         app:showAsAction="ifRoom"/>
 
     <item
-        android:id="@+id/chats_video_menu"
-        android:icon="@drawable/video_call"
-        android:title="@string/chat_video_call"
-        android:visible="false"
-        app:showAsAction="ifRoom"/>
-
-    <item
         android:id="@+id/chats_overflow"
         android:icon="@drawable/abc_ic_menu_overflow_material"
         android:title=""

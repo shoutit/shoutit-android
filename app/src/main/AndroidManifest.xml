@@ -304,12 +304,6 @@
         <activity android:name=".view.listeners.ListenersActivity"
             android:screenOrientation="portrait"/>
 
-        <activity
-            android:name=".view.videoconversation.DialogCallActivity"
-            android:screenOrientation="portrait"
-            android:launchMode="singleTask"
-            android:theme="@style/TranslucentBackground"/>
-
         <activity android:name=".view.chooseprofile.SelectProfileActivity"
             android:screenOrientation="portrait"/>
 

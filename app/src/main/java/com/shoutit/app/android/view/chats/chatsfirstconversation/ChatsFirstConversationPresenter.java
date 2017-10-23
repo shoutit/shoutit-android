@@ -130,12 +130,6 @@ public class ChatsFirstConversationPresenter {
         getConversationInfo(user);
     }
 
-    private void setupUserForVideoChat(@Nonnull User user) {
-        chatParticipantProfileSubject.onNext(new ConversationProfile(
-                user.getId(), user.getName(), user.getUsername(), user.getType(), user.getImage()));
-        mListener.showVideoChatIcon();
-    }
-
     private void getConversationInfo(User user) {
         if (mIsShoutConversation) {
             getShout(user);
@@ -160,7 +154,6 @@ public class ChatsFirstConversationPresenter {
                                         user.getType(),
                                         user.getImage())), mUserPreferences.getUser().getId())
                                 , null);
-                        setupUserForVideoChat(user);
                     }
                 }, getOnError()));
     }
@@ -198,8 +191,6 @@ public class ChatsFirstConversationPresenter {
                                             shoutOwner.getType(),
                                             shoutOwner.getImage())), user.getId()));
                         }
-
-                        setupUserForVideoChat(shoutOwner);
                     }
                 }, getOnError()));
     }
