@@ -34,7 +34,6 @@ import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.Promotion;
-import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
@@ -57,7 +56,6 @@ import com.shoutit.app.android.view.promote.promoted.PromotedActivity;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.main.MainSearchActivity;
 import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsActivity;
-import com.shoutit.app.android.view.videoconversation.VideoConversationActivity;
 
 import java.util.List;
 
@@ -89,8 +87,8 @@ public class ShoutActivity extends BaseActivity {
     View bottomBar;
     @Bind(R.id.shout_bottom_bar_call_or_promote)
     TextView callOrPromoteTextView;
-    @Bind(R.id.shout_bottom_bar_video_call_or_edit)
-    TextView videoCallOrEditTextView;
+    @Bind(R.id.shout_bottom_bar_edit)
+    TextView editTextView;
     @Bind(R.id.shout_bottom_bar_chat_or_chats)
     TextView chatOrChatsTextView;
     @Bind(R.id.shout_bottom_bar_more)
@@ -291,19 +289,9 @@ public class ShoutActivity extends BaseActivity {
                 .compose(this.bindToLifecycle())
                 .subscribe();
 
-        RxView.clicks(videoCallOrEditTextView)
+        RxView.clicks(editTextView)
                 .compose(bindToLifecycle())
-                .subscribe(presenter.getVideoOrEditClickSubject());
-
-        presenter.getVideoCallClickedObservable()
-                .compose(bindToLifecycle())
-                .subscribe(shoutOwnerProfile -> {
-                    startActivity(VideoConversationActivity.newIntent(
-                            shoutOwnerProfile.getName(),
-                            shoutOwnerProfile.getUsername(),
-                            shoutOwnerProfile.getImage(),
-                            ShoutActivity.this));
-                });
+                .subscribe(presenter.getEditClickSubject());
 
         presenter.getEditShoutClickedObservable()
                 .compose(this.<Boolean>bindToLifecycle())
@@ -386,9 +374,7 @@ public class ShoutActivity extends BaseActivity {
                         R.string.shout_bottom_bar_promoted : R.string.shout_bottom_bar_promote);
 
                 ImageHelper.setStartCompoundRelativeDrawable(callOrPromoteTextView, R.drawable.ic_promote);
-                ImageHelper.setStartCompoundRelativeDrawable(videoCallOrEditTextView, R.drawable.ic_edit_red);
-
-                videoCallOrEditTextView.setText(R.string.shout_bottom_bar_edit);
+                editTextView.setVisibility(View.VISIBLE);
 
                 chatOrChatsTextView.setText(R.string.shout_bottom_bar_chats);
                 chatOrChatsTextView.setOnClickListener(v ->
@@ -400,9 +386,7 @@ public class ShoutActivity extends BaseActivity {
                 chatOrChatsTextView.setText(R.string.shout_bottom_bar_chat);
 
                 ImageHelper.setStartCompoundRelativeDrawable(callOrPromoteTextView, R.drawable.ic_call_green);
-                ImageHelper.setStartCompoundRelativeDrawable(videoCallOrEditTextView, R.drawable.ic_video_chat_red);
-
-                videoCallOrEditTextView.setText(R.string.shout_bottom_bar_video_call);
+                editTextView.setVisibility(View.GONE);
 
                 chatOrChatsTextView.setOnClickListener(v -> {
                     if (bottomBarData.isNormalUser()) {

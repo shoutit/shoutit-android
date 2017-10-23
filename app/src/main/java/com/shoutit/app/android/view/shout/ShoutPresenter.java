@@ -62,7 +62,6 @@ public class ShoutPresenter {
     private final Observable<Response<Object>> reportShoutObservable;
     private final Observable<List<ConversationDetails>> conversationObservable;
     private final Observable<Object> refreshShoutsObservable;
-    private final Observable<User> videoCallClickedObservable;
     private final Observable<Boolean> editShoutClickedObservable;
     private final Observable<Object> onlyForLoggedInUserObservable;
     private final Observable<String> shareObservable;
@@ -75,7 +74,7 @@ public class ShoutPresenter {
     private PublishSubject<String> relatedShoutSelectedSubject = PublishSubject.create();
     private PublishSubject<String> seeAllRelatedShoutSubject = PublishSubject.create();
     private PublishSubject<User> visitProfileSubject = PublishSubject.create();
-    private PublishSubject<Object> onVideoOrEditClickSubject = PublishSubject.create();
+    private PublishSubject<Object> onEditClickSubject = PublishSubject.create();
     private PublishSubject<Object> shareSubject = PublishSubject.create();
     private PublishSubject<Object> showDeleteDialogSubject = PublishSubject.create();
 
@@ -328,18 +327,12 @@ public class ShoutPresenter {
                 .observeOn(uiScheduler)
                 .doOnNext(objectResponse -> shoutsGlobalRefreshPresenter.refreshShouts());
 
-        videoCallClickedObservable = onVideoOrEditClickSubject
-                .withLatestFrom(isUserShoutOwnerObservable, (o, isShoutOwner) -> isShoutOwner)
-                .filter(Functions1.isFalse())
-                .filter(aBoolean -> !userPreferences.isGuest())
-                .withLatestFrom(shoutOwnerProfile, (aBoolean, profile) -> profile);
-
-        editShoutClickedObservable = onVideoOrEditClickSubject
+        editShoutClickedObservable = onEditClickSubject
                 .withLatestFrom(isUserShoutOwnerObservable, (o, isOwner) -> isOwner)
                 .filter(isOwner -> isOwner)
                 .filter(aBoolean -> !userPreferences.isGuest());
 
-        onlyForLoggedInUserObservable = onVideoOrEditClickSubject
+        onlyForLoggedInUserObservable = onEditClickSubject
                 .filter(o -> userPreferences.isGuest());
 
         shareObservable = shareSubject
@@ -362,13 +355,8 @@ public class ShoutPresenter {
     }
 
     @Nonnull
-    public Observable<User> getVideoCallClickedObservable() {
-        return videoCallClickedObservable;
-    }
-
-    @Nonnull
-    public Observer<Object> getVideoOrEditClickSubject() {
-        return RxMoreObservers.ignoreCompleted(onVideoOrEditClickSubject);
+    public Observer<Object> getEditClickSubject() {
+        return RxMoreObservers.ignoreCompleted(onEditClickSubject);
     }
 
     @Nonnull

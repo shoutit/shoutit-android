@@ -12,7 +12,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -23,7 +22,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
-import com.appunite.rx.functions.BothParams;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
@@ -41,7 +39,6 @@ import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.utils.TextWatcherAdapter;
-import com.shoutit.app.android.view.chats.ChatActivity;
 import com.shoutit.app.android.view.chats.ChatsHelper;
 import com.shoutit.app.android.view.chats.chat_info.ChatInfoActivity;
 import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
@@ -50,7 +47,6 @@ import com.shoutit.app.android.view.media.RecordMediaActivity;
 import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.shoutit.app.android.view.shouts.selectshout.SelectShoutActivity;
-import com.shoutit.app.android.view.videoconversation.VideoConversationActivity;
 import com.squareup.picasso.Picasso;
 import com.veinhorn.scrollgalleryview.Constants;
 import com.veinhorn.scrollgalleryview.VideoPlayerActivity;
@@ -154,18 +150,6 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
                 case R.id.chats_attatchments_menu: {
                     final int visibility = mChatsAttatchmentsLayout.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE;
                     mChatsAttatchmentsLayout.setVisibility(visibility);
-                    return true;
-                }
-                case R.id.chats_video_menu: {
-                    presenter.calledPersonUsernameObservable()
-                            .compose(ChatFirstConversationActivity.this.bindToLifecycle())
-                            .subscribe(calledUserProfile -> {
-                                startActivity(VideoConversationActivity.newIntent(
-                                        calledUserProfile.getName(),
-                                        calledUserProfile.getUsername(),
-                                        calledUserProfile.getImage(),
-                                        ChatFirstConversationActivity.this));
-                            });
                     return true;
                 }
                 case R.id.chats_chat_information: {
@@ -329,14 +313,6 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
     public void setToolbarInfo(String title, String subTitle) {
         mChatsToolbar.setTitle(title);
         mChatsToolbar.setSubtitle(subTitle);
-    }
-
-    @Override
-    public void showVideoChatIcon() {
-        final MenuItem item = mChatsToolbar.getMenu().findItem(R.id.chats_video_menu);
-        if (item != null) {
-            item.setVisible(true);
-        }
     }
 
     @Override

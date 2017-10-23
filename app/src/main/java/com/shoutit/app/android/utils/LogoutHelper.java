@@ -4,7 +4,6 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.db.RecentSearchesTable;
-import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
 
@@ -21,9 +20,6 @@ public class LogoutHelper {
     private final ProfilesDao mProfilesDao;
 
     @Inject
-    Twilio twilio;
-
-    @Inject
     public LogoutHelper(@Nonnull UserPreferences userPreferences,
                         @Nonnull RecentSearchesTable recentSearchesTable,
                         PusherHelper pusherHelper,
@@ -35,8 +31,6 @@ public class LogoutHelper {
     }
 
     public void logout() {
-        twilio.unregisterTwillio();
-
         mProfilesDao.registerToGcmAction(null);
 
         final User user = userPreferences.getUser();

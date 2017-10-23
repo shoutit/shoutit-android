@@ -24,7 +24,6 @@ import com.shoutit.app.android.dagger.DaggerAppComponent;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.mixpanel.MixPanel;
-import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.AviaryContants;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
@@ -64,8 +63,6 @@ public class App extends MultiDexApplication implements IAdobeAuthClientCredenti
     @Inject
     NetworkObservableProvider mNetworkObservableProvider;
     @Inject
-    Twilio mTwilio;
-    @Inject
     MixPanel mixPanel;
     @Inject
     StackCounterManager mStackCounterManager;
@@ -102,8 +99,6 @@ public class App extends MultiDexApplication implements IAdobeAuthClientCredenti
 
         setUpPusher();
 
-        initTwilio();
-
         facebookHelper.initFacebook();
 
         AdobeCSDKFoundation.initializeCSDKFoundation(this);
@@ -114,14 +109,6 @@ public class App extends MultiDexApplication implements IAdobeAuthClientCredenti
         mStackCounterManager.register(this)
                 .subscribe(foreground -> {
                     mixPanel.trackAppOpenOrClose(foreground);
-                });
-    }
-
-    private void initTwilio() {
-        userPreferences.getTokenObservable()
-                .filter(userToken -> userToken != null && !userPreferences.isGuest())
-                .subscribe(ignore -> {
-                    mTwilio.initTwilio();
                 });
     }
 

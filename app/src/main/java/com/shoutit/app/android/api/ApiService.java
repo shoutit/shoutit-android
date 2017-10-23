@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.shoutit.app.android.api.model.BlockedProfilesResposne;
-import com.shoutit.app.android.api.model.CallerProfile;
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.ChangePasswordRequest;
 import com.shoutit.app.android.api.model.ConversationMediaResponse;
@@ -50,19 +49,15 @@ import com.shoutit.app.android.api.model.Suggestion;
 import com.shoutit.app.android.api.model.SuggestionsResponse;
 import com.shoutit.app.android.api.model.TagDetail;
 import com.shoutit.app.android.api.model.TagsRequest;
-import com.shoutit.app.android.api.model.Transaction;
 import com.shoutit.app.android.api.model.TransactionRsponse;
-import com.shoutit.app.android.api.model.TwilioResponse;
 import com.shoutit.app.android.api.model.UpdateFacebookTokenRequest;
 import com.shoutit.app.android.api.model.UpdateLocationRequest;
 import com.shoutit.app.android.api.model.UpdateUserRequest;
 import com.shoutit.app.android.api.model.UploadContactsRequest;
 import com.shoutit.app.android.api.model.User;
-import com.shoutit.app.android.api.model.UserIdentity;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.VerifyEmailRequest;
 import com.shoutit.app.android.api.model.VerifyEmailResponse;
-import com.shoutit.app.android.api.model.VideoCallRequest;
 import com.shoutit.app.android.api.model.login.EmailLoginRequest;
 import com.shoutit.app.android.api.model.login.FacebookLogin;
 import com.shoutit.app.android.api.model.login.GoogleLogin;
@@ -485,22 +480,6 @@ public interface ApiService {
 
     @POST("notifications/{id}/read")
     Observable<ResponseBody> markNotificationAsRead(@Path("id") String notificationId);
-
-    /**
-     * Twilio
-     **/
-    @POST("twilio/video_auth")
-    Observable<TwilioResponse> getTokenAndIdentity();
-
-    @GET("twilio/video_identity")
-    Observable<UserIdentity> getUserIdentity(@Query("profile") String username);
-
-    @GET("twilio/profile")
-    Observable<CallerProfile> getUserByIdentity(@Query("identity") String identity);
-
-
-    @POST("twilio/video_call")
-    Observable<ResponseBody> videoCall(@Body VideoCallRequest rejectRequest);
 
     @PATCH("profiles/me/link")
     Observable<ResponseBody> updateFacebookToken(@Body UpdateFacebookTokenRequest updateFacebookTokenRequest);
