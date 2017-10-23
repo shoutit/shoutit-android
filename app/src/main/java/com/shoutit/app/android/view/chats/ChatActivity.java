@@ -15,7 +15,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -57,7 +56,6 @@ import com.shoutit.app.android.view.media.RecordMediaActivity;
 import com.shoutit.app.android.view.profile.ProfileIntentHelper;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.shoutit.app.android.view.shouts.selectshout.SelectShoutActivity;
-import com.shoutit.app.android.view.videoconversation.OutgoingVideoCallActivity;
 import com.squareup.picasso.Picasso;
 import com.veinhorn.scrollgalleryview.Constants;
 import com.veinhorn.scrollgalleryview.VideoPlayerActivity;
@@ -168,18 +166,6 @@ public class ChatActivity extends BaseActivity implements Listener {
                 case R.id.chats_attatchments_menu: {
                     final int visibility = mChatsAttatchmentsLayout.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE;
                     mChatsAttatchmentsLayout.setVisibility(visibility);
-                    return true;
-                }
-                case R.id.chats_video_menu: {
-                    presenter.getCalledPersonNameObservable()
-                            .compose(ChatActivity.this.bindToLifecycle())
-                            .subscribe(calledUserProfile -> {
-                                startActivity(OutgoingVideoCallActivity.newIntent(
-                                        calledUserProfile.getName(),
-                                        calledUserProfile.getUsername(),
-                                        calledUserProfile.getImage(),
-                                        ChatActivity.this));
-                            });
                     return true;
                 }
                 case R.id.chats_chat_information: {
@@ -295,14 +281,6 @@ public class ChatActivity extends BaseActivity implements Listener {
     public void error(Throwable throwable) {
         Log.e(TAG, "error", throwable);
         ColoredSnackBar.error(ColoredSnackBar.contentView(this), R.string.error_default, Snackbar.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void showVideoChatIcon() {
-        final MenuItem item = mChatsToolbar.getMenu().findItem(R.id.chats_video_menu);
-        if (item != null) {
-            item.setVisible(true);
-        }
     }
 
     @Override

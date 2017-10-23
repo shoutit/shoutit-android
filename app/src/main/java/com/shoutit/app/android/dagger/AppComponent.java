@@ -18,11 +18,9 @@ import com.shoutit.app.android.db.DbHelper;
 import com.shoutit.app.android.facebook.FacebookHelper;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.mixpanel.MixPanel;
-import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
 import com.shoutit.app.android.view.chats.LocalMessageBus;
 import com.shoutit.app.android.view.conversations.RefreshConversationBus;
-import com.shoutit.app.android.view.videoconversation.CameraTool;
 import com.squareup.picasso.Picasso;
 
 import javax.inject.Named;
@@ -82,11 +80,7 @@ public interface AppComponent extends DaoComponent {
     @Named("user")
     PusherHelperHolder userPusher();
 
-    Twilio twilio();
-
     MixPanel mixPanel();
-
-    CameraTool cameraTool();
 
     SharedPreferences sharedPreferences();
 

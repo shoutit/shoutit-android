@@ -64,7 +64,7 @@ public class AuthInterceptor implements Interceptor {
                         LogHelper.logIfDebug(TAG, "Token expired");
                         final retrofit2.Response<SignResponse> refreshTokenResponse = refreshToken(token);
 
-                        if (refreshTokenResponse.isSuccess()) {
+                        if (refreshTokenResponse.isSuccessful()) {
                             final SignResponse signResponse = refreshTokenResponse.body();
                             userPreferences.setLoggedIn(signResponse.getAccessToken(), signResponse.getExpiresIn(),
                                     signResponse.getRefreshToken(), signResponse.getProfile());

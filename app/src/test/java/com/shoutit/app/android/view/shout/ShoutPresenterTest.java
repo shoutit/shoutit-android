@@ -20,7 +20,6 @@ import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
-import com.shoutit.app.android.dao.UsersIdentityDao;
 import com.shoutit.app.android.model.MobilePhoneResponse;
 import com.shoutit.app.android.model.RelatedShoutsPointer;
 import com.shoutit.app.android.model.UserShoutsPointer;
@@ -59,8 +58,6 @@ public class ShoutPresenterTest {
     ShoutsGlobalRefreshPresenter globalRefreshPresenter;
     @Mock
     ShoutsDao.ShoutDao shoutDao;
-    @Mock
-    UsersIdentityDao userIdentityDao;
     @Mock
     ShoutsDao.RelatedShoutsDao relatedShoutsDao;
     @Mock

@@ -6,8 +6,6 @@ import android.support.multidex.MultiDexApplication;
 
 import com.appsee.Appsee;
 import com.appsee.AppseeSessionStartedInfo;
-import com.adobe.creativesdk.foundation.AdobeCSDKFoundation;
-import com.adobe.creativesdk.foundation.auth.IAdobeAuthClientCredentials;
 import com.appunite.appunitegcm.AppuniteGcm;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.functions.Functions1;
@@ -31,7 +29,6 @@ import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.facebook.FacebookHelper;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.mixpanel.MixPanel;
-import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.AppseeListenerAdapter;
 import com.shoutit.app.android.utils.BuildTypeUtils;
 import com.shoutit.app.android.utils.LogHelper;
@@ -51,12 +48,11 @@ import javax.inject.Provider;
 import io.fabric.sdk.android.Fabric;
 import rx.Observable;
 import rx.Scheduler;
-import rx.functions.Func2;
 import rx.plugins.RxJavaErrorHandler;
 import rx.plugins.RxJavaPlugins;
 
 
-public class App extends MultiDexApplication implements IAdobeAuthClientCredentials {
+public class App extends MultiDexApplication {
 
     private static final String GCM_TOKEN = "935842257865";
     private static final String TAG = App.class.getCanonicalName();
@@ -76,8 +72,6 @@ public class App extends MultiDexApplication implements IAdobeAuthClientCredenti
     Provider<PusherHelper> mPusherHelperProvider;
     @Inject
     NetworkObservableProvider mNetworkObservableProvider;
-    @Inject
-    Twilio mTwilio;
     @Inject
     MixPanel mixPanel;
     @Inject
@@ -131,8 +125,6 @@ public class App extends MultiDexApplication implements IAdobeAuthClientCredenti
 
         setUpPusher();
 
-        initTwilio();
-
         facebookHelper.initFacebook();
     }
 
@@ -179,15 +171,6 @@ public class App extends MultiDexApplication implements IAdobeAuthClientCredenti
         mStackCounterManager.register(this)
                 .subscribe(foreground -> {
                     mixPanel.trackAppOpenOrClose(foreground);
-                });
-    }
-
-    private void initTwilio() {
-        Observable.combineLatest(userPreferences.getTokenObservable().filter(userToken -> userToken != null && !userPreferences.isGuest()),
-                userPreferences.getTwilioTokenObservable().filter(Functions1.isNull()).startWith((String) null),
-                (Func2<String, String, Object>) (s, s2) -> s)
-                .subscribe(ignore -> {
-                    mTwilio.initTwilio();
                 });
     }
 
@@ -334,25 +317,5 @@ public class App extends MultiDexApplication implements IAdobeAuthClientCredenti
     private void fetchLocation() {
         locationManager.updateUserLocationObservable()
                 .subscribe();
-    }
-
-    @Override
-    public String getClientID() {
-        return AviaryContants.CREATIVE_SDK_CLIENT_ID;
-    }
-
-    @Override
-    public String getClientSecret() {
-        return AviaryContants.CREATIVE_SDK_CLIENT_SECRET;
-    }
-
-    @Override
-    public String[] getAdditionalScopesList() {
-        return new String[0];
-    }
-
-    @Override
-    public String getRedirectURI() {
-        return null;
     }
 }

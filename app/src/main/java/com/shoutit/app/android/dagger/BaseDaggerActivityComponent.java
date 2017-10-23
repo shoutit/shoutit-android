@@ -19,9 +19,6 @@ import com.shoutit.app.android.view.shouts.selectshout.SelectShoutActivity;
 import com.shoutit.app.android.view.signin.forgotpassword.ForgotPasswordActivity;
 import com.shoutit.app.android.view.verifybusiness.VerifyBusinessActivity;
 import com.shoutit.app.android.view.verifyemail.VerifyEmailActivity;
-import com.shoutit.app.android.view.videoconversation.DialogCallActivity;
-import com.shoutit.app.android.view.videoconversation.IncomingVideoCallActivity;
-import com.shoutit.app.android.view.videoconversation.OutgoingVideoCallActivity;
 
 import dagger.Component;
 
@@ -39,9 +36,6 @@ import dagger.Component;
 public interface BaseDaggerActivityComponent extends BaseActivityComponent {
 
         void inject(VerifyBusinessActivity activity);
-        void inject(OutgoingVideoCallActivity activity);
-        void inject(IncomingVideoCallActivity activity);
-        void inject(DialogCallActivity activity);
         void inject(VerifyEmailActivity activity);
         void inject(ForgotPasswordActivity forgotPasswordActivity);
         void inject(SelectShoutActivity activity);

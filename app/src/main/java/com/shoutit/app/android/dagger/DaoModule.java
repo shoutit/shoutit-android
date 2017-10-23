@@ -20,8 +20,6 @@ import com.shoutit.app.android.dao.SortTypesDao;
 import com.shoutit.app.android.dao.SuggestionsDao;
 import com.shoutit.app.android.dao.TagListDaos;
 import com.shoutit.app.android.dao.TagsDao;
-import com.shoutit.app.android.dao.UsersIdentityDao;
-import com.shoutit.app.android.dao.VideoCallsDao;
 
 import javax.inject.Singleton;
 
@@ -64,20 +62,8 @@ public class DaoModule {
 
     @Singleton
     @Provides
-    public VideoCallsDao provideVideoCallsDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
-        return new VideoCallsDao(apiService, networkScheduler);
-    }
-
-    @Singleton
-    @Provides
     ConversationMediaDaos provideConversationMediaDaos(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
         return new ConversationMediaDaos(apiService, networkScheduler);
-    }
-
-    @Singleton
-    @Provides
-    public UsersIdentityDao provideUsersIdentityDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
-        return new UsersIdentityDao(apiService, networkScheduler);
     }
 
     @Provides

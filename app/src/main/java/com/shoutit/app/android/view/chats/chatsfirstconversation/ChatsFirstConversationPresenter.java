@@ -131,12 +131,6 @@ public class ChatsFirstConversationPresenter {
         getConversationInfo(user);
     }
 
-    private void setupUserForVideoChat(@Nonnull BaseProfile user) {
-        chatParticipantProfileSubject.onNext(new ConversationProfile(
-                user.getId(), user.getName(), user.getUsername(), user.getType(), user.getImage()));
-        mListener.showVideoChatIcon();
-    }
-
     private void getConversationInfo(BaseProfile user) {
         if (mIsShoutConversation) {
             getShout(user);
@@ -149,20 +143,16 @@ public class ChatsFirstConversationPresenter {
         mSubscribe.add(mApiService.getUser(mIdForCreation)
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
-                .subscribe(new Action1<BaseProfile>() {
-                    @Override
-                    public void call(BaseProfile user) {
-                        //noinspection ConstantConditions
-                        mListener.setToolbarInfo(ConversationsUtils.getChatWithString(
-                                ImmutableList.of(new ConversationProfile(
-                                        user.getId(),
-                                        user.getName(),
-                                        user.getUsername(),
-                                        user.getType(),
-                                        user.getImage())), mUserPreferences.getUserOrPage().getId())
-                                , null);
-                        setupUserForVideoChat(user);
-                    }
+                .subscribe(user -> {
+                    //noinspection ConstantConditions
+                    mListener.setToolbarInfo(ConversationsUtils.getChatWithString(
+                            ImmutableList.of(new ConversationProfile(
+                                    user.getId(),
+                                    user.getName(),
+                                    user.getUsername(),
+                                    user.getType(),
+                                    user.getImage())), mUserPreferences.getUserOrPage().getId())
+                            , null);
                 }, getOnError()));
     }
 
@@ -199,8 +189,6 @@ public class ChatsFirstConversationPresenter {
                                             shoutOwner.getType(),
                                             shoutOwner.getImage())), user.getId()));
                         }
-
-                        setupUserForVideoChat(shoutOwner);
                     }
                 }, getOnError()));
     }

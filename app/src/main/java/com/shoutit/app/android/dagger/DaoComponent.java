@@ -18,7 +18,6 @@ import com.shoutit.app.android.dao.SortTypesDao;
 import com.shoutit.app.android.dao.SuggestionsDao;
 import com.shoutit.app.android.dao.TagListDaos;
 import com.shoutit.app.android.dao.TagsDao;
-import com.shoutit.app.android.dao.VideoCallsDao;
 
 public interface DaoComponent {
 
@@ -51,8 +50,6 @@ public interface DaoComponent {
     PromoteOptionsDao promoteOptionsDao();
 
     ConversationMediaDaos conversationMediaDaos();
-
-    VideoCallsDao videoCallsDao();
 
     PromoteLabelsDao promoteDao();
 

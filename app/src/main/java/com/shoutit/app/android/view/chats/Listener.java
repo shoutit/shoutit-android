@@ -32,7 +32,5 @@ public interface Listener {
 
     void hideAttatchentsMenu();
 
-    void showVideoChatIcon();
-
     void setToolbarInfo(String title, String subTitle);
 }

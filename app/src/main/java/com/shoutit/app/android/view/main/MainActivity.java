@@ -33,7 +33,6 @@ import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.mixpanel.MixPanel;
-import com.shoutit.app.android.twilio.Twilio;
 import com.shoutit.app.android.utils.AppseeHelper;
 import com.shoutit.app.android.utils.BackPressedHelper;
 import com.shoutit.app.android.utils.BuildTypeUtils;
@@ -86,8 +85,6 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
     UserPreferences mUserPreferences;
     @Inject
     ProfilesDao profilesDao;
-    @Inject
-    Twilio twilio;
     @Inject
     MixPanel mixPanel;
     @Inject

@@ -26,8 +26,6 @@ repositories {
     maven { url 'http://clojars.org/repo' }
     maven { url "https://jitpack.io" }
     mavenCentral()
-    maven { url 'http://maven.localytics.com/public' }
-    maven { url 'https://repo.adobe.com/nexus/content/repositories/releases/' }
 }
 
 apply plugin: 'com.android.application'
@@ -267,7 +265,6 @@ dependencies {
     compile 'com.github.jacek-marchwicki.rx-java-extensions:rx-android-extensions:9906cc7974'
 
     // other
-    compile 'com.twilio:conversations-android:0.10.0'
     compile 'com.uservoice:uservoice-android-sdk:1.2.4'
     compile 'fr.avianey.com.viewpagerindicator:library:2.4.1@aar'
     compile('com.crashlytics.sdk.android:crashlytics:2.5.1@aar') {
@@ -276,9 +273,6 @@ dependencies {
     compile 'com.commonsware.cwac:cam2:0.5.3'
     compile 'com.pusher:pusher-java-client:1.5.0'
     compile "com.mixpanel.android:mixpanel-android:5.2.1"
-    compile 'com.adobe.creativesdk.foundation:auth:0.9.1251'
-    compile 'com.adobe.creativesdk:image:4.8.4'
-    compile 'com.localytics.android:library:3.8.0'
     compile project(":FFmpegAndroid")
     compile project(":appuniteGcm")
     compile project(":ScrollViewGallery")
