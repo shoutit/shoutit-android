@@ -20,6 +20,8 @@ import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForApplication;
 import com.shoutit.app.android.model.Stats;
 
+import java.util.UUID;
+
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -35,6 +37,7 @@ public class UserPreferences {
     private static final String REFRESH_TOKEN = "refresh_token";
     private static final String TOKEN_EXPIRES_IN = "token_expires_in";
     private static final String TOKEN_SAVE_DATE = "token_save_date";
+    private static final String DEVICE_ID = "device_id";
     private static final String KEY_USER = "user";
     private static final String KEY_GUEST_USER = "guest_user";
     private static final String KEY_LOCATION = "location";
@@ -42,7 +45,6 @@ public class UserPreferences {
     private static final String KEY_LOCATION_TRACKING = "location_tracking";
     private static final String SHOULD_ASK_FOR_INTEREST = "is_first_run";
     private static final String GCM_PUSH_TOKEN = "gcm_push_token";
-    private static final String TWILIO_TOKEN = "twilio_token";
     private static final String KEY_PROFILE_ALERT_DISPLAYED = "profile_alert_displayed";
     private static final String KEY_WAS_SHARE_DIALOG_DISPLAYED = "was_share_info_dialog_displayed";
     private static final String PAGE_ID = "page_id";
@@ -52,9 +54,7 @@ public class UserPreferences {
     private final PublishSubject<Object> userRefreshSubject = PublishSubject.create();
     private final PublishSubject<Object> locationRefreshSubject = PublishSubject.create();
     private final PublishSubject<Object> tokenRefreshSubject = PublishSubject.create();
-    private final PublishSubject<Object> twilioTokenRefreshSubject = PublishSubject.create();
     private final PublishSubject<Object> pageIdRefreshSubject = PublishSubject.create();
-    private final Observable<String> twilioTokenObservable;
     private final Observable<BaseProfile> pageOrUserObservable;
     // locationObservable should be used instead pageOrUserObservable to get location as there is no user for guest
     private final Observable<UserLocation> locationObservable;
@@ -94,11 +94,6 @@ public class UserPreferences {
                 .defer(() -> Observable.just(getUser()))
                 .compose(MoreOperators.<User>refresh(userRefreshSubject))
                 .filter(Functions1.isNotNull())
-                .observeOn(uiScheduler);
-
-        twilioTokenObservable = Observable
-                .defer(() -> Observable.just(getTwilioToken()))
-                .compose(MoreOperators.<String>refresh(twilioTokenRefreshSubject))
                 .observeOn(uiScheduler);
 
         pageIdObservable = Observable
@@ -236,6 +231,25 @@ public class UserPreferences {
         mPreferences.edit().putString(GCM_PUSH_TOKEN, gcmPushToken).apply();
     }
 
+    private void setDeviceId(@Nonnull final String deviceId) {
+        mPreferences.edit().putString(DEVICE_ID, deviceId).apply();
+    }
+
+    @Nonnull
+    public String getDeviceId() {
+        String deviceId = mPreferences.getString(DEVICE_ID, null);
+        if (deviceId == null) {
+            deviceId = UUID.randomUUID().toString();
+            setDeviceId(deviceId);
+        }
+        return deviceId;
+    }
+
+    @Nullable
+    public String getGcmPushToken() {
+        return mPreferences.getString(GCM_PUSH_TOKEN, null);
+    }
+
     public boolean shouldAskForInterestAndSetToFalse() {
         final boolean isFirstRun = mPreferences.getBoolean(SHOULD_ASK_FOR_INTEREST, false);
         mPreferences.edit().putBoolean(SHOULD_ASK_FOR_INTEREST, false).apply();
@@ -351,19 +365,6 @@ public class UserPreferences {
                 .commit();
     }
 
-    @SuppressLint("CommitPrefEdits")
-    public void setTwilioToken(@Nullable String twilioToken) {
-        mPreferences.edit()
-                .putString(TWILIO_TOKEN, twilioToken)
-                .commit();
-        twilioTokenRefreshSubject.onNext(twilioToken);
-    }
-
-    @Nullable
-    public String getTwilioToken() {
-        return mPreferences.getString(TWILIO_TOKEN, null);
-    }
-
     public boolean wasProfileAlertAlreadyDisplayed() {
         return mPreferences.getBoolean(KEY_PROFILE_ALERT_DISPLAYED, false);
     }
@@ -414,7 +415,6 @@ public class UserPreferences {
     public void clearPage() {
         setPrimaryUserAsUser();
         editPage(null, null);
-        setTwilioToken(null);
     }
 
     @SuppressLint("CommitPrefEdits")
@@ -436,10 +436,6 @@ public class UserPreferences {
 
     public String getUserId() {
         return Preconditions.checkNotNull(getUserOrPage()).getId();
-    }
-
-    public Observable<String> getTwilioTokenObservable() {
-        return twilioTokenObservable;
     }
 
     public Observable<String> getPageIdObservable() {
