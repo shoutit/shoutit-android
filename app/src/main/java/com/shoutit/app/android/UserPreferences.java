@@ -17,6 +17,8 @@ import com.shoutit.app.android.dagger.ForApplication;
 import com.shoutit.app.android.model.Stats;
 
 
+import java.util.UUID;
+
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -32,13 +34,13 @@ public class UserPreferences {
 
     private static final String AUTH_TOKEN = "token";
     private static final String REFRESH_TOKEN = "refresh_token";
+    private static final String DEVICE_ID = "device_id";
     private static final String KEY_USER = "user";
     private static final String KEY_LOCATION = "location";
     private static final String IS_GUEST = "is_guest";
     private static final String KEY_LOCATION_TRACKING = "location_tracking";
     private static final String SHOULD_ASK_FOR_INTEREST = "is_first_run";
     private static final String GCM_PUSH_TOKEN = "gcm_push_token";
-    private static final String TWILIO_TOKEN = "twilio_token";
     private static final String KEY_PROFILE_ALERT_DISPLAYED = "profile_alert_displayed";
     private static final String KEY_WAS_SHARE_DIALOG_DISPLAYED = "was_share_info_dialog_displayed";
 
@@ -178,6 +180,20 @@ public class UserPreferences {
         mPreferences.edit().putString(GCM_PUSH_TOKEN, gcmPushToken).apply();
     }
 
+    private void setDeviceId(@Nonnull final String deviceId) {
+        mPreferences.edit().putString(DEVICE_ID, deviceId).apply();
+    }
+
+    @Nonnull
+    public String getDeviceId() {
+        String deviceId = mPreferences.getString(DEVICE_ID, null);
+        if (deviceId == null) {
+            deviceId = UUID.randomUUID().toString();
+            setDeviceId(deviceId);
+        }
+        return deviceId;
+    }
+
     @Nullable
     public String getGcmPushToken() {
         return mPreferences.getString(GCM_PUSH_TOKEN, null);
@@ -262,18 +278,6 @@ public class UserPreferences {
                 .clear()
                 .putString(KEY_LOCATION, locationJson)
                 .commit();
-    }
-
-    @SuppressLint("CommitPrefEdits")
-    public void setTwilioToken(@Nullable String twilioToken) {
-        mPreferences.edit()
-                .putString(TWILIO_TOKEN, twilioToken)
-                .commit();
-    }
-
-    @Nullable
-    public String getTwilioToken() {
-        return mPreferences.getString(TWILIO_TOKEN, null);
     }
 
     public boolean wasProfileAlertAlreadyDisplayed() {
