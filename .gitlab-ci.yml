@@ -19,7 +19,7 @@ before_script:
   # client build will start when adding tag v*.*.*
   - export FOR_CLIENT="$([[ "${CI_BUILD_TAG}" =~ ^v([0-9]+\.)*[0-9]+$ ]] && echo "TRUE")"
   # testers will receive builds from master, for client or any tag
-  - export FOR_TESTERS="$([[ "${CI_BUILD_REF_NAME}" == "master" || "${FOR_CLIENT}" || "${CI_BUILD_TAG}" ]] && echo "TRUE")"
+  - export FOR_TESTERS="$([[ "${CI_BUILD_REF_NAME}" == "master" || "${CI_BUILD_REF_NAME}" == "develop" || "${FOR_CLIENT}" || "${CI_BUILD_TAG}" ]] && echo "TRUE")"
 
 build:
   # docker image for build
