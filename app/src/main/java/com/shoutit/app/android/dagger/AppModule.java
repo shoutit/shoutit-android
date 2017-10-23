@@ -18,7 +18,6 @@ import com.appunite.rx.android.NetworkObservableProviderImpl;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.observables.NetworkObservableProvider;
-import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
