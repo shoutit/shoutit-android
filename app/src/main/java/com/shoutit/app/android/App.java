@@ -169,9 +169,11 @@ public class App extends MultiDexApplication {
     private void setUpMixPanel() {
         mixPanel.initMixPanel();
         mStackCounterManager.register(this)
-                .subscribe(foreground -> {
-                    mixPanel.trackAppOpenOrClose(foreground);
-                });
+                .withLatestFrom(userPreferences.getMixpanelCampaignParamsObservable(), (foreground, params) -> {
+                    mixPanel.trackAppOpenOrClose(foreground, params);
+                    return null;
+                })
+                .subscribe();
     }
 
     private void initGcm() {
