@@ -14,6 +14,7 @@ import com.crashlytics.android.core.CrashlyticsCore;
 import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
 import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler;
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
+import com.google.common.collect.Maps;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.constants.UserVoiceConstants;
@@ -29,15 +30,21 @@ import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
 import com.shoutit.app.android.utils.stackcounter.StackCounterManager;
 import com.shoutit.app.android.view.loginintro.FacebookHelper;
+import com.squareup.haha.guava.collect.ImmutableMap;
 import com.squareup.leakcanary.LeakCanary;
 import com.uservoice.uservoicesdk.Config;
 import com.uservoice.uservoicesdk.UserVoice;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import io.fabric.sdk.android.Fabric;
 import rx.Scheduler;
+import rx.functions.Func2;
 import rx.plugins.RxJavaErrorHandler;
 import rx.plugins.RxJavaPlugins;
 
@@ -107,9 +114,17 @@ public class App extends MultiDexApplication implements IAdobeAuthClientCredenti
     private void setUpMixPanel() {
         mixPanel.initMixPanel();
         mStackCounterManager.register(this)
-                .subscribe(foreground -> {
-                    mixPanel.trackAppOpenOrClose(foreground);
-                });
+                .withLatestFrom(userPreferences.getMixpanelCampaignParamsObservable(), (foreground, params) -> {
+                    mixPanel.trackAppOpenOrClose(foreground, params);
+                    return null;
+                })
+                .subscribe();
+    }
+
+    public void test(boolean fromacti) {
+        final HashMap<String, String> objectObjectHashMap = Maps.newHashMap();
+        objectObjectHashMap.put("utm1", fromacti? "activ" : "recei");
+        userPreferences.mixpanelCampaignParamsObserver().onNext(objectObjectHashMap);
     }
 
     private void refreshUser() {
