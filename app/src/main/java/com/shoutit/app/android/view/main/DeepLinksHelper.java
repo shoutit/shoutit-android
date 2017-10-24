@@ -13,9 +13,6 @@ import com.shoutit.app.android.view.discover.DiscoverActivity;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
@@ -46,7 +43,7 @@ public class DeepLinksHelper {
             return;
         }
         final String stringUri = uri.toString();
-        mixPanel.utmParamsFromUri(uri);
+        mixPanel.utmParamsFromIntent(intent);
 
         if (stringUri.contains(DeepLinksContants.HOME)) {
             menuHandler.selectMenuItem(MenuHandler.FRAGMENT_HOME);

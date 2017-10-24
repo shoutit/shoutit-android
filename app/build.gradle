@@ -214,6 +214,7 @@ dependencies {
     compile 'com.google.guava:guava:18.0'
     compile 'com.google.android.gms:play-services-auth:11.4.0'
     compile 'com.google.android.gms:play-services-places:11.4.0'
+    compile 'com.google.android.gms:play-services-analytics:11.4.0'
 
     // Square
     compile 'com.jakewharton:butterknife:7.0.1'

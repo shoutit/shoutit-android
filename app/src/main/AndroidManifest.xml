@@ -348,7 +348,7 @@
         </receiver>
 
         <receiver
-            android:name="com.mixpanel.android.mpmetrics.InstallReferrerReceiver"
+            android:name=".mixpanel.MixPanelReferrerReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="com.android.vending.INSTALL_REFERRER" />
@@ -377,11 +377,11 @@
             android:name="com.amazonaws.mobileconnectors.s3.transferutility.TransferService"
             android:enabled="true"/>
 
-        <receiver android:name=".mixpanel.MixPanelReferrerReceiver" android:exported="true">
-            <intent-filter>
-                <action android:name="com.android.vending.INSTALL_REFERRER" />
-            </intent-filter>
-        </receiver>
+        <!--<receiver android:name=".mixpanel.MixPanelReferrerReceiver" android:exported="true">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="com.android.vending.INSTALL_REFERRER" />-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
     </application>
 
 

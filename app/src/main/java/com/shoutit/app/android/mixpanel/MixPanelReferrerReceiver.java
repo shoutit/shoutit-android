@@ -12,6 +12,6 @@ public class MixPanelReferrerReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        App.getAppComponent((Application) context).mixPanel().utmParamsFromUri(intent.getData());
+        App.getAppComponent((Application) context.getApplicationContext()).mixPanel().utmParamsFromIntent(intent);
     }
 }
