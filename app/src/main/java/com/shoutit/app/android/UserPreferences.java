@@ -330,7 +330,7 @@ public class UserPreferences {
     }
 
     @SuppressLint("CommitPrefEdits")
-    public void setMixpanelCampaignParams(@Nullable final Map<String, String> params) {
+    private void setMixpanelCampaignParams(@Nullable final Map<String, String> params) {
         final String jsonObject = params == null ? null : gson.toJson(params);
         mPreferences.edit()
                 .putString(MIXPANEL_CAMPAIGN_PARAMS, jsonObject)
@@ -338,7 +338,7 @@ public class UserPreferences {
     }
 
     @Nullable
-    public Map<String, String> getMixpanelCampaignParams() {
+    private Map<String, String> getMixpanelCampaignParams() {
         final String params = mPreferences.getString(MIXPANEL_CAMPAIGN_PARAMS, null);
         return params == null ? null : gson.fromJson(params, Map.class);
     }
