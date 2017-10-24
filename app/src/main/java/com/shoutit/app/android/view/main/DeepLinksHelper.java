@@ -7,6 +7,7 @@ import android.net.Uri;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.data.DeepLinksContants;
+import com.shoutit.app.android.mixpanel.MixPanel;
 import com.shoutit.app.android.view.createshout.request.CreateRequestActivity;
 import com.shoutit.app.android.view.discover.DiscoverActivity;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
@@ -22,14 +23,18 @@ public class DeepLinksHelper {
     private final UserPreferences userPreferences;
     @Nonnull
     private final Context context;
+    @Nonnull
+    private final MixPanel mixPanel;
 
     @Inject
     public DeepLinksHelper(@Nonnull MenuHandler menuHandler,
                            @Nonnull UserPreferences userPreferences,
-                           @Nonnull @ForActivity Context context) {
+                           @Nonnull @ForActivity Context context,
+                           @Nonnull MixPanel mixPanel) {
         this.menuHandler = menuHandler;
         this.userPreferences = userPreferences;
         this.context = context;
+        this.mixPanel = mixPanel;
     }
 
     public void checkForDeepLinksIntent(Intent intent) {
@@ -38,6 +43,7 @@ public class DeepLinksHelper {
             return;
         }
         final String stringUri = uri.toString();
+        mixPanel.utmParamsFromIntent(intent);
 
         if (stringUri.contains(DeepLinksContants.HOME)) {
             menuHandler.selectMenuItem(MenuHandler.FRAGMENT_HOME);

@@ -11,12 +11,16 @@ import com.appunite.rx.functions.Functions1;
 import com.appunite.rx.operators.MoreOperators;
 import com.google.common.base.Optional;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForApplication;
 import com.shoutit.app.android.model.Stats;
 
 
+import org.json.JSONObject;
+
+import java.util.Map;
 import java.util.UUID;
 
 import javax.annotation.Nonnull;
@@ -24,7 +28,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import rx.Observable;
+import rx.Observer;
 import rx.Scheduler;
+import rx.functions.Action1;
 import rx.functions.Func0;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
@@ -43,13 +49,16 @@ public class UserPreferences {
     private static final String GCM_PUSH_TOKEN = "gcm_push_token";
     private static final String KEY_PROFILE_ALERT_DISPLAYED = "profile_alert_displayed";
     private static final String KEY_WAS_SHARE_DIALOG_DISPLAYED = "was_share_info_dialog_displayed";
+    private static final String MIXPANEL_CAMPAIGN_PARAMS = "mixpanel_campaign_params";
 
     private final PublishSubject<Object> userRefreshSubject = PublishSubject.create();
     private final PublishSubject<Object> locationRefreshSubject = PublishSubject.create();
     private final PublishSubject<Object> tokenRefreshSubject = PublishSubject.create();
+    private final PublishSubject<Map<String, String>> mixpanelCampaignParamsSubject = PublishSubject.create();
     private final Observable<User> userObservable;
     // locationObservable should be used instead userObservable to get location as there is no user for guest
     private final Observable<UserLocation> locationObservable;
+    private final Observable<Map<String, String>> mixpanelCampaignParamsObservable;
     private final Observable<String> tokenObservable;
 
     @SuppressLint("CommitPrefEdits")
@@ -104,6 +113,14 @@ public class UserPreferences {
                 })
                 .compose(MoreOperators.<String>refresh(tokenRefreshSubject))
                 .observeOn(uiScheduler);
+
+        mixpanelCampaignParamsObservable = Observable
+                .defer(() -> Observable.just(getMixpanelCampaignParams()))
+                .mergeWith(mixpanelCampaignParamsSubject)
+                .observeOn(uiScheduler);
+
+        mixpanelCampaignParamsSubject
+                .subscribe(this::setMixpanelCampaignParams);
     }
 
     @SuppressLint("CommitPrefEdits")
@@ -246,6 +263,16 @@ public class UserPreferences {
         return tokenObservable;
     }
 
+    @Nonnull
+    public Observable<Map<String, String>> getMixpanelCampaignParamsObservable() {
+        return mixpanelCampaignParamsObservable;
+    }
+
+    @Nonnull
+    public Observer<Map<String, String>> mixpanelCampaignParamsObserver() {
+        return mixpanelCampaignParamsSubject;
+    }
+
     public void saveLocation(@Nullable UserLocation location) {
         if (location == null) {
             return;
@@ -300,6 +327,20 @@ public class UserPreferences {
         mPreferences.edit()
                 .putBoolean(KEY_WAS_SHARE_DIALOG_DISPLAYED, true)
                 .commit();
+    }
+
+    @SuppressLint("CommitPrefEdits")
+    private void setMixpanelCampaignParams(@Nullable final Map<String, String> params) {
+        final String jsonObject = params == null ? null : gson.toJson(params);
+        mPreferences.edit()
+                .putString(MIXPANEL_CAMPAIGN_PARAMS, jsonObject)
+                .commit();
+    }
+
+    @Nullable
+    private Map<String, String> getMixpanelCampaignParams() {
+        final String params = mPreferences.getString(MIXPANEL_CAMPAIGN_PARAMS, null);
+        return params == null ? null : gson.fromJson(params, Map.class);
     }
 
     public void updateStats(@Nonnull Stats pusherStats) {
