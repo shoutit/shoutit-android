@@ -54,7 +54,6 @@ public class AuthInterceptor implements Interceptor {
         if (TextUtils.isEmpty(token)) {
             return chain.proceed(authorizationBuilder.build());
         } else {
-<<<<<<< HEAD
             final boolean isTokenExpired = TokenUtils.isTokenExpired(userPreferences);
 
             if (isTokenExpired) {
@@ -86,16 +85,11 @@ public class AuthInterceptor implements Interceptor {
 
             authorizationBuilder.addHeader(Headers.AUTHORIZATION, Headers.TOKEN_PREFIX + userPreferences.getAuthToken().orNull());
             authorizationBuilder.addHeader(Headers.USER_AGENT, getUserAgent());
+            authorizationBuilder.addHeader(Headers.USER_DEVICE_ID, userPreferences.getDeviceId());
             final Optional<String> pageId = userPreferences.getPageId();
             if (pageId.isPresent()) {
                 authorizationBuilder.addHeader(Headers.AUTHORIZATION_PAGE_ID, pageId.get());
             }
-=======
-            final Request request = original.newBuilder()
-                    .header("Authorization", TOKEN_PREFIX + token)
-                    .header("USER_DEVICE_ID", userPreferences.getDeviceId())
-                    .build();
->>>>>>> ede45d5... Merge branch 'device-id-header' into 'develop'
 
             return chain.proceed(authorizationBuilder.build());
         }
