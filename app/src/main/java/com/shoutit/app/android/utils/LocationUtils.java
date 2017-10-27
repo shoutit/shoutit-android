@@ -97,32 +97,30 @@ public class LocationUtils {
 
     public static Observable<LocationInfo> getLocationFromUpdatesObservable(@Nonnull final GoogleApiClient googleApiClient,
                                                                             @Nonnull @ForApplication final Context context) {
-        return Observable.create(new Observable.OnSubscribe<Object>() {
-            @Override
-            public void call(Subscriber<? super Object> subscriber) {
-                if (!googleApiClient.isConnected()) {
-                    googleApiClient.registerConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
-                        @Override
-                        public void onConnected(@Nullable Bundle bundle) {
-                            subscriber.onNext(null);
-                            subscriber.onCompleted();
-                        }
+        return Observable.create(subscriber -> {
+            if (!googleApiClient.isConnected()) {
+                googleApiClient.registerConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                    @Override
+                    public void onConnected(@Nullable Bundle bundle) {
+                        subscriber.onNext(null);
+                        subscriber.onCompleted();
+                    }
 
-                        @Override
-                        public void onConnectionSuspended(int i) {
+                    @Override
+                    public void onConnectionSuspended(int i) {
 
-                        }
-                    });
-                    googleApiClient.connect();
-                } else {
-                    subscriber.onNext(null);
-                    subscriber.onCompleted();
-                }
+                    }
+                });
+                googleApiClient.connect();
+            } else {
+                subscriber.onNext(null);
+                subscriber.onCompleted();
             }
         }).switchMap(o -> Observable.create(new Observable.OnSubscribe<LocationInfo>() {
 
             private LocationListener locationListener;
 
+            @SuppressWarnings("MissingPermission")
             @Override
             public void call(Subscriber<? super LocationInfo> subscriber) {
                 if (!PermissionHelper.hasPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)) {
