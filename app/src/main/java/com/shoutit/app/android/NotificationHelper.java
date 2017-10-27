@@ -1,5 +1,6 @@
 package com.shoutit.app.android;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -15,6 +16,12 @@ import android.support.v4.app.TaskStackBuilder;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.google.common.base.Optional;
+import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
+import com.shoutit.app.android.api.model.BaseProfile;
+import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.dagger.ForApplication;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.view.main.MainActivity;
 import com.squareup.picasso.Picasso;
@@ -23,9 +30,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Nonnull;
+
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 
@@ -39,6 +45,7 @@ public class NotificationHelper {
     private static final String GCM_ICON_FIELD = "icon";
     private static final String GCM_DATA_FIELD = "data";
     private static final String GCM_APP_URL_FIELD = "app_url";
+    private static final String GCM_PUSHED_FOR_FIELD = "pushed_for";
     private static final String GCM_EVENT_NAME = "event_name";
 
     private static final String EVENT_INCOMING_CALL = "incoming_video_call";
@@ -47,9 +54,12 @@ public class NotificationHelper {
 
     private static final int DEFAULT_NOTIFICATION_ID = 0;
 
+    private final Context mContext;
     private final Picasso picasso;
+    private final UserPreferences userPreferences;
 
-    private static final Map<String, Integer> notificationIdsMap = new HashMap<>();
+    private static final Map<String, Integer> notificationIdsMap = Maps.newHashMap();
+
     static {
         notificationIdsMap.put(EVENT_INCOMING_CALL, 1);
         notificationIdsMap.put(EVENT_NEW_MESSAGE, 2);
@@ -57,92 +67,142 @@ public class NotificationHelper {
     }
 
     @Inject
-    public NotificationHelper(Picasso picasso) {
+    public NotificationHelper(@ForApplication Context context, Picasso picasso, UserPreferences userPreferences) {
+        mContext = context;
         this.picasso = picasso;
+        this.userPreferences = userPreferences;
     }
 
-    public Action1<Bundle> sendNotificationAction(@NonNull final Context context) {
-        return bundle -> sendNotification(bundle, context);
+    @NonNull
+    public Action1<Bundle> sendNotificationAction() {
+        return this::sendNotification;
     }
 
-    public void sendNotification(@NonNull Bundle bundle, @NonNull Context context) {
+    public void sendNotification(@NonNull Bundle bundle) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "Received Push bundle: " + bundle.toString());
         }
 
         final String eventName = bundle.getString(GCM_EVENT_NAME);
         if (!EVENT_INCOMING_CALL.equals(eventName)) {
-            showNotificationFromBundle(bundle, context);
+            showNotificationFromBundle(bundle);
         }
     }
 
-    private void showNotificationFromBundle(Bundle bundle, Context context) {
+    private void showNotificationFromBundle(Bundle bundle) {
         final String title = bundle.getString(GCM_TITLE_FIELD) != null ?
-                bundle.getString(GCM_TITLE_FIELD) : context.getString(R.string.app_name);
+                bundle.getString(GCM_TITLE_FIELD) : mContext.getString(R.string.app_name);
         final String body = bundle.getString(GCM_BODY_FIELD);
         final String iconUrl = bundle.getString(GCM_ICON_FIELD);
+        final String pushedFor = bundle.getString(GCM_PUSHED_FOR_FIELD);
+        final Optional<String> optionalPusherFor = Strings.isNullOrEmpty(pushedFor) ?
+                Optional.absent() : Optional.of(pushedFor);
         final String eventName = bundle.getString(GCM_EVENT_NAME);
         final String dataJson = bundle.getString(GCM_DATA_FIELD);
 
-        showNotification(dataJson, context, title, body, iconUrl, eventName);
+        showNotification(dataJson, title, body, iconUrl, eventName, optionalPusherFor);
     }
 
-    private void showNotification(String dataJson, Context context, String title, String body, String iconUrl, String eventName) {
-        final JSONObject dataObject;
-        String appUrl = null;
-        if (dataJson != null) {
-            try {
-                dataObject = new JSONObject(dataJson);
-                appUrl = dataObject.optString(GCM_APP_URL_FIELD);
-            } catch (JSONException e) {
-                LogHelper.logThrowableAndCrashlytics(TAG, "Cannot parse data field from push", e);
-                appUrl = null;
-            }
-        }
-
-        Bitmap largeIcon = null;
-        try {
-            largeIcon = getLargeIcon(iconUrl, context);
-        } catch (IOException e) {
-            LogHelper.logThrowableAndCrashlytics(TAG, "Cannot fetch large icon for url: " + iconUrl, e);
-        }
+    private void showNotification(String dataJson, String title, String body, String iconUrl, String eventName, Optional<String> pushedFor) {
+        final Bitmap largeIcon = getLargeIconOrNull(iconUrl);
 
         final Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-        Intent intent;
-        if (TextUtils.isEmpty(appUrl)) {
-            intent = new Intent(context, MainActivity.class);
-        } else {
-            intent = new Intent(Intent.ACTION_VIEW, Uri.parse(appUrl));
+        final PendingIntent pendingIntent = getPendingIntent(dataJson, checkIfNotificationIsForCurrentUser(pushedFor));
+
+        final Notification notification = getNotification(title, body, largeIcon, defaultSoundUri, pendingIntent);
+
+        ((NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE))
+                .notify(getNotificationId(eventName), notification);
+    }
+
+    private boolean checkIfNotificationIsForCurrentUser(Optional<String> pushedFor) {
+        final BaseProfile userOrPage = userPreferences.getUserOrPage();
+        final User guestUser = userPreferences.getGuestUser();
+        String userId = null;
+
+        if (userOrPage != null) {
+            userId = userOrPage.getId();
+        } else if (guestUser != null) {
+            userId = guestUser.getId();
         }
 
-        final TaskStackBuilder stackBuilder = TaskStackBuilder
-                .create(context)
-                .addNextIntent(MainActivity.newIntent(context))
-                .addNextIntent(intent);
+        return !pushedFor.isPresent() || pushedFor.get().equals(userId);
+    }
 
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        final PendingIntent pendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_ONE_SHOT);
-
-        final NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.mipmap.ic_launcher)
+    @NonNull
+    private Notification getNotification(String title, String body, Bitmap largeIcon, Uri defaultSoundUri, PendingIntent pendingIntent) {
+        return new NotificationCompat.Builder(mContext)
+                .setSmallIcon(R.drawable.notification_small)
                 .setContentTitle(title)
                 .setContentText(body)
                 .setLargeIcon(largeIcon)
                 .setSound(defaultSoundUri)
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(body));
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(body))
+                .build();
+    }
 
-        ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE))
-                .notify(getNotificationId(eventName), notificationBuilder.build());
+    @NonNull
+    private PendingIntent getPendingIntent(String dataJson, boolean isForCurrentUser) {
+        final TaskStackBuilder stackBuilder = TaskStackBuilder
+                .create(mContext)
+                .addNextIntent(MainActivity.newIntent(mContext));
+        if (isForCurrentUser) {
+            final String appUrl = getAppUrl(dataJson);
+            final Intent intent = getIntent(appUrl);
+            stackBuilder.addNextIntent(intent);
+        }
+
+        return stackBuilder.getPendingIntent(0, PendingIntent.FLAG_ONE_SHOT);
+    }
+
+    @NonNull
+    private Intent getIntent(String appUrl) {
+        final Intent intent;
+        if (TextUtils.isEmpty(appUrl)) {
+            intent = new Intent(mContext, MainActivity.class);
+        } else {
+            intent = new Intent(Intent.ACTION_VIEW, Uri.parse(appUrl));
+        }
+        return intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
     }
 
     @Nullable
-    private Bitmap getLargeIcon(@Nullable String imageUrl,
-                                @Nonnull Context context) throws IOException {
+    private Bitmap getLargeIconOrNull(String iconUrl) {
+        try {
+            return getLargeIcon(iconUrl);
+        } catch (IOException e) {
+            LogHelper.logThrowableAndCrashlytics(TAG, "Cannot fetch large icon for url: " + iconUrl, e);
+            return null;
+        }
+    }
+
+    @Nullable
+    private String getAppUrl(String dataJson) {
+        return getStringFromJson(dataJson, GCM_APP_URL_FIELD);
+    }
+
+    @Nullable
+    private String getStringFromJson(String dataJson, String field) {
+        if (dataJson != null) {
+            try {
+                final JSONObject dataObject = new JSONObject(dataJson);
+                return dataObject.optString(field);
+            } catch (JSONException e) {
+                LogHelper.logThrowableAndCrashlytics(TAG, "Cannot parse data field from push", e);
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    @Nullable
+    private Bitmap getLargeIcon(@Nullable String imageUrl) throws IOException {
         if (TextUtils.isEmpty(imageUrl)) {
-            return BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher);
+            return BitmapFactory.decodeResource(mContext.getResources(), R.drawable.notification_large);
         } else {
             return picasso.load(imageUrl)
                     .resizeDimen(R.dimen.notification_large_icon, R.dimen.notification_large_icon)

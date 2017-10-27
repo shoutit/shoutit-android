@@ -120,8 +120,10 @@ public class ConversationsPagerFragment extends BaseFragment {
 
         for (int i = 0; i < menu.size(); i++) {
             final MenuItem item = menu.getItem(i);
-            item.setVisible(false);
-            mMenuItems.add(item);
+            if (item.getItemId() != R.id.base_menu_search) {
+                item.setVisible(false);
+                mMenuItems.add(item);
+            }
         }
 
         super.onCreateOptionsMenu(menu, inflater);

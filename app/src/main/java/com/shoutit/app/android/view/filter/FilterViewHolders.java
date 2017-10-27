@@ -3,13 +3,11 @@ package com.shoutit.app.android.view.filter;
 import android.content.Context;
 import android.os.Handler;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.RadioButton;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -20,12 +18,11 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableMultimap;
 import com.jakewharton.rxbinding.view.RxView;
-import com.jakewharton.rxbinding.widget.RxCompoundButton;
 import com.jakewharton.rxbinding.widget.RxSeekBar;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.Category;
-import com.shoutit.app.android.api.model.CategoryFilter;
+import com.shoutit.app.android.api.model.FilterValue;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.SortType;
 import com.shoutit.app.android.api.model.UserLocation;
@@ -323,7 +320,7 @@ public class FilterViewHolders {
                                     }),
 
                             item.getSortTypeObservable()
-                                    .first()
+                                    .take(1)
                                     .subscribe(new Action1<SortType>() {
                                         @Override
                                         public void call(SortType sortType) {
@@ -639,10 +636,10 @@ public class FilterViewHolders {
                 @Override
                 public void run() {
                     subscription = item.getSelectedValuesMapObservable()
-                            .subscribe(new Action1<ImmutableMultimap<String, CategoryFilter.FilterValue>>() {
+                            .subscribe(new Action1<ImmutableMultimap<String, FilterValue>>() {
                                 @Override
-                                public void call(ImmutableMultimap<String, CategoryFilter.FilterValue> selectedValuesMap) {
-                                    final ImmutableCollection<CategoryFilter.FilterValue> filterValues = selectedValuesMap.get(item.getFilterSlug());
+                                public void call(ImmutableMultimap<String, FilterValue> selectedValuesMap) {
+                                    final ImmutableCollection<FilterValue> filterValues = selectedValuesMap.get(item.getFilterSlug());
                                     if (filterValues != null && !filterValues.isEmpty()) {
                                         final String selectedValues = item.getSelectedValues(filterValues);
                                         valuesTv.setText(selectedValues);
@@ -721,13 +718,13 @@ public class FilterViewHolders {
                                     }),
 
                             item.getSelectedValuesMapObservable()
-                                    .subscribe(new Action1<ImmutableMultimap<String, CategoryFilter.FilterValue>>() {
+                                    .subscribe(new Action1<ImmutableMultimap<String, FilterValue>>() {
                                         @Override
-                                        public void call(ImmutableMultimap<String, CategoryFilter.FilterValue> selectedValuesMap) {
-                                            final ImmutableCollection<CategoryFilter.FilterValue> filterValues =
+                                        public void call(ImmutableMultimap<String, FilterValue> selectedValuesMap) {
+                                            final ImmutableCollection<FilterValue> filterValues =
                                                     selectedValuesMap.get(item.getCategoryFilter().getSlug());
 
-                                            for (CategoryFilter.FilterValue filterValue : filterValues) {
+                                            for (FilterValue filterValue : filterValues) {
                                                 if (filterValue.getSlug().equals(item.getFilterValue().getSlug())) {
                                                     filtersValueCheckbox.setChecked(true);
                                                     return;

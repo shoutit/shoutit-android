@@ -8,9 +8,11 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.dagger.ActivityScope;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.TagsDao;
-import com.shoutit.app.android.view.profile.ProfilePresenter;
+import com.shoutit.app.android.utils.BookmarkHelper;
+import com.shoutit.app.android.view.profile.user.ProfilePresenter;
 
 import javax.annotation.Nonnull;
 
@@ -22,10 +24,10 @@ import rx.Scheduler;
 public class TagProfileActivityModule {
 
     @Nonnull
-    private final String slugName;
+    private final String tagSlug;
 
-    public TagProfileActivityModule(@Nonnull String slugName) {
-        this.slugName = slugName;
+    public TagProfileActivityModule(@Nonnull String tagSlug) {
+        this.tagSlug = tagSlug;
     }
 
     @Provides
@@ -33,8 +35,10 @@ public class TagProfileActivityModule {
     public ProfilePresenter provideTagProfilePresenter(TagsDao tagsDao, ShoutsDao shoutsDao, @ForActivity Context context,
                                                        @UiScheduler Scheduler uiScheduler,
                                                        @NetworkScheduler Scheduler networkScheduler, ApiService apiService,
-                                                       UserPreferences userPreferences) {
-        return new TagProfilePresenter(tagsDao, shoutsDao, slugName, uiScheduler, networkScheduler,
-                apiService, context, userPreferences);
+                                                       UserPreferences userPreferences,
+                                                       BookmarksDao bookmarksDao,
+                                                       BookmarkHelper bookmarkHelper) {
+        return new TagProfilePresenter(tagsDao, shoutsDao, tagSlug, uiScheduler, networkScheduler,
+                apiService, context, userPreferences, bookmarksDao, bookmarkHelper);
     }
 }

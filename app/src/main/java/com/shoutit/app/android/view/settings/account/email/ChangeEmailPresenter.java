@@ -81,12 +81,6 @@ public class ChangeEmailPresenter {
                 .compose(ObservableExtensions.<ResponseOrError<User>>behaviorRefCount());
 
         successObservable = requestObservable.compose(ResponseOrError.<User>onlySuccess())
-                .doOnNext(new Action1<User>() {
-                    @Override
-                    public void call(User user) {
-                        userPreferences.updateUserJson(user);
-                    }
-                })
                 .map(Functions1.toObject());
 
 

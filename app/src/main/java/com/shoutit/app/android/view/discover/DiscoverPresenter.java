@@ -17,6 +17,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
 import com.shoutit.app.android.api.model.DiscoverChild;
 import com.shoutit.app.android.api.model.DiscoverItemDetailsResponse;
 import com.shoutit.app.android.api.model.DiscoverResponse;
@@ -30,7 +31,6 @@ import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.model.LocationPointer;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.utils.PriceUtils;
-import com.shoutit.app.android.view.home.HomePresenter;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.subsearch.SubSearchActivity;
 
@@ -100,106 +100,58 @@ public class DiscoverPresenter {
 
 
         /** Main Discover Item **/
-        final Observable<Optional<String>> discoverParentIdObservable = Observable.just(discoverParentId)
+        final Observable<Optional<String>> optionalDiscoverParentIdObservable = Observable.just(discoverParentId)
                 .compose(ObservableExtensions.<Optional<String>>behaviorRefCount());
 
         final Observable<ResponseOrError<DiscoverResponse>> mainDiscoverObservable =
-                discoverParentIdObservable
+                optionalDiscoverParentIdObservable
                         .filter(MoreFunctions1.<String>isAbsent())
-                        .flatMap(new Func1<Optional<String>, Observable<LocationPointer>>() {
-                            @Override
-                            public Observable<LocationPointer> call(Optional<String> optional) {
-                                return locationObservable;
-                            }
-                        })
-                        .switchMap(new Func1<LocationPointer, Observable<ResponseOrError<DiscoverResponse>>>() {
-                            @Override
-                            public Observable<ResponseOrError<DiscoverResponse>> call(LocationPointer locationPointer) {
-                                return discoversDao.getDiscoverObservable(locationPointer);
-                            }
-                        });
+                        .flatMap(optional -> locationObservable)
+                        .switchMap(discoversDao::getDiscoverObservable);
 
         final Observable<String> mainDiscoverIdObservable = mainDiscoverObservable
                 .compose(ResponseOrError.<DiscoverResponse>onlySuccess())
-                .map(new Func1<DiscoverResponse, String>() {
-                    @Override
-                    public String call(DiscoverResponse response) {
-                        assert response.getDiscovers() != null;
+                .map(response -> {
+                    assert response.getDiscovers() != null;
 
-                        return response.getDiscovers().get(0).getId();
-                    }
+                    return response.getDiscovers().get(0).getId();
                 });
 
-        final Observable<String> parentDiscoverIdObservable = discoverParentIdObservable
+        final Observable<String> discoverParentIdObservable = optionalDiscoverParentIdObservable
                 .filter(MoreFunctions1.<String>isPresent())
-                .map(new Func1<Optional<String>, String>() {
-                    @Override
-                    public String call(Optional<String> optional) {
-                        return optional.get();
-                    }
-                });
+                .map(Optional::get);
 
         final Observable<String> idObservable = Observable.merge(
-                mainDiscoverIdObservable, parentDiscoverIdObservable)
+                mainDiscoverIdObservable, discoverParentIdObservable)
                 .compose(ObservableExtensions.<String>behaviorRefCount());
 
         /** DiscoverItemDetails **/
         final Observable<ResponseOrError<DiscoverItemDetailsResponse>> discoverItemObservable =
                 idObservable
                         .filter(Functions1.isNotNull())
-                        .switchMap(new Func1<String, Observable<ResponseOrError<DiscoverItemDetailsResponse>>>() {
-                            @Override
-                            public Observable<ResponseOrError<DiscoverItemDetailsResponse>> call(String itemId) {
-                                return discoversDao.getDiscoverItemDao(itemId)
-                                        .getDiscoverItemObservable();
-                            }
-                        })
+                        .switchMap(itemId -> discoversDao.getDiscoverItemDao(itemId)
+                                .getDiscoverItemObservable())
                         .compose(ObservableExtensions.<ResponseOrError<DiscoverItemDetailsResponse>>behaviorRefCount());
 
         final Observable<DiscoverItemDetailsResponse> itemDetailsResponseObservable = discoverItemObservable
                 .compose(ResponseOrError.<DiscoverItemDetailsResponse>onlySuccess());
 
-        final Observable<String> discoveryTitle = itemDetailsResponseObservable.map(new Func1<DiscoverItemDetailsResponse, String>() {
-            @Override
-            public String call(DiscoverItemDetailsResponse discoverItemDetailsResponse) {
-                return discoverItemDetailsResponse.getTitle();
-            }
-        });
+        final Observable<String> discoveryTitle = itemDetailsResponseObservable.map(DiscoverItemDetailsResponse::getTitle);
 
         /** Shouts **/
         final Observable<ResponseOrError<ShoutsResponse>> shoutsItemsObservable = itemDetailsResponseObservable
-                .filter(new Func1<DiscoverItemDetailsResponse, Boolean>() {
-                    @Override
-                    public Boolean call(DiscoverItemDetailsResponse response) {
-                        return response.isShowShouts();
-                    }
-                })
-                .switchMap(new Func1<DiscoverItemDetailsResponse, Observable<ResponseOrError<ShoutsResponse>>>() {
-                    @Override
-                    public Observable<ResponseOrError<ShoutsResponse>> call(DiscoverItemDetailsResponse response) {
-                        return discoverShoutsDao.getShoutsObservable(response.getId())
-                                .subscribeOn(networkScheduler)
-                                .observeOn(uiScheduler);
-                    }
-                })
+                .filter(DiscoverItemDetailsResponse::isShowShouts)
+                .switchMap(response -> discoverShoutsDao.getShoutsObservable(response.getId())
+                        .subscribeOn(networkScheduler)
+                        .observeOn(uiScheduler))
                 .compose(ObservableExtensions.<ResponseOrError<ShoutsResponse>>behaviorRefCount());
 
         /** Adapter Items **/
         final Observable<BaseAdapterItem> headerAdapterItemObservable = itemDetailsResponseObservable
-                .map(new Func1<DiscoverItemDetailsResponse, BaseAdapterItem>() {
-                    @Override
-                    public BaseAdapterItem call(DiscoverItemDetailsResponse response) {
-                        return new HeaderAdapterItem(response.getTitle(), response.getCover());
-                    }
-                });
+                .map((Func1<DiscoverItemDetailsResponse, BaseAdapterItem>) response -> new HeaderAdapterItem(response.getTitle(), response.getCover()));
 
         final Observable<List<BaseAdapterItem>> discoverAdapterItemsObservable = itemDetailsResponseObservable
-                .filter(new Func1<DiscoverItemDetailsResponse, Boolean>() {
-                    @Override
-                    public Boolean call(DiscoverItemDetailsResponse response) {
-                        return response.isShowChildren() && response.getChildren() != null;
-                    }
-                })
+                .filter(response -> response.isShowChildren() && response.getChildren() != null)
                 .map(new Func1<DiscoverItemDetailsResponse, List<BaseAdapterItem>>() {
                     @Override
                     public List<BaseAdapterItem> call(DiscoverItemDetailsResponse response) {
@@ -222,12 +174,7 @@ public class DiscoverPresenter {
 
         final Observable<List<BaseAdapterItem>> shoutAdapterItemObservable = shoutsItemsObservable
                 .compose(ResponseOrError.<ShoutsResponse>onlySuccess())
-                .filter(new Func1<ShoutsResponse, Boolean>() {
-                    @Override
-                    public Boolean call(ShoutsResponse shoutsResponse) {
-                        return !shoutsResponse.getShouts().isEmpty();
-                    }
-                })
+                .filter(shoutsResponse -> !shoutsResponse.getShouts().isEmpty())
                 .map(new Func1<ShoutsResponse, List<BaseAdapterItem>>() {
                     @Override
                     public List<BaseAdapterItem> call(ShoutsResponse shoutsResponse) {
@@ -291,32 +238,19 @@ public class DiscoverPresenter {
                 shoutsItemsObservable.map(Functions1.returnFalse()))
                 .observeOn(uiScheduler);
 
-        mDiscoveryInfoObservable = showMoreObserver.withLatestFrom(discoveryTitle, new Func2<String, String, DiscoveryInfo>() {
-            @Override
-            public DiscoveryInfo call(String id, String title) {
-                return new DiscoveryInfo(id, title);
-            }
-        });
+        mDiscoveryInfoObservable = showMoreObserver.withLatestFrom(discoveryTitle, DiscoveryInfo::new);
 
         /** Search Click **/
         searchMenuItemClickObservable = searchMenuItemClickSubject
-                .withLatestFrom(itemDetailsResponseObservable, new Func2<Object, DiscoverItemDetailsResponse, Intent>() {
-                    @Override
-                    public Intent call(Object o, DiscoverItemDetailsResponse response) {
-                        return SubSearchActivity.newIntent(
-                                context, SearchPresenter.SearchType.DISCOVER,
-                                response.getId(), response.getTitle());
-                    }
-                });
+                .withLatestFrom(itemDetailsResponseObservable, (o, response) -> SubSearchActivity.newIntent(
+                        context, SearchPresenter.SearchType.DISCOVER,
+                        response.getId(), response.getTitle()));
 
         shoutsRefreshObservable = shoutsGlobalRefreshPresenter
                 .getShoutsGlobalRefreshObservable()
-                .withLatestFrom(itemDetailsResponseObservable, new Func2<Object, DiscoverItemDetailsResponse, Object>() {
-                    @Override
-                    public Object call(Object o, DiscoverItemDetailsResponse response) {
-                        discoverShoutsDao.getRefreshObserver(response.getId()).onNext(null);
-                        return null;
-                    }
+                .withLatestFrom(itemDetailsResponseObservable, (o, response) -> {
+                    discoverShoutsDao.getRefreshObserver(response.getId()).onNext(null);
+                    return null;
                 });
 
     }
@@ -375,7 +309,6 @@ public class DiscoverPresenter {
         private final String image;
 
         public HeaderAdapterItem(String title, String image) {
-
             this.title = title;
             this.image = image;
         }
@@ -387,12 +320,12 @@ public class DiscoverPresenter {
 
         @Override
         public boolean matches(@Nonnull BaseAdapterItem item) {
-            return false;
+            return item instanceof HeaderAdapterItem;
         }
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return false;
+            return item instanceof HeaderAdapterItem && this.equals(item);
         }
 
         public String getTitle() {
@@ -402,9 +335,23 @@ public class DiscoverPresenter {
         public String getImage() {
             return image;
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof HeaderAdapterItem)) return false;
+            final HeaderAdapterItem that = (HeaderAdapterItem) o;
+            return Objects.equal(title, that.title) &&
+                    Objects.equal(image, that.image);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(title, image);
+        }
     }
 
-    public class DiscoverAdapterItem implements BaseAdapterItem {
+    public class DiscoverAdapterItem extends BaseNoIDAdapterItem {
 
         @Nonnull
         private final DiscoverChild discoverChild;
@@ -423,19 +370,14 @@ public class DiscoverPresenter {
         }
 
         @Override
-        public long adapterId() {
-            return BaseAdapterItem.NO_ID;
-        }
-
-        @Override
         public boolean matches(@Nonnull BaseAdapterItem item) {
-            return item instanceof HomePresenter.DiscoverAdapterItem &&
-                    discoverChild.getId().equals(((HomePresenter.DiscoverAdapterItem) item).getDiscover().getId());
+            return item instanceof DiscoverAdapterItem &&
+                    discoverChild.getId().equals(((DiscoverAdapterItem) item).getDiscoverChild().getId());
         }
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof HomePresenter.DiscoverAdapterItem && this.equals(item);
+            return item instanceof DiscoverAdapterItem && this.equals(item);
         }
 
         public void onDiscoverSelected() {

@@ -2,6 +2,7 @@ package com.shoutit.app.android.view.settings.account.password;
 
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.api.model.ChangePasswordRequest;
 import com.shoutit.app.android.api.model.User;
 
@@ -32,11 +33,11 @@ public class ChangePasswordPresenterTest {
         MockitoAnnotations.initMocks(this);
 
         when(apiService.changePassword(any(ChangePasswordRequest.class)))
-                .thenReturn(Observable.just(ResponseBody.create(null, "z")));
+                .thenReturn(Observable.just(new ApiMessageResponse("zz")));
 
-        when(userPreferences.getUserObservable())
-                .thenReturn(Observable.just(new User("z", null, null, null, null, null, null, null, false, null,
-                null, false, false, false, null, 1, null, null, null, 1, null, false, null, null, null, null, null, null, null, null, null)));
+        when(userPreferences.getUser())
+                .thenReturn(new User("z", null, null, null, null, null, null, null, false, null,
+                null, false, false, false, null, 1, null, 1, null, false, null, null, null, null, null, null, null, null, null, null, false));
 
         presenter = new ChangePasswordPresenter(apiService, userPreferences, Schedulers.immediate(), Schedulers.immediate());
     }
@@ -139,7 +140,7 @@ public class ChangePasswordPresenterTest {
         TestSubscriber<Object> subscriber = new TestSubscriber<>();
         presenter.getRequestSuccessObservable().subscribe(subscriber);
 
-        when(userPreferences.getUserObservable())
+        when(userPreferences.getPageOrUserObservable())
                 .thenReturn(Observable.just(userWithPasswordSet()));
 
         presenter.getOldPasswordObserver().onNext("Password");
@@ -153,6 +154,6 @@ public class ChangePasswordPresenterTest {
 
     private User userWithPasswordSet() {
         return new User("z", null, null, null, null, null, null, null, false, null,
-                null, false, false, false, null, 1, null, null, null, 1, null, false, null, null, null, null, null, null, null, null, null);
+                null, false, false, false, null, 1, null, 1, null, false, null, null, null, null, null, null, null, null, null, null, false);
     }
 }

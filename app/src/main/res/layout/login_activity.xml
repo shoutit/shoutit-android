@@ -10,23 +10,17 @@
         android:id="@+id/login_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?actionBarSize"
-        android:navigationIcon="@drawable/ic_blue_arrow"
-        android:theme="@style/WhiteToolbar"
-        android:title="">
+        style="@style/AppTheme.BaseToolbarStyle">
 
         <ImageView
+            android:id="@+id/activity_main_logo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:src="@drawable/ic_shoutit_logo"/>
+            android:layout_marginLeft="12dp"
+            android:layout_marginStart="12dp"
+            android:src="@drawable/ic_ab_logo" />
 
     </android.support.v7.widget.Toolbar>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="4dp"
-        android:layout_below="@id/login_toolbar"
-        android:background="@drawable/toolbar_drop_shadow"/>
 
     <FrameLayout
         android:id="@+id/login_sign_layout"

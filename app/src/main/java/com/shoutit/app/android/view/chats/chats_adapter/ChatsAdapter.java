@@ -28,6 +28,8 @@ import com.squareup.picasso.Picasso;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
+import rx.Observable;
+
 public class ChatsAdapter extends BaseAdapter {
 
     private static final int DATE_ITEM = 0;

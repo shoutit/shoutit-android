@@ -28,7 +28,7 @@ public interface Listener {
 
     void onShoutClicked(String shoutId);
 
-    void onProfileClicked(String userName);
+    void onProfileClicked(String userName, boolean isPage);
 
     void hideAttatchentsMenu();
 

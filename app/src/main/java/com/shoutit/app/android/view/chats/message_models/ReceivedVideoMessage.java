@@ -9,15 +9,22 @@ public class ReceivedVideoMessage extends ReceivedMessage {
 
     private final String videoThumbnail;
     private final String time;
+    @Nonnull
+    private final String userName;
     private final Listener mListener;
     private final String url;
+    private final boolean mIsPage;
 
-    public ReceivedVideoMessage(boolean isFirst, String videoThumbnail, String time, String avatarUrl, Listener listener, String url) {
+    public ReceivedVideoMessage(boolean isFirst, String videoThumbnail, String time,
+                                String avatarUrl, @Nonnull String userName, Listener listener,
+                                String url, boolean isPage) {
         super(isFirst, avatarUrl);
         this.videoThumbnail = videoThumbnail;
         this.time = time;
+        this.userName = userName;
         mListener = listener;
         this.url = url;
+        mIsPage = isPage;
     }
 
     public String getVideoThumbnail() {
@@ -70,5 +77,9 @@ public class ReceivedVideoMessage extends ReceivedMessage {
 
     public void click() {
         mListener.onVideoClicked(url);
+    }
+
+    public void onAvatarClicked() {
+        mListener.onProfileClicked(userName, mIsPage);
     }
 }

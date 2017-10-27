@@ -29,34 +29,25 @@ import com.shoutit.app.android.BuildConfig;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.AuthInterceptor;
+import com.shoutit.app.android.api.NewRelicNetworkInterceptor;
+import com.shoutit.app.android.api.RefreshTokenApiService;
 import com.shoutit.app.android.constants.AmazonConstants;
-import com.shoutit.app.android.dao.CategoriesDao;
-import com.shoutit.app.android.dao.ConversationMediaDaos;
-import com.shoutit.app.android.dao.DiscoverShoutsDao;
-import com.shoutit.app.android.dao.DiscoversDao;
-import com.shoutit.app.android.dao.ListenersDaos;
-import com.shoutit.app.android.dao.ListeningsDao;
-import com.shoutit.app.android.dao.NotificationsDao;
-import com.shoutit.app.android.dao.ProfilesDao;
-import com.shoutit.app.android.dao.PromoteLabelsDao;
-import com.shoutit.app.android.dao.PromoteOptionsDao;
-import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
-import com.shoutit.app.android.dao.SortTypesDao;
-import com.shoutit.app.android.dao.SuggestionsDao;
-import com.shoutit.app.android.dao.TagsDao;
 import com.shoutit.app.android.db.DbHelper;
+import com.shoutit.app.android.facebook.FacebookHelper;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.utils.AmazonRequestTransfomer;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
+import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
 import com.shoutit.app.android.view.chats.LocalMessageBus;
 import com.shoutit.app.android.view.conversations.RefreshConversationBus;
-import com.shoutit.app.android.view.loginintro.FacebookHelper;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -156,8 +147,14 @@ public final class AppModule {
 
         final HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
         okHttpClient.interceptors().add(loggingInterceptor);
+
+        okHttpClient.networkInterceptors().add(new NewRelicNetworkInterceptor());
+
         loggingInterceptor.setLevel(BuildConfig.DEBUG ?
                 HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE);
+        okHttpClient.writeTimeout(15L, TimeUnit.SECONDS);
+        okHttpClient.readTimeout(15L, TimeUnit.SECONDS);
+        okHttpClient.connectTimeout(15L, TimeUnit.SECONDS);
 
         return okHttpClient.build();
     }
@@ -176,6 +173,23 @@ public final class AppModule {
 
     @Provides
     @Singleton
+    RefreshTokenApiService provideRefreshTokenApiService(Gson gson) {
+        final HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+        loggingInterceptor.setLevel(BuildConfig.DEBUG ? HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE);
+        final OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(loggingInterceptor)
+                .build();
+
+        return new Retrofit.Builder()
+                .baseUrl(BuildConfig.API_URL)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .client(okHttpClient)
+                .build()
+                .create(RefreshTokenApiService.class);
+    }
+
+    @Provides
+    @Singleton
     Optional<Cache> provideCache(@ForApplication Context context) {
         final File httpCacheDir = new File(context.getCacheDir(), "cache");
         final long httpCacheSize = 100 * 1024 * 1024; // 100 MiB
@@ -184,23 +198,10 @@ public final class AppModule {
 
     @Singleton
     @Provides
-    AuthInterceptor prvideAuthInterceptor(UserPreferences userPreferences) {
-        return new AuthInterceptor(userPreferences);
-    }
-
-    @Singleton
-    @Provides
-    public ShoutsDao provideShoutsDao(ApiService apiService,
-                                      @NetworkScheduler Scheduler networkScheduler,
-                                      UserPreferences userPreferences) {
-        return new ShoutsDao(apiService, networkScheduler, userPreferences);
-    }
-
-    @Singleton
-    @Provides
-    public DiscoversDao provideDiscoversDao(ApiService apiService,
-                                            @NetworkScheduler Scheduler networkScheduler) {
-        return new DiscoversDao(apiService, networkScheduler);
+    AuthInterceptor prvideAuthInterceptor(UserPreferences userPreferences,
+                                          @ForApplication Context context,
+                                          RefreshTokenApiService apiService) {
+        return new AuthInterceptor(userPreferences, context, apiService);
     }
 
     @Provides
@@ -224,37 +225,8 @@ public final class AppModule {
 
     @Singleton
     @Provides
-    public DiscoverShoutsDao provideDiscoverShoutsDao(@NetworkScheduler Scheduler networkScheduler,
-                                                      ApiService apiService) {
-        return new DiscoverShoutsDao(networkScheduler, apiService);
-    }
-
-    @Singleton
-    @Provides
-    public ProfilesDao provideProfilesDao(ApiService apiService,
-                                          @NetworkScheduler Scheduler networkScheduler,
-                                          UserPreferences userPreferences) {
-        return new ProfilesDao(apiService, networkScheduler, userPreferences);
-    }
-
-    @Singleton
-    @Provides
-    public TagsDao provideTagsDao(ApiService apiService,
-                                  @NetworkScheduler Scheduler networkScheduler) {
-        return new TagsDao(apiService, networkScheduler);
-    }
-
-    @Singleton
-    @Provides
     public ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter() {
         return new ShoutsGlobalRefreshPresenter();
-    }
-
-    @Singleton
-    @Provides
-    public NotificationsDao notificationsDao(ApiService apiService,
-                                             @NetworkScheduler Scheduler networkScheduler) {
-        return new NotificationsDao(apiService, networkScheduler);
     }
 
     @Singleton
@@ -275,62 +247,26 @@ public final class AppModule {
 
     @Provides
     @Singleton
-    SuggestionsDao provideSuggestionsDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
-        return new SuggestionsDao(apiService, networkScheduler);
-    }
-
-    @Provides
-    @Singleton
-    CategoriesDao categoriesDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
-        return new CategoriesDao(apiService, networkScheduler);
-    }
-
-    @Provides
-    @Singleton
-    ListenersDaos listenersDaos(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
-        return new ListenersDaos(apiService, networkScheduler);
-    }
-
-    @Provides
-    @Singleton
-    ListeningsDao listeningsDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
-        return new ListeningsDao(apiService, networkScheduler);
-    }
-
-    @Singleton
-    @Provides
-    ConversationMediaDaos provideConversationMediaDaos(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
-        return new ConversationMediaDaos(apiService, networkScheduler);
-    }
-
-    @Provides
-    @Singleton
-    SortTypesDao sortTypesDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
-        return new SortTypesDao(apiService, networkScheduler);
-    }
-
-    @Provides
-    @Singleton
-    PromoteLabelsDao promoteDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
-        return new PromoteLabelsDao(apiService, networkScheduler);
-    }
-
-    @Provides
-    @Singleton
-    PromoteOptionsDao promoteOptionsDao(ApiService apiService, @NetworkScheduler Scheduler networkScheduler) {
-        return new PromoteOptionsDao(apiService, networkScheduler);
-    }
-
-    @Provides
-    @Singleton
     DbHelper dbHelper(@ForApplication Context context) {
         return new DbHelper(context);
     }
 
     @Provides
+    PusherHelper providePusher(Gson gson, @UiScheduler Scheduler uiScheduler) {
+        return new PusherHelper(gson, uiScheduler);
+    }
+
+    @Provides
     @Singleton
-    PusherHelper providePusher(Gson gson, UserPreferences userPreferences, @UiScheduler Scheduler uiScheduler) {
-        return new PusherHelper(gson, userPreferences, uiScheduler);
+    PusherHelperHolder providePusherHolder(Provider<PusherHelper> pusherHelperProvider) {
+        return new PusherHelperHolder(pusherHelperProvider);
+    }
+
+    @Provides
+    @Singleton
+    @Named("user")
+    PusherHelperHolder provideUserPusherHolder(Provider<PusherHelper> pusherHelperProvider) {
+        return new PusherHelperHolder(pusherHelperProvider);
     }
 
     @Provides
@@ -348,8 +284,8 @@ public final class AppModule {
     @Singleton
     FacebookHelper provideFacebookHelper(ApiService apiService, UserPreferences userPreferences,
                                          @ForApplication Context context, @NetworkScheduler Scheduler networkScheduler,
-                                         PusherHelper pusherHelper) {
-        return new FacebookHelper(apiService, userPreferences, context, networkScheduler, pusherHelper);
+                                         PusherHelperHolder pusherHelper, Gson gson) {
+        return new FacebookHelper(apiService, userPreferences, context, networkScheduler, pusherHelper, gson);
     }
 
     @Provides

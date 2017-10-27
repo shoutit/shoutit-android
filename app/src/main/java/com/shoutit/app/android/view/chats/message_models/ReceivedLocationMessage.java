@@ -8,16 +8,21 @@ import javax.annotation.Nonnull;
 public class ReceivedLocationMessage extends ReceivedMessage {
 
     private final String time;
+    private final String userName;
     private final Listener mListener;
     private final double latitude;
     private final double longitude;
+    private final boolean mIsPage;
 
-    public ReceivedLocationMessage(boolean isFirst, String time, String avatarUrl, Listener listener, double latitude, double longitude) {
+    public ReceivedLocationMessage(boolean isFirst, String time, String avatarUrl, String userName,
+                                   Listener listener, double latitude, double longitude, boolean isPage) {
         super(isFirst, avatarUrl);
         this.time = time;
+        this.userName = userName;
         mListener = listener;
         this.latitude = latitude;
         this.longitude = longitude;
+        mIsPage = isPage;
     }
 
     public String getTime() {
@@ -69,5 +74,9 @@ public class ReceivedLocationMessage extends ReceivedMessage {
 
     public void click() {
         mListener.onLocationClicked(latitude, longitude);
+    }
+
+    public void onAvatarClicked() {
+        mListener.onProfileClicked(userName, mIsPage);
     }
 }

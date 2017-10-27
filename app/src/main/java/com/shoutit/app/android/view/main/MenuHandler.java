@@ -3,34 +3,38 @@ package com.shoutit.app.android.view.main;
 import android.graphics.Bitmap;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
-import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.api.model.BaseProfile;
+import com.shoutit.app.android.facebook.FacebookHelper;
 import com.shoutit.app.android.utils.BlurTransform;
 import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.RtlUtils;
+import com.shoutit.app.android.view.admins.AdminsFragment;
+import com.shoutit.app.android.view.bookmarks.BookmarkedShoutsFragment;
+import com.shoutit.app.android.view.chats.chats_adapter.AvatarHelper;
 import com.shoutit.app.android.view.conversations.ConversationsPagerFragment;
 import com.shoutit.app.android.view.createshout.CreateShoutDialogActivity;
 import com.shoutit.app.android.view.credits.CreditsFragment;
 import com.shoutit.app.android.view.discover.DiscoverFragment;
 import com.shoutit.app.android.view.home.HomeFragment;
-import com.shoutit.app.android.view.invitefriends.InviteFriendsFragment;
+import com.shoutit.app.android.view.invitefriends.InviteFacebookFriendsFragment;
 import com.shoutit.app.android.view.location.LocationActivity;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
-import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
+import com.shoutit.app.android.view.pages.PagesPagerFragment;
+import com.shoutit.app.android.view.profile.ProfileIntentHelper;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsFragment;
 import com.shoutit.app.android.view.settings.SettingsActivity;
@@ -40,7 +44,10 @@ import com.squareup.picasso.Transformation;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 import com.uservoice.uservoicesdk.UserVoice;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 
@@ -59,6 +66,9 @@ public class MenuHandler {
     public static final String FRAGMENT_CREDITS = "fragment_credits";
     public static final String ACTIVITY_SETTINGS = "activity_settings";
     public static final String ACTIVITY_HELP = "activity_help";
+    public static final String FRAGMENT_PAGES = "fragment_pages";
+    public static final String FRAGMENT_ADMINS = "fragment_admins";
+    public static final String FRAGMENT_BOOKMARKS = "fragment_bookmarks";
 
     @Bind(R.id.menu_user_name_tv)
     TextView userNameTextView;
@@ -78,6 +88,8 @@ public class MenuHandler {
     TextView chatsBadgeTv;
     @Bind(R.id.menu_credits_badge)
     TextView creditsBadgeTv;
+    @Bind(R.id.menu_use_profile_badge)
+    TextView useProfileBadeTv;
 
     @Bind(R.id.menu_home)
     CheckedTextView homeItem;
@@ -89,6 +101,17 @@ public class MenuHandler {
     CheckedTextView chatItem;
     @Bind(R.id.menu_credits)
     CheckedTextView creditsItem;
+    @Bind(R.id.menu_pages)
+    CheckedTextView pagesItem;
+    @Bind(R.id.menu_admins)
+    CheckedTextView adminsItem;
+    @Bind(R.id.menu_bookmarks)
+    CheckedTextView bookmarks;
+
+    @Bind(R.id.menu_use_profile)
+    Button useProfile;
+    @Bind(R.id.menu_use_profile_container)
+    View useProfileContainer;
 
     @Nonnull
     private final RxAppCompatActivity rxActivity;
@@ -103,17 +126,21 @@ public class MenuHandler {
 
     private List<CheckedTextView> selectableItems = ImmutableList.of();
 
-    private static BiMap<String, Integer> viewTagViewIdMap = HashBiMap.create();
+    private static Map<String, Integer> viewTagViewIdMap = new LinkedHashMap<>();
 
     static {
         viewTagViewIdMap.put(FRAGMENT_HOME, R.id.menu_home);
         viewTagViewIdMap.put(FRAGMENT_DISCOVER, R.id.menu_discover);
         viewTagViewIdMap.put(FRAGMENT_BROWSE, R.id.menu_browse);
         viewTagViewIdMap.put(FRAGMENT_CHATS, R.id.menu_chat);
+        viewTagViewIdMap.put(FRAGMENT_PUBLIC_CHATS, R.id.menu_chat);
         viewTagViewIdMap.put(FRAGMENT_CREDITS, R.id.menu_credits);
         viewTagViewIdMap.put(FRAGMENT_INVITE_FRIENDS, R.id.menu_invite_friends);
         viewTagViewIdMap.put(ACTIVITY_HELP, R.id.menu_help);
         viewTagViewIdMap.put(ACTIVITY_SETTINGS, R.id.menu_settings);
+        viewTagViewIdMap.put(FRAGMENT_PAGES, R.id.menu_pages);
+        viewTagViewIdMap.put(FRAGMENT_ADMINS, R.id.menu_admins);
+        viewTagViewIdMap.put(FRAGMENT_BOOKMARKS, R.id.menu_bookmarks);
     }
 
     public MenuHandler(@Nonnull final RxAppCompatActivity rxActivity,
@@ -134,17 +161,50 @@ public class MenuHandler {
 
     public void initMenu(@Nonnull View view, @IdRes int id) {
         ButterKnife.bind(this, view);
-        selectableItems = ImmutableList.of(homeItem, discoverItem, browseItem, chatItem, creditsItem);
-        userPreferences.getUserObservable()
+
+        selectableItems = ImmutableList.of(homeItem, discoverItem, browseItem, chatItem, creditsItem, pagesItem, adminsItem, bookmarks);
+
+        userPreferences.getPageOrUserObservable()
                 .filter(user -> user != null)
-                .map(user -> {
-                    Preconditions.checkNotNull(user);
-                    return user.getStats().getCredits();
-                })
-                .subscribe(credits -> {
-                    creditsBadgeTv.setVisibility(credits > 0 ? View.VISIBLE : View.GONE);
-                    creditsBadgeTv.setText(String.valueOf(credits));
+                .map(BaseProfile::getStats)
+                .compose(rxActivity.bindToLifecycle())
+                .subscribe(stats -> {
+                    if (stats != null) {
+                        final int credits = stats.getCredits();
+                        creditsBadgeTv.setVisibility(credits > 0 ? View.VISIBLE : View.GONE);
+                        creditsBadgeTv.setText(String.valueOf(credits));
+                    } else {
+                        creditsBadgeTv.setVisibility(View.GONE);
+                    }
                 });
+        userPreferences.getPageOrUserObservable()
+                .filter(user -> user != null)
+                .compose(rxActivity.bindToLifecycle())
+                .subscribe(user -> {
+                    pagesItem.setVisibility(user.isUser() ?
+                            View.VISIBLE : View.GONE);
+                    adminsItem.setVisibility(user.isUser() ?
+                            View.GONE : View.VISIBLE);
+                });
+
+        final boolean loggedInAsPage = userPreferences.isLoggedInAsPage();
+        useProfileContainer.setVisibility(loggedInAsPage ? View.VISIBLE : View.GONE);
+        if (loggedInAsPage) {
+            userPreferences.getUserObservable()
+                    .filter(user -> user != null)
+                    .map(BaseProfile::getStats)
+                    .compose(rxActivity.bindToLifecycle())
+                    .subscribe(stats -> {
+                        if (stats != null) {
+                            final int statsCount = stats.getUnreadConversationsCount() + stats.getUnreadNotifications();
+                            useProfileBadeTv.setVisibility(statsCount > 0 ? View.VISIBLE : View.GONE);
+                            useProfileBadeTv.setText(String.valueOf(statsCount));
+                        } else {
+                            useProfileBadeTv.setVisibility(View.GONE);
+                        }
+                    });
+        }
+
         setData(id);
     }
 
@@ -157,12 +217,18 @@ public class MenuHandler {
                 .compose(rxActivity.<String>bindToLifecycle())
                 .subscribe(RxTextView.text(userNameTextView));
 
+        presenter.getUserNameObservable()
+                .compose(rxActivity.<String>bindToLifecycle())
+                .subscribe(userName -> {
+                    useProfile.setText(String.format(rxActivity.getString(R.string.menu_use_as_format), userName));
+                });
+
         presenter.getCityObservable()
                 .compose(rxActivity.<String>bindToLifecycle())
                 .subscribe(RxTextView.text(locationTextView));
 
         presenter.getAvatarObservable()
-                .compose(rxActivity.<String>bindToLifecycle())
+                .compose(rxActivity.<BaseProfile>bindToLifecycle())
                 .subscribe(loadAvatarAction());
 
         presenter.getCoverObservable()
@@ -185,9 +251,41 @@ public class MenuHandler {
                 .into(roundedBitmapTarget);
     }
 
-    @OnClick({R.id.menu_home, R.id.menu_discover, R.id.menu_browse, R.id.menu_chat, R.id.menu_settings, R.id.menu_help, R.id.menu_invite_friends, R.id.menu_credits})
+    @OnClick({
+            R.id.menu_home,
+            R.id.menu_discover,
+            R.id.menu_browse,
+            R.id.menu_chat,
+            R.id.menu_settings,
+            R.id.menu_help,
+            R.id.menu_invite_friends,
+            R.id.menu_credits,
+            R.id.menu_pages,
+            R.id.menu_admins,
+            R.id.menu_use_profile,
+            R.id.menu_bookmarks
+    })
     public void onMenuItemSelected(View view) {
-        selectMenuItem(viewTagViewIdMap.inverse().get(view.getId()));
+        dispatchClick(view.getId());
+    }
+
+    private void dispatchClick(int viewId) {
+        switch (viewId) {
+            case R.id.menu_use_profile: {
+                userPreferences.clearPage();
+                FacebookHelper.logOutFromFacebook();
+                ActivityCompat.finishAffinity(rxActivity);
+                rxActivity.startActivity(MainActivity.newIntent(rxActivity));
+                break;
+            }
+            default:
+                for (Map.Entry<String, Integer> entry : viewTagViewIdMap.entrySet()) {
+                    if (entry.getValue() == viewId) {
+                        selectMenuItem(entry.getKey());
+                        break;
+                    }
+                }
+        }
     }
 
     public void selectMenuItem(@Nonnull String viewTag) {
@@ -196,10 +294,14 @@ public class MenuHandler {
             case FRAGMENT_DISCOVER:
             case FRAGMENT_BROWSE:
             case FRAGMENT_INVITE_FRIENDS:
+            case FRAGMENT_BOOKMARKS:
                 selectFragment(viewTag);
                 break;
             case FRAGMENT_CREDITS:
             case FRAGMENT_CHATS:
+            case FRAGMENT_PUBLIC_CHATS:
+            case FRAGMENT_PAGES:
+            case FRAGMENT_ADMINS:
                 if (userPreferences.isNormalUser()) {
                     selectFragment(viewTag);
                 } else {
@@ -222,7 +324,9 @@ public class MenuHandler {
     private void selectFragment(@Nonnull String viewTag) {
         selectItem(viewTagViewIdMap.get(viewTag));
         onMenuItemSelectedListener.onMenuItemSelected(viewTag);
-        setToolbarElevation(viewTagViewIdMap.get(viewTag) != R.id.menu_chat);
+
+        final Integer selectedViewId = viewTagViewIdMap.get(viewTag);
+        setToolbarElevation(selectedViewId != R.id.menu_chat && selectedViewId != R.id.menu_pages);
     }
 
     public void setToolbarElevation(boolean enable) {
@@ -256,7 +360,10 @@ public class MenuHandler {
     @OnClick({R.id.menu_avatar_iv, R.id.menu_user_name_tv})
     public void startUserProfile() {
         if (userPreferences.isNormalUser()) {
-            rxActivity.startActivity(UserOrPageProfileActivity.newIntent(rxActivity, User.ME));
+            //noinspection ConstantConditions
+            rxActivity.startActivity(ProfileIntentHelper.newIntent(rxActivity,
+                    userPreferences.getUserOrPage().getUsername(),
+                    userPreferences.isLoggedInAsPage()));
         } else {
             showLoginActivity();
         }
@@ -298,12 +405,12 @@ public class MenuHandler {
     }
 
     @NonNull
-    private Action1<String> loadAvatarAction() {
+    private Action1<BaseProfile> loadAvatarAction() {
         final int strokeSize = rxActivity.getResources().getDimensionPixelSize(R.dimen.side_menu_avatar_stroke_size);
 
-        return avatarUrl -> picasso.load(avatarUrl)
-                .error(R.drawable.ic_avatar_placeholder)
-                .placeholder(R.drawable.ic_avatar_placeholder)
+        return baseProfile -> picasso.load(baseProfile.getImage())
+                .error(AvatarHelper.getCirclePlaceholderId(baseProfile.getType()))
+                .placeholder(AvatarHelper.getCirclePlaceholderId(baseProfile.getType()))
                 .resizeDimen(R.dimen.side_menu_avatar_size, R.dimen.side_menu_avatar_size)
                 .centerCrop()
                 .transform(PicassoHelper.getCircularBitmapWithStrokeTarget(strokeSize, "MenuAvatar"))
@@ -325,7 +432,13 @@ public class MenuHandler {
             case FRAGMENT_PUBLIC_CHATS:
                 return ConversationsPagerFragment.newInstance(true);
             case FRAGMENT_INVITE_FRIENDS:
-                return InviteFriendsFragment.newInstance();
+                return InviteFacebookFriendsFragment.newInstance();
+            case FRAGMENT_BOOKMARKS:
+                return BookmarkedShoutsFragment.newInstance();
+            case FRAGMENT_PAGES:
+                return PagesPagerFragment.newInstance();
+            case FRAGMENT_ADMINS:
+                return AdminsFragment.newInstance();
             default:
                 throw new RuntimeException("Unknown fragment tag");
         }

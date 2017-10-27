@@ -3,6 +3,7 @@ package com.shoutit.app.android.view.chats;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -39,17 +40,20 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.utils.AppseeHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.utils.TextWatcherAdapter;
+import com.shoutit.app.android.utils.UpNavigationHelper;
 import com.shoutit.app.android.view.chats.chat_info.ChatInfoActivity;
 import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
 import com.shoutit.app.android.view.chooseprofile.SelectProfileActivity;
 import com.shoutit.app.android.view.loginintro.LoginIntroActivity;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
-import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
+import com.shoutit.app.android.view.profile.ProfileIntentHelper;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.shoutit.app.android.view.shouts.selectshout.SelectShoutActivity;
 import com.squareup.picasso.Picasso;
@@ -140,6 +144,8 @@ public class ChatActivity extends BaseActivity implements Listener {
         setContentView(R.layout.activity_chats);
         ButterKnife.bind(this);
 
+        AppseeHelper.start(this);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             // It doesn't work from xml
             inputContainer.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
@@ -152,7 +158,7 @@ public class ChatActivity extends BaseActivity implements Listener {
         }
 
         mChatsToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
-        mChatsToolbar.setNavigationOnClickListener(view -> finish());
+        mChatsToolbar.setNavigationOnClickListener(view -> new UpNavigationHelper(this).onUpButtonClicked());
         mChatsToolbar.inflateMenu(R.menu.chats_menu);
         mChatsToolbar.setOnMenuItemClickListener(item -> {
             final int itemId = item.getItemId();
@@ -173,6 +179,17 @@ public class ChatActivity extends BaseActivity implements Listener {
 
         mChatsRecyclerview.setAdapter(chatsAdapter);
         mChatsRecyclerview.setLayoutManager(new MyLinearLayoutManager(this));
+        mChatsRecyclerview.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+                final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) view.getLayoutParams();
+                final int position = params.getViewAdapterPosition();
+
+                if (position == parent.getAdapter().getItemCount() - 1) {
+                    outRect.bottom = getResources().getDimensionPixelSize(R.dimen.chat_last_item_decoration);
+                }
+            }
+        });
 
         RxRecyclerView.scrollEvents(mChatsRecyclerview)
                 .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
@@ -253,7 +270,8 @@ public class ChatActivity extends BaseActivity implements Listener {
     }
 
     @Override
-    public void setData(@NonNull List<BaseAdapterItem> items) {
+    public void
+    setData(@NonNull List<BaseAdapterItem> items) {
         mChatsRecyclerview.setVisibility(View.VISIBLE);
         chatsAdapter.call(items);
         mChatsRecyclerview.scrollToPosition(items.size() - 1);
@@ -287,10 +305,7 @@ public class ChatActivity extends BaseActivity implements Listener {
 
     @Override
     public void onImageClicked(String url) {
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.parse(url), "image/*");
-        startActivity(intent);
+        startActivity(IntentHelper.singleImageGalleryIntent(this, url));
     }
 
     @Override
@@ -327,8 +342,8 @@ public class ChatActivity extends BaseActivity implements Listener {
     }
 
     @Override
-    public void onProfileClicked(String userName) {
-        startActivity(UserOrPageProfileActivity.newIntent(this, userName));
+    public void onProfileClicked(String userName, boolean isPage) {
+        startActivity(ProfileIntentHelper.newIntent(this, userName, isPage));
     }
 
     @Override

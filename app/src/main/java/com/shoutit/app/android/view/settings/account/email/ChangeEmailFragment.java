@@ -16,6 +16,7 @@ import com.shoutit.app.android.BaseFragment;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
+import com.shoutit.app.android.utils.AppseeHelper;
 import com.shoutit.app.android.utils.rx.Actions1;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.MoreFunctions1;
@@ -55,6 +56,8 @@ public class ChangeEmailFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        AppseeHelper.markViewAsSensitive(emailInput);
 
         RxTextView.textChangeEvents(emailEditText)
                 .map(MoreFunctions1.mapTextChangeEventToString())

@@ -22,9 +22,11 @@ import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.utils.AppseeHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.utils.RtlUtils;
+import com.shoutit.app.android.utils.UpNavigationHelper;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.SearchQueryPresenter;
 import com.shoutit.app.android.view.search.categories.SearchCategoriesFragment;
@@ -74,6 +76,8 @@ public class MainSearchActivity extends BaseActivity implements SearchView.OnQue
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         ButterKnife.bind(this);
+
+        AppseeHelper.start(this);
 
         setUpToolbar();
 
@@ -134,7 +138,7 @@ public class MainSearchActivity extends BaseActivity implements SearchView.OnQue
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
+                new UpNavigationHelper(this).onUpButtonClicked();
                 return true;
             case R.id.search:
                 showPagerAdapter();

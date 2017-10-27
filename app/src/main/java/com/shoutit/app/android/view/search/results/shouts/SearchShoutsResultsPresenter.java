@@ -1,10 +1,12 @@
 package com.shoutit.app.android.view.search.results.shouts;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
+import com.appunite.rx.android.util.LogTransformer;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
@@ -13,15 +15,18 @@ import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.NoDataTextAdapterItem;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
-import com.shoutit.app.android.api.model.User;
-import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.BaseShoutsDao;
+import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.model.FiltersToSubmit;
 import com.shoutit.app.android.model.SearchShoutPointer;
+import com.shoutit.app.android.utils.FBAdHalfPresenter;
+import com.shoutit.app.android.utils.BookmarkHelper;
 import com.shoutit.app.android.utils.PromotionHelper;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
@@ -34,7 +39,6 @@ import javax.annotation.Nullable;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
-import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.subjects.PublishSubject;
@@ -52,6 +56,9 @@ public class SearchShoutsResultsPresenter {
     private final Observable<Integer> countObservable;
     private final Observable<String> shareClickedObservable;
     private final Observable<Object> refreshShoutsObservable;
+    private final Observable<Object> loadMoreObservable;
+    @NonNull
+    private final BookmarkHelper mBookmarkHelper;
 
     public SearchShoutsResultsPresenter(@Nonnull final ShoutsDao dao,
                                         @Nullable final String searchQuery,
@@ -60,54 +67,38 @@ public class SearchShoutsResultsPresenter {
                                         @Nonnull final UserPreferences userPreferences,
                                         @Nonnull @ForActivity final Context context,
                                         @UiScheduler Scheduler uiScheduler,
-                                        @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter) {
+                                        @Nonnull FBAdHalfPresenter fbAdHalfPresenter,
+                                        @Nonnull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
+                                        @NonNull BookmarksDao bookmarksDao,
+                                        @NonNull BookmarkHelper bookmarkHelper) {
+        mBookmarkHelper = bookmarkHelper;
 
         final boolean isNormalUser = userPreferences.isNormalUser();
-        final User currentUser = userPreferences.getUser();
+        final BaseProfile currentUser = userPreferences.getUserOrPage();
         final String currentUserName = currentUser != null ? currentUser.getUsername() : null;
 
-        final boolean initWithUserLocation = searchType != SearchPresenter.SearchType.PROFILE &&
-                searchType != SearchPresenter.SearchType.TAG_PROFILE;
+        final boolean initWithUserLocation = searchType != SearchPresenter.SearchType.PROFILE;
 
         final Observable<ShoutsDao.SearchShoutsDao> daoWithFilters = filtersSelectedSubject
-                .map(new Func1<FiltersToSubmit, ShoutsDao.SearchShoutsDao>() {
-                    @Override
-                    public ShoutsDao.SearchShoutsDao call(FiltersToSubmit filtersToSubmit) {
-                        return dao.getSearchShoutsDao(new SearchShoutPointer(
-                                searchQuery, searchType, contextualItemId, filtersToSubmit));
-                    }
-                });
+                .map(filtersToSubmit -> dao.getSearchShoutsDao(new SearchShoutPointer(
+                        searchQuery, searchType, contextualItemId, filtersToSubmit)));
 
         final Observable<ShoutsDao.SearchShoutsDao> daoObservable = Observable.just(initWithUserLocation)
-                .flatMap(new Func1<Boolean, Observable<UserLocation>>() {
-                    @Override
-                    public Observable<UserLocation> call(Boolean initWithUserLocation) {
-                        if (initWithUserLocation) {
-                            return userPreferences.getLocationObservable()
-                                    .filter(Functions1.isNotNull())
-                                    .first();
-                        } else {
-                            return Observable.just(null);
-                        }
+                .flatMap(initWithUserLocation1 -> {
+                    if (initWithUserLocation1) {
+                        return userPreferences.getLocationObservable()
+                                .filter(Functions1.isNotNull());
+                    } else {
+                        return Observable.just(null);
                     }
                 })
-                .map(new Func1<UserLocation, ShoutsDao.SearchShoutsDao>() {
-                    @Override
-                    public ShoutsDao.SearchShoutsDao call(UserLocation userLocation) {
-                        return dao.getSearchShoutsDao(new SearchShoutPointer(
-                                searchQuery, searchType, userLocation, contextualItemId));
-                    }
-                })
+                .map(userLocation -> dao.getSearchShoutsDao(new SearchShoutPointer(
+                        searchQuery, searchType, userLocation, contextualItemId)))
                 .mergeWith(daoWithFilters)
                 .compose(ObservableExtensions.<ShoutsDao.SearchShoutsDao>behaviorRefCount());
 
         final Observable<ResponseOrError<ShoutsResponse>> shoutsRequest = daoObservable
-                .switchMap(new Func1<ShoutsDao.SearchShoutsDao, Observable<ResponseOrError<ShoutsResponse>>>() {
-                    @Override
-                    public Observable<ResponseOrError<ShoutsResponse>> call(ShoutsDao.SearchShoutsDao searchShoutsDao) {
-                        return searchShoutsDao.getShoutsObservable();
-                    }
-                })
+                .switchMap(BaseShoutsDao::getShoutsObservable)
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<ShoutsResponse>>behaviorRefCount());
 
@@ -116,14 +107,9 @@ public class SearchShoutsResultsPresenter {
                 .compose(ObservableExtensions.<ShoutsResponse>behaviorRefCount());
 
         countObservable = successShoutsResponse
-                .map(new Func1<ShoutsResponse, Integer>() {
-                    @Override
-                    public Integer call(ShoutsResponse shoutsResponse) {
-                        return shoutsResponse.getCount();
-                    }
-                });
+                .map(ShoutsResponse::getCount);
 
-        adapterItems = successShoutsResponse
+        final Observable<List<BaseAdapterItem>> shoutsItems = successShoutsResponse
                 .map(new Func1<ShoutsResponse, List<BaseAdapterItem>>() {
                     @Override
                     public List<BaseAdapterItem> call(ShoutsResponse shoutsResponse) {
@@ -136,49 +122,47 @@ public class SearchShoutsResultsPresenter {
                                 @Override
                                 public BaseAdapterItem apply(Shout shout) {
                                     final boolean isShoutOwner = shout.getProfile().getUsername().equals(currentUserName);
-                                    return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context, shoutSelectedSubject, PromotionHelper.promotionInfoOrNull(shout));
+                                    final BookmarkHelper.ShoutItemBookmarkHelper shoutItemBookmarkHelper = bookmarkHelper.getShoutItemBookmarkHelper();
+                                    return new ShoutAdapterItem(shout, isShoutOwner, isNormalUser, context,
+                                            shoutSelectedSubject, PromotionHelper.promotionInfoOrNull(shout),
+                                            bookmarksDao.getBookmarkForShout(shout.getId(), shout.isBookmarked()),
+                                            shoutItemBookmarkHelper.getObserver(), shoutItemBookmarkHelper.getEnableObservable());
                                 }
                             }));
                             return builder.build();
                         }
                     }
-                });
+                })
+                .doOnNext(fbAdHalfPresenter::updatedShoutsCount);
+
+        adapterItems = Observable.combineLatest(shoutsItems,
+                fbAdHalfPresenter.getAdsObservable(),
+                FBAdHalfPresenter::combineShoutsWithAds);
 
         progressObservable = shoutsRequest.map(Functions1.returnFalse())
                 .startWith(true);
 
         errorObservable = shoutsRequest.compose(ResponseOrError.<ShoutsResponse>onlyError());
 
-        loadMoreSubject
-                .withLatestFrom(daoObservable, new Func2<Object, ShoutsDao.SearchShoutsDao, Observer<Object>>() {
-                    @Override
-                    public Observer<Object> call(Object o, ShoutsDao.SearchShoutsDao searchShoutsDao) {
-                        return searchShoutsDao.getLoadMoreObserver();
-                    }
-                })
-                .subscribe(new Action1<Observer<Object>>() {
-                    @Override
-                    public void call(Observer<Object> loadMoreObserver) {
-                        loadMoreObserver.onNext(null);
-                    }
+        loadMoreObservable = loadMoreSubject
+                .withLatestFrom(daoObservable, (Func2<Object, ShoutsDao.SearchShoutsDao, Observer<Object>>) (o, searchShoutsDao) -> searchShoutsDao.getLoadMoreObserver())
+                .map(loadMoreObserver -> {
+                    loadMoreObserver.onNext(null);
+                    return null;
                 });
 
         shareClickedObservable = shareClickSubject.withLatestFrom(successShoutsResponse,
-                new Func2<Object, ShoutsResponse, String>() {
-                    @Override
-                    public String call(Object o, ShoutsResponse shoutsResponse) {
-                        return shoutsResponse.getWebUrl();
-                    }
-                });
+                (o, shoutsResponse) -> shoutsResponse.getWebUrl());
 
         refreshShoutsObservable = shoutsGlobalRefreshPresenter.getShoutsGlobalRefreshObservable()
-                .withLatestFrom(daoObservable, new Func2<Object, ShoutsDao.SearchShoutsDao, Object>() {
-                    @Override
-                    public Object call(Object o, ShoutsDao.SearchShoutsDao searchShoutsDao) {
-                        searchShoutsDao.getRefreshObserver().onNext(null);
-                        return null;
-                    }
+                .withLatestFrom(daoObservable, (o, searchShoutsDao) -> {
+                    searchShoutsDao.getRefreshObserver().onNext(null);
+                    return null;
                 });
+    }
+
+    public Observable<Object> getLoadMoreObservable() {
+        return loadMoreObservable;
     }
 
     public Observable<Object> getRefreshShoutsObservable() {
@@ -215,6 +199,11 @@ public class SearchShoutsResultsPresenter {
 
     public Observable<Integer> getCountObservable() {
         return countObservable;
+    }
+
+    @NonNull
+    public Observable<String> getBookmarkSuccessMessage() {
+        return mBookmarkHelper.getBookmarkSuccessMessage();
     }
 
     public void onShareClicked() {

@@ -13,11 +13,14 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.Gson;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.CategoriesDao;
 import com.shoutit.app.android.dao.DiscoverShoutsDao;
 import com.shoutit.app.android.dao.DiscoversDao;
 import com.shoutit.app.android.dao.ListeningsDao;
+import com.shoutit.app.android.dao.PagesDao;
 import com.shoutit.app.android.dao.ProfilesDao;
+import com.shoutit.app.android.dao.PublicPagesDaos;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.SortTypesDao;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
@@ -27,7 +30,10 @@ import com.shoutit.app.android.dao.TagsDao;
 import com.shoutit.app.android.db.RecentSearchesTable;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.mixpanel.MixPanel;
-import com.shoutit.app.android.utils.pusher.PusherHelper;
+import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
+import com.shoutit.app.android.facebook.FacebookHelper;
+import com.shoutit.app.android.view.chats.LocalMessageBus;
+import com.shoutit.app.android.view.conversations.RefreshConversationBus;
 import com.squareup.picasso.Picasso;
 
 
@@ -85,6 +91,8 @@ public interface BaseActivityComponent {
 
     ListeningsDao listeningsDao();
 
+    PublicPagesDaos publicPagesDaos();
+
     GoogleApiClient googleApiClient();
 
     UserPreferences userPreferences();
@@ -107,7 +115,20 @@ public interface BaseActivityComponent {
 
     ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter();
 
-    PusherHelper pusherHelper();
+    PusherHelperHolder pusher();
+
+    @Named("user")
+    PusherHelperHolder userPusher();
 
     MixPanel mixPanel();
+
+    PagesDao pagesDao();
+
+    FacebookHelper facebookHelper();
+
+    BookmarksDao bookmarkDao();
+
+    LocalMessageBus localMessageBus();
+
+    RefreshConversationBus refreshConversationBus();
 }

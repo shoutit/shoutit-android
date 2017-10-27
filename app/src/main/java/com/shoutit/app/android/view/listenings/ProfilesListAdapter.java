@@ -17,6 +17,7 @@ import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.TextHelper;
+import com.shoutit.app.android.view.chats.chats_adapter.AvatarHelper;
 import com.shoutit.app.android.viewholders.NoDataTextViewHolder;
 import com.shoutit.app.android.viewholders.NoDataViewHolder;
 import com.squareup.picasso.Picasso;
@@ -71,7 +72,7 @@ public class ProfilesListAdapter extends BaseAdapter {
             final BaseProfile profile = item.getProfile();
 
             picasso.load(profile.getImage())
-                    .placeholder(R.drawable.ic_rect_avatar_placeholder)
+                    .placeholder(AvatarHelper.getPlaceholderId(profile.getType()))
                     .into(target);
 
             nameTextView.setText(profile.getName());

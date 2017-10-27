@@ -12,9 +12,9 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -31,12 +31,12 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.App;
+import com.shoutit.app.android.AppPreferences;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.CreateOfferShoutWithImageRequest;
 import com.shoutit.app.android.api.model.CreateShoutResponse;
-import com.shoutit.app.android.api.model.Currency;
 import com.shoutit.app.android.api.model.EditShoutPriceRequest;
 import com.shoutit.app.android.api.model.EditShoutPublishToFacebook;
 import com.shoutit.app.android.utils.AmazonHelper;
@@ -45,12 +45,11 @@ import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.view.createshout.DialogsHelper;
 import com.shoutit.app.android.view.createshout.publish.PublishShoutActivity;
-import com.shoutit.app.android.view.loginintro.FacebookHelper;
+import com.shoutit.app.android.facebook.FacebookHelper;
 import com.shoutit.app.android.widget.CurrencySpinnerAdapter;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -74,12 +73,10 @@ public class PublishMediaShoutFragment extends Fragment {
 
     @Bind(R.id.publish_media_shout_preview)
     ImageView mPublishMediaShoutPreview;
-    @Bind(R.id.camera_cool_icon)
-    ImageView mPublishMediaCool;
     @Bind(R.id.camera_published_price)
-    EditText mCameraPublishedPrice;
+    EditText mPriceEt;
     @Bind(R.id.camera_published_currency)
-    Spinner mCameraPublishedCurrency;
+    Spinner mCurrencySpinner;
     @Bind(R.id.camera_progress)
     View progress;
     @Bind(R.id.camera_published_done)
@@ -100,6 +97,9 @@ public class PublishMediaShoutFragment extends Fragment {
 
     @Inject
     UserPreferences mUserPreferences;
+
+    @Inject
+    AppPreferences mAppPreferences;
 
     private CurrencySpinnerAdapter mCurrencyAdapter;
 
@@ -160,10 +160,10 @@ public class PublishMediaShoutFragment extends Fragment {
         setUpFacebookCheckbox();
         showShareInfoDialogIfNeeded();
 
-        mCameraPublishedCurrency.setAdapter(mCurrencyAdapter);
-        mCameraPublishedCurrency.setEnabled(false);
+        mCurrencySpinner.setAdapter(mCurrencyAdapter);
+        mCurrencySpinner.setEnabled(false);
 
-        mCameraPublishedPrice.addTextChangedListener(new TextWatcher() {
+        mPriceEt.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -176,7 +176,7 @@ public class PublishMediaShoutFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                mCameraPublishedCurrency.setEnabled(s.length() != 0);
+                mCurrencySpinner.setEnabled(s.length() != 0);
             }
         });
 
@@ -189,13 +189,12 @@ public class PublishMediaShoutFragment extends Fragment {
         }
 
         closeButton.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
-        mPublishMediaCool.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
     }
 
     private void setUpFacebookCheckbox() {
         //noinspection ConstantConditions
         faceBookCheckbox.setChecked(mFacebookHelper.hasRequiredPermissionInApi(
-                mUserPreferences.getUser(), FacebookHelper.PERMISSION_PUBLISH_ACTIONS));
+                mUserPreferences.getUserOrPage(), new String[]{FacebookHelper.PERMISSION_PUBLISH_ACTIONS}));
 
         mCompositeSubscription.add(
                 RxView.clicks(faceBookCheckbox)
@@ -212,33 +211,27 @@ public class PublishMediaShoutFragment extends Fragment {
                                 showProgress(true);
 
                                 return mFacebookHelper.askForPermissionIfNeeded(getActivity(),
-                                        FacebookHelper.PERMISSION_PUBLISH_ACTIONS, mCallbackManager, true)
+                                        new String[]{FacebookHelper.PERMISSION_PUBLISH_ACTIONS}, mCallbackManager, true)
                                         .observeOn(MyAndroidSchedulers.mainThread());
                             }
                         })
-                        .subscribe(new Action1<ResponseOrError<Boolean>>() {
-                            @Override
-                            public void call(ResponseOrError<Boolean> responseOrError) {
-                                showProgress(false);
+                        .subscribe(responseOrError -> {
+                            showProgress(false);
 
-                                if (responseOrError.isData()) {
-                                    final Boolean isPermissionGranted = responseOrError.data();
-                                    if (!isPermissionGranted) {
-                                        faceBookCheckbox.setChecked(false);
-                                        showPermissionNotGrantedError();
-                                    }
-                                } else {
+                            if (responseOrError.isData()) {
+                                final Boolean isPermissionGranted = responseOrError.data();
+                                if (!isPermissionGranted) {
                                     faceBookCheckbox.setChecked(false);
-                                    showApiError(responseOrError.error());
+                                    showPermissionNotGrantedError();
                                 }
-                            }
-                        }, new Action1<Throwable>() {
-                            @Override
-                            public void call(Throwable throwable) {
-                                showProgress(false);
+                            } else {
                                 faceBookCheckbox.setChecked(false);
-                                showApiError(throwable);
+                                showApiError(responseOrError.error());
                             }
+                        }, throwable -> {
+                            showProgress(false);
+                            faceBookCheckbox.setChecked(false);
+                            showApiError(throwable);
                         })
         );
     }
@@ -282,6 +275,7 @@ public class PublishMediaShoutFragment extends Fragment {
                             createdShoutOfferId = createShoutResponse.getId();
                             mWebUrl = createShoutResponse.getWebUrl();
                             mCameraPublishedDone.setEnabled(true);
+                            mAppPreferences.increaseCreatedShouts();
                         }, throwable -> {
                             Log.e(TAG, "error", throwable);
                             showApiError(throwable);
@@ -321,65 +315,60 @@ public class PublishMediaShoutFragment extends Fragment {
                         mPublishMediaShoutPreview.setImageURI(Uri.fromFile(file));
                     }
                 })
-                .flatMap(new Func1<File, Observable<String>>() {
-                    @Override
-                    public Observable<String> call(File file) {
-                        return mAmazonHelper.uploadShoutMediaImageObservable(file)
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(MyAndroidSchedulers.mainThread());
-                    }
-                })
-                .flatMap(new Func1<String, Observable<BothParams<String, String>>>() {
-                    @Override
-                    public Observable<BothParams<String, String>> call(final String thumb) {
-                        return mAmazonHelper.uploadShoutMediaVideoObservable(new File(mFile))
-                                .map(new Func1<String, BothParams<String, String>>() {
-                                    @Override
-                                    public BothParams<String, String> call(String file) {
-                                        return BothParams.of(thumb, file);
-                                    }
-                                });
-                    }
-                })
-                .flatMap(new Func1<BothParams<String, String>, Observable<CreateShoutResponse>>() {
-                    @Override
-                    public Observable<CreateShoutResponse> call(BothParams<String, String> urls) {
-                        return mApiService.createShoutOffer(CreateOfferShoutWithImageRequest.withVideo(urls.param1(), urls.param2()))
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(MyAndroidSchedulers.mainThread());
-                    }
-                });
+                .flatMap(file -> mAmazonHelper.uploadShoutMediaImageObservable(file)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(MyAndroidSchedulers.mainThread()))
+                .flatMap(thumb -> mAmazonHelper.uploadShoutMediaVideoObservable(new File(mFile))
+                        .map((Func1<String, BothParams<String, String>>) file -> BothParams.of(thumb, file)))
+                .flatMap(urls -> mApiService.createShoutOffer(CreateOfferShoutWithImageRequest.withVideo(urls.param1(), urls.param2()))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(MyAndroidSchedulers.mainThread()));
     }
 
     private void downloadCurrencies() {
+        mCurrencySpinner.setEnabled(false);
         mCompositeSubscription.add(mApiService.getCurrencies()
                 .subscribeOn(Schedulers.io())
                 .observeOn(MyAndroidSchedulers.mainThread())
                 .subscribe(
-                        new Action1<List<Currency>>() {
-                            @Override
-                            public void call(List<Currency> currencies) {
-                                mCurrencyAdapter.setData(PriceUtils.transformCurrencyToPair(currencies));
-                            }
-                        }, new Action1<Throwable>() {
-                            @Override
-                            public void call(Throwable throwable) {
-                                Log.e(TAG, "error", throwable);
-                                showApiError(throwable);
-                            }
+                        currencies -> {
+                            mCurrencyAdapter.setData(PriceUtils.transformCurrencyToPair(currencies));
+                            removeRetryCurrenciesListener();
+                            mCurrencySpinner.setEnabled(!Strings.isNullOrEmpty(mPriceEt.getText().toString()));
+                        }, throwable -> {
+                            Log.e(TAG, "error", throwable);
+                            showApiError(throwable);
+                            setRetryCurrenciesListener();
+                            mCurrencySpinner.setEnabled(!Strings.isNullOrEmpty(mPriceEt.getText().toString()));
                         }));
+    }
+
+    public void setRetryCurrenciesListener() {
+        mCurrencySpinner.setEnabled(!Strings.isNullOrEmpty(mPriceEt.getText().toString()));
+        mCurrencySpinner.setOnTouchListener((v, event) -> {
+            downloadCurrencies();
+            return true;
+        });
+    }
+
+    public void removeRetryCurrenciesListener() {
+        mCurrencySpinner.setOnTouchListener(null);
     }
 
     @SuppressWarnings("unchecked")
     @OnClick(R.id.camera_published_done)
     public void doneClicked() {
-        Preconditions.checkNotNull(mCameraPublishedPrice);
+        Preconditions.checkNotNull(mPriceEt);
 
-        final String price = mCameraPublishedPrice.getText().toString();
+        if (!areDataValid()) {
+            return;
+        }
+
+        final String price = mPriceEt.getText().toString();
         if (!Strings.isNullOrEmpty(price)) {
             showProgress(true);
             final long priceInCents = PriceUtils.getPriceInCents(price);
-            final PriceUtils.SpinnerCurrency selectedItem = (PriceUtils.SpinnerCurrency) mCameraPublishedCurrency.getSelectedItem();
+            final PriceUtils.SpinnerCurrency selectedItem = (PriceUtils.SpinnerCurrency) mCurrencySpinner.getSelectedItem();
             mCompositeSubscription.add(
                     mApiService.editShoutPrice(createdShoutOfferId, new EditShoutPriceRequest(priceInCents, selectedItem.getCode(), faceBookCheckbox.isChecked()))
                             .subscribeOn(Schedulers.io())
@@ -401,6 +390,20 @@ public class PublishMediaShoutFragment extends Fragment {
         } else {
             finishActivity();
         }
+    }
+
+    private boolean areDataValid() {
+        if (!Strings.isNullOrEmpty(mPriceEt.getText().toString())) {
+            String currencyCode = ((PriceUtils.SpinnerCurrency) mCurrencySpinner.getSelectedItem()).getCode();
+            currencyCode = currencyCode.equals(mCurrencyAdapter.getStartingText()) ? null : currencyCode;
+
+            if (Strings.isNullOrEmpty(currencyCode)) {
+                ColoredSnackBar.error(ColoredSnackBar.contentView(getActivity()), getString(R.string.request_acitvity_currency_prompt_error), Snackbar.LENGTH_SHORT).show();
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @NonNull

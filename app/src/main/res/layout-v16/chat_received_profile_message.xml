@@ -48,6 +48,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end|top"
                 android:background="@drawable/chat_time_gradient"
+                android:paddingEnd="@dimen/chat_item_time_right_margin"
+                android:paddingRight="@dimen/chat_item_time_right_margin"
+                android:layout_marginTop="2dp"
                 android:textColor="@android:color/white"
                 tools:text="18:04" />
         </FrameLayout>
@@ -62,6 +65,7 @@
                 android:id="@+id/chats_message_profile_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textIsSelectable="true"
                 android:lines="1"
                 android:ellipsize="end"
                 tools:text="John Smithdsfdsfdsf" />

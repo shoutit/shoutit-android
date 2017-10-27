@@ -32,7 +32,7 @@ public class ConversationsPagerAdapter extends FragmentPagerAdapter {
             case POSITION_PUBLIC_CONVERSATIONS:
                 return ConversationsFragment.newInstance(false);
             default:
-                throw new RuntimeException("Unknown adpater position: " + position);
+                throw new RuntimeException("Unknown adapter position: " + position);
         }
     }
 
@@ -44,7 +44,7 @@ public class ConversationsPagerAdapter extends FragmentPagerAdapter {
             case POSITION_PUBLIC_CONVERSATIONS:
                 return context.getString(R.string.conversations_public_ab_title);
             default:
-                throw new RuntimeException("Unknown adpater position: " + position);
+                throw new RuntimeException("Unknown adapter position: " + position);
         }
     }
 

@@ -19,7 +19,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/ic_rect_avatar_placeholder" />
+        android:src="@drawable/default_profile" />
 
     <LinearLayout
         android:layout_width="match_parent"

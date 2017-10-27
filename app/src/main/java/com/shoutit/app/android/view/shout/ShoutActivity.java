@@ -5,23 +5,23 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,23 +33,27 @@ import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.Promotion;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.model.MobilePhoneResponse;
+import com.shoutit.app.android.utils.AppseeHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.ImageHelper;
 import com.shoutit.app.android.utils.IntentHelper;
+import com.shoutit.app.android.utils.MyGridLayoutManager;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.RtlUtils;
+import com.shoutit.app.android.utils.UpNavigationHelper;
 import com.shoutit.app.android.view.ReportDialog;
 import com.shoutit.app.android.view.chats.ChatActivity;
 import com.shoutit.app.android.view.chats.chatsfirstconversation.ChatFirstConversationActivity;
 import com.shoutit.app.android.view.conversations.ConversationsActivity;
 import com.shoutit.app.android.view.createshout.edit.EditShoutActivity;
 import com.shoutit.app.android.view.main.MainActivity;
-import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
+import com.shoutit.app.android.view.profile.ProfileIntentHelper;
 import com.shoutit.app.android.view.profile.tagprofile.TagProfileActivity;
 import com.shoutit.app.android.view.promote.PromoteActivity;
 import com.shoutit.app.android.view.promote.promoted.PromotedActivity;
@@ -81,8 +85,8 @@ public class ShoutActivity extends BaseActivity {
     Toolbar toolbar;
     @Bind(R.id.shout_recycler_view)
     RecyclerView recyclerView;
-    @Bind(R.id.shout_progress_bar)
-    ProgressBar progressBar;
+    @Bind(R.id.base_progress)
+    View progressView;
     @Bind(R.id.shout_bottom_toolbar)
     View bottomBar;
     @Bind(R.id.shout_bottom_bar_call_or_promote)
@@ -93,6 +97,8 @@ public class ShoutActivity extends BaseActivity {
     TextView chatOrChatsTextView;
     @Bind(R.id.shout_bottom_bar_more)
     TextView showMoreIcon;
+    @Bind(R.id.shout_item_not_exist_tv)
+    TextView shoutNotExistTv;
 
     @Inject
     ShoutPresenter presenter;
@@ -116,6 +122,8 @@ public class ShoutActivity extends BaseActivity {
         setContentView(R.layout.activity_shout);
         ButterKnife.bind(this);
 
+        AppseeHelper.start(this);
+
         setUpActionBar();
         setUpBottomBar();
         setUpAdapter();
@@ -132,96 +140,79 @@ public class ShoutActivity extends BaseActivity {
                 .compose(this.<Throwable>bindToLifecycle())
                 .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(this)));
 
+        presenter.getShoutNotFoundErrorObservable()
+                .compose(bindToLifecycle())
+                .subscribe(throwable -> {
+                    shoutNotExistTv.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.GONE);
+                    bottomBar.setVisibility(View.GONE);
+                });
+
         presenter.getProgressObservable()
                 .compose(this.<Boolean>bindToLifecycle())
-                .subscribe(RxView.visibility(progressBar));
+                .subscribe(RxView.visibility(progressView));
 
         presenter.getRelatedShoutSelectedObservable()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String shoutId) {
-                        startActivity(ShoutActivity.newIntent(ShoutActivity.this, shoutId));
-                    }
+                .subscribe(shoutId -> {
+                    startActivity(ShoutActivity.newIntent(ShoutActivity.this, shoutId));
                 });
 
         presenter.getSeeAllRelatedShoutObservable()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String shoutId) {
-                        startActivity(SearchShoutsResultsActivity.newIntent(
-                                ShoutActivity.this, null, shoutId, SearchPresenter.SearchType.RELATED_SHOUTS));
-                    }
+                .subscribe(shoutId -> {
+                    startActivity(SearchShoutsResultsActivity.newIntent(
+                            ShoutActivity.this, null, shoutId, SearchPresenter.SearchType.RELATED_SHOUTS));
                 });
 
         presenter.getTitleObservable()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String title) {
-                        getSupportActionBar().setTitle(title);
-                    }
+                .subscribe(title -> {
+                    final ActionBar supportActionBar = getSupportActionBar();
+                    assert supportActionBar != null;
+                    supportActionBar.setTitle(title);
                 });
 
         presenter.getUserShoutSelectedObservable()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String shoutId) {
-                        startActivity(ShoutActivity.newIntent(ShoutActivity.this, shoutId));
-                    }
+                .subscribe(shoutId -> {
+                    startActivity(ShoutActivity.newIntent(ShoutActivity.this, shoutId));
                 });
 
         presenter.getVisitProfileObservable()
-                .compose(this.<User>bindToLifecycle())
-                .subscribe(new Action1<User>() {
-                    @Override
-                    public void call(User user) {
-                        startActivity(UserOrPageProfileActivity.newIntent(ShoutActivity.this, user.getUsername()));
-                    }
+                .compose(this.<BaseProfile>bindToLifecycle())
+                .subscribe(user -> {
+                    startActivity(ProfileIntentHelper.newIntent(ShoutActivity.this, user));
                 });
 
         presenter.getAddToCartSubject()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String s) {
-                        Toast.makeText(ShoutActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
-                    }
+                .subscribe(s -> {
+                    Toast.makeText(ShoutActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
                 });
 
         presenter.getOnCategoryClickedObservable()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String categorySlug) {
-                        startActivity(TagProfileActivity.newIntent(ShoutActivity.this, categorySlug));
-                    }
+                .subscribe(categorySlug -> {
+                    startActivity(TagProfileActivity.newIntent(ShoutActivity.this, categorySlug));
                 });
 
         presenter.getCallErrorObservable()
                 .compose(this.<ResponseOrError<MobilePhoneResponse>>bindToLifecycle())
-                .subscribe(new Action1<ResponseOrError<MobilePhoneResponse>>() {
-                    @Override
-                    public void call(ResponseOrError<MobilePhoneResponse> responseOrError) {
-                        if (responseOrError.isData()) {
-                            final String phoneNumber = responseOrError.data().getMobile();
+                .subscribe(responseOrError -> {
+                    if (responseOrError.isData()) {
+                        final String phoneNumber = responseOrError.data().getMobile();
 
-                            new AlertDialog.Builder(ShoutActivity.this)
-                                    .setMessage(getString(R.string.call_dialog_message, phoneNumber))
-                                    .setPositiveButton(getString(R.string.call_dialog_positive_button), new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            startCall(phoneNumber);
-                                        }
-                                    })
-                                    .setNegativeButton(getString(R.string.dialog_cancel_button), null)
-                                    .show();
+                        new AlertDialog.Builder(ShoutActivity.this)
+                                .setMessage(getString(R.string.call_dialog_message, phoneNumber))
+                                .setPositiveButton(getString(R.string.call_dialog_positive_button), (dialog, which) -> {
+                                    startCall(phoneNumber);
+                                })
+                                .setNegativeButton(getString(R.string.dialog_cancel_button), null)
+                                .show();
 
-                        } else {
-                            Snackbar.make(findViewById(android.R.id.content), R.string.no_phone_number_error, Snackbar.LENGTH_SHORT).show();
-                        }
+                    } else {
+                        Snackbar.make(findViewById(android.R.id.content), R.string.no_phone_number_error, Snackbar.LENGTH_SHORT).show();
                     }
                 });
 
@@ -245,43 +236,31 @@ public class ShoutActivity extends BaseActivity {
                             Snackbar.make(findViewById(android.R.id.content), R.string.delete_shout_error, Snackbar.LENGTH_SHORT).show();
                         }
                     }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        Snackbar.make(findViewById(android.R.id.content), R.string.delete_shout_error, Snackbar.LENGTH_SHORT).show();
-                    }
+                }, throwable -> {
+                    Snackbar.make(findViewById(android.R.id.content), R.string.delete_shout_error, Snackbar.LENGTH_SHORT).show();
                 });
 
         presenter.getShowDeleteDialogObservable()
                 .compose(this.<Boolean>bindToLifecycle())
-                .subscribe(new Action1<Boolean>() {
-                    @Override
-                    public void call(Boolean aBoolean) {
-                        new AlertDialog.Builder(ShoutActivity.this)
-                                .setTitle(R.string.delete_shout_dialog_title)
-                                .setMessage(getString(R.string.delete_shout_dialog_message))
-                                .setPositiveButton(getString(R.string.delete_shout_dialog_button), new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        presenter.getDeleteShoutObserver().onNext(null);
+                .subscribe(aBoolean -> {
+                    new AlertDialog.Builder(ShoutActivity.this)
+                            .setTitle(R.string.delete_shout_dialog_title)
+                            .setMessage(getString(R.string.delete_shout_dialog_message))
+                            .setPositiveButton(getString(R.string.delete_shout_dialog_button), (dialog, which) -> {
+                                presenter.getDeleteShoutObserver().onNext(null);
 
-                                    }
-                                })
-                                .setNegativeButton(getString(R.string.dialog_cancel_button), null)
-                                .show();
-                    }
+                            })
+                            .setNegativeButton(getString(R.string.dialog_cancel_button), null)
+                            .show();
                 });
 
         presenter.getReportShoutObservable()
                 .compose(this.<Response<Object>>bindToLifecycle())
-                .subscribe(new Action1<Response<Object>>() {
-                    @Override
-                    public void call(Response<Object> objectResponse) {
-                        if (objectResponse.isSuccessful()) {
-                            ColoredSnackBar.success(findViewById(android.R.id.content), R.string.report_send_success, Snackbar.LENGTH_SHORT).show();
-                        } else {
-                            ColoredSnackBar.error(findViewById(android.R.id.content), R.string.error_default, Snackbar.LENGTH_SHORT);
-                        }
+                .subscribe(objectResponse -> {
+                    if (objectResponse.isSuccessful()) {
+                        ColoredSnackBar.success(findViewById(android.R.id.content), R.string.report_send_success, Snackbar.LENGTH_SHORT).show();
+                    } else {
+                        ColoredSnackBar.error(findViewById(android.R.id.content), R.string.error_default, Snackbar.LENGTH_SHORT);
                     }
                 }, ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(this)));
 
@@ -304,6 +283,14 @@ public class ShoutActivity extends BaseActivity {
                 .subscribe(o -> {
                     ColoredSnackBar.error(ColoredSnackBar.contentView(ShoutActivity.this), R.string.error_action_only_for_logged_in_user, Snackbar.LENGTH_SHORT).show();
                 });
+
+        presenter.getBookmarkSuccesMessageObservable()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(ColoredSnackBar.successSnackBarAction(ColoredSnackBar.contentView(this)));
+
+        presenter.getLikeApiMessage()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(ColoredSnackBar.successSnackBarAction(ColoredSnackBar.contentView(this)));
 
         presenter.getShareObservable()
                 .compose(this.<String>bindToLifecycle())
@@ -330,6 +317,10 @@ public class ShoutActivity extends BaseActivity {
                     startActivity(PromotedActivity.newIntent(
                             ShoutActivity.this, promotionJson, shout.getTitle()));
                 });
+
+        presenter.getMarkAsObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
     }
 
     private void startCall(String phoneNumber) {
@@ -428,8 +419,8 @@ public class ShoutActivity extends BaseActivity {
     }
 
     private void setUpAdapter() {
-        final GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
-        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+        final GridLayoutManager layoutManager = new MyGridLayoutManager(this, 2);
+        layoutManager.setSpanSizeLookup(new MyGridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
                 if (adapter.getItemViewType(position) == ShoutAdapter.VIEW_TYPE_USER_SHOUTS) {
@@ -442,7 +433,7 @@ public class ShoutActivity extends BaseActivity {
 
         final boolean rtlEnable = RtlUtils.isRtlEnabled(this);
         final int spacing = getResources().getDimensionPixelSize(R.dimen.shout_item_padding);
-        final int bottomSpacing = getResources().getDimensionPixelSize(R.dimen.shout_bottom_bar);
+        final int bottomSpacing = getResources().getDimensionPixelSize(R.dimen.last_item_margin);
         recyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
@@ -463,8 +454,6 @@ public class ShoutActivity extends BaseActivity {
                     } else {
                         outRect.right = spacing;
                     }
-                } else if (viewType == ShoutAdapter.VIEW_TYPE_RELATED_SHOUTS_CONTAINER) {
-                    return;
                 } else {
                     outRect.right = spacing;
                     outRect.left = spacing;
@@ -473,11 +462,14 @@ public class ShoutActivity extends BaseActivity {
         });
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
+        ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
     }
 
     private void setUpActionBar() {
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        final ActionBar supportActionBar = getSupportActionBar();
+        assert supportActionBar != null;
+        supportActionBar.setDisplayHomeAsUpEnabled(true);
     }
 
     @Override
@@ -496,8 +488,13 @@ public class ShoutActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                setResult(RESULT_OK);
-                finish();
+                new UpNavigationHelper(this) {
+                    @Override
+                    public void handleActivityFinish() {
+                        setResult(RESULT_OK);
+                        super.handleActivityFinish();
+                    }
+                }.onUpButtonClicked();
                 return true;
             case R.id.shouts_search:
                 startActivity(MainSearchActivity.newIntent(this));

@@ -8,6 +8,7 @@ import android.net.Uri;
 import com.appunite.rx.functions.Functions1;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.dagger.ForApplication;
 import com.shoutit.app.android.utils.BuildTypeUtils;
 import com.shoutit.app.android.utils.LogHelper;
@@ -25,7 +26,9 @@ import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
+@Singleton
 public class MixPanel {
     private static final String TAG = MixPanel.class.getSimpleName();
 
@@ -34,8 +37,6 @@ public class MixPanel {
     private static final String LOCAL = "a5774a99b9068ae66129859421ade687";
     private static final String API_CLIENT = "shoutit-android";
 
-    private static final String PEOPLE_FIELD_USER_NAME = "username";
-    private static final String PEOPLE_FIELD_EMAIL = "Email";
     /**
      * EVENTS
      **/
@@ -66,15 +67,22 @@ public class MixPanel {
     }
 
     public void initMixPanel() {
-        userPreferences.getUserObservable()
-                .filter(Functions1.isNotNull())
-                .distinctUntilChanged()
-                .subscribe(user -> {
-                    mixpanel.identify(user.getId());
-                    mixpanel.getPeople().identify(user.getId());
-                    mixpanel.getPeople().set(PEOPLE_FIELD_USER_NAME, user.getUsername());
-                    mixpanel.getPeople().set(PEOPLE_FIELD_EMAIL, user.getEmail());
-                });
+        if (userPreferences.isNormalUser()) {
+            userPreferences.getPageOrUserObservable()
+                    .filter(Functions1.isNotNull())
+                    .distinctUntilChanged()
+                    .subscribe(user -> identifyMixPanel(user.getId()));
+        } else {
+            final User guestUser = userPreferences.getGuestUser();
+            if (guestUser != null) {
+                identifyMixPanel(guestUser.getId());
+            }
+        }
+    }
+
+    private void identifyMixPanel(@Nonnull String userId) {
+        mixpanel.identify(userId);
+        mixpanel.getPeople().identify(userId);
     }
 
     private String getToken() {
@@ -128,7 +136,11 @@ public class MixPanel {
     }
 
     public void showNotificationIfAvailable(@Nonnull Activity activity) {
-        mixpanel.getPeople().showNotificationIfAvailable(activity);
+        if (mixpanel.getPeople().getDistinctId() != null) {
+            mixpanel.getPeople().showNotificationIfAvailable(activity);
+        } else {
+            LogHelper.logIfDebug(TAG, "Mixpanel people distinctId is null");
+        }
     }
 
     public void utmParamsFromIntent(@Nonnull final Intent intent) {

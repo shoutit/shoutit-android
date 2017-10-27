@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v7.widget.LinearLayoutManager;
+import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -13,13 +13,17 @@ import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.utils.ApiMessagesHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.chats.chat_info.chats_users_list.ChatUsersListAdapter;
 import com.shoutit.app.android.view.chats.chat_info.chats_users_list.ChatUsersListComponent;
 import com.shoutit.app.android.view.chats.chat_info.chats_users_list.ChatUsersListModule;
 import com.shoutit.app.android.view.chats.chat_info.chats_users_list.DaggerChatUsersListComponent;
+import com.shoutit.app.android.view.profile.ProfileIntentHelper;
 
 import java.util.List;
 
@@ -48,7 +52,9 @@ public class ChatBlockedUsersActivity extends BaseActivity implements ChatBlocke
     ChatBlockedUsersPresenter mChatParticipantsPresenter;
 
     @Inject
-    UnblockDialog dialog;
+    UnblockDialog unblockDialog;
+    @Inject
+    BlockedDialog blockedDialog;
 
     public static Intent newIntent(Context context, String conversationId) {
         return new Intent(context, ChatBlockedUsersActivity.class)
@@ -70,7 +76,7 @@ public class ChatBlockedUsersActivity extends BaseActivity implements ChatBlocke
             }
         });
 
-        mChatParticipantRecyclerview.setLayoutManager(new LinearLayoutManager(this));
+        mChatParticipantRecyclerview.setLayoutManager(new MyLinearLayoutManager(this));
         mChatParticipantRecyclerview.setAdapter(adapter);
 
         mChatParticipantsPresenter.register(this);
@@ -111,7 +117,22 @@ public class ChatBlockedUsersActivity extends BaseActivity implements ChatBlocke
     }
 
     @Override
-    public void showDialog(String id, String name) {
-        dialog.show(id, name, mChatParticipantsPresenter);
+    public void showProfile(String userName, boolean isPage) {
+        startActivity(ProfileIntentHelper.newIntent(this, userName, isPage));
+    }
+
+    @Override
+    public void showUnblockConfirmDialog(String id, String name) {
+        unblockDialog.show(id, name, mChatParticipantsPresenter);
+    }
+
+    @Override
+    public void showApiMessage(ApiMessageResponse apiMessageResponse) {
+        ApiMessagesHelper.showApiMessage(this, apiMessageResponse);
+    }
+
+    @Override
+    public void showDialog(String id, String name, String userName, boolean isPage) {
+        blockedDialog.show(id, name, userName, isPage, mChatParticipantsPresenter);
     }
 }

@@ -17,18 +17,22 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.ListenResponse;
+import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.api.model.RelatedTagsResponse;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
 import com.shoutit.app.android.api.model.TagDetail;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.ForActivity;
+import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.dao.TagsDao;
 import com.shoutit.app.android.model.TagShoutsPointer;
+import com.shoutit.app.android.utils.BookmarkHelper;
 import com.shoutit.app.android.utils.PromotionHelper;
-import com.shoutit.app.android.view.profile.ProfileAdapterItems;
-import com.shoutit.app.android.view.profile.ProfilePresenter;
+import com.shoutit.app.android.view.profile.BaseProfileAdapterItems;
+import com.shoutit.app.android.view.profile.user.ProfilePresenter;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.subsearch.SubSearchActivity;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
@@ -40,11 +44,9 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
-import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.functions.Func3;
@@ -61,12 +63,12 @@ public class TagProfilePresenter implements ProfilePresenter {
     private final PublishSubject<Throwable> errorSubject = PublishSubject.create();
     private final PublishSubject<Object> moreMenuOptionClickedSubject = PublishSubject.create();
     private final PublishSubject<Object> actionOnlyForLoggedInUserSubject = PublishSubject.create();
-    private final PublishSubject<String> profileToOpenSubject = PublishSubject.create();
+    private final PublishSubject<ProfileType> profileToOpenSubject = PublishSubject.create();
     private final PublishSubject<String> showAllShoutsSubject = PublishSubject.create();
     private final PublishSubject<Object> shareInitSubject = PublishSubject.create();
     private final PublishSubject<Object> searchMenuItemClickSubject = PublishSubject.create();
-    private final PublishSubject<String> listenSuccess = PublishSubject.create();
-    private final PublishSubject<String> unListenSuccess = PublishSubject.create();
+    private final PublishSubject<ListenResponse> listenSuccess = PublishSubject.create();
+    private final PublishSubject<ListenResponse> unListenSuccess = PublishSubject.create();
 
     private final Observable<String> shareObservable;
     private final Observable<String> avatarObservable;
@@ -82,18 +84,27 @@ public class TagProfilePresenter implements ProfilePresenter {
     private final TagsDao tagsDao;
     @Nonnull
     private final String tagName;
+    @NonNull
+    private final BookmarkHelper mBookmarkHelper;
 
 
-    public TagProfilePresenter(TagsDao tagsDao, final ShoutsDao shoutsDao, @Nonnull final String tagName,
-                               @UiScheduler final Scheduler uiScheduler, @NetworkScheduler final Scheduler networkScheduler,
-                               final ApiService apiService, @ForActivity final Context context,
-                               UserPreferences userPreferences) {
+    public TagProfilePresenter(@NonNull TagsDao tagsDao,
+                               @NonNull final ShoutsDao shoutsDao,
+                               @Nonnull final String tagSlug,
+                               @NonNull @UiScheduler final Scheduler uiScheduler,
+                               @NonNull @NetworkScheduler final Scheduler networkScheduler,
+                               @NonNull final ApiService apiService,
+                               @NonNull@ForActivity final Context context,
+                               @NonNull UserPreferences userPreferences,
+                               @NonNull BookmarksDao bookmarksDao,
+                               @NonNull BookmarkHelper bookmarkHelper) {
         this.tagsDao = tagsDao;
-        this.tagName = tagName;
+        this.tagName = tagSlug;
+        mBookmarkHelper = bookmarkHelper;
         isLoggedInAsNormalUser = userPreferences.isNormalUser();
 
         /** Base Tag **/
-        final Observable<ResponseOrError<TagDetail>> tagRequestObservable = tagsDao.getTagObservable(tagName)
+        final Observable<ResponseOrError<TagDetail>> tagRequestObservable = tagsDao.getTagObservable(tagSlug)
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<TagDetail>>behaviorRefCount());
 
@@ -102,55 +113,42 @@ public class TagProfilePresenter implements ProfilePresenter {
                 .switchMap(new Func1<TagDetail, Observable<ResponseOrError<TagDetail>>>() {
                     @Override
                     public Observable<ResponseOrError<TagDetail>> call(final TagDetail tagDetail) {
-                        final Observable<ResponseOrError<ResponseBody>> request;
+                        final Observable<ResponseOrError<ListenResponse>> request;
                         if (tagDetail.isListening()) {
-                            request = apiService.unlistenTag(tagDetail.getName())
+                            request = apiService.unlistenTag(tagDetail.getSlug())
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
-                                    .doOnNext(new Action1<ResponseBody>() {
-                                        @Override
-                                        public void call(ResponseBody responseBody) {
-                                            unListenSuccess.onNext(tagDetail.getName());
-                                        }
-                                    })
-                                    .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
+                                    .doOnNext(unListenSuccess::onNext)
+                                    .compose(ResponseOrError.<ListenResponse>toResponseOrErrorObservable());
                         } else {
-                            request = apiService.listenTag(tagDetail.getName())
+                            request = apiService.listenTag(tagDetail.getSlug())
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
-                                    .doOnNext(new Action1<ResponseBody>() {
-                                        @Override
-                                        public void call(ResponseBody responseBody) {
-                                            listenSuccess.onNext(tagDetail.getName());
-                                        }
-                                    })
-                                    .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
+                                    .doOnNext(listenSuccess::onNext)
+                                    .compose(ResponseOrError.<ListenResponse>toResponseOrErrorObservable());
                         }
 
-                        return request.map(new Func1<ResponseOrError<ResponseBody>, ResponseOrError<TagDetail>>() {
-                            @Override
-                            public ResponseOrError<TagDetail> call(ResponseOrError<ResponseBody> response) {
-                                if (response.isData()) {
-                                    return ResponseOrError.fromData(tagDetail.toListenedTag());
-                                } else {
-                                    errorSubject.onNext(new Throwable());
-                                    // On error return current user in order to select/deselect already deselected/selected 'listenProfile' icon
-                                    return ResponseOrError.fromData(tagDetail.toListenedTag());
-                                }
+                        return request.map(response -> {
+                            if (response.isData()) {
+                                return ResponseOrError.fromData(tagDetail.toListenedTag(response.data().getNewListenersCount()));
+                            } else {
+                                errorSubject.onNext(new Throwable());
+                                // On error return current user in order to select/deselect already deselected/selected 'listenProfile' icon
+                                return ResponseOrError.fromData(tagDetail.toListenedTag(response.data().getNewListenersCount()));
                             }
                         });
                     }
                 })
-                .subscribe(tagsDao.getUpdatedTagObserver(tagName));
+                .subscribe(tagsDao.getUpdatedTagObserver(tagSlug));
 
         final Observable<TagDetail> successTagRequestObservable = tagRequestObservable
                 .compose(ResponseOrError.<TagDetail>onlySuccess());
 
-        final Observable<ProfileAdapterItems.TagInfoAdapterItem> tagAdapterItem = successTagRequestObservable
-                .map(new Func1<TagDetail, ProfileAdapterItems.TagInfoAdapterItem>() {
+        final Observable<BaseProfileAdapterItems.TagInfoAdapterItem> tagAdapterItem = successTagRequestObservable
+                .map(new Func1<TagDetail, BaseProfileAdapterItems.TagInfoAdapterItem>() {
                     @Override
-                    public ProfileAdapterItems.TagInfoAdapterItem call(TagDetail tagDetail) {
-                        return new ProfileAdapterItems.TagInfoAdapterItem(tagDetail, isLoggedInAsNormalUser,
+                    public BaseProfileAdapterItems.TagInfoAdapterItem call(TagDetail tagDetail) {
+                        return new BaseProfileAdapterItems.TagInfoAdapterItem(tagDetail, isLoggedInAsNormalUser,
                                 actionOnlyForLoggedInUserSubject, onListenActionClickedSubject, moreMenuOptionClickedSubject);
                     }
                 });
@@ -191,12 +189,12 @@ public class TagProfilePresenter implements ProfilePresenter {
         /** Shouts **/
         final Observable<ResponseOrError<ShoutsResponse>> shoutsRequestObservable = userPreferences
                 .getLocationObservable()
-                .first()
+                .take(1)
                 .filter(Functions1.isNotNull())
                 .switchMap(new Func1<UserLocation, Observable<ResponseOrError<ShoutsResponse>>>() {
                     @Override
                     public Observable<ResponseOrError<ShoutsResponse>> call(UserLocation userLocation) {
-                        return shoutsDao.getTagsShoutsObservable(new TagShoutsPointer(SHOUTS_PAGE_SIZE, tagName, userLocation.getLocationPointer()))
+                        return shoutsDao.getTagsShoutsObservable(new TagShoutsPointer(SHOUTS_PAGE_SIZE, tagSlug, userLocation.getLocationPointer()))
                                 .observeOn(uiScheduler);
                     }
                 })
@@ -218,7 +216,12 @@ public class TagProfilePresenter implements ProfilePresenter {
                             @Nullable
                             @Override
                             public BaseAdapterItem apply(@Nullable Shout shout) {
-                                return new ShoutAdapterItem(shout, false,  false, context, shoutSelectedSubject, PromotionHelper.promotionInfoOrNull(shout));
+                                assert shout != null;
+                                final BookmarkHelper.ShoutItemBookmarkHelper shoutItemBookmarkHelper = bookmarkHelper.getShoutItemBookmarkHelper();
+                                return new ShoutAdapterItem(shout, false,  false, context, shoutSelectedSubject,
+                                        PromotionHelper.promotionInfoOrNull(shout),
+                                        bookmarksDao.getBookmarkForShout(shout.getId(), shout.isBookmarked()),
+                                        shoutItemBookmarkHelper.getObserver(), shoutItemBookmarkHelper.getEnableObservable());
                             }
                         });
 
@@ -228,7 +231,7 @@ public class TagProfilePresenter implements ProfilePresenter {
 
         /** Related Tags **/
         final Observable<ResponseOrError<RelatedTagsResponse>> relatedTagsRequest = tagsDao
-                .getRelatedTagsObservable(tagName)
+                .getRelatedTagsObservable(tagSlug)
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<RelatedTagsResponse>>behaviorRefCount());
 
@@ -258,46 +261,33 @@ public class TagProfilePresenter implements ProfilePresenter {
                     public Observable<ResponseOrError<RelatedTagsResponse>> call(final ListenedTagWithRelatedTags listenedTagWithRelatedTags) {
                         final TagDetail tagDetail = listenedTagWithRelatedTags.getTagInSection();
 
-                        final Observable<ResponseOrError<ResponseBody>> request;
+                        final Observable<ResponseOrError<ListenResponse>> request;
                         if (tagDetail.isListening()) {
-                            request = apiService.unlistenTag(tagDetail.getName())
+                            request = apiService.unlistenTag(tagDetail.getSlug())
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
-                                    .doOnNext(new Action1<ResponseBody>() {
-                                        @Override
-                                        public void call(ResponseBody responseBody) {
-                                            unListenSuccess.onNext(tagDetail.getName());
-                                        }
-                                    })
-                                    .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
+                                    .doOnNext(unListenSuccess::onNext)
+                                    .compose(ResponseOrError.<ListenResponse>toResponseOrErrorObservable());
                         } else {
-                            request = apiService.listenTag(tagDetail.getName())
+                            request = apiService.listenTag(tagDetail.getSlug())
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
-                                    .doOnNext(new Action1<ResponseBody>() {
-                                        @Override
-                                        public void call(ResponseBody responseBody) {
-                                            listenSuccess.onNext(tagDetail.getName());
-                                        }
-                                    })
-                                    .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
+                                    .doOnNext(listenSuccess::onNext)
+                                    .compose(ResponseOrError.<ListenResponse>toResponseOrErrorObservable());
                         }
 
-                        return request.map(new Func1<ResponseOrError<ResponseBody>, ResponseOrError<RelatedTagsResponse>>() {
-                            @Override
-                            public ResponseOrError<RelatedTagsResponse> call(ResponseOrError<ResponseBody> response) {
-                                if (response.isData()) {
-                                    return ResponseOrError.fromData(updateRelatedTagsWithListenings(listenedTagWithRelatedTags));
-                                } else {
-                                    errorSubject.onNext(new Throwable());
-                                    // On error return current tag in order to select/deselect already deselected/selected 'listenTagProfile' icon
-                                    return ResponseOrError.fromData(listenedTagWithRelatedTags.getRelatedTagsResponse());
-                                }
+                        return request.map(response -> {
+                            if (response.isData()) {
+                                return ResponseOrError.fromData(updateRelatedTagsWithListenings(listenedTagWithRelatedTags, response.data()));
+                            } else {
+                                errorSubject.onNext(new Throwable());
+                                // On error return current tag in order to select/deselect already deselected/selected 'listenTagProfile' icon
+                                return ResponseOrError.fromData(listenedTagWithRelatedTags.getRelatedTagsResponse());
                             }
                         });
                     }
                 })
-                .subscribe(tagsDao.getUpdatedRelatedTagsObserver(tagName));
+                .subscribe(tagsDao.getUpdatedRelatedTagsObserver(tagSlug));
 
 
         /** All adapter items **/
@@ -305,9 +295,9 @@ public class TagProfilePresenter implements ProfilePresenter {
                 tagAdapterItem,
                 successRelatedTags,
                 shoutsSuccessResponse.startWith(ImmutableList.<List<BaseAdapterItem>>of()),
-                new Func3<ProfileAdapterItems.TagInfoAdapterItem, List<BaseAdapterItem>, List<BaseAdapterItem>, List<BaseAdapterItem>>() {
+                new Func3<BaseProfileAdapterItems.TagInfoAdapterItem, List<BaseAdapterItem>, List<BaseAdapterItem>, List<BaseAdapterItem>>() {
                     @Override
-                    public List<BaseAdapterItem> call(ProfileAdapterItems.TagInfoAdapterItem tagItem,
+                    public List<BaseAdapterItem> call(BaseProfileAdapterItems.TagInfoAdapterItem tagItem,
                                                       List<BaseAdapterItem> relatedTags,
                                                       List<BaseAdapterItem> shouts) {
                         final ImmutableList.Builder<BaseAdapterItem> builder = ImmutableList.builder();
@@ -323,8 +313,8 @@ public class TagProfilePresenter implements ProfilePresenter {
                             builder.add(new HeaderAdapterItem(
                                     context.getString(R.string.tag_profile_shouts, tagItem.getTagDetail().getName()).toUpperCase()))
                             .addAll(shouts)
-                            .add(new ProfileAdapterItems.SeeAllUserShoutsAdapterItem(
-                                    showAllShoutsSubject, tagName));
+                            .add(new BaseProfileAdapterItems.SeeAllUserShoutsAdapterItem(
+                                    showAllShoutsSubject, tagSlug));
                         }
 
                         return builder.build();
@@ -360,37 +350,38 @@ public class TagProfilePresenter implements ProfilePresenter {
                     @Override
                     public Intent call(Object o, TagDetail tagDetail) {
                         return SubSearchActivity.newIntent(context,
-                                SearchPresenter.SearchType.TAG_PROFILE, tagDetail.getUsername(),
-                                tagDetail.getName());
+                                SearchPresenter.SearchType.TAG_PROFILE, tagDetail.getSlug(),
+                                tagDetail.getSlug());
                     }
                 });
 
     }
 
-    private ProfileAdapterItems.RelatedTagAdapterItem getRelatedTagdapterItemForPosition(int position, TagDetail tag,
-                                                                                         RelatedTagsResponse relatedTagsResponse,
-                                                                                         int tagsNumberToDisplay) {
+    private BaseProfileAdapterItems.RelatedTagAdapterItem getRelatedTagdapterItemForPosition(int position, TagDetail tag,
+                                                                                             RelatedTagsResponse relatedTagsResponse,
+                                                                                             int tagsNumberToDisplay) {
         if (position == 0) {
-            return new ProfileAdapterItems.RelatedTagAdapterItem(true, false, tag, relatedTagsResponse,
+            return new BaseProfileAdapterItems.RelatedTagAdapterItem(true, false, tag, relatedTagsResponse,
                     onListenRelatedTagClickedSubject, profileToOpenSubject, actionOnlyForLoggedInUserSubject, isLoggedInAsNormalUser, tagsNumberToDisplay == 1);
         } else if (position == tagsNumberToDisplay - 1) {
-            return new ProfileAdapterItems.RelatedTagAdapterItem(false, true, tag, relatedTagsResponse,
+            return new BaseProfileAdapterItems.RelatedTagAdapterItem(false, true, tag, relatedTagsResponse,
                     onListenRelatedTagClickedSubject, profileToOpenSubject, actionOnlyForLoggedInUserSubject, isLoggedInAsNormalUser, false);
         } else {
-            return new ProfileAdapterItems.RelatedTagAdapterItem(false, false, tag, relatedTagsResponse,
+            return new BaseProfileAdapterItems.RelatedTagAdapterItem(false, false, tag, relatedTagsResponse,
                     onListenRelatedTagClickedSubject, profileToOpenSubject, actionOnlyForLoggedInUserSubject, isLoggedInAsNormalUser, false);
         }
     }
 
     @Nonnull
-    private RelatedTagsResponse updateRelatedTagsWithListenings(@Nonnull ListenedTagWithRelatedTags listenedTagWithRelatedTags) {
+    private RelatedTagsResponse updateRelatedTagsWithListenings(@Nonnull ListenedTagWithRelatedTags listenedTagWithRelatedTags,
+                                                                ListenResponse listenResponse) {
         final List<TagDetail> tags = listenedTagWithRelatedTags.getRelatedTagsResponse().getResults();
         final TagDetail tagToUpdate = listenedTagWithRelatedTags.getTagInSection();
 
         for (int i = 0; i < tags.size(); i++) {
-            if (tags.get(i).getName().equals(tagToUpdate.getName())) {
+            if (tags.get(i).getSlug().equals(tagToUpdate.getSlug())) {
                 final List<TagDetail> updatedTags = new ArrayList<>(tags);
-                updatedTags.set(i, tagToUpdate.toListenedTag());
+                updatedTags.set(i, tagToUpdate.toListenedTag(listenResponse.getNewListenersCount()));
 
                 return new RelatedTagsResponse(updatedTags);
             }
@@ -458,7 +449,7 @@ public class TagProfilePresenter implements ProfilePresenter {
 
     @Nonnull
     @Override
-    public Observable<String> getProfileToOpenObservable() {
+    public Observable<ProfileType> getProfileToOpenObservable() {
         return profileToOpenSubject;
     }
 
@@ -472,6 +463,12 @@ public class TagProfilePresenter implements ProfilePresenter {
     @Override
     public Observable<Object> getMoreMenuOptionClickedSubject() {
         return moreMenuOptionClickedSubject;
+    }
+
+    @Override
+    @NonNull
+    public Observable<String> getBookmarkSuccesMessageObservable() {
+        return mBookmarkHelper.getBookmarkSuccessMessage();
     }
 
     @Nonnull
@@ -494,13 +491,13 @@ public class TagProfilePresenter implements ProfilePresenter {
 
     @Nonnull
     @Override
-    public Observable<String> getListenSuccessObservable() {
+    public Observable<ListenResponse> getListenSuccessObservable() {
         return listenSuccess;
     }
 
     @Nonnull
     @Override
-    public Observable<String> getUnListenSuccessObservable() {
+    public Observable<ListenResponse> getUnListenSuccessObservable() {
         return unListenSuccess;
     }
 

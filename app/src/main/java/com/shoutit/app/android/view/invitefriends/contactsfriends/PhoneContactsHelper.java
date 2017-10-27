@@ -7,11 +7,14 @@ import android.os.Build;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.shoutit.app.android.api.model.Contact;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,8 +37,19 @@ public class PhoneContactsHelper {
             ContactsContract.Contacts.DISPLAY_NAME;
 
     @Nonnull
+    public List<Contact> getAllPhoneContactsSorted() {
+        final List<Contact> allPhoneContacts = new ArrayList<>(getAllPhoneContacts());
+
+        Collections.sort(allPhoneContacts, (contact1, contact2) ->
+                Strings.nullToEmpty(contact1.getName())
+                        .compareToIgnoreCase(Strings.nullToEmpty(contact2.getName())));
+
+        return ImmutableList.copyOf(allPhoneContacts);
+    }
+
+    @Nonnull
     public List<Contact> getAllPhoneContacts() {
-        final Map<String, Contact> contactsMap = new HashMap<>();
+        final Map<String, Contact> contactsMap = new LinkedHashMap<>();
 
         getPhoneNumbers(contactsMap);
         getEmails(contactsMap);

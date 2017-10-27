@@ -99,6 +99,10 @@ public class HomeFragment extends BaseFragment {
                     }
                 });
 
+        presenter.getBookmarkSuccessMessage()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(ColoredSnackBar.successSnackBarAction(ColoredSnackBar.contentView(getActivity())));
+
         presenter.getGridLayoutManagerObservable()
                 .compose(this.<Boolean>bindToLifecycle())
                 .subscribe(new Action1<Boolean>() {

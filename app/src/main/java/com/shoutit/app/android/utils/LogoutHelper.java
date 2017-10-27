@@ -1,14 +1,17 @@
 package com.shoutit.app.android.utils;
 
 import com.shoutit.app.android.UserPreferences;
-import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.dao.BookmarksDao;
 import com.shoutit.app.android.dao.ProfilesDao;
+import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.db.RecentSearchesTable;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
-import com.shoutit.app.android.view.loginintro.FacebookHelper;
+import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
+import com.shoutit.app.android.facebook.FacebookHelper;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 public class LogoutHelper {
 
@@ -18,28 +21,43 @@ public class LogoutHelper {
     private final RecentSearchesTable recentSearchesTable;
     private final PusherHelper mPusherHelper;
     private final ProfilesDao mProfilesDao;
+    private final ShoutsDao shoutsDao;
+    private final PusherHelper mUserPusherHelper;
+
+    @Inject
+    BookmarksDao bookmarksDao;
 
     @Inject
     public LogoutHelper(@Nonnull UserPreferences userPreferences,
                         @Nonnull RecentSearchesTable recentSearchesTable,
-                        PusherHelper pusherHelper,
-                        ProfilesDao profilesDao) {
+                        PusherHelperHolder pusherHelper,
+                        @Named("user") PusherHelperHolder userPusherHelper,
+                        ProfilesDao profilesDao,
+                        ShoutsDao shoutsDao) {
         this.userPreferences = userPreferences;
         this.recentSearchesTable = recentSearchesTable;
-        mPusherHelper = pusherHelper;
+        mPusherHelper = pusherHelper.getPusherHelper();
+        mUserPusherHelper = userPusherHelper.getPusherHelper();
         mProfilesDao = profilesDao;
+        this.shoutsDao = shoutsDao;
     }
 
     public void logout() {
         mProfilesDao.registerToGcmAction(null);
 
-        final User user = userPreferences.getUser();
-        assert user != null;
-        mPusherHelper.unsubscribeProfileChannel(user.getId());
+        mPusherHelper.unsubscribeProfileChannel();
         mPusherHelper.disconnect();
+
+        if (mUserPusherHelper != null) {
+            mUserPusherHelper.unsubscribeProfileChannel();
+            mUserPusherHelper.disconnect();
+        }
 
         userPreferences.logout();
         recentSearchesTable.clearRecentSearches();
         FacebookHelper.logOutFromFacebook();
+
+        shoutsDao.invalidate();
+        bookmarksDao.invalidate();
     }
 }

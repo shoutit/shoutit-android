@@ -9,9 +9,11 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.api.model.BlockedProfilesResposne;
 import com.shoutit.app.android.api.model.ConversationProfile;
 import com.shoutit.app.android.api.model.ProfileRequest;
+import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.view.chats.chat_info.chats_users_list.ChatListProfileItem;
 
 import java.util.List;
@@ -76,12 +78,12 @@ public class ChatBlockedUsersPresenter {
         return ImmutableList.copyOf(Iterables.transform(profiles, new Function<ConversationProfile, BaseAdapterItem>() {
             @Nullable
             @Override
-            public BaseAdapterItem apply(@Nullable ConversationProfile input) {
-                assert input != null;
-                return new ChatListProfileItem(input.getId(), input.getName(), input.getImage(), new ChatListProfileItem.OnItemClicked() {
+            public BaseAdapterItem apply(@Nullable ConversationProfile profile) {
+                assert profile != null;
+                return new ChatListProfileItem(profile.getId(), profile.getName(), profile.getImage(), new ChatListProfileItem.OnItemClicked() {
                     @Override
                     public void onItemClicked(String id, String name) {
-                        mListener.showDialog(id, name);
+                        mListener.showDialog(id, name, profile.getUsername(), profile.isPage());
                     }
                 });
             }
@@ -93,10 +95,11 @@ public class ChatBlockedUsersPresenter {
         mCompositeSubscription.add(mApiService.unblockProfile(mConversationId, new ProfileRequest(id))
                 .observeOn(mUiScheduler)
                 .subscribeOn(mNetworkScheduler)
-                .subscribe(new Action1<ResponseBody>() {
+                .subscribe(new Action1<ApiMessageResponse>() {
                     @Override
-                    public void call(ResponseBody responseBody) {
+                    public void call(ApiMessageResponse apiMessageResponse) {
                         getConversation();
+                        mListener.showApiMessage(apiMessageResponse);
                     }
                 }, new Action1<Throwable>() {
                     @Override
@@ -111,6 +114,14 @@ public class ChatBlockedUsersPresenter {
         mCompositeSubscription.unsubscribe();
     }
 
+    public void showProfile(String userName, boolean isPage) {
+        mListener.showProfile(userName, isPage);
+    }
+
+    public void showUnblockConfirmDialog(String id, String name) {
+        mListener.showUnblockConfirmDialog(id, name);
+    }
+
     public interface Listener {
 
         void error();
@@ -119,6 +130,12 @@ public class ChatBlockedUsersPresenter {
 
         void showProgress(boolean show);
 
-        void showDialog(String id, String name);
+        void showDialog(String id, String name, String userName, boolean isPage);
+
+        void showProfile(String userName, boolean isPage);
+
+        void showUnblockConfirmDialog(String id, String name);
+
+        void showApiMessage(ApiMessageResponse apiMessageResponse);
     }
 }

@@ -104,14 +104,8 @@ public class PublishShoutActivity extends RxAppCompatActivity {
         mId = extras.getString(ARGS_ID);
         mWebUrl = extras.getString(ARGS_WEB_URL);
 
-        final String title = extras.getString(ARGS_TITLE);
-        if (Strings.isNullOrEmpty(title)) {
-            subHeader.setText(getString(R.string.published_extra_info,
-                    getString(mRequest ? R.string.publish_request : R.string.publish_offer)));
-        } else {
-            subHeader.setText(getString(R.string.published_extra_info_with_title,
-                    getString(mRequest ? R.string.publish_request : R.string.publish_offer), title));
-        }
+        subHeader.setText(getString(R.string.published_extra_info,
+                getString(mRequest ? R.string.publish_request : R.string.publish_offer)));
 
         button.setText(getString(R.string.published_create_another_shout,
                 getString(mRequest ? R.string.publish_request_capitalized : R.string.publish_offer_capitalized)));

@@ -78,7 +78,7 @@
 
                     <com.shoutit.app.android.widget.StateSpinner
                         android:layout_gravity="bottom"
-                        android:id="@+id/create_request_spinner"
+                        android:id="@+id/create_request_currency_spinner"
                         android:layout_width="130dp"
                         android:layout_height="43dp" />
 

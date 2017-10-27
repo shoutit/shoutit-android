@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ad_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:foreground="?selectableItemBackground"
+    card_view:cardCornerRadius="2dp"
+    card_view:cardElevation="2dp"
+    card_view:cardUseCompatPadding="true"
+    >
+
+    <RelativeLayout
+        android:id="@+id/shout_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="4dp"
+        android:paddingEnd="4dp"
+        android:paddingRight="4dp"
+        android:paddingLeft="4dp"
+        android:paddingStart="4dp"
+        android:paddingTop="4dp">
+
+        <com.facebook.ads.MediaView
+            android:id="@+id/ad_media_view"
+            android:layout_width="@dimen/home_feed_image_size_linear"
+            android:layout_height="@dimen/home_feed_image_size_linear"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp" />
+
+
+        <ImageView
+            android:id="@+id/ad_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_toEndOf="@+id/ad_media_view"
+            android:layout_toRightOf="@+id/ad_media_view"
+            android:src="@drawable/ic_about" />
+
+        <TextView
+            android:id="@+id/ad_title_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/ad_icon"
+            android:layout_toRightOf="@+id/ad_icon"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textColor="@color/black_54"
+            android:textSize="14sp"
+            tools:text="Ad title dfdsfsdf" />
+
+        <TextView
+            android:id="@+id/ad_sponsored_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ad_title_tv"
+            android:layout_toEndOf="@+id/ad_icon"
+            android:layout_toRightOf="@+id/ad_icon"
+            android:ellipsize="end"
+            android:text="@string/ad_sponsored"
+            android:textColor="@color/black_38"
+            android:textSize="12sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:layout_below="@+id/ad_sponsored_tv"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="2dp"
+            android:layout_centerHorizontal="true"
+            android:layout_toEndOf="@+id/ad_media_view"
+            android:layout_toRightOf="@+id/ad_media_view"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/ad_text_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:minHeight="40dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:textColor="@color/black_54"
+                android:textSize="16sp"
+                tools:text="Ad title dfsf sdf dsfdsfdsfdsfdsfdsf dsfdsfdsfdsfdsf" />
+
+            <TextView
+                android:id="@+id/ad_action_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/shape_ad_button"
+                android:gravity="center"
+                android:minWidth="100dp"
+                android:textColor="@color/colorPrimary"
+                tools:text="Install Now" />
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/ad_adchoice_container"
+            android:layout_width="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingStart="10dp"
+            android:paddingRight="2dp"
+            android:paddingEnd="2dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_gravity="right|end"/>
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

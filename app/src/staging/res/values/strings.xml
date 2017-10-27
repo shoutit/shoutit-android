@@ -1,4 +1,15 @@
 <resources>
     <string name="app_name">Shoutit Staging</string>
+    <string name="shoutit_scheme" translatable="false">shoutit-stage</string>
     <string name="facebook_app_id" translatable="false">1151546964858487</string>
+
+    <string name="facebook_shout_list_ad_id" translatable="false">1151546964858487_1245960432083806</string>
+    <string name="facebook_shout_detail_ad_id" translatable="false">1151546964858487_1249823215030861</string>
+
+    <!-- NewRelic -->
+    <string name="newrelic_api_key" translatable="false">AA52f20a8d2726a5f9d33f69160e55aa21aa557c54</string>
+
+    <!-- Appsee -->
+    <string name="app_see_api_key" translatable="false">ec274d5916bd4a72b3ae0eb776adec88</string>
+
 </resources>

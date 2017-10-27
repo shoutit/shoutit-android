@@ -35,7 +35,7 @@
                 android:layout_marginEnd="8dp"
                 android:layout_marginRight="8dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/ic_rect_avatar_placeholder" />
+                tools:src="@drawable/default_profile" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -92,8 +92,6 @@
             android:id="@+id/shout_pager_container"
             android:layout_below="@+id/shout_user_header"
             android:layout_width="wrap_content"
-            android:visibility="gone"
-            tools:visibility="visible"
             android:layout_height="wrap_content">
 
             <android.support.v4.view.ViewPager
@@ -112,6 +110,26 @@
                 app:fillColor="@android:color/white"
                 app:pageColor="@color/shout_page_indicator"/>
 
+            <ImageView
+                android:id="@+id/shout_like"
+                android:src="@drawable/likeoff"
+                android:layout_gravity="right|end"
+                android:layout_marginRight="45dp"
+                android:layout_marginEnd="45dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <CheckBox
+                android:id="@+id/shout_bookmark"
+                android:background="?selectableItemBackground"
+                android:layout_marginRight="12dp"
+                android:layout_marginEnd="12dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:button="@drawable/bookmark_button"
+                android:checked="false"/>
+
         </FrameLayout>
 
         <TextView
@@ -125,6 +143,7 @@
             android:layout_marginTop="4dp"
             android:layout_marginBottom="18dp"
             android:textColor="@color/black_87"
+            android:textIsSelectable="true"
             tools:text="Merino Wool Slouchy Hat, Winter Hat, Chunky Textured Knit Hat, Oxblood Chunky Hat"/>
 
         <TextView
@@ -184,6 +203,23 @@
                 />
 
         </LinearLayout>
+        
+        <TextView
+            android:id="@+id/shout_mark_as_tv"
+            android:layout_width="match_parent"
+            android:layout_below="@+id/shouts_price_tv"
+            android:layout_height="40dp"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            tools:text="@string/shout_mark_as_sold"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="14sp"
+            android:textColor="@color/colorPrimary"
+            android:textAllCaps="true"
+            android:background="@drawable/selector_stroke_button"/>
 
     </RelativeLayout>
 

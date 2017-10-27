@@ -21,6 +21,7 @@ import com.shoutit.app.android.api.model.SignResponse;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
+import com.shoutit.app.android.utils.AppseeHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.rx.Actions1;
 import com.shoutit.app.android.view.about.AboutActivity;
@@ -37,7 +38,6 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
-import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -85,6 +85,9 @@ public class LoginFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        AppseeHelper.markViewAsSensitive(emailInputLayout);
+        AppseeHelper.markViewAsSensitive(passwordInputLayout);
 
         passwordEdittext.setTransformationMethod(new PasswordTransformationMethod());
 
@@ -171,17 +174,6 @@ public class LoginFragment extends BaseFragment {
                     }
                 });
 
-    }
-
-    @OnCheckedChanged(R.id.login_lock_password)
-    public void lock(boolean checked) {
-        if (checked) {
-            passwordEdittext.setTransformationMethod(new PasswordTransformationMethod());
-        } else {
-            passwordEdittext.setTransformationMethod(null);
-
-        }
-        passwordEdittext.setSelection(passwordEdittext.length());
     }
 
     @Override

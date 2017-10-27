@@ -3,6 +3,8 @@ package com.shoutit.app.android.view.home;
 import android.content.Context;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
+import com.shoutit.app.android.utils.MyLinearLayoutManager;
+
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -15,12 +17,12 @@ import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.appunite.rx.dagger.UiScheduler;
 import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.R;
-import com.shoutit.app.android.adapters.ChangeableLayoutManagerAdapter;
+import com.shoutit.app.android.adapters.FBAdsAdapter;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.shouts.ShoutAdapterItem;
 import com.shoutit.app.android.view.shouts.ShoutGridViewHolder;
-import com.shoutit.app.android.view.shouts.ShoutLinerViewHolder;
+import com.shoutit.app.android.view.shouts.ShoutLinearViewHolder;
 import com.squareup.picasso.Picasso;
 
 import javax.annotation.Nonnull;
@@ -33,10 +35,9 @@ import butterknife.OnClick;
 import rx.Observable;
 import rx.Scheduler;
 import rx.Subscription;
-import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
 
-public class HomeAdapter extends ChangeableLayoutManagerAdapter {
+public class HomeAdapter extends FBAdsAdapter {
 
     private static final int VIEW_TYPE_DISCOVER_HEADER = 1;
     private static final int VIEW_TYPE_DISCOVER_ITEMS_CONTAINER = 2;
@@ -214,12 +215,12 @@ public class HomeAdapter extends ChangeableLayoutManagerAdapter {
                 return new ShoutHeaderViewHolder(layoutInflater.inflate(R.layout.home_feed_header_item, parent, false));
             case VIEW_TYPE_SHOUT:
                 return isLinearLayoutManager ?
-                        new ShoutLinerViewHolder(layoutInflater.inflate(R.layout.home_feed_item_linear, parent, false), context, picasso, picassoNoTransformer) :
-                        new ShoutGridViewHolder(layoutInflater.inflate(R.layout.shout_item_grid, parent, false), picasso);
+                        new ShoutLinearViewHolder(layoutInflater.inflate(R.layout.shout_item_linear, parent, false), context, picasso, picassoNoTransformer) :
+                        new ShoutGridViewHolder(layoutInflater.inflate(ShoutGridViewHolder.getLayoutRes(), parent, false), picasso);
             case VIEW_TYPE_EMPTY_SHOUTS_ITEM:
                 return new ShoutEmptyViewHolder(layoutInflater.inflate(R.layout.home_shouts_empty, parent, false));
             default:
-                throw new RuntimeException("Unknown adapter view type");
+                return super.onCreateViewHolder(parent, viewType);
         }
     }
 
@@ -243,7 +244,7 @@ public class HomeAdapter extends ChangeableLayoutManagerAdapter {
         } else if (item instanceof HomePresenter.ShoutsEmptyAdapterItem) {
             return VIEW_TYPE_EMPTY_SHOUTS_ITEM;
         } else {
-            throw new RuntimeException("Unknown adapter view type");
+            return super.getItemViewType(position);
         }
     }
 }

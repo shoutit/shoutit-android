@@ -11,12 +11,7 @@ public class LoadMoreHelper {
     @Nonnull
     public static Func1<Object, Boolean> needLoadMore(@Nonnull final MyLayoutManager layoutManager,
                                                       @Nonnull final RecyclerView.Adapter<?> adapter) {
-        return new Func1<Object, Boolean>() {
-            @Override
-            public Boolean call(final Object recyclerScrollEvent) {
-                return isNeedLoadMore(layoutManager, adapter);
-            }
-        };
+        return recyclerScrollEvent -> isNeedLoadMore(layoutManager, adapter);
     }
 
     private static boolean isNeedLoadMore(@Nonnull MyLayoutManager layoutManager,

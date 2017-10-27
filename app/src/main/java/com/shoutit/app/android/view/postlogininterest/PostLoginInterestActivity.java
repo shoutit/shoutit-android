@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.LinearLayoutManager;
+import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
@@ -59,7 +59,7 @@ public class PostLoginInterestActivity extends RxAppCompatActivity implements Ba
 
         ButterKnife.bind(this);
 
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setLayoutManager(new MyLinearLayoutManager(this));
         mRecyclerView.setAdapter(mPostLoginAdapter);
 
         mPostLoginPresenter

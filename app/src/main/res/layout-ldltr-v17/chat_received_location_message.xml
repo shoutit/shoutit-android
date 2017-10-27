@@ -20,7 +20,7 @@
         android:id="@+id/chats_map_container"
         android:layout_width="220dp"
         android:layout_height="50dp"
-        android:layout_marginLeft="10dp"
+        android:layout_marginLeft="6dp"
         android:layout_toRightOf="@+id/chats_received_avatar"
         android:background="@drawable/message_background_other">
 

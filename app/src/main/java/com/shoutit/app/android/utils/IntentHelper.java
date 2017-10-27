@@ -3,14 +3,19 @@ package com.shoutit.app.android.utils;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 
 import com.amazonaws.services.s3.util.Mimetypes;
 import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
+import com.google.gson.Gson;
+import com.shoutit.app.android.view.gallery.GalleryActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +52,22 @@ public class IntentHelper {
                 .setData(Uri.parse("package:" + context.getPackageName()));
     }
 
+    public static Intent getSmsIntent(@Nonnull String phoneNumber, @Nonnull String text) {
+        final Uri uri = Uri.parse("smsto:" + phoneNumber);
+        return new Intent(Intent.ACTION_SENDTO, uri)
+                .putExtra("sms_body", text);
+    }
+
+    public static Intent getEmailIntent(@Nonnull String emailAddress, @Nonnull String text) {
+        return new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", emailAddress, null))
+                .putExtra(Intent.EXTRA_TEXT, text);
+    }
+
+    public static Intent inAppDeepLinkIntent(@NonNull String appUrl) {
+        return new Intent(Intent.ACTION_VIEW, Uri.parse(appUrl))
+                .putExtra(UpNavigationHelper.IN_APP_DEEP_LINK, true);
+    }
+
     @Nonnull
     public static List<Intent> getTwitterShareIntent(@Nonnull PackageManager packageManager,
                                                          @Nonnull String shareText) {
@@ -69,5 +90,38 @@ public class IntentHelper {
         }
 
         return intentsList;
+    }
+
+    public static Intent singleImageGalleryIntent(Context context, @Nonnull String imageUrl) {
+        final String imageJson = new Gson().toJson(Lists.newArrayList(imageUrl));
+        return GalleryActivity.singleImageIntent(context, imageJson);
+    }
+
+    public static void showAppInPlayStore(Context context) {
+        final Intent rateIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + context.getPackageName()));
+        boolean marketFound = false;
+
+        final List<ResolveInfo> otherApps = context.getPackageManager().queryIntentActivities(rateIntent, 0);
+        for (ResolveInfo otherApp: otherApps) {
+            if (otherApp.activityInfo.applicationInfo.packageName.equals("com.android.vending")) {
+
+                final ActivityInfo otherAppActivity = otherApp.activityInfo;
+                final ComponentName componentName = new ComponentName(
+                        otherAppActivity.applicationInfo.packageName,
+                        otherAppActivity.name
+                );
+                rateIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+                rateIntent.setComponent(componentName);
+                context.startActivity(rateIntent);
+                marketFound = true;
+                break;
+
+            }
+        }
+
+        if (!marketFound) {
+            final Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id="+context.getPackageName()));
+            context.startActivity(webIntent);
+        }
     }
 }

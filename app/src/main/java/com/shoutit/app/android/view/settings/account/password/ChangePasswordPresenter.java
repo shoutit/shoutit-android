@@ -10,6 +10,8 @@ import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Strings;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.ApiMessageResponse;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.ChangePasswordRequest;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.utils.MoreFunctions1;
@@ -53,7 +55,7 @@ public class ChangePasswordPresenter {
     @Nonnull
     private final Observable<Throwable> requestErrorObservable;
     @Nonnull
-    private final Observable<Object> requestSuccessObservable;
+    private final Observable<ApiMessageResponse> requestSuccessObservable;
     @Nonnull
     private final Scheduler uiScheduler;
 
@@ -69,16 +71,8 @@ public class ChangePasswordPresenter {
         newPasswordSubject.onNext(null);
         newPasswordVerifySubject.onNext(null);
 
-        hadUserPasswordSetObservable = userPreferences.getUserObservable()
-                .observeOn(uiScheduler)
-                .filter(Functions1.isNotNull())
-                .first()
-                .map(new Func1<User, Boolean>() {
-                    @Override
-                    public Boolean call(User user) {
-                        return user.isPasswordSet();
-                    }
-                })
+        hadUserPasswordSetObservable = Observable.just(userPreferences.getUser())
+                .map(User::isPasswordSet)
                 .compose(ObservableExtensions.<Boolean>behaviorRefCount());
 
         /** Errors **/
@@ -137,38 +131,22 @@ public class ChangePasswordPresenter {
 
 
         /** Request **/
-        final Observable<ResponseOrError<ResponseBody>> requestObservable = confirmClickSubject
-                .withLatestFrom(isAnyErrorObservable, new Func2<Object, Boolean, Boolean>() {
-                    @Override
-                    public Boolean call(Object o, Boolean isError) {
-                        return isError;
-                    }
-                })
+        final Observable<ResponseOrError<ApiMessageResponse>> requestObservable = confirmClickSubject
+                .withLatestFrom(isAnyErrorObservable, (o, isError) -> isError)
                 .filter(Functions1.isFalse())
-                .switchMap(new Func1<Boolean, Observable<ChangePasswordRequest>>() {
-                    @Override
-                    public Observable<ChangePasswordRequest> call(Boolean ignore) {
-                        return lastCredentialsObservable.first();
-                    }
-                })
-                .switchMap(new Func1<ChangePasswordRequest, Observable<ResponseOrError<ResponseBody>>>() {
-                    @Override
-                    public Observable<ResponseOrError<ResponseBody>> call(ChangePasswordRequest changePasswordRequest) {
-                        return apiService.changePassword(changePasswordRequest)
-                                .subscribeOn(networkScheduler)
-                                .observeOn(uiScheduler)
-                                .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
-                    }
-                })
-                .compose(ObservableExtensions.<ResponseOrError<ResponseBody>>behaviorRefCount());
+                .switchMap(ignore -> lastCredentialsObservable.take(1))
+                .switchMap(changePasswordRequest -> apiService.changePassword(changePasswordRequest)
+                        .subscribeOn(networkScheduler)
+                        .observeOn(uiScheduler)
+                        .compose(ResponseOrError.<ApiMessageResponse>toResponseOrErrorObservable()))
+                .compose(ObservableExtensions.<ResponseOrError<ApiMessageResponse>>behaviorRefCount());
 
         requestErrorObservable = requestObservable
-                .compose(ResponseOrError.<ResponseBody>onlyError())
+                .compose(ResponseOrError.<ApiMessageResponse>onlyError())
                 .observeOn(uiScheduler);
 
         requestSuccessObservable = requestObservable
-                .compose(ResponseOrError.<ResponseBody>onlySuccess())
-                .map(Functions1.toObject())
+                .compose(ResponseOrError.<ApiMessageResponse>onlySuccess())
                 .observeOn(uiScheduler);
     }
 
@@ -207,7 +185,7 @@ public class ChangePasswordPresenter {
     }
 
     @Nonnull
-    public Observable<Object> getRequestSuccessObservable() {
+    public Observable<ApiMessageResponse> getRequestSuccessObservable() {
         return requestSuccessObservable;
     }
 

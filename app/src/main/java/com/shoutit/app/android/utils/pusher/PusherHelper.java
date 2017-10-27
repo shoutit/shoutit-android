@@ -15,10 +15,11 @@ import com.pusher.client.connection.ConnectionState;
 import com.pusher.client.connection.ConnectionStateChange;
 import com.pusher.client.util.HttpAuthorizer;
 import com.shoutit.app.android.BuildConfig;
-import com.shoutit.app.android.UserPreferences;
+import com.shoutit.app.android.api.Headers;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.NotificationsResponse;
+import com.shoutit.app.android.api.model.PusherConversationUpdate;
 import com.shoutit.app.android.api.model.PusherMessage;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.model.Stats;
 import com.shoutit.app.android.utils.BuildTypeUtils;
 import com.shoutit.app.android.view.chats.PresenceChannelEventListenerAdapter;
@@ -34,6 +35,7 @@ import rx.Subscriber;
 public class PusherHelper {
 
     private static final String EVENT_NEW_MESSAGE = "new_message";
+    private static final String EVENT_CONVERSATION_UPDATE = "conversation_update";
     private static final String EVENT_NEW_NOTIFICATION = "new_notification";
     private static final String EVENT_STATS_UPDATE = "stats_update";
     private static final String EVENT_CLIENT_IS_TYPING = "client-is_typing";
@@ -49,22 +51,25 @@ public class PusherHelper {
     private static final String TAG = PusherHelper.class.getCanonicalName();
 
     private Pusher mPusher;
+    private BaseProfile mUser;
     private final Gson mGson;
-    private final UserPreferences mUserPreferences;
     private final Scheduler uiScheduler;
 
     public PusherHelper(@NonNull Gson gson,
-                        @NonNull UserPreferences userPreferences,
                         @NonNull @UiScheduler Scheduler uiScheduler) {
         mGson = gson;
-        mUserPreferences = userPreferences;
         this.uiScheduler = uiScheduler;
     }
 
-    public void init(@NonNull String token) {
+    public void init(@NonNull String token, BaseProfile user) {
+        mUser = user;
         if (mPusher == null) {
             final HttpAuthorizer authorizer = new HttpAuthorizer(BuildConfig.API_URL + "pusher/auth");
-            authorizer.setHeaders(ImmutableMap.of("Authorization", "Bearer " + token));
+            if (user.isPage()) {
+                authorizer.setHeaders(ImmutableMap.of(Headers.AUTHORIZATION, Headers.TOKEN_PREFIX + token, Headers.AUTHORIZATION_PAGE_ID, user.getId()));
+            } else {
+                authorizer.setHeaders(ImmutableMap.of(Headers.AUTHORIZATION, Headers.TOKEN_PREFIX + token));
+            }
             final PusherOptions options = new PusherOptions().setAuthorizer(authorizer);
             mPusher = new Pusher(getKey(), options);
         }
@@ -82,11 +87,11 @@ public class PusherHelper {
         }
     }
 
-    public static String getProfileChannelName(@NonNull String userId) {
+    private static String getProfileChannelName(@NonNull String userId) {
         return String.format(PROFILE_CHANNEL, userId);
     }
 
-    public static String getConversationChannelName(@NonNull String conversationId) {
+    private static String getConversationChannelName(@NonNull String conversationId) {
         return String.format(CONVERSATION_CHANNEL, conversationId);
     }
 
@@ -112,16 +117,16 @@ public class PusherHelper {
                 });
     }
 
-    public Observable<User> getUserUpdatedObservable() {
+    public Observable<BaseProfile> getUserUpdatedObservable() {
         return Observable
-                .create(new Observable.OnSubscribe<User>() {
+                .create(new Observable.OnSubscribe<BaseProfile>() {
                     @Override
-                    public void call(final Subscriber<? super User> subscriber) {
+                    public void call(final Subscriber<? super BaseProfile> subscriber) {
                         getProfileChannel().bind(EVENT_PROFILE_UPDATE, new PresenceChannelEventListenerAdapter() {
 
                             @Override
                             public void onEvent(String channelName, String eventName, String data) {
-                                final User user = mGson.fromJson(data, User.class);
+                                final BaseProfile user = mGson.fromJson(data, BaseProfile.class);
                                 subscriber.onNext(user);
                             }
                         });
@@ -129,19 +134,20 @@ public class PusherHelper {
                 });
     }
 
-    public Observable<PusherMessage> getNewMessagesObservable() {
+    public Observable<PusherConversationUpdate> getConverstionUpdateObservable() {
         return Observable
-                .create(new Observable.OnSubscribe<PusherMessage>() {
+                .create(new Observable.OnSubscribe<PusherConversationUpdate>() {
                     @Override
-                    public void call(final Subscriber<? super PusherMessage> subscriber) {
-                        getProfileChannel().bind(EVENT_NEW_MESSAGE, new PresenceChannelEventListenerAdapter() {
+                    public void call(final Subscriber<? super PusherConversationUpdate> subscriber) {
+                        getProfileChannel().bind(EVENT_CONVERSATION_UPDATE, new PresenceChannelEventListenerAdapter() {
 
                             @Override
                             public void onEvent(String channelName, String eventName, String data) {
                                 try {
-                                    final PusherMessage pusherMessage = mGson.getAdapter(PusherMessage.class).fromJson(data);
-                                    logMessage(pusherMessage, "profile / getNewMessagesObservable");
-                                    subscriber.onNext(pusherMessage);
+
+                                    final PusherConversationUpdate conversationUpdate = mGson.getAdapter(PusherConversationUpdate.class).fromJson(data);
+                                    logMessage(data, "profile / getConverstionUpdateObservable");
+                                    subscriber.onNext(conversationUpdate);
                                 } catch (IOException e) {
                                     subscriber.onError(e);
                                 }
@@ -197,11 +203,13 @@ public class PusherHelper {
                 .observeOn(uiScheduler);
     }
 
-    public PresenceChannel getProfileChannel() {
-        final User user = mUserPreferences.getUser();
-        assert user != null;
-        log("get profile channel id : " + user.getId());
-        return mPusher.getPresenceChannel(PusherHelper.getProfileChannelName(user.getId()));
+    private PresenceChannel getProfileChannel() {
+        final String id = mUser.getId();
+        log("get profile channel id : " + id + userLogInfo());
+
+        final PresenceChannel presenceChannel = mPusher.getPresenceChannel(PusherHelper.getProfileChannelName(id));
+
+        return presenceChannel == null ? subscribeProfileChannel() : presenceChannel;
     }
 
     public Observable<TypingInfo> getIsTypingObservable(@NonNull final PresenceChannel conversationChannel) {
@@ -223,18 +231,18 @@ public class PusherHelper {
     }
 
     public void unsubscribeConversationChannel(@NonNull String conversationId) {
-        log("unsubscribe conversation channel : " + conversationId);
+        log("unsubscribe conversation channel : " + conversationId + userLogInfo());
         mPusher.unsubscribe(getConversationChannelName(conversationId));
     }
 
-    public void unsubscribeProfileChannel(@NonNull String userId) {
-        log("unsubscribe profile channel : " + userId);
-        mPusher.unsubscribe(PusherHelper.getProfileChannelName(userId));
+    public void unsubscribeProfileChannel() {
+        log("unsubscribe profile channel : " + mUser.getId() + userLogInfo());
+        mPusher.unsubscribe(PusherHelper.getProfileChannelName(mUser.getId()));
     }
 
     @Nonnull
     public PresenceChannel subscribeConversationChannel(@NonNull String conversationId) {
-        log("subscribe conversation channel : " + conversationId);
+        log("subscribe conversation channel : " + conversationId + userLogInfo());
         final PresenceChannel presenceChannel = mPusher.getPresenceChannel(PusherHelper.getConversationChannelName(conversationId));
 
         if (presenceChannel == null || !presenceChannel.isSubscribed()) {
@@ -252,29 +260,36 @@ public class PusherHelper {
         return new ConnectionEventListener() {
             @Override
             public void onConnectionStateChange(ConnectionStateChange connectionStateChange) {
-                Log.i(TAG, connectionStateChange.getCurrentState().name());
+                Log.i(TAG, connectionStateChange.getCurrentState().name() + userLogInfo());
             }
 
             @Override
             public void onError(String s, String s1, Exception e) {
-                Log.e(TAG, "pusher message", e);
+                Log.e(TAG, "pusher message" + userLogInfo(), e);
             }
         };
     }
 
-    public void subscribeProfileChannel(@NonNull String id) {
-        log("subscribe profile channel : " + id);
-        mPusher.subscribePresence(PusherHelper.getProfileChannelName(id));
+    @NonNull
+    private String userLogInfo() {
+        return " user : " + mUser.getId() + " is page " + mUser.isPage();
+    }
+
+    public PresenceChannel subscribeProfileChannel() {
+        final String id = mUser.getId();
+        log("subscribe profile channel : " + id + userLogInfo());
+        return mPusher.subscribePresence(PusherHelper.getProfileChannelName(id));
     }
 
     public void connect() {
+        log("connect called : " + userLogInfo());
         mPusher.connect(getEventListener());
     }
 
-    public void sendTyping(@NonNull String conversationId, @NonNull String userId, @NonNull String userName) {
+    public void sendTyping(@NonNull String conversationId, @NonNull String userId, @NonNull String name) {
         final PresenceChannel presenceChannel = mPusher.getPresenceChannel(getConversationChannelName(conversationId));
         if (presenceChannel != null && presenceChannel.isSubscribed() && mPusher.getConnection().getState() != ConnectionState.CONNECTING) {
-            final String typing = mGson.toJson(new TypingPusherModel(userId, userName));
+            final String typing = mGson.toJson(new TypingPusherModel(userId, name));
             presenceChannel.trigger("client-is_typing", typing);
         }
     }
@@ -284,7 +299,7 @@ public class PusherHelper {
     }
 
     public void disconnect() {
-        log("disconnect");
+        log("disconnect" + userLogInfo());
         mPusher.disconnect();
     }
 
@@ -307,9 +322,7 @@ public class PusherHelper {
     }
 
     private void logMessage(Object message, String channel) {
-        if (BuildConfig.DEBUG) {
-            Log.i(TAG, channel + " : " + message.toString());
-        }
+        log(channel + " : " + message.toString() + userLogInfo());
     }
 
     private void log(String msg) {

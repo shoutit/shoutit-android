@@ -1,5 +1,6 @@
 package com.shoutit.app.android.view.main;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +14,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,25 +22,27 @@ import android.view.MenuItem;
 import com.appunite.appunitegcm.AppuniteGcm;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.collect.Iterables;
-import com.mixpanel.android.mpmetrics.MixpanelAPI;
 import com.shoutit.app.android.App;
+import com.shoutit.app.android.AppPreferences;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
-import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.mixpanel.MixPanel;
-import com.shoutit.app.android.model.Stats;
+import com.shoutit.app.android.utils.AppseeHelper;
 import com.shoutit.app.android.utils.BackPressedHelper;
+import com.shoutit.app.android.utils.BuildTypeUtils;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.PlayServicesHelper;
-import com.shoutit.app.android.utils.pusher.PusherHelper;
+import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
 import com.shoutit.app.android.view.discover.DiscoverActivity;
 import com.shoutit.app.android.view.discover.OnNewDiscoverSelectedListener;
 import com.shoutit.app.android.view.home.HomeFragment;
@@ -46,6 +50,7 @@ import com.shoutit.app.android.view.intro.IntroActivity;
 import com.shoutit.app.android.view.postlogininterest.PostLoginInterestActivity;
 import com.shoutit.app.android.view.search.main.MainSearchActivity;
 import com.shoutit.app.android.view.signin.LoginActivity;
+import com.uservoice.uservoicesdk.UserVoice;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -63,6 +68,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
     public static final int REQUST_CODE_CAMERA_PERMISSION = 1;
     public static final int REQUST_CODE_CALL_PHONE_PERMISSION = 2;
     public static final int REQUST_CODE_PLAY_SERVICES_CHECK = 3;
+    public static final int REQUST_CODE_LEAK_CANARY_PERMISSION = 4;
 
     public static Intent newIntent(@Nonnull Context context) {
         return new Intent(context, MainActivity.class);
@@ -82,11 +88,13 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
     @Inject
     MixPanel mixPanel;
     @Inject
-    PusherHelper mPusherHelper;
+    PusherHelperHolder mPusherHelper;
     @Inject
     ApiService apiService;
     @Inject
     DeepLinksHelper deepLinksHelper;
+    @Inject
+    AppPreferences appPreferences;
 
     private ActionBarDrawerToggle drawerToggle;
     private BackPressedHelper mBackPressedHelper;
@@ -97,6 +105,8 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        AppseeHelper.start(this);
 
         mBackPressedHelper = new BackPressedHelper(this);
 
@@ -114,8 +124,11 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
         setUpActionBar();
         setUpDrawer();
+        refreshUser();
 
         if (savedInstanceState == null) {
+            appPreferences.increaseAppOpenings();
+
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.activity_main_fragment_container, HomeFragment.newInstance())
@@ -133,7 +146,63 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
             subscribeToStats();
         }
 
+        mixPanel.initMixPanel(); // Workaround for mixpanel people id issue
         mixPanel.showNotificationIfAvailable(this);
+
+        askForStoragePermissionForLeakCanary();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        showRateDialogIfNeeded();
+    }
+
+    private void showRateDialogIfNeeded() {
+        final boolean shouldShowRateDialogForAppOpening = appPreferences.shouldShowRateDialogForAppOpening();
+        final boolean shouldShowRateDialogForShoutCreate = appPreferences.shouldShowRateDialogForShoutCreate();
+
+        if ((shouldShowRateDialogForAppOpening || shouldShowRateDialogForShoutCreate) && !isFinishing()) {
+            final int mainMessageResId = shouldShowRateDialogForAppOpening ?
+                    R.string.app_rate_dialog_text_for_openings : R.string.app_rate_dialog_text_for_shouts;
+
+            new AlertDialog.Builder(this)
+                    .setMessage(mainMessageResId)
+                    .setPositiveButton(R.string.app_rate_dialog_positive_btn, (dialog, which) -> {
+                        dialog.dismiss();
+                        showSecondRateDialog(true);
+                    })
+                    .setNegativeButton(R.string.app_rate_dialog_negative_btn, (dialog, which) -> {
+                        dialog.dismiss();
+                        showSecondRateDialog(false);
+                        appPreferences.resetCounters();
+                    })
+                    .setCancelable(false)
+                    .show();
+        }
+    }
+
+    private void showSecondRateDialog(boolean wasAnswerPositive) {
+        final int messageResId = wasAnswerPositive ?
+                R.string.app_rate_second_dialog_rate : R.string.app_rate_second_dialog_feedback;
+
+        new AlertDialog.Builder(this)
+                .setMessage(messageResId)
+                .setPositiveButton(R.string.second_app_rate_dialog_positive_btn, (dialog, which) -> {
+                    if (wasAnswerPositive) {
+                        IntentHelper.showAppInPlayStore(MainActivity.this);
+                        appPreferences.setRateDialogShown();
+                    } else {
+                        UserVoice.launchUserVoice(this);
+                    }
+                    dialog.dismiss();
+                })
+                .setNegativeButton(R.string.second_app_rate_dialog_negative_btn, (dialog, which) -> {
+                    appPreferences.resetCounters();
+                    dialog.dismiss();
+                })
+                .setCancelable(false)
+                .show();
     }
 
     @Override
@@ -149,16 +218,23 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
         }
     }
 
+    private void refreshUser() {
+        if (!mUserPreferences.isNormalUser()) {
+            return;
+        }
+
+        profilesDao.updateUser()
+                .compose(bindToLifecycle())
+                .subscribe(user -> {
+                    mUserPreferences.setUserOrPage(user);
+                });
+    }
+
     private void subscribeToStats() {
-        mStatsSubscription.add(mPusherHelper.getStatsObservable()
-                .compose(this.<Stats>bindToLifecycle())
-                .subscribe(pusherStats -> {
-                    menuHandler.setStats(pusherStats.getUnreadConversationsCount(), pusherStats.getUnreadNotifications());
-                }));
-        mStatsSubscription.add(mUserPreferences.getUserObservable()
+        mStatsSubscription.add(mUserPreferences.getPageOrUserObservable()
                 .filter(Functions1.isNotNull())
                 .distinctUntilChanged()
-                .compose(this.<User>bindToLifecycle())
+                .compose(this.<BaseProfile>bindToLifecycle())
                 .subscribe(user -> {
                     menuHandler.setStats(user.getUnreadConversationsCount(), user.getUnreadNotificationsCount());
                 }, throwable -> {
@@ -251,10 +327,8 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
     public void onMenuItemSelected(@Nonnull String fragmentTag) {
         if (!mUserPreferences.isNormalUser()) {
             if (MenuHandler.FRAGMENT_CHATS.equals(fragmentTag) || MenuHandler.FRAGMENT_CREDITS.equals(fragmentTag)) {
-                {
-                    startActivity(LoginActivity.newIntent(MainActivity.this));
-                    return;
-                }
+                startActivity(LoginActivity.newIntent(MainActivity.this));
+                return;
             }
         }
 
@@ -282,6 +356,14 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
         menuHandler.setDiscoverMenuItem();
     }
 
+    private void askForStoragePermissionForLeakCanary() {
+        if (BuildTypeUtils.isDebug()) {
+            PermissionHelper.checkPermissions(this, REQUST_CODE_LEAK_CANARY_PERMISSION, ColoredSnackBar.contentView(this),
+                    R.string.permission_location_explanation,
+                    new String[] {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE});
+        }
+    }
+
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(MENU_SELECT_ITEM, menuHandler.getSelectedItem());
@@ -297,17 +379,18 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        for (Fragment fragment : getSupportFragmentManager().getFragments()) {
-            if (MenuHandler.FRAGMENT_INVITE_FRIENDS.equals(fragment.getTag())) {
-                fragment.onActivityResult(requestCode, resultCode, data);
-                break;
-            }
-        }
-
         if (resultCode == Activity.RESULT_OK && requestCode == REQUST_CODE_PLAY_SERVICES_CHECK) {
             registerToGcm();
         } else {
             super.onActivityResult(requestCode, resultCode, data);
+        }
+
+        for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+            if (fragment == null) {
+                continue;
+            }
+            fragment.onActivityResult(requestCode, resultCode, data);
+            break;
         }
     }
 
@@ -318,7 +401,7 @@ public class MainActivity extends BaseActivity implements OnMenuItemSelectedList
             if (permissionsGranted) {
                 ColoredSnackBar.success(findViewById(android.R.id.content), R.string.permission_granted, Snackbar.LENGTH_SHORT).show();
             } else {
-                ColoredSnackBar.error(findViewById(android.R.id.content), R.string.permission_not_granted, Snackbar.LENGTH_SHORT);
+                ColoredSnackBar.error(findViewById(android.R.id.content), R.string.permission_not_granted, Snackbar.LENGTH_SHORT).show();
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);

@@ -34,13 +34,12 @@ import com.shoutit.app.android.utils.KeyboardHelper;
 import com.shoutit.app.android.utils.LayoutManagerHelper;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyGridLayoutManager;
-import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.view.filter.FiltersFragment;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.shout.ShoutActivity;
+import com.shoutit.app.android.view.shouts_list_common.SimpleShoutsAdapter;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -48,7 +47,6 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
-import rx.functions.Action1;
 
 import static com.appunite.rx.internal.Preconditions.checkNotNull;
 
@@ -76,7 +74,7 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
     @Inject
     SearchShoutsResultsPresenter presenter;
     @Inject
-    SearchShoutsResultsAdapter adapter;
+    SimpleShoutsAdapter adapter;
 
     private ActionBarDrawerToggle drawerToggle;
     private SearchPresenter.SearchType searchType;
@@ -149,68 +147,61 @@ public class SearchShoutsResultsFragment extends BaseFragmentWithComponent imple
 
         presenter.getShoutSelectedObservable()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String shoutId) {
-                        startActivity(ShoutActivity.newIntent(getActivity(), shoutId));
-                    }
+                .subscribe(shoutId -> {
+                    startActivity(ShoutActivity.newIntent(getActivity(), shoutId));
                 });
 
         RxRecyclerView.scrollEvents(recyclerView)
-                .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
                 .filter(LoadMoreHelper.needLoadMore(linearLayoutManager, adapter))
+                .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
                 .subscribe(presenter.getLoadMoreObserver());
 
         RxRecyclerView.scrollEvents(recyclerView)
-                .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
                 .filter(LoadMoreHelper.needLoadMore(gridLayoutManager, adapter))
+                .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())
                 .subscribe(presenter.getLoadMoreObserver());
+
+        presenter.getLoadMoreObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
 
         presenter.getCountObservable()
                 .compose(this.<Integer>bindToLifecycle())
-                .subscribe(new Action1<Integer>() {
-                    @Override
-                    public void call(Integer integer) {
-                        headerCountTv.setText(getResources().getQuantityString(
-                                R.plurals.shouts_results_pluaral, integer, integer));
-                    }
+                .subscribe(integer -> {
+                    headerCountTv.setText(getResources().getQuantityString(
+                            R.plurals.shouts_results_pluaral, integer, integer));
                 });
+
+        presenter.getBookmarkSuccessMessage()
+                .compose(this.<String>bindToLifecycle())
+                .subscribe(ColoredSnackBar.successSnackBarAction(ColoredSnackBar.contentView(getActivity())));
 
         presenter.getShareClickedObservable()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String shareUrl) {
-                        startActivity(Intent.createChooser(
-                                IntentHelper.getShareIntent(shareUrl),
-                                getString(R.string.search_share_results)));
-                    }
+                .subscribe(shareUrl -> {
+                    startActivity(Intent.createChooser(
+                            IntentHelper.getShareIntent(shareUrl),
+                            getString(R.string.search_share_results)));
                 });
 
         presenter.getRefreshShoutsObservable()
                 .compose(bindToLifecycle())
                 .subscribe();
 
-        filterIv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (shouldShowFilters()) {
-                    drawerLayout.openDrawer(filterLayout);
-                }
+        filterIv.setOnClickListener(v -> {
+            if (shouldShowFilters()) {
+                drawerLayout.openDrawer(filterLayout);
             }
         });
 
-        layoutSwitchIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                layoutSwitchIcon.setChecked(!layoutSwitchIcon.isChecked());
-                if (layoutSwitchIcon.isChecked()) {
-                    layoutSwitchIcon.setBackground(getResources().getDrawable(R.drawable.ic_grid_switch));
-                    setLinearLayoutManager();
-                } else {
-                    layoutSwitchIcon.setBackground(getResources().getDrawable(R.drawable.ic_list_switch));
-                    setGridLayoutManager();
-                }
+        layoutSwitchIcon.setOnClickListener(v -> {
+            layoutSwitchIcon.setChecked(!layoutSwitchIcon.isChecked());
+            if (layoutSwitchIcon.isChecked()) {
+                layoutSwitchIcon.setBackground(getResources().getDrawable(R.drawable.ic_grid_switch));
+                setLinearLayoutManager();
+            } else {
+                layoutSwitchIcon.setBackground(getResources().getDrawable(R.drawable.ic_list_switch));
+                setGridLayoutManager();
             }
         });
     }

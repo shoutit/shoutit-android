@@ -55,6 +55,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:background="@drawable/chat_time_gradient"
+        android:paddingEnd="@dimen/chat_item_time_right_margin"
+        android:paddingRight="@dimen/chat_item_time_right_margin"
         android:textColor="@android:color/white"
         tools:text="18:04" />
 

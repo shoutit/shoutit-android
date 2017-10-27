@@ -6,22 +6,24 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
+import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.pusher.client.channel.PresenceChannel;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.ConversationProfile;
 import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessageAttachment;
 import com.shoutit.app.android.api.model.PostMessage;
 import com.shoutit.app.android.api.model.PusherMessage;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
+import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
 import com.shoutit.app.android.utils.pusher.TypingInfo;
 import com.shoutit.app.android.view.chats.message_models.DateItem;
 import com.shoutit.app.android.view.chats.message_models.InfoItem;
@@ -76,13 +78,16 @@ public class ChatsDelegate {
     private final Context mContext;
     private final AmazonHelper mAmazonHelper;
     private Listener mListener;
-    private final User mUser;
+    private final BaseProfile mUser;
     private final PublishSubject<PusherMessage> newMessagesSubject;
     private final LocalMessageBus mBus;
 
 
-    public ChatsDelegate(PusherHelper pusher, Scheduler uiScheduler, Scheduler networkScheduler, ApiService apiService, Resources resources, UserPreferences userPreferences, Context context, AmazonHelper amazonHelper, PublishSubject<PusherMessage> newMessagesSubject, LocalMessageBus bus) {
-        mPusher = pusher;
+    public ChatsDelegate(PusherHelperHolder pusher, Scheduler uiScheduler, Scheduler networkScheduler,
+                         ApiService apiService, Resources resources, UserPreferences userPreferences,
+                         Context context, AmazonHelper amazonHelper, PublishSubject<PusherMessage> newMessagesSubject,
+                         LocalMessageBus bus) {
+        mPusher = pusher.getPusherHelper();
         mUiScheduler = uiScheduler;
         mNetworkScheduler = networkScheduler;
         mApiService = apiService;
@@ -92,7 +97,7 @@ public class ChatsDelegate {
         mAmazonHelper = amazonHelper;
         this.newMessagesSubject = newMessagesSubject;
         mBus = bus;
-        mUser = mUserPreferences.getUser();
+        mUser = mUserPreferences.getUserOrPage();
     }
 
     public void setListener(Listener listener) {
@@ -110,12 +115,21 @@ public class ChatsDelegate {
     public Observable<PusherMessage> getPusherMessageObservable(PresenceChannel presenceChannel) {
         return mPusher.getNewMessageObservable(presenceChannel)
                 .flatMap(pusherMessage -> {
-                    final String id = pusherMessage.getProfile().getId();
-                    if (mUser.getId().equals(id)) {
+                    final ConversationProfile profile = pusherMessage.getProfile();
+
+                    if (profile == null || mUser.getId().equals(profile.getId())) {
                         return Observable.just(pusherMessage);
                     } else {
                         return mApiService.readMessage(pusherMessage.getId())
-                                .map(responseBody -> pusherMessage);
+                                .subscribeOn(mNetworkScheduler)
+                                .compose(ResponseOrError.toResponseOrErrorObservable())
+                                .compose(ResponseOrError.onlySuccess())
+                                .map(new Func1<ResponseBody, PusherMessage>() {
+                                    @Override
+                                    public PusherMessage call(ResponseBody responseBody) {
+                                        return pusherMessage;
+                                    }
+                                });
                     }
                 })
                 .observeOn(mUiScheduler);
@@ -169,9 +183,7 @@ public class ChatsDelegate {
 
     @NonNull
     public List<BaseAdapterItem> transform(@NonNull List<Message> results) {
-        final User user = mUserPreferences.getUser();
-        assert user != null;
-        final String userId = user.getId();
+        final String userId = mUserPreferences.getUserId();
 
         final List<BaseAdapterItem> objects = Lists.newArrayList();
         for (int i = 0; i < results.size(); i++) {
@@ -252,23 +264,28 @@ public class ChatsDelegate {
 
     private BaseAdapterItem getReceivedItem(Message message, boolean isFirst, String time) {
         final List<MessageAttachment> attachments = message.getAttachments();
-        final String avatarUrl = message.getProfile().getImage();
+        final ConversationProfile profile = message.getProfile();
+        final String avatarUrl = profile.getImage();
         if (attachments.isEmpty()) {
-            return new ReceivedTextMessage(isFirst, time, message.getText(), avatarUrl);
+            return new ReceivedTextMessage(isFirst, time, message.getText(), avatarUrl,
+                    profile.getUsername(), mListener, profile.isPage());
         } else {
             final MessageAttachment messageAttachment = attachments.get(0);
             final String type = messageAttachment.getType();
             if (MessageAttachment.ATTACHMENT_TYPE_MEDIA.equals(type)) {
                 final List<String> images = messageAttachment.getImages();
                 if (images != null && !images.isEmpty()) {
-                    return new ReceivedImageMessage(isFirst, time, images.get(0), avatarUrl, mListener);
+                    return new ReceivedImageMessage(isFirst, time, images.get(0), avatarUrl,
+                            profile.getUsername(), mListener, profile.isPage());
                 } else {
                     final Video video = messageAttachment.getVideos().get(0);
-                    return new ReceivedVideoMessage(isFirst, video.getThumbnailUrl(), time, avatarUrl, mListener, video.getUrl());
+                    return new ReceivedVideoMessage(isFirst, video.getThumbnailUrl(), time, avatarUrl,
+                            profile.getUsername(), mListener, video.getUrl(), profile.isPage());
                 }
             } else if (MessageAttachment.ATTACHMENT_TYPE_LOCATION.equals(type)) {
                 final MessageAttachment.MessageLocation location = messageAttachment.getLocation();
-                return new ReceivedLocationMessage(isFirst, time, avatarUrl, mListener, location.getLatitude(), location.getLongitude());
+                return new ReceivedLocationMessage(isFirst, time, avatarUrl, profile.getUsername(),
+                        mListener, location.getLatitude(), location.getLongitude(), profile.isPage());
             } else if (MessageAttachment.ATTACHMENT_TYPE_SHOUT.equals(type)) {
                 final MessageAttachment.AttachtmentShout shout = messageAttachment.getShout();
                 return new ReceivedShoutMessage(
@@ -278,13 +295,14 @@ public class ChatsDelegate {
                         PriceUtils.formatPriceWithCurrency(shout.getPrice(), mResources, shout.getCurrency()),
                         shout.getText(),
                         shout.getUser().getName(),
-                        avatarUrl, mListener, shout.getId());
+                        shout.getUser().getUsername(),
+                        avatarUrl, mListener, shout.getId(), profile.isPage());
             } else if (MessageAttachment.ATTACHMENT_TYPE_PROFILE.equals(type)) {
-                final MessageAttachment.MessageProfile profile = messageAttachment.getProfile();
+                final MessageAttachment.MessageProfile messageAttachmentProfile = messageAttachment.getProfile();
 
-                return new ReceivedProfileMessage(isFirst, time, avatarUrl, profile.getId(),
-                        profile.getUsername(), profile.getName(),
-                        profile.getImage(), profile.getCover(), profile.getListenersCount(), mListener);
+                return new ReceivedProfileMessage(isFirst, time, avatarUrl, messageAttachmentProfile.getId(),
+                        messageAttachmentProfile.getUsername(), messageAttachmentProfile.getName(),
+                        messageAttachmentProfile.getImage(), messageAttachmentProfile.getCover(), messageAttachmentProfile.getListenersCount(), mListener, profile.isPage());
             } else {
                 throw new RuntimeException(type);
             }
@@ -315,7 +333,7 @@ public class ChatsDelegate {
             } else if (MessageAttachment.ATTACHMENT_TYPE_PROFILE.equals(type)) {
                 final MessageAttachment.MessageProfile profile = messageAttachment.getProfile();
                 return new SentProfileMessage(time, profile.getId(), profile.getUsername(), profile.getName(),
-                        profile.getImage(), profile.getCover(), profile.getListenersCount(), mListener);
+                        profile.getImage(), profile.getCover(), profile.getListenersCount(), mListener, profile.isPage());
             } else {
                 throw new RuntimeException(type);
             }
@@ -323,7 +341,7 @@ public class ChatsDelegate {
     }
 
     public void sendTyping(String conversationId) {
-        mPusher.sendTyping(conversationId, mUser.getId(), mUser.getUsername());
+        mPusher.sendTyping(conversationId, mUser.getId(), mUser.getName());
     }
 
     public PostMessage getShoutMessage(@Nonnull String shoutId) {

@@ -8,11 +8,15 @@ public class Stats {
     private final Integer credit;
     private final Integer unreadConversationsCount;
     private final Integer unreadNotificationsCount;
+    private final Integer totalUnreadCount;
 
-    public Stats(Integer credit, Integer unreadConversationsCount, Integer unreadNotificationsCount) {
+    public Stats(Integer credit, Integer unreadConversationsCount,
+                 Integer unreadNotificationsCount,
+                 Integer totalUnreadCount) {
         this.credit = credit;
         this.unreadConversationsCount = unreadConversationsCount;
         this.unreadNotificationsCount = unreadNotificationsCount;
+        this.totalUnreadCount = totalUnreadCount;
     }
 
     public int getUnreadConversationsCount() {
@@ -28,6 +32,14 @@ public class Stats {
             return 0;
         } else {
             return unreadNotificationsCount;
+        }
+    }
+
+    public int getTotalUnreadCount() {
+        if (totalUnreadCount == null) {
+            return 0;
+        } else {
+            return totalUnreadCount;
         }
     }
 

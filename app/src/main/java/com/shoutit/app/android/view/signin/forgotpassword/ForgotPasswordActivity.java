@@ -9,36 +9,30 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import com.appunite.rx.android.MyAndroidSchedulers;
 import com.google.common.base.Strings;
-import com.shoutit.app.android.App;
-import com.shoutit.app.android.BaseActivity;
+import com.shoutit.app.android.BaseDaggerActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.ResetPasswordRequest;
-import com.shoutit.app.android.dagger.ActivityModule;
-import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.dagger.BaseDaggerActivityComponent;
+import com.shoutit.app.android.utils.ApiMessagesHelper;
+import com.shoutit.app.android.utils.AppseeHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
-import com.shoutit.app.android.utils.RtlUtils;
 import com.shoutit.app.android.view.about.AboutActivity;
 import com.uservoice.uservoicesdk.UserVoice;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import okhttp3.ResponseBody;
 import rx.Subscription;
-import rx.functions.Action0;
-import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
-public class ForgotPasswordActivity extends BaseActivity {
+public class ForgotPasswordActivity extends BaseDaggerActivity {
 
     @Bind(R.id.forgot_password_email_edittext)
     EditText mForgotPasswordEmailEdittext;
@@ -47,7 +41,7 @@ public class ForgotPasswordActivity extends BaseActivity {
     @Bind(R.id.forgot_password_proceed_btn)
     Button mForgotPasswordProceedBtn;
     @Bind(R.id.forgot_password_toolbar)
-    Toolbar mForgotPasswordToolbar;
+    Toolbar toolbar;
     @Bind(R.id.forgot_password_progress)
     FrameLayout mForgotPasswordProgress;
 
@@ -61,50 +55,28 @@ public class ForgotPasswordActivity extends BaseActivity {
         setContentView(R.layout.forgot_password_activity);
         ButterKnife.bind(this);
 
-        mForgotPasswordToolbar.setNavigationIcon(RtlUtils.isRtlEnabled(this) ?
-                R.drawable.ic_blue_arrow_rtl : R.drawable.ic_blue_arrow);
-        mForgotPasswordToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        AppseeHelper.markViewAsSensitive(mForgotPasswordEmailEdittext);
+        AppseeHelper.markViewAsSensitive(mForgotPasswordEdittextLayout);
 
-        mForgotPasswordProceedBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final String mail = mForgotPasswordEmailEdittext.getText().toString();
-                if (Strings.isNullOrEmpty(mail)) {
-                    mForgotPasswordEdittextLayout.setError(getString(R.string.login_empty_mail));
-                } else {
-                    mForgotPasswordEdittextLayout.setError(null);
-                    mForgotPasswordProgress.setVisibility(View.VISIBLE);
-                    mSubscription = service.resetPassword(new ResetPasswordRequest(mail))
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(MyAndroidSchedulers.mainThread())
-                            .doOnTerminate(new Action0() {
-                                @Override
-                                public void call() {
-                                    mForgotPasswordProgress.setVisibility(View.GONE);
-                                }
-                            })
-                            .subscribe(new Action1<ResponseBody>() {
-                                @Override
-                                public void call(ResponseBody responseBody) {
-                                    finish();
-                                }
-                            }, new Action1<Throwable>() {
-                                @Override
-                                public void call(Throwable throwable) {
-                                    ColoredSnackBar
-                                            .error(
-                                                    ColoredSnackBar.contentView(ForgotPasswordActivity.this),
-                                                    R.string.forgot_password_fail,
-                                                    Toast.LENGTH_SHORT)
-                                            .show();
-                                }
-                            });
-                }
+        toolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
+        toolbar.setLogo(R.drawable.appbar_logo_white);
+        toolbar.setNavigationOnClickListener(v -> finish());
+
+        mForgotPasswordProceedBtn.setOnClickListener(v -> {
+            final String mail = mForgotPasswordEmailEdittext.getText().toString();
+            if (Strings.isNullOrEmpty(mail)) {
+                mForgotPasswordEdittextLayout.setError(getString(R.string.login_empty_mail));
+            } else {
+                mForgotPasswordEdittextLayout.setError(null);
+                mForgotPasswordProgress.setVisibility(View.VISIBLE);
+                mSubscription = service.resetPassword(new ResetPasswordRequest(mail))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(MyAndroidSchedulers.mainThread())
+                        .doOnTerminate(() -> mForgotPasswordProgress.setVisibility(View.GONE))
+                        .subscribe(apiMessageResponse -> {
+                            ApiMessagesHelper.showApiMessageToast(ForgotPasswordActivity.this, apiMessageResponse);
+                            finish();
+                        }, ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(ForgotPasswordActivity.this)));
             }
         });
     }
@@ -115,17 +87,6 @@ public class ForgotPasswordActivity extends BaseActivity {
         if (mSubscription != null) {
             mSubscription.unsubscribe();
         }
-    }
-
-    @Nonnull
-    @Override
-    public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
-        final ForgotPasswordActivityComponent component = DaggerForgotPasswordActivityComponent.builder()
-                .activityModule(new ActivityModule(this))
-                .appComponent(App.getAppComponent(getApplication()))
-                .build();
-        component.inject(this);
-        return component;
     }
 
     @Nonnull
@@ -146,5 +107,10 @@ public class ForgotPasswordActivity extends BaseActivity {
     @OnClick(R.id.activity_login_about)
     public void onAboutClick() {
         startActivity(AboutActivity.newIntent(this));
+    }
+
+    @Override
+    protected void injectComponent(BaseDaggerActivityComponent component) {
+        component.inject(this);
     }
 }

@@ -18,7 +18,7 @@ public class MoreFunctions1 {
         return new Func1<T, Observable<R>>() {
             @Override
             public Observable<R> call(T t) {
-                return toReturn.first();
+                return toReturn.take(1);
             }
         };
     }

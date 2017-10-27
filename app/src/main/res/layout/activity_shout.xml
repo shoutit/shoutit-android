@@ -12,18 +12,23 @@
         android:layout_height="?actionBarSize"/>
 
     <android.support.v7.widget.RecyclerView
-        android:layout_below="@+id/shout_toolbar"
         android:id="@+id/shout_recycler_view"
+        android:layout_below="@+id/shout_toolbar"
         android:layout_marginTop="4dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <ProgressBar
-        android:id="@+id/shout_progress_bar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"/>
+    <TextView
+        android:id="@+id/shout_item_not_exist_tv"
+        android:layout_width="match_parent"
+        android:layout_height="280dp"
+        android:gravity="bottom|center_horizontal"
+        android:textSize="20sp"
+        android:visibility="gone"
+        android:layout_below="@+id/shout_toolbar"
+        android:text="@string/shout_not_found"/>
 
+    <include layout="@layout/base_progress"/>
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/shout_bottom_toolbar"
@@ -65,8 +70,8 @@
                 android:id="@+id/shout_bottom_bar_edit"
                 style="@style/ShoutBottomBarItem"
                 android:background="?selectableItemBackground"
-                android:drawableLeft="@drawable/ic_edit_red"
-                android:drawableStart="@drawable/ic_edit_red"
+                android:drawableLeft="@drawable/ic_edit_green"
+                android:drawableStart="@drawable/ic_edit_green"
                 android:text="@string/shout_bottom_bar_edit"
                 android:visibility="gone"/>
 

@@ -11,9 +11,8 @@ import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.UserLocationSimple;
 import com.shoutit.app.android.location.LocationManager;
 import com.shoutit.app.android.mixpanel.MixPanel;
-import com.shoutit.app.android.utils.LocationUtils;
-import com.shoutit.app.android.utils.PermissionHelper;
 import com.shoutit.app.android.utils.Validators;
+import com.shoutit.app.android.facebook.FacebookHelper;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -33,19 +32,18 @@ import rx.subjects.BehaviorSubject;
 
 import static com.google.common.truth.Truth.assert_;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(Validators.class)
+@PrepareForTest({Validators.class, FacebookHelper.class})
 public class RegisterPresenterTest {
 
     private RegisterPresenter mRegisterPresenter;
 
     private BehaviorSubject<SignResponse> mResponseSubject;
-
-    private BehaviorSubject<UserLocation> mLocationObservable;
 
     @Mock
     UserLocation location;
@@ -66,21 +64,23 @@ public class RegisterPresenterTest {
     LocationManager locationManager;
 
     @Mock
+    Context context;
+
+    @Mock
     MixPanel mixPanel;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         PowerMockito.mockStatic(Validators.class);
+        PowerMockito.mockStatic(FacebookHelper.class);
 
         when(location.getLatitude()).thenReturn(1d);
         when(location.getLongitude()).thenReturn(1d);
 
-        mResponseSubject = BehaviorSubject.create(new SignResponse("a", "b", "c", true, user));
-        mLocationObservable = BehaviorSubject.create();
+        mResponseSubject = BehaviorSubject.create(new SignResponse("a", "b", "c", 0, true, user));
 
         when(mApiService.signup(any(EmailSignupRequest.class))).thenReturn(mResponseSubject);
-        when(locationManager.updateUserLocationObservable()).thenReturn(mLocationObservable);
 
         when(mUserPreferences.getLocationObservable())
                 .thenReturn(Observable.just(location));
@@ -91,8 +91,11 @@ public class RegisterPresenterTest {
         when(mixPanel.getDistinctId())
                 .thenReturn("id");
 
+        when(FacebookHelper.getPromotionalCodeObservable(any(Context.class)))
+                .thenReturn(Observable.just("lala"));
+
         mRegisterPresenter = new RegisterPresenter(mApiService,
-                mUserPreferences, Schedulers.immediate(), Schedulers.immediate(), mixPanel);
+                mUserPreferences, Schedulers.immediate(), Schedulers.immediate(), mixPanel, context);
     }
 
     @Test
@@ -104,7 +107,7 @@ public class RegisterPresenterTest {
     public void testRegisterSuccessfulAndTokenSet() {
         registerSuccessful();
 
-        verify(mUserPreferences).setLoggedIn(anyString(), anyString(), any(User.class));
+        verify(mUserPreferences).setLoggedIn(anyString(), anyInt(), anyString(), any(User.class));
     }
 
     private void registerSuccessful() {
@@ -254,34 +257,5 @@ public class RegisterPresenterTest {
         assert_().that(failObserver.getOnNextEvents()).isEmpty();
 
         assert_().that(emptyNameObserver.getOnNextEvents()).hasSize(1);
-    }
-
-    @Test
-    public void testWhenNewLocationIsPassed_locationPassedToRequest() {
-        mRegisterPresenter.getLocationObservable().subscribe();
-        mLocationObservable.onNext(location);
-
-        final TestObserver<Object> successObserver = new TestObserver<>();
-        final TestObserver<Object> failObserver = new TestObserver<>();
-        mRegisterPresenter.successObservable().subscribe(successObserver);
-        mRegisterPresenter.failObservable().subscribe(failObserver);
-
-        mRegisterPresenter.getEmailObserver().onNext("test@z.com");
-        mRegisterPresenter.getPasswordObserver().onNext("testtest");
-        mRegisterPresenter.getNameObserver().onNext("test");
-        mRegisterPresenter.getProceedObserver().onNext(new Object());
-
-        assert_().that(successObserver.getOnErrorEvents()).isEmpty();
-        assert_().that(successObserver.getOnNextEvents()).hasSize(1);
-
-        assert_().that(failObserver.getOnNextEvents()).isEmpty();
-        assert_().that(failObserver.getOnNextEvents()).isEmpty();
-
-        final ArgumentCaptor<EmailSignupRequest> argumentCaptor = ArgumentCaptor.forClass(EmailSignupRequest.class);
-        verify(mApiService).signup(argumentCaptor.capture());
-
-        final UserLocationSimple location = argumentCaptor.getValue().getUser().getLocation();
-        assert_().that(location.getLatitude()).isEqualTo(1d);
-        assert_().that(location.getLongitude()).isEqualTo(1d);
     }
 }

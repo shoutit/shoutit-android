@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v7.widget.LinearLayoutManager;
+import com.shoutit.app.android.utils.MyLinearLayoutManager;
+
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -14,9 +16,12 @@ import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.utils.ApiMessagesHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.view.profile.ProfileIntentHelper;
 
 import java.util.List;
 
@@ -67,7 +72,7 @@ public class ChatParticipantsActivity extends BaseActivity implements ChatPartic
             }
         });
 
-        mChatParticipantRecyclerview.setLayoutManager(new LinearLayoutManager(this));
+        mChatParticipantRecyclerview.setLayoutManager(new MyLinearLayoutManager(this));
         mChatParticipantRecyclerview.setAdapter(adapter);
 
         mChatParticipantsPresenter.register(this);
@@ -109,9 +114,17 @@ public class ChatParticipantsActivity extends BaseActivity implements ChatPartic
 
     @SuppressLint("InflateParams")
     @Override
-    public void showDialog(String id, boolean isBlocked, boolean isAdmin, String name, boolean isClickable) {
-        if (isClickable) {
-            dialog.show(id, isBlocked, isAdmin, name, mChatParticipantsPresenter);
-        }
+    public void showDialog(String id, boolean isBlocked, boolean isAdmin, boolean isPage, String name, String userName) {
+        dialog.show(id, isBlocked, isAdmin, isPage, name, userName, mChatParticipantsPresenter);
+    }
+
+    @Override
+    public void showProfile(String userName, boolean isPage) {
+        startActivity(ProfileIntentHelper.newIntent(this, userName, isPage));
+    }
+
+    @Override
+    public void displayApiMessage(ApiMessageResponse apiMessageResponse) {
+        ApiMessagesHelper.showApiMessage(this, apiMessageResponse);
     }
 }

@@ -10,10 +10,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.api.model.BaseProfile;
-import com.shoutit.app.android.api.model.ListenersResponse;
 import com.shoutit.app.android.api.model.ProfileRequest;
-import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.api.model.ProfilesListResponse;
 import com.shoutit.app.android.view.chats.chat_info.chats_users_list.ChatListProfileItem;
 
 import java.util.List;
@@ -47,7 +47,7 @@ public class ChatSelectUsersPresenter {
         mNetworkScheduler = networkScheduler;
         mUiScheduler = uiScheduler;
 
-        final User user = userPreferences.getUser();
+        final BaseProfile user = userPreferences.getUserOrPage();
         assert user != null;
         mId = user.getUsername();
     }
@@ -62,10 +62,10 @@ public class ChatSelectUsersPresenter {
         mCompositeSubscription.add(mApiService.listeners(mId, 1, 20) // TODO paging
                 .observeOn(mUiScheduler)
                 .subscribeOn(mNetworkScheduler)
-                .subscribe(new Action1<ListenersResponse>() {
+                .subscribe(new Action1<ProfilesListResponse>() {
                     @Override
-                    public void call(final ListenersResponse listenersResponse) {
-                        final List<BaseProfile> profiles = listenersResponse.getProfiles();
+                    public void call(final ProfilesListResponse listenersResponse) {
+                        final List<BaseProfile> profiles = listenersResponse.getResults();
                         final List<BaseAdapterItem> profileItems = getProfileItems(profiles);
 
                         mListener.setData(profileItems);
@@ -101,17 +101,11 @@ public class ChatSelectUsersPresenter {
         mCompositeSubscription.add(mApiService.addProfile(mConversationId, new ProfileRequest(id))
                 .observeOn(mUiScheduler)
                 .subscribeOn(mNetworkScheduler)
-                .subscribe(new Action1<ResponseBody>() {
-                    @Override
-                    public void call(ResponseBody responseBody) {
-                        mListener.finishScreen();
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        mListener.showProgress(false);
-                        mListener.error();
-                    }
+                .subscribe(apiMessageResponse -> {
+                    mListener.finishScreen(apiMessageResponse);
+                }, throwable -> {
+                    mListener.showProgress(false);
+                    mListener.error();
                 }));
     }
 
@@ -129,6 +123,6 @@ public class ChatSelectUsersPresenter {
 
         void showDialog(String id, String name);
 
-        void finishScreen();
+        void finishScreen(ApiMessageResponse apiMessageResponse);
     }
 }

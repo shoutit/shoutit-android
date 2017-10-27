@@ -11,6 +11,7 @@ import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.facebook.CallbackManager;
 import com.google.common.base.Strings;
+import com.shoutit.app.android.AppPreferences;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.CreateRequestShoutRequest;
@@ -23,7 +24,7 @@ import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.ResourcesHelper;
-import com.shoutit.app.android.view.loginintro.FacebookHelper;
+import com.shoutit.app.android.facebook.FacebookHelper;
 
 import java.util.List;
 
@@ -62,6 +63,7 @@ public class CreateRequestPresenter {
     @NonNull
     private final ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter;
     private final FacebookHelper facebookHelper;
+    private final AppPreferences appPreferences;
     private Listener mListener;
     private UserLocation mUserLocation;
     private Subscription locationSubscription;
@@ -74,13 +76,15 @@ public class CreateRequestPresenter {
                                   @NetworkScheduler Scheduler networkScheduler,
                                   @UiScheduler Scheduler uiScheduler,
                                   @NonNull ShoutsGlobalRefreshPresenter shoutsGlobalRefreshPresenter,
-                                  FacebookHelper facebookHelper) {
+                                  FacebookHelper facebookHelper,
+                                  AppPreferences appPreferences) {
         mContext = context;
         mApiService = apiService;
         mNetworkScheduler = networkScheduler;
         mUiScheduler = uiScheduler;
         this.shoutsGlobalRefreshPresenter = shoutsGlobalRefreshPresenter;
         this.facebookHelper = facebookHelper;
+        this.appPreferences = appPreferences;
         mLocationObservable = userPreferences.getLocationObservable()
                 .compose(ObservableExtensions.<UserLocation>behaviorRefCount());
     }
@@ -128,7 +132,7 @@ public class CreateRequestPresenter {
 
     public void confirmClicked(boolean publishToFacebook) {
         final RequestData requestData = mListener.getRequestData();
-        if (!checkValidity(requestData)) return;
+        if (!areDataValid(requestData)) return;
 
         mListener.showProgress();
 
@@ -153,6 +157,7 @@ public class CreateRequestPresenter {
                     public void call(CreateShoutResponse responseBody) {
                         mListener.hideProgress();
                         mListener.finishActivity(responseBody.getId(), responseBody.getWebUrl(), responseBody.getTitle());
+                        appPreferences.increaseCreatedShouts();
                         shoutsGlobalRefreshPresenter.refreshShouts();
                     }
                 }, new Action1<Throwable>() {
@@ -170,41 +175,42 @@ public class CreateRequestPresenter {
 
         pendingSubscriptions.add(
                 facebookHelper.askForPermissionIfNeeded(activity,
-                        FacebookHelper.PERMISSION_PUBLISH_ACTIONS, callbackManager, true)
+                        new String[]{FacebookHelper.PERMISSION_PUBLISH_ACTIONS}, callbackManager, true)
                         .observeOn(mUiScheduler)
-                        .subscribe(new Action1<ResponseOrError<Boolean>>() {
-                            @Override
-                            public void call(ResponseOrError<Boolean> responseOrError) {
-                                mListener.hideProgress();
+                        .subscribe(responseOrError -> {
+                            mListener.hideProgress();
 
-                                if (responseOrError.isData()) {
-                                    final Boolean isPermissionGranted = responseOrError.data();
-                                    if (!isPermissionGranted) {
-                                        mListener.uncheckFacebookCheckbox();
-                                        mListener.showPermissionNotGranted();
-                                    }
-                                } else {
+                            if (responseOrError.isData()) {
+                                final Boolean isPermissionGranted = responseOrError.data();
+                                if (!isPermissionGranted) {
                                     mListener.uncheckFacebookCheckbox();
-                                    mListener.showApiError(responseOrError.error());
+                                    mListener.showPermissionNotGranted();
                                 }
-                            }
-                        }, new Action1<Throwable>() {
-                            @Override
-                            public void call(Throwable throwable) {
-                                mListener.hideProgress();
+                            } else {
                                 mListener.uncheckFacebookCheckbox();
-                                mListener.showApiError(throwable);
+                                mListener.showApiError(responseOrError.error());
                             }
+                        }, throwable -> {
+                            mListener.hideProgress();
+                            mListener.uncheckFacebookCheckbox();
+                            mListener.showApiError(throwable);
                         })
         );
 
     }
 
-    private boolean checkValidity(RequestData requestData) {
+    private boolean areDataValid(RequestData requestData) {
         final boolean erroredTitle = requestData.mDescription.length() < 6;
         mListener.showTitleTooShortError(erroredTitle);
 
-        return !erroredTitle;
+        boolean missingCurrency = false;
+        if (!Strings.isNullOrEmpty(requestData.mBudget) &&
+                Strings.isNullOrEmpty(requestData.mCurrencyId)) {
+            missingCurrency = true;
+            mListener.showCurrenciesErrorPrompt();
+        }
+
+        return !erroredTitle && !missingCurrency;
     }
 
     public void updateLocation(@NonNull UserLocation userLocation) {
@@ -241,6 +247,8 @@ public class CreateRequestPresenter {
         void setCurrencies(@NonNull List<PriceUtils.SpinnerCurrency> list);
 
         void showCurrenciesError();
+
+        void showCurrenciesErrorPrompt();
 
         void setCurrenciesEnabled(boolean enabled);
 

@@ -3,6 +3,7 @@ buildscript {
         jcenter()
         maven { url 'https://maven.fabric.io/public' }
         maven { url "https://jitpack.io" }
+        mavenCentral()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.3'
@@ -10,27 +11,28 @@ buildscript {
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
         classpath 'com.google.gms:google-services:3.0.0'
         classpath 'me.tatarka:gradle-retrolambda:3.3.0-beta3'
+        classpath 'me.tatarka.retrolambda.projectlombok:lombok.ast:0.2.3.a2'
+        classpath "com.newrelic.agent.android:agent-gradle-plugin:5.+"
     }
+
+    // Exclude the version that the android plugin depends on.
+    configurations.classpath.exclude group: 'com.android.tools.external.lombok'
 }
 
 repositories {
     jcenter()
-    maven { url 'https://repo.adobe.com/nexus/content/repositories/releases/' }
     maven { url "https://s3.amazonaws.com/repo.commonsware.com" }
     maven { url 'https://maven.fabric.io/public' }
     maven { url 'http://clojars.org/repo' }
     maven { url "https://jitpack.io" }
-    maven { url 'http://maven.localytics.com/public' }
-    maven {
-        name 'maven.aviary.com'
-        url uri("http://maven.aviary.com/repo/release")
-    }
+    mavenCentral()
 }
 
 apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'io.fabric'
 apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'newrelic'
 
 Properties props = new Properties()
 def keystoreProperties = file("keystore.properties")
@@ -39,13 +41,25 @@ if (keystoreProperties.exists()) {
 }
 
 if (!project.hasProperty("versionName")) {
-    project.ext.versionName = "2.6.0"
+    project.ext.versionName = "3.0.7"
 }
 if (!project.hasProperty("versionCode")) {
-    project.ext.versionCode = "79"
+    project.ext.versionCode = "92"
 }
 if (!project.hasProperty("autoCloseToken")) {
     project.ext.autoCloseToken = "wrong-token"
+}
+
+if (project.hasProperty("commitId")) {
+    project.ext.commitId = project.commitId
+} else {
+    project.ext.commitId = "localBuildCommtId"
+}
+
+if (project.hasProperty("buildNumber")) {
+    project.ext.buildNumber = project.buildNumber
+} else {
+    project.ext.buildNumber = "localBuildNumber"
 }
 
 android {
@@ -66,6 +80,8 @@ android {
         multiDexEnabled true
         testInstrumentationRunner "com.android.test.runner.MultiDexTestRunner"
         manifestPlaceholders = [appPackageName: "${applicationId}"]
+        buildConfigField 'String', 'commitId', "\"${project.ext.commitId}\""
+        buildConfigField 'String', 'buildNumber', "\"${project.ext.buildNumber}\""
     }
 
     compileOptions {
@@ -147,7 +163,7 @@ android {
     }
 
     android.variantFilter { variant ->
-   /*     if (variant.buildType.name.equals('staging') && variant.getFlavors().get(0).name.equals('dev')) {
+/*        if (variant.buildType.name.equals('staging') && variant.getFlavors().get(0).name.equals('dev')) {
             variant.setIgnore(true);
         }*/
         if (variant.buildType.name.equals('release') && variant.getFlavors().get(0).name.equals('dev')) {
@@ -186,12 +202,19 @@ configurations.all {
     resolutionStrategy.force 'com.android.support:palette-v7:25.3.1'
     resolutionStrategy.force 'com.android.support:support-v13:25.3.1'
     resolutionStrategy.force 'io.reactivex:rxjava:1.1.0'
+    resolutionStrategy.force 'com.android.support:cardview-v7:25.3.1'
+    resolutionStrategy.force 'com.android.support:customtabs:25.3.1'
+    resolutionStrategy.force 'com.android.support:design:25.3.1'
+    resolutionStrategy.force 'com.google.android.gms:play-services-ads:11.4.0'
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     // Supports
+    compile 'com.android.support:support-compat:25.3.1'
+    compile 'com.android.support:support-core-ui:25.3.1'
+    compile 'com.android.support:support-fragment:25.3.1'
     compile 'com.android.support:support-v4:25.3.1'
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:design:25.3.1'
@@ -203,6 +226,7 @@ dependencies {
 
     // Facebook
     compile 'com.facebook.android:facebook-android-sdk:4.27.0'
+    compile 'com.facebook.android:audience-network-sdk:4.26.1'
 
     // Google
     provided 'javax.annotation:jsr250-api:1.0'
@@ -210,6 +234,7 @@ dependencies {
     compile 'com.google.dagger:dagger:2.0.1'
     compile 'com.google.code.gson:gson:2.5'
     compile 'com.google.code.findbugs:jsr305:2.0.1'
+    compile 'com.google.android.gms:play-services-ads:11.4.0'
     compile 'com.google.android.gms:play-services-location:11.4.0'
     compile 'com.google.guava:guava:18.0'
     compile 'com.google.android.gms:play-services-auth:11.4.0'
@@ -232,6 +257,7 @@ dependencies {
     // RX
     compile 'com.trello:rxlifecycle:0.3.0'
     compile 'com.trello:rxlifecycle-components:0.3.0'
+
     compile 'com.jakewharton.rxbinding:rxbinding:0.4.0'
     compile 'com.jakewharton.rxbinding:rxbinding-recyclerview-v7:0.4.0'
 
@@ -245,8 +271,6 @@ dependencies {
     compile 'com.commonsware.cwac:cam2:0.5.3'
     compile 'com.pusher:pusher-java-client:1.5.0'
     compile "com.mixpanel.android:mixpanel-android:5.2.1"
-    compile 'com.adobe.creativesdk.foundation:auth:0.9.1251'
-    compile 'com.adobe.creativesdk:image:4.8.4'
     compile project(":FFmpegAndroid")
     compile project(":appuniteGcm")
     compile project(":ScrollViewGallery")
@@ -261,12 +285,39 @@ dependencies {
     testCompile 'org.powermock:powermock-module-junit4-rule:1.6.4'
     testCompile 'org.powermock:powermock-module-junit4:1.6.4'
 
+    androidTestCompile 'org.mockito:mockito-core:1.10.19'
+    androidTestCompile 'com.google.truth:truth:0.26'
+
     // Amazon
     compile 'com.amazonaws:aws-android-sdk-core:2.2.13'
     compile 'com.amazonaws:aws-android-sdk-cognito:2.2.13'
     compile 'com.amazonaws:aws-android-sdk-s3:2.2.13'
     compile 'com.amazonaws:aws-android-sdk-ddb:2.2.13'
 
+    // other
+    compile 'com.uservoice:uservoice-android-sdk:1.2.4'
+    compile 'fr.avianey.com.viewpagerindicator:library:2.4.1@aar'
+    compile('com.crashlytics.sdk.android:crashlytics:2.6.2@aar') {
+        transitive = true;
+    }
+    compile 'com.commonsware.cwac:cam2:0.6.5'
+    compile "com.mixpanel.android:mixpanel-android:4.8.7"
+    compile project(":FFmpegAndroid")
+    compile project(":appuniteGcm")
+    compile project(":ScrollViewGallery")
+    compile 'com.newrelic.agent.android:android-agent:5.+'
+    compile ('com.appsee:appsee-android:+') {
+        transitive = true;
+    }
+
+}
+
+// Add dependencies to crashlytics, signingReport and google play upload so they will not finish before building the app
+tasks.whenTaskAdded { task ->
+    if (task.name.startsWith('crashlyticsUploadDistribution') ||
+            task.name == 'signingReport') {
+        task.dependsOn build
+    }
 }
 
 // Add dependencies to crashlytics, signingReport and google play upload so they will not finish before building the app

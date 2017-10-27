@@ -71,7 +71,7 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
     @Bind(R.id.chat_info_blocked_number)
     TextView mChatInfoBlockedNumber;
     @Bind(R.id.chat_info_exit_chat)
-    Button mChatInfoEditChat;
+    Button mChatInfoExitChat;
     @Bind(R.id.chat_info_progress)
     FrameLayout mChatInfoProgress;
     @Bind(R.id.chat_info_subject_layout)
@@ -82,6 +82,11 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
     TextView mChatInfoChatCreatedAt;
     @Bind(R.id.chat_info_edit_save)
     Button mChatInfoEditSave;
+    @Bind(R.id.chat_info_blocked_layouts)
+    View mBlockedView;
+    @Bind(R.id.chat_info_blocked_divider)
+    View mBlockedDividerView;
+
 
     private String conversationId;
 
@@ -243,12 +248,14 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
         mChatInfoToolbar.getMenu().findItem(R.id.chat_info_add_person).setVisible(isAdmin);
         mChatInfoSubject.setVisibility(isAdmin ? View.VISIBLE : View.GONE);
         mChatInfoSubjectTextView.setVisibility(!isAdmin ? View.VISIBLE : View.GONE);
+        mBlockedView.setVisibility(isAdmin ? View.VISIBLE : View.GONE);
+        mBlockedDividerView.setVisibility(isAdmin ? View.VISIBLE : View.GONE);
     }
 
     @Override
-    public void showSubject(boolean show) {
-        mChatInfoSubjectLayout.setVisibility(show ? View.VISIBLE : View.GONE);
-        mChatInfoEditSave.setVisibility(show ? View.VISIBLE : View.GONE);
+    public void showSubject(boolean isPublicChat, boolean isAdmin) {
+        mChatInfoSubjectLayout.setVisibility(isPublicChat ? View.VISIBLE : View.GONE);
+        mChatInfoEditSave.setVisibility(isAdmin && isPublicChat ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -279,6 +286,11 @@ public class ChatInfoActivity extends BaseActivity implements ChatInfoPresenter.
     @Override
     public void reportError() {
         ColoredSnackBar.error(ColoredSnackBar.contentView(this), R.string.chat_info_report_error, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showExitButton(boolean show) {
+        mChatInfoExitChat.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     @OnClick(R.id.chat_info_edit_save)

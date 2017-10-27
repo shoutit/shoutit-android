@@ -25,6 +25,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.facebook.CallbackManager;
+import com.google.common.base.Strings;
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
@@ -39,10 +40,10 @@ import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.RtlUtils;
 import com.shoutit.app.android.utils.TextWatcherAdapter;
 import com.shoutit.app.android.view.createshout.DialogsHelper;
-import com.shoutit.app.android.view.createshout.location.LocationActivity;
-import com.shoutit.app.android.view.createshout.location.LocationResultHelper;
+import com.shoutit.app.android.view.location.LocationActivityForResult;
+import com.shoutit.app.android.view.location.LocationHelper;
 import com.shoutit.app.android.view.createshout.publish.PublishShoutActivity;
-import com.shoutit.app.android.view.loginintro.FacebookHelper;
+import com.shoutit.app.android.facebook.FacebookHelper;
 import com.shoutit.app.android.widget.SimpleCurrencySpinnerAdapter;
 
 import java.util.List;
@@ -71,8 +72,8 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
     EditText mCreateRequestDescirption;
     @Bind(R.id.create_request_budget)
     EditText mCreateRequestBudget;
-    @Bind(R.id.create_request_spinner)
-    Spinner mCreateRequestSpinner;
+    @Bind(R.id.create_request_currency_spinner)
+    Spinner mCurrencySpinner;
     @Bind(R.id.create_request_location)
     TextView mCreateRequestLocation;
     @Bind(R.id.create_request_progress)
@@ -114,13 +115,13 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
 
         //noinspection ConstantConditions
         facebookCheckbox.setChecked(facebookHelper.hasRequiredPermissionInApi(
-                userPreferences.getUser(), FacebookHelper.PERMISSION_PUBLISH_ACTIONS));
+                userPreferences.getUserOrPage(), new String[]{FacebookHelper.PERMISSION_PUBLISH_ACTIONS}));
         RtlUtils.setTextDirection(this, facebookCheckbox);
 
         showShareInfoDialogIfNeeded();
 
         mAdapter = new SimpleCurrencySpinnerAdapter(R.string.request_activity_currency, this);
-        mCreateRequestSpinner.setAdapter(mAdapter);
+        mCurrencySpinner.setAdapter(mAdapter);
 
         mRequestActivityToolbar.setTitle(getString(R.string.request_activity_title));
         mRequestActivityToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_material);
@@ -194,7 +195,7 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
 
     @OnClick(R.id.create_request_location_btn)
     public void onLocationClick() {
-        startActivityForResult(LocationActivity.newIntent(this), LOCATION_REQUEST);
+        startActivityForResult(LocationActivityForResult.newIntent(this), LOCATION_REQUEST);
     }
 
     @OnClick(R.id.create_request_credits_info_iv)
@@ -205,7 +206,7 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == LOCATION_REQUEST && resultCode == Activity.RESULT_OK) {
-            final UserLocation userLocation = LocationResultHelper.getLocationFromIntent(data);
+            final UserLocation userLocation = LocationHelper.getLocationFromIntent(data);
             mCreateRequestPresenter.updateLocation(userLocation);
             changedLocation = userLocation;
         } else {
@@ -217,10 +218,13 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
     @SuppressWarnings("unchecked")
     @Override
     public CreateRequestPresenter.RequestData getRequestData() {
+        String currencyCode = ((PriceUtils.SpinnerCurrency) mCurrencySpinner.getSelectedItem()).getCode();
+        currencyCode = currencyCode.equals(mAdapter.getStartingText()) ? null : currencyCode;
+
         return new CreateRequestPresenter.RequestData(
                 mCreateRequestDescirption.getText().toString(),
                 mCreateRequestBudget.getText().toString(),
-                ((PriceUtils.SpinnerCurrency) mCreateRequestSpinner.getSelectedItem()).getCode());
+                currencyCode);
     }
 
     @Override
@@ -251,6 +255,7 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
     @Override
     public void setCurrencies(@NonNull List<PriceUtils.SpinnerCurrency> list) {
         mAdapter.setData(list);
+        mCurrencySpinner.setEnabled(!Strings.isNullOrEmpty(mCreateRequestBudget.getText().toString()));
     }
 
     @Override
@@ -259,13 +264,19 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
     }
 
     @Override
+    public void showCurrenciesErrorPrompt() {
+        ColoredSnackBar.error(ColoredSnackBar.contentView(this), getString(R.string.request_acitvity_currency_prompt_error), Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
     public void setCurrenciesEnabled(boolean enabled) {
-        mCreateRequestSpinner.setEnabled(enabled);
+        mCurrencySpinner.setEnabled(enabled);
     }
 
     @Override
     public void setRetryCurrenciesListener() {
-        mCreateRequestSpinner.setOnTouchListener(new View.OnTouchListener() {
+        mCurrencySpinner.setEnabled(!Strings.isNullOrEmpty(mCreateRequestBudget.getText().toString()));
+        mCurrencySpinner.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 mCreateRequestPresenter.retryCurrencies();
@@ -276,7 +287,7 @@ public class CreateRequestActivity extends BaseActivity implements CreateRequest
 
     @Override
     public void removeRetryCurrenciesListener() {
-        mCreateRequestSpinner.setOnTouchListener(null);
+        mCurrencySpinner.setOnTouchListener(null);
     }
 
     @Override

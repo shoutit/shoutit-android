@@ -6,6 +6,7 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
+import com.appunite.rx.ResponseOrError;
 import com.google.common.base.Preconditions;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.constants.AmazonConstants;
@@ -17,7 +18,9 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import rx.Observable;
+import rx.Scheduler;
 import rx.Subscriber;
+import rx.functions.Func1;
 
 public class AmazonHelper {
 
@@ -48,8 +51,8 @@ public class AmazonHelper {
     @Inject
     public AmazonHelper(@Nonnull TransferUtility transferUtility, @Nonnull UserPreferences userPreferences) {
         this.transferUtility = transferUtility;
-        Preconditions.checkNotNull(userPreferences.getUser());
-        userId = userPreferences.getUser().getId();
+        Preconditions.checkNotNull(userPreferences.getUserOrPage());
+        userId = userPreferences.getUserOrPage().getId();
     }
 
     public Observable<String> uploadShoutMediaVideoObservable(@Nonnull final File fileToUpload) {
@@ -117,5 +120,13 @@ public class AmazonHelper {
 
     public static File getfileFromPath(@NonNull String path) {
         return new File(path.replace("file://", ""));
+    }
+
+    @NonNull
+    public Func1<File, Observable<ResponseOrError<String>>> uploadImageToAmazonFunction(Scheduler networkScheduler, Scheduler uiScheduler) {
+        return fileToUpload -> uploadUserImageObservable(fileToUpload)
+                .subscribeOn(networkScheduler)
+                .observeOn(uiScheduler)
+                .compose(ResponseOrError.<String>toResponseOrErrorObservable());
     }
 }

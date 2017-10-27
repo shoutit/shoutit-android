@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.google.common.collect.ImmutableList;
+import com.shoutit.app.android.AppPreferences;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.CreateRequestShoutWithPriceRequest;
@@ -12,7 +13,7 @@ import com.shoutit.app.android.api.model.Currency;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.dao.ShoutsGlobalRefreshPresenter;
 import com.shoutit.app.android.utils.ResourcesHelper;
-import com.shoutit.app.android.view.loginintro.FacebookHelper;
+import com.shoutit.app.android.facebook.FacebookHelper;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -64,6 +65,9 @@ public class CreateRequestPresenterTest {
     @Mock
     ApiService mApiService;
 
+    @Mock
+    AppPreferences appPreferences;
+
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -75,7 +79,8 @@ public class CreateRequestPresenterTest {
         when(mUserPreferences.getLocationObservable()).thenReturn(Observable.just(getUserLocation()));
         when(mListener.getRequestData()).thenReturn(new CreateRequestPresenter.RequestData("123456", "5", "a"));
 
-        mCreateRequestPresenter = new CreateRequestPresenter(mUserPreferences, mContext, mApiService, Schedulers.immediate(), Schedulers.immediate(), globalRefreshPresenter, facebookHelper);
+        mCreateRequestPresenter = new CreateRequestPresenter(mUserPreferences, mContext, mApiService,
+                Schedulers.immediate(), Schedulers.immediate(), globalRefreshPresenter, facebookHelper, appPreferences);
     }
 
     @NonNull
@@ -105,7 +110,7 @@ public class CreateRequestPresenterTest {
 
     @Test
     public void testWhenButtonClicked_DataSentToApi() {
-        when(mListener.getRequestData()).thenReturn(new CreateRequestPresenter.RequestData("123456", "5", ""));
+        when(mListener.getRequestData()).thenReturn(new CreateRequestPresenter.RequestData("123456", "5", "z"));
         when(mApiService.createShoutRequest(any(CreateRequestShoutWithPriceRequest.class))).thenReturn(Observable.just(emptyCreateShoutResponse()));
         mCreateRequestPresenter.registerListener(mListener);
 
@@ -116,7 +121,7 @@ public class CreateRequestPresenterTest {
 
     @Test
     public void testWhenButtonClickedAndRequestSuccessful_progressShownAndHidden() {
-        when(mListener.getRequestData()).thenReturn(new CreateRequestPresenter.RequestData("123456", "5", ""));
+        when(mListener.getRequestData()).thenReturn(new CreateRequestPresenter.RequestData("123456", "5", "z"));
         when(mApiService.createShoutRequest(any(CreateRequestShoutWithPriceRequest.class))).thenReturn(Observable.just(emptyCreateShoutResponse()));
         mCreateRequestPresenter.registerListener(mListener);
 
@@ -128,7 +133,7 @@ public class CreateRequestPresenterTest {
 
     @Test
     public void testWhenButtonClickedAndRequestFailed_progressShownAndHiddenAndErrorShown() {
-        when(mListener.getRequestData()).thenReturn(new CreateRequestPresenter.RequestData("123456", "5", ""));
+        when(mListener.getRequestData()).thenReturn(new CreateRequestPresenter.RequestData("123456", "5", "z"));
 
         when(mApiService.createShoutRequest(any(CreateRequestShoutWithPriceRequest.class))).thenReturn(Observable.<CreateShoutResponse>error(new RuntimeException("")));
         mCreateRequestPresenter.registerListener(mListener);

@@ -1,8 +1,10 @@
 package com.shoutit.app.android.view.shouts;
 
 import android.graphics.Color;
+import android.support.annotation.LayoutRes;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -16,6 +18,7 @@ import javax.annotation.Nonnull;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import rx.subscriptions.CompositeSubscription;
 
 public class ShoutGridViewHolder extends ViewHolderManager.BaseViewHolder<ShoutAdapterItem> implements View.OnClickListener {
 
@@ -31,10 +34,17 @@ public class ShoutGridViewHolder extends ViewHolderManager.BaseViewHolder<ShoutA
     TextView mShoutPromotedLabel;
     @Bind(R.id.shout_container)
     View mShoutContainer;
-
+    @Bind(R.id.shout_grid_bookmark)
+    CheckBox mBoomark;
 
     private final Picasso picasso;
     private ShoutAdapterItem item;
+    private CompositeSubscription mSubscription;
+
+    @LayoutRes
+    public static int getLayoutRes() {
+        return R.layout.shout_item_grid;
+    }
 
     public ShoutGridViewHolder(@Nonnull View itemView, Picasso picasso) {
         super(itemView);
@@ -45,6 +55,8 @@ public class ShoutGridViewHolder extends ViewHolderManager.BaseViewHolder<ShoutA
 
     @Override
     public void bind(@Nonnull ShoutAdapterItem item) {
+        unsubscribe();
+
         this.item = item;
         final Shout shout = item.getShout();
         titleTextView.setText(shout.getTitle());
@@ -67,10 +79,31 @@ public class ShoutGridViewHolder extends ViewHolderManager.BaseViewHolder<ShoutA
             mShoutPromotedLabel.setVisibility(View.GONE);
             mShoutContainer.setBackgroundColor(Color.WHITE);
         }
+
+        mSubscription = new CompositeSubscription(item.getBookmarkObservable()
+                .subscribe(checked -> {
+                    mBoomark.setChecked(checked);
+                }), item.getEnableObservable().subscribe(enable -> {
+            mBoomark.setEnabled(enable);
+        }));
+
+        mBoomark.setOnClickListener(v -> item.onBookmarkSelectionChanged(mBoomark.isChecked()));
     }
 
     @Override
     public void onClick(View v) {
         item.onShoutSelected();
+    }
+
+    @Override
+    public void onViewRecycled() {
+        super.onViewRecycled();
+        unsubscribe();
+    }
+
+    private void unsubscribe() {
+        if (mSubscription != null) {
+            mSubscription.unsubscribe();
+        }
     }
 }

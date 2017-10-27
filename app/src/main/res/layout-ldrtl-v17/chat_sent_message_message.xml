@@ -16,7 +16,9 @@
         android:id="@+id/chats_sent_message_message_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:autoLink="email|phone|web"
         android:paddingEnd="40dp"
+        android:textIsSelectable="true"
         android:textSize="16sp"
         tools:text="Lorem ipsum" />
 

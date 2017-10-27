@@ -8,22 +8,24 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentActivity;
 import android.widget.Toast;
 
-import com.commonsware.cwac.cam2.AbstractCameraActivity;
 import com.commonsware.cwac.cam2.CameraController;
 import com.commonsware.cwac.cam2.CameraEngine;
 import com.commonsware.cwac.cam2.CameraSelectionCriteria;
 import com.commonsware.cwac.cam2.Facing;
+import com.commonsware.cwac.cam2.FlashMode;
 import com.commonsware.cwac.cam2.FocusMode;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.PermissionHelper;
 
 import java.util.List;
 
-public class RecordMediaActivity extends AbstractCameraActivity
+public class RecordMediaActivity extends FragmentActivity
         implements CameraFragment.CameraFragmentListener {
 
     private static final String TAG_CAMERA = CameraFragment.class.getCanonicalName();
@@ -56,37 +58,9 @@ public class RecordMediaActivity extends AbstractCameraActivity
     }
 
     @Override
-    protected boolean needsOverlay() {
-        return false;
-    }
-
-    @Override
-    protected boolean needsActionBar() {
-        return false;
-    }
-
-    @Override
-    protected boolean isVideo() {
-        return false;
-    }
-
-    @Override
-    protected com.commonsware.cwac.cam2.CameraFragment buildFragment() {
-        return null;
-    }
-
-    @Override
-    protected String[] getNeededPermissions() {
-        return new String[]{};
-    }
-
-    @Override
-    protected void configEngine(CameraEngine cameraEngine) {
-        // do nothing
-    }
-
-    @Override
     public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
         final Bundle extras = getIntent().getExtras();
         if (extras != null) {
             isActivityForResult = extras.getBoolean(EXTRA_IS_FOR_RESULT);
@@ -96,12 +70,11 @@ public class RecordMediaActivity extends AbstractCameraActivity
             useEditor = extras.getBoolean(EXTRA_USE_EDITOR);
         }
 
-        super.onCreate(savedInstanceState);
+        init();
     }
 
-    @Override
     protected void init() {
-        if (!hasPermissions()) {
+        if (!checkPermissions()) {
             return;
         }
 
@@ -121,7 +94,7 @@ public class RecordMediaActivity extends AbstractCameraActivity
         }
     }
 
-    private boolean hasPermissions() {
+    private boolean checkPermissions() {
         return PermissionHelper.checkPermissions(
                 this, REQUEST_CODE_PERMISSIONS, ColoredSnackBar.contentView(this),
                 R.string.permission_camera_create_shout_explanation,
@@ -164,27 +137,27 @@ public class RecordMediaActivity extends AbstractCameraActivity
     }
 
     private void initCamera() {
-        FocusMode focusMode = (FocusMode) getIntent().getSerializableExtra(EXTRA_FOCUS_MODE);
-        CameraController ctrlClassic = new CameraController(focusMode, true, isVideo());
+        CameraController ctrlClassic = new CameraController(FocusMode.CONTINUOUS, null, true, false);
 
         cameraFragment.setController(ctrlClassic);
-        cameraFragment.setMirrorPreview(getIntent().getBooleanExtra(EXTRA_MIRROR_PREVIEW, false));
+        cameraFragment.setMirrorPreview(false);
 
         SHCameraInfo shCameraInfo = SHCameraInfo.getInstance();
 
         if ((!shCameraInfo.isHasFrontFacingCamera() && !shCameraInfo.isHasBackFacingCamera())
                 || shCameraInfo.getNumberOfCameras() == 0) {
-            Toast.makeText(this, "no camera", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "No camera found", Toast.LENGTH_LONG).show();
             finish();
             return;
         }
 
-        CameraSelectionCriteria criteria =
+        final CameraSelectionCriteria criteria =
                 new CameraSelectionCriteria.Builder().facing(Facing.BACK).facingExactMatch(false).build();
 
-        ctrlClassic.setEngine(CameraEngine.buildInstance(RecordMediaActivity.this, true),
-                criteria);
-        ctrlClassic.getEngine().setDebug(getIntent().getBooleanExtra(EXTRA_DEBUG_ENABLED, true));
+        ctrlClassic.setEngine(CameraEngine.buildInstance(RecordMediaActivity.this, CameraEngine.ID.CLASSIC), criteria);
+        ctrlClassic.getEngine().setDebug(true);
+        ctrlClassic.getEngine().setPreferredFlashModes(Lists.newArrayList(FlashMode.AUTO));
+        ctrlClassic.setQuality(1);
 
         if (!cameraFragment.isVisible()) {
             getFragmentManager().beginTransaction().show(cameraFragment).commit();
@@ -198,11 +171,6 @@ public class RecordMediaActivity extends AbstractCameraActivity
         if (fragment != null) {
             fragment.onActivityResult(requestCode, resultCode, data);
         }
-    }
-
-    @Override
-    public void onEventMainThread(CameraController.ControllerDestroyedEvent event) {
-        // dont destroy
     }
 
     @Override
@@ -220,6 +188,4 @@ public class RecordMediaActivity extends AbstractCameraActivity
             }
         }
     }
-
-
 }

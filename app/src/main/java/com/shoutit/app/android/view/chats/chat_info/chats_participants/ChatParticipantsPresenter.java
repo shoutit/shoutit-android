@@ -10,10 +10,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.ApiMessageResponse;
 import com.shoutit.app.android.api.model.ConversationDetails;
 import com.shoutit.app.android.api.model.ConversationProfile;
 import com.shoutit.app.android.api.model.ProfileRequest;
-import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.api.model.ProfileType;
 
 import java.util.List;
 
@@ -47,9 +48,7 @@ public class ChatParticipantsPresenter {
         mNetworkScheduler = networkScheduler;
         mUiScheduler = uiScheduler;
 
-        final User user = userPreferences.getUser();
-        assert user != null;
-        mId = user.getId();
+        mId = userPreferences.getUserId();
     }
 
     public void register(Listener listener) {
@@ -85,12 +84,17 @@ public class ChatParticipantsPresenter {
         return ImmutableList.copyOf(Iterables.transform(profiles, new Function<ConversationProfile, BaseAdapterItem>() {
             @Nullable
             @Override
-            public BaseAdapterItem apply(@Nullable final ConversationProfile input) {
-                return getProfileItem(input, conversation, new ProfileItem.OnItemClicked() {
+            public BaseAdapterItem apply(@Nullable final ConversationProfile profile) {
+                return getProfileItem(profile, conversation, new ProfileItem.OnItemClicked() {
                     @Override
                     public void onItemClicked(String id, boolean isBlocked, boolean isAdmin, String name) {
-                        assert input != null;
-                        mListener.showDialog(id, isBlocked, isAdmin, name, isUserAdmin && !input.getId().equals(mId));
+                        assert profile != null;
+                        final boolean isPage = profile.getType().equals(ProfileType.PAGE);
+                        if (!profile.getId().equals(mId) && isUserAdmin) {
+                            mListener.showDialog(id, isBlocked, isAdmin, isPage, name, profile.getUsername());
+                        } else {
+                            mListener.showProfile(profile.getUsername(), isPage);
+                        }
                     }
                 });
             }
@@ -133,27 +137,26 @@ public class ChatParticipantsPresenter {
         userAction(mApiService.removeProfile(mConversationId, new ProfileRequest(id)));
     }
 
-    private void userAction(@NonNull Observable<ResponseBody> observable) {
+    private void userAction(@NonNull Observable<ApiMessageResponse> observable) {
         mListener.showProgress(true);
         mCompositeSubscription.add(observable
                 .observeOn(mUiScheduler)
                 .subscribeOn(mNetworkScheduler)
-                .subscribe(new Action1<ResponseBody>() {
-                    @Override
-                    public void call(ResponseBody responseBody) {
-                        getConversation();
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        mListener.showProgress(false);
-                        mListener.error();
-                    }
+                .subscribe(apiMessageResponse -> {
+                    getConversation();
+                    mListener.displayApiMessage(apiMessageResponse);
+                }, throwable -> {
+                    mListener.showProgress(false);
+                    mListener.error();
                 }));
     }
 
     public void unregister() {
         mCompositeSubscription.unsubscribe();
+    }
+
+    public void showProfile(@NonNull String userName, boolean isPage) {
+        mListener.showProfile(userName, isPage);
     }
 
     public interface Listener {
@@ -164,6 +167,10 @@ public class ChatParticipantsPresenter {
 
         void showProgress(boolean show);
 
-        void showDialog(String id, boolean isBlocked, boolean isAdmin, String name, boolean isClickable);
+        void showDialog(String id, boolean isBlocked, boolean isAdmin, boolean isPage, String name, String userName);
+
+        void showProfile(String username, boolean isPage);
+
+        void displayApiMessage(ApiMessageResponse apiMessageResponse);
     }
 }

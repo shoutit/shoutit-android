@@ -13,11 +13,12 @@ import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.jakewharton.rxbinding.view.RxView;
 import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.ApiMessageResponse;
+import com.shoutit.app.android.utils.ApiMessagesHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
-import com.shoutit.app.android.utils.rx.RxUtils;
 import com.shoutit.app.android.view.listenings.ProfilesListAdapter;
 
 import java.util.List;
@@ -26,7 +27,6 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import rx.functions.Action1;
 
 public abstract class BaseProfilesListActivity extends BaseActivity {
 
@@ -37,10 +37,10 @@ public abstract class BaseProfilesListActivity extends BaseActivity {
     @Bind(R.id.profiles_list_recycler_view)
     RecyclerView recyclerView;
     @Bind(R.id.base_progress)
-    View progressView;
+    protected View progressView;
 
     @Inject
-    ProfilesListPresenter presenter;
+    BaseProfileListPresenter presenter;
     @Inject
     ProfilesListAdapter adapter;
 
@@ -68,24 +68,32 @@ public abstract class BaseProfilesListActivity extends BaseActivity {
                 .subscribe(ColoredSnackBar.errorSnackBarAction(ColoredSnackBar.contentView(this)));
 
         presenter.getListenSuccessObservable()
-                .compose(this.<String>bindToLifecycle())
-                .doOnNext(new Action1<String>() {
-                    @Override
-                    public void call(String s) {
-                        setResult(RESULT_OK);
-                    }
-                })
-                .subscribe(RxUtils.listenMessageAction(this));
+                .compose(this.<ApiMessageResponse>bindToLifecycle())
+                .doOnNext(s -> setResult(RESULT_OK))
+                .subscribe(ApiMessagesHelper.apiMessageAction(this));
 
         presenter.getUnListenSuccessObservable()
-                .compose(this.<String>bindToLifecycle())
-                .doOnNext(new Action1<String>() {
-                    @Override
-                    public void call(String s) {
-                        setResult(RESULT_OK);
-                    }
-                })
-                .subscribe(RxUtils.unListenMessageAction(this));
+                .compose(this.<ApiMessageResponse>bindToLifecycle())
+                .doOnNext(s -> setResult(RESULT_OK))
+                .subscribe(ApiMessagesHelper.apiMessageAction(this));
+
+        presenter.getLoadMoreObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
+
+        presenter.getRefreshDataObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
+
+        presenter.getListeningObservable()
+                .compose(bindToLifecycle())
+                .subscribe();
+
+        presenter.getActionOnlyForLoggedInUsers()
+                .compose(bindToLifecycle())
+                .subscribe(ColoredSnackBar.errorSnackBarAction(
+                        ColoredSnackBar.contentView(this),
+                        R.string.error_action_only_for_logged_in_user));
 
         RxRecyclerView.scrollEvents(recyclerView)
                 .compose(this.<RecyclerViewScrollEvent>bindToLifecycle())

@@ -9,10 +9,10 @@ public class TagsRequest {
     }
 
     public static class TagToListen {
-        private final String name;
+        private final String slug;
 
-        public TagToListen(String name) {
-            this.name = name;
+        public TagToListen(String slug) {
+            this.slug = slug;
         }
     }
 

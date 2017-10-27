@@ -53,7 +53,6 @@ public class LocationManagerTest {
     android.location.Location gpsLocation;
 
     private BehaviorSubject<UserLocation> locationFromGpsSubject = BehaviorSubject.create();
-    private BehaviorSubject<UserLocation> locationFromIPSubject = BehaviorSubject.create();
 
     private TestScheduler testScheduler = new TestScheduler();
     private LocationManager locationManager;
@@ -69,14 +68,16 @@ public class LocationManagerTest {
         when(userPreferences.getLocation()).thenReturn(getCurrentLocation());
 
         when(apiService.geocode(anyString())).thenReturn(locationFromGpsSubject);
-        when(apiService.geocodeDefault()).thenReturn(locationFromIPSubject);
         when(apiService.updateUserLocation(any(UpdateLocationRequest.class))).thenReturn(Observable.just(user));
 
         when(gpsLocation.getLatitude()).thenReturn(1d);
         when(gpsLocation.getLongitude()).thenReturn(2d);
 
-        when(LocationUtils.getLocationObservable(any(GoogleApiClient.class), any(Context.class), any(Scheduler.class)))
-                .thenReturn(Observable.just(gpsLocation));
+        when(LocationUtils.getLastLocationObservable(any(GoogleApiClient.class), any(Context.class), any(Scheduler.class)))
+                .thenReturn(Observable.just(new LocationUtils.LocationInfo(gpsLocation, true, true)));
+
+        when(LocationUtils.convertCoordinatesForRequest(anyDouble(), anyDouble()))
+                .thenReturn("lala");
 
         when(PermissionHelper.hasPermission(any(Context.class), anyString())).thenReturn(true);
         when(LocationUtils.isLocationDifferenceMoreThanDelta(anyDouble(), anyDouble(), anyDouble(), anyDouble(), anyDouble()))
@@ -104,73 +105,23 @@ public class LocationManagerTest {
     }
 
     @Test
-    public void testWhenRefreshedSubject_locationFromGpsFetchedAgain() throws Exception {
+    public void testWhenLocationChangedAndUserLoggedIn_userUpdated() throws Exception {
         final TestSubscriber<UserLocation> subscriber = new TestSubscriber<>();
         when(userPreferences.automaticLocationTrackingEnabled()).thenReturn(true);
+        when(userPreferences.isUserLoggedIn()).thenReturn(true);
+        when(PermissionHelper.hasPermission(any(Context.class), anyString())).thenReturn(true);
+
         final UserLocation location = getLocationWithLatLngCity(1, 2, "city");
 
         locationManager.updateUserLocationObservable().subscribe(subscriber);
 
         locationFromGpsSubject.onNext(location);
-        testScheduler.triggerActions();
-        subscriber.assertValueCount(1);
-        locationManager.getRefreshGetLocationSubject().onNext(null);
-        testScheduler.triggerActions();
 
-        subscriber.assertValueCount(2);
-        subscriber.assertValues(location, location);
-    }
-
-    @Test
-    public void testWhenSubscribed_locationFromIPFetched() throws Exception {
-        final TestSubscriber<UserLocation> subscriber = new TestSubscriber<>();
-        when(userPreferences.automaticLocationTrackingEnabled()).thenReturn(true);
-        when(PermissionHelper.hasPermission(any(Context.class), anyString())).thenReturn(false);
-        final UserLocation location = getLocationWithLatLngCity(1, 2, "city");
-
-        locationManager.updateUserLocationObservable().subscribe(subscriber);
-
-        locationFromIPSubject.onNext(location);
-        testScheduler.triggerActions();
-
-        subscriber.assertValueCount(1);
-        subscriber.assertValue(location);
-    }
-
-    @Test
-    public void testWhenRefreshedSubject_locationFromIpFetchedAgain() throws Exception {
-        final TestSubscriber<UserLocation> subscriber = new TestSubscriber<>();
-        when(userPreferences.automaticLocationTrackingEnabled()).thenReturn(true);
-        when(PermissionHelper.hasPermission(any(Context.class), anyString())).thenReturn(false);
-        final UserLocation location = getLocationWithLatLngCity(1, 2, "city");
-
-        locationManager.updateUserLocationObservable().subscribe(subscriber);
-
-        locationFromIPSubject.onNext(location);
-        testScheduler.triggerActions();
-        locationManager.getRefreshGetLocationSubject().onNext(null);
-        testScheduler.triggerActions();
-
-        subscriber.assertValueCount(2);
-        subscriber.assertValues(location, location);
-    }
-
-    @Test
-    public void testWhenLocationChangedAndUserLoggedIn_userUpdated() throws Exception {
-        final TestSubscriber<UserLocation> subscriber = new TestSubscriber<>();
-        when(userPreferences.automaticLocationTrackingEnabled()).thenReturn(true);
-        when(userPreferences.isUserLoggedIn()).thenReturn(true);
-        when(PermissionHelper.hasPermission(any(Context.class), anyString())).thenReturn(false);
-        final UserLocation location = getLocationWithLatLngCity(1, 2, "city");
-
-        locationManager.updateUserLocationObservable().subscribe(subscriber);
-
-        locationFromIPSubject.onNext(location);
         testScheduler.triggerActions();
 
         subscriber.assertValueCount(1);
         verify(apiService, times(1)).updateUserLocation(any(UpdateLocationRequest.class));
-        verify(userPreferences, times(1)).updateUserJson(any(User.class));
+        verify(userPreferences, times(1)).setUserOrPage(any(User.class));
     }
 
     @Test
@@ -178,17 +129,19 @@ public class LocationManagerTest {
         final TestSubscriber<UserLocation> subscriber = new TestSubscriber<>();
         when(userPreferences.automaticLocationTrackingEnabled()).thenReturn(true);
         when(userPreferences.isUserLoggedIn()).thenReturn(false);
-        when(PermissionHelper.hasPermission(any(Context.class), anyString())).thenReturn(false);
+        when(PermissionHelper.hasPermission(any(Context.class), anyString())).thenReturn(true);
+
         final UserLocation location = getLocationWithLatLngCity(1, 2, "city");
 
         locationManager.updateUserLocationObservable().subscribe(subscriber);
 
-        locationFromIPSubject.onNext(location);
+        locationFromGpsSubject.onNext(location);
+
         testScheduler.triggerActions();
 
         subscriber.assertValueCount(1);
         verify(apiService, times(0)).updateUserLocation(any(UpdateLocationRequest.class));
-        verify(userPreferences, times(0)).updateUserJson(any(User.class));
+        verify(userPreferences, times(0)).setUserOrPage(any(User.class));
     }
 
     private UserLocation getLocationWithLatLngCity(float lat, float lng, String city) {

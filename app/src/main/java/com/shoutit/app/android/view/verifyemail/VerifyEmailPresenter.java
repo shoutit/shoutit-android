@@ -9,6 +9,7 @@ import com.appunite.rx.operators.MoreOperators;
 import com.google.common.collect.ImmutableList;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.VerifyEmailRequest;
 import com.shoutit.app.android.api.model.VerifyEmailResponse;
@@ -16,8 +17,6 @@ import com.shoutit.app.android.dao.ProfilesDao;
 import com.shoutit.app.android.utils.MoreFunctions1;
 import com.shoutit.app.android.utils.Validators;
 import com.shoutit.app.android.utils.rx.RxMoreObservers;
-
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -61,21 +60,23 @@ public class VerifyEmailPresenter {
 
         final Observable<ResponseOrError<User>> profileObservable = profilesDao.getProfileDao(User.ME)
                 .getProfileObservable()
+                .compose(ResponseOrError.map(new Func1<BaseProfile, User>() {
+                    @Override
+                    public User call(BaseProfile baseProfile) {
+                        return (User) baseProfile;
+                    }
+                }))
                 .observeOn(uiScheduler)
                 .compose(ObservableExtensions.<ResponseOrError<User>>behaviorRefCount());
 
         final Observable<User> profilesSuccessObservable = profileObservable
                 .compose(ResponseOrError.<User>onlySuccess());
 
-        emailObservable = profilesSuccessObservable.first()
-                .startWith(userPreferences.getUserObservable().first())
+        emailObservable = profilesSuccessObservable.take(1)
+                .map((Func1<User, BaseProfile>) user -> user)
+                .startWith(userPreferences.getUserOrPage())
                 .filter(Functions1.isNotNull())
-                .map(new Func1<User, String>() {
-                    @Override
-                    public String call(User user) {
-                        return user.getEmail();
-                    }
-                })
+                .map(BaseProfile::getEmail)
                 .compose(ObservableExtensions.<String>behaviorRefCount());
 
         final Observable<Boolean> isEmailCorrectObservable = emailSubject.startWith((String) null)

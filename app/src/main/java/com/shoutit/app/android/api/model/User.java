@@ -6,13 +6,12 @@ import android.support.annotation.NonNull;
 import com.google.common.base.Objects;
 import com.shoutit.app.android.model.Stats;
 
-import java.util.List;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class User extends BaseProfile {
-    public static final String ME = "me";
+    public static final String USER = "user";
+    public static final String PAGE = "page";
 
     public enum Gender {
         FEMALE("female"),
@@ -35,99 +34,77 @@ public class User extends BaseProfile {
 
     private final String apiUrl;
     private final String webUrl;
-    // whever the profile is listening to you
-    private final boolean isListener;
     private final boolean isPasswordSet;
-    private final UserLocation location;
-    private final List<Page> pages;
-    private final List<Admin> admins;
     private final String bio;
     private final int dateJoined;
     private final Listening listeningCount;
-    private final boolean isOwner;
     private final String about;
     private final String mobile;
-    private final String website;
-    private final String email;
-    private final ConversationDetails conversation;
     @Nullable
     private final String gender;
     @Nullable
     private final String birthday; // Formatted like YYYY-MM-DD
-    @NonNull
-    private final Stats stats;
+
     @Nullable
-    private final LinkedAccounts linkedAccounts;
+    private final User admin; // Field only for Page user.
+    private final boolean isVerified; // Field only for Page user.
 
     public User(String id, String type, String apiUrl, String webUrl, String username,
                 String name, String firstName, String lastName, boolean isActivated, String image,
-                String cover, boolean isListening, boolean isListener, boolean isPasswordSet, UserLocation location,
-                int listenersCount, List<Page> pages, List<Admin> admins, String bio, int dateJoined,
-                Listening listeningCount, boolean isOwner, String about, String mobile, String website, String email, ConversationDetails conversation,
-                @Nullable String gender, @Nullable String birthday, @Nullable Stats stats, @Nullable LinkedAccounts linkedAccounts) {
-        super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount);
+                String cover, boolean isListening, boolean isListener, boolean isPasswordSet, @Nullable UserLocation location,
+                int listenersCount, String bio, int dateJoined,
+                Listening listeningCount, boolean isOwner, String about, String mobile,
+                String website, String email, ConversationDetails conversation,
+                @Nullable String gender, @Nullable String birthday, @Nullable Stats stats,
+                @Nullable LinkedAccounts linkedAccounts, @Nullable User admin, boolean isVerified) {
+        super(id, type, username, name, firstName, lastName, isActivated, image, cover, isListening, listenersCount, location, isOwner, stats, email, linkedAccounts, conversation, isListener, null);
         this.apiUrl = apiUrl;
         this.webUrl = webUrl;
-        this.isListener = isListener;
         this.isPasswordSet = isPasswordSet;
-        this.location = location;
-        this.pages = pages;
-        this.admins = admins;
         this.bio = bio;
         this.dateJoined = dateJoined;
         this.listeningCount = listeningCount;
+        this.admin = admin;
+        this.isVerified = isVerified;
         this.isOwner = isOwner;
         this.about = about;
         this.mobile = mobile;
-        this.website = website;
-        this.email = email;
-        this.conversation = conversation;
         this.gender = gender;
         this.birthday = birthday;
-        this.stats = stats;
-        this.linkedAccounts = linkedAccounts;
     }
 
-    public User getListenedProfile() {
+    @NonNull
+    @Override
+    public User getListenedProfile(int newListenersCount) {
         boolean newIsListening = !isListening;
-        int newListenersCount = newIsListening ? listenersCount + 1 : listenersCount - 1;
+
         return new User(id, type, apiUrl, webUrl, username, name,
                 firstName, lastName, isActivated, image, cover,
                 newIsListening, isListener, isPasswordSet, location,
-                newListenersCount, pages, admins, bio, dateJoined, listeningCount,
-                false, about, mobile, website, email, conversation, gender, birthday, stats, linkedAccounts);
-    }
-
-    public static User userWithUpdatedPages(@Nonnull User user, List<Page> pages) {
-        return new User(user.id, user.type, user.apiUrl, user.webUrl, user.username, user.name,
-                user.firstName, user.lastName, user.isActivated, user.image, user.cover,
-                user.isListening, user.isListener, user.isPasswordSet, user.location,
-                user.listenersCount, pages, user.admins, user.bio, user.dateJoined, user.listeningCount,
-                false, user.about, user.mobile, user.website, user.email, user.conversation,
-                user.gender, user.birthday, user.stats, user.linkedAccounts);
-    }
-
-    public static User userWithUpdatedAdmins(@Nonnull User user, List<Admin> updatedAdmins) {
-        return new User(user.id, user.type, user.apiUrl, user.webUrl, user.username, user.name,
-                user.firstName, user.lastName, user.isActivated, user.image, user.cover,
-                user.isListening, user.isListener, user.isPasswordSet, user.location,
-                user.listenersCount, user.pages, updatedAdmins, user.bio, user.dateJoined, user.listeningCount,
-                false, user.about, user.mobile, user.website, user.email, user.conversation,
-                user.gender, user.birthday, user.stats, user.linkedAccounts);
+                newListenersCount, bio, dateJoined, listeningCount,
+                false, about, mobile, website, getEmail(), conversation, gender, birthday, getStats(), linkedAccounts, admin, isVerified);
     }
 
     @Nonnull
+    @Override
     public User withUpdatedStats(@Nonnull Stats newStats) {
-        return new User(id, type, apiUrl, webUrl, username, name, firstName, lastName, isActivated,
-                image, cover, isListening, isListener, isPasswordSet, location, listenersCount,
-                pages, admins, bio, dateJoined, listeningCount, isOwner, about, mobile, website,
-                email, conversation, gender, birthday, newStats, linkedAccounts);
+        return new User(id, type, apiUrl, webUrl, username, name,
+                firstName, lastName, isActivated, image, cover,
+                isListening, isListener, isPasswordSet, location,
+                listenersCount, bio, dateJoined, listeningCount,
+                false, about, mobile, website, getEmail(), conversation, gender, birthday, newStats, linkedAccounts, admin, isVerified);
     }
 
+    public boolean isUser(@Nonnull User user) {
+        return (USER.equals(user.type));
+    }
+
+    @NonNull
     public String getId() {
         return id;
     }
 
+    @NonNull
     public String getType() {
         return type;
     }
@@ -140,18 +117,22 @@ public class User extends BaseProfile {
         return webUrl;
     }
 
+    @NonNull
     public String getUsername() {
         return username;
     }
 
+    @NonNull
     public String getName() {
         return name;
     }
 
+    @NonNull
     public String getFirstName() {
         return firstName;
     }
 
+    @NonNull
     public String getLastName() {
         return lastName;
     }
@@ -188,10 +169,6 @@ public class User extends BaseProfile {
         return listenersCount;
     }
 
-    public List<Page> getPages() {
-        return pages;
-    }
-
     public String getBio() {
         return bio;
     }
@@ -208,10 +185,6 @@ public class User extends BaseProfile {
         return isListener;
     }
 
-    public List<Admin> getAdmins() {
-        return admins;
-    }
-
     public boolean isOwner() {
         return isOwner;
     }
@@ -220,26 +193,13 @@ public class User extends BaseProfile {
         return about;
     }
 
-    public String getWebsite() {
-        return website;
-    }
-
     public ConversationDetails getConversation() {
         return conversation;
-    }
-
-    public String getEmail() {
-        return email;
     }
 
     @Nullable
     public LinkedAccounts getLinkedAccounts() {
         return linkedAccounts;
-    }
-
-    @Nonnull
-    public Stats getStats() {
-        return stats;
     }
 
     @Nullable
@@ -252,62 +212,38 @@ public class User extends BaseProfile {
         return birthday;
     }
 
-    public int getUnreadConversationsCount() {
-        if (stats == null) {
-            return 0;
-        } else {
-            return stats.getUnreadConversationsCount();
-        }
+    @Nullable
+    public User getAdmin() {
+        return isUser() ? null : admin;
     }
 
-    public int getUnreadNotificationsCount() {
-        if (stats == null) {
-            return 0;
-        } else {
-            return stats.getUnreadNotifications();
-        }
+    public boolean isVerified() {
+        return isVerified;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof User)) return false;
+        if (!super.equals(o)) return false;
         final User user = (User) o;
-        return isActivated == user.isActivated &&
-                isListening == user.isListening &&
-                isPasswordSet == user.isPasswordSet &&
-                listenersCount == user.listenersCount &&
+        return isPasswordSet == user.isPasswordSet &&
                 dateJoined == user.dateJoined &&
-                isOwner == user.isOwner &&
-                Objects.equal(id, user.id) &&
-                Objects.equal(type, user.type) &&
+                isVerified == user.isVerified &&
                 Objects.equal(apiUrl, user.apiUrl) &&
                 Objects.equal(webUrl, user.webUrl) &&
-                Objects.equal(website, user.website) &&
-                Objects.equal(username, user.username) &&
-                Objects.equal(name, user.name) &&
-                Objects.equal(firstName, user.firstName) &&
-                Objects.equal(lastName, user.lastName) &&
-                Objects.equal(image, user.image) &&
-                Objects.equal(cover, user.cover) &&
-                Objects.equal(location, user.location) &&
-                Objects.equal(pages, user.pages) &&
-                Objects.equal(admins, user.admins) &&
                 Objects.equal(bio, user.bio) &&
-                Objects.equal(isListener, user.isListener) &&
-                Objects.equal(email, user.email) &&
-                Objects.equal(stats, user.stats) &&
-                Objects.equal(birthday, user.birthday) &&
+                Objects.equal(listeningCount, user.listeningCount) &&
+                Objects.equal(about, user.about) &&
+                Objects.equal(mobile, user.mobile) &&
                 Objects.equal(gender, user.gender) &&
-                Objects.equal(linkedAccounts, user.linkedAccounts) &&
-                Objects.equal(listeningCount, user.listeningCount);
+                Objects.equal(birthday, user.birthday) &&
+                Objects.equal(admin, user.admin);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id, type, apiUrl, webUrl, username, name, firstName, lastName,
-                isActivated, image, cover, isListening, isPasswordSet, location, listenersCount,
-                pages, bio, dateJoined, listeningCount, isListener, admins, isOwner, website, email,
-                stats, linkedAccounts, birthday, gender);
+        return Objects.hashCode(super.hashCode(), apiUrl, webUrl, isPasswordSet, bio,
+                dateJoined, listeningCount, about, mobile, gender, birthday, admin, isVerified);
     }
 }

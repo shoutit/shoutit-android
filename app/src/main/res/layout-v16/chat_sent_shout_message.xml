@@ -37,6 +37,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end|top"
                 android:textDirection="rtl"
+                android:paddingEnd="@dimen/chat_item_time_right_margin"
+                android:paddingRight="@dimen/chat_item_time_right_margin"
+                android:layout_marginTop="@dimen/chat_item_time_right_margin"
                 android:background="@drawable/chat_time_gradient"
                 android:textColor="@android:color/white"
                 tools:text="18:04" />
@@ -48,6 +51,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:lines="1"
+            android:textIsSelectable="true"
             android:paddingLeft="2dp"
             android:paddingRight="2dp"
             tools:text="Cotton wool line with cap and other cool things like computers" />

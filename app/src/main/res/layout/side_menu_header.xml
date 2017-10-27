@@ -24,7 +24,7 @@
             android:layout_marginTop="40dp"
             android:layout_centerHorizontal="true"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_avatar_placeholder" />
+            android:src="@drawable/default_profile_circle" />
 
         <LinearLayout
             android:layout_width="wrap_content"

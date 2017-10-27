@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.util.Pair;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.base.Optional;
@@ -14,7 +15,9 @@ import com.shoutit.app.android.utils.ResourcesHelper;
 
 import javax.annotation.Nonnull;
 
+import rx.Observable;
 import rx.Observer;
+import rx.subjects.PublishSubject;
 
 public class ShoutAdapterItem implements BaseAdapterItem {
 
@@ -53,17 +56,25 @@ public class ShoutAdapterItem implements BaseAdapterItem {
     private final Observer<String> shoutSelectedObserver;
     @Nullable
     private final PromotionInfo mPromotionInfo;
+    private final Observable<Boolean> mBookmarkObservable;
+    @NonNull
+    private final Observer<Pair<String, Boolean>> mShoutBookmarkedObserver;
+    private final Observable<Boolean> mEnableObservable;
 
     public ShoutAdapterItem(@Nonnull Shout shout, boolean isShoutOwner,
                             boolean isNormalUser, @Nonnull Context context,
                             @Nonnull Observer<String> shoutSelectedObserver,
-                            @Nullable PromotionInfo promotionInfo) {
+                            @Nullable PromotionInfo promotionInfo, Observable<Boolean> bookmarkObservable,
+                            @NonNull Observer<Pair<String, Boolean>> shoutBookmarkedObserver, Observable<Boolean> enableObservable) {
         this.shout = shout;
         this.isShoutOwner = isShoutOwner;
         this.isNormalUser = isNormalUser;
         this.context = context;
         this.shoutSelectedObserver = shoutSelectedObserver;
         this.mPromotionInfo = promotionInfo;
+        mBookmarkObservable = bookmarkObservable;
+        mShoutBookmarkedObserver = shoutBookmarkedObserver;
+        mEnableObservable = enableObservable;
     }
 
     @Override
@@ -77,6 +88,10 @@ public class ShoutAdapterItem implements BaseAdapterItem {
                 shout.getId().equals(((ShoutAdapterItem) item).shout.getId());
     }
 
+    public Observable<Boolean> getEnableObservable() {
+        return mEnableObservable;
+    }
+
     public boolean isShoutOwner() {
         return isShoutOwner;
     }
@@ -85,7 +100,7 @@ public class ShoutAdapterItem implements BaseAdapterItem {
         return isNormalUser;
     }
 
-    public boolean isPromoted(){
+    public boolean isPromoted() {
         return mPromotionInfo != null;
     }
 
@@ -102,6 +117,14 @@ public class ShoutAdapterItem implements BaseAdapterItem {
     public String getLabel() {
         assert mPromotionInfo != null;
         return mPromotionInfo.getLabel();
+    }
+
+    public void onBookmarkSelectionChanged(boolean checked) {
+        mShoutBookmarkedObserver.onNext(Pair.create(shout.getId(), checked));
+    }
+
+    public Observable<Boolean> getBookmarkObservable() {
+        return mBookmarkObservable;
     }
 
     @Override

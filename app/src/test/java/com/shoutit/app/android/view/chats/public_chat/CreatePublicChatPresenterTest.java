@@ -7,15 +7,15 @@ import android.net.Uri;
 import com.google.common.base.Optional;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.CreatePublicChatRequest;
 import com.shoutit.app.android.api.model.UpdateLocationRequest;
-import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.ImageCaptureHelper;
 import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.view.conversations.RefreshConversationBus;
-import com.shoutit.app.android.view.createshout.location.LocationResultHelper;
+import com.shoutit.app.android.view.location.LocationHelper;
 import com.shoutit.app.android.view.media.MediaUtils;
 
 import org.junit.Before;
@@ -42,7 +42,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({LocationResultHelper.class, ResourcesHelper.class, MediaUtils.class})
+@PrepareForTest({LocationHelper.class, ResourcesHelper.class, MediaUtils.class})
 public class CreatePublicChatPresenterTest {
 
     @Mock
@@ -69,7 +69,7 @@ public class CreatePublicChatPresenterTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        PowerMockito.mockStatic(LocationResultHelper.class);
+        PowerMockito.mockStatic(LocationHelper.class);
         PowerMockito.mockStatic(ResourcesHelper.class);
         PowerMockito.mockStatic(MediaUtils.class);
         when(MediaUtils.createFileFromUri(any(Context.class), any(Uri.class), anyInt())).thenReturn(new File(""));
@@ -134,7 +134,7 @@ public class CreatePublicChatPresenterTest {
     @Test
     public void whenLocationSelected_locationChanged() {
         //given
-        when(LocationResultHelper.getLocationFromIntent(any(Intent.class))).thenReturn(new UserLocation(0, 0, "", "", "", "", ""));
+        when(LocationHelper.getLocationFromIntent(any(Intent.class))).thenReturn(new UserLocation(0, 0, "", "", "", "", ""));
         when(ResourcesHelper.getCountryResId(any(Context.class), any(UserLocation.class))).thenReturn(Optional.of(1));
         mCreatePublicChatPresenter.register(listener);
 
@@ -166,7 +166,7 @@ public class CreatePublicChatPresenterTest {
         when(listener.getData()).thenReturn(new CreatePublicChatPresenter.CreatePublicChatData("subject", false, false));
 
         when(mApiService.createPublicChat(any(CreatePublicChatRequest.class))).thenReturn(Observable.just(ResponseBody.create(MediaType.parse("*/*"), "")));
-        when(mApiService.updateUserLocation(any(UpdateLocationRequest.class))).thenReturn(Observable.<User>just(null));
+        when(mApiService.updateUserLocation(any(UpdateLocationRequest.class))).thenReturn(Observable.<BaseProfile>just(null));
 
         //when
         mCreatePublicChatPresenter.createClicked();
@@ -182,7 +182,7 @@ public class CreatePublicChatPresenterTest {
         when(listener.getData()).thenReturn(new CreatePublicChatPresenter.CreatePublicChatData("subject", false, false));
 
         when(mApiService.createPublicChat(any(CreatePublicChatRequest.class))).thenReturn(Observable.just(ResponseBody.create(MediaType.parse("*/*"), "")));
-        when(mApiService.updateUserLocation(any(UpdateLocationRequest.class))).thenReturn(Observable.<User>just(null));
+        when(mApiService.updateUserLocation(any(UpdateLocationRequest.class))).thenReturn(Observable.<BaseProfile>just(null));
 
         //when
         mCreatePublicChatPresenter.createClicked();
@@ -197,7 +197,7 @@ public class CreatePublicChatPresenterTest {
         mCreatePublicChatPresenter.register(listener);
         when(listener.getData()).thenReturn(new CreatePublicChatPresenter.CreatePublicChatData("subject", false, false));
 
-        when(mApiService.updateUserLocation(any(UpdateLocationRequest.class))).thenReturn(Observable.<User>just(null));
+        when(mApiService.updateUserLocation(any(UpdateLocationRequest.class))).thenReturn(Observable.<BaseProfile>just(null));
 
         when(mApiService.createPublicChat(any(CreatePublicChatRequest.class))).thenReturn(Observable.<ResponseBody>error(new RuntimeException("")));
 
@@ -217,7 +217,7 @@ public class CreatePublicChatPresenterTest {
         when(listener.getData()).thenReturn(new CreatePublicChatPresenter.CreatePublicChatData("subject", false, false));
 
         when(mApiService.createPublicChat(any(CreatePublicChatRequest.class))).thenReturn(Observable.just(ResponseBody.create(MediaType.parse("*/*"), "")));
-        when(mApiService.updateUserLocation(any(UpdateLocationRequest.class))).thenReturn(Observable.<User>just(null));
+        when(mApiService.updateUserLocation(any(UpdateLocationRequest.class))).thenReturn(Observable.<BaseProfile>just(null));
 
         //when
         mCreatePublicChatPresenter.selectImageClicked();
@@ -237,7 +237,7 @@ public class CreatePublicChatPresenterTest {
         when(listener.getData()).thenReturn(new CreatePublicChatPresenter.CreatePublicChatData("subject", false, false));
 
         when(mApiService.createPublicChat(any(CreatePublicChatRequest.class))).thenReturn(Observable.just(ResponseBody.create(MediaType.parse("*/*"), "")));
-        when(mApiService.updateUserLocation(any(UpdateLocationRequest.class))).thenReturn(Observable.<User>just(null));
+        when(mApiService.updateUserLocation(any(UpdateLocationRequest.class))).thenReturn(Observable.<BaseProfile>just(null));
 
         //when
         mCreatePublicChatPresenter.createClicked();

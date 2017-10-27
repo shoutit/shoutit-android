@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
+import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,11 +21,10 @@ import com.shoutit.app.android.model.FiltersToSubmit;
 import com.shoutit.app.android.retainfragment.RetainFragmentHelper;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.KeyboardHelper;
-import com.shoutit.app.android.view.createshout.location.LocationActivity;
-import com.shoutit.app.android.view.createshout.location.LocationResultHelper;
+import com.shoutit.app.android.view.location.LocationActivityForResult;
+import com.shoutit.app.android.view.location.LocationHelper;
 import com.shoutit.app.android.view.search.SearchPresenter;
 
-import java.io.Serializable;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -94,7 +93,7 @@ public class FiltersFragment extends BaseFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setLayoutManager(new MyLinearLayoutManager(getActivity()));
         recyclerView.setAdapter(adapter);
 
         if (savedInstanceState == null) {
@@ -127,10 +126,10 @@ public class FiltersFragment extends BaseFragment {
                     public void call(Object o) {
                         if (getParentFragment() != null) {
                             getParentFragment().startActivityForResult(
-                                    LocationActivity.newIntent(getActivity()), REQUEST_GET_LOCATION);
+                                    LocationActivityForResult.newIntent(getActivity()), REQUEST_GET_LOCATION);
                         } else {
                             startActivityForResult(
-                                    LocationActivity.newIntent(getActivity()), REQUEST_GET_LOCATION);
+                                    LocationActivityForResult.newIntent(getActivity()), REQUEST_GET_LOCATION);
                         }
 
                     }
@@ -152,7 +151,7 @@ public class FiltersFragment extends BaseFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_GET_LOCATION && resultCode == Activity.RESULT_OK && data != null) {
-            final UserLocation userLocation = LocationResultHelper.getLocationFromIntent(data);
+            final UserLocation userLocation = LocationHelper.getLocationFromIntent(data);
             presenter.onLocationChanged(userLocation);
         } else if (resultCode == Activity.RESULT_OK) {
             super.onActivityResult(requestCode, resultCode, data);

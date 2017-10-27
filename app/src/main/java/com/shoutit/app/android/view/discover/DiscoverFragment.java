@@ -19,6 +19,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.FragmentModule;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.MyGridLayoutManager;
 import com.shoutit.app.android.utils.RtlUtils;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.shoutit.app.android.view.shouts.discover.DiscoverShoutsActivity;
@@ -30,7 +31,6 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;
-import rx.functions.Action1;
 
 public class DiscoverFragment extends BaseFragment {
 
@@ -90,39 +90,25 @@ public class DiscoverFragment extends BaseFragment {
 
         presenter.getDiscoverSelectedObservable()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String discoverItemId) {
-                        onNewDiscoverSelectedListener.onNewDiscoverSelected(discoverItemId);
-                    }
+                .subscribe(discoverItemId -> {
+                    onNewDiscoverSelectedListener.onNewDiscoverSelected(discoverItemId);
                 });
 
         presenter.getShowMoreObservable()
                 .compose(this.<DiscoverPresenter.DiscoveryInfo>bindToLifecycle())
-                .subscribe(new Action1<DiscoverPresenter.DiscoveryInfo>() {
-                    @Override
-                    public void call(DiscoverPresenter.DiscoveryInfo discoveryInfo) {
-                        startActivity(DiscoverShoutsActivity.newIntent(getActivity(), discoveryInfo.getId(), discoveryInfo.getTitle()));
-                    }
+                .subscribe(discoveryInfo -> {
+                    startActivity(DiscoverShoutsActivity.newIntent(getActivity(), discoveryInfo.getId(), discoveryInfo.getTitle()));
                 });
 
         presenter.getShoutSelectedObservable()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String shoutId) {
-                        startActivity(ShoutActivity.newIntent(getActivity(), shoutId));
-                    }
+                .subscribe(shoutId -> {
+                    startActivity(ShoutActivity.newIntent(getActivity(), shoutId));
                 });
 
         presenter.getSearchMenuItemClickObservable()
                 .compose(this.<Intent>bindToLifecycle())
-                .subscribe(new Action1<Intent>() {
-                    @Override
-                    public void call(Intent intent) {
-                        startActivity(intent);
-                    }
-                });
+                .subscribe(this::startActivity);
 
         presenter.getShoutsRefreshObservable()
                 .compose(bindToLifecycle())
@@ -158,8 +144,8 @@ public class DiscoverFragment extends BaseFragment {
     }
 
     private void setUpAdapter() {
-        final GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 2);
-        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+        final GridLayoutManager layoutManager = new MyGridLayoutManager(getContext(), 2);
+        layoutManager.setSpanSizeLookup(new MyGridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
                 final int viewType = adapter.getItemViewType(position);

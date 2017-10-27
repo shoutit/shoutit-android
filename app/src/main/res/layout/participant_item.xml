@@ -13,7 +13,7 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:scaleType="centerCrop"
-        tools:src="@drawable/af"/>
+        tools:src="@drawable/default_profile"/>
 
     <TextView
         android:id="@+id/chat_participant_item_name"

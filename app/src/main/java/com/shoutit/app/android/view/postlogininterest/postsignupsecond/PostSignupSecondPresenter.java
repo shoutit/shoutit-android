@@ -1,5 +1,6 @@
 package com.shoutit.app.android.view.postlogininterest.postsignupsecond;
 
+import android.content.res.Resources;
 import android.support.annotation.NonNull;
 
 import com.appunite.rx.ObservableExtensions;
@@ -9,31 +10,29 @@ import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
 import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.functions.Functions1;
-import com.appunite.rx.functions.ThreeParams;
-import com.appunite.rx.operators.MoreOperators;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.BaseNoIDAdapterItem;
+import com.shoutit.app.android.adapteritems.NoDataTextAdapterItem;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.BaseProfile;
+import com.shoutit.app.android.api.model.ListenResponse;
 import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.api.model.SuggestionsResponse;
+import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.dao.SuggestionsDao;
 
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
-import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.subjects.PublishSubject;
@@ -47,17 +46,19 @@ public class PostSignupSecondPresenter {
 
     private final PublishSubject<Throwable> errorSubject = PublishSubject.create();
     private final PublishSubject<BaseProfile> itemListenedSubject = PublishSubject.create();
-    private final PublishSubject<String> listenSuccess = PublishSubject.create();
-    private final PublishSubject<String> unListenSuccess = PublishSubject.create();
+    private final PublishSubject<ListenResponse> listenSuccess = PublishSubject.create();
+    private final PublishSubject<ListenResponse> unListenSuccess = PublishSubject.create();
     private final Observable<Boolean> progressObservable;
+
+    private Resources resources;
 
     public PostSignupSecondPresenter(@Nonnull SuggestionsDao suggestionsDao,
                                      @Nonnull final ApiService apiService,
                                      @Nonnull UserPreferences userPreferences,
                                      @NetworkScheduler final Scheduler networkScheduler,
-                                     @UiScheduler final Scheduler uiScheduler) {
-
-
+                                     @UiScheduler final Scheduler uiScheduler,
+                                     @Nonnull @ForActivity Resources resources) {
+        this.resources = resources;
 
         final SuggestionsDao.SuggestionsPointer suggestionsPointer =
                 new SuggestionsDao.SuggestionsPointer(PAGE_SIZE, userPreferences.getLocation());
@@ -103,46 +104,33 @@ public class PostSignupSecondPresenter {
 
                         final boolean isListeningToProfile = baseProfile.isListening();
 
-                        Observable<ResponseOrError<ResponseBody>> listenRequestObservable;
+                        Observable<ResponseOrError<ListenResponse>> listenRequestObservable;
                         if (isListeningToProfile) {
                             listenRequestObservable = apiService.unlistenProfile(baseProfile.getUsername())
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
-                                    .doOnNext(new Action1<ResponseBody>() {
-                                        @Override
-                                        public void call(ResponseBody responseBody) {
-                                            unListenSuccess.onNext(baseProfile.getName());
-                                        }
-                                    })
-                                    .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
+                                    .doOnNext(unListenSuccess::onNext)
+                                    .compose(ResponseOrError.<ListenResponse>toResponseOrErrorObservable());
                         } else {
                             listenRequestObservable = apiService.listenProfile(baseProfile.getUsername())
                                     .subscribeOn(networkScheduler)
                                     .observeOn(uiScheduler)
-                                    .doOnNext(new Action1<ResponseBody>() {
-                                        @Override
-                                        public void call(ResponseBody responseBody) {
-                                            listenSuccess.onNext(baseProfile.getName());
-                                        }
-                                    })
-                                    .compose(ResponseOrError.<ResponseBody>toResponseOrErrorObservable());
+                                    .doOnNext(listenSuccess::onNext)
+                                    .compose(ResponseOrError.<ListenResponse>toResponseOrErrorObservable());
                         }
 
                         return listenRequestObservable
-                                .map(new Func1<ResponseOrError<ResponseBody>, ResponseOrError<SuggestionsResponse>>() {
-                                    @Override
-                                    public ResponseOrError<SuggestionsResponse> call(ResponseOrError<ResponseBody> response) {
-                                        if (response.isData()) {
-                                            if (ProfileType.USER.equals(baseProfile.getType())) {
-                                                return ResponseOrError.fromData(suggestionsResponse.withUpdatedUser(baseProfile.getListenedProfile()));
-                                            } else {
-                                                return ResponseOrError.fromData(suggestionsResponse.withUpdatedPage(baseProfile.getListenedProfile()));
-                                            }
+                                .map(response -> {
+                                    if (response.isData()) {
+                                        if (ProfileType.USER.equals(baseProfile.getType())) {
+                                            return ResponseOrError.fromData(suggestionsResponse.withUpdatedUser(baseProfile.getListenedProfile(response.data().getNewListenersCount())));
                                         } else {
-                                            errorSubject.onNext(new Throwable());
-                                            // On error return current user in order to select/deselect already deselected/selected item to listenProfile
-                                            return ResponseOrError.fromData(suggestionsResponse);
+                                            return ResponseOrError.fromData(suggestionsResponse.withUpdatedPage(baseProfile.getListenedProfile(response.data().getNewListenersCount())));
                                         }
+                                    } else {
+                                        errorSubject.onNext(new Throwable());
+                                        // On error return current user in order to select/deselect already deselected/selected item to listenProfile
+                                        return ResponseOrError.fromData(suggestionsResponse);
                                     }
                                 });
                     }
@@ -159,12 +147,12 @@ public class PostSignupSecondPresenter {
     }
 
     @Nonnull
-    public Observable<String> getListenSuccessObservable() {
+    public Observable<ListenResponse> getListenSuccessObservable() {
         return listenSuccess;
     }
 
     @Nonnull
-    public Observable<String> getUnListenSuccessObservable() {
+    public Observable<ListenResponse> getUnListenSuccessObservable() {
         return unListenSuccess;
     }
 
@@ -173,15 +161,18 @@ public class PostSignupSecondPresenter {
         return new Func1<List<BaseProfile>, List<BaseAdapterItem>>() {
             @Override
             public List<BaseAdapterItem> call(List<BaseProfile> baseProfiles) {
-                final List<BaseAdapterItem> transform = Lists.transform(baseProfiles, new Function<BaseProfile, BaseAdapterItem>() {
-                    @Nullable
-                    @Override
-                    public BaseAdapterItem apply(@Nullable BaseProfile input) {
-                        return new SuggestionAdapterItem(input, itemListenedSubject);
-                    }
-                });
-
-                return ImmutableList.copyOf(transform);
+                if (!baseProfiles.isEmpty()) {
+                    final List<BaseAdapterItem> transform = Lists.transform(baseProfiles, new Function<BaseProfile, BaseAdapterItem>() {
+                        @Nullable
+                        @Override
+                        public BaseAdapterItem apply(@Nullable BaseProfile input) {
+                            return new SuggestionAdapterItem(input, itemListenedSubject);
+                        }
+                    });
+                    return ImmutableList.copyOf(transform);
+                } else {
+                    return ImmutableList.of(new NoDataTextAdapterItem(resources.getString(R.string.nothing_to_show)));
+                }
             }
         };
     }

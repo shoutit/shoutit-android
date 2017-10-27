@@ -7,29 +7,56 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 public class LinkedAccounts {
+
     @Nullable
     private final Facebook facebook;
+    @Nullable
+    private final Gplus gplus;
+    @Nullable
+    private final FacebookPage facebookPage;
 
-    private LinkedAccounts(@Nullable Facebook facebook) {
+    public LinkedAccounts(@Nullable Facebook facebook, @Nullable final Gplus gplus, @Nullable FacebookPage facebookPage) {
         this.facebook = facebook;
+        this.gplus = gplus;
+        this.facebookPage = facebookPage;
     }
 
+    public LinkedAccounts unlinkedFacebook(){
+        return new LinkedAccounts(null, gplus, facebookPage);
+    }
+
+    public LinkedAccounts unlinkedGoogle(){
+        return new LinkedAccounts(facebook, null, facebookPage);
+    }
+    public LinkedAccounts updatedGoogle(String token){
+        return new LinkedAccounts(facebook, new Gplus(token), facebookPage);
+    }
     @Nullable
     public Facebook getFacebook() {
         return facebook;
+    }
+
+    @Nullable
+    public Gplus getGplus() {return  gplus;}
+
+    @Nullable
+    public FacebookPage getFacebookPage() {
+        return facebookPage;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof LinkedAccounts)) return false;
-        final LinkedAccounts that = (LinkedAccounts) o;
-        return Objects.equal(facebook, that.facebook);
+        LinkedAccounts that = (LinkedAccounts) o;
+        return Objects.equal(facebook, that.facebook) &&
+                Objects.equal(gplus, that.gplus) &&
+                Objects.equal(facebookPage, that.facebookPage);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(facebook);
+        return Objects.hashCode(facebook, gplus, facebookPage);
     }
 
     public class Facebook {
@@ -70,4 +97,32 @@ public class LinkedAccounts {
             return Objects.hashCode(scopes, expiresAt, facebookId);
         }
     }
+
+    public class Gplus {
+        private final String gplusId;
+
+        public String getGplusId() {
+            return gplusId;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            final Gplus gplus = (Gplus) o;
+            return Objects.equal(gplusId, gplus.gplusId);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(gplusId);
+        }
+
+        public Gplus(final String gplusId) {
+            this.gplusId = gplusId;
+
+        }
+    }
+
+
 }

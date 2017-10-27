@@ -74,7 +74,12 @@ public class SearchShoutsResultsActivity extends BaseActivity {
                 checkNotNull(intent.getSerializableExtra(KEY_SEARCH_TYPE));
         categoryName = intent.getStringExtra(KEY_CATEGORY_NAME_FOR_SUB_SEARCH);
 
-        final String toolbarTitle = searchQuery == null ? categoryName : searchQuery;
+        String toolbarTitle;
+        if (searchQuery == null && categoryName == null) {
+            toolbarTitle = getString(R.string.chat_shouts_ab_title);
+        } else {
+            toolbarTitle = searchQuery == null ? categoryName : searchQuery;
+        }
         setUpToolbar(toolbarTitle );
 
         if (savedInstanceState == null) {

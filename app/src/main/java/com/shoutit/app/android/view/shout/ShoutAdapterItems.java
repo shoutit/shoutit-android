@@ -1,18 +1,23 @@
 package com.shoutit.app.android.view.shout;
 
 import android.content.res.Resources;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.util.Pair;
 
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.google.common.base.Objects;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.utils.BookmarkHelper;
 import com.shoutit.app.android.utils.PriceUtils;
 
 import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import rx.Observable;
 import rx.Observer;
 
 public class ShoutAdapterItems {
@@ -24,22 +29,61 @@ public class ShoutAdapterItems {
         @Nonnull
         private final Observer<String> onCategoryClickedObserver;
         @Nonnull
-        private final Observer<User> visitProfileObserver;
+        private final Observer<BaseProfile> visitProfileObserver;
+        @Nonnull
+        private final Observer<Boolean> likeClickedObserver;
         @Nonnull
         private final Shout shout;
         @Nonnull
         private final Resources mResources;
+        @NonNull
+        private final Observable<Boolean> mBookmarObservable;
+        @NonNull
+        private final Observer<Pair<String, Boolean>> mBookmarkObserver;
+        @NonNull
+        private final Observer<Shout> markAsObserver;
+        private final boolean isShoutOwner;
+        private final boolean isNormalUser;
+        @NonNull
+        private final Observable<Boolean> mEnableBookmarkObservable;
 
         public MainShoutAdapterItem(@Nonnull Observer<String> addToCartObserver,
                                     @Nonnull Observer<String> onCategoryClickedObserver,
-                                    @Nonnull Observer<User> visitProfileObserver,
+                                    @Nonnull Observer<BaseProfile> visitProfileObserver,
+                                    @Nonnull Observer<Boolean> likeClickedObserver,
                                     @Nonnull Shout shout,
-                                    @Nonnull Resources resources) {
+                                    @Nonnull Resources resources,
+                                    @NonNull Observable<Boolean> bookmarObservable,
+                                    @NonNull Observer<Pair<String, Boolean>> bookmarkObserver,
+                                    @NonNull Observer<Shout> markAsObserver,
+                                    boolean isShoutOwner, boolean isNormalUser,
+                                    @NonNull Observable<Boolean> enableBookmarkObservable) {
             this.addToCartObserver = addToCartObserver;
             this.onCategoryClickedObserver = onCategoryClickedObserver;
             this.visitProfileObserver = visitProfileObserver;
+            this.likeClickedObserver = likeClickedObserver;
             this.shout = shout;
             mResources = resources;
+            mBookmarObservable = bookmarObservable;
+            mBookmarkObserver = bookmarkObserver;
+            this.markAsObserver = markAsObserver;
+            this.isShoutOwner = isShoutOwner;
+            this.isNormalUser = isNormalUser;
+            mEnableBookmarkObservable = enableBookmarkObservable;
+        }
+
+        @NonNull
+        public Observable<Boolean> getEnableBookmarkObservable() {
+            return mEnableBookmarkObservable;
+        }
+
+        public void onBookmarkSelectionChanged(boolean checked) {
+            mBookmarkObserver.onNext(Pair.create(shout.getId(), checked));
+        }
+
+        @NonNull
+        public Observable<Boolean> getBookmarObservable() {
+            return mBookmarObservable;
         }
 
         @Nonnull
@@ -61,9 +105,21 @@ public class ShoutAdapterItems {
             }
         }
 
+        public boolean isShoutOwner() {
+            return isShoutOwner;
+        }
+
+        public boolean isNormalUser() {
+            return isNormalUser;
+        }
+
+        public void onLikeClicked() {
+            likeClickedObserver.onNext(shout.isLiked());
+        }
+
         @Override
         public long adapterId() {
-            return BaseAdapterItem.NO_ID;
+            return shout.getId().hashCode();
         }
 
         @Override
@@ -73,7 +129,7 @@ public class ShoutAdapterItems {
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof SeeAllRelatesAdapterItem && this.equals(item);
+            return item instanceof MainShoutAdapterItem && equals(item);
         }
 
         @Override
@@ -95,6 +151,10 @@ public class ShoutAdapterItems {
 
         public void onHeaderClick() {
             visitProfileObserver.onNext(shout.getProfile());
+        }
+
+        public void onMarkAsClick() {
+            markAsObserver.onNext(shout);
         }
     }
 
@@ -137,17 +197,17 @@ public class ShoutAdapterItems {
 
         @Override
         public long adapterId() {
-            return BaseAdapterItem.NO_ID;
+            return shout.hashCode();
         }
 
         @Override
         public boolean matches(@Nonnull BaseAdapterItem item) {
-            return item instanceof UserShoutAdapterItem;
+            return item instanceof UserShoutAdapterItem && ((UserShoutAdapterItem) item).shout.getId().equals(shout.getId());
         }
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof UserShoutAdapterItem && this.equals(item);
+            return item instanceof UserShoutAdapterItem && equals(item);
         }
 
         @Override
@@ -166,11 +226,11 @@ public class ShoutAdapterItems {
 
     public static class VisitProfileAdapterItem implements BaseAdapterItem {
         @Nonnull
-        private final Observer<User> visitProfileObserver;
+        private final Observer<BaseProfile> visitProfileObserver;
         @Nonnull
-        private final User user;
+        private final BaseProfile user;
 
-        public VisitProfileAdapterItem(@Nonnull Observer<User> visitProfileObserver, @Nonnull User user) {
+        public VisitProfileAdapterItem(@Nonnull Observer<BaseProfile> visitProfileObserver, @Nonnull BaseProfile user) {
             this.visitProfileObserver = visitProfileObserver;
             this.user = user;
         }
@@ -181,12 +241,29 @@ public class ShoutAdapterItems {
 
         @Nonnull
         public String getName() {
-            return user.getFirstName().toUpperCase();
+            if (user.isUser()) {
+                return user.getFirstName().toUpperCase();
+            } else {
+                return user.getName().toUpperCase();
+            }
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            final VisitProfileAdapterItem that = (VisitProfileAdapterItem) o;
+            return Objects.equal(user, that.user);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(user);
         }
 
         @Override
         public long adapterId() {
-            return BaseAdapterItem.NO_ID;
+            return user.hashCode();
         }
 
         @Override
@@ -196,7 +273,7 @@ public class ShoutAdapterItems {
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof VisitProfileAdapterItem;
+            return item instanceof VisitProfileAdapterItem && equals(item);
         }
     }
 
@@ -217,10 +294,22 @@ public class ShoutAdapterItems {
             seeAllObserver.onNext(shoutId);
         }
 
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            final SeeAllRelatesAdapterItem that = (SeeAllRelatesAdapterItem) o;
+            return Objects.equal(shoutId, that.shoutId);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(shoutId);
+        }
 
         @Override
         public long adapterId() {
-            return BaseAdapterItem.NO_ID;
+            return shoutId.hashCode();
         }
 
         @Override
@@ -230,7 +319,7 @@ public class ShoutAdapterItems {
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return item instanceof SeeAllRelatesAdapterItem;
+            return item instanceof SeeAllRelatesAdapterItem && item.equals(this);
         }
     }
 
@@ -247,18 +336,31 @@ public class ShoutAdapterItems {
         }
 
         @Override
+        public boolean equals(final Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            final RelatedContainerAdapterItem that = (RelatedContainerAdapterItem) o;
+            return Objects.equal(items, that.items);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(items);
+        }
+
+        @Override
         public long adapterId() {
-            return BaseAdapterItem.NO_ID;
+            return items.hashCode();
         }
 
         @Override
         public boolean matches(@Nonnull BaseAdapterItem item) {
-            return false;
+            return item instanceof RelatedContainerAdapterItem;
         }
 
         @Override
         public boolean same(@Nonnull BaseAdapterItem item) {
-            return false;
+            return item instanceof RelatedContainerAdapterItem && item.equals(this);
         }
     }
 }

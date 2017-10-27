@@ -9,7 +9,6 @@ import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.dagger.UiScheduler;
-import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
@@ -20,6 +19,7 @@ import com.pusher.client.channel.PresenceChannel;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.ConversationProfile;
 import com.shoutit.app.android.api.model.Message;
 import com.shoutit.app.android.api.model.MessageAttachment;
@@ -34,6 +34,7 @@ import com.shoutit.app.android.dao.ShoutsDao;
 import com.shoutit.app.android.utils.AmazonHelper;
 import com.shoutit.app.android.utils.PriceUtils;
 import com.shoutit.app.android.utils.pusher.PusherHelper;
+import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
 import com.shoutit.app.android.utils.pusher.TypingInfo;
 import com.shoutit.app.android.view.chats.ChatsDelegate;
 import com.shoutit.app.android.view.chats.LocalMessageBus;
@@ -91,7 +92,7 @@ public class ChatsFirstConversationPresenter {
                                            @ForActivity Resources resources,
                                            @ForActivity Context context,
                                            AmazonHelper amazonHelper,
-                                           PusherHelper pusher,
+                                           PusherHelperHolder pusher,
                                            String idForCreation,
                                            ShoutsDao shoutsDao,
                                            ProfilesDao profilesDao,
@@ -103,7 +104,7 @@ public class ChatsFirstConversationPresenter {
         mUserPreferences = userPreferences;
         mResources = resources;
         mContext = context;
-        mPusher = pusher;
+        mPusher = pusher.getPusherHelper();
         mIdForCreation = idForCreation;
         mShoutsDao = shoutsDao;
         mProfilesDao = profilesDao;
@@ -112,13 +113,13 @@ public class ChatsFirstConversationPresenter {
         calledPersonProfile = chatParticipantProfileSubject
                 .filter(Functions1.isNotNull())
                 .filter(profile ->
-                        !Objects.equal(userPreferences.getUser().getUsername(), profile.getUsername()));
+                        !Objects.equal(userPreferences.getUserOrPage().getUsername(), profile.getUsername()));
 
         mChatsDelegate = new ChatsDelegate(pusher, uiScheduler, networkScheduler, apiService, resources, userPreferences, context, amazonHelper, newMessagesSubject, bus);
     }
 
     public void register(@NonNull FirstConversationListener listener) {
-        final User user = mUserPreferences.getUser();
+        final BaseProfile user = mUserPreferences.getUserOrPage();
         assert user != null;
         mListener = listener;
         mListener.showDeleteMenu(false);
@@ -130,7 +131,7 @@ public class ChatsFirstConversationPresenter {
         getConversationInfo(user);
     }
 
-    private void getConversationInfo(User user) {
+    private void getConversationInfo(BaseProfile user) {
         if (mIsShoutConversation) {
             getShout(user);
         } else {
@@ -142,23 +143,20 @@ public class ChatsFirstConversationPresenter {
         mSubscribe.add(mApiService.getUser(mIdForCreation)
                 .subscribeOn(mNetworkScheduler)
                 .observeOn(mUiScheduler)
-                .subscribe(new Action1<User>() {
-                    @Override
-                    public void call(User user) {
-                        //noinspection ConstantConditions
-                        mListener.setToolbarInfo(ConversationsUtils.getChatWithString(
-                                ImmutableList.of(new ConversationProfile(
-                                        user.getId(),
-                                        user.getName(),
-                                        user.getUsername(),
-                                        user.getType(),
-                                        user.getImage())), mUserPreferences.getUser().getId())
-                                , null);
-                    }
+                .subscribe(user -> {
+                    //noinspection ConstantConditions
+                    mListener.setToolbarInfo(ConversationsUtils.getChatWithString(
+                            ImmutableList.of(new ConversationProfile(
+                                    user.getId(),
+                                    user.getName(),
+                                    user.getUsername(),
+                                    user.getType(),
+                                    user.getImage())), mUserPreferences.getUserOrPage().getId())
+                            , null);
                 }, getOnError()));
     }
 
-    private void getShout(final User user) {
+    private void getShout(final BaseProfile user) {
         mSubscribe.add(mShoutsDao.getShoutObservable(mIdForCreation)
                 .observeOn(mUiScheduler)
                 .compose(ResponseOrError.<Shout>onlySuccess())
@@ -169,7 +167,7 @@ public class ChatsFirstConversationPresenter {
                         final String thumbnail = Strings.emptyToNull(shout.getThumbnail());
                         final String type = shout.getType().equals(Shout.TYPE_OFFER) ? mContext.getString(R.string.chat_offer) : mContext.getString(R.string.chat_request);
                         final String price = PriceUtils.formatPriceWithCurrency(shout.getPrice(), mResources, shout.getCurrency());
-                        final User shoutOwner = shout.getProfile();
+                        final BaseProfile shoutOwner = shout.getProfile();
                         final String authorAndTime = shoutOwner.getName() + " - " + DateUtils.getRelativeTimeSpanString(mContext, shout.getDatePublishedInMillis());
                         final String id = shout.getId();
 

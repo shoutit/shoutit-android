@@ -7,7 +7,7 @@ import com.appunite.rx.dagger.UiScheduler;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.dagger.ForActivity;
-import com.shoutit.app.android.utils.pusher.PusherHelper;
+import com.shoutit.app.android.utils.pusher.PusherHelperHolder;
 import com.shoutit.app.android.view.chats.LocalMessageBus;
 
 import dagger.Module;
@@ -28,7 +28,7 @@ public class ConverstationsFragmentModule {
                                                          @NetworkScheduler Scheduler networkScheduler,
                                                          @UiScheduler Scheduler uiScheduler,
                                                          @ForActivity Context context,
-                                                         PusherHelper pusherHelper,
+                                                         PusherHelperHolder pusherHelper,
                                                          LocalMessageBus bus,
                                                          RefreshConversationBus refreshConversationBus) {
         return new ConversationsPresenter(apiService, networkScheduler, uiScheduler, context,

@@ -51,6 +51,9 @@
                 android:layout_gravity="end|top"
                 android:background="@drawable/chat_time_gradient"
                 android:textColor="@android:color/white"
+                android:paddingEnd="@dimen/chat_item_time_right_margin"
+                android:paddingRight="@dimen/chat_item_time_right_margin"
+                android:layout_marginTop="2dp"
                 tools:text="18:04" />
         </FrameLayout>
 
@@ -66,6 +69,7 @@
                 android:layout_height="wrap_content"
                 android:lines="1"
                 android:ellipsize="end"
+                android:textIsSelectable="true"
                 android:textDirection="locale"
                 tools:text="John Smithdsfdsfdsf" />
 

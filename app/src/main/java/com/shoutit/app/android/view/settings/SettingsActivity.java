@@ -9,16 +9,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.shoutit.app.android.App;
-import com.shoutit.app.android.BaseActivity;
-import com.shoutit.app.android.BuildConfig;
+import com.shoutit.app.android.BaseDaggerActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
-import com.shoutit.app.android.dagger.ActivityModule;
-import com.shoutit.app.android.dagger.BaseActivityComponent;
+import com.shoutit.app.android.dagger.BaseDaggerActivityComponent;
 import com.shoutit.app.android.utils.IntentHelper;
+import com.shoutit.app.android.utils.UpNavigationHelper;
 import com.shoutit.app.android.view.about.AboutActivity;
 import com.shoutit.app.android.view.settings.account.AccountActivity;
 
@@ -29,7 +26,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class SettingsActivity extends BaseActivity {
+public class SettingsActivity extends BaseDaggerActivity {
 
     @Bind(R.id.activity_settings_toolbar)
     Toolbar toolbar;
@@ -61,7 +58,7 @@ public class SettingsActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
+                new UpNavigationHelper(this).onUpButtonClicked();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -90,16 +87,8 @@ public class SettingsActivity extends BaseActivity {
         startActivity(AccountActivity.newIntent(this));
     }
 
-    @Nonnull
     @Override
-    public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
-        final SettingsActivityComponent component = DaggerSettingsActivityComponent
-                .builder()
-                .activityModule(new ActivityModule(this))
-                .appComponent(App.getAppComponent(getApplication()))
-                .build();
+    protected void injectComponent(BaseDaggerActivityComponent component) {
         component.inject(this);
-
-        return component;
     }
 }

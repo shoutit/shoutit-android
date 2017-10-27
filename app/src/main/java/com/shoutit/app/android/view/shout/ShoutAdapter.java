@@ -2,13 +2,17 @@ package com.shoutit.app.android.view.shout;
 
 import android.content.Context;
 import android.graphics.Rect;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import com.shoutit.app.android.utils.MyLinearLayoutManager;
+
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -16,21 +20,32 @@ import android.widget.TextView;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.android.adapter.ViewHolderManager;
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
+import com.jakewharton.rxbinding.view.RxView;
+import com.jakewharton.rxbinding.widget.RxCompoundButton;
 import com.shoutit.app.android.BaseAdapter;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.adapteritems.FbAdAdapterItem;
 import com.shoutit.app.android.adapteritems.HeaderAdapterItem;
+import com.shoutit.app.android.api.model.BaseProfile;
 import com.shoutit.app.android.api.model.Filter;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
+import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ForActivity;
 import com.shoutit.app.android.utils.DateTimeUtils;
+import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.utils.PicassoHelper;
 import com.shoutit.app.android.utils.ResourcesHelper;
+import com.shoutit.app.android.view.chats.chats_adapter.AvatarHelper;
+import com.shoutit.app.android.viewholders.FbAdLinearViewHolder;
 import com.shoutit.app.android.viewholders.HeaderViewHolder;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.viewpagerindicator.CirclePageIndicator;
+
+import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -40,6 +55,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Observable;
 import rx.Subscription;
+import rx.subscriptions.CompositeSubscription;
 
 public class ShoutAdapter extends BaseAdapter {
 
@@ -48,6 +64,7 @@ public class ShoutAdapter extends BaseAdapter {
     private static final int VIEW_TYPE_VISIT_PROFILE = 3;
     public static final int VIEW_TYPE_RELATED_SHOUTS_CONTAINER = 4;
     private static final int VIEW_TYPE_HEADER = 5;
+    private static final int VIEW_TYPE_FB_AD = 6;
 
     @Nonnull
     private final Picasso picasso;
@@ -106,9 +123,16 @@ public class ShoutAdapter extends BaseAdapter {
         View descriptionHeader;
         @Bind(R.id.shout_pager_container)
         View viewPagerContainer;
+        @Bind(R.id.shout_like)
+        ImageView shoutLikeImageView;
+        @Bind(R.id.shout_bookmark)
+        CheckBox bookmarkCheckbox;
+        @Bind(R.id.shout_mark_as_tv)
+        TextView markAsTv;
 
         private final Target flagTarget;
         private ShoutAdapterItems.MainShoutAdapterItem item;
+        private CompositeSubscription subscription;
 
         public ShoutViewHolder(@Nonnull View itemView) {
             super(itemView);
@@ -122,26 +146,47 @@ public class ShoutAdapter extends BaseAdapter {
             item.addToCartClicked();
         }
 
+        @OnClick(R.id.shout_like)
+        public void onShoutLikeClicked() {
+            item.onLikeClicked();
+        }
+
         @Override
         public void bind(@Nonnull ShoutAdapterItems.MainShoutAdapterItem item) {
+            unsubscribe();
             this.item = item;
             final Shout shout = item.getShout();
-            final User user = shout.getProfile();
+            final BaseProfile user = shout.getProfile();
+            final UserLocation location = shout.getLocation();
+
+            int currentItem = shoutViewPager.getCurrentItem();
+            shoutViewPager.setAdapter(imagesPagerAdapter);
+            pageIndicator.setViewPager(shoutViewPager);
+
+            markAsTv.setVisibility(item.isShoutOwner() ? View.VISIBLE : View.GONE);
+            if (shout.isOffer()) {
+                markAsTv.setText(shout.isSold() ?
+                        R.string.shout_unmark_as_sold : R.string.shout_mark_as_sold);
+            } else {
+                markAsTv.setText(shout.isSold() ?
+                        R.string.shout_unmark_as_fulfilled : R.string.shout_mark_as_fulfilled);
+            }
+            markAsTv.setAlpha(shout.isSold() ? 0.7f : 1f);
 
             picasso.load(user.getImage())
                     .resizeDimen(R.dimen.shout_avatar_size, R.dimen.shout_avatar_size)
                     .centerCrop()
-                    .placeholder(R.drawable.ic_rect_avatar_placeholder)
-                    .error(R.drawable.ic_rect_avatar_placeholder)
+                    .placeholder(AvatarHelper.getPlaceholderId(user.getType()))
+                    .error(AvatarHelper.getPlaceholderId(user.getType()))
                     .into(avatarImageView);
 
+            final boolean showLikeIcon = item.isNormalUser() && !item.isShoutOwner();
+            shoutLikeImageView.setVisibility(showLikeIcon ? View.VISIBLE : View.GONE);
+            shoutLikeImageView.setImageResource(shout.isLiked() ? R.drawable.likeon : R.drawable.likeoff);
+
             nameTextView.setText(user.getName());
-            final UserLocation location = shout.getLocation();
-            if (location != null) {
-                userLocationTextView.setText(context.getString(R.string.shout_user_location,
-                        location.getCity(), location.getCountry()));
-                locationTextView.setText(location.getCity());
-            }
+
+            setUserLocation(location);
 
             labelTextView.setText(shout.getTypeResId());
 
@@ -149,42 +194,84 @@ public class ShoutAdapter extends BaseAdapter {
 
             priceTextView.setText(item.getShoutPrice());
 
-            if (shout.getNumber() == 0) {
-                availableTextView.setText(context.getString(R.string.shout_available, shout.getAvailableCount()));
-            } else {
-                availableTextView.setText(context.getString(R.string.shout_only_available, shout.getAvailableCount()));
-            }
+            setNumber(shout.getNumber(), shout.getAvailableCount());
 
-            shoutViewPager.setAdapter(imagesPagerAdapter);
+            setIndicatorVisibility(shout.getImages(), shout.getVideos());
+            setMedia(shout.getImages(), shout.getVideos());
+            shoutViewPager.setCurrentItem(currentItem);
 
-            pageIndicator.setViewPager(shoutViewPager);
-            boolean hasMoreThanOneItem = shout.getImages().size() + shout.getVideos().size() > 1;
-            pageIndicator.setVisibility(hasMoreThanOneItem ? View.VISIBLE : View.GONE);
-
-            imagesPagerAdapter.setData(shout.getImages(), shout.getVideos());
-            boolean hasAnyMedia = !shout.getImages().isEmpty() || !shout.getVideos().isEmpty();
-            viewPagerContainer.setVisibility(hasAnyMedia ? View.VISIBLE : View.GONE);
-
-            descriptionTextView.setText(shout.getText());
-            final boolean isDescription = !TextUtils.isEmpty(shout.getText());
-            descriptionHeader.setVisibility(isDescription ? View.VISIBLE : View.GONE);
-            descriptionContainer.setVisibility(isDescription ? View.VISIBLE : View.GONE);
+            setDescription(shout.getText());
 
             dateTextView.setText(DateTimeUtils.getShoutDetailDate(shout.getDatePublishedInMillis()));
             categoryTextView.setText(shout.getCategory().getName());
 
-            final Optional<Integer> flagResId = ResourcesHelper.getCountryResId(context, shout.getLocation());
+            setFlag(location);
+
+            setUpFilters(shout);
+
+            subscription = new CompositeSubscription(
+                    item.getEnableBookmarkObservable().subscribe(RxView.enabled(bookmarkCheckbox)),
+                    item.getBookmarObservable().subscribe(RxCompoundButton.checked(bookmarkCheckbox)),
+                    RxView.clicks(bookmarkCheckbox).subscribe(aVoid -> {
+                        item.onBookmarkSelectionChanged(bookmarkCheckbox.isChecked());
+                    }));
+        }
+
+        private void setFlag(UserLocation location) {
+            final Optional<Integer> flagResId = ResourcesHelper.getCountryResId(context, location);
             if (flagResId.isPresent()) {
                 picasso.load(flagResId.get())
                         .into(flagTarget);
             }
+        }
 
-            setUpFilters(shout);
+        private void setDescription(String text) {
+            descriptionTextView.setText(text);
+            final boolean isDescription = !TextUtils.isEmpty(text);
+            descriptionHeader.setVisibility(isDescription ? View.VISIBLE : View.GONE);
+            descriptionContainer.setVisibility(isDescription ? View.VISIBLE : View.GONE);
+        }
+
+        private void setIndicatorVisibility(List<String> images, List<Video> videos) {
+            boolean hasMoreThanOneItem = images.size() + videos.size() > 1;
+            pageIndicator.setVisibility(hasMoreThanOneItem ? View.VISIBLE : View.GONE);
+        }
+
+        private void setNumber(float number, int availableCount) {
+            if (number == 0) {
+                availableTextView.setText(context.getString(R.string.shout_available, availableCount));
+            } else {
+                availableTextView.setText(context.getString(R.string.shout_only_available, availableCount));
+            }
+        }
+
+        private void setUserLocation(UserLocation location) {
+            if (location != null) {
+                userLocationTextView.setText(context.getString(R.string.shout_user_location,
+                        location.getCity(), location.getCountry()));
+                locationTextView.setText(location.getCity());
+            }
+        }
+
+        private void setMedia(List<String> images, List<Video> videos) {
+            imagesPagerAdapter.setData(images, videos);
+        }
+
+        @Override
+        public void onViewRecycled() {
+            super.onViewRecycled();
+            unsubscribe();
+        }
+
+        private void unsubscribe() {
+            if (subscription != null) {
+                subscription.unsubscribe();
+            }
         }
 
         private void setUpFilters(Shout shout) {
-            if (detailsContainer.getChildCount() > initDetailsContainerChildsCount) {
-                return;
+            for (int i = initDetailsContainerChildsCount - 1; i < detailsContainer.getChildCount() - 1; i++) {
+                detailsContainer.removeViewAt(i);
             }
 
             for (int i = 0; i < shout.getFilters().size(); i++) {
@@ -199,24 +286,23 @@ public class ShoutAdapter extends BaseAdapter {
                 ((TextView) view.getChildAt(0)).setText(filter.getName());
                 ((TextView) view.getChildAt(1)).setText(filter.getValue().getName());
 
-                assert detailsContainer.getChildCount() >= 2;
+                Preconditions.checkArgument(detailsContainer.getChildCount() >= 2);
                 detailsContainer.addView(view, detailsContainer.getChildCount() - 1);
-                view.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        item.onCategoryClick(filter.getValue().getSlug());
-                    }
-                });
+                view.setOnClickListener(v -> item.onCategoryClick(filter.getValue().getSlug()));
             }
 
             final boolean isLastElementLight = detailsContainer.getChildCount() % 2 != 0;
-            locationContainer.setBackgroundColor(context.getResources().getColor(
-                    isLastElementLight ? android.R.color.white : R.color.black_12));
+            locationContainer.setBackgroundColor(ContextCompat.getColor(context, isLastElementLight ? android.R.color.white : R.color.black_12));
         }
 
         @OnClick(R.id.shout_detail_category_row)
         public void onCategoryClick() {
             item.onCategoryClick(item.getShout().getCategory().getSlug());
+        }
+
+        @OnClick(R.id.shout_mark_as_tv)
+        public void onMarkAsClick() {
+            item.onMarkAsClick();
         }
 
         @OnClick(R.id.shout_user_header)
@@ -311,7 +397,7 @@ public class ShoutAdapter extends BaseAdapter {
                     outRect.right = itemSpacing;
                 }
             };
-            final LinearLayoutManager layoutManager = new LinearLayoutManager(
+            final LinearLayoutManager layoutManager = new MyLinearLayoutManager(
                     context, LinearLayoutManager.HORIZONTAL, false);
             recyclerView.addItemDecoration(itemDecoration);
             recyclerView.setLayoutManager(layoutManager);
@@ -353,11 +439,14 @@ public class ShoutAdapter extends BaseAdapter {
                 return new VisitProfileViewHolder(layoutInflater.inflate(R.layout.button_gray_with_stroke, parent, false));
             case VIEW_TYPE_RELATED_SHOUTS_CONTAINER:
                 return new RelatedShoutsContainerViewHolder(layoutInflater.inflate(R.layout.shout_related_shout_container_item, parent, false));
+            case VIEW_TYPE_FB_AD:
+                return new FbAdLinearViewHolder(layoutInflater.inflate(R.layout.ad_list_layout, parent, false), context);
             default:
                 throw new RuntimeException("Unknown view type");
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void onBindViewHolder(ViewHolderManager.BaseViewHolder holder, int position) {
         holder.bind(items.get(position));
@@ -376,6 +465,8 @@ public class ShoutAdapter extends BaseAdapter {
             return VIEW_TYPE_VISIT_PROFILE;
         } else if (item instanceof ShoutAdapterItems.UserShoutAdapterItem) {
             return VIEW_TYPE_USER_SHOUTS;
+        } else if (item instanceof FbAdAdapterItem) {
+            return VIEW_TYPE_FB_AD;
         } else {
             throw new RuntimeException("Unknown view type: " + item.getClass().getSimpleName());
         }

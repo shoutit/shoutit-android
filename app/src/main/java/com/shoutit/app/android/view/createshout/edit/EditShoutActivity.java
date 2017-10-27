@@ -38,24 +38,24 @@ import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.CategoryFilter;
+import com.shoutit.app.android.api.model.Filter;
+import com.shoutit.app.android.api.model.FilterValue;
 import com.shoutit.app.android.api.model.UserLocation;
 import com.shoutit.app.android.api.model.Video;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.ImageHelper;
-import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.PriceUtils;
-import com.shoutit.app.android.utils.ResourcesHelper;
 import com.shoutit.app.android.view.createshout.DialogsHelper;
 import com.shoutit.app.android.view.createshout.ShoutMediaPresenter;
-import com.shoutit.app.android.view.createshout.location.LocationActivity;
-import com.shoutit.app.android.view.createshout.location.LocationResultHelper;
+import com.shoutit.app.android.view.location.LocationActivityForResult;
+import com.shoutit.app.android.view.location.LocationHelper;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
+import com.shoutit.app.android.widget.BaseSpinnerAdapter;
+import com.shoutit.app.android.widget.CategorySpinnerAdapter;
 import com.shoutit.app.android.widget.CurrencySpinnerAdapter;
 import com.shoutit.app.android.widget.SimpleCurrencySpinnerAdapter;
-import com.shoutit.app.android.widget.SimpleSpinnerAdapter;
-import com.shoutit.app.android.widget.SpinnerAdapter;
 import com.shoutit.app.android.widget.StateSpinner;
 import com.squareup.picasso.Picasso;
 
@@ -70,11 +70,14 @@ import javax.inject.Named;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.subjects.PublishSubject;
 
 public class EditShoutActivity extends BaseActivity implements EditShoutPresenter.Listener, ShoutMediaPresenter.MediaListener {
 
     private static final int LOCATION_REQUEST = 0;
     private static final int MEDIA_REQUEST_CODE = 1;
+    public static final int MEDIA_EDIT_REQUEST_CODE = 2;
+    public static final int MEDIA_EDIT_EDTOR_REQUEST_CODE = 3;
 
     private static final String ARGS_ID = "args_id";
 
@@ -111,6 +114,10 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     Button editButton;
 
     @Inject
+    EditImageShoutDialog editImageDialog;
+    @Inject
+    EditVideoShoutDialog editVideoDialog;
+    @Inject
     EditShoutPresenter mEditShoutPresenter;
     @Inject
     ShoutMediaPresenter mShoutMediaPresenter;
@@ -121,7 +128,8 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     Picasso mPicassoNoTransformer;
 
     private CurrencySpinnerAdapter mCurrencyAdapter;
-    private SpinnerAdapter mCategoryAdapter;
+    private CategorySpinnerAdapter mCategoryAdapter;
+    private PublishSubject<Pair<String, Boolean>> mediaSwappedSubject = PublishSubject.create();
 
     public static Intent newIntent(@NonNull String id, @NonNull Context context) {
         return new Intent(context, EditShoutActivity.class)
@@ -154,15 +162,15 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
         mCurrencyAdapter = new SimpleCurrencySpinnerAdapter(R.string.request_activity_currency, this);
         mEditCurrencySpinner.setAdapter(mCurrencyAdapter);
 
-        mCategoryAdapter = new SimpleSpinnerAdapter(R.string.edit_shout_category, this);
+        mCategoryAdapter = new CategorySpinnerAdapter(this, android.R.layout.simple_list_item_1);
         mEditCategorySpinner.setAdapter(mCategoryAdapter);
         mEditCategorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
             @SuppressWarnings("unchecked")
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                final Pair<String, String> item = (Pair<String, String>) mEditCategorySpinner.getItemAtPosition(position);
-                mEditShoutPresenter.categorySelected(item.first);
+                final Category item = (Category) mEditCategorySpinner.getItemAtPosition(position);
+                mEditShoutPresenter.categorySelected(item.getSlug());
             }
 
             @Override
@@ -209,13 +217,13 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
 
     @OnClick(R.id.edit_location_btn)
     public void onLocationClick() {
-        startActivityForResult(LocationActivity.newIntent(this), LOCATION_REQUEST);
+        startActivityForResult(LocationActivityForResult.newIntent(this), LOCATION_REQUEST);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == LOCATION_REQUEST && resultCode == RESULT_OK) {
-            final UserLocation userLocation = LocationResultHelper.getLocationFromIntent(data);
+            final UserLocation userLocation = LocationHelper.getLocationFromIntent(data);
             mEditShoutPresenter.updateLocation(userLocation);
         } else if (requestCode == MEDIA_REQUEST_CODE && resultCode == RESULT_OK) {
             final Bundle extras = data.getExtras();
@@ -223,6 +231,15 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
             final String media = extras.getString(RecordMediaActivity.EXTRA_MEDIA);
             Preconditions.checkNotNull(media);
             mShoutMediaPresenter.addMediaItem(media, isVideo);
+        } else if (requestCode == MEDIA_EDIT_REQUEST_CODE && resultCode == RESULT_OK) {
+            final Bundle extras = data.getExtras();
+            final boolean isVideo = extras.getBoolean(RecordMediaActivity.EXTRA_IS_VIDEO);
+            final String media = extras.getString(RecordMediaActivity.EXTRA_MEDIA);
+            Preconditions.checkNotNull(media);
+            mediaSwappedSubject.onNext(Pair.create(media, isVideo));
+        } else if (requestCode == MEDIA_EDIT_EDTOR_REQUEST_CODE && resultCode == RESULT_OK) {
+            final Uri editedImageUri = data.getData();
+            mediaSwappedSubject.onNext(Pair.create(editedImageUri.toString(), false));
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
@@ -301,8 +318,8 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     }
 
     @Override
-    public void setCategories(@NonNull List<Pair<String, String>> list) {
-        mCategoryAdapter.setData(list);
+    public void setCategories(@NonNull List<Category> list) {
+        mCategoryAdapter.bindData(list);
     }
 
     @Override
@@ -313,31 +330,38 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
 
         for (CategoryFilter categoryFilter : options) {
             final String name = categoryFilter.getName();
-            final List<CategoryFilter.FilterValue> optionsList = categoryFilter.getValues();
+            final List<FilterValue> optionsList = categoryFilter.getValues();
 
             final View view = layoutInflater.inflate(R.layout.options_layout, mEditShoutContainer, false);
             final TextView title = (TextView) view.findViewById(R.id.option_title);
             final Spinner spinner = (Spinner) view.findViewById(R.id.option_spinner);
 
-            final List<Pair<String, String>> optionsPairs = ImmutableList.copyOf(Iterables.transform(optionsList,
-                    new Function<CategoryFilter.FilterValue, Pair<String, String>>() {
+            final BaseSpinnerAdapter<Filter> adapter = new BaseSpinnerAdapter<Filter>(this, android.R.layout.simple_list_item_1) {
+                @Override
+                protected String getDisplayName(int position) {
+                    return getItem(position).getValue().getName();
+                }
+            };
+            spinner.setAdapter(adapter);
+
+            final List<Filter> filters = ImmutableList.copyOf(Iterables.transform(optionsList,
+                    new Function<FilterValue, Filter>() {
                         @Nullable
                         @Override
-                        public Pair<String, String> apply(@Nullable CategoryFilter.FilterValue input) {
-                            assert input != null;
-                            return Pair.create(input.getSlug(), input.getName());
+                        public Filter apply(@Nullable FilterValue filterValue) {
+                            assert filterValue != null;
+                            return new Filter(categoryFilter.getName(), categoryFilter.getSlug(), filterValue);
                         }
                     }));
 
-            final SpinnerAdapter adapter = new SimpleSpinnerAdapter(R.string.edit_shout_option, this);
-            spinner.setAdapter(adapter);
-
-            adapter.setData(ImmutableList.<Pair<String, String>>builder()
-                    .add(new Pair<>("", getString(R.string.option_not_set)))
-                    .addAll(optionsPairs)
+            adapter.bindData(ImmutableList.<Filter>builder()
+                    .add(new Filter("", "", new FilterValue("", getString(R.string.option_not_set), "")))
+                    .addAll(filters)
                     .build());
+
             if (setStartSelection && categoryFilter.getSelectedValue() != null) {
-                spinner.setSelection(adapter.getPosition(categoryFilter.getSelectedValue().getSlug()));
+                final Filter filter = new Filter(categoryFilter.getName(), categoryFilter.getSlug(), categoryFilter.getSelectedValue());
+                spinner.setSelection(adapter.getItemPosition(filter));
             }
 
             title.setText(name);
@@ -348,16 +372,16 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     }
 
     @SuppressWarnings("unchecked")
-    private List<Pair<String, String>> getSelectedOptions() {
+    private List<Filter> getSelectedOptions() {
         final int childCount = mEditShoutContainer.getChildCount();
-        final List<Pair<String, String>> list = Lists.newArrayList();
+        final List<Filter> list = Lists.newArrayList();
         for (int i = 0; i < childCount; i++) {
             final View view = mEditShoutContainer.getChildAt(i);
             final StateSpinner spinner = (StateSpinner) view.findViewById(R.id.option_spinner);
 
-            final Pair<String, String> selectedItem = (Pair<String, String>) spinner.getSelectedItem();
-            if (selectedItem != null && !Strings.isNullOrEmpty(selectedItem.first)) {
-                list.add(Pair.create((String) view.getTag(), selectedItem.first));
+            final Filter selectedOption = (Filter) spinner.getSelectedItem();
+            if (selectedOption != null && !Strings.isNullOrEmpty(selectedOption.getSlug())) {
+                list.add(selectedOption);
             }
         }
         return ImmutableList.copyOf(list);
@@ -385,7 +409,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
                     .fit()
                     .into(mEditCategoryIcon);
 
-            mEditCategorySpinner.setSelection(mCategoryAdapter.getPosition(category.getSlug()));
+            mEditCategorySpinner.setSelection(mCategoryAdapter.getItemPosition(category));
         }
     }
 
@@ -421,7 +445,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
             if (item instanceof ShoutMediaPresenter.AddImageItem) {
                 view = layoutInflater.inflate(R.layout.edit_media_add, mEditMediaContainer, false);
             } else if (item instanceof ShoutMediaPresenter.MediaItem) {
-                view = layoutInflater.inflate(item instanceof ShoutMediaPresenter.IVideoItem ? R.layout.edit_media_video_item :  R.layout.edit_media_item, mEditMediaContainer, false);
+                view = layoutInflater.inflate(item instanceof ShoutMediaPresenter.IVideoItem ? R.layout.edit_media_video_item : R.layout.edit_media_item, mEditMediaContainer, false);
                 final ImageView imageView = (ImageView) view.findViewById(R.id.edit_media_item_image);
                 mPicasso.load(Uri.parse(((ShoutMediaPresenter.MediaItem) item).getThumb()))
                         .centerCrop()
@@ -462,7 +486,7 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
                 mEditShoutDescription.getText().toString(),
                 mEditBudget.getText().toString(),
                 ((PriceUtils.SpinnerCurrency) mEditCurrencySpinner.getSelectedItem()).getCode(),
-                ((Pair<String, String>) mEditCategorySpinner.getSelectedItem()).first,
+                (Category) mEditCategorySpinner.getSelectedItem(),
                 getSelectedOptions(), images, videos, (Strings.isNullOrEmpty(mobile) || mobile.endsWith(".")) ? null : mobile);
         mEditShoutPresenter.dataReady(requestData);
     }
@@ -475,5 +499,15 @@ public class EditShoutActivity extends BaseActivity implements EditShoutPresente
     @Override
     public void showUploadError(Throwable throwable) {
         ColoredSnackBar.error(ColoredSnackBar.contentView(this), throwable, Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void showImageDialog(int position, String path) {
+        editImageDialog.show(position, mShoutMediaPresenter, mediaSwappedSubject, path);
+    }
+
+    @Override
+    public void showVideoDialog(int position) {
+        editVideoDialog.show(position, mShoutMediaPresenter, mediaSwappedSubject);
     }
 }

@@ -7,9 +7,10 @@ import android.view.MenuItem;
 
 import com.shoutit.app.android.App;
 import com.shoutit.app.android.R;
+import com.shoutit.app.android.api.model.ProfileType;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
-import com.shoutit.app.android.view.profile.ProfileActivity;
+import com.shoutit.app.android.view.profile.user.ProfileActivity;
 import com.shoutit.app.android.view.search.SearchPresenter;
 import com.shoutit.app.android.view.search.results.shouts.SearchShoutsResultsActivity;
 
@@ -36,33 +37,22 @@ public class TagProfileActivity extends ProfileActivity {
         presenter = (TagProfilePresenter) ((TagProfileActivityComponent) getActivityComponent()).getPresenter();
 
         presenter.getProfileToOpenObservable()
-                .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String categorySlug) {
-                        startActivityForResult(
-                                TagProfileActivity.newIntent(TagProfileActivity.this, categorySlug),
-                                REQUEST_PROFILE_OPENED_FROM_PROFILE);
-                    }
+                .compose(this.<ProfileType>bindToLifecycle())
+                .subscribe(profile -> {
+                    startActivityForResult(
+                            TagProfileActivity.newIntent(TagProfileActivity.this, profile.getUsername()),
+                            REQUEST_PROFILE_OPENED_FROM_PROFILE);
                 });
 
         presenter.getSearchMenuItemClickObservable()
                 .compose(this.<Intent>bindToLifecycle())
-                .subscribe(new Action1<Intent>() {
-                    @Override
-                    public void call(Intent intent) {
-                        startActivity(intent);
-                    }
-                });
+                .subscribe(this::startActivity);
 
         presenter.getSeeAllShoutsObservable()
                 .compose(this.<String>bindToLifecycle())
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String tagProfileName) {
-                        startActivity(SearchShoutsResultsActivity.newIntent(
-                                TagProfileActivity.this, null, tagProfileName, SearchPresenter.SearchType.TAG_PROFILE));
-                    }
+                .subscribe(tagSlug -> {
+                    startActivity(SearchShoutsResultsActivity.newIntent(
+                            TagProfileActivity.this, null, tagSlug, SearchPresenter.SearchType.TAG_PROFILE));
                 });
     }
 
@@ -79,19 +69,19 @@ public class TagProfileActivity extends ProfileActivity {
 
     @Override
     protected int getAvatarPlaceholder() {
-        return R.drawable.ic_tag_avatar;
+        return R.drawable.default_tag;
     }
 
     @Nonnull
     @Override
     public BaseActivityComponent createActivityComponent(@Nullable Bundle savedInstanceState) {
         final Intent intent = checkNotNull(getIntent());
-        final String userName = checkNotNull(intent.getStringExtra(KEY_PROFILE_ID));
+        final String tagSlug = checkNotNull(intent.getStringExtra(KEY_PROFILE_ID));
 
         final TagProfileActivityComponent component = DaggerTagProfileActivityComponent
                 .builder()
                 .activityModule(new ActivityModule(this))
-                .tagProfileActivityModule(new TagProfileActivityModule(userName))
+                .tagProfileActivityModule(new TagProfileActivityModule(tagSlug))
                 .appComponent(App.getAppComponent(getApplication()))
                 .build();
         component.inject(this);

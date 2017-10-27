@@ -34,7 +34,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.adobe.creativesdk.aviary.AdobeImageIntent;
 import com.appunite.rx.internal.Preconditions;
 import com.commonsware.cwac.cam2.CameraController;
 import com.commonsware.cwac.cam2.CameraEngine;
@@ -44,6 +43,7 @@ import com.commonsware.cwac.cam2.VideoTransaction;
 import com.google.common.base.Optional;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.LogHelper;
 import com.shoutit.app.android.utils.PermissionHelper;
 
 import java.io.ByteArrayOutputStream;
@@ -252,13 +252,16 @@ public class CameraFragment extends Fragment {
 
     @Override
     public void onStop() {
-        if (ctlr != null) {
-            ctlr.stop();
+        try {
+            if (ctlr != null) {
+                ctlr.stop();
+            }
+        } catch (Exception e) {
+            LogHelper.logThrowableAndCrashlytics(TAG, "Cannot stop camera controller", e);
+        } finally {
+            EventBus.getDefault().unregister(this);
+            super.onStop();
         }
-
-        EventBus.getDefault().unregister(this);
-
-        super.onStop();
     }
 
     @Override
@@ -506,7 +509,7 @@ public class CameraFragment extends Fragment {
             try {
                 actionBtn.setSelected(true);
                 actionBtn.setEnabled(false);
-                ctlr.stopVideoRecording();
+                ctlr.stopVideoRecording(false);
             } catch (Exception e) {
                 Log.e("tag", "Exception stopping recording of video", e);
             }
@@ -554,7 +557,7 @@ public class CameraFragment extends Fragment {
             public void onFinish() {
                 textViewTime.setText("0");
                 try {
-                    ctlr.stopVideoRecording();
+                    ctlr.stopVideoRecording(true);
                 } catch (Exception e) {
                     Log.e("tag", "Exception stopping recording of video", e);
                 }
@@ -567,13 +570,14 @@ public class CameraFragment extends Fragment {
         imageOutput =
                 Utils.getPictureDirectory(getActivity(), true) + File.separator + Utils.getPictureName();
         Uri output = Uri.fromFile(new File(imageOutput));
-        PictureTransaction.Builder b = new PictureTransaction.Builder();
+        PictureTransaction.Builder builder = new PictureTransaction.Builder();
 
         if (output != null) {
-            b.toUri(getActivity(), output, true);
+            builder.toUri(getActivity(), output, true, true);
         }
 
-        ctlr.takePicture(b.build());
+        ctlr.setQuality(1);
+        ctlr.takePicture(builder.build());
     }
 
     private void onStartTakingPicture() {
@@ -767,9 +771,12 @@ public class CameraFragment extends Fragment {
 
     @OnClick(R.id.fragment_camera_switch_camera)
     void switchCamera() {
-        ctlr.switchCamera();
-
-        isMFfcEnabled = SHCameraInfo.getInstance().isHasFrontFacingCamera() && !isMFfcEnabled;
+        try {
+            ctlr.switchCamera();
+            isMFfcEnabled = SHCameraInfo.getInstance().isHasFrontFacingCamera() && !isMFfcEnabled;
+        } catch (Exception e) {
+            ColoredSnackBar.error(ColoredSnackBar.contentView(getActivity()), R.string.camera_switch_error, Snackbar.LENGTH_LONG).show();
+        }
     }
 
     @OnClick(R.id.fragment_camera_close)
@@ -857,13 +864,11 @@ public class CameraFragment extends Fragment {
                         .show();
             }
         } else {
-            if (useEditor) {
-                final Intent imageEditorIntent = new AdobeImageIntent.Builder(getActivity())
-                        .setData(Uri.parse(imageOutput))
-                        .build();
-                startActivityForResult(imageEditorIntent, REQUEST_CODE_IMAGE_EDITOR);
-            } else {
-                if(imageOutput != null) {
+         /*   // TODO When new library for editing will be ready, pass correct intent
+            if (useEditor = false) {
+                //startActivityForResult(imageEditorIntent, REQUEST_CODE_IMAGE_EDITOR);
+            } else {*/
+                if (imageOutput != null) {
                     onPictureConfirmed(Uri.parse(imageOutput));
                 } else {
                     ColoredSnackBar.error(
@@ -872,7 +877,7 @@ public class CameraFragment extends Fragment {
                             Snackbar.LENGTH_SHORT)
                             .show();
                 }
-            }
+            //}
         }
     }
 

@@ -4,6 +4,7 @@ package com.shoutit.app.android.dao;
 import android.support.annotation.NonNull;
 
 import com.appunite.rx.ResponseOrError;
+import com.appunite.rx.android.util.LogTransformer;
 import com.appunite.rx.dagger.NetworkScheduler;
 import com.appunite.rx.operators.MoreOperators;
 import com.google.common.cache.CacheBuilder;
@@ -13,8 +14,8 @@ import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.ApiService;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.ShoutsResponse;
+import com.shoutit.app.android.api.model.User;
 import com.shoutit.app.android.api.model.UserLocation;
-import com.shoutit.app.android.constants.RequestsConstants;
 import com.shoutit.app.android.model.FiltersToSubmit;
 import com.shoutit.app.android.model.LocationPointer;
 import com.shoutit.app.android.model.MobilePhoneResponse;
@@ -23,6 +24,7 @@ import com.shoutit.app.android.model.ReportBody;
 import com.shoutit.app.android.model.SearchShoutPointer;
 import com.shoutit.app.android.model.TagShoutsPointer;
 import com.shoutit.app.android.model.UserShoutsPointer;
+import com.shoutit.app.android.utils.rx.RxMoreObservers;
 import com.shoutit.app.android.view.search.SearchPresenter;
 
 import java.util.Collections;
@@ -125,6 +127,8 @@ public class ShoutsDao {
                 });
     }
 
+    public void invalidate(){shoutCache.invalidateAll();}
+
     @Nonnull
     public Observable<ResponseOrError<ShoutsResponse>> getHomeShoutsObservable(@Nonnull LocationPointer locationPointer) {
         return homeCache.getUnchecked(locationPointer).getShoutsObservable();
@@ -225,7 +229,7 @@ public class ShoutsDao {
         Observable<ShoutsResponse> getShoutsRequest(int pageNumber) {
             if (userPreferences.isNormalUser()) {
                 return apiService
-                        .home(RequestsConstants.USER_ME, pageNumber, PAGE_SIZE)
+                        .home(User.ME, pageNumber, PAGE_SIZE)
                         .subscribeOn(networkScheduler);
             } else {
                 return apiService
@@ -240,6 +244,8 @@ public class ShoutsDao {
     public class ShoutDao {
         @Nonnull
         private Observable<ResponseOrError<Shout>> shoutObservable;
+        @Nonnull
+        private PublishSubject<Shout> updateShoutLocally = PublishSubject.create();
         @Nonnull
         private Observable<ResponseOrError<MobilePhoneResponse>> shoutMobileObservable;
         @Nonnull
@@ -260,8 +266,8 @@ public class ShoutsDao {
                     .subscribeOn(networkScheduler)
                     .mergeWith(Observable.<Shout>never())
                     .compose(MoreOperators.<Shout>refresh(refreshShoutsSubject))
-                    .compose(ResponseOrError.<Shout>toResponseOrErrorObservable())
-                    .compose(MoreOperators.<ResponseOrError<Shout>>cacheWithTimeout(networkScheduler));
+                    .mergeWith(updateShoutLocally)
+                    .compose(ResponseOrError.<Shout>toResponseOrErrorObservable());
 
             shoutMobileObservable = apiService.shoutCall(shoutId)
                     .subscribeOn(networkScheduler)
@@ -286,7 +292,11 @@ public class ShoutsDao {
                                     .subscribeOn(networkScheduler);
                         }
                     });
+        }
 
+        @Nonnull
+        public Observer<Shout> updateShoutLocally() {
+            return RxMoreObservers.ignoreCompleted(updateShoutLocally);
         }
 
         @Nonnull
@@ -392,7 +402,7 @@ public class ShoutsDao {
         @Override
         Observable<ShoutsResponse> getShoutsRequest(int pageNumber) {
             return apiService
-                    .tagShouts(pointer.getTagName(), pageNumber, pointer.getPageSize());
+                    .tagShouts(pointer.getTagName(), pointer.getCountry(), pageNumber, pointer.getPageSize());
         }
     }
 

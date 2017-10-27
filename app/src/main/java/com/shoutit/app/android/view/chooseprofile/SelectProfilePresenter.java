@@ -4,19 +4,16 @@ import com.appunite.rx.ObservableExtensions;
 import com.appunite.rx.ResponseOrError;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.appunite.rx.dagger.UiScheduler;
-import com.appunite.rx.functions.BothParams;
 import com.appunite.rx.functions.Functions1;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.adapteritems.NoDataAdapterItem;
 import com.shoutit.app.android.api.model.BaseProfile;
-import com.shoutit.app.android.api.model.ListenersResponse;
-import com.shoutit.app.android.api.model.ListeningResponse;
-import com.shoutit.app.android.api.model.User;
+import com.shoutit.app.android.api.model.ProfilesListResponse;
 import com.shoutit.app.android.dao.ListenersDaos;
 import com.shoutit.app.android.dao.ListeningsDao;
-import com.shoutit.app.android.view.listenings.ListeningsPresenter;
 
 import java.util.List;
 
@@ -25,7 +22,6 @@ import javax.annotation.Nonnull;
 import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
-import rx.functions.Func1;
 import rx.subjects.PublishSubject;
 
 public class SelectProfilePresenter {
@@ -39,43 +35,36 @@ public class SelectProfilePresenter {
     @Nonnull
     private final Observable<Boolean> progressObservable;
 
-    private PublishSubject<BothParams<String, String>> profileSelectedSubject = PublishSubject.create();
+    private PublishSubject<BaseProfile> profileSelectedSubject = PublishSubject.create();
     private PublishSubject<Object> loadMoreListenings = PublishSubject.create();
     private PublishSubject<Object> loadMoreListeners = PublishSubject.create();
 
     public SelectProfilePresenter(@Nonnull ListeningsDao listeningsDao,
                                   @Nonnull ListenersDaos listenersDao,
-                                  @UiScheduler Scheduler uiScheduler) {
+                                  @UiScheduler Scheduler uiScheduler,
+                                  @Nonnull UserPreferences userPreferences) {
 
-        final Observable<ResponseOrError<ListeningResponse>> listeningsObservable = listeningsDao
-                .getDao(ListeningsPresenter.ListeningsType.USERS_AND_PAGES)
-                .getListeningObservable()
-                .observeOn(uiScheduler)
-                .compose(ObservableExtensions.<ResponseOrError<ListeningResponse>>behaviorRefCount());
+        final String userName = userPreferences.getUserOrPage().getUsername();
 
-        final Observable<ResponseOrError<ListenersResponse>> listenersObservable = listenersDao
-                .getDao(User.ME)
-                .getLstenersObservable()
+        final Observable<ResponseOrError<ProfilesListResponse>> listeningsObservable = listeningsDao
+                .getDao(userName)
+                .getProfilesObservable()
                 .observeOn(uiScheduler)
-                .compose(ObservableExtensions.<ResponseOrError<ListenersResponse>>behaviorRefCount());
+                .compose(ObservableExtensions.<ResponseOrError<ProfilesListResponse>>behaviorRefCount());
+
+        final Observable<ResponseOrError<ProfilesListResponse>> listenersObservable = listenersDao
+                .getDao(userName)
+                .getProfilesObservable()
+                .observeOn(uiScheduler)
+                .compose(ObservableExtensions.<ResponseOrError<ProfilesListResponse>>behaviorRefCount());
 
         listeningsAdapterItems = listeningsObservable
-                .compose(ResponseOrError.<ListeningResponse>onlySuccess())
-                .map(new Func1<ListeningResponse, List<BaseAdapterItem>>() {
-                    @Override
-                    public List<BaseAdapterItem> call(ListeningResponse listeningResponse) {
-                        return itemsToAdapterItem(listeningResponse.getProfiles());
-                    }
-                });
+                .compose(ResponseOrError.<ProfilesListResponse>onlySuccess())
+                .map(listeningResponse -> itemsToAdapterItem(listeningResponse.getResults()));
 
         listenersAdapterItems = listenersObservable
-                .compose(ResponseOrError.<ListenersResponse>onlySuccess())
-                .map(new Func1<ListenersResponse, List<BaseAdapterItem>>() {
-                    @Override
-                    public List<BaseAdapterItem> call(ListenersResponse listenersResponse) {
-                        return itemsToAdapterItem(listenersResponse.getProfiles());
-                    }
-                });
+                .compose(ResponseOrError.<ProfilesListResponse>onlySuccess())
+                .map(listenersResponse -> itemsToAdapterItem(listenersResponse.getResults()));
 
         errorObservable = ResponseOrError.combineErrorsObservable(
                 ImmutableList.of(
@@ -114,7 +103,7 @@ public class SelectProfilePresenter {
         return errorObservable;
     }
 
-    public Observable<BothParams<String, String>> getProfileSelectedObservable() {
+    public Observable<BaseProfile> getProfileSelectedObservable() {
         return profileSelectedSubject;
     }
 

@@ -6,14 +6,12 @@
     <dimen name="home_feed_image_height">156dp</dimen>
     <dimen name="home_discover_card_width">150dp</dimen>
     <dimen name="home_discover_card_height">156dp</dimen>
-    <dimen name="home_grid_side_spacing">8dp</dimen>
     <dimen name="home_linear_side_spacing">8dp</dimen>
     <dimen name="home_discover_item_spacing">6dp</dimen>
     <dimen name="home_feed_image_size_linear">140dp</dimen>
 
     <!-- Side menu -->
     <dimen name="side_menu_cover_height">202dp</dimen>
-    <dimen name="side_menu_header_height">222dp</dimen>
     <dimen name="side_menu_avatar_size">84dp</dimen>
 
     <!-- Discover -->
@@ -24,10 +22,8 @@
     <!-- Shout detail -->
     <dimen name="shout_related_width">150dp</dimen>
     <dimen name="shout_related_image_height">110dp</dimen>
-    <dimen name="shout_related_container_height">180dp</dimen>
 
     <!-- Profile -->
     <dimen name="profile_cover_height">240dp</dimen>
-    <dimen name="profile_shout_height">220dp</dimen>
 
 </resources>

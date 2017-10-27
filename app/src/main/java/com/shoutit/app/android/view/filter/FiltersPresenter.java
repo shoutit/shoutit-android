@@ -21,6 +21,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
 import com.shoutit.app.android.api.model.Category;
 import com.shoutit.app.android.api.model.CategoryFilter;
+import com.shoutit.app.android.api.model.FilterValue;
 import com.shoutit.app.android.api.model.Shout;
 import com.shoutit.app.android.api.model.SortType;
 import com.shoutit.app.android.api.model.UserLocation;
@@ -69,7 +70,7 @@ public class FiltersPresenter {
     private final Observable<List<BaseAdapterItem>> allAdapterItems;
     private final Observable<Throwable> errorObservable;
     private final Observable<Boolean> progressObservable;
-    private final Observable<ImmutableMultimap<String, CategoryFilter.FilterValue>> selectedValuesMapObservable;
+    private final Observable<ImmutableMultimap<String, FilterValue>> selectedValuesMapObservable;
     private final Observable<FiltersToSubmit> selectedFiltersObservable;
 
     private static final Integer[] distanceValuesTable = new Integer[] {
@@ -179,23 +180,23 @@ public class FiltersPresenter {
                                 return categoriesMap.get(categorySlug);
                             }
                         })
-                .startWith(initCategoryObservable.first())
+                .startWith(initCategoryObservable.take(1))
                 .compose(MoreOperators.<Category>refresh(resetClickedSubject))
                 .compose(ObservableExtensions.<Category>behaviorRefCount());
 
         /** Filters **/
         selectedValuesMapObservable = filterValueSelectionChanged
-                .scan(ImmutableMultimap.<String, CategoryFilter.FilterValue>of(),
-                        new Func2<ImmutableMultimap<String, CategoryFilter.FilterValue>, AdapterFilterValue, ImmutableMultimap<String, CategoryFilter.FilterValue>>() {
+                .scan(ImmutableMultimap.<String, FilterValue>of(),
+                        new Func2<ImmutableMultimap<String, FilterValue>, AdapterFilterValue, ImmutableMultimap<String, FilterValue>>() {
                             @Override
-                            public ImmutableMultimap<String, CategoryFilter.FilterValue> call(ImmutableMultimap<String, CategoryFilter.FilterValue> selectedValues,
+                            public ImmutableMultimap<String, FilterValue> call(ImmutableMultimap<String, FilterValue> selectedValues,
                                                                                               AdapterFilterValue changedValue) {
-                                final Multimap<String, CategoryFilter.FilterValue> newMap = LinkedHashMultimap.create(selectedValues);
-                                final Collection<CategoryFilter.FilterValue> filterValues = newMap.get(changedValue.filter.getSlug());
+                                final Multimap<String, FilterValue> newMap = LinkedHashMultimap.create(selectedValues);
+                                final Collection<FilterValue> filterValues = newMap.get(changedValue.filter.getSlug());
 
                                 boolean wasValueVisible = false;
                                 if (filterValues != null) {
-                                    for (CategoryFilter.FilterValue value : filterValues) {
+                                    for (FilterValue value : filterValues) {
                                         if (value.getSlug().equals(changedValue.filterValue.getSlug())) {
                                             wasValueVisible = true;
                                             break;
@@ -211,9 +212,9 @@ public class FiltersPresenter {
                                 return ImmutableMultimap.copyOf(newMap);
                             }
                         })
-                .compose(MoreOperators.<ImmutableMultimap<String, CategoryFilter.FilterValue>>refresh(Observable.merge(resetClickedSubject, selectedCategoryObservable)))
-                .startWith(ImmutableMultimap.<String, CategoryFilter.FilterValue>of())
-                .compose(ObservableExtensions.<ImmutableMultimap<String, CategoryFilter.FilterValue>>behaviorRefCount());
+                .compose(MoreOperators.<ImmutableMultimap<String, FilterValue>>refresh(Observable.merge(resetClickedSubject, selectedCategoryObservable)))
+                .startWith(ImmutableMultimap.<String, FilterValue>of())
+                .compose(ObservableExtensions.<ImmutableMultimap<String, FilterValue>>behaviorRefCount());
 
         final Observable<ImmutableMap<String, Boolean>> filtersVisibilityMap = filterVisibilityChanged
                 .scan(ImmutableMap.<String, Boolean>of(),
@@ -306,7 +307,7 @@ public class FiltersPresenter {
                 sortTypeObservable,
                 selectedValuesMapObservable,
                 selectedCategoryObservable,
-                new Func8<String, String, UserLocation, Integer, String, SortType, Multimap<String, CategoryFilter.FilterValue>, Category, FiltersToSubmit>() {
+                new Func8<String, String, UserLocation, Integer, String, SortType, Multimap<String, FilterValue>, Category, FiltersToSubmit>() {
                     @Override
                     public FiltersToSubmit call(String minPrice,
                                                 String maxPrice,
@@ -314,7 +315,7 @@ public class FiltersPresenter {
                                                 Integer distance,
                                                 String shoutType,
                                                 SortType sortType,
-                                                Multimap<String, CategoryFilter.FilterValue> selectedValues,
+                                                Multimap<String, FilterValue> selectedValues,
                                                 Category category) {
                         final String categorySlug = DEFAULT_CATEGORY_SLUG.equals(category.getSlug()) ? null : category.getSlug();
                         return new FiltersToSubmit(minPrice, maxPrice, userLocation, distance, shoutType, sortType, selectedValues, categorySlug);
@@ -346,7 +347,7 @@ public class FiltersPresenter {
                             selectedValuesMapObservable, hasVisibleValues));
 
                     if (hasVisibleValues) {
-                        for (CategoryFilter.FilterValue filterValue : categoryFilter.getValues()) {
+                        for (FilterValue filterValue : categoryFilter.getValues()) {
                             allItemsBuilder.add(new FiltersAdapterItems.FilterValueAdapterItem(
                                     categoryFilter, filterValue, filterValueSelectionChanged, selectedValuesMapObservable));
                         }
@@ -395,9 +396,9 @@ public class FiltersPresenter {
 
     public static class AdapterFilterValue {
         private final CategoryFilter filter;
-        private final CategoryFilter.FilterValue filterValue;
+        private final FilterValue filterValue;
 
-        public AdapterFilterValue(CategoryFilter filter, CategoryFilter.FilterValue filterValue) {
+        public AdapterFilterValue(CategoryFilter filter, FilterValue filterValue) {
             this.filter = filter;
             this.filterValue = filterValue;
         }

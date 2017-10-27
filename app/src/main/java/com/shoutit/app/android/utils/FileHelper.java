@@ -3,6 +3,7 @@ package com.shoutit.app.android.utils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.appunite.rx.ResponseOrError;
@@ -21,6 +22,7 @@ import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Subscriber;
+import rx.functions.Func1;
 
 public class FileHelper {
 
@@ -134,5 +136,23 @@ public class FileHelper {
         public WrongFileException(Throwable e, Uri uri) {
             super("Could not load photo: " + uri + " file", e);
         }
+    }
+
+    @NonNull
+    public Func1<Uri, Observable<ResponseOrError<File>>> scaleAndCompressImage(final int maxImageSize) {
+        return imageUri -> scaleAndCompressImage(maxImageSize, imageUri);
+    }
+
+    @NonNull
+    public Observable<ResponseOrError<File>> scaleAndCompressImage(final int maxImageSize, Uri imageUri) {
+        return Observable.defer(() -> {
+            try {
+                final String tempFile = createTempFileAndStoreUri(imageUri);
+                final Bitmap bitmapToUpload = ImageHelper.scaleImage(tempFile, maxImageSize);
+                return saveBitmapToTempFileObservable(bitmapToUpload);
+            } catch (IOException e) {
+                return Observable.just(ResponseOrError.<File>fromError(e));
+            }
+        });
     }
 }

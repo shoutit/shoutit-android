@@ -2,6 +2,7 @@ package com.shoutit.app.android.view.chats.chatsfirstconversation;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -37,6 +38,7 @@ import com.shoutit.app.android.R;
 import com.shoutit.app.android.dagger.ActivityModule;
 import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
+import com.shoutit.app.android.utils.IntentHelper;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.utils.TextWatcherAdapter;
 import com.shoutit.app.android.view.chats.ChatsHelper;
@@ -44,7 +46,7 @@ import com.shoutit.app.android.view.chats.chat_info.ChatInfoActivity;
 import com.shoutit.app.android.view.chats.chats_adapter.ChatsAdapter;
 import com.shoutit.app.android.view.chooseprofile.SelectProfileActivity;
 import com.shoutit.app.android.view.media.RecordMediaActivity;
-import com.shoutit.app.android.view.profile.UserOrPageProfileActivity;
+import com.shoutit.app.android.view.profile.ProfileIntentHelper;
 import com.shoutit.app.android.view.shout.ShoutActivity;
 import com.shoutit.app.android.view.shouts.selectshout.SelectShoutActivity;
 import com.squareup.picasso.Picasso;
@@ -163,6 +165,17 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
 
         mChatsRecyclerview.setAdapter(chatsAdapter);
         mChatsRecyclerview.setLayoutManager(new MyLinearLayoutManager(this));
+        mChatsRecyclerview.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+                final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) view.getLayoutParams();
+                final int position = params.getViewAdapterPosition();
+
+                if (position == parent.getAdapter().getItemCount() - 1) {
+                    outRect.bottom = getResources().getDimensionPixelSize(R.dimen.chat_last_item_decoration);
+                }
+            }
+        });
 
         presenter.register(this);
 
@@ -258,10 +271,7 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
 
     @Override
     public void onImageClicked(String url) {
-        Intent intent = new Intent();
-        intent.setAction(android.content.Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.parse(url), "image/*");
-        startActivity(intent);
+        startActivity(IntentHelper.singleImageGalleryIntent(this, url));
     }
 
     @Override
@@ -300,8 +310,8 @@ public class ChatFirstConversationActivity extends BaseActivity implements First
     }
 
     @Override
-    public void onProfileClicked(String userName) {
-        startActivity(UserOrPageProfileActivity.newIntent(this, userName));
+    public void onProfileClicked(String userName, boolean isPage) {
+        startActivity(ProfileIntentHelper.newIntent(this, userName, isPage));
     }
 
     @Override

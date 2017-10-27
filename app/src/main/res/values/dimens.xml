@@ -46,6 +46,7 @@
     <dimen name="shout_item_padding">6dp</dimen>
     <dimen name="shout_related_item_spacing">1dp</dimen>
     <dimen name="shout_bottom_bar">48dp</dimen>
+    <dimen name="last_item_margin">52dp</dimen>
 
     <!-- Profile fragment -->
     <dimen name="profile_side_spacing">6dp</dimen>
@@ -65,8 +66,13 @@
     <!-- Shout detail -->
     <dimen name="edit_shout_media_item_size">72dp</dimen>
     <dimen name="edit_shout_media_item_padding">8dp</dimen>
+
+    <!-- Chat -->
     <dimen name="chat_received_msg_item_margin_left">58dp</dimen>
     <dimen name="chat_sent_msg_item_margin_left">52dp</dimen>
+    <dimen name="chat_sent_default_item_margin">8dp</dimen>
+    <dimen name="chat_last_item_decoration">8dp</dimen>
+    <dimen name="chat_item_time_right_margin">2dp</dimen>
 
     <!-- Notifications -->
     <dimen name="notifications_avatar_corners">4dp</dimen>
