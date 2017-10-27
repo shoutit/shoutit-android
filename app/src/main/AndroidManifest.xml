@@ -437,14 +437,6 @@
             </intent-filter>
         </receiver>
 
-        <receiver
-            android:name=".mixpanel.MixPanelReferrerReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.android.vending.INSTALL_REFERRER" />
-            </intent-filter>
-        </receiver>
-
         <!-- Facebook -->
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
