@@ -264,17 +264,6 @@ dependencies {
     compile 'com.github.jacek-marchwicki.rx-java-extensions:rx-extensions:9906cc7974'
     compile 'com.github.jacek-marchwicki.rx-java-extensions:rx-android-extensions:9906cc7974'
 
-    // other
-    compile 'com.uservoice:uservoice-android-sdk:1.2.4'
-    compile 'fr.avianey.com.viewpagerindicator:library:2.4.1@aar'
-    compile 'com.crashlytics.sdk.android:crashlytics:2.6.7'
-    compile 'com.commonsware.cwac:cam2:0.5.3'
-    compile 'com.pusher:pusher-java-client:1.5.0'
-    compile "com.mixpanel.android:mixpanel-android:5.2.1"
-    compile project(":FFmpegAndroid")
-    compile project(":appuniteGcm")
-    compile project(":ScrollViewGallery")
-
     // Tests
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
@@ -301,7 +290,8 @@ dependencies {
         transitive = true;
     }
     compile 'com.commonsware.cwac:cam2:0.6.5'
-    compile "com.mixpanel.android:mixpanel-android:4.8.7"
+    compile "com.mixpanel.android:mixpanel-android:5.2.1"
+    compile 'com.pusher:pusher-java-client:1.5.0'
     compile project(":FFmpegAndroid")
     compile project(":appuniteGcm")
     compile project(":ScrollViewGallery")
@@ -310,14 +300,6 @@ dependencies {
         transitive = true;
     }
 
-}
-
-// Add dependencies to crashlytics, signingReport and google play upload so they will not finish before building the app
-tasks.whenTaskAdded { task ->
-    if (task.name.startsWith('crashlyticsUploadDistribution') ||
-            task.name == 'signingReport') {
-        task.dependsOn build
-    }
 }
 
 // Add dependencies to crashlytics, signingReport and google play upload so they will not finish before building the app
