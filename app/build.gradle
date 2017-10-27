@@ -295,7 +295,6 @@ dependencies {
     compile 'com.amazonaws:aws-android-sdk-ddb:2.2.13'
 
     // other
-    compile 'com.twilio:conversations-android:0.12.1'
     compile 'com.uservoice:uservoice-android-sdk:1.2.4'
     compile 'fr.avianey.com.viewpagerindicator:library:2.4.1@aar'
     compile('com.crashlytics.sdk.android:crashlytics:2.6.2@aar') {
@@ -312,6 +311,14 @@ dependencies {
         transitive = true;
     }
 
+}
+
+// Add dependencies to crashlytics, signingReport and google play upload so they will not finish before building the app
+tasks.whenTaskAdded { task ->
+    if (task.name.startsWith('crashlyticsUploadDistribution') ||
+            task.name == 'signingReport') {
+        task.dependsOn build
+    }
 }
 
 // Add dependencies to crashlytics, signingReport and google play upload so they will not finish before building the app

@@ -134,7 +134,6 @@ public class MyPagesFragment extends BaseDaggerFragment implements MyPagesDialog
     public void useShoutItAsPage(Page page) {
         FacebookHelper.logOutFromFacebook();
         mUserPreferences.setPage(page);
-        mUserPreferences.setTwilioToken(null);
 
         ActivityCompat.finishAffinity(getActivity());
         startActivity(MainActivity.newIntent(getActivity()));

@@ -11,12 +11,8 @@ import android.view.View;
 import com.appunite.rx.android.adapter.BaseAdapterItem;
 import com.jakewharton.rxbinding.support.v7.widget.RecyclerViewScrollEvent;
 import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
-import com.shoutit.app.android.App;
-import com.shoutit.app.android.BaseActivity;
 import com.shoutit.app.android.BaseDaggerActivity;
 import com.shoutit.app.android.R;
-import com.shoutit.app.android.dagger.ActivityModule;
-import com.shoutit.app.android.dagger.BaseActivityComponent;
 import com.shoutit.app.android.dagger.BaseDaggerActivityComponent;
 import com.shoutit.app.android.utils.ColoredSnackBar;
 import com.shoutit.app.android.utils.IntentHelper;
@@ -24,12 +20,9 @@ import com.shoutit.app.android.utils.LoadMoreHelper;
 import com.shoutit.app.android.utils.MyLayoutManager;
 import com.shoutit.app.android.utils.MyLinearLayoutManager;
 import com.shoutit.app.android.utils.ToolbarUtils;
-import com.shoutit.app.android.utils.UpNavigationHelper;
 
 import java.util.List;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import butterknife.Bind;

@@ -153,7 +153,6 @@ public class App extends MultiDexApplication {
         }
     }
 
-
     private void initNewRelic() {
         if (BuildTypeUtils.isDebug()) {
             return;

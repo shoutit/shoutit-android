@@ -339,17 +339,6 @@
             </intent-filter>
 
         </activity>
-        <activity
-            android:name=".view.videoconversation.OutgoingVideoCallActivity"
-            android:launchMode="singleTop"
-            android:excludeFromRecents="true"
-            android:screenOrientation="portrait"/>
-
-        <activity
-            android:name=".view.videoconversation.IncomingVideoCallActivity"
-            android:launchMode="singleTop"
-            android:excludeFromRecents="true"
-            android:screenOrientation="portrait"/>
 
         <activity android:name=".view.gallery.GalleryActivity"/>
         <activity android:name=".view.verifyemail.VerifyEmailActivity"
@@ -405,6 +394,10 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize"/>
 
+        <!-- Mixpanel -->
+        <activity android:name="com.mixpanel.android.takeoverinapp.TakeoverInAppActivity"
+            android:theme="@style/com_mixpanel_android_TakeoverInAppActivityTheme"/>
+
         <activity android:name=".view.interests.InterestsActivity"
             android:screenOrientation="portrait"/>
 
@@ -429,16 +422,20 @@
 
         </activity>
 
-        <!-- Mixpanel -->
-        <activity android:name="com.mixpanel.android.takeoverinapp.TakeoverInAppActivity"
-            android:theme="@style/com_mixpanel_android_TakeoverInAppActivityTheme"/>
-
         <meta-data
             android:name="com.mixpanel.android.MPConfig.EnableDebugLogging"
             android:value="true" />
 
         <meta-data android:name="com.mixpanel.android.MPConfig.AutoShowMixpanelUpdates"
             android:value="false" />
+
+        <receiver
+            android:name=".mixpanel.MixPanelReferrerReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.android.vending.INSTALL_REFERRER" />
+            </intent-filter>
+        </receiver>
 
         <receiver
             android:name=".mixpanel.MixPanelReferrerReceiver"
@@ -474,7 +471,6 @@
         <service
             android:name="com.amazonaws.mobileconnectors.s3.transferutility.TransferService"
             android:enabled="true"/>
-
     </application>
 
 
