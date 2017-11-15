@@ -14,9 +14,9 @@ import android.view.View;
 
 import com.appunite.rx.android.MyAndroidSchedulers;
 import com.facebook.CallbackManager;
-import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.tasks.Task;
 import com.shoutit.app.android.BaseDaggerActivity;
 import com.shoutit.app.android.R;
 import com.shoutit.app.android.UserPreferences;
@@ -107,10 +107,10 @@ public class LoginIntroActivity extends BaseDaggerActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == GOOGLE_SIGN_IN) {
             if (resultCode == RESULT_OK) {
-                final GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-                final GoogleSignInAccount acct = result.getSignInAccount();
-                assert acct != null;
-                final String authCode = acct.getServerAuthCode();
+                final Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+                final GoogleSignInAccount account = task.getResult();
+                assert account != null;
+                final String authCode = account.getServerAuthCode();
 
                 subscriptions.add(
                         FacebookHelper.getPromotionalCodeObservable(LoginIntroActivity.this)
